@@ -225,51 +225,54 @@ private[parquet] class CatalystWriteSupport
       recordConsumer.addLong(unscaledLong)
     }
 
-    val binaryWriterUsingUnscaledLong = (row: SpecializedGetters,
-                                         ordinal: Int) => {
-      // When the precision is low enough (<= 18) to squeeze the decimal value into a `Long`, we
-      // can build a fixed-length byte array with length `numBytes` using the unscaled `Long`
-      // value and the `decimalBuffer` for better performance.
-      val unscaled = row.getDecimal(ordinal, precision, scale).toUnscaledLong
-      var i = 0
-      var shift = 8 * (numBytes - 1)
+    val binaryWriterUsingUnscaledLong =
+      (row: SpecializedGetters, ordinal: Int) => {
+        // When the precision is low enough (<= 18) to squeeze the decimal value into a `Long`, we
+        // can build a fixed-length byte array with length `numBytes` using the unscaled `Long`
+        // value and the `decimalBuffer` for better performance.
+        val unscaled = row.getDecimal(ordinal, precision, scale).toUnscaledLong
+        var i = 0
+        var shift = 8 * (numBytes - 1)
 
-      while (i < numBytes) {
-        decimalBuffer(i) = (unscaled >> shift).toByte
-        i += 1
-        shift -= 8
-      }
-
-      recordConsumer.addBinary(
-        Binary.fromByteArray(decimalBuffer, 0, numBytes))
-    }
-
-    val binaryWriterUsingUnscaledBytes = (row: SpecializedGetters,
-                                          ordinal: Int) => {
-      val decimal = row.getDecimal(ordinal, precision, scale)
-      val bytes = decimal.toJavaBigDecimal.unscaledValue().toByteArray
-      val fixedLengthBytes =
-        if (bytes.length == numBytes) {
-          // If the length of the underlying byte array of the unscaled `BigInteger` happens to be
-          // `numBytes`, just reuse it, so that we don't bother copying it to `decimalBuffer`.
-          bytes
-        } else {
-          // Otherwise, the length must be less than `numBytes`.  In this case we copy contents of
-          // the underlying bytes with padding sign bytes to `decimalBuffer` to form the result
-          // fixed-length byte array.
-          val signByte = if (bytes.head < 0) -1: Byte else 0: Byte
-          util.Arrays.fill(decimalBuffer, 0, numBytes - bytes.length, signByte)
-          System.arraycopy(bytes,
-                           0,
-                           decimalBuffer,
-                           numBytes - bytes.length,
-                           bytes.length)
-          decimalBuffer
+        while (i < numBytes) {
+          decimalBuffer(i) = (unscaled >> shift).toByte
+          i += 1
+          shift -= 8
         }
 
-      recordConsumer.addBinary(
-        Binary.fromByteArray(fixedLengthBytes, 0, numBytes))
-    }
+        recordConsumer.addBinary(
+          Binary.fromByteArray(decimalBuffer, 0, numBytes))
+      }
+
+    val binaryWriterUsingUnscaledBytes =
+      (row: SpecializedGetters, ordinal: Int) => {
+        val decimal = row.getDecimal(ordinal, precision, scale)
+        val bytes = decimal.toJavaBigDecimal.unscaledValue().toByteArray
+        val fixedLengthBytes =
+          if (bytes.length == numBytes) {
+            // If the length of the underlying byte array of the unscaled `BigInteger` happens to be
+            // `numBytes`, just reuse it, so that we don't bother copying it to `decimalBuffer`.
+            bytes
+          } else {
+            // Otherwise, the length must be less than `numBytes`.  In this case we copy contents of
+            // the underlying bytes with padding sign bytes to `decimalBuffer` to form the result
+            // fixed-length byte array.
+            val signByte = if (bytes.head < 0) -1: Byte else 0: Byte
+            util.Arrays.fill(decimalBuffer,
+                             0,
+                             numBytes - bytes.length,
+                             signByte)
+            System.arraycopy(bytes,
+                             0,
+                             decimalBuffer,
+                             numBytes - bytes.length,
+                             bytes.length)
+            decimalBuffer
+          }
+
+        recordConsumer.addBinary(
+          Binary.fromByteArray(fixedLengthBytes, 0, numBytes))
+      }
 
     writeLegacyParquetFormat match {
       // Standard mode, 1 <= precision <= 9, writes as INT32

@@ -31,30 +31,36 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
 
   val userVisitPath =
     new File(testDataDirectory, "uservisits").getCanonicalPath
-  val testTables = Seq(TestTable("rankings",
-                                 s"""
+  val testTables = Seq(
+    TestTable(
+      "rankings",
+      s"""
         |CREATE EXTERNAL TABLE rankings (
         |  pageURL STRING,
         |  pageRank INT,
         |  avgDuration INT)
         |  ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
         |  STORED AS TEXTFILE LOCATION "${new File(
-                                      testDataDirectory,
-                                      "rankings").getCanonicalPath}"
-      """.stripMargin.cmd),
-                       TestTable("scratch",
-                                 s"""
+           testDataDirectory,
+           "rankings").getCanonicalPath}"
+      """.stripMargin.cmd
+    ),
+    TestTable(
+      "scratch",
+      s"""
         |CREATE EXTERNAL TABLE scratch (
         |  pageURL STRING,
         |  pageRank INT,
         |  avgDuration INT)
         |  ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
         |  STORED AS TEXTFILE LOCATION "${new File(
-                                      testDataDirectory,
-                                      "scratch").getCanonicalPath}"
-      """.stripMargin.cmd),
-                       TestTable("uservisits",
-                                 s"""
+           testDataDirectory,
+           "scratch").getCanonicalPath}"
+      """.stripMargin.cmd
+    ),
+    TestTable(
+      "uservisits",
+      s"""
         |CREATE EXTERNAL TABLE uservisits (
         |  sourceIP STRING,
         |  destURL STRING,
@@ -67,13 +73,17 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
         |  duration INT)
         |  ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
         |  STORED AS TEXTFILE LOCATION "$userVisitPath"
-      """.stripMargin.cmd),
-                       TestTable("documents",
-                                 s"""
+      """.stripMargin.cmd
+    ),
+    TestTable(
+      "documents",
+      s"""
         |CREATE EXTERNAL TABLE documents (line STRING)
         |STORED AS TEXTFILE
         |LOCATION "${new File(testDataDirectory, "crawl").getCanonicalPath}"
-      """.stripMargin.cmd))
+      """.stripMargin.cmd
+    )
+  )
 
   testTables.foreach(registerTestTable)
 
@@ -92,8 +102,9 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
         |GROUP BY SUBSTR(sourceIP, 1, 10)
       """.stripMargin)
 
-    createQueryTest("query3",
-                    """
+    createQueryTest(
+      "query3",
+      """
         |SELECT sourceIP,
         |       sum(adRevenue) as totalRevenue,
         |       avg(pageRank) as pageRank
@@ -107,7 +118,8 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
         |GROUP BY sourceIP
         |ORDER BY totalRevenue DESC
         |LIMIT 1
-      """.stripMargin)
+      """.stripMargin
+    )
 
     createQueryTest(
       "query4",
@@ -127,6 +139,7 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
         |-- SELECT COUNT(*) FROM url_counts_partial
         |-- SELECT * FROM url_counts_partial
         |-- SELECT * FROM url_counts_total
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 }

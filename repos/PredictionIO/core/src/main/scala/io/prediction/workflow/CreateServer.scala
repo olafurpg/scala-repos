@@ -255,19 +255,21 @@ object CreateServer extends Logging {
                        servingParamsWithName._2)
 
     actorSystem.actorOf(
-      Props(classOf[ServerActor[Q, P]],
-            sc,
-            engineInstance,
-            engine,
-            engineLanguage,
-            manifest,
-            engineParams.dataSourceParams._2,
-            engineParams.preparatorParams._2,
-            algorithms,
-            engineParams.algorithmParamsList.map(_._2),
-            models,
-            serving,
-            engineParams.servingParams._2))
+      Props(
+        classOf[ServerActor[Q, P]],
+        sc,
+        engineInstance,
+        engine,
+        engineLanguage,
+        manifest,
+        engineParams.dataSourceParams._2,
+        engineParams.preparatorParams._2,
+        algorithms,
+        engineParams.algorithmParamsList.map(_._2),
+        models,
+        serving,
+        engineParams.servingParams._2
+      ))
   }
 }
 
@@ -587,15 +589,16 @@ class ServerActor[Q, P](val args: ServerConfig,
                   }
                   val data =
                     Map(
-                        // "appId" -> dataSourceParams.asInstanceOf[ParamsWithAppId].appId,
-                        "event" -> "predict",
-                        "eventTime" -> queryTime.toString(),
-                        "entityType" -> "pio_pr", // prediction result
-                        "entityId" -> newPrId,
-                        "properties" -> Map(
-                          "engineInstanceId" -> engineInstance.id,
-                          "query" -> query,
-                          "prediction" -> prediction)) ++ queryPrId
+                      // "appId" -> dataSourceParams.asInstanceOf[ParamsWithAppId].appId,
+                      "event" -> "predict",
+                      "eventTime" -> queryTime.toString(),
+                      "entityType" -> "pio_pr", // prediction result
+                      "entityId" -> newPrId,
+                      "properties" -> Map(
+                        "engineInstanceId" -> engineInstance.id,
+                        "query" -> query,
+                        "prediction" -> prediction)
+                    ) ++ queryPrId
                   // At this point args.accessKey should be Some(String).
                   val accessKey = args.accessKey.getOrElse("")
                   val f: Future[Int] = future {
@@ -699,25 +702,24 @@ class ServerActor[Q, P](val args: ServerConfig,
       get {
         respondWithMediaType(MediaTypes.`application/json`) {
           complete {
-            Map(
-              "plugins" -> Map(
-                "outputblockers" -> pluginContext.outputBlockers.map {
-                  case (n, p) =>
-                    n -> Map(
-                      "name" -> p.pluginName,
-                      "description" -> p.pluginDescription,
-                      "class" -> p.getClass.getName,
-                      "params" -> pluginContext.pluginParams(p.pluginName))
-                },
-                "outputsniffers" -> pluginContext.outputSniffers.map {
-                  case (n, p) =>
-                    n -> Map(
-                      "name" -> p.pluginName,
-                      "description" -> p.pluginDescription,
-                      "class" -> p.getClass.getName,
-                      "params" -> pluginContext.pluginParams(p.pluginName))
-                }
-              ))
+            Map("plugins" -> Map(
+              "outputblockers" -> pluginContext.outputBlockers.map {
+                case (n, p) =>
+                  n -> Map(
+                    "name" -> p.pluginName,
+                    "description" -> p.pluginDescription,
+                    "class" -> p.getClass.getName,
+                    "params" -> pluginContext.pluginParams(p.pluginName))
+              },
+              "outputsniffers" -> pluginContext.outputSniffers.map {
+                case (n, p) =>
+                  n -> Map(
+                    "name" -> p.pluginName,
+                    "description" -> p.pluginDescription,
+                    "class" -> p.getClass.getName,
+                    "params" -> pluginContext.pluginParams(p.pluginName))
+              }
+            ))
           }
         }
       }

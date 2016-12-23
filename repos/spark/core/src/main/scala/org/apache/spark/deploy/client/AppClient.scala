@@ -135,19 +135,23 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
     private def registerWithMaster(nthRetry: Int) {
       registerMasterFutures.set(tryRegisterAllMasters())
       registrationRetryTimer.set(
-        registrationRetryThread.schedule(new Runnable {
-          override def run(): Unit = {
-            if (registered.get) {
-              registerMasterFutures.get.foreach(_.cancel(true))
-              registerMasterThreadPool.shutdownNow()
-            } else if (nthRetry >= REGISTRATION_RETRIES) {
-              markDead("All masters are unresponsive! Giving up.")
-            } else {
-              registerMasterFutures.get.foreach(_.cancel(true))
-              registerWithMaster(nthRetry + 1)
+        registrationRetryThread.schedule(
+          new Runnable {
+            override def run(): Unit = {
+              if (registered.get) {
+                registerMasterFutures.get.foreach(_.cancel(true))
+                registerMasterThreadPool.shutdownNow()
+              } else if (nthRetry >= REGISTRATION_RETRIES) {
+                markDead("All masters are unresponsive! Giving up.")
+              } else {
+                registerMasterFutures.get.foreach(_.cancel(true))
+                registerWithMaster(nthRetry + 1)
+              }
             }
-          }
-        }, REGISTRATION_TIMEOUT_SECONDS, TimeUnit.SECONDS))
+          },
+          REGISTRATION_TIMEOUT_SECONDS,
+          TimeUnit.SECONDS
+        ))
     }
 
     /**

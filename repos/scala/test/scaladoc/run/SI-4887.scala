@@ -47,14 +47,17 @@ object Test extends ScaladocModelTest {
         .resultType
         .name == "X[Z[_], U, _ <: [_]AnyRef { def z: String } with Singleton]",
       foo2.valueParams(0)(0).resultType.name +
-        " == X[Z[_], U, _ <: [_]AnyRef { def z: String } with Singleton]")
+        " == X[Z[_], U, _ <: [_]AnyRef { def z: String } with Singleton]"
+    )
 
     val foo3 = TEST._method("foo3")
-    assert(foo3
-             .valueParams(0)(0)
-             .resultType
-             .name == "X[Z, Z, V] forSome {type Z <: T, type V <: T}",
-           foo3.valueParams(0)(0).resultType.name +
-             " == X[Z, Z, V] forSome {type Z <: T, type V <: T}")
+    assert(
+      foo3
+        .valueParams(0)(0)
+        .resultType
+        .name == "X[Z, Z, V] forSome {type Z <: T, type V <: T}",
+      foo3.valueParams(0)(0).resultType.name +
+        " == X[Z, Z, V] forSome {type Z <: T, type V <: T}"
+    )
   }
 }

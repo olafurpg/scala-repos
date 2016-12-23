@@ -160,7 +160,8 @@ object DuplicatesUtil {
       val message = RefactoringBundle.message(
         "0.has.detected.1.code.fragments.in.this.file.that.can.be.replaced.with.a.call.to.extracted.method",
         ApplicationNamesInfo.getInstance.getProductName,
-        Int.box(duplicates.size))
+        Int.box(duplicates.size)
+      )
       Messages.showYesNoDialog(project,
                                message,
                                "Process Duplicates",

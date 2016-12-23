@@ -30,15 +30,15 @@ object KMeans {
       vecs: TraversableOnce[Vector[Double]]): Vector[Double] = {
     val (vec, count) = vecs
     // add a 1 to each value to count the number of vectors in one pass:
-    .map { v =>
-      (v, 1)
-    }
-    // Here we add both the count and the vectors:
-    .reduce { (ll, rr) =>
-      val (l, lc) = ll
-      val (r, rc) = rr
-      (add(l, r), lc + rc)
-    }
+      .map { v =>
+        (v, 1)
+      }
+      // Here we add both the count and the vectors:
+      .reduce { (ll, rr) =>
+        val (l, lc) = ll
+        val (r, rc) = rr
+        (add(l, r), lc + rc)
+      }
     // Now scale to get the pointwise average
     scale(1.0 / count, vec)
   }
@@ -48,11 +48,11 @@ object KMeans {
       centroids: TraversableOnce[(Id, Vector[Double])]): (Id, Vector[Double]) =
     centroids
     // compute the distance to each center
-    .map { case (id, cent) => (distance(from, cent), (id, cent)) }
-    // take the minimum by the distance, ignoring the id and the centroid
-    .minBy { case (dist, _) => dist }
-    // Just keep the id and the centroid
-    ._2
+      .map { case (id, cent) => (distance(from, cent), (id, cent)) }
+      // take the minimum by the distance, ignoring the id and the centroid
+      .minBy { case (dist, _) => dist }
+      // Just keep the id and the centroid
+      ._2
 
   type LabeledVector = (Int, Vector[Double])
 
@@ -105,9 +105,11 @@ object KMeans {
     : (ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector]) = {
     val rng = new java.util.Random(123)
     // take a random k vectors:
-    val clusters = points.map { v =>
-      (rng.nextDouble, v)
-    }.groupAll
+    val clusters = points
+      .map { v =>
+        (rng.nextDouble, v)
+      }
+      .groupAll
       .sortedTake(k)(Ordering.by(_._1))
       .mapValues { randk =>
         randk.iterator.zipWithIndex.map { case ((_, v), id) => (id, v) }.toList

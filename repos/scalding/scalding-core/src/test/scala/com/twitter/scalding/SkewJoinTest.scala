@@ -55,9 +55,11 @@ object JoinTestHelper {
   def generateInput(size: Int, max: Int): List[(String, String, String)] = {
     def next: String =
       rng.nextInt(max).toString
-    (0 to size).map { i =>
-      (next, next, next)
-    }.toList
+    (0 to size)
+      .map { i =>
+        (next, next, next)
+      }
+      .toList
   }
 
   type JoinResult = (Int, Int, Int, Int, Int, Int)

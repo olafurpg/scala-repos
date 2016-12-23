@@ -86,14 +86,16 @@ abstract class ScTypeDefinitionImpl protected (
   }
 
   override def getSuperTypes: Array[PsiClassType] = {
-    superTypes.flatMap {
-      case tp =>
-        val psiType = ScType.toPsi(tp, getProject, getResolveScope)
-        psiType match {
-          case c: PsiClassType => Seq(c)
-          case _ => Seq.empty
-        }
-    }.toArray
+    superTypes
+      .flatMap {
+        case tp =>
+          val psiType = ScType.toPsi(tp, getProject, getResolveScope)
+          psiType match {
+            case c: PsiClassType => Seq(c)
+            case _ => Seq.empty
+          }
+      }
+      .toArray
   }
 
   override def isAnnotationType: Boolean = {
@@ -121,13 +123,15 @@ abstract class ScTypeDefinitionImpl protected (
       }
     } else {
       if (parentClass != null) {
-        Success(ScParameterizedType(
-                  ScProjectionType(ScThisType(parentClass),
-                                   this,
-                                   superReference = false),
-                  typeParameters.map(
-                    new ScTypeParameterType(_, ScSubstitutor.empty))),
-                Some(this))
+        Success(
+          ScParameterizedType(
+            ScProjectionType(ScThisType(parentClass),
+                             this,
+                             superReference = false),
+            typeParameters.map(
+              new ScTypeParameterType(_, ScSubstitutor.empty))),
+          Some(this)
+        )
       } else {
         Success(ScParameterizedType(
                   ScType.designator(this),

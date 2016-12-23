@@ -966,12 +966,14 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
 
   private def isSubclass(lhs: String, rhs: String)(
       implicit ctx: ErrorContext): Boolean = {
-    tryLookupClass(lhs).fold({ info =>
-      val parents = info.superClass ++: info.interfaces
-      parents.exists(_ == rhs) || parents.exists(isSubclass(_, rhs))
-    }, { lhsClass =>
-      lhsClass.ancestors.contains(rhs)
-    })
+    tryLookupClass(lhs).fold(
+      { info =>
+        val parents = info.superClass ++: info.interfaces
+        parents.exists(_ == rhs) || parents.exists(isSubclass(_, rhs))
+      }, { lhsClass =>
+        lhsClass.ancestors.contains(rhs)
+      }
+    )
   }
 
   private def isSubtype(lhs: Type, rhs: Type)(
@@ -1050,13 +1052,15 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
     lazy val superClass = superClassName.map(classes)
 
     def this(classDef: LinkedClass)(implicit ctx: ErrorContext) = {
-      this(classDef.name.name,
-           classDef.kind,
-           classDef.superClass.map(_.name),
-           classDef.ancestors.toSet,
-           classDef.jsName,
-           if (classDef.kind.isJSClass) Nil
-           else classDef.fields.map(CheckedClass.checkedField))
+      this(
+        classDef.name.name,
+        classDef.kind,
+        classDef.superClass.map(_.name),
+        classDef.ancestors.toSet,
+        classDef.jsName,
+        if (classDef.kind.isJSClass) Nil
+        else classDef.fields.map(CheckedClass.checkedField)
+      )
     }
 
     def isAncestorOfHijackedClass: Boolean =

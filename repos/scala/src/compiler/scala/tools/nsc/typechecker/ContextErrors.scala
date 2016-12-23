@@ -542,7 +542,8 @@ trait ContextErrors { self: Analyzer =>
           vparam,
           "missing parameter type for expanded function\n" +
             "The argument types of an anonymous function must be fully known. (SLS 8.5)\n" +
-            "Expected type was: " + pt.toLongString)
+            "Expected type was: " + pt.toLongString
+        )
 
       def ConstructorsOrderError(tree: Tree) = {
         issueNormalTypeError(
@@ -1072,7 +1073,8 @@ trait ContextErrors { self: Analyzer =>
             (if (expanded == null) "null"
              else if (isPathMismatch)
                s"$actual, but it doesn't belong to this compiler's universe"
-             else "of " + expanded.getClass))
+             else "of " + expanded.getClass)
+        )
       }
 
       def MacroImplementationNotFoundError(expandee: Tree) =
@@ -1145,7 +1147,8 @@ trait ContextErrors { self: Analyzer =>
                 "ambiguous reference to overloaded definition,\n" +
                   s"both ${sym1.fullLocationString} of type ${pre.memberType(sym1)}\n" +
                   s"and  ${sym2.fullLocationString} of type ${pre.memberType(sym2)}\n" +
-                  s"match $rest")
+                  s"match $rest"
+              )
             })
       }
 
@@ -1182,7 +1185,8 @@ trait ContextErrors { self: Analyzer =>
             applyErrorMsg(fn,
                           " exist so that it can be applied to arguments ",
                           args map (_.tpe.widen),
-                          WildcardType) + "\n --- because ---\n" + msg)
+                          WildcardType) + "\n --- because ---\n" + msg
+        )
 
       // TODO: no test case
       def NoConstructorInstanceError(tree: Tree,
@@ -1280,7 +1284,8 @@ trait ContextErrors { self: Analyzer =>
             "kinds of the type arguments " + targs.mkString("(", ",", ")") +
             " do not conform to the expected kinds of the type parameters " +
             tparams.mkString("(", ",", ")") + tparams.head.locationString +
-            "." + kindErrors.toList.mkString("\n", ", ", ""))
+            "." + kindErrors.toList.mkString("\n", ", ", "")
+        )
       }
 
       private[scala] def NotWithinBoundsErrorMessage(prefix: String,
@@ -1603,15 +1608,18 @@ trait ContextErrors { self: Analyzer =>
           }
 
         context.issueAmbiguousError(
-          AmbiguousImplicitTypeError(tree, (info1.sym, info2.sym) match {
-            case (ImplicitAmbiguousMsg(msg), _) =>
-              msg.format(treeTypeArgs(tree1))
-            case (_, ImplicitAmbiguousMsg(msg)) =>
-              msg.format(treeTypeArgs(tree2))
-            case (_, _) if isView => viewMsg
-            case (_, _) =>
-              s"ambiguous implicit values:\n${coreMsg}match expected type $pt"
-          }))
+          AmbiguousImplicitTypeError(
+            tree,
+            (info1.sym, info2.sym) match {
+              case (ImplicitAmbiguousMsg(msg), _) =>
+                msg.format(treeTypeArgs(tree1))
+              case (_, ImplicitAmbiguousMsg(msg)) =>
+                msg.format(treeTypeArgs(tree2))
+              case (_, _) if isView => viewMsg
+              case (_, _) =>
+                s"ambiguous implicit values:\n${coreMsg}match expected type $pt"
+            }
+          ))
       }
     }
 

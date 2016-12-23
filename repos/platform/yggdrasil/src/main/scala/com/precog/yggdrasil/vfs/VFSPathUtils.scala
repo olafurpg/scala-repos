@@ -59,20 +59,26 @@ object VFSPathUtils extends Logging {
   }
 
   def escapePath(path: Path, toEscape: Set[String]) =
-    Path(path.elements.map {
-      case needsEscape
-          if toEscape.contains(needsEscape) ||
-            needsEscape.endsWith(escapeSuffix) =>
-        needsEscape + escapeSuffix
-      case fine => fine
-    }.toList)
+    Path(
+      path.elements
+        .map {
+          case needsEscape
+              if toEscape.contains(needsEscape) ||
+                needsEscape.endsWith(escapeSuffix) =>
+            needsEscape + escapeSuffix
+          case fine => fine
+        }
+        .toList)
 
   def unescapePath(path: Path) =
-    Path(path.elements.map {
-      case escaped if escaped.endsWith(escapeSuffix) =>
-        escaped.substring(0, escaped.length - escapeSuffix.length)
-      case fine => fine
-    }.toList)
+    Path(
+      path.elements
+        .map {
+          case escaped if escaped.endsWith(escapeSuffix) =>
+            escaped.substring(0, escaped.length - escapeSuffix.length)
+          case fine => fine
+        }
+        .toList)
 
   /**
     * Computes the stable path for a given vfs path relative to the given base dir. Version subdirs
@@ -99,16 +105,20 @@ object VFSPathUtils extends Logging {
       val childMetadata =
         files.toList traverse { f =>
           val childPath = unescapePath(path / Path(f.getName))
-          currentPathMetadata(baseDir, childPath).fold[Option[PathMetadata]]({
-            case NotFound(message) =>
-              logger.trace("No child data found for %s".format(childPath.path))
-              None
-            case error =>
-              logger.error(
-                "Encountered corruption or error searching child paths: %s"
-                  .format(error.messages.list.mkString("; ")))
-              None
-          }, pathMetadata => Some(pathMetadata))
+          currentPathMetadata(baseDir, childPath).fold[Option[PathMetadata]](
+            {
+              case NotFound(message) =>
+                logger.trace(
+                  "No child data found for %s".format(childPath.path))
+                None
+              case error =>
+                logger.error(
+                  "Encountered corruption or error searching child paths: %s"
+                    .format(error.messages.list.mkString("; ")))
+                None
+            },
+            pathMetadata => Some(pathMetadata)
+          )
         }
 
       childMetadata.map(_.flatten.toSet): IO[Set[PathMetadata]]
@@ -138,36 +148,39 @@ object VFSPathUtils extends Logging {
         case true =>
           VersionLog.currentVersionEntry(pathDir0).run flatMap {
             currentVersionV =>
-              currentVersionV.fold[IO[ResourceError \/ PathMetadata]]({
-                case NotFound(message) =>
-                  // Recurse on children to find one that is nonempty
-                  containsNonemptyChild(Option(
-                    pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
-                    case true =>
-                      \/.right(PathMetadata(path, PathMetadata.PathOnly))
-                    case false =>
-                      \/.left(NotFound("All subpaths of %s appear to be empty."
-                        .format(path.path)))
-                  }
+              currentVersionV.fold[IO[ResourceError \/ PathMetadata]](
+                {
+                  case NotFound(message) =>
+                    // Recurse on children to find one that is nonempty
+                    containsNonemptyChild(Option(
+                      pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
+                      case true =>
+                        \/.right(PathMetadata(path, PathMetadata.PathOnly))
+                      case false =>
+                        \/.left(
+                          NotFound("All subpaths of %s appear to be empty."
+                            .format(path.path)))
+                    }
 
-                case otherError =>
-                  IO(\/.left(otherError))
-              }, {
-                case VersionEntry(uuid, dataType, timestamp) =>
-                  containsNonemptyChild(Option(
-                    pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
-                    case true =>
-                      \/.right(
-                        PathMetadata(
-                          path,
-                          PathMetadata.DataDir(dataType.contentType)))
-                    case false =>
-                      \/.right(
-                        PathMetadata(
-                          path,
-                          PathMetadata.DataOnly(dataType.contentType)))
-                  }
-              })
+                  case otherError =>
+                    IO(\/.left(otherError))
+                }, {
+                  case VersionEntry(uuid, dataType, timestamp) =>
+                    containsNonemptyChild(Option(
+                      pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
+                      case true =>
+                        \/.right(
+                          PathMetadata(
+                            path,
+                            PathMetadata.DataDir(dataType.contentType)))
+                      case false =>
+                        \/.right(
+                          PathMetadata(
+                            path,
+                            PathMetadata.DataOnly(dataType.contentType)))
+                    }
+                }
+              )
           }
 
         case false =>

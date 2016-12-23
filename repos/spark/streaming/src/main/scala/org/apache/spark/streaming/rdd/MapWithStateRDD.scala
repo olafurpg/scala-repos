@@ -202,14 +202,17 @@ private[streaming] object MapWithStateRDD {
 
     val stateRDD = pairRDD
       .partitionBy(partitioner)
-      .mapPartitions({ iterator =>
-        val stateMap = StateMap.create[K, S](SparkEnv.get.conf)
-        iterator.foreach {
-          case (key, state) =>
-            stateMap.put(key, state, updateTime.milliseconds)
-        }
-        Iterator(MapWithStateRDDRecord(stateMap, Seq.empty[E]))
-      }, preservesPartitioning = true)
+      .mapPartitions(
+        { iterator =>
+          val stateMap = StateMap.create[K, S](SparkEnv.get.conf)
+          iterator.foreach {
+            case (key, state) =>
+              stateMap.put(key, state, updateTime.milliseconds)
+          }
+          Iterator(MapWithStateRDDRecord(stateMap, Seq.empty[E]))
+        },
+        preservesPartitioning = true
+      )
 
     val emptyDataRDD =
       pairRDD.sparkContext.emptyRDD[(K, V)].partitionBy(partitioner)
@@ -234,14 +237,17 @@ private[streaming] object MapWithStateRDD {
     }
     val stateRDD = pairRDD
       .partitionBy(partitioner)
-      .mapPartitions({ iterator =>
-        val stateMap = StateMap.create[K, S](SparkEnv.get.conf)
-        iterator.foreach {
-          case (key, (state, updateTime)) =>
-            stateMap.put(key, state, updateTime)
-        }
-        Iterator(MapWithStateRDDRecord(stateMap, Seq.empty[E]))
-      }, preservesPartitioning = true)
+      .mapPartitions(
+        { iterator =>
+          val stateMap = StateMap.create[K, S](SparkEnv.get.conf)
+          iterator.foreach {
+            case (key, (state, updateTime)) =>
+              stateMap.put(key, state, updateTime)
+          }
+          Iterator(MapWithStateRDDRecord(stateMap, Seq.empty[E]))
+        },
+        preservesPartitioning = true
+      )
 
     val emptyDataRDD =
       pairRDD.sparkContext.emptyRDD[(K, V)].partitionBy(partitioner)

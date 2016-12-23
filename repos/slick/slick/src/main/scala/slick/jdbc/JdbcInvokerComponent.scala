@@ -39,7 +39,8 @@ trait JdbcInvokerComponent { self: JdbcProfile =>
         case c: CompiledStatement => c
         case ParameterSwitch(cases, default) =>
           findCompiledStatement(
-            cases.find { case (f, n) => f(param) }
+            cases
+              .find { case (f, n) => f(param) }
               .map(_._2)
               .getOrElse(default))
       }

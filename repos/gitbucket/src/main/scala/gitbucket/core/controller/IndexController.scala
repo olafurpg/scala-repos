@@ -61,9 +61,12 @@ trait IndexControllerBase extends ControllerBase {
       gitbucket.core.html.index(
         getRecentActivities(),
         getVisibleRepositories(loginAccount, withoutPhysicalInfo = true),
-        loginAccount.map { account =>
-          getUserRepositories(account.userName, withoutPhysicalInfo = true)
-        }.getOrElse(Nil))
+        loginAccount
+          .map { account =>
+            getUserRepositories(account.userName, withoutPhysicalInfo = true)
+          }
+          .getOrElse(Nil)
+      )
     } else {
       val loginUserName = loginAccount.get.userName
       val loginUserGroups = getGroupsByUserName(loginUserName)
@@ -74,9 +77,12 @@ trait IndexControllerBase extends ControllerBase {
       gitbucket.core.html.index(
         getRecentActivitiesByOwners(visibleOwnerSet),
         getVisibleRepositories(loginAccount, withoutPhysicalInfo = true),
-        loginAccount.map { account =>
-          getUserRepositories(account.userName, withoutPhysicalInfo = true)
-        }.getOrElse(Nil))
+        loginAccount
+          .map { account =>
+            getUserRepositories(account.userName, withoutPhysicalInfo = true)
+          }
+          .getOrElse(Nil)
+      )
     }
   }
 

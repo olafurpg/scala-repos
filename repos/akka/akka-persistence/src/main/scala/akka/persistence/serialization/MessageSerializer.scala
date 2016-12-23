@@ -136,12 +136,14 @@ class MessageSerializer(val system: ExtendedActorSystem)
 
   def stateChange(persistentStateChange: mf.PersistentStateChangeEvent)
     : StateChangeEvent = {
-    StateChangeEvent(persistentStateChange.getStateIdentifier,
-                     if (persistentStateChange.hasTimeout)
-                       Some(
-                         Duration(persistentStateChange.getTimeout)
-                           .asInstanceOf[duration.FiniteDuration])
-                     else None)
+    StateChangeEvent(
+      persistentStateChange.getStateIdentifier,
+      if (persistentStateChange.hasTimeout)
+        Some(
+          Duration(persistentStateChange.getTimeout)
+            .asInstanceOf[duration.FiniteDuration])
+      else None
+    )
   }
 
   private def atomicWriteBuilder(a: AtomicWrite) = {
@@ -224,7 +226,8 @@ class MessageSerializer(val system: ExtendedActorSystem)
         system.provider.resolveActorRef(persistentMessage.getSender)
       else Actor.noSender,
       if (persistentMessage.hasWriterUuid) persistentMessage.getWriterUuid
-      else Undefined)
+      else Undefined
+    )
   }
 
   private def atomicWrite(atomicWrite: mf.AtomicWrite): AtomicWrite = {

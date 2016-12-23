@@ -96,7 +96,8 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
                                                                                                                     false,
                                                                                                                     false) :: (null,
                                                                                                                                null,
-                                                                                                                               null) :: Nil)
+                                                                                                                               null) :: Nil
+  )
 
   booleanLogicTest(
     "OR",
@@ -113,7 +114,8 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
                                                                                                                  false,
                                                                                                                  null) :: (null,
                                                                                                                            null,
-                                                                                                                           null) :: Nil)
+                                                                                                                           null) :: Nil
+  )
 
   booleanLogicTest(
     "=",
@@ -130,7 +132,8 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
                                                                                                                   false,
                                                                                                                   null) :: (null,
                                                                                                                             null,
-                                                                                                                            null) :: Nil)
+                                                                                                                            null) :: Nil
+  )
 
   test("IN") {
     checkEvaluation(

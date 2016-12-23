@@ -128,11 +128,13 @@ object LinearRegression {
     val prediction = model.predict(test.map(_.features))
     val predictionAndLabel = prediction.zip(test.map(_.label))
 
-    val loss = predictionAndLabel.map {
-      case (p, l) =>
-        val err = p - l
-        err * err
-    }.reduce(_ + _)
+    val loss = predictionAndLabel
+      .map {
+        case (p, l) =>
+          val err = p - l
+          err * err
+      }
+      .reduce(_ + _)
     val rmse = math.sqrt(loss / numTest)
 
     println(s"Test RMSE = $rmse.")

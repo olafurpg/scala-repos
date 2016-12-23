@@ -134,7 +134,8 @@ class ScalaRearranger
         new CompositeArrangementSettingsToken(JAVA_GETTERS_AND_SETTERS),
         new CompositeArrangementSettingsToken(SCALA_GETTERS_AND_SETTERS),
         new CompositeArrangementSettingsToken(
-          SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS)))
+          SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS)
+      ))
 
   override def getSupportedMatchingTokens =
     seqAsJavaList(
@@ -145,7 +146,8 @@ class ScalaRearranger
                                               scalaModifiers.toList),
         new CompositeArrangementSettingsToken(General.ORDER,
                                               Order.KEEP,
-                                              Order.BY_NAME)))
+                                              Order.BY_NAME)
+      ))
 
   override def isEnabled(token: ArrangementSettingsToken,
                          current: ArrangementMatchCondition) =
@@ -252,7 +254,8 @@ object ScalaRearranger {
     val groupingRules = immutable.List[ArrangementGroupingRule](
       new ArrangementGroupingRule(DEPENDENT_METHODS, DEPTH_FIRST),
       new ArrangementGroupingRule(JAVA_GETTERS_AND_SETTERS),
-      new ArrangementGroupingRule(SCALA_GETTERS_AND_SETTERS))
+      new ArrangementGroupingRule(SCALA_GETTERS_AND_SETTERS)
+    )
     var matchRules = immutable.List[ArrangementSectionRule]()
     for (access <- scalaAccessModifiersValues) {
       matchRules = addCondition(matchRules, TYPE, access, FINAL)

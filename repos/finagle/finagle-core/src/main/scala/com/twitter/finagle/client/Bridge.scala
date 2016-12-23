@@ -23,8 +23,8 @@ object Bridge {
     * transport.
     */
   def apply[In, Out, Req, Rep](
-      transporter: (SocketAddress,
-                    StatsReceiver) => Future[Transport[In, Out]],
+      transporter: (SocketAddress, StatsReceiver) => Future[
+        Transport[In, Out]],
       newDispatcher: Transport[In, Out] => Service[Req, Rep]
   ): ((Address, StatsReceiver) => ServiceFactory[Req, Rep]) = {
     case (Address.Inet(ia, _), sr) =>

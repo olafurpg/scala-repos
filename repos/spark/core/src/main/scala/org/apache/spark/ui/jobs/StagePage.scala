@@ -105,9 +105,11 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       val parameterTaskPrevPageSize = request.getParameter("task.prevPageSize")
 
       val taskPage = Option(parameterTaskPage).map(_.toInt).getOrElse(1)
-      val taskSortColumn = Option(parameterTaskSortColumn).map { sortColumn =>
-        UIUtils.decodeURLParameter(sortColumn)
-      }.getOrElse("Index")
+      val taskSortColumn = Option(parameterTaskSortColumn)
+        .map { sortColumn =>
+          UIUtils.decodeURLParameter(sortColumn)
+        }
+        .getOrElse("Index")
       val taskSortDesc =
         Option(parameterTaskSortDesc).map(_.toBoolean).getOrElse(false)
       val taskPageSize =
@@ -606,7 +608,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
             else Nil,
             if (stageData.hasBytesSpilled)
               <tr>{diskBytesSpilledQuantiles}</tr>
-            else Nil)
+            else Nil
+          )
 
           val quantileHeaders = Seq("Metric",
                                     "Min",
@@ -792,15 +795,17 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       }
       .mkString("[", ",", "]")
 
-    val groupArrayStr = executorsSet.map {
-      case (executorId, host) =>
-        s"""
+    val groupArrayStr = executorsSet
+      .map {
+        case (executorId, host) =>
+          s"""
             {
               'id': '$executorId',
               'content': '$executorId / $host',
             }
           """
-    }.mkString("[", ",", "]")
+      }
+      .mkString("[", ",", "]")
 
     <span class="expand-task-assignment-timeline">
       <span class="expand-task-assignment-timeline-arrow arrow-closed"></span>
@@ -1102,31 +1107,33 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
         None
       }
 
-    new TaskTableRowData(info.index,
-                         info.taskId,
-                         info.attemptNumber,
-                         info.speculative,
-                         info.status,
-                         info.taskLocality.toString,
-                         s"${info.executorId} / ${info.host}",
-                         info.launchTime,
-                         duration,
-                         formatDuration,
-                         schedulerDelay,
-                         taskDeserializationTime,
-                         gcTime,
-                         serializationTime,
-                         gettingResultTime,
-                         peakExecutionMemoryUsed,
-                         if (hasAccumulators)
-                           Some(externalAccumulableReadable.mkString("<br/>"))
-                         else None,
-                         input,
-                         output,
-                         shuffleRead,
-                         shuffleWrite,
-                         bytesSpilled,
-                         errorMessage.getOrElse(""))
+    new TaskTableRowData(
+      info.index,
+      info.taskId,
+      info.attemptNumber,
+      info.speculative,
+      info.status,
+      info.taskLocality.toString,
+      s"${info.executorId} / ${info.host}",
+      info.launchTime,
+      duration,
+      formatDuration,
+      schedulerDelay,
+      taskDeserializationTime,
+      gcTime,
+      serializationTime,
+      gettingResultTime,
+      peakExecutionMemoryUsed,
+      if (hasAccumulators)
+        Some(externalAccumulableReadable.mkString("<br/>"))
+      else None,
+      input,
+      output,
+      shuffleRead,
+      shuffleWrite,
+      bytesSpilled,
+      errorMessage.getOrElse("")
+    )
   }
 
   /**
@@ -1420,7 +1427,8 @@ private[ui] class TaskPagedTable(conf: SparkConf,
         ("GC Time", ""),
         ("Result Serialization Time",
          TaskDetailsClassNames.RESULT_SERIALIZATION_TIME),
-        ("Getting Result Time", TaskDetailsClassNames.GETTING_RESULT_TIME)) ++ {
+        ("Getting Result Time", TaskDetailsClassNames.GETTING_RESULT_TIME)
+      ) ++ {
         if (displayPeakExecutionMemory) {
           Seq(("Peak Execution Memory",
                TaskDetailsClassNames.PEAK_EXECUTION_MEMORY))
@@ -1431,11 +1439,13 @@ private[ui] class TaskPagedTable(conf: SparkConf,
         if (hasInput) Seq(("Input Size / Records", "")) else Nil
       } ++ { if (hasOutput) Seq(("Output Size / Records", "")) else Nil } ++ {
         if (hasShuffleRead) {
-          Seq(("Shuffle Read Blocked Time",
-               TaskDetailsClassNames.SHUFFLE_READ_BLOCKED_TIME),
-              ("Shuffle Read Size / Records", ""),
-              ("Shuffle Remote Reads",
-               TaskDetailsClassNames.SHUFFLE_READ_REMOTE_SIZE))
+          Seq(
+            ("Shuffle Read Blocked Time",
+             TaskDetailsClassNames.SHUFFLE_READ_BLOCKED_TIME),
+            ("Shuffle Read Size / Records", ""),
+            ("Shuffle Remote Reads",
+             TaskDetailsClassNames.SHUFFLE_READ_REMOTE_SIZE)
+          )
         } else {
           Nil
         }

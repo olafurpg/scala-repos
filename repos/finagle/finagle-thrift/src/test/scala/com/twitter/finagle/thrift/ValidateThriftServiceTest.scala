@@ -61,11 +61,13 @@ class ValidateThriftServiceTest extends FunSuite with MockitoSugar {
     val c = ValidateThriftServiceContext()
     import c._
 
-    val codes = Seq(TApplicationException.BAD_SEQUENCE_ID,
-                    TApplicationException.INVALID_MESSAGE_TYPE,
-                    TApplicationException.MISSING_RESULT,
-                    TApplicationException.UNKNOWN,
-                    TApplicationException.WRONG_METHOD_NAME)
+    val codes = Seq(
+      TApplicationException.BAD_SEQUENCE_ID,
+      TApplicationException.INVALID_MESSAGE_TYPE,
+      TApplicationException.MISSING_RESULT,
+      TApplicationException.UNKNOWN,
+      TApplicationException.WRONG_METHOD_NAME
+    )
 
     for (typ <- codes) {
       val buf = new OutputBuffer(protocolFactory)

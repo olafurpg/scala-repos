@@ -69,14 +69,16 @@ trait AnalysisTest extends PlanTest {
     try analyzer.checkAnalysis(analysisAttempt)
     catch {
       case a: AnalysisException =>
-        fail(s"""
+        fail(
+          s"""
             |Failed to Analyze Plan
             |$inputPlan
             |
             |Partial Analysis
             |$analysisAttempt
           """.stripMargin,
-             a)
+          a
+        )
     }
   }
 

@@ -92,12 +92,15 @@ trait FSLibSpecs[M[+ _]]
                                                    Path.Root,
                                                    new DateTime)
   val defaultMorphContext =
-    MorphContext(defaultEvaluationContext, new MorphLogger {
-      def info(msg: String): M[Unit] = M.point(())
-      def warn(msg: String): M[Unit] = M.point(())
-      def error(msg: String): M[Unit] = M.point(())
-      def die(): M[Unit] = M.point(sys.error("MorphContext#die()"))
-    })
+    MorphContext(
+      defaultEvaluationContext,
+      new MorphLogger {
+        def info(msg: String): M[Unit] = M.point(())
+        def warn(msg: String): M[Unit] = M.point(())
+        def error(msg: String): M[Unit] = M.point(())
+        def die(): M[Unit] = M.point(sys.error("MorphContext#die()"))
+      }
+    )
 
   def runExpansion(table: Table): List[JValue] = {
     expandGlob(table, defaultMorphContext)

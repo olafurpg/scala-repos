@@ -91,17 +91,20 @@ object GraphStages {
         inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
-            if (isAvailable(out)) {
-              push(out, grab(in))
-              tryPull(in)
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = {
+              if (isAvailable(out)) {
+                push(out, grab(in))
+                tryPull(in)
+              }
+            }
+            override def onUpstreamFinish(): Unit = {
+              if (!isAvailable(in)) completeStage()
             }
           }
-          override def onUpstreamFinish(): Unit = {
-            if (!isAvailable(in)) completeStage()
-          }
-        })
+        )
 
         setHandler(out, new OutHandler {
           override def onPull(): Unit = {
@@ -191,18 +194,24 @@ object GraphStages {
 
       val logic = new GraphStageLogic(shape) {
 
-        setHandler(shape.in1, new InHandler {
-          override def onPush(): Unit = push(shape.out1, grab(shape.in1))
-          override def onUpstreamFinish(): Unit = complete(shape.out1)
-          override def onUpstreamFailure(ex: Throwable): Unit =
-            fail(shape.out1, ex)
-        })
-        setHandler(shape.in2, new InHandler {
-          override def onPush(): Unit = push(shape.out2, grab(shape.in2))
-          override def onUpstreamFinish(): Unit = complete(shape.out2)
-          override def onUpstreamFailure(ex: Throwable): Unit =
-            fail(shape.out2, ex)
-        })
+        setHandler(
+          shape.in1,
+          new InHandler {
+            override def onPush(): Unit = push(shape.out1, grab(shape.in1))
+            override def onUpstreamFinish(): Unit = complete(shape.out1)
+            override def onUpstreamFailure(ex: Throwable): Unit =
+              fail(shape.out1, ex)
+          }
+        )
+        setHandler(
+          shape.in2,
+          new InHandler {
+            override def onPush(): Unit = push(shape.out2, grab(shape.in2))
+            override def onUpstreamFinish(): Unit = complete(shape.out2)
+            override def onUpstreamFailure(ex: Throwable): Unit =
+              fail(shape.out2, ex)
+          }
+        )
         setHandler(shape.out1, new OutHandler {
           override def onPull(): Unit = pull(shape.in1)
           override def onDownstreamFinish(): Unit = cancel(shape.in1)
@@ -250,19 +259,22 @@ object GraphStages {
       val finishPromise = Promise[Done]()
 
       (new GraphStageLogic(shape) {
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = push(out, grab(in))
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = push(out, grab(in))
 
-          override def onUpstreamFinish(): Unit = {
-            finishPromise.success(Done)
-            completeStage()
-          }
+            override def onUpstreamFinish(): Unit = {
+              finishPromise.success(Done)
+              completeStage()
+            }
 
-          override def onUpstreamFailure(ex: Throwable): Unit = {
-            finishPromise.failure(ex)
-            failStage(ex)
+            override def onUpstreamFailure(ex: Throwable): Unit = {
+              finishPromise.failure(ex)
+              failStage(ex)
+            }
           }
-        })
+        )
         setHandler(out, new OutHandler {
           override def onPull(): Unit = pull(in)
           override def onDownstreamFinish(): Unit = {
@@ -396,16 +408,19 @@ object GraphStages {
     val out = shape.out
     override def initialAttributes: Attributes = DefaultAttributes.futureSource
     override def createLogic(attr: Attributes) = new GraphStageLogic(shape) {
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          val cb = getAsyncCallback[Try[T]] {
-            case scala.util.Success(v) ⇒ emit(out, v, () ⇒ completeStage())
-            case scala.util.Failure(t) ⇒ failStage(t)
-          }.invoke _
-          future.onComplete(cb)(ExecutionContexts.sameThreadExecutionContext)
-          setHandler(out, eagerTerminateOutput) // After first pull we won't produce anything more
+      setHandler(
+        out,
+        new OutHandler {
+          override def onPull(): Unit = {
+            val cb = getAsyncCallback[Try[T]] {
+              case scala.util.Success(v) ⇒ emit(out, v, () ⇒ completeStage())
+              case scala.util.Failure(t) ⇒ failStage(t)
+            }.invoke _
+            future.onComplete(cb)(ExecutionContexts.sameThreadExecutionContext)
+            setHandler(out, eagerTerminateOutput) // After first pull we won't produce anything more
+          }
         }
-      })
+      )
     }
     override def toString: String = "FutureSource"
   }

@@ -94,25 +94,27 @@ final class LinkedClass(
            hasInstanceTests: Boolean = this.hasInstanceTests,
            hasRuntimeTypeInfo: Boolean = this.hasRuntimeTypeInfo,
            version: Option[String] = this.version) = {
-    new LinkedClass(name,
-                    kind,
-                    superClass,
-                    interfaces,
-                    jsName,
-                    fields,
-                    staticMethods,
-                    memberMethods,
-                    abstractMethods,
-                    exportedMembers,
-                    classExports,
-                    classExportInfo,
-                    optimizerHints,
-                    pos,
-                    ancestors,
-                    hasInstances,
-                    hasInstanceTests,
-                    hasRuntimeTypeInfo,
-                    version)
+    new LinkedClass(
+      name,
+      kind,
+      superClass,
+      interfaces,
+      jsName,
+      fields,
+      staticMethods,
+      memberMethods,
+      abstractMethods,
+      exportedMembers,
+      classExports,
+      classExportInfo,
+      optimizerHints,
+      pos,
+      ancestors,
+      hasInstances,
+      hasInstanceTests,
+      hasRuntimeTypeInfo,
+      version
+    )
   }
 }
 
@@ -174,25 +176,27 @@ object LinkedClass {
     val classExportInfo =
       memberInfoByName.get(Definitions.ExportedConstructorsName)
 
-    new LinkedClass(classDef.name,
-                    classDef.kind,
-                    classDef.superClass,
-                    classDef.interfaces,
-                    classDef.jsName,
-                    fields.toList,
-                    staticMethods.toList,
-                    memberMethods.toList,
-                    abstractMethods.toList,
-                    exportedMembers.toList,
-                    classExports.toList,
-                    classExportInfo,
-                    classDef.optimizerHints,
-                    classDef.pos,
-                    ancestors,
-                    hasInstances = true,
-                    hasInstanceTests = true,
-                    hasRuntimeTypeInfo = true,
-                    version = None)
+    new LinkedClass(
+      classDef.name,
+      classDef.kind,
+      classDef.superClass,
+      classDef.interfaces,
+      classDef.jsName,
+      fields.toList,
+      staticMethods.toList,
+      memberMethods.toList,
+      abstractMethods.toList,
+      exportedMembers.toList,
+      classExports.toList,
+      classExportInfo,
+      classDef.optimizerHints,
+      classDef.pos,
+      ancestors,
+      hasInstances = true,
+      hasInstanceTests = true,
+      hasRuntimeTypeInfo = true,
+      version = None
+    )
   }
 
   def dummyParent(encodedName: String, version: Option[String]): LinkedClass = {
@@ -200,24 +204,26 @@ object LinkedClass {
 
     implicit val pos = Position.NoPosition
 
-    new LinkedClass(name = Ident(encodedName),
-                    kind = ClassKind.Class,
-                    superClass = Some(Ident(Definitions.ObjectClass)),
-                    interfaces = Nil,
-                    jsName = None,
-                    fields = Nil,
-                    staticMethods = Nil,
-                    memberMethods = Nil,
-                    abstractMethods = Nil,
-                    exportedMembers = Nil,
-                    classExports = Nil,
-                    classExportInfo = None,
-                    optimizerHints = OptimizerHints.empty,
-                    pos = Position.NoPosition,
-                    ancestors = List(Definitions.ObjectClass, encodedName),
-                    hasInstances = true,
-                    hasInstanceTests = true,
-                    hasRuntimeTypeInfo = true,
-                    version = version)
+    new LinkedClass(
+      name = Ident(encodedName),
+      kind = ClassKind.Class,
+      superClass = Some(Ident(Definitions.ObjectClass)),
+      interfaces = Nil,
+      jsName = None,
+      fields = Nil,
+      staticMethods = Nil,
+      memberMethods = Nil,
+      abstractMethods = Nil,
+      exportedMembers = Nil,
+      classExports = Nil,
+      classExportInfo = None,
+      optimizerHints = OptimizerHints.empty,
+      pos = Position.NoPosition,
+      ancestors = List(Definitions.ObjectClass, encodedName),
+      hasInstances = true,
+      hasInstanceTests = true,
+      hasRuntimeTypeInfo = true,
+      version = version
+    )
   }
 }

@@ -15,30 +15,36 @@ abstract class Taggers {
   private val runDefinitions = currentRun.runDefinitions
   import runDefinitions._
 
-  val coreTags = Map(ByteTpe -> nme.Byte,
-                     ShortTpe -> nme.Short,
-                     CharTpe -> nme.Char,
-                     IntTpe -> nme.Int,
-                     LongTpe -> nme.Long,
-                     FloatTpe -> nme.Float,
-                     DoubleTpe -> nme.Double,
-                     BooleanTpe -> nme.Boolean,
-                     UnitTpe -> nme.Unit,
-                     AnyTpe -> nme.Any,
-                     AnyValTpe -> nme.AnyVal,
-                     AnyRefTpe -> nme.AnyRef,
-                     ObjectTpe -> nme.Object,
-                     NothingTpe -> nme.Nothing,
-                     NullTpe -> nme.Null)
+  val coreTags = Map(
+    ByteTpe -> nme.Byte,
+    ShortTpe -> nme.Short,
+    CharTpe -> nme.Char,
+    IntTpe -> nme.Int,
+    LongTpe -> nme.Long,
+    FloatTpe -> nme.Float,
+    DoubleTpe -> nme.Double,
+    BooleanTpe -> nme.Boolean,
+    UnitTpe -> nme.Unit,
+    AnyTpe -> nme.Any,
+    AnyValTpe -> nme.AnyVal,
+    AnyRefTpe -> nme.AnyRef,
+    ObjectTpe -> nme.Object,
+    NothingTpe -> nme.Nothing,
+    NullTpe -> nme.Null
+  )
 
   def materializeClassTag(tpe: Type): Tree = {
     val tagModule = ClassTagModule
-    materializeTag(EmptyTree, tpe, tagModule, {
-      val erasure = c.reifyRuntimeClass(tpe, concrete = true)
-      val factory =
-        TypeApply(Select(Ident(tagModule), nme.apply), List(TypeTree(tpe)))
-      Apply(factory, List(erasure))
-    })
+    materializeTag(
+      EmptyTree,
+      tpe,
+      tagModule, {
+        val erasure = c.reifyRuntimeClass(tpe, concrete = true)
+        val factory =
+          TypeApply(Select(Ident(tagModule), nme.apply), List(TypeTree(tpe)))
+        Apply(factory, List(erasure))
+      }
+    )
   }
 
   def materializeTypeTag(universe: Tree,

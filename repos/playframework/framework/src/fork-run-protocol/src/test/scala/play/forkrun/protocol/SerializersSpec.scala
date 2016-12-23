@@ -105,8 +105,8 @@ trait PicklingTestUtils extends Specification {
       a.getMessage must beEqualTo(b.getMessage)
     }
 
-  def roundTripBase[A: Pickler: Unpickler](a: A)(f: (A,
-                                                     A) => MatchResult[Any])(
+  def roundTripBase[A: Pickler: Unpickler](a: A)(
+      f: (A, A) => MatchResult[Any])(
       e: (Throwable, Throwable) => MatchResult[Any]): MatchResult[Any] =
     addWhatWeWerePickling(a) {
       val json = SerializedValue(a).toJsonString

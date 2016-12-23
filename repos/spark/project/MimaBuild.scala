@@ -101,6 +101,7 @@ object MimaBuild {
       previousArtifact := Some(organization % fullId % previousSparkVersion),
       binaryIssueFilters ++= ignoredABIProblems(sparkHome, version.value),
       sbt.Keys.resolvers +=
-        "MQTT Repository" at "https://repo.eclipse.org/content/repositories/paho-releases")
+        "MQTT Repository" at "https://repo.eclipse.org/content/repositories/paho-releases"
+    )
   }
 }

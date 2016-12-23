@@ -741,9 +741,9 @@ class FutureTest
         }
       }
 
-      def testJoin(label: String,
-                   joiner: ((Future[Int],
-                             Future[Int]) => Future[(Int, Int)])) {
+      def testJoin(
+          label: String,
+          joiner: ((Future[Int], Future[Int]) => Future[(Int, Int)])) {
         "join(%s)".format(label) should {
           trait JoinHelper {
             val p0 = new HandledPromise[Int]
@@ -1092,9 +1092,9 @@ class FutureTest
         }
       }
 
-      def testSequence(which: String,
-                       seqop: (Future[Unit],
-                               () => Future[Unit]) => Future[Unit]) {
+      def testSequence(
+          which: String,
+          seqop: (Future[Unit], () => Future[Unit]) => Future[Unit]) {
         which when {
           "successes" should {
             "interruption of the produced future" which {

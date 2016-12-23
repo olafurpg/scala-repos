@@ -2025,8 +2025,8 @@ trait TraitView[This <: android.view.View]
 
   @inline
   def onLayoutChange[U](
-      f: (android.view.View, Int, Int, Int, Int, Int, Int, Int,
-          Int) => U): This = {
+      f: (android.view.View, Int, Int, Int, Int, Int, Int, Int, Int) => U)
+    : This = {
     basis.addOnLayoutChangeListener(
       new android.view.View.OnLayoutChangeListener {
         def onLayoutChange(p1: android.view.View,

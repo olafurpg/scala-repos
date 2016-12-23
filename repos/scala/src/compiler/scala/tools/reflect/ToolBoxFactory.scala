@@ -91,8 +91,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
 
         if (expr.freeTypes.nonEmpty) {
           val ft_s =
-            expr.freeTypes map (ft =>
-                                  s"  ${ft.name} ${ft.origin}") mkString "\n  "
+            expr.freeTypes map (ft => s"  ${ft.name} ${ft.origin}") mkString "\n  "
           throw ToolBoxError(s"""
             |reflective toolbox failed due to unresolved free type variables:
             |$ft_s
@@ -158,14 +157,16 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
             extractFreeTerms(expr1, wrapFreeTermRefs = false)
           var expr2 = exprAndFreeTerms._1
           val freeTerms = exprAndFreeTerms._2
-          val dummies = freeTerms.map {
-            case (freeTerm, name) =>
-              ValDef(NoMods,
-                     name,
-                     TypeTree(freeTerm.info),
-                     Select(Ident(PredefModule),
-                            newTermName("$qmark$qmark$qmark")))
-          }.toList
+          val dummies = freeTerms
+            .map {
+              case (freeTerm, name) =>
+                ValDef(NoMods,
+                       name,
+                       TypeTree(freeTerm.info),
+                       Select(Ident(PredefModule),
+                              newTermName("$qmark$qmark$qmark")))
+            }
+            .toList
           expr2 = Block(dummies, expr2)
 
           // !!! Why is this is in the empty package? If it's only to make
@@ -315,9 +316,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         val freeTerms =
           expr.freeTerms // need to calculate them here, because later on they will be erased
         val thunks =
-          freeTerms map (fte =>
-                           () =>
-                             fte.value) // need to be lazy in order not to distort evaluation order
+          freeTerms map (fte => () => fte.value) // need to be lazy in order not to distort evaluation order
         verify(expr)
 
         def wrapInModule(expr0: Tree): ModuleDef = {

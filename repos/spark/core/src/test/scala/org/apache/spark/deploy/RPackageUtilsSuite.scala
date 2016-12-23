@@ -88,9 +88,11 @@ class RPackageUtilsSuite
     assume(RUtils.isRInstalled, "R isn't installed on this machine.")
     val deps = Seq(dep1, dep2).mkString(",")
     IvyTestUtils.withRepository(main, Some(deps), None, withR = true) { repo =>
-      val jars = Seq(main, dep1, dep2).map { c =>
-        getJarPath(c, new File(new URI(repo)))
-      }.mkString(",")
+      val jars = Seq(main, dep1, dep2)
+        .map { c =>
+          getJarPath(c, new File(new URI(repo)))
+        }
+        .mkString(",")
       RPackageUtils.checkAndBuildRPackage(jars,
                                           new BufferPrintStream,
                                           verbose = true)
@@ -109,9 +111,11 @@ class RPackageUtilsSuite
     assume(RUtils.isRInstalled, "R isn't installed on this machine.")
     val deps = Seq(dep1, dep2).mkString(",")
     IvyTestUtils.withRepository(main, Some(deps), None, withR = true) { repo =>
-      val jars = Seq(main, dep1, dep2).map { c =>
-        getJarPath(c, new File(new URI(repo))) + "dummy"
-      }.mkString(",")
+      val jars = Seq(main, dep1, dep2)
+        .map { c =>
+          getJarPath(c, new File(new URI(repo))) + "dummy"
+        }
+        .mkString(",")
       RPackageUtils.checkAndBuildRPackage(jars,
                                           new BufferPrintStream,
                                           verbose = true)

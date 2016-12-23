@@ -62,11 +62,13 @@ class QueryPartitionSuite
         testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect)
 
       // delete the path of one partition
-      tmpDir.listFiles.find { f =>
-        f.isDirectory && f.getName().startsWith("ds=")
-      }.foreach { f =>
-        Utils.deleteRecursively(f)
-      }
+      tmpDir.listFiles
+        .find { f =>
+          f.isDirectory && f.getName().startsWith("ds=")
+        }
+        .foreach { f =>
+          Utils.deleteRecursively(f)
+        }
 
       // test for after delete the path
       checkAnswer(

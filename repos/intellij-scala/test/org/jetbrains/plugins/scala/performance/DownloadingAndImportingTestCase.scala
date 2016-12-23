@@ -109,7 +109,8 @@ abstract class DownloadingAndImportingTestCase
         GlobalSearchScope.projectScope(myProject),
         ScalaFileType.SCALA_FILE_TYPE,
         JavaFileType.INSTANCE),
-      myProject)
+      myProject
+    )
 
     val files: util.Collection[VirtualFile] =
       FileTypeIndex.getFiles(ScalaFileType.SCALA_FILE_TYPE, searchScope)

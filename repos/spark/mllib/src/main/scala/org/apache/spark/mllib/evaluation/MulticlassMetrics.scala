@@ -44,18 +44,27 @@ class MulticlassMetrics @Since("1.1.0")(
   private lazy val labelCountByClass: Map[Double, Long] =
     predictionAndLabels.values.countByValue()
   private lazy val labelCount: Long = labelCountByClass.values.sum
-  private lazy val tpByClass: Map[Double, Int] = predictionAndLabels.map {
-    case (prediction, label) =>
-      (label, if (label == prediction) 1 else 0)
-  }.reduceByKey(_ + _).collectAsMap()
-  private lazy val fpByClass: Map[Double, Int] = predictionAndLabels.map {
-    case (prediction, label) =>
-      (prediction, if (prediction != label) 1 else 0)
-  }.reduceByKey(_ + _).collectAsMap()
-  private lazy val confusions = predictionAndLabels.map {
-    case (prediction, label) =>
-      ((label, prediction), 1)
-  }.reduceByKey(_ + _).collectAsMap()
+  private lazy val tpByClass: Map[Double, Int] = predictionAndLabels
+    .map {
+      case (prediction, label) =>
+        (label, if (label == prediction) 1 else 0)
+    }
+    .reduceByKey(_ + _)
+    .collectAsMap()
+  private lazy val fpByClass: Map[Double, Int] = predictionAndLabels
+    .map {
+      case (prediction, label) =>
+        (prediction, if (prediction != label) 1 else 0)
+    }
+    .reduceByKey(_ + _)
+    .collectAsMap()
+  private lazy val confusions = predictionAndLabels
+    .map {
+      case (prediction, label) =>
+        ((label, prediction), 1)
+    }
+    .reduceByKey(_ + _)
+    .collectAsMap()
 
   /**
     * Returns confusion matrix:
@@ -169,29 +178,35 @@ class MulticlassMetrics @Since("1.1.0")(
     * Returns weighted false positive rate
     */
   @Since("1.1.0")
-  lazy val weightedFalsePositiveRate: Double = labelCountByClass.map {
-    case (category, count) =>
-      falsePositiveRate(category) * count.toDouble / labelCount
-  }.sum
+  lazy val weightedFalsePositiveRate: Double = labelCountByClass
+    .map {
+      case (category, count) =>
+        falsePositiveRate(category) * count.toDouble / labelCount
+    }
+    .sum
 
   /**
     * Returns weighted averaged recall
     * (equals to precision, recall and f-measure)
     */
   @Since("1.1.0")
-  lazy val weightedRecall: Double = labelCountByClass.map {
-    case (category, count) =>
-      recall(category) * count.toDouble / labelCount
-  }.sum
+  lazy val weightedRecall: Double = labelCountByClass
+    .map {
+      case (category, count) =>
+        recall(category) * count.toDouble / labelCount
+    }
+    .sum
 
   /**
     * Returns weighted averaged precision
     */
   @Since("1.1.0")
-  lazy val weightedPrecision: Double = labelCountByClass.map {
-    case (category, count) =>
-      precision(category) * count.toDouble / labelCount
-  }.sum
+  lazy val weightedPrecision: Double = labelCountByClass
+    .map {
+      case (category, count) =>
+        precision(category) * count.toDouble / labelCount
+    }
+    .sum
 
   /**
     * Returns weighted averaged f-measure
@@ -199,19 +214,23 @@ class MulticlassMetrics @Since("1.1.0")(
     */
   @Since("1.1.0")
   def weightedFMeasure(beta: Double): Double =
-    labelCountByClass.map {
-      case (category, count) =>
-        fMeasure(category, beta) * count.toDouble / labelCount
-    }.sum
+    labelCountByClass
+      .map {
+        case (category, count) =>
+          fMeasure(category, beta) * count.toDouble / labelCount
+      }
+      .sum
 
   /**
     * Returns weighted averaged f1-measure
     */
   @Since("1.1.0")
-  lazy val weightedFMeasure: Double = labelCountByClass.map {
-    case (category, count) =>
-      fMeasure(category, 1.0) * count.toDouble / labelCount
-  }.sum
+  lazy val weightedFMeasure: Double = labelCountByClass
+    .map {
+      case (category, count) =>
+        fMeasure(category, 1.0) * count.toDouble / labelCount
+    }
+    .sum
 
   /**
     * Returns the sequence of labels in ascending order

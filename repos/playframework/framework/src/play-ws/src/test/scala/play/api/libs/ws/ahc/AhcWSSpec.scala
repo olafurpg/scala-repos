@@ -368,15 +368,17 @@ object AhcWSSpec extends PlaySpecification with Mockito {
       actual.getRealm must beNull
     }
 
-    val patchFakeApp = GuiceApplicationBuilder().routes {
-      case ("PATCH", "/") =>
-        Action {
-          Results.Ok(play.api.libs.json.Json.parse("""{
+    val patchFakeApp = GuiceApplicationBuilder()
+      .routes {
+        case ("PATCH", "/") =>
+          Action {
+            Results.Ok(play.api.libs.json.Json.parse("""{
             |  "data": "body"
             |}
           """.stripMargin))
-        }
-    }.build()
+          }
+      }
+      .build()
 
     "support patch method" in new WithServer(patchFakeApp) {
       // NOTE: if you are using a client proxy like Privoxy or Polipo, your proxy may not support PATCH & return 400.
@@ -521,22 +523,8 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
     "get the body as bytes from the AHC response" in {
       val ahcResponse: AHCResponse = mock[AHCResponse]
-      val bytes = ByteString(-87,
-                             -72,
-                             96,
-                             -63,
-                             -32,
-                             46,
-                             -117,
-                             -40,
-                             -128,
-                             -7,
-                             61,
-                             109,
-                             80,
-                             45,
-                             44,
-                             30)
+      val bytes = ByteString(-87, -72, 96, -63, -32, 46, -117, -40, -128, -7,
+        61, 109, 80, 45, 44, 30)
       ahcResponse.getResponseBodyAsBytes returns bytes.toArray
       val response = AhcWSResponse(ahcResponse)
       response.bodyAsBytes must_== bytes
@@ -596,10 +584,12 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
   "Ahc WS Config" should {
     "support overriding secure default values" in {
-      val ahcConfig = new AhcConfigBuilder().modifyUnderlying { builder =>
-        builder.setCompressionEnforced(false)
-        builder.setFollowRedirect(false)
-      }.build()
+      val ahcConfig = new AhcConfigBuilder()
+        .modifyUnderlying { builder =>
+          builder.setCompressionEnforced(false)
+          builder.setFollowRedirect(false)
+        }
+        .build()
       ahcConfig.isCompressionEnforced must beFalse
       ahcConfig.isFollowRedirect must beFalse
       ahcConfig.getConnectTimeout must_== 120000

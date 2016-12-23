@@ -301,14 +301,19 @@ class MemoryLaws extends WordSpec {
         sinkBuffer += x
       }
 
-      val summed = source.map { v =>
-        (v, v)
-      }.sumByKey(store).map {
-        case (_, (existingEventOpt, currentEvent)) =>
-          existingEventOpt.map { existingEvent =>
-            Semigroup.plus(existingEvent, currentEvent)
-          }.getOrElse(currentEvent)
-      }
+      val summed = source
+        .map { v =>
+          (v, v)
+        }
+        .sumByKey(store)
+        .map {
+          case (_, (existingEventOpt, currentEvent)) =>
+            existingEventOpt
+              .map { existingEvent =>
+                Semigroup.plus(existingEvent, currentEvent)
+              }
+              .getOrElse(currentEvent)
+        }
 
       val write1 = summed.write(sink)
       val write2 = summed.write(sink)

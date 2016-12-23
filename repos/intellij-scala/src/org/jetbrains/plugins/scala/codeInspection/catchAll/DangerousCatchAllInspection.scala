@@ -59,7 +59,8 @@ class DangerousCatchAllInspection extends LocalInspectionTool {
               InspectionBundle.message("catch.all"),
               ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
               isOnTheFly,
-              new ReplaceDangerousCatchAllQuickFix(isInspection._2)))
+              new ReplaceDangerousCatchAllQuickFix(isInspection._2)
+            ))
         }
       }
     }

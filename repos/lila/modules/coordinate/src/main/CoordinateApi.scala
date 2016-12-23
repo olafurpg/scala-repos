@@ -24,6 +24,7 @@ final class CoordinateApi(scoreColl: Coll) {
                                       (!white ?? List(BSONInteger(hits))),
                                     "$slice" -> -20)
           )),
-        upsert = true)
+        upsert = true
+      )
       .void
 }

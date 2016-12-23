@@ -102,21 +102,23 @@ class EngineInstanceSerializer
       ({
         case JObject(fields) =>
           implicit val formats = DefaultFormats
-          val seed = EngineInstance(id = "",
-                                    status = "",
-                                    startTime = DateTime.now,
-                                    endTime = DateTime.now,
-                                    engineId = "",
-                                    engineVersion = "",
-                                    engineVariant = "",
-                                    engineFactory = "",
-                                    batch = "",
-                                    env = Map(),
-                                    sparkConf = Map(),
-                                    dataSourceParams = "",
-                                    preparatorParams = "",
-                                    algorithmsParams = "",
-                                    servingParams = "")
+          val seed = EngineInstance(
+            id = "",
+            status = "",
+            startTime = DateTime.now,
+            endTime = DateTime.now,
+            engineId = "",
+            engineVersion = "",
+            engineVariant = "",
+            engineFactory = "",
+            batch = "",
+            env = Map(),
+            sparkConf = Map(),
+            dataSourceParams = "",
+            preparatorParams = "",
+            algorithmsParams = "",
+            servingParams = ""
+          )
           fields.foldLeft(seed) {
             case (i, field) =>
               field match {

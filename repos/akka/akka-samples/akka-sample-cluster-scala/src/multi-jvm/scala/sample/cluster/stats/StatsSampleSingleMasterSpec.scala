@@ -114,13 +114,15 @@ abstract class StatsSampleSingleMasterSpec
           terminationMessage = PoisonPill,
           settings =
             ClusterSingletonManagerSettings(system).withRole("compute")),
-        name = "statsService")
+        name = "statsService"
+      )
 
       system.actorOf(
         ClusterSingletonProxy.props(
           singletonManagerPath = "/user/statsService",
           ClusterSingletonProxySettings(system).withRole("compute")),
-        name = "statsServiceProxy")
+        name = "statsServiceProxy"
+      )
 
       testConductor.enter("all-up")
     }

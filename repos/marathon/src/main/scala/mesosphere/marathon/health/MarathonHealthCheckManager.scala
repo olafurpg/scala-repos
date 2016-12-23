@@ -250,10 +250,12 @@ class MarathonHealthCheckManager @Inject()(
       case None => Future.successful(Nil)
       case Some(appVersion) =>
         Future.sequence(
-          listActive(appId, appVersion).iterator.collect {
-            case ActiveHealthCheck(_, actor) =>
-              (actor ? GetTaskHealth(taskId)).mapTo[Health]
-          }.to[Seq]
+          listActive(appId, appVersion).iterator
+            .collect {
+              case ActiveHealthCheck(_, actor) =>
+                (actor ? GetTaskHealth(taskId)).mapTo[Health]
+            }
+            .to[Seq]
         )
     }
   }
@@ -269,12 +271,14 @@ class MarathonHealthCheckManager @Inject()(
         val groupedHealth = healths.flatMap(_.health).groupBy(_.taskId)
 
         taskTracker.appTasks(appId).map { appTasks =>
-          appTasks.iterator.map { task =>
-            groupedHealth.get(task.taskId) match {
-              case Some(xs) => task.taskId -> xs.toSeq
-              case None => task.taskId -> Nil
+          appTasks.iterator
+            .map { task =>
+              groupedHealth.get(task.taskId) match {
+                case Some(xs) => task.taskId -> xs.toSeq
+                case None => task.taskId -> Nil
+              }
             }
-          }.toMap
+            .toMap
         }
       }
     }

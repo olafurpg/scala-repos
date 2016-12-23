@@ -75,11 +75,14 @@ private[spark] class FairSchedulableBuilder(val rootPool: Pool,
     var is: Option[InputStream] = None
     try {
       is = Option {
-        schedulerAllocFile.map { f =>
-          new FileInputStream(f)
-        }.getOrElse {
-          Utils.getSparkClassLoader.getResourceAsStream(DEFAULT_SCHEDULER_FILE)
-        }
+        schedulerAllocFile
+          .map { f =>
+            new FileInputStream(f)
+          }
+          .getOrElse {
+            Utils.getSparkClassLoader.getResourceAsStream(
+              DEFAULT_SCHEDULER_FILE)
+          }
       }
 
       is.foreach { i =>

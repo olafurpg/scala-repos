@@ -588,12 +588,17 @@ class HttpExtensionApiSpec
   def runWebsocketServer(): (Host, Port, ServerBinding) = {
     val (_, host, port) = TestUtils.temporaryServerHostnameAndPort()
     val server =
-      http.bindAndHandleSync(new Function[HttpRequest, HttpResponse] {
+      http.bindAndHandleSync(
+        new Function[HttpRequest, HttpResponse] {
 
-        override def apply(request: HttpRequest): HttpResponse = {
-          WebSocket.handleWebSocketRequestWith(request, Flow.create[Message]())
-        }
-      }, toHost(host, port), materializer)
+          override def apply(request: HttpRequest): HttpResponse = {
+            WebSocket.handleWebSocketRequestWith(request,
+                                                 Flow.create[Message]())
+          }
+        },
+        toHost(host, port),
+        materializer
+      )
 
     (host, port, waitFor(server))
   }

@@ -71,14 +71,16 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
                                         64 * 1024,
                                         "test-client")
     val consumerMetadataRequest = GroupCoordinatorRequest(group)
-    Stream.continually {
-      val consumerMetadataResponse =
-        simpleConsumer.send(consumerMetadataRequest)
-      consumerMetadataResponse.coordinatorOpt.isDefined
-    }.dropWhile(success => {
-      if (!success) Thread.sleep(1000)
-      !success
-    })
+    Stream
+      .continually {
+        val consumerMetadataResponse =
+          simpleConsumer.send(consumerMetadataRequest)
+        consumerMetadataResponse.coordinatorOpt.isDefined
+      }
+      .dropWhile(success => {
+        if (!success) Thread.sleep(1000)
+        !success
+      })
   }
 
   @After
@@ -183,7 +185,8 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
                                                           metadata =
                                                             "metadata three"),
         TopicAndPartition(topic2, 1) -> OffsetAndMetadata(offset = 45L)
-      ))
+      )
+    )
     val commitResponse = simpleConsumer.commitOffsets(commitRequest)
     assertEquals(
       Errors.NONE.code,
@@ -208,7 +211,8 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
         TopicAndPartition(topic3, 1), // An unknown partition
         TopicAndPartition(topic4, 0), // An unused topic
         TopicAndPartition(topic5, 0) // An unknown topic
-      ))
+      )
+    )
     val fetchResponse = simpleConsumer.fetchOffsets(fetchRequest)
 
     assertEquals(

@@ -63,23 +63,27 @@ object Utils {
     val usesTungstenAggregate = TungstenAggregate.supportsAggregate(
       aggregateExpressions.flatMap(_.aggregateFunction.aggBufferAttributes))
     if (usesTungstenAggregate) {
-      TungstenAggregate(requiredChildDistributionExpressions =
-                          requiredChildDistributionExpressions,
-                        groupingExpressions = groupingExpressions,
-                        aggregateExpressions = aggregateExpressions,
-                        aggregateAttributes = aggregateAttributes,
-                        initialInputBufferOffset = initialInputBufferOffset,
-                        resultExpressions = resultExpressions,
-                        child = child)
+      TungstenAggregate(
+        requiredChildDistributionExpressions =
+          requiredChildDistributionExpressions,
+        groupingExpressions = groupingExpressions,
+        aggregateExpressions = aggregateExpressions,
+        aggregateAttributes = aggregateAttributes,
+        initialInputBufferOffset = initialInputBufferOffset,
+        resultExpressions = resultExpressions,
+        child = child
+      )
     } else {
-      SortBasedAggregate(requiredChildDistributionExpressions =
-                           requiredChildDistributionExpressions,
-                         groupingExpressions = groupingExpressions,
-                         aggregateExpressions = aggregateExpressions,
-                         aggregateAttributes = aggregateAttributes,
-                         initialInputBufferOffset = initialInputBufferOffset,
-                         resultExpressions = resultExpressions,
-                         child = child)
+      SortBasedAggregate(
+        requiredChildDistributionExpressions =
+          requiredChildDistributionExpressions,
+        groupingExpressions = groupingExpressions,
+        aggregateExpressions = aggregateExpressions,
+        aggregateAttributes = aggregateAttributes,
+        initialInputBufferOffset = initialInputBufferOffset,
+        resultExpressions = resultExpressions,
+        child = child
+      )
     }
   }
 
@@ -110,7 +114,8 @@ object Utils {
       aggregateAttributes = partialAggregateAttributes,
       initialInputBufferOffset = 0,
       resultExpressions = partialResultExpressions,
-      child = child)
+      child = child
+    )
 
     // 2. Create an Aggregate Operator for final aggregations.
     val finalAggregateExpressions =
@@ -128,7 +133,8 @@ object Utils {
       aggregateAttributes = finalAggregateAttributes,
       initialInputBufferOffset = groupingExpressions.length,
       resultExpressions = resultExpressions,
-      child = partialAggregate)
+      child = partialAggregate
+    )
 
     finalAggregate :: Nil
   }
@@ -172,7 +178,8 @@ object Utils {
         aggregateAttributes = aggregateAttributes,
         resultExpressions = groupingAttributes ++ distinctAttributes ++ aggregateExpressions
             .flatMap(_.aggregateFunction.inputAggBufferAttributes),
-        child = child)
+        child = child
+      )
     }
 
     // 2. Create an Aggregate Operator for partial merge aggregations.
@@ -192,7 +199,8 @@ object Utils {
           (groupingAttributes ++ distinctAttributes).length,
         resultExpressions = groupingAttributes ++ distinctAttributes ++ aggregateExpressions
             .flatMap(_.aggregateFunction.inputAggBufferAttributes),
-        child = partialAggregate)
+        child = partialAggregate
+      )
     }
 
     // 3. Create an Aggregate operator for partial aggregation (for distinct)
@@ -217,20 +225,22 @@ object Utils {
         aggregateFunctionToAttribute(expr.aggregateFunction, expr.isDistinct)
       }
       val (distinctAggregateExpressions, distinctAggregateAttributes) =
-        rewrittenDistinctFunctions.zipWithIndex.map {
-          case (func, i) =>
-            // We rewrite the aggregate function to a non-distinct aggregation because
-            // its input will have distinct arguments.
-            // We just keep the isDistinct setting to true, so when users look at the query plan,
-            // they still can see distinct aggregations.
-            val expr = AggregateExpression(func, Partial, isDistinct = true)
-            // Use original AggregationFunction to lookup attributes, which is used to build
-            // aggregateFunctionToAttribute
-            val attr = aggregateFunctionToAttribute(
-              functionsWithDistinct(i).aggregateFunction,
-              true)
-            (expr, attr)
-        }.unzip
+        rewrittenDistinctFunctions.zipWithIndex
+          .map {
+            case (func, i) =>
+              // We rewrite the aggregate function to a non-distinct aggregation because
+              // its input will have distinct arguments.
+              // We just keep the isDistinct setting to true, so when users look at the query plan,
+              // they still can see distinct aggregations.
+              val expr = AggregateExpression(func, Partial, isDistinct = true)
+              // Use original AggregationFunction to lookup attributes, which is used to build
+              // aggregateFunctionToAttribute
+              val attr = aggregateFunctionToAttribute(
+                functionsWithDistinct(i).aggregateFunction,
+                true)
+              (expr, attr)
+          }
+          .unzip
 
       val partialAggregateResult =
         groupingAttributes ++ mergeAggregateExpressions.flatMap(
@@ -243,7 +253,8 @@ object Utils {
         initialInputBufferOffset =
           (groupingAttributes ++ distinctAttributes).length,
         resultExpressions = partialAggregateResult,
-        child = partialMergeAggregate)
+        child = partialMergeAggregate
+      )
     }
 
     // 4. Create an Aggregate Operator for the final aggregation.
@@ -257,20 +268,22 @@ object Utils {
       }
 
       val (distinctAggregateExpressions, distinctAggregateAttributes) =
-        rewrittenDistinctFunctions.zipWithIndex.map {
-          case (func, i) =>
-            // We rewrite the aggregate function to a non-distinct aggregation because
-            // its input will have distinct arguments.
-            // We just keep the isDistinct setting to true, so when users look at the query plan,
-            // they still can see distinct aggregations.
-            val expr = AggregateExpression(func, Final, isDistinct = true)
-            // Use original AggregationFunction to lookup attributes, which is used to build
-            // aggregateFunctionToAttribute
-            val attr = aggregateFunctionToAttribute(
-              functionsWithDistinct(i).aggregateFunction,
-              true)
-            (expr, attr)
-        }.unzip
+        rewrittenDistinctFunctions.zipWithIndex
+          .map {
+            case (func, i) =>
+              // We rewrite the aggregate function to a non-distinct aggregation because
+              // its input will have distinct arguments.
+              // We just keep the isDistinct setting to true, so when users look at the query plan,
+              // they still can see distinct aggregations.
+              val expr = AggregateExpression(func, Final, isDistinct = true)
+              // Use original AggregationFunction to lookup attributes, which is used to build
+              // aggregateFunctionToAttribute
+              val attr = aggregateFunctionToAttribute(
+                functionsWithDistinct(i).aggregateFunction,
+                true)
+              (expr, attr)
+          }
+          .unzip
 
       createAggregate(
         requiredChildDistributionExpressions = Some(groupingAttributes),
@@ -279,7 +292,8 @@ object Utils {
         aggregateAttributes = finalAggregateAttributes ++ distinctAggregateAttributes,
         initialInputBufferOffset = groupingAttributes.length,
         resultExpressions = resultExpressions,
-        child = partialDistinctAggregate)
+        child = partialDistinctAggregate
+      )
     }
 
     finalAndCompleteAggregate :: Nil

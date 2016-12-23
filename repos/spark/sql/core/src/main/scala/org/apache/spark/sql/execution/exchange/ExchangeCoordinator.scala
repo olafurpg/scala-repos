@@ -158,7 +158,8 @@ private[sql] class ExchangeCoordinator(
     assert(
       distinctNumPreShufflePartitions.length == 1,
       "There should be only one distinct value of the number pre-shuffle partitions " +
-        "among registered Exchange operator.")
+        "among registered Exchange operator."
+    )
     val numPreShufflePartitions = distinctNumPreShufflePartitions.head
 
     val partitionStartIndices = ArrayBuffer[Int]()

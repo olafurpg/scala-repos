@@ -18,26 +18,27 @@ object Test extends InteractiveTest {
     }
 
     def checkTypeTagSymbolConsistent() {
-      compiler.askForResponse { () =>
-        {
-          val runDefinitions = currentRun.runDefinitions
-          import runDefinitions._
-          assert(
-            TypeTagsClass
+      compiler
+        .askForResponse { () =>
+          {
+            val runDefinitions = currentRun.runDefinitions
+            import runDefinitions._
+            assert(TypeTagsClass
               .map(sym => getMemberClass(sym, tpnme.TypeTag)) == TypeTagClass)
-          assert(TypeTagsClass.map(sym =>
-            getMemberClass(sym, tpnme.WeakTypeTag)) == WeakTypeTagClass)
-          assert(TypeTagsClass.map(sym =>
-            getMemberModule(sym, nme.WeakTypeTag)) == WeakTypeTagModule)
-          assert(
-            getMemberMethod(ReflectPackage, nme.materializeClassTag) == materializeClassTag)
-          assert(ReflectApiPackage.map(sym =>
-            getMemberMethod(sym, nme.materializeWeakTypeTag)) == materializeWeakTypeTag)
-          assert(ReflectApiPackage.map(sym =>
-            getMemberMethod(sym, nme.materializeTypeTag)) == materializeTypeTag)
-          ()
+            assert(TypeTagsClass.map(sym =>
+              getMemberClass(sym, tpnme.WeakTypeTag)) == WeakTypeTagClass)
+            assert(TypeTagsClass.map(sym =>
+              getMemberModule(sym, nme.WeakTypeTag)) == WeakTypeTagModule)
+            assert(
+              getMemberMethod(ReflectPackage, nme.materializeClassTag) == materializeClassTag)
+            assert(ReflectApiPackage.map(sym =>
+              getMemberMethod(sym, nme.materializeWeakTypeTag)) == materializeWeakTypeTag)
+            assert(ReflectApiPackage.map(sym =>
+              getMemberMethod(sym, nme.materializeTypeTag)) == materializeTypeTag)
+            ()
+          }
         }
-      }.get match {
+        .get match {
         case Right(t) => t.printStackTrace
         case Left(_) =>
       }

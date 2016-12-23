@@ -278,11 +278,13 @@ trait AccountManagementControllerBase extends ControllerBase {
                             value: String,
                             params: Map[String, String],
                             messages: Messages): Option[String] =
-        getAccountByMailAddress(value, true).filter { x =>
-          if (paramName.isEmpty) true
-          else Some(x.userName) != params.get(paramName)
-        }.map { _ =>
-          "Mail address is already registered."
-        }
+        getAccountByMailAddress(value, true)
+          .filter { x =>
+            if (paramName.isEmpty) true
+            else Some(x.userName) != params.get(paramName)
+          }
+          .map { _ =>
+            "Mail address is already registered."
+          }
     }
 }

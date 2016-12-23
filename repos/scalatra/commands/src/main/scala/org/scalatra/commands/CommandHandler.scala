@@ -11,7 +11,8 @@ import scalaz.syntax.validation._
 
 @deprecated(
   "This approach is not fully type-safe. The compiler can't enforce that the handle method returns a `S`. Please use the `>>` or `apply` method on a command.",
-  "2.2.1")
+  "2.2.1"
+)
 trait CommandHandler {
   @transient private[this] val commandLogger: Logger = Logger[this.type]
   def execute[S: Manifest](cmd: ModelCommand[S]): ModelValidation[S] = {

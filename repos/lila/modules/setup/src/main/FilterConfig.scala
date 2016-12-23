@@ -24,22 +24,26 @@ case class FilterConfig(variant: List[chess.variant.Variant],
       "rating" -> ratingRange.notBroad.map(rr => List(rr.min, rr.max)))
 
   def nonEmpty =
-    copy(variant = variant.isEmpty.fold(FilterConfig.default.variant, variant),
-         mode = mode.isEmpty.fold(FilterConfig.default.mode, mode),
-         speed = speed.isEmpty.fold(FilterConfig.default.speed, speed))
+    copy(
+      variant = variant.isEmpty.fold(FilterConfig.default.variant, variant),
+      mode = mode.isEmpty.fold(FilterConfig.default.mode, mode),
+      speed = speed.isEmpty.fold(FilterConfig.default.speed, speed)
+    )
 }
 
 object FilterConfig {
 
-  val variants = List(chess.variant.Standard,
-                      chess.variant.Chess960,
-                      chess.variant.KingOfTheHill,
-                      chess.variant.ThreeCheck,
-                      chess.variant.Antichess,
-                      chess.variant.Atomic,
-                      chess.variant.Horde,
-                      chess.variant.RacingKings,
-                      chess.variant.Crazyhouse)
+  val variants = List(
+    chess.variant.Standard,
+    chess.variant.Chess960,
+    chess.variant.KingOfTheHill,
+    chess.variant.ThreeCheck,
+    chess.variant.Antichess,
+    chess.variant.Atomic,
+    chess.variant.Horde,
+    chess.variant.RacingKings,
+    chess.variant.Crazyhouse
+  )
 
   val modes = Mode.all
   val speeds = Speed.all
@@ -68,7 +72,8 @@ object FilterConfig {
           variant = r intsD "v" flatMap { chess.variant.Variant(_) },
           mode = r intsD "m" flatMap { Mode(_) },
           speed = r intsD "s" flatMap { Speed(_) },
-          ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default)
+          ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default
+        )
 
       def writes(w: BSON.Writer, o: FilterConfig) =
         BSONDocument("v" -> o.variant.map(_.id),

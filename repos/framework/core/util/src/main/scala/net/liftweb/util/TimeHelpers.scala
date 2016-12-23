@@ -351,7 +351,8 @@ trait TimeHelpers { self: ControlHelpers =>
       */
     @deprecated(
       "Implicit conversion from TimeSpan to Period will be removed due to its unclear behavior; use new TimeSpan(period.toDurationFrom(startDateTime)) instead.",
-      "3.0.0")
+      "3.0.0"
+    )
     implicit def tsToPeriod[TS <% TimeSpan](in: TS): Period = in.toPeriod
 
     /**

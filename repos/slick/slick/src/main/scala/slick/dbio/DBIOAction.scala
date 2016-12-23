@@ -332,9 +332,11 @@ object DBIOAction {
             .asInstanceOf[DBIOAction[Unit, NoStream, E]]
         case n =>
           val last = grouped.length - 1
-          val as = grouped.iterator.zipWithIndex.map {
-            case (g, i) => sequenceGroup(g, i == last)
-          }.toVector
+          val as = grouped.iterator.zipWithIndex
+            .map {
+              case (g, i) => sequenceGroup(g, i == last)
+            }
+            .toVector
           AndThenAction[Unit, NoStream, E](as)
       }
     }
@@ -343,8 +345,8 @@ object DBIOAction {
   /** Create a DBIOAction that runs some other actions in sequence and combines their results
     * with the given function. */
   def fold[T, E <: Effect](actions: Seq[DBIOAction[T, NoStream, E]], zero: T)(
-      f: (T,
-          T) => T)(implicit ec: ExecutionContext): DBIOAction[T, NoStream, E] =
+      f: (T, T) => T)(
+      implicit ec: ExecutionContext): DBIOAction[T, NoStream, E] =
     actions.foldLeft[DBIOAction[T, NoStream, E]](DBIO.successful(zero)) {
       (za, va) =>
         za.flatMap(z => va.map(v => f(z, v)))

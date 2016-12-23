@@ -37,32 +37,39 @@ final class Env(config: Config,
 
   lazy val repo = new SimulRepo(simulColl = simulColl)
 
-  lazy val api = new SimulApi(repo = repo,
-                              system = system,
-                              socketHub = socketHub,
-                              site = hub.socket.site,
-                              renderer = hub.actor.renderer,
-                              timeline = hub.actor.timeline,
-                              userRegister = hub.actor.userRegister,
-                              lobby = hub.socket.lobby,
-                              onGameStart = onGameStart,
-                              sequencers = sequencerMap)
+  lazy val api = new SimulApi(
+    repo = repo,
+    system = system,
+    socketHub = socketHub,
+    site = hub.socket.site,
+    renderer = hub.actor.renderer,
+    timeline = hub.actor.timeline,
+    userRegister = hub.actor.userRegister,
+    lobby = hub.socket.lobby,
+    onGameStart = onGameStart,
+    sequencers = sequencerMap
+  )
 
   lazy val forms = new DataForm
 
   lazy val jsonView = new JsonView(lightUser)
 
   private val socketHub =
-    system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket] {
-      def mkActor(simulId: String) =
-        new Socket(simulId = simulId,
-                   history = new History(ttl = HistoryMessageTtl),
-                   getSimul = repo.find,
-                   jsonView = jsonView,
-                   uidTimeout = UidTimeout,
-                   socketTimeout = SocketTimeout,
-                   lightUser = lightUser)
-    }), name = SocketName)
+    system.actorOf(
+      Props(new lila.socket.SocketHubActor.Default[Socket] {
+        def mkActor(simulId: String) =
+          new Socket(
+            simulId = simulId,
+            history = new History(ttl = HistoryMessageTtl),
+            getSimul = repo.find,
+            jsonView = jsonView,
+            uidTimeout = UidTimeout,
+            socketTimeout = SocketTimeout,
+            lightUser = lightUser
+          )
+      }),
+      name = SocketName
+    )
 
   lazy val socketHandler = new SocketHandler(hub = hub,
                                              socketHub = socketHub,
@@ -70,26 +77,30 @@ final class Env(config: Config,
                                              flood = flood,
                                              exists = repo.exists)
 
-  system.actorOf(Props(new Actor {
-    override def preStart() {
-      system.lilaBus.subscribe(self, 'finishGame, 'adjustCheater, 'moveEvent)
-    }
-    import akka.pattern.pipe
-    def receive = {
-      case lila.game.actorApi.FinishGame(game, _, _) => api finishGame game
-      case lila.hub.actorApi.mod.MarkCheater(userId) => api ejectCheater userId
-      case lila.hub.actorApi.simul.GetHostIds =>
-        api.currentHostIds pipeTo sender
-      case move: lila.hub.actorApi.round.MoveEvent =>
-        move.simulId foreach { simulId =>
-          move.opponentUserId foreach { opId =>
-            hub.actor.userRegister ! lila.hub.actorApi.SendTo(
-              opId,
-              lila.socket.Socket.makeMessage("simulPlayerMove", move.gameId))
+  system.actorOf(
+    Props(new Actor {
+      override def preStart() {
+        system.lilaBus.subscribe(self, 'finishGame, 'adjustCheater, 'moveEvent)
+      }
+      import akka.pattern.pipe
+      def receive = {
+        case lila.game.actorApi.FinishGame(game, _, _) => api finishGame game
+        case lila.hub.actorApi.mod.MarkCheater(userId) =>
+          api ejectCheater userId
+        case lila.hub.actorApi.simul.GetHostIds =>
+          api.currentHostIds pipeTo sender
+        case move: lila.hub.actorApi.round.MoveEvent =>
+          move.simulId foreach { simulId =>
+            move.opponentUserId foreach { opId =>
+              hub.actor.userRegister ! lila.hub.actorApi.SendTo(
+                opId,
+                lila.socket.Socket.makeMessage("simulPlayerMove", move.gameId))
+            }
           }
-        }
-    }
-  }), name = ActorName)
+      }
+    }),
+    name = ActorName
+  )
 
   def isHosting(userId: String): Fu[Boolean] =
     api.currentHostIds map (_ contains userId)
@@ -121,14 +132,16 @@ object Env {
   private def hub = lila.hub.Env.current
 
   lazy val current =
-    "simul" boot new Env(config = lila.common.PlayApp loadConfig "simul",
-                         system = lila.common.PlayApp.system,
-                         scheduler = lila.common.PlayApp.scheduler,
-                         db = lila.db.Env.current,
-                         mongoCache = lila.memo.Env.current.mongoCache,
-                         flood = lila.security.Env.current.flood,
-                         hub = lila.hub.Env.current,
-                         lightUser = lila.user.Env.current.lightUser,
-                         onGameStart = lila.game.Env.current.onStart,
-                         isOnline = lila.user.Env.current.isOnline)
+    "simul" boot new Env(
+      config = lila.common.PlayApp loadConfig "simul",
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler,
+      db = lila.db.Env.current,
+      mongoCache = lila.memo.Env.current.mongoCache,
+      flood = lila.security.Env.current.flood,
+      hub = lila.hub.Env.current,
+      lightUser = lila.user.Env.current.lightUser,
+      onGameStart = lila.game.Env.current.onStart,
+      isOnline = lila.user.Env.current.isOnline
+    )
 }

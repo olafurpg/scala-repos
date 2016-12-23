@@ -14,12 +14,14 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 3/2/12
   */
 class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
-  val surrounders = Array[Surrounder](new ScalaDocWithBoldSurrounder,
-                                      new ScalaDocWithUnderlinedSurrounder,
-                                      new ScalaDocWithMonospaceSurrounder,
-                                      new ScalaDocWithItalicSurrounder,
-                                      new ScalaDocWithSubscriptSurrounder,
-                                      new ScalaDocWithSuperscriptSurrounder)
+  val surrounders = Array[Surrounder](
+    new ScalaDocWithBoldSurrounder,
+    new ScalaDocWithUnderlinedSurrounder,
+    new ScalaDocWithMonospaceSurrounder,
+    new ScalaDocWithItalicSurrounder,
+    new ScalaDocWithSubscriptSurrounder,
+    new ScalaDocWithSuperscriptSurrounder
+  )
 
   def getElementsToSurround(file: PsiFile,
                             startOffset: Int,

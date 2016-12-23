@@ -1183,7 +1183,8 @@ trait DB extends Loggable {
       "with",
       "work",
       "write",
-      "xor")
+      "xor"
+    )
 }
 
 class SuperConnection(val connection: Connection,

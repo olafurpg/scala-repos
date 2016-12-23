@@ -21,6 +21,7 @@ trait PropSpecSingleTestTest extends PropSpecGenerator {
       root =>
         checkResultTreeHasExactNamedPath(root, propSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "other tests should not run"),
-      debug = true)
+      debug = true
+    )
   }
 }

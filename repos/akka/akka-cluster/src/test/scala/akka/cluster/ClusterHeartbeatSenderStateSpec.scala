@@ -55,7 +55,8 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
                                monitoredByNrOfMembers = 3),
       oldReceiversNowUnreachable = Set.empty[UniqueAddress],
       failureDetector = new DefaultFailureDetectorRegistry[Address](() ⇒
-        new FailureDetectorStub))
+        new FailureDetectorStub)
+    )
 
   private def fd(state: ClusterHeartbeatSenderState,
                  node: UniqueAddress): FailureDetectorStub =

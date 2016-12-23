@@ -211,32 +211,39 @@ object IntentionUtils {
     if (expr == null || f == null || secondPart == null) return
     CommandProcessor
       .getInstance()
-      .executeCommand(project, new Runnable {
-        def run() {
-          val buf = new StringBuilder
-          val clazz = f.containingClass
-          if (clazz != null && secondPart.contains(f))
-            buf.append(clazz.name).append(".")
+      .executeCommand(
+        project,
+        new Runnable {
+          def run() {
+            val buf = new StringBuilder
+            val clazz = f.containingClass
+            if (clazz != null && secondPart.contains(f))
+              buf.append(clazz.name).append(".")
 
-          buf.append(f.name).append("(").append(expr.getText).append(")")
-          val newExpr = ScalaPsiElementFactory
-            .createExpressionFromText(buf.toString(), expr.getManager)
+            buf.append(f.name).append("(").append(expr.getText).append(")")
+            val newExpr = ScalaPsiElementFactory
+              .createExpressionFromText(buf.toString(), expr.getManager)
 
-          inWriteAction {
-            val replaced = expr.replace(newExpr)
-            val ref = replaced
-              .asInstanceOf[ScMethodCall]
-              .deepestInvokedExpr
-              .asInstanceOf[ScReferenceExpression]
-            val qualRef = ref.qualifier.orNull
-            if (clazz != null && qualRef != null && secondPart.contains(f))
-              qualRef.asInstanceOf[ScReferenceExpression].bindToElement(clazz)
-            PsiDocumentManager
-              .getInstance(project)
-              .commitDocument(editor.getDocument)
+            inWriteAction {
+              val replaced = expr.replace(newExpr)
+              val ref = replaced
+                .asInstanceOf[ScMethodCall]
+                .deepestInvokedExpr
+                .asInstanceOf[ScReferenceExpression]
+              val qualRef = ref.qualifier.orNull
+              if (clazz != null && qualRef != null && secondPart.contains(f))
+                qualRef
+                  .asInstanceOf[ScReferenceExpression]
+                  .bindToElement(clazz)
+              PsiDocumentManager
+                .getInstance(project)
+                .commitDocument(editor.getDocument)
+            }
           }
-        }
-      }, null, null)
+        },
+        null,
+        null
+      )
   }
 
   def replaceWithExplicitStatically(expr: ScExpression,
@@ -247,36 +254,41 @@ object IntentionUtils {
     if (expr == null || f == null || secondPart == null) return
     CommandProcessor
       .getInstance()
-      .executeCommand(project, new Runnable {
-        def run() {
-          val buf = new StringBuilder
-          val clazz = f.containingClass
-          if (clazz != null && secondPart.contains(f))
-            buf.append(clazz.qualifiedName).append(".")
+      .executeCommand(
+        project,
+        new Runnable {
+          def run() {
+            val buf = new StringBuilder
+            val clazz = f.containingClass
+            if (clazz != null && secondPart.contains(f))
+              buf.append(clazz.qualifiedName).append(".")
 
-          val bufExpr = new StringBuilder
-          bufExpr.append(f.name).append("(").append(expr.getText).append(")")
-          buf.append(bufExpr.toString())
-          val newExpr = ScalaPsiElementFactory
-            .createExpressionFromText(bufExpr.toString(), expr.getManager)
-          val fullRef = ScalaPsiElementFactory
-            .createReferenceFromText(buf.toString(), expr.getManager)
-            .resolve()
+            val bufExpr = new StringBuilder
+            bufExpr.append(f.name).append("(").append(expr.getText).append(")")
+            buf.append(bufExpr.toString())
+            val newExpr = ScalaPsiElementFactory
+              .createExpressionFromText(bufExpr.toString(), expr.getManager)
+            val fullRef = ScalaPsiElementFactory
+              .createReferenceFromText(buf.toString(), expr.getManager)
+              .resolve()
 
-          inWriteAction {
-            val replaced = expr.replace(newExpr)
-            val ref = replaced
-              .asInstanceOf[ScMethodCall]
-              .deepestInvokedExpr
-              .asInstanceOf[ScReferenceExpression]
-            if (clazz != null && fullRef != null && secondPart.contains(f))
-              ref.bindToElement(fullRef, Some(clazz))
-            PsiDocumentManager
-              .getInstance(project)
-              .commitDocument(editor.getDocument)
+            inWriteAction {
+              val replaced = expr.replace(newExpr)
+              val ref = replaced
+                .asInstanceOf[ScMethodCall]
+                .deepestInvokedExpr
+                .asInstanceOf[ScReferenceExpression]
+              if (clazz != null && fullRef != null && secondPart.contains(f))
+                ref.bindToElement(fullRef, Some(clazz))
+              PsiDocumentManager
+                .getInstance(project)
+                .commitDocument(editor.getDocument)
+            }
           }
-        }
-      }, null, null)
+        },
+        null,
+        null
+      )
   }
 
   def showMakeExplicitPopup(project: Project,

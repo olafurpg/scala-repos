@@ -118,25 +118,26 @@ object RunWorkflow extends Logging {
                "spark.serializer=org.apache.spark.serializer.KryoSerializer")
          } else {
            Seq()
-         }) ++ Seq(mainJar,
-                   "--env",
-                   pioEnvVars,
-                   "--engine-id",
-                   em.id,
-                   "--engine-version",
-                   em.version,
-                   "--engine-variant",
-                   if (deployMode == "cluster") {
-                     hdfs
-                       .makeQualified(
-                         new Path((engineLocation :+ variantJson.getName)
-                           .mkString(Path.SEPARATOR)))
-                       .toString
-                   } else {
-                     variantJson.getCanonicalPath
-                   },
-                   "--verbosity",
-                   ca.common.verbosity.toString) ++ ca.common.engineFactory
+         }) ++ Seq(
+        mainJar,
+        "--env",
+        pioEnvVars,
+        "--engine-id",
+        em.id,
+        "--engine-version",
+        em.version,
+        "--engine-variant",
+        if (deployMode == "cluster") {
+          hdfs
+            .makeQualified(new Path((engineLocation :+ variantJson.getName)
+              .mkString(Path.SEPARATOR)))
+            .toString
+        } else {
+          variantJson.getCanonicalPath
+        },
+        "--verbosity",
+        ca.common.verbosity.toString
+      ) ++ ca.common.engineFactory
         .map(x => Seq("--engine-factory", x))
         .getOrElse(Seq()) ++ ca.common.engineParamsKey
         .map(x => Seq("--engine-params-key", x))

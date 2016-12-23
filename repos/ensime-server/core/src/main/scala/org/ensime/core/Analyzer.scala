@@ -296,9 +296,11 @@ class Analyzer(
   def handleReloadFiles(files: List[SourceFileInfo]): RpcResponse = {
     val (existing, missingFiles) = files.partition(FileUtils.exists)
     if (missingFiles.nonEmpty) {
-      val missingFilePaths = missingFiles.map { f =>
-        "\"" + f.file + "\""
-      }.mkString(",")
+      val missingFilePaths = missingFiles
+        .map { f =>
+          "\"" + f.file + "\""
+        }
+        .mkString(",")
       EnsimeServerError(s"file(s): $missingFilePaths do not exist")
     } else {
       val (javas, scalas) =

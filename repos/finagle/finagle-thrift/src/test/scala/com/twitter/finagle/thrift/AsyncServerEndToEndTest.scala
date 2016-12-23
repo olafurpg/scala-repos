@@ -31,20 +31,23 @@ class AsyncServerEndToEndTest extends FunSuite {
         pipeline.addLast("framer", new ThriftFrameCodec)
         pipeline.addLast("decode", new ThriftServerDecoder(protocolFactory))
         pipeline.addLast("encode", new ThriftServerEncoder(protocolFactory))
-        pipeline.addLast("handler", new SimpleChannelUpstreamHandler {
-          override def messageReceived(ctx: ChannelHandlerContext,
-                                       e: MessageEvent) {
-            e.getMessage match {
-              case bleep: ThriftCall[Silly.bleep_args, Silly.bleep_result]
-                  if bleep.method.equals("bleep") =>
-                val response = bleep.newReply
-                response.setSuccess(bleep.arguments.request.reverse)
-                Channels.write(ctx.getChannel, bleep.reply(response))
-              case _ =>
-                throw new IllegalArgumentException
+        pipeline.addLast(
+          "handler",
+          new SimpleChannelUpstreamHandler {
+            override def messageReceived(ctx: ChannelHandlerContext,
+                                         e: MessageEvent) {
+              e.getMessage match {
+                case bleep: ThriftCall[Silly.bleep_args, Silly.bleep_result]
+                    if bleep.method.equals("bleep") =>
+                  val response = bleep.newReply
+                  response.setSuccess(bleep.arguments.request.reverse)
+                  Channels.write(ctx.getChannel, bleep.reply(response))
+                case _ =>
+                  throw new IllegalArgumentException
+              }
             }
           }
-        })
+        )
         pipeline
       }
     })
@@ -60,13 +63,16 @@ class AsyncServerEndToEndTest extends FunSuite {
         pipeline.addLast("framer", new ThriftFrameCodec)
         pipeline.addLast("decode", new ThriftClientDecoder(protocolFactory))
         pipeline.addLast("encode", new ThriftClientEncoder(protocolFactory))
-        pipeline.addLast("handler", new SimpleChannelUpstreamHandler {
-          override def messageReceived(ctx: ChannelHandlerContext,
-                                       e: MessageEvent) {
-            callResults() = Return(
-              e.getMessage.asInstanceOf[ThriftReply[Silly.bleep_result]])
+        pipeline.addLast(
+          "handler",
+          new SimpleChannelUpstreamHandler {
+            override def messageReceived(ctx: ChannelHandlerContext,
+                                         e: MessageEvent) {
+              callResults() = Return(
+                e.getMessage.asInstanceOf[ThriftReply[Silly.bleep_result]])
+            }
           }
-        })
+        )
 
         pipeline
       }

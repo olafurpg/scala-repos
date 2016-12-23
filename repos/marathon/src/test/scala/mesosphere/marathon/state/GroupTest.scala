@@ -16,15 +16,15 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("can find a group by its path") {
       Given("an existing group with two subgroups")
       val current = Group.empty.copy(
-          groups = Set(Group("/test".toPath,
-                             groups = Set(
-                                   Group("/test/group1".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group1/app1".toPath))),
-                                   Group("/test/group2".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
-                               ))))
+        groups = Set(Group(
+          "/test".toPath,
+          groups = Set(
+            Group("/test/group1".toPath,
+                  Set(AppDefinition("/test/group1/app1".toPath))),
+            Group("/test/group2".toPath,
+                  Set(AppDefinition("/test/group2/app2".toPath)))
+          )
+        )))
 
       When("a group with a specific path is requested")
       val path = PathId("/test/group1")
@@ -36,15 +36,15 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("can not find a group if its not existing") {
       Given("an existing group with two subgroups")
       val current = Group.empty.copy(
-          groups = Set(Group("/test".toPath,
-                             groups = Set(
-                                   Group("/test/group1".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group1/app1".toPath))),
-                                   Group("/test/group2".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
-                               ))))
+        groups = Set(Group(
+          "/test".toPath,
+          groups = Set(
+            Group("/test/group1".toPath,
+                  Set(AppDefinition("/test/group1/app1".toPath))),
+            Group("/test/group2".toPath,
+                  Set(AppDefinition("/test/group2/app2".toPath)))
+          )
+        )))
 
       When("a group with a specific path is requested")
       val path = PathId("/test/unknown")
@@ -57,27 +57,23 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       Given("an group with subgroups")
       val current =
         Group.empty.copy(
+          groups = Set(Group(
+            "/test".toPath,
             groups = Set(
-                  Group("/test".toPath,
-                        groups = Set(
-                              Group("/test/group1".toPath,
-                                    Set(AppDefinition(
-                                            "/test/group1/app1".toPath))),
-                              Group(
-                                  "/test/group2".toPath,
-                                  Set(AppDefinition(
-                                          "/test/group2/app2".toPath)),
-                                  Set(
-                                      Group(
-                                          "/test/group2/a".toPath,
-                                          Set(AppDefinition(
-                                                  "/test/group2/a/app1".toPath))),
-                                      Group(
-                                          "/test/group2/b".toPath,
-                                          Set(AppDefinition(
-                                                  "/test/group2/b/app1".toPath)))
-                                  ))
-                          ))))
+              Group("/test/group1".toPath,
+                    Set(AppDefinition("/test/group1/app1".toPath))),
+              Group(
+                "/test/group2".toPath,
+                Set(AppDefinition("/test/group2/app2".toPath)),
+                Set(
+                  Group("/test/group2/a".toPath,
+                        Set(AppDefinition("/test/group2/a/app1".toPath))),
+                  Group("/test/group2/b".toPath,
+                        Set(AppDefinition("/test/group2/b/app1".toPath)))
+                )
+              )
+            )
+          )))
 
       When("a group with a specific path is requested")
       val allowed = "/test/group2/a".toPath
@@ -100,15 +96,15 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("can do an update by applying a change function") {
       Given("an existing group with two subgroups")
       val current = Group.empty.copy(
-          groups = Set(Group("/test".toPath,
-                             groups = Set(
-                                   Group("/test/group1".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group1/app1".toPath))),
-                                   Group("/test/group2".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
-                               ))))
+        groups = Set(Group(
+          "/test".toPath,
+          groups = Set(
+            Group("/test/group1".toPath,
+                  Set(AppDefinition("/test/group1/app1".toPath))),
+            Group("/test/group2".toPath,
+                  Set(AppDefinition("/test/group2/app2".toPath)))
+          )
+        )))
 
       When("the group will be updated")
       val timestamp = Timestamp.now()
@@ -130,15 +126,15 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("can do an update by applying a change function with a path identifier") {
       Given("an existing group with two subgroups")
       val current = Group.empty.copy(
-          groups = Set(Group("/test".toPath,
-                             groups = Set(
-                                   Group("/test/group1".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group1/app1".toPath))),
-                                   Group("/test/group2".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
-                               ))))
+        groups = Set(Group(
+          "/test".toPath,
+          groups = Set(
+            Group("/test/group1".toPath,
+                  Set(AppDefinition("/test/group1/app1".toPath))),
+            Group("/test/group2".toPath,
+                  Set(AppDefinition("/test/group2/app2".toPath)))
+          )
+        )))
 
       When("the group will be updated")
       val timestamp = Timestamp.now()
@@ -173,15 +169,15 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("can make groups specified by a path") {
       Given("a group with subgroups")
       val current = Group.empty.copy(
-          groups = Set(Group("/test".toPath,
-                             groups = Set(
-                                   Group("/test/group1".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group1/app1".toPath))),
-                                   Group("/test/group2".toPath,
-                                         Set(AppDefinition(
-                                                 "/test/group2/app2".toPath)))
-                               ))))
+        groups = Set(Group(
+          "/test".toPath,
+          groups = Set(
+            Group("/test/group1".toPath,
+                  Set(AppDefinition("/test/group1/app1".toPath))),
+            Group("/test/group2".toPath,
+                  Set(AppDefinition("/test/group2/app2".toPath)))
+          )
+        )))
 
       When("a non existing path is requested")
       val path = PathId("/test/group3/group4/group5")
@@ -211,29 +207,31 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       // at the time of the creation of this test/issue. They are only visible in the GUI if they contain apps.
 
       Given(
-          "an existing group /some/nested which does not directly or indirectly contain apps")
+        "an existing group /some/nested which does not directly or indirectly contain apps")
       val current = Group.empty
         .makeGroup("/some/nested/path".toPath)
         .makeGroup("/some/nested/path2".toPath)
 
       current.transitiveGroups.map(_.id.toString) should be(
-          Set("/",
-              "/some",
-              "/some/nested",
-              "/some/nested/path",
-              "/some/nested/path2"))
+        Set("/",
+            "/some",
+            "/some/nested",
+            "/some/nested/path",
+            "/some/nested/path2"))
 
       When("requesting to put an app definition")
       val changed = current.updateApp(
-          "/some/nested".toPath,
-          _ => AppDefinition("/some/nested".toPath, cmd = Some("true")),
-          Timestamp.now())
+        "/some/nested".toPath,
+        _ => AppDefinition("/some/nested".toPath, cmd = Some("true")),
+        Timestamp.now())
 
-      Then("the group with same path has been replaced by the new app definition")
+      Then(
+        "the group with same path has been replaced by the new app definition")
       changed.transitiveGroups.map(_.id.toString) should be(Set("/", "/some"))
       changed.transitiveApps.map(_.id.toString) should be(Set("/some/nested"))
 
-      Then("the resulting group should be valid when represented in the V2 API model")
+      Then(
+        "the resulting group should be valid when represented in the V2 API model")
       validate(changed) should be(Success)
     }
 
@@ -249,33 +247,34 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
                    Timestamp.now())
 
       current.transitiveGroups.map(_.id.toString) should be(
-          Set("/",
-              "/some",
-              "/some/nested",
-              "/some/nested/path",
-              "/some/nested/path2"))
+        Set("/",
+            "/some",
+            "/some/nested",
+            "/some/nested/path",
+            "/some/nested/path2"))
 
       When("requesting to put an app definition")
       val changed = current.updateApp(
-          "/some/nested".toPath,
-          _ => AppDefinition("/some/nested".toPath, cmd = Some("true")),
-          Timestamp.now())
+        "/some/nested".toPath,
+        _ => AppDefinition("/some/nested".toPath, cmd = Some("true")),
+        Timestamp.now())
 
-      Then("the group with same path has NOT been replaced by the new app definition")
+      Then(
+        "the group with same path has NOT been replaced by the new app definition")
       current.transitiveGroups.map(_.id.toString) should be(
-          Set("/",
-              "/some",
-              "/some/nested",
-              "/some/nested/path",
-              "/some/nested/path2"))
+        Set("/",
+            "/some",
+            "/some/nested",
+            "/some/nested/path",
+            "/some/nested/path2"))
       changed.transitiveApps.map(_.id.toString) should be(
-          Set("/some/nested", "/some/nested/path2/app"))
+        Set("/some/nested", "/some/nested/path2/app"))
 
       Then("the conflict will be detected by our V2 API model validation")
       val result = validate(changed)
       result.isFailure should be(true)
       ValidationHelper.getAllRuleConstrains(result).head.message should be(
-          "Groups and Applications may not have the same identifier.")
+        "Groups and Applications may not have the same identifier.")
     }
 
     it("can marshal and unmarshal from to protos") {
@@ -283,23 +282,23 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       val now = Timestamp(11)
       val fullVersion = VersionInfo.forNewConfig(now)
       val current = Group.empty.copy(
+        groups = Set(Group(
+          "/test".toPath,
           groups = Set(
-                Group("/test".toPath,
-                      groups = Set(
-                            Group("/test/group1".toPath,
-                                  Set(
-                                      AppDefinition(
-                                          "/test/group1/app1".toPath,
-                                          args = Some(Seq("a", "b", "c")),
-                                          versionInfo = fullVersion)
-                                  )),
-                            Group("/test/group2".toPath,
-                                  Set(
-                                      AppDefinition("/test/group2/app2".toPath,
-                                                    args = Some(Seq("a", "b")),
-                                                    versionInfo = fullVersion)
-                                  ))
-                        ))))
+            Group("/test/group1".toPath,
+                  Set(
+                    AppDefinition("/test/group1/app1".toPath,
+                                  args = Some(Seq("a", "b", "c")),
+                                  versionInfo = fullVersion)
+                  )),
+            Group("/test/group2".toPath,
+                  Set(
+                    AppDefinition("/test/group2/app2".toPath,
+                                  args = Some(Seq("a", "b")),
+                                  versionInfo = fullVersion)
+                  ))
+          )
+        )))
 
       When("the group is marshalled and unmarshalled again")
       val group = Group.fromProto(current.toProto)
@@ -311,70 +310,61 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("can turn a group with group dependencies into a dependency graph") {
       Given("a group with subgroups and dependencies")
       val current: Group = Group.empty.copy(
-          groups = Set(Group(
-                    "/test".toPath,
-                    groups = Set(
-                          Group("/test/database".toPath,
-                                groups = Set(
-                                      Group("/test/database/redis".toPath,
-                                            Set(AppDefinition(
-                                                    "/test/database/redis/r1".toPath))),
-                                      Group(
-                                          "/test/database/memcache".toPath,
-                                          Set(AppDefinition(
-                                                  "/test/database/memcache/c1".toPath)),
-                                          dependencies = Set(
-                                                "/test/database/mongo".toPath,
-                                                "/test/database/redis".toPath)),
-                                      Group(
-                                          "/test/database/mongo".toPath,
-                                          Set(AppDefinition(
-                                                  "/test/database/mongo/m1".toPath)),
-                                          dependencies = Set(
-                                                "/test/database/redis".toPath))
-                                  )),
-                          Group(
-                              "/test/service".toPath,
-                              groups = Set(
-                                    Group("/test/service/service1".toPath,
-                                          Set(AppDefinition(
-                                                  "/test/service/service1/s1".toPath)),
-                                          dependencies = Set(
-                                                "/test/database/memcache".toPath)),
-                                    Group(
-                                        "/test/service/service2".toPath,
-                                        Set(AppDefinition(
-                                                "/test/service/service2/s2".toPath)),
-                                        dependencies = Set(
-                                              "/test/database".toPath,
-                                              "/test/service/service1".toPath))
-                                )),
-                          Group(
-                              "/test/frontend".toPath,
-                              groups = Set(
-                                    Group(
-                                        "/test/frontend/app1".toPath,
-                                        Set(AppDefinition(
-                                                "/test/frontend/app1/a1".toPath)),
-                                        dependencies = Set(
-                                              "/test/service/service2".toPath)),
-                                    Group(
-                                        "/test/frontend/app2".toPath,
-                                        Set(AppDefinition(
-                                                "/test/frontend/app2/a2".toPath)),
-                                        dependencies = Set(
-                                              "/test/service".toPath,
-                                              "/test/database/mongo".toPath,
-                                              "/test/frontend/app1".toPath))
-                                )),
-                          Group(
-                              "/test/cache".toPath,
-                              groups = Set(
-                                    Group("/test/cache/c1".toPath,
-                                          Set(AppDefinition(
-                                                  "/test/cache/c1/c1".toPath))) //has no dependencies
-                                ))
-                      ))))
+        groups = Set(Group(
+          "/test".toPath,
+          groups = Set(
+            Group(
+              "/test/database".toPath,
+              groups = Set(
+                Group("/test/database/redis".toPath,
+                      Set(AppDefinition("/test/database/redis/r1".toPath))),
+                Group(
+                  "/test/database/memcache".toPath,
+                  Set(AppDefinition("/test/database/memcache/c1".toPath)),
+                  dependencies = Set("/test/database/mongo".toPath,
+                                     "/test/database/redis".toPath)
+                ),
+                Group("/test/database/mongo".toPath,
+                      Set(AppDefinition("/test/database/mongo/m1".toPath)),
+                      dependencies = Set("/test/database/redis".toPath))
+              )
+            ),
+            Group(
+              "/test/service".toPath,
+              groups = Set(
+                Group("/test/service/service1".toPath,
+                      Set(AppDefinition("/test/service/service1/s1".toPath)),
+                      dependencies = Set("/test/database/memcache".toPath)),
+                Group(
+                  "/test/service/service2".toPath,
+                  Set(AppDefinition("/test/service/service2/s2".toPath)),
+                  dependencies = Set("/test/database".toPath,
+                                     "/test/service/service1".toPath)
+                )
+              )
+            ),
+            Group(
+              "/test/frontend".toPath,
+              groups = Set(
+                Group("/test/frontend/app1".toPath,
+                      Set(AppDefinition("/test/frontend/app1/a1".toPath)),
+                      dependencies = Set("/test/service/service2".toPath)),
+                Group(
+                  "/test/frontend/app2".toPath,
+                  Set(AppDefinition("/test/frontend/app2/a2".toPath)),
+                  dependencies = Set("/test/service".toPath,
+                                     "/test/database/mongo".toPath,
+                                     "/test/frontend/app1".toPath)
+                )
+              )
+            ),
+            Group("/test/cache".toPath,
+                  groups = Set(
+                    Group("/test/cache/c1".toPath,
+                          Set(AppDefinition("/test/cache/c1/c1".toPath))) //has no dependencies
+                  ))
+          )
+        )))
       current.hasNonCyclicDependencies should equal(true)
 
       When("the dependency graph is computed")
@@ -385,14 +375,14 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       ids should have size 8
 
       val expectedIds = Set[PathId](
-          "/test/database/redis/r1".toPath,
-          "/test/database/mongo/m1".toPath,
-          "/test/database/memcache/c1".toPath,
-          "/test/service/service1/s1".toPath,
-          "/test/service/service2/s2".toPath,
-          "/test/frontend/app1/a1".toPath,
-          "/test/frontend/app2/a2".toPath,
-          "/test/cache/c1/c1".toPath
+        "/test/database/redis/r1".toPath,
+        "/test/database/mongo/m1".toPath,
+        "/test/database/memcache/c1".toPath,
+        "/test/service/service1/s1".toPath,
+        "/test/service/service2/s2".toPath,
+        "/test/frontend/app1/a1".toPath,
+        "/test/frontend/app2/a2".toPath,
+        "/test/cache/c1/c1".toPath
       )
       ids should equal(expectedIds)
 
@@ -402,52 +392,56 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("can turn a group with app dependencies into a dependency graph") {
       Given("a group with subgroups and dependencies")
       val current: Group = Group.empty
-        .copy(groups = Set(
-                Group("/test".toPath,
-                      groups = Set(Group(
-                                       "/test/database".toPath,
-                                       Set(
-                                           AppDefinition(
-                                               "/test/database/redis".toPath),
-                                           AppDefinition(
-                                               "/test/database/memcache".toPath,
-                                               dependencies = Set(
-                                                     "/test/database/mongo".toPath,
-                                                     "/test/database/redis".toPath)),
-                                           AppDefinition(
-                                               "/test/database/mongo".toPath,
-                                               dependencies = Set("/test/database/redis".toPath))
-                                       )),
-                                   Group(
-                                       "/test/service".toPath,
-                                       Set(
-                                           AppDefinition("/test/service/srv1".toPath,
-                                                         dependencies = Set("/test/database/memcache".toPath)),
-                                           AppDefinition(
-                                               "/test/service/srv2".toPath,
-                                               dependencies = Set(
-                                                     "/test/database/mongo".toPath,
-                                                     "/test/service/srv1".toPath))
-                                       )),
-                                   Group("/test/frontend".toPath,
-                                         Set(
-                                             AppDefinition(
-                                                 "/test/frontend/app1".toPath,
-                                                 dependencies = Set(
-                                                       "/test/service/srv2".toPath)),
-                                             AppDefinition(
-                                                 "/test/frontend/app2".toPath,
-                                                 dependencies = Set(
-                                                       "/test/service/srv2".toPath,
-                                                       "/test/database/mongo".toPath,
-                                                       "/test/frontend/app1".toPath))
-                                         )),
-                                   Group("/test/cache".toPath,
-                                         Set(
-                                             AppDefinition(
-                                                 "/test/cache/cache1".toPath) //has no dependencies
-                                         ))))
-            ))
+        .copy(
+          groups = Set(
+            Group(
+              "/test".toPath,
+              groups = Set(
+                Group(
+                  "/test/database".toPath,
+                  Set(
+                    AppDefinition("/test/database/redis".toPath),
+                    AppDefinition("/test/database/memcache".toPath,
+                                  dependencies =
+                                    Set("/test/database/mongo".toPath,
+                                        "/test/database/redis".toPath)),
+                    AppDefinition("/test/database/mongo".toPath,
+                                  dependencies =
+                                    Set("/test/database/redis".toPath))
+                  )
+                ),
+                Group(
+                  "/test/service".toPath,
+                  Set(
+                    AppDefinition("/test/service/srv1".toPath,
+                                  dependencies =
+                                    Set("/test/database/memcache".toPath)),
+                    AppDefinition("/test/service/srv2".toPath,
+                                  dependencies =
+                                    Set("/test/database/mongo".toPath,
+                                        "/test/service/srv1".toPath))
+                  )
+                ),
+                Group(
+                  "/test/frontend".toPath,
+                  Set(
+                    AppDefinition("/test/frontend/app1".toPath,
+                                  dependencies =
+                                    Set("/test/service/srv2".toPath)),
+                    AppDefinition("/test/frontend/app2".toPath,
+                                  dependencies =
+                                    Set("/test/service/srv2".toPath,
+                                        "/test/database/mongo".toPath,
+                                        "/test/frontend/app1".toPath))
+                  )
+                ),
+                Group("/test/cache".toPath,
+                      Set(
+                        AppDefinition("/test/cache/cache1".toPath) //has no dependencies
+                      ))
+              )
+            )
+          ))
       current.hasNonCyclicDependencies should equal(true)
 
       When("the dependency graph is calculated")
@@ -458,14 +452,14 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       ids should have size 8
       ids should not contain PathId("/test/cache/c1")
       val expected = Set[PathId](
-          "/test/database/redis".toPath,
-          "/test/database/mongo".toPath,
-          "/test/database/memcache".toPath,
-          "/test/service/srv1".toPath,
-          "/test/service/srv2".toPath,
-          "/test/frontend/app1".toPath,
-          "/test/frontend/app2".toPath,
-          "/test/cache/cache1".toPath
+        "/test/database/redis".toPath,
+        "/test/database/mongo".toPath,
+        "/test/database/memcache".toPath,
+        "/test/service/srv1".toPath,
+        "/test/service/srv2".toPath,
+        "/test/frontend/app1".toPath,
+        "/test/frontend/app2".toPath,
+        "/test/cache/cache1".toPath
       )
       ids should be(expected)
 
@@ -475,53 +469,46 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("can turn a group without dependencies into a dependency graph") {
       Given("a group with subgroups and dependencies")
       val current: Group = Group.empty.copy(
-          groups = Set(Group(
-                    "/test".toPath,
-                    groups = Set(
-                          Group(
-                              "/test/database".toPath,
-                              groups = Set(
-                                    Group(
-                                        "/test/database/redis".toPath,
-                                        Set(AppDefinition(
-                                                "/test/database/redis/r1".toPath))),
-                                    Group("/test/database/memcache".toPath,
-                                          Set(AppDefinition(
-                                                  "/test/database/memcache/m1".toPath))),
-                                    Group("/test/database/mongo".toPath,
-                                          Set(AppDefinition(
-                                                  "/test/database/mongo/m1".toPath)))
-                                )),
-                          Group(
-                              "/test/service".toPath,
-                              groups = Set(
-                                    Group(
-                                        "/test/service/service1".toPath,
-                                        Set(
-                                            AppDefinition(
-                                                "/test/service/service1/srv1".toPath))),
-                                    Group(
-                                        "/test/service/service2".toPath,
-                                        Set(AppDefinition("/test/service/service2/srv2".toPath)))
-                                )),
-                          Group("/test/frontend".toPath,
-                                groups = Set(
-                                      Group(
-                                          "/test/frontend/app1".toPath,
-                                          Set(AppDefinition("/test/frontend/app1/a1".toPath))),
-                                      Group("/test/frontend/app2".toPath,
-                                            Set(AppDefinition(
-                                                    "/test/frontend/app2/a2".toPath)))
-                                  )),
-                          Group(
-                              "/test/cache".toPath,
-                              groups = Set(
-                                    Group(
-                                        "/test/cache/c1".toPath,
-                                        Set(AppDefinition(
-                                                "/test/cache/c1/cache1".toPath)))
-                                ))
-                      ))))
+        groups = Set(Group(
+          "/test".toPath,
+          groups = Set(
+            Group(
+              "/test/database".toPath,
+              groups = Set(
+                Group("/test/database/redis".toPath,
+                      Set(AppDefinition("/test/database/redis/r1".toPath))),
+                Group("/test/database/memcache".toPath,
+                      Set(AppDefinition("/test/database/memcache/m1".toPath))),
+                Group("/test/database/mongo".toPath,
+                      Set(AppDefinition("/test/database/mongo/m1".toPath)))
+              )
+            ),
+            Group(
+              "/test/service".toPath,
+              groups = Set(
+                Group(
+                  "/test/service/service1".toPath,
+                  Set(AppDefinition("/test/service/service1/srv1".toPath))),
+                Group("/test/service/service2".toPath,
+                      Set(AppDefinition("/test/service/service2/srv2".toPath)))
+              )
+            ),
+            Group(
+              "/test/frontend".toPath,
+              groups = Set(
+                Group("/test/frontend/app1".toPath,
+                      Set(AppDefinition("/test/frontend/app1/a1".toPath))),
+                Group("/test/frontend/app2".toPath,
+                      Set(AppDefinition("/test/frontend/app2/a2".toPath)))
+              )
+            ),
+            Group("/test/cache".toPath,
+                  groups = Set(
+                    Group("/test/cache/c1".toPath,
+                          Set(AppDefinition("/test/cache/c1/cache1".toPath)))
+                  ))
+          )
+        )))
       current.hasNonCyclicDependencies should equal(true)
 
       When("the dependency graph is calculated")
@@ -534,26 +521,30 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("detects a cyclic dependency graph") {
       Given("a group with cyclic dependencies")
       val current: Group = Group(
-          "/test".toPath,
-          groups = Set(
-                Group("/test/database".toPath,
-                      groups = Set(
-                            Group("/test/database/mongo".toPath,
-                                  Set(
-                                      AppDefinition(
-                                          "/test/database/mongo/m1".toPath,
-                                          dependencies = Set(
-                                                "/test/service".toPath))))
-                        )),
-                Group(
-                    "/test/service".toPath,
-                    groups = Set(
-                          Group(
-                              "/test/service/service1".toPath,
-                              Set(
-                                  AppDefinition("/test/service/service1/srv1".toPath, dependencies = Set("/test/database".toPath))))
-        ))
-      ))
+        "/test".toPath,
+        groups = Set(
+          Group(
+            "/test/database".toPath,
+            groups = Set(
+              Group(
+                "/test/database/mongo".toPath,
+                Set(AppDefinition("/test/database/mongo/m1".toPath,
+                                  dependencies = Set("/test/service".toPath))))
+            )
+          ),
+          Group(
+            "/test/service".toPath,
+            groups =
+              Set(
+                Group("/test/service/service1".toPath,
+                      Set(
+                        AppDefinition("/test/service/service1/srv1".toPath,
+                                      dependencies =
+                                        Set("/test/database".toPath))))
+              )
+          )
+        )
+      )
 
       Then("the cycle is detected")
       current.hasNonCyclicDependencies should equal(false)
@@ -562,19 +553,21 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("can contain a path which has the same name multiple times in it") {
       Given("a group with subgroups having the same name")
       val reference: Group = Group(
-          "/".toPath,
-          groups = Set(
-                Group("/test".toPath,
-                      groups = Set(
-                            Group(
-                                "/test/service".toPath,
-                                groups = Set(
-                                      Group("/test/service/test".toPath,
-                                            Set(
-                                                AppDefinition("/test/service/test/app".toPath, cmd = Some("Foobar"))))
-          ))
-        ))
-      ))
+        "/".toPath,
+        groups = Set(
+          Group(
+            "/test".toPath,
+            groups = Set(
+              Group("/test/service".toPath,
+                    groups = Set(
+                      Group("/test/service/test".toPath,
+                            Set(AppDefinition("/test/service/test/app".toPath,
+                                              cmd = Some("Foobar"))))
+                    ))
+            )
+          )
+        )
+      )
 
       When("App is updated")
       val app =
@@ -592,19 +585,21 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
     it("relative dependencies should be resolvable") {
       Given("a group with an app having relative dependency")
       val group: Group = Group(
-          "/".toPath,
-          groups = Set(
-                Group("group".toPath,
-                      apps = Set(
-                            AppDefinition("app1".toPath, cmd = Some("foo"))),
-                      groups = Set(
-                            Group("subgroup".toPath,
-                                  Set(AppDefinition("app2".toPath,
-                                                    cmd = Some("bar"),
-                                                    dependencies = Set(
-                                                          "../app1".toPath))))
-                        ))
-            ))
+        "/".toPath,
+        groups = Set(
+          Group(
+            "group".toPath,
+            apps = Set(AppDefinition("app1".toPath, cmd = Some("foo"))),
+            groups = Set(
+              Group("subgroup".toPath,
+                    Set(
+                      AppDefinition("app2".toPath,
+                                    cmd = Some("bar"),
+                                    dependencies = Set("../app1".toPath))))
+            )
+          )
+        )
+      )
 
       When("group is validated")
       val result = validate(group)

@@ -21,32 +21,39 @@ private final class PushApi(
   def finish(game: Game): Funit =
     if (!game.isCorrespondence || game.hasAi) funit
     else
-      game.userIds.map { userId =>
-        Pov.ofUserId(game, userId) ?? { pov =>
-          IfAway(pov) {
-            pushToAll(
-              userId,
-              _.finish,
-              PushApi.Data(
-                title = pov.win match {
-                  case Some(true) => "You won!"
-                  case Some(false) => "You lost."
-                  case _ => "It's a draw."
-                },
-                body = s"Your game with ${opponentName(pov)} is over.",
-                payload = Json.obj(
-                  "userId" -> userId,
-                  "userData" -> Json.obj(
-                    "type" -> "gameFinish",
-                    "gameId" -> game.id,
-                    "fullId" -> pov.fullId,
-                    "color" -> pov.color.name,
-                    "fen" -> Forsyth.exportBoard(game.toChess.board),
-                    "lastMove" -> game.castleLastMoveTime.lastMoveString,
-                    "win" -> pov.win))))
+      game.userIds
+        .map { userId =>
+          Pov.ofUserId(game, userId) ?? { pov =>
+            IfAway(pov) {
+              pushToAll(
+                userId,
+                _.finish,
+                PushApi.Data(
+                  title = pov.win match {
+                    case Some(true) => "You won!"
+                    case Some(false) => "You lost."
+                    case _ => "It's a draw."
+                  },
+                  body = s"Your game with ${opponentName(pov)} is over.",
+                  payload = Json.obj(
+                    "userId" -> userId,
+                    "userData" -> Json.obj(
+                      "type" -> "gameFinish",
+                      "gameId" -> game.id,
+                      "fullId" -> pov.fullId,
+                      "color" -> pov.color.name,
+                      "fen" -> Forsyth.exportBoard(game.toChess.board),
+                      "lastMove" -> game.castleLastMoveTime.lastMoveString,
+                      "win" -> pov.win
+                    )
+                  )
+                )
+              )
+            }
           }
         }
-      }.sequenceFu.void
+        .sequenceFu
+        .void
 
   def move(move: MoveEvent): Funit = move.mobilePushable ?? {
     GameRepo game move.gameId flatMap {
@@ -70,7 +77,11 @@ private final class PushApi(
                       "color" -> pov.color.name,
                       "fen" -> Forsyth.exportBoard(game.toChess.board),
                       "lastMove" -> game.castleLastMoveTime.lastMoveString,
-                      "secondsLeft" -> pov.remainingSeconds))))
+                      "secondsLeft" -> pov.remainingSeconds
+                    )
+                  )
+                )
+              )
             }
           }
         }
@@ -91,7 +102,9 @@ private final class PushApi(
             payload =
               Json.obj("userId" -> dest.id,
                        "userData" -> Json.obj("type" -> "challengeCreate",
-                                              "challengeId" -> c.id))))
+                                              "challengeId" -> c.id))
+          )
+        )
       }
     }
   }
@@ -111,7 +124,9 @@ private final class PushApi(
               Json.obj("userId" -> challenger.id,
                        "userData" -> Json.obj("type" -> "challengeAccept",
                                               "challengeId" -> c.id,
-                                              "joiner" -> lightJoiner))))
+                                              "joiner" -> lightJoiner))
+          )
+        )
     }
 
   private type MonitorType = lila.mon.push.send.type => (String => Unit)

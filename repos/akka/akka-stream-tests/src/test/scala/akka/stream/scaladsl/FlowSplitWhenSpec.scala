@@ -269,20 +269,23 @@ class FlowSplitWhenSpec extends AkkaSpec {
           .mapAsync(1)(_.runWith(Sink.head)) // Please note that this line *also* implicitly asserts nonempty substreams
           .grouped(200)
           .runWith(Sink.head),
-        3.second) should ===(1 to 100)
+        3.second
+      ) should ===(1 to 100)
     }
 
     "fail substream if materialized twice" in assertAllStagesStopped {
       an[IllegalStateException] mustBe thrownBy {
-        Await.result(Source
-                       .single(1)
-                       .splitWhen(_ ⇒ true)
-                       .lift
-                       .mapAsync(1) { src ⇒
-                         src.runWith(Sink.ignore); src.runWith(Sink.ignore)
-                       } // Sink.ignore+mapAsync pipes error back
-                       .runWith(Sink.ignore),
-                     3.seconds)
+        Await.result(
+          Source
+            .single(1)
+            .splitWhen(_ ⇒ true)
+            .lift
+            .mapAsync(1) { src ⇒
+              src.runWith(Sink.ignore); src.runWith(Sink.ignore)
+            } // Sink.ignore+mapAsync pipes error back
+            .runWith(Sink.ignore),
+          3.seconds
+        )
       }
     }
 

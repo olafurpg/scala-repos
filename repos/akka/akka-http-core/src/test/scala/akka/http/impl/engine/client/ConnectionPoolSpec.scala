@@ -380,7 +380,8 @@ class ConnectionPoolSpec
           .transform(StreamUtils.recover {
             case NoErrorComplete ⇒ ByteString.empty
           }),
-        Flow[ByteString].map(SessionBytes(null, _)))
+        Flow[ByteString].map(SessionBytes(null, _))
+      )
       val sink =
         if (autoAccept) Sink.foreach[Http.IncomingConnection](handleConnection)
         else Sink.fromSubscriber(incomingConnections)

@@ -53,7 +53,8 @@ class TestActorRef[T <: Actor](_system: ActorSystem,
   dispatcher,
   _system.mailboxes.getMailboxType(props, dispatcher.configurator.config),
   _supervisor.asInstanceOf[InternalActorRef],
-  _supervisor.path / name) {
+  _supervisor.path / name
+) {
 
   // we need to start ourselves since the creation of an actor has been split into initialization and starting
   underlying.start()
@@ -192,7 +193,8 @@ object TestActorRef {
           "\nMake sure Actor is NOT defined inside a class/trait," +
           "\nif so put it outside the class/trait, f.e. in a companion object," +
           "\nOR try to change: 'actorOf(Props[MyActor]' to 'actorOf(Props(new MyActor)'.",
-        exception)
+        exception
+      )
   }
 
   def apply[T <: Actor](name: String)(implicit t: ClassTag[T],
@@ -221,14 +223,18 @@ object TestActorRef {
   def apply[T <: Actor](supervisor: ActorRef, name: String)(
       implicit t: ClassTag[T],
       system: ActorSystem): TestActorRef[T] =
-    apply[T](Props({
-      system
-        .asInstanceOf[ExtendedActorSystem]
-        .dynamicAccess
-        .createInstanceFor[T](t.runtimeClass, Nil)
-        .recover(dynamicCreateRecover)
-        .get
-    }), supervisor, name)
+    apply[T](
+      Props({
+        system
+          .asInstanceOf[ExtendedActorSystem]
+          .dynamicAccess
+          .createInstanceFor[T](t.runtimeClass, Nil)
+          .recover(dynamicCreateRecover)
+          .get
+      }),
+      supervisor,
+      name
+    )
 
   /**
     * Java API: create a TestActorRef in the given system for the given props,

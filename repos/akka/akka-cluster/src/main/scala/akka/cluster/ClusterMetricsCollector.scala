@@ -779,12 +779,14 @@ class SigarMetricsCollector(address: Address,
   import StandardMetrics._
 
   private def this(cluster: Cluster) =
-    this(cluster.selfAddress,
-         EWMA.alpha(cluster.settings.MetricsMovingAverageHalfLife,
-                    cluster.settings.MetricsInterval),
-         cluster.system.dynamicAccess
-           .createInstanceFor[AnyRef]("org.hyperic.sigar.Sigar", Nil)
-           .get)
+    this(
+      cluster.selfAddress,
+      EWMA.alpha(cluster.settings.MetricsMovingAverageHalfLife,
+                 cluster.settings.MetricsInterval),
+      cluster.system.dynamicAccess
+        .createInstanceFor[AnyRef]("org.hyperic.sigar.Sigar", Nil)
+        .get
+    )
 
   /**
     * This constructor is used when creating an instance from configured FQCN

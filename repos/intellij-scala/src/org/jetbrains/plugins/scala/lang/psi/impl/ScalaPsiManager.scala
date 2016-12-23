@@ -367,28 +367,32 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
 
         @volatile
         private var outOfCodeBlockModCount: Long = 0L
-      })
+      }
+    )
 
     project.getMessageBus.connect
-      .subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootListener {
-        def beforeRootsChange(event: ModuleRootEvent) {}
+      .subscribe(
+        ProjectTopics.PROJECT_ROOTS,
+        new ModuleRootListener {
+          def beforeRootsChange(event: ModuleRootEvent) {}
 
-        def rootsChanged(event: ModuleRootEvent) {
-          clearOnChange()
-          clearOnOutOfCodeBlockChange()
-        }
-
-        LowMemoryWatcher.register(new Runnable {
-          def run(): Unit = {
-            clearCacheOnLowMemory.foreach(_.clear())
-            Conformance.cache.clear()
-            Equivalence.cache.clear()
-            ScParameterizedType.substitutorCache.clear()
-            ScalaPsiUtil.collectImplicitObjectsCache.clear()
-            ImplicitCollector.cache.clear()
+          def rootsChanged(event: ModuleRootEvent) {
+            clearOnChange()
+            clearOnOutOfCodeBlockChange()
           }
-        })
-      })
+
+          LowMemoryWatcher.register(new Runnable {
+            def run(): Unit = {
+              clearCacheOnLowMemory.foreach(_.clear())
+              Conformance.cache.clear()
+              Equivalence.cache.clear()
+              ScParameterizedType.substitutorCache.clear()
+              ScalaPsiUtil.collectImplicitObjectsCache.clear()
+              ImplicitCollector.cache.clear()
+            }
+          })
+        }
+      )
   }
 
   private val syntheticPackagesCreator = new SyntheticPackageCreator(project)

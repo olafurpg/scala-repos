@@ -229,17 +229,19 @@ private[spark] object SparkUI {
     listenerBus.addListener(storageListener)
     listenerBus.addListener(operationGraphListener)
 
-    new SparkUI(sc,
-                conf,
-                securityManager,
-                environmentListener,
-                storageStatusListener,
-                executorsListener,
-                _jobProgressListener,
-                storageListener,
-                operationGraphListener,
-                appName,
-                basePath,
-                startTime)
+    new SparkUI(
+      sc,
+      conf,
+      securityManager,
+      environmentListener,
+      storageStatusListener,
+      executorsListener,
+      _jobProgressListener,
+      storageListener,
+      operationGraphListener,
+      appName,
+      basePath,
+      startTime
+    )
   }
 }

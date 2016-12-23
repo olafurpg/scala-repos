@@ -290,16 +290,18 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
         // const restParam = []
         genLet(restParamIdent, mutable = false, js.ArrayConstr(Nil)),
         // while (i < len)
-        js.While(js.BinaryOp(JSBinaryOp.<, counter, len),
-                 js.Block(
-                   // restParam.push(arguments[i]);
-                   js.Apply(genIdentBracketSelect(restParam, "push"),
-                            List(js.BracketSelect(arguments, counter))),
-                   // i = (i + 1) | 0
-                   js.Assign(
-                     counter,
-                     or0(js.BinaryOp(JSBinaryOp.+, counter, js.IntLiteral(1))))
-                 ))
+        js.While(
+          js.BinaryOp(JSBinaryOp.<, counter, len),
+          js.Block(
+            // restParam.push(arguments[i]);
+            js.Apply(genIdentBracketSelect(restParam, "push"),
+                     List(js.BracketSelect(arguments, counter))),
+            // i = (i + 1) | 0
+            js.Assign(
+              counter,
+              or0(js.BinaryOp(JSBinaryOp.+, counter, js.IntLiteral(1))))
+          )
+        )
       )
     }
 
@@ -417,14 +419,17 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
              * care because we never emit continue statements for do..while
              * loops.
              */
-            js.While(js.BooleanLiteral(true), {
-              js.Block(transformStat(body), {
-                unnest(cond) { (newCond, env0) =>
-                  implicit val env = env0
-                  js.If(transformExpr(newCond), js.Skip(), js.Break())
-                }
-              })
-            }, newLabel)
+            js.While(
+              js.BooleanLiteral(true), {
+                js.Block(transformStat(body), {
+                  unnest(cond) { (newCond, env0) =>
+                    implicit val env = env0
+                    js.If(transformExpr(newCond), js.Skip(), js.Break())
+                  }
+                })
+              },
+              newLabel
+            )
           }
 
         case Debugger() =>
@@ -594,10 +599,12 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
       */
     def unnestOrSpread(args: List[Tree])(
         makeStat: (List[Tree], Env) => js.Tree)(implicit env: Env): js.Tree = {
-      val (argsNoSpread, argsWereSpread) = args.map {
-        case JSSpread(items) => (items, true)
-        case arg => (arg, false)
-      }.unzip
+      val (argsNoSpread, argsWereSpread) = args
+        .map {
+          case JSSpread(items) => (items, true)
+          case arg => (arg, false)
+        }
+        .unzip
 
       unnest(argsNoSpread) { (newArgsNoSpread, env) =>
         val newArgs = newArgsNoSpread.zip(argsWereSpread).map {
@@ -770,8 +777,8 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
 
     /** Same as above, for one head argument and a list of arguments */
     def unnest(arg0: Tree, args: List[Tree])(
-        makeStat: (Tree, List[Tree],
-                   Env) => js.Tree)(implicit env: Env): js.Tree = {
+        makeStat: (Tree, List[Tree], Env) => js.Tree)(
+        implicit env: Env): js.Tree = {
       unnest(arg0 :: args) { (newArgs, env) =>
         makeStat(newArgs.head, newArgs.tail, env)
       }

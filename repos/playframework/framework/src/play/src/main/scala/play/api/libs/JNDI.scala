@@ -23,23 +23,27 @@ object JNDI {
 
     val env = new java.util.Hashtable[String, String]
 
-    env.put(INITIAL_CONTEXT_FACTORY, {
-      Play.privateMaybeApplication
-        .flatMap(_.configuration.getString(INITIAL_CONTEXT_FACTORY))
-        .getOrElse {
-          System.setProperty(INITIAL_CONTEXT_FACTORY, IN_MEMORY_JNDI)
-          IN_MEMORY_JNDI
-        }
-    })
+    env.put(
+      INITIAL_CONTEXT_FACTORY, {
+        Play.privateMaybeApplication
+          .flatMap(_.configuration.getString(INITIAL_CONTEXT_FACTORY))
+          .getOrElse {
+            System.setProperty(INITIAL_CONTEXT_FACTORY, IN_MEMORY_JNDI)
+            IN_MEMORY_JNDI
+          }
+      }
+    )
 
-    env.put(PROVIDER_URL, {
-      Play.privateMaybeApplication
-        .flatMap(_.configuration.getString(PROVIDER_URL))
-        .getOrElse {
-          System.setProperty(PROVIDER_URL, IN_MEMORY_URL)
-          IN_MEMORY_URL
-        }
-    })
+    env.put(
+      PROVIDER_URL, {
+        Play.privateMaybeApplication
+          .flatMap(_.configuration.getString(PROVIDER_URL))
+          .getOrElse {
+            System.setProperty(PROVIDER_URL, IN_MEMORY_URL)
+            IN_MEMORY_URL
+          }
+      }
+    )
 
     new InitialContext(env)
   }

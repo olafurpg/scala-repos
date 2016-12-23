@@ -32,11 +32,13 @@ class HaltTestServlet extends ScalatraServlet {
   }
 
   get("/all-args") {
-    halt(status = 403,
-         reason = "Go away",
-         headers = Map("X-Your-Mother-Was-A" -> "hamster",
-                       "X-Your-Father-Smelt-Of" -> "elderberries"),
-         body = <h1>Go away or I shall taunt you a second time!</h1>)
+    halt(
+      status = 403,
+      reason = "Go away",
+      headers = Map("X-Your-Mother-Was-A" -> "hamster",
+                    "X-Your-Father-Smelt-Of" -> "elderberries"),
+      body = <h1>Go away or I shall taunt you a second time!</h1>
+    )
     "this content must not be returned"
   }
 

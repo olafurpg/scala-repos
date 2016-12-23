@@ -162,15 +162,15 @@ private[spire] trait Fuser[C <: Context, A] {
     }
   }
 
-  private def fuse2(lhs: Tree, rhs: Tree)(f: (Approx,
-                                              Approx) => Approx): Fused = {
+  private def fuse2(lhs: Tree, rhs: Tree)(
+      f: (Approx, Approx) => Approx): Fused = {
     val lfused = extract(lhs)
     val rfused = extract(rhs)
     f(lfused.approx, rfused.approx).fused(lfused.stats ++ rfused.stats)
   }
 
-  private def resign(sub: Tree)(f: (TermName,
-                                    TermName) => (Tree, Tree)): Fused = {
+  private def resign(sub: Tree)(
+      f: (TermName, TermName) => (Tree, Tree)): Fused = {
     val fused = extract(sub)
     val (apx, _, _, exact) = freshApproxNames
     val (apx0, exact0) = f(fused.apx, fused.exact)
@@ -192,15 +192,17 @@ private[spire] trait Fuser[C <: Context, A] {
     val fused = extract(tree)
     val (apx, mes, ind, exact) = freshApproxNames
     val indValDef = fused.ind.fold(n => q"val $ind = $n + 1" :: Nil, _ => Nil)
-    val stats = List(q"val $apx = ${sqrt(fused.apx)}",
-                     q"""val $mes =
+    val stats = List(
+        q"val $apx = ${sqrt(fused.apx)}",
+        q"""val $mes =
         if (${fused.apx} < 0) {
           ${sqrt(fused.mes)} * (1 << 26)
         } else {
           (${fused.mes} / ${fused.apx}) * $apx
         }
       """,
-                     q"def $exact = $ev.sqrt(${fused.exact})") ++ indValDef
+        q"def $exact = $ev.sqrt(${fused.exact})"
+      ) ++ indValDef
     val ind0 = fused.ind.fold(_ => Left(ind), n => Right(n + 1))
     val result = Fused(fused.stats ++ stats, apx, mes, ind0, exact)
     result
@@ -245,27 +247,31 @@ private[spire] trait Fuser[C <: Context, A] {
           Approx(rapx, rmes, rind, rexact)) =>
       val tmp = freshTermName(c)("fpf$tmp$")
       val rindp1 = rind.fold(rind0 => q"$rind0 + 1", n => q"${intLit(n)} + 1")
-      Approx(q"$lapx / $rapx",
-             q"""
+      Approx(
+        q"$lapx / $rapx",
+        q"""
           val $tmp = ${abs(rapx)}
           (${abs(lapx)} / $tmp + ($lmes / $rmes)) / ($tmp / $rmes - $rindp1 * $Epsilon)
         """,
-             zipInd(lind, rind)((l, _) => q"${max(l, rindp1)} + 1",
-                                (l, r) => spire.math.max(l, r + 1) + 1),
-             q"$ev.div($lexact, $rexact)")
+        zipInd(lind, rind)((l, _) => q"${max(l, rindp1)} + 1",
+                           (l, r) => spire.math.max(l, r + 1) + 1),
+        q"$ev.div($lexact, $rexact)"
+      )
   }
 
   def sign(tree: Tree)(signed: Tree): Tree = {
     val Fused(stats, apx, mes, ind, exact) = extract(tree)
     val err = freshTermName(c)("fpf$err$")
     val ind0 = ind.fold(name => q"$name", intLit)
-    val block = Block(stats :+ q"val $err = $mes * $ind0 * $Epsilon",
-                      q"""
+    val block = Block(
+      stats :+ q"val $err = $mes * $ind0 * $Epsilon",
+      q"""
         if ($apx > $err && $apx < $PositiveInfinity) 1
         else if ($apx < -$err && $apx > $NegativeInfinity) -1
         else if ($err == 0D) 0
         else $signed.signum($exact)
-      """)
+      """
+    )
     block
   }
 

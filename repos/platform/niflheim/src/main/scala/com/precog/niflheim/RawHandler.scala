@@ -84,11 +84,13 @@ class RawReader private[niflheim] (val id: Long,
   def snapshot(pathConstraint: Option[Set[CPath]]): Block = {
     handleNonempty
 
-    val segs = pathConstraint.map { cpaths =>
-      segments.a.filter { seg =>
-        cpaths(seg.cpath)
+    val segs = pathConstraint
+      .map { cpaths =>
+        segments.a.filter { seg =>
+          cpaths(seg.cpath)
+        }
       }
-    }.getOrElse(segments.a.clone)
+      .getOrElse(segments.a.clone)
 
     Block(id, segs, isStable)
   }
@@ -96,11 +98,13 @@ class RawReader private[niflheim] (val id: Long,
   def snapshotRef(refConstraints: Option[Set[ColumnRef]]): Block = {
     handleNonempty
 
-    val segs = refConstraints.map { refs =>
-      segments.a.filter { seg =>
-        refs(ColumnRef(seg.cpath, seg.ctype))
+    val segs = refConstraints
+      .map { refs =>
+        segments.a.filter { seg =>
+          refs(ColumnRef(seg.cpath, seg.ctype))
+        }
       }
-    }.getOrElse(segments.a.clone)
+      .getOrElse(segments.a.clone)
 
     Block(id, segs, isStable)
   }

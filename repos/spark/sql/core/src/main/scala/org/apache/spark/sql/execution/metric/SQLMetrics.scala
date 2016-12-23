@@ -142,26 +142,29 @@ private object LongSQLMetricParam
     extends LongSQLMetricParam(_.sum.toString, 0L)
 
 private object StaticsLongSQLMetricParam
-    extends LongSQLMetricParam((values: Seq[Long]) => {
-      // This is a workaround for SPARK-11013.
-      // We use -1 as initial value of the accumulator, if the accumulator is valid, we will update
-      // it at the end of task and the value will be at least 0.
-      val validValues = values.filter(_ >= 0)
-      val Seq(sum, min, med, max) = {
-        val metric =
-          if (validValues.length == 0) {
-            Seq.fill(4)(0L)
-          } else {
-            val sorted = validValues.sorted
-            Seq(sorted.sum,
-                sorted(0),
-                sorted(validValues.length / 2),
-                sorted(validValues.length - 1))
-          }
-        metric.map(Utils.bytesToString)
-      }
-      s"\n$sum ($min, $med, $max)"
-    }, -1L)
+    extends LongSQLMetricParam(
+      (values: Seq[Long]) => {
+        // This is a workaround for SPARK-11013.
+        // We use -1 as initial value of the accumulator, if the accumulator is valid, we will update
+        // it at the end of task and the value will be at least 0.
+        val validValues = values.filter(_ >= 0)
+        val Seq(sum, min, med, max) = {
+          val metric =
+            if (validValues.length == 0) {
+              Seq.fill(4)(0L)
+            } else {
+              val sorted = validValues.sorted
+              Seq(sorted.sum,
+                  sorted(0),
+                  sorted(validValues.length / 2),
+                  sorted(validValues.length - 1))
+            }
+          metric.map(Utils.bytesToString)
+        }
+        s"\n$sum ($min, $med, $max)"
+      },
+      -1L
+    )
 
 private[sql] object SQLMetrics {
 

@@ -158,18 +158,21 @@ class HBLEvents(val client: HBClient,
       require(
         !((reversed == Some(true)) &&
           (entityType.isEmpty || entityId.isEmpty)),
-        "the parameter reversed can only be used with both entityType and entityId specified.")
+        "the parameter reversed can only be used with both entityType and entityId specified."
+      )
 
       val table = getTable(appId, channelId)
 
-      val scan = HBEventsUtil.createScan(startTime = startTime,
-                                         untilTime = untilTime,
-                                         entityType = entityType,
-                                         entityId = entityId,
-                                         eventNames = eventNames,
-                                         targetEntityType = targetEntityType,
-                                         targetEntityId = targetEntityId,
-                                         reversed = reversed)
+      val scan = HBEventsUtil.createScan(
+        startTime = startTime,
+        untilTime = untilTime,
+        entityType = entityType,
+        entityId = entityId,
+        eventNames = eventNames,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId,
+        reversed = reversed
+      )
       val scanner = table.getScanner(scan)
       table.close()
 

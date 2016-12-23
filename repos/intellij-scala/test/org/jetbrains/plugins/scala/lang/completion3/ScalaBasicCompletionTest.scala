@@ -143,9 +143,12 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
-    assert(activeLookup.collect {
-      case le if le.getLookupString == "getGoo" => le
-    }.length == 1)
+    assert(
+      activeLookup
+        .collect {
+          case le if le.getLookupString == "getGoo" => le
+        }
+        .length == 1)
   }
 
   def testSCL3546() {

@@ -48,29 +48,31 @@ object Multipart {
       boundary <- value
     } yield boundary
 
-    maybeBoundary.map { boundary =>
-      val multipartFlow = Flow[ByteString]
-        .transform(() =>
-          new BodyPartParser(boundary, maxMemoryBufferSize, maxHeaderBuffer))
-        .splitWhen(_.isLeft)
-        .prefixAndTail(1)
-        .map {
-          case (Seq(Left(part: FilePart[_])), body) =>
-            part.copy[Source[ByteString, _]](ref = body.collect {
-              case Right(bytes) => bytes
-            })
-          case (Seq(Left(other)), ignored) =>
-            // If we don't run the source, it takes Akka streams 5 seconds to wake up and realise the source is empty
-            // before it progresses onto the next element
-            ignored.runWith(Sink.cancelled)
-            other.asInstanceOf[Part[Nothing]]
-        }
-        .concatSubstreams
+    maybeBoundary
+      .map { boundary =>
+        val multipartFlow = Flow[ByteString]
+          .transform(() =>
+            new BodyPartParser(boundary, maxMemoryBufferSize, maxHeaderBuffer))
+          .splitWhen(_.isLeft)
+          .prefixAndTail(1)
+          .map {
+            case (Seq(Left(part: FilePart[_])), body) =>
+              part.copy[Source[ByteString, _]](ref = body.collect {
+                case Right(bytes) => bytes
+              })
+            case (Seq(Left(other)), ignored) =>
+              // If we don't run the source, it takes Akka streams 5 seconds to wake up and realise the source is empty
+              // before it progresses onto the next element
+              ignored.runWith(Sink.cancelled)
+              other.asInstanceOf[Part[Nothing]]
+          }
+          .concatSubstreams
 
-      partHandler.through(multipartFlow)
-    }.getOrElse {
-      Accumulator.done(createBadResult("Missing boundary header")(request))
-    }
+        partHandler.through(multipartFlow)
+      }
+      .getOrElse {
+        Accumulator.done(createBadResult("Missing boundary header")(request))
+      }
   }
 
   /**
@@ -105,21 +107,22 @@ object Multipart {
             }
 
             parseError orElse bufferExceededError getOrElse {
-              Future.successful(
-                Right(
-                  MultipartFormData(
-                    parts.collect {
-                      case dp: DataPart => dp
-                    }.groupBy(_.key).map {
-                      case (key, partValues) => key -> partValues.map(_.value)
-                    },
-                    parts.collect {
-                      case fp: FilePart[A] => fp
-                    },
-                    parts.collect {
-                      case bad: BadPart => bad
-                    }
-                  )))
+              Future.successful(Right(MultipartFormData(
+                parts
+                  .collect {
+                    case dp: DataPart => dp
+                  }
+                  .groupBy(_.key)
+                  .map {
+                    case (key, partValues) => key -> partValues.map(_.value)
+                  },
+                parts.collect {
+                  case fp: FilePart[A] => fp
+                },
+                parts.collect {
+                  case bad: BadPart => bad
+                }
+              )))
             }
         }
 
@@ -363,11 +366,13 @@ object Multipart {
             "Header length exceeded buffer size of " + memoryBufferSize)
         case headerEnd =>
           val headerString = input.slice(headerStart, headerEnd).utf8String
-          val headers = headerString.lines.map { header =>
-            val key :: value = header.trim.split(":").toList
-            (key.trim.toLowerCase(java.util.Locale.ENGLISH),
-             value.mkString(":").trim)
-          }.toMap
+          val headers = headerString.lines
+            .map { header =>
+              val key :: value = header.trim.split(":").toList
+              (key.trim.toLowerCase(java.util.Locale.ENGLISH),
+               value.mkString(":").trim)
+            }
+            .toMap
 
           val partStart = headerEnd + 4
 

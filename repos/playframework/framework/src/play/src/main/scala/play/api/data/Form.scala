@@ -41,20 +41,26 @@ case class Form[T](mapping: Mapping[T],
     * Constraints associated with this form, indexed by field name.
     */
   val constraints: Map[String, Seq[(String, Seq[Any])]] =
-    mapping.mappings.map { m =>
-      m.key -> m.constraints.collect {
-        case Constraint(Some(name), args) => name -> args
+    mapping.mappings
+      .map { m =>
+        m.key -> m.constraints.collect {
+          case Constraint(Some(name), args) => name -> args
+        }
       }
-    }.filterNot(_._2.isEmpty).toMap
+      .filterNot(_._2.isEmpty)
+      .toMap
 
   /**
     * Formats associated to this form, indexed by field name. *
     */
-  val formats: Map[String, (String, Seq[Any])] = mapping.mappings.map { m =>
-    m.key -> m.format
-  }.collect {
-    case (k, Some(f)) => k -> f
-  }.toMap
+  val formats: Map[String, (String, Seq[Any])] = mapping.mappings
+    .map { m =>
+      m.key -> m.format
+    }
+    .collect {
+      case (k, Some(f)) => k -> f
+    }
+    .toMap
 
   /**
     * Binds data to this form, i.e. handles form submission.
@@ -418,19 +424,23 @@ private[data] object FormUtils {
   def fromJson(prefix: String = "", js: JsValue): Map[String, String] =
     js match {
       case JsObject(fields) => {
-        fields.map {
-          case (key, value) =>
-            fromJson(Option(prefix)
-                       .filterNot(_.isEmpty)
-                       .map(_ + ".")
-                       .getOrElse("") + key,
-                     value)
-        }.foldLeft(Map.empty[String, String])(_ ++ _)
+        fields
+          .map {
+            case (key, value) =>
+              fromJson(Option(prefix)
+                         .filterNot(_.isEmpty)
+                         .map(_ + ".")
+                         .getOrElse("") + key,
+                       value)
+          }
+          .foldLeft(Map.empty[String, String])(_ ++ _)
       }
       case JsArray(values) => {
-        values.zipWithIndex.map {
-          case (value, i) => fromJson(prefix + "[" + i + "]", value)
-        }.foldLeft(Map.empty[String, String])(_ ++ _)
+        values.zipWithIndex
+          .map {
+            case (value, i) => fromJson(prefix + "[" + i + "]", value)
+          }
+          .foldLeft(Map.empty[String, String])(_ ++ _)
       }
       case JsNull => Map.empty
       case JsUndefined() => Map.empty
@@ -723,7 +733,10 @@ object RepeatedMapping {
   def indexes(key: String, data: Map[String, String]): Seq[Int] = {
     val KeyPattern =
       ("^" + java.util.regex.Pattern.quote(key) + """\[(\d+)\].*$""").r
-    data.toSeq.collect { case (KeyPattern(index), _) => index.toInt }.sorted.distinct
+    data.toSeq
+      .collect { case (KeyPattern(index), _) => index.toInt }
+      .sorted
+      .distinct
   }
 }
 
@@ -799,10 +812,12 @@ case class RepeatedMapping[T](wrapped: Mapping[T],
     */
   def unbindAndValidate(
       value: List[T]): (Map[String, String], Seq[FormError]) = {
-    val (datas, errors) = value.zipWithIndex.map {
-      case (t, i) =>
-        wrapped.withPrefix(key + "[" + i + "]").unbindAndValidate(t)
-    }.unzip
+    val (datas, errors) = value.zipWithIndex
+      .map {
+        case (t, i) =>
+          wrapped.withPrefix(key + "[" + i + "]").unbindAndValidate(t)
+      }
+      .unzip
     (datas.foldLeft(Map.empty[String, String])(_ ++ _),
      errors.flatten ++ collectErrors(value))
   }

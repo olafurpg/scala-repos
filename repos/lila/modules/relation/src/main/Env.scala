@@ -24,14 +24,16 @@ final class Env(config: Config,
   }
   import settings._
 
-  lazy val api = new RelationApi(coll = relationColl,
-                                 actor = hub.actor.relation,
-                                 bus = system.lilaBus,
-                                 timeline = hub.actor.timeline,
-                                 reporter = hub.actor.report,
-                                 followable = followable,
-                                 maxFollow = MaxFollow,
-                                 maxBlock = MaxBlock)
+  lazy val api = new RelationApi(
+    coll = relationColl,
+    actor = hub.actor.relation,
+    bus = system.lilaBus,
+    timeline = hub.actor.timeline,
+    reporter = hub.actor.report,
+    followable = followable,
+    maxFollow = MaxFollow,
+    maxBlock = MaxBlock
+  )
 
   private[relation] val actor = system.actorOf(
     Props(
@@ -66,5 +68,6 @@ object Env {
       lightUser = lila.user.Env.current.lightUser,
       followable = lila.pref.Env.current.api.followable _,
       system = lila.common.PlayApp.system,
-      scheduler = lila.common.PlayApp.scheduler)
+      scheduler = lila.common.PlayApp.scheduler
+    )
 }

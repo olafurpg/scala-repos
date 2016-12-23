@@ -53,16 +53,19 @@ object Thenable {
       def defined[A](x: A): js.UndefOr[A] = x
 
       val p2 = scala.concurrent.Promise[A]()
-      p.`then`[Unit]({ (v: A) =>
-        p2.success(v)
-        (): Unit | Thenable[Unit]
-      }, defined { (e: scala.Any) =>
-        p2.failure(e match {
-          case th: Throwable => th
-          case _ => JavaScriptException(e)
-        })
-        (): Unit | Thenable[Unit]
-      })
+      p.`then`[Unit](
+        { (v: A) =>
+          p2.success(v)
+          (): Unit | Thenable[Unit]
+        },
+        defined { (e: scala.Any) =>
+          p2.failure(e match {
+            case th: Throwable => th
+            case _ => JavaScriptException(e)
+          })
+          (): Unit | Thenable[Unit]
+        }
+      )
       p2.future
     }
   }

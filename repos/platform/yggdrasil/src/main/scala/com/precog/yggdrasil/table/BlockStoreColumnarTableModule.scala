@@ -952,12 +952,14 @@ trait BlockStoreColumnarTableModule[M[+ _]]
       // We need some id that can be used to memoize then load table for each side.
       val initState = JDBMState.empty("alignSpace")
 
-      writeStreams(reduceSlices(sourceLeft.slices),
-                   composeSliceTransform(addGlobalId(alignOnL)),
-                   reduceSlices(sourceRight.slices),
-                   composeSliceTransform(addGlobalId(alignOnR)),
-                   initState,
-                   initState)
+      writeStreams(
+        reduceSlices(sourceLeft.slices),
+        composeSliceTransform(addGlobalId(alignOnL)),
+        reduceSlices(sourceRight.slices),
+        composeSliceTransform(addGlobalId(alignOnR)),
+        initState,
+        initState
+      )
     }
 
     /**
@@ -1223,9 +1225,11 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                   sortOrder: DesiredSortOrder): Table = {
       import mergeEngine._
 
-      val totalCount = indices.toList.map {
-        case (_, sliceIndex) => sliceIndex.count
-      }.sum
+      val totalCount = indices.toList
+        .map {
+          case (_, sliceIndex) => sliceIndex.count
+        }
+        .sum
 
       // Map the distinct indices into SortProjections/Cells, then merge them
       def cellsMs: Stream[M[Option[CellState]]] =

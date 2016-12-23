@@ -264,10 +264,12 @@ class DateExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("time_add") {
-    checkEvaluation(TimeAdd(Literal(Timestamp.valueOf("2016-01-29 10:00:00")),
-                            Literal(new CalendarInterval(1, 123000L))),
-                    DateTimeUtils.fromJavaTimestamp(
-                      Timestamp.valueOf("2016-02-29 10:00:00.123")))
+    checkEvaluation(
+      TimeAdd(Literal(Timestamp.valueOf("2016-01-29 10:00:00")),
+              Literal(new CalendarInterval(1, 123000L))),
+      DateTimeUtils.fromJavaTimestamp(
+        Timestamp.valueOf("2016-02-29 10:00:00.123"))
+    )
 
     checkEvaluation(TimeAdd(Literal.create(null, TimestampType),
                             Literal(new CalendarInterval(1, 123000L))),
@@ -284,14 +286,16 @@ class DateExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("time_sub") {
-    checkEvaluation(TimeSub(Literal(Timestamp.valueOf("2016-03-31 10:00:00")),
-                            Literal(new CalendarInterval(1, 0))),
-                    DateTimeUtils.fromJavaTimestamp(
-                      Timestamp.valueOf("2016-02-29 10:00:00")))
-    checkEvaluation(TimeSub(Literal(Timestamp.valueOf("2016-03-30 00:00:01")),
-                            Literal(new CalendarInterval(1, 2000000.toLong))),
-                    DateTimeUtils.fromJavaTimestamp(
-                      Timestamp.valueOf("2016-02-28 23:59:59")))
+    checkEvaluation(
+      TimeSub(Literal(Timestamp.valueOf("2016-03-31 10:00:00")),
+              Literal(new CalendarInterval(1, 0))),
+      DateTimeUtils.fromJavaTimestamp(Timestamp.valueOf("2016-02-29 10:00:00"))
+    )
+    checkEvaluation(
+      TimeSub(Literal(Timestamp.valueOf("2016-03-30 00:00:01")),
+              Literal(new CalendarInterval(1, 2000000.toLong))),
+      DateTimeUtils.fromJavaTimestamp(Timestamp.valueOf("2016-02-28 23:59:59"))
+    )
 
     checkEvaluation(TimeSub(Literal.create(null, TimestampType),
                             Literal(new CalendarInterval(1, 123000L))),
@@ -503,7 +507,8 @@ class DateExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
       UnixTimestamp(Literal(sdf3.format(Date.valueOf("2015-07-24"))),
                     Literal(fmt3)),
       DateTimeUtils.daysToMillis(
-        DateTimeUtils.fromJavaDate(Date.valueOf("2015-07-24"))) / 1000L)
+        DateTimeUtils.fromJavaDate(Date.valueOf("2015-07-24"))) / 1000L
+    )
     val t1 = UnixTimestamp(CurrentTimestamp(), Literal("yyyy-MM-dd HH:mm:ss"))
       .eval()
       .asInstanceOf[Long]
@@ -553,7 +558,8 @@ class DateExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
       ToUnixTimestamp(Literal(sdf3.format(Date.valueOf("2015-07-24"))),
                       Literal(fmt3)),
       DateTimeUtils.daysToMillis(
-        DateTimeUtils.fromJavaDate(Date.valueOf("2015-07-24"))) / 1000L)
+        DateTimeUtils.fromJavaDate(Date.valueOf("2015-07-24"))) / 1000L
+    )
     val t1 = ToUnixTimestamp(
       CurrentTimestamp(),
       Literal("yyyy-MM-dd HH:mm:ss")).eval().asInstanceOf[Long]
@@ -595,19 +601,22 @@ class DateExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("to_utc_timestamp") {
     def test(t: String, tz: String, expected: String): Unit = {
-      checkEvaluation(ToUTCTimestamp(Literal.create(if (t != null)
-                                                      Timestamp.valueOf(t)
-                                                    else null,
-                                                    TimestampType),
-                                     Literal.create(tz, StringType)),
-                      if (expected != null) Timestamp.valueOf(expected)
-                      else null)
+      checkEvaluation(
+        ToUTCTimestamp(Literal.create(if (t != null)
+                                        Timestamp.valueOf(t)
+                                      else null,
+                                      TimestampType),
+                       Literal.create(tz, StringType)),
+        if (expected != null) Timestamp.valueOf(expected)
+        else null
+      )
       checkEvaluation(
         ToUTCTimestamp(Literal.create(if (t != null) Timestamp.valueOf(t)
                                       else null,
                                       TimestampType),
                        NonFoldableLiteral.create(tz, StringType)),
-        if (expected != null) Timestamp.valueOf(expected) else null)
+        if (expected != null) Timestamp.valueOf(expected) else null
+      )
     }
     test("2015-07-24 00:00:00", "PST", "2015-07-24 07:00:00")
     test("2015-01-24 00:00:00", "PST", "2015-01-24 08:00:00")
@@ -618,19 +627,22 @@ class DateExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("from_utc_timestamp") {
     def test(t: String, tz: String, expected: String): Unit = {
-      checkEvaluation(FromUTCTimestamp(Literal.create(if (t != null)
-                                                        Timestamp.valueOf(t)
-                                                      else null,
-                                                      TimestampType),
-                                       Literal.create(tz, StringType)),
-                      if (expected != null) Timestamp.valueOf(expected)
-                      else null)
+      checkEvaluation(
+        FromUTCTimestamp(Literal.create(if (t != null)
+                                          Timestamp.valueOf(t)
+                                        else null,
+                                        TimestampType),
+                         Literal.create(tz, StringType)),
+        if (expected != null) Timestamp.valueOf(expected)
+        else null
+      )
       checkEvaluation(
         FromUTCTimestamp(Literal.create(if (t != null) Timestamp.valueOf(t)
                                         else null,
                                         TimestampType),
                          NonFoldableLiteral.create(tz, StringType)),
-        if (expected != null) Timestamp.valueOf(expected) else null)
+        if (expected != null) Timestamp.valueOf(expected) else null
+      )
     }
     test("2015-07-24 00:00:00", "PST", "2015-07-23 17:00:00")
     test("2015-01-24 00:00:00", "PST", "2015-01-23 16:00:00")

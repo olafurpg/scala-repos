@@ -30,9 +30,10 @@ object XmlBodyParserSpec extends PlaySpecification {
     }
 
     "parse XML bodies" in new WithApplication() {
-      parse("<foo>bar</foo>", Some("application/xml; charset=utf-8"), "utf-8") must beRight.like {
-        case xml => xml.text must_== "bar"
-      }
+      parse("<foo>bar</foo>", Some("application/xml; charset=utf-8"), "utf-8") must beRight
+        .like {
+          case xml => xml.text must_== "bar"
+        }
     }
 
     "honour the external charset for application sub types" in new WithApplication() {
@@ -54,15 +55,17 @@ object XmlBodyParserSpec extends PlaySpecification {
             "iso-8859-1") must beRight.like {
         case xml => xml.text must_== "bär"
       }
-      parse("<foo>bär</foo>", Some("text/xml; charset=utf-16"), "utf-16") must beRight.like {
-        case xml => xml.text must_== "bär"
-      }
+      parse("<foo>bär</foo>", Some("text/xml; charset=utf-16"), "utf-16") must beRight
+        .like {
+          case xml => xml.text must_== "bär"
+        }
     }
 
     "default to iso-8859-1 for text sub types" in new WithApplication() {
-      parse("<foo>bär</foo>", Some("text/xml"), "iso-8859-1") must beRight.like {
-        case xml => xml.text must_== "bär"
-      }
+      parse("<foo>bär</foo>", Some("text/xml"), "iso-8859-1") must beRight
+        .like {
+          case xml => xml.text must_== "bär"
+        }
     }
 
     "default to reading the encoding from the prolog for application sub types" in new WithApplication() {
@@ -146,11 +149,13 @@ object XmlBodyParserSpec extends PlaySpecification {
     "parse XML bodies without loading in a related schema from a parameter" in new WithApplication() {
       val externalParameterEntity = File.createTempFile("xep", ".dtd")
       val externalGeneralEntity = File.createTempFile("xxe", ".txt")
-      FileUtils.writeStringToFile(externalParameterEntity,
-                                  s"""
+      FileUtils.writeStringToFile(
+        externalParameterEntity,
+        s"""
           |<!ENTITY % xge SYSTEM "${externalGeneralEntity.toURI}">
           |<!ENTITY % pe "<!ENTITY xxe '%xge;'>">
-        """.stripMargin)
+        """.stripMargin
+      )
       FileUtils.writeStringToFile(externalGeneralEntity,
                                   "I shouldnt be there!")
       externalGeneralEntity.deleteOnExit()

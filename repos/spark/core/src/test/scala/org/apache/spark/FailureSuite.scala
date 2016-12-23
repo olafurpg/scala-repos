@@ -112,9 +112,11 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
       results.collect()
     }
     assert(thrown.getClass === classOf[SparkException])
-    assert(thrown.getMessage.contains("serializable") ||
-             thrown.getCause.getClass === classOf[NotSerializableException],
-           "Exception does not contain \"serializable\": " + thrown.getMessage)
+    assert(
+      thrown.getMessage.contains("serializable") ||
+        thrown.getCause.getClass === classOf[NotSerializableException],
+      "Exception does not contain \"serializable\": " + thrown.getMessage
+    )
 
     FailureSuiteState.clear()
   }

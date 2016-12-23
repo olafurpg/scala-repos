@@ -147,16 +147,19 @@ object RunConfig {
         config *> "The argument to --timeout must be a non-negative number".failureNel)
 
     case test :: args =>
-      fromCommandLine(args, config map { config =>
-        val g = { (path: List[String], _: Any) =>
-          path contains test
-        }
-        val select =
-          config.select map { f => (path: List[String], test: PerfTest) =>
-            (f(path, test) || g(path, test))
-          } orElse Some(g)
+      fromCommandLine(
+        args,
+        config map { config =>
+          val g = { (path: List[String], _: Any) =>
+            path contains test
+          }
+          val select =
+            config.select map { f => (path: List[String], test: PerfTest) =>
+              (f(path, test) || g(path, test))
+            } orElse Some(g)
 
-        config.copy(select = select)
-      })
+          config.copy(select = select)
+        }
+      )
   }
 }

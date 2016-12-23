@@ -96,12 +96,14 @@ case class Statistics private[ragnarok] (tails: Int,
 
   def toJson: JObject =
     JObject(
-      List(JField("mean", JNum(mean)),
-           JField("variance", JNum(variance)),
-           JField("stdDev", JNum(stdDev)),
-           JField("min", JNum(min)),
-           JField("max", JNum(max)),
-           JField("count", JNum(count))))
+      List(
+        JField("mean", JNum(mean)),
+        JField("variance", JNum(variance)),
+        JField("stdDev", JNum(stdDev)),
+        JField("min", JNum(min)),
+        JField("max", JNum(max)),
+        JField("count", JNum(count))
+      ))
 }
 
 object Statistics {

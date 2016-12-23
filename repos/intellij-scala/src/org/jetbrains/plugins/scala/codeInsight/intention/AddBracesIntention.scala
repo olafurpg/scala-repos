@@ -48,7 +48,8 @@ class AddBracesIntention extends PsiElementBaseIntentionAction {
       classOf[ScTryBlock],
       classOf[ScFinallyBlock],
       classOf[ScWhileStmt],
-      classOf[ScDoStmt])
+      classOf[ScDoStmt]
+    )
 
     def isAncestorOfElement(ancestor: PsiElement) =
       PsiTreeUtil.isContextAncestor(ancestor, element, false)

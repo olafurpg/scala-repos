@@ -241,11 +241,13 @@ class SparkHadoopUtil extends Logging {
 
   def globPath(pattern: Path): Seq[Path] = {
     val fs = pattern.getFileSystem(conf)
-    Option(fs.globStatus(pattern)).map { statuses =>
-      statuses
-        .map(_.getPath.makeQualified(fs.getUri, fs.getWorkingDirectory))
-        .toSeq
-    }.getOrElse(Seq.empty[Path])
+    Option(fs.globStatus(pattern))
+      .map { statuses =>
+        statuses
+          .map(_.getPath.makeQualified(fs.getUri, fs.getWorkingDirectory))
+          .toSeq
+      }
+      .getOrElse(Seq.empty[Path])
   }
 
   def globPathIfNecessary(pattern: Path): Seq[Path] = {
@@ -272,11 +274,14 @@ class SparkHadoopUtil extends Logging {
           name.startsWith(prefix) && !name.endsWith(exclusionSuffix)
         }
       })
-      Arrays.sort(fileStatuses, new Comparator[FileStatus] {
-        override def compare(o1: FileStatus, o2: FileStatus): Int = {
-          Longs.compare(o1.getModificationTime, o2.getModificationTime)
+      Arrays.sort(
+        fileStatuses,
+        new Comparator[FileStatus] {
+          override def compare(o1: FileStatus, o2: FileStatus): Int = {
+            Longs.compare(o1.getModificationTime, o2.getModificationTime)
+          }
         }
-      })
+      )
       fileStatuses
     } catch {
       case NonFatal(e) =>

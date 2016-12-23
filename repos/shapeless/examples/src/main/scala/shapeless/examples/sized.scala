@@ -40,7 +40,8 @@ object SizedExamples extends App {
       // List[Sized[IndexedSeq[String], _2]]
       Sized("Types and Programming Languages", "Benjamin Pierce"),
       Sized("The Implementation of Functional Programming Languages",
-            "Simon Peyton-Jones"))
+            "Simon Peyton-Jones")
+    )
 
     // hdrs and rows statically known to have the same number of columns
     val formatted = csv(hdrs, rows)

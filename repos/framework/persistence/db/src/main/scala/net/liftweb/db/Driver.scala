@@ -485,7 +485,8 @@ object OracleDriver extends DriverType("Oracle") {
         "_trigger BEFORE INSERT ON " + tableName + " " + "FOR EACH ROW " +
         "WHEN (new." + columnName + " is null) " + "BEGIN " +
         "SELECT " + tableName + "_sequence.nextval INTO :new." + columnName +
-        " FROM DUAL; " + "END;")
+        " FROM DUAL; " + "END;"
+    )
   }
 
   // Oracle supports returning generated keys only if we specify the names of the column(s) to return.

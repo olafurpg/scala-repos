@@ -89,13 +89,15 @@ abstract class QueryTest extends PlanTest {
     val decoded = try ds.collect().toSet
     catch {
       case e: Exception =>
-        fail(s"""
+        fail(
+          s"""
              |Exception collecting dataset as objects
              |${ds.resolvedTEncoder}
              |${ds.resolvedTEncoder.fromRowExpression.treeString}
              |${ds.queryExecution}
            """.stripMargin,
-             e)
+          e
+        )
     }
 
     // Handle the case where the return type is an array
@@ -205,15 +207,17 @@ abstract class QueryTest extends PlanTest {
   private def checkJsonFormat(df: DataFrame): Unit = {
     val logicalPlan = df.queryExecution.analyzed
     // bypass some cases that we can't handle currently.
-    logicalPlan.transform {
-      case _: MapPartitions => return
-      case _: MapGroups => return
-      case _: AppendColumns => return
-      case _: CoGroup => return
-      case _: LogicalRelation => return
-    }.transformAllExpressions {
-      case a: ImperativeAggregate => return
-    }
+    logicalPlan
+      .transform {
+        case _: MapPartitions => return
+        case _: MapGroups => return
+        case _: AppendColumns => return
+        case _: CoGroup => return
+        case _: LogicalRelation => return
+      }
+      .transformAllExpressions {
+        case a: ImperativeAggregate => return
+      }
 
     // bypass hive tests before we fix all corner cases in hive module.
     if (this.getClass.getName.startsWith("org.apache.spark.sql.hive")) return
@@ -249,13 +253,15 @@ abstract class QueryTest extends PlanTest {
       TreeNode.fromJSON[LogicalPlan](jsonString, sqlContext.sparkContext)
     } catch {
       case NonFatal(e) =>
-        fail(s"""
+        fail(
+          s"""
              |Failed to rebuild the logical plan from JSON:
              |${logicalPlan.treeString}
              |
              |${logicalPlan.prettyJson}
            """.stripMargin,
-             e)
+          e
+        )
     }
 
     val normalized2 =
@@ -321,7 +327,8 @@ object QueryTest {
     * @param expectedAnswer the expected result in a [[Seq]] of [[Row]]s.
     */
   def checkAnswer(df: DataFrame, expectedAnswer: Seq[Row]): Option[String] = {
-    val isSorted = df.logicalPlan.collect { case s: logical.Sort => s }.nonEmpty
+    val isSorted =
+      df.logicalPlan.collect { case s: logical.Sort => s }.nonEmpty
 
     val sparkAnswer = try df.collect().toSeq
     catch {
@@ -382,7 +389,8 @@ object QueryTest {
                isSorted).map(_.toString()),
              s"== Spark Answer - ${sparkAnswer.size} ==" +: prepareAnswer(
                sparkAnswer,
-               isSorted).map(_.toString())).mkString("\n")}
+               isSorted).map(_.toString())
+           ).mkString("\n")}
         """.stripMargin
       return Some(errorMessage)
     }

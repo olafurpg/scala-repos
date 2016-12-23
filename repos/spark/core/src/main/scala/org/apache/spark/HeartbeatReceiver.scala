@@ -101,11 +101,16 @@ private[spark] class HeartbeatReceiver(sc: SparkContext, clock: Clock)
     ThreadUtils.newDaemonSingleThreadExecutor("kill-executor-thread")
 
   override def onStart(): Unit = {
-    timeoutCheckingTask = eventLoopThread.scheduleAtFixedRate(new Runnable {
-      override def run(): Unit = Utils.tryLogNonFatalError {
-        Option(self).foreach(_.ask[Boolean](ExpireDeadHosts))
-      }
-    }, 0, checkTimeoutIntervalMs, TimeUnit.MILLISECONDS)
+    timeoutCheckingTask = eventLoopThread.scheduleAtFixedRate(
+      new Runnable {
+        override def run(): Unit = Utils.tryLogNonFatalError {
+          Option(self).foreach(_.ask[Boolean](ExpireDeadHosts))
+        }
+      },
+      0,
+      checkTimeoutIntervalMs,
+      TimeUnit.MILLISECONDS
+    )
   }
 
   override def receiveAndReply(

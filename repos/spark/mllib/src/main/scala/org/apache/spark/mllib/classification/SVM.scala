@@ -117,7 +117,8 @@ object SVMModel extends Loader[SVMModel] {
         assert(
           model.weights.size == numFeatures,
           s"SVMModel.load with numFeatures=$numFeatures" +
-            s" was given non-matching weights vector of size ${model.weights.size}")
+            s" was given non-matching weights vector of size ${model.weights.size}"
+        )
         assert(
           numClasses == 2,
           s"SVMModel.load was given numClasses=$numClasses but only supports 2 classes")

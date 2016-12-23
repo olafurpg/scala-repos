@@ -43,11 +43,14 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val data1 = data.map(l1Normalizer.transform)
     val data1RDD = l1Normalizer.transform(dataRDD)
 
-    assert((data, data1, data1RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after normalization.")
+    assert(
+      (data, data1, data1RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after normalization."
+    )
 
     assert((data1, data1RDD.collect()).zipped.forall((v1, v2) =>
       v1 ~== v2 absTol 1E-5))
@@ -78,11 +81,14 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val data2 = data.map(l2Normalizer.transform)
     val data2RDD = l2Normalizer.transform(dataRDD)
 
-    assert((data, data2, data2RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after normalization.")
+    assert(
+      (data, data2, data2RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after normalization."
+    )
 
     assert((data2, data2RDD.collect()).zipped.forall((v1, v2) =>
       v1 ~== v2 absTol 1E-5))
@@ -114,11 +120,14 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val dataInf = data.map(lInfNormalizer.transform)
     val dataInfRDD = lInfNormalizer.transform(dataRDD)
 
-    assert((data, dataInf, dataInfRDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after normalization.")
+    assert(
+      (data, dataInf, dataInfRDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after normalization."
+    )
 
     assert((dataInf, dataInfRDD.collect()).zipped.forall((v1, v2) =>
       v1 ~== v2 absTol 1E-5))

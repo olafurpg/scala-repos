@@ -164,7 +164,7 @@ object Plugins extends PluginsFunctions {
     * The [[AutoPlugin]]s are topologically sorted so that a required [[AutoPlugin]] comes before its requiring [[AutoPlugin]].*/
   def deducer(
       defined0: List[AutoPlugin]): (Plugins, Logger) => Seq[AutoPlugin] =
-    if (defined0.isEmpty) (_, _) => Nil
+    if (defined0.isEmpty)(_, _) => Nil
     else {
       // TODO: defined should return all the plugins
       val allReqs = (defined0 flatMap { asRequirements }).toSet

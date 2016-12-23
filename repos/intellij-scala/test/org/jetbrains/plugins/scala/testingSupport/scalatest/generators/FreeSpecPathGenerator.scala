@@ -24,6 +24,7 @@ trait FreeSpecPathGenerator extends ScalaTestTestCase {
         |    }
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 }

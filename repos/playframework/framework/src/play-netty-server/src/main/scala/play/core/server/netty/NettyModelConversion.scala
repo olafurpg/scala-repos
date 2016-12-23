@@ -270,9 +270,11 @@ private[server] class NettyModelConversion(
     } catch {
       case NonFatal(e) =>
         if (logger.isErrorEnabled) {
-          val prettyHeaders = headers.map {
-            case (name, value) => s"$name -> $value"
-          }.mkString("[", ",", "]")
+          val prettyHeaders = headers
+            .map {
+              case (name, value) => s"$name -> $value"
+            }
+            .mkString("[", ",", "]")
           val msg =
             s"Exception occurred while setting response's headers to $prettyHeaders. Action taken is to set the response's status to ${HttpResponseStatus.INTERNAL_SERVER_ERROR} and discard all headers."
           logger.error(msg, e)
@@ -307,17 +309,19 @@ private[server] class NettyModelConversion(
     val publisher = chunks.runWith(Sink.asPublisher(false))
 
     val httpContentPublisher =
-      SynchronousMappedStreams.map[HttpChunk, HttpContent](publisher, {
-        case HttpChunk.Chunk(bytes) =>
-          new DefaultHttpContent(byteStringToByteBuf(bytes))
-        case HttpChunk.LastChunk(trailers) =>
-          val lastChunk = new DefaultLastHttpContent()
-          trailers.headers.foreach {
-            case (name, value) =>
-              lastChunk.trailingHeaders().add(name, value)
-          }
-          lastChunk
-      })
+      SynchronousMappedStreams.map[HttpChunk, HttpContent](
+        publisher, {
+          case HttpChunk.Chunk(bytes) =>
+            new DefaultHttpContent(byteStringToByteBuf(bytes))
+          case HttpChunk.LastChunk(trailers) =>
+            val lastChunk = new DefaultLastHttpContent()
+            trailers.headers.foreach {
+              case (name, value) =>
+                lastChunk.trailingHeaders().add(name, value)
+            }
+            lastChunk
+        }
+      )
 
     val response = new DefaultStreamedHttpResponse(httpVersion,
                                                    responseStatus,

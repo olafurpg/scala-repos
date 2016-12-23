@@ -18,14 +18,16 @@ private[io] class AtomicFileOutputStream private (
   private[this] var _closed = false
 
   def this(baseFile: File) = {
-    this(baseFile, {
-      // Create a temporary file we actually write to
-      val tmpFile = File.createTempFile(".tmp-" + baseFile.getName,
-                                        ".tmp",
-                                        baseFile.getParentFile)
-      tmpFile.deleteOnExit()
-      tmpFile
-    })
+    this(
+      baseFile, {
+        // Create a temporary file we actually write to
+        val tmpFile = File.createTempFile(".tmp-" + baseFile.getName,
+                                          ".tmp",
+                                          baseFile.getParentFile)
+        tmpFile.deleteOnExit()
+        tmpFile
+      }
+    )
   }
 
   override def close(): Unit = {

@@ -126,7 +126,8 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
           .get
           .highWatermark
           .messageOffset == numMessages,
-      "Failed to update high watermark for follower after timeout")
+      "Failed to update high watermark for follower after timeout"
+    )
 
     servers.foreach(_.replicaManager.checkpointHighWatermarks())
     val leaderHW = hwFile1.read.getOrElse(TopicAndPartition(topic, 0), 0L)

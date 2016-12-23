@@ -81,5 +81,6 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
       title =
         s"${tour.fullName}: ${tour.variant.name} ${tour.clock.show} ${tour.mode.name} #${tour.id}",
       url = s"$netBaseUrl${routes.Tournament.show(tour.id).url}",
-      description = longTournamentDescription(tour))
+      description = longTournamentDescription(tour)
+    )
 }

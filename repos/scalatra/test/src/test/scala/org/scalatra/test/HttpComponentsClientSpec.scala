@@ -22,38 +22,42 @@ class HttpComponentsClientSpec
   def beforeAll = start()
   def afterAll = stop()
 
-  addServlet(new HttpServlet {
-    override def service(req: HttpServletRequest, resp: HttpServletResponse) {
-      def copy(in: InputStream, out: OutputStream, bufferSize: Int = 4096) {
-        val buf = new Array[Byte](bufferSize)
-        @tailrec
-        def loop() {
-          val n = in.read(buf)
-          if (n >= 0) {
-            out.write(buf, 0, n)
-            loop()
+  addServlet(
+    new HttpServlet {
+      override def service(req: HttpServletRequest,
+                           resp: HttpServletResponse) {
+        def copy(in: InputStream, out: OutputStream, bufferSize: Int = 4096) {
+          val buf = new Array[Byte](bufferSize)
+          @tailrec
+          def loop() {
+            val n = in.read(buf)
+            if (n >= 0) {
+              out.write(buf, 0, n)
+              loop()
+            }
           }
+          loop()
         }
-        loop()
+
+        resp.setHeader("Request-Method", req.getMethod.toUpperCase)
+        resp.setHeader("Request-URI", req.getRequestURI)
+        req.getHeaderNames.foreach(
+          headerName =>
+            resp.setHeader("Request-Header-%s".format(headerName),
+                           req.getHeader(headerName)))
+
+        req.getParameterMap.foreach {
+          case (name, values) =>
+            resp.setHeader("Request-Param-%s".format(name),
+                           values.mkString(", "))
+        }
+
+        resp.getOutputStream.write("received: ".getBytes)
+        copy(req.getInputStream, resp.getOutputStream)
       }
-
-      resp.setHeader("Request-Method", req.getMethod.toUpperCase)
-      resp.setHeader("Request-URI", req.getRequestURI)
-      req.getHeaderNames.foreach(
-        headerName =>
-          resp.setHeader("Request-Header-%s".format(headerName),
-                         req.getHeader(headerName)))
-
-      req.getParameterMap.foreach {
-        case (name, values) =>
-          resp.setHeader("Request-Param-%s".format(name),
-                         values.mkString(", "))
-      }
-
-      resp.getOutputStream.write("received: ".getBytes)
-      copy(req.getInputStream, resp.getOutputStream)
-    }
-  }, "/*")
+    },
+    "/*"
+  )
 
   "client" should {
     "support all HTTP methods" in {

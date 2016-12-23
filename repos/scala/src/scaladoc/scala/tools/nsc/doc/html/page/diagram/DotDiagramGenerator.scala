@@ -211,24 +211,26 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
         nodes.map(n => node2Dot(n)).mkString +
         subClasses.map(n => node2Dot(n)).mkString +
         superClasses.map(n => node2Dot(n)).mkString + // inheritance edges
-        edges.map {
-          case (from, tos) =>
-            tos
-              .map(to => {
-                val id =
-                  "graph" +
-                    counter + "_" + node2Index(to) + "_" + node2Index(from)
-                // the X -> Y edge is inverted twice to keep the diagram flowing the right way
-                // that is, an edge from node X to Y will result in a dot instruction nodeY -> nodeX [dir="back"]
-                "node" + node2Index(to) + " -> node" +
-                  node2Index(from) + " [id=\"" + cssClass(to, from) +
-                  "|" + id + "\", " + "tooltip=\"" + from.name +
-                  (if (from.name.endsWith(MultiSuffix)) " are subtypes of "
-                   else " is a subtype of ") + to.name +
-                  "\", dir=\"back\", arrowtail=\"empty\"];\n"
-              })
-              .mkString
-        }.mkString + "}"
+        edges
+          .map {
+            case (from, tos) =>
+              tos
+                .map(to => {
+                  val id =
+                    "graph" +
+                      counter + "_" + node2Index(to) + "_" + node2Index(from)
+                  // the X -> Y edge is inverted twice to keep the diagram flowing the right way
+                  // that is, an edge from node X to Y will result in a dot instruction nodeY -> nodeX [dir="back"]
+                  "node" + node2Index(to) + " -> node" +
+                    node2Index(from) + " [id=\"" + cssClass(to, from) +
+                    "|" + id + "\", " + "tooltip=\"" + from.name +
+                    (if (from.name.endsWith(MultiSuffix)) " are subtypes of "
+                     else " is a subtype of ") + to.name +
+                    "\", dir=\"back\", arrowtail=\"empty\"];\n"
+                })
+                .mkString
+          }
+          .mkString + "}"
 
     tDot += System.currentTimeMillis
     DiagramStats.addDotGenerationTime(tDot)
@@ -563,12 +565,15 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
   )
 
   private def flatten(attributes: Map[String, String]) =
-    attributes.map { case (key, value) => key + "=\"" + value + "\"" }
+    attributes
+      .map { case (key, value) => key + "=\"" + value + "\"" }
       .mkString(", ")
 
-  private val graphAttributesStr = graphAttributes.map {
-    case (key, value) => key + "=\"" + value + "\";\n"
-  }.mkString
+  private val graphAttributesStr = graphAttributes
+    .map {
+      case (key, value) => key + "=\"" + value + "\";\n"
+    }
+    .mkString
   private val nodeAttributesStr = flatten(nodeAttributes)
   private val edgeAttributesStr = flatten(edgeAttributes)
 }

@@ -89,14 +89,16 @@ object TreeOrderedBuf {
           Some(m.asInstanceOf[MaybeLengthCalculation[c.type]].t)
       }
 
-      fnBodyOpt.map { fnBody =>
-        q"""
+      fnBodyOpt
+        .map { fnBody =>
+          q"""
         private[this] def payloadLength($element: $T): _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.MaybeLength = {
           lengthCalculationAttempts += 1
           $fnBody
         }
         """
-      }.getOrElse(q"()")
+        }
+        .getOrElse(q"()")
     }
 
     def binaryLengthGen(typeName: Tree): (Tree, Tree) = {

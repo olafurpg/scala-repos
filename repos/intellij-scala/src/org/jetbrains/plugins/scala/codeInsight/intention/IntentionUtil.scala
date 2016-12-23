@@ -29,8 +29,10 @@ object IntentionUtil {
       }
 
       it.takeWhile { a =>
-        acceptableElem(a)
-      }.filter(a => a.isInstanceOf[PsiComment]).toSeq
+          acceptableElem(a)
+        }
+        .filter(a => a.isInstanceOf[PsiComment])
+        .toSeq
     }
 
     CommentsAroundElement(getElements(element.prevSiblings).reverse,

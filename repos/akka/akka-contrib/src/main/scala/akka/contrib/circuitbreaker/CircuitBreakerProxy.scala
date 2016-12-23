@@ -299,7 +299,8 @@ final class CircuitBreakerProxy(target: ActorRef,
             message,
             response,
             currentSender,
-            state)
+            state
+          )
 
           self ! CallSucceeded
         }
@@ -310,7 +311,8 @@ final class CircuitBreakerProxy(target: ActorRef,
           message,
           target,
           reason,
-          state)
+          state
+        )
 
         self ! CallFailed
     }

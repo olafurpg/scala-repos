@@ -125,11 +125,15 @@ final case class DeploymentPlan(id: String,
     }
     val stepString =
       if (steps.nonEmpty) {
-        steps.map {
-          _.actions.map(actionString).mkString("  * ", "\n  * ", "")
-        }.zipWithIndex.map {
-          case (stepsString, index) => s"step ${index + 1}:\n$stepsString"
-        }.mkString("\n", "\n", "")
+        steps
+          .map {
+            _.actions.map(actionString).mkString("  * ", "\n  * ", "")
+          }
+          .zipWithIndex
+          .map {
+            case (stepsString, index) => s"step ${index + 1}:\n$stepsString"
+          }
+          .mkString("\n", "\n", "")
       } else " NO STEPS"
     s"DeploymentPlan $version$stepString\n"
   }
@@ -206,9 +210,11 @@ object DeploymentPlan {
 
       if (outgoingEdges.isEmpty) Seq(vertex)
       else
-        outgoingEdges.map { e =>
-          vertex +: longestPathFromVertex(g, g.getEdgeTarget(e))
-        }.maxBy(_.length)
+        outgoingEdges
+          .map { e =>
+            vertex +: longestPathFromVertex(g, g.getEdgeTarget(e))
+          }
+          .maxBy(_.length)
     }
 
     val unsortedEquivalenceClasses = group.transitiveApps.groupBy { app =>
@@ -232,8 +238,8 @@ object DeploymentPlan {
     val appsByLongestPath: SortedMap[Int, Set[AppDefinition]] =
       appsGroupedByLongestPath(target)
 
-    appsByLongestPath.valuesIterator.map {
-      (equivalenceClass: Set[AppDefinition]) =>
+    appsByLongestPath.valuesIterator
+      .map { (equivalenceClass: Set[AppDefinition]) =>
         val actions: Set[DeploymentAction] = equivalenceClass.flatMap {
           (newApp: AppDefinition) =>
             originalApps.get(newApp.id) match {
@@ -259,7 +265,8 @@ object DeploymentPlan {
         }
 
         DeploymentStep(actions.to[Seq])
-    }.to[Seq]
+      }
+      .to[Seq]
   }
 
   /**
@@ -293,18 +300,22 @@ object DeploymentPlan {
 
     // 1. Destroy apps that do not exist in the target.
     steps += DeploymentStep(
-      (originalApps -- targetApps.keys).valuesIterator.map { oldApp =>
-        StopApplication(oldApp)
-      }.to[Seq]
+      (originalApps -- targetApps.keys).valuesIterator
+        .map { oldApp =>
+          StopApplication(oldApp)
+        }
+        .to[Seq]
     )
 
     // 2. Start apps that do not exist in the original, requiring only 0
     //    instances.  These are scaled as needed in the dependency-ordered
     //    steps that follow.
     steps += DeploymentStep(
-      (targetApps -- originalApps.keys).valuesIterator.map { newApp =>
-        StartApplication(newApp, 0)
-      }.to[Seq]
+      (targetApps -- originalApps.keys).valuesIterator
+        .map { newApp =>
+          StartApplication(newApp, 0)
+        }
+        .to[Seq]
     )
 
     // 3. For each app in each dependency class,

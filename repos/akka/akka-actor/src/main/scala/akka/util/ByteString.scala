@@ -657,8 +657,8 @@ final class ByteStringBuilder extends Builder[Byte, ByteString] { builder ⇒
   private var _tempLength: Int = 0
   private var _tempCapacity: Int = 0
 
-  protected def fillArray(len: Int)(fill: (Array[Byte],
-                                           Int) ⇒ Unit): this.type = {
+  protected def fillArray(len: Int)(
+      fill: (Array[Byte], Int) ⇒ Unit): this.type = {
     ensureTempSize(_tempLength + len)
     fill(_temp, _tempLength)
     _tempLength += len

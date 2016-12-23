@@ -75,8 +75,9 @@ object StormLaws {
     }
 
   def memoryPlanWithoutSummer(original: List[Int])(
-      mkJob: (Producer[Memory, Int],
-              Memory#Sink[Int]) => TailProducer[Memory, Int]): List[Int] = {
+      mkJob: (Producer[Memory, Int], Memory#Sink[Int]) => TailProducer[Memory,
+                                                                       Int])
+    : List[Int] = {
     val memory = new Memory
     val outputList = ArrayBuffer[Int]()
     val sink: (Int) => Unit = { x: Int =>
@@ -97,8 +98,9 @@ object StormLaws {
   }
 
   def runWithOutSummer(original: List[Int])(
-      mkJob: (Producer[Storm, Int],
-              Storm#Sink[Int]) => TailProducer[Storm, Int]): List[Int] = {
+      mkJob: (Producer[Storm, Int], Storm#Sink[Int]) => TailProducer[Storm,
+                                                                     Int])
+    : List[Int] = {
     val cluster = new LocalCluster()
 
     val job = mkJob(
@@ -219,41 +221,9 @@ class StormLaws extends WordSpec {
   }
 
   "StormPlatform matches Scala for flatmap keys jobs" in {
-    val original = List(1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        41,
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        41) // sample[List[Int]]
+    val original =
+      List(1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 41,
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 41) // sample[List[Int]]
     val fnA = sample[Int => List[(Int, Int)]]
     val fnB = sample[Int => List[Int]]
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
@@ -364,41 +334,9 @@ class StormLaws extends WordSpec {
   }
 
   "StormPlatform with multiple summers" in {
-    val original = List(1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        41,
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        41) // sample[List[Int]]
+    val original =
+      List(1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 41,
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 41) // sample[List[Int]]
     val doubler = { (x): (Int) =>
       List((x -> x * 2))
     }

@@ -141,19 +141,23 @@ abstract class Reifier extends States with Phases with Errors with Utils {
         ApiUniverseClass,
         JavaUniverseClass,
         ReflectRuntimePackage,
-        runDefinitions.ReflectRuntimeCurrentMirror)
+        runDefinitions.ReflectRuntimeCurrentMirror
+      )
       importantSymbols ++= importantSymbols map (_.companionSymbol)
       importantSymbols ++= importantSymbols map (_.moduleClass)
       importantSymbols ++= importantSymbols map (_.linkedClassOfClass)
       def isImportantSymbol(sym: Symbol): Boolean =
         sym != null && sym != NoSymbol && importantSymbols(sym)
-      val untyped = brutallyResetAttrs(result, leaveAlone = {
-        case ValDef(_, u, _, _) if u == nme.UNIVERSE_SHORT => true
-        case ValDef(_, m, _, _) if m == nme.MIRROR_SHORT => true
-        case tree if symtab.syms contains tree.symbol => true
-        case tree if isImportantSymbol(tree.symbol) => true
-        case _ => false
-      })
+      val untyped = brutallyResetAttrs(
+        result,
+        leaveAlone = {
+          case ValDef(_, u, _, _) if u == nme.UNIVERSE_SHORT => true
+          case ValDef(_, m, _, _) if m == nme.MIRROR_SHORT => true
+          case tree if symtab.syms contains tree.symbol => true
+          case tree if isImportantSymbol(tree.symbol) => true
+          case _ => false
+        }
+      )
 
       if (reifyCopypaste) {
         if (reifyDebug) println("=============================")

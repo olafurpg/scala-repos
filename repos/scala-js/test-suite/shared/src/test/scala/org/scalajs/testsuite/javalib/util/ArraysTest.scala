@@ -82,11 +82,11 @@ class ArraysTest {
                      Arrays.sort(_),
                      Arrays.sort(_, _, _))
 
-  private def testSort[T: ClassTag](elem: Int => T,
-                                    newArray: Int => Array[T],
-                                    sort: Array[T] => Unit,
-                                    sort2: (Array[T], Int,
-                                            Int) => Unit): Unit = {
+  private def testSort[T: ClassTag](
+      elem: Int => T,
+      newArray: Int => Array[T],
+      sort: Array[T] => Unit,
+      sort2: (Array[T], Int, Int) => Unit): Unit = {
     val values = Array(5, 3, 6, 1, 2, 4).map(elem)
     val arr = newArray(values.length)
 

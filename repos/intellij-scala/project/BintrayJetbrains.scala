@@ -35,10 +35,12 @@ object BintrayJetbrains {
       "[organisation]/[module]/scala_2.10/sbt_0.13/[revision]/[type]s/[artifact](-[classifier]).[ext]")
   }
 
-  val allResolvers = Seq(Resolvers.mavenPatched,
-                         Resolvers.structureCore,
-                         Resolvers.structureExtractor012,
-                         Resolvers.structureExtractor013,
-                         Resolvers.scalaTestFindersPatched,
-                         Resolvers.scalaPluginDeps)
+  val allResolvers = Seq(
+    Resolvers.mavenPatched,
+    Resolvers.structureCore,
+    Resolvers.structureExtractor012,
+    Resolvers.structureExtractor013,
+    Resolvers.scalaTestFindersPatched,
+    Resolvers.scalaPluginDeps
+  )
 }

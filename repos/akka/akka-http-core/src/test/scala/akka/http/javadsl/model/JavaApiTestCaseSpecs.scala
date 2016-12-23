@@ -70,7 +70,8 @@ class JavaApiTestCaseSpecs extends FreeSpec with MustMatchers {
         Optional.empty[java.util.Collection[String]],
         Optional.empty[java.util.Collection[String]],
         Optional.empty[TLSClientAuth],
-        Optional.empty[SSLParameters]) mustNot be(null)
+        Optional.empty[SSLParameters]
+      ) mustNot be(null)
     }
   }
 }

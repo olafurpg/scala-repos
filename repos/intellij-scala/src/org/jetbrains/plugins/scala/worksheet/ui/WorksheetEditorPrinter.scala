@@ -273,40 +273,45 @@ class WorksheetEditorPrinter(originalEditor: Editor,
 
         CommandProcessor
           .getInstance()
-          .executeCommand(project, new Runnable {
-            override def run() {
-              viewerFolding runBatchFoldingOperation
-                (new Runnable {
-                  override def run() {
-                    foldingOffsetsCopy map {
-                      case (start, end, limit, originalEnd) =>
-                        val offset =
-                          originalDocument getLineEndOffset Math
-                            .min(originalEnd, originalDocument.getLineCount)
-                        val linesCount =
-                          viewerDocument.getLineNumber(end) - start - limit +
-                            1
+          .executeCommand(
+            project,
+            new Runnable {
+              override def run() {
+                viewerFolding runBatchFoldingOperation
+                  (new Runnable {
+                    override def run() {
+                      foldingOffsetsCopy map {
+                        case (start, end, limit, originalEnd) =>
+                          val offset =
+                            originalDocument getLineEndOffset Math
+                              .min(originalEnd, originalDocument.getLineCount)
+                          val linesCount =
+                            viewerDocument.getLineNumber(end) - start - limit +
+                              1
 
-                        new WorksheetFoldRegionDelegate(
-                          ed,
-                          viewerDocument.getLineStartOffset(start +
-                            limit - 1),
-                          end,
-                          offset,
-                          linesCount,
-                          group,
-                          limit
-                        )
-                    } foreach {
-                      case region =>
-                        viewerFolding addFoldRegion region
+                          new WorksheetFoldRegionDelegate(
+                            ed,
+                            viewerDocument.getLineStartOffset(start +
+                              limit - 1),
+                            end,
+                            offset,
+                            linesCount,
+                            group,
+                            limit
+                          )
+                      } foreach {
+                        case region =>
+                          viewerFolding addFoldRegion region
+                      }
+
+                      WorksheetFoldGroup.save(file, group)
                     }
-
-                    WorksheetFoldGroup.save(file, group)
-                  }
-                }, false)
-            }
-          }, null, null)
+                  }, false)
+              }
+            },
+            null,
+            null
+          )
       }
     }
   }
@@ -337,20 +342,25 @@ class WorksheetEditorPrinter(originalEditor: Editor,
     } else {
       CommandProcessor
         .getInstance()
-        .executeCommand(project, new Runnable {
-          override def run() {
-            if (linesOld != viewerDocument.getLineCount) return
-            viewerDocument.deleteString(0, text.length)
-            viewerDocument.insertString(0, text)
+        .executeCommand(
+          project,
+          new Runnable {
+            override def run() {
+              if (linesOld != viewerDocument.getLineCount) return
+              viewerDocument.deleteString(0, text.length)
+              viewerDocument.insertString(0, text)
 
-            for (i <- total until viewerDocument.getLineCount)
-              getViewerEditor.getMarkupModel.addLineHighlighter(
-                i,
-                0,
-                new TextAttributes(Color.gray, null, null, null, 0))
-            commitDocument(viewerDocument)
-          }
-        }, null, null)
+              for (i <- total until viewerDocument.getLineCount)
+                getViewerEditor.getMarkupModel.addLineHighlighter(
+                  i,
+                  0,
+                  new TextAttributes(Color.gray, null, null, null, 0))
+              commitDocument(viewerDocument)
+            }
+          },
+          null,
+          null
+        )
     }
   }
 
@@ -522,7 +532,8 @@ object WorksheetEditorPrinter {
       PsiManager getInstance editor.getProject findFile virtualFile match {
         case scalaFile: ScalaFile => scalaFile
         case _ => null
-      })
+      }
+    )
 
   def createWorksheetEditor(editor: Editor) =
     getOrCreateViewerEditorFor(editor, true)

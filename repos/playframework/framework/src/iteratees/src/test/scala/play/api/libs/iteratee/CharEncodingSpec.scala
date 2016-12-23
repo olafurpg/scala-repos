@@ -86,50 +86,12 @@ object CharEncodingSpec extends Specification {
 
     "decode UTF-32" in {
       val input = Seq(
-        Array[Byte](0x00,
-                    0x00,
-                    0x00,
-                    0x48,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x65,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x6c),
-        Array[Byte](0x00,
-                    0x00,
-                    0x00,
-                    0x6c,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x6f,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x20,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x57),
-        Array[Byte](0x00,
-                    0x00,
-                    0x00,
-                    0x6f,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x72,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x6c,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x64)
+        Array[Byte](0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x65, 0x00, 0x00,
+          0x00, 0x6c),
+        Array[Byte](0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x00, 0x6f, 0x00, 0x00,
+          0x00, 0x20, 0x00, 0x00, 0x00, 0x57),
+        Array[Byte](0x00, 0x00, 0x00, 0x6f, 0x00, 0x00, 0x00, 0x72, 0x00, 0x00,
+          0x00, 0x6c, 0x00, 0x00, 0x00, 0x64)
       )
       val result =
         Enumerator(input: _*) &> CharEncoding.decode("UTF-32") |>>> Iteratee
@@ -160,9 +122,11 @@ object CharEncodingSpec extends Specification {
       )
       val result =
         Enumerator(input: _*) &> CharEncoding.decode("US-ASCII") |>>> Iteratee.skipToEof
-      val status = result.map { _ =>
-        "success"
-      }.recover { case e => "failure" }
+      val status = result
+        .map { _ =>
+          "success"
+        }
+        .recover { case e => "failure" }
       Await.result(status, Duration.Inf) must be equalTo "failure"
     }
 
@@ -172,9 +136,11 @@ object CharEncodingSpec extends Specification {
       )
       val result =
         Enumerator(input: _*) &> CharEncoding.decode("UTF-8") |>>> Iteratee.skipToEof
-      val status = result.map { _ =>
-        "success"
-      }.recover { case e => "failure" }
+      val status = result
+        .map { _ =>
+          "success"
+        }
+        .recover { case e => "failure" }
       Await.result(status, Duration.Inf) must be equalTo "failure"
     }
 
@@ -185,9 +151,11 @@ object CharEncodingSpec extends Specification {
       )
       val result =
         Enumerator(input: _*) &> CharEncoding.decode("UTF-16") |>>> Iteratee.skipToEof
-      val status = result.map { _ =>
-        "success"
-      }.recover { case e => "failure" }
+      val status = result
+        .map { _ =>
+          "success"
+        }
+        .recover { case e => "failure" }
       Await.result(status, Duration.Inf) must be equalTo "failure"
     }
 
@@ -197,9 +165,11 @@ object CharEncodingSpec extends Specification {
       )
       val result =
         Enumerator(input: _*) &> CharEncoding.decode("UTF-32") |>>> Iteratee.skipToEof
-      val status = result.map { _ =>
-        "success"
-      }.recover { case e => "failure" }
+      val status = result
+        .map { _ =>
+          "success"
+        }
+        .recover { case e => "failure" }
       Await.result(status, Duration.Inf) must be equalTo "failure"
     }
   }
@@ -301,9 +271,11 @@ object CharEncodingSpec extends Specification {
       val input = Seq("\u20ac")
       val result =
         Enumerator(input: _*) &> CharEncoding.encode("US-ASCII") |>>> Iteratee.skipToEof
-      val status = result.map { _ =>
-        "success"
-      }.recover { case e => "failure" }
+      val status = result
+        .map { _ =>
+          "success"
+        }
+        .recover { case e => "failure" }
       Await.result(status, Duration.Inf) must be equalTo "failure"
     }
 
@@ -313,9 +285,11 @@ object CharEncodingSpec extends Specification {
       )
       val result =
         Enumerator(input: _*) &> CharEncoding.encode("UTF-8") |>>> Iteratee.skipToEof
-      val status = result.map { _ =>
-        "success"
-      }.recover { case e => "failure" }
+      val status = result
+        .map { _ =>
+          "success"
+        }
+        .recover { case e => "failure" }
       Await.result(status, Duration.Inf) must be equalTo "failure"
     }
 
@@ -325,9 +299,11 @@ object CharEncodingSpec extends Specification {
       )
       val result =
         Enumerator(input: _*) &> CharEncoding.encode("UTF-16") |>>> Iteratee.skipToEof
-      val status = result.map { _ =>
-        "success"
-      }.recover { case e => "failure" }
+      val status = result
+        .map { _ =>
+          "success"
+        }
+        .recover { case e => "failure" }
       Await.result(status, Duration.Inf) must be equalTo "failure"
     }
 
@@ -337,9 +313,11 @@ object CharEncodingSpec extends Specification {
       )
       val result =
         Enumerator(input: _*) &> CharEncoding.encode("UTF-32") |>>> Iteratee.skipToEof
-      val status = result.map { _ =>
-        "success"
-      }.recover { case e => "failure" }
+      val status = result
+        .map { _ =>
+          "success"
+        }
+        .recover { case e => "failure" }
       Await.result(status, Duration.Inf) must be equalTo "failure"
     }
   }

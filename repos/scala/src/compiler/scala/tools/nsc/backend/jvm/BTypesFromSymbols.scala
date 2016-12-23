@@ -117,18 +117,20 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     else if (classSym == NullClass) srNullRef
     else {
       val internalName = classSym.javaBinaryName.toString
-      classBTypeFromInternalName.getOrElse(internalName, {
-        // The new ClassBType is added to the map in its constructor, before we set its info. This
-        // allows initializing cyclic dependencies, see the comment on variable ClassBType._info.
-        val res = ClassBType(internalName)
-        if (completeSilentlyAndCheckErroneous(classSym)) {
-          res.info = Left(
-            NoClassBTypeInfoClassSymbolInfoFailedSI9111(classSym.fullName))
-          res
-        } else {
-          setClassInfo(classSym, res)
+      classBTypeFromInternalName.getOrElse(
+        internalName, {
+          // The new ClassBType is added to the map in its constructor, before we set its info. This
+          // allows initializing cyclic dependencies, see the comment on variable ClassBType._info.
+          val res = ClassBType(internalName)
+          if (completeSilentlyAndCheckErroneous(classSym)) {
+            res.info = Left(
+              NoClassBTypeInfoClassSymbolInfoFailedSI9111(classSym.fullName))
+            res
+          } else {
+            setClassInfo(classSym, res)
+          }
         }
-      })
+      )
     }
   }
 
@@ -241,7 +243,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         currentUnit.warning(
           tp.typeSymbol.pos,
           s"an unexpected type representation reached the compiler backend while compiling $currentUnit: $tp. " +
-            "If possible, please file a bug on issues.scala-lang.org.")
+            "If possible, please file a bug on issues.scala-lang.org."
+        )
 
         tp match {
           case ThisType(ArrayClass) =>
@@ -551,7 +554,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       devWarning(
         innerClassSym.pos,
         s"""The class symbol $innerClassSym with the term symbol ${innerClassSym.rawowner} as `rawowner` reached the backend.
-           |Most likely this indicates a stale reference to a non-existing class introduced by a macro, see SI-9392.""".stripMargin)
+           |Most likely this indicates a stale reference to a non-existing class introduced by a macro, see SI-9392.""".stripMargin
+      )
       None
     } else {
       // See comment in BTypes, when is a class marked static in the InnerClass table.
@@ -656,36 +660,41 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     assert(isTopLevelModuleClass(moduleClassSym),
            s"not a top-level module class: $moduleClassSym")
     val internalName = moduleClassSym.javaBinaryName.dropModule.toString
-    classBTypeFromInternalName.getOrElse(internalName, {
-      val c = ClassBType(internalName)
-      // class info consistent with BCodeHelpers.genMirrorClass
-      val nested =
-        exitingPickler(memberClassesForInnerClassTable(moduleClassSym)) map classBTypeFromSymbol
-      c.info = Right(
-        ClassInfo(
-          superClass = Some(ObjectRef),
-          interfaces = Nil,
-          flags = asm.Opcodes.ACC_SUPER | asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_FINAL,
-          nestedClasses = nested,
-          nestedInfo = None,
-          inlineInfo = EmptyInlineInfo.copy(isEffectivelyFinal = true))) // no method inline infos needed, scala never invokes methods on the mirror class
-      c
-    })
+    classBTypeFromInternalName.getOrElse(
+      internalName, {
+        val c = ClassBType(internalName)
+        // class info consistent with BCodeHelpers.genMirrorClass
+        val nested =
+          exitingPickler(memberClassesForInnerClassTable(moduleClassSym)) map classBTypeFromSymbol
+        c.info = Right(
+          ClassInfo(
+            superClass = Some(ObjectRef),
+            interfaces = Nil,
+            flags = asm.Opcodes.ACC_SUPER | asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_FINAL,
+            nestedClasses = nested,
+            nestedInfo = None,
+            inlineInfo = EmptyInlineInfo.copy(isEffectivelyFinal = true)
+          )) // no method inline infos needed, scala never invokes methods on the mirror class
+        c
+      }
+    )
   }
 
   def beanInfoClassClassBType(mainClass: Symbol): ClassBType = {
     val internalName = mainClass.javaBinaryName.toString + "BeanInfo"
-    classBTypeFromInternalName.getOrElse(internalName, {
-      val c = ClassBType(internalName)
-      c.info = Right(
-        ClassInfo(superClass = Some(sbScalaBeanInfoRef),
-                  interfaces = Nil,
-                  flags = javaFlags(mainClass),
-                  nestedClasses = Nil,
-                  nestedInfo = None,
-                  inlineInfo = EmptyInlineInfo))
-      c
-    })
+    classBTypeFromInternalName.getOrElse(
+      internalName, {
+        val c = ClassBType(internalName)
+        c.info = Right(
+          ClassInfo(superClass = Some(sbScalaBeanInfoRef),
+                    interfaces = Nil,
+                    flags = javaFlags(mainClass),
+                    nestedClasses = Nil,
+                    nestedInfo = None,
+                    inlineInfo = EmptyInlineInfo))
+        c
+      }
+    )
   }
 
   /**

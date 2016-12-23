@@ -372,8 +372,8 @@ object Array extends FallbackArrayBuilding {
     *  @param   n2  the number of elements in the 2nd dimension
     *  @param   f   The function computing element values
     */
-  def tabulate[T: ClassTag](n1: Int, n2: Int)(f: (Int,
-                                                  Int) => T): Array[Array[T]] =
+  def tabulate[T: ClassTag](n1: Int, n2: Int)(
+      f: (Int, Int) => T): Array[Array[T]] =
     tabulate(n1)(i1 => tabulate(n2)(f(i1, _)))
 
   /** Returns a three-dimensional array containing values of a given function
@@ -412,8 +412,8 @@ object Array extends FallbackArrayBuilding {
     *  @param   f   The function computing element values
     */
   def tabulate[T: ClassTag](n1: Int, n2: Int, n3: Int, n4: Int, n5: Int)(
-      f: (Int, Int, Int, Int,
-          Int) => T): Array[Array[Array[Array[Array[T]]]]] =
+      f: (Int, Int, Int, Int, Int) => T)
+    : Array[Array[Array[Array[Array[T]]]]] =
     tabulate(n1)(i1 => tabulate(n2, n3, n4, n5)(f(i1, _, _, _, _)))
 
   /** Returns an array containing a sequence of increasing integers in a range.

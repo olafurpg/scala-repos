@@ -24,7 +24,8 @@ class GoToFailureLocationTest extends Scalatest2_10_2_2_1_Base {
             | }
             |}
             |
-          """.stripMargin)
+          """.stripMargin
+    )
 
     val project = getProject
     val projectScope = ProjectScope.getProjectScope(project)

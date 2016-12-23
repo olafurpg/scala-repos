@@ -174,11 +174,14 @@ class GraphStageTimersSpec extends AkkaSpec {
             override def onDownstreamFinish() = completeStage()
           })
 
-          setHandler(in, new InHandler {
-            override def onPush() = () // Do nothing
-            override def onUpstreamFinish() = completeStage()
-            override def onUpstreamFailure(ex: Throwable) = failStage(ex)
-          })
+          setHandler(
+            in,
+            new InHandler {
+              override def onPush() = () // Do nothing
+              override def onUpstreamFinish() = completeStage()
+              override def onUpstreamFailure(ex: Throwable) = failStage(ex)
+            }
+          )
 
           override def onTimer(timerKey: Any) = {
             tickCount += 1

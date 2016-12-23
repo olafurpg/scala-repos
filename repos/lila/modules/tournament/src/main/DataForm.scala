@@ -70,7 +70,8 @@ final class DataForm {
       variant = chess.variant.Standard.id,
       position = StartingPosition.initial.eco,
       `private` = None,
-      mode = Mode.Rated.id.some)
+      mode = Mode.Rated.id.some
+    )
 }
 
 object DataForm {

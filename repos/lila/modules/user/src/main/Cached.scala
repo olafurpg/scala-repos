@@ -51,17 +51,19 @@ final class Cached(nbTtl: FiniteDuration,
       racingKings <- top10Perf(PerfType.RacingKings.id)
       crazyhouse <- top10Perf(PerfType.Crazyhouse.id)
     } yield
-      Perfs.Leaderboards(bullet = bullet,
-                         blitz = blitz,
-                         classical = classical,
-                         crazyhouse = crazyhouse,
-                         chess960 = chess960,
-                         kingOfTheHill = kingOfTheHill,
-                         threeCheck = threeCheck,
-                         antichess = antichess,
-                         atomic = atomic,
-                         horde = horde,
-                         racingKings = racingKings)
+      Perfs.Leaderboards(
+        bullet = bullet,
+        blitz = blitz,
+        classical = classical,
+        crazyhouse = crazyhouse,
+        chess960 = chess960,
+        kingOfTheHill = kingOfTheHill,
+        threeCheck = threeCheck,
+        antichess = antichess,
+        atomic = atomic,
+        horde = horde,
+        racingKings = racingKings
+      )
 
   val top10Perf = mongoCache[Perf.ID, List[LightPerf]](
     prefix = "user:top10:perf",
@@ -75,9 +77,12 @@ final class Cached(nbTtl: FiniteDuration,
 
   private val topWeekCache = mongoCache.single[List[User.LightPerf]](
     prefix = "user:top:week",
-    f = PerfType.leaderboardable.map { perf =>
-      rankingApi.topPerf(perf.id, 1)
-    }.sequenceFu.map(_.flatten),
+    f = PerfType.leaderboardable
+      .map { perf =>
+        rankingApi.topPerf(perf.id, 1)
+      }
+      .sequenceFu
+      .map(_.flatten),
     timeToLive = 9 minutes)
 
   def topWeek = topWeekCache.apply _

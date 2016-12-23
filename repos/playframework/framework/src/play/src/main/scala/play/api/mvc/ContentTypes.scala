@@ -366,15 +366,19 @@ trait BodyParsers {
             maxLength: Long = DefaultMaxDiskLength): BodyParser[RawBuffer] =
       BodyParser("raw, memoryThreshold=" + memoryThreshold) { request =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
-        enforceMaxLength(request, maxLength, Accumulator {
-          val buffer = RawBuffer(memoryThreshold)
-          val sink = Sink.fold[RawBuffer, ByteString](buffer) { (bf, bs) =>
-            bf.push(bs); bf
-          }
-          sink.mapMaterializedValue { future =>
-            future andThen { case _ => buffer.close() }
-          }
-        } map (buffer => Right(buffer)))
+        enforceMaxLength(
+          request,
+          maxLength,
+          Accumulator {
+            val buffer = RawBuffer(memoryThreshold)
+            val sink = Sink.fold[RawBuffer, ByteString](buffer) { (bf, bs) =>
+              bf.push(bs); bf
+            }
+            sink.mapMaterializedValue { future =>
+              future andThen { case _ => buffer.close() }
+            }
+          } map (buffer => Right(buffer))
+        )
       }
 
     /**
@@ -850,7 +854,8 @@ trait BodyParsers {
                 createBadResult(errorMessage + ": " + e.getMessage)(request)
                   .map(Left(_))
             }
-          })
+          }
+        )
       }
   }
 }
@@ -894,27 +899,30 @@ object BodyParsers extends BodyParsers {
             completeStage()
           }
         })
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
-            val chunk = grab(in)
-            pushedBytes += chunk.size
-            if (pushedBytes > maxLength) {
-              status.success(MaxSizeExceeded(maxLength))
-              // Make sure we fail the stream, this will ensure downstream body parsers don't try to parse it
-              failStage(new MaxLengthLimitAttained)
-            } else {
-              push(out, chunk)
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = {
+              val chunk = grab(in)
+              pushedBytes += chunk.size
+              if (pushedBytes > maxLength) {
+                status.success(MaxSizeExceeded(maxLength))
+                // Make sure we fail the stream, this will ensure downstream body parsers don't try to parse it
+                failStage(new MaxLengthLimitAttained)
+              } else {
+                push(out, chunk)
+              }
+            }
+            override def onUpstreamFinish(): Unit = {
+              status.success(MaxSizeNotExceeded)
+              completeStage()
+            }
+            override def onUpstreamFailure(ex: Throwable): Unit = {
+              status.failure(ex)
+              failStage(ex)
             }
           }
-          override def onUpstreamFinish(): Unit = {
-            status.success(MaxSizeNotExceeded)
-            completeStage()
-          }
-          override def onUpstreamFailure(ex: Throwable): Unit = {
-            status.failure(ex)
-            failStage(ex)
-          }
-        })
+        )
       }
 
       (logic, status.future)

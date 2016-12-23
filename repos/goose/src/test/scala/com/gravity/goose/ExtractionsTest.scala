@@ -294,7 +294,8 @@ class ExtractionsTest {
       article = article,
       expectedStart = "This month, the federal government released",
       expectedTitle =
-        "Invisible Oil from BP Spill May Threaten Gulf Aquatic Life")
+        "Invisible Oil from BP Spill May Threaten Gulf Aquatic Life"
+    )
   }
 
   @Test
@@ -413,7 +414,8 @@ class ExtractionsTest {
     TestUtils.runArticleAssertions(
       article = article,
       expectedStart =
-        "UK INSTITUTES have thrown their weight behind rapid adoption of international financial reporting standards in the US.")
+        "UK INSTITUTES have thrown their weight behind rapid adoption of international financial reporting standards in the US."
+    )
   }
 
   @Test

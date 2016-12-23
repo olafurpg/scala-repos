@@ -113,10 +113,12 @@ final case class ScatterGatherFirstCompletedPool(
     with PoolOverrideUnsetConfig[ScatterGatherFirstCompletedPool] {
 
   def this(config: Config) =
-    this(nrOfInstances = config.getInt("nr-of-instances"),
-         within = config.getMillisDuration("within"),
-         resizer = Resizer.fromConfig(config),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances = config.getInt("nr-of-instances"),
+      within = config.getMillisDuration("within"),
+      resizer = Resizer.fromConfig(config),
+      usePoolDispatcher = config.hasPath("pool-dispatcher")
+    )
 
   /**
     * Java API

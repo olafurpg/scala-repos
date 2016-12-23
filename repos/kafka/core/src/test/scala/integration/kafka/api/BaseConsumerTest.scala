@@ -127,7 +127,8 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
         consumer0.poll(50)
         consumer0.assignment() == assignment.asJava
       },
-      s"Expected partitions ${assignment.asJava} but actually got ${consumer0.assignment()}")
+      s"Expected partitions ${assignment.asJava} but actually got ${consumer0.assignment()}"
+    )
 
     consumer0.seek(tp, 300)
     consumer0.seek(tp2, 500)
@@ -144,7 +145,8 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
         val records = consumer0.poll(50)
         consumer0.assignment() == newAssignment.asJava
       },
-      s"Expected partitions ${newAssignment.asJava} but actually got ${consumer0.assignment()}")
+      s"Expected partitions ${newAssignment.asJava} but actually got ${consumer0.assignment()}"
+    )
 
     // after rebalancing, we should have reset to the committed positions
     assertEquals(300, consumer0.committed(tp).offset)
@@ -360,7 +362,8 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       } else
         assertTrue(
           s"Got unexpected timestamp ${record.timestamp}. Timestamp should be between [$startingTimestamp, $now}]",
-          record.timestamp >= startingTimestamp && record.timestamp <= now)
+          record.timestamp >= startingTimestamp && record.timestamp <= now
+        )
       assertEquals(offset.toLong, record.offset)
       val keyAndValueIndex = startingKeyAndValueIndex + i
       assertEquals(s"key $keyAndValueIndex", new String(record.key))

@@ -239,9 +239,11 @@ class PlannerSuite extends SharedSQLContext {
               |  normal JOIN small ON (normal.key = small.key)
               |  JOIN tiny ON (small.key = tiny.key)
             """.stripMargin
-          ).queryExecution.executedPlan.collect {
-            case exchange: ShuffleExchange => exchange
-          }.length
+          ).queryExecution.executedPlan
+            .collect {
+              case exchange: ShuffleExchange => exchange
+            }
+            .length
           assert(numExchanges === 5)
         }
 
@@ -254,9 +256,11 @@ class PlannerSuite extends SharedSQLContext {
               |  normal JOIN small ON (normal.key = small.key)
               |  JOIN tiny ON (normal.key = tiny.key)
             """.stripMargin
-          ).queryExecution.executedPlan.collect {
-            case exchange: ShuffleExchange => exchange
-          }.length
+          ).queryExecution.executedPlan
+            .collect {
+              case exchange: ShuffleExchange => exchange
+            }
+            .length
           assert(numExchanges === 5)
         }
       }
@@ -490,7 +494,8 @@ class PlannerSuite extends SharedSQLContext {
                          outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
-      None)
+      None
+    )
 
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
@@ -513,7 +518,8 @@ class PlannerSuite extends SharedSQLContext {
                          outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
-      None)
+      None
+    )
 
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
@@ -536,7 +542,8 @@ class PlannerSuite extends SharedSQLContext {
                          outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
-      None)
+      None
+    )
 
     val inputPlan = SortMergeJoin(Literal(1) :: Nil,
                                   Literal(1) :: Nil,

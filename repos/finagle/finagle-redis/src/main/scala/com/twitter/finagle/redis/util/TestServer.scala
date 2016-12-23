@@ -21,10 +21,13 @@ object RedisCluster { self =>
 
   def hostAddresses(): String = {
     require(instanceStack.length > 0)
-    addresses.map { address =>
-      val addy = address.get
-      "%s:%d".format(addy.getHostName(), addy.getPort())
-    }.sorted.mkString(",")
+    addresses
+      .map { address =>
+        val addy = address.get
+        "%s:%d".format(addy.getHostName(), addy.getPort())
+      }
+      .sorted
+      .mkString(",")
   }
 
   def start(count: Int = 1) {

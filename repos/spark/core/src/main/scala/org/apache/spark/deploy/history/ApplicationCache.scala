@@ -324,10 +324,11 @@ private[history] class ApplicationCache(
           // guava's cache logs via java.util log, so is of limited use. Hence: our own message
           logInfo(s"Failed to load application attempt $appId/$attemptId")
           throw new NoSuchElementException(
-            s"no application with application Id '$appId'" + attemptId.map {
-              id =>
+            s"no application with application Id '$appId'" + attemptId
+              .map { id =>
                 s" attemptId '$id'"
-            }.getOrElse(" and no attempt Id"))
+              }
+              .getOrElse(" and no attempt Id"))
       }
     }
   }
@@ -357,9 +358,11 @@ private[history] class ApplicationCache(
     */
   def mergeAppAndAttemptToKey(appId: String,
                               attemptId: Option[String]): String = {
-    appId + attemptId.map { id =>
-      s"/$id"
-    }.getOrElse("")
+    appId + attemptId
+      .map { id =>
+        s"/$id"
+      }
+      .getOrElse("")
   }
 
   /**
@@ -414,9 +417,11 @@ private[history] final case class CacheKey(appId: String,
                                            attemptId: Option[String]) {
 
   override def toString: String = {
-    appId + attemptId.map { id =>
-      s"/$id"
-    }.getOrElse("")
+    appId + attemptId
+      .map { id =>
+        s"/$id"
+      }
+      .getOrElse("")
   }
 }
 
@@ -437,12 +442,14 @@ private[history] class CacheMetrics(prefix: String) extends Source {
   val updateTriggeredCount = new Counter()
 
   /** all the counters: for registration and string conversion. */
-  private val counters = Seq(("lookup.count", lookupCount),
-                             ("lookup.failure.count", lookupFailureCount),
-                             ("eviction.count", evictionCount),
-                             ("load.count", loadCount),
-                             ("update.probe.count", updateProbeCount),
-                             ("update.triggered.count", updateTriggeredCount))
+  private val counters = Seq(
+    ("lookup.count", lookupCount),
+    ("lookup.failure.count", lookupFailureCount),
+    ("eviction.count", evictionCount),
+    ("load.count", loadCount),
+    ("update.probe.count", updateProbeCount),
+    ("update.triggered.count", updateTriggeredCount)
+  )
 
   /** all metrics, including timers */
   private val allMetrics =

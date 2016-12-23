@@ -59,16 +59,19 @@ private[akka] abstract class ByteStringParser[T]
         if (cont) doParse()
       } else pull(bytesIn)
 
-    setHandler(bytesIn, new InHandler {
-      override def onPush(): Unit = {
-        pullOnParserRequest = false
-        buffer ++= grab(bytesIn)
-        doParse()
+    setHandler(
+      bytesIn,
+      new InHandler {
+        override def onPush(): Unit = {
+          pullOnParserRequest = false
+          buffer ++= grab(bytesIn)
+          doParse()
+        }
+        override def onUpstreamFinish(): Unit =
+          if (buffer.isEmpty && acceptUpstreamFinish) completeStage()
+          else current.onTruncation()
       }
-      override def onUpstreamFinish(): Unit =
-        if (buffer.isEmpty && acceptUpstreamFinish) completeStage()
-        else current.onTruncation()
-    })
+    )
   }
 }
 

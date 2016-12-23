@@ -53,13 +53,16 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
     }
 
     "create new file if not exists" in assertAllStagesStopped {
-      targetFile({ f ⇒
-        val completion = Source(TestByteStrings).runWith(FileIO.toFile(f))
+      targetFile(
+        { f ⇒
+          val completion = Source(TestByteStrings).runWith(FileIO.toFile(f))
 
-        val result = Await.result(completion, 3.seconds)
-        result.count should equal(6006)
-        checkFileContents(f, TestLines.mkString(""))
-      }, create = false)
+          val result = Await.result(completion, 3.seconds)
+          result.count should equal(6006)
+          checkFileContents(f, TestLines.mkString(""))
+        },
+        create = false
+      )
     }
 
     "by default write into existing file" in assertAllStagesStopped {

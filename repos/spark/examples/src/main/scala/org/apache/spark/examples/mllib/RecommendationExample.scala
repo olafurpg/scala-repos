@@ -51,15 +51,19 @@ object RecommendationExample {
       case Rating(user, product, rate) =>
         ((user, product), rate)
     }
-    val ratesAndPreds = ratings.map {
-      case Rating(user, product, rate) =>
-        ((user, product), rate)
-    }.join(predictions)
-    val MSE = ratesAndPreds.map {
-      case ((user, product), (r1, r2)) =>
-        val err = (r1 - r2)
-        err * err
-    }.mean()
+    val ratesAndPreds = ratings
+      .map {
+        case Rating(user, product, rate) =>
+          ((user, product), rate)
+      }
+      .join(predictions)
+    val MSE = ratesAndPreds
+      .map {
+        case ((user, product), (r1, r2)) =>
+          val err = (r1 - r2)
+          err * err
+      }
+      .mean()
     println("Mean Squared Error = " + MSE)
 
     // Save and load model

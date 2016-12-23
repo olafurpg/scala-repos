@@ -39,9 +39,11 @@ class PageRankTest extends WordSpec with Matchers {
         }
       }
       .sink[(Long, String, Double)](Tsv("outputFile")) { outputBuffer =>
-        val pageRank = outputBuffer.map { res =>
-          (res._1, res._3)
-        }.toMap
+        val pageRank = outputBuffer
+          .map { res =>
+            (res._1, res._3)
+          }
+          .toMap
         "correctly compute pagerank" in {
           val d = 0.85
           val twoPR = (1.0 + 2 * d) / (1.0 + d)

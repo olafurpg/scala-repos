@@ -113,9 +113,11 @@ class NormalDistinctJob(args: Args) extends Job(args) {
 object MultipleGroupByJobData {
   val data: List[String] = {
     val rnd = new scala.util.Random(22)
-    (0 until 20).map { _ =>
-      rnd.nextLong.toString
-    }.toList
+    (0 until 20)
+      .map { _ =>
+        rnd.nextLong.toString
+      }
+      .toList
   }.distinct
 }
 
@@ -498,9 +500,11 @@ class PlatformTest
           _.map { f: Float =>
             (f * 10).toInt
           }.toList shouldBe
-            (outputData.map { f: Float =>
-              (f * 10).toInt
-            }.toList)
+            (outputData
+              .map { f: Float =>
+                (f * 10).toInt
+              }
+              .toList)
         }
         .run
     }
@@ -520,25 +524,27 @@ class PlatformTest
   "A TypedPipeForceToDiskWithDescriptionPipe" should {
     "have a custom step name from withDescription" in {
       HadoopPlatformJobTest(new TypedPipeForceToDiskWithDescriptionJob(_),
-                            cluster).inspectCompletedFlow { flow =>
-        val steps = flow.getFlowSteps.asScala
-        val firstStep = steps.filter(_.getName.startsWith("(1/2"))
-        val secondStep = steps.filter(_.getName.startsWith("(2/2"))
-        val lab1 = firstStep.map(_.getConfig.get(Config.StepDescriptions))
-        lab1 should have size 1
-        lab1(0) should include("write words to disk")
-        val lab2 = secondStep.map(_.getConfig.get(Config.StepDescriptions))
-        lab2 should have size 1
-        lab2(0) should include("output frequency by length")
-      }.run
+                            cluster)
+        .inspectCompletedFlow { flow =>
+          val steps = flow.getFlowSteps.asScala
+          val firstStep = steps.filter(_.getName.startsWith("(1/2"))
+          val secondStep = steps.filter(_.getName.startsWith("(2/2"))
+          val lab1 = firstStep.map(_.getConfig.get(Config.StepDescriptions))
+          lab1 should have size 1
+          lab1(0) should include("write words to disk")
+          val lab2 = secondStep.map(_.getConfig.get(Config.StepDescriptions))
+          lab2 should have size 1
+          lab2(0) should include("output frequency by length")
+        }
+        .run
     }
   }
 
   //also tests HashJoin behavior to verify that we don't introduce a forceToDisk as the RHS pipe is source Pipe
   "A TypedPipeJoinWithDescriptionPipe" should {
     "have a custom step name from withDescription and no extra forceToDisk steps on hashJoin's rhs" in {
-      HadoopPlatformJobTest(new TypedPipeJoinWithDescriptionJob(_), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new TypedPipeJoinWithDescriptionJob(_), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 1
           val firstStep = steps.headOption
@@ -555,7 +561,8 @@ class PlatformTest
           steps
             .map(_.getConfig.get(Config.StepDescriptions))
             .foreach(s => info(s))
-      }.run
+        }
+        .run
     }
   }
 
@@ -563,14 +570,16 @@ class PlatformTest
   "A TypedPipeHashJoinWithForceToDiskJob" should {
     "have a custom step name from withDescription and only one user provided forceToDisk on hashJoin's rhs" in {
       HadoopPlatformJobTest(new TypedPipeHashJoinWithForceToDiskJob(_),
-                            cluster).inspectCompletedFlow { flow =>
-        val steps = flow.getFlowSteps.asScala
-        steps should have size 2
-        val secondStep = steps.lastOption
-          .map(_.getConfig.get(Config.StepDescriptions))
-          .getOrElse("")
-        secondStep should include("hashJoin")
-      }.run
+                            cluster)
+        .inspectCompletedFlow { flow =>
+          val steps = flow.getFlowSteps.asScala
+          steps should have size 2
+          val secondStep = steps.lastOption
+            .map(_.getConfig.get(Config.StepDescriptions))
+            .getOrElse("")
+          secondStep should include("hashJoin")
+        }
+        .run
     }
   }
 
@@ -578,14 +587,16 @@ class PlatformTest
   "A TypedPipeHashJoinWithForceToDiskFilterJob" should {
     "have a custom step name from withDescription and an extra forceToDisk due to a filter operation on hashJoin's rhs" in {
       HadoopPlatformJobTest(new TypedPipeHashJoinWithForceToDiskFilterJob(_),
-                            cluster).inspectCompletedFlow { flow =>
-        val steps = flow.getFlowSteps.asScala
-        steps should have size 3
-        val lastStep = steps.lastOption
-          .map(_.getConfig.get(Config.StepDescriptions))
-          .getOrElse("")
-        lastStep should include("hashJoin")
-      }.run
+                            cluster)
+        .inspectCompletedFlow { flow =>
+          val steps = flow.getFlowSteps.asScala
+          steps should have size 3
+          val lastStep = steps.lastOption
+            .map(_.getConfig.get(Config.StepDescriptions))
+            .getOrElse("")
+          lastStep should include("hashJoin")
+        }
+        .run
     }
   }
 
@@ -594,14 +605,16 @@ class PlatformTest
     "have a custom step name from withDescription and no extra forceToDisk due to with complete operation on hashJoin's rhs" in {
       HadoopPlatformJobTest(
         new TypedPipeHashJoinWithForceToDiskWithComplete(_),
-        cluster).inspectCompletedFlow { flow =>
-        val steps = flow.getFlowSteps.asScala
-        steps should have size 2
-        val lastStep = steps.lastOption
-          .map(_.getConfig.get(Config.StepDescriptions))
-          .getOrElse("")
-        lastStep should include("hashJoin")
-      }.run
+        cluster)
+        .inspectCompletedFlow { flow =>
+          val steps = flow.getFlowSteps.asScala
+          steps should have size 2
+          val lastStep = steps.lastOption
+            .map(_.getConfig.get(Config.StepDescriptions))
+            .getOrElse("")
+          lastStep should include("hashJoin")
+        }
+        .run
     }
   }
 
@@ -609,14 +622,16 @@ class PlatformTest
   "A TypedPipeHashJoinWithForceToDiskMapJob" should {
     "have a custom step name from withDescription and no extra forceToDisk due to map (autoForce = false) on forceToDisk operation on hashJoin's rhs" in {
       HadoopPlatformJobTest(new TypedPipeHashJoinWithForceToDiskMapJob(_),
-                            cluster).inspectCompletedFlow { flow =>
-        val steps = flow.getFlowSteps.asScala
-        steps should have size 2
-        val lastStep = steps.lastOption
-          .map(_.getConfig.get(Config.StepDescriptions))
-          .getOrElse("")
-        lastStep should include("hashJoin")
-      }.run
+                            cluster)
+        .inspectCompletedFlow { flow =>
+          val steps = flow.getFlowSteps.asScala
+          steps should have size 2
+          val lastStep = steps.lastOption
+            .map(_.getConfig.get(Config.StepDescriptions))
+            .getOrElse("")
+          lastStep should include("hashJoin")
+        }
+        .run
     }
   }
 
@@ -625,14 +640,16 @@ class PlatformTest
     "have a custom step name from withDescription and an extra forceToDisk due to map (autoForce = true) on forceToDisk operation on hashJoin's rhs" in {
       HadoopPlatformJobTest(
         new TypedPipeHashJoinWithForceToDiskMapWithAutoForceJob(_),
-        cluster).inspectCompletedFlow { flow =>
-        val steps = flow.getFlowSteps.asScala
-        steps should have size 3
-        val lastStep = steps.lastOption
-          .map(_.getConfig.get(Config.StepDescriptions))
-          .getOrElse("")
-        lastStep should include("hashJoin")
-      }.run
+        cluster)
+        .inspectCompletedFlow { flow =>
+          val steps = flow.getFlowSteps.asScala
+          steps should have size 3
+          val lastStep = steps.lastOption
+            .map(_.getConfig.get(Config.StepDescriptions))
+            .getOrElse("")
+          lastStep should include("hashJoin")
+        }
+        .run
     }
   }
 
@@ -696,8 +713,8 @@ class PlatformTest
 
   "A TypedPipeWithDescriptionPipe" should {
     "have a custom step name from withDescription" in {
-      HadoopPlatformJobTest(new TypedPipeWithDescriptionJob(_), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new TypedPipeWithDescriptionJob(_), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           val descs = List(
             "map stage - assign words to 1",
@@ -705,7 +722,8 @@ class PlatformTest
             "write",
             // should see the .group and the .write show up as line numbers
             "com.twitter.scalding.platform.TypedPipeWithDescriptionJob.<init>(PlatformTest.scala:137)",
-            "com.twitter.scalding.platform.TypedPipeWithDescriptionJob.<init>(PlatformTest.scala:141)")
+            "com.twitter.scalding.platform.TypedPipeWithDescriptionJob.<init>(PlatformTest.scala:141)"
+          )
 
           val foundDescs = steps.map(_.getConfig.get(Config.StepDescriptions))
           descs.foreach { d =>
@@ -713,7 +731,8 @@ class PlatformTest
             assert(foundDescs(0).contains(d))
           }
         //steps.map(_.getConfig.get(Config.StepDescriptions)).foreach(s => info(s))
-      }.run
+        }
+        .run
     }
   }
 

@@ -130,7 +130,8 @@ private[hive] class SparkHiveWriterContainer(
       conf.value.getOutputValueClass.asInstanceOf[Class[Writable]],
       fileSinkConf,
       FileOutputFormat.getTaskOutputPath(conf.value, getOutputName),
-      Reporter.NULL)
+      Reporter.NULL
+    )
   }
 
   protected def commit() {
@@ -308,7 +309,8 @@ private[spark] class SparkHiveDynamicPartitionWriterContainer(
         StructType.fromAttributes(partitionOutput),
         StructType.fromAttributes(dataOutput),
         SparkEnv.get.blockManager,
-        TaskContext.get().taskMemoryManager().pageSizeBytes)
+        TaskContext.get().taskMemoryManager().pageSizeBytes
+      )
 
       while (iterator.hasNext) {
         val inputRow = iterator.next()

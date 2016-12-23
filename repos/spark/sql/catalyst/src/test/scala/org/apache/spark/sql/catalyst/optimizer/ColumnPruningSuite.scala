@@ -110,16 +110,19 @@ class ColumnPruningSuite extends PlanTest {
       Expand(Seq(Seq('a, 'b, 'c, Literal.create(null, StringType), 1),
                  Seq('a, 'b, 'c, 'a, 2)),
              Seq('a, 'b, 'c, 'aa.int, 'gid.int),
-             input)).analyze
+             input)
+    ).analyze
     val optimized = Optimize.execute(query)
 
     val expected =
-      Aggregate(Seq('aa, 'gid),
-                Seq(sum('c).as("sum")),
-                Expand(Seq(Seq('c, Literal.create(null, StringType), 1),
-                           Seq('c, 'a, 2)),
-                       Seq('c, 'aa.int, 'gid.int),
-                       Project(Seq('a, 'c), input))).analyze
+      Aggregate(
+        Seq('aa, 'gid),
+        Seq(sum('c).as("sum")),
+        Expand(Seq(Seq('c, Literal.create(null, StringType), 1),
+                   Seq('c, 'a, 2)),
+               Seq('c, 'aa.int, 'gid.int),
+               Project(Seq('a, 'c), input))
+      ).analyze
 
     comparePlans(optimized, expected)
   }
@@ -238,7 +241,8 @@ class ColumnPruningSuite extends PlanTest {
           AggregateExpression(Count('b), Complete, isDistinct = false),
           WindowSpecDefinition('a :: Nil,
                                SortOrder('b, Ascending) :: Nil,
-                               UnspecifiedFrame)).as('window))
+                               UnspecifiedFrame)).as('window)
+      )
       .select('a, 'c)
 
     val correctAnswer =
@@ -253,27 +257,32 @@ class ColumnPruningSuite extends PlanTest {
     val input = LocalRelation('a.int, 'b.string, 'c.double, 'd.int)
 
     val originalQuery = input
-      .select('a,
-              'b,
-              'c,
-              'd,
-              WindowExpression(
-                AggregateExpression(Count('b), Complete, isDistinct = false),
-                WindowSpecDefinition('a :: Nil,
-                                     SortOrder('b, Ascending) :: Nil,
-                                     UnspecifiedFrame)).as('window))
+      .select(
+        'a,
+        'b,
+        'c,
+        'd,
+        WindowExpression(AggregateExpression(Count('b),
+                                             Complete,
+                                             isDistinct = false),
+                         WindowSpecDefinition('a :: Nil,
+                                              SortOrder('b, Ascending) :: Nil,
+                                              UnspecifiedFrame)).as('window)
+      )
       .where('window > 1)
       .select('a, 'c)
 
     val correctAnswer = input
       .select('a, 'b, 'c)
-      .window(WindowExpression(
-                AggregateExpression(Count('b), Complete, isDistinct = false),
-                WindowSpecDefinition('a :: Nil,
-                                     SortOrder('b, Ascending) :: Nil,
-                                     UnspecifiedFrame)).as('window) :: Nil,
-              'a :: Nil,
-              'b.asc :: Nil)
+      .window(
+        WindowExpression(
+          AggregateExpression(Count('b), Complete, isDistinct = false),
+          WindowSpecDefinition('a :: Nil,
+                               SortOrder('b, Ascending) :: Nil,
+                               UnspecifiedFrame)).as('window) :: Nil,
+        'a :: Nil,
+        'b.asc :: Nil
+      )
       .select('a, 'c, 'window)
       .where('window > 1)
       .select('a, 'c)
@@ -288,15 +297,17 @@ class ColumnPruningSuite extends PlanTest {
     val input = LocalRelation('a.int, 'b.string, 'c.double, 'd.int)
 
     val originalQuery = input
-      .select('a,
-              'b,
-              'c,
-              'd,
-              WindowExpression(
-                AggregateExpression(Count('b), Complete, isDistinct = false),
-                WindowSpecDefinition('a :: Nil,
-                                     SortOrder('b, Ascending) :: Nil,
-                                     UnspecifiedFrame)).as('window))
+      .select(
+        'a,
+        'b,
+        'c,
+        'd,
+        WindowExpression(
+          AggregateExpression(Count('b), Complete, isDistinct = false),
+          WindowSpecDefinition('a :: Nil,
+                               SortOrder('b, Ascending) :: Nil,
+                               UnspecifiedFrame)).as('window)
+      )
       .select('a, 'c)
 
     val correctAnswer = input.select('a, 'c).analyze

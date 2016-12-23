@@ -665,7 +665,8 @@ trait TypeDiagnostics { self: Analyzer =>
             case LookupSucceeded(_, sym2) =>
               context.warning(
                 tp.pos,
-                s"type parameter ${tp.name} defined in $sym shadows $sym2 defined in ${sym2.owner}. You may want to rename your type parameter, or possibly remove it.")
+                s"type parameter ${tp.name} defined in $sym shadows $sym2 defined in ${sym2.owner}. You may want to rename your type parameter, or possibly remove it."
+              )
             case _ =>
           }
         }

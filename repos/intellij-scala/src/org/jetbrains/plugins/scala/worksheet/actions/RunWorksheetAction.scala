@@ -104,16 +104,19 @@ object RunWorksheetAction {
         val viewer = WorksheetViewerInfo getViewer editor
 
         if (viewer != null) {
-          ApplicationManager.getApplication.invokeAndWait(new Runnable {
-            override def run() {
-              scala.extensions.inWriteAction {
-                CleanWorksheetAction.resetScrollModel(viewer)
-                if (!auto)
-                  CleanWorksheetAction
-                    .cleanWorksheet(file.getNode, editor, viewer, project)
+          ApplicationManager.getApplication.invokeAndWait(
+            new Runnable {
+              override def run() {
+                scala.extensions.inWriteAction {
+                  CleanWorksheetAction.resetScrollModel(viewer)
+                  if (!auto)
+                    CleanWorksheetAction
+                      .cleanWorksheet(file.getNode, editor, viewer, project)
+                }
               }
-            }
-          }, ModalityState.any())
+            },
+            ModalityState.any()
+          )
         }
 
         def runnable() = {
@@ -132,20 +135,24 @@ object RunWorksheetAction {
               }
             },
             Option(editor),
-            auto)
+            auto
+          )
         }
 
         if (WorksheetCompiler isMakeBeforeRun psiFile) {
           CompilerManager
             .getInstance(project)
-            .make(getModuleFor(file), new CompileStatusNotification {
-              override def finished(aborted: Boolean,
-                                    errors: Int,
-                                    warnings: Int,
-                                    compileContext: CompileContext) {
-                if (!aborted && errors == 0) runnable()
+            .make(
+              getModuleFor(file),
+              new CompileStatusNotification {
+                override def finished(aborted: Boolean,
+                                      errors: Int,
+                                      warnings: Int,
+                                      compileContext: CompileContext) {
+                  if (!aborted && errors == 0) runnable()
+                }
               }
-            })
+            )
         } else runnable()
       case _ =>
     }

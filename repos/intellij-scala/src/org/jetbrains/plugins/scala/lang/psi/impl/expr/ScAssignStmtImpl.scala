@@ -119,7 +119,8 @@ class ScAssignStmtImpl(node: ASTNode)
                   Nil,
                   ref.getPrevTypeInfoParams,
                   isShapeResolve = shapeResolve,
-                  kinds = StdKinds.methodsOnly)
+                  kinds = StdKinds.methodsOnly
+                )
                 r.fromType match {
                   case Some(tp) => processor.processType(tp, ref)
                   case None =>

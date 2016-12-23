@@ -64,23 +64,28 @@ class ProducerFeatureTest
     "02 produce a message and receive failure response" in {
       val latch = TestLatch()
       var deadActor: Option[ActorRef] = None
-      val supervisor = system.actorOf(Props(new Actor {
-        def receive = {
-          case p: Props ⇒ {
-            val producer = context.actorOf(p)
-            context.watch(producer)
-            sender() ! producer
-          }
-          case Terminated(actorRef) ⇒ {
-            deadActor = Some(actorRef)
-            latch.countDown()
-          }
-        }
-        override val supervisorStrategy =
-          OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
-            case _: AkkaCamelException ⇒ Stop
-          }
-      }), name = "02-prod-anonymous-supervisor")
+      val supervisor = system.actorOf(
+        Props(
+          new Actor {
+            def receive = {
+              case p: Props ⇒ {
+                val producer = context.actorOf(p)
+                context.watch(producer)
+                sender() ! producer
+              }
+              case Terminated(actorRef) ⇒ {
+                deadActor = Some(actorRef)
+                latch.countDown()
+              }
+            }
+            override val supervisorStrategy =
+              OneForOneStrategy(maxNrOfRetries = 10,
+                                withinTimeRange = 1 minute) {
+                case _: AkkaCamelException ⇒ Stop
+              }
+          }),
+        name = "02-prod-anonymous-supervisor"
+      )
 
       supervisor.tell(Props(new TestProducer("direct:producer-test-2")),
                       testActor)

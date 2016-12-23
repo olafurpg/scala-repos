@@ -59,13 +59,15 @@ final class DonationApi(coll: Coll,
     coll insert donation recover lila.db.recoverDuplicateKey(e =>
       println(e.getMessage)) void
   } >> donation.userId.??(donorCache.remove) >>- progress.foreach { prog =>
-    bus.publish(lila.hub.actorApi.DonationEvent(
-                  userId = donation.userId,
-                  gross = donation.gross,
-                  net = donation.net,
-                  message = donation.message.trim.some.filter(_.nonEmpty),
-                  progress = prog.percent),
-                'donation)
+    bus.publish(
+      lila.hub.actorApi.DonationEvent(
+        userId = donation.userId,
+        gross = donation.gross,
+        net = donation.net,
+        message = donation.message.trim.some.filter(_.nonEmpty),
+        progress = prog.percent),
+      'donation
+    )
   }
 
   def progress: Fu[Progress] = {

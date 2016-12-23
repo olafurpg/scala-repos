@@ -89,22 +89,26 @@ class TemplateExample
     Template.page(title, content, url(_, includeServletPath = false))
 
   get("/date/:year/:month/:day") {
-    displayPage("Scalatra: Date Example",
-                <ul>
+    displayPage(
+      "Scalatra: Date Example",
+      <ul>
         <li>Year: { params("year") }</li>
         <li>Month: { params("month") }</li>
         <li>Day: { params("day") }</li>
       </ul>
-      <pre>Route: /date/:year/:month/:day</pre>)
+      <pre>Route: /date/:year/:month/:day</pre>
+    )
   }
 
   get("/form") {
-    displayPage("Scalatra: Form Post Example",
-                <form action={ url("/post") } method='POST'>
+    displayPage(
+      "Scalatra: Form Post Example",
+      <form action={ url("/post") } method='POST'>
         Post something:<input name="submission" type='text'/>
         <input type='submit'/>
       </form>
-      <pre>Route: /form</pre>)
+      <pre>Route: /form</pre>
+    )
   }
 
   post("/post") {
@@ -120,13 +124,15 @@ class TemplateExample
                     <pre>You have logged in as: { first + "-" + last }</pre>
           <pre>Route: /login</pre>)
       case x =>
-        displayPage("Scalatra: Session Example" + x.toString,
-                    <form action={ url("/login") } method='POST'>
+        displayPage(
+          "Scalatra: Session Example" + x.toString,
+          <form action={ url("/login") } method='POST'>
             First Name:<input name="first" type='text'/>
             Last Name:<input name="last" type='text'/>
             <input type='submit'/>
           </form>
-          <pre>Route: /login</pre>)
+          <pre>Route: /login</pre>
+        )
     }
   }
 
@@ -151,10 +157,12 @@ class TemplateExample
   }
 
   get("/") {
-    displayPage("Scalatra: Hello World",
-                <h2>Hello world!</h2>
+    displayPage(
+      "Scalatra: Hello World",
+      <h2>Hello world!</h2>
       <p>Referer: { (request referrer) map { Text(_) } getOrElse { <i>none</i> } }</p>
-      <pre>Route: /</pre>)
+      <pre>Route: /</pre>
+    )
   }
 
   get("/scalate") {
@@ -163,13 +171,15 @@ class TemplateExample
   }
 
   get("/flash-map/form") {
-    displayPage("Scalatra: Flash Map Example",
-                <span>Supports the post-then-redirect pattern</span>
+    displayPage(
+      "Scalatra: Flash Map Example",
+      <span>Supports the post-then-redirect pattern</span>
       <br/>
       <form method="post">
         <label>Message: <input type="text" name="message"/></label><br/>
         <input type="submit"/>
-      </form>)
+      </form>
+    )
   }
 
   post("/flash-map/form") {

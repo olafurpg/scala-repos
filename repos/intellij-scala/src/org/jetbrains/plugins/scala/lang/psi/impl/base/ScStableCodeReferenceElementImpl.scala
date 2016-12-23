@@ -61,23 +61,25 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
   def getVariants: Array[Object] = {
     val isInImport: Boolean =
       ScalaPsiUtil.getParentOfType(this, classOf[ScImportStmt]) != null
-    doResolve(this, new CompletionProcessor(getKinds(incomplete = true), this)).flatMap {
-      case res: ScalaResolveResult =>
-        import org.jetbrains.plugins.scala.lang.psi.types.Nothing
-        val qualifier = res.fromType.getOrElse(Nothing)
-        LookupElementManager.getLookupElement(res,
-                                              isInImport = isInImport,
-                                              qualifierType = qualifier,
-                                              isInStableCodeReference = true)
-      case r => Seq(r.getElement)
-    }
+    doResolve(this, new CompletionProcessor(getKinds(incomplete = true), this))
+      .flatMap {
+        case res: ScalaResolveResult =>
+          import org.jetbrains.plugins.scala.lang.psi.types.Nothing
+          val qualifier = res.fromType.getOrElse(Nothing)
+          LookupElementManager.getLookupElement(res,
+                                                isInImport = isInImport,
+                                                qualifierType = qualifier,
+                                                isInStableCodeReference = true)
+        case r => Seq(r.getElement)
+      }
   }
 
   def getResolveResultVariants: Array[ScalaResolveResult] = {
-    doResolve(this, new CompletionProcessor(getKinds(incomplete = true), this)).flatMap {
-      case res: ScalaResolveResult => Seq(res)
-      case r => Seq.empty
-    }
+    doResolve(this, new CompletionProcessor(getKinds(incomplete = true), this))
+      .flatMap {
+        case res: ScalaResolveResult => Seq(res)
+        case r => Seq.empty
+      }
   }
 
   def getConstructor = {
@@ -217,14 +219,16 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
                   }
                 //todo: so what to return? probable PIEAE after such code invocation
                 case _ =>
-                  return safeBindToElement(qname, {
-                    case (qual, true) =>
-                      ScalaPsiElementFactory
-                        .createReferenceFromText(qual, getContext, this)
-                    case (qual, false) =>
-                      ScalaPsiElementFactory
-                        .createReferenceFromText(qual, getManager)
-                  }) {
+                  return safeBindToElement(
+                    qname, {
+                      case (qual, true) =>
+                        ScalaPsiElementFactory
+                          .createReferenceFromText(qual, getContext, this)
+                      case (qual, false) =>
+                        ScalaPsiElementFactory
+                          .createReferenceFromText(qual, getManager)
+                    }
+                  ) {
                     c match {
                       case ClassTypeToImport(clazz) =>
                         ScalaImportTypeFix

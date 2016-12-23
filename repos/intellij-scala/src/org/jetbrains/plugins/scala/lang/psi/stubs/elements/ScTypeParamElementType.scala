@@ -59,18 +59,20 @@ class ScTypeParamElementType[Func <: ScTypeParam]
     val contextText =
       psi.contextBoundTypeElement.map(te => StringRef.fromString(te.getText))
     val typeParameterText = psi.getText
-    new ScTypeParamStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
-                            this,
-                            StringRef.fromString(psi.name),
-                            StringRef.fromString(upperText),
-                            StringRef.fromString(lowerText),
-                            viewText,
-                            contextText,
-                            psi.isCovariant,
-                            psi.isContravariant,
-                            psi.getTextRange.getStartOffset,
-                            StringRef.fromString(psi.getContainingFileName),
-                            StringRef.fromString(typeParameterText))
+    new ScTypeParamStubImpl(
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this,
+      StringRef.fromString(psi.name),
+      StringRef.fromString(upperText),
+      StringRef.fromString(lowerText),
+      viewText,
+      contextText,
+      psi.isCovariant,
+      psi.isContravariant,
+      psi.getTextRange.getStartOffset,
+      StringRef.fromString(psi.getContainingFileName),
+      StringRef.fromString(typeParameterText)
+    )
   }
 
   def deserializeImpl(dataStream: StubInputStream,
@@ -85,18 +87,20 @@ class ScTypeParamElementType[Func <: ScTypeParam]
     val contextBoundText = deserialiseSeq(dataStream)
     val fileName = dataStream.readName()
     val typeParameterText = dataStream.readName()
-    new ScTypeParamStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
-                            this,
-                            name,
-                            upperText,
-                            lowerText,
-                            viewText,
-                            contextBoundText,
-                            covariant,
-                            contravariant,
-                            position,
-                            fileName,
-                            typeParameterText)
+    new ScTypeParamStubImpl(
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this,
+      name,
+      upperText,
+      lowerText,
+      viewText,
+      contextBoundText,
+      covariant,
+      contravariant,
+      position,
+      fileName,
+      typeParameterText
+    )
   }
 
   def deserialiseSeq(dataStream: StubInputStream): Seq[StringRef] = {

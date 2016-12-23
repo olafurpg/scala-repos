@@ -392,10 +392,12 @@ class DateTimeUtilsSuite extends SparkFunSuite {
   }
 
   test("hours / minutes / seconds") {
-    Seq(Timestamp.valueOf("2015-06-11 10:12:35.789"),
-        Timestamp.valueOf("2015-06-11 20:13:40.789"),
-        Timestamp.valueOf("1900-06-11 12:14:50.789"),
-        Timestamp.valueOf("1700-02-28 12:14:50.123456")).foreach { t =>
+    Seq(
+      Timestamp.valueOf("2015-06-11 10:12:35.789"),
+      Timestamp.valueOf("2015-06-11 20:13:40.789"),
+      Timestamp.valueOf("1900-06-11 12:14:50.789"),
+      Timestamp.valueOf("1700-02-28 12:14:50.123456")
+    ).foreach { t =>
       val us = fromJavaTimestamp(t)
       assert(toJavaTimestamp(us) === t)
     }

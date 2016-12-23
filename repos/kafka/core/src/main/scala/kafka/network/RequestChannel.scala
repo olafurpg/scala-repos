@@ -44,7 +44,8 @@ object RequestChannel extends Logging {
     new Session(KafkaPrincipal.ANONYMOUS, InetAddress.getLocalHost()),
     buffer = getShutdownReceive(),
     startTimeMs = 0,
-    securityProtocol = SecurityProtocol.PLAINTEXT)
+    securityProtocol = SecurityProtocol.PLAINTEXT
+  )
 
   def getShutdownReceive() = {
     val emptyRequestHeader = new RequestHeader(ApiKeys.PRODUCE.id, "", 0)
@@ -173,29 +174,33 @@ object RequestChannel extends Logging {
       if (requestLogger.isTraceEnabled)
         requestLogger.trace(
           "Completed request:%s from connection %s;totalTime:%d,requestQueueTime:%d,localTime:%d,remoteTime:%d,responseQueueTime:%d,sendTime:%d,securityProtocol:%s,principal:%s"
-            .format(requestDesc(true),
-                    connectionId,
-                    totalTime,
-                    requestQueueTime,
-                    apiLocalTime,
-                    apiRemoteTime,
-                    responseQueueTime,
-                    responseSendTime,
-                    securityProtocol,
-                    session.principal))
+            .format(
+              requestDesc(true),
+              connectionId,
+              totalTime,
+              requestQueueTime,
+              apiLocalTime,
+              apiRemoteTime,
+              responseQueueTime,
+              responseSendTime,
+              securityProtocol,
+              session.principal
+            ))
       else if (requestLogger.isDebugEnabled)
         requestLogger.debug(
           "Completed request:%s from connection %s;totalTime:%d,requestQueueTime:%d,localTime:%d,remoteTime:%d,responseQueueTime:%d,sendTime:%d,securityProtocol:%s,principal:%s"
-            .format(requestDesc(false),
-                    connectionId,
-                    totalTime,
-                    requestQueueTime,
-                    apiLocalTime,
-                    apiRemoteTime,
-                    responseQueueTime,
-                    responseSendTime,
-                    securityProtocol,
-                    session.principal))
+            .format(
+              requestDesc(false),
+              connectionId,
+              totalTime,
+              requestQueueTime,
+              apiLocalTime,
+              apiRemoteTime,
+              responseQueueTime,
+              responseSendTime,
+              securityProtocol,
+              session.principal
+            ))
     }
   }
 

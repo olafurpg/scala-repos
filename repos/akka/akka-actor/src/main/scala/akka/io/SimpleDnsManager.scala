@@ -20,7 +20,8 @@ class SimpleDnsManager(val ext: DnsExt)
       Props(ext.provider.actorClass, ext.cache, ext.Settings.ResolverConfig)
         .withDeploy(Deploy.local)
         .withDispatcher(ext.Settings.Dispatcher)),
-    ext.Settings.Resolver)
+    ext.Settings.Resolver
+  )
   private val cacheCleanup = ext.cache match {
     case cleanup: PeriodicCacheCleanup ⇒ Some(cleanup)
     case _ ⇒ None

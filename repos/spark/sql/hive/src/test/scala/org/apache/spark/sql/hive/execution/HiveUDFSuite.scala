@@ -95,36 +95,44 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
   }
 
   test("Max/Min on named_struct") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT max(named_struct(
         |           "key", key,
         |           "value", value)).value FROM src
       """.stripMargin),
-                Seq(Row("val_498")))
-    checkAnswer(sql("""
+      Seq(Row("val_498"))
+    )
+    checkAnswer(
+      sql("""
         |SELECT min(named_struct(
         |           "key", key,
         |           "value", value)).value FROM src
       """.stripMargin),
-                Seq(Row("val_0")))
+      Seq(Row("val_0"))
+    )
 
     // nested struct cases
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT max(named_struct(
         |           "key", named_struct(
                             "key", key,
                             "value", value),
         |           "value", value)).value FROM src
       """.stripMargin),
-                Seq(Row("val_498")))
-    checkAnswer(sql("""
+      Seq(Row("val_498"))
+    )
+    checkAnswer(
+      sql("""
         |SELECT min(named_struct(
         |           "key", named_struct(
                            "key", key,
                            "value", value),
         |           "value", value)).value FROM src
       """.stripMargin),
-                Seq(Row("val_0")))
+      Seq(Row("val_0"))
+    )
   }
 
   test("SPARK-6409 UDAF Average test") {
@@ -513,9 +521,10 @@ class PairSerDe extends AbstractSerDe {
       Arrays.asList(
         ObjectInspectorFactory.getStandardStructObjectInspector(
           Arrays.asList("id", "value"),
-          Arrays.asList(
-            PrimitiveObjectInspectorFactory.javaIntObjectInspector,
-            PrimitiveObjectInspectorFactory.javaIntObjectInspector))))
+          Arrays.asList(PrimitiveObjectInspectorFactory.javaIntObjectInspector,
+                        PrimitiveObjectInspectorFactory.javaIntObjectInspector)
+        ))
+    )
   }
 
   override def getSerializedClass: Class[_ <: Writable] = classOf[TestPair]

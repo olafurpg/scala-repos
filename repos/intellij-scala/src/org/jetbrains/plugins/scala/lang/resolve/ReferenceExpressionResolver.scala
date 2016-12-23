@@ -64,7 +64,8 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
               case rOp => Some(Seq(rOp))
             },
           () => None,
-          isUnderscore = false)
+          isUnderscore = false
+        )
       case parents: ScParenthesisedExpr => getContextInfo(ref, parents)
       case postf: ScPostfixExpr if ref == postf.operation =>
         getContextInfo(ref, postf)
@@ -121,16 +122,18 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
 
     def nonAssignResolve: Array[ResolveResult] = {
       def processor(smartProcessor: Boolean): MethodResolveProcessor =
-        new MethodResolveProcessor(reference,
-                                   name,
-                                   info.arguments.toList,
-                                   getTypeArgs(reference),
-                                   prevInfoTypeParams,
-                                   kinds(reference, reference, incomplete),
-                                   expectedOption,
-                                   info.isUnderscore,
-                                   shapesOnly,
-                                   enableTupling = true) {
+        new MethodResolveProcessor(
+          reference,
+          name,
+          info.arguments.toList,
+          getTypeArgs(reference),
+          prevInfoTypeParams,
+          kinds(reference, reference, incomplete),
+          expectedOption,
+          info.isUnderscore,
+          shapesOnly,
+          enableTupling = true
+        ) {
           override def candidatesS: Set[ScalaResolveResult] = {
             if (!smartProcessor) super.candidatesS
             else {

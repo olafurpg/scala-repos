@@ -112,7 +112,8 @@ class RequestRendererSpec
                RawHeader("Cache-Control", "public"),
                Host("spray.io")),
           HttpEntity(ContentTypes.NoContentType,
-                     ByteString("The content please!"))) should renderTo {
+                     ByteString("The content please!"))
+        ) should renderTo {
           """PUT /abc/xyz HTTP/1.1
             |X-Fancy: naa
             |Cache-Control: public
@@ -249,9 +250,9 @@ class RequestRendererSpec
           POST,
           "/abc/xyz",
           List(`Transfer-Encoding`(TransferEncodings.Extension("fancy"))),
-          entity = Chunked(
-            ContentTypes.`text/plain(UTF-8)`,
-            source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))) should renderTo {
+          entity = Chunked(ContentTypes.`text/plain(UTF-8)`,
+                           source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+        ) should renderTo {
           """POST /abc/xyz HTTP/1.1
               |Transfer-Encoding: fancy, chunked
               |Host: test.com:8080

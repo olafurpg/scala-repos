@@ -72,15 +72,18 @@ class ParquetAvroCompatibilitySuite
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
-        Row(i % 2 == 0,
-            i,
-            i.toLong * 10,
-            i.toFloat + 0.1f,
-            i.toDouble + 0.2d,
-            s"val_$i".getBytes(StandardCharsets.UTF_8),
-            s"val_$i")
-      })
+      checkAnswer(
+        sqlContext.read.parquet(path),
+        (0 until 10).map { i =>
+          Row(i % 2 == 0,
+              i,
+              i.toLong * 10,
+              i.toFloat + 0.1f,
+              i.toDouble + 0.2d,
+              s"val_$i".getBytes(StandardCharsets.UTF_8),
+              s"val_$i")
+        }
+      )
     }
   }
 
@@ -124,19 +127,22 @@ class ParquetAvroCompatibilitySuite
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
-        if (i % 3 == 0) {
-          Row.apply(Seq.fill(7)(null): _*)
-        } else {
-          Row(i % 2 == 0,
-              i,
-              i.toLong * 10,
-              i.toFloat + 0.1f,
-              i.toDouble + 0.2d,
-              s"val_$i".getBytes(StandardCharsets.UTF_8),
-              s"val_$i")
+      checkAnswer(
+        sqlContext.read.parquet(path),
+        (0 until 10).map { i =>
+          if (i % 3 == 0) {
+            Row.apply(Seq.fill(7)(null): _*)
+          } else {
+            Row(i % 2 == 0,
+                i,
+                i.toLong * 10,
+                i.toFloat + 0.1f,
+                i.toDouble + 0.2d,
+                s"val_$i".getBytes(StandardCharsets.UTF_8),
+                s"val_$i")
+          }
         }
-      })
+      )
     }
   }
 
@@ -248,8 +254,11 @@ class ParquetAvroCompatibilitySuite
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
-        Row(Seq.tabulate(3)(n => s"arr_${i + n}"),
+      checkAnswer(
+        sqlContext.read.parquet(path),
+        (0 until 10).map { i =>
+          Row(
+            Seq.tabulate(3)(n => s"arr_${i + n}"),
             Seq.tabulate(3)(n => n.toString -> (i + n: Integer)).toMap,
             Seq
               .tabulate(3) { n =>
@@ -257,8 +266,10 @@ class ParquetAvroCompatibilitySuite
                   Row(Seq.tabulate(3)(j => i + j + m), s"val_${i + m}")
                 }
               }
-              .toMap)
-      })
+              .toMap
+          )
+        }
+      )
     }
   }
 

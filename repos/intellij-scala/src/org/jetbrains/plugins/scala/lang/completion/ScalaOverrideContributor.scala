@@ -42,18 +42,21 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
                            resultSet: CompletionResultSet) {
           addCompletionsOnOverrideKeyWord(resultSet, parameters)
         }
-      })
+      }
+    )
   }
 
-  extend(CompletionType.BASIC,
-         PlatformPatterns.psiElement(),
-         new CompletionProvider[CompletionParameters] {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              resultSet: CompletionResultSet) {
-             addCompletionsAfterOverride(resultSet, parameters)
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    PlatformPatterns.psiElement(),
+    new CompletionProvider[CompletionParameters] {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         resultSet: CompletionResultSet) {
+        addCompletionsAfterOverride(resultSet, parameters)
+      }
+    }
+  )
 
   class MyElementRenderer(member: ScalaNamedMember)
       extends LookupElementRenderer[LookupElementDecorator[LookupElement]] {
@@ -95,11 +98,11 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       ScalaOIUtil.getMembersToOverride(clazz, withSelfType = true)
     if (classMembers.isEmpty) return
 
-    handleMembers(classMembers,
-                  clazz,
-                  (classMember,
-                   clazz) => createText(classMember, clazz, full = true),
-                  resultSet) { classMember =>
+    handleMembers(
+      classMembers,
+      clazz,
+      (classMember, clazz) => createText(classMember, clazz, full = true),
+      resultSet) { classMember =>
       new MyInsertHandler()
     }
   }
@@ -220,11 +223,11 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       } else "override " + text
   }
 
-  private def handleMembers(classMembers: Iterable[ClassMember],
-                            td: ScTemplateDefinition,
-                            name: (ClassMember,
-                                   ScTemplateDefinition) => String,
-                            resultSet: CompletionResultSet)(
+  private def handleMembers(
+      classMembers: Iterable[ClassMember],
+      td: ScTemplateDefinition,
+      name: (ClassMember, ScTemplateDefinition) => String,
+      resultSet: CompletionResultSet)(
       insertionHandler: ClassMember => InsertHandler[LookupElement]): Unit = {
     classMembers.foreach {
       case mm: ScalaNamedMember =>

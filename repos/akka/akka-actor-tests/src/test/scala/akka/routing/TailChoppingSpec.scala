@@ -13,18 +13,21 @@ import akka.testkit._
 
 object TailChoppingSpec {
   def newActor(id: Int, sleepTime: Duration)(implicit system: ActorSystem) =
-    system.actorOf(Props(new Actor {
-      var times: Int = _
+    system.actorOf(
+      Props(new Actor {
+        var times: Int = _
 
-      def receive = {
-        case "stop" ⇒ context.stop(self)
-        case "times" ⇒ sender() ! times
-        case x ⇒
-          times += 1
-          Thread sleep sleepTime.toMillis
-          sender ! "ack"
-      }
-    }), "Actor:" + id)
+        def receive = {
+          case "stop" ⇒ context.stop(self)
+          case "times" ⇒ sender() ! times
+          case x ⇒
+            times += 1
+            Thread sleep sleepTime.toMillis
+            sender ! "ack"
+        }
+      }),
+      "Actor:" + id
+    )
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])

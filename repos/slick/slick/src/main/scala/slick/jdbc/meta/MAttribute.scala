@@ -31,24 +31,26 @@ object MAttribute {
                                typePattern.schema_?,
                                typePattern.name,
                                attributeNamePattern)) { r =>
-      MAttribute(MQName.from(r),
-                 r.<<,
-                 r.<<,
-                 r.<<,
-                 r.<<,
-                 r.<<,
-                 r.<<,
-                 r.nextInt match {
-                   case DatabaseMetaData.attributeNoNulls => Some(false)
-                   case DatabaseMetaData.attributeNullable => Some(true)
-                   case _ => None
-                 },
-                 r.<<,
-                 r.<<,
-                 r.skip.skip.<<,
-                 r.<<,
-                 DatabaseMeta.yesNoOpt(r),
-                 MQName.optionalFrom(r),
-                 r.<<)
+      MAttribute(
+        MQName.from(r),
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.nextInt match {
+          case DatabaseMetaData.attributeNoNulls => Some(false)
+          case DatabaseMetaData.attributeNullable => Some(true)
+          case _ => None
+        },
+        r.<<,
+        r.<<,
+        r.skip.skip.<<,
+        r.<<,
+        DatabaseMeta.yesNoOpt(r),
+        MQName.optionalFrom(r),
+        r.<<
+      )
     }
 }

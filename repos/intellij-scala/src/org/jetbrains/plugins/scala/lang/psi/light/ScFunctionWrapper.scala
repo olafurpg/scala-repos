@@ -120,10 +120,12 @@ class ScFunctionWrapper(val function: ScFunction,
           case _ =>
         }
       }
-      assert(res != null,
-             "Method: " + function.getText +
-               "\nhas null containing class. isStatic: " + isStatic +
-               "\nContaining file text: " + function.getContainingFile.getText)
+      assert(
+        res != null,
+        "Method: " + function.getText +
+          "\nhas null containing class. isStatic: " + isStatic +
+          "\nContaining file text: " + function.getContainingFile.getText
+      )
       res
     }
   }
@@ -328,12 +330,14 @@ object ScFunctionWrapper {
     builder.append(name)
 
     builder.append(
-      function.effectiveParameterClauses.takeWhile { clause =>
-        defaultParam match {
-          case Some(param) => !clause.effectiveParameters.contains(param)
-          case None => true
+      function.effectiveParameterClauses
+        .takeWhile { clause =>
+          defaultParam match {
+            case Some(param) => !clause.effectiveParameters.contains(param)
+            case None => true
+          }
         }
-      }.flatMap(_.effectiveParameters)
+        .flatMap(_.effectiveParameters)
         .map {
           case param =>
             val builder = new StringBuilder

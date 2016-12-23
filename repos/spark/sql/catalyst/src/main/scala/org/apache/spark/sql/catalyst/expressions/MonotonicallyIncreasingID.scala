@@ -42,7 +42,8 @@ import org.apache.spark.sql.types.{DataType, LongType}
       The current implementation puts the partition ID in the upper 31 bits, and the lower 33 bits
       represent the record number within each partition. The assumption is that the data frame has
       less than 1 billion partitions, and each partition has less than 8 billion records.""",
-  extended = "> SELECT _FUNC_();\n 0")
+  extended = "> SELECT _FUNC_();\n 0"
+)
 private[sql] case class MonotonicallyIncreasingID()
     extends LeafExpression
     with Nondeterministic {

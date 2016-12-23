@@ -96,9 +96,11 @@ trait ClusteringSpecs extends EvalStackSpecs {
       val results = evalE(input)
       val resultsCount = evalE(input2)
 
-      val count = resultsCount.collectFirst {
-        case (_, SDecimal(d)) => d.toInt
-      }.get
+      val count = resultsCount
+        .collectFirst {
+          case (_, SDecimal(d)) => d.toInt
+        }
+        .get
       results must haveSize(count)
 
       val validClusters = (1 to 4).map("cluster" + _).toSet
@@ -118,9 +120,11 @@ trait ClusteringSpecs extends EvalStackSpecs {
       val results = evalE(input)
       val resultsCount = evalE(input2)
 
-      val count = resultsCount.collectFirst {
-        case (_, SDecimal(d)) => d.toInt
-      }.get
+      val count = resultsCount
+        .collectFirst {
+          case (_, SDecimal(d)) => d.toInt
+        }
+        .get
 
       results must haveSize(count)
       results must not beEmpty
@@ -230,9 +234,11 @@ trait ClusteringSpecs extends EvalStackSpecs {
       val results = evalE(input)
       val resultsCount = evalE(input2)
 
-      val count = resultsCount.collectFirst {
-        case (_, SDecimal(d)) => d.toInt
-      }.get
+      val count = resultsCount
+        .collectFirst {
+          case (_, SDecimal(d)) => d.toInt
+        }
+        .get
 
       results must haveSize(count)
       results must not beEmpty

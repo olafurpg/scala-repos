@@ -348,36 +348,42 @@ object WorksheetSourceProcessor {
         val hadMods =
           fun.getModifierList.accessModifier map (_.modifierFormattedText) getOrElse ""
 
-        withPrecomputeLines(fun, {
-          objectRes append
-            (printMethodName + "(\"" + fun.getName + ": \" + " +
-              macroPrinterName + s".printGeneric({import $instanceName._ ;" +
-              fun.getText.stripPrefix(hadMods) + " })" + eraseClassName +
-              ")\n")
-        })
+        withPrecomputeLines(
+          fun, {
+            objectRes append
+              (printMethodName + "(\"" + fun.getName + ": \" + " +
+                macroPrinterName + s".printGeneric({import $instanceName._ ;" +
+                fun.getText.stripPrefix(hadMods) + " })" + eraseClassName +
+                ")\n")
+          }
+        )
       case tpeDef: ScTypeDefinition =>
-        withPrecomputeLines(tpeDef, {
-          val keyword = tpeDef match {
-            case _: ScClass => "class"
-            case _: ScTrait => "trait"
-            case _ => "module"
-          }
+        withPrecomputeLines(
+          tpeDef, {
+            val keyword = tpeDef match {
+              case _: ScClass => "class"
+              case _: ScTrait => "trait"
+              case _ => "module"
+            }
 
-          objectRes append withPrint(s"defined $keyword ${tpeDef.name}")
-        })
+            objectRes append withPrint(s"defined $keyword ${tpeDef.name}")
+          }
+        )
       case valDef: ScPatternDefinition =>
-        withPrecomputeLines(valDef, {
-          valDef.bindings foreach {
-            case p =>
-              val pName = p.name
-              val defName = variableInstanceName(pName)
+        withPrecomputeLines(
+          valDef, {
+            valDef.bindings foreach {
+              case p =>
+                val pName = p.name
+                val defName = variableInstanceName(pName)
 
-              classRes append s"def $defName = $pName;$END_GENERATED_MARKER"
-              objectRes append
-                (printMethodName + "(\"" + startText + pName + ": \" + " +
-                  withTempVar(defName) + ")\n")
+                classRes append s"def $defName = $pName;$END_GENERATED_MARKER"
+                objectRes append
+                  (printMethodName + "(\"" + startText + pName + ": \" + " +
+                    withTempVar(defName) + ")\n")
+            }
           }
-        })
+        )
       case varDef: ScVariableDefinition =>
         def writeTypedPatter(p: ScTypedPattern) = {
           p.typePattern map {
@@ -399,10 +405,12 @@ object WorksheetSourceProcessor {
                 case (tpe, el) => el.name + ": " + tpe.getText
               }).mkString("(", ",", ")") + " = { " + expr.getText + ";}"
           case (_, Some(expr)) =>
-            "var " + varDef.declaredElements.map {
-              case tpePattern: ScTypedPattern => writeTypedPatter(tpePattern)
-              case a => a.name
-            }.mkString("(", ",", ")") + " = { " + expr.getText + ";}"
+            "var " + varDef.declaredElements
+              .map {
+                case tpePattern: ScTypedPattern => writeTypedPatter(tpePattern)
+                case a => a.name
+              }
+              .mkString("(", ",", ")") + " = { " + expr.getText + ";}"
           case _ => varDef.getText
         }
 

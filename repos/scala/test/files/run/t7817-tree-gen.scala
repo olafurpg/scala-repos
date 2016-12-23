@@ -21,17 +21,19 @@ object Test extends CompilerTest {
     def checkTree(msg: String, t: => Tree) = {
       val run = currentRun
       import run._
-      val phases = List(typerPhase,
-                        picklerPhase,
-                        refchecksPhase,
-                        uncurryPhase,
-                        specializePhase,
-                        explicitouterPhase,
-                        erasurePhase,
-                        posterasurePhase,
-                        flattenPhase,
-                        mixinPhase,
-                        cleanupPhase)
+      val phases = List(
+        typerPhase,
+        picklerPhase,
+        refchecksPhase,
+        uncurryPhase,
+        specializePhase,
+        explicitouterPhase,
+        erasurePhase,
+        posterasurePhase,
+        flattenPhase,
+        mixinPhase,
+        cleanupPhase
+      )
       for (phase <- phases) {
         enteringPhase(phase) {
           val error = t.exists(t => t.symbol == NoSymbol)

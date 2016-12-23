@@ -138,7 +138,8 @@ final class GBTRegressor @Since("1.4.0")(
       " tries to minimize (case-insensitive). Supported options:" +
       s" ${GBTRegressor.supportedLossTypes.mkString(", ")}",
     (value: String) =>
-      GBTRegressor.supportedLossTypes.contains(value.toLowerCase))
+      GBTRegressor.supportedLossTypes.contains(value.toLowerCase)
+  )
 
   setDefault(lossType -> "squared")
 
@@ -212,7 +213,8 @@ final class GBTRegressionModel private[ml] (
   require(
     _trees.length == _treeWeights.length,
     "GBTRegressionModel given trees, treeWeights of" +
-      s" non-matching lengths (${_trees.length}, ${_treeWeights.length}, respectively).")
+      s" non-matching lengths (${_trees.length}, ${_treeWeights.length}, respectively)."
+  )
 
   /**
     * Construct a GBTRegressionModel
@@ -275,7 +277,8 @@ private[ml] object GBTRegressionModel {
     require(
       oldModel.algo == OldAlgo.Regression,
       "Cannot convert GradientBoostedTreesModel" +
-        s" with algo=${oldModel.algo} (old API) to GBTRegressionModel (new API).")
+        s" with algo=${oldModel.algo} (old API) to GBTRegressionModel (new API)."
+    )
     val newTrees = oldModel.trees.map { tree =>
       // parent for each tree is null since there is no good way to set this.
       DecisionTreeRegressionModel.fromOld(tree, null, categoricalFeatures)

@@ -28,7 +28,8 @@ class LoadJournalSpec
           """
   akka.persistence.journal.inmem.class = "akka.persistence.LoadJournalSpec$JournalWithConfig"
   akka.persistence.journal.inmem.extra-property = 17
-  """)))
+  """)
+      ))
     with ImplicitSender {
   import LoadJournalSpec._
 

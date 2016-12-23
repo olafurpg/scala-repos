@@ -32,7 +32,8 @@ import kafka.utils._
 @deprecated(
   "This class has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
-  "0.10.0.0")
+  "0.10.0.0"
+)
 class Producer[K, V](
     val config: ProducerConfig,
     private val eventHandler: EventHandler[K, V]) // only for unit testing
@@ -67,16 +68,19 @@ class Producer[K, V](
   AppInfo.registerInfo()
 
   def this(config: ProducerConfig) =
-    this(config,
-         new DefaultEventHandler[K, V](
-           config,
-           CoreUtils.createObject[Partitioner](config.partitionerClass,
-                                               config.props),
-           CoreUtils.createObject[Encoder[V]](config.serializerClass,
-                                              config.props),
-           CoreUtils.createObject[Encoder[K]](config.keySerializerClass,
-                                              config.props),
-           new ProducerPool(config)))
+    this(
+      config,
+      new DefaultEventHandler[K, V](
+        config,
+        CoreUtils.createObject[Partitioner](config.partitionerClass,
+                                            config.props),
+        CoreUtils.createObject[Encoder[V]](config.serializerClass,
+                                           config.props),
+        CoreUtils.createObject[Encoder[K]](config.keySerializerClass,
+                                           config.props),
+        new ProducerPool(config)
+      )
+    )
 
   /**
     * Sends the data, partitioned by key to the topic using either the

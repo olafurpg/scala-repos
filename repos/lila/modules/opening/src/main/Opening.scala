@@ -99,14 +99,16 @@ object Opening {
     import Perf.perfBSONHandler
 
     def reads(r: BSON.Reader): Opening =
-      Opening(id = r int id,
-              fen = r str fen,
-              moves = r.get[List[Move]](moves),
-              color = Color(r bool white),
-              date = r date date,
-              perf = r.get[Perf](perf),
-              attempts = r int attempts,
-              wins = r int wins)
+      Opening(
+        id = r int id,
+        fen = r str fen,
+        moves = r.get[List[Move]](moves),
+        color = Color(r bool white),
+        date = r date date,
+        perf = r.get[Perf](perf),
+        attempts = r int attempts,
+        wins = r int wins
+      )
 
     def writes(w: BSON.Writer, o: Opening) =
       BSONDocument(id -> o.id,

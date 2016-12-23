@@ -111,7 +111,8 @@ object SerializationTestUtils {
       Map(
         SecurityProtocol.PLAINTEXT -> EndPoint("localhost",
                                                1013,
-                                               SecurityProtocol.PLAINTEXT))))
+                                               SecurityProtocol.PLAINTEXT)))
+  )
   private val brokerEndpoints =
     brokers.map(_.getBrokerEndPoint(SecurityProtocol.PLAINTEXT))
 
@@ -199,7 +200,8 @@ object SerializationTestUtils {
                                                                20001)
       ),
       ProducerRequest.CurrentVersion,
-      100)
+      100
+    )
 
   def createTestFetchRequest: FetchRequest = {
     new FetchRequest(requestInfo = requestInfos)
@@ -234,7 +236,8 @@ object SerializationTestUtils {
         TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
           100L,
           OffsetMetadata.NoMetadata)
-      ))
+      )
+    )
   }
 
   def createTestOffsetCommitRequestV1: OffsetCommitRequest = {
@@ -250,7 +253,8 @@ object SerializationTestUtils {
           100L,
           OffsetMetadata.NoMetadata,
           SystemTime.milliseconds)
-      ))
+      )
+    )
   }
 
   def createTestOffsetCommitRequestV0: OffsetCommitRequest = {
@@ -263,7 +267,8 @@ object SerializationTestUtils {
         TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
           100L,
           OffsetMetadata.NoMetadata)
-      ))
+      )
+    )
   }
 
   def createTestOffsetCommitResponse: OffsetCommitResponse = {
@@ -353,7 +358,8 @@ class RequestResponseSerializationTest extends JUnitSuite {
       offsetFetchResponse,
       consumerMetadataRequest,
       consumerMetadataResponse,
-      consumerMetadataResponseNoCoordinator)
+      consumerMetadataResponseNoCoordinator
+    )
 
     requestsAndResponses.foreach { original =>
       val buffer = ByteBuffer.allocate(original.sizeInBytes)

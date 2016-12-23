@@ -259,29 +259,34 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
     activeBrokers.foreach(x => {
       var metadata: TopicMetadataResponse =
         new TopicMetadataResponse(Seq(), Seq(), -1)
-      waitUntilTrue(() => {
-        metadata = ClientUtils.fetchTopicMetadata(
-          Set.empty,
-          Seq(
-            new BrokerEndPoint(x.config.brokerId,
-                               if (x.config.hostName.nonEmpty)
-                                 x.config.hostName
-                               else "localhost",
-                               x.boundPort())),
-          "TopicMetadataTest-testBasicTopicMetadata",
-          2000,
-          0)
-        metadata.topicsMetadata.nonEmpty &&
-        metadata.topicsMetadata.head.partitionsMetadata.nonEmpty && expectedIsr
-          .sortBy(_.id) == metadata.topicsMetadata.head.partitionsMetadata.head.isr
-          .sortBy(_.id)
-      }, "Topic metadata is not correctly updated for broker " +
-        x + ".\n" + "Expected ISR: " + expectedIsr + "\n" +
-        "Actual ISR  : " +
-        (if (metadata.topicsMetadata.nonEmpty &&
-             metadata.topicsMetadata.head.partitionsMetadata.nonEmpty)
-           metadata.topicsMetadata.head.partitionsMetadata.head.isr
-         else ""), 8000L)
+      waitUntilTrue(
+        () => {
+          metadata = ClientUtils.fetchTopicMetadata(
+            Set.empty,
+            Seq(
+              new BrokerEndPoint(x.config.brokerId,
+                                 if (x.config.hostName.nonEmpty)
+                                   x.config.hostName
+                                 else "localhost",
+                                 x.boundPort())),
+            "TopicMetadataTest-testBasicTopicMetadata",
+            2000,
+            0
+          )
+          metadata.topicsMetadata.nonEmpty &&
+          metadata.topicsMetadata.head.partitionsMetadata.nonEmpty && expectedIsr
+            .sortBy(_.id) == metadata.topicsMetadata.head.partitionsMetadata.head.isr
+            .sortBy(_.id)
+        },
+        "Topic metadata is not correctly updated for broker " +
+          x + ".\n" + "Expected ISR: " + expectedIsr + "\n" +
+          "Actual ISR  : " +
+          (if (metadata.topicsMetadata.nonEmpty &&
+               metadata.topicsMetadata.head.partitionsMetadata.nonEmpty)
+             metadata.topicsMetadata.head.partitionsMetadata.head.isr
+           else ""),
+        8000L
+      )
     })
   }
 
@@ -319,33 +324,40 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
 
     // Get topic metadata from old broker
     // Wait for metadata to get updated by checking metadata from a new broker
-    waitUntilTrue(() => {
-      topicMetadata = ClientUtils.fetchTopicMetadata(
-        Set.empty,
-        brokerEndPoints,
-        "TopicMetadataTest-testBasicTopicMetadata",
-        2000,
-        0)
-      topicMetadata.brokers.size == expectedBrokersCount
-    }, "Alive brokers list is not correctly propagated by coordinator to brokers")
+    waitUntilTrue(
+      () => {
+        topicMetadata = ClientUtils.fetchTopicMetadata(
+          Set.empty,
+          brokerEndPoints,
+          "TopicMetadataTest-testBasicTopicMetadata",
+          2000,
+          0)
+        topicMetadata.brokers.size == expectedBrokersCount
+      },
+      "Alive brokers list is not correctly propagated by coordinator to brokers"
+    )
 
     // Assert that topic metadata at new brokers is updated correctly
     servers
       .filter(x => x.brokerState.currentState != NotRunning.state)
       .foreach(x =>
-        waitUntilTrue(() => {
-          val foundMetadata = ClientUtils.fetchTopicMetadata(
-            Set.empty,
-            Seq(
-              new Broker(x.config.brokerId, x.config.hostName, x.boundPort())
-                .getBrokerEndPoint(SecurityProtocol.PLAINTEXT)),
-            "TopicMetadataTest-testBasicTopicMetadata",
-            2000,
-            0)
-          topicMetadata.brokers.sortBy(_.id) == foundMetadata.brokers.sortBy(
-            _.id) && topicMetadata.topicsMetadata
-            .sortBy(_.topic) == foundMetadata.topicsMetadata.sortBy(_.topic)
-        }, s"Topic metadata is not correctly updated"))
+        waitUntilTrue(
+          () => {
+            val foundMetadata = ClientUtils.fetchTopicMetadata(
+              Set.empty,
+              Seq(
+                new Broker(x.config.brokerId, x.config.hostName, x.boundPort())
+                  .getBrokerEndPoint(SecurityProtocol.PLAINTEXT)),
+              "TopicMetadataTest-testBasicTopicMetadata",
+              2000,
+              0
+            )
+            topicMetadata.brokers.sortBy(_.id) == foundMetadata.brokers.sortBy(
+              _.id) && topicMetadata.topicsMetadata
+              .sortBy(_.topic) == foundMetadata.topicsMetadata.sortBy(_.topic)
+          },
+          s"Topic metadata is not correctly updated"
+      ))
   }
 
   @Test

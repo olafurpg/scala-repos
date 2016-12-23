@@ -123,9 +123,11 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
           searcher.search(new lucene.search.MatchAllDocsQuery, reader.maxDoc())
         val data = docs.scoreDocs.map { case doc => reader document doc.doc }
 
-        data.map {
-          case docData => Keys.from(docData)
-        }.toMap
+        data
+          .map {
+            case docData => Keys.from(docData)
+          }
+          .toMap
       }
     } catch {
       case io: IOException =>

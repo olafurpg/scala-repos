@@ -174,12 +174,14 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
     case SQLTable(database, table, _, sample) =>
       val qualifiedName =
         s"${quoteIdentifier(database)}.${quoteIdentifier(table)}"
-      sample.map {
-        case (lowerBound, upperBound) =>
-          val fraction =
-            math.min(100, math.max(0, (upperBound - lowerBound) * 100))
-          qualifiedName + " TABLESAMPLE(" + fraction + " PERCENT)"
-      }.getOrElse(qualifiedName)
+      sample
+        .map {
+          case (lowerBound, upperBound) =>
+            val fraction =
+              math.min(100, math.max(0, (upperBound - lowerBound) * 100))
+            qualifiedName + " TABLESAMPLE(" + fraction + " PERCENT)"
+        }
+        .getOrElse(qualifiedName)
 
     case Sort(orders, _, RepartitionByExpression(partitionExprs, child, _))
         if orders.map(_.child) == partitionExprs =>
@@ -238,9 +240,11 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
       throw new UnsupportedOperationException(
         s"unsupported row format ${ioSchema.outputRowFormat}"))
 
-    val outputSchema = plan.output.map { attr =>
-      s"${attr.sql} ${attr.dataType.simpleString}"
-    }.mkString(", ")
+    val outputSchema = plan.output
+      .map { attr =>
+        s"${attr.sql} ${attr.dataType.simpleString}"
+      }
+      .mkString(", ")
 
     build(
       "SELECT TRANSFORM",
@@ -407,39 +411,43 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
   object Canonicalizer extends RuleExecutor[LogicalPlan] {
     override protected def batches: Seq[Batch] = Seq(
-      Batch("Prepare",
-            FixedPoint(100),
-            // The `WidenSetOperationTypes` analysis rule may introduce extra `Project`s over
-            // `Aggregate`s to perform type casting.  This rule merges these `Project`s into
-            // `Aggregate`s.
-            CollapseProject,
-            // Parser is unable to parse the following query:
-            // SELECT  `u_1`.`id`
-            // FROM (((SELECT  `t0`.`id` FROM `default`.`t0`)
-            // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`))
-            // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`)) AS u_1
-            // This rule combine adjacent Unions together so we can generate flat UNION ALL SQL string.
-            CombineUnions),
-      Batch("Recover Scoping Info",
-            Once,
-            // A logical plan is allowed to have same-name outputs with different qualifiers(e.g. the
-            // `Join` operator). However, this kind of plan can't be put under a sub query as we will
-            // erase and assign a new qualifier to all outputs and make it impossible to distinguish
-            // same-name outputs. This rule renames all attributes, to guarantee different
-            // attributes(with different exprId) always have different names. It also removes all
-            // qualifiers, as attributes have unique names now and we don't need qualifiers to resolve
-            // ambiguity.
-            NormalizedAttribute,
-            // Our analyzer will add one or more sub-queries above table relation, this rule removes
-            // these sub-queries so that next rule can combine adjacent table relation and sample to
-            // SQLTable.
-            RemoveSubqueriesAboveSQLTable,
-            // Finds the table relations and wrap them with `SQLTable`s.  If there are any `Sample`
-            // operators on top of a table relation, merge the sample information into `SQLTable` of
-            // that table relation, as we can only convert table sample to standard SQL string.
-            ResolveSQLTable,
-            // Insert sub queries on top of operators that need to appear after FROM clause.
-            AddSubquery)
+      Batch(
+        "Prepare",
+        FixedPoint(100),
+        // The `WidenSetOperationTypes` analysis rule may introduce extra `Project`s over
+        // `Aggregate`s to perform type casting.  This rule merges these `Project`s into
+        // `Aggregate`s.
+        CollapseProject,
+        // Parser is unable to parse the following query:
+        // SELECT  `u_1`.`id`
+        // FROM (((SELECT  `t0`.`id` FROM `default`.`t0`)
+        // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`))
+        // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`)) AS u_1
+        // This rule combine adjacent Unions together so we can generate flat UNION ALL SQL string.
+        CombineUnions
+      ),
+      Batch(
+        "Recover Scoping Info",
+        Once,
+        // A logical plan is allowed to have same-name outputs with different qualifiers(e.g. the
+        // `Join` operator). However, this kind of plan can't be put under a sub query as we will
+        // erase and assign a new qualifier to all outputs and make it impossible to distinguish
+        // same-name outputs. This rule renames all attributes, to guarantee different
+        // attributes(with different exprId) always have different names. It also removes all
+        // qualifiers, as attributes have unique names now and we don't need qualifiers to resolve
+        // ambiguity.
+        NormalizedAttribute,
+        // Our analyzer will add one or more sub-queries above table relation, this rule removes
+        // these sub-queries so that next rule can combine adjacent table relation and sample to
+        // SQLTable.
+        RemoveSubqueriesAboveSQLTable,
+        // Finds the table relations and wrap them with `SQLTable`s.  If there are any `Sample`
+        // operators on top of a table relation, merge the sample information into `SQLTable` of
+        // that table relation, as we can only convert table sample to standard SQL string.
+        ResolveSQLTable,
+        // Insert sub queries on top of operators that need to appear after FROM clause.
+        AddSubquery
+      )
     )
 
     object NormalizedAttribute extends Rule[LogicalPlan] {

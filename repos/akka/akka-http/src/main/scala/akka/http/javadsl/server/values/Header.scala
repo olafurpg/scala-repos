@@ -40,7 +40,10 @@ object Headers {
 
   private def optionalHeaderInstanceByName(
       lowercaseName: String): Directive1[Optional[model.HttpHeader]] =
-    extract(_.request.headers.collectFirst {
-      case h @ model.HttpHeader(`lowercaseName`, _) ⇒ h
-    }.asJava)
+    extract(
+      _.request.headers
+        .collectFirst {
+          case h @ model.HttpHeader(`lowercaseName`, _) ⇒ h
+        }
+        .asJava)
 }

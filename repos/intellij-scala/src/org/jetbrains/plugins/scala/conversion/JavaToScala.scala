@@ -110,7 +110,8 @@ object JavaToScala {
         BinaryExpressionConstruction(
           convertPsiToIntermdeiate(a.getLExpression, externalProperties),
           convertPsiToIntermdeiate(a.getRExpression, externalProperties),
-          a.getOperationSign.getText)
+          a.getOperationSign.getText
+        )
       case e: PsiExpressionListStatement =>
         ExpressionListStatement(
           e.getExpressionList.getExpressions
@@ -283,10 +284,12 @@ object JavaToScala {
           convertPsiToIntermdeiate(be.getROperand, externalProperties),
           operation)
       case c: PsiTypeCastExpression =>
-        ClassCast(convertPsiToIntermdeiate(c.getOperand, externalProperties),
-                  convertPsiToIntermdeiate(c.getCastType, externalProperties),
-                  c.getCastType.getType.isInstanceOf[PsiPrimitiveType] &&
-                    c.getOperand.getType.isInstanceOf[PsiPrimitiveType])
+        ClassCast(
+          convertPsiToIntermdeiate(c.getOperand, externalProperties),
+          convertPsiToIntermdeiate(c.getCastType, externalProperties),
+          c.getCastType.getType.isInstanceOf[PsiPrimitiveType] &&
+            c.getOperand.getType.isInstanceOf[PsiPrimitiveType]
+        )
       case a: PsiArrayAccessExpression =>
         ArrayAccess(
           convertPsiToIntermdeiate(a.getArrayExpression, externalProperties),
@@ -345,13 +348,15 @@ object JavaToScala {
               " == ",
               convertPsiToIntermdeiate(
                 m.getArgumentList.getExpressions.apply(0),
-                externalProperties))
+                externalProperties)
+            )
           case _ =>
             MethodCallExpression(
               m.getMethodExpression.getQualifiedName,
               convertPsiToIntermdeiate(m.getMethodExpression,
                                        externalProperties),
-              convertPsiToIntermdeiate(m.getArgumentList, externalProperties))
+              convertPsiToIntermdeiate(m.getArgumentList, externalProperties)
+            )
         }
       case t: PsiThisExpression =>
         ThisExpression(
@@ -417,7 +422,8 @@ object JavaToScala {
             m.getTypeParameters.map(
               convertPsiToIntermdeiate(_, externalProperties)),
             convertPsiToIntermdeiate(m.getParameterList, externalProperties),
-            body)
+            body
+          )
         } else {
           MethodConstruction(
             handleModifierList(m),
@@ -429,7 +435,8 @@ object JavaToScala {
             if (m.getReturnType != PsiType.VOID)
               convertPsiToIntermdeiate(m.getReturnTypeElement,
                                        externalProperties)
-            else null)
+            else null
+          )
         }
       case c: PsiClass => createClass(c, externalProperties)
       case p: PsiParenthesizedExpression =>
@@ -846,7 +853,8 @@ object JavaToScala {
                 companionObject,
                 Some(
                   extendList.map(
-                    convertPsiToIntermdeiate(_, externalProperties))))
+                    convertPsiToIntermdeiate(_, externalProperties)))
+              )
           }
         } finally {
           context.get().pop()
@@ -1010,15 +1018,19 @@ object JavaToScala {
 
         val superCall = getSuperCall(dropStatements)
 
-        getStatements(constructor).map { statements =>
-          PrimaryConstruction(
-            updatedParams,
-            superCall,
-            statements
-              .filter(notContains(_, dropStatements))
-              .map(convertPsiToIntermdeiate(_, WithReferenceExpression(true))),
-            handleModifierList(constructor))
-        }.orNull
+        getStatements(constructor)
+          .map { statements =>
+            PrimaryConstruction(
+              updatedParams,
+              superCall,
+              statements
+                .filter(notContains(_, dropStatements))
+                .map(
+                  convertPsiToIntermdeiate(_, WithReferenceExpression(true))),
+              handleModifierList(constructor)
+            )
+          }
+          .orNull
       }
 
       createContructor
@@ -1092,9 +1104,11 @@ object JavaToScala {
 
     def handleModifiers: Seq[IntermediateNode] = {
       val modifiers = new ArrayBuffer[IntermediateNode]()
-      val simpleList = SIMPLE_MODIFIERS_MAP.filter {
-        case (psiType, el) => owner.hasModifierProperty(psiType)
-      }.values
+      val simpleList = SIMPLE_MODIFIERS_MAP
+        .filter {
+          case (psiType, el) => owner.hasModifierProperty(psiType)
+        }
+        .values
 
       modifiers ++= simpleList.map(SimpleModifier)
 

@@ -27,13 +27,15 @@ class ApacheWatcherTest extends FlatSpec with OneInstancePerTest {
     (KeeperState.NoSyncConnected, SessionState.NoSyncConnected),
     (KeeperState.SyncConnected, SessionState.SyncConnected),
     (KeeperState.SaslAuthenticated, SessionState.SaslAuthenticated),
-    (KeeperState.ConnectedReadOnly, SessionState.ConnectedReadOnly))
+    (KeeperState.ConnectedReadOnly, SessionState.ConnectedReadOnly)
+  )
 
   val nodeEvents = Map(
     (EventType.NodeChildrenChanged, NodeEvent.ChildrenChanged),
     (EventType.NodeCreated, NodeEvent.Created),
     (EventType.NodeDataChanged, NodeEvent.DataChanged),
-    (EventType.NodeDeleted, NodeEvent.Deleted))
+    (EventType.NodeDeleted, NodeEvent.Deleted)
+  )
 
   "ApacheWatcher" should "start in the pending state" in {
     assert(watcher.state() == WatchState.Pending)

@@ -118,7 +118,8 @@ trait PersistenceMatchers {
         MatchResult(
           false,
           s"""Messages sequence with prefix ${prefixes(pos)} was not sorted! Was: $seq"""",
-          s"""Messages sequence with prefix ${prefixes(pos)} was sorted! Was: $seq"""")
+          s"""Messages sequence with prefix ${prefixes(pos)} was sorted! Was: $seq""""
+        )
 
       if (results.forall(_.matches)) MatchResult(true, "", "")
       else results.find(r ⇒ !r.matches).get

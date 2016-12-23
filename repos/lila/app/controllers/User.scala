@@ -79,20 +79,24 @@ object User extends LilaController {
     Reasonable(page) {
       OptionFuResult(UserRepo named username) { u =>
         if (u.enabled || isGranted(_.UserSpy))
-          negotiate(html = {
-                      if (lila.common.HTTPRequest.isSynchronousHttp(ctx.req))
-                        userShow(u, filterOption, page)
-                      else
-                        userGames(u, filterOption, page) map {
-                          case (filterName, pag) =>
-                            html.user.games(u, pag, filterName)
-                        }
-                    }.map { status(_) }.mon(_.http.response.user.show.website),
-                    api = _ =>
-                      userGames(u, filterOption, page).map {
-                        case (filterName, pag) =>
-                          Ok(Env.api.userGameApi.filter(filterName, pag))
-                      }.mon(_.http.response.user.show.mobile))
+          negotiate(
+            html = {
+              if (lila.common.HTTPRequest.isSynchronousHttp(ctx.req))
+                userShow(u, filterOption, page)
+              else
+                userGames(u, filterOption, page) map {
+                  case (filterName, pag) =>
+                    html.user.games(u, pag, filterName)
+                }
+            }.map { status(_) }.mon(_.http.response.user.show.website),
+            api = _ =>
+              userGames(u, filterOption, page)
+                .map {
+                  case (filterName, pag) =>
+                    Ok(Env.api.userGameApi.filter(filterName, pag))
+                }
+                .mon(_.http.response.user.show.mobile)
+          )
         else
           negotiate(
             html = fuccess(NotFound(html.user.disabled(u))),
@@ -176,18 +180,21 @@ object User extends LilaController {
             implicit val lpWrites =
               OWrites[UserModel.LightPerf](env.jsonView.lightPerfIsOnline)
             Ok(
-              Json.obj("bullet" -> leaderboards.bullet,
-                       "blitz" -> leaderboards.blitz,
-                       "classical" -> leaderboards.classical,
-                       "crazyhouse" -> leaderboards.crazyhouse,
-                       "chess960" -> leaderboards.chess960,
-                       "kingOfTheHill" -> leaderboards.kingOfTheHill,
-                       "threeCheck" -> leaderboards.threeCheck,
-                       "antichess" -> leaderboards.antichess,
-                       "atomic" -> leaderboards.atomic,
-                       "horde" -> leaderboards.horde,
-                       "racingKings" -> leaderboards.racingKings))
-        })
+              Json.obj(
+                "bullet" -> leaderboards.bullet,
+                "blitz" -> leaderboards.blitz,
+                "classical" -> leaderboards.classical,
+                "crazyhouse" -> leaderboards.crazyhouse,
+                "chess960" -> leaderboards.chess960,
+                "kingOfTheHill" -> leaderboards.kingOfTheHill,
+                "threeCheck" -> leaderboards.threeCheck,
+                "antichess" -> leaderboards.antichess,
+                "atomic" -> leaderboards.atomic,
+                "horde" -> leaderboards.horde,
+                "racingKings" -> leaderboards.racingKings
+              ))
+        }
+      )
     } yield res
   }
 
@@ -242,12 +249,14 @@ object User extends LilaController {
           Env.pref.api.followables(ops map (_._1.id)),
           fuccess(List.fill(50)(true))
         ) flatMap { followables =>
-          (ops zip followables).map {
-            case ((u, nb), followable) =>
-              ctx.userId ?? {
-                relationApi.fetchRelation(_, u.id)
-              } map { lila.relation.Related(u, nb.some, followable, _) }
-          }.sequenceFu map { relateds =>
+          (ops zip followables)
+            .map {
+              case ((u, nb), followable) =>
+                ctx.userId ?? {
+                  relationApi.fetchRelation(_, u.id)
+                } map { lila.relation.Related(u, nb.some, followable, _) }
+            }
+            .sequenceFu map { relateds =>
             html.user.opponents(user, relateds)
           }
         }

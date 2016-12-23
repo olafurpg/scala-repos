@@ -206,21 +206,23 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
         def mapToStored(droppedBinder: Symbol) =
           if (mostRecentReusedMaker eq null) Nil
           else List((droppedBinder, REF(mostRecentReusedMaker.nextBinder)))
-        val (from, to) = sharedPrefix.flatMap { dropped =>
-          dropped.reuses.map(test => toReused(test.treeMaker)).foreach {
-            case reusedMaker: ReusedCondTreeMaker =>
-              mostRecentReusedMaker = reusedMaker
-            case _ =>
-          }
+        val (from, to) = sharedPrefix
+          .flatMap { dropped =>
+            dropped.reuses.map(test => toReused(test.treeMaker)).foreach {
+              case reusedMaker: ReusedCondTreeMaker =>
+                mostRecentReusedMaker = reusedMaker
+              case _ =>
+            }
 
-          // TODO: have super-trait for retrieving the variable that's operated on by a tree maker
-          // and thus assumed in scope, either because it binds it or because it refers to it
-          dropped.treeMaker match {
-            case dropped: FunTreeMaker =>
-              mapToStored(dropped.nextBinder)
-            case _ => Nil
+            // TODO: have super-trait for retrieving the variable that's operated on by a tree maker
+            // and thus assumed in scope, either because it binds it or because it refers to it
+            dropped.treeMaker match {
+              case dropped: FunTreeMaker =>
+                mapToStored(dropped.nextBinder)
+              case _ => Nil
+            }
           }
-        }.unzip
+          .unzip
         val rerouteToReusedBinders = Substitution(from, to)
 
         val collapsedDroppedSubst =

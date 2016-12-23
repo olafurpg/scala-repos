@@ -45,12 +45,14 @@ class ScalaParameterTableModel(typeContext: PsiElement,
   def this(typeContext: PsiElement,
            defaultValueContext: PsiElement,
            methodDescriptor: ScalaMethodDescriptor) {
-    this(typeContext,
-         defaultValueContext,
-         methodDescriptor,
-         new ScalaNameColumn(typeContext.getProject),
-         new ScalaTypeColumn(typeContext.getProject),
-         new ScalaDefaultValueColumn(typeContext.getProject))
+    this(
+      typeContext,
+      defaultValueContext,
+      methodDescriptor,
+      new ScalaNameColumn(typeContext.getProject),
+      new ScalaTypeColumn(typeContext.getProject),
+      new ScalaDefaultValueColumn(typeContext.getProject)
+    )
   }
 
   override def createRowItem(

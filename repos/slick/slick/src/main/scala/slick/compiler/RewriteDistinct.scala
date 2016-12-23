@@ -12,19 +12,25 @@ class RewriteDistinct extends Phase {
 
   def apply(state: CompilerState) =
     if (state.get(Phase.assignUniqueSymbols).map(_.distinct).getOrElse(true))
-      state.map(_.replace({
+      state.map(
+        _.replace(
+          {
 
-        case n @ Bind(s1, dist1: Distinct, Pure(sel1, ts1)) =>
-          logger.debug("Rewriting Distinct in Bind:", Ellipsis(n, List(0, 0)))
-          val (inner, sel2) = rewrite(s1, dist1, sel1)
-          Bind(s1, inner, Pure(sel2, ts1)).infer()
+            case n @ Bind(s1, dist1: Distinct, Pure(sel1, ts1)) =>
+              logger.debug("Rewriting Distinct in Bind:",
+                           Ellipsis(n, List(0, 0)))
+              val (inner, sel2) = rewrite(s1, dist1, sel1)
+              Bind(s1, inner, Pure(sel2, ts1)).infer()
 
-        case n @ Aggregate(s1, dist1: Distinct, sel1) =>
-          logger.debug("Rewriting Distinct in Aggregate:",
-                       Ellipsis(n, List(0, 0)))
-          val (inner, sel2) = rewrite(s1, dist1, sel1)
-          Aggregate(s1, inner, sel2).infer()
-      }, keepType = true, bottomUp = true))
+            case n @ Aggregate(s1, dist1: Distinct, sel1) =>
+              logger.debug("Rewriting Distinct in Aggregate:",
+                           Ellipsis(n, List(0, 0)))
+              val (inner, sel2) = rewrite(s1, dist1, sel1)
+              Aggregate(s1, inner, sel2).infer()
+          },
+          keepType = true,
+          bottomUp = true
+        ))
     else {
       logger.debug(
         "No DISTINCT used as determined by assignUniqueSymbols - skipping phase")

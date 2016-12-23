@@ -86,7 +86,8 @@ final class CategoricalSplit private[ml] (
   require(
     _leftCategories.forall(cat => 0 <= cat && cat < numCategories),
     "Invalid leftCategories" +
-      s" (should be in range [0, $numCategories)): ${_leftCategories.mkString(",")}")
+      s" (should be in range [0, $numCategories)): ${_leftCategories.mkString(",")}"
+  )
 
   /**
     * If true, then "categories" is the set of categories for splitting to the left, and vice versa.

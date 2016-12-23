@@ -136,17 +136,18 @@ object Docs {
 
       val options =
         Seq(
-            // Note, this is used by the doc-source-url feature to determine the relative path of a given source file.
-            // If it's not a prefix of a the absolute path of the source file, the absolute path of that file will be put
-            // into the FILE_SOURCE variable below, which is definitely not what we want.
-            // Hence it needs to be the base directory for the build, not the base directory for the play-docs project.
-            "-sourcepath",
-            (baseDirectory in ThisBuild).value.getAbsolutePath,
-            "-doc-source-url",
-            "https://github.com/playframework/playframework/tree/" +
-              sourceTree + "/framework€{FILE_PATH}.scala",
-            "-doc-external-doc",
-            externalDocsScalacOption)
+          // Note, this is used by the doc-source-url feature to determine the relative path of a given source file.
+          // If it's not a prefix of a the absolute path of the source file, the absolute path of that file will be put
+          // into the FILE_SOURCE variable below, which is definitely not what we want.
+          // Hence it needs to be the base directory for the build, not the base directory for the play-docs project.
+          "-sourcepath",
+          (baseDirectory in ThisBuild).value.getAbsolutePath,
+          "-doc-source-url",
+          "https://github.com/playframework/playframework/tree/" +
+            sourceTree + "/framework€{FILE_PATH}.scala",
+          "-doc-external-doc",
+          externalDocsScalacOption
+        )
 
       val compilers = Keys.compilers.value
       val useCache = apiDocsUseCache.value
@@ -287,8 +288,8 @@ object Docs {
 
   // Generate documentation but avoid caching the inputs because of https://github.com/sbt/sbt/issues/1614
   object DocNoCache {
-    type GenerateDoc = (Seq[File], Seq[File], File, Seq[String], Int,
-                        Logger) => Unit
+    type GenerateDoc =
+      (Seq[File], Seq[File], File, Seq[String], Int, Logger) => Unit
 
     def scaladoc(label: String,
                  compile: compiler.AnalyzingCompiler): GenerateDoc =

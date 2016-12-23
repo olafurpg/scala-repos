@@ -312,9 +312,7 @@ private[sql] class SQLListener(conf: SparkConf)
         case Some(executionUIData) =>
           val accumulatorUpdates = {
             for (stageId <- executionUIData.stages;
-                 stageMetrics <- _stageIdToStageMetrics
-                   .get(stageId)
-                   .toIterable;
+                 stageMetrics <- _stageIdToStageMetrics.get(stageId).toIterable;
                  taskMetrics <- stageMetrics.taskIdToMetricUpdates.values;
                  accumulatorUpdate <- taskMetrics.accumulatorUpdates) yield {
               assert(
@@ -379,7 +377,8 @@ private[spark] class SQLHistoryListener(conf: SparkConf, sparkUI: SparkUI)
           None
         }
       },
-      finishTask = true)
+      finishTask = true
+    )
   }
 
   override def onOtherEvent(event: SparkListenerEvent): Unit = event match {
@@ -420,13 +419,22 @@ private[ui] class SQLExecutionUIData(
   def isFailed: Boolean = jobs.values.exists(_ == JobExecutionStatus.FAILED)
 
   def runningJobs: Seq[Long] =
-    jobs.filter { case (_, status) => status == JobExecutionStatus.RUNNING }.keys.toSeq
+    jobs
+      .filter { case (_, status) => status == JobExecutionStatus.RUNNING }
+      .keys
+      .toSeq
 
   def succeededJobs: Seq[Long] =
-    jobs.filter { case (_, status) => status == JobExecutionStatus.SUCCEEDED }.keys.toSeq
+    jobs
+      .filter { case (_, status) => status == JobExecutionStatus.SUCCEEDED }
+      .keys
+      .toSeq
 
   def failedJobs: Seq[Long] =
-    jobs.filter { case (_, status) => status == JobExecutionStatus.FAILED }.keys.toSeq
+    jobs
+      .filter { case (_, status) => status == JobExecutionStatus.FAILED }
+      .keys
+      .toSeq
 }
 
 /**

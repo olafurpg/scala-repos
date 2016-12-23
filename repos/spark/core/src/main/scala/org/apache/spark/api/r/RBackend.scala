@@ -63,7 +63,8 @@ private[spark] class RBackend {
             // lengthFieldLength = 4
             // lengthAdjustment = 0
             // initialBytesToStrip = 4, i.e. strip out the length field itself
-            new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
+            new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4)
+          )
           .addLast("decoder", new ByteArrayDecoder())
           .addLast("handler", handler)
       }

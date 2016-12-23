@@ -146,7 +146,8 @@ class ScalaPluginVersionVerifierApplicationComponent
                             //do nothing it seems all is ok for the user
                           }
                         }
-                      })
+                      }
+                    )
 
                     Notifications.Bus.notify(notification)
                   }

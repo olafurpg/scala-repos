@@ -100,14 +100,16 @@ private[round] final class Finisher(messenger: Messenger,
   private def incNbGames(game: Game)(user: User): Funit = game.finished ?? {
     val totalTime = user.playTime.isDefined option game.moveTimes.sum / 10
     val tvTime = totalTime ifTrue game.metadata.tvAt.isDefined
-    UserRepo.incNbGames(user.id,
-                        game.rated,
-                        game.hasAi,
-                        result =
-                          if (game.winnerUserId exists (user.id ==)) 1
-                          else if (game.loserUserId exists (user.id ==)) -1
-                          else 0,
-                        totalTime = totalTime,
-                        tvTime = tvTime)
+    UserRepo.incNbGames(
+      user.id,
+      game.rated,
+      game.hasAi,
+      result =
+        if (game.winnerUserId exists (user.id ==)) 1
+        else if (game.loserUserId exists (user.id ==)) -1
+        else 0,
+      totalTime = totalTime,
+      tvTime = tvTime
+    )
   }
 }

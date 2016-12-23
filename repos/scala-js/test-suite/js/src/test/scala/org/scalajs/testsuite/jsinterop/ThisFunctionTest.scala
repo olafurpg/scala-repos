@@ -59,13 +59,16 @@ class ThisFunctionTest {
     val obj = js.Object().asInstanceOf[js.Dynamic]
     obj.foo = "foo"
     obj.foobar = "foobar"
-    val res = g({ (thiz: js.Dynamic, v: Int, u: String) =>
-      import js.DynamicImplicits.truthValue
-      assertTrue(thiz)
-      val thiz_foobar = thiz.foobar
-      assertEquals("foobar", thiz_foobar)
-      u + v
-    }, obj)
+    val res = g(
+      { (thiz: js.Dynamic, v: Int, u: String) =>
+        import js.DynamicImplicits.truthValue
+        assertTrue(thiz)
+        val thiz_foobar = thiz.foobar
+        assertEquals("foobar", thiz_foobar)
+        u + v
+      },
+      obj
+    )
     assertEquals("foo42", res)
   }
 

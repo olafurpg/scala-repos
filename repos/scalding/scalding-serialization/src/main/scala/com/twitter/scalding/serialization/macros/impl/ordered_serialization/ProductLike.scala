@@ -180,18 +180,20 @@ object ProductLike {
     val innerElementA = freshT("innerElementA")
     val innerElementB = freshT("innerElementB")
 
-    elementData.map {
-      case (tpe, accessorSymbol, tBuf) =>
-        val curCmp = freshT("curCmp")
-        val cmpTree = q"""
+    elementData
+      .map {
+        case (tpe, accessorSymbol, tBuf) =>
+          val curCmp = freshT("curCmp")
+          val cmpTree = q"""
             val $curCmp: Int = {
               val $innerElementA = $elementA.$accessorSymbol
               val $innerElementB = $elementB.$accessorSymbol
               ${tBuf.compare(innerElementA, innerElementB)}
             }
           """
-        (cmpTree, curCmp)
-    }.reverse // go through last to first
+          (cmpTree, curCmp)
+      }
+      .reverse // go through last to first
       .foldLeft(None: Option[Tree]) {
         case (Some(rest), (tree, valname)) =>
           Some(q"""$tree;

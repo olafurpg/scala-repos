@@ -216,9 +216,11 @@ abstract class Storm(options: Map[String, Options],
       jobID: JobId,
       stormDag: Dag[Storm],
       node: StormNode)(implicit topologyBuilder: TopologyBuilder) = {
-    val (spout, parOpt) = node.members.collect {
-      case Source(SpoutSource(s, parOpt)) => (s, parOpt)
-    }.head
+    val (spout, parOpt) = node.members
+      .collect {
+        case Source(SpoutSource(s, parOpt)) => (s, parOpt)
+      }
+      .head
     val nodeName = stormDag.getNodeName(node)
 
     val tormentaSpout = node.members.reverse
@@ -269,9 +271,11 @@ abstract class Storm(options: Map[String, Options],
       jobID: JobId,
       stormDag: Dag[Storm],
       node: StormNode)(implicit topologyBuilder: TopologyBuilder) = {
-    val summer: Summer[Storm, K, V] = node.members.collect {
-      case c: Summer[Storm, K, V] => c
-    }.head
+    val summer: Summer[Storm, K, V] = node.members
+      .collect {
+        case c: Summer[Storm, K, V] => c
+      }
+      .head
     implicit val semigroup = summer.semigroup
     implicit val batcher = summer.store.mergeableBatcher
     val nodeName = stormDag.getNodeName(node)
@@ -341,7 +345,8 @@ abstract class Storm(options: Map[String, Options],
         maxEmitPerExecute,
         getOrElse(stormDag, node, IncludeSuccessHandler.default),
         new KeyValueInjection[Int, CMap[ExecutorKeyType, ExecutorValueType]],
-        new SingleItemInjection[ExecutorOutputType])
+        new SingleItemInjection[ExecutorOutputType]
+      )
     )
 
     val parallelism =
@@ -362,10 +367,12 @@ abstract class Storm(options: Map[String, Options],
   }
 
   private def dumpOptions: String = {
-    options.map {
-      case (k, opts) =>
-        "%s -> [%s]".format(k, opts.opts.values.mkString(", "))
-    }.mkString("\n || ")
+    options
+      .map {
+        case (k, opts) =>
+          "%s -> [%s]".format(k, opts.opts.values.mkString(", "))
+      }
+      .mkString("\n || ")
   }
 
   /**

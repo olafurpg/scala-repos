@@ -316,7 +316,8 @@ object AclCommand {
       .accepts(
         "authorizer-properties",
         "REQUIRED: properties required to configure an instance of Authorizer. " +
-          "These are key=val pairs. For the default authorizer the example values are: zookeeper.connect=localhost:2181")
+          "These are key=val pairs. For the default authorizer the example values are: zookeeper.connect=localhost:2181"
+      )
       .withRequiredArg
       .describedAs("authorizer-properties")
       .ofType(classOf[String])
@@ -360,7 +361,8 @@ object AclCommand {
         "allow-principal",
         "principal is in principalType:name format." +
           " Note that principalType must be supported by the Authorizer being used." +
-          " For example, User:* is the wild card indicating all users.")
+          " For example, User:* is the wild card indicating all users."
+      )
       .withRequiredArg
       .describedAs("allow-principal")
       .ofType(classOf[String])
@@ -374,7 +376,8 @@ object AclCommand {
           "Note that principalType must be supported by the Authorizer being used. " +
           "For example if you wanted to allow access to all users in the system but not test-user you can define an ACL that " +
           "allows access to User:* and specify --deny-principal=User:test@EXAMPLE.COM. " +
-          "AND PLEASE REMEMBER DENY RULES TAKES PRECEDENCE OVER ALLOW RULES.")
+          "AND PLEASE REMEMBER DENY RULES TAKES PRECEDENCE OVER ALLOW RULES."
+      )
       .withRequiredArg
       .describedAs("deny-principal")
       .ofType(classOf[String])
@@ -383,7 +386,8 @@ object AclCommand {
       .accepts(
         "allow-host",
         "Host from which principals listed in --allow-principal will have access. " +
-          "If you have specified --allow-principal then the default for this option will be set to * which allows access from all hosts.")
+          "If you have specified --allow-principal then the default for this option will be set to * which allows access from all hosts."
+      )
       .withRequiredArg
       .describedAs("allow-host")
       .ofType(classOf[String])
@@ -392,7 +396,8 @@ object AclCommand {
       .accepts(
         "deny-host",
         "Host from which principals listed in --deny-principal will be denied access. " +
-          "If you have specified --deny-principal then the default for this option will be set to * which denies access from all hosts.")
+          "If you have specified --deny-principal then the default for this option will be set to * which denies access from all hosts."
+      )
       .withRequiredArg
       .describedAs("deny-host")
       .ofType(classOf[String])
@@ -400,12 +405,14 @@ object AclCommand {
     val producerOpt = parser.accepts(
       "producer",
       "Convenience option to add/remove ACLs for producer role. " +
-        "This will generate ACLs that allows WRITE,DESCRIBE on topic and CREATE on cluster. ")
+        "This will generate ACLs that allows WRITE,DESCRIBE on topic and CREATE on cluster. "
+    )
 
     val consumerOpt = parser.accepts(
       "consumer",
       "Convenience option to add/remove ACLs for consumer role. " +
-        "This will generate ACLs that allows READ,DESCRIBE on topic and READ on group.")
+        "This will generate ACLs that allows READ,DESCRIBE on topic and READ on group."
+    )
 
     val helpOpt = parser.accepts("help", "Print usage information.")
 

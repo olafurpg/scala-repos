@@ -123,19 +123,22 @@ class NestedShapesTest {
       """
       implicitly[Shape[FlatShapeLevel, Query[(Rep[Int], Rep[String]), (Int, String), Seq], Seq[(Int, String)], Query[(Rep[Int], Rep[String]), (Int, String), Seq]]] // 6
     """,
-      "No matching Shape.*")
+      "No matching Shape.*"
+    )
 
   def illegal7 =
     ShouldNotTypecheck(
       """
       implicitly[Shape[FlatShapeLevel, (Rep[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq]), (Int, Seq[(Int, String)]), (Rep[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 7
     """,
-      "No matching Shape.*")
+      "No matching Shape.*"
+    )
 
   def illegal8 =
     ShouldNotTypecheck(
       """
       implicitly[Shape[FlatShapeLevel, (Int, Query[(Rep[Int], Rep[String]), (Int, String), Seq]), (Int, Seq[(Int, String)]), (ConstColumn[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 8
     """,
-      "No matching Shape.*")
+      "No matching Shape.*"
+    )
 }

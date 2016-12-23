@@ -100,10 +100,12 @@ class ParquetPartitionDiscoverySuite
                     Set(new Path("hdfs://host:9000/path/")))
 
     // Valid
-    paths = Seq("hdfs://host:9000/path/something=true/table/",
-                "hdfs://host:9000/path/something=true/table/_temporary",
-                "hdfs://host:9000/path/something=true/table/a=10/b=20",
-                "hdfs://host:9000/path/something=true/table/_temporary/path")
+    paths = Seq(
+      "hdfs://host:9000/path/something=true/table/",
+      "hdfs://host:9000/path/something=true/table/_temporary",
+      "hdfs://host:9000/path/something=true/table/a=10/b=20",
+      "hdfs://host:9000/path/something=true/table/_temporary/path"
+    )
 
     parsePartitions(
       paths.map(new Path(_)),
@@ -112,10 +114,12 @@ class ParquetPartitionDiscoverySuite
       Set(new Path("hdfs://host:9000/path/something=true/table")))
 
     // Valid
-    paths = Seq("hdfs://host:9000/path/table=true/",
-                "hdfs://host:9000/path/table=true/_temporary",
-                "hdfs://host:9000/path/table=true/a=10/b=20",
-                "hdfs://host:9000/path/table=true/_temporary/path")
+    paths = Seq(
+      "hdfs://host:9000/path/table=true/",
+      "hdfs://host:9000/path/table=true/_temporary",
+      "hdfs://host:9000/path/table=true/a=10/b=20",
+      "hdfs://host:9000/path/table=true/_temporary/path"
+    )
 
     parsePartitions(paths.map(new Path(_)),
                     defaultPartitionName,
@@ -143,10 +147,12 @@ class ParquetPartitionDiscoverySuite
     // "hdfs://host:9000/tmp/tables/partitionedTable"
     // "hdfs://host:9000/tmp/tables/nonPartitionedTable1"
     // "hdfs://host:9000/tmp/tables/nonPartitionedTable2"
-    paths = Seq("hdfs://host:9000/tmp/tables/partitionedTable",
-                "hdfs://host:9000/tmp/tables/partitionedTable/p=1/",
-                "hdfs://host:9000/tmp/tables/nonPartitionedTable1",
-                "hdfs://host:9000/tmp/tables/nonPartitionedTable2")
+    paths = Seq(
+      "hdfs://host:9000/tmp/tables/partitionedTable",
+      "hdfs://host:9000/tmp/tables/partitionedTable/p=1/",
+      "hdfs://host:9000/tmp/tables/nonPartitionedTable1",
+      "hdfs://host:9000/tmp/tables/nonPartitionedTable2"
+    )
 
     exception = intercept[AssertionError] {
       parsePartitions(paths.map(new Path(_)),
@@ -186,12 +192,15 @@ class ParquetPartitionDiscoverySuite
                       ArrayBuffer(Literal.create(10, IntegerType)))
     })
 
-    check("file://path/a=10/b=hello/c=1.5", Some {
-      PartitionValues(ArrayBuffer("a", "b", "c"),
-                      ArrayBuffer(Literal.create(10, IntegerType),
-                                  Literal.create("hello", StringType),
-                                  Literal.create(1.5, DoubleType)))
-    })
+    check(
+      "file://path/a=10/b=hello/c=1.5",
+      Some {
+        PartitionValues(ArrayBuffer("a", "b", "c"),
+                        ArrayBuffer(Literal.create(10, IntegerType),
+                                    Literal.create("hello", StringType),
+                                    Literal.create(1.5, DoubleType)))
+      }
+    )
 
     check("file://path/a=10/b_hello/c=1.5", Some {
       PartitionValues(ArrayBuffer("c"),
@@ -229,35 +238,49 @@ class ParquetPartitionDiscoverySuite
           Seq(StructField("a", IntegerType), StructField("b", StringType))),
         Seq(
           Partition(InternalRow(10, UTF8String.fromString("hello")),
-                    "hdfs://host:9000/path/a=10/b=hello"))))
+                    "hdfs://host:9000/path/a=10/b=hello"))
+      )
+    )
 
-    check(Seq("hdfs://host:9000/path/a=10/b=20",
-              "hdfs://host:9000/path/a=10.5/b=hello"),
-          PartitionSpec(
-            StructType(
-              Seq(StructField("a", DoubleType), StructField("b", StringType))),
-            Seq(Partition(InternalRow(10, UTF8String.fromString("20")),
-                          "hdfs://host:9000/path/a=10/b=20"),
-                Partition(InternalRow(10.5, UTF8String.fromString("hello")),
-                          "hdfs://host:9000/path/a=10.5/b=hello"))))
+    check(
+      Seq("hdfs://host:9000/path/a=10/b=20",
+          "hdfs://host:9000/path/a=10.5/b=hello"),
+      PartitionSpec(
+        StructType(
+          Seq(StructField("a", DoubleType), StructField("b", StringType))),
+        Seq(
+          Partition(InternalRow(10, UTF8String.fromString("20")),
+                    "hdfs://host:9000/path/a=10/b=20"),
+          Partition(InternalRow(10.5, UTF8String.fromString("hello")),
+                    "hdfs://host:9000/path/a=10.5/b=hello")
+        )
+      )
+    )
 
-    check(Seq("hdfs://host:9000/path/_temporary",
-              "hdfs://host:9000/path/a=10/b=20",
-              "hdfs://host:9000/path/a=10.5/b=hello",
-              "hdfs://host:9000/path/a=10.5/_temporary",
-              "hdfs://host:9000/path/a=10.5/_TeMpOrArY",
-              "hdfs://host:9000/path/a=10.5/b=hello/_temporary",
-              "hdfs://host:9000/path/a=10.5/b=hello/_TEMPORARY",
-              "hdfs://host:9000/path/_temporary/path",
-              "hdfs://host:9000/path/a=11/_temporary/path",
-              "hdfs://host:9000/path/a=10.5/b=world/_temporary/path"),
-          PartitionSpec(
-            StructType(
-              Seq(StructField("a", DoubleType), StructField("b", StringType))),
-            Seq(Partition(InternalRow(10, UTF8String.fromString("20")),
-                          "hdfs://host:9000/path/a=10/b=20"),
-                Partition(InternalRow(10.5, UTF8String.fromString("hello")),
-                          "hdfs://host:9000/path/a=10.5/b=hello"))))
+    check(
+      Seq(
+        "hdfs://host:9000/path/_temporary",
+        "hdfs://host:9000/path/a=10/b=20",
+        "hdfs://host:9000/path/a=10.5/b=hello",
+        "hdfs://host:9000/path/a=10.5/_temporary",
+        "hdfs://host:9000/path/a=10.5/_TeMpOrArY",
+        "hdfs://host:9000/path/a=10.5/b=hello/_temporary",
+        "hdfs://host:9000/path/a=10.5/b=hello/_TEMPORARY",
+        "hdfs://host:9000/path/_temporary/path",
+        "hdfs://host:9000/path/a=11/_temporary/path",
+        "hdfs://host:9000/path/a=10.5/b=world/_temporary/path"
+      ),
+      PartitionSpec(
+        StructType(
+          Seq(StructField("a", DoubleType), StructField("b", StringType))),
+        Seq(
+          Partition(InternalRow(10, UTF8String.fromString("20")),
+                    "hdfs://host:9000/path/a=10/b=20"),
+          Partition(InternalRow(10.5, UTF8String.fromString("hello")),
+                    "hdfs://host:9000/path/a=10.5/b=hello")
+        )
+      )
+    )
 
     check(
       Seq(s"hdfs://host:9000/path/a=10/b=20",
@@ -265,11 +288,14 @@ class ParquetPartitionDiscoverySuite
       PartitionSpec(
         StructType(
           Seq(StructField("a", IntegerType), StructField("b", StringType))),
-        Seq(Partition(InternalRow(10, UTF8String.fromString("20")),
-                      s"hdfs://host:9000/path/a=10/b=20"),
-            Partition(
-              InternalRow(null, UTF8String.fromString("hello")),
-              s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello"))))
+        Seq(
+          Partition(InternalRow(10, UTF8String.fromString("20")),
+                    s"hdfs://host:9000/path/a=10/b=20"),
+          Partition(InternalRow(null, UTF8String.fromString("hello")),
+                    s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello")
+        )
+      )
+    )
 
     check(
       Seq(s"hdfs://host:9000/path/a=10/b=$defaultPartitionName",
@@ -281,7 +307,10 @@ class ParquetPartitionDiscoverySuite
           Partition(InternalRow(10, null),
                     s"hdfs://host:9000/path/a=10/b=$defaultPartitionName"),
           Partition(InternalRow(10.5, null),
-                    s"hdfs://host:9000/path/a=10.5/b=$defaultPartitionName"))))
+                    s"hdfs://host:9000/path/a=10.5/b=$defaultPartitionName")
+        )
+      )
+    )
 
     check(Seq(s"hdfs://host:9000/path1", s"hdfs://host:9000/path2"),
           PartitionSpec.emptySpec)
@@ -296,58 +325,77 @@ class ParquetPartitionDiscoverySuite
       assert(actualSpec === spec)
     }
 
-    check(Seq("hdfs://host:9000/path/a=10/b=hello"),
-          PartitionSpec(
-            StructType(
-              Seq(StructField("a", StringType), StructField("b", StringType))),
-            Seq(
-              Partition(InternalRow(UTF8String.fromString("10"),
-                                    UTF8String.fromString("hello")),
-                        "hdfs://host:9000/path/a=10/b=hello"))))
+    check(
+      Seq("hdfs://host:9000/path/a=10/b=hello"),
+      PartitionSpec(
+        StructType(
+          Seq(StructField("a", StringType), StructField("b", StringType))),
+        Seq(
+          Partition(InternalRow(UTF8String.fromString("10"),
+                                UTF8String.fromString("hello")),
+                    "hdfs://host:9000/path/a=10/b=hello"))
+      )
+    )
 
-    check(Seq("hdfs://host:9000/path/a=10/b=20",
-              "hdfs://host:9000/path/a=10.5/b=hello"),
-          PartitionSpec(
-            StructType(
-              Seq(StructField("a", StringType), StructField("b", StringType))),
-            Seq(Partition(InternalRow(UTF8String.fromString("10"),
-                                      UTF8String.fromString("20")),
-                          "hdfs://host:9000/path/a=10/b=20"),
-                Partition(InternalRow(UTF8String.fromString("10.5"),
-                                      UTF8String.fromString("hello")),
-                          "hdfs://host:9000/path/a=10.5/b=hello"))))
+    check(
+      Seq("hdfs://host:9000/path/a=10/b=20",
+          "hdfs://host:9000/path/a=10.5/b=hello"),
+      PartitionSpec(
+        StructType(
+          Seq(StructField("a", StringType), StructField("b", StringType))),
+        Seq(
+          Partition(InternalRow(UTF8String.fromString("10"),
+                                UTF8String.fromString("20")),
+                    "hdfs://host:9000/path/a=10/b=20"),
+          Partition(InternalRow(UTF8String.fromString("10.5"),
+                                UTF8String.fromString("hello")),
+                    "hdfs://host:9000/path/a=10.5/b=hello")
+        )
+      )
+    )
 
-    check(Seq("hdfs://host:9000/path/_temporary",
-              "hdfs://host:9000/path/a=10/b=20",
-              "hdfs://host:9000/path/a=10.5/b=hello",
-              "hdfs://host:9000/path/a=10.5/_temporary",
-              "hdfs://host:9000/path/a=10.5/_TeMpOrArY",
-              "hdfs://host:9000/path/a=10.5/b=hello/_temporary",
-              "hdfs://host:9000/path/a=10.5/b=hello/_TEMPORARY",
-              "hdfs://host:9000/path/_temporary/path",
-              "hdfs://host:9000/path/a=11/_temporary/path",
-              "hdfs://host:9000/path/a=10.5/b=world/_temporary/path"),
-          PartitionSpec(
-            StructType(
-              Seq(StructField("a", StringType), StructField("b", StringType))),
-            Seq(Partition(InternalRow(UTF8String.fromString("10"),
-                                      UTF8String.fromString("20")),
-                          "hdfs://host:9000/path/a=10/b=20"),
-                Partition(InternalRow(UTF8String.fromString("10.5"),
-                                      UTF8String.fromString("hello")),
-                          "hdfs://host:9000/path/a=10.5/b=hello"))))
+    check(
+      Seq(
+        "hdfs://host:9000/path/_temporary",
+        "hdfs://host:9000/path/a=10/b=20",
+        "hdfs://host:9000/path/a=10.5/b=hello",
+        "hdfs://host:9000/path/a=10.5/_temporary",
+        "hdfs://host:9000/path/a=10.5/_TeMpOrArY",
+        "hdfs://host:9000/path/a=10.5/b=hello/_temporary",
+        "hdfs://host:9000/path/a=10.5/b=hello/_TEMPORARY",
+        "hdfs://host:9000/path/_temporary/path",
+        "hdfs://host:9000/path/a=11/_temporary/path",
+        "hdfs://host:9000/path/a=10.5/b=world/_temporary/path"
+      ),
+      PartitionSpec(
+        StructType(
+          Seq(StructField("a", StringType), StructField("b", StringType))),
+        Seq(
+          Partition(InternalRow(UTF8String.fromString("10"),
+                                UTF8String.fromString("20")),
+                    "hdfs://host:9000/path/a=10/b=20"),
+          Partition(InternalRow(UTF8String.fromString("10.5"),
+                                UTF8String.fromString("hello")),
+                    "hdfs://host:9000/path/a=10.5/b=hello")
+        )
+      )
+    )
 
-    check(Seq(s"hdfs://host:9000/path/a=10/b=20",
-              s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello"),
-          PartitionSpec(
-            StructType(
-              Seq(StructField("a", StringType), StructField("b", StringType))),
-            Seq(Partition(InternalRow(UTF8String.fromString("10"),
-                                      UTF8String.fromString("20")),
-                          s"hdfs://host:9000/path/a=10/b=20"),
-                Partition(
-                  InternalRow(null, UTF8String.fromString("hello")),
-                  s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello"))))
+    check(
+      Seq(s"hdfs://host:9000/path/a=10/b=20",
+          s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello"),
+      PartitionSpec(
+        StructType(
+          Seq(StructField("a", StringType), StructField("b", StringType))),
+        Seq(
+          Partition(InternalRow(UTF8String.fromString("10"),
+                                UTF8String.fromString("20")),
+                    s"hdfs://host:9000/path/a=10/b=20"),
+          Partition(InternalRow(null, UTF8String.fromString("hello")),
+                    s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello")
+        )
+      )
+    )
 
     check(
       Seq(s"hdfs://host:9000/path/a=10/b=$defaultPartitionName",
@@ -359,7 +407,10 @@ class ParquetPartitionDiscoverySuite
           Partition(InternalRow(UTF8String.fromString("10"), null),
                     s"hdfs://host:9000/path/a=10/b=$defaultPartitionName"),
           Partition(InternalRow(UTF8String.fromString("10.5"), null),
-                    s"hdfs://host:9000/path/a=10.5/b=$defaultPartitionName"))))
+                    s"hdfs://host:9000/path/a=10.5/b=$defaultPartitionName")
+        )
+      )
+    )
 
     check(Seq(s"hdfs://host:9000/path1", s"hdfs://host:9000/path2"),
           PartitionSpec.emptySpec)
@@ -546,12 +597,14 @@ class ParquetPartitionDiscoverySuite
         .parquet(dir.getCanonicalPath)
       val queryExecution =
         sqlContext.read.parquet(dir.getCanonicalPath).queryExecution
-      queryExecution.analyzed.collectFirst {
-        case LogicalRelation(relation: HadoopFsRelation, _, _) =>
-          assert(relation.partitionSpec === PartitionSpec.emptySpec)
-      }.getOrElse {
-        fail(s"Expecting a ParquetRelation2, but got:\n$queryExecution")
-      }
+      queryExecution.analyzed
+        .collectFirst {
+          case LogicalRelation(relation: HadoopFsRelation, _, _) =>
+            assert(relation.partitionSpec === PartitionSpec.emptySpec)
+        }
+        .getOrElse {
+          fail(s"Expecting a ParquetRelation2, but got:\n$queryExecution")
+        }
     }
   }
 
@@ -564,18 +617,20 @@ class ParquetPartitionDiscoverySuite
   }
 
   test("Various partition value types") {
-    val row = Row(100.toByte,
-                  40000.toShort,
-                  Int.MaxValue,
-                  Long.MaxValue,
-                  1.5.toFloat,
-                  4.5,
-                  new java.math.BigDecimal(new BigInteger("212500"), 5),
-                  new java.math.BigDecimal(2.125),
-                  java.sql.Date.valueOf("2015-05-23"),
-                  new Timestamp(0),
-                  "This is a string, /[]?=:",
-                  "This is not a partition column")
+    val row = Row(
+      100.toByte,
+      40000.toShort,
+      Int.MaxValue,
+      Long.MaxValue,
+      1.5.toFloat,
+      4.5,
+      new java.math.BigDecimal(new BigInteger("212500"), 5),
+      new java.math.BigDecimal(2.125),
+      java.sql.Date.valueOf("2015-05-23"),
+      new Timestamp(0),
+      "This is a string, /[]?=:",
+      "This is not a partition column"
+    )
 
     // BooleanType is not supported yet
     val partitionColumnTypes = Seq(ByteType,
@@ -723,10 +778,12 @@ class ParquetPartitionDiscoverySuite
   test("listConflictingPartitionColumns") {
     def makeExpectedMessage(colNameLists: Seq[String],
                             paths: Seq[String]): String = {
-      val conflictingColNameLists = colNameLists.zipWithIndex.map {
-        case (list, index) =>
-          s"\tPartition column name list #$index: $list"
-      }.mkString("\n", "\n", "\n")
+      val conflictingColNameLists = colNameLists.zipWithIndex
+        .map {
+          case (list, index) =>
+            s"\tPartition column name list #$index: $list"
+        }
+        .mkString("\n", "\n", "\n")
 
       // scalastyle:off
       s"""Conflicting partition column names detected:
@@ -749,25 +806,24 @@ class ParquetPartitionDiscoverySuite
         Seq("file:/tmp/foo/a=1", "file:/tmp/foo/b=1")))
 
     assert(
-      listConflictingPartitionColumns(
-        Seq((new Path("file:/tmp/foo/a=1/_temporary"),
-             PartitionValues(Seq("a"), Seq(Literal(1)))),
-            (new Path("file:/tmp/foo/a=1"),
-             PartitionValues(Seq("a"), Seq(Literal(1)))))).trim === makeExpectedMessage(
-        Seq("a"),
-        Seq("file:/tmp/foo/a=1/_temporary", "file:/tmp/foo/a=1")))
+      listConflictingPartitionColumns(Seq(
+        (new Path("file:/tmp/foo/a=1/_temporary"),
+         PartitionValues(Seq("a"), Seq(Literal(1)))),
+        (new Path("file:/tmp/foo/a=1"),
+         PartitionValues(Seq("a"), Seq(Literal(1))))
+      )).trim === makeExpectedMessage(Seq("a"),
+                                      Seq("file:/tmp/foo/a=1/_temporary",
+                                          "file:/tmp/foo/a=1")))
 
     assert(
-      listConflictingPartitionColumns(Seq((new Path("file:/tmp/foo/a=1"),
-                                           PartitionValues(Seq("a"),
-                                                           Seq(Literal(1)))),
-                                          (new Path("file:/tmp/foo/a=1/b=foo"),
-                                           PartitionValues(
-                                             Seq("a", "b"),
-                                             Seq(Literal(1),
-                                                 Literal("foo")))))).trim === makeExpectedMessage(
-        Seq("a", "a, b"),
-        Seq("file:/tmp/foo/a=1", "file:/tmp/foo/a=1/b=foo")))
+      listConflictingPartitionColumns(Seq(
+        (new Path("file:/tmp/foo/a=1"),
+         PartitionValues(Seq("a"), Seq(Literal(1)))),
+        (new Path("file:/tmp/foo/a=1/b=foo"),
+         PartitionValues(Seq("a", "b"), Seq(Literal(1), Literal("foo"))))
+      )).trim === makeExpectedMessage(Seq("a", "a, b"),
+                                      Seq("file:/tmp/foo/a=1",
+                                          "file:/tmp/foo/a=1/b=foo")))
   }
 
   test("Parallel partition discovery") {

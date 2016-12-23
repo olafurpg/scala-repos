@@ -152,7 +152,8 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
       JoinType.OuterOption,
       aliased1.zip(aliased2),
       shaped.encodeRef(Ref(leftGen)).value,
-      q2.shaped.encodeRef(Ref(rightGen)).value)
+      q2.shaped.encodeRef(Ref(rightGen)).value
+    )
   }
 
   private[this] def standardJoin[E2, U2, D[_]](q2: Query[E2, U2, D],

@@ -29,7 +29,8 @@ class RankingMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
         (Array[Int](4, 1, 5, 6, 2, 7, 3, 8, 9, 10), Array[Int](1, 2, 3)),
         (Array[Int](1, 2, 3, 4, 5), Array[Int]())
       ),
-      2)
+      2
+    )
     val eps: Double = 1E-5
 
     val metrics = new RankingMetrics(predictionAndLabels)

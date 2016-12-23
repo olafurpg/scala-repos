@@ -158,10 +158,12 @@ implicit def ${name}(implicit $dependencies): GR[${TableClass.elementType}] = GR
             else s"$accessor.get"
         }
         val fac = s"$factory(${compoundValue(accessors)})"
-        val discriminator = columns.zipWithIndex.collect {
-          case (c, i) if !c.model.nullable =>
-            if (columns.size > 1) tuple(i) else "r"
-        }.headOption
+        val discriminator = columns.zipWithIndex
+          .collect {
+            case (c, i) if !c.model.nullable =>
+              if (columns.size > 1) tuple(i) else "r"
+          }
+          .headOption
         val expr =
           discriminator.map(d => s"$d.map(_=> $fac)").getOrElse(s"None")
         if (columns.size > 1) s"{r=>import r._; $expr}"
@@ -249,14 +251,16 @@ class $name(_tableTag: Tag) extends Table[$elementType](_tableTag, ${args
       def code = {
         val pkTable = referencedTable.TableValue.name
         val (pkColumns, fkColumns) =
-          (referencedColumns, referencingColumns).zipped.map { (p, f) =>
-            val pk = s"r.${p.name}"
-            val fk = f.name
-            if (p.model.nullable && !f.model.nullable) (pk, s"Rep.Some($fk)")
-            else if (!p.model.nullable && f.model.nullable)
-              (s"Rep.Some($pk)", fk)
-            else (pk, fk)
-          }.unzip
+          (referencedColumns, referencingColumns).zipped
+            .map { (p, f) =>
+              val pk = s"r.${p.name}"
+              val fk = f.name
+              if (p.model.nullable && !f.model.nullable) (pk, s"Rep.Some($fk)")
+              else if (!p.model.nullable && f.model.nullable)
+                (s"Rep.Some($pk)", fk)
+              else (pk, fk)
+            }
+            .unzip
         s"""lazy val $name = foreignKey("$dbName", ${compoundValue(fkColumns)}, $pkTable)(r => ${compoundValue(
           pkColumns)}, onUpdate=${onUpdate}, onDelete=${onDelete})"""
       }

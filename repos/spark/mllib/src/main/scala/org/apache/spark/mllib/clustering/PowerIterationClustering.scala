@@ -266,18 +266,22 @@ object PowerIterationClustering extends Logging {
     */
   private[clustering] def normalize(
       graph: Graph[Double, Double]): Graph[Double, Double] = {
-    val vD = graph.aggregateMessages[Double](sendMsg = ctx => {
-      val i = ctx.srcId
-      val j = ctx.dstId
-      val s = ctx.attr
-      if (s < 0.0) {
-        throw new SparkException(
-          "Similarity must be nonnegative but found s($i, $j) = $s.")
-      }
-      if (s > 0.0) {
-        ctx.sendToSrc(s)
-      }
-    }, mergeMsg = _ + _, TripletFields.EdgeOnly)
+    val vD = graph.aggregateMessages[Double](
+      sendMsg = ctx => {
+        val i = ctx.srcId
+        val j = ctx.dstId
+        val s = ctx.attr
+        if (s < 0.0) {
+          throw new SparkException(
+            "Similarity must be nonnegative but found s($i, $j) = $s.")
+        }
+        if (s > 0.0) {
+          ctx.sendToSrc(s)
+        }
+      },
+      mergeMsg = _ + _,
+      TripletFields.EdgeOnly
+    )
     Graph(vD, graph.edges).mapTriplets(
       e => e.attr / math.max(e.srcAttr, MLUtils.EPSILON),
       new TripletFields( /* useSrc */ true,

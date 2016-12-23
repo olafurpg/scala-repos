@@ -26,28 +26,33 @@ object TestServer extends App {
   implicit val fm = ActorMaterializer()
 
   try {
-    val binding = Http().bindAndHandleSync({
-      case req @ HttpRequest(GET, Uri.Path("/"), _, _, _)
-          if req.header[UpgradeToWebSocket].isDefined ⇒
-        req.header[UpgradeToWebSocket] match {
-          case Some(upgrade) ⇒
-            upgrade
-              .handleMessages(echoWebSocketService) // needed for running the autobahn test suite
-          case None ⇒
-            HttpResponse(400, entity = "Not a valid websocket request!")
-        }
-      case HttpRequest(GET, Uri.Path("/"), _, _, _) ⇒ index
-      case HttpRequest(GET, Uri.Path("/ping"), _, _, _) ⇒
-        HttpResponse(entity = "PONG!")
-      case HttpRequest(GET, Uri.Path("/crash"), _, _, _) ⇒ sys.error("BOOM!")
-      case req @ HttpRequest(GET, Uri.Path("/ws-greeter"), _, _, _) ⇒
-        req.header[UpgradeToWebSocket] match {
-          case Some(upgrade) ⇒ upgrade.handleMessages(greeterWebSocketService)
-          case None ⇒
-            HttpResponse(400, entity = "Not a valid websocket request!")
-        }
-      case _: HttpRequest ⇒ HttpResponse(404, entity = "Unknown resource!")
-    }, interface = "localhost", port = 9001)
+    val binding = Http().bindAndHandleSync(
+      {
+        case req @ HttpRequest(GET, Uri.Path("/"), _, _, _)
+            if req.header[UpgradeToWebSocket].isDefined ⇒
+          req.header[UpgradeToWebSocket] match {
+            case Some(upgrade) ⇒
+              upgrade
+                .handleMessages(echoWebSocketService) // needed for running the autobahn test suite
+            case None ⇒
+              HttpResponse(400, entity = "Not a valid websocket request!")
+          }
+        case HttpRequest(GET, Uri.Path("/"), _, _, _) ⇒ index
+        case HttpRequest(GET, Uri.Path("/ping"), _, _, _) ⇒
+          HttpResponse(entity = "PONG!")
+        case HttpRequest(GET, Uri.Path("/crash"), _, _, _) ⇒ sys.error("BOOM!")
+        case req @ HttpRequest(GET, Uri.Path("/ws-greeter"), _, _, _) ⇒
+          req.header[UpgradeToWebSocket] match {
+            case Some(upgrade) ⇒
+              upgrade.handleMessages(greeterWebSocketService)
+            case None ⇒
+              HttpResponse(400, entity = "Not a valid websocket request!")
+          }
+        case _: HttpRequest ⇒ HttpResponse(404, entity = "Unknown resource!")
+      },
+      interface = "localhost",
+      port = 9001
+    )
 
     Await.result(binding, 1.second) // throws if binding fails
     println("Server online at http://localhost:9001")
@@ -60,8 +65,9 @@ object TestServer extends App {
   ////////////// helpers //////////////
 
   lazy val index = HttpResponse(
-    entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                        """|<html>
+    entity = HttpEntity(
+      ContentTypes.`text/html(UTF-8)`,
+      """|<html>
          | <body>
          |    <h1>Say hello to <i>akka-http-core</i>!</h1>
          |    <p>Defined resources:</p>
@@ -70,7 +76,8 @@ object TestServer extends App {
          |      <li><a href="/crash">/crash</a></li>
          |    </ul>
          |  </body>
-         |</html>""".stripMargin))
+         |</html>""".stripMargin
+    ))
 
   def echoWebSocketService: Flow[Message, Message, NotUsed] =
     Flow[Message] // just let message flow directly to the output

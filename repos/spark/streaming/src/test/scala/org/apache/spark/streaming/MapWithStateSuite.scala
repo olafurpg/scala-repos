@@ -236,17 +236,17 @@ class MapWithStateSuite
   test("mapWithState - type inferencing and class tags") {
 
     // Simple track state function with value as Int, state as Double and mapped type as Double
-    val simpleFunc = (key: String, value: Option[Int],
-                      state: State[Double]) => {
-      0L
-    }
+    val simpleFunc =
+      (key: String, value: Option[Int], state: State[Double]) => {
+        0L
+      }
 
     // Advanced track state function with key as String, value as Int, state as Double and
     // mapped type as Double
-    val advancedFunc = (time: Time, key: String, value: Option[Int],
-                        state: State[Double]) => {
-      Some(0L)
-    }
+    val advancedFunc =
+      (time: Time, key: String, value: Option[Int], state: State[Double]) => {
+        Some(0L)
+      }
 
     def testTypes(dstream: MapWithStateDStream[_, _, _, _]): Unit = {
       val dstreamImpl =
@@ -320,13 +320,13 @@ class MapWithStateSuite
       Seq(("a", 5), ("b", 3), ("c", 1))
     )
 
-    val mappingFunc = (time: Time, key: String, value: Option[Int],
-                       state: State[Int]) => {
-      val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
-      val output = (key, sum)
-      state.update(sum)
-      Some(output)
-    }
+    val mappingFunc =
+      (time: Time, key: String, value: Option[Int], state: State[Int]) => {
+        val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
+        val output = (key, sum)
+        state.update(sum)
+        Some(output)
+      }
 
     testOperation(inputData,
                   StateSpec.function(mappingFunc),
@@ -361,13 +361,13 @@ class MapWithStateSuite
       Seq(("a", 10), ("b", 13), ("c", -19), ("d", 0))
     )
 
-    val mappingFunc = (time: Time, key: String, value: Option[Int],
-                       state: State[Int]) => {
-      val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
-      val output = (key, sum)
-      state.update(sum)
-      None.asInstanceOf[Option[Int]]
-    }
+    val mappingFunc =
+      (time: Time, key: String, value: Option[Int], state: State[Int]) => {
+        val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
+        val output = (key, sum)
+        state.update(sum)
+        None.asInstanceOf[Option[Int]]
+      }
 
     val mapWithStateSpec =
       StateSpec.function(mappingFunc).initialState(sc.makeRDD(initialState))
@@ -409,16 +409,16 @@ class MapWithStateSuite
       Seq()
     )
 
-    val mappingFunc = (time: Time, key: String, value: Option[Int],
-                       state: State[Int]) => {
-      if (state.exists) {
-        state.remove()
-        Some(key)
-      } else {
-        state.update(value.get)
-        None
+    val mappingFunc =
+      (time: Time, key: String, value: Option[Int], state: State[Int]) => {
+        if (state.exists) {
+          state.remove()
+          Some(key)
+        } else {
+          state.update(value.get)
+          None
+        }
       }
-    }
 
     testOperation(inputData,
                   StateSpec.function(mappingFunc).numPartitions(1),
@@ -437,17 +437,17 @@ class MapWithStateSuite
         Seq("a") // a will not time out
       ) ++ Seq.fill(20)(Seq("a")) // a will continue to stay active
 
-    val mappingFunc = (time: Time, key: String, value: Option[Int],
-                       state: State[Int]) => {
-      if (value.isDefined) {
-        state.update(1)
+    val mappingFunc =
+      (time: Time, key: String, value: Option[Int], state: State[Int]) => {
+        if (value.isDefined) {
+          state.update(1)
+        }
+        if (state.isTimingOut) {
+          Some(key)
+        } else {
+          None
+        }
       }
-      if (state.isTimingOut) {
-        Some(key)
-      } else {
-        None
-      }
-    }
 
     val (collectedOutputs, collectedStateSnapshots) =
       getOperationOutput(inputData,
@@ -534,13 +534,14 @@ class MapWithStateSuite
 
       val checkpointDuration = batchDuration * (stateData.size / 2)
 
-      val runningCount = (key: String, value: Option[Int],
-                          state: State[Int]) => {
-        state.update(state.getOption().getOrElse(0) + value.getOrElse(0))
-        state.get()
-      }
+      val runningCount =
+        (key: String, value: Option[Int], state: State[Int]) => {
+          state.update(state.getOption().getOrElse(0) + value.getOrElse(0))
+          state.get()
+        }
 
-      val mapWithStateStream = dstream.map { _ -> 1 }
+      val mapWithStateStream = dstream
+        .map { _ -> 1 }
         .mapWithState(StateSpec.function(runningCount))
       // Set interval make sure there is one RDD checkpointing
       mapWithStateStream.checkpoint(checkpointDuration)

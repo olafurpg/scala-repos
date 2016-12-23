@@ -31,7 +31,8 @@ class ScalaDocInlinedTagInspection extends LocalInspectionTool {
             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
             isOnTheFly,
             new ScalaDocInlinedTagDeleteQuickFix(s),
-            new ScalaDocInlinedTagReplaceQuickFix(s)))
+            new ScalaDocInlinedTagReplaceQuickFix(s)
+          ))
       }
     }
   }

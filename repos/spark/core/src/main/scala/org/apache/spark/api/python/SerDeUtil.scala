@@ -118,12 +118,14 @@ private[spark] object SerDeUtil extends Logging {
     * It is only used by pyspark.sql.
     */
   def toJavaArray(jrdd: JavaRDD[Any]): JavaRDD[Array[_]] = {
-    jrdd.rdd.map {
-      case objs: JArrayList[_] =>
-        objs.toArray
-      case obj if obj.getClass.isArray =>
-        obj.asInstanceOf[Array[_]].toArray
-    }.toJavaRDD()
+    jrdd.rdd
+      .map {
+        case objs: JArrayList[_] =>
+          objs.toArray
+        case obj if obj.getClass.isArray =>
+          obj.asInstanceOf[Array[_]].toArray
+      }
+      .toJavaRDD()
   }
 
   /**
@@ -169,21 +171,23 @@ private[spark] object SerDeUtil extends Logging {
     */
   def pythonToJava(pyRDD: JavaRDD[Array[Byte]],
                    batched: Boolean): JavaRDD[Any] = {
-    pyRDD.rdd.mapPartitions { iter =>
-      initialize()
-      val unpickle = new Unpickler
-      iter.flatMap { row =>
-        val obj = unpickle.loads(row)
-        if (batched) {
-          obj match {
-            case array: Array[Any] => array.toSeq
-            case _ => obj.asInstanceOf[JArrayList[_]].asScala
+    pyRDD.rdd
+      .mapPartitions { iter =>
+        initialize()
+        val unpickle = new Unpickler
+        iter.flatMap { row =>
+          val obj = unpickle.loads(row)
+          if (batched) {
+            obj match {
+              case array: Array[Any] => array.toSeq
+              case _ => obj.asInstanceOf[JArrayList[_]].asScala
+            }
+          } else {
+            Seq(obj)
           }
-        } else {
-          Seq(obj)
         }
       }
-    }.toJavaRDD()
+      .toJavaRDD()
   }
 
   private def checkPickle(t: (Any, Any)): (Boolean, Boolean) = {

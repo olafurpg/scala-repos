@@ -71,24 +71,27 @@ private[akka] class ActorRefBackpressureSinkStage[In](
         completeStage()
       }
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          buffer offer grab(in)
-          if (acknowledgementReceived) {
-            dequeueAndSend()
-            acknowledgementReceived = false
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            buffer offer grab(in)
+            if (acknowledgementReceived) {
+              dequeueAndSend()
+              acknowledgementReceived = false
+            }
+            if (buffer.size() < maxBuffer) pull(in)
           }
-          if (buffer.size() < maxBuffer) pull(in)
+          override def onUpstreamFinish(): Unit = {
+            if (buffer.isEmpty) finish()
+            else completeReceived = true
+          }
+          override def onUpstreamFailure(ex: Throwable): Unit = {
+            ref ! onFailureMessage(ex)
+            failStage(ex)
+          }
         }
-        override def onUpstreamFinish(): Unit = {
-          if (buffer.isEmpty) finish()
-          else completeReceived = true
-        }
-        override def onUpstreamFailure(ex: Throwable): Unit = {
-          ref ! onFailureMessage(ex)
-          failStage(ex)
-        }
-      })
+      )
     }
 
   override def toString = "ActorRefBackpressureSink"

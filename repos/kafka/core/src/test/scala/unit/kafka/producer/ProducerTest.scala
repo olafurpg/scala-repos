@@ -141,7 +141,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
       brokerList = "localhost:80," +
           TestUtils.getBrokerListStrFromServers(Seq(server1)),
       encoder = classOf[StringEncoder].getName,
-      keyEncoder = classOf[StringEncoder].getName)
+      keyEncoder = classOf[StringEncoder].getName
+    )
 
     try {
       producer2.send(new KeyedMessage[String, String](topic, "test", "test1"))
@@ -156,7 +157,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         brokerList =
           TestUtils.getBrokerListStrFromServers(Seq(server1, server2)),
         encoder = classOf[StringEncoder].getName,
-        keyEncoder = classOf[StringEncoder].getName)
+        keyEncoder = classOf[StringEncoder].getName
+      )
 
     try {
       producer3.send(new KeyedMessage[String, String](topic, "test", "test1"))
@@ -187,7 +189,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName,
-        producerProps = props1)
+        producerProps = props1
+      )
     val startTime = System.currentTimeMillis()
     // Available partition ids should be 0.
     producer1.send(new KeyedMessage[String, String](topic, "test", "test1"))
@@ -247,7 +250,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName,
-        producerProps = props2)
+        producerProps = props2
+      )
       producer2.close
       fail("we don't support request.required.acks greater than 1")
     } catch {
@@ -280,7 +284,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName,
-        producerProps = props)
+        producerProps = props
+      )
     val startTime = System.currentTimeMillis()
     try {
       // Available partition ids should be 0, 1, 2 and 3, all lead and hosted only
@@ -346,7 +351,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName,
-        producerProps = props)
+        producerProps = props
+      )
 
     val topic = "new-topic"
     // create topics in ZK
@@ -399,7 +405,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
           TestUtils.getBrokerListStrFromServers(Seq(server1, server2)),
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
-        partitioner = classOf[StaticPartitioner].getName)
+        partitioner = classOf[StaticPartitioner].getName
+      )
 
     try {
 
@@ -411,7 +418,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
             .fetchTopicMetadataFromZk("new-topic", zkUtils)
             .error != Errors.UNKNOWN_TOPIC_OR_PARTITION,
         "Topic new-topic not created after timeout",
-        waitTime = zookeeper.tickTime)
+        waitTime = zookeeper.tickTime
+      )
       TestUtils.waitUntilLeaderIsElectedOrChanged(zkUtils, "new-topic", 0)
 
       producer.send(new KeyedMessage[String, String]("new-topic", "key", null))

@@ -178,14 +178,16 @@ object ConsoleProducer {
     val messageSendMaxRetriesOpt = parser
       .accepts(
         "message-send-max-retries",
-        "Brokers can fail receiving the message for multiple reasons, and being unavailable transiently is just one of them. This property specifies the number of retires before the producer give up and drop this message.")
+        "Brokers can fail receiving the message for multiple reasons, and being unavailable transiently is just one of them. This property specifies the number of retires before the producer give up and drop this message."
+      )
       .withRequiredArg
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(3)
     val retryBackoffMsOpt = parser
       .accepts(
         "retry-backoff-ms",
-        "Before each retry, the producer refreshes the metadata of relevant topics. Since leader election takes a bit of time, this property specifies the amount of time that the producer waits before refreshing the metadata.")
+        "Before each retry, the producer refreshes the metadata of relevant topics. Since leader election takes a bit of time, this property specifies the amount of time that the producer waits before refreshing the metadata."
+      )
       .withRequiredArg
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(100)
@@ -193,7 +195,8 @@ object ConsoleProducer {
       .accepts(
         "timeout",
         "If set and the producer is running in asynchronous mode, this gives the maximum amount of time" +
-          " a message will queue awaiting sufficient batch size. The value is given in ms.")
+          " a message will queue awaiting sufficient batch size. The value is given in ms."
+      )
       .withRequiredArg
       .describedAs("timeout_ms")
       .ofType(classOf[java.lang.Integer])
@@ -202,7 +205,8 @@ object ConsoleProducer {
       .accepts(
         "queue-size",
         "If set and the producer is running in asynchronous mode, this gives the maximum amount of " +
-          " messages will queue awaiting sufficient batch size.")
+          " messages will queue awaiting sufficient batch size."
+      )
       .withRequiredArg
       .describedAs("queue_size")
       .ofType(classOf[java.lang.Integer])
@@ -256,7 +260,8 @@ object ConsoleProducer {
       .accepts(
         "max-partition-memory-bytes",
         "The buffer size allocated for a partition. When records are received which are smaller than this size the producer " +
-          "will attempt to optimistically group them together until this size is reached.")
+          "will attempt to optimistically group them together until this size is reached."
+      )
       .withRequiredArg
       .describedAs("memory in bytes per partition")
       .ofType(classOf[java.lang.Long])
@@ -296,7 +301,8 @@ object ConsoleProducer {
       .accepts(
         "property",
         "A mechanism to pass user-defined properties in the form key=value to the message reader. " +
-          "This allows custom configuration for a user-defined message reader.")
+          "This allows custom configuration for a user-defined message reader."
+      )
       .withRequiredArg
       .describedAs("prop")
       .ofType(classOf[String])

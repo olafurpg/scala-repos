@@ -437,7 +437,8 @@ class LogTest extends JUnitSuite {
       assertEquals(
         "Should still be able to append and should get the logEndOffset assigned to the new append",
         currOffset,
-        log.append(TestUtils.singleMessageSet("hello".getBytes)).firstOffset)
+        log.append(TestUtils.singleMessageSet("hello".getBytes)).firstOffset
+      )
 
       // cleanup the log
       log.delete()
@@ -898,7 +899,8 @@ class LogTest extends JUnitSuite {
     assertTrue(
       "All log and index files should end in .deleted",
       segments.forall(_.log.file.getName.endsWith(Log.DeletedFileSuffix)) &&
-        segments.forall(_.index.file.getName.endsWith(Log.DeletedFileSuffix)))
+        segments.forall(_.index.file.getName.endsWith(Log.DeletedFileSuffix))
+    )
     assertTrue("The .deleted files should still be there.",
                segments.forall(_.log.file.exists) &&
                  segments.forall(_.index.file.exists))

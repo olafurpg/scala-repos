@@ -134,7 +134,9 @@ trait ScPattern extends ScalaPsiElement {
                   case inf: ScInfixPattern => inf.expectedType
                   case constr: ScConstructorPattern => constr.expectedType
                   case _ => None
-                }))
+                }
+              )
+            )
         }
         if (resolve.length != 1) None
         else {
@@ -498,17 +500,20 @@ object ScPattern {
     val cp =
       new CompletionProcessor(StdKinds.methodRef, place, forName = Some(name))
     cp.processType(tp, place)
-    cp.candidatesS.flatMap {
-      case ScalaResolveResult(fun: ScFunction, subst)
-          if fun.parameters.isEmpty && fun.name == name =>
-        Seq(subst.subst(fun.returnType.getOrAny))
-      case ScalaResolveResult(b: ScBindingPattern, subst) if b.name == name =>
-        Seq(subst.subst(b.getType(TypingContext.empty).getOrAny))
-      case ScalaResolveResult(param: ScClassParameter, subst)
-          if param.name == name =>
-        Seq(subst.subst(param.getType(TypingContext.empty).getOrAny))
-      case _ => Seq.empty
-    }.headOption
+    cp.candidatesS
+      .flatMap {
+        case ScalaResolveResult(fun: ScFunction, subst)
+            if fun.parameters.isEmpty && fun.name == name =>
+          Seq(subst.subst(fun.returnType.getOrAny))
+        case ScalaResolveResult(b: ScBindingPattern, subst)
+            if b.name == name =>
+          Seq(subst.subst(b.getType(TypingContext.empty).getOrAny))
+        case ScalaResolveResult(param: ScClassParameter, subst)
+            if param.name == name =>
+          Seq(subst.subst(param.getType(TypingContext.empty).getOrAny))
+        case _ => Seq.empty
+      }
+      .headOption
   }
 
   private def extractPossibleProductParts(

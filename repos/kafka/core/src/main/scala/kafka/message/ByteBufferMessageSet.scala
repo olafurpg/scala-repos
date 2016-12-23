@@ -519,12 +519,13 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
             Some(now)
         }
 
-        (new ByteBufferMessageSet(compressionCodec = targetCodec,
-                                  offsetCounter = offsetCounter,
-                                  wrapperMessageTimestamp =
-                                    wrapperMessageTimestamp,
-                                  timestampType = messageTimestampType,
-                                  messages = validatedMessages: _*),
+        (new ByteBufferMessageSet(
+           compressionCodec = targetCodec,
+           offsetCounter = offsetCounter,
+           wrapperMessageTimestamp = wrapperMessageTimestamp,
+           timestampType = messageTimestampType,
+           messages = validatedMessages: _*
+         ),
          true)
       } else {
         // Do not do re-compression but simply update the offset, timestamp and attributes field of the wrapper message.

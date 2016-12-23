@@ -967,7 +967,8 @@ object RelationSpecs
         StaticProvenance("/foo") -> Set(StaticProvenance("/bar")),
         StaticProvenance("/bar") -> Set(StaticProvenance("/foo"),
                                         StaticProvenance("/baz")),
-        StaticProvenance("/baz") -> Set(StaticProvenance("/bar")))
+        StaticProvenance("/baz") -> Set(StaticProvenance("/bar"))
+      )
 
       tree.provenance must beLike {
         case p: ProductProvenance => {

@@ -520,11 +520,13 @@ private[stream] object Fusing {
     */
   final class BuildStructuralInfo {
     def toInfo: StructuralInfo =
-      StructuralInfo(immutable.Map.empty ++ upstreams.asScala,
-                     immutable.Map.empty ++ downstreams.asScala,
-                     immutable.Map.empty ++ inOwners.asScala,
-                     immutable.Map.empty ++ outOwners.asScala,
-                     Set.empty ++ modules.asScala)
+      StructuralInfo(
+        immutable.Map.empty ++ upstreams.asScala,
+        immutable.Map.empty ++ downstreams.asScala,
+        immutable.Map.empty ++ inOwners.asScala,
+        immutable.Map.empty ++ outOwners.asScala,
+        Set.empty ++ modules.asScala
+      )
 
     /**
       * the set of all contained modules

@@ -73,7 +73,8 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           Right(HttpRequest(POST, "/foo", protocol = `HTTP/1.0`)),
           Left(
             MessageStartError(StatusCodes.BadRequest,
-                              ErrorInfo("Illegal HTTP message start"))))
+                              ErrorInfo("Illegal HTTP message start")))
+        )
         closeAfterResponseCompletion shouldEqual Seq(true, true)
       }
 
@@ -111,13 +112,15 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           |
           |Shake your BOODY!GET / HTTP/1.0
           |
-          |""" should parseTo(HttpRequest(POST,
-                                          "/resource/yes",
-                                          List(`User-Agent`("curl/7.19.7 xyz"),
-                                               Connection("keep-alive")),
-                                          "Shake your BOODY!".getBytes,
-                                          `HTTP/1.0`),
-                              HttpRequest(protocol = `HTTP/1.0`))
+          |""" should parseTo(
+          HttpRequest(POST,
+                      "/resource/yes",
+                      List(`User-Agent`("curl/7.19.7 xyz"),
+                           Connection("keep-alive")),
+                      "Shake your BOODY!".getBytes,
+                      `HTTP/1.0`),
+          HttpRequest(protocol = `HTTP/1.0`)
+        )
         closeAfterResponseCompletion shouldEqual Seq(false, true)
       }
 
@@ -229,34 +232,38 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
               HttpEntity.Chunked(`application/pdf`, source()))),
           Left(
             EntityStreamError(
-              ErrorInfo("Illegal character 'r' in chunk start"))))
+              ErrorInfo("Illegal character 'r' in chunk start")))
+        )
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
       "message chunk with and without extension" in new Test {
-        Seq(start + """3
+        Seq(
+          start + """3
             |abc
             |10;some=stuff;bla
             |0123456789ABCDEF
             |""",
-            "10;foo=",
-            """bar
+          "10;foo=",
+          """bar
             |0123456789ABCDEF
             |A
             |0123456789""",
-            """
+          """
             |0
             |
-            |""") should generalMultiParseTo(
-          Right(
-            baseRequest.withEntity(
-              Chunked(`application/pdf`,
-                      source(Chunk(ByteString("abc")),
-                             Chunk(ByteString("0123456789ABCDEF"),
-                                   "some=stuff;bla"),
-                             Chunk(ByteString("0123456789ABCDEF"), "foo=bar"),
-                             Chunk(ByteString("0123456789"), ""),
-                             LastChunk)))))
+            |"""
+        ) should generalMultiParseTo(
+          Right(baseRequest.withEntity(Chunked(
+            `application/pdf`,
+            source(
+              Chunk(ByteString("abc")),
+              Chunk(ByteString("0123456789ABCDEF"), "some=stuff;bla"),
+              Chunk(ByteString("0123456789ABCDEF"), "foo=bar"),
+              Chunk(ByteString("0123456789"), ""),
+              LastChunk
+            )
+          ))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -422,7 +429,9 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           BadRequest,
           ErrorInfo(
             "Unsupported HTTP method",
-            "HTTP method too long (started with 'ABCDEFGHIJKLMNOP'). Increase `akka.http.server.parsing.max-method-length` to support HTTP methods with more characters."))
+            "HTTP method too long (started with 'ABCDEFGHIJKLMNOP'). Increase `akka.http.server.parsing.max-method-length` to support HTTP methods with more characters."
+          )
+        )
       }
 
       "two Content-Length headers" in new Test {

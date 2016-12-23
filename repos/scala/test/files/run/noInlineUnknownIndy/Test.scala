@@ -28,7 +28,8 @@ object Test extends DirectTest {
       Opcodes.H_INVOKESTATIC,
       "not/java/lang/SomeLambdaMetafactory",
       "notAMetaFactoryMethod",
-      "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;")
+      "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;"
+    )
     modifyClassFile(new File(testOutput.toFile, "A_1.class"))(
       (cn: ClassNode) => {
         val testMethod =

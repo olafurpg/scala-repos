@@ -48,7 +48,8 @@ class ScalaPackageNameInspection extends LocalInspectionTool {
                 "problems with resolve to classes from this file",
               ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
               isOnTheFly,
-              buffer: _*)
+              buffer: _*
+            )
         }
 
         val expectedPackageName = file.typeDefinitions.head match {
@@ -66,7 +67,8 @@ class ScalaPackageNameInspection extends LocalInspectionTool {
           val fixes = Seq(
             new ScalaRenamePackageQuickFix(file, expectedPackageName),
             new ScalaMoveToPackageQuickFix(file, packName),
-            new EnablePerformanceProblemsQuickFix(file.getProject))
+            new EnablePerformanceProblemsQuickFix(file.getProject)
+          )
 
           problemDescriptors(fixes).toArray
         } else null

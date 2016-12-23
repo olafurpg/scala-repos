@@ -71,7 +71,8 @@ private[v1] object AllJobsResource {
       val lastStageData = lastStageInfo.flatMap { s =>
         listener.stageIdToData.get((s.stageId, s.attemptId))
       }
-      val lastStageName = lastStageInfo.map { _.name }
+      val lastStageName = lastStageInfo
+        .map { _.name }
         .getOrElse("(Unknown Stage Name)")
       val lastStageDescription = lastStageData.flatMap { _.description }
       new JobData(

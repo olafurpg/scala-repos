@@ -307,9 +307,11 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
     val stage = stageSubmitted.stageInfo
     activeStages(stage.stageId) = stage
     pendingStages.remove(stage.stageId)
-    val poolName = Option(stageSubmitted.properties).map { p =>
-      p.getProperty("spark.scheduler.pool", SparkUI.DEFAULT_POOL_NAME)
-    }.getOrElse(SparkUI.DEFAULT_POOL_NAME)
+    val poolName = Option(stageSubmitted.properties)
+      .map { p =>
+        p.getProperty("spark.scheduler.pool", SparkUI.DEFAULT_POOL_NAME)
+      }
+      .getOrElse(SparkUI.DEFAULT_POOL_NAME)
 
     stageIdToInfo(stage.stageId) = stage
     val stageData = stageIdToData

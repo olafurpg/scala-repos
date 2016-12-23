@@ -36,9 +36,13 @@ private[twitter] class EndpointRegistry {
   def endpoints(client: String): Map[Dtab, Map[String, Addr]] = synchronized {
     registry.get(client) match {
       case Some(dtabMap) =>
-        dtabMap.mapValues { paths =>
-          paths.mapValues { case (observation, _) => observation.get() }.toMap
-        }.toMap
+        dtabMap
+          .mapValues { paths =>
+            paths
+              .mapValues { case (observation, _) => observation.get() }
+              .toMap
+          }
+          .toMap
       case None => Map.empty
     }
   }

@@ -66,8 +66,10 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "puzzle" boot new Env(config = lila.common.PlayApp loadConfig "puzzle",
-                          renderer = lila.hub.Env.current.actor.renderer,
-                          system = lila.common.PlayApp.system,
-                          lifecycle = lila.common.PlayApp.lifecycle)
+    "puzzle" boot new Env(
+      config = lila.common.PlayApp loadConfig "puzzle",
+      renderer = lila.hub.Env.current.actor.renderer,
+      system = lila.common.PlayApp.system,
+      lifecycle = lila.common.PlayApp.lifecycle
+    )
 }

@@ -37,7 +37,8 @@ class DriverSuite extends SparkFunSuite with Timeouts {
             "org.apache.spark.DriverWithoutCleanup",
             master),
         new File(sparkHome),
-        Map("SPARK_TESTING" -> "1", "SPARK_HOME" -> sparkHome))
+        Map("SPARK_TESTING" -> "1", "SPARK_HOME" -> sparkHome)
+      )
       failAfter(60 seconds) { process.waitFor() }
       // Ensure we still kill the process in case it timed out
       process.destroy()

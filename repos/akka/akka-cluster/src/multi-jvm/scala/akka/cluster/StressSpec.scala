@@ -236,7 +236,8 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
         numberOfNodesJoiningOneByOneSmall +
         numberOfNodesJoiningOneByOneLarge + numberOfNodesJoiningToOneNode +
         numberOfNodesJoiningToSeedNodes <= totalNumberOfNodes,
-      s"specified number of joining nodes <= ${totalNumberOfNodes}")
+      s"specified number of joining nodes <= ${totalNumberOfNodes}"
+    )
 
     // don't shutdown the 3 nodes hosting the master actors
     require(
@@ -244,7 +245,8 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
         numberOfNodesLeaving + numberOfNodesShutdownOneByOneSmall +
         numberOfNodesShutdownOneByOneLarge +
         numberOfNodesShutdown <= totalNumberOfNodes - 3,
-      s"specified number of leaving/shutdown nodes <= ${totalNumberOfNodes - 3}")
+      s"specified number of leaving/shutdown nodes <= ${totalNumberOfNodes - 3}"
+    )
 
     require(numberOfNodesJoinRemove <= totalNumberOfNodes,
             s"nr-of-nodes-join-remove should be <= ${totalNumberOfNodes}")

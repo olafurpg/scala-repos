@@ -23,7 +23,8 @@ object RemoteDeployerSpec {
       }
       akka.remote.netty.tcp.port = 0
       """,
-    ConfigParseOptions.defaults)
+    ConfigParseOptions.defaults
+  )
 
   class RecipeActor extends Actor {
     def receive = { case _ ⇒ }

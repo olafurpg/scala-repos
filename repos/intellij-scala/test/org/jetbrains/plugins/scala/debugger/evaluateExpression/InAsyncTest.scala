@@ -18,8 +18,9 @@ abstract class InAsyncTestBase extends ScalaDebuggerTestCase {
                        "scala-async_2.11-0.9.5.jar")
   }
 
-  addFileWithBreakpoints("InAsync.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "InAsync.scala",
+    s"""
       |import scala.async.Async._
       |import scala.concurrent.Await
       |import scala.concurrent.duration.Duration
@@ -53,7 +54,8 @@ abstract class InAsyncTestBase extends ScalaDebuggerTestCase {
       |    println(Await.result(future, Duration.Inf))
       |  }
       |}
-    """.stripMargin)
+    """.stripMargin
+  )
 
   def testInAsync(): Unit = {
     runDebugger() {

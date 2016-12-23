@@ -98,7 +98,8 @@ case class SortBasedAggregate(
               newMutableProjection(expressions,
                                    inputSchema,
                                    subexpressionEliminationEnabled),
-            numOutputRows)
+            numOutputRows
+          )
           if (!hasInput && groupingExpressions.isEmpty) {
             // There is no input and there is no grouping expressions.
             // We need to output a single row as the output.

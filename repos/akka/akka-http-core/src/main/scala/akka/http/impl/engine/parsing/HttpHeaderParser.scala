@@ -517,15 +517,17 @@ private[http] object HttpHeaderParser {
   }
 
   private def predefinedHeaders =
-    Seq("Accept: *",
-        "Accept: */*",
-        "Connection: Keep-Alive",
-        "Connection: close",
-        "Connection: keep-alive",
-        "Content-Length: 0",
-        "Cache-Control: max-age=0",
-        "Cache-Control: no-cache",
-        "Expect: 100-continue")
+    Seq(
+      "Accept: *",
+      "Accept: */*",
+      "Connection: Keep-Alive",
+      "Connection: close",
+      "Connection: keep-alive",
+      "Content-Length: 0",
+      "Cache-Control: max-age=0",
+      "Cache-Control: no-cache",
+      "Expect: 100-continue"
+    )
 
   def apply(settings: HttpHeaderParser.Settings)(
       onIllegalHeader: ErrorInfo ⇒ Unit = info ⇒

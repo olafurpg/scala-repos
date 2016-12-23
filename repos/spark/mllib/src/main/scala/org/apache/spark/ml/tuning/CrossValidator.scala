@@ -263,7 +263,8 @@ object CrossValidator extends MLReadable[CrossValidator] {
                 uidToInstance.contains(p.parent),
                 s"CrossValidator save requires all Params in" +
                   s" estimatorParamMaps to apply to this CrossValidator, its Estimator, or its" +
-                  s" Evaluator.  An extraneous Param was found: $p")
+                  s" Evaluator.  An extraneous Param was found: $p"
+              )
           }
       }
     }
@@ -277,15 +278,17 @@ object CrossValidator extends MLReadable[CrossValidator] {
 
       val estimatorParamMapsJson = compact(
         render(
-          instance.getEstimatorParamMaps.map {
-            case paramMap =>
-              paramMap.toSeq.map {
-                case ParamPair(p, v) =>
-                  Map("parent" -> p.parent,
-                      "name" -> p.name,
-                      "value" -> p.jsonEncode(v))
-              }
-          }.toSeq
+          instance.getEstimatorParamMaps
+            .map {
+              case paramMap =>
+                paramMap.toSeq.map {
+                  case ParamPair(p, v) =>
+                    Map("parent" -> p.parent,
+                        "name" -> p.name,
+                        "value" -> p.jsonEncode(v))
+                }
+            }
+            .toSeq
         ))
       val jsonParams = List(
         "numFolds" -> parse(

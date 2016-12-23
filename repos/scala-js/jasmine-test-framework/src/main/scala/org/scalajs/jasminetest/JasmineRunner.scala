@@ -73,17 +73,19 @@ object JasmineRunner {
       .getPrototypeOf((new Throwable).asInstanceOf[js.Object])
       .asInstanceOf[js.Object]
 
-    js.Object.defineProperty(ThrowablePrototype,
-                             "stack",
-                             js.Dynamic
-                               .literal(
-                                 configurable = false,
-                                 enumerable = false,
-                                 get = { (self: js.Dynamic) =>
-                                   self.stackdata && self.stackdata.stack
-                                 }: js.ThisFunction
-                               )
-                               .asInstanceOf[js.PropertyDescriptor])
+    js.Object.defineProperty(
+      ThrowablePrototype,
+      "stack",
+      js.Dynamic
+        .literal(
+          configurable = false,
+          enumerable = false,
+          get = { (self: js.Dynamic) =>
+            self.stackdata && self.stackdata.stack
+          }: js.ThisFunction
+        )
+        .asInstanceOf[js.PropertyDescriptor]
+    )
   }
 
   private def handleArgs(args: Array[String]): Unit = {

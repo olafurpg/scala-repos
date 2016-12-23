@@ -123,6 +123,6 @@ object RawCompileLike {
               cpOptions: ClasspathOptions): Gen =
     cached(cache, prepare(label + " sources", rawCompile(instance, cpOptions)))
 
-  val nop: Gen = (sources, classpath, outputDirectory, options, maxErrors,
-                  log) => ()
+  val nop: Gen =
+    (sources, classpath, outputDirectory, options, maxErrors, log) => ()
 }

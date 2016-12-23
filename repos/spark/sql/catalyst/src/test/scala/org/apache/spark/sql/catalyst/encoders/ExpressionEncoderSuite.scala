@@ -293,7 +293,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
       val convertedBack = try boundEncoder.fromRow(row)
       catch {
         case e: Exception =>
-          fail(s"""Exception thrown while decoding
+          fail(
+            s"""Exception thrown while decoding
               |Converted: $row
               |Schema: ${schema.mkString(",")}
               |${encoder.schema.treeString}
@@ -302,7 +303,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
               |$boundEncoder
               |
             """.stripMargin,
-               e)
+            e
+          )
       }
 
       // Test the correct resolution of serialization / deserialization.

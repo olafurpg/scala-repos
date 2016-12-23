@@ -29,14 +29,19 @@ final class Env(config: Config,
   import settings._
 
   private val socketHub =
-    system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket] {
-      def mkActor(challengeId: String) =
-        new Socket(challengeId = challengeId,
-                   history = new lila.socket.History(ttl = HistoryMessageTtl),
-                   getChallenge = repo.byId,
-                   uidTimeout = UidTimeout,
-                   socketTimeout = SocketTimeout)
-    }), name = SocketName)
+    system.actorOf(
+      Props(new lila.socket.SocketHubActor.Default[Socket] {
+        def mkActor(challengeId: String) =
+          new Socket(
+            challengeId = challengeId,
+            history = new lila.socket.History(ttl = HistoryMessageTtl),
+            getChallenge = repo.byId,
+            uidTimeout = UidTimeout,
+            socketTimeout = SocketTimeout
+          )
+      }),
+      name = SocketName
+    )
 
   def version(challengeId: Challenge.ID): Fu[Int] =
     socketHub ? Ask(challengeId, GetVersion) mapTo manifest[Int]
@@ -72,5 +77,6 @@ object Env {
       hub = lila.hub.Env.current,
       lightUser = lila.user.Env.current.lightUser,
       db = lila.db.Env.current,
-      scheduler = lila.common.PlayApp.scheduler)
+      scheduler = lila.common.PlayApp.scheduler
+    )
 }

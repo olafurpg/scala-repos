@@ -260,9 +260,11 @@ object InjectedRoutesGenerator extends RoutesGenerator {
                              rules: List[Rule]) = {
 
     // Generate dependency descriptors for all includes
-    val includesDeps = rules.collect {
-      case include: Include => include
-    }.groupBy(_.router)
+    val includesDeps = rules
+      .collect {
+        case include: Include => include
+      }
+      .groupBy(_.router)
       .zipWithIndex
       .map {
         case ((router, includes), index) =>
@@ -273,7 +275,8 @@ object InjectedRoutesGenerator extends RoutesGenerator {
       .toMap
 
     // Generate dependency descriptors for all routes
-    val routesDeps = rules.collect { case route: Route => route }
+    val routesDeps = rules
+      .collect { case route: Route => route }
       .groupBy(r =>
         (r.call.packageName, r.call.controller, r.call.instantiate))
       .zipWithIndex
@@ -289,15 +292,17 @@ object InjectedRoutesGenerator extends RoutesGenerator {
       .toMap
 
     // Get the distinct dependency descriptors in the same order as defined in the routes file
-    val orderedDeps = rules.map {
-      case include: Include =>
-        includesDeps(include.router)
-      case route: Route =>
-        routesDeps(
-          (route.call.packageName,
-           route.call.controller,
-           route.call.instantiate))
-    }.distinct
+    val orderedDeps = rules
+      .map {
+        case include: Include =>
+          includesDeps(include.router)
+        case route: Route =>
+          routesDeps(
+            (route.call.packageName,
+             route.call.controller,
+             route.call.instantiate))
+      }
+      .distinct
 
     // Map all the rules to dependency descriptors
     val rulesWithDeps = rules.map {

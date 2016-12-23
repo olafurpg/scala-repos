@@ -149,11 +149,10 @@ object LiftJavaScriptSpec extends Specification {
           .map(_.apply(session))
           .map(LiftJavaScript.initCmd(_).toJsCmd)
         init must_== Full(
-          formatjs(
-            List(
-              "var lift_settings = {};",
-              "window.lift.extend(lift_settings,window.liftJQuery);",
-              """window.lift.extend(lift_settings,{"liftPath": "/lift",
+          formatjs(List(
+            "var lift_settings = {};",
+            "window.lift.extend(lift_settings,window.liftJQuery);",
+            """window.lift.extend(lift_settings,{"liftPath": "/lift",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -165,8 +164,8 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}});""",
-              "window.lift.init(lift_settings);"
-            )))
+            "window.lift.init(lift_settings);"
+          )))
       }
     }
     "create init command with VanillaJS" in withEnglishLocale {
@@ -177,11 +176,10 @@ object LiftJavaScriptSpec extends Specification {
           .map(_.apply(session))
           .map(LiftJavaScript.initCmd(_).toJsCmd)
         init must_== Full(
-          formatjs(
-            List(
-              "var lift_settings = {};",
-              "window.lift.extend(lift_settings,window.liftVanilla);",
-              """window.lift.extend(lift_settings,{"liftPath": "/lift",
+          formatjs(List(
+            "var lift_settings = {};",
+            "window.lift.extend(lift_settings,window.liftVanilla);",
+            """window.lift.extend(lift_settings,{"liftPath": "/lift",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -193,8 +191,8 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}});""",
-              "window.lift.init(lift_settings);"
-            )))
+            "window.lift.init(lift_settings);"
+          )))
       }
     }
     "create init command with custom setting" in withEnglishLocale {
@@ -228,12 +226,14 @@ object LiftJavaScriptSpec extends Specification {
 
   def formatjs(line: String): String = formatjs(line :: Nil)
   def formatjs(lines: List[String]): String =
-    lines.map {
-      _.stripMargin.lines.toList match {
-        case init :+ last => (init.map(_ + " ") :+ last).mkString
-        case Nil => ""
+    lines
+      .map {
+        _.stripMargin.lines.toList match {
+          case init :+ last => (init.map(_ + " ") :+ last).mkString
+          case Nil => ""
+        }
       }
-    }.mkString("\n")
+      .mkString("\n")
 
   object withEnglishLocale extends WithLocale(Locale.ENGLISH)
 

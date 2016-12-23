@@ -165,14 +165,16 @@ abstract class BTypes {
     * be found in the `byteCodeRepository`, the `info` of the resulting ClassBType is undefined.
     */
   def classBTypeFromParsedClassfile(internalName: InternalName): ClassBType = {
-    classBTypeFromInternalName.getOrElse(internalName, {
-      val res = ClassBType(internalName)
-      byteCodeRepository.classNode(internalName) match {
-        case Left(msg) =>
-          res.info = Left(NoClassBTypeInfoMissingBytecode(msg)); res
-        case Right(c) => setClassInfoFromClassNode(c, res)
+    classBTypeFromInternalName.getOrElse(
+      internalName, {
+        val res = ClassBType(internalName)
+        byteCodeRepository.classNode(internalName) match {
+          case Left(msg) =>
+            res.info = Left(NoClassBTypeInfoMissingBytecode(msg)); res
+          case Right(c) => setClassInfoFromClassNode(c, res)
+        }
       }
-    })
+    )
   }
 
   /**
@@ -301,11 +303,13 @@ abstract class BTypes {
           (methodNode.name + methodNode.desc, info)
         })
         .toMap
-      InlineInfo(traitImplClassSelfType = None,
-                 isEffectivelyFinal = BytecodeUtils.isFinalClass(classNode),
-                 sam = inlinerHeuristics.javaSam(classNode.name),
-                 methodInfos = methodInfos,
-                 warning)
+      InlineInfo(
+        traitImplClassSelfType = None,
+        isEffectivelyFinal = BytecodeUtils.isFinalClass(classNode),
+        sam = inlinerHeuristics.javaSam(classNode.name),
+        methodInfos = methodInfos,
+        warning
+      )
     }
 
     // The InlineInfo is built from the classfile (not from the symbol) for all classes that are NOT

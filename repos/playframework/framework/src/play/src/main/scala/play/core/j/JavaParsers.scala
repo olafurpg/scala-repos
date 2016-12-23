@@ -26,12 +26,15 @@ object JavaParsers {
         multipart.asFormUrlEncoded.mapValues(_.toArray).asJava
       }
       lazy val getFiles = {
-        multipart.files.map { file =>
-          new play.mvc.Http.MultipartFormData.FilePart(file.key,
-                                                       file.filename,
-                                                       file.contentType.orNull,
-                                                       file.ref.file)
-        }.asJava
+        multipart.files
+          .map { file =>
+            new play.mvc.Http.MultipartFormData.FilePart(
+              file.key,
+              file.filename,
+              file.contentType.orNull,
+              file.ref.file)
+          }
+          .asJava
       }
     }
   }

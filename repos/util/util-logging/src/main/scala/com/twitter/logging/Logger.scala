@@ -250,14 +250,17 @@ object NullLogger
 
 object Logger extends Iterable[Logger] {
 
-  private[this] val levelNamesMap: Map[String, Level] = Level.AllLevels.map {
-    level =>
+  private[this] val levelNamesMap: Map[String, Level] = Level.AllLevels
+    .map { level =>
       level.name -> level
-  }.toMap
+    }
+    .toMap
 
-  private[this] val levelsMap: Map[Int, Level] = Level.AllLevels.map { level =>
-    level.value -> level
-  }.toMap
+  private[this] val levelsMap: Map[Int, Level] = Level.AllLevels
+    .map { level =>
+      level.value -> level
+    }
+    .toMap
 
   // A cache of scala Logger objects by name.
   // Using a low concurrencyLevel (2), with the assumption that we aren't ever creating too

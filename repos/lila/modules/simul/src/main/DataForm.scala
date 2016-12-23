@@ -35,16 +35,17 @@ final class DataForm {
         "clockIncrement" -> numberIn(clockIncrementChoices),
         "clockExtra" -> numberIn(clockExtraChoices),
         "variants" -> list {
-          number.verifying(
-            Set(chess.variant.Standard.id,
-                chess.variant.Chess960.id,
-                chess.variant.KingOfTheHill.id,
-                chess.variant.ThreeCheck.id,
-                chess.variant.Antichess.id,
-                chess.variant.Atomic.id,
-                chess.variant.Horde.id,
-                chess.variant.RacingKings.id,
-                chess.variant.Crazyhouse.id) contains _)
+          number.verifying(Set(
+            chess.variant.Standard.id,
+            chess.variant.Chess960.id,
+            chess.variant.KingOfTheHill.id,
+            chess.variant.ThreeCheck.id,
+            chess.variant.Antichess.id,
+            chess.variant.Atomic.id,
+            chess.variant.Horde.id,
+            chess.variant.RacingKings.id,
+            chess.variant.Crazyhouse.id
+          ) contains _)
         }.verifying("At least one variant", _.nonEmpty),
         "color" -> stringIn(colorChoices)
       )(SimulSetup.apply)(SimulSetup.unapply)) fill SimulSetup(
@@ -52,7 +53,8 @@ final class DataForm {
       clockIncrement = clockIncrementDefault,
       clockExtra = clockExtraDefault,
       variants = List(chess.variant.Standard.id),
-      color = colorDefault)
+      color = colorDefault
+    )
 }
 
 case class SimulSetup(clockTime: Int,

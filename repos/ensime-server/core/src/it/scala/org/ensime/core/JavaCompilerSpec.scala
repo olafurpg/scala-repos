@@ -107,7 +107,8 @@ class JavaCompilerSpec
         "    return \"tues\";",
         "  }",
         "  public enum Day { MON, TUES }",
-        "}") { (sf, offset, label, cc) =>
+        "}"
+      ) { (sf, offset, label, cc) =>
         val info = cc.askSymbolAtPoint(sf, offset).get
         label match {
           case "0" | "11" | "12" =>
@@ -246,7 +247,8 @@ class JavaCompilerSpec
         "      System.out.@14@",
         "    }",
         "  }",
-        "}") { (sf, offset, label, cc) =>
+        "}"
+      ) { (sf, offset, label, cc) =>
         val info = cc.askCompletionsAtPoint(sf, offset, 0, false)
         label match {
           case "0" =>
@@ -313,7 +315,8 @@ class JavaCompilerSpec
         "    System.out.println(\"bla\".index@7@Of(\"b\", 1));",
         "    System.out.println(\"bla\".index@8@Of(1));",
         "  }",
-        "}") { (sf, offset, label, cc) =>
+        "}"
+      ) { (sf, offset, label, cc) =>
         val sig = cc.askDocSignatureAtPoint(sf, offset).get.java
         label match {
           case "0" => sig.fqn shouldBe DocFqn("", "Test1")

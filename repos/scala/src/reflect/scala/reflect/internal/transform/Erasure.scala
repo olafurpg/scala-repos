@@ -140,11 +140,13 @@ trait Erasure {
       case ExistentialType(tparams, restpe) =>
         apply(restpe)
       case mt @ MethodType(params, restpe) =>
-        MethodType(cloneSymbolsAndModify(params, ErasureMap.this),
-                   if (restpe.typeSymbol == UnitClass) UnitTpe
-                   // this replaces each typeref that refers to an argument
-                   // by the type `p.tpe` of the actual argument p (p in params)
-                   else apply(mt.resultType(mt.paramTypes)))
+        MethodType(
+          cloneSymbolsAndModify(params, ErasureMap.this),
+          if (restpe.typeSymbol == UnitClass) UnitTpe
+          // this replaces each typeref that refers to an argument
+          // by the type `p.tpe` of the actual argument p (p in params)
+          else apply(mt.resultType(mt.paramTypes))
+        )
       case RefinedType(parents, decls) =>
         apply(mergeParents(parents))
       case AnnotatedType(_, atp) =>

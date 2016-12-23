@@ -402,7 +402,8 @@ class ActorMailboxSpec(conf: Config)
           .withDispatcher("requiring-bounded-dispatcher")
           .withMailbox("akka.actor.mailbox.bounded-deque-based"),
         "bounded-deque-requirements-configured-props",
-        BoundedDeqMailboxTypes)
+        BoundedDeqMailboxTypes
+      )
     }
 
     "fail with a unbounded deque-based message queue if configured and required with Props" in {
@@ -411,7 +412,8 @@ class ActorMailboxSpec(conf: Config)
           Props[StashQueueReportingActor]
             .withDispatcher("requiring-bounded-dispatcher")
             .withMailbox("akka.actor.mailbox.unbounded-deque-based"),
-          "bounded-deque-require-unbounded-configured-props"))
+          "bounded-deque-require-unbounded-configured-props"
+        ))
     }
 
     "fail with a bounded deque-based message queue if not configured with Props" in {
@@ -422,10 +424,12 @@ class ActorMailboxSpec(conf: Config)
     }
 
     "get a bounded deque-based message queue if configured and required with Props (dispatcher)" in {
-      checkMailboxQueue(Props[StashQueueReportingActor].withDispatcher(
-                          "requiring-bounded-dispatcher"),
-                        "bounded-deque-requirements-configured-props-disp",
-                        BoundedDeqMailboxTypes)
+      checkMailboxQueue(
+        Props[StashQueueReportingActor].withDispatcher(
+          "requiring-bounded-dispatcher"),
+        "bounded-deque-requirements-configured-props-disp",
+        BoundedDeqMailboxTypes
+      )
     }
 
     "fail with a unbounded deque-based message queue if configured and required with Props (dispatcher)" in {
@@ -445,10 +449,12 @@ class ActorMailboxSpec(conf: Config)
     }
 
     "get a bounded deque-based message queue if configured and required with Props (mailbox)" in {
-      checkMailboxQueue(Props[StashQueueReportingActor].withMailbox(
-                          "akka.actor.mailbox.bounded-deque-based"),
-                        "bounded-deque-requirements-configured-props-mail",
-                        BoundedDeqMailboxTypes)
+      checkMailboxQueue(
+        Props[StashQueueReportingActor].withMailbox(
+          "akka.actor.mailbox.bounded-deque-based"),
+        "bounded-deque-requirements-configured-props-mail",
+        BoundedDeqMailboxTypes
+      )
     }
 
     "fail with a unbounded deque-based message queue if configured and required with Props (mailbox)" in {

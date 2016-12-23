@@ -288,7 +288,8 @@ object HtmlEntities {
     ("omega", 969),
     ("thetasym", 977),
     ("upsih", 978),
-    ("piv", 982))
+    ("piv", 982)
+  )
 
   val entMap: Map[String, Char] =
     Map.empty ++ entList.map { case (name, value) => (name, value.toChar) }

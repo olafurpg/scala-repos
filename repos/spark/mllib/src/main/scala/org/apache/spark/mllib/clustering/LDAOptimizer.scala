@@ -121,11 +121,13 @@ final class EMLDAOptimizer extends LDAOptimizer {
     require(
       docConcentration > 1.0 || docConcentration == -1.0,
       s"LDA docConcentration must be" +
-        s" > 1.0 (or -1 for auto) for EM Optimizer, but was set to $docConcentration")
+        s" > 1.0 (or -1 for auto) for EM Optimizer, but was set to $docConcentration"
+    )
     require(
       topicConcentration > 1.0 || topicConcentration == -1.0,
       s"LDA topicConcentration " +
-        s"must be > 1.0 (or -1 for auto) for EM Optimizer, but was set to $topicConcentration")
+        s"must be > 1.0 (or -1 for auto) for EM Optimizer, but was set to $topicConcentration"
+    )
 
     this.docConcentration =
       if (docConcentration == -1) (50.0 / k) + 1.0
@@ -205,8 +207,8 @@ final class EMLDAOptimizer extends LDAOptimizer {
       }
     // The Boolean is a hack to detect whether we could modify the values in-place.
     // TODO: Add zero/seqOp/combOp option to aggregateMessages. (SPARK-5438)
-    val mergeMsg: ((Boolean, TopicCounts),
-                   (Boolean, TopicCounts)) => (Boolean, TopicCounts) =
+    val mergeMsg: ((Boolean, TopicCounts), (Boolean, TopicCounts)) => (Boolean,
+                                                                       TopicCounts) =
       (m0, m1) => {
         val sum =
           if (m0._1) {
@@ -258,7 +260,8 @@ final class EMLDAOptimizer extends LDAOptimizer {
       this.vocabSize,
       Vectors.dense(Array.fill(this.k)(this.docConcentration)),
       this.topicConcentration,
-      iterationTimes)
+      iterationTimes
+    )
   }
 }
 

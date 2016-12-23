@@ -598,13 +598,15 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
 
     override def receive(): BaseConsumerRecord = {
       val messageAndMetadata = iter.next()
-      BaseConsumerRecord(messageAndMetadata.topic,
-                         messageAndMetadata.partition,
-                         messageAndMetadata.offset,
-                         messageAndMetadata.timestamp,
-                         messageAndMetadata.timestampType,
-                         messageAndMetadata.key,
-                         messageAndMetadata.message)
+      BaseConsumerRecord(
+        messageAndMetadata.topic,
+        messageAndMetadata.partition,
+        messageAndMetadata.offset,
+        messageAndMetadata.timestamp,
+        messageAndMetadata.timestampType,
+        messageAndMetadata.key,
+        messageAndMetadata.message
+      )
     }
 
     override def stop() {

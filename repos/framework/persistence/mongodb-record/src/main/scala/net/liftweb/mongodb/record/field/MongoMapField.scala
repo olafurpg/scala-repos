@@ -87,16 +87,22 @@ class MongoMapField[OwnerType <: BsonRecord[OwnerType], MapValueType](
   def toForm: Box[NodeSeq] = Empty
 
   def asJValue: JValue =
-    JObject(value.keys.map { k =>
-      JField(k, value(k).asInstanceOf[AnyRef] match {
-        case x if primitive_?(x.getClass) => primitive2jvalue(x)
-        case x if mongotype_?(x.getClass) =>
-          mongotype2jvalue(x)(owner.meta.formats)
-        case x if datetype_?(x.getClass) =>
-          datetype2jvalue(x)(owner.meta.formats)
-        case _ => JNothing
-      })
-    }.toList)
+    JObject(
+      value.keys
+        .map { k =>
+          JField(
+            k,
+            value(k).asInstanceOf[AnyRef] match {
+              case x if primitive_?(x.getClass) => primitive2jvalue(x)
+              case x if mongotype_?(x.getClass) =>
+                mongotype2jvalue(x)(owner.meta.formats)
+              case x if datetype_?(x.getClass) =>
+                datetype2jvalue(x)(owner.meta.formats)
+              case _ => JNothing
+            }
+          )
+        }
+        .toList)
 
   /*
    * Convert this field's value into a DBObject so it can be stored in Mongo.

@@ -234,17 +234,19 @@ class EventLoggingListenerSuite
     val logStart = SparkListenerLogStart(SPARK_VERSION)
     val lines = readLines(logData)
     val eventSet = mutable
-      .Set(SparkListenerApplicationStart,
-           SparkListenerBlockManagerAdded,
-           SparkListenerExecutorAdded,
-           SparkListenerEnvironmentUpdate,
-           SparkListenerJobStart,
-           SparkListenerJobEnd,
-           SparkListenerStageSubmitted,
-           SparkListenerStageCompleted,
-           SparkListenerTaskStart,
-           SparkListenerTaskEnd,
-           SparkListenerApplicationEnd)
+      .Set(
+        SparkListenerApplicationStart,
+        SparkListenerBlockManagerAdded,
+        SparkListenerExecutorAdded,
+        SparkListenerEnvironmentUpdate,
+        SparkListenerJobStart,
+        SparkListenerJobEnd,
+        SparkListenerStageSubmitted,
+        SparkListenerStageCompleted,
+        SparkListenerTaskStart,
+        SparkListenerTaskEnd,
+        SparkListenerApplicationEnd
+      )
       .map(Utils.getFormattedClassName)
     lines.foreach { line =>
       eventSet.foreach { event =>

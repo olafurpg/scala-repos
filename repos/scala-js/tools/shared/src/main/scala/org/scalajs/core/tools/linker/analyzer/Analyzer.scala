@@ -220,11 +220,13 @@ private final class Analyzer(semantics: Semantics,
 
       val parents = data.superClass ++: data.interfaces
 
-      ancestors = this +: parents.flatMap { parent =>
-        val cls = lookupClass(parent)
-        cls.linkClasses()
-        cls.ancestors
-      }.distinct
+      ancestors = this +: parents
+          .flatMap { parent =>
+          val cls = lookupClass(parent)
+          cls.linkClasses()
+          cls.ancestors
+        }
+          .distinct
 
       for (ancestor <- ancestors) ancestor.descendants += this
     }
@@ -450,11 +452,13 @@ private final class Analyzer(semantics: Semantics,
     }
 
     private def findProxyMatch(proxyName: String): Option[MethodInfo] = {
-      val candidates = methodInfos.valuesIterator.filter { m =>
-        // TODO In theory we should filter out protected methods
-        !m.isReflProxy && !m.isExported && !m.isAbstract &&
-        reflProxyMatches(m.encodedName, proxyName)
-      }.toSeq
+      val candidates = methodInfos.valuesIterator
+        .filter { m =>
+          // TODO In theory we should filter out protected methods
+          !m.isReflProxy && !m.isExported && !m.isAbstract &&
+          reflProxyMatches(m.encodedName, proxyName)
+        }
+        .toSeq
 
       /* From the JavaDoc of java.lang.Class.getMethod:
        *
@@ -532,7 +536,8 @@ private final class Analyzer(semantics: Semantics,
            else Map.empty),
         instantiatedClasses =
           (if (returnsChar) List(BoxedCharacterClass)
-           else Nil))
+           else Nil)
+      )
       val m = new MethodInfo(this, syntheticInfo)
       m.syntheticKind = MethodSyntheticKind.ReflectiveProxy(targetName)
       methodInfos += proxyName -> m

@@ -355,8 +355,8 @@ private[spark] object StatsReportListener extends Logging {
 
   def extractDoubleDistribution(
       taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)],
-      getMetric: (TaskInfo,
-                  TaskMetrics) => Option[Double]): Option[Distribution] = {
+      getMetric: (TaskInfo, TaskMetrics) => Option[Double])
+    : Option[Distribution] = {
     Distribution(taskInfoMetrics.flatMap {
       case (info, metric) => getMetric(info, metric)
     })
@@ -365,8 +365,8 @@ private[spark] object StatsReportListener extends Logging {
   // Is there some way to setup the types that I can get rid of this completely?
   def extractLongDistribution(
       taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)],
-      getMetric: (TaskInfo,
-                  TaskMetrics) => Option[Long]): Option[Distribution] = {
+      getMetric: (TaskInfo, TaskMetrics) => Option[Long])
+    : Option[Distribution] = {
     extractDoubleDistribution(taskInfoMetrics, (info, metric) => {
       getMetric(info, metric).map(_.toDouble)
     })
@@ -432,10 +432,10 @@ private[spark] object StatsReportListener extends Logging {
       (d => StatsReportListener.millisToString(d.toLong)): Double => String)
   }
 
-  def showMillisDistribution(heading: String,
-                             getMetric: (TaskInfo,
-                                         TaskMetrics) => Option[Long],
-                             taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
+  def showMillisDistribution(
+      heading: String,
+      getMetric: (TaskInfo, TaskMetrics) => Option[Long],
+      taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
     showMillisDistribution(heading,
                            extractLongDistribution(taskInfoMetrics, getMetric))
   }

@@ -56,6 +56,7 @@ class AppRepository(val store: EntityStore[AppDefinition],
     for (as <- apps())
       yield
         as.map { a =>
-          a.id -> a.version
-        }.toMap
+            a.id -> a.version
+          }
+          .toMap
 }

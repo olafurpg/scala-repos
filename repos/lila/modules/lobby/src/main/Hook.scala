@@ -96,15 +96,17 @@ object Hook {
            sid: Option[String],
            ratingRange: RatingRange,
            blocking: Set[String]): Hook =
-    new Hook(id = Random nextStringUppercase idSize,
-             uid = uid,
-             variant = variant.id,
-             clock = clock,
-             mode = mode.id,
-             allowAnon = allowAnon || user.isEmpty,
-             color = color,
-             user = user map { LobbyUser.make(_, blocking) },
-             sid = sid,
-             ratingRange = ratingRange.toString,
-             createdAt = DateTime.now)
+    new Hook(
+      id = Random nextStringUppercase idSize,
+      uid = uid,
+      variant = variant.id,
+      clock = clock,
+      mode = mode.id,
+      allowAnon = allowAnon || user.isEmpty,
+      color = color,
+      user = user map { LobbyUser.make(_, blocking) },
+      sid = sid,
+      ratingRange = ratingRange.toString,
+      createdAt = DateTime.now
+    )
 }

@@ -68,15 +68,17 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
     assert(mforall(vparamss)(_.symbol.owner == sym),
            (mmap(vparamss)(_.symbol), sym))
 
-    ClassDef(sym,
-             gen.mkTemplate(sym.info.parents map TypeTree,
-                            if (sym.thisSym == sym || phase.erasedTypes)
-                              noSelfType
-                            else ValDef(sym.thisSym),
-                            constrMods,
-                            vparamss,
-                            body,
-                            superPos))
+    ClassDef(
+      sym,
+      gen.mkTemplate(sym.info.parents map TypeTree,
+                     if (sym.thisSym == sym || phase.erasedTypes)
+                       noSelfType
+                     else ValDef(sym.thisSym),
+                     constrMods,
+                     vparamss,
+                     body,
+                     superPos)
+    )
   }
 
   // --- subcomponents --------------------------------------------------

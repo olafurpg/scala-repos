@@ -87,7 +87,8 @@ object ProducerPerformance extends Logging {
         totalMBSent,
         totalMBSent / elapsedSecs,
         totalMessagesSent.get,
-        totalMessagesSent.get / elapsedSecs))
+        totalMessagesSent.get / elapsedSecs
+      ))
     System.exit(0)
   }
 
@@ -148,7 +149,8 @@ object ProducerPerformance extends Logging {
         "initial-message-id",
         "The is used for generating test data, If set, messages will be tagged with an " +
           "ID and sent by producer starting from this ID sequentially. Message content will be String type and " +
-          "in the form of 'Message:000...1:xxx...'")
+          "in the form of 'Message:000...1:xxx...'"
+      )
       .withRequiredArg()
       .describedAs("initial message id")
       .ofType(classOf[java.lang.Integer])

@@ -365,14 +365,16 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
           runStoreLoadAgain
 
       val downstreamRequireEliminateUnusedLocals =
-        runAgain && removalRound(requestNullness = runNullnessAgain,
-                                 requestDCE = runDCEAgain,
-                                 requestBoxUnbox = runBoxUnboxAgain,
-                                 requestStaleStores = runStaleStoresAgain,
-                                 requestPushPop = runPushPopAgain,
-                                 requestStoreLoad = runStoreLoadAgain,
-                                 firstIteration = false,
-                                 maxRecursion = maxRecursion - 1)._2
+        runAgain && removalRound(
+          requestNullness = runNullnessAgain,
+          requestDCE = runDCEAgain,
+          requestBoxUnbox = runBoxUnboxAgain,
+          requestStaleStores = runStaleStoresAgain,
+          requestPushPop = runPushPopAgain,
+          requestStoreLoad = runStoreLoadAgain,
+          firstIteration = false,
+          maxRecursion = maxRecursion - 1
+        )._2
 
       val requireEliminateUnusedLocals =
         downstreamRequireEliminateUnusedLocals || nullnessOptChanged ||

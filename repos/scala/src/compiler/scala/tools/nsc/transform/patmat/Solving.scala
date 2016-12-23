@@ -51,9 +51,11 @@ trait Solving extends Logic {
 
     class SymbolMapping(symbols: Set[Sym]) {
       val variableForSymbol: Map[Sym, Int] = {
-        symbols.zipWithIndex.map {
-          case (sym, i) => sym -> (i + 1)
-        }.toMap
+        symbols.zipWithIndex
+          .map {
+            case (sym, i) => sym -> (i + 1)
+          }
+          .toMap
       }
 
       val symForVar: Map[Int, Sym] = variableForSymbol.map(_.swap)

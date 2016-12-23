@@ -226,11 +226,13 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
       }
 
       val activeStagesTable =
-        new StageTableBase(activeStages.sortBy(_.submissionTime).reverse,
-                           parent.basePath,
-                           parent.jobProgresslistener,
-                           isFairScheduler = parent.isFairScheduler,
-                           killEnabled = parent.killEnabled)
+        new StageTableBase(
+          activeStages.sortBy(_.submissionTime).reverse,
+          parent.basePath,
+          parent.jobProgresslistener,
+          isFairScheduler = parent.isFairScheduler,
+          killEnabled = parent.killEnabled
+        )
       val pendingOrSkippedStagesTable =
         new StageTableBase(pendingOrSkippedStages.sortBy(_.stageId).reverse,
                            parent.basePath,

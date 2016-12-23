@@ -43,7 +43,8 @@ trait RackAwareTest {
       assertEquals(
         "More than one replica of the same partition is assigned to the same rack",
         List.fill(numPartitions)(replicationFactor),
-        partitionRackMap.values.toList.map(_.distinct.size))
+        partitionRackMap.values.toList.map(_.distinct.size)
+      )
     }
 
     if (verifyLeaderDistribution) {
@@ -92,9 +93,11 @@ trait RackAwareTest {
     rackMap.toSeq.map {
       case (brokerId, rack) =>
         BrokerMetadata(brokerId, Some(rack))
-    } ++ brokersWithoutRack.map { brokerId =>
-      BrokerMetadata(brokerId, None)
-    }.sortBy(_.id)
+    } ++ brokersWithoutRack
+      .map { brokerId =>
+        BrokerMetadata(brokerId, None)
+      }
+      .sortBy(_.id)
 }
 
 case class ReplicaDistributions(partitionRacks: Map[Int, Seq[String]],

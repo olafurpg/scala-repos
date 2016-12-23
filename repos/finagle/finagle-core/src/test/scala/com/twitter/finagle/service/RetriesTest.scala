@@ -44,7 +44,8 @@ class RetriesTest extends FunSuite {
       ttl = 1.second, // simplifies the math such that minRetries == minRetriesPerSecond
       minRetriesPerSec = minBudget,
       percentCanRetry = 0.0, // this shouldn't be a factor because we are relying on the reserve
-      nowMillis = Stopwatch.timeMillis)
+      nowMillis = Stopwatch.timeMillis
+    )
 
   test("moduleRetryableWrites only does requeues") {
     val stats = new InMemoryStatsReceiver()
@@ -141,7 +142,8 @@ class RetriesTest extends FunSuite {
       ttl = 20.seconds, // give a long window so we don't need to worry
       minRetriesPerSec = 1, // works out to 20 minimum retries per ttl
       percentCanRetry = 0.0, // this shouldn't be a factor because we are relying on the reserve
-      nowMillis = Stopwatch.systemMillis)
+      nowMillis = Stopwatch.systemMillis
+    )
 
     val params =
       Stack.Params.empty + param.Stats(stats) +

@@ -177,18 +177,22 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
       consumerOffsets(topicPartitions).flatMap { from =>
         kc.getLatestLeaderOffsets(topicPartitions).right.toOption.map {
           until =>
-            val offsetRanges = from.map {
-              case (tp: TopicAndPartition, fromOffset: Long) =>
-                OffsetRange(tp.topic,
-                            tp.partition,
-                            fromOffset,
-                            until(tp).offset)
-            }.toArray
+            val offsetRanges = from
+              .map {
+                case (tp: TopicAndPartition, fromOffset: Long) =>
+                  OffsetRange(tp.topic,
+                              tp.partition,
+                              fromOffset,
+                              until(tp).offset)
+              }
+              .toArray
 
-            val leaders = until.map {
-              case (tp: TopicAndPartition, lo: KafkaCluster.LeaderOffset) =>
-                tp -> Broker(lo.host, lo.port)
-            }.toMap
+            val leaders = until
+              .map {
+                case (tp: TopicAndPartition, lo: KafkaCluster.LeaderOffset) =>
+                  tp -> Broker(lo.host, lo.port)
+              }
+              .toMap
 
             KafkaUtils
               .createRDD[String, String, StringDecoder, StringDecoder, String](

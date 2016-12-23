@@ -71,7 +71,8 @@ private[feature] trait CountVectorizerParams
       " different documents a term must appear in to be included in the vocabulary." +
       " If this is an integer >= 1, this specifies the number of documents the term must" +
       " appear in; if this is a double in [0,1), then this specifies the fraction of documents.",
-    ParamValidators.gtEq(0.0))
+    ParamValidators.gtEq(0.0)
+  )
 
   /** @group getParam */
   def getMinDF: Double = $(minDF)
@@ -107,7 +108,8 @@ private[feature] trait CountVectorizerParams
       " appear in the document); if this is a double in [0,1), then this specifies a fraction (out" +
       " of the document's token count). Note that the parameter is only used in transform of" +
       " CountVectorizerModel and does not affect fitting.",
-    ParamValidators.gtEq(0.0))
+    ParamValidators.gtEq(0.0)
+  )
 
   setDefault(minTF -> 1)
 
@@ -154,23 +156,28 @@ class CountVectorizer(override val uid: String)
       } else {
         $(minDF) * input.cache().count()
       }
-    val wordCounts: RDD[(String, Long)] = input.flatMap {
-      case (tokens) =>
-        val wc = new OpenHashMap[String, Long]
-        tokens.foreach { w =>
-          wc.changeValue(w, 1L, _ + 1L)
-        }
-        wc.map { case (word, count) => (word, (count, 1)) }
-    }.reduceByKey {
-      case ((wc1, df1), (wc2, df2)) =>
-        (wc1 + wc2, df1 + df2)
-    }.filter {
-      case (word, (wc, df)) =>
-        df >= minDf
-    }.map {
-      case (word, (count, dfCount)) =>
-        (word, count)
-    }.cache()
+    val wordCounts: RDD[(String, Long)] = input
+      .flatMap {
+        case (tokens) =>
+          val wc = new OpenHashMap[String, Long]
+          tokens.foreach { w =>
+            wc.changeValue(w, 1L, _ + 1L)
+          }
+          wc.map { case (word, count) => (word, (count, 1)) }
+      }
+      .reduceByKey {
+        case ((wc1, df1), (wc2, df2)) =>
+          (wc1 + wc2, df1 + df2)
+      }
+      .filter {
+        case (word, (wc, df)) =>
+          df >= minDf
+      }
+      .map {
+        case (word, (count, dfCount)) =>
+          (word, count)
+      }
+      .cache()
     val fullVocabSize = wordCounts.count()
     val vocab: Array[String] = {
       val tmpSortedWC: Array[(String, Long)] =
@@ -243,7 +250,8 @@ class CountVectorizerModel(override val uid: String,
     "binary",
     "If True, all non zero counts are set to 1. " +
       "This is useful for discrete probabilistic models that model binary events rather " +
-      "than integer counts")
+      "than integer counts"
+  )
 
   /** @group getParam */
   def getBinary: Boolean = $(binary)

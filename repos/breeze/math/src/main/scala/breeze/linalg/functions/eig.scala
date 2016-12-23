@@ -42,20 +42,22 @@ object eig extends UFunc {
       val worksize = Array.ofDim[Double](1)
       val info = new intW(0)
 
-      lapack.dgeev("N",
-                   "V",
-                   n,
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   Array.empty[Double],
-                   Array.empty[Double],
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   worksize,
-                   -1,
-                   info)
+      lapack.dgeev(
+        "N",
+        "V",
+        n,
+        Array.empty[Double],
+        scala.math.max(1, n),
+        Array.empty[Double],
+        Array.empty[Double],
+        Array.empty[Double],
+        scala.math.max(1, n),
+        Array.empty[Double],
+        scala.math.max(1, n),
+        worksize,
+        -1,
+        info
+      )
 
       // Allocate the workspace
       val lwork: Int =

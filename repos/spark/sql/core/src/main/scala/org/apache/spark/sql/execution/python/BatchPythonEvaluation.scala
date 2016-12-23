@@ -73,10 +73,12 @@ case class BatchPythonEvaluation(udf: PythonUDF,
       // Input iterator to Python: input rows are grouped so we send them in batches to Python.
       // For each row, add it to the queue.
       val inputIterator = iter.grouped(100).map { inputRows =>
-        val toBePickled = inputRows.map { row =>
-          queue.add(row)
-          EvaluatePython.toJava(currentRow(row), schema)
-        }.toArray
+        val toBePickled = inputRows
+          .map { row =>
+            queue.add(row)
+            EvaluatePython.toJava(currentRow(row), schema)
+          }
+          .toArray
         pickle.dumps(toBePickled)
       }
 
@@ -94,13 +96,15 @@ case class BatchPythonEvaluation(udf: PythonUDF,
       val joined = new JoinedRow
       val resultProj = UnsafeProjection.create(output, output)
 
-      outputIterator.flatMap { pickedResult =>
-        val unpickledBatch = unpickle.loads(pickedResult)
-        unpickledBatch.asInstanceOf[java.util.ArrayList[Any]].asScala
-      }.map { result =>
-        row(0) = EvaluatePython.fromJava(result, udf.dataType)
-        resultProj(joined(queue.poll(), row))
-      }
+      outputIterator
+        .flatMap { pickedResult =>
+          val unpickledBatch = unpickle.loads(pickedResult)
+          unpickledBatch.asInstanceOf[java.util.ArrayList[Any]].asScala
+        }
+        .map { result =>
+          row(0) = EvaluatePython.fromJava(result, udf.dataType)
+          resultProj(joined(queue.poll(), row))
+        }
     }
   }
 }

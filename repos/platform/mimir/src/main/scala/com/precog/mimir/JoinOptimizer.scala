@@ -62,19 +62,23 @@ trait JoinOptimizerModule[M[+ _]]
           val key = "key"
           val value = "value"
 
-          AddSortKey(Join(JoinObject,
-                          IdentitySort,
-                          Join(WrapObject,
-                               Cross(Some(CrossRight)),
-                               Const(CString(key))(filter.loc),
-                               keyGraph)(filter.loc),
-                          Join(WrapObject,
-                               Cross(Some(CrossRight)),
-                               Const(CString(value))(filter.loc),
-                               valueGraph)(filter.loc))(filter.loc),
-                     key,
-                     value,
-                     sortId)
+          AddSortKey(
+            Join(
+              JoinObject,
+              IdentitySort,
+              Join(WrapObject,
+                   Cross(Some(CrossRight)),
+                   Const(CString(key))(filter.loc),
+                   keyGraph)(filter.loc),
+              Join(WrapObject,
+                   Cross(Some(CrossRight)),
+                   Const(CString(value))(filter.loc),
+                   valueGraph)(filter.loc)
+            )(filter.loc),
+            key,
+            value,
+            sortId
+          )
         }
 
         val rewritten = transformBottomUp(body) {

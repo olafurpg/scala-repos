@@ -365,7 +365,8 @@ object MarathonTestHelper {
               .newBuilder()
               .setId(UUID.randomUUID().toString)
               .build()),
-        prefix = TaskRepository.storePrefix),
+        prefix = TaskRepository.storePrefix
+      ),
       metrics
     )
 
@@ -662,7 +663,8 @@ object MarathonTestHelper {
       ),
       networking = Task.NoNetworking,
       reservation =
-        Task.Reservation(localVolumeIds, Task.Reservation.State.Launched))
+        Task.Reservation(localVolumeIds, Task.Reservation.State.Launched)
+    )
   }
 
   def mesosContainerWithPersistentVolume = Container(

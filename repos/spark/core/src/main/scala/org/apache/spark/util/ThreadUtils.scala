@@ -76,7 +76,8 @@ private[spark] object ThreadUtils {
       keepAliveSeconds,
       TimeUnit.SECONDS,
       new LinkedBlockingQueue[Runnable],
-      threadFactory)
+      threadFactory
+    )
     threadPool.allowCoreThreadTimeOut(true)
     threadPool
   }

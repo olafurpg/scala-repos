@@ -260,7 +260,8 @@ private[finagle] class BindingFactory[Req, Rep](
         }
     },
     statsReceiver.scope("namecache"),
-    maxNameCacheSize)
+    maxNameCacheSize
+  )
 
   private[this] val nameTreeCache =
     new ServiceFactoryCache[NameTree[Name.Bound], Req, Rep](
@@ -273,7 +274,8 @@ private[finagle] class BindingFactory[Req, Rep](
           }
       },
       statsReceiver.scope("nametreecache"),
-      maxNameTreeCacheSize)
+      maxNameTreeCacheSize
+    )
 
   private[this] val dtabCache = {
     val newFactory: ((Dtab, Dtab)) => ServiceFactory[Req, Rep] = {

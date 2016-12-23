@@ -45,5 +45,6 @@ private[blog] final class Notifier(blogApi: BlogApi,
       subject = s"New blog post: ${~doc.getText("blog.title")}",
       message = s"""${~doc.getText("blog.shortlede")}
 
-Continue reading this post on http://lichess.org/blog/${doc.id}/${doc.slug}""")
+Continue reading this post on http://lichess.org/blog/${doc.id}/${doc.slug}"""
+    )
 }

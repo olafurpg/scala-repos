@@ -322,9 +322,11 @@ private[python] class PythonMLLibAPI extends Serializable {
   def trainIsotonicRegressionModel(data: JavaRDD[Vector],
                                    isotonic: Boolean): JList[Object] = {
     val isotonicRegressionAlg = new IsotonicRegression().setIsotonic(isotonic)
-    val input = data.rdd.map { x =>
-      (x(0), x(1), x(2))
-    }.persist(StorageLevel.MEMORY_AND_DISK)
+    val input = data.rdd
+      .map { x =>
+        (x(0), x(1), x(2))
+      }
+      .persist(StorageLevel.MEMORY_AND_DISK)
     try {
       val model = isotonicRegressionAlg.run(input)
       List[AnyRef](model.boundaryVector, model.predictionVector).asJava
@@ -711,15 +713,16 @@ private[python] class PythonMLLibAPI extends Serializable {
     val algo = Algo.fromString(algoStr)
     val impurity = Impurities.fromString(impurityStr)
 
-    val strategy = new Strategy(algo = algo,
-                                impurity = impurity,
-                                maxDepth = maxDepth,
-                                numClasses = numClasses,
-                                maxBins = maxBins,
-                                categoricalFeaturesInfo =
-                                  categoricalFeaturesInfo.asScala.toMap,
-                                minInstancesPerNode = minInstancesPerNode,
-                                minInfoGain = minInfoGain)
+    val strategy = new Strategy(
+      algo = algo,
+      impurity = impurity,
+      maxDepth = maxDepth,
+      numClasses = numClasses,
+      maxBins = maxBins,
+      categoricalFeaturesInfo = categoricalFeaturesInfo.asScala.toMap,
+      minInstancesPerNode = minInstancesPerNode,
+      minInfoGain = minInfoGain
+    )
     try {
       DecisionTree
         .train(data.rdd.persist(StorageLevel.MEMORY_AND_DISK), strategy)
@@ -1564,20 +1567,22 @@ private[spark] object SerDe extends Serializable {
     */
   def pythonToJava(pyRDD: JavaRDD[Array[Byte]],
                    batched: Boolean): JavaRDD[Any] = {
-    pyRDD.rdd.mapPartitions { iter =>
-      initialize() // let it called in executor
-      val unpickle = new Unpickler
-      iter.flatMap { row =>
-        val obj = unpickle.loads(row)
-        if (batched) {
-          obj match {
-            case list: JArrayList[_] => list.asScala
-            case arr: Array[_] => arr
+    pyRDD.rdd
+      .mapPartitions { iter =>
+        initialize() // let it called in executor
+        val unpickle = new Unpickler
+        iter.flatMap { row =>
+          val obj = unpickle.loads(row)
+          if (batched) {
+            obj match {
+              case list: JArrayList[_] => list.asScala
+              case arr: Array[_] => arr
+            }
+          } else {
+            Seq(obj)
           }
-        } else {
-          Seq(obj)
         }
       }
-    }.toJavaRDD()
+      .toJavaRDD()
   }
 }

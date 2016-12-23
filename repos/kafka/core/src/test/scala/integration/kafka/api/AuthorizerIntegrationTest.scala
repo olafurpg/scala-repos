@@ -103,7 +103,8 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
     ApiKeys.LEADER_AND_ISR.id -> classOf[requests.LeaderAndIsrResponse],
     ApiKeys.STOP_REPLICA.id -> classOf[requests.StopReplicaResponse],
     ApiKeys.CONTROLLED_SHUTDOWN_KEY.id -> classOf[
-      requests.ControlledShutdownResponse])
+      requests.ControlledShutdownResponse]
+  )
 
   val RequestKeyToErrorCode = Map[Short, (Nothing) => Short](
     ApiKeys.METADATA.id ->
@@ -311,7 +312,8 @@ class AuthorizerIntegrationTest extends KafkaServerTestHarness {
           List(brokerId).asJava,
           2,
           Set(brokerId).asJava)).asJava,
-      Set(new BrokerEndPoint(brokerId, "localhost", 0)).asJava)
+      Set(new BrokerEndPoint(brokerId, "localhost", 0)).asJava
+    )
   }
 
   private def createStopReplicaRequest = {

@@ -105,14 +105,16 @@ private[http] object OutgoingConnectionBlueprint {
             // the initial header parser we initially use for every connection,
             // will not be mutated, all "shared copy" parsers copy on first-write into the header cache
             val rootParser =
-              new HttpResponseParser(parserSettings,
-                                     HttpHeaderParser(parserSettings) { info ⇒
-                                       if (parserSettings.illegalHeaderWarnings)
-                                         logParsingError(
-                                           info withSummaryPrepended "Illegal response header",
-                                           log,
-                                           parserSettings.errorLoggingVerbosity)
-                                     })
+              new HttpResponseParser(
+                parserSettings,
+                HttpHeaderParser(parserSettings) { info ⇒
+                  if (parserSettings.illegalHeaderWarnings)
+                    logParsingError(
+                      info withSummaryPrepended "Illegal response header",
+                      log,
+                      parserSettings.errorLoggingVerbosity)
+                }
+              )
             new ResponseParsingMerge(rootParser)
           }
 
@@ -341,33 +343,39 @@ private[http] object OutgoingConnectionBlueprint {
         val parser = rootParser.createShallowCopy()
         var waitingForMethod = true
 
-        setHandler(bypassInput, new InHandler {
-          override def onPush(): Unit = {
-            val responseContext = grab(bypassInput)
-            parser.setContextForNextResponse(responseContext)
-            val output = parser.parseBytes(ByteString.empty)
-            drainParser(output)
-          }
-          override def onUpstreamFinish(): Unit =
-            if (waitingForMethod) completeStage()
-        })
-
-        setHandler(dataInput, new InHandler {
-          override def onPush(): Unit = {
-            val bytes = grab(dataInput)
-            val output = parser.parseSessionBytes(bytes)
-            drainParser(output)
-          }
-          override def onUpstreamFinish(): Unit =
-            if (waitingForMethod) completeStage()
-            else {
-              if (parser.onUpstreamFinish()) {
-                completeStage()
-              } else {
-                emit(out, parser.onPull() :: Nil, () ⇒ completeStage())
-              }
+        setHandler(
+          bypassInput,
+          new InHandler {
+            override def onPush(): Unit = {
+              val responseContext = grab(bypassInput)
+              parser.setContextForNextResponse(responseContext)
+              val output = parser.parseBytes(ByteString.empty)
+              drainParser(output)
             }
-        })
+            override def onUpstreamFinish(): Unit =
+              if (waitingForMethod) completeStage()
+          }
+        )
+
+        setHandler(
+          dataInput,
+          new InHandler {
+            override def onPush(): Unit = {
+              val bytes = grab(dataInput)
+              val output = parser.parseSessionBytes(bytes)
+              drainParser(output)
+            }
+            override def onUpstreamFinish(): Unit =
+              if (waitingForMethod) completeStage()
+              else {
+                if (parser.onUpstreamFinish()) {
+                  completeStage()
+                } else {
+                  emit(out, parser.onPull() :: Nil, () ⇒ completeStage())
+                }
+              }
+          }
+        )
 
         setHandler(out, eagerTerminateOutput)
 

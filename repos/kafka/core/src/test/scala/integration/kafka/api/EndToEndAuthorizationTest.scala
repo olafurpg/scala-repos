@@ -96,41 +96,51 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
   // 2- Provides only write access to topic
   // 3- Provides read access to consumer group
   def clusterAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--cluster",
-          s"--operation=ClusterAction",
-          s"--allow-principal=$kafkaPrincipalType:$kafkaPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--cluster",
+      s"--operation=ClusterAction",
+      s"--allow-principal=$kafkaPrincipalType:$kafkaPrincipal"
+    )
   def topicBrokerReadAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--topic=$topicWildcard",
-          s"--operation=Read",
-          s"--allow-principal=$kafkaPrincipalType:$kafkaPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--topic=$topicWildcard",
+      s"--operation=Read",
+      s"--allow-principal=$kafkaPrincipalType:$kafkaPrincipal"
+    )
   def produceAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--topic=$topic",
-          s"--producer",
-          s"--allow-principal=$kafkaPrincipalType:$clientPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--topic=$topic",
+      s"--producer",
+      s"--allow-principal=$kafkaPrincipalType:$clientPrincipal"
+    )
   def consumeAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--topic=$topic",
-          s"--group=$group",
-          s"--consumer",
-          s"--allow-principal=$kafkaPrincipalType:$clientPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--topic=$topic",
+      s"--group=$group",
+      s"--consumer",
+      s"--allow-principal=$kafkaPrincipalType:$clientPrincipal"
+    )
   def groupAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--group=$group",
-          s"--operation=Read",
-          s"--allow-principal=$kafkaPrincipalType:$clientPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--group=$group",
+      s"--operation=Read",
+      s"--allow-principal=$kafkaPrincipalType:$clientPrincipal"
+    )
   def ClusterActionAcl =
     Set(
       new Acl(new KafkaPrincipal(kafkaPrincipalType, kafkaPrincipal),

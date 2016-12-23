@@ -41,10 +41,14 @@ class ExecutionKMeansTest extends WordSpec with Matchers {
         randVect(i % k)
       })
 
-      val labels = KMeans(k, vectors).flatMap {
-        case (_, _, labeledPipe) =>
-          labeledPipe.toIterableExecution
-      }.waitFor(Config.default, Local(false)).get.toList
+      val labels = KMeans(k, vectors)
+        .flatMap {
+          case (_, _, labeledPipe) =>
+            labeledPipe.toIterableExecution
+        }
+        .waitFor(Config.default, Local(false))
+        .get
+        .toList
 
       def clusterOf(v: Vector[Double]): Int = v.indexWhere(_ > 0.0)
 

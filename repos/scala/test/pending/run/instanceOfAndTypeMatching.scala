@@ -121,13 +121,15 @@ object Test {
   def testInnerRuntime = {
     println("testInnerRuntime\n")
 
-    List("These should be true under any scenario: ",
-         inner1.isInstanceOf[outer1.Inner],
-         inner1.isInstanceOf[Outer#Inner],
-         (inner1: Any) match { case _: Outer#Inner => true; case _ => false },
-         (inner1: Any) match { case _: outer1.Inner => true; case _ => false },
-         inner1.compareSharpWithTypeMatch(inner2),
-         inner1.compareSharpWithInstanceOf(inner2)) foreach println
+    List(
+      "These should be true under any scenario: ",
+      inner1.isInstanceOf[outer1.Inner],
+      inner1.isInstanceOf[Outer#Inner],
+      (inner1: Any) match { case _: Outer#Inner => true; case _ => false },
+      (inner1: Any) match { case _: outer1.Inner => true; case _ => false },
+      inner1.compareSharpWithTypeMatch(inner2),
+      inner1.compareSharpWithInstanceOf(inner2)
+    ) foreach println
 
     List("These should be true under current proposal: ",
          inner1.compareSimpleWithInstanceOf(inner2)) foreach println

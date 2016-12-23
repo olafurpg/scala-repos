@@ -38,6 +38,7 @@ trait FeatureSpecGenerator extends ScalaTestTestCase {
         |
         | feature("empty") {}
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 }

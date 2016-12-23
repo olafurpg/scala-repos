@@ -368,38 +368,40 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
       }
     }
 
-    var res: ScType = checkApplication(
-      invokedType,
-      args(isNamedDynamic = isApplyDynamicNamed)).getOrElse {
-      var (processedType, importsUsed, implicitFunction, applyOrUpdateResult) =
-        ScalaPsiUtil
-          .processTypeForUpdateOrApply(invokedType, this, isShape = false)
-          .getOrElse {
-            (types.Nothing,
-             Set.empty[ImportUsed],
-             None,
-             this.applyOrUpdateElement)
+    var res: ScType =
+      checkApplication(invokedType, args(isNamedDynamic = isApplyDynamicNamed))
+        .getOrElse {
+          var (processedType,
+               importsUsed,
+               implicitFunction,
+               applyOrUpdateResult) =
+            ScalaPsiUtil
+              .processTypeForUpdateOrApply(invokedType, this, isShape = false)
+              .getOrElse {
+                (types.Nothing,
+                 Set.empty[ImportUsed],
+                 None,
+                 this.applyOrUpdateElement)
+              }
+          if (useExpectedType) {
+            updateAccordingToExpectedType(Success(processedType, None))
+              .foreach(x => processedType = x)
           }
-      if (useExpectedType) {
-        updateAccordingToExpectedType(Success(processedType, None))
-          .foreach(x => processedType = x)
-      }
-      setApplyOrUpdate(applyOrUpdateResult)
-      setImportsUsed(importsUsed)
-      setImplicitFunction(implicitFunction)
-      val isNamedDynamic: Boolean = applyOrUpdateResult.exists(
-        result =>
-          result.isDynamic &&
-            result.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED)
-      checkApplication(
-        processedType,
-        args(includeUpdateCall = true, isNamedDynamic)).getOrElse {
-        setApplyOrUpdate(None)
-        setApplicabilityProblemsVar(Seq(new DoesNotTakeParameters))
-        setMatchedParametersVar(Seq())
-        processedType
-      }
-    }
+          setApplyOrUpdate(applyOrUpdateResult)
+          setImportsUsed(importsUsed)
+          setImplicitFunction(implicitFunction)
+          val isNamedDynamic: Boolean = applyOrUpdateResult.exists(result =>
+            result.isDynamic &&
+              result.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED)
+          checkApplication(
+            processedType,
+            args(includeUpdateCall = true, isNamedDynamic)).getOrElse {
+            setApplyOrUpdate(None)
+            setApplicabilityProblemsVar(Seq(new DoesNotTakeParameters))
+            setMatchedParametersVar(Seq())
+            processedType
+          }
+        }
 
     //Implicit parameters
     val checkImplicitParameters = withEtaExpansion(this)

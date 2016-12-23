@@ -170,7 +170,8 @@ private[client] class Shim_v0_12 extends Shim with Logging {
     JBoolean.TYPE,
     JInteger.TYPE,
     JBoolean.TYPE,
-    JBoolean.TYPE)
+    JBoolean.TYPE
+  )
   private lazy val dropIndexMethod = findMethod(classOf[Hive],
                                                 "dropIndex",
                                                 classOf[String],
@@ -337,18 +338,22 @@ private[client] class Shim_v0_13 extends Shim_v0_12 {
       .map(col => col.getName)
       .toSet
 
-    filters.collect {
-      case op @ BinaryComparison(a: Attribute, Literal(v, _: IntegralType)) =>
-        s"${a.name} ${op.symbol} $v"
-      case op @ BinaryComparison(Literal(v, _: IntegralType), a: Attribute) =>
-        s"$v ${op.symbol} ${a.name}"
-      case op @ BinaryComparison(a: Attribute, Literal(v, _: StringType))
-          if !varcharKeys.contains(a.name) =>
-        s"""${a.name} ${op.symbol} "$v""""
-      case op @ BinaryComparison(Literal(v, _: StringType), a: Attribute)
-          if !varcharKeys.contains(a.name) =>
-        s""""$v" ${op.symbol} ${a.name}"""
-    }.mkString(" and ")
+    filters
+      .collect {
+        case op @ BinaryComparison(a: Attribute,
+                                   Literal(v, _: IntegralType)) =>
+          s"${a.name} ${op.symbol} $v"
+        case op @ BinaryComparison(Literal(v, _: IntegralType),
+                                   a: Attribute) =>
+          s"$v ${op.symbol} ${a.name}"
+        case op @ BinaryComparison(a: Attribute, Literal(v, _: StringType))
+            if !varcharKeys.contains(a.name) =>
+          s"""${a.name} ${op.symbol} "$v""""
+        case op @ BinaryComparison(Literal(v, _: StringType), a: Attribute)
+            if !varcharKeys.contains(a.name) =>
+          s""""$v" ${op.symbol} ${a.name}"""
+      }
+      .mkString(" and ")
   }
 
   override def getPartitionsByFilter(
@@ -405,7 +410,8 @@ private[client] class Shim_v0_14 extends Shim_v0_13 {
     JBoolean.TYPE,
     JBoolean.TYPE,
     JBoolean.TYPE,
-    JBoolean.TYPE)
+    JBoolean.TYPE
+  )
   private lazy val loadTableMethod = findMethod(classOf[Hive],
                                                 "loadTable",
                                                 classOf[Path],
@@ -425,7 +431,8 @@ private[client] class Shim_v0_14 extends Shim_v0_13 {
     JInteger.TYPE,
     JBoolean.TYPE,
     JBoolean.TYPE,
-    JBoolean.TYPE)
+    JBoolean.TYPE
+  )
   private lazy val getTimeVarMethod = findMethod(classOf[HiveConf],
                                                  "getTimeVar",
                                                  classOf[HiveConf.ConfVars],
@@ -439,16 +446,18 @@ private[client] class Shim_v0_14 extends Shim_v0_13 {
                              holdDDLTime: Boolean,
                              inheritTableSpecs: Boolean,
                              isSkewedStoreAsSubdir: Boolean): Unit = {
-    loadPartitionMethod.invoke(hive,
-                               loadPath,
-                               tableName,
-                               partSpec,
-                               replace: JBoolean,
-                               holdDDLTime: JBoolean,
-                               inheritTableSpecs: JBoolean,
-                               isSkewedStoreAsSubdir: JBoolean,
-                               isSrcLocal(loadPath, hive.getConf()): JBoolean,
-                               JBoolean.FALSE)
+    loadPartitionMethod.invoke(
+      hive,
+      loadPath,
+      tableName,
+      partSpec,
+      replace: JBoolean,
+      holdDDLTime: JBoolean,
+      inheritTableSpecs: JBoolean,
+      isSkewedStoreAsSubdir: JBoolean,
+      isSrcLocal(loadPath, hive.getConf()): JBoolean,
+      JBoolean.FALSE
+    )
   }
 
   override def loadTable(hive: Hive,
@@ -539,7 +548,8 @@ private[client] class Shim_v1_2 extends Shim_v1_1 {
     JBoolean.TYPE,
     JBoolean.TYPE,
     JBoolean.TYPE,
-    JLong.TYPE)
+    JLong.TYPE
+  )
 
   override def loadDynamicPartitions(hive: Hive,
                                      loadPath: Path,

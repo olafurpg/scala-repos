@@ -97,36 +97,43 @@ object MatrixProduct extends java.io.Serializable {
   var maxReducers = 200
 
   def numOfReducers(hint: SizeHint) = {
-    hint.total.map { tot =>
-      // + 1L is to make sure there is at least once reducer
-      (tot / MatrixProduct.maxTinyJoin +
-        1L).toInt min MatrixProduct.maxReducers
-    }.getOrElse(-1)
+    hint.total
+      .map { tot =>
+        // + 1L is to make sure there is at least once reducer
+        (tot / MatrixProduct.maxTinyJoin +
+          1L).toInt min MatrixProduct.maxReducers
+      }
+      .getOrElse(-1)
   }
 
   def getJoiner(leftSize: SizeHint, rightSize: SizeHint): MatrixJoiner = {
     val newHint = leftSize * rightSize
     if (SizeHintOrdering.lteq(leftSize, rightSize)) {
       // If leftsize is definite:
-      leftSize.total.map { t =>
-        if (t < maxTinyJoin) TinyToAny
-        else new SmallToBig(numOfReducers(newHint))
-      }
-      // Else just assume the right is smaller, but both are unknown:
+      leftSize.total
+        .map { t =>
+          if (t < maxTinyJoin) TinyToAny
+          else new SmallToBig(numOfReducers(newHint))
+        }
+        // Else just assume the right is smaller, but both are unknown:
         .getOrElse(new BigToSmall(numOfReducers(newHint)))
     } else {
       // left > right
-      rightSize.total.map { rs =>
-        if (rs < maxTinyJoin) AnyToTiny
-        else new BigToSmall(numOfReducers(newHint))
-      }.getOrElse(new BigToSmall(numOfReducers(newHint)))
+      rightSize.total
+        .map { rs =>
+          if (rs < maxTinyJoin) AnyToTiny
+          else new BigToSmall(numOfReducers(newHint))
+        }
+        .getOrElse(new BigToSmall(numOfReducers(newHint)))
     }
   }
 
   def getCrosser(rightSize: SizeHint): MatrixCrosser =
-    rightSize.total.map { t =>
-      if (t < maxTinyJoin) AnyCrossTiny else AnyCrossSmall
-    }.getOrElse(AnyCrossSmall)
+    rightSize.total
+      .map { t =>
+        if (t < maxTinyJoin) AnyCrossTiny else AnyCrossSmall
+      }
+      .getOrElse(AnyCrossSmall)
 
   implicit def literalScalarRightProduct[Row, Col, ValT](
       implicit ring: Ring[ValT]): MatrixProduct[Matrix[Row, Col, ValT],

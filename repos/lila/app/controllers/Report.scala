@@ -45,7 +45,8 @@ object Report extends LilaController {
       data =>
         api.create(data, me) map { report =>
           Redirect(routes.Report.thanks(data.user.username))
-      })
+      }
+    )
   }
 
   def thanks(reported: String) = Auth { implicit ctx => implicit me =>

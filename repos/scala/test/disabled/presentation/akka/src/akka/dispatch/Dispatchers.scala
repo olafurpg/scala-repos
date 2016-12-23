@@ -301,7 +301,9 @@ class ExecutorBasedEventDrivenDispatcherConfigurator
           config.getInt("throughput-deadline-time",
                         Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
           mailboxType(config),
-          threadPoolConfig)).build
+          threadPoolConfig
+      )
+    ).build
   }
 }
 
@@ -317,6 +319,8 @@ class ExecutorBasedEventDrivenWorkStealingDispatcherConfigurator
           config.getInt("throughput-deadline-time",
                         Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
           mailboxType(config),
-          threadPoolConfig)).build
+          threadPoolConfig
+      )
+    ).build
   }
 }

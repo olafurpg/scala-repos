@@ -7,8 +7,9 @@ package testingSupport.specs2
   */
 abstract class Specs2ObjectSpecTest extends Specs2TestCase {
   def testSpecObject() {
-    addFileToProject("SpecObject.scala",
-                     """
+    addFileToProject(
+      "SpecObject.scala",
+      """
       |import org.specs2.mutable.Specification
       |
       |object SpecObject extends Specification {
@@ -24,7 +25,8 @@ abstract class Specs2ObjectSpecTest extends Specs2TestCase {
       |    }
       |  }
       |}
-    """.stripMargin)
+    """.stripMargin
+    )
 
     runTestByLocation(
       5,
@@ -38,6 +40,7 @@ abstract class Specs2ObjectSpecTest extends Specs2TestCase {
                                          "single test in SpecObject should",
                                          "run alone") &&
           checkResultTreeDoesNotHaveNodes(root, "ignore other test"),
-      debug = true)
+      debug = true
+    )
   }
 }

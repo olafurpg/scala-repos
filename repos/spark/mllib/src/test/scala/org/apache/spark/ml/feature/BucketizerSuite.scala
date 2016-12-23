@@ -172,7 +172,8 @@ private object BucketizerSuite extends SparkFunSuite {
       assert(
         Bucketizer.binarySearchForBuckets(splits, feature) === expectedBucket,
         s"Expected feature value $feature to be in bucket $expectedBucket with splits:" +
-          s" ${splits.mkString(", ")}")
+          s" ${splits.mkString(", ")}"
+      )
     }
     var i = 0
     val n = splits.length - 1

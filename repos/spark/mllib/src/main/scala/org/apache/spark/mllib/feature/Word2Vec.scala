@@ -188,7 +188,8 @@ class Word2Vec extends Serializable with Logging {
     require(
       vocabSize > 0,
       "The vocabulary size should be > 0. You may need to check " +
-        "the setting of minCount, which could be large enough to remove all your words in sentences.")
+        "the setting of minCount, which could be large enough to remove all your words in sentences."
+    )
 
     var a = 0
     while (a < vocabSize) {
@@ -428,11 +429,13 @@ class Word2Vec extends Serializable with Logging {
             }
             .flatten
       }
-      val synAgg = partial.reduceByKey {
-        case (v1, v2) =>
-          blas.saxpy(vectorSize, 1.0f, v2, 1, v1, 1)
-          v1
-      }.collect()
+      val synAgg = partial
+        .reduceByKey {
+          case (v1, v2) =>
+            blas.saxpy(vectorSize, 1.0f, v2, 1, v1, 1)
+            v1
+        }
+        .collect()
       var i = 0
       while (i < synAgg.length) {
         val index = synAgg(i)._1
@@ -705,7 +708,8 @@ object Word2VecModel extends Loader[Word2VecModel] {
         require(
           expectedVectorSize == vectorSize,
           s"Word2VecModel requires each word to be mapped to a vector of size " +
-            s"$expectedVectorSize, got vector of size $vectorSize")
+            s"$expectedVectorSize, got vector of size $vectorSize"
+        )
         require(
           expectedNumWords == numWords,
           s"Word2VecModel requires $expectedNumWords words, but got $numWords")

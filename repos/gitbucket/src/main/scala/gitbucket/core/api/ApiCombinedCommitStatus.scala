@@ -25,5 +25,6 @@ object ApiCombinedCommitStatus {
       statuses = statuses.map {
         case (s, a) => ApiCommitStatus(s, ApiUser(a))
       },
-      repository = repository)
+      repository = repository
+    )
 }

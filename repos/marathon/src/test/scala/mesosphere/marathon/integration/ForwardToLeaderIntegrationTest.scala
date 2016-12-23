@@ -85,15 +85,17 @@ class ForwardToLeaderIntegrationTest
 
   test("direct HTTPS ping") {
     ProcessKeeper.startService(
-      ForwarderService.createHelloApp("--disable_http",
-                                      "--ssl_keystore_path",
-                                      SSLContextTestUtil.keyStorePath,
-                                      "--ssl_keystore_password",
-                                      SSLContextTestUtil.keyStorePassword,
-                                      "--https_address",
-                                      "localhost",
-                                      "--https_port",
-                                      ports.head.toString))
+      ForwarderService.createHelloApp(
+        "--disable_http",
+        "--ssl_keystore_path",
+        SSLContextTestUtil.keyStorePath,
+        "--ssl_keystore_password",
+        SSLContextTestUtil.keyStorePassword,
+        "--https_address",
+        "localhost",
+        "--https_port",
+        ports.head.toString
+      ))
 
     val pingURL = new URL(s"https://localhost:${ports.head}/ping")
     val connection = SSLContextTestUtil.sslConnection(pingURL)
@@ -111,26 +113,30 @@ class ForwardToLeaderIntegrationTest
   test("forwarding HTTPS ping") {
     // We cannot start two service in one process because of static variables in GuiceFilter
     ProcessKeeper.startService(
-      ForwarderService.createHelloApp("--disable_http",
-                                      "--ssl_keystore_path",
-                                      SSLContextTestUtil.keyStorePath,
-                                      "--ssl_keystore_password",
-                                      SSLContextTestUtil.keyStorePassword,
-                                      "--https_address",
-                                      "localhost",
-                                      "--https_port",
-                                      ports.head.toString))
+      ForwarderService.createHelloApp(
+        "--disable_http",
+        "--ssl_keystore_path",
+        SSLContextTestUtil.keyStorePath,
+        "--ssl_keystore_password",
+        SSLContextTestUtil.keyStorePassword,
+        "--https_address",
+        "localhost",
+        "--https_port",
+        ports.head.toString
+      ))
 
-    ForwarderService.startForwarderProcess(forwardToPort = ports.head,
-                                           "--disable_http",
-                                           "--ssl_keystore_path",
-                                           SSLContextTestUtil.keyStorePath,
-                                           "--ssl_keystore_password",
-                                           SSLContextTestUtil.keyStorePassword,
-                                           "--https_address",
-                                           "localhost",
-                                           "--https_port",
-                                           ports(1).toString)
+    ForwarderService.startForwarderProcess(
+      forwardToPort = ports.head,
+      "--disable_http",
+      "--ssl_keystore_path",
+      SSLContextTestUtil.keyStorePath,
+      "--ssl_keystore_password",
+      SSLContextTestUtil.keyStorePassword,
+      "--https_address",
+      "localhost",
+      "--https_port",
+      ports(1).toString
+    )
 
     val pingURL = new URL(s"https://localhost:${ports(1)}/ping")
     val connection = SSLContextTestUtil.sslConnection(pingURL)

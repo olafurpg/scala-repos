@@ -35,44 +35,47 @@ private[stream] class Throttle[T](cost: Int,
 
       var currentElement: Option[T] = None
 
-      setHandler(in, new InHandler {
-        val scaledMaximumBurst = scale(maximumBurst)
+      setHandler(
+        in,
+        new InHandler {
+          val scaledMaximumBurst = scale(maximumBurst)
 
-        override def onUpstreamFinish(): Unit =
-          if (isAvailable(out) && isTimerActive(timerName)) willStop = true
-          else completeStage()
+          override def onUpstreamFinish(): Unit =
+            if (isAvailable(out) && isTimerActive(timerName)) willStop = true
+            else completeStage()
 
-        override def onPush(): Unit = {
-          val elem = grab(in)
-          val elementCost = scale(costCalculation(elem))
+          override def onPush(): Unit = {
+            val elem = grab(in)
+            val elementCost = scale(costCalculation(elem))
 
-          if (lastTokens >= elementCost) {
-            lastTokens -= elementCost
-            push(out, elem)
-          } else {
-            val currentTime = now()
-            val currentTokens =
-              Math.min((currentTime - previousTime) * speed + lastTokens,
-                       scaledMaximumBurst)
-            if (currentTokens < elementCost)
-              mode match {
-                case Shaping ⇒
-                  currentElement = Some(elem)
-                  val waitTime = (elementCost - currentTokens) / speed
-                  previousTime = currentTime + waitTime
-                  scheduleOnce(timerName, waitTime.nanos)
-                case Enforcing ⇒
-                  failStage(
-                    new RateExceededException(
-                      "Maximum throttle throughput exceeded"))
-              } else {
-              lastTokens = currentTokens - elementCost
-              previousTime = currentTime
+            if (lastTokens >= elementCost) {
+              lastTokens -= elementCost
               push(out, elem)
+            } else {
+              val currentTime = now()
+              val currentTokens =
+                Math.min((currentTime - previousTime) * speed + lastTokens,
+                         scaledMaximumBurst)
+              if (currentTokens < elementCost)
+                mode match {
+                  case Shaping ⇒
+                    currentElement = Some(elem)
+                    val waitTime = (elementCost - currentTokens) / speed
+                    previousTime = currentTime + waitTime
+                    scheduleOnce(timerName, waitTime.nanos)
+                  case Enforcing ⇒
+                    failStage(
+                      new RateExceededException(
+                        "Maximum throttle throughput exceeded"))
+                } else {
+                lastTokens = currentTokens - elementCost
+                previousTime = currentTime
+                push(out, elem)
+              }
             }
           }
         }
-      })
+      )
 
       override protected def onTimer(key: Any): Unit = {
         push(out, currentElement.get)

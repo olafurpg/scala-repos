@@ -157,7 +157,8 @@ class Strategy @Since("1.3.0")(
         require(
           Set(Gini, Entropy).contains(impurity),
           s"DecisionTree Strategy given invalid impurity for Classification: $impurity." +
-            s"  Valid settings: Gini, Entropy")
+            s"  Valid settings: Gini, Entropy"
+        )
       case Regression =>
         require(
           impurity == Variance,
@@ -193,19 +194,21 @@ class Strategy @Since("1.3.0")(
     */
   @Since("1.2.0")
   def copy: Strategy = {
-    new Strategy(algo,
-                 impurity,
-                 maxDepth,
-                 numClasses,
-                 maxBins,
-                 quantileCalculationStrategy,
-                 categoricalFeaturesInfo,
-                 minInstancesPerNode,
-                 minInfoGain,
-                 maxMemoryInMB,
-                 subsamplingRate,
-                 useNodeIdCache,
-                 checkpointInterval)
+    new Strategy(
+      algo,
+      impurity,
+      maxDepth,
+      numClasses,
+      maxBins,
+      quantileCalculationStrategy,
+      categoricalFeaturesInfo,
+      minInstancesPerNode,
+      minInfoGain,
+      maxMemoryInMB,
+      subsamplingRate,
+      useNodeIdCache,
+      checkpointInterval
+    )
   }
 }
 

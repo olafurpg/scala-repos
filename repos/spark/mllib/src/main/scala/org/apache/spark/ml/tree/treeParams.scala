@@ -56,7 +56,8 @@ private[ml] trait DecisionTreeParams
     "maxDepth",
     "Maximum depth of the tree. (>= 0)" +
       " E.g., depth 0 means 1 leaf node; depth 1 means 1 internal node + 2 leaf nodes.",
-    ParamValidators.gtEq(0))
+    ParamValidators.gtEq(0)
+  )
 
   /**
     * Maximum number of bins used for discretizing continuous features and for choosing how to split
@@ -71,7 +72,8 @@ private[ml] trait DecisionTreeParams
     "Max number of bins for" +
       " discretizing continuous features.  Must be >=2 and >= number of categories for any" +
       " categorical feature.",
-    ParamValidators.gtEq(2))
+    ParamValidators.gtEq(2)
+  )
 
   /**
     * Minimum number of instances each child must have after split.
@@ -88,7 +90,8 @@ private[ml] trait DecisionTreeParams
       " number of instances each child must have after split.  If a split causes the left or right" +
       " child to have fewer than minInstancesPerNode, the split will be discarded as invalid." +
       " Should be >= 1.",
-    ParamValidators.gtEq(1))
+    ParamValidators.gtEq(1)
+  )
 
   /**
     * Minimum information gain for a split to be considered at a tree node.
@@ -125,7 +128,8 @@ private[ml] trait DecisionTreeParams
     "If false, the" +
       " algorithm will pass trees to executors to match instances with nodes. If true, the" +
       " algorithm will cache node IDs for each instance. Caching can speed up training of deeper" +
-      " trees.")
+      " trees."
+  )
 
   setDefault(maxDepth -> 5,
              maxBins -> 32,
@@ -227,7 +231,8 @@ private[ml] trait TreeClassifierParams extends Params {
       " information gain calculation (case-insensitive). Supported options:" +
       s" ${TreeClassifierParams.supportedImpurities.mkString(", ")}",
     (value: String) =>
-      TreeClassifierParams.supportedImpurities.contains(value.toLowerCase))
+      TreeClassifierParams.supportedImpurities.contains(value.toLowerCase)
+  )
 
   setDefault(impurity -> "gini")
 
@@ -278,7 +283,8 @@ private[ml] trait TreeRegressorParams extends Params {
       " information gain calculation (case-insensitive). Supported options:" +
       s" ${TreeRegressorParams.supportedImpurities.mkString(", ")}",
     (value: String) =>
-      TreeRegressorParams.supportedImpurities.contains(value.toLowerCase))
+      TreeRegressorParams.supportedImpurities.contains(value.toLowerCase)
+  )
 
   setDefault(impurity -> "variance")
 
@@ -342,7 +348,8 @@ private[ml] trait TreeEnsembleParams extends DecisionTreeParams {
     "subsamplingRate",
     "Fraction of the training data used for learning each decision tree, in range (0, 1].",
     ParamValidators
-      .inRange(0, 1, lowerInclusive = false, upperInclusive = true))
+      .inRange(0, 1, lowerInclusive = false, upperInclusive = true)
+  )
 
   setDefault(subsamplingRate -> 1.0)
 
@@ -421,7 +428,8 @@ private[ml] trait RandomForestParams extends TreeEnsembleParams {
         .mkString(", ")}",
     (value: String) =>
       RandomForestParams.supportedFeatureSubsetStrategies.contains(
-        value.toLowerCase))
+        value.toLowerCase)
+  )
 
   setDefault(numTrees -> 20, featureSubsetStrategy -> "auto")
 
@@ -481,12 +489,14 @@ private[ml] trait GBTParams
   def setStepSize(value: Double): this.type = set(stepSize, value)
 
   override def validateParams(): Unit = {
-    require(ParamValidators.inRange(0,
-                                    1,
-                                    lowerInclusive = false,
-                                    upperInclusive = true)(getStepSize),
-            "GBT parameter stepSize should be in interval (0, 1], " +
-              s"but it given invalid value $getStepSize.")
+    require(
+      ParamValidators.inRange(0,
+                              1,
+                              lowerInclusive = false,
+                              upperInclusive = true)(getStepSize),
+      "GBT parameter stepSize should be in interval (0, 1], " +
+        s"but it given invalid value $getStepSize."
+    )
   }
 
   /** (private[ml]) Create a BoostingStrategy instance to use with the old API. */

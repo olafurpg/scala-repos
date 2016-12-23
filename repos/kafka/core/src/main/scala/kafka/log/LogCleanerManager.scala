@@ -86,31 +86,36 @@ private[log] class LogCleanerManager(val logDirs: Array[File],
   def grabFilthiestLog(): Option[LogToClean] = {
     inLock(lock) {
       val lastClean = allCleanerCheckpoints()
-      val dirtyLogs = logs.filter {
-        case (topicAndPartition, log) =>
-          log.config.compact // skip any logs marked for delete rather than dedupe
-      }.filterNot {
-        case (topicAndPartition, log) =>
-          inProgress.contains(topicAndPartition) // skip any logs already in-progress
-      }.map {
-        case (topicAndPartition, log) =>
-          // create a LogToClean instance for each
-          // if the log segments are abnormally truncated and hence the checkpointed offset
-          // is no longer valid, reset to the log starting offset and log the error event
-          val logStartOffset = log.logSegments.head.baseOffset
-          val firstDirtyOffset = {
-            val offset = lastClean.getOrElse(topicAndPartition, logStartOffset)
-            if (offset < logStartOffset) {
-              error(
-                "Resetting first dirty offset to log start offset %d since the checkpointed offset %d is invalid."
-                  .format(logStartOffset, offset))
-              logStartOffset
-            } else {
-              offset
+      val dirtyLogs = logs
+        .filter {
+          case (topicAndPartition, log) =>
+            log.config.compact // skip any logs marked for delete rather than dedupe
+        }
+        .filterNot {
+          case (topicAndPartition, log) =>
+            inProgress.contains(topicAndPartition) // skip any logs already in-progress
+        }
+        .map {
+          case (topicAndPartition, log) =>
+            // create a LogToClean instance for each
+            // if the log segments are abnormally truncated and hence the checkpointed offset
+            // is no longer valid, reset to the log starting offset and log the error event
+            val logStartOffset = log.logSegments.head.baseOffset
+            val firstDirtyOffset = {
+              val offset =
+                lastClean.getOrElse(topicAndPartition, logStartOffset)
+              if (offset < logStartOffset) {
+                error(
+                  "Resetting first dirty offset to log start offset %d since the checkpointed offset %d is invalid."
+                    .format(logStartOffset, offset))
+                logStartOffset
+              } else {
+                offset
+              }
             }
-          }
-          LogToClean(topicAndPartition, log, firstDirtyOffset)
-      }.filter(ltc => ltc.totalBytes > 0) // skip any empty logs
+            LogToClean(topicAndPartition, log, firstDirtyOffset)
+        }
+        .filter(ltc => ltc.totalBytes > 0) // skip any empty logs
 
       this.dirtiestLogCleanableRatio =
         if (!dirtyLogs.isEmpty)

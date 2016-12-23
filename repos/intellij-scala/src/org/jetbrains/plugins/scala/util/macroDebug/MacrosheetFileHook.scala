@@ -91,17 +91,21 @@ class MacrosheetFileHook(private val project: Project)
 
     override def documentChanged(e: DocumentEvent) {
       myAlarm.cancelAllRequests()
-      myAlarm.addRequest(new Runnable {
-        override def run() {
-          val sourcEditor =
-            FileEditorManager.getInstance(project).getSelectedTextEditor
-          val macroEditor = WorksheetViewerInfo.getViewer(sourcEditor)
-          if (macroEditor != null &&
-              macroEditor.getDocument.getTextLength > 0) {
-            ScalaMacroDebuggingUtil.expandMacros(sourcEditor.getProject)
+      myAlarm.addRequest(
+        new Runnable {
+          override def run() {
+            val sourcEditor =
+              FileEditorManager.getInstance(project).getSelectedTextEditor
+            val macroEditor = WorksheetViewerInfo.getViewer(sourcEditor)
+            if (macroEditor != null &&
+                macroEditor.getDocument.getTextLength > 0) {
+              ScalaMacroDebuggingUtil.expandMacros(sourcEditor.getProject)
+            }
           }
-        }
-      }, RUN_DELAY_MS, true)
+        },
+        RUN_DELAY_MS,
+        true
+      )
     }
   }
 }

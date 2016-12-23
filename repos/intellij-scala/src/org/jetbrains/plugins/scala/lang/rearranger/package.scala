@@ -46,7 +46,8 @@ package object rearranger {
   val scalaGroupingRules = immutable.HashMap(
     SCALA_GETTERS_AND_SETTERS.getId -> SCALA_GETTERS_AND_SETTERS,
     JAVA_GETTERS_AND_SETTERS.getId -> JAVA_GETTERS_AND_SETTERS,
-    SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS.getId -> SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS)
+    SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS.getId -> SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS
+  )
 
   //access modifiers
   val scalaAccessModifiersByName = immutable.ListMap("public" -> PUBLIC,
@@ -129,15 +130,17 @@ package object rearranger {
                                            MACRO,
                                            CONSTRUCTOR,
                                            OBJECT)
-  val scalaTypesById = immutable.HashMap(TYPE.getId -> TYPE,
-                                         FUNCTION.getId -> FUNCTION,
-                                         CLASS.getId -> CLASS,
-                                         VAL.getId -> VAL,
-                                         VAR.getId -> VAR,
-                                         TRAIT.getId -> TRAIT,
-                                         MACRO.getId -> MACRO,
-                                         CONSTRUCTOR.getId -> CONSTRUCTOR,
-                                         OBJECT.getId -> OBJECT)
+  val scalaTypesById = immutable.HashMap(
+    TYPE.getId -> TYPE,
+    FUNCTION.getId -> FUNCTION,
+    CLASS.getId -> CLASS,
+    VAL.getId -> VAL,
+    VAR.getId -> VAR,
+    TRAIT.getId -> TRAIT,
+    MACRO.getId -> MACRO,
+    CONSTRUCTOR.getId -> CONSTRUCTOR,
+    OBJECT.getId -> OBJECT
+  )
 
   val scalaAccessModifiersValues =
     scalaAccessModifiersByName.toSet.map((x: tokensType) => x._2)
@@ -169,7 +172,8 @@ package object rearranger {
     VAR -> (commonModifiers + OVERRIDE),
     MACRO -> (commonModifiers + OVERRIDE),
     CONSTRUCTOR -> scalaAccessModifiersValues,
-    OBJECT -> commonModifiers)
+    OBJECT -> commonModifiers
+  )
 
   def getModifierByName(modifierName: String) = {
     scalaModifiersByName.get(modifierName)

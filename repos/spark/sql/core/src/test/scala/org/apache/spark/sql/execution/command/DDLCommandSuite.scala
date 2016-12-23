@@ -273,7 +273,8 @@ class DDLCommandSuite extends PlanTest {
       TableIdentifier("table_name", None),
       Seq((Map("dt" -> "2008-08-08", "country" -> "us"), Some("location1")),
           (Map("dt" -> "2009-09-09", "country" -> "uk"), None)),
-      ifNotExists = true)(sql)
+      ifNotExists = true
+    )(sql)
     comparePlans(parsed, expected)
   }
 
@@ -472,33 +473,39 @@ class DDLCommandSuite extends PlanTest {
     val parsed2 = parser.parsePlan(sql2)
     val parsed3 = parser.parsePlan(sql3)
     val tableIdent = TableIdentifier("table_name", None)
-    val expected1 = AlterTableChangeCol(tableName = tableIdent,
-                                        partitionSpec = None,
-                                        oldColName = "col_old_name",
-                                        newColName = "col_new_name",
-                                        dataType = IntegerType,
-                                        comment = None,
-                                        afterColName = None,
-                                        restrict = false,
-                                        cascade = false)(sql1)
-    val expected2 = AlterTableChangeCol(tableName = tableIdent,
-                                        partitionSpec = None,
-                                        oldColName = "col_old_name",
-                                        newColName = "col_new_name",
-                                        dataType = IntegerType,
-                                        comment = Some("col_comment"),
-                                        afterColName = None,
-                                        restrict = false,
-                                        cascade = true)(sql2)
-    val expected3 = AlterTableChangeCol(tableName = tableIdent,
-                                        partitionSpec = None,
-                                        oldColName = "col_old_name",
-                                        newColName = "col_new_name",
-                                        dataType = IntegerType,
-                                        comment = Some("col_comment"),
-                                        afterColName = Some("column_name"),
-                                        restrict = true,
-                                        cascade = false)(sql3)
+    val expected1 = AlterTableChangeCol(
+      tableName = tableIdent,
+      partitionSpec = None,
+      oldColName = "col_old_name",
+      newColName = "col_new_name",
+      dataType = IntegerType,
+      comment = None,
+      afterColName = None,
+      restrict = false,
+      cascade = false
+    )(sql1)
+    val expected2 = AlterTableChangeCol(
+      tableName = tableIdent,
+      partitionSpec = None,
+      oldColName = "col_old_name",
+      newColName = "col_new_name",
+      dataType = IntegerType,
+      comment = Some("col_comment"),
+      afterColName = None,
+      restrict = false,
+      cascade = true
+    )(sql2)
+    val expected3 = AlterTableChangeCol(
+      tableName = tableIdent,
+      partitionSpec = None,
+      oldColName = "col_old_name",
+      newColName = "col_new_name",
+      dataType = IntegerType,
+      comment = Some("col_comment"),
+      afterColName = Some("column_name"),
+      restrict = true,
+      cascade = false
+    )(sql3)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
     comparePlans(parsed3, expected3)
@@ -530,7 +537,8 @@ class DDLCommandSuite extends PlanTest {
         Seq(StructField("new_col1", IntegerType, nullable = true, meta1),
             StructField("new_col2", LongType, nullable = true, meta2))),
       restrict = false,
-      cascade = true)(sql1)
+      cascade = true
+    )(sql1)
     val expected2 = AlterTableReplaceCol(
       tableIdent,
       None,
@@ -538,7 +546,8 @@ class DDLCommandSuite extends PlanTest {
         Seq(StructField("new_col1", IntegerType, nullable = true, meta1),
             StructField("new_col2", LongType, nullable = true, meta2))),
       restrict = true,
-      cascade = false)(sql2)
+      cascade = false
+    )(sql2)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
   }

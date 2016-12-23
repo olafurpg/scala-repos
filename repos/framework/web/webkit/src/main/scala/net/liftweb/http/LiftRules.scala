@@ -346,8 +346,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * A method that returns a function to create migratory sessions.  If you want migratory sessions for your
     * application, <code>LiftRules.sessionCreator = LiftRules.sessionCreatorForMigratorySessions</code>
     */
-  def sessionCreatorForMigratorySessions: (HTTPSession,
-                                           String) => LiftSession = {
+  def sessionCreatorForMigratorySessions: (HTTPSession, String) => LiftSession = {
     case (httpSession, contextPath) =>
       new LiftSession(contextPath, httpSession.sessionId, Full(httpSession))
       with MigratorySession
@@ -1112,9 +1111,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val externalTemplateResolver: FactoryMaker[
     () => PartialFunction[(Locale, List[String]), Box[NodeSeq]]] =
-    new FactoryMaker(() =>
-      (() =>
-         Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])) {}
+    new FactoryMaker(
+      () =>
+        (() =>
+           Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])) {}
 
   /**
     * There may be times when you want to entirely control the templating process.  You can insert a function
@@ -1586,17 +1586,23 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
                   cookies: List[HTTPCookie],
                   req: Req,
                   code: Int) =
-    convertResponse({
-      val ret =
-        XhtmlResponse(ns,
-                      /*LiftRules.docType.vend(req)*/ S.htmlProperties.docType,
-                      headers,
-                      cookies,
-                      code,
-                      S.legacyIeCompatibilityMode)
-      ret._includeXmlVersion = !S.skipDocType
-      ret
-    }, headers, cookies, req)
+    convertResponse(
+      {
+        val ret =
+          XhtmlResponse(
+            ns,
+            /*LiftRules.docType.vend(req)*/ S.htmlProperties.docType,
+            headers,
+            cookies,
+            code,
+            S.legacyIeCompatibilityMode)
+        ret._includeXmlVersion = !S.skipDocType
+        ret
+      },
+      headers,
+      cookies,
+      req
+    )
 
   @volatile
   var defaultHeaders: PartialFunction[(NodeSeq, Req), List[(String, String)]] = {
@@ -1690,7 +1696,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
         List("Content-Type" -> "text/html; charset=utf-8"),
         Nil,
         500,
-        S.legacyIeCompatibilityMode)
+        S.legacyIeCompatibilityMode
+      )
 
     case (_, r, e) =>
       logger.error("Exception being returned to browser when processing " +
@@ -1702,7 +1709,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
         List("Content-Type" -> "text/html; charset=utf-8"),
         Nil,
         500,
-        S.legacyIeCompatibilityMode)
+        S.legacyIeCompatibilityMode
+      )
   }
 
   /**
@@ -2008,8 +2016,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * to create an on-disk version
     */
   @volatile
-  var handleMimeFile: (String, String, String,
-                       InputStream) => FileParamHolder =
+  var handleMimeFile: (String, String, String, InputStream) => FileParamHolder =
     (fieldName, contentType, fileName, inputStream) =>
       new InMemFileParamHolder(fieldName,
                                contentType,
@@ -2094,46 +2101,48 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     import net.liftweb.builtin.snippet._
 
     snippetDispatch.append(
-      Map("CSS" -> CSS,
-          "Msgs" -> Msgs,
-          "Msg" -> Msg,
-          "Menu" -> Menu,
-          "css" -> CSS,
-          "msgs" -> Msgs,
-          "msg" -> Msg,
-          "menu" -> Menu,
-          "children" -> Children,
-          "comet" -> Comet,
-          "form" -> Form,
-          "ignore" -> Ignore,
-          "loc" -> Loc,
-          "surround" -> Surround,
-          "test_cond" -> TestCond,
-          "TestCond" -> TestCond,
-          "testcond" -> TestCond,
-          "embed" -> Embed,
-          "tail" -> Tail,
-          "head" -> Head,
-          "Head" -> Head,
-          "with-param" -> WithParam,
-          "withparam" -> WithParam,
-          "WithParam" -> WithParam,
-          "bind-at" -> WithParam,
-          "VersionInfo" -> VersionInfo,
-          "versioninfo" -> VersionInfo,
-          "version_info" -> VersionInfo,
-          "SkipDocType" -> SkipDocType,
-          "skipdoctype" -> SkipDocType,
-          "skip_doc_type" -> SkipDocType,
-          "xml_group" -> XmlGroup,
-          "XmlGroup" -> XmlGroup,
-          "xmlgroup" -> XmlGroup,
-          "lazy-load" -> LazyLoad,
-          "LazyLoad" -> LazyLoad,
-          "lazyload" -> LazyLoad,
-          "html5" -> HTML5,
-          "HTML5" -> HTML5,
-          "with-resource-id" -> WithResourceId))
+      Map(
+        "CSS" -> CSS,
+        "Msgs" -> Msgs,
+        "Msg" -> Msg,
+        "Menu" -> Menu,
+        "css" -> CSS,
+        "msgs" -> Msgs,
+        "msg" -> Msg,
+        "menu" -> Menu,
+        "children" -> Children,
+        "comet" -> Comet,
+        "form" -> Form,
+        "ignore" -> Ignore,
+        "loc" -> Loc,
+        "surround" -> Surround,
+        "test_cond" -> TestCond,
+        "TestCond" -> TestCond,
+        "testcond" -> TestCond,
+        "embed" -> Embed,
+        "tail" -> Tail,
+        "head" -> Head,
+        "Head" -> Head,
+        "with-param" -> WithParam,
+        "withparam" -> WithParam,
+        "WithParam" -> WithParam,
+        "bind-at" -> WithParam,
+        "VersionInfo" -> VersionInfo,
+        "versioninfo" -> VersionInfo,
+        "version_info" -> VersionInfo,
+        "SkipDocType" -> SkipDocType,
+        "skipdoctype" -> SkipDocType,
+        "skip_doc_type" -> SkipDocType,
+        "xml_group" -> XmlGroup,
+        "XmlGroup" -> XmlGroup,
+        "xmlgroup" -> XmlGroup,
+        "lazy-load" -> LazyLoad,
+        "LazyLoad" -> LazyLoad,
+        "lazyload" -> LazyLoad,
+        "html5" -> HTML5,
+        "HTML5" -> HTML5,
+        "with-resource-id" -> WithResourceId
+      ))
   }
   ctor()
 

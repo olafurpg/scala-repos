@@ -55,13 +55,16 @@ abstract class NodeUpSpec
     "be unaffected when joining again" in {
 
       val unexpected = new AtomicReference[SortedSet[Member]](SortedSet.empty)
-      cluster.subscribe(system.actorOf(Props(new Actor {
-        def receive = {
-          case event: MemberEvent ⇒
-            unexpected.set(unexpected.get + event.member)
-          case _: CurrentClusterState ⇒ // ignore
-        }
-      })), classOf[MemberEvent])
+      cluster.subscribe(
+        system.actorOf(Props(new Actor {
+          def receive = {
+            case event: MemberEvent ⇒
+              unexpected.set(unexpected.get + event.member)
+            case _: CurrentClusterState ⇒ // ignore
+          }
+        })),
+        classOf[MemberEvent]
+      )
       enterBarrier("listener-registered")
 
       runOn(second) {

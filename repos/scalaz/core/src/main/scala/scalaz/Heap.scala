@@ -67,18 +67,20 @@ sealed abstract class Heap[A] {
 
   /**Delete the minimum key from the heap and return the resulting heap. O(log n) */
   def deleteMin: Heap[A] = {
-    fold(Empty[A],
-         (s, leq, t) =>
-           t match {
-             case Node(_, Stream()) => Empty[A]
-             case Node(_, f0) => {
-               val (Node(Ranked(r, x), cf), ts2) = getMin(leq, f0)
-               val (zs, ts1, f1) = splitForest(r, Stream(), Stream(), cf)
-               val f2 = skewMeld(leq, skewMeld(leq, ts1, ts2), f1)
-               val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
-               Heap(s - 1, leq, Node(Ranked(0, x), f3))
-             }
-         })
+    fold(
+      Empty[A],
+      (s, leq, t) =>
+        t match {
+          case Node(_, Stream()) => Empty[A]
+          case Node(_, f0) => {
+            val (Node(Ranked(r, x), cf), ts2) = getMin(leq, f0)
+            val (zs, ts1, f1) = splitForest(r, Stream(), Stream(), cf)
+            val f2 = skewMeld(leq, skewMeld(leq, ts1, ts2), f1)
+            val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
+            Heap(s - 1, leq, Node(Ranked(0, x), f3))
+          }
+      }
+    )
   }
 
   def adjustMin(f: A => A): Heap[A] = this match {
@@ -125,14 +127,17 @@ sealed abstract class Heap[A] {
 
   /**Partition the heap of the elements that are less than, equal to, and greater than a given value. O(n)*/
   def split(a: A): (Heap[A], Heap[A], Heap[A]) = {
-    fold((Empty[A], Empty[A], Empty[A]), (s, leq, t) => {
-      def f(x: A) =
-        if (leq(x, a))
-          if (leq(a, x)) (Empty[A], singletonWith(leq, x), Empty[A])
-          else (singletonWith(leq, x), Empty[A], Empty[A])
-        else (Empty[A], Empty[A], singletonWith(leq, x))
-      t foldMap (x => f(x.value))
-    })
+    fold(
+      (Empty[A], Empty[A], Empty[A]),
+      (s, leq, t) => {
+        def f(x: A) =
+          if (leq(x, a))
+            if (leq(a, x)) (Empty[A], singletonWith(leq, x), Empty[A])
+            else (singletonWith(leq, x), Empty[A], Empty[A])
+          else (Empty[A], Empty[A], singletonWith(leq, x))
+        t foldMap (x => f(x.value))
+      }
+    )
   }
 
   /**Return a heap consisting of the least n elements of this heap. O(n log n) */
@@ -199,15 +204,18 @@ sealed abstract class Heap[A] {
   }
 
   private[scalaz] def insertWith(f: (A, A) => Boolean, x: A) =
-    fold(singletonWith(f, x), (s, _, t) => {
-      val y = t.rootLabel.value
-      if (f(x, y)) Heap(s + 1, f, Node(Ranked(0, x), Stream(t)))
-      else
-        Heap(s + 1,
-             f,
-             Node(Ranked(0, y),
-                  skewInsert(f, Node(Ranked(0, x), Stream()), t.subForest)))
-    })
+    fold(
+      singletonWith(f, x),
+      (s, _, t) => {
+        val y = t.rootLabel.value
+        if (f(x, y)) Heap(s + 1, f, Node(Ranked(0, x), Stream(t)))
+        else
+          Heap(s + 1,
+               f,
+               Node(Ranked(0, y),
+                    skewInsert(f, Node(Ranked(0, x), Stream()), t.subForest)))
+      }
+    )
 
   private def splitWithList(f: List[A] => (List[A], List[A])) = {
     import std.list._
@@ -231,9 +239,9 @@ object Heap extends HeapInstances {
   /**The empty heap */
   object Empty {
     def apply[A]: Heap[A] = new Heap[A] {
-      def fold[B](empty: => B,
-                  nonempty: (Int, (A, A) => Boolean,
-                             Tree[Ranked[A]]) => B): B = empty
+      def fold[B](
+          empty: => B,
+          nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B): B = empty
     }
 
     def unapply[A](h: Heap[A]): Boolean = h.fold(true, (_, _, _) => false)
@@ -390,8 +398,10 @@ object Heap extends HeapInstances {
         }
       }
 
-    def splitForest[A]: (Int, Forest[A], Forest[A],
-                         Forest[A]) => (Forest[A], Forest[A], Forest[A]) = {
+    def splitForest[A]
+      : (Int, Forest[A], Forest[A], Forest[A]) => (Forest[A],
+                                                   Forest[A],
+                                                   Forest[A]) = {
       case (0, zs, ts, f) => (zs, ts, f)
       case (1, zs, ts, Stream(t)) => (zs, t #:: ts, Stream())
       case (1, zs, ts, t1 #:: t2 #:: f) =>

@@ -37,7 +37,8 @@ trait ProducerConsumerTestHarness extends KafkaServerTestHarness {
       TestUtils.getBrokerListStrFromServers(servers),
       encoder = classOf[StringEncoder].getName,
       keyEncoder = classOf[StringEncoder].getName,
-      partitioner = classOf[StaticPartitioner].getName)
+      partitioner = classOf[StaticPartitioner].getName
+    )
     consumer =
       new SimpleConsumer(host, servers(0).boundPort(), 1000000, 64 * 1024, "")
   }

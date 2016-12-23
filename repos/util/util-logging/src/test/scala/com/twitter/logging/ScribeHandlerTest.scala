@@ -138,16 +138,18 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       // although the test just checked a short moment ago.
       // Solution: try multiple times until it gets a connection failure.
       def scribeWithConnectionFailure(retries: Int): ScribeHandler = {
-        val scribe = new ScribeHandler(hostname = "localhost",
-                                       port = portWithoutListener,
-                                       category = "test",
-                                       bufferTime = 5.seconds,
-                                       connectBackoff = 15.seconds,
-                                       maxMessagesPerTransaction = 1,
-                                       maxMessagesToBuffer = 4,
-                                       formatter = BareFormatter,
-                                       level = None,
-                                       statsReceiver = statsReceiver) {
+        val scribe = new ScribeHandler(
+          hostname = "localhost",
+          port = portWithoutListener,
+          category = "test",
+          bufferTime = 5.seconds,
+          connectBackoff = 15.seconds,
+          maxMessagesPerTransaction = 1,
+          maxMessagesToBuffer = 4,
+          formatter = BareFormatter,
+          level = None,
+          statsReceiver = statsReceiver
+        ) {
           override private[logging] val flusher = new MockThreadPoolExecutor
         }
         scribe.publish(record1)

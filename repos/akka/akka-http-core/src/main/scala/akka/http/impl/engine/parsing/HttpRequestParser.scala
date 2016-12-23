@@ -65,7 +65,9 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
           ErrorInfo(
             "Unsupported HTTP method",
             s"HTTP method too long (started with '${sb.toString}'). " +
-              "Increase `akka.http.server.parsing.max-method-length` to support HTTP methods with more characters."))
+              "Increase `akka.http.server.parsing.max-method-length` to support HTTP methods with more characters."
+          )
+        )
 
     @tailrec def parseMethod(meth: HttpMethod, ix: Int = 1): Int =
       if (ix == meth.value.length)

@@ -268,7 +268,8 @@ trait TypeDefConstruction { self: QuasiquoteProperties =>
                               TypeDef(Modifiers(DEFERRED),
                                       X,
                                       List(),
-                                      TypeBoundsTree(Ident(Lo), Ident(Hi))))))
+                                      TypeBoundsTree(Ident(Lo), Ident(Hi)))))
+      )
   }
 
   property("unquote tree into singleton type tree") = forAll {

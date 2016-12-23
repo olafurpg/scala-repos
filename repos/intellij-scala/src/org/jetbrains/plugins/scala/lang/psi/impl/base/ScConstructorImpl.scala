@@ -187,7 +187,8 @@ class ScConstructorImpl(node: ASTNode)
                  arg.getType(TypingContext.empty).getOrAny)
             },
             Map.empty,
-            None)
+            None
+          )
           Success(appSubst.subst(res), Some(this))
         case _ =>
           var nonValueType = ScTypePolymorphicType(res, typeParameters)
@@ -205,7 +206,8 @@ class ScConstructorImpl(node: ASTNode)
                         .subst(subst.subst(tp).inferValueType))),
                   nonValueType.typeParameters,
                   shouldUndefineParameters = false,
-                  filterTypeParams = false)
+                  filterTypeParams = false
+                )
               } catch {
                 case s: SafeCheckException => //ignore
               }

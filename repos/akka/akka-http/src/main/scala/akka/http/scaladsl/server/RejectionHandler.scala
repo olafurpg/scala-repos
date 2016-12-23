@@ -265,14 +265,14 @@ object RejectionHandler {
       }
       .handleAll[UnsupportedWebSocketSubprotocolRejection] { rejections ⇒
         val supported = rejections.map(_.supportedProtocol)
-        complete(
-          HttpResponse(
-            BadRequest,
-            entity =
-              s"None of the websocket subprotocols offered in the request are supported. Supported are ${supported
-                .map("'" + _ + "'")
-                .mkString(",")}.",
-            headers = `Sec-WebSocket-Protocol`(supported) :: Nil))
+        complete(HttpResponse(
+          BadRequest,
+          entity =
+            s"None of the websocket subprotocols offered in the request are supported. Supported are ${supported
+              .map("'" + _ + "'")
+              .mkString(",")}.",
+          headers = `Sec-WebSocket-Protocol`(supported) :: Nil
+        ))
       }
       .handle {
         case ValidationRejection(msg, _) ⇒ complete((BadRequest, msg))

@@ -81,8 +81,8 @@ trait CoGroupable[K, +R]
     * how to achieve, and since it is an internal function, not clear it
     * would actually help anyone for it to be type-safe
     */
-  protected def joinFunction: (K, Iterator[CTuple],
-                               Seq[Iterable[CTuple]]) => Iterator[R]
+  protected def joinFunction: (K, Iterator[CTuple], Seq[Iterable[CTuple]]) => Iterator[
+    R]
 
   /**
     * Smaller is about average values/key not total size (that does not matter, but is
@@ -254,15 +254,18 @@ trait CoGrouped[K, +R]
               * not repeated. That case is below
               */
             val NUM_OF_SELF_JOINS = firstCount - 1
-            new CoGroup(assignName(inputs.head.toPipe[(K, Any)](
-                          ("key", "value"))(flowDef, mode, tupset)),
-                        ordKeyField,
-                        NUM_OF_SELF_JOINS,
-                        outFields(firstCount),
-                        WrappedJoiner(
-                          new DistinctCoGroupJoiner(firstCount,
-                                                    Grouped.keyGetter(ord),
-                                                    joinFunction)))
+            new CoGroup(
+              assignName(
+                inputs.head
+                  .toPipe[(K, Any)](("key", "value"))(flowDef, mode, tupset)),
+              ordKeyField,
+              NUM_OF_SELF_JOINS,
+              outFields(firstCount),
+              WrappedJoiner(
+                new DistinctCoGroupJoiner(firstCount,
+                                          Grouped.keyGetter(ord),
+                                          joinFunction))
+            )
           } else if (firstCount == 1) {
 
             def keyId(idx: Int): String = "key%d".format(idx)
@@ -294,17 +297,21 @@ trait CoGrouped[K, +R]
             val groupFields: Array[Fields] =
               (0 until dsize).map(makeFields).toArray
 
-            val pipes: Array[Pipe] = distincts.zipWithIndex.map {
-              case (item, idx) => assignName(renamePipe(idx, item))
-            }.toArray
+            val pipes: Array[Pipe] = distincts.zipWithIndex
+              .map {
+                case (item, idx) => assignName(renamePipe(idx, item))
+              }
+              .toArray
 
             val cjoiner =
               if (isize != dsize) {
                 // avoid capturing anything other than the mapping ints:
-                val mapping: Map[Int, Int] = inputs.zipWithIndex.map {
-                  case (item, idx) =>
-                    idx -> distincts.indexWhere(_ == item)
-                }.toMap
+                val mapping: Map[Int, Int] = inputs.zipWithIndex
+                  .map {
+                    case (item, idx) =>
+                      idx -> distincts.indexWhere(_ == item)
+                  }
+                  .toMap
 
                 new CoGroupedJoiner(isize,
                                     Grouped.keyGetter(ord),
@@ -355,8 +362,8 @@ trait CoGrouped[K, +R]
 abstract class CoGroupedJoiner[K](
     inputSize: Int,
     getter: TupleGetter[K],
-    @transient inJoinFunction: (K, Iterator[CTuple],
-                                Seq[Iterable[CTuple]]) => Iterator[Any])
+    @transient inJoinFunction: (K, Iterator[CTuple], Seq[Iterable[CTuple]]) => Iterator[
+      Any])
     extends CJoiner {
 
   /**
@@ -381,9 +388,11 @@ abstract class CoGroupedJoiner[K](
     // This use of `_.get` is safe, but difficult to prove in the types.
     @SuppressWarnings(
       Array("org.brianmckenna.wartremover.warts.OptionPartial"))
-    val keyTuple = iters.collectFirst {
-      case iter if iter.nonEmpty => iter.head
-    }.get // One of these must have a key
+    val keyTuple = iters
+      .collectFirst {
+        case iter if iter.nonEmpty => iter.head
+      }
+      .get // One of these must have a key
     val key = getter.get(keyTuple, 0)
 
     val leftMost = iters.head
@@ -412,8 +421,8 @@ abstract class CoGroupedJoiner[K](
 class DistinctCoGroupJoiner[K](
     count: Int,
     getter: TupleGetter[K],
-    @transient joinF: (K, Iterator[CTuple],
-                       Seq[Iterable[CTuple]]) => Iterator[Any])
+    @transient joinF: (K, Iterator[CTuple], Seq[Iterable[CTuple]]) => Iterator[
+      Any])
     extends CoGroupedJoiner[K](count, getter, joinF) {
   val distinctSize = count
   def distinctIndexOf(idx: Int) = idx

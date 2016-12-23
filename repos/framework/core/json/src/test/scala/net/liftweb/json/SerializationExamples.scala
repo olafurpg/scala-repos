@@ -33,7 +33,8 @@ object SerializationExamples extends Specification {
          Team("Impl",
               List(Employee("Mark", 4),
                    Employee("Mary", 5),
-                   Employee("Nick Noob", 1)))))
+                   Employee("Nick Noob", 1))))
+  )
 
   "Project serialization example" in {
     val ser = swrite(project)

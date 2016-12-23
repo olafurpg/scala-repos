@@ -124,17 +124,19 @@ private[rhino] class ScalaJSCoreLib(linkingUnit: LinkingUnit) {
     elem
   }
 
-  private val scalaJSLazyFields = Seq(Info("d"),
-                                      Info("c"),
-                                      Info("h"),
-                                      Info("s", isStatics = true),
-                                      Info("f", isStatics = true),
-                                      Info("n"),
-                                      Info("m"),
-                                      Info("is"),
-                                      Info("as"),
-                                      Info("isArrayOf"),
-                                      Info("asArrayOf"))
+  private val scalaJSLazyFields = Seq(
+    Info("d"),
+    Info("c"),
+    Info("h"),
+    Info("s", isStatics = true),
+    Info("f", isStatics = true),
+    Info("n"),
+    Info("m"),
+    Info("is"),
+    Info("as"),
+    Info("isArrayOf"),
+    Info("asArrayOf")
+  )
 
   private def lazifyScalaJSFields(scope: Scriptable) = {
     val ScalaJS = Context.toObject(scope.get("ScalaJS", scope), scope)

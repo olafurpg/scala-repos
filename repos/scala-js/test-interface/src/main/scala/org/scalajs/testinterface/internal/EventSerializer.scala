@@ -15,7 +15,8 @@ object EventSerializer {
       selector = SelectorSerializer.serialize(ev.selector),
       status = ev.status.name(),
       durationLS = ev.duration().toInt,
-      durationMS = (ev.duration() >>> 32).toInt)
+      durationMS = (ev.duration() >>> 32).toInt
+    )
 
     val optT = ev.throwable()
     if (optT.isDefined)

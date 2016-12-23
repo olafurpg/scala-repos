@@ -386,14 +386,16 @@ object Test extends BytecodeTest {
   // Note: the new trait encoding removed impl classes, so this test name doesn't make sense.
   // But I've left it here as there were some tests remaining that are still relevant.
   def testImplClassesTopLevel() {
-    val classes = List("ImplClassesAreTopLevel$$anon$14",
-                       "ImplClassesAreTopLevel$$anon$15",
-                       "ImplClassesAreTopLevel$$anon$16",
-                       "ImplClassesAreTopLevel$B1",
-                       "ImplClassesAreTopLevel$B2$1",
-                       "ImplClassesAreTopLevel$B3$1",
-                       "ImplClassesAreTopLevel$B4$1",
-                       "ImplClassesAreTopLevel")
+    val classes = List(
+      "ImplClassesAreTopLevel$$anon$14",
+      "ImplClassesAreTopLevel$$anon$15",
+      "ImplClassesAreTopLevel$$anon$16",
+      "ImplClassesAreTopLevel$B1",
+      "ImplClassesAreTopLevel$B2$1",
+      "ImplClassesAreTopLevel$B3$1",
+      "ImplClassesAreTopLevel$B4$1",
+      "ImplClassesAreTopLevel"
+    )
 
     assertNoEnclosingMethod("ImplClassesAreTopLevel$B1") // member, no encl meth attr
 
@@ -448,12 +450,14 @@ object Test extends BytecodeTest {
   }
 
   def testSpecializedClassesTopLevel() {
-    val cls = List("SpecializedClassesAreTopLevel$A$mcI$sp",
-                   "SpecializedClassesAreTopLevel$A",
-                   "SpecializedClassesAreTopLevel$T$",
-                   "SpecializedClassesAreTopLevel$T$B$mcI$sp",
-                   "SpecializedClassesAreTopLevel$T$B",
-                   "SpecializedClassesAreTopLevel")
+    val cls = List(
+      "SpecializedClassesAreTopLevel$A$mcI$sp",
+      "SpecializedClassesAreTopLevel$A",
+      "SpecializedClassesAreTopLevel$T$",
+      "SpecializedClassesAreTopLevel$T$B$mcI$sp",
+      "SpecializedClassesAreTopLevel$T$B",
+      "SpecializedClassesAreTopLevel"
+    )
 
     // all classes are members, no local (can't test local, they crash in specialize)
     cls.foreach(assertNoEnclosingMethod)

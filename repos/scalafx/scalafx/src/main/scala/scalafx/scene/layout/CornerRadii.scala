@@ -92,22 +92,24 @@ class CornerRadii(override val delegate: jfxsl.CornerRadii)
            bottomLeftVerticalRadiusAsPercent: Boolean,
            bottomLeftHorizontalRadiusAsPercent: Boolean) =
     this(
-      new jfxsl.CornerRadii(topLeftHorizontalRadius,
-                            topLeftVerticalRadius,
-                            topRightVerticalRadius,
-                            topRightHorizontalRadius,
-                            bottomRightHorizontalRadius,
-                            bottomRightVerticalRadius,
-                            bottomLeftVerticalRadius,
-                            bottomLeftHorizontalRadius,
-                            topLeftHorizontalRadiusAsPercent,
-                            topLeftVerticalRadiusAsPercent,
-                            topRightVerticalRadiusAsPercent,
-                            topRightHorizontalRadiusAsPercent,
-                            bottomRightHorizontalRadiusAsPercent,
-                            bottomRightVerticalRadiusAsPercent,
-                            bottomLeftVerticalRadiusAsPercent,
-                            bottomLeftHorizontalRadiusAsPercent))
+      new jfxsl.CornerRadii(
+        topLeftHorizontalRadius,
+        topLeftVerticalRadius,
+        topRightVerticalRadius,
+        topRightHorizontalRadius,
+        bottomRightHorizontalRadius,
+        bottomRightVerticalRadius,
+        bottomLeftVerticalRadius,
+        bottomLeftHorizontalRadius,
+        topLeftHorizontalRadiusAsPercent,
+        topLeftVerticalRadiusAsPercent,
+        topRightVerticalRadiusAsPercent,
+        topRightHorizontalRadiusAsPercent,
+        bottomRightHorizontalRadiusAsPercent,
+        bottomRightVerticalRadiusAsPercent,
+        bottomLeftVerticalRadiusAsPercent,
+        bottomLeftHorizontalRadiusAsPercent
+      ))
 
   /**
     * The length of the horizontal radii of the bottom-left corner.

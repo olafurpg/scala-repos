@@ -68,12 +68,14 @@ class CountMinSketchSuite extends FunSuite {
       checkSerDe(sketch)
 
       val probCorrect = {
-        val numErrors = allItems.map { item =>
-          val count = exactFreq.getOrElse(item, 0L)
-          val ratio =
-            (sketch.estimateCount(item) - count).toDouble / numAllItems
-          if (ratio > epsOfTotalCount) 1 else 0
-        }.sum
+        val numErrors = allItems
+          .map { item =>
+            val count = exactFreq.getOrElse(item, 0L)
+            val ratio =
+              (sketch.estimateCount(item) - count).toDouble / numAllItems
+            if (ratio > epsOfTotalCount) 1 else 0
+          }
+          .sum
 
         1D - numErrors.toDouble / numAllItems
       }

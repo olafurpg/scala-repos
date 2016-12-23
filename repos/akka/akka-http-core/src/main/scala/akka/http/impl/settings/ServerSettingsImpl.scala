@@ -89,7 +89,8 @@ object ServerSettingsImpl
             throw new ConfigurationException(info.formatPretty)
         },
       Randoms.SecureRandomInstances, // can currently only be overridden from code
-      ParserSettingsImpl.fromSubConfig(root, c.getConfig("parsing")))
+      ParserSettingsImpl.fromSubConfig(root, c.getConfig("parsing"))
+    )
 
   //  def apply(optionalSettings: Option[ServerSettings])(implicit actorRefFactory: ActorRefFactory): ServerSettings =
   //    optionalSettings getOrElse apply(actorSystem)

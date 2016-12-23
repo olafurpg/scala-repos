@@ -351,11 +351,13 @@ case class JsonTuple(children: Seq[Expression])
 
   // eagerly evaluate any foldable the field names
   @transient private lazy val foldableFieldNames: IndexedSeq[String] = {
-    fieldExpressions.map {
-      case expr if expr.foldable =>
-        expr.eval().asInstanceOf[UTF8String].toString
-      case _ => null
-    }.toIndexedSeq
+    fieldExpressions
+      .map {
+        case expr if expr.foldable =>
+          expr.eval().asInstanceOf[UTF8String].toString
+        case _ => null
+      }
+      .toIndexedSeq
   }
 
   // and count the number of foldable fields, we'll use this later to optimize evaluation

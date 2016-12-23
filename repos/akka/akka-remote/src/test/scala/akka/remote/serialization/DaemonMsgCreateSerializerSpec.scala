@@ -78,19 +78,23 @@ class DaemonMsgCreateSerializerSpec extends AkkaSpec {
           case _ ⇒ SupervisorStrategy.Escalate
         }
         val deploy1 =
-          Deploy(path = "path1",
-                 config = ConfigFactory.parseString("a=1"),
-                 routerConfig = RoundRobinPool(nrOfInstances = 5,
-                                               supervisorStrategy =
-                                                 supervisorStrategy),
-                 scope = RemoteScope(Address("akka", "Test", "host1", 1921)),
-                 dispatcher = "mydispatcher")
+          Deploy(
+            path = "path1",
+            config = ConfigFactory.parseString("a=1"),
+            routerConfig = RoundRobinPool(nrOfInstances = 5,
+                                          supervisorStrategy =
+                                            supervisorStrategy),
+            scope = RemoteScope(Address("akka", "Test", "host1", 1921)),
+            dispatcher = "mydispatcher"
+          )
         val deploy2 =
-          Deploy(path = "path2",
-                 config = ConfigFactory.parseString("a=2"),
-                 routerConfig = FromConfig,
-                 scope = RemoteScope(Address("akka", "Test", "host2", 1922)),
-                 dispatcher = Deploy.NoDispatcherGiven)
+          Deploy(
+            path = "path2",
+            config = ConfigFactory.parseString("a=2"),
+            routerConfig = FromConfig,
+            scope = RemoteScope(Address("akka", "Test", "host2", 1922)),
+            dispatcher = Deploy.NoDispatcherGiven
+          )
         DaemonMsgCreate(
           props = Props[MyActor].withDispatcher("my-disp").withDeploy(deploy1),
           deploy = deploy2,

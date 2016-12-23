@@ -229,13 +229,14 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
           return Seq.empty[Row]
         case SaveMode.Append =>
           // Check if the specified data source match the data source of the existing table.
-          val dataSource = DataSource(sqlContext = sqlContext,
-                                      userSpecifiedSchema =
-                                        Some(query.schema.asNullable),
-                                      partitionColumns = partitionColumns,
-                                      bucketSpec = bucketSpec,
-                                      className = provider,
-                                      options = optionsWithPath)
+          val dataSource = DataSource(
+            sqlContext = sqlContext,
+            userSpecifiedSchema = Some(query.schema.asNullable),
+            partitionColumns = partitionColumns,
+            bucketSpec = bucketSpec,
+            className = provider,
+            options = optionsWithPath
+          )
           // TODO: Check that options from the resolved relation match the relation that we are
           // inserting into (i.e. using the same compression).
 

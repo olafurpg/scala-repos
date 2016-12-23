@@ -512,11 +512,12 @@ class RouterDocSpec
     //#dispatchers
     val router: ActorRef =
       system.actorOf(
-                     // “head” router actor will run on "router-dispatcher" dispatcher
-                     // Worker routees will run on "pool-dispatcher" dispatcher
-                     RandomPool(5, routerDispatcher = "router-dispatcher")
-                       .props(Props[Worker]),
-                     name = "poolWithDispatcher")
+        // “head” router actor will run on "router-dispatcher" dispatcher
+        // Worker routees will run on "pool-dispatcher" dispatcher
+        RandomPool(5, routerDispatcher = "router-dispatcher")
+          .props(Props[Worker]),
+        name = "poolWithDispatcher"
+      )
     //#dispatchers
   }
 

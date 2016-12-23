@@ -948,7 +948,8 @@ class MessageSpec extends FreeSpec with Matchers with WithMaterializerSpec {
         Flow[Message]
           .buffer(1, OverflowStrategy.backpressure)
           .to(Sink.fromSubscriber(messageIn)), // alternatively need to request(1) before expectComplete
-        Source.fromPublisher(messageOut))
+        Source.fromPublisher(messageOut)
+      )
 
     Source
       .fromPublisher(netIn)

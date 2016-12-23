@@ -89,7 +89,8 @@ class JdbcRDDSuite
         1,
         100,
         3,
-        (r: ResultSet) => { r.getInt(1) }).cache()
+        (r: ResultSet) => { r.getInt(1) }
+      ).cache()
 
     assert(rdd.count === 100)
     assert(rdd.reduce(_ + _) === 10100)
@@ -107,7 +108,8 @@ class JdbcRDDSuite
         1131544775L,
         567279358897692673L,
         20,
-        (r: ResultSet) => { r.getInt(1) }).cache()
+        (r: ResultSet) => { r.getInt(1) }
+      ).cache()
     assert(rdd.count === 100)
     assert(rdd.reduce(_ + _) === 5050)
   }

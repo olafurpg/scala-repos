@@ -36,9 +36,11 @@ trait JavaResultsHandlingSpec
   "Java results handling" should {
     def makeRequest[T](controller: MockController)(block: WSResponse => T) = {
       implicit val port = testServerPort
-      lazy val app: Application = GuiceApplicationBuilder().routes {
-        case _ => JAction(app, controller)
-      }.build()
+      lazy val app: Application = GuiceApplicationBuilder()
+        .routes {
+          case _ => JAction(app, controller)
+        }
+        .build()
 
       running(TestServer(port, app)) {
         val response = await(wsUrl("/").get())

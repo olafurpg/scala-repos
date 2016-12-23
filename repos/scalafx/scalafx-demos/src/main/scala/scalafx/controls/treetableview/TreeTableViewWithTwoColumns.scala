@@ -54,7 +54,8 @@ object TreeTableViewWithTwoColumns extends JFXApp {
     new Employee("Michael Brown", "michael.brown@example.com"),
     new Employee("Anna Black", "anna.black@example.com"),
     new Employee("Rodger York", "roger.york@example.com"),
-    new Employee("Susan Collins", "susan.collins@example.com"))
+    new Employee("Susan Collins", "susan.collins@example.com")
+  )
 
   val depIcon = new ImageView(
     getClass.getResource("department.png").toExternalForm)

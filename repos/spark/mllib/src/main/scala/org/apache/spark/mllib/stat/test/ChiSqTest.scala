@@ -95,39 +95,41 @@ private[stat] object ChiSqTest extends Logging {
       // chiSquared(data: RDD[(V1, V2)])
       val startCol = batch * batchSize
       val endCol = startCol + math.min(batchSize, numCols - startCol)
-      val pairCounts = data.mapPartitions { iter =>
-        val distinctLabels = mutable.HashSet.empty[Double]
-        val allDistinctFeatures: Map[Int, mutable.HashSet[Double]] =
-          Map((startCol until endCol).map(col =>
-            (col, mutable.HashSet.empty[Double])): _*)
-        var i = 1
-        iter.flatMap {
-          case LabeledPoint(label, features) =>
-            if (i % 1000 == 0) {
-              if (distinctLabels.size > maxCategories) {
-                throw new SparkException(
-                  s"Chi-square test expect factors (categorical values) but " +
-                    s"found more than $maxCategories distinct label values.")
+      val pairCounts = data
+        .mapPartitions { iter =>
+          val distinctLabels = mutable.HashSet.empty[Double]
+          val allDistinctFeatures: Map[Int, mutable.HashSet[Double]] =
+            Map((startCol until endCol).map(col =>
+              (col, mutable.HashSet.empty[Double])): _*)
+          var i = 1
+          iter.flatMap {
+            case LabeledPoint(label, features) =>
+              if (i % 1000 == 0) {
+                if (distinctLabels.size > maxCategories) {
+                  throw new SparkException(
+                    s"Chi-square test expect factors (categorical values) but " +
+                      s"found more than $maxCategories distinct label values.")
+                }
+                allDistinctFeatures.foreach {
+                  case (col, distinctFeatures) =>
+                    if (distinctFeatures.size > maxCategories) {
+                      throw new SparkException(
+                        s"Chi-square test expect factors (categorical values) but " +
+                          s"found more than $maxCategories distinct values in column $col.")
+                    }
+                }
               }
-              allDistinctFeatures.foreach {
-                case (col, distinctFeatures) =>
-                  if (distinctFeatures.size > maxCategories) {
-                    throw new SparkException(
-                      s"Chi-square test expect factors (categorical values) but " +
-                        s"found more than $maxCategories distinct values in column $col.")
-                  }
+              i += 1
+              distinctLabels += label
+              val brzFeatures = features.toBreeze
+              (startCol until endCol).map { col =>
+                val feature = brzFeatures(col)
+                allDistinctFeatures(col) += feature
+                (col, feature, label)
               }
-            }
-            i += 1
-            distinctLabels += label
-            val brzFeatures = features.toBreeze
-            (startCol until endCol).map { col =>
-              val feature = brzFeatures(col)
-              allDistinctFeatures(col) += feature
-              (col, feature, label)
-            }
+          }
         }
-      }.countByValue()
+        .countByValue()
 
       if (labels == null) {
         // Do this only once for the first column since labels are invariant across features.

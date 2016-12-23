@@ -335,9 +335,11 @@ private[scala] trait JavaMirrors
       lazy val boxer =
         runtimeClass(symbol.toType).getDeclaredConstructors().head
       lazy val unboxer = {
-        val fields @ (field :: _) = symbol.toType.decls.collect {
-          case ts: TermSymbol if ts.isParamAccessor && ts.isMethod => ts
-        }.toList
+        val fields @ (field :: _) = symbol.toType.decls
+          .collect {
+            case ts: TermSymbol if ts.isParamAccessor && ts.isMethod => ts
+          }
+          .toList
         assert(fields.length == 1, s"$symbol: $fields")
         runtimeClass(symbol.asClass).getDeclaredMethod(field.name.toString)
       }
@@ -616,8 +618,8 @@ private[scala] trait JavaMirrors
           val arg = args(i)
           args1(i) =
             (if (i >= paramCount) arg // don't transform varargs
-             else if (isByName(i))
-               () => arg // don't transform by-name value class params
+             else if (isByName(i))() =>
+               arg // don't transform by-name value class params
              else if (isDerivedValueClass(i))
                paramUnboxers(i).invoke(arg) // do get the underlying value
              else arg // don't molest anything else
@@ -1289,7 +1291,8 @@ private[scala] trait JavaMirrors
           cls.isType,
           (if (cls != NoSymbol) s"not a type: symbol $cls"
            else "no symbol could be") +
-            s" loaded from $jclazz in $owner with name $simpleName and classloader $classLoader")
+            s" loaded from $jclazz in $owner with name $simpleName and classloader $classLoader"
+        )
 
         cls.asClass
       }

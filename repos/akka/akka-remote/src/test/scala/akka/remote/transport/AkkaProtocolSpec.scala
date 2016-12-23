@@ -159,7 +159,8 @@ class AkkaProtocolSpec
           ActorAssociationEventListener(testActor),
           new AkkaProtocolSettings(conf),
           codec,
-          failureDetector))
+          failureDetector
+        ))
 
       awaitCond(handle.readHandlerPromise.isCompleted)
     }
@@ -174,7 +175,8 @@ class AkkaProtocolSpec
           ActorAssociationEventListener(testActor),
           new AkkaProtocolSettings(conf),
           codec,
-          failureDetector))
+          failureDetector
+        ))
 
       reader ! testAssociate(uid = 33, cookie = None)
 
@@ -211,7 +213,8 @@ class AkkaProtocolSpec
           ActorAssociationEventListener(testActor),
           new AkkaProtocolSettings(conf),
           codec,
-          failureDetector))
+          failureDetector
+        ))
 
       // a stray message will force a disassociate
       reader ! testHeartbeat
@@ -240,7 +243,8 @@ class AkkaProtocolSpec
           new AkkaProtocolSettings(conf),
           codec,
           failureDetector,
-          refuseUid = None))
+          refuseUid = None
+        ))
 
       awaitCond(lastActivityIsAssociate(registry, 42, None))
       failureDetector.called should ===(true)
@@ -278,7 +282,8 @@ class AkkaProtocolSpec
               .parseString("akka.remote.require-cookie = on")
               .withFallback(conf)),
           codec,
-          failureDetector))
+          failureDetector
+        ))
 
       reader ! testAssociate(uid = 33, Some("xyzzy"))
 
@@ -303,7 +308,8 @@ class AkkaProtocolSpec
               .parseString("akka.remote.require-cookie = on")
               .withFallback(conf)),
           codec,
-          failureDetector))
+          failureDetector
+        ))
 
       // Send the correct cookie
       reader ! testAssociate(uid = 33, Some("abcde"))
@@ -344,7 +350,8 @@ class AkkaProtocolSpec
               .withFallback(conf)),
           codec,
           failureDetector,
-          refuseUid = None))
+          refuseUid = None
+        ))
 
       awaitCond(
         lastActivityIsAssociate(registry, uid = 42, cookie = Some("abcde")))
@@ -365,7 +372,8 @@ class AkkaProtocolSpec
           new AkkaProtocolSettings(conf),
           codec,
           failureDetector,
-          refuseUid = None))
+          refuseUid = None
+        ))
 
       awaitCond(lastActivityIsAssociate(registry, uid = 42, cookie = None))
 
@@ -403,7 +411,8 @@ class AkkaProtocolSpec
           new AkkaProtocolSettings(conf),
           codec,
           failureDetector,
-          refuseUid = None))
+          refuseUid = None
+        ))
 
       awaitCond(lastActivityIsAssociate(registry, uid = 42, cookie = None))
 
@@ -441,7 +450,8 @@ class AkkaProtocolSpec
           new AkkaProtocolSettings(conf),
           codec,
           failureDetector,
-          refuseUid = None))
+          refuseUid = None
+        ))
 
       awaitCond(lastActivityIsAssociate(registry, uid = 42, cookie = None))
 
@@ -482,7 +492,8 @@ class AkkaProtocolSpec
           new AkkaProtocolSettings(conf),
           codec,
           failureDetector,
-          refuseUid = None))
+          refuseUid = None
+        ))
 
       awaitCond(lastActivityIsAssociate(registry, uid = 42, cookie = None))
 
@@ -525,7 +536,8 @@ class AkkaProtocolSpec
           new AkkaProtocolSettings(conf2),
           codec,
           failureDetector,
-          refuseUid = None))
+          refuseUid = None
+        ))
 
       watch(stateActor)
       intercept[TimeoutException] {
@@ -548,7 +560,8 @@ class AkkaProtocolSpec
           ActorAssociationEventListener(testActor),
           new AkkaProtocolSettings(conf2),
           codec,
-          failureDetector))
+          failureDetector
+        ))
 
       watch(reader)
       expectTerminated(reader)

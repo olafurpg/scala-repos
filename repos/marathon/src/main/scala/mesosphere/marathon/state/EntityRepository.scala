@@ -54,10 +54,13 @@ trait EntityRepository[T <: MarathonState[_, T]]
   def listVersions(id: String): Future[Iterable[Timestamp]] = timedRead {
     val prefix = versionKeyPrefix(id)
     this.store.names().map { names =>
-      names.collect {
-        case name: String if name.startsWith(prefix) =>
-          Timestamp(name.substring(prefix.length))
-      }.sorted.reverse
+      names
+        .collect {
+          case name: String if name.startsWith(prefix) =>
+            Timestamp(name.substring(prefix.length))
+        }
+        .sorted
+        .reverse
     }
   }
 

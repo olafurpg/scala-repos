@@ -555,8 +555,7 @@ object Codec {
     }
 
     def read(src: ByteBuffer): IndexedSeq[A] =
-      ((0 until readPackedInt(src)) map (_ =>
-                                           elemCodec.read(src))).toIndexedSeq
+      ((0 until readPackedInt(src)) map (_ => elemCodec.read(src))).toIndexedSeq
 
     override def skip(buf: ByteBuffer) {
       (0 until readPackedInt(buf)) foreach { _ =>

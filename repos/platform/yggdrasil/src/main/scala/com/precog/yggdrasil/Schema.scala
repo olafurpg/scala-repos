@@ -336,14 +336,17 @@ object Schema {
         case _ => None
       }
 
-    val elements = ctpes.collect {
-      case ColumnRef(CPath(CPathIndex(i), _ *), _) => i
-    }.toSet.flatMap { (i: Int) =>
-      mkType(ctpes.collect {
-        case ColumnRef(CPath(CPathIndex(`i`), tail @ _ *), ctpe) =>
-          ColumnRef(CPath(tail: _*), ctpe)
-      }).map(i -> _)
-    }
+    val elements = ctpes
+      .collect {
+        case ColumnRef(CPath(CPathIndex(i), _ *), _) => i
+      }
+      .toSet
+      .flatMap { (i: Int) =>
+        mkType(ctpes.collect {
+          case ColumnRef(CPath(CPathIndex(`i`), tail @ _ *), ctpe) =>
+            ColumnRef(CPath(tail: _*), ctpe)
+        }).map(i -> _)
+      }
     val array =
       if (elements.isEmpty) Nil else List(JArrayFixedT(elements.toMap))
 
@@ -493,12 +496,15 @@ object Schema {
     case JArrayFixedT(elements) => {
       val indices = elements.keySet
       indices.forall { i =>
-        subsumes(ctpes.collect {
-          case (CPath(CPathArray, tail @ _ *), CArrayType(elemType)) =>
-            (CPath(tail: _*), elemType)
-          case (CPath(CPathIndex(`i`), tail @ _ *), ctpe) =>
-            (CPath(tail: _*), ctpe)
-        }, elements(i))
+        subsumes(
+          ctpes.collect {
+            case (CPath(CPathArray, tail @ _ *), CArrayType(elemType)) =>
+              (CPath(tail: _*), elemType)
+            case (CPath(CPathIndex(`i`), tail @ _ *), ctpe) =>
+              (CPath(tail: _*), ctpe)
+          },
+          elements(i)
+        )
       }
     }
     case JArrayHomogeneousT(jElemType) =>

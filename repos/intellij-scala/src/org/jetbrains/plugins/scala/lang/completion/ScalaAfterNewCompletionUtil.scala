@@ -53,7 +53,8 @@ object ScalaAfterNewCompletionUtil {
       classOf[ScConstructor],
       classOf[ScClassParents],
       classOf[ScExtendsBlock],
-      classOf[ScNewTemplateDefinition])
+      classOf[ScNewTemplateDefinition]
+    )
 
   def expectedTypesAfterNew(
       position: PsiElement,
@@ -175,15 +176,18 @@ object ScalaAfterNewCompletionUtil {
       tp: ScType,
       psiClass: PsiClass,
       subst: ScSubstitutor,
-      renderer: (ScType, PsiClass,
-                 ScSubstitutor) => LookupElementRenderer[LookupElement],
+      renderer: (ScType, PsiClass, ScSubstitutor) => LookupElementRenderer[
+        LookupElement],
       insertHandler: InsertHandler[LookupElement],
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)])
     : ScalaLookupItem = {
     val name: String = psiClass.name
-    val isRenamed = renamesMap.filter {
-      case (aName, (renamed, aClazz)) => aName == name && aClazz == psiClass
-    }.map(_._2._1).headOption
+    val isRenamed = renamesMap
+      .filter {
+        case (aName, (renamed, aClazz)) => aName == name && aClazz == psiClass
+      }
+      .map(_._2._1)
+      .headOption
     val lookupElement: ScalaLookupItem =
       new ScalaLookupItem(psiClass, isRenamed.getOrElse(name)) {
         override def renderElement(presentation: LookupElementPresentation) {
@@ -221,8 +225,8 @@ object ScalaAfterNewCompletionUtil {
       tp: ScType,
       place: PsiElement,
       addedClasses: mutable.HashSet[String],
-      renderer: (ScType, PsiClass,
-                 ScSubstitutor) => LookupElementRenderer[LookupElement],
+      renderer: (ScType, PsiClass, ScSubstitutor) => LookupElementRenderer[
+        LookupElement],
       insertHandler: InsertHandler[LookupElement],
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)])
     : ScalaLookupItem = {
@@ -259,8 +263,8 @@ object ScalaAfterNewCompletionUtil {
       place: PsiElement,
       addedClasses: mutable.HashSet[String],
       result: CompletionResultSet,
-      renderer: (ScType, PsiClass,
-                 ScSubstitutor) => LookupElementRenderer[LookupElement],
+      renderer: (ScType, PsiClass, ScSubstitutor) => LookupElementRenderer[
+        LookupElement],
       insertHandler: InsertHandler[LookupElement],
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)]) {
     ScType.extractClassType(typez, Some(place.getProject)) match {

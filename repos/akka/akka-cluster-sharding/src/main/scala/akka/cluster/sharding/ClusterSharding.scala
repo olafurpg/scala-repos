@@ -298,7 +298,8 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
       },
       extractShardId = msg ⇒ messageExtractor.shardId(msg),
       allocationStrategy = allocationStrategy,
-      handOffStopMessage = handOffStopMessage)
+      handOffStopMessage = handOffStopMessage
+    )
   }
 
   /**
@@ -390,10 +391,15 @@ class ClusterSharding(system: ExtendedActorSystem) extends Extension {
                  role: Optional[String],
                  messageExtractor: ShardRegion.MessageExtractor): ActorRef = {
 
-    startProxy(typeName, Option(role.orElse(null)), extractEntityId = {
-      case msg if messageExtractor.entityId(msg) ne null ⇒
-        (messageExtractor.entityId(msg), messageExtractor.entityMessage(msg))
-    }, extractShardId = msg ⇒ messageExtractor.shardId(msg))
+    startProxy(
+      typeName,
+      Option(role.orElse(null)),
+      extractEntityId = {
+        case msg if messageExtractor.entityId(msg) ne null ⇒
+          (messageExtractor.entityId(msg), messageExtractor.entityMessage(msg))
+      },
+      extractShardId = msg ⇒ messageExtractor.shardId(msg)
+    )
   }
 
   /**
@@ -488,16 +494,20 @@ private[akka] class ClusterShardingGuardian extends Actor {
                           name = cName)
         }
 
-        context.actorOf(ShardRegion
-                          .props(typeName = typeName,
-                                 entityProps = entityProps,
-                                 settings = settings,
-                                 coordinatorPath = cPath,
-                                 extractEntityId = extractEntityId,
-                                 extractShardId = extractShardId,
-                                 handOffStopMessage = handOffStopMessage)
-                          .withDispatcher(context.props.dispatcher),
-                        name = encName)
+        context.actorOf(
+          ShardRegion
+            .props(
+              typeName = typeName,
+              entityProps = entityProps,
+              settings = settings,
+              coordinatorPath = cPath,
+              extractEntityId = extractEntityId,
+              extractShardId = extractShardId,
+              handOffStopMessage = handOffStopMessage
+            )
+            .withDispatcher(context.props.dispatcher),
+          name = encName
+        )
       }
       sender() ! Started(shardRegion)
 
@@ -506,14 +516,16 @@ private[akka] class ClusterShardingGuardian extends Actor {
       val cName = coordinatorSingletonManagerName(encName)
       val cPath = coordinatorPath(encName)
       val shardRegion = context.child(encName).getOrElse {
-        context.actorOf(ShardRegion
-                          .proxyProps(typeName = typeName,
-                                      settings = settings,
-                                      coordinatorPath = cPath,
-                                      extractEntityId = extractEntityId,
-                                      extractShardId = extractShardId)
-                          .withDispatcher(context.props.dispatcher),
-                        name = encName)
+        context.actorOf(
+          ShardRegion
+            .proxyProps(typeName = typeName,
+                        settings = settings,
+                        coordinatorPath = cPath,
+                        extractEntityId = extractEntityId,
+                        extractShardId = extractShardId)
+            .withDispatcher(context.props.dispatcher),
+          name = encName
+        )
       }
       sender() ! Started(shardRegion)
   }

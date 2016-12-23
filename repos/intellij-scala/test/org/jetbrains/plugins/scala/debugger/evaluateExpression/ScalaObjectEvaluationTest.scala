@@ -18,14 +18,16 @@ class ScalaObjectEvaluationTest_212
     with ScalaVersion_2_12
 
 abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase {
-  addFileWithBreakpoints("SimpleObject.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "SimpleObject.scala",
+    s"""
        |object EvaluateObjects {
        |  def main(args: Array[String]) {
        |    ""$bp
        |  }
        |}
-       """.stripMargin.trim())
+       """.stripMargin.trim()
+  )
   addSourceFile("Simple.scala", "object Simple")
   addSourceFile("qual/Simple.scala",
                 s"""
@@ -69,8 +71,9 @@ abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase {
     }
   }
 
-  addFileWithBreakpoints("InnerClassObjectFromObject.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "InnerClassObjectFromObject.scala",
+    s"""
        |object InnerClassObjectFromObject {
        |  class S {
        |    object SS {
@@ -92,7 +95,8 @@ abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase {
        |    x.foo()
        |  }
        |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+  )
   def testInnerClassObjectFromObject() {
     runDebugger() {
       waitForBreakpoint()

@@ -55,7 +55,8 @@ case class TungstenAggregate(
     "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
                                                    "number of output rows"),
     "dataSize" -> SQLMetrics.createSizeMetric(sparkContext, "data size"),
-    "spillSize" -> SQLMetrics.createSizeMetric(sparkContext, "spill size"))
+    "spillSize" -> SQLMetrics.createSizeMetric(sparkContext, "spill size")
+  )
 
   override def output: Seq[Attribute] = resultExpressions.map(_.toAttribute)
 
@@ -112,7 +113,8 @@ case class TungstenAggregate(
             testFallbackStartsAt,
             numOutputRows,
             dataSize,
-            spillSize)
+            spillSize
+          )
           if (!hasInput && groupingExpressions.isEmpty) {
             numOutputRows += 1
             Iterator.single[UnsafeRow](
@@ -212,15 +214,17 @@ case class TungstenAggregate(
       }
 
     val doAgg = ctx.freshName("doAggregateWithoutKey")
-    ctx.addNewFunction(doAgg,
-                       s"""
+    ctx.addNewFunction(
+      doAgg,
+      s"""
          | private void $doAgg() throws java.io.IOException {
          |   // initialize aggregation buffer
          |   $initBufVar
          |
          |   ${child.asInstanceOf[CodegenSupport].produce(ctx, this)}
          | }
-       """.stripMargin)
+       """.stripMargin
+    )
 
     val numOutput = metricTerm(ctx, "numOutputRows")
     s"""
@@ -481,14 +485,16 @@ case class TungstenAggregate(
                         "")
 
     val doAgg = ctx.freshName("doAggregateWithKeys")
-    ctx.addNewFunction(doAgg,
-                       s"""
+    ctx.addNewFunction(
+      doAgg,
+      s"""
         private void $doAgg() throws java.io.IOException {
           ${child.asInstanceOf[CodegenSupport].produce(ctx, this)}
 
           $iterTerm = $thisPlan.finishAggregate($hashMapTerm, $sorterTerm);
         }
-       """)
+       """
+    )
 
     // generate code for output
     val keyTerm = ctx.freshName("aggKey")

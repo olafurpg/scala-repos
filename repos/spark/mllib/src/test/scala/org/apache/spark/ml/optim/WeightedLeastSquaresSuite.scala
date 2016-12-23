@@ -47,7 +47,8 @@ class WeightedLeastSquaresSuite
         Instance(23.0, 3.0, Vectors.dense(2.0, 11.0)),
         Instance(29.0, 4.0, Vectors.dense(3.0, 13.0))
       ),
-      2)
+      2
+    )
 
     /*
        R code:
@@ -63,7 +64,8 @@ class WeightedLeastSquaresSuite
         Instance(17.0, 3.0, Vectors.dense(2.0, 11.0)),
         Instance(17.0, 4.0, Vectors.dense(3.0, 13.0))
       ),
-      2)
+      2
+    )
   }
 
   test("WLS against lm") {
@@ -174,18 +176,20 @@ class WeightedLeastSquaresSuite
        [1] 13.1860638  2.1761382  0.6213134
      */
 
-    val expected = Seq(Vectors.dense(0.0, -3.727117, 3.009982),
-                       Vectors.dense(0.0, -3.727117, 3.009982),
-                       Vectors.dense(0.0, -3.307532, 2.924206),
-                       Vectors.dense(0.0, -2.914790, 2.840627),
-                       Vectors.dense(0.0, -1.526575, 2.558158),
-                       Vectors.dense(0.0, 0.06984238, 2.20488344),
-                       Vectors.dense(18.0799727, 6.0799832, -0.5999941),
-                       Vectors.dense(18.0799727, 6.0799832, -0.5999941),
-                       Vectors.dense(13.5356178, 3.2714044, 0.3770744),
-                       Vectors.dense(14.064629, 3.565802, 0.269593),
-                       Vectors.dense(10.1238013, 0.9708569, 1.1475466),
-                       Vectors.dense(13.1860638, 2.1761382, 0.6213134))
+    val expected = Seq(
+      Vectors.dense(0.0, -3.727117, 3.009982),
+      Vectors.dense(0.0, -3.727117, 3.009982),
+      Vectors.dense(0.0, -3.307532, 2.924206),
+      Vectors.dense(0.0, -2.914790, 2.840627),
+      Vectors.dense(0.0, -1.526575, 2.558158),
+      Vectors.dense(0.0, 0.06984238, 2.20488344),
+      Vectors.dense(18.0799727, 6.0799832, -0.5999941),
+      Vectors.dense(18.0799727, 6.0799832, -0.5999941),
+      Vectors.dense(13.5356178, 3.2714044, 0.3770744),
+      Vectors.dense(14.064629, 3.565802, 0.269593),
+      Vectors.dense(10.1238013, 0.9708569, 1.1475466),
+      Vectors.dense(13.1860638, 2.1761382, 0.6213134)
+    )
 
     var idx = 0
     for (fitIntercept <- Seq(false, true);

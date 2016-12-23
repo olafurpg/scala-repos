@@ -48,29 +48,33 @@ object History {
     private implicit val ratingsMapReader =
       new BSONDocumentReader[RatingsMap] {
         def read(doc: BSONDocument): RatingsMap =
-          doc.stream.flatMap {
-            case scala.util.Success((k, BSONInteger(v))) =>
-              parseIntOption(k) map (_ -> v)
-            case _ => none[(Int, Int)]
-          }.toList sortBy (_._1)
+          doc.stream
+            .flatMap {
+              case scala.util.Success((k, BSONInteger(v))) =>
+                parseIntOption(k) map (_ -> v)
+              case _ => none[(Int, Int)]
+            }
+            .toList sortBy (_._1)
       }
 
     def read(doc: BSONDocument): History = {
       def ratingsMap(key: String): RatingsMap = ~doc.getAs[RatingsMap](key)
-      History(standard = ratingsMap("standard"),
-              chess960 = ratingsMap("chess960"),
-              kingOfTheHill = ratingsMap("kingOfTheHill"),
-              threeCheck = ratingsMap("threeCheck"),
-              antichess = ratingsMap("antichess"),
-              atomic = ratingsMap("atomic"),
-              horde = ratingsMap("horde"),
-              racingKings = ratingsMap("racingKings"),
-              crazyhouse = ratingsMap("crazyhouse"),
-              bullet = ratingsMap("bullet"),
-              blitz = ratingsMap("blitz"),
-              classical = ratingsMap("classical"),
-              correspondence = ratingsMap("correspondence"),
-              puzzle = ratingsMap("puzzle"))
+      History(
+        standard = ratingsMap("standard"),
+        chess960 = ratingsMap("chess960"),
+        kingOfTheHill = ratingsMap("kingOfTheHill"),
+        threeCheck = ratingsMap("threeCheck"),
+        antichess = ratingsMap("antichess"),
+        atomic = ratingsMap("atomic"),
+        horde = ratingsMap("horde"),
+        racingKings = ratingsMap("racingKings"),
+        crazyhouse = ratingsMap("crazyhouse"),
+        bullet = ratingsMap("bullet"),
+        blitz = ratingsMap("blitz"),
+        classical = ratingsMap("classical"),
+        correspondence = ratingsMap("correspondence"),
+        puzzle = ratingsMap("puzzle")
+      )
     }
   }
 }

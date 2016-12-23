@@ -283,8 +283,7 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     val context = createRenderContext(out)
     val attrs =
       templateAttributes ++
-        (defaultLayoutPath map (p =>
-                                  Map("layout" -> p) ++ Map(attributes: _*)) getOrElse Map(
+        (defaultLayoutPath map (p => Map("layout" -> p) ++ Map(attributes: _*)) getOrElse Map(
           attributes: _*))
 
     attrs foreach {

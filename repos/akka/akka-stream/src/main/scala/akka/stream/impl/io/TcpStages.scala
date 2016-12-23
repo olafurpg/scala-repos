@@ -94,14 +94,17 @@ private[stream] class ConnectionSourceStage(
         }
       }
 
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          // Ignore if still binding
-          if (listener ne null) listener ! ResumeAccepting(1)
-        }
+      setHandler(
+        out,
+        new OutHandler {
+          override def onPull(): Unit = {
+            // Ignore if still binding
+            if (listener ne null) listener ! ResumeAccepting(1)
+          }
 
-        override def onDownstreamFinish(): Unit = tryUnbind()
-      })
+          override def onDownstreamFinish(): Unit = tryUnbind()
+        }
+      )
 
       private def connectionFor(
           connected: Connected,
@@ -287,34 +290,37 @@ private[stream] object TcpConnectionStage {
       }
     }
 
-    setHandler(bytesIn, new InHandler {
-      override def onPush(): Unit = {
-        val elem = grab(bytesIn)
-        ReactiveStreamsCompliance.requireNonNullElement(elem)
-        connection ! Write(elem.asInstanceOf[ByteString], WriteAck)
-      }
+    setHandler(
+      bytesIn,
+      new InHandler {
+        override def onPush(): Unit = {
+          val elem = grab(bytesIn)
+          ReactiveStreamsCompliance.requireNonNullElement(elem)
+          connection ! Write(elem.asInstanceOf[ByteString], WriteAck)
+        }
 
-      override def onUpstreamFinish(): Unit = {
-        // Reading has stopped before, either because of cancel, or PeerClosed, so just Close now
-        // (or half-close is turned off)
-        if (isClosed(bytesOut) || !role.halfClose) connection ! Close
-        // We still read, so we only close the write side
-        else if (connection != null) connection ! ConfirmedClose
-        else completeStage()
-      }
+        override def onUpstreamFinish(): Unit = {
+          // Reading has stopped before, either because of cancel, or PeerClosed, so just Close now
+          // (or half-close is turned off)
+          if (isClosed(bytesOut) || !role.halfClose) connection ! Close
+          // We still read, so we only close the write side
+          else if (connection != null) connection ! ConfirmedClose
+          else completeStage()
+        }
 
-      override def onUpstreamFailure(ex: Throwable): Unit = {
-        if (connection != null) {
-          if (interpreter.log.isDebugEnabled) {
-            interpreter.log.debug(
-              "Aborting tcp connection because of upstream failure: {}\n{}",
-              ex.getMessage,
-              ex.getStackTrace.mkString("\n"))
-          }
-          connection ! Abort
-        } else failStage(ex)
+        override def onUpstreamFailure(ex: Throwable): Unit = {
+          if (connection != null) {
+            if (interpreter.log.isDebugEnabled) {
+              interpreter.log.debug(
+                "Aborting tcp connection because of upstream failure: {}\n{}",
+                ex.getMessage,
+                ex.getStackTrace.mkString("\n"))
+            }
+            connection ! Abort
+          } else failStage(ex)
+        }
       }
-    })
+    )
 
     override def postStop(): Unit = role match {
       case Outbound(_, _, localAddressPromise, _) ⇒

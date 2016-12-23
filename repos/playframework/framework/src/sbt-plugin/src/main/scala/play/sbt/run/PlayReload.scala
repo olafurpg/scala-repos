@@ -93,55 +93,57 @@ object PlayReload {
           val JavacErrorInfo = """\[error\]\s*([a-z ]+):(.*)""".r
           val JavacErrorPosition = """\[error\](\s*)\^\s*""".r
 
-          streams.map { streamsManager =>
-            var first: (Option[(String, String, String)], Option[Int]) =
-              (None, None)
-            var parsed: (Option[(String, String, String)], Option[Int]) =
-              (None, None)
-            Output
-              .lastLines(scopedKey, streamsManager, None)
-              .map(_.replace(scala.Console.RESET, ""))
-              .map(_.replace(scala.Console.RED, ""))
-              .collect {
-                case JavacError(file, line, message) =>
-                  parsed = Some((file, line, message)) -> None
-                case JavacErrorInfo(key, message) =>
-                  parsed._1.foreach { o =>
-                    parsed = Some(
-                        (parsed._1.get._1,
-                         parsed._1.get._2,
-                         parsed._1.get._3 + " [" + key.trim + ": " +
-                           message.trim + "]")) -> None
-                  }
-                case JavacErrorPosition(pos) =>
-                  parsed = parsed._1 -> Some(pos.size)
-                  if (first == ((None, None))) {
-                    first = parsed
-                  }
-              }
-            first
-          }.collect {
-            case (Some(error), maybePosition) =>
-              new xsbti.Problem {
-                def message = error._3
-                def category = ""
-                def position = new xsbti.Position {
-                  def line = xsbti.Maybe.just(error._2.toInt)
-                  def lineContent = ""
-                  def offset = xsbti.Maybe.nothing[java.lang.Integer]
-                  def pointer =
-                    maybePosition
-                      .map(pos =>
-                        xsbti.Maybe.just(
-                          (pos - 1).asInstanceOf[java.lang.Integer]))
-                      .getOrElse(xsbti.Maybe.nothing[java.lang.Integer])
-                  def pointerSpace = xsbti.Maybe.nothing[String]
-                  def sourceFile = xsbti.Maybe.just(file(error._1))
-                  def sourcePath = xsbti.Maybe.just(error._1)
+          streams
+            .map { streamsManager =>
+              var first: (Option[(String, String, String)], Option[Int]) =
+                (None, None)
+              var parsed: (Option[(String, String, String)], Option[Int]) =
+                (None, None)
+              Output
+                .lastLines(scopedKey, streamsManager, None)
+                .map(_.replace(scala.Console.RESET, ""))
+                .map(_.replace(scala.Console.RED, ""))
+                .collect {
+                  case JavacError(file, line, message) =>
+                    parsed = Some((file, line, message)) -> None
+                  case JavacErrorInfo(key, message) =>
+                    parsed._1.foreach { o =>
+                      parsed = Some(
+                          (parsed._1.get._1,
+                           parsed._1.get._2,
+                           parsed._1.get._3 + " [" + key.trim + ": " +
+                             message.trim + "]")) -> None
+                    }
+                  case JavacErrorPosition(pos) =>
+                    parsed = parsed._1 -> Some(pos.size)
+                    if (first == ((None, None))) {
+                      first = parsed
+                    }
                 }
-                def severity = xsbti.Severity.Error
-              }
-          }
+              first
+            }
+            .collect {
+              case (Some(error), maybePosition) =>
+                new xsbti.Problem {
+                  def message = error._3
+                  def category = ""
+                  def position = new xsbti.Position {
+                    def line = xsbti.Maybe.just(error._2.toInt)
+                    def lineContent = ""
+                    def offset = xsbti.Maybe.nothing[java.lang.Integer]
+                    def pointer =
+                      maybePosition
+                        .map(pos =>
+                          xsbti.Maybe.just(
+                            (pos - 1).asInstanceOf[java.lang.Integer]))
+                        .getOrElse(xsbti.Maybe.nothing[java.lang.Integer])
+                    def pointerSpace = xsbti.Maybe.nothing[String]
+                    def sourceFile = xsbti.Maybe.just(file(error._1))
+                    def sourcePath = xsbti.Maybe.just(error._1)
+                  }
+                  def severity = xsbti.Severity.Error
+                }
+            }
       }
     }
   }

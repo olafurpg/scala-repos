@@ -89,7 +89,8 @@ private[remote] object Remoting {
             throw new RemoteTransportException(
               s"No transport is responsible for address: [$remote] although protocol [${remote.protocol}] is available." +
                 " Make sure at least one transport is configured to be responsible for the address.",
-              null)
+              null
+            )
 
           case 1 ⇒
             responsibleTransports.head._2
@@ -100,7 +101,8 @@ private[remote] object Remoting {
                 .mkString(",")}]. " +
                 "Remoting cannot decide which transport to use to reach the remote system. Change your configuration " +
                 "so that only one transport is responsible for the address.",
-              null)
+              null
+            )
         }
       case None ⇒
         throw new RemoteTransportException(
@@ -560,7 +562,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
           remoteAddress,
           settings.RetryGateClosedFor.toMillis,
           reason.getMessage,
-          causedBy)
+          causedBy
+        )
         endpoints.markAsFailed(sender(),
                                Deadline.now + settings.RetryGateClosedFor)
       }
@@ -578,7 +581,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
           "Remote system with address [{}] has shut down. " +
             "Address is now gated for {} ms, all messages to this address will be delivered to dead letters.",
           remoteAddress,
-          settings.RetryGateClosedFor.toMillis)
+          settings.RetryGateClosedFor.toMillis
+        )
         endpoints.markAsFailed(sender(),
                                Deadline.now + settings.RetryGateClosedFor)
       }
@@ -604,7 +608,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
           "Association to [{}] with unknown UID is irrecoverably failed. " +
             "Address cannot be quarantined without knowing the UID, gating instead for {} ms.",
           remoteAddress,
-          settings.RetryGateClosedFor.toMillis)
+          settings.RetryGateClosedFor.toMillis
+        )
         endpoints.markAsFailed(sender(),
                                Deadline.now + settings.RetryGateClosedFor)
       }
@@ -677,7 +682,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
             "Association to [{}] with unknown UID is reported as quarantined, but " +
               "address cannot be quarantined without knowing the UID, gating instead for {} ms.",
             address,
-            settings.RetryGateClosedFor.toMillis)
+            settings.RetryGateClosedFor.toMillis
+          )
           endpoints
             .markAsFailed(endpoint, Deadline.now + settings.RetryGateClosedFor)
         case (Some(Pass(endpoint, Some(currentUid), _)), Some(quarantineUid))
@@ -747,7 +753,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
                          settings,
                          handleOption = None,
                          writing = true,
-                         refuseUid))
+                         refuseUid)
+        )
 
       endpoints.writableEndpointWithPolicyFor(recipientAddress) match {
         case Some(Pass(endpoint, _, _)) ⇒
@@ -922,21 +929,24 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
                 s"Cannot instantiate transport [$fqn]. " +
                   "Make sure it extends [akka.remote.transport.Transport] and has constructor with " +
                   "[akka.actor.ExtendedActorSystem] and [com.typesafe.config.Config] parameters",
-                exception)
+                exception
+              )
           })
           .get
 
         // Iteratively decorates the bottom level driver with a list of adapters.
         // The chain at this point:
         //   Adapter <- ... <- Adapter <- Driver
-        val wrappedTransport = adapters.map {
-          TransportAdaptersExtension.get(context.system).getAdapterProvider
-        }.foldLeft(driver) {
-          (t: Transport, provider: TransportAdapterProvider) ⇒
-            // The TransportAdapterProvider will wrap the given Transport and returns with a wrapped one
-            provider.create(t,
-                            context.system.asInstanceOf[ExtendedActorSystem])
-        }
+        val wrappedTransport = adapters
+          .map {
+            TransportAdaptersExtension.get(context.system).getAdapterProvider
+          }
+          .foldLeft(driver) {
+            (t: Transport, provider: TransportAdapterProvider) ⇒
+              // The TransportAdapterProvider will wrap the given Transport and returns with a wrapped one
+              provider.create(t,
+                              context.system.asInstanceOf[ExtendedActorSystem])
+          }
 
         // Apply AkkaProtocolTransport wrapper to the end of the chain
         // The chain at this point:
@@ -1011,7 +1021,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
                                                receiveBuffers))
             .withDeploy(Deploy.local),
           "reliableEndpointWriter-" + AddressUrlEncoder(remoteAddress) +
-            "-" + endpointId.next()))
+            "-" + endpointId.next()
+        ))
     else
       context.watch(
         context.actorOf(
@@ -1028,7 +1039,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
                                    reliableDeliverySupervisor = None))
             .withDeploy(Deploy.local),
           "endpointWriter-" + AddressUrlEncoder(remoteAddress) + "-" +
-            endpointId.next()))
+            endpointId.next()
+        ))
   }
 
   private var normalShutdown = false

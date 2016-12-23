@@ -99,8 +99,8 @@ class ObservableValueSpec extends FlatSpec with BeforeAndAfterEach {
     // ...
     // subscription.cancel()
     val listener: ChangeListener[Number] =
-      (obs: JFXObservableValue[_ <: Number], oldV: Number,
-       newV: Number) => invalidateCalled = true
+      (obs: JFXObservableValue[_ <: Number], oldV: Number, newV: Number) =>
+        invalidateCalled = true
     property addListener listener
     invalidateCalled should be(false)
     property() = 100

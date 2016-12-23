@@ -93,14 +93,16 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
       def registerModuleExports(
           sym: ScalaJSJUnitPluginComponent.global.Symbol): Unit
     }
-    global.plugins.collectFirst {
-      case pl
-          if pl.getClass.getName == "org.scalajs.core.compiler.ScalaJSPlugin" =>
-        pl.asInstanceOf[ScalaJSPlugin]
-    }.getOrElse {
-      throw new Exception(
-        "The Scala.js JUnit plugin only works with the Scala.js plugin enabled.")
-    }
+    global.plugins
+      .collectFirst {
+        case pl
+            if pl.getClass.getName == "org.scalajs.core.compiler.ScalaJSPlugin" =>
+          pl.asInstanceOf[ScalaJSPlugin]
+      }
+      .getOrElse {
+        throw new Exception(
+          "The Scala.js JUnit plugin only works with the Scala.js plugin enabled.")
+      }
   }
 
   object ScalaJSJUnitPluginComponent
@@ -162,34 +164,37 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
             case _ => false
           }
 
-          val bootstrappers = tree.stats.groupBy {
-            // Group the class with its module
-            case clDef: ClassDef => Some(clDef.name)
-            case _ => None
-          }.iterator.flatMap {
-            case (Some(_), xs)
-                if xs.exists(x => isClassWithJUnitAnnotation(x.symbol)) =>
-              def isModule(cDef: ClassDef): Boolean =
-                cDef.mods.hasFlag(Flags.MODULE)
-              def isTestClass(cDef: ClassDef): Boolean = {
-                !cDef.mods.hasFlag(Flags.MODULE) &&
-                !cDef.mods.hasFlag(Flags.ABSTRACT) &&
-                !cDef.mods.hasFlag(Flags.TRAIT)
-              }
-              // Get the class definition and do the transformation
-              xs.collectFirst {
-                case clDef: ClassDef if isTestClass(clDef) =>
-                  // Get the module definition
-                  val modDefOption =
-                    xs collectFirst {
-                      case clDef: ClassDef if isModule(clDef) => clDef
-                    }
-                  // Create a new module for the JUnit entry point.
-                  mkBootstrapperClass(clDef, modDefOption)
-              }
+          val bootstrappers = tree.stats
+            .groupBy {
+              // Group the class with its module
+              case clDef: ClassDef => Some(clDef.name)
+              case _ => None
+            }
+            .iterator
+            .flatMap {
+              case (Some(_), xs)
+                  if xs.exists(x => isClassWithJUnitAnnotation(x.symbol)) =>
+                def isModule(cDef: ClassDef): Boolean =
+                  cDef.mods.hasFlag(Flags.MODULE)
+                def isTestClass(cDef: ClassDef): Boolean = {
+                  !cDef.mods.hasFlag(Flags.MODULE) &&
+                  !cDef.mods.hasFlag(Flags.ABSTRACT) &&
+                  !cDef.mods.hasFlag(Flags.TRAIT)
+                }
+                // Get the class definition and do the transformation
+                xs.collectFirst {
+                  case clDef: ClassDef if isTestClass(clDef) =>
+                    // Get the module definition
+                    val modDefOption =
+                      xs collectFirst {
+                        case clDef: ClassDef if isModule(clDef) => clDef
+                      }
+                    // Create a new module for the JUnit entry point.
+                    mkBootstrapperClass(clDef, modDefOption)
+                }
 
-            case (_, xs) => None
-          }
+              case (_, xs) => None
+            }
 
           val newStats = tree.stats.map(transform) ++ bootstrappers
 
@@ -263,9 +268,11 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
       }
 
       def jUnitAnnotatedMethods(sym: Symbol): List[MethodSymbol] = {
-        sym.selfType.members.collect {
-          case m: MethodSymbol if hasJUnitMethodAnnotation(m) => m
-        }.toList
+        sym.selfType.members
+          .collect {
+            case m: MethodSymbol if hasJUnitMethodAnnotation(m) => m
+          }
+          .toList
       }
 
       /** This method generates a method that invokes a test method in the module
@@ -424,14 +431,16 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
           mkList(testMethods.map(defaultMethodMetadata(tpe)))
 
         val getJUnitMethodRhs = {
-          mkNewInstance(TypeTree(jUnitClassMetadataType),
-                        List(
-                          mkList(liftAnnotations(clSym)),
-                          gen.mkNil,
-                          mkMethodList(jUnitMethodMetadataTypeTree)(methods),
-                          modMethods.fold(gen.mkNil)(
-                            mkMethodList(jUnitMethodMetadataTypeTree))
-                        ))
+          mkNewInstance(
+            TypeTree(jUnitClassMetadataType),
+            List(
+              mkList(liftAnnotations(clSym)),
+              gen.mkNil,
+              mkMethodList(jUnitMethodMetadataTypeTree)(methods),
+              modMethods.fold(gen.mkNil)(
+                mkMethodList(jUnitMethodMetadataTypeTree))
+            )
+          )
         }
 
         val getJUnitMetadataSym = clSym.newMethod(newTermName("metadata"))

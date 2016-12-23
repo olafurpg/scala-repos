@@ -206,14 +206,16 @@ object Retries {
     val budget =
       if (withdrawsOnly) new WithdrawOnlyRetryBudget(retryBudget)
       else retryBudget
-    new RequeueFilter[Req, Rep](budget,
-                                retrySchedule,
-                                statsReceiver,
-                                // TODO: If we ensure that the stack doesn't return restartable
-                                // failures when it isn't Open, we wouldn't need to gate on status.
-                                () => next.status == Status.Open,
-                                MaxRequeuesPerReq,
-                                timer)
+    new RequeueFilter[Req, Rep](
+      budget,
+      retrySchedule,
+      statsReceiver,
+      // TODO: If we ensure that the stack doesn't return restartable
+      // failures when it isn't Open, we wouldn't need to gate on status.
+      () => next.status == Status.Open,
+      MaxRequeuesPerReq,
+      timer
+    )
   }
 
   private[this] def svcFactory[Req, Rep](

@@ -38,7 +38,8 @@ object JmxTool extends Logging {
         "object-name",
         "A JMX object name to use as a query. This can contain wild cards, and this option " +
           "can be given multiple times to specify more than one query. If no objects are specified " +
-          "all objects will be queried.")
+          "all objects will be queried."
+      )
       .withRequiredArg
       .describedAs("name")
       .ofType(classOf[String])
@@ -114,11 +115,15 @@ object JmxTool extends Logging {
       attributesWhitelistExists match {
         case true => queries.map((_, attributesWhitelist.get.size)).toMap
         case false =>
-          names.map { (name: ObjectName) =>
-            val mbean = mbsc.getMBeanInfo(name)
-            (name,
-             mbsc.getAttributes(name, mbean.getAttributes.map(_.getName)).size)
-          }.toMap
+          names
+            .map { (name: ObjectName) =>
+              val mbean = mbsc.getMBeanInfo(name)
+              (name,
+               mbsc
+                 .getAttributes(name, mbean.getAttributes.map(_.getName))
+                 .size)
+            }
+            .toMap
       }
 
     // print csv header

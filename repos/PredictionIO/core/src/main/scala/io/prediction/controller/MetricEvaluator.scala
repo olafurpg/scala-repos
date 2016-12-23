@@ -141,14 +141,16 @@ object MetricEvaluator {
                            serving: NameParams) {
 
     def this(evaluation: Evaluation, engineParams: EngineParams) =
-      this(id = "",
-           description = "",
-           engineFactory = evaluation.getClass.getName,
-           datasource = new NameParams(engineParams.dataSourceParams),
-           preparator = new NameParams(engineParams.preparatorParams),
-           algorithms =
-             engineParams.algorithmParamsList.map(np => new NameParams(np)),
-           serving = new NameParams(engineParams.servingParams))
+      this(
+        id = "",
+        description = "",
+        engineFactory = evaluation.getClass.getName,
+        datasource = new NameParams(engineParams.dataSourceParams),
+        preparator = new NameParams(engineParams.preparatorParams),
+        algorithms =
+          engineParams.algorithmParamsList.map(np => new NameParams(np)),
+        serving = new NameParams(engineParams.servingParams)
+      )
   }
 }
 
@@ -193,7 +195,8 @@ class MetricEvaluator[EI, Q, P, A, R](
         new MetricEvaluator.NameParams(engineParams.preparatorParams),
       algorithms = engineParams.algorithmParamsList.map(np =>
         new MetricEvaluator.NameParams(np)),
-      serving = new MetricEvaluator.NameParams(engineParams.servingParams))
+      serving = new MetricEvaluator.NameParams(engineParams.servingParams)
+    )
 
     implicit lazy val formats = Utils.json4sDefaultFormats
 
@@ -210,13 +213,15 @@ class MetricEvaluator[EI, Q, P, A, R](
       params: WorkflowParams): MetricEvaluatorResult[R] = {
 
     val evalResultList: Seq[(EngineParams, MetricScores[R])] =
-      engineEvalDataSet.zipWithIndex.par.map {
-        case ((engineParams, evalDataSet), idx) =>
-          val metricScores =
-            MetricScores[R](metric.calculate(sc, evalDataSet),
-                            otherMetrics.map(_.calculate(sc, evalDataSet)))
-          (engineParams, metricScores)
-      }.seq
+      engineEvalDataSet.zipWithIndex.par
+        .map {
+          case ((engineParams, evalDataSet), idx) =>
+            val metricScores =
+              MetricScores[R](metric.calculate(sc, evalDataSet),
+                              otherMetrics.map(_.calculate(sc, evalDataSet)))
+            (engineParams, metricScores)
+        }
+        .seq
 
     implicit lazy val formats =
       Utils.json4sDefaultFormats + new NameParamsSerializer
@@ -240,12 +245,14 @@ class MetricEvaluator[EI, Q, P, A, R](
       saveEngineJson(evaluation, bestEngineParams, path)
     }
 
-    MetricEvaluatorResult(bestScore = bestScore,
-                          bestEngineParams = bestEngineParams,
-                          bestIdx = bestIdx,
-                          metricHeader = metric.header,
-                          otherMetricHeaders = otherMetrics.map(_.header),
-                          engineParamsScores = evalResultList,
-                          outputPath = outputPath)
+    MetricEvaluatorResult(
+      bestScore = bestScore,
+      bestEngineParams = bestEngineParams,
+      bestIdx = bestIdx,
+      metricHeader = metric.header,
+      otherMetricHeaders = otherMetrics.map(_.header),
+      engineParamsScores = evalResultList,
+      outputPath = outputPath
+    )
   }
 }

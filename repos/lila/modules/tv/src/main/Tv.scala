@@ -118,9 +118,11 @@ object Tv {
                    Horde,
                    RacingKings,
                    Computer)
-    val byKey = all.map { c =>
-      c.key -> c
-    }.toMap
+    val byKey = all
+      .map { c =>
+        c.key -> c
+      }
+      .toMap
   }
 
   private def rated = (g: Game) => g.rated

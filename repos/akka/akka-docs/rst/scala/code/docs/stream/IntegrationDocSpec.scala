@@ -203,13 +203,15 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     //#external-service-mapAsyncUnordered
 
     probe.receiveN(7).toSet should be(
-      Set("rolandkuhn@somewhere.com",
-          "patriknw@somewhere.com",
-          "bantonsson@somewhere.com",
-          "drewhk@somewhere.com",
-          "ktosopl@somewhere.com",
-          "mmartynas@somewhere.com",
-          "akkateam@somewhere.com"))
+      Set(
+        "rolandkuhn@somewhere.com",
+        "patriknw@somewhere.com",
+        "bantonsson@somewhere.com",
+        "drewhk@somewhere.com",
+        "ktosopl@somewhere.com",
+        "mmartynas@somewhere.com",
+        "akkateam@somewhere.com"
+      ))
   }
 
   "careful managed blocking with mapAsync" in {
@@ -239,13 +241,15 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     //#blocking-mapAsync
 
     probe.receiveN(7).toSet should be(
-      Set("rolandkuhn".hashCode.toString,
-          "patriknw".hashCode.toString,
-          "bantonsson".hashCode.toString,
-          "drewhk".hashCode.toString,
-          "ktosopl".hashCode.toString,
-          "mmartynas".hashCode.toString,
-          "akkateam".hashCode.toString))
+      Set(
+        "rolandkuhn".hashCode.toString,
+        "patriknw".hashCode.toString,
+        "bantonsson".hashCode.toString,
+        "drewhk".hashCode.toString,
+        "ktosopl".hashCode.toString,
+        "mmartynas".hashCode.toString,
+        "akkateam".hashCode.toString
+      ))
   }
 
   "careful managed blocking with map" in {
@@ -260,9 +264,11 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       .collect { case Some(phoneNo) => phoneNo }
 
     //#blocking-map
-    val send = Flow[String].map { phoneNo =>
-      smsServer.send(TextMessage(to = phoneNo, body = "I like your tweet"))
-    }.withAttributes(ActorAttributes.dispatcher("blocking-dispatcher"))
+    val send = Flow[String]
+      .map { phoneNo =>
+        smsServer.send(TextMessage(to = phoneNo, body = "I like your tweet"))
+      }
+      .withAttributes(ActorAttributes.dispatcher("blocking-dispatcher"))
     val sendTextMessages: RunnableGraph[NotUsed] =
       phoneNumbers.via(send).to(Sink.ignore)
 

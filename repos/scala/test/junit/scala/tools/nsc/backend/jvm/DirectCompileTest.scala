@@ -66,19 +66,21 @@ class DirectCompileTest extends ClearAfterClass {
     // makes sure that dropNoOp doesn't drop labels that are being used
     val List(f) =
       compileMethods(compiler)("""def f(x: Int) = if (x == 0) "a" else "b"""")
-    assertSameCode(instructionsFromMethod(f).dropLinesFrames,
-                   List(
-                     Label(0),
-                     VarOp(ILOAD, 1),
-                     Op(ICONST_0),
-                     Jump(IF_ICMPNE, Label(7)),
-                     Ldc(LDC, "a"),
-                     Op(ARETURN),
-                     Label(7),
-                     Ldc(LDC, "b"),
-                     Op(ARETURN),
-                     Label(11)
-                   ))
+    assertSameCode(
+      instructionsFromMethod(f).dropLinesFrames,
+      List(
+        Label(0),
+        VarOp(ILOAD, 1),
+        Op(ICONST_0),
+        Jump(IF_ICMPNE, Label(7)),
+        Ldc(LDC, "a"),
+        Op(ARETURN),
+        Label(7),
+        Ldc(LDC, "b"),
+        Op(ARETURN),
+        Label(11)
+      )
+    )
   }
 
   @Test

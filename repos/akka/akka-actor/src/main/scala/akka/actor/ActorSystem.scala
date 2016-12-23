@@ -823,7 +823,8 @@ private[akka] class ActorSystemImpl(
         immutable.Seq(classOf[Config] -> settings.config,
                       classOf[LoggingAdapter] -> log,
                       classOf[ThreadFactory] -> threadFactory.withName(
-                        threadFactory.name + "-scheduler")))
+                        threadFactory.name + "-scheduler"))
+      )
       .get
   //#create-scheduler
 

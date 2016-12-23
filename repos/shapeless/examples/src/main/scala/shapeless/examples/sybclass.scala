@@ -46,12 +46,14 @@ object SybClassExamples {
   def paradise: Unit = {
     val beforeRaise = Company(
       List(
-        Dept("Research",
-             Employee(Person("Ralf", "Amsterdam"), Salary(8000)),
-             List(
-               Employee(Person("Joost", "Amsterdam"), Salary(1000)),
-               Employee(Person("Marlow", "Cambridge"), Salary(2000))
-             )),
+        Dept(
+          "Research",
+          Employee(Person("Ralf", "Amsterdam"), Salary(8000)),
+          List(
+            Employee(Person("Joost", "Amsterdam"), Salary(1000)),
+            Employee(Person("Marlow", "Cambridge"), Salary(2000))
+          )
+        ),
         Dept("Strategy",
              Employee(Person("Blair", "London"), Salary(100000)),
              List())
@@ -66,12 +68,14 @@ object SybClassExamples {
 
     val expected = Company(
       List(
-        Dept("Research",
-             Employee(Person("Ralf", "Amsterdam"), Salary(8800)),
-             List(
-               Employee(Person("Joost", "Amsterdam"), Salary(1100)),
-               Employee(Person("Marlow", "Cambridge"), Salary(2200))
-             )),
+        Dept(
+          "Research",
+          Employee(Person("Ralf", "Amsterdam"), Salary(8800)),
+          List(
+            Employee(Person("Joost", "Amsterdam"), Salary(1100)),
+            Employee(Person("Marlow", "Cambridge"), Salary(2200))
+          )
+        ),
         Dept("Strategy",
              Employee(Person("Blair", "London"), Salary(110000)),
              List())

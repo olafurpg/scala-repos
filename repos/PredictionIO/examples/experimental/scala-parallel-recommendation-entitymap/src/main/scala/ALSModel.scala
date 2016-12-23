@@ -51,6 +51,7 @@ object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
       userFeatures = sc.get.objectFile(s"/tmp/${id}/userFeatures"),
       productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"),
       users = sc.get.objectFile[EntityMap[User]](s"/tmp/${id}/users").first,
-      items = sc.get.objectFile[EntityMap[Item]](s"/tmp/${id}/items").first)
+      items = sc.get.objectFile[EntityMap[Item]](s"/tmp/${id}/items").first
+    )
   }
 }

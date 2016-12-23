@@ -371,10 +371,10 @@ abstract class BinaryComparison extends BinaryOperator with Predicate {
       // faster version
       defineCodeGen(ctx, ev, (c1, c2) => s"$c1 $symbol $c2")
     } else {
-      defineCodeGen(ctx,
-                    ev,
-                    (c1,
-                     c2) => s"${ctx.genComp(left.dataType, c1, c2)} $symbol 0")
+      defineCodeGen(
+        ctx,
+        ev,
+        (c1, c2) => s"${ctx.genComp(left.dataType, c1, c2)} $symbol 0")
     }
   }
 }

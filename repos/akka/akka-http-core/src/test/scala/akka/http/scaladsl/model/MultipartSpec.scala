@@ -81,7 +81,8 @@ class MultipartSpec
         Multipart.ByteRanges.BodyPart.Strict(ContentRange(8, 9),
                                              HttpEntity("PR"),
                                              additionalHeaders =
-                                               List(ETag("xzy"))))
+                                               List(ETag("xzy")))
+      )
     }
   }
 

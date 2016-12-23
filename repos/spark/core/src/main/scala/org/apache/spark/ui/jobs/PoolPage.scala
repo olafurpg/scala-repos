@@ -31,11 +31,13 @@ private[ui] class PoolPage(parent: StagesTab) extends WebUIPage("pool") {
 
   def render(request: HttpServletRequest): Seq[Node] = {
     listener.synchronized {
-      val poolName = Option(request.getParameter("poolname")).map { poolname =>
-        UIUtils.decodeURLParameter(poolname)
-      }.getOrElse {
-        throw new IllegalArgumentException(s"Missing poolname parameter")
-      }
+      val poolName = Option(request.getParameter("poolname"))
+        .map { poolname =>
+          UIUtils.decodeURLParameter(poolname)
+        }
+        .getOrElse {
+          throw new IllegalArgumentException(s"Missing poolname parameter")
+        }
 
       val poolToActiveStages = listener.poolToActiveStages
       val activeStages = poolToActiveStages.get(poolName) match {
@@ -43,11 +45,13 @@ private[ui] class PoolPage(parent: StagesTab) extends WebUIPage("pool") {
         case None => Seq[StageInfo]()
       }
       val activeStagesTable =
-        new StageTableBase(activeStages.sortBy(_.submissionTime).reverse,
-                           parent.basePath,
-                           parent.progressListener,
-                           isFairScheduler = parent.isFairScheduler,
-                           killEnabled = parent.killEnabled)
+        new StageTableBase(
+          activeStages.sortBy(_.submissionTime).reverse,
+          parent.basePath,
+          parent.progressListener,
+          isFairScheduler = parent.isFairScheduler,
+          killEnabled = parent.killEnabled
+        )
 
       // For now, pool information is only accessible in live UIs
       val pools = sc

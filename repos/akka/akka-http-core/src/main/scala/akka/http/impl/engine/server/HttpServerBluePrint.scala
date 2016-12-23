@@ -270,7 +270,8 @@ private[http] object HttpServerBluePrint {
           logParsingError(info withSummaryPrepended "Illegal request header",
                           log,
                           parserSettings.errorLoggingVerbosity)
-      })
+      }
+    )
 
     def establishAbsoluteUri(requestOutput: RequestOutput): RequestOutput =
       requestOutput match {
@@ -341,44 +342,52 @@ private[http] object HttpServerBluePrint {
     def createLogic(effectiveAttributes: Attributes) =
       new GraphStageLogic(shape) {
         var openTimeouts = immutable.Queue[TimeoutAccessImpl]()
-        setHandler(requestIn, new InHandler {
-          def onPush(): Unit = {
-            val request = grab(requestIn)
-            val (entity, requestEnd) =
-              HttpEntity.captureTermination(request.entity)
-            val access =
-              new TimeoutAccessImpl(request,
-                                    initialTimeout,
-                                    requestEnd,
-                                    getAsyncCallback(emitTimeoutResponse),
-                                    interpreter.materializer)
-            openTimeouts = openTimeouts.enqueue(access)
-            push(requestOut,
-                 request.copy(
-                   headers = request.headers :+ `Timeout-Access`(access),
-                   entity = entity))
+        setHandler(
+          requestIn,
+          new InHandler {
+            def onPush(): Unit = {
+              val request = grab(requestIn)
+              val (entity, requestEnd) =
+                HttpEntity.captureTermination(request.entity)
+              val access =
+                new TimeoutAccessImpl(request,
+                                      initialTimeout,
+                                      requestEnd,
+                                      getAsyncCallback(emitTimeoutResponse),
+                                      interpreter.materializer)
+              openTimeouts = openTimeouts.enqueue(access)
+              push(requestOut,
+                   request.copy(
+                     headers = request.headers :+ `Timeout-Access`(access),
+                     entity = entity))
+            }
+            override def onUpstreamFinish() = complete(requestOut)
+            override def onUpstreamFailure(ex: Throwable) =
+              fail(requestOut, ex)
+            def emitTimeoutResponse(response: (TimeoutAccess, HttpResponse)) =
+              if (openTimeouts.head eq response._1) {
+                emit(responseOut, response._2, () ⇒ completeStage())
+              } // else the application response arrived after we scheduled the timeout response, which is close but ok
           }
-          override def onUpstreamFinish() = complete(requestOut)
-          override def onUpstreamFailure(ex: Throwable) = fail(requestOut, ex)
-          def emitTimeoutResponse(response: (TimeoutAccess, HttpResponse)) =
-            if (openTimeouts.head eq response._1) {
-              emit(responseOut, response._2, () ⇒ completeStage())
-            } // else the application response arrived after we scheduled the timeout response, which is close but ok
-        })
+        )
         // TODO: provide and use default impl for simply connecting an input and an output port as we do here
         setHandler(requestOut, new OutHandler {
           def onPull(): Unit = pull(requestIn)
           override def onDownstreamFinish() = cancel(requestIn)
         })
-        setHandler(responseIn, new InHandler {
-          def onPush(): Unit = {
-            openTimeouts.head.clear()
-            openTimeouts = openTimeouts.tail
-            push(responseOut, grab(responseIn))
+        setHandler(
+          responseIn,
+          new InHandler {
+            def onPush(): Unit = {
+              openTimeouts.head.clear()
+              openTimeouts = openTimeouts.tail
+              push(responseOut, grab(responseIn))
+            }
+            override def onUpstreamFinish() = complete(responseOut)
+            override def onUpstreamFailure(ex: Throwable) =
+              fail(responseOut, ex)
           }
-          override def onUpstreamFinish() = complete(responseOut)
-          override def onUpstreamFailure(ex: Throwable) = fail(responseOut, ex)
-        })
+        )
         setHandler(responseOut, new OutHandler {
           def onPull(): Unit = pull(responseIn)
           override def onDownstreamFinish() = cancel(responseIn)
@@ -416,7 +425,8 @@ private[http] object HttpServerBluePrint {
       HttpResponse(
         StatusCodes.ServiceUnavailable,
         entity = "The server was not able " +
-            "to produce a timely response to your request.\r\nPlease try again in a short while!")
+            "to produce a timely response to your request.\r\nPlease try again in a short while!"
+      )
     //#
 
     def clear(): Unit =
@@ -492,107 +502,119 @@ private[http] object HttpServerBluePrint {
         var pullSuppressed = false
         var messageEndPending = false
 
-        setHandler(requestParsingIn, new InHandler {
-          def onPush(): Unit =
-            grab(requestParsingIn) match {
-              case r: RequestStart ⇒
-                openRequests = openRequests.enqueue(r)
-                messageEndPending =
-                  r.createEntity.isInstanceOf[StreamedEntityCreator[_, _]]
-                val rs =
-                  if (r.expect100Continue) {
-                    oneHundredContinueResponsePending = true
-                    r.copy(
-                      createEntity = with100ContinueTrigger(r.createEntity))
-                  } else r
-                push(requestPrepOut, rs)
-              case MessageEnd ⇒
-                messageEndPending = false
-                push(requestPrepOut, MessageEnd)
-              case MessageStartError(status, info) ⇒
-                finishWithIllegalRequestError(status, info)
-              case x ⇒ push(requestPrepOut, x)
-            }
-          override def onUpstreamFinish() =
-            if (openRequests.isEmpty) completeStage()
-            else complete(requestPrepOut)
-        })
+        setHandler(
+          requestParsingIn,
+          new InHandler {
+            def onPush(): Unit =
+              grab(requestParsingIn) match {
+                case r: RequestStart ⇒
+                  openRequests = openRequests.enqueue(r)
+                  messageEndPending =
+                    r.createEntity.isInstanceOf[StreamedEntityCreator[_, _]]
+                  val rs =
+                    if (r.expect100Continue) {
+                      oneHundredContinueResponsePending = true
+                      r.copy(
+                        createEntity = with100ContinueTrigger(r.createEntity))
+                    } else r
+                  push(requestPrepOut, rs)
+                case MessageEnd ⇒
+                  messageEndPending = false
+                  push(requestPrepOut, MessageEnd)
+                case MessageStartError(status, info) ⇒
+                  finishWithIllegalRequestError(status, info)
+                case x ⇒ push(requestPrepOut, x)
+              }
+            override def onUpstreamFinish() =
+              if (openRequests.isEmpty) completeStage()
+              else complete(requestPrepOut)
+          }
+        )
 
-        setHandler(requestPrepOut, new OutHandler {
-          def onPull(): Unit =
-            if (oneHundredContinueResponsePending) pullSuppressed = true
-            else pull(requestParsingIn)
-          override def onDownstreamFinish() = cancel(requestParsingIn)
-        })
+        setHandler(
+          requestPrepOut,
+          new OutHandler {
+            def onPull(): Unit =
+              if (oneHundredContinueResponsePending) pullSuppressed = true
+              else pull(requestParsingIn)
+            override def onDownstreamFinish() = cancel(requestParsingIn)
+          }
+        )
 
-        setHandler(httpResponseIn, new InHandler {
-          def onPush(): Unit = {
-            val response = grab(httpResponseIn)
-            val requestStart = openRequests.head
-            openRequests = openRequests.tail
-            val isEarlyResponse = messageEndPending && openRequests.isEmpty
-            if (isEarlyResponse && response.status.isSuccess)
-              log.warning(
-                """Sending 2xx response before end of request was received...
+        setHandler(
+          httpResponseIn,
+          new InHandler {
+            def onPush(): Unit = {
+              val response = grab(httpResponseIn)
+              val requestStart = openRequests.head
+              openRequests = openRequests.tail
+              val isEarlyResponse = messageEndPending && openRequests.isEmpty
+              if (isEarlyResponse && response.status.isSuccess)
+                log.warning(
+                  """Sending 2xx response before end of request was received...
                 |Note that the connection will be closed after this response. Also, many clients will not read early responses!
                 |Consider waiting for the request end before dispatching this response!""".stripMargin)
-            val close =
-              requestStart.closeRequested || requestStart.expect100Continue &&
-                oneHundredContinueResponsePending ||
-                isClosed(requestParsingIn) && openRequests.isEmpty ||
-                isEarlyResponse
-            emit(responseCtxOut,
-                 ResponseRenderingContext(response,
-                                          requestStart.method,
-                                          requestStart.protocol,
-                                          close),
-                 pullHttpResponseIn)
-            if (close) complete(responseCtxOut)
-          }
-          override def onUpstreamFinish() =
-            if (openRequests.isEmpty && isClosed(requestParsingIn))
-              completeStage()
-            else complete(responseCtxOut)
-          override def onUpstreamFailure(ex: Throwable): Unit =
-            ex match {
-              case EntityStreamException(errorInfo) ⇒
-                // the application has forwarded a request entity stream error to the response stream
-                finishWithIllegalRequestError(StatusCodes.BadRequest,
-                                              errorInfo)
-
-              case EntityStreamSizeException(limit, contentLength) ⇒
-                val summary = contentLength match {
-                  case Some(cl) ⇒
-                    s"Request Content-Length of $cl bytes exceeds the configured limit of $limit bytes"
-                  case None ⇒
-                    s"Aggregated data length of request entity exceeds the configured limit of $limit bytes"
-                }
-                val info = ErrorInfo(
-                  summary,
-                  "Consider increasing the value of akka.http.server.parsing.max-content-length")
-                finishWithIllegalRequestError(
-                  StatusCodes.RequestEntityTooLarge,
-                  info)
-
-              case NonFatal(e) ⇒
-                log.error(e, "Internal server error, sending 500 response")
-                emitErrorResponse(
-                  HttpResponse(StatusCodes.InternalServerError))
+              val close =
+                requestStart.closeRequested || requestStart.expect100Continue &&
+                  oneHundredContinueResponsePending ||
+                  isClosed(requestParsingIn) && openRequests.isEmpty ||
+                  isEarlyResponse
+              emit(responseCtxOut,
+                   ResponseRenderingContext(response,
+                                            requestStart.method,
+                                            requestStart.protocol,
+                                            close),
+                   pullHttpResponseIn)
+              if (close) complete(responseCtxOut)
             }
-        })
+            override def onUpstreamFinish() =
+              if (openRequests.isEmpty && isClosed(requestParsingIn))
+                completeStage()
+              else complete(responseCtxOut)
+            override def onUpstreamFailure(ex: Throwable): Unit =
+              ex match {
+                case EntityStreamException(errorInfo) ⇒
+                  // the application has forwarded a request entity stream error to the response stream
+                  finishWithIllegalRequestError(StatusCodes.BadRequest,
+                                                errorInfo)
+
+                case EntityStreamSizeException(limit, contentLength) ⇒
+                  val summary = contentLength match {
+                    case Some(cl) ⇒
+                      s"Request Content-Length of $cl bytes exceeds the configured limit of $limit bytes"
+                    case None ⇒
+                      s"Aggregated data length of request entity exceeds the configured limit of $limit bytes"
+                  }
+                  val info = ErrorInfo(
+                    summary,
+                    "Consider increasing the value of akka.http.server.parsing.max-content-length")
+                  finishWithIllegalRequestError(
+                    StatusCodes.RequestEntityTooLarge,
+                    info)
+
+                case NonFatal(e) ⇒
+                  log.error(e, "Internal server error, sending 500 response")
+                  emitErrorResponse(
+                    HttpResponse(StatusCodes.InternalServerError))
+              }
+          }
+        )
 
         class ResponseCtxOutHandler extends OutHandler {
           override def onPull() = {}
           override def onDownstreamFinish() =
             cancel(httpResponseIn) // we cannot fully completeState() here as the websocket pipeline would not complete properly
         }
-        setHandler(responseCtxOut, new ResponseCtxOutHandler {
-          override def onPull() = {
-            pull(httpResponseIn)
-            // after the initial pull here we only ever pull after having emitted in `onPush` of `httpResponseIn`
-            setHandler(responseCtxOut, new ResponseCtxOutHandler)
+        setHandler(
+          responseCtxOut,
+          new ResponseCtxOutHandler {
+            override def onPull() = {
+              pull(httpResponseIn)
+              // after the initial pull here we only ever pull after having emitted in `onPush` of `httpResponseIn`
+              setHandler(responseCtxOut, new ResponseCtxOutHandler)
+            }
           }
-        })
+        )
 
         def finishWithIllegalRequestError(status: StatusCode,
                                           info: ErrorInfo): Unit = {
@@ -713,30 +735,37 @@ private[http] object HttpServerBluePrint {
          * are replaced.
          */
 
-        setHandler(fromHttp, new InHandler {
-          override def onPush(): Unit =
-            grab(fromHttp) match {
-              case HttpData(b) ⇒ push(toNet, b)
-              case SwitchToWebSocket(bytes, handlerFlow) ⇒
-                push(toNet, bytes)
-                complete(toHttp)
-                cancel(fromHttp)
-                switchToWebSocket(handlerFlow)
-            }
-          override def onUpstreamFinish(): Unit = complete(toNet)
-          override def onUpstreamFailure(ex: Throwable): Unit = fail(toNet, ex)
-        })
+        setHandler(
+          fromHttp,
+          new InHandler {
+            override def onPush(): Unit =
+              grab(fromHttp) match {
+                case HttpData(b) ⇒ push(toNet, b)
+                case SwitchToWebSocket(bytes, handlerFlow) ⇒
+                  push(toNet, bytes)
+                  complete(toHttp)
+                  cancel(fromHttp)
+                  switchToWebSocket(handlerFlow)
+              }
+            override def onUpstreamFinish(): Unit = complete(toNet)
+            override def onUpstreamFailure(ex: Throwable): Unit =
+              fail(toNet, ex)
+          }
+        )
         setHandler(toNet, new OutHandler {
           override def onPull(): Unit = pull(fromHttp)
           override def onDownstreamFinish(): Unit = completeStage()
         })
 
-        setHandler(fromNet, new InHandler {
-          override def onPush(): Unit = push(toHttp, grab(fromNet))
-          override def onUpstreamFinish(): Unit = complete(toHttp)
-          override def onUpstreamFailure(ex: Throwable): Unit =
-            fail(toHttp, ex)
-        })
+        setHandler(
+          fromNet,
+          new InHandler {
+            override def onPush(): Unit = push(toHttp, grab(fromNet))
+            override def onUpstreamFinish(): Unit = complete(toHttp)
+            override def onUpstreamFailure(ex: Throwable): Unit =
+              fail(toHttp, ex)
+          }
+        )
         setHandler(toHttp, new OutHandler {
           override def onPull(): Unit = pull(fromNet)
           override def onDownstreamFinish(): Unit = cancel(fromNet)
@@ -821,12 +850,16 @@ private[http] object HttpServerBluePrint {
               }
             })
 
-            setHandler(fromNet, new InHandler {
-              override def onPush(): Unit = sourceOut.push(grab(fromNet).bytes)
-              override def onUpstreamFinish(): Unit = sourceOut.complete()
-              override def onUpstreamFailure(ex: Throwable): Unit =
-                sourceOut.fail(ex)
-            })
+            setHandler(
+              fromNet,
+              new InHandler {
+                override def onPush(): Unit =
+                  sourceOut.push(grab(fromNet).bytes)
+                override def onUpstreamFinish(): Unit = sourceOut.complete()
+                override def onUpstreamFailure(ex: Throwable): Unit =
+                  sourceOut.fail(ex)
+              }
+            )
             sourceOut.setHandler(new OutHandler {
               override def onPull(): Unit = {
                 if (!hasBeenPulled(fromNet)) pull(fromNet)

@@ -403,17 +403,20 @@ final class DataFrameNaFunctions private[sql] (df: DataFrame) {
 
     val columnEquals = df.sqlContext.sessionState.analyzer.resolver
     val projections = df.schema.fields.map { f =>
-      values.find { case (k, _) => columnEquals(k, f.name) }.map {
-        case (_, v) =>
-          v match {
-            case v: jl.Float => fillCol[Double](f, v.toDouble)
-            case v: jl.Double => fillCol[Double](f, v)
-            case v: jl.Long => fillCol[Double](f, v.toDouble)
-            case v: jl.Integer => fillCol[Double](f, v.toDouble)
-            case v: jl.Boolean => fillCol[Boolean](f, v.booleanValue())
-            case v: String => fillCol[String](f, v)
-          }
-      }.getOrElse(df.col(f.name))
+      values
+        .find { case (k, _) => columnEquals(k, f.name) }
+        .map {
+          case (_, v) =>
+            v match {
+              case v: jl.Float => fillCol[Double](f, v.toDouble)
+              case v: jl.Double => fillCol[Double](f, v)
+              case v: jl.Long => fillCol[Double](f, v.toDouble)
+              case v: jl.Integer => fillCol[Double](f, v.toDouble)
+              case v: jl.Boolean => fillCol[Boolean](f, v.booleanValue())
+              case v: String => fillCol[String](f, v)
+            }
+        }
+        .getOrElse(df.col(f.name))
     }
     df.select(projections: _*)
   }
@@ -441,10 +444,12 @@ final class DataFrameNaFunctions private[sql] (df: DataFrame) {
   private def replaceCol(col: StructField, replacementMap: Map[_, _]): Column = {
     val keyExpr = df.col(col.name).expr
     def buildExpr(v: Any) = Cast(Literal(v), keyExpr.dataType)
-    val branches = replacementMap.flatMap {
-      case (source, target) =>
-        Seq(buildExpr(source), buildExpr(target))
-    }.toSeq
+    val branches = replacementMap
+      .flatMap {
+        case (source, target) =>
+          Seq(buildExpr(source), buildExpr(target))
+      }
+      .toSeq
     new Column(CaseKeyWhen(keyExpr, branches :+ keyExpr)).as(col.name)
   }
 

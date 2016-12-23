@@ -98,25 +98,27 @@ class DDLTestSuite extends DataSourceTest with SharedSQLContext {
       """.stripMargin)
   }
 
-  sqlTest("describe ddlPeople",
-          Seq(
-            Row("intType", "int", "test comment test1"),
-            Row("stringType", "string", ""),
-            Row("dateType", "date", ""),
-            Row("timestampType", "timestamp", ""),
-            Row("doubleType", "double", ""),
-            Row("bigintType", "bigint", ""),
-            Row("tinyintType", "tinyint", ""),
-            Row("decimalType", "decimal(10,0)", ""),
-            Row("fixedDecimalType", "decimal(5,1)", ""),
-            Row("binaryType", "binary", ""),
-            Row("booleanType", "boolean", ""),
-            Row("smallIntType", "smallint", ""),
-            Row("floatType", "float", ""),
-            Row("mapType", "map<string,string>", ""),
-            Row("arrayType", "array<string>", ""),
-            Row("structType", "struct<f1:string,f2:int>", "")
-          ))
+  sqlTest(
+    "describe ddlPeople",
+    Seq(
+      Row("intType", "int", "test comment test1"),
+      Row("stringType", "string", ""),
+      Row("dateType", "date", ""),
+      Row("timestampType", "timestamp", ""),
+      Row("doubleType", "double", ""),
+      Row("bigintType", "bigint", ""),
+      Row("tinyintType", "tinyint", ""),
+      Row("decimalType", "decimal(10,0)", ""),
+      Row("fixedDecimalType", "decimal(5,1)", ""),
+      Row("binaryType", "binary", ""),
+      Row("booleanType", "boolean", ""),
+      Row("smallIntType", "smallint", ""),
+      Row("floatType", "float", ""),
+      Row("mapType", "map<string,string>", ""),
+      Row("arrayType", "array<string>", ""),
+      Row("structType", "struct<f1:string,f2:int>", "")
+    )
+  )
 
   test(
     "SPARK-7686 DescribeCommand should have correct physical plan output attributes") {

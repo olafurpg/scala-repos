@@ -154,27 +154,8 @@ class BufTest
     val bytes = new Array[Byte](21)
     buf.write(bytes, 0)
 
-    val expected = Array[Byte](-17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68)
+    val expected = Array[Byte](-17, -65, -68, -17, -65, -68, -17, -65, -68,
+      -17, -65, -68, -17, -65, -68, -17, -65, -68, -17, -65, -68)
 
     assert(bytes.toSeq == expected.toSeq)
 
@@ -467,7 +448,8 @@ class BufTest
       Buf.Utf16BE.apply,
       Buf.Utf16LE.apply,
       s => Buf.ByteArray.Owned(s.getBytes("UTF-8")),
-      s => Buf.ByteBuffer.Owned(UTF_8.encode(CharBuffer.wrap(s))))
+      s => Buf.ByteBuffer.Owned(UTF_8.encode(CharBuffer.wrap(s)))
+    )
 
     Arbitrary(for {
       s <- Arbitrary.arbitrary[String]

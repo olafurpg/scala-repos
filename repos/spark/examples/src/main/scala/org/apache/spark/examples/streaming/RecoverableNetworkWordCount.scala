@@ -125,15 +125,18 @@ object RecoverableNetworkWordCount {
       val droppedWordsCounter =
         DroppedWordsCounter.getInstance(rdd.sparkContext)
       // Use blacklist to drop words and use droppedWordsCounter to count them
-      val counts = rdd.filter {
-        case (word, count) =>
-          if (blacklist.value.contains(word)) {
-            droppedWordsCounter += count
-            false
-          } else {
-            true
-          }
-      }.collect().mkString("[", ", ", "]")
+      val counts = rdd
+        .filter {
+          case (word, count) =>
+            if (blacklist.value.contains(word)) {
+              droppedWordsCounter += count
+              false
+            } else {
+              true
+            }
+        }
+        .collect()
+        .mkString("[", ", ", "]")
       val output = "Counts at time " + time + " " + counts
       println(output)
       println("Dropped " + droppedWordsCounter.value + " word(s) totally")

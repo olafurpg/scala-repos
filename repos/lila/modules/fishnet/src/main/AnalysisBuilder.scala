@@ -17,7 +17,8 @@ private object AnalysisBuilder {
       startPly = work.startPly,
       uid = work.sender.userId,
       by = !client.lichess option client.userId.value,
-      date = DateTime.now)
+      date = DateTime.now
+    )
 
     GameRepo.game(uciAnalysis.id) flatMap {
       case None => fufail(AnalysisBuilder.GameIsGone(uciAnalysis.id))
@@ -40,7 +41,8 @@ private object AnalysisBuilder {
                           s"Analysis $debug has ${analysis.nbEmptyInfos} empty infos out of ${analysis.infos.size}")
                       else fuccess(analysis)
                     } else fufail(s"[analysis] Analysis $debug is empty")
-              })
+              }
+            )
         }
     }
   }

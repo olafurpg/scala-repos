@@ -22,7 +22,8 @@ class DateTimeSpec extends WordSpec with Matchers {
   "DateTime.toRfc1123DateTimeString" should {
     "properly print a known date" in {
       DateTime(specificClicks).toRfc1123DateTimeString shouldEqual "Tue, 12 Jul 2011 14:08:12 GMT"
-      DateTime(2011, 7, 12, 14, 8, 12).toRfc1123DateTimeString shouldEqual "Tue, 12 Jul 2011 14:08:12 GMT"
+      DateTime(2011, 7, 12, 14, 8,
+        12).toRfc1123DateTimeString shouldEqual "Tue, 12 Jul 2011 14:08:12 GMT"
     }
     "behave exactly as a corresponding formatting via SimpleDateFormat" in {
       val Rfc1123Format = {
@@ -82,14 +83,16 @@ class DateTimeSpec extends WordSpec with Matchers {
       def roundTrip(dt: DateTime) =
         DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
       val roundTripOk: Matcher[DateTime] = Matcher { dt: DateTime ⇒
-        MatchResult({
-                      val rt = roundTrip(dt);
-                      dt == rt && dt.weekday == rt.weekday
-                    },
-                    dt.toRfc1123DateTimeString + " != " +
-                      roundTrip(dt).toRfc1123DateTimeString,
-                    dt.toRfc1123DateTimeString +
-                      " == " + roundTrip(dt).toRfc1123DateTimeString)
+        MatchResult(
+          {
+            val rt = roundTrip(dt);
+            dt == rt && dt.weekday == rt.weekday
+          },
+          dt.toRfc1123DateTimeString + " != " +
+            roundTrip(dt).toRfc1123DateTimeString,
+          dt.toRfc1123DateTimeString +
+            " == " + roundTrip(dt).toRfc1123DateTimeString
+        )
       }
       all(httpDateTimes.take(10000)) should roundTripOk
     }

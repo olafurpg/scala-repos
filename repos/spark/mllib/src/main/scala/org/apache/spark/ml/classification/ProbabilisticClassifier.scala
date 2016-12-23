@@ -108,7 +108,8 @@ abstract class ProbabilisticClassificationModel[
         $(thresholds).length == numClasses,
         this.getClass.getSimpleName +
           ".transform() called with non-matching numClasses and thresholds.length." +
-          s" numClasses=$numClasses, but thresholds has length ${$(thresholds).length}")
+          s" numClasses=$numClasses, but thresholds has length ${$(thresholds).length}"
+      )
     }
 
     // Output selected columns only.

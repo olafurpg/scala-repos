@@ -218,9 +218,11 @@ class DeploymentPlanTest
 
     val instances: Int = 10
 
-    val apps: Set[AppDefinition] = (1 to 4).map { i =>
-      AppDefinition(s"/test/$i".toPath, Some("cmd"), instances = instances)
-    }.toSet
+    val apps: Set[AppDefinition] = (1 to 4)
+      .map { i =>
+        AppDefinition(s"/test/$i".toPath, Some("cmd"), instances = instances)
+      }
+      .toSet
 
     val targetGroup = Group(
       id = "/test".toPath,
@@ -348,20 +350,24 @@ class DeploymentPlanTest
                                 dependencies = Set(serviceId))
 
     val from: Group =
-      Group("/test".toPath,
-            groups = Set(
-              Group("/test/database".toPath, Set(mongo._1)),
-              Group("/test/service".toPath, Set(service._1, toStop)),
-              Group("/test/independent".toPath, Set(independent._1))
-            ))
+      Group(
+        "/test".toPath,
+        groups = Set(
+          Group("/test/database".toPath, Set(mongo._1)),
+          Group("/test/service".toPath, Set(service._1, toStop)),
+          Group("/test/independent".toPath, Set(independent._1))
+        )
+      )
 
     val to: Group =
-      Group("/test".toPath,
-            groups = Set(
-              Group("/test/database".toPath, Set(mongo._2)),
-              Group("/test/service".toPath, Set(service._2, toStart)),
-              Group("/test/independent".toPath, Set(independent._2))
-            ))
+      Group(
+        "/test".toPath,
+        groups = Set(
+          Group("/test/database".toPath, Set(mongo._2)),
+          Group("/test/service".toPath, Set(service._2, toStart)),
+          Group("/test/independent".toPath, Set(independent._2))
+        )
+      )
 
     When("the deployment plan is computed")
     val plan = DeploymentPlan(from, to)

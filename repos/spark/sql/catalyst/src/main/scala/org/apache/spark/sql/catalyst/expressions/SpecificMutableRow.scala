@@ -196,18 +196,21 @@ final class SpecificMutableRow(val values: Array[MutableValue])
     with BaseGenericInternalRow {
 
   def this(dataTypes: Seq[DataType]) =
-    this(dataTypes.map {
-      case BooleanType => new MutableBoolean
-      case ByteType => new MutableByte
-      case ShortType => new MutableShort
-      // We use INT for DATE internally
-      case IntegerType | DateType => new MutableInt
-      // We use Long for Timestamp internally
-      case LongType | TimestampType => new MutableLong
-      case FloatType => new MutableFloat
-      case DoubleType => new MutableDouble
-      case _ => new MutableAny
-    }.toArray)
+    this(
+      dataTypes
+        .map {
+          case BooleanType => new MutableBoolean
+          case ByteType => new MutableByte
+          case ShortType => new MutableShort
+          // We use INT for DATE internally
+          case IntegerType | DateType => new MutableInt
+          // We use Long for Timestamp internally
+          case LongType | TimestampType => new MutableLong
+          case FloatType => new MutableFloat
+          case DoubleType => new MutableDouble
+          case _ => new MutableAny
+        }
+        .toArray)
 
   def this() = this(Seq.empty)
 

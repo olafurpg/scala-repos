@@ -139,10 +139,12 @@ trait BaseMappedField
     val name = dbColumnName
 
     val conn = DB.currentConnection
-    conn.map { c =>
-      if (c.metaData.storesMixedCaseIdentifiers) name
-      else name.toLowerCase
-    }.openOr(name)
+    conn
+      .map { c =>
+        if (c.metaData.storesMixedCaseIdentifiers) name
+        else name.toLowerCase
+      }
+      .openOr(name)
   }
 
   /**
@@ -471,8 +473,7 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
       case other => other
     }
 
-    _toForm
-      .map(_.flatMap(mf))
+    _toForm.map(_.flatMap(mf))
       .map(SHtml.ElemAttr.applyToAllElems(_, formElemAttrs))
   }
 

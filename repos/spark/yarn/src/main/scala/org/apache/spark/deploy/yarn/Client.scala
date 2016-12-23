@@ -638,12 +638,12 @@ private[spark] class Client(val args: ClientArguments,
     // configuration file is provided through --files then executors will be taking configurations
     // from --files instead of $SPARK_CONF_DIR/log4j.properties.
     val log4jFileName = "log4j.properties"
-    Option(Utils.getContextOrSparkClassLoader.getResource(log4jFileName)).foreach {
-      url =>
+    Option(Utils.getContextOrSparkClassLoader.getResource(log4jFileName))
+      .foreach { url =>
         if (url.getProtocol == "file") {
           hadoopConfFiles(log4jFileName) = new File(url.getPath)
         }
-    }
+      }
 
     Seq("HADOOP_CONF_DIR", "YARN_CONF_DIR").foreach { envKey =>
       sys.env.get(envKey).foreach { path =>
@@ -751,11 +751,14 @@ private[spark] class Client(val args: ClientArguments,
 
     // Pick up any environment variables for the AM provided through spark.yarn.appMasterEnv.*
     val amEnvPrefix = "spark.yarn.appMasterEnv."
-    sparkConf.getAll.filter { case (k, v) => k.startsWith(amEnvPrefix) }.map {
-      case (k, v) => (k.substring(amEnvPrefix.length), v)
-    }.foreach {
-      case (k, v) => YarnSparkHadoopUtil.addPathToEnvironment(env, k, v)
-    }
+    sparkConf.getAll
+      .filter { case (k, v) => k.startsWith(amEnvPrefix) }
+      .map {
+        case (k, v) => (k.substring(amEnvPrefix.length), v)
+      }
+      .foreach {
+        case (k, v) => YarnSparkHadoopUtil.addPathToEnvironment(env, k, v)
+      }
 
     // Keep this for backwards compatibility but users should move to the config
     sys.env.get("SPARK_YARN_USER_ENV").foreach { userEnvs =>
@@ -999,7 +1002,8 @@ private[spark] class Client(val args: ClientArguments,
         "--properties-file",
         buildPath(YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
                   LOCALIZED_CONF_DIR,
-                  SPARK_CONF_FILE))
+                  SPARK_CONF_FILE)
+      )
 
     // Command for the ApplicationMaster
     val commands =
@@ -1153,11 +1157,13 @@ private[spark] class Client(val args: ClientArguments,
     )
 
     // Use more loggable format if value is null or empty
-    details.map {
-      case (k, v) =>
-        val newValue = Option(v).filter(_.nonEmpty).getOrElse("N/A")
-        s"\n\t $k: $newValue"
-    }.mkString("")
+    details
+      .map {
+        case (k, v) =>
+          val newValue = Option(v).filter(_.nonEmpty).getOrElse("N/A")
+          s"\n\t $k: $newValue"
+      }
+      .mkString("")
   }
 
   /**
@@ -1435,10 +1441,12 @@ object Client extends Logging {
   }
 
   private def getMainJarUri(mainJar: Option[String]): Option[URI] = {
-    mainJar.flatMap { path =>
-      val uri = Utils.resolveURI(path)
-      if (uri.getScheme == LOCAL_SCHEME) Some(uri) else None
-    }.orElse(Some(new URI(APP_JAR_NAME)))
+    mainJar
+      .flatMap { path =>
+        val uri = Utils.resolveURI(path)
+        if (uri.getScheme == LOCAL_SCHEME) Some(uri) else None
+      }
+      .orElse(Some(new URI(APP_JAR_NAME)))
   }
 
   private def getSecondaryJarUris(

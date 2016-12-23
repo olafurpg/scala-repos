@@ -219,14 +219,16 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
 
     // Prepare messages.
     val offsets = Seq(0L, 2L)
-    val messagesV0 = Seq(new Message("hello".getBytes,
-                                     "k1".getBytes,
-                                     Message.NoTimestamp,
-                                     Message.MagicValue_V0),
-                         new Message("goodbye".getBytes,
-                                     "k2".getBytes,
-                                     Message.NoTimestamp,
-                                     Message.MagicValue_V0))
+    val messagesV0 = Seq(
+      new Message("hello".getBytes,
+                  "k1".getBytes,
+                  Message.NoTimestamp,
+                  Message.MagicValue_V0),
+      new Message("goodbye".getBytes,
+                  "k2".getBytes,
+                  Message.NoTimestamp,
+                  Message.MagicValue_V0)
+    )
     val messageSetV0 = new ByteBufferMessageSet(compressionCodec =
                                                   NoCompressionCodec,
                                                 offsetSeq = offsets,

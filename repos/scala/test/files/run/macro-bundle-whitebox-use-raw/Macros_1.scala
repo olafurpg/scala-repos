@@ -31,8 +31,8 @@ class FundepMaterializationBundle(val c: Context) {
   import definitions._
   import Flag._
 
-  def impl[T : c.WeakTypeTag, U : c.WeakTypeTag]: c.Expr[FundepMaterialization[
-          T, U]] = {
+  def impl[T: c.WeakTypeTag, U: c.WeakTypeTag]
+    : c.Expr[FundepMaterialization[T, U]] = {
     val sym = c.weakTypeOf[T].typeSymbol
     if (!sym.isClass || !sym.asClass.isCaseClass)
       c.abort(c.enclosingPosition, s"$sym is not a case class")
@@ -51,49 +51,59 @@ class FundepMaterializationBundle(val c: Context) {
       else
         Apply(Ident(newTermName("Tuple" + fields.length)),
               fields map
-              (f =>
-                    Select(Ident(newTermName("f")),
-                           newTermName(f.name.toString.trim))))
+                (f =>
+                   Select(Ident(newTermName("f")),
+                          newTermName(f.name.toString.trim))))
     }
 
     val evidenceClass = ClassDef(
-        Modifiers(FINAL),
-        newTypeName("$anon"),
-        List(),
-        Template(
-            List(AppliedTypeTree(Ident(newTypeName("FundepMaterialization")),
-                                 List(Ident(sym), mkTpt()))),
-            emptyValDef,
-            List(DefDef(Modifiers(),
-                        termNames.CONSTRUCTOR,
-                        List(),
-                        List(List()),
-                        TypeTree(),
-                        Block(List(Apply(Select(Super(This(typeNames.EMPTY),
-                                                      typeNames.EMPTY),
-                                                termNames.CONSTRUCTOR),
-                                         List())),
-                              Literal(Constant(())))),
-                 DefDef(Modifiers(),
-                        newTermName("to"),
-                        List(),
-                        List(List(ValDef(Modifiers(PARAM),
-                                         newTermName("f"),
-                                         Ident(sym),
-                                         EmptyTree))),
-                        TypeTree(),
-                        mkFrom()))))
+      Modifiers(FINAL),
+      newTypeName("$anon"),
+      List(),
+      Template(
+        List(
+          AppliedTypeTree(Ident(newTypeName("FundepMaterialization")),
+                          List(Ident(sym), mkTpt()))),
+        emptyValDef,
+        List(
+          DefDef(
+            Modifiers(),
+            termNames.CONSTRUCTOR,
+            List(),
+            List(List()),
+            TypeTree(),
+            Block(List(
+                    Apply(Select(Super(This(typeNames.EMPTY), typeNames.EMPTY),
+                                 termNames.CONSTRUCTOR),
+                          List())),
+                  Literal(Constant(())))
+          ),
+          DefDef(Modifiers(),
+                 newTermName("to"),
+                 List(),
+                 List(
+                   List(
+                     ValDef(Modifiers(PARAM),
+                            newTermName("f"),
+                            Ident(sym),
+                            EmptyTree))),
+                 TypeTree(),
+                 mkFrom())
+        )
+      )
+    )
     c.Expr[FundepMaterialization[T, U]](
-        Block(List(evidenceClass),
-              Apply(Select(New(Ident(newTypeName("$anon"))),
-                           termNames.CONSTRUCTOR),
-                    List())))
+      Block(
+        List(evidenceClass),
+        Apply(Select(New(Ident(newTypeName("$anon"))), termNames.CONSTRUCTOR),
+              List())))
   }
 }
 
 object FundepMaterialization {
-  implicit def materializeIso[T, U]: FundepMaterialization[T, U] = macro FundepMaterializationBundle
-    .impl[T, U]
+  implicit def materializeIso[T, U]: FundepMaterialization[T, U] =
+    macro FundepMaterializationBundle
+      .impl[T, U]
 }
 
 // whitebox use case #3: dynamic materialization
@@ -108,17 +118,18 @@ trait LowPriority {
 }
 
 object DynamicMaterialization extends LowPriority {
-  implicit def moreSpecific[T]: DynamicMaterialization[T] = macro DynamicMaterializationBundle
-    .impl[T]
+  implicit def moreSpecific[T]: DynamicMaterialization[T] =
+    macro DynamicMaterializationBundle
+      .impl[T]
 }
 
 class DynamicMaterializationBundle(val c: Context) {
   import c.universe._
-  def impl[T : c.WeakTypeTag] = {
+  def impl[T: c.WeakTypeTag] = {
     val tpe = weakTypeOf[T]
     if (tpe.members.exists(_.info =:= typeOf[Int]))
-      c.abort(
-          c.enclosingPosition, "I don't like classes that contain integers")
+      c.abort(c.enclosingPosition,
+              "I don't like classes that contain integers")
     q"new DynamicMaterialization[$tpe]{ override def toString = ${tpe.toString} }"
   }
 }

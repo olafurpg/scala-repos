@@ -200,7 +200,8 @@ object Upgrade_0_8_3 {
       require(
         isEmpty(eventClient, toAppId),
         s"Target appId: $toAppId is not empty. Please run " +
-          "`pio app data-delete <app_name>` to clean the data before upgrading")
+          "`pio app data-delete <app_name>` to clean the data before upgrading"
+      )
 
       logger.info(s"$fromAppId isEmpty: " + isEmpty(eventClient, fromAppId))
 

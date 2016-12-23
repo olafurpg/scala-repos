@@ -120,14 +120,16 @@ private class SelectorMap(binds: List[CssBind])
     var elemMap: Map[String, List[CssBind]] = Map()
     var starFunc: Box[List[CssBind]] = Empty
 
-    val selThis: Box[CssBind] = binds.flatMap { b =>
-      b.css
-        .openOrThrowException("Guarded with test before calling this method")
-        .subNodes match {
-        case Full(SelectThisNode(_)) => List(b)
-        case _ => Nil
+    val selThis: Box[CssBind] = binds
+      .flatMap { b =>
+        b.css
+          .openOrThrowException("Guarded with test before calling this method")
+          .subNodes match {
+          case Full(SelectThisNode(_)) => List(b)
+          case _ => Nil
+        }
       }
-    }.headOption
+      .headOption
 
     binds.foreach {
       case i @ CssBind(IdSelector(id, _)) =>
@@ -495,9 +497,7 @@ private class SelectorMap(binds: List[CssBind])
                             ids.contains(id)
                           } getOrElse (false)
                         val newIds =
-                          targetId filter (_ =>
-                                             keepId) map (i =>
-                                                            ids - i) getOrElse
+                          targetId filter (_ => keepId) map (i => ids - i) getOrElse
                             (ids)
                         val newElem =
                           new Elem(e.prefix,

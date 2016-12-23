@@ -11,13 +11,17 @@ class StreamBuffersRateSpec extends AkkaSpec {
   "Demonstrate pipelining" in {
     def println(s: Any) = ()
     //#pipelining
-    Source(1 to 3).map { i =>
-      println(s"A: $i"); i
-    }.map { i =>
-      println(s"B: $i"); i
-    }.map { i =>
-      println(s"C: $i"); i
-    }.runWith(Sink.ignore)
+    Source(1 to 3)
+      .map { i =>
+        println(s"A: $i"); i
+      }
+      .map { i =>
+        println(s"B: $i"); i
+      }
+      .map { i =>
+        println(s"C: $i"); i
+      }
+      .runWith(Sink.ignore)
     //#pipelining
   }
 

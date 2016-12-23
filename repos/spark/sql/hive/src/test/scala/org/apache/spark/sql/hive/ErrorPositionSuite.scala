@@ -169,8 +169,9 @@ class ErrorPositionSuite
         fail(
           s"start not returned for error on token $token\n${ast.treeString}")
       }
-      assert(expectedStart === actualStart,
-             s"""Incorrect start position.
+      assert(
+        expectedStart === actualStart,
+        s"""Incorrect start position.
           |== QUERY ==
           |$query
           |
@@ -182,7 +183,8 @@ class ErrorPositionSuite
           |${" " * actualStart}^
           |0123456789 123456789 1234567890
           |          2         3
-        """.stripMargin)
+        """.stripMargin
+      )
     }
   }
 }

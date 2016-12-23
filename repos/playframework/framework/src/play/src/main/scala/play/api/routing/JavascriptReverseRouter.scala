@@ -48,12 +48,14 @@ object JavaScriptReverseRouter {
     import org.apache.commons.lang3.StringEscapeUtils.{escapeEcmaScript => esc}
     val ajaxField = ajaxMethod.fold("")(m =>
       s"ajax:function(c){c=c||{};c.url=r.url;c.type=r.method;return $m(c)},")
-    val routesStr = routes.map { route =>
-      val nameParts = route.name.split('.')
-      val controllerName = nameParts.dropRight(1).mkString(".")
-      val prop = "_root" + nameParts.map(p => s"['${esc(p)}']").mkString
-      s"_nS('${esc(controllerName)}'); $prop = ${route.f};"
-    }.mkString("\n")
+    val routesStr = routes
+      .map { route =>
+        val nameParts = route.name.split('.')
+        val controllerName = nameParts.dropRight(1).mkString(".")
+        val prop = "_root" + nameParts.map(p => s"['${esc(p)}']").mkString
+        s"_nS('${esc(controllerName)}'); $prop = ${route.f};"
+      }
+      .mkString("\n")
     s"""
       |var $name = {}; (function(_root){
       |var _nS = function(c,f,b){var e=c.split(f||"."),g=b||_root,d,a;for(d=0,a=e.length;d<a;d++){g=g[e[d]]=g[e[d]]||{}}return g}

@@ -271,12 +271,14 @@ object BigDecimal {
 
   @deprecated(
     "The default conversion from Float may not do what you want.  Use BigDecimal.decimal for a String representation, or explicitly convert the Float with .toDouble.",
-    "2.11")
+    "2.11"
+  )
   def apply(x: Float): BigDecimal = apply(x.toDouble)
 
   @deprecated(
     "The default conversion from Float may not do what you want.  Use BigDecimal.decimal for a String representation, or explicitly convert the Float with .toDouble.",
-    "2.11")
+    "2.11"
+  )
   def apply(x: Float, mc: MathContext): BigDecimal = apply(x.toDouble, mc)
 
   /** Translates a character array representation of a `BigDecimal`
@@ -345,7 +347,8 @@ object BigDecimal {
 
   @deprecated(
     "This method appears to round a java.math.BigDecimal but actually doesn't.  Use new BigDecimal(bd, mc) instead for no rounding, or BigDecimal.decimal(bd, mc) for rounding.",
-    "2.11")
+    "2.11"
+  )
   def apply(bd: BigDec, mc: MathContext): BigDecimal = new BigDecimal(bd, mc)
 
   /** Implicit conversion from `Int` to `BigDecimal`. */

@@ -193,15 +193,17 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       val staticCallsite = callsite.copy(
         callsiteInstruction = newCallsiteInstruction,
         callee = Right(
-          Callee(callee = implClassMethod,
-                 calleeDeclarationClass = implClassBType,
-                 safeToInline = true,
-                 safeToRewrite = false,
-                 canInlineFromSource = canInlineFromSource,
-                 annotatedInline = annotatedInline,
-                 annotatedNoInline = annotatedNoInline,
-                 samParamTypes = staticCallSamParamTypes,
-                 calleeInfoWarning = infoWarning))
+          Callee(
+            callee = implClassMethod,
+            calleeDeclarationClass = implClassBType,
+            safeToInline = true,
+            safeToRewrite = false,
+            canInlineFromSource = canInlineFromSource,
+            annotatedInline = annotatedInline,
+            annotatedNoInline = annotatedNoInline,
+            samParamTypes = staticCallSamParamTypes,
+            calleeInfoWarning = infoWarning
+          ))
       )
       callGraph.addCallsite(staticCallsite)
     }

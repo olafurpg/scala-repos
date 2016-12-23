@@ -142,7 +142,8 @@ final class GBTClassifier @Since("1.4.0")(
       " tries to minimize (case-insensitive). Supported options:" +
       s" ${GBTClassifier.supportedLossTypes.mkString(", ")}",
     (value: String) =>
-      GBTClassifier.supportedLossTypes.contains(value.toLowerCase))
+      GBTClassifier.supportedLossTypes.contains(value.toLowerCase)
+  )
 
   setDefault(lossType -> "logistic")
 
@@ -228,7 +229,8 @@ final class GBTClassificationModel private[ml] (
   require(
     _trees.length == _treeWeights.length,
     "GBTClassificationModel given trees, treeWeights" +
-      s" of non-matching lengths (${_trees.length}, ${_treeWeights.length}, respectively).")
+      s" of non-matching lengths (${_trees.length}, ${_treeWeights.length}, respectively)."
+  )
 
   /**
     * Construct a GBTClassificationModel
@@ -293,7 +295,8 @@ private[ml] object GBTClassificationModel {
     require(
       oldModel.algo == OldAlgo.Classification,
       "Cannot convert GradientBoostedTreesModel" +
-        s" with algo=${oldModel.algo} (old API) to GBTClassificationModel (new API).")
+        s" with algo=${oldModel.algo} (old API) to GBTClassificationModel (new API)."
+    )
     val newTrees = oldModel.trees.map { tree =>
       // parent for each tree is null since there is no good way to set this.
       DecisionTreeRegressionModel.fromOld(tree, null, categoricalFeatures)

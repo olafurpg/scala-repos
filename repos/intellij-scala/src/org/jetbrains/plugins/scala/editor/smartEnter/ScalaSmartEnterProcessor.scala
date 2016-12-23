@@ -29,13 +29,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 object ScalaSmartEnterProcessor {
   private val LOG = Logger.getInstance(getClass)
 
-  val myFixers = Seq(new ScalaMethodCallFixer,
-                     new ScalaIfConditionFixer,
-                     new ScalaForStatementFixer,
-                     new ScalaWhileConditionFixer,
-                     new ScalaMissingWhileBodyFixer,
-                     new ScalaMissingIfBranchesFixer,
-                     new ScalaMissingForBodyFixer)
+  val myFixers = Seq(
+    new ScalaMethodCallFixer,
+    new ScalaIfConditionFixer,
+    new ScalaForStatementFixer,
+    new ScalaWhileConditionFixer,
+    new ScalaMissingWhileBodyFixer,
+    new ScalaMissingIfBranchesFixer,
+    new ScalaMissingForBodyFixer
+  )
   val myEnterProcessors = Seq.empty[EnterProcessor] //Can plug in later
 }
 

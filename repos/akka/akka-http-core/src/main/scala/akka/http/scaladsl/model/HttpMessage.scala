@@ -313,7 +313,8 @@ object HttpRequest {
     else
       throw IllegalUriException(
         s"'Host' header value of request to `$uri` doesn't match request target authority",
-        s"Host header: $hostHeader\nrequest target authority: ${uri.authority}")
+        s"Host header: $hostHeader\nrequest target authority: ${uri.authority}"
+      )
   }
 
   /**

@@ -120,7 +120,8 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
       EasyMock.and(EasyMock.capture(entityArgument),
                    EasyMock.isA(classOf[String])),
       EasyMock.and(EasyMock.capture(propertiesArgument),
-                   EasyMock.isA(classOf[Properties])))
+                   EasyMock.isA(classOf[Properties]))
+    )
     EasyMock.expectLastCall().once()
     EasyMock.replay(handler)
 

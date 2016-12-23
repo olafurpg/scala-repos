@@ -133,14 +133,16 @@ class ResponseParserSpec
       }
 
       "a response with 3 headers, a body and remaining content" in new Test {
-        Seq("""HTTP/1.1 500 Internal Server Error
+        Seq(
+          """HTTP/1.1 500 Internal Server Error
           |User-Agent: curl/7.19.7 xyz
           |Connection:close
           |Content-Length: 17
           |Content-Type: text/plain; charset=UTF-8
           |
           |Sh""",
-            "ake your BOODY!HTTP/1.") should generalMultiParseTo(
+          "ake your BOODY!HTTP/1."
+        ) should generalMultiParseTo(
           Right(
             HttpResponse(InternalServerError,
                          List(`User-Agent`("curl/7.19.7 xyz"),
@@ -182,29 +184,32 @@ class ResponseParserSpec
       }
 
       "message chunk with and without extension" in new Test {
-        Seq(start + """3
+        Seq(
+          start + """3
             |abc
             |10;some=stuff;bla
             |0123456789ABCDEF
             |""",
-            "10;foo=",
-            """bar
+          "10;foo=",
+          """bar
             |0123456789ABCDEF
             |10
             |0123456789""",
-            """ABCDEF
+          """ABCDEF
             |0
             |
-            |""") should generalMultiParseTo(
-          Right(
-            baseResponse.withEntity(
-              Chunked(`application/pdf`,
-                      source(Chunk(ByteString("abc")),
-                             Chunk(ByteString("0123456789ABCDEF"),
-                                   "some=stuff;bla"),
-                             Chunk(ByteString("0123456789ABCDEF"), "foo=bar"),
-                             Chunk(ByteString("0123456789ABCDEF")),
-                             LastChunk)))))
+            |"""
+        ) should generalMultiParseTo(
+          Right(baseResponse.withEntity(Chunked(
+            `application/pdf`,
+            source(
+              Chunk(ByteString("abc")),
+              Chunk(ByteString("0123456789ABCDEF"), "some=stuff;bla"),
+              Chunk(ByteString("0123456789ABCDEF"), "foo=bar"),
+              Chunk(ByteString("0123456789ABCDEF")),
+              LastChunk
+            )
+          ))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -232,7 +237,8 @@ class ResponseParserSpec
                                             RawHeader("Bar", "xyz"))))))),
           Left(
             MessageStartError(400: StatusCode,
-                              ErrorInfo("Illegal HTTP message start"))))
+                              ErrorInfo("Illegal HTTP message start")))
+        )
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -248,7 +254,8 @@ class ResponseParserSpec
               headers = List(
                 `Transfer-Encoding`(TransferEncodings.Extension("fancy"))),
               entity = HttpEntity.Chunked(`application/pdf`, source()))),
-          Left(EntityStreamError(ErrorInfo("Entity stream truncation"))))
+          Left(EntityStreamError(ErrorInfo("Entity stream truncation")))
+        )
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
     }

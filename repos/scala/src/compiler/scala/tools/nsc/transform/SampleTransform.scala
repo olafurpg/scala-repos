@@ -43,7 +43,9 @@ abstract class SampleTransform extends Transform {
                   currentOwner.newValue(
                     // creates a new term symbol owned by `currentowner`
                     newTermName("sample"), // The standard term name creator
-                    tree1.pos)))))
+                    tree1.pos)
+                )))
+          )
         case _ =>
           tree1
       }

@@ -133,7 +133,7 @@ class MarathonSchedulerActor private (
             // the self notification MUST happen before informing the initiator
             // if we want to ensure that we trigger a new reconciliation for
             // the first call after the last ReconcileTasks.answer has been received.
-            .andThen { case _ => self ! ReconcileFinished }
+              .andThen { case _ => self ! ReconcileFinished }
           case Some(active) =>
             log.info("task reconciliation still active, reusing result")
             active
@@ -360,18 +360,20 @@ object MarathonSchedulerActor {
             eventBus: EventStream,
             cancellationTimeout: FiniteDuration = 1.minute): Props = {
     Props(
-      new MarathonSchedulerActor(createSchedulerActions,
-                                 deploymentManagerProps,
-                                 historyActorProps,
-                                 appRepository,
-                                 deploymentRepository,
-                                 healthCheckManager,
-                                 taskTracker,
-                                 taskQueue,
-                                 marathonSchedulerDriverHolder,
-                                 leaderInfo,
-                                 eventBus,
-                                 cancellationTimeout))
+      new MarathonSchedulerActor(
+        createSchedulerActions,
+        deploymentManagerProps,
+        historyActorProps,
+        appRepository,
+        deploymentRepository,
+        healthCheckManager,
+        taskTracker,
+        taskQueue,
+        marathonSchedulerDriverHolder,
+        leaderInfo,
+        eventBus,
+        cancellationTimeout
+      ))
   }
 
   case class RecoverDeployments(deployments: Seq[DeploymentPlan])

@@ -45,7 +45,8 @@ class DaemonicSpec extends AkkaSpec {
         akka.remote.netty.tcp.transport-class = "akka.remote.transport.netty.NettyTransport"
         akka.remote.netty.tcp.port = 0
         akka.log-dead-letters-during-shutdown = off
-      """))
+      """)
+      )
 
       val unusedAddress =
         addr(daemonicSystem, "tcp").copy(port = Some(unusedPort))

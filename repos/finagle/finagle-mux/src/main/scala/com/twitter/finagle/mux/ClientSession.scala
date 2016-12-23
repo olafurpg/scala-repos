@@ -206,18 +206,21 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
     FailureDetector(detectorConfig, ping, sr.scope("failuredetector"))
 
   override def status: Status =
-    Status.worst(detector.status, trans.status match {
-      case Status.Closed => Status.Closed
-      case Status.Busy => Status.Busy
-      case Status.Open =>
-        readLk.lock()
-        try state match {
-          case Draining => Status.Busy
-          case Drained => Status.Closed
-          case leased @ Leasing(_) if leased.expired => Status.Busy
-          case Leasing(_) | Dispatching => Status.Open
-        } finally readLk.unlock()
-    })
+    Status.worst(
+      detector.status,
+      trans.status match {
+        case Status.Closed => Status.Closed
+        case Status.Busy => Status.Busy
+        case Status.Open =>
+          readLk.lock()
+          try state match {
+            case Draining => Status.Busy
+            case Drained => Status.Closed
+            case leased @ Leasing(_) if leased.expired => Status.Busy
+            case Leasing(_) | Dispatching => Status.Open
+          } finally readLk.unlock()
+      }
+    )
 
   val onClose = trans.onClose
   def localAddress = trans.localAddress

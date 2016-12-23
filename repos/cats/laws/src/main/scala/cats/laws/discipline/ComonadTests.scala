@@ -27,7 +27,8 @@ trait ComonadTests[F[_]] extends CoflatMapTests[F] {
       "coflatMapIdentity" -> forAll(laws.coflatMapIdentity[A, B] _),
       "mapCoflatMapCoherence" -> forAll(laws.mapCoflatMapCoherence[A, B] _),
       "comonad left identity" -> forAll(laws.comonadLeftIdentity[A] _),
-      "comonad right identity" -> forAll(laws.comonadRightIdentity[A, B] _))
+      "comonad right identity" -> forAll(laws.comonadRightIdentity[A, B] _)
+    )
   }
 }
 

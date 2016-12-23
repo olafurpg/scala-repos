@@ -69,18 +69,22 @@ object LEventStore {
 
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
-    Await.result(eventsDb.futureFind(appId = appId,
-                                     channelId = channelId,
-                                     startTime = startTime,
-                                     untilTime = untilTime,
-                                     entityType = Some(entityType),
-                                     entityId = Some(entityId),
-                                     eventNames = eventNames,
-                                     targetEntityType = targetEntityType,
-                                     targetEntityId = targetEntityId,
-                                     limit = limit,
-                                     reversed = Some(latest)),
-                 timeout)
+    Await.result(
+      eventsDb.futureFind(
+        appId = appId,
+        channelId = channelId,
+        startTime = startTime,
+        untilTime = untilTime,
+        entityType = Some(entityType),
+        entityId = Some(entityId),
+        eventNames = eventNames,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId,
+        limit = limit,
+        reversed = Some(latest)
+      ),
+      timeout
+    )
   }
 
   /** Reads events generically. If entityType or entityId is not specified, it
@@ -122,16 +126,20 @@ object LEventStore {
 
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
-    Await.result(eventsDb.futureFind(appId = appId,
-                                     channelId = channelId,
-                                     startTime = startTime,
-                                     untilTime = untilTime,
-                                     entityType = entityType,
-                                     entityId = entityId,
-                                     eventNames = eventNames,
-                                     targetEntityType = targetEntityType,
-                                     targetEntityId = targetEntityId,
-                                     limit = limit),
-                 timeout)
+    Await.result(
+      eventsDb.futureFind(
+        appId = appId,
+        channelId = channelId,
+        startTime = startTime,
+        untilTime = untilTime,
+        entityType = entityType,
+        entityId = entityId,
+        eventNames = eventNames,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId,
+        limit = limit
+      ),
+      timeout
+    )
   }
 }

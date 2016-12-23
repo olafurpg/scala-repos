@@ -420,36 +420,38 @@ object Build extends sbt.Build {
         name := "Scala.js",
         publishArtifact in Compile := false,
         clean := clean
-          .dependsOn(clean in compiler,
-                     clean in irProject,
-                     clean in irProjectJS,
-                     clean in tools,
-                     clean in toolsJS,
-                     clean in jsEnvs,
-                     clean in testAdapter,
-                     clean in plugin,
-                     clean in javalanglib,
-                     clean in javalib,
-                     clean in scalalib,
-                     clean in libraryAux,
-                     clean in library,
-                     clean in javalibEx,
-                     clean in stubs,
-                     clean in cli,
-                     clean in testInterface,
-                     clean in jasmineTestFramework,
-                     clean in jUnitRuntime,
-                     clean in jUnitPlugin,
-                     clean in examples,
-                     clean in helloworld,
-                     clean in reversi,
-                     clean in testingExample,
-                     clean in testSuite,
-                     clean in testSuiteJVM,
-                     clean in noIrCheckTest,
-                     clean in javalibExTestSuite,
-                     clean in partest,
-                     clean in partestSuite)
+          .dependsOn(
+            clean in compiler,
+            clean in irProject,
+            clean in irProjectJS,
+            clean in tools,
+            clean in toolsJS,
+            clean in jsEnvs,
+            clean in testAdapter,
+            clean in plugin,
+            clean in javalanglib,
+            clean in javalib,
+            clean in scalalib,
+            clean in libraryAux,
+            clean in library,
+            clean in javalibEx,
+            clean in stubs,
+            clean in cli,
+            clean in testInterface,
+            clean in jasmineTestFramework,
+            clean in jUnitRuntime,
+            clean in jUnitPlugin,
+            clean in examples,
+            clean in helloworld,
+            clean in reversi,
+            clean in testingExample,
+            clean in testSuite,
+            clean in testSuiteJVM,
+            clean in noIrCheckTest,
+            clean in javalibExTestSuite,
+            clean in partest,
+            clean in partestSuite
+          )
           .value,
         publish := {},
         publishLocal := {}
@@ -1193,20 +1195,22 @@ object Build extends sbt.Build {
 
         var i = 0
         val pat = "/\\*{2,3}/".r
-        val replaced = pat.replaceAllIn(template, { mat =>
-          val lNo = lineNo(mat.before)
-          val res =
-            if (mat.end - mat.start == 5)
-              // matching a /***/
-              s"if (TC.is($i)) { throw new TestException($lNo) } else "
-            else
-              // matching a /**/
-              s"; if (TC.is($i)) { throw new TestException($lNo) } ;"
+        val replaced = pat.replaceAllIn(
+          template, { mat =>
+            val lNo = lineNo(mat.before)
+            val res =
+              if (mat.end - mat.start == 5)
+                // matching a /***/
+                s"if (TC.is($i)) { throw new TestException($lNo) } else "
+              else
+                // matching a /**/
+                s"; if (TC.is($i)) { throw new TestException($lNo) } ;"
 
-          i += 1
+            i += 1
 
-          res
-        })
+            res
+          }
+        )
 
         val outFile = dir / "SourceMapTest.scala"
         val unitTests = (0 until i)
@@ -1357,18 +1361,17 @@ object Build extends sbt.Build {
         if (shouldPartest.value)
           Def.task {
             val _ = (fetchScalaSource in partest).value
-            Seq(
-              new sbt.TestDefinition(
-                s"partest-${scalaVersion.value}",
-                // marker fingerprint since there are no test classes
-                // to be discovered by sbt:
-                new sbt.testing.AnnotatedFingerprint {
-                  def isModule = true
-                  def annotationName = "partest"
-                },
-                true,
-                Array()
-              ))
+            Seq(new sbt.TestDefinition(
+              s"partest-${scalaVersion.value}",
+              // marker fingerprint since there are no test classes
+              // to be discovered by sbt:
+              new sbt.testing.AnnotatedFingerprint {
+                def isModule = true
+                def annotationName = "partest"
+              },
+              true,
+              Array()
+            ))
           } else {
           Def.task(Seq())
         }

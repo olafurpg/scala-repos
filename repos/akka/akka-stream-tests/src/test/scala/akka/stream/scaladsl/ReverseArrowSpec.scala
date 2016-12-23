@@ -84,31 +84,35 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "work from UniformFanInShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       val f: UniformFanInShape[Int, Int] =
-                         b.add(Merge[Int](2))
-                       f <~ source
-                       f <~ Source.empty
-                       f ~> s
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanInShape[Int, Int] =
+              b.add(Merge[Int](2))
+            f <~ source
+            f <~ Source.empty
+            f ~> s
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "work from UniformFanOutShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       val f: UniformFanOutShape[Int, Int] =
-                         b.add(Broadcast[Int](2))
-                       f <~ source
-                       f ~> Sink.ignore
-                       f ~> s
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanOutShape[Int, Int] =
+              b.add(Broadcast[Int](2))
+            f <~ source
+            f ~> Sink.ignore
+            f ~> s
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "work towards Outlets" in {
@@ -156,17 +160,19 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "work towards UniformFanInShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       val f: UniformFanInShape[Int, Int] =
-                         b.add(Merge[Int](2))
-                       s <~ f
-                       Source.empty ~> f
-                       source ~> f
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanInShape[Int, Int] =
+              b.add(Merge[Int](2))
+            s <~ f
+            Source.empty ~> f
+            source ~> f
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "fail towards already full UniformFanInShape" in {
@@ -183,21 +189,24 @@ class ReverseArrowSpec extends AkkaSpec {
             ClosedShape
           })
           .run(),
-        1.second) should ===(Seq(1, 2, 3))
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "work towards UniformFanOutShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       val f: UniformFanOutShape[Int, Int] =
-                         b.add(Broadcast[Int](2))
-                       s <~ f
-                       Sink.ignore <~ f
-                       source ~> f
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanOutShape[Int, Int] =
+              b.add(Broadcast[Int](2))
+            s <~ f
+            Sink.ignore <~ f
+            source ~> f
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "fail towards already full UniformFanOutShape" in {
@@ -215,7 +224,8 @@ class ReverseArrowSpec extends AkkaSpec {
             ClosedShape
           })
           .run(),
-        1.second) should ===(Seq(1, 2, 3))
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "work across a Flow" in {

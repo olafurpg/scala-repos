@@ -140,7 +140,8 @@ trait PullRequestsControllerBase extends ControllerBase {
                   diffs,
                   hasWritePermission(owner, name, context.loginAccount),
                   repository,
-                  flash.toMap.map(f => f._1 -> f._2.toString))
+                  flash.toMap.map(f => f._1 -> f._2.toString)
+                )
             }
         }
     } getOrElse NotFound
@@ -170,20 +171,25 @@ trait PullRequestsControllerBase extends ControllerBase {
                     owner,
                     name,
                     pullreq.branch) != Some(pullreq.commitIdFrom),
-                needStatusCheck = context.loginAccount.map { u =>
-                  branchProtection.needStatusCheck(u.userName)
-                }.getOrElse(true),
+                needStatusCheck = context.loginAccount
+                  .map { u =>
+                    branchProtection.needStatusCheck(u.userName)
+                  }
+                  .getOrElse(true),
                 hasUpdatePermission = hasWritePermission(
                     pullreq.requestUserName,
                     pullreq.requestRepositoryName,
-                    context.loginAccount) && context.loginAccount.map { u =>
-                  !getProtectedBranchInfo(
-                    pullreq.requestUserName,
-                    pullreq.requestRepositoryName,
-                    pullreq.requestBranch).needStatusCheck(u.userName)
-                }.getOrElse(false),
+                    context.loginAccount) && context.loginAccount
+                    .map { u =>
+                    !getProtectedBranchInfo(
+                      pullreq.requestUserName,
+                      pullreq.requestRepositoryName,
+                      pullreq.requestBranch).needStatusCheck(u.userName)
+                  }
+                    .getOrElse(false),
                 hasMergePermission = hasMergePermission,
-                commitIdTo = pullreq.commitIdTo)
+                commitIdTo = pullreq.commitIdTo
+              )
               html.mergeguide(mergeStatus,
                               issue,
                               pullreq,
@@ -264,7 +270,8 @@ trait PullRequestsControllerBase extends ControllerBase {
               pullreq.repositoryName,
               pullreq.branch,
               loginAccount,
-              "Merge branch '${alias}' into ${pullreq.requestBranch}") match {
+              "Merge branch '${alias}' into ${pullreq.requestBranch}"
+            ) match {
               case None => // conflict
                 flash +=
                   "error" -> s"Can't automatic merging branch '${alias}' into ${pullreq.requestBranch}."
@@ -383,7 +390,8 @@ trait PullRequestsControllerBase extends ControllerBase {
                       s"Merge pull request #${issueId} from ${pullreq.requestUserName}/${pullreq.requestBranch}\n\n" +
                         form.message,
                       new PersonIdent(loginAccount.fullName,
-                                      loginAccount.mailAddress))
+                                      loginAccount.mailAddress)
+                    )
 
                     val (commits, _) =
                       getRequestCompareInfo(owner,
@@ -502,10 +510,12 @@ trait PullRequestsControllerBase extends ControllerBase {
             forkedRepository.repository.originRepositoryName
           } else {
             // Sibling repository
-            getUserRepositories(originOwner).find { x =>
-              x.repository.originUserName == forkedRepository.repository.originUserName &&
-              x.repository.originRepositoryName == forkedRepository.repository.originRepositoryName
-            }.map(_.repository.repositoryName)
+            getUserRepositories(originOwner)
+              .find { x =>
+                x.repository.originUserName == forkedRepository.repository.originUserName &&
+                x.repository.originRepositoryName == forkedRepository.repository.originRepositoryName
+              }
+              .map(_.repository.repositoryName)
           };
           originRepository <- getRepository(originOwner, originRepositoryName))
       yield {
@@ -654,26 +664,30 @@ trait PullRequestsControllerBase extends ControllerBase {
           val loginUserName = context.loginAccount.get.userName
 
           val issueId =
-            createIssue(owner = repository.owner,
-                        repository = repository.name,
-                        loginUser = loginUserName,
-                        title = form.title,
-                        content = form.content,
-                        assignedUserName =
-                          if (writable) form.assignedUserName
-                          else None,
-                        milestoneId = if (writable) form.milestoneId else None,
-                        isPullRequest = true)
+            createIssue(
+              owner = repository.owner,
+              repository = repository.name,
+              loginUser = loginUserName,
+              title = form.title,
+              content = form.content,
+              assignedUserName =
+                if (writable) form.assignedUserName
+                else None,
+              milestoneId = if (writable) form.milestoneId else None,
+              isPullRequest = true
+            )
 
-          createPullRequest(originUserName = repository.owner,
-                            originRepositoryName = repository.name,
-                            issueId = issueId,
-                            originBranch = form.targetBranch,
-                            requestUserName = form.requestUserName,
-                            requestRepositoryName = form.requestRepositoryName,
-                            requestBranch = form.requestBranch,
-                            commitIdFrom = form.commitIdFrom,
-                            commitIdTo = form.commitIdTo)
+          createPullRequest(
+            originUserName = repository.owner,
+            originRepositoryName = repository.name,
+            issueId = issueId,
+            originBranch = form.targetBranch,
+            requestUserName = form.requestUserName,
+            requestRepositoryName = form.requestRepositoryName,
+            requestBranch = form.requestBranch,
+            commitIdFrom = form.commitIdFrom,
+            commitIdTo = form.commitIdTo
+          )
 
           // insert labels
           if (writable) {
@@ -792,13 +806,15 @@ trait PullRequestsControllerBase extends ControllerBase {
 
         // retrieve search condition
         val condition =
-          session.putAndGet(sessionKey,
-                            if (request.hasQueryString)
-                              IssueSearchCondition(request)
-                            else
-                              session
-                                .getAs[IssueSearchCondition](sessionKey)
-                                .getOrElse(IssueSearchCondition()))
+          session.putAndGet(
+            sessionKey,
+            if (request.hasQueryString)
+              IssueSearchCondition(request)
+            else
+              session
+                .getAs[IssueSearchCondition](sessionKey)
+                .getOrElse(IssueSearchCondition())
+          )
 
         gitbucket.core.issues.html.list(
           "pulls",
@@ -821,6 +837,7 @@ trait PullRequestsControllerBase extends ControllerBase {
                      owner -> repoName),
           condition,
           repository,
-          hasWritePermission(owner, repoName, context.loginAccount))
+          hasWritePermission(owner, repoName, context.loginAccount)
+        )
     }
 }

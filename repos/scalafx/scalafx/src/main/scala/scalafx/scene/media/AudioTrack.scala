@@ -47,7 +47,8 @@ class AudioTrack(override val delegate: jfxsm.AudioTrack)
     */
   @deprecated(
     "This method is deprecated, due to deprecation of the underlying JavaFX method 'getLanguage'. Use 'locale' instead. For now, this method call is redirected to utilise 'locale'.",
-    "ScalaFX 8.0.0-R5")
+    "ScalaFX 8.0.0-R5"
+  )
   def language =
     locale // <-- Calling 'getLocale' instead of the deprecated 'getLanguage' removes a compilation warning while building ScalaFX.
 }

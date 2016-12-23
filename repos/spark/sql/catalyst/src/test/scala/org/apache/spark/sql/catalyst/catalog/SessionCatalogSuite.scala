@@ -704,7 +704,8 @@ class SessionCatalogSuite extends SparkFunSuite {
       Seq(oldPart1.copy(
             storage = storageFormat.copy(locationUri = Some(newLocation))),
           oldPart2.copy(
-            storage = storageFormat.copy(locationUri = Some(newLocation)))))
+            storage = storageFormat.copy(locationUri = Some(newLocation))))
+    )
     val newPart1 =
       catalog.getPartition(TableIdentifier("tbl2", Some("db2")), part1.spec)
     val newPart2 =
@@ -1007,7 +1008,8 @@ class SessionCatalogSuite extends SparkFunSuite {
         FunctionIdentifier("yes_me"),
         FunctionIdentifier("func1", Some("db2")),
         FunctionIdentifier("func2", Some("db2")),
-        FunctionIdentifier("not_me", Some("db2"))))
+        FunctionIdentifier("not_me", Some("db2"))
+      ))
     assert(
       catalog.listFunctions("db2", "func*").toSet == Set(
         FunctionIdentifier("func1"),

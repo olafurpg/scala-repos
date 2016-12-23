@@ -568,10 +568,13 @@ class ServerBuilder[Req, Rep, HasCodec, HasBindTo, HasName] private[builder] (
   def build(serviceFactory: (ClientConnection) => Service[Req, Rep])(
       implicit THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ServerBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig
   ): Server =
-    build(new ServiceFactory[Req, Rep] {
-      def apply(conn: ClientConnection) = Future.value(serviceFactory(conn))
-      def close(deadline: Time) = Future.Done
-    }, THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ServerBuilder_DOCUMENTATION)
+    build(
+      new ServiceFactory[Req, Rep] {
+        def apply(conn: ClientConnection) = Future.value(serviceFactory(conn))
+        def close(deadline: Time) = Future.Done
+      },
+      THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ServerBuilder_DOCUMENTATION
+    )
 
   /**
     * Construct the Server, given the provided ServiceFactory. This

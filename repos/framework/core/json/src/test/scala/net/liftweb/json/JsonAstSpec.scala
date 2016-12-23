@@ -30,8 +30,8 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
 
   "Functor composition" in {
     val compositionProp =
-      (json: JValue, fa: JValue => JValue,
-       fb: JValue => JValue) => json.map(fb).map(fa) == json.map(fa compose fb)
+      (json: JValue, fa: JValue => JValue, fb: JValue => JValue) =>
+        json.map(fb).map(fa) == json.map(fa compose fb)
 
     forAll(compositionProp)
   }
@@ -43,8 +43,8 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
   }
 
   "Monoid associativity" in {
-    val assocProp = (x: JValue, y: JValue,
-                     z: JValue) => x ++ (y ++ z) == (x ++ y) ++ z
+    val assocProp =
+      (x: JValue, y: JValue, z: JValue) => x ++ (y ++ z) == (x ++ y) ++ z
     forAll(assocProp)
   }
 

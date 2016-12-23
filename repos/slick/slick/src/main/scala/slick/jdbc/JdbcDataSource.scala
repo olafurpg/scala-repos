@@ -224,7 +224,8 @@ object DriverJdbcDataSource extends JdbcDataSourceFactory {
       c.getStringOr("driver", c.getStringOr("driverClassName")),
       driver,
       if (cp.isLive) cp else null,
-      c.getBooleanOr("keepAliveConnection"))
+      c.getBooleanOr("keepAliveConnection")
+    )
   }
 }
 

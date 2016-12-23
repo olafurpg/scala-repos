@@ -97,9 +97,11 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
     }
 
     @inline def isMultilineInterpolatedStringPrefix(tpe: IElementType) =
-      Set(ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE,
-          ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE,
-          ScalaTokenTypes.tINTERPOLATED_STRING_ID) contains tpe
+      Set(
+        ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE,
+        ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE,
+        ScalaTokenTypes.tINTERPOLATED_STRING_ID
+      ) contains tpe
 
     def correctMultilineString(closingQuotesOffset: Int) {
       extensions.inWriteAction {

@@ -378,20 +378,8 @@ class BigIntegerCompareTest {
     val aBytes =
       Array[Byte](12, 56, 100, -2, -76, 89, 45, 91, 3, -15, 35, 26, 3, 91)
     val aSign = 1
-    val rBytes = Array[Byte](-13,
-                             -57,
-                             -101,
-                             1,
-                             75,
-                             -90,
-                             -46,
-                             -92,
-                             -4,
-                             14,
-                             -36,
-                             -27,
-                             -4,
-                             -91)
+    val rBytes = Array[Byte](-13, -57, -101, 1, 75, -90, -46, -92, -4, 14, -36,
+      -27, -4, -91)
     val aNumber = new BigInteger(aSign, aBytes)
     val result = aNumber.negate()
     var resBytes = Array.ofDim[Byte](rBytes.length)

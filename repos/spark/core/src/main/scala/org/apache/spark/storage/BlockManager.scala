@@ -1027,13 +1027,17 @@ private[spark] class BlockManager(executorId: String,
           memoryStore.getBytes(blockId).get
         } else {
           val putSucceeded =
-            memoryStore.putBytes(blockId, diskBytes.size, () => {
-              // https://issues.apache.org/jira/browse/SPARK-6076
-              // If the file size is bigger than the free memory, OOM will happen. So if we
-              // cannot put it into MemoryStore, copyForMemory should not be created. That's why
-              // this action is put into a `() => ChunkedByteBuffer` and created lazily.
-              diskBytes.copy()
-            })
+            memoryStore.putBytes(
+              blockId,
+              diskBytes.size,
+              () => {
+                // https://issues.apache.org/jira/browse/SPARK-6076
+                // If the file size is bigger than the free memory, OOM will happen. So if we
+                // cannot put it into MemoryStore, copyForMemory should not be created. That's why
+                // this action is put into a `() => ChunkedByteBuffer` and created lazily.
+                diskBytes.copy()
+              }
+            )
           if (putSucceeded) {
             diskBytes.dispose()
             memoryStore.getBytes(blockId).get

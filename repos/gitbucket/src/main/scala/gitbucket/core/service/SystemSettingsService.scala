@@ -93,31 +93,35 @@ trait SystemSettingsService {
         getValue(props, UseSMTP, getValue(props, Notification, false)), // handle migration scenario from only notification to useSMTP
         if (getValue(props, UseSMTP, getValue(props, Notification, false))) {
           Some(
-            Smtp(getValue(props, SmtpHost, ""),
-                 getOptionValue(props, SmtpPort, Some(DefaultSmtpPort)),
-                 getOptionValue(props, SmtpUser, None),
-                 getOptionValue(props, SmtpPassword, None),
-                 getOptionValue[Boolean](props, SmtpSsl, None),
-                 getOptionValue(props, SmtpFromAddress, None),
-                 getOptionValue(props, SmtpFromName, None)))
+            Smtp(
+              getValue(props, SmtpHost, ""),
+              getOptionValue(props, SmtpPort, Some(DefaultSmtpPort)),
+              getOptionValue(props, SmtpUser, None),
+              getOptionValue(props, SmtpPassword, None),
+              getOptionValue[Boolean](props, SmtpSsl, None),
+              getOptionValue(props, SmtpFromAddress, None),
+              getOptionValue(props, SmtpFromName, None)
+            ))
         } else {
           None
         },
         getValue(props, LdapAuthentication, false),
         if (getValue(props, LdapAuthentication, false)) {
           Some(
-            Ldap(getValue(props, LdapHost, ""),
-                 getOptionValue(props, LdapPort, Some(DefaultLdapPort)),
-                 getOptionValue(props, LdapBindDN, None),
-                 getOptionValue(props, LdapBindPassword, None),
-                 getValue(props, LdapBaseDN, ""),
-                 getValue(props, LdapUserNameAttribute, ""),
-                 getOptionValue(props, LdapAdditionalFilterCondition, None),
-                 getOptionValue(props, LdapFullNameAttribute, None),
-                 getOptionValue(props, LdapMailAddressAttribute, None),
-                 getOptionValue[Boolean](props, LdapTls, None),
-                 getOptionValue[Boolean](props, LdapSsl, None),
-                 getOptionValue(props, LdapKeystore, None)))
+            Ldap(
+              getValue(props, LdapHost, ""),
+              getOptionValue(props, LdapPort, Some(DefaultLdapPort)),
+              getOptionValue(props, LdapBindDN, None),
+              getOptionValue(props, LdapBindPassword, None),
+              getValue(props, LdapBaseDN, ""),
+              getValue(props, LdapUserNameAttribute, ""),
+              getOptionValue(props, LdapAdditionalFilterCondition, None),
+              getOptionValue(props, LdapFullNameAttribute, None),
+              getOptionValue(props, LdapMailAddressAttribute, None),
+              getOptionValue[Boolean](props, LdapTls, None),
+              getOptionValue[Boolean](props, LdapSsl, None),
+              getOptionValue(props, LdapKeystore, None)
+            ))
         } else {
           None
         }

@@ -26,19 +26,21 @@ final class QaApi(questionColl: Coll,
 
     def create(data: QuestionData, user: User): Fu[Question] =
       lila.db.Util findNextId questionColl flatMap { id =>
-        val q = Question(_id = id,
-                         userId = user.id,
-                         title = data.title,
-                         body = data.body,
-                         tags = data.tags,
-                         vote = Vote(Set(user.id), Set.empty, 1),
-                         comments = Nil,
-                         views = 0,
-                         answers = 0,
-                         createdAt = DateTime.now,
-                         updatedAt = DateTime.now,
-                         acceptedAt = None,
-                         editedAt = None)
+        val q = Question(
+          _id = id,
+          userId = user.id,
+          title = data.title,
+          body = data.body,
+          tags = data.tags,
+          vote = Vote(Set(user.id), Set.empty, 1),
+          comments = Nil,
+          views = 0,
+          answers = 0,
+          createdAt = DateTime.now,
+          updatedAt = DateTime.now,
+          acceptedAt = None,
+          editedAt = None
+        )
 
         (questionColl insert q) >> tag.clearCache >> relation.clearCache >>- notifier
           .createQuestion(q, user) inject q
@@ -88,14 +90,16 @@ final class QaApi(questionColl: Coll,
                 maxPerPage = perPage)
 
     private def popularCache =
-      mongoCache(prefix = "qa:popular",
-                 f = (nb: Int) =>
-                   questionColl
-                     .find(BSONDocument())
-                     .sort(BSONDocument("vote.score" -> -1))
-                     .cursor[Question]()
-                     .collect[List](nb),
-                 timeToLive = 3 hour)
+      mongoCache(
+        prefix = "qa:popular",
+        f = (nb: Int) =>
+          questionColl
+            .find(BSONDocument())
+            .sort(BSONDocument("vote.score" -> -1))
+            .cursor[Question]()
+            .collect[List](nb),
+        timeToLive = 3 hour
+      )
 
     def popular(max: Int): Fu[List[Question]] = popularCache(max)
 
@@ -169,15 +173,17 @@ final class QaApi(questionColl: Coll,
 
     def create(data: AnswerData, q: Question, user: User): Fu[Answer] =
       lila.db.Util findNextId answerColl flatMap { id =>
-        val a = Answer(_id = id,
-                       questionId = q.id,
-                       userId = user.id,
-                       body = data.body,
-                       vote = Vote(Set(user.id), Set.empty, 1),
-                       comments = Nil,
-                       acceptedAt = None,
-                       createdAt = DateTime.now,
-                       editedAt = None)
+        val a = Answer(
+          _id = id,
+          questionId = q.id,
+          userId = user.id,
+          body = data.body,
+          vote = Vote(Set(user.id), Set.empty, 1),
+          comments = Nil,
+          acceptedAt = None,
+          createdAt = DateTime.now,
+          editedAt = None
+        )
 
         (answerColl insert a) >> (question recountAnswers q.id) >>- notifier
           .createAnswer(q, a, user) inject a

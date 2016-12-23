@@ -40,13 +40,15 @@ private[prediction] case class SetProp(val fields: Map[String, PropTime],
   def ++(that: SetProp): SetProp = {
     val commonKeys = fields.keySet.intersect(that.fields.keySet)
 
-    val common: Map[String, PropTime] = commonKeys.map { k =>
-      val thisData = this.fields(k)
-      val thatData = that.fields(k)
-      // only keep the value with latest time
-      val v = if (thisData.t > thatData.t) thisData else thatData
-      (k, v)
-    }.toMap
+    val common: Map[String, PropTime] = commonKeys
+      .map { k =>
+        val thisData = this.fields(k)
+        val thatData = that.fields(k)
+        // only keep the value with latest time
+        val v = if (thisData.t > thatData.t) thisData else thatData
+        (k, v)
+      }
+      .toMap
 
     val combinedFields =
       common ++ (this.fields -- commonKeys) ++ (that.fields -- commonKeys)
@@ -66,13 +68,15 @@ private[prediction] case class UnsetProp(fields: Map[String, Long])
   def ++(that: UnsetProp): UnsetProp = {
     val commonKeys = fields.keySet.intersect(that.fields.keySet)
 
-    val common: Map[String, Long] = commonKeys.map { k =>
-      val thisData = this.fields(k)
-      val thatData = that.fields(k)
-      // only keep the value with latest time
-      val v = if (thisData > thatData) thisData else thatData
-      (k, v)
-    }.toMap
+    val common: Map[String, Long] = commonKeys
+      .map { k =>
+        val thisData = this.fields(k)
+        val thatData = that.fields(k)
+        // only keep the value with latest time
+        val v = if (thisData > thatData) thisData else thatData
+        (k, v)
+      }
+      .toMap
 
     val combinedFields =
       common ++ (this.fields -- commonKeys) ++ (that.fields -- commonKeys)
@@ -110,19 +114,23 @@ private[prediction] case class EventOp(
           unset.fields.filter { case (k, v) => (v >= set.fields(k).t) }.keySet)
         .getOrElse(Set())
 
-      val combinedFields = deleteEntity.map { delete =>
-        if (delete.t >= set.t) {
-          None
-        } else {
-          val deleteKeys: Set[String] = set.fields.filter {
-            case (k, PropTime(kv, t)) =>
-              (delete.t >= t)
-          }.keySet
-          Some(set.fields -- unsetKeys -- deleteKeys)
+      val combinedFields = deleteEntity
+        .map { delete =>
+          if (delete.t >= set.t) {
+            None
+          } else {
+            val deleteKeys: Set[String] = set.fields
+              .filter {
+                case (k, PropTime(kv, t)) =>
+                  (delete.t >= t)
+              }
+              .keySet
+            Some(set.fields -- unsetKeys -- deleteKeys)
+          }
         }
-      }.getOrElse {
-        Some(set.fields -- unsetKeys)
-      }
+        .getOrElse {
+          Some(set.fields -- unsetKeys)
+        }
 
       // Note: mapValues() doesn't return concrete Map and causes
       // NotSerializableException issue. Use map(identity) to work around this.
@@ -187,10 +195,9 @@ class PBatchView(val appId: Int,
       untilTimeOpt: Option[DateTime] = None
   ): RDD[(String, DataMap)] = {
 
-    _events
-      .filter(e =>
-        ((e.entityType == entityType) &&
-          (EventValidation.isSpecialEvents(e.event))))
+    _events.filter(e =>
+      ((e.entityType == entityType) &&
+        (EventValidation.isSpecialEvents(e.event))))
       .map(e => (e.entityId, EventOp(e)))
       .aggregateByKey[EventOp](EventOp())(
         // within same partition

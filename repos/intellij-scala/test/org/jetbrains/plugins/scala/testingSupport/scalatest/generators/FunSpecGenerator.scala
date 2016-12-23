@@ -12,8 +12,9 @@ trait FunSpecGenerator extends ScalaTestTestCase {
   def funSpecFileName = funSpecClassName + ".scala"
 
   def addFunSpec() {
-    addFileToProject("FunSpecTest.scala",
-                     """
+    addFileToProject(
+      "FunSpecTest.scala",
+      """
         |import org.scalatest._
         |
         |class FunSpecTest extends FunSpec {
@@ -33,6 +34,7 @@ trait FunSpecGenerator extends ScalaTestTestCase {
         |
         |  describe("emptyScope") {}
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 }

@@ -40,17 +40,21 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
       ("World", 8, 3.0)
     )
 
-    checkAnswer(input.toDF("a", "b", "c"),
-                (child: SparkPlan) =>
-                  Sort('a.asc :: 'b.asc :: Nil, global = true, child = child),
-                input.sortBy(t => (t._1, t._2)).map(Row.fromTuple),
-                sortAnswers = false)
+    checkAnswer(
+      input.toDF("a", "b", "c"),
+      (child: SparkPlan) =>
+        Sort('a.asc :: 'b.asc :: Nil, global = true, child = child),
+      input.sortBy(t => (t._1, t._2)).map(Row.fromTuple),
+      sortAnswers = false
+    )
 
-    checkAnswer(input.toDF("a", "b", "c"),
-                (child: SparkPlan) =>
-                  Sort('b.asc :: 'a.asc :: Nil, global = true, child = child),
-                input.sortBy(t => (t._2, t._1)).map(Row.fromTuple),
-                sortAnswers = false)
+    checkAnswer(
+      input.toDF("a", "b", "c"),
+      (child: SparkPlan) =>
+        Sort('b.asc :: 'a.asc :: Nil, global = true, child = child),
+      input.sortBy(t => (t._2, t._1)).map(Row.fromTuple),
+      sortAnswers = false
+    )
   }
 
   test("sort followed by limit") {
@@ -80,12 +84,14 @@ class SortSuite extends SparkPlanTest with SharedSQLContext {
   test("sorting updates peak execution memory") {
     AccumulatorSuite.verifyPeakExecutionMemorySet(sparkContext,
                                                   "unsafe external sort") {
-      checkThatPlansAgree((1 to 100).map(v => Tuple1(v)).toDF("a"),
-                          (child: SparkPlan) =>
-                            Sort('a.asc :: Nil, global = true, child = child),
-                          (child: SparkPlan) =>
-                            ReferenceSort('a.asc :: Nil, global = true, child),
-                          sortAnswers = false)
+      checkThatPlansAgree(
+        (1 to 100).map(v => Tuple1(v)).toDF("a"),
+        (child: SparkPlan) =>
+          Sort('a.asc :: Nil, global = true, child = child),
+        (child: SparkPlan) =>
+          ReferenceSort('a.asc :: Nil, global = true, child),
+        sortAnswers = false
+      )
     }
   }
 

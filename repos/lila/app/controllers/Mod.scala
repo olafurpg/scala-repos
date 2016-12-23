@@ -120,28 +120,33 @@ object Mod extends LilaController {
       }
   }
 
-  private val ipIntelCache = lila.memo.AsyncCache[String, Int](ip => {
-    import play.api.libs.ws.WS
-    import play.api.Play.current
-    val email = "lichess.contact@gmail.com"
-    val url =
-      s"http://check.getipintel.net/check.php?ip=$ip&contact=$email"
-    WS.url(url)
-      .get()
-      .map(_.body)
-      .mon(_.security.proxy.request.time)
-      .flatMap { str =>
-        parseFloatOption(str).fold[Fu[Int]](fufail(s"Invalid ratio $str")) {
-          ratio =>
-            fuccess((ratio * 100).toInt)
+  private val ipIntelCache = lila.memo.AsyncCache[String, Int](
+    ip => {
+      import play.api.libs.ws.WS
+      import play.api.Play.current
+      val email = "lichess.contact@gmail.com"
+      val url =
+        s"http://check.getipintel.net/check.php?ip=$ip&contact=$email"
+      WS.url(url)
+        .get()
+        .map(_.body)
+        .mon(_.security.proxy.request.time)
+        .flatMap { str =>
+          parseFloatOption(str).fold[Fu[Int]](fufail(s"Invalid ratio $str")) {
+            ratio =>
+              fuccess((ratio * 100).toInt)
+          }
         }
-      }
-      .addEffects(fail = _ => lila.mon.security.proxy.request.failure(),
-                  succ = percent => {
-                    lila.mon.security.proxy.percent(percent max 0)
-                    lila.mon.security.proxy.request.success()
-                  })
-  }, maxCapacity = 1024)
+        .addEffects(
+          fail = _ => lila.mon.security.proxy.request.failure(),
+          succ = percent => {
+            lila.mon.security.proxy.percent(percent max 0)
+            lila.mon.security.proxy.request.success()
+          }
+        )
+    },
+    maxCapacity = 1024
+  )
 
   def ipIntel(ip: String) = Secure(_.IpBan) { ctx => me =>
     ipIntelCache(ip).map { Ok(_) }

@@ -41,7 +41,8 @@ class ChainedPackageInspection extends LocalInspectionTool {
                     "Package declaration could use chained package clauses",
                     ProblemHighlightType.WEAK_WARNING,
                     false,
-                    new UseChainedPackageQuickFix(scalaFile, basePackage))
+                    new UseChainedPackageQuickFix(scalaFile, basePackage)
+                  )
                 }
               }
           }

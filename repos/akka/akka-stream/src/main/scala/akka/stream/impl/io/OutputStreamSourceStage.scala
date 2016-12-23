@@ -112,20 +112,23 @@ final private[stream] class OutputStreamSourceStage(
           sendResponseIfNeed()
         }
 
-      setHandler(out, new OutHandler {
-        override def onDownstreamFinish(): Unit = {
-          //assuming there can be no further in messages
-          downstreamStatus.set(Canceled)
-          dataQueue.clear()
-          // if blocked reading, make sure the take() completes
-          dataQueue.put(ByteString())
-          completeStage()
+      setHandler(
+        out,
+        new OutHandler {
+          override def onDownstreamFinish(): Unit = {
+            //assuming there can be no further in messages
+            downstreamStatus.set(Canceled)
+            dataQueue.clear()
+            // if blocked reading, make sure the take() completes
+            dataQueue.put(ByteString())
+            completeStage()
+          }
+          override def onPull(): Unit = {
+            implicit val ex = interpreter.materializer.executionContext
+            Future(dataQueue.take()).onComplete(downstreamCallback.invoke)
+          }
         }
-        override def onPull(): Unit = {
-          implicit val ex = interpreter.materializer.executionContext
-          Future(dataQueue.take()).onComplete(downstreamCallback.invoke)
-        }
-      })
+      )
     }
     (logic,
      new OutputStreamAdapter(dataQueue,

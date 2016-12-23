@@ -37,4 +37,5 @@ class DottySdkTableModel
 
         override def valueOf(item: SdkChoice): Boolean =
           item.sdk.docFiles.nonEmpty
-      })
+      }
+    )

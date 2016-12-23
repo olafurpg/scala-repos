@@ -63,14 +63,16 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    dropTables("partitioned_parquet",
-               "partitioned_parquet_with_key",
-               "partitioned_parquet_with_complextypes",
-               "partitioned_parquet_with_key_and_complextypes",
-               "normal_parquet",
-               "jt",
-               "jt_array",
-               "test_parquet")
+    dropTables(
+      "partitioned_parquet",
+      "partitioned_parquet_with_key",
+      "partitioned_parquet_with_complextypes",
+      "partitioned_parquet_with_key_and_complextypes",
+      "normal_parquet",
+      "jt",
+      "jt_array",
+      "test_parquet"
+    )
     sql(s"""
       create external table partitioned_parquet
       (
@@ -185,26 +187,32 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
   }
 
   override def afterAll(): Unit = {
-    dropTables("partitioned_parquet",
-               "partitioned_parquet_with_key",
-               "partitioned_parquet_with_complextypes",
-               "partitioned_parquet_with_key_and_complextypes",
-               "normal_parquet",
-               "jt",
-               "jt_array",
-               "test_parquet")
+    dropTables(
+      "partitioned_parquet",
+      "partitioned_parquet_with_key",
+      "partitioned_parquet_with_complextypes",
+      "partitioned_parquet_with_key_and_complextypes",
+      "normal_parquet",
+      "jt",
+      "jt_array",
+      "test_parquet"
+    )
     setConf(HiveContext.CONVERT_METASTORE_PARQUET, false)
   }
 
   test(s"conversion is working") {
     assert(
-      sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan.collect {
-        case _: HiveTableScan => true
-      }.isEmpty)
+      sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan
+        .collect {
+          case _: HiveTableScan => true
+        }
+        .isEmpty)
     assert(
-      sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan.collect {
-        case _: DataSourceScan => true
-      }.nonEmpty)
+      sql("SELECT * FROM normal_parquet").queryExecution.sparkPlan
+        .collect {
+          case _: DataSourceScan => true
+        }
+        .nonEmpty)
   }
 
   test("scan an empty parquet table") {
@@ -385,20 +393,24 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
         """.stripMargin).queryExecution.analyzed
 
       assertResult(2) {
-        analyzed.collect {
-          case r @ LogicalRelation(_: HadoopFsRelation, _, _) => r
-        }.size
+        analyzed
+          .collect {
+            case r @ LogicalRelation(_: HadoopFsRelation, _, _) => r
+          }
+          .size
       }
     }
   }
 
   def collectHadoopFsRelation(df: DataFrame): HadoopFsRelation = {
     val plan = df.queryExecution.analyzed
-    plan.collectFirst {
-      case LogicalRelation(r: HadoopFsRelation, _, _) => r
-    }.getOrElse {
-      fail(s"Expecting a HadoopFsRelation 2, but got:\n$plan")
-    }
+    plan
+      .collectFirst {
+        case LogicalRelation(r: HadoopFsRelation, _, _) => r
+      }
+      .getOrElse {
+        fail(s"Expecting a HadoopFsRelation 2, but got:\n$plan")
+      }
   }
 
   test(
@@ -518,8 +530,9 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
         |  OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
       """.stripMargin)
 
-    tableIdentifier = _catalog
-      .QualifiedTableName("default", "test_parquet_partitioned_cache_test")
+    tableIdentifier =
+      _catalog.QualifiedTableName("default",
+                                  "test_parquet_partitioned_cache_test")
     assert(
       sessionState.catalog.cachedDataSourceTables
         .getIfPresent(tableIdentifier) === null)
@@ -553,7 +566,8 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
           |select b, '2015-04-01', a FROM jt
           |UNION ALL
           |select b, '2015-04-02', a FROM jt
-        """.stripMargin).collect())
+        """.stripMargin).collect()
+    )
 
     invalidateTable("test_parquet_partitioned_cache_test")
     assert(
@@ -573,11 +587,13 @@ class ParquetSourceSuite extends ParquetPartitioningTest {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    dropTables("partitioned_parquet",
-               "partitioned_parquet_with_key",
-               "partitioned_parquet_with_complextypes",
-               "partitioned_parquet_with_key_and_complextypes",
-               "normal_parquet")
+    dropTables(
+      "partitioned_parquet",
+      "partitioned_parquet_with_key",
+      "partitioned_parquet_with_complextypes",
+      "partitioned_parquet_with_key_and_complextypes",
+      "normal_parquet"
+    )
 
     sql(s"""
       create temporary table partitioned_parquet
@@ -907,21 +923,28 @@ abstract class ParquetPartitioningTest
     }
 
     test(s"hive udfs $table") {
-      checkAnswer(sql(s"SELECT concat(stringField, stringField) FROM $table"),
-                  sql(s"SELECT stringField FROM $table").rdd.map {
-                    case Row(s: String) => Row(s + s)
-                  }.collect().toSeq)
+      checkAnswer(
+        sql(s"SELECT concat(stringField, stringField) FROM $table"),
+        sql(s"SELECT stringField FROM $table").rdd
+          .map {
+            case Row(s: String) => Row(s + s)
+          }
+          .collect()
+          .toSeq
+      )
     }
   }
 
   Seq("partitioned_parquet_with_key_and_complextypes",
       "partitioned_parquet_with_complextypes").foreach { table =>
     test(s"SPARK-5775 read struct from $table") {
-      checkAnswer(sql(s"""
+      checkAnswer(
+        sql(s"""
              |SELECT p, structField.intStructField, structField.stringStructField
              |FROM $table WHERE p = 1
            """.stripMargin),
-                  (1 to 10).map(i => Row(1, i, f"${i}_string")))
+        (1 to 10).map(i => Row(1, i, f"${i}_string"))
+      )
     }
 
     test(s"SPARK-5775 read array from $table") {

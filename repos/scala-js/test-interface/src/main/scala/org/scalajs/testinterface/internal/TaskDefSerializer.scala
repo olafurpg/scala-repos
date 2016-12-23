@@ -9,10 +9,12 @@ import sbt.testing._
 object TaskDefSerializer {
 
   def serialize(td: TaskDef): js.Dynamic = {
-    lit(fullyQualifiedName = td.fullyQualifiedName,
-        fingerprint = FingerprintSerializer.serialize(td.fingerprint),
-        explicitlySpecified = td.explicitlySpecified,
-        selectors = td.selectors.map(SelectorSerializer.serialize _).toJSArray)
+    lit(
+      fullyQualifiedName = td.fullyQualifiedName,
+      fingerprint = FingerprintSerializer.serialize(td.fingerprint),
+      explicitlySpecified = td.explicitlySpecified,
+      selectors = td.selectors.map(SelectorSerializer.serialize _).toJSArray
+    )
   }
 
   def deserialize(obj: js.Dynamic): TaskDef = {
@@ -21,9 +23,11 @@ object TaskDefSerializer {
       .map(SelectorSerializer.deserialize _)
       .toArray
 
-    new TaskDef(obj.fullyQualifiedName.asInstanceOf[String],
-                FingerprintSerializer.deserialize(obj.fingerprint),
-                obj.explicitlySpecified.asInstanceOf[Boolean],
-                selectors)
+    new TaskDef(
+      obj.fullyQualifiedName.asInstanceOf[String],
+      FingerprintSerializer.deserialize(obj.fingerprint),
+      obj.explicitlySpecified.asInstanceOf[Boolean],
+      selectors
+    )
   }
 }

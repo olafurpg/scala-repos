@@ -105,13 +105,15 @@ class RegressionStrategy(params: RegressionStrategyParams)
                          ticker: String,
                          dataView: DataView): Double = {
 
-    val vecArray = params.indicators.map {
-      case (name, indicator) => {
-        val price = dataView.priceFrame(indicator.getMinWindowSize())
-        val logPrice = price.mapValues(math.log)
-        indicator.getOne(logPrice.firstCol(ticker))
+    val vecArray = params.indicators
+      .map {
+        case (name, indicator) => {
+          val price = dataView.priceFrame(indicator.getMinWindowSize())
+          val logPrice = price.mapValues(math.log)
+          indicator.getOne(logPrice.firstCol(ticker))
+        }
       }
-    }.toArray
+      .toArray
 
     val densVecArray = vecArray ++ Array[Double](1)
     val vec = DenseVector[Double](densVecArray)

@@ -624,7 +624,8 @@ case class InconsistentDatabase(db: String,
     extends PlayException.RichDescription(
       "Database '" + db + "' is in an inconsistent state!",
       "An evolution has not been applied properly. Please check the problem and resolve it manually" +
-        (if (autocommit) " before marking it as resolved." else ".")) {
+        (if (autocommit) " before marking it as resolved." else ".")
+    ) {
 
   def subTitle =
     "We got the following error: " + error +

@@ -335,8 +335,10 @@ class EventTest extends FunSuite {
     val ref = new AtomicReference[IndexedSeq[Int]]
 
     e.dedupWith { (a, b) =>
-      a >= b
-    }.build.register(Witness(ref))
+        a >= b
+      }
+      .build
+      .register(Witness(ref))
     e.notify(0)
     e.notify(0)
     e.notify(1)

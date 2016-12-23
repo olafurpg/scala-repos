@@ -70,10 +70,12 @@ class LogisticRegressionSuite
     * so we can validate the training accuracy compared with R's glmnet package.
     */
   ignore("export test data into CSV format") {
-    binaryDataset.rdd.map {
-      case Row(label: Double, features: Vector) =>
-        label + "," + features.toArray.mkString(",")
-    }.repartition(1)
+    binaryDataset.rdd
+      .map {
+        case Row(label: Double, features: Vector) =>
+          label + "," + features.toArray.mkString(",")
+      }
+      .repartition(1)
       .saveAsTextFile("target/tmp/LogisticRegressionSuite/binaryDataset")
   }
 
@@ -191,9 +193,11 @@ class LogisticRegressionSuite
       .select("prediction", "myProbability")
       .collect()
       .map { case Row(pred: Double, prob: Vector) => pred }
-    assert(predAllZero.forall(_ === 0),
-           s"With threshold=1.0, expected predictions to be all 0, but only" +
-             s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0.")
+    assert(
+      predAllZero.forall(_ === 0),
+      s"With threshold=1.0, expected predictions to be all 0, but only" +
+        s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0."
+    )
     // Call transform with params, and check that the params worked.
     val predNotAllZero = model
       .transform(dataset,
@@ -832,9 +836,11 @@ class LogisticRegressionSuite
     val model1 = trainer1.fit(binaryDataset)
     val model2 = trainer2.fit(binaryDataset)
 
-    val histogram = binaryDataset.rdd.map {
-      case Row(label: Double, features: Vector) => label
-    }.treeAggregate(new MultiClassSummarizer)(
+    val histogram = binaryDataset.rdd
+      .map {
+        case Row(label: Double, features: Vector) => label
+      }
+      .treeAggregate(new MultiClassSummarizer)(
         seqOp = (c, v) =>
           (c, v) match {
             case (classSummarizer: MultiClassSummarizer, label: Double) =>
@@ -845,7 +851,8 @@ class LogisticRegressionSuite
             case (classSummarizer1: MultiClassSummarizer,
                   classSummarizer2: MultiClassSummarizer) =>
               classSummarizer1.merge(classSummarizer2)
-        })
+        }
+      )
       .histogram
 
     /*

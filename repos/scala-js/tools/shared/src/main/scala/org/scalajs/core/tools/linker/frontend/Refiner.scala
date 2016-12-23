@@ -92,13 +92,15 @@ final class Refiner {
       if (info.isModuleAccessed) classDef.kind
       else classDef.kind.withoutModuleAccessor
 
-    classDef.copy(kind = kind,
-                  fields = fields,
-                  staticMethods = staticMethods,
-                  memberMethods = memberMethods,
-                  abstractMethods = abstractMethods,
-                  hasInstances = info.isAnySubclassInstantiated,
-                  hasInstanceTests = info.areInstanceTestsUsed,
-                  hasRuntimeTypeInfo = info.isDataAccessed)
+    classDef.copy(
+      kind = kind,
+      fields = fields,
+      staticMethods = staticMethods,
+      memberMethods = memberMethods,
+      abstractMethods = abstractMethods,
+      hasInstances = info.isAnySubclassInstantiated,
+      hasInstanceTests = info.areInstanceTestsUsed,
+      hasRuntimeTypeInfo = info.isDataAccessed
+    )
   }
 }

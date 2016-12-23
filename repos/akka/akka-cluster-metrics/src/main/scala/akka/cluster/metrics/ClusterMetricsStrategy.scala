@@ -12,12 +12,11 @@ import akka.util.Helpers.ConfigOps
   * A configurable [[akka.actor.OneForOneStrategy]] with restart-on-throwable decider.
   */
 class ClusterMetricsStrategy(config: Config)
-    extends OneForOneStrategy(maxNrOfRetries = config.getInt("maxNrOfRetries"),
-                              withinTimeRange =
-                                config.getMillisDuration("withinTimeRange"),
-                              loggingEnabled =
-                                config.getBoolean("loggingEnabled"))(
-      ClusterMetricsStrategy.metricsDecider)
+    extends OneForOneStrategy(
+      maxNrOfRetries = config.getInt("maxNrOfRetries"),
+      withinTimeRange = config.getMillisDuration("withinTimeRange"),
+      loggingEnabled = config.getBoolean("loggingEnabled")
+    )(ClusterMetricsStrategy.metricsDecider)
 
 /**
   * Provide custom metrics strategy resources.

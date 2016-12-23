@@ -130,8 +130,8 @@ private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, ?]] {
       ob map (f(a, _)) orElse some(z(a))) map (f(fa.head, _)) getOrElse z(
       fa.head))
 
-  override def foldMapLeft1[A, B](fa: OneAnd[F, A])(z: A => B)(f: (B,
-                                                                   A) => B) =
+  override def foldMapLeft1[A, B](fa: OneAnd[F, A])(z: A => B)(
+      f: (B, A) => B) =
     F.foldLeft(fa.tail, z(fa.head))(f)
 
   override def foldMap[A, B](fa: OneAnd[F, A])(f: A => B)(

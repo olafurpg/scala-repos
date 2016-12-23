@@ -302,9 +302,11 @@ object SqlToSlick extends App {
           """.as[(String, String)]
         //#sqlQueryExplicitJoin
         val slick = //#slickQueryExplicitJoin
-        (people join addresses on (_.addressId === _.id)).map {
-          case (p, a) => (p.name, a.city)
-        }.result
+        (people join addresses on (_.addressId === _.id))
+          .map {
+            case (p, a) => (p.name, a.city)
+          }
+          .result
         //#slickQueryExplicitJoin
         val (sqlRes, slickRes) =
           Await.result(db.run(sql zip slick), Duration.Inf)
@@ -320,9 +322,11 @@ object SqlToSlick extends App {
           """.as[(Option[String], String)]
         //#sqlQueryLeftJoin
         val slick = //#slickQueryLeftJoin
-        (addresses joinLeft people on (_.id === _.addressId)).map {
-          case (a, p) => (p.map(_.name), a.city)
-        }.result
+        (addresses joinLeft people on (_.id === _.addressId))
+          .map {
+            case (a, p) => (p.map(_.name), a.city)
+          }
+          .result
         //#slickQueryLeftJoin
         val (sqlRes, slickRes) =
           Await.result(db.run(sql zip slick), Duration.Inf)

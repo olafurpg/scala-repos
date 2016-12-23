@@ -126,7 +126,8 @@ private[akka] class ClusterShardingMessageSerializer(
       },
       ShardStatsManifest -> { bytes ⇒
         shardStatsFromBinary(bytes)
-      })
+      }
+    )
 
   override def manifest(obj: AnyRef): String = obj match {
     case _: EntityState ⇒ EntityStateManifest
@@ -208,9 +209,12 @@ private[akka] class ClusterShardingMessageSerializer(
     }
 
   private def coordinatorStateToProto(state: State): sm.CoordinatorState = {
-    val regions = state.regions.map {
-      case (regionRef, _) ⇒ Serialization.serializedActorPath(regionRef)
-    }.toVector.asJava
+    val regions = state.regions
+      .map {
+        case (regionRef, _) ⇒ Serialization.serializedActorPath(regionRef)
+      }
+      .toVector
+      .asJava
 
     val builder = sm.CoordinatorState.newBuilder()
 

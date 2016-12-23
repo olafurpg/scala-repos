@@ -385,7 +385,8 @@ abstract class MessageDispatcherConfigurator(
                             config.getString("id"),
                             classOf[Config],
                             classOf[DispatcherPrerequisites]),
-                  exception)
+                  exception
+                )
             })
             .get
       }
@@ -556,7 +557,8 @@ class ForkJoinExecutorConfigurator(config: Config,
       ThreadPoolConfig.scaledPoolSize(config.getInt("parallelism-min"),
                                       config.getDouble("parallelism-factor"),
                                       config.getInt("parallelism-max")),
-      asyncMode)
+      asyncMode
+    )
   }
 }
 
@@ -572,7 +574,8 @@ class DefaultExecutorServiceConfigurator(
           Debug(
             "DefaultExecutorServiceConfigurator",
             this.getClass,
-            s"Using passed in ExecutionContext as default executor for this ActorSystem. If you want to use a different executor, please specify one in akka.actor.default-dispatcher.default-executor."))
+            s"Using passed in ExecutionContext as default executor for this ActorSystem. If you want to use a different executor, please specify one in akka.actor.default-dispatcher.default-executor."
+          ))
 
         new AbstractExecutorService with ExecutorServiceFactory
         with ExecutorServiceFactoryProvider {

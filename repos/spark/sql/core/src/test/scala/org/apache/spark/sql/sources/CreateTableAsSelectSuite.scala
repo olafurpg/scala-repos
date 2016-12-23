@@ -117,7 +117,8 @@ class CreateTableAsSelectSuite
     assert(
       message.contains(
         s"a CREATE TEMPORARY TABLE statement does not allow IF NOT EXISTS clause."),
-      "CREATE TEMPORARY TABLE IF NOT EXISTS should not be allowed.")
+      "CREATE TEMPORARY TABLE IF NOT EXISTS should not be allowed."
+    )
 
     // Overwrite the temporary table.
     sql(s"""
@@ -164,7 +165,8 @@ class CreateTableAsSelectSuite
     assert(
       message.contains(
         "a CREATE TEMPORARY TABLE statement does not allow IF NOT EXISTS clause."),
-      "CREATE TEMPORARY TABLE IF NOT EXISTS should not be allowed.")
+      "CREATE TEMPORARY TABLE IF NOT EXISTS should not be allowed."
+    )
   }
 
   test("a CTAS statement with column definitions is not allowed") {

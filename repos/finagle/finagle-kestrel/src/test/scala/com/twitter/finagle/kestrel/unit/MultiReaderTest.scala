@@ -96,14 +96,16 @@ class MultiReaderTest
       }
     }
 
-    val hostQueuesMap = hosts.map { host =>
-      val queues = CacheBuilder
-        .newBuilder()
-        .build(new CacheLoader[Buf, BlockingDeque[Buf]] {
-          def load(k: Buf) = new LinkedBlockingDeque[Buf]
-        })
-      (host, queues)
-    }.toMap
+    val hostQueuesMap = hosts
+      .map { host =>
+        val queues = CacheBuilder
+          .newBuilder()
+          .build(new CacheLoader[Buf, BlockingDeque[Buf]] {
+            def load(k: Buf) = new LinkedBlockingDeque[Buf]
+          })
+        (host, queues)
+      }
+      .toMap
 
     lazy val mockClientBuilder = {
       val result = mock[
@@ -210,14 +212,16 @@ class MultiReaderTest
       }
     }
 
-    val hostQueuesMap = hosts.map { host =>
-      val queues = CacheBuilder
-        .newBuilder()
-        .build(new CacheLoader[Buf, BlockingDeque[Buf]] {
-          def load(k: Buf) = new LinkedBlockingDeque[Buf]
-        })
-      (host, queues)
-    }.toMap
+    val hostQueuesMap = hosts
+      .map { host =>
+        val queues = CacheBuilder
+          .newBuilder()
+          .build(new CacheLoader[Buf, BlockingDeque[Buf]] {
+            def load(k: Buf) = new LinkedBlockingDeque[Buf]
+          })
+        (host, queues)
+      }
+      .toMap
 
     lazy val mockClientBuilder = {
       val result = mock[

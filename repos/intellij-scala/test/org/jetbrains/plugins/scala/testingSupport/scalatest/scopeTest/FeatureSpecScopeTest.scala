@@ -37,6 +37,7 @@ trait FeatureSpecScopeTest extends FeatureSpecGenerator {
       root =>
         checkResultTreeHasExactNamedPath(root, aPath: _*) &&
           checkResultTreeHasExactNamedPath(root, bPath: _*) &&
-          checkResultTreeDoesNotHaveNodes(root, "Feature: Feature 2"))
+          checkResultTreeDoesNotHaveNodes(root, "Feature: Feature 2")
+    )
   }
 }

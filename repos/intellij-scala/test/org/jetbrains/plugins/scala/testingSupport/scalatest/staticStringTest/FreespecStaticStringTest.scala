@@ -11,8 +11,9 @@ trait FreeSpecStaticStringTest extends ScalaTestTestCase {
   val freeSpecFileName = freeSpecClassName + ".scala"
 
   def addFreeSpec() {
-    addFileToProject(freeSpecFileName,
-                     """
+    addFileToProject(
+      freeSpecFileName,
+      """
         |import org.scalatest._
         |
         |class FreeSpecStringTest extends FreeSpec {
@@ -41,7 +42,8 @@ trait FreeSpecStaticStringTest extends ScalaTestTestCase {
         |    }
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   def testFreeSpecSum() = {

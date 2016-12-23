@@ -27,7 +27,8 @@ private[qa] final class Notifier(sender: String,
         message =
           s"""Your question "${q.title}" got a new answer from ${u.username}!
 
-Check it out on ${questionUrl(q)}#answer-${a.id}""")
+Check it out on ${questionUrl(q)}#answer-${a.id}"""
+      )
   }
 
   private[qa] def createQuestionComment(q: Question, c: Comment, u: User) {

@@ -922,7 +922,8 @@ private[finagle] class KetamaFailureAccrualFactory[Req, Rep](
       healthBroker,
       ejectFailedHost,
       label,
-      ClientStatsReceiver.scope("memcached_client"))
+      ClientStatsReceiver.scope("memcached_client")
+    )
 
   private[this] val failureAccrualEx = Future.exception(
     new FailureAccrualException("Endpoint is marked dead by failureAccrual") {
@@ -1358,10 +1359,12 @@ case class RubyMemCacheClientBuilder(
     copy(_nodes = nodes)
 
   def nodes(hostPortWeights: String): RubyMemCacheClientBuilder =
-    copy(_nodes = CacheNodeGroup(hostPortWeights).members.map {
-      node: CacheNode =>
-        (node.host, node.port, node.weight)
-    }.toSeq)
+    copy(
+      _nodes = CacheNodeGroup(hostPortWeights).members
+        .map { node: CacheNode =>
+          (node.host, node.port, node.weight)
+        }
+        .toSeq)
 
   def clientBuilder(clientBuilder: ClientBuilder[_, _, _, _, ClientConfig.Yes])
     : RubyMemCacheClientBuilder =
@@ -1411,10 +1414,12 @@ case class PHPMemCacheClientBuilder(
     copy(_nodes = nodes)
 
   def nodes(hostPortWeights: String): PHPMemCacheClientBuilder =
-    copy(_nodes = CacheNodeGroup(hostPortWeights).members.map {
-      node: CacheNode =>
-        (node.host, node.port, node.weight)
-    }.toSeq)
+    copy(
+      _nodes = CacheNodeGroup(hostPortWeights).members
+        .map { node: CacheNode =>
+          (node.host, node.port, node.weight)
+        }
+        .toSeq)
 
   def hashName(hashName: String): PHPMemCacheClientBuilder =
     copy(_hashName = Some(hashName))

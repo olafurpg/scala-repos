@@ -780,12 +780,14 @@ trait Slice { source =>
           findStraddlingDistinct0(prevRow, curRow)
         }
 
-        val lastDefined = prevFilter.flatMap { slice =>
-          (slice.size - 1 to 0 by -1).find(row =>
-            slice.columns.values.exists(_.isDefinedAt(row)))
-        }.map {
-          (prevFilter.get, _)
-        }
+        val lastDefined = prevFilter
+          .flatMap { slice =>
+            (slice.size - 1 to 0 by -1).find(row =>
+              slice.columns.values.exists(_.isDefinedAt(row)))
+          }
+          .map {
+            (prevFilter.get, _)
+          }
 
         val firstDefined = (0 until filter.size).find(i =>
           filter.columns.values.exists(_.isDefinedAt(i)))

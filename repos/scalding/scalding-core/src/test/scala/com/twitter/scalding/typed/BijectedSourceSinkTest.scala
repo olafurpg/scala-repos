@@ -35,9 +35,11 @@ class MutatedSourceJob(args: Args) extends Job(args) {
   val in0: TypedPipe[(Int, Int)] =
     TypedPipe.from(BijectedSourceSink(TypedTsv[Long]("input0")))
 
-  in0.map { tup: (Int, Int) =>
-    (tup._1 * 2, tup._2 * 2)
-  }.write(BijectedSourceSink(TypedTsv[Long]("output")))
+  in0
+    .map { tup: (Int, Int) =>
+      (tup._1 * 2, tup._2 * 2)
+    }
+    .write(BijectedSourceSink(TypedTsv[Long]("output")))
 }
 
 class MutatedSourceTest extends WordSpec with Matchers {

@@ -76,30 +76,32 @@ class ScalaClassNameCompletionContributor extends ScalaCompletionContributor {
         }
         result.stopHere()
       }
-    })
+    }
+  )
 
-  extend(CompletionType.BASIC,
-         PlatformPatterns.psiElement(),
-         new CompletionProvider[CompletionParameters] {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             parameters.getPosition.getNode.getElementType match {
-               case ScalaTokenTypes.tSTRING |
-                   ScalaTokenTypes.tMULTILINE_STRING =>
-                 if (shouldRunClassNameCompletion(
-                       positionFromParameters(parameters),
-                       parameters,
-                       result.getPrefixMatcher)) {
-                   completeClassName(positionFromParameters(parameters),
-                                     parameters,
-                                     context,
-                                     result)
-                 }
-               case _ =>
-             }
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    PlatformPatterns.psiElement(),
+    new CompletionProvider[CompletionParameters] {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        parameters.getPosition.getNode.getElementType match {
+          case ScalaTokenTypes.tSTRING | ScalaTokenTypes.tMULTILINE_STRING =>
+            if (shouldRunClassNameCompletion(
+                  positionFromParameters(parameters),
+                  parameters,
+                  result.getPrefixMatcher)) {
+              completeClassName(positionFromParameters(parameters),
+                                parameters,
+                                context,
+                                result)
+            }
+          case _ =>
+        }
+      }
+    }
+  )
 }
 
 object ScalaClassNameCompletionContributor {
@@ -215,7 +217,8 @@ object ScalaClassNameCompletionContributor {
           isClassName = true,
           isInImport = isInImport,
           isInStableCodeReference = stableRefElement != null,
-          isInSimpleString = inString)
+          isInSimpleString = inString
+        )
       } {
         if (!afterNewPattern.accepts(dummyPosition, context))
           result.addElement(el)
@@ -259,7 +262,8 @@ object ScalaClassNameCompletionContributor {
             .foreach(clazz => addTypeForCompletion(ClassTypeToImport(clazz)))
           addTypeForCompletion(ClassTypeToImport(psiClass))
         }
-      })
+      }
+    )
 
     for {
       name <- ScalaPsiManager.instance(project).getStableTypeAliasesNames

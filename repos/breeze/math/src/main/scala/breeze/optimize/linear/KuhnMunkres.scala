@@ -40,9 +40,12 @@ object KuhnMunkres extends BipartiteMatching {
              j <- 0 until costs(0).length) {
           newCosts(j)(i) = costs(i)(j)
         }
-        (newCosts.map { row =>
-          row.toSeq
-        }.toSeq, true)
+        (newCosts
+           .map { row =>
+             row.toSeq
+           }
+           .toSeq,
+         true)
       } else {
         (costs, false)
       }

@@ -514,24 +514,27 @@ object Execution {
       extends Execution[T] {
     def runStats(conf: Config, mode: Mode, cache: EvalCache)(
         implicit cec: ConcurrentExecutionContext) =
-      cache.getOrElseInsert(conf, this, {
-        val res = prev.runStats(conf, mode, cache)
+      cache.getOrElseInsert(
+        conf,
+        this, {
+          val res = prev.runStats(conf, mode, cache)
 
-        /**
-          * The result we give is only completed AFTER fn is run
-          * so callers can wait on the result of this OnComplete
-          */
-        val finished = Promise[(T, ExecutionCounters)]()
-        res.onComplete { tryT =>
-          try {
-            fn(tryT.map(_._1))
-          } finally {
-            // Do our best to signal when we are done
-            finished.complete(tryT)
+          /**
+            * The result we give is only completed AFTER fn is run
+            * so callers can wait on the result of this OnComplete
+            */
+          val finished = Promise[(T, ExecutionCounters)]()
+          res.onComplete { tryT =>
+            try {
+              fn(tryT.map(_._1))
+            } finally {
+              // Do our best to signal when we are done
+              finished.complete(tryT)
+            }
           }
+          finished.future
         }
-        finished.future
-      })
+      )
   }
   private case class RecoverWith[T](
       prev: Execution[T],
@@ -625,13 +628,16 @@ object Execution {
       extends Execution[(S, T)] {
     def runStats(conf: Config, mode: Mode, cache: EvalCache)(
         implicit cec: ConcurrentExecutionContext) =
-      cache.getOrElseInsert(conf, this, {
-        val f1 = one.runStats(conf, mode, cache)
-        val f2 = two.runStats(conf, mode, cache)
-        failFastZip(f1, f2).map {
-          case ((s, ss), (t, st)) => ((s, t), Monoid.plus(ss, st))
+      cache.getOrElseInsert(
+        conf,
+        this, {
+          val f1 = one.runStats(conf, mode, cache)
+          val f2 = two.runStats(conf, mode, cache)
+          failFastZip(f1, f2).map {
+            case ((s, ss), (t, st)) => ((s, t), Monoid.plus(ss, st))
+          }
         }
-      })
+      )
   }
   private case class UniqueIdExecution[T](fn: UniqueID => Execution[T])
       extends Execution[T] {
@@ -649,12 +655,16 @@ object Execution {
       extends Execution[Unit] {
     def runStats(conf: Config, mode: Mode, cache: EvalCache)(
         implicit cec: ConcurrentExecutionContext) =
-      cache.getOrElseInsert(conf, this, for {
-        flowDef <- toFuture(Try(result(conf, mode)))
-        _ = FlowStateMap.validateSources(flowDef, mode)
-        jobStats <- cache.runFlowDef(conf, mode, flowDef)
-        _ = FlowStateMap.clear(flowDef)
-      } yield ((), ExecutionCounters.fromJobStats(jobStats)))
+      cache.getOrElseInsert(
+        conf,
+        this,
+        for {
+          flowDef <- toFuture(Try(result(conf, mode)))
+          _ = FlowStateMap.validateSources(flowDef, mode)
+          jobStats <- cache.runFlowDef(conf, mode, flowDef)
+          _ = FlowStateMap.clear(flowDef)
+        } yield ((), ExecutionCounters.fromJobStats(jobStats))
+      )
   }
 
   /*
@@ -738,45 +748,49 @@ object Execution {
     // Anything not already ran we run as part of a single flow def, using their combined counters for the others
     def runStats(conf: Config, mode: Mode, cache: EvalCache)(
         implicit cec: ConcurrentExecutionContext) =
-      cache.getOrElseInsert(conf, this, {
-        val cacheLookup: List[
-          (ToWrite,
-           Either[Promise[ExecutionCounters], Future[ExecutionCounters]])] =
-          (head :: tail).map { tw =>
-            (tw, cache.getOrLock(conf, tw))
-          }
-        val (weDoOperation, someoneElseDoesOperation) =
-          unwrapListEither(cacheLookup)
-
-        val otherResult = failFastSequence(someoneElseDoesOperation.map(_._2))
-        otherResult.value match {
-          case Some(Failure(e)) => Future.failed(e)
-          case _ => // Either successful or not completed yet
-            val localFlowDefCountersFuture: Future[ExecutionCounters] =
-              weDoOperation match {
-                case all @ (h :: tail) =>
-                  val futCounters: Future[ExecutionCounters] =
-                    scheduleToWrites(conf, mode, cache, h._1, tail.map(_._1))
-                  // Complete all of the promises we put into the cache
-                  // with this future counters set
-                  weDoOperation.foreach {
-                    case (toWrite, promise) =>
-                      promise.completeWith(futCounters)
-                  }
-                  futCounters
-                case Nil =>
-                  Future
-                    .successful(ExecutionCounters.empty) // No work to do, provide a fulled set of 0 counters to operate on
-              }
-
-            failFastZip(otherResult, localFlowDefCountersFuture).map {
-              case (lCounters, fdCounters) =>
-                val summedCounters: ExecutionCounters =
-                  Monoid.sum(fdCounters :: lCounters)
-                (fn(conf, mode), summedCounters)
+      cache.getOrElseInsert(
+        conf,
+        this, {
+          val cacheLookup: List[
+            (ToWrite,
+             Either[Promise[ExecutionCounters], Future[ExecutionCounters]])] =
+            (head :: tail).map { tw =>
+              (tw, cache.getOrLock(conf, tw))
             }
+          val (weDoOperation, someoneElseDoesOperation) =
+            unwrapListEither(cacheLookup)
+
+          val otherResult =
+            failFastSequence(someoneElseDoesOperation.map(_._2))
+          otherResult.value match {
+            case Some(Failure(e)) => Future.failed(e)
+            case _ => // Either successful or not completed yet
+              val localFlowDefCountersFuture: Future[ExecutionCounters] =
+                weDoOperation match {
+                  case all @ (h :: tail) =>
+                    val futCounters: Future[ExecutionCounters] =
+                      scheduleToWrites(conf, mode, cache, h._1, tail.map(_._1))
+                    // Complete all of the promises we put into the cache
+                    // with this future counters set
+                    weDoOperation.foreach {
+                      case (toWrite, promise) =>
+                        promise.completeWith(futCounters)
+                    }
+                    futCounters
+                  case Nil =>
+                    Future
+                      .successful(ExecutionCounters.empty) // No work to do, provide a fulled set of 0 counters to operate on
+                }
+
+              failFastZip(otherResult, localFlowDefCountersFuture).map {
+                case (lCounters, fdCounters) =>
+                  val summedCounters: ExecutionCounters =
+                    Monoid.sum(fdCounters :: lCounters)
+                  (fn(conf, mode), summedCounters)
+              }
+          }
         }
-      })
+      )
 
     /*
      * run this and that in parallel, without any dependency. This will
@@ -852,10 +866,10 @@ object Execution {
     * This variant allows the user to supply a method using the config and mode to build a new
     * type U for the resultant execution.
     */
-  private[scalding] def write[T, U](pipe: TypedPipe[T],
-                                    sink: TypedSink[T],
-                                    generatorFn: (Config,
-                                                  Mode) => U): Execution[U] =
+  private[scalding] def write[T, U](
+      pipe: TypedPipe[T],
+      sink: TypedSink[T],
+      generatorFn: (Config, Mode) => U): Execution[U] =
     WriteExecution(SimpleWrite(pipe, sink), Nil, generatorFn)
 
   /**
@@ -1054,9 +1068,11 @@ trait ExecutionCounters {
     */
   def get(key: StatKey): Option[Long]
   def toMap: Map[StatKey, Long] =
-    keys.map { k =>
-      (k, get(k).getOrElse(0L))
-    }.toMap
+    keys
+      .map { k =>
+        (k, get(k).getOrElse(0L))
+      }
+      .toMap
 }
 
 /**
@@ -1129,9 +1145,12 @@ object ExecutionCounters {
       override def isNonZero(that: ExecutionCounters) = that.keys.nonEmpty
       def zero = ExecutionCounters.empty
       def plus(left: ExecutionCounters, right: ExecutionCounters) = {
-        fromMap((left.keys ++ right.keys).map { k =>
-          (k, left(k) + right(k))
-        }.toMap)
+        fromMap(
+          (left.keys ++ right.keys)
+            .map { k =>
+              (k, left(k) + right(k))
+            }
+            .toMap)
       }
     }
 }

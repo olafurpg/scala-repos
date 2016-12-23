@@ -159,12 +159,14 @@ object Menu extends DispatchSnippet {
                   TopScope,
                   true,
                   // Is a placeholder useful if we don't display the kids? I say no (DCB, 20101108)
-                  <xml:group> <span>{text}</span>{buildUlLine(kids)}</xml:group>) %
+                  <xml:group> <span>{text}</span>{buildUlLine(kids)}</xml:group>
+                ) %
                   (if (m.path)
                      S.prefixedAttrsToMetaData("li_path", liMap)
                    else Null) %
                   (if (m.current) S.prefixedAttrsToMetaData("li_item", liMap)
-                   else Null))
+                   else Null)
+              )
 
             case MenuItem(text, uri, kids, true, _, _) if linkToSelf =>
               Helpers.addCssClass(
@@ -176,7 +178,8 @@ object Menu extends DispatchSnippet {
                   TopScope,
                   true,
                   <xml:group> <a href={uri}>{text}</a>{ifExpandCurrent(buildUlLine(kids))}</xml:group>) % S
-                  .prefixedAttrsToMetaData("li_item", liMap))
+                  .prefixedAttrsToMetaData("li_item", liMap)
+              )
 
             case MenuItem(text, uri, kids, true, _, _) =>
               Helpers.addCssClass(
@@ -188,7 +191,8 @@ object Menu extends DispatchSnippet {
                   TopScope,
                   true,
                   <xml:group> <span>{text}</span>{ifExpandCurrent(buildUlLine(kids))}</xml:group>) % S
-                  .prefixedAttrsToMetaData("li_item", liMap))
+                  .prefixedAttrsToMetaData("li_item", liMap)
+              )
 
             // Not current, but on the path, so we need to expand children to show the current one
             case MenuItem(text, uri, kids, _, true, _) =>
@@ -201,7 +205,8 @@ object Menu extends DispatchSnippet {
                   TopScope,
                   true,
                   <xml:group> <a href={uri}>{text}</a>{buildUlLine(kids)}</xml:group>) % S
-                  .prefixedAttrsToMetaData("li_path", liMap))
+                  .prefixedAttrsToMetaData("li_path", liMap)
+              )
 
             case MenuItem(text, uri, kids, _, _, _) =>
               Helpers.addCssClass(
@@ -272,13 +277,15 @@ object Menu extends DispatchSnippet {
 
     def buildItem(in: MenuItem): JsExp = in match {
       case MenuItem(text, uri, kids, current, path, _) =>
-        JsObj("text" -> text.toString,
-              "uri" -> uri.toString,
-              "children" -> buildItems(kids),
-              "current" -> current,
-              "cssClass" -> Str(in.cssClass openOr ""),
-              "placeholder" -> in.placeholder_?,
-              "path" -> path)
+        JsObj(
+          "text" -> text.toString,
+          "uri" -> uri.toString,
+          "children" -> buildItems(kids),
+          "current" -> current,
+          "cssClass" -> Str(in.cssClass openOr ""),
+          "placeholder" -> in.placeholder_?,
+          "path" -> path
+        )
     }
 
     def buildItems(in: Seq[MenuItem]): JsExp =

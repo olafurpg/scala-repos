@@ -36,7 +36,8 @@ trait IgnoredSpecTest extends ScalaTestTestCase {
         |   print(">>TEST: FAILED<<")
         | }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
 
     runTestByLocation(
       2,
@@ -45,6 +46,7 @@ trait IgnoredSpecTest extends ScalaTestTestCase {
       checkConfigAndSettings(_, "IgnoredTestSpec"),
       root =>
         checkResultTreeHasExactNamedPath(root, succeededTestPath: _*) &&
-          checkResultTreeHasExactNamedPath(root, ignoredTestPath: _*))
+          checkResultTreeHasExactNamedPath(root, ignoredTestPath: _*)
+    )
   }
 }

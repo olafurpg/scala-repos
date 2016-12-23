@@ -82,8 +82,9 @@ private[spark] object StratifiedSamplingUtils extends Logging {
                      fractions: Map[K, Double],
                      rng: RandomDataGenerator,
                      counts: Option[Map[K, Long]])
-    : (mutable.Map[K, AcceptanceResult],
-       (K, V)) => mutable.Map[K, AcceptanceResult] = {
+    : (mutable.Map[K, AcceptanceResult], (K, V)) => mutable.Map[
+      K,
+      AcceptanceResult] = {
     val delta = 5e-5
     (result: mutable.Map[K, AcceptanceResult], item: (K, V)) =>
       {

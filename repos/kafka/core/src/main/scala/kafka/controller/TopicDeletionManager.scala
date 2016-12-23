@@ -428,7 +428,8 @@ class TopicDeletionManager(controller: KafkaController,
     val partitionsInError =
       if (stopReplicaResponse.errorCode != Errors.NONE.code) responseMap.keySet
       else
-        responseMap.filter { case (_, error) => error != Errors.NONE.code }
+        responseMap
+          .filter { case (_, error) => error != Errors.NONE.code }
           .map(_._1)
           .toSet
     val replicasInError = partitionsInError.map(p =>

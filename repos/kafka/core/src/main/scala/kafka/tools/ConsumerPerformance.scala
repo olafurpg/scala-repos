@@ -117,7 +117,8 @@ object ConsumerPerformance {
           totalMBRead,
           totalMBRead / elapsedSecs,
           totalMessagesRead.get,
-          totalMessagesRead.get / elapsedSecs))
+          totalMessagesRead.get / elapsedSecs
+        ))
     }
   }
 
@@ -136,14 +137,17 @@ object ConsumerPerformance {
     // Wait for group join, metadata fetch, etc
     val joinTimeout = 10000
     val isAssigned = new AtomicBoolean(false)
-    consumer.subscribe(topics, new ConsumerRebalanceListener {
-      def onPartitionsAssigned(partitions: util.Collection[TopicPartition]) {
-        isAssigned.set(true)
+    consumer.subscribe(
+      topics,
+      new ConsumerRebalanceListener {
+        def onPartitionsAssigned(partitions: util.Collection[TopicPartition]) {
+          isAssigned.set(true)
+        }
+        def onPartitionsRevoked(partitions: util.Collection[TopicPartition]) {
+          isAssigned.set(false)
+        }
       }
-      def onPartitionsRevoked(partitions: util.Collection[TopicPartition]) {
-        isAssigned.set(false)
-      }
-    })
+    )
     val joinStart = System.currentTimeMillis()
     while (!isAssigned.get()) {
       if (System.currentTimeMillis() - joinStart >= joinTimeout) {
@@ -214,7 +218,8 @@ object ConsumerPerformance {
       .accepts(
         "zookeeper",
         "The connection string for the zookeeper connection in the form host:port. " +
-          "Multiple URLS can be given to allow fail-over. This option is only used with the old consumer.")
+          "Multiple URLS can be given to allow fail-over. This option is only used with the old consumer."
+      )
       .withRequiredArg
       .describedAs("urls")
       .ofType(classOf[String])
@@ -246,7 +251,8 @@ object ConsumerPerformance {
     val resetBeginningOffsetOpt = parser.accepts(
       "from-latest",
       "If the consumer does not already have an established " +
-        "offset to consume from, start with the latest message present in the log rather than the earliest message.")
+        "offset to consume from, start with the latest message present in the log rather than the earliest message."
+    )
     val socketBufferSizeOpt = parser
       .accepts("socket-buffer-size", "The size of the tcp RECV size.")
       .withRequiredArg

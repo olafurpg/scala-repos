@@ -134,11 +134,13 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
       result
     }
 
-    val (lastReturn, lastExprType) = elements.reverse.collectFirst {
-      case expr: ScExpression =>
-        (checkLastReturn(expr),
-         Some(expr.getType(TypingContext.empty).getOrAny))
-    }.getOrElse((false, None))
+    val (lastReturn, lastExprType) = elements.reverse
+      .collectFirst {
+        case expr: ScExpression =>
+          (checkLastReturn(expr),
+           Some(expr.getType(TypingContext.empty).getOrAny))
+      }
+      .getOrElse((false, None))
 
     val hasReturn: Option[ScType] = returnType
     val stopAtScope: PsiElement = findScopeBound(elements).getOrElse(file)
@@ -177,7 +179,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
         },
         "Choose level for Extract Method",
         getTextForElement,
-        (e: PsiElement) => e.getParent)
+        (e: PsiElement) => e.getParent
+      )
     } else if (siblings.length == 1) {
       invokeDialog(project,
                    editor,
@@ -343,7 +346,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           hasReturn,
           lastReturn,
           lastExprType,
-          innerClassSettings)
+          innerClassSettings
+        )
       }
     val duplicates = DuplicatesUtil.findDuplicates(settings)
     performRefactoring(settings, editor)

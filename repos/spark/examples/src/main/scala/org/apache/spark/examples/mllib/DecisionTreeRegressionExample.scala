@@ -56,9 +56,11 @@ object DecisionTreeRegressionExample {
       val prediction = model.predict(point.features)
       (point.label, prediction)
     }
-    val testMSE = labelsAndPredictions.map {
-      case (v, p) => math.pow(v - p, 2)
-    }.mean()
+    val testMSE = labelsAndPredictions
+      .map {
+        case (v, p) => math.pow(v - p, 2)
+      }
+      .mean()
     println("Test Mean Squared Error = " + testMSE)
     println("Learned regression tree model:\n" + model.toDebugString)
 

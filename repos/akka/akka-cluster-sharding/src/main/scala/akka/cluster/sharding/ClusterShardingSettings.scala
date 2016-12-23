@@ -50,7 +50,8 @@ object ClusterShardingSettings {
         waitingForStateTimeout =
           config.getDuration("waiting-for-state-timeout", MILLISECONDS).millis,
         updatingStateTimeout =
-          config.getDuration("updating-state-timeout", MILLISECONDS).millis)
+          config.getDuration("updating-state-timeout", MILLISECONDS).millis
+      )
 
     val coordinatorSingletonSettings = ClusterSingletonManagerSettings(
       config.getConfig("coordinator-singleton"))
@@ -62,7 +63,8 @@ object ClusterShardingSettings {
       snapshotPluginId = config.getString("snapshot-plugin-id"),
       stateStoreMode = config.getString("state-store-mode"),
       tuningParameters,
-      coordinatorSingletonSettings)
+      coordinatorSingletonSettings
+    )
   }
 
   /**

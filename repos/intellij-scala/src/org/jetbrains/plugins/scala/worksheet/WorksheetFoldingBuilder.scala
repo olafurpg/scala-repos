@@ -68,7 +68,8 @@ class WorksheetFoldingBuilder extends FoldingBuilder {
               .getStartOffset + length),
           null,
           Collections.emptySet[AnyRef],
-          true))
+          true
+        ))
     }
 
     for (child <- node.getChildren(null)) {

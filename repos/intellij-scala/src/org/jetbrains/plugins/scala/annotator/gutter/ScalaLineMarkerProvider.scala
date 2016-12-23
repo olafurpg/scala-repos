@@ -76,7 +76,8 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
       NullableFunction.NULL
         .asInstanceOf[com.intellij.util.Function[PsiElement, String]],
       null,
-      GutterIconRenderer.Alignment.RIGHT)
+      GutterIconRenderer.Alignment.RIGHT
+    )
   }
 
   def addSeparatorInfo(info: LineMarkerInfo[_ <: PsiElement]) = {
@@ -199,7 +200,8 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
                 (e: PsiElement) =>
                   "Method '%s' is recursive".format(e.getText),
                 null,
-                GutterIconRenderer.Alignment.LEFT)
+                GutterIconRenderer.Alignment.LEFT
+              )
             case RecursionType.TailRecursion =>
               return new LineMarkerInfo[PsiElement](
                 method.nameId,
@@ -209,7 +211,8 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
                 (e: PsiElement) =>
                   "Method '%s' is tail recursive".format(e.getText),
                 null,
-                GutterIconRenderer.Alignment.LEFT)
+                GutterIconRenderer.Alignment.LEFT
+              )
             case RecursionType.NoRecursion => // no markers
           }
         case _ =>

@@ -250,9 +250,11 @@ object arityize {
 
   private def extractOrder(c: Context): Int = {
     import c.mirror.universe._
-    val order = c.macroApplication.collect {
-      case Literal(x) if x.value.isInstanceOf[Int] => x.value.toString.toInt
-    }.head
+    val order = c.macroApplication
+      .collect {
+        case Literal(x) if x.value.isInstanceOf[Int] => x.value.toString.toInt
+      }
+      .head
     order
   }
 }

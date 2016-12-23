@@ -154,5 +154,6 @@ class ScalaCaseClassParametersNameContributer
 
       case class ParameterWithPosition(parameter: Option[ScParameter],
                                        position: Int)
-    })
+    }
+  )
 }

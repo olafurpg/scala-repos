@@ -264,64 +264,61 @@ object WebSocketClient {
         message
       }
 
-      messagesToFrames via captureClientClose via Flow.fromGraph(
-        GraphDSL
-          .create[FlowShape[WebSocketFrame, WebSocketFrame]]() {
-            implicit b =>
-              import GraphDSL.Implicits._
+      messagesToFrames via captureClientClose via Flow.fromGraph(GraphDSL
+        .create[FlowShape[WebSocketFrame, WebSocketFrame]]() { implicit b =>
+          import GraphDSL.Implicits._
 
-              val broadcast = b.add(Broadcast[WebSocketFrame](2))
-              val merge = b.add(Merge[WebSocketFrame](2, eagerComplete = true))
+          val broadcast = b.add(Broadcast[WebSocketFrame](2))
+          val merge = b.add(Merge[WebSocketFrame](2, eagerComplete = true))
 
-              val handleServerClose = Flow[WebSocketFrame].filter { frame =>
-                if (frame.isInstanceOf[CloseWebSocketFrame] &&
-                    !clientInitiatedClose.get()) {
-                  serverInitiatedClose.set(true)
-                  true
-                } else {
-                  // If we're going to drop it, we need to release it first
-                  ReferenceCountUtil.release(frame)
-                  false
+          val handleServerClose = Flow[WebSocketFrame].filter { frame =>
+            if (frame.isInstanceOf[CloseWebSocketFrame] &&
+                !clientInitiatedClose.get()) {
+              serverInitiatedClose.set(true)
+              true
+            } else {
+              // If we're going to drop it, we need to release it first
+              ReferenceCountUtil.release(frame)
+              false
+            }
+          }
+
+          val handleConnectionTerminated =
+            Flow[WebSocketFrame].transform(() =>
+              new PushStage[WebSocketFrame, WebSocketFrame] {
+                def onPush(elem: WebSocketFrame,
+                           ctx: Context[WebSocketFrame]) =
+                  ctx.push(elem)
+                override def onUpstreamFinish(ctx: Context[WebSocketFrame]) = {
+                  disconnected.trySuccess(())
+                  super.onUpstreamFinish(ctx)
                 }
-              }
+                override def onUpstreamFailure(
+                    cause: Throwable,
+                    ctx: Context[WebSocketFrame]) = {
+                  if (serverInitiatedClose.get()) {
+                    disconnected.trySuccess(())
+                    ctx.finish()
+                  } else {
+                    disconnected.tryFailure(cause)
+                    ctx.fail(cause)
+                  }
+                }
+            })
 
-              val handleConnectionTerminated =
-                Flow[WebSocketFrame].transform(() =>
-                  new PushStage[WebSocketFrame, WebSocketFrame] {
-                    def onPush(elem: WebSocketFrame,
-                               ctx: Context[WebSocketFrame]) =
-                      ctx.push(elem)
-                    override def onUpstreamFinish(
-                        ctx: Context[WebSocketFrame]) = {
-                      disconnected.trySuccess(())
-                      super.onUpstreamFinish(ctx)
-                    }
-                    override def onUpstreamFailure(
-                        cause: Throwable,
-                        ctx: Context[WebSocketFrame]) = {
-                      if (serverInitiatedClose.get()) {
-                        disconnected.trySuccess(())
-                        ctx.finish()
-                      } else {
-                        disconnected.tryFailure(cause)
-                        ctx.fail(cause)
-                      }
-                    }
-                })
+          /**
+            * Since we've got two consumers of the messages when we broadcast, we need to ensure that they get retained for each.
+            */
+          val retainForBroadcast = Flow[WebSocketFrame].map { frame =>
+            ReferenceCountUtil.retain(frame)
+            frame
+          }
 
-              /**
-                * Since we've got two consumers of the messages when we broadcast, we need to ensure that they get retained for each.
-                */
-              val retainForBroadcast = Flow[WebSocketFrame].map { frame =>
-                ReferenceCountUtil.retain(frame)
-                frame
-              }
+          merge.out ~> clientConnection ~> handleConnectionTerminated ~> retainForBroadcast ~> broadcast.in
+          merge.in(0) <~ handleServerClose <~ broadcast.out(0)
 
-              merge.out ~> clientConnection ~> handleConnectionTerminated ~> retainForBroadcast ~> broadcast.in
-              merge.in(0) <~ handleServerClose <~ broadcast.out(0)
-
-              FlowShape(merge.in(1), broadcast.out(1))
-          }) via framesToMessages
+          FlowShape(merge.in(1), broadcast.out(1))
+        }) via framesToMessages
     }
 
     def toByteString(data: ByteBufHolder) = {

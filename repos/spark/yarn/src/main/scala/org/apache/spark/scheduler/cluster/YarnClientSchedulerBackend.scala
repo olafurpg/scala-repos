@@ -95,7 +95,8 @@ private[spark] class YarnClientSchedulerBackend(scheduler: TaskSchedulerImpl,
     // Warn against the following deprecated environment variables: env var -> suggestion
     val deprecatedEnvVars = Map(
       "SPARK_WORKER_MEMORY" -> "SPARK_EXECUTOR_MEMORY or --executor-memory through spark-submit",
-      "SPARK_WORKER_CORES" -> "SPARK_EXECUTOR_CORES or --executor-cores through spark-submit")
+      "SPARK_WORKER_CORES" -> "SPARK_EXECUTOR_CORES or --executor-cores through spark-submit"
+    )
     optionTuples.foreach {
       case (optionName, envVar, sparkProp) =>
         if (sc.getConf.contains(sparkProp)) {

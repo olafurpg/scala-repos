@@ -61,17 +61,20 @@ private[reflect] object ScalaSigReader {
   }
 
   def findClass(sig: ScalaSig, clazz: Class[_]): Option[ClassSymbol] = {
-    sig.symbols.collect { case c: ClassSymbol if !c.isModule => c }
+    sig.symbols
+      .collect { case c: ClassSymbol if !c.isModule => c }
       .find(_.name == clazz.getSimpleName)
       .orElse {
         sig.topLevelClasses
           .find(_.symbolInfo.name == clazz.getSimpleName)
           .orElse {
-            sig.topLevelObjects.map { obj =>
-              val t = obj.infoType.asInstanceOf[TypeRefType]
-              t.symbol.children collect { case c: ClassSymbol => c } find
-                (_.symbolInfo.name == clazz.getSimpleName)
-            }.head
+            sig.topLevelObjects
+              .map { obj =>
+                val t = obj.infoType.asInstanceOf[TypeRefType]
+                t.symbol.children collect { case c: ClassSymbol => c } find
+                  (_.symbolInfo.name == clazz.getSimpleName)
+              }
+              .head
           }
       }
   }

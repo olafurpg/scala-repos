@@ -27,15 +27,25 @@ class RewriteJoins extends Phase {
       logger.debug("Hoisting flatMapped Filter from:",
                    Ellipsis(n, List(0), List(1, 0, 0)))
       val sn, sj1, sj2 = new AnonSymbol
-      val j = Join(sj1, sj2, f1, f2.replace({
-        case Ref(s) if s == s1 =>
-          Ref(sj1) :@ f1.nodeType.asCollectionType.elementType
-      }, bottomUp = true), JoinType.Inner, pred.replace({
-        case Ref(s) if s == s1 =>
-          Ref(sj1) :@ f1.nodeType.asCollectionType.elementType
-        case Ref(s) if s == s3 =>
-          Ref(sj2) :@ f2.nodeType.asCollectionType.elementType
-      }, bottomUp = true)).infer()
+      val j = Join(
+        sj1,
+        sj2,
+        f1,
+        f2.replace({
+          case Ref(s) if s == s1 =>
+            Ref(sj1) :@ f1.nodeType.asCollectionType.elementType
+        }, bottomUp = true),
+        JoinType.Inner,
+        pred.replace(
+          {
+            case Ref(s) if s == s1 =>
+              Ref(sj1) :@ f1.nodeType.asCollectionType.elementType
+            case Ref(s) if s == s3 =>
+              Ref(sj2) :@ f2.nodeType.asCollectionType.elementType
+          },
+          bottomUp = true
+        )
+      ).infer()
       val refSn = Ref(sn) :@ j.nodeType.asCollectionType.elementType
       val ref1 = Select(refSn, ElementSymbol(1))
       val ref2 = Select(refSn, ElementSymbol(2))
@@ -159,12 +169,17 @@ class RewriteJoins extends Phase {
             (p, FwdPath(b.generator :: rest))
         }, stopOnMatch = true)
         val Bind(_, _, Pure(StructNode(struct1), pts)) = b
-        val foundRefs = sRefs.map {
-          case (p, pOnBGen) =>
-            (p, (pOnBGen, /*None: Option[Symbol]*/ struct1.find {
-              case (s, n) => pOnBGen == n
-            }.map(_._1)))
-        }.toMap
+        val foundRefs = sRefs
+          .map {
+            case (p, pOnBGen) =>
+              (p,
+               (pOnBGen, /*None: Option[Symbol]*/ struct1
+                  .find {
+                    case (s, n) => pOnBGen == n
+                  }
+                  .map(_._1)))
+          }
+          .toMap
         logger.debug(
           "Found references in predicate: " + foundRefs.mkString(", "))
         val newDefs = foundRefs.filter(_._2._2.isEmpty).map {
@@ -172,9 +187,10 @@ class RewriteJoins extends Phase {
         }
         logger.debug("New references for predicate: " + newDefs.mkString(", "))
         val allRefs =
-          foundRefs.collect { case (p, (_, Some(s))) => (p, s) } ++ newDefs.map {
-            case (p, (_, s)) => (p, s)
-          }
+          foundRefs.collect { case (p, (_, Some(s))) => (p, s) } ++ newDefs
+            .map {
+              case (p, (_, s)) => (p, s)
+            }
         logger.debug(
           "All reference mappings for predicate: " + allRefs.mkString(", "))
         val (sel, tss) =
@@ -230,9 +246,11 @@ class RewriteJoins extends Phase {
           .flatMap(
             _._2.collect { case p @ FwdPath(s :: _) if s == ok => p }.toSeq)
           .toSet
-        val existingOkDefs = legalDefs.collect {
-          case (s, p @ FwdPath(s2 :: _)) if s2 == ok => (p, s)
-        }.toMap
+        val existingOkDefs = legalDefs
+          .collect {
+            case (s, p @ FwdPath(s2 :: _)) if s2 == ok => (p, s)
+          }
+          .toMap
         val createDefs = (requiredOkPaths -- existingOkDefs.keySet)
           .map(p => (new AnonSymbol, p))
           .toMap
@@ -273,14 +291,18 @@ class RewriteJoins extends Phase {
     if (l1m.isEmpty && r1m.isEmpty) (j, Map.empty)
     else {
       val on1 = j.on
-        .replace({
-          case p @ FwdPath(r1 :: rest)
-              if r1 == j.leftGen && l1m.contains(rest) =>
-            l1m(rest)
-          case p @ FwdPath(r1 :: rest)
-              if r1 == j.rightGen && r1m.contains(rest) =>
-            r1m(rest)
-        }, keepType = true, bottomUp = true)
+        .replace(
+          {
+            case p @ FwdPath(r1 :: rest)
+                if r1 == j.leftGen && l1m.contains(rest) =>
+              l1m(rest)
+            case p @ FwdPath(r1 :: rest)
+                if r1 == j.rightGen && r1m.contains(rest) =>
+              r1m(rest)
+          },
+          keepType = true,
+          bottomUp = true
+        )
         .replace {
           case r @ Ref(s) if s == j.leftGen || s == j.rightGen =>
             r.untyped // Structural expansion may have changed
@@ -293,14 +315,20 @@ class RewriteJoins extends Phase {
         l1m.map { case (p, n) => (ElementSymbol(1) :: p, n) } ++ r1m.map {
           case (p, n) => (ElementSymbol(2) :: p, n)
         }
-      val m2 = m.mapValues(_.replace({
-        case Ref(s) :@ tpe if s == j.leftGen =>
-          Select(Ref(outsideRef) :@ j2.nodeType.asCollectionType.elementType,
-                 ElementSymbol(1)) :@ tpe
-        case Ref(s) :@ tpe if s == j.rightGen =>
-          Select(Ref(outsideRef) :@ j2.nodeType.asCollectionType.elementType,
-                 ElementSymbol(2)) :@ tpe
-      }, keepType = true))
+      val m2 = m.mapValues(
+        _.replace(
+          {
+            case Ref(s) :@ tpe if s == j.leftGen =>
+              Select(
+                Ref(outsideRef) :@ j2.nodeType.asCollectionType.elementType,
+                ElementSymbol(1)) :@ tpe
+            case Ref(s) :@ tpe if s == j.rightGen =>
+              Select(
+                Ref(outsideRef) :@ j2.nodeType.asCollectionType.elementType,
+                ElementSymbol(2)) :@ tpe
+          },
+          keepType = true
+        ))
       if (logger.isDebugEnabled)
         m2.foreach {
           case (p, n) =>
@@ -333,12 +361,16 @@ class RewriteJoins extends Phase {
           splitConjunctions(j2b.on).partition(p => hasRefTo(p, pull))
         if (on1Down.nonEmpty || on2Up.nonEmpty) {
           val refS2 = Ref(s2) :@ j2b.nodeType.asCollectionType.elementType
-          val on1b = and(on1Keep ++ on2Up.map(_.replace({
-            case Ref(s) :@ tpe if s == j2b.leftGen =>
-              Select(refS2, ElementSymbol(1)) :@ tpe
-            case Ref(s) :@ tpe if s == j2b.rightGen =>
-              Select(refS2, ElementSymbol(2)) :@ tpe
-          }, keepType = true)))
+          val on1b = and(
+            on1Keep ++ on2Up.map(_.replace(
+              {
+                case Ref(s) :@ tpe if s == j2b.leftGen =>
+                  Select(refS2, ElementSymbol(1)) :@ tpe
+                case Ref(s) :@ tpe if s == j2b.rightGen =>
+                  Select(refS2, ElementSymbol(2)) :@ tpe
+              },
+              keepType = true
+            )))
           val on2b = and(on1Down.map(_.replace({
             case Select(Ref(s), ElementSymbol(i)) :@ tpe if s == s2 =>
               Ref(if (i == 0) j2b.leftGen else j2b.rightGen) :@ tpe
@@ -417,7 +449,8 @@ class RewriteJoins extends Phase {
 
   def hasRefTo(n: Node, s: Set[TermSymbol]): Boolean =
     n.findNode {
-      case Ref(s2) if s contains s2 => true
-      case _ => false
-    }.isDefined
+        case Ref(s2) if s contains s2 => true
+        case _ => false
+      }
+      .isDefined
 }

@@ -117,7 +117,8 @@ object SimpleConsumerPerformance {
               (totalBytesRead * 1.0) / (1024 * 1024),
               totalMBRead / elapsed,
               totalMessagesRead,
-              (totalMessagesRead - lastMessagesRead) / elapsed))
+              (totalMessagesRead - lastMessagesRead) / elapsed
+            ))
         }
         lastReportTime = SystemTime.milliseconds
         lastBytesRead = totalBytesRead
@@ -138,7 +139,8 @@ object SimpleConsumerPerformance {
           totalMBRead,
           totalMBRead / elapsed,
           totalMessagesRead,
-          totalMessagesRead / elapsed))
+          totalMessagesRead / elapsed
+        ))
     }
     System.exit(0)
   }
@@ -157,7 +159,8 @@ object SimpleConsumerPerformance {
     val resetBeginningOffsetOpt = parser.accepts(
       "from-latest",
       "If the consumer does not already have an established " +
-        "offset to consume from, start with the latest message present in the log rather than the earliest message.")
+        "offset to consume from, start with the latest message present in the log rather than the earliest message."
+    )
     val partitionOpt = parser
       .accepts("partition", "The topic partition to consume from.")
       .withRequiredArg

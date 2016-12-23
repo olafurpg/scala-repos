@@ -84,23 +84,25 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
     request get CgiParamsKey map (_.asInstanceOf[Map[String, String]]) getOrElse Map.empty
 
   private[this] def readCgiParams(req: HttpServletRequest) =
-    Map("AUTH_TYPE" -> req.getAuthType,
-        "CONTENT_LENGTH" -> req.getContentLength.toString,
-        "CONTENT_TYPE" -> req.getContentType,
-        "DOCUMENT_ROOT" -> servletContext.getRealPath(
-          servletContext.getContextPath),
-        "PATH_INFO" -> req.getPathInfo,
-        "PATH_TRANSLATED" -> req.getPathTranslated,
-        "QUERY_STRING" -> req.getQueryString,
-        "REMOTE_ADDR" -> req.getRemoteAddr,
-        "REMOTE_HOST" -> req.getRemoteHost,
-        "REMOTE_USER" -> req.getRemoteUser,
-        "REQUEST_METHOD" -> req.getMethod,
-        "SCRIPT_NAME" -> req.getServletPath,
-        "SERVER_NAME" -> req.getServerName,
-        "SERVER_PORT" -> req.getServerPort.toString,
-        "SERVER_PROTOCOL" -> req.getProtocol,
-        "SERVER_SOFTWARE" -> servletContext.getServerInfo)
+    Map(
+      "AUTH_TYPE" -> req.getAuthType,
+      "CONTENT_LENGTH" -> req.getContentLength.toString,
+      "CONTENT_TYPE" -> req.getContentType,
+      "DOCUMENT_ROOT" -> servletContext.getRealPath(
+        servletContext.getContextPath),
+      "PATH_INFO" -> req.getPathInfo,
+      "PATH_TRANSLATED" -> req.getPathTranslated,
+      "QUERY_STRING" -> req.getQueryString,
+      "REMOTE_ADDR" -> req.getRemoteAddr,
+      "REMOTE_HOST" -> req.getRemoteHost,
+      "REMOTE_USER" -> req.getRemoteUser,
+      "REQUEST_METHOD" -> req.getMethod,
+      "SCRIPT_NAME" -> req.getServletPath,
+      "SERVER_NAME" -> req.getServerName,
+      "SERVER_PORT" -> req.getServerPort.toString,
+      "SERVER_PROTOCOL" -> req.getProtocol,
+      "SERVER_SOFTWARE" -> servletContext.getServerInfo
+    )
 
   private def %-(s: String) = s.blankOption map (_.urlEncode) getOrElse ""
 

@@ -27,18 +27,20 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     s"""<span $title class="$klass">$span</span>"""
   }
 
-  val topBarSortedPerfTypes: List[PerfType] = List(PerfType.Bullet,
-                                                   PerfType.Chess960,
-                                                   PerfType.Blitz,
-                                                   PerfType.KingOfTheHill,
-                                                   PerfType.Classical,
-                                                   PerfType.ThreeCheck,
-                                                   PerfType.Correspondence,
-                                                   PerfType.Antichess,
-                                                   PerfType.Atomic,
-                                                   PerfType.Horde,
-                                                   PerfType.RacingKings,
-                                                   PerfType.Crazyhouse)
+  val topBarSortedPerfTypes: List[PerfType] = List(
+    PerfType.Bullet,
+    PerfType.Chess960,
+    PerfType.Blitz,
+    PerfType.KingOfTheHill,
+    PerfType.Classical,
+    PerfType.ThreeCheck,
+    PerfType.Correspondence,
+    PerfType.Antichess,
+    PerfType.Atomic,
+    PerfType.Horde,
+    PerfType.RacingKings,
+    PerfType.Crazyhouse
+  )
 
   private def best4Of(u: User, perfTypes: List[PerfType]) =
     perfTypes.sortBy { pt =>
@@ -52,14 +54,17 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
                  PerfType.Classical,
                  PerfType.Correspondence)) ::: best4Of(
       u,
-      List(PerfType.Crazyhouse,
-           PerfType.Chess960,
-           PerfType.KingOfTheHill,
-           PerfType.ThreeCheck,
-           PerfType.Antichess,
-           PerfType.Atomic,
-           PerfType.Horde,
-           PerfType.RacingKings))
+      List(
+        PerfType.Crazyhouse,
+        PerfType.Chess960,
+        PerfType.KingOfTheHill,
+        PerfType.ThreeCheck,
+        PerfType.Antichess,
+        PerfType.Atomic,
+        PerfType.Horde,
+        PerfType.RacingKings
+      )
+    )
 
   def showPerfRating(rating: Int,
                      name: String,

@@ -120,98 +120,102 @@ object DevServerStart {
               // Because we are on DEV mode here, it doesn't really matter
               // but it's more coherent with the way it works in PROD mode.
               implicit val ec = play.core.Execution.internalContext
-              Await.result(scala.concurrent.Future {
+              Await.result(
+                scala.concurrent.Future {
 
-                val reloaded = buildLink.reload match {
-                  case NonFatal(t) => Failure(t)
-                  case cl: ClassLoader => Success(Some(cl))
-                  case null => Success(None)
-                }
+                  val reloaded = buildLink.reload match {
+                    case NonFatal(t) => Failure(t)
+                    case cl: ClassLoader => Success(Some(cl))
+                    case null => Success(None)
+                  }
 
-                reloaded.flatMap {
-                  maybeClassLoader =>
-                    val maybeApplication: Option[Try[Application]] =
-                      maybeClassLoader.map {
-                        projectClassloader =>
-                          try {
+                  reloaded.flatMap {
+                    maybeClassLoader =>
+                      val maybeApplication: Option[Try[Application]] =
+                        maybeClassLoader.map {
+                          projectClassloader =>
+                            try {
 
-                            if (lastState.isSuccess) {
-                              println()
-                              println(
-                                play.utils.Colors.magenta("--- (RELOAD) ---"))
-                              println()
-                            }
+                              if (lastState.isSuccess) {
+                                println()
+                                println(play.utils.Colors
+                                  .magenta("--- (RELOAD) ---"))
+                                println()
+                              }
 
-                            val reloadable = this
+                              val reloadable = this
 
-                            // First, stop the old application if it exists
-                            lastState.foreach(Play.stop)
+                              // First, stop the old application if it exists
+                              lastState.foreach(Play.stop)
 
-                            // Create the new environment
-                            val environment =
-                              Environment(path, projectClassloader, Mode.Dev)
-                            val sourceMapper = new SourceMapper {
-                              def sourceOf(className: String,
-                                           line: Option[Int]) = {
-                                Option(
-                                  buildLink.findSource(
-                                    className,
-                                    line
-                                      .map(_.asInstanceOf[java.lang.Integer])
-                                      .orNull)).flatMap {
-                                  case Array(file: java.io.File, null) =>
-                                    Some((file, None))
-                                  case Array(file: java.io.File,
-                                             line: java.lang.Integer) =>
-                                    Some((file, Some(line)))
-                                  case _ => None
+                              // Create the new environment
+                              val environment =
+                                Environment(path, projectClassloader, Mode.Dev)
+                              val sourceMapper = new SourceMapper {
+                                def sourceOf(className: String,
+                                             line: Option[Int]) = {
+                                  Option(
+                                    buildLink.findSource(
+                                      className,
+                                      line
+                                        .map(_.asInstanceOf[java.lang.Integer])
+                                        .orNull)).flatMap {
+                                    case Array(file: java.io.File, null) =>
+                                      Some((file, None))
+                                    case Array(file: java.io.File,
+                                               line: java.lang.Integer) =>
+                                      Some((file, Some(line)))
+                                    case _ => None
+                                  }
                                 }
                               }
-                            }
 
-                            val webCommands = new DefaultWebCommands
-                            currentWebCommands = Some(webCommands)
+                              val webCommands = new DefaultWebCommands
+                              currentWebCommands = Some(webCommands)
 
-                            val newApplication =
-                              Threads.withContextClassLoader(
-                                projectClassloader) {
-                                val context = ApplicationLoader.createContext(
-                                  environment,
-                                  dirAndDevSettings,
-                                  Some(sourceMapper),
-                                  webCommands)
-                                val loader = ApplicationLoader(context)
-                                loader.load(context)
+                              val newApplication =
+                                Threads.withContextClassLoader(
+                                  projectClassloader) {
+                                  val context =
+                                    ApplicationLoader.createContext(
+                                      environment,
+                                      dirAndDevSettings,
+                                      Some(sourceMapper),
+                                      webCommands)
+                                  val loader = ApplicationLoader(context)
+                                  loader.load(context)
+                                }
+
+                              Play.start(newApplication)
+
+                              Success(newApplication)
+                            } catch {
+                              case e: PlayException => {
+                                lastState = Failure(e)
+                                lastState
                               }
+                              case NonFatal(e) => {
+                                lastState = Failure(
+                                  UnexpectedException(unexpected = Some(e)))
+                                lastState
+                              }
+                              case e: LinkageError => {
+                                lastState = Failure(
+                                  UnexpectedException(unexpected = Some(e)))
+                                lastState
+                              }
+                            }
+                        }
 
-                            Play.start(newApplication)
-
-                            Success(newApplication)
-                          } catch {
-                            case e: PlayException => {
-                              lastState = Failure(e)
-                              lastState
-                            }
-                            case NonFatal(e) => {
-                              lastState = Failure(
-                                UnexpectedException(unexpected = Some(e)))
-                              lastState
-                            }
-                            case e: LinkageError => {
-                              lastState = Failure(
-                                UnexpectedException(unexpected = Some(e)))
-                              lastState
-                            }
-                          }
+                      maybeApplication.flatMap(_.toOption).foreach { app =>
+                        lastState = Success(app)
                       }
 
-                    maybeApplication.flatMap(_.toOption).foreach { app =>
-                      lastState = Success(app)
-                    }
-
-                    maybeApplication.getOrElse(lastState)
-                }
-              }, Duration.Inf)
+                      maybeApplication.getOrElse(lastState)
+                  }
+                },
+                Duration.Inf
+              )
             }
           }
 
@@ -259,7 +263,8 @@ object DevServerStart {
             actorSystem.terminate()
             Await.result(actorSystem.whenTerminated, Duration.Inf)
             Future.successful(())
-          })
+          }
+        )
         val serverProvider = ServerProvider
           .fromConfiguration(classLoader, serverConfig.configuration)
         serverProvider.createServer(serverContext)

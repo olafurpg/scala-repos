@@ -51,8 +51,10 @@ case class Info(section: ChannelBuffer) extends Command {
 
 object Info {
   def apply(section: Seq[Array[Byte]]) = {
-    new Info(section.headOption.map { ChannelBuffers.wrappedBuffer }
-      .getOrElse(ChannelBuffers.EMPTY_BUFFER))
+    new Info(
+      section.headOption
+        .map { ChannelBuffers.wrappedBuffer }
+        .getOrElse(ChannelBuffers.EMPTY_BUFFER))
   }
 }
 
@@ -111,7 +113,8 @@ object Config {
   def apply(args: Seq[Array[Byte]]): Config = {
     val subCommandString = new String(
       trimList(args.headOption.toList, 1, "CONFIG")(0)).toUpperCase
-    val subCommand = subCommands.find { _.command == subCommandString }
+    val subCommand = subCommands
+      .find { _.command == subCommandString }
       .getOrElse(
         throw ClientError("Invalid Config command " + subCommandString))
     subCommand(args.tail)

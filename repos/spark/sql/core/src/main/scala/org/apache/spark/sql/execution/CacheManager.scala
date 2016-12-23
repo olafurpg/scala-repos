@@ -96,7 +96,8 @@ private[sql] class CacheManager extends Logging {
                          sqlContext.conf.columnBatchSize,
                          storageLevel,
                          sqlContext.executePlan(planToCache).executedPlan,
-                         tableName))
+                         tableName)
+      )
     }
   }
 
@@ -158,7 +159,9 @@ private[sql] class CacheManager extends Logging {
   private[sql] def invalidateCache(plan: LogicalPlan): Unit = writeLock {
     cachedData.foreach {
       case data
-          if data.plan.collect { case p if p.sameResult(plan) => p }.nonEmpty =>
+          if data.plan
+            .collect { case p if p.sameResult(plan) => p }
+            .nonEmpty =>
         data.cachedRepresentation.recache()
       case _ =>
     }

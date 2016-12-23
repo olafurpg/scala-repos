@@ -262,9 +262,12 @@ trait MapTest {
   class SimpleQueryableMap[K, V](inner: mu.HashMap[K, V])
       extends ju.AbstractMap[K, V] {
     def entrySet(): java.util.Set[java.util.Map.Entry[K, V]] = {
-      setAsJavaSet(inner.map {
-        case (k, v) => new ju.AbstractMap.SimpleImmutableEntry(k, v)
-      }.toSet)
+      setAsJavaSet(
+        inner
+          .map {
+            case (k, v) => new ju.AbstractMap.SimpleImmutableEntry(k, v)
+          }
+          .toSet)
     }
   }
 

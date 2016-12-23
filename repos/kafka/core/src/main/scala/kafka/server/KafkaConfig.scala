@@ -1329,14 +1329,16 @@ object KafkaConfig {
               null,
               LOW,
               SslEndpointIdentificationAlgorithmDoc)
-      .define(SslClientAuthProp,
-              STRING,
-              Defaults.SslClientAuth,
-              in(Defaults.SslClientAuthRequired,
-                 Defaults.SslClientAuthRequested,
-                 Defaults.SslClientAuthNone),
-              MEDIUM,
-              SslClientAuthDoc)
+      .define(
+        SslClientAuthProp,
+        STRING,
+        Defaults.SslClientAuth,
+        in(Defaults.SslClientAuthRequired,
+           Defaults.SslClientAuthRequested,
+           Defaults.SslClientAuthNone),
+        MEDIUM,
+        SslClientAuthDoc
+      )
       .define(SslCipherSuitesProp, LIST, null, MEDIUM, SslCipherSuitesDoc)
 
       /** ********* Sasl Configuration ****************/
@@ -1749,32 +1751,40 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
     require(
       replicaFetchWaitMaxMs <= replicaSocketTimeoutMs,
       "replica.socket.timeout.ms should always be at least replica.fetch.wait.max.ms" +
-        " to prevent unnecessary socket timeouts")
+        " to prevent unnecessary socket timeouts"
+    )
     require(
       replicaFetchMaxBytes >= messageMaxBytes,
       "replica.fetch.max.bytes should be equal or greater than message.max.bytes")
     require(
       replicaFetchWaitMaxMs <= replicaLagTimeMaxMs,
       "replica.fetch.wait.max.ms should always be at least replica.lag.time.max.ms" +
-        " to prevent frequent changes in ISR")
+        " to prevent frequent changes in ISR"
+    )
     require(
       offsetCommitRequiredAcks >= -1 &&
         offsetCommitRequiredAcks <= offsetsTopicReplicationFactor,
-      "offsets.commit.required.acks must be greater or equal -1 and less or equal to offsets.topic.replication.factor")
-    require(BrokerCompressionCodec.isValid(compressionType),
-            "compression.type : " + compressionType + " is not valid." +
-              " Valid options are " +
-              BrokerCompressionCodec.brokerCompressionOptions.mkString(","))
+      "offsets.commit.required.acks must be greater or equal -1 and less or equal to offsets.topic.replication.factor"
+    )
+    require(
+      BrokerCompressionCodec.isValid(compressionType),
+      "compression.type : " + compressionType + " is not valid." +
+        " Valid options are " +
+        BrokerCompressionCodec.brokerCompressionOptions.mkString(",")
+    )
     require(
       advertisedListeners.keySet.contains(interBrokerSecurityProtocol),
       s"${KafkaConfig.InterBrokerSecurityProtocolProp} must be a protocol in the configured set of ${KafkaConfig.AdvertisedListenersProp}. " +
-        s"The valid options based on currently configured protocols are ${advertisedListeners.keySet}")
+        s"The valid options based on currently configured protocols are ${advertisedListeners.keySet}"
+    )
     require(
       advertisedListeners.keySet.subsetOf(listeners.keySet),
       s"${KafkaConfig.AdvertisedListenersProp} protocols must be equal to or a subset of ${KafkaConfig.ListenersProp} protocols. " +
-        s"Found ${advertisedListeners.keySet}. The valid options based on currently configured protocols are ${listeners.keySet}")
+        s"Found ${advertisedListeners.keySet}. The valid options based on currently configured protocols are ${listeners.keySet}"
+    )
     require(
       interBrokerProtocolVersion >= logMessageFormatVersion,
-      s"log.message.format.version $logMessageFormatVersionString cannot be used when inter.broker.protocol.version is set to $interBrokerProtocolVersionString")
+      s"log.message.format.version $logMessageFormatVersionString cannot be used when inter.broker.protocol.version is set to $interBrokerProtocolVersionString"
+    )
   }
 }

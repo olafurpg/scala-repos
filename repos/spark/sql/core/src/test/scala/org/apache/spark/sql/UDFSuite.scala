@@ -203,9 +203,9 @@ class UDFSuite extends QueryTest with SharedSQLContext {
 
   test("udf in different types") {
     sqlContext.udf.register("testDataFunc", (n: Int, s: String) => { (n, s) })
-    sqlContext.udf.register("decimalDataFunc",
-                            (a: java.math.BigDecimal,
-                             b: java.math.BigDecimal) => { (a, b) })
+    sqlContext.udf.register(
+      "decimalDataFunc",
+      (a: java.math.BigDecimal, b: java.math.BigDecimal) => { (a, b) })
     sqlContext.udf.register("binaryDataFunc", (a: Array[Byte], b: Int) => {
       (a, b)
     })
@@ -227,22 +227,27 @@ class UDFSuite extends QueryTest with SharedSQLContext {
         "SELECT tmp.t.* FROM (SELECT testDataFunc(key, value) AS t from testData) tmp")
         .toDF(),
       testData)
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
            | SELECT tmp.t.* FROM
            | (SELECT decimalDataFunc(a, b) AS t FROM decimalData) tmp
           """.stripMargin).toDF(),
-                decimalData)
-    checkAnswer(sql("""
+      decimalData
+    )
+    checkAnswer(
+      sql("""
            | SELECT tmp.t.* FROM
            | (SELECT binaryDataFunc(a, b) AS t FROM binaryData) tmp
           """.stripMargin).toDF(),
-                binaryData)
+      binaryData
+    )
     checkAnswer(
       sql("""
            | SELECT tmp.t.* FROM
            | (SELECT arrayDataFunc(data, nestedData) AS t FROM arrayData) tmp
           """.stripMargin).toDF(),
-      arrayData.toDF())
+      arrayData.toDF()
+    )
     checkAnswer(sql("""
            | SELECT mapDataFunc(data) AS t FROM mapData
           """.stripMargin).toDF(),
@@ -252,7 +257,8 @@ class UDFSuite extends QueryTest with SharedSQLContext {
            | SELECT tmp.t.* FROM
            | (SELECT complexDataFunc(m, a, b) AS t FROM complexData) tmp
           """.stripMargin).toDF(),
-      complexData.select("m", "a", "b"))
+      complexData.select("m", "a", "b")
+    )
   }
 
   test(

@@ -22,7 +22,8 @@ class RepositoryServiceSpec
         targetUrl = Some("http://example.com/target"),
         description = Some("description"),
         creator = tester,
-        now = new java.util.Date)
+        now = new java.util.Date
+      )
 
       service.enableBranchProtection("root",
                                      "repo",

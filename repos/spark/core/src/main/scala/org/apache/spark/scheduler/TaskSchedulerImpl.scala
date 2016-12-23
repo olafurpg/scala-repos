@@ -159,7 +159,8 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
         },
         SPECULATION_INTERVAL_MS,
         SPECULATION_INTERVAL_MS,
-        TimeUnit.MILLISECONDS)
+        TimeUnit.MILLISECONDS
+      )
     }
   }
 
@@ -189,17 +190,22 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
       schedulableBuilder.addTaskSetManager(manager, manager.taskSet.properties)
 
       if (!isLocal && !hasReceivedTask) {
-        starvationTimer.scheduleAtFixedRate(new TimerTask() {
-          override def run() {
-            if (!hasLaunchedTask) {
-              logWarning("Initial job has not accepted any resources; " +
-                "check your cluster UI to ensure that workers are registered " +
-                "and have sufficient resources")
-            } else {
-              this.cancel()
+        starvationTimer.scheduleAtFixedRate(
+          new TimerTask() {
+            override def run() {
+              if (!hasLaunchedTask) {
+                logWarning(
+                  "Initial job has not accepted any resources; " +
+                    "check your cluster UI to ensure that workers are registered " +
+                    "and have sufficient resources")
+              } else {
+                this.cancel()
+              }
             }
-          }
-        }, STARVATION_TIMEOUT_MS, STARVATION_TIMEOUT_MS)
+          },
+          STARVATION_TIMEOUT_MS,
+          STARVATION_TIMEOUT_MS
+        )
       }
       hasReceivedTask = true
     }

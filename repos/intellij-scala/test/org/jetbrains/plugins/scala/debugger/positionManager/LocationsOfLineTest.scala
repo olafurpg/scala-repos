@@ -46,8 +46,9 @@ class LocationOfLineTest_212
 abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
   val noLocations = Set.empty[Loc]
 
-  setupFile("Simple.scala",
-            s"""
+  setupFile(
+    "Simple.scala",
+    s"""
         |object Simple {
         |  ${offsetMarker}val z = 1
         |  def main(args: Array[String]) {
@@ -60,7 +61,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
         |    $offsetMarker$bp""
         |  }$offsetMarker
         |}$offsetMarker
-        |""".stripMargin.trim)
+        |""".stripMargin.trim
+  )
   def testSimple(): Unit = {
     checkLocationsOfLine(
       Set(Loc("Simple$", "<init>", 2), Loc("Simple$", "z", 2)),
@@ -74,8 +76,9 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("SimpleClass.scala",
-            s"""
+  setupFile(
+    "SimpleClass.scala",
+    s"""
        |object SimpleClass {
        |  def main(args: Array[String]) {
        |    val b = new Bar(1)
@@ -91,7 +94,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
        |  }
        |}
        |
-       |""".stripMargin.trim)
+       |""".stripMargin.trim
+  )
   def testSimpleClass(): Unit = {
     checkLocationsOfLine(
       Set(Loc("Bar", "<init>", 14)), //location for constructor is customized
@@ -100,8 +104,9 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("Lambdas.scala",
-            s"""
+  setupFile(
+    "Lambdas.scala",
+    s"""
         |object Lambdas {
         |  def main(args: Array[String]): Unit = {
         |    val list = List(1, 2)
@@ -111,7 +116,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
         |    ""$bp
         |  }
         |}
-        |""".stripMargin.trim)
+        |""".stripMargin.trim
+  )
   def testLambdas(): Unit = {
     checkLocationsOfLine(
       Set(Loc("Lambdas$", "main", 4),
@@ -123,8 +129,9 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("LocalFunction.scala",
-            s"""
+  setupFile(
+    "LocalFunction.scala",
+    s"""
         |object LocalFunction {
         |
         |  def main(args: Array[String]) {
@@ -140,7 +147,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
         |    ${offsetMarker}foo("aaa") $bp
         |  }
         |}
-        |""".stripMargin.trim)
+        |""".stripMargin.trim
+  )
   def testLocalFunction(): Unit = {
     checkLocationsOfLine(
       Set(Loc("LocalFunction$", "bar$1", 6)),
@@ -149,8 +157,9 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
     )
   }
 
-  setupFile("Multilevel.scala",
-            s"""
+  setupFile(
+    "Multilevel.scala",
+    s"""
         |object Multilevel {
         |  def main(args: Array[String]) {
         |    ${offsetMarker}class This {
@@ -170,7 +179,8 @@ abstract class LocationsOfLineTestBase extends PositionManagerTestBase {
         |    }
         |    ${offsetMarker}new This().foo()
         |  }
-        |}""".stripMargin.trim)
+        |}""".stripMargin.trim
+  )
   def testMultilevel(): Unit = {
     checkLocationsOfLine(
       Set(Loc("Multilevel$This$1", "<init>", 18)), //location for constructor is customized

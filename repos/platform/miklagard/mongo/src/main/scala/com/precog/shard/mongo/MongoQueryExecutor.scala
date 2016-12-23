@@ -154,18 +154,27 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
               }
               .toList
               .sorted
-            Success(finalNames.map { d =>
-              d + "/"
-            }.serialize.asInstanceOf[JArray])
+            Success(
+              finalNames
+                .map { d =>
+                  d + "/"
+                }
+                .serialize
+                .asInstanceOf[JArray])
 
           case dbName :: Nil =>
             val db = Table.mongo.getDB(dbName)
             Success(
               if (db == null) JArray(Nil)
               else
-                db.getCollectionNames.asScala.map { d =>
-                  d + "/"
-                }.toList.sorted.serialize.asInstanceOf[JArray])
+                db.getCollectionNames.asScala
+                  .map { d =>
+                    d + "/"
+                  }
+                  .toList
+                  .sorted
+                  .serialize
+                  .asInstanceOf[JArray])
 
           case dbName :: collectionName :: Nil =>
             Success(JArray(Nil))

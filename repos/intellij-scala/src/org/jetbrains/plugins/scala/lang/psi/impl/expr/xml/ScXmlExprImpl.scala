@@ -32,17 +32,20 @@ class ScXmlExprImpl(node: ASTNode)
       if (typez.length != 0) ScType.designator(typez(0))
       else types.Nothing
     }
-    Success(getElements.length match {
-      case 0 => types.Any
-      case 1 =>
-        getElements(0) match {
-          case _: ScXmlElement => getType("scala.xml.Elem")
-          case _: ScXmlComment => getType("scala.xml.Comment")
-          case _: ScXmlCDSect => getType("scala.xml.Text")
-          case _: ScXmlPI => getType("scala.xml.ProcInstr")
-        }
-      case _ =>
-        getType("scala.xml.NodeBuffer")
-    }, Some(this))
+    Success(
+      getElements.length match {
+        case 0 => types.Any
+        case 1 =>
+          getElements(0) match {
+            case _: ScXmlElement => getType("scala.xml.Elem")
+            case _: ScXmlComment => getType("scala.xml.Comment")
+            case _: ScXmlCDSect => getType("scala.xml.Text")
+            case _: ScXmlPI => getType("scala.xml.ProcInstr")
+          }
+        case _ =>
+          getType("scala.xml.NodeBuffer")
+      },
+      Some(this)
+    )
   }
 }

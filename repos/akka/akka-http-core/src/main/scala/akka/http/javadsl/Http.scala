@@ -451,7 +451,8 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
             .asScala,
           localAddress.asScala,
           settings.asScala,
-          log)
+          log
+        )
       else
         delegate.outgoingConnection(to.host,
                                     to.port,

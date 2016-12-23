@@ -318,8 +318,8 @@ object Multipart {
           .toJava
 
       private[BodyPart] def tryCreateFormDataBodyPart[T](
-          f: (String, Map[String, String],
-              immutable.Seq[HttpHeader]) ⇒ T): Try[T] = {
+          f: (String, Map[String, String], immutable.Seq[HttpHeader]) ⇒ T)
+        : Try[T] = {
         val params = dispositionParams
         params.get("name") match {
           case Some(name) ⇒
@@ -333,8 +333,8 @@ object Multipart {
         }
       }
       private[BodyPart] def tryCreateByteRangesBodyPart[T](
-          f: (ContentRange, RangeUnit,
-              immutable.Seq[HttpHeader]) ⇒ T): Try[T] =
+          f: (ContentRange, RangeUnit, immutable.Seq[HttpHeader]) ⇒ T)
+        : Try[T] =
         headers.collectFirst { case x: `Content-Range` ⇒ x } match {
           case Some(`Content-Range`(unit, range)) ⇒
             Success(f(range, unit, headers.filterNot(_ is "content-range")))

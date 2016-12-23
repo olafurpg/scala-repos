@@ -49,14 +49,16 @@ object ClusterSingletonProxySpec {
                                       settings =
                                         ClusterSingletonManagerSettings(system)
                                           .withRemovalMargin(5.seconds)),
-        name = "singletonManager")
+        name = "singletonManager"
+      )
     }
 
     val proxy = system.actorOf(
       ClusterSingletonProxy.props("user/singletonManager",
                                   settings =
                                     ClusterSingletonProxySettings(system)),
-      s"singletonProxy-${cluster.selfAddress.port.getOrElse(0)}")
+      s"singletonProxy-${cluster.selfAddress.port.getOrElse(0)}"
+    )
 
     def testProxy(msg: String) {
       val probe = TestProbe()

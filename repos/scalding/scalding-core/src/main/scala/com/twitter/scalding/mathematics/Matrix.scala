@@ -473,9 +473,13 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
 
   protected lazy val rowL0Norm = {
     val matD = this.asInstanceOf[Matrix[RowT, ColT, Double]]
-    (matD.mapValues { x =>
-      1.0
-    }.sumColVectors.diag.inverse) * matD
+    (matD
+      .mapValues { x =>
+        1.0
+      }
+      .sumColVectors
+      .diag
+      .inverse) * matD
   }
 
   def rowL0Normalize(
@@ -483,9 +487,13 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
 
   protected lazy val rowL1Norm = {
     val matD = this.asInstanceOf[Matrix[RowT, ColT, Double]]
-    (matD.mapValues { x =>
-      x.abs
-    }.sumColVectors.diag.inverse) * matD
+    (matD
+      .mapValues { x =>
+        x.abs
+      }
+      .sumColVectors
+      .diag
+      .inverse) * matD
   }
 
   // Row L1 normalization, only makes sense for Doubles
@@ -495,11 +503,17 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
 
   protected lazy val rowL2Norm = {
     val matD = this.asInstanceOf[Matrix[RowT, ColT, Double]]
-    (matD.mapValues { x =>
-      x * x
-    }.sumColVectors.diag.mapValues { x =>
-      scala.math.sqrt(x)
-    }.diagonal.inverse) * matD
+    (matD
+      .mapValues { x =>
+        x * x
+      }
+      .sumColVectors
+      .diag
+      .mapValues { x =>
+        scala.math.sqrt(x)
+      }
+      .diagonal
+      .inverse) * matD
   }
   // Row L2 normalization (can only be called for Double)
   // After this operation, the sum(|x|^2) along each row will be 1.
@@ -1169,9 +1183,11 @@ class RowVector[ColT, ValT](val colS: Symbol,
       val ordValS = new Fields(fieldName)
       ordValS.setComparator(fieldName, ord)
 
-      val newPipe = pipe.groupAll {
-        _.sortBy(ordValS).reverse.take(k)
-      }.project(colS, valS)
+      val newPipe = pipe
+        .groupAll {
+          _.sortBy(ordValS).reverse.take(k)
+        }
+        .project(colS, valS)
       new RowVector[ColT, ValT](colS,
                                 valS,
                                 newPipe,
@@ -1182,12 +1198,14 @@ class RowVector[ColT, ValT](val colS: Symbol,
   protected def topWithTiny(k: Int)(
       implicit ord: Ordering[ValT]): RowVector[ColT, ValT] = {
     val topSym = Symbol(colS.name + "_topK")
-    val newPipe = pipe.groupAll {
-      _.sortWithTake((colS, valS) -> 'top_vals, k)(
-        (t0: (ColT, ValT), t1: (ColT, ValT)) => ord.gt(t0._2, t1._2))
-    }.flatMap('top_vals -> (topSym, valS)) { imp: List[(ColT, ValT)] =>
-      imp
-    }
+    val newPipe = pipe
+      .groupAll {
+        _.sortWithTake((colS, valS) -> 'top_vals, k)(
+          (t0: (ColT, ValT), t1: (ColT, ValT)) => ord.gt(t0._2, t1._2))
+      }
+      .flatMap('top_vals -> (topSym, valS)) { imp: List[(ColT, ValT)] =>
+        imp
+      }
     new RowVector[ColT, ValT](topSym,
                               valS,
                               newPipe,
@@ -1308,9 +1326,11 @@ class ColVector[RowT, ValT](val rowS: Symbol,
 
   def topElems(k: Int)(implicit ord: Ordering[ValT]): ColVector[RowT, ValT] = {
     if (k < 1000) { topWithTiny(k) } else {
-      val newPipe = pipe.groupAll {
-        _.sortBy(valS).reverse.take(k)
-      }.project(rowS, valS)
+      val newPipe = pipe
+        .groupAll {
+          _.sortBy(valS).reverse.take(k)
+        }
+        .project(rowS, valS)
       new ColVector[RowT, ValT](rowS,
                                 valS,
                                 newPipe,
@@ -1321,12 +1341,14 @@ class ColVector[RowT, ValT](val rowS: Symbol,
   protected def topWithTiny(k: Int)(
       implicit ord: Ordering[ValT]): ColVector[RowT, ValT] = {
     val topSym = Symbol(rowS.name + "_topK")
-    val newPipe = pipe.groupAll {
-      _.sortWithTake((rowS, valS) -> 'top_vals, k)(
-        (t0: (RowT, ValT), t1: (RowT, ValT)) => ord.gt(t0._2, t1._2))
-    }.flatMap('top_vals -> (topSym, valS)) { imp: List[(RowT, ValT)] =>
-      imp
-    }
+    val newPipe = pipe
+      .groupAll {
+        _.sortWithTake((rowS, valS) -> 'top_vals, k)(
+          (t0: (RowT, ValT), t1: (RowT, ValT)) => ord.gt(t0._2, t1._2))
+      }
+      .flatMap('top_vals -> (topSym, valS)) { imp: List[(RowT, ValT)] =>
+        imp
+      }
     new ColVector[RowT, ValT](topSym,
                               valS,
                               newPipe,

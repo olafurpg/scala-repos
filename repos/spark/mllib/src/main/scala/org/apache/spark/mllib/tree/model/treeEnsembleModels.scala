@@ -409,10 +409,12 @@ private[tree] sealed class TreeEnsembleModel(
     */
   def toDebugString: String = {
     val header = toString + "\n"
-    header + trees.zipWithIndex.map {
-      case (tree, treeIndex) =>
-        s"  Tree $treeIndex:\n" + tree.topNode.subtreeToString(4)
-    }.fold("")(_ + _)
+    header + trees.zipWithIndex
+      .map {
+        case (tree, treeIndex) =>
+          s"  Tree $treeIndex:\n" + tree.topNode.subtreeToString(4)
+      }
+      .fold("")(_ + _)
   }
 
   /**

@@ -34,7 +34,8 @@ class SingleImportInspection extends LocalInspectionTool {
               InspectionBundle.message("single.import"),
               new RemoveBracesForSingleImportQuickFix(importExpr),
               ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-              isOnTheFly))
+              isOnTheFly
+            ))
         }
       }
     }

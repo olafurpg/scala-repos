@@ -38,9 +38,11 @@ class WeightedPageRankSpec extends WordSpec with Matchers {
         idx += 1
       }
       .sink[(Int, Double)](Tsv("./pagerank_1")) { outputBuffer =>
-        val pageRank = outputBuffer.map { res =>
-          (res._1, res._2)
-        }.toMap
+        val pageRank = outputBuffer
+          .map { res =>
+            (res._1, res._2)
+          }
+          .toMap
         (idx + ": correctly compute pagerank") in {
           val deadMass = 0.722 / 3 * 0.9
           val userMass = List(0.26, 0.54, 0.2).map { _ * 0.1 }

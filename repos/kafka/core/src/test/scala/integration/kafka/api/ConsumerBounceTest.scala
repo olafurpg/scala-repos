@@ -92,16 +92,19 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
     var consumed = 0L
     val consumer = this.consumers(0)
 
-    consumer.subscribe(List(topic), new ConsumerRebalanceListener {
-      override def onPartitionsAssigned(
-          partitions: util.Collection[TopicPartition]) {
-        // TODO: until KAFKA-2017 is merged, we have to handle the case in which the
-        // the commit fails on prior to rebalancing on coordinator fail-over.
-        consumer.seek(tp, consumed)
+    consumer.subscribe(
+      List(topic),
+      new ConsumerRebalanceListener {
+        override def onPartitionsAssigned(
+            partitions: util.Collection[TopicPartition]) {
+          // TODO: until KAFKA-2017 is merged, we have to handle the case in which the
+          // the commit fails on prior to rebalancing on coordinator fail-over.
+          consumer.seek(tp, consumed)
+        }
+        override def onPartitionsRevoked(
+            partitions: util.Collection[TopicPartition]) {}
       }
-      override def onPartitionsRevoked(
-          partitions: util.Collection[TopicPartition]) {}
-    })
+    )
 
     val scheduler = new BounceBrokerScheduler(numIters)
     scheduler.start()
@@ -152,7 +155,8 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
               .get
               .highWatermark
               .messageOffset == numRecords),
-      "Failed to update high watermark for followers after timeout")
+      "Failed to update high watermark for followers after timeout"
+    )
 
     val scheduler = new BounceBrokerScheduler(numIters)
     scheduler.start()

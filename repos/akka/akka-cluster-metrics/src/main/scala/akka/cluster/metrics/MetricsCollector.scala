@@ -76,11 +76,13 @@ private[metrics] object MetricsCollector {
         create(collectorCustom) orElse create(collectorSigar) orElse create(
           collectorJMX)
 
-    collector.recover {
-      case e ⇒
-        throw new ConfigurationException(
-          s"Could not create metrics collector: ${e}")
-    }.get
+    collector
+      .recover {
+        case e ⇒
+          throw new ConfigurationException(
+            s"Could not create metrics collector: ${e}")
+      }
+      .get
   }
 }
 

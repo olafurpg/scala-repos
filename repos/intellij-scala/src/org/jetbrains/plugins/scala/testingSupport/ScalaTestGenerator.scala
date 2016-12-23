@@ -70,7 +70,8 @@ class ScalaTestGenerator extends TestGenerator {
         case f: AbstractTestFramework if f.generateObjectTests =>
           "Scala Object"
         case _ => "Scala Class"
-      })
+      }
+    )
     val typeDefinition =
       file.depthFirst.filterByType(classOf[ScTypeDefinition]).next()
     val scope: GlobalSearchScope = GlobalSearchScope.allScope(project)
@@ -349,7 +350,8 @@ object ScalaTestGenerator {
             .map("scenario (\"" + _.getMember.getName + "\"){\n\n}\n")
             .fold("feature(\"Methods tests\") {")(_ + "\n" + _) + "}",
           psiManager),
-        templateBody.getLastChild)
+        templateBody.getLastChild
+      )
     }
   }
 
@@ -388,7 +390,8 @@ object ScalaTestGenerator {
             .map("\"" + _.getMember.getName + "\" in {\n\n}\n")
             .fold("\"Methods tests\" - {")(_ + "\n" + _) + "\n}",
           psiManager),
-        templateBody.getLastChild)
+        templateBody.getLastChild
+      )
     }
   }
 
@@ -404,7 +407,8 @@ object ScalaTestGenerator {
             .fold("describe(\"" + className + "\") {\n")(_ + "\n" + _) +
             "\n}",
           psiManager),
-        templateBody.getLastChild)
+        templateBody.getLastChild
+      )
     }
   }
 
@@ -454,7 +458,8 @@ object ScalaTestGenerator {
             .fold("\"" + className + "\" should {\n")(_ + "\n" + _) +
             "\n}",
           psiManager),
-        templateBody.getLastChild)
+        templateBody.getLastChild
+      )
     }
   }
 
@@ -522,13 +527,14 @@ object ScalaTestGenerator {
                                closingBrace)
         if (methods.nonEmpty) {
           templateBody
-            .addBefore(ScalaPsiElementFactory.createExpressionFromText(
-                         testNames
-                           .map("eg := ok //" + _)
-                           .fold("\"" + className + "\" - new group {")(
-                             _ + "\n" + _) + "\n}",
-                         psiManager),
-                       closingBrace)
+            .addBefore(
+              ScalaPsiElementFactory.createExpressionFromText(
+                testNames
+                  .map("eg := ok //" + _)
+                  .fold("\"" + className + "\" - new group {")(_ + "\n" + _) + "\n}",
+                psiManager),
+              closingBrace
+            )
         }
       case _ =>
     }
@@ -546,7 +552,8 @@ object ScalaTestGenerator {
             .map("\"" + _.getMember.getName + "\" in {\nok\n}\n")
             .fold("\"" + className + "\" should {")(_ + "\n" + _) + "\n}",
           psiManager),
-        templateBody.getLastChild)
+        templateBody.getLastChild
+      )
     }
   }
 
@@ -569,7 +576,8 @@ object ScalaTestGenerator {
             .fold("val methodsTests = TestSuite{")(_ + "\n" + _) + "}",
           psiManager,
           Def.parse(_)),
-        templateBody.getLastChild)
+        templateBody.getLastChild
+      )
     }
   }
 }

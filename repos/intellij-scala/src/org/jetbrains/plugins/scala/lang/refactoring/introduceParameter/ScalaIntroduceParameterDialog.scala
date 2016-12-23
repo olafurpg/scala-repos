@@ -88,7 +88,8 @@ class ScalaIntroduceParameterDialog(project: Project,
       paramName = paramNameField.getText,
       tp = typeMap.get(typeCombobox.getSelectedItem),
       replaceAll = replaceOccurrencesChb.isSelected,
-      defaultArg = defaultForIntroducedTextField.getText)
+      defaultArg = defaultForIntroducedTextField.getText
+    )
 
     changeInfo.introducedParameterData = Some(newData)
     new ScalaChangeSignatureProcessor(project, changeInfo)

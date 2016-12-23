@@ -56,7 +56,8 @@ class IncrementalLexerHighlightingTest
 
     assert(
       incSegments.getSegmentCount == segments.getSegmentCount,
-      s"Different segment count for incremental (${incSegments.getSegmentCount}) and full (${segments.getSegmentCount}) highlightings ")
+      s"Different segment count for incremental (${incSegments.getSegmentCount}) and full (${segments.getSegmentCount}) highlightings "
+    )
 
     for (i <- 0 until incSegments.getSegmentCount) {
       val startI = incSegments getSegmentStart i

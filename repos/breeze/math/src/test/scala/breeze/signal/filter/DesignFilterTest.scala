@@ -67,12 +67,9 @@ class DesignFilterTest extends FunSuite {
     assert(norm(testFirwin5 - firwin5.kernel) < testNormThreshold)
   }
 
-  val testFirwin1 = DenseVector(-0.0077763127191025679,
-                                0.064454645578710029,
-                                0.44332166714039256,
-                                0.44332166714039256,
-                                0.064454645578710029,
-                                -0.0077763127191025679)
+  val testFirwin1 = DenseVector(-0.0077763127191025679, 0.064454645578710029,
+    0.44332166714039256, 0.44332166714039256, 0.064454645578710029,
+    -0.0077763127191025679)
   val testFirwin2 = DenseVector(0.022053155816871686,
                                 0.66666666666666663,
                                 0.022053155816871686)

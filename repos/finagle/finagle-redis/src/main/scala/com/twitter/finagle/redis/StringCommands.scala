@@ -165,11 +165,13 @@ trait Strings { self: BaseClient =>
     doRequest(MGet(keys)) {
       case MBulkReply(messages) =>
         Future {
-          messages.map {
-            case BulkReply(message) => Some(message)
-            case EmptyBulkReply() => None
-            case _ => throw new IllegalStateException()
-          }.toSeq
+          messages
+            .map {
+              case BulkReply(message) => Some(message)
+              case EmptyBulkReply() => None
+              case _ => throw new IllegalStateException()
+            }
+            .toSeq
         }
       case EmptyMBulkReply() => Future.Nil
     }

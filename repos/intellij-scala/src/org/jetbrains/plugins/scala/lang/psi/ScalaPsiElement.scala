@@ -128,11 +128,14 @@ trait ScalaPsiElement
   }
 
   abstract override def getUseScope: SearchScope = {
-    ScalaPsiUtil.intersectScopes(super.getUseScope, containingFile match {
-      case Some(file: ScalaFile)
-          if file.isWorksheetFile || file.isScriptFile() =>
-        Some(new LocalSearchScope(file))
-      case _ => None
-    })
+    ScalaPsiUtil.intersectScopes(
+      super.getUseScope,
+      containingFile match {
+        case Some(file: ScalaFile)
+            if file.isWorksheetFile || file.isScriptFile() =>
+          Some(new LocalSearchScope(file))
+        case _ => None
+      }
+    )
   }
 }

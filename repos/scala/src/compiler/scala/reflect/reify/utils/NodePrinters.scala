@@ -39,27 +39,30 @@ trait NodePrinters { self: Utils =>
           })
         s = s.replace("Modifiers(0L, TypeName(\"\"), List())", "Modifiers()")
         s = """Modifiers\((\d+)[lL], TypeName\("(.*?)"\), List\((.*?)\)\)""".r
-          .replaceAllIn(s, m => {
-            val buf = new scala.collection.mutable.ListBuffer[String]
+          .replaceAllIn(
+            s,
+            m => {
+              val buf = new scala.collection.mutable.ListBuffer[String]
 
-            val annotations = m.group(3)
-            if (buf.nonEmpty || annotations != "")
-              buf.append("List(" + annotations + ")")
+              val annotations = m.group(3)
+              if (buf.nonEmpty || annotations != "")
+                buf.append("List(" + annotations + ")")
 
-            val privateWithin = "" + m.group(2)
-            if (buf.nonEmpty || privateWithin != "")
-              buf.append("TypeName(\"" + privateWithin + "\")")
+              val privateWithin = "" + m.group(2)
+              if (buf.nonEmpty || privateWithin != "")
+                buf.append("TypeName(\"" + privateWithin + "\")")
 
-            val bits = m.group(1)
-            if (buf.nonEmpty || bits != "0L") {
-              flagsAreUsed = true
-              buf.append(show(bits.toLong))
+              val bits = m.group(1)
+              if (buf.nonEmpty || bits != "0L") {
+                flagsAreUsed = true
+                buf.append(show(bits.toLong))
+              }
+
+              val replacement =
+                "Modifiers(" + buf.reverse.mkString(", ") + ")"
+              java.util.regex.Matcher.quoteReplacement(replacement)
             }
-
-            val replacement =
-              "Modifiers(" + buf.reverse.mkString(", ") + ")"
-            java.util.regex.Matcher.quoteReplacement(replacement)
-          })
+          )
         s
       })
 

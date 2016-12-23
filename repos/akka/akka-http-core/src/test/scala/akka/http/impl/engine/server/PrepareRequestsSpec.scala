@@ -36,7 +36,8 @@ class PrepareRequestsSpec extends AkkaSpec {
                          HttpEntity.limitableChunkSource(chunks))
     },
     expect100Continue = true,
-    closeRequested = false)
+    closeRequested = false
+  )
 
   val chunkPart =
     ParserOutput.EntityChunk(HttpEntity.ChunkStreamPart(ByteString("abc")))
@@ -52,7 +53,8 @@ class PrepareRequestsSpec extends AkkaSpec {
       HttpEntity.Strict(ContentTypes.`application/octet-stream`,
                         ByteString("body"))),
     true,
-    false)
+    false
+  )
 
   "The PrepareRequest stage" should {
 

@@ -42,20 +42,22 @@ object TestNullableColumnBuilder {
 class NullableColumnBuilderSuite extends SparkFunSuite {
   import org.apache.spark.sql.execution.columnar.ColumnarTestUtils._
 
-  Seq(BOOLEAN,
-      BYTE,
-      SHORT,
-      INT,
-      LONG,
-      FLOAT,
-      DOUBLE,
-      STRING,
-      BINARY,
-      COMPACT_DECIMAL(15, 10),
-      LARGE_DECIMAL(20, 10),
-      STRUCT(StructType(StructField("a", StringType) :: Nil)),
-      ARRAY(ArrayType(IntegerType)),
-      MAP(MapType(IntegerType, StringType))).foreach {
+  Seq(
+    BOOLEAN,
+    BYTE,
+    SHORT,
+    INT,
+    LONG,
+    FLOAT,
+    DOUBLE,
+    STRING,
+    BINARY,
+    COMPACT_DECIMAL(15, 10),
+    LARGE_DECIMAL(20, 10),
+    STRUCT(StructType(StructField("a", StringType) :: Nil)),
+    ARRAY(ArrayType(IntegerType)),
+    MAP(MapType(IntegerType, StringType))
+  ).foreach {
     testNullableColumnBuilder(_)
   }
 

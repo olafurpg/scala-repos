@@ -128,7 +128,8 @@ class VectorAssemblerSuite
         col("hour").as("hour", hour.toMetadata()),
         col("count"), // "count" is an integer column without ML attribute
         col("user").as("user", user.toMetadata()),
-        col("ad")) // "ad" is a vector column without ML attribute
+        col("ad")
+      ) // "ad" is a vector column without ML attribute
     val assembler = new VectorAssembler()
       .setInputCols(Array("browser", "hour", "count", "user", "ad"))
       .setOutputCol("features")

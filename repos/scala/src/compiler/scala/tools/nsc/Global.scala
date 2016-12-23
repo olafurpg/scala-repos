@@ -1714,9 +1714,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       // The name as given was not found, so we'll sift through every symbol in
       // the run looking for plausible matches.
       case NoSymbol =>
-        phased(currentRun.symSource.keys map
-          (sym =>
-             findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
+        phased(
+          currentRun.symSource.keys map
+            (sym => findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
       // The name as given matched, so show only that.
       case sym => List(sym)
     }

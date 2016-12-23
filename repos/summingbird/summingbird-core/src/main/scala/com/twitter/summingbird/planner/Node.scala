@@ -37,9 +37,11 @@ sealed trait Node[P <: Platform[P]] {
   def getName(dag: Dag[P]): String = dag.getNodeName(this)
 
   def collapseNamedNodes(sanitize: String => String): String = {
-    val membersCombined = members.reverse.collect {
-      case NamedProducer(_, n) => sanitize(n)
-    }.mkString(",")
+    val membersCombined = members.reverse
+      .collect {
+        case NamedProducer(_, n) => sanitize(n)
+      }
+      .mkString(",")
     if (membersCombined.size > 0) "|" + membersCombined + "|" else ""
   }
 

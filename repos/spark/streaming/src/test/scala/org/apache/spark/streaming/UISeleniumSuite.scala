@@ -167,15 +167,17 @@ class UISeleniumSuite
         findAll(cssSelector("""#batch-job-table th"""))
           .map(_.text)
           .toSeq should be {
-          List("Output Op Id",
-               "Description",
-               "Output Op Duration",
-               "Status",
-               "Job Id",
-               "Job Duration",
-               "Stages: Succeeded/Total",
-               "Tasks (for all stages): Succeeded/Total",
-               "Error")
+          List(
+            "Output Op Id",
+            "Description",
+            "Output Op Duration",
+            "Status",
+            "Job Id",
+            "Job Duration",
+            "Stages: Succeeded/Total",
+            "Tasks (for all stages): Succeeded/Total",
+            "Error"
+          )
         }
 
         // Check we have 2 output op ids

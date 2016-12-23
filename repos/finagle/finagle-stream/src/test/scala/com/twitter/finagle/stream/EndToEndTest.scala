@@ -149,18 +149,21 @@ class EndToEndTest extends FunSuite {
           override def getPipeline() = {
             val pipeline = Channels.pipeline()
             pipeline.addLast("httpCodec", new HttpClientCodec)
-            pipeline.addLast("recvd", new ChannelUpstreamHandler {
-              override def handleUpstream(ctx: ChannelHandlerContext,
-                                          e: ChannelEvent) {
-                val keep = e match {
-                  case se: ChannelStateEvent =>
-                    se.getState == ChannelState.OPEN
-                  case _: WriteCompletionEvent => false
-                  case _ => true
+            pipeline.addLast(
+              "recvd",
+              new ChannelUpstreamHandler {
+                override def handleUpstream(ctx: ChannelHandlerContext,
+                                            e: ChannelEvent) {
+                  val keep = e match {
+                    case se: ChannelStateEvent =>
+                      se.getState == ChannelState.OPEN
+                    case _: WriteCompletionEvent => false
+                    case _ => true
+                  }
+                  if (keep) recvd ! e
                 }
-                if (keep) recvd ! e
               }
-            })
+            )
             pipeline
           }
         })

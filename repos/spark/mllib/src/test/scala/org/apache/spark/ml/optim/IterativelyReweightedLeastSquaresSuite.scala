@@ -47,7 +47,8 @@ class IterativelyReweightedLeastSquaresSuite
         Instance(1.0, 3.0, Vectors.dense(2.0, 1.0)),
         Instance(0.0, 4.0, Vectors.dense(3.0, 3.0))
       ),
-      2)
+      2
+    )
     /*
        R code:
 
@@ -62,7 +63,8 @@ class IterativelyReweightedLeastSquaresSuite
         Instance(3.0, 3.0, Vectors.dense(2.0, 11.0)),
         Instance(9.0, 4.0, Vectors.dense(3.0, 13.0))
       ),
-      2)
+      2
+    )
   }
 
   test("IRLS against GLM with Binomial errors") {

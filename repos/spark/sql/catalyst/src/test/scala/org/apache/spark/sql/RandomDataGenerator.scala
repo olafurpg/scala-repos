@@ -188,25 +188,29 @@ object RandomDataGenerator {
                      new MathContext(precision))
               .bigDecimal)
       case DoubleType =>
-        randomNumeric[Double](rand,
-                              r => longBitsToDouble(r.nextLong()),
-                              Seq(Double.MinValue,
-                                  Double.MinPositiveValue,
-                                  Double.MaxValue,
-                                  Double.PositiveInfinity,
-                                  Double.NegativeInfinity,
-                                  Double.NaN,
-                                  0.0))
+        randomNumeric[Double](
+          rand,
+          r => longBitsToDouble(r.nextLong()),
+          Seq(Double.MinValue,
+              Double.MinPositiveValue,
+              Double.MaxValue,
+              Double.PositiveInfinity,
+              Double.NegativeInfinity,
+              Double.NaN,
+              0.0)
+        )
       case FloatType =>
-        randomNumeric[Float](rand,
-                             r => intBitsToFloat(r.nextInt()),
-                             Seq(Float.MinValue,
-                                 Float.MinPositiveValue,
-                                 Float.MaxValue,
-                                 Float.PositiveInfinity,
-                                 Float.NegativeInfinity,
-                                 Float.NaN,
-                                 0.0f))
+        randomNumeric[Float](
+          rand,
+          r => intBitsToFloat(r.nextInt()),
+          Seq(Float.MinValue,
+              Float.MinPositiveValue,
+              Float.MaxValue,
+              Float.PositiveInfinity,
+              Float.NegativeInfinity,
+              Float.NaN,
+              0.0f)
+        )
       case ByteType =>
         randomNumeric[Byte](rand,
                             _.nextInt().toByte,

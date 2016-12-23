@@ -429,7 +429,8 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         Option(elem.getParent).map(_.getParent).exists {
           case _: ScParameterClause | _: ScArgumentExprList => true
           case _ => false
-      })
+      }
+    )
   }
 
   private def indentDefinitionAssign(file: PsiFile)(document: Document,
@@ -447,7 +448,8 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
           case _: ScFunction | _: ScVariable | _: ScValue | _: ScTypeAlias =>
             true
           case _ => false
-      })
+      }
+    )
   }
 
   private def indentValBraceStyle(file: PsiFile)(document: Document,

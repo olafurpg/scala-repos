@@ -68,16 +68,18 @@ class ConstraintPropagationSuite extends SparkFunSuite {
       ExpressionSet(
         Seq(resolveColumn(tr, "a") > 10, IsNotNull(resolveColumn(tr, "a")))))
 
-    verifyConstraints(tr.where('a.attr > 10)
-                        .select('c.attr, 'a.attr)
-                        .where('c.attr =!= 100)
-                        .analyze
-                        .constraints,
-                      ExpressionSet(
-                        Seq(resolveColumn(tr, "a") > 10,
-                            resolveColumn(tr, "c") =!= 100,
-                            IsNotNull(resolveColumn(tr, "a")),
-                            IsNotNull(resolveColumn(tr, "c")))))
+    verifyConstraints(
+      tr.where('a.attr > 10)
+        .select('c.attr, 'a.attr)
+        .where('c.attr =!= 100)
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(resolveColumn(tr, "a") > 10,
+            resolveColumn(tr, "c") =!= 100,
+            IsNotNull(resolveColumn(tr, "a")),
+            IsNotNull(resolveColumn(tr, "c"))))
+    )
   }
 
   test("propagating constraints in aggregate") {
@@ -94,10 +96,13 @@ class ConstraintPropagationSuite extends SparkFunSuite {
     verifyConstraints(
       aliasedRelation.analyze.constraints,
       ExpressionSet(
-        Seq(resolveColumn(aliasedRelation.analyze, "c1") > 10,
-            IsNotNull(resolveColumn(aliasedRelation.analyze, "c1")),
-            resolveColumn(aliasedRelation.analyze, "a") < 5,
-            IsNotNull(resolveColumn(aliasedRelation.analyze, "a")))))
+        Seq(
+          resolveColumn(aliasedRelation.analyze, "c1") > 10,
+          IsNotNull(resolveColumn(aliasedRelation.analyze, "c1")),
+          resolveColumn(aliasedRelation.analyze, "a") < 5,
+          IsNotNull(resolveColumn(aliasedRelation.analyze, "a"))
+        ))
+    )
   }
 
   test("propagating constraints in aliases") {
@@ -116,13 +121,16 @@ class ConstraintPropagationSuite extends SparkFunSuite {
     verifyConstraints(
       aliasedRelation.analyze.constraints,
       ExpressionSet(
-        Seq(resolveColumn(aliasedRelation.analyze, "x") > 10,
-            IsNotNull(resolveColumn(aliasedRelation.analyze, "x")),
-            resolveColumn(aliasedRelation.analyze, "b") <=> resolveColumn(
-              aliasedRelation.analyze,
-              "y"),
-            resolveColumn(aliasedRelation.analyze, "z") > 10,
-            IsNotNull(resolveColumn(aliasedRelation.analyze, "z")))))
+        Seq(
+          resolveColumn(aliasedRelation.analyze, "x") > 10,
+          IsNotNull(resolveColumn(aliasedRelation.analyze, "x")),
+          resolveColumn(aliasedRelation.analyze, "b") <=> resolveColumn(
+            aliasedRelation.analyze,
+            "y"),
+          resolveColumn(aliasedRelation.analyze, "z") > 10,
+          IsNotNull(resolveColumn(aliasedRelation.analyze, "z"))
+        ))
+    )
   }
 
   test("propagating constraints in union") {
@@ -145,23 +153,26 @@ class ConstraintPropagationSuite extends SparkFunSuite {
         .analyze
         .constraints,
       ExpressionSet(
-        Seq(resolveColumn(tr1, "a") > 10, IsNotNull(resolveColumn(tr1, "a")))))
+        Seq(resolveColumn(tr1, "a") > 10, IsNotNull(resolveColumn(tr1, "a"))))
+    )
   }
 
   test("propagating constraints in intersect") {
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int)
     val tr2 = LocalRelation('a.int, 'b.int, 'c.int)
 
-    verifyConstraints(tr1
-                        .where('a.attr > 10)
-                        .intersect(tr2.where('b.attr < 100))
-                        .analyze
-                        .constraints,
-                      ExpressionSet(
-                        Seq(resolveColumn(tr1, "a") > 10,
-                            resolveColumn(tr1, "b") < 100,
-                            IsNotNull(resolveColumn(tr1, "a")),
-                            IsNotNull(resolveColumn(tr1, "b")))))
+    verifyConstraints(
+      tr1
+        .where('a.attr > 10)
+        .intersect(tr2.where('b.attr < 100))
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(resolveColumn(tr1, "a") > 10,
+            resolveColumn(tr1, "b") < 100,
+            IsNotNull(resolveColumn(tr1, "a")),
+            IsNotNull(resolveColumn(tr1, "b"))))
+    )
   }
 
   test("propagating constraints in except") {
@@ -174,7 +185,8 @@ class ConstraintPropagationSuite extends SparkFunSuite {
         .analyze
         .constraints,
       ExpressionSet(
-        Seq(resolveColumn(tr1, "a") > 10, IsNotNull(resolveColumn(tr1, "a")))))
+        Seq(resolveColumn(tr1, "a") > 10, IsNotNull(resolveColumn(tr1, "a"))))
+    )
   }
 
   test("propagating constraints in inner join") {
@@ -189,15 +201,18 @@ class ConstraintPropagationSuite extends SparkFunSuite {
         .analyze
         .constraints,
       ExpressionSet(
-        Seq(tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
-            tr2.resolveQuoted("d", caseInsensitiveResolution).get < 100,
-            tr1
-              .resolveQuoted("a", caseInsensitiveResolution)
-              .get === tr2.resolveQuoted("a", caseInsensitiveResolution).get,
-            tr2.resolveQuoted("a", caseInsensitiveResolution).get > 10,
-            IsNotNull(tr2.resolveQuoted("a", caseInsensitiveResolution).get),
-            IsNotNull(tr1.resolveQuoted("a", caseInsensitiveResolution).get),
-            IsNotNull(tr2.resolveQuoted("d", caseInsensitiveResolution).get))))
+        Seq(
+          tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
+          tr2.resolveQuoted("d", caseInsensitiveResolution).get < 100,
+          tr1
+            .resolveQuoted("a", caseInsensitiveResolution)
+            .get === tr2.resolveQuoted("a", caseInsensitiveResolution).get,
+          tr2.resolveQuoted("a", caseInsensitiveResolution).get > 10,
+          IsNotNull(tr2.resolveQuoted("a", caseInsensitiveResolution).get),
+          IsNotNull(tr1.resolveQuoted("a", caseInsensitiveResolution).get),
+          IsNotNull(tr2.resolveQuoted("d", caseInsensitiveResolution).get)
+        ))
+    )
   }
 
   test("propagating constraints in left-semi join") {
@@ -213,7 +228,8 @@ class ConstraintPropagationSuite extends SparkFunSuite {
         .constraints,
       ExpressionSet(
         Seq(tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
-            IsNotNull(tr1.resolveQuoted("a", caseInsensitiveResolution).get))))
+            IsNotNull(tr1.resolveQuoted("a", caseInsensitiveResolution).get)))
+    )
   }
 
   test("propagating constraints in left-outer join") {
@@ -229,7 +245,8 @@ class ConstraintPropagationSuite extends SparkFunSuite {
         .constraints,
       ExpressionSet(
         Seq(tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
-            IsNotNull(tr1.resolveQuoted("a", caseInsensitiveResolution).get))))
+            IsNotNull(tr1.resolveQuoted("a", caseInsensitiveResolution).get)))
+    )
   }
 
   test("propagating constraints in right-outer join") {
@@ -245,7 +262,8 @@ class ConstraintPropagationSuite extends SparkFunSuite {
         .constraints,
       ExpressionSet(
         Seq(tr2.resolveQuoted("d", caseInsensitiveResolution).get < 100,
-            IsNotNull(tr2.resolveQuoted("d", caseInsensitiveResolution).get))))
+            IsNotNull(tr2.resolveQuoted("d", caseInsensitiveResolution).get)))
+    )
   }
 
   test("propagating constraints in full-outer join") {
@@ -268,10 +286,13 @@ class ConstraintPropagationSuite extends SparkFunSuite {
     verifyConstraints(
       tr.where('a.attr > 10 && 'a.attr === 'b.attr).analyze.constraints,
       ExpressionSet(
-        Seq(resolveColumn(tr, "a") > 10,
-            resolveColumn(tr, "b") > 10,
-            resolveColumn(tr, "a") === resolveColumn(tr, "b"),
-            IsNotNull(resolveColumn(tr, "a")),
-            IsNotNull(resolveColumn(tr, "b")))))
+        Seq(
+          resolveColumn(tr, "a") > 10,
+          resolveColumn(tr, "b") > 10,
+          resolveColumn(tr, "a") === resolveColumn(tr, "b"),
+          IsNotNull(resolveColumn(tr, "a")),
+          IsNotNull(resolveColumn(tr, "b"))
+        ))
+    )
   }
 }

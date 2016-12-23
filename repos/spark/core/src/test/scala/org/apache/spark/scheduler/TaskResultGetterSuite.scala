@@ -183,12 +183,14 @@ class TaskResultGetterSuite
     val srcDir = new File(tempDir, "repro/")
     srcDir.mkdirs()
     val excSource =
-      new JavaSourceFromString(new File(srcDir, "MyException").getAbsolutePath,
-                               """package repro;
+      new JavaSourceFromString(
+        new File(srcDir, "MyException").getAbsolutePath,
+        """package repro;
         |
         |public class MyException extends Exception {
         |}
-      """.stripMargin)
+      """.stripMargin
+      )
     val excFile = TestUtils
       .createCompiledClass("MyException", srcDir, excSource, Seq.empty)
     val jarFile =

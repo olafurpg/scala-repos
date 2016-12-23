@@ -156,14 +156,16 @@ class WebHookServiceSpec extends FunSuite with ServiceSpecBase {
                          "http://example.com/3",
                          Set(WebHook.PullRequest, WebHook.Push),
                          Some("key"))
-      assert(service.getWebHooks("user1", "repo1") == List(
-        WebHook("user1", "repo1", "http://example.com/1", Some("key")) -> Set(
-          WebHook.PullRequest),
-        WebHook("user1", "repo1", "http://example.com/2", Some("key")) -> Set(
-          WebHook.Push),
-        WebHook("user1", "repo1", "http://example.com/3", Some("key")) -> Set(
-          WebHook.PullRequest,
-          WebHook.Push)))
+      assert(
+        service.getWebHooks("user1", "repo1") == List(
+          WebHook("user1", "repo1", "http://example.com/1", Some("key")) -> Set(
+            WebHook.PullRequest),
+          WebHook("user1", "repo1", "http://example.com/2", Some("key")) -> Set(
+            WebHook.Push),
+          WebHook("user1", "repo1", "http://example.com/3", Some("key")) -> Set(
+            WebHook.PullRequest,
+            WebHook.Push)
+        ))
       assert(
         service
           .getWebHooksByEvent("user1", "repo1", WebHook.PullRequest) == List(

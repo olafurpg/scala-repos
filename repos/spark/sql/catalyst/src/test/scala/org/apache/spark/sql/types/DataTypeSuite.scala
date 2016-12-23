@@ -314,7 +314,8 @@ class DataTypeSuite extends SparkFunSuite {
     to = MapType(StringType,
                  ArrayType(IntegerType, false),
                  valueContainsNull = true),
-    expected = false)
+    expected = false
+  )
   checkEqualsIgnoreCompatibleNullability(
     from = MapType(StringType,
                    ArrayType(IntegerType, false),
@@ -322,7 +323,8 @@ class DataTypeSuite extends SparkFunSuite {
     to = MapType(StringType,
                  ArrayType(IntegerType, true),
                  valueContainsNull = true),
-    expected = true)
+    expected = true
+  )
 
   checkEqualsIgnoreCompatibleNullability(
     from = StructType(StructField("a", StringType, nullable = true) :: Nil),
@@ -351,5 +353,6 @@ class DataTypeSuite extends SparkFunSuite {
         "b",
         StringType,
         nullable = false) :: Nil),
-    expected = false)
+    expected = false
+  )
 }
