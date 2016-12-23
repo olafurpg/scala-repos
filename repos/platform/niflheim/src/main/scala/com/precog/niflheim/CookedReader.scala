@@ -165,22 +165,24 @@ final class CookedReader(baseDir: File,
     : ValidationNel[IOException, List[(ColumnRef, List[Segment])]] = {
     segmentsByRef.toValidationNel flatMap {
       (segsByRef: Map[ColumnRef, List[File]]) =>
-        paths.map { path =>
-          val v: ValidationNel[IOException, List[Segment]] = segsByRef
-            .getOrElse(path, Nil)
-            .map { file0 =>
-              val file =
-                if (file0.isAbsolute) file0
-                else new File(baseDir, file0.getPath)
-              read(file) { channel =>
-                segmentFormat.reader.readSegment(channel).toValidationNel
+        paths
+          .map { path =>
+            val v: ValidationNel[IOException, List[Segment]] = segsByRef
+              .getOrElse(path, Nil)
+              .map { file0 =>
+                val file =
+                  if (file0.isAbsolute) file0
+                  else new File(baseDir, file0.getPath)
+                read(file) { channel =>
+                  segmentFormat.reader.readSegment(channel).toValidationNel
+                }
               }
-            }
-            .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
-                      Segment]
-          v map (path -> _)
-        }.sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
-                   (ColumnRef, List[Segment])]
+              .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
+                        Segment]
+            v map (path -> _)
+          }
+          .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
+                    (ColumnRef, List[Segment])]
     }
   }
 }

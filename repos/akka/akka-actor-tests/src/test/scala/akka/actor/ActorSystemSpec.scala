@@ -115,7 +115,8 @@ object ActorSystemSpec {
       config.getInt("throughput"),
       config.getNanosDuration("throughput-deadline-time"),
       configureExecutor(),
-      config.getMillisDuration("shutdown-timeout")) {
+      config.getMillisDuration("shutdown-timeout")
+    ) {
       val doneIt = new Switch
       override protected[akka] def registerForExecution(
           mbox: Mailbox,

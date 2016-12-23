@@ -151,25 +151,29 @@ class LoggerTest extends WordSpec with TempFolder with BeforeAndAfter {
 
     "provide level name and value maps" in {
       assert(
-        Logger.levels == Map(Level.ALL.value -> Level.ALL,
-                             Level.TRACE.value -> Level.TRACE,
-                             Level.DEBUG.value -> Level.DEBUG,
-                             Level.INFO.value -> Level.INFO,
-                             Level.WARNING.value -> Level.WARNING,
-                             Level.ERROR.value -> Level.ERROR,
-                             Level.CRITICAL.value -> Level.CRITICAL,
-                             Level.FATAL.value -> Level.FATAL,
-                             Level.OFF.value -> Level.OFF))
+        Logger.levels == Map(
+          Level.ALL.value -> Level.ALL,
+          Level.TRACE.value -> Level.TRACE,
+          Level.DEBUG.value -> Level.DEBUG,
+          Level.INFO.value -> Level.INFO,
+          Level.WARNING.value -> Level.WARNING,
+          Level.ERROR.value -> Level.ERROR,
+          Level.CRITICAL.value -> Level.CRITICAL,
+          Level.FATAL.value -> Level.FATAL,
+          Level.OFF.value -> Level.OFF
+        ))
       assert(
-        Logger.levelNames == Map("ALL" -> Level.ALL,
-                                 "TRACE" -> Level.TRACE,
-                                 "DEBUG" -> Level.DEBUG,
-                                 "INFO" -> Level.INFO,
-                                 "WARNING" -> Level.WARNING,
-                                 "ERROR" -> Level.ERROR,
-                                 "CRITICAL" -> Level.CRITICAL,
-                                 "FATAL" -> Level.FATAL,
-                                 "OFF" -> Level.OFF))
+        Logger.levelNames == Map(
+          "ALL" -> Level.ALL,
+          "TRACE" -> Level.TRACE,
+          "DEBUG" -> Level.DEBUG,
+          "INFO" -> Level.INFO,
+          "WARNING" -> Level.WARNING,
+          "ERROR" -> Level.ERROR,
+          "CRITICAL" -> Level.CRITICAL,
+          "FATAL" -> Level.FATAL,
+          "OFF" -> Level.OFF
+        ))
     }
 
     "figure out package names" in {

@@ -49,7 +49,8 @@ final case class AtomicWrite(payload: immutable.Seq[PersistentRepr])
     require(
       payload.forall(_.persistenceId == payload.head.persistenceId),
       "AtomicWrite must contain messages for the same persistenceId, " +
-        s"yet different persistenceIds found: ${payload.map(_.persistenceId).toSet}")
+        s"yet different persistenceIds found: ${payload.map(_.persistenceId).toSet}"
+    )
 
   def persistenceId = payload.head.persistenceId
   def lowestSequenceNr =

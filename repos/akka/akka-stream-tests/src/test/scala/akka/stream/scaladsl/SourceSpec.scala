@@ -79,50 +79,53 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
   }
 
   "Maybe Source" must {
-    "complete materialized future with None when stream cancels" in Utils.assertAllStagesStopped {
-      val neverSource = Source.maybe[Int]
-      val pubSink = Sink.asPublisher[Int](false)
+    "complete materialized future with None when stream cancels" in Utils
+      .assertAllStagesStopped {
+        val neverSource = Source.maybe[Int]
+        val pubSink = Sink.asPublisher[Int](false)
 
-      val (f, neverPub) = neverSource.toMat(pubSink)(Keep.both).run()
+        val (f, neverPub) = neverSource.toMat(pubSink)(Keep.both).run()
 
-      val c = TestSubscriber.manualProbe[Int]()
-      neverPub.subscribe(c)
-      val subs = c.expectSubscription()
+        val c = TestSubscriber.manualProbe[Int]()
+        neverPub.subscribe(c)
+        val subs = c.expectSubscription()
 
-      subs.request(1000)
-      c.expectNoMsg(300.millis)
+        subs.request(1000)
+        c.expectNoMsg(300.millis)
 
-      subs.cancel()
-      Await.result(f.future, 500.millis) shouldEqual None
-    }
-
-    "allow external triggering of empty completion" in Utils.assertAllStagesStopped {
-      val neverSource = Source.maybe[Int].filter(_ ⇒ false)
-      val counterSink = Sink.fold[Int, Int](0) { (acc, _) ⇒
-        acc + 1
+        subs.cancel()
+        Await.result(f.future, 500.millis) shouldEqual None
       }
 
-      val (neverPromise, counterFuture) =
-        neverSource.toMat(counterSink)(Keep.both).run()
+    "allow external triggering of empty completion" in Utils
+      .assertAllStagesStopped {
+        val neverSource = Source.maybe[Int].filter(_ ⇒ false)
+        val counterSink = Sink.fold[Int, Int](0) { (acc, _) ⇒
+          acc + 1
+        }
 
-      // external cancellation
-      neverPromise.trySuccess(None) shouldEqual true
+        val (neverPromise, counterFuture) =
+          neverSource.toMat(counterSink)(Keep.both).run()
 
-      Await.result(counterFuture, 500.millis) shouldEqual 0
-    }
+        // external cancellation
+        neverPromise.trySuccess(None) shouldEqual true
 
-    "allow external triggering of non-empty completion" in Utils.assertAllStagesStopped {
-      val neverSource = Source.maybe[Int]
-      val counterSink = Sink.head[Int]
+        Await.result(counterFuture, 500.millis) shouldEqual 0
+      }
 
-      val (neverPromise, counterFuture) =
-        neverSource.toMat(counterSink)(Keep.both).run()
+    "allow external triggering of non-empty completion" in Utils
+      .assertAllStagesStopped {
+        val neverSource = Source.maybe[Int]
+        val counterSink = Sink.head[Int]
 
-      // external cancellation
-      neverPromise.trySuccess(Some(6)) shouldEqual true
+        val (neverPromise, counterFuture) =
+          neverSource.toMat(counterSink)(Keep.both).run()
 
-      Await.result(counterFuture, 500.millis) shouldEqual 6
-    }
+        // external cancellation
+        neverPromise.trySuccess(Some(6)) shouldEqual true
+
+        Await.result(counterFuture, 500.millis) shouldEqual 6
+      }
 
     "allow external triggering of onError" in Utils.assertAllStagesStopped {
       val neverSource = Source.maybe[Int]
@@ -240,42 +243,10 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
   }
 
   "Unfold Source" must {
-    val expected = List(9227465,
-                        5702887,
-                        3524578,
-                        2178309,
-                        1346269,
-                        832040,
-                        514229,
-                        317811,
-                        196418,
-                        121393,
-                        75025,
-                        46368,
-                        28657,
-                        17711,
-                        10946,
-                        6765,
-                        4181,
-                        2584,
-                        1597,
-                        987,
-                        610,
-                        377,
-                        233,
-                        144,
-                        89,
-                        55,
-                        34,
-                        21,
-                        13,
-                        8,
-                        5,
-                        3,
-                        2,
-                        1,
-                        1,
-                        0)
+    val expected = List(9227465, 5702887, 3524578, 2178309, 1346269, 832040,
+      514229, 317811, 196418, 121393, 75025, 46368, 28657, 17711, 10946, 6765,
+      4181, 2584, 1597, 987, 610, 377, 233, 144, 89, 55, 34, 21, 13, 8, 5, 3,
+      2, 1, 1, 0)
 
     "generate a finite fibonacci sequence" in {
       Source

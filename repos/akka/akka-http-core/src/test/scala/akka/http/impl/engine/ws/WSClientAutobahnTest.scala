@@ -113,46 +113,51 @@ object WSClientAutobahnTest extends App {
     // run one
     val testId = args(0)
     println(s"Trying to run test $testId")
-    getCaseMap().flatMap { map ⇒
-      val info = map(testId)
-      richRunCase(info.index)
-    }.onComplete {
-      case Success(res) ⇒
-        println(s"[OK] Run successfully finished!")
-        updateReportsAndShutdown()
-      case Failure(e) ⇒
-        println(s"[${RED}FAILED$RESET] Run failed with this exception: ")
-        e.printStackTrace()
-        updateReportsAndShutdown()
-    }
+    getCaseMap()
+      .flatMap { map ⇒
+        val info = map(testId)
+        richRunCase(info.index)
+      }
+      .onComplete {
+        case Success(res) ⇒
+          println(s"[OK] Run successfully finished!")
+          updateReportsAndShutdown()
+        case Failure(e) ⇒
+          println(s"[${RED}FAILED$RESET] Run failed with this exception: ")
+          e.printStackTrace()
+          updateReportsAndShutdown()
+      }
   } else {
     println("Running complete test suite")
-    getCaseCount().flatMap { count ⇒
-      println(s"Found $count tests.")
-      Source(1 to count)
-        .mapAsyncUnordered(Parallelism)(richRunCase(_))
-        .grouped(count)
-        .runWith(Sink.head)
-    }.map { results ⇒
-      val grouped = results.groupBy(_.status.behavior)
-
-      println(s"${results.size} tests run.")
-      println()
-      println(s"${GREEN}OK$RESET: ${grouped.getOrElse("OK", Nil).size}")
-      val notOk = grouped.filterNot(_._1 == "OK")
-      notOk.toSeq.sortBy(_._2.size).foreach {
-        case (status, cases) ⇒ println(s"$RED$status$RESET: ${cases.size}")
+    getCaseCount()
+      .flatMap { count ⇒
+        println(s"Found $count tests.")
+        Source(1 to count)
+          .mapAsyncUnordered(Parallelism)(richRunCase(_))
+          .grouped(count)
+          .runWith(Sink.head)
       }
-      println()
-      println("Not OK tests: ")
-      println()
-      results.filterNot(_.status.behavior == "OK").foreach { r ⇒
-        println(
-          f"$RED${r.status.behavior}%-20s$RESET $YELLOW${r.info.id}%-7s$RESET - $RESET${r.info.description}")
-      }
+      .map { results ⇒
+        val grouped = results.groupBy(_.status.behavior)
 
-      ()
-    }.onComplete(completion)
+        println(s"${results.size} tests run.")
+        println()
+        println(s"${GREEN}OK$RESET: ${grouped.getOrElse("OK", Nil).size}")
+        val notOk = grouped.filterNot(_._1 == "OK")
+        notOk.toSeq.sortBy(_._2.size).foreach {
+          case (status, cases) ⇒ println(s"$RED$status$RESET: ${cases.size}")
+        }
+        println()
+        println("Not OK tests: ")
+        println()
+        results.filterNot(_.status.behavior == "OK").foreach { r ⇒
+          println(
+            f"$RED${r.status.behavior}%-20s$RESET $YELLOW${r.info.id}%-7s$RESET - $RESET${r.info.description}")
+        }
+
+        ()
+      }
+      .onComplete(completion)
   }
 
   def completion[T]: Try[T] ⇒ Unit = {
@@ -210,15 +215,15 @@ object WSClientAutobahnTest extends App {
     */
   def runToSingleText(uri: Uri): Future[String] = {
     val sink = Sink.head[Message]
-    runWs(
-      uri,
-      Flow
-        .fromSinkAndSourceMat(sink, Source.maybe[Message])(Keep.left)).flatMap {
-      case tm: TextMessage ⇒ tm.textStream.runWith(Sink.fold("")(_ + _))
-      case other ⇒
-        throw new IllegalStateException(
-          s"unexpected element of type ${other.getClass}")
-    }
+    runWs(uri,
+          Flow
+            .fromSinkAndSourceMat(sink, Source.maybe[Message])(Keep.left))
+      .flatMap {
+        case tm: TextMessage ⇒ tm.textStream.runWith(Sink.fold("")(_ + _))
+        case other ⇒
+          throw new IllegalStateException(
+            s"unexpected element of type ${other.getClass}")
+      }
   }
   def runToSingleJsonValue[T: JsonReader](uri: Uri): Future[T] =
     runToSingleText(uri).map(_.parseJson.convertTo[T])

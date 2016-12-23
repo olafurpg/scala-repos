@@ -172,7 +172,8 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
                 expr("named_struct('a', _1, 'b', _2)").as[ClassData]),
       ("a", ClassData("a", 1)),
       ("b", ClassData("b", 2)),
-      ("c", ClassData("c", 3)))
+      ("c", ClassData("c", 3))
+    )
   }
 
   test("select 2, primitive and class, fields reordered") {
@@ -182,7 +183,8 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
                 expr("named_struct('b', _2, 'a', _1)").as[ClassData]),
       ("a", ClassData("a", 1)),
       ("b", ClassData("b", 2)),
-      ("c", ClassData("c", 3)))
+      ("c", ClassData("c", 3))
+    )
   }
 
   test("filter") {
@@ -228,7 +230,8 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
       ds1.joinWith(ds2, $"_1" === $"a", "outer"),
       (ClassNullableData("a", 1), ("a", new Integer(1))),
       (ClassNullableData("c", 3), (nullString, nullInteger)),
-      (ClassNullableData(nullString, nullInteger), ("b", new Integer(2))))
+      (ClassNullableData(nullString, nullInteger), ("b", new Integer(2)))
+    )
   }
 
   test("joinWith tuple with primitive, expression") {
@@ -387,14 +390,16 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
   test("typed aggregation: expr, expr, expr, expr") {
     val ds = Seq(("a", 10), ("a", 20), ("b", 1), ("b", 2), ("c", 1)).toDS()
 
-    checkDataset(ds.groupByKey(_._1)
-                   .agg(sum("_2").as[Long],
-                        sum($"_2" + 1).as[Long],
-                        count("*").as[Long],
-                        avg("_2").as[Double]),
-                 ("a", 30L, 32L, 2L, 15.0),
-                 ("b", 3L, 5L, 2L, 1.5),
-                 ("c", 1L, 2L, 1L, 1.0))
+    checkDataset(
+      ds.groupByKey(_._1)
+        .agg(sum("_2").as[Long],
+             sum($"_2" + 1).as[Long],
+             count("*").as[Long],
+             avg("_2").as[Double]),
+      ("a", 30L, 32L, 2L, 15.0),
+      ("b", 3L, 5L, 2L, 1.5),
+      ("c", 1L, 2L, 1L, 1.0)
+    )
   }
 
   test("cogroup") {
@@ -529,7 +534,8 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
       ((nullInt, "1"), (nullInt, "1")),
       ((new java.lang.Integer(22), "2"), (nullInt, "1")),
       ((nullInt, "1"), (new java.lang.Integer(22), "2")),
-      ((new java.lang.Integer(22), "2"), (new java.lang.Integer(22), "2")))
+      ((new java.lang.Integer(22), "2"), (new java.lang.Integer(22), "2"))
+    )
   }
 
   test("change encoder with compatible schema") {

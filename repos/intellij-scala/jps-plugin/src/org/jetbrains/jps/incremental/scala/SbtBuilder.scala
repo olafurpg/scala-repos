@@ -126,15 +126,18 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     resourceRoots.foreach { root: ResourceRootDescriptor =>
       val filter = root.createFileFilter()
 
-      FileUtil.processFilesRecursively(root.getRootFile, new Processor[File] {
-        def process(file: File) = {
-          if (file.isFile && filter.accept(file) &&
-              !excludeIndex.isExcluded(file)) {
-            ResourceUpdater.updateResource(context, root, file, outputRoot)
+      FileUtil.processFilesRecursively(
+        root.getRootFile,
+        new Processor[File] {
+          def process(file: File) = {
+            if (file.isFile && filter.accept(file) &&
+                !excludeIndex.isExcluded(file)) {
+              ResourceUpdater.updateResource(context, root, file, outputRoot)
+            }
+            true
           }
-          true
         }
-      })
+      )
     }
   }
 
@@ -203,17 +206,20 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
 
     for (target <- chunk.getTargets.asScala ++ sourceTargets;
          root <- rootIndex.getTargetRoots(target, context).asScala) {
-      FileUtil.processFilesRecursively(root.getRootFile, new Processor[File] {
-        def process(file: File) = {
-          if (!excludeIndex.isExcluded(file)) {
-            val path = file.getPath
-            if (path.endsWith(".scala") || path.endsWith(".java")) {
-              result += file -> target
+      FileUtil.processFilesRecursively(
+        root.getRootFile,
+        new Processor[File] {
+          def process(file: File) = {
+            if (!excludeIndex.isExcluded(file)) {
+              val path = file.getPath
+              if (path.endsWith(".scala") || path.endsWith(".java")) {
+                result += file -> target
+              }
             }
+            true
           }
-          true
         }
-      })
+      )
     }
 
     result

@@ -54,27 +54,30 @@ class ScalaKeywordCompletionContributor extends ScalaCompletionContributor {
                 positionFromParameters(parameters)))
           }
         }
-      })
+      }
+    )
   }
 
   private def registerTypeAfterDotCompletion(filter: ElementFilter,
                                              keywords: String*) {
-    extend(CompletionType.BASIC,
-           PlatformPatterns.psiElement.and(
-             new FilterPattern(
-               new AndFilter(new LeftNeighbour(new TextFilter(".")), filter))),
-           new CompletionProvider[CompletionParameters] {
-             def addCompletions(parameters: CompletionParameters,
-                                context: ProcessingContext,
-                                result: CompletionResultSet) {
-               for (keyword <- keywords) {
-                 result.addElement(
-                   LookupElementManager.getKeywrodLookupElement(
-                     keyword,
-                     positionFromParameters(parameters)))
-               }
-             }
-           })
+    extend(
+      CompletionType.BASIC,
+      PlatformPatterns.psiElement.and(
+        new FilterPattern(
+          new AndFilter(new LeftNeighbour(new TextFilter(".")), filter))),
+      new CompletionProvider[CompletionParameters] {
+        def addCompletions(parameters: CompletionParameters,
+                           context: ProcessingContext,
+                           result: CompletionResultSet) {
+          for (keyword <- keywords) {
+            result.addElement(
+              LookupElementManager.getKeywrodLookupElement(
+                keyword,
+                positionFromParameters(parameters)))
+          }
+        }
+      }
+    )
   }
 
   registerStandardCompletion(new PackageFilter, "package")

@@ -83,67 +83,74 @@ abstract class IntroduceParameterTestBase
 
     //start to inline
     try {
-      ScalaUtils.runWriteActionDoNotRequestConfirmation(new Runnable {
-        def run() {
-          editor.getSelectionModel.setSelection(startOffset, endOffset)
-          ScalaRefactoringUtil.afterExpressionChoosing(project,
-                                                       editor,
-                                                       scalaFile,
-                                                       null,
-                                                       "Introduce Variable") {
-            ScalaRefactoringUtil.trimSpacesAndComments(editor, scalaFile)
-            PsiDocumentManager.getInstance(project).commitAllDocuments()
-            val handler = new ScalaIntroduceParameterHandler()
-            val (exprWithTypes, elems) =
-              handler.selectedElements(scalaFile, project, editor) match {
-                case Some((x, y)) => (x, y)
-                case None => return
-              }
+      ScalaUtils.runWriteActionDoNotRequestConfirmation(
+        new Runnable {
+          def run() {
+            editor.getSelectionModel.setSelection(startOffset, endOffset)
+            ScalaRefactoringUtil.afterExpressionChoosing(
+              project,
+              editor,
+              scalaFile,
+              null,
+              "Introduce Variable") {
+              ScalaRefactoringUtil.trimSpacesAndComments(editor, scalaFile)
+              PsiDocumentManager.getInstance(project).commitAllDocuments()
+              val handler = new ScalaIntroduceParameterHandler()
+              val (exprWithTypes, elems) =
+                handler.selectedElements(scalaFile, project, editor) match {
+                  case Some((x, y)) => (x, y)
+                  case None => return
+                }
 
-            val (methodLike: ScMethodLike, returnType) =
-              if (toPrimaryConstructor)
-                (PsiTreeUtil
-                   .getContextOfType(elems.head, true, classOf[ScClass])
-                   .constructor
-                   .get,
-                 StdType.ANY)
-              else {
-                val fun =
-                  PsiTreeUtil.getContextOfType(elems.head,
-                                               true,
-                                               classOf[ScFunctionDefinition])
-                (fun, fun.returnType.getOrAny)
-              }
-            val collectedData =
-              handler.collectData(exprWithTypes, elems, methodLike, editor)
-            assert(collectedData.isDefined,
-                   "Could not collect data for introduce parameter")
-            val data = collectedData.get
-              .copy(paramName = paramName, replaceAll = replaceAllOccurrences)
+              val (methodLike: ScMethodLike, returnType) =
+                if (toPrimaryConstructor)
+                  (PsiTreeUtil
+                     .getContextOfType(elems.head, true, classOf[ScClass])
+                     .constructor
+                     .get,
+                   StdType.ANY)
+                else {
+                  val fun =
+                    PsiTreeUtil.getContextOfType(elems.head,
+                                                 true,
+                                                 classOf[ScFunctionDefinition])
+                  (fun, fun.returnType.getOrAny)
+                }
+              val collectedData =
+                handler.collectData(exprWithTypes, elems, methodLike, editor)
+              assert(collectedData.isDefined,
+                     "Could not collect data for introduce parameter")
+              val data = collectedData.get
+                .copy(paramName = paramName,
+                      replaceAll = replaceAllOccurrences)
 
-            val paramInfo =
-              new ScalaParameterInfo(data.paramName,
-                                     -1,
-                                     data.tp,
-                                     project,
-                                     false,
-                                     false,
-                                     data.defaultArg,
-                                     isIntroducedParameter = true)
-            val descriptor: ScalaMethodDescriptor =
-              handler.createMethodDescriptor(data.methodToSearchFor, paramInfo)
-            val changeInfo = new ScalaChangeInfo(descriptor.getVisibility,
-                                                 data.methodToSearchFor,
-                                                 descriptor.getName,
-                                                 returnType,
-                                                 descriptor.parameters,
-                                                 isDefaultParam)
+              val paramInfo =
+                new ScalaParameterInfo(data.paramName,
+                                       -1,
+                                       data.tp,
+                                       project,
+                                       false,
+                                       false,
+                                       data.defaultArg,
+                                       isIntroducedParameter = true)
+              val descriptor: ScalaMethodDescriptor =
+                handler.createMethodDescriptor(data.methodToSearchFor,
+                                               paramInfo)
+              val changeInfo = new ScalaChangeInfo(descriptor.getVisibility,
+                                                   data.methodToSearchFor,
+                                                   descriptor.getName,
+                                                   returnType,
+                                                   descriptor.parameters,
+                                                   isDefaultParam)
 
-            changeInfo.introducedParameterData = Some(data)
-            new ScalaChangeSignatureProcessor(project, changeInfo).run()
+              changeInfo.introducedParameterData = Some(data)
+              new ScalaChangeSignatureProcessor(project, changeInfo).run()
+            }
           }
-        }
-      }, project, "Test")
+        },
+        project,
+        "Test"
+      )
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
     } catch {
       case e: Exception =>

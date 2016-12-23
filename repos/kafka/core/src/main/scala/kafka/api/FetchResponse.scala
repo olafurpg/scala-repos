@@ -303,7 +303,8 @@ class FetchResponseSend(val dest: String, val fetchResponse: FetchResponse)
           case (topicAndPartition, message) =>
             (topicAndPartition.partition, message)
         }))
-    }))
+    })
+  )
 
   override def writeTo(channel: GatheringByteChannel): Long = {
     if (completed)

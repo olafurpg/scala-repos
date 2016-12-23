@@ -91,8 +91,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
 
         if (expr.freeTypes.nonEmpty) {
           val ft_s =
-            expr.freeTypes map (ft =>
-                                  s"  ${ft.name} ${ft.origin}") mkString "\n  "
+            expr.freeTypes map (ft => s"  ${ft.name} ${ft.origin}") mkString "\n  "
           throw ToolBoxError(s"""
             |reflective toolbox failed due to unresolved free type variables:
             |$ft_s
@@ -315,9 +314,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         val freeTerms =
           expr.freeTerms // need to calculate them here, because later on they will be erased
         val thunks =
-          freeTerms map (fte =>
-                           () =>
-                             fte.value) // need to be lazy in order not to distort evaluation order
+          freeTerms map (fte => () => fte.value) // need to be lazy in order not to distort evaluation order
         verify(expr)
 
         def wrapInModule(expr0: Tree): ModuleDef = {

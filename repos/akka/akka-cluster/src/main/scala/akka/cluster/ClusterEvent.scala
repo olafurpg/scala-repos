@@ -466,7 +466,8 @@ private[cluster] final class ClusterDomainEventPublisher
       leader = latestGossip.leader(selfUniqueAddress).map(_.address),
       roleLeaderMap = latestGossip.allRoles.map(r ⇒
         r -> latestGossip.roleLeader(r, selfUniqueAddress).map(_.address))(
-        collection.breakOut))
+        collection.breakOut)
+    )
     receiver ! state
   }
 

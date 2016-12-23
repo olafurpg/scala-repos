@@ -55,15 +55,19 @@ class JavaActionAnnotations(val controller: Class[_],
       } else {
         method.getDeclaredAnnotations ++ controllerAnnotations
       }
-    allDeclaredAnnotations.collect {
-      case a: play.mvc.With => a.value.map(c => (a, c)).toSeq
-      case a if a.annotationType.isAnnotationPresent(classOf[play.mvc.With]) =>
-        a.annotationType
-          .getAnnotation(classOf[play.mvc.With])
-          .value
-          .map(c => (a, c))
-          .toSeq
-    }.flatten.reverse
+    allDeclaredAnnotations
+      .collect {
+        case a: play.mvc.With => a.value.map(c => (a, c)).toSeq
+        case a
+            if a.annotationType.isAnnotationPresent(classOf[play.mvc.With]) =>
+          a.annotationType
+            .getAnnotation(classOf[play.mvc.With])
+            .value
+            .map(c => (a, c))
+            .toSeq
+      }
+      .flatten
+      .reverse
   }
 }
 

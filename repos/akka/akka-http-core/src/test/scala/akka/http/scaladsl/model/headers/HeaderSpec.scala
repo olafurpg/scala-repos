@@ -15,11 +15,13 @@ class HeaderSpec extends FreeSpec with Matchers {
       "successful parse run" in {
         headers.`Cache-Control`.parseFromValueString(
           "private, no-cache, no-cache=Set-Cookie, proxy-revalidate, s-maxage=1000") shouldEqual Right(
-          headers.`Cache-Control`(CacheDirectives.`private`(),
-                                  CacheDirectives.`no-cache`,
-                                  CacheDirectives.`no-cache`("Set-Cookie"),
-                                  CacheDirectives.`proxy-revalidate`,
-                                  CacheDirectives.`s-maxage`(1000)))
+          headers.`Cache-Control`(
+            CacheDirectives.`private`(),
+            CacheDirectives.`no-cache`,
+            CacheDirectives.`no-cache`("Set-Cookie"),
+            CacheDirectives.`proxy-revalidate`,
+            CacheDirectives.`s-maxage`(1000)
+          ))
       }
       "failing parse run" in {
         val Left(List(ErrorInfo(summary, detail))) =
@@ -103,7 +105,8 @@ class HeaderSpec extends FreeSpec with Matchers {
         Upgrade(Vector(UpgradeProtocol("HTTP", Some("2.0")))),
         `User-Agent`("Akka HTTP Client 2.4"),
         `X-Forwarded-For`(RemoteAddress(InetAddress.getByName("192.168.0.1"))),
-        `X-Real-Ip`(RemoteAddress(InetAddress.getByName("192.168.1.1"))))
+        `X-Real-Ip`(RemoteAddress(InetAddress.getByName("192.168.1.1")))
+      )
 
       requestHeaders.foreach { header ⇒
         header shouldBe 'renderInRequests
@@ -145,7 +148,8 @@ class HeaderSpec extends FreeSpec with Matchers {
         `Set-Cookie`(HttpCookie("sessionId", "b0eb8b8b3ad246")),
         `Transfer-Encoding`(TransferEncodings.chunked),
         Upgrade(Vector(UpgradeProtocol("HTTP", Some("2.0")))),
-        `WWW-Authenticate`(HttpChallenge("Basic", "example.com")))
+        `WWW-Authenticate`(HttpChallenge("Basic", "example.com"))
+      )
 
       responseHeaders.foreach { header ⇒
         header shouldBe 'renderInResponses

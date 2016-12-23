@@ -25,8 +25,8 @@ trait FlatMapTests[F[_]] extends ApplyTests[F] {
       name = "flatMap",
       parent = Some(apply[A, B, C]),
       "flatMap associativity" -> forAll(laws.flatMapAssociativity[A, B, C] _),
-      "flatMap consistent apply" -> forAll(
-        laws.flatMapConsistentApply[A, B] _))
+      "flatMap consistent apply" -> forAll(laws.flatMapConsistentApply[A, B] _)
+    )
   }
 }
 

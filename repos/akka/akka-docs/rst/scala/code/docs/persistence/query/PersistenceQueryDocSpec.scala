@@ -251,14 +251,17 @@ class PersistenceQueryDocSpec(s: String) extends AkkaSpec(s) {
     val query: Source[RichEvent, QueryMetadata] =
       readJournal.byTagsWithMeta(Set("red", "blue"))
 
-    query.mapMaterializedValue { meta =>
-      println(
-        s"The query is: " +
-          s"ordered deterministically: ${meta.deterministicOrder}, " +
-          s"infinite: ${meta.infinite}")
-    }.map { event =>
-      println(s"Event payload: ${event.payload}")
-    }.runWith(Sink.ignore)
+    query
+      .mapMaterializedValue { meta =>
+        println(
+          s"The query is: " +
+            s"ordered deterministically: ${meta.deterministicOrder}, " +
+            s"infinite: ${meta.infinite}")
+      }
+      .map { event =>
+        println(s"Event payload: ${event.payload}")
+      }
+      .runWith(Sink.ignore)
 
     //#advanced-journal-query-usage
   }

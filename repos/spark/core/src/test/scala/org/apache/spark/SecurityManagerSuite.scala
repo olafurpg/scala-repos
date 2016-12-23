@@ -167,16 +167,18 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
 
   test("ssl on setup") {
     val conf = SSLSampleConfigs.sparkSSLConfig()
-    val expectedAlgorithms = Set("TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
-                                 "TLS_RSA_WITH_AES_256_CBC_SHA256",
-                                 "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
-                                 "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-                                 "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
-                                 "SSL_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
-                                 "SSL_RSA_WITH_AES_256_CBC_SHA256",
-                                 "SSL_DHE_RSA_WITH_AES_256_CBC_SHA256",
-                                 "SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-                                 "SSL_DHE_RSA_WITH_AES_128_CBC_SHA256")
+    val expectedAlgorithms = Set(
+      "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+      "TLS_RSA_WITH_AES_256_CBC_SHA256",
+      "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
+      "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+      "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
+      "SSL_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+      "SSL_RSA_WITH_AES_256_CBC_SHA256",
+      "SSL_DHE_RSA_WITH_AES_256_CBC_SHA256",
+      "SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+      "SSL_DHE_RSA_WITH_AES_128_CBC_SHA256"
+    )
 
     val securityManager = new SecurityManager(conf)
 

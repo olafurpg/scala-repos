@@ -73,28 +73,30 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
                          numToString)
 
     override def _lib2 =
-      super._lib2 ++ Set(equalsIgnoreCase,
-                         codePointAt,
-                         startsWith,
-                         lastIndexOf,
-                         concat,
-                         endsWith,
-                         codePointBefore,
-                         takeLeft,
-                         takeRight,
-                         dropLeft,
-                         dropRight,
-                         matches,
-                         regexMatch,
-                         compareTo,
-                         compareToIgnoreCase,
-                         compare,
-                         compareIgnoreCase,
-                         equals,
-                         indexOf,
-                         split,
-                         splitRegex,
-                         editDistance)
+      super._lib2 ++ Set(
+        equalsIgnoreCase,
+        codePointAt,
+        startsWith,
+        lastIndexOf,
+        concat,
+        endsWith,
+        codePointBefore,
+        takeLeft,
+        takeRight,
+        dropLeft,
+        dropRight,
+        matches,
+        regexMatch,
+        compareTo,
+        compareToIgnoreCase,
+        compare,
+        compareIgnoreCase,
+        equals,
+        indexOf,
+        split,
+        splitRegex,
+        editDistance
+      )
 
     private def isValidInt(num: BigDecimal): Boolean = {
       try {

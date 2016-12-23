@@ -329,7 +329,8 @@ trait BlockAlignSpec[M[+ _]]
          List(
            (JPath(".xb5hs2ckjajs0k44x"), CDouble),
            (JPath(".zzTqxfzwzacakwjqeGFcnhpkzd5akfobsg2nxump"), CEmptyArray),
-           (JPath(".sp7hpv"), CEmptyObject)))))
+           (JPath(".sp7hpv"), CEmptyObject))))
+    )
     testAlign(sample.sortBy(_ \ "key"))
   }
 

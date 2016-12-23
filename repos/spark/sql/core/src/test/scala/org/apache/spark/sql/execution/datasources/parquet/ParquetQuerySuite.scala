@@ -361,13 +361,15 @@ class ParquetQuerySuite
       df.write.parquet(path)
 
       val userDefinedSchema =
-        new StructType().add("s",
-                             new StructType()
-                               .add("a", LongType, nullable = true)
-                               .add("b", LongType, nullable = true)
-                               .add("c", LongType, nullable = true)
-                               .add("d", LongType, nullable = true),
-                             nullable = true)
+        new StructType().add(
+          "s",
+          new StructType()
+            .add("a", LongType, nullable = true)
+            .add("b", LongType, nullable = true)
+            .add("c", LongType, nullable = true)
+            .add("d", LongType, nullable = true),
+          nullable = true
+        )
 
       checkAnswer(sqlContext.read.schema(userDefinedSchema).parquet(path),
                   Row(Row(0L, 1L, null, null)))
@@ -382,13 +384,15 @@ class ParquetQuerySuite
       df.write.parquet(path)
 
       val userDefinedSchema =
-        new StructType().add("s",
-                             new StructType()
-                               .add("a", LongType, nullable = true)
-                               .add("b", LongType, nullable = true)
-                               .add("c", LongType, nullable = true)
-                               .add("d", LongType, nullable = true),
-                             nullable = true)
+        new StructType().add(
+          "s",
+          new StructType()
+            .add("a", LongType, nullable = true)
+            .add("b", LongType, nullable = true)
+            .add("c", LongType, nullable = true)
+            .add("d", LongType, nullable = true),
+          nullable = true
+        )
 
       checkAnswer(sqlContext.read.schema(userDefinedSchema).parquet(path),
                   Row(Row(0L, null, null, 3L)))
@@ -485,7 +489,8 @@ class ParquetQuerySuite
                       .add("d", StringType, nullable = true),
                     containsNull = true),
           nullable = true),
-        nullable = true)
+        nullable = true
+      )
 
       checkAnswer(sqlContext.read.schema(userDefinedSchema).parquet(path),
                   Row(Row(Seq(Row(0, null)))))

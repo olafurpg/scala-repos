@@ -97,8 +97,9 @@ private[ui] class DriverPage(parent: MesosClusterUI)
 
   private def launchedRow(
       submissionState: Option[MesosClusterSubmissionState]): Seq[Node] = {
-    submissionState.map { state =>
-      <tr>
+    submissionState
+      .map { state =>
+        <tr>
         <td>Mesos Slave ID</td>
         <td>{state.slaveId.getValue}</td>
       </tr>
@@ -118,7 +119,8 @@ private[ui] class DriverPage(parent: MesosClusterUI)
         <td>Last Task Status</td>
         <td>{state.mesosTaskStatus.map(_.toString).getOrElse("")}</td>
       </tr>
-    }.getOrElse(Seq[Node]())
+      }
+      .getOrElse(Seq[Node]())
   }
 
   private def propertiesRow(
@@ -171,8 +173,9 @@ private[ui] class DriverPage(parent: MesosClusterUI)
   }
 
   private def retryRow(retryState: Option[MesosClusterRetryState]): Seq[Node] = {
-    retryState.map { state =>
-      <tr>
+    retryState
+      .map { state =>
+        <tr>
         <td>
           {state.lastFailureStatus}
         </td>
@@ -183,6 +186,7 @@ private[ui] class DriverPage(parent: MesosClusterUI)
           {state.retries}
         </td>
       </tr>
-    }.getOrElse(Seq[Node]())
+      }
+      .getOrElse(Seq[Node]())
   }
 }

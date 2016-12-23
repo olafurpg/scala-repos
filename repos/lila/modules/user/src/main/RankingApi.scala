@@ -33,16 +33,18 @@ final class RankingApi(coll: lila.db.Types.Coll,
 
   def save(userId: User.ID, perfType: PerfType, perf: Perf): Funit =
     (perf.nb >= 2) ?? coll
-      .update(BSONDocument(
-                "_id" -> s"$userId:${perfType.id}"
-              ),
-              BSONDocument("user" -> userId,
-                           "perf" -> perfType.id,
-                           "rating" -> perf.intRating,
-                           "prog" -> perf.progress,
-                           "stable" -> perf.established,
-                           "expiresAt" -> DateTime.now.plusDays(7)),
-              upsert = true)
+      .update(
+        BSONDocument(
+          "_id" -> s"$userId:${perfType.id}"
+        ),
+        BSONDocument("user" -> userId,
+                     "perf" -> perfType.id,
+                     "rating" -> perf.intRating,
+                     "prog" -> perf.progress,
+                     "stable" -> perf.established,
+                     "expiresAt" -> DateTime.now.plusDays(7)),
+        upsert = true
+      )
       .void
 
   def remove(userId: User.ID): Funit = UserRepo byId userId flatMap {
@@ -50,12 +52,13 @@ final class RankingApi(coll: lila.db.Types.Coll,
       coll
         .remove(
           BSONDocument(
-            "_id" -> BSONDocument("$in" -> PerfType.leaderboardable.filter {
-              pt =>
+            "_id" -> BSONDocument("$in" -> PerfType.leaderboardable
+              .filter { pt =>
                 user.perfs(pt).nonEmpty
-            }.map { pt =>
-              s"${user.id}:${pt.id}"
-            })
+              }
+              .map { pt =>
+                s"${user.id}:${pt.id}"
+              })
           ))
         .void
     }
@@ -144,7 +147,9 @@ final class RankingApi(coll: lila.db.Types.Coll,
                     )
                   )
                 )),
-              GroupField("r")("nb" -> SumValue(1))))
+              GroupField("r")("nb" -> SumValue(1))
+            )
+          )
           .map { res =>
             val hash = res.documents.flatMap { obj =>
               for {

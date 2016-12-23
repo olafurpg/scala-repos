@@ -98,39 +98,49 @@ class XmlRenameHandler extends RenameHandler {
     def rename() {
       CommandProcessor
         .getInstance()
-        .executeCommand(project, new Runnable {
-          def run() {
-            extensions.inWriteAction {
-              val offset = editor.getCaretModel.getOffset
-              val template = buildTemplate()
-              editor.getCaretModel.moveToOffset(
-                element.getParent.getTextOffset)
+        .executeCommand(
+          project,
+          new Runnable {
+            def run() {
+              extensions.inWriteAction {
+                val offset = editor.getCaretModel.getOffset
+                val template = buildTemplate()
+                editor.getCaretModel.moveToOffset(
+                  element.getParent.getTextOffset)
 
-              TemplateManager
-                .getInstance(project)
-                .startTemplate(editor, template, new TemplateEditingAdapter {
-                  override def templateFinished(template: Template,
-                                                brokenOff: Boolean) {
-                    templateCancelled(template)
-                  }
+                TemplateManager
+                  .getInstance(project)
+                  .startTemplate(
+                    editor,
+                    template,
+                    new TemplateEditingAdapter {
+                      override def templateFinished(template: Template,
+                                                    brokenOff: Boolean) {
+                        templateCancelled(template)
+                      }
 
-                  override def templateCancelled(template: Template) {
-                    val highlightManager =
-                      HighlightManager.getInstance(project)
-                    rangeHighlighters.foreach { a =>
-                      highlightManager.removeSegmentHighlighter(editor, a)
+                      override def templateCancelled(template: Template) {
+                        val highlightManager =
+                          HighlightManager.getInstance(project)
+                        rangeHighlighters.foreach { a =>
+                          highlightManager.removeSegmentHighlighter(editor, a)
+                        }
+                      }
+                    },
+                    new PairProcessor[String, String] {
+                      def process(s: String, t: String): Boolean =
+                        !(t.length == 0 || t.charAt(t.length - 1) == ' ')
                     }
-                  }
-                }, new PairProcessor[String, String] {
-                  def process(s: String, t: String): Boolean =
-                    !(t.length == 0 || t.charAt(t.length - 1) == ' ')
-                })
+                  )
 
-              highlightMatched()
-              editor.getCaretModel.moveToOffset(offset)
+                highlightMatched()
+                editor.getCaretModel.moveToOffset(offset)
+              }
             }
-          }
-        }, RefactoringBundle.message("rename.title"), null)
+          },
+          RefactoringBundle.message("rename.title"),
+          null
+        )
     }
 
     def buildTemplate(): Template = {
@@ -147,7 +157,8 @@ class XmlRenameHandler extends RenameHandler {
           override def calculateResult(context: ExpressionContext): Result =
             calculateQuickResult(context)
         },
-        true)
+        true
+      )
       builder.replaceElement(element.getMatchedTag.getTagNameElement,
                              "second",
                              "first",

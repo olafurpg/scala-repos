@@ -91,7 +91,8 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
                       ref.nameId,
                       "Don't use this method, use appropriate method implemented for Scala, or use " +
                         "\"for Java only\" text in bounded doc comment owner ScalaDoc",
-                      ProblemHighlightType.LIKE_DEPRECATED)
+                      ProblemHighlightType.LIKE_DEPRECATED
+                    )
                   case _ =>
                 }
               case _ =>

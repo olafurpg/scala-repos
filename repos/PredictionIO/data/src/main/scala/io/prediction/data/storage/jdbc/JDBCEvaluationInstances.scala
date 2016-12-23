@@ -161,6 +161,7 @@ class JDBCEvaluationInstances(client: String,
       sparkConf = JDBCUtils.stringToMap(rs.string("sparkConf")),
       evaluatorResults = rs.string("evaluatorResults"),
       evaluatorResultsHTML = rs.string("evaluatorResultsHTML"),
-      evaluatorResultsJSON = rs.string("evaluatorResultsJSON"))
+      evaluatorResultsJSON = rs.string("evaluatorResultsJSON")
+    )
   }
 }

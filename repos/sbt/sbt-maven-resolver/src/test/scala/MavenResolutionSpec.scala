@@ -175,7 +175,8 @@ class MavenResolutionSpec extends BaseIvySpecification {
       ModuleID("com.example", "foo", "0.1.0", Some("compile")),
       Seq(ModuleID("org.scala-sbt", "does-not-exist", "1.0", Some("compile"))),
       Some("2.10.2"),
-      defaultUpdateOptions)
+      defaultUpdateOptions
+    )
     an[Exception] should be thrownBy ivyUpdate(m)
   }
 
@@ -290,14 +291,16 @@ class MavenResolutionSpec extends BaseIvySpecification {
     )
     sbt.io.IO.withTemporaryDirectory { dir =>
       val pomFile = new java.io.File(dir, "pom.xml")
-      sbt.io.IO.write(pomFile,
-                      """
+      sbt.io.IO.write(
+        pomFile,
+        """
           |<project>
           |   <groupId>com.example</groupId>
           |   <name>test-it</name>
           |   <version>1.0-SNAPSHOT</version>
           |</project>
-        """.stripMargin)
+        """.stripMargin
+      )
       val jarFile = new java.io.File(dir, "test-it-1.0-SNAPSHOT.jar")
       sbt.io.IO.touch(jarFile)
       System.err.println(
@@ -309,7 +312,8 @@ class MavenResolutionSpec extends BaseIvySpecification {
           Map(
             Artifact("test-it-1.0-SNAPSHOT.jar") -> pomFile,
             Artifact("test-it-1.0-SNAPSHOT.pom", "pom", "pom") -> jarFile
-          )))
+          ))
+      )
     }
     val baseLocalMavenDir: java.io.File = Resolver.publishMavenLocal.rootFile
     val allFiles: Seq[java.io.File] = sbt.io

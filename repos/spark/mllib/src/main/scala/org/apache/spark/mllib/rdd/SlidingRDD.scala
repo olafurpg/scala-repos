@@ -56,7 +56,8 @@ private[mllib] class SlidingRDD[T: ClassTag](@transient val parent: RDD[T],
   require(
     windowSize > 0 && step > 0 && !(windowSize == 1 && step == 1),
     "Window size and step must be greater than 0, " +
-      s"and they cannot be both 1, but got windowSize = $windowSize and step = $step.")
+      s"and they cannot be both 1, but got windowSize = $windowSize and step = $step."
+  )
 
   override def compute(split: Partition,
                        context: TaskContext): Iterator[Array[T]] = {
@@ -82,10 +83,13 @@ private[mllib] class SlidingRDD[T: ClassTag](@transient val parent: RDD[T],
     } else {
       val w1 = windowSize - 1
       // Get partition sizes and first w1 elements.
-      val (sizes, heads) = parent.mapPartitions { iter =>
-        val w1Array = iter.take(w1).toArray
-        Iterator.single((w1Array.length + iter.length, w1Array))
-      }.collect().unzip
+      val (sizes, heads) = parent
+        .mapPartitions { iter =>
+          val w1Array = iter.take(w1).toArray
+          Iterator.single((w1Array.length + iter.length, w1Array))
+        }
+        .collect()
+        .unzip
       val partitions = mutable.ArrayBuffer.empty[SlidingRDDPartition[T]]
       var i = 0
       var cumSize = 0

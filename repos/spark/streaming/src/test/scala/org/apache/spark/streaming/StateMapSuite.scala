@@ -371,10 +371,10 @@ class StateMapSuite extends SparkFunSuite {
 
       // Assert that every time threshold returns the correct data
       for (t <- 0L to (time + 1)) {
-        val expectedRecords = refMapToTestWith.iterator.filter { _._2._2 < t }.map {
-          x =>
+        val expectedRecords =
+          refMapToTestWith.iterator.filter { _._2._2 < t }.map { x =>
             (x._1, x._2._1, x._2._2)
-        }
+          }
         assert(mapToTest.getByTime(t).toSet === expectedRecords.toSet)
       }
     }

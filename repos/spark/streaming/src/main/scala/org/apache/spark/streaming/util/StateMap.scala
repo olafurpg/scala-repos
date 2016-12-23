@@ -140,13 +140,15 @@ private[streaming] class OpenHashMapBasedStateMap[K, S](
         !deltaMap.contains(key)
     }
 
-    val updatedStates = deltaMap.iterator.filter {
-      case (_, stateInfo) =>
-        !stateInfo.deleted && stateInfo.updateTime < threshUpdatedTime
-    }.map {
-      case (key, stateInfo) =>
-        (key, stateInfo.data, stateInfo.updateTime)
-    }
+    val updatedStates = deltaMap.iterator
+      .filter {
+        case (_, stateInfo) =>
+          !stateInfo.deleted && stateInfo.updateTime < threshUpdatedTime
+      }
+      .map {
+        case (key, stateInfo) =>
+          (key, stateInfo.data, stateInfo.updateTime)
+      }
     oldStates ++ updatedStates
   }
 

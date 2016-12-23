@@ -38,9 +38,11 @@ private[upgrade] object DeploymentPlanReverter {
 
       val ids = originalById.keys ++ targetById.keys
 
-      ids.iterator.map { id =>
-        originalById.get(id) -> targetById.get(id)
-      }.to[Seq]
+      ids.iterator
+        .map { id =>
+          originalById.get(id) -> targetById.get(id)
+        }
+        .to[Seq]
     }
 
     /* a sequence of tuples with the old and the new group definition (also for unchanged groups) */
@@ -49,9 +51,10 @@ private[upgrade] object DeploymentPlanReverter {
 
     /* a sequence of tuples with the old and the new app definition */
     val appChanges: Seq[(Option[AppDefinition], Option[AppDefinition])] = {
-      changesOnIds(original.transitiveApps, target.transitiveApps)(_.id).filter {
-        case (oldOpt, newOpt) => oldOpt != newOpt
-      }
+      changesOnIds(original.transitiveApps, target.transitiveApps)(_.id)
+        .filter {
+          case (oldOpt, newOpt) => oldOpt != newOpt
+        }
     }
 
     // We need to revert app changes first so that apps have already been deleted when we check

@@ -75,12 +75,15 @@ class EndToEndTest
   }
 
   test("Dtab propagation") {
-    val server = Mux.serve("localhost:*", Service.mk[Request, Response] { _ =>
-      val stringer = new StringWriter
-      val printer = new PrintWriter(stringer)
-      Dtab.local.print(printer)
-      Future.value(Response(Buf.Utf8(stringer.toString)))
-    })
+    val server = Mux.serve(
+      "localhost:*",
+      Service.mk[Request, Response] { _ =>
+        val stringer = new StringWriter
+        val printer = new PrintWriter(stringer)
+        Dtab.local.print(printer)
+        Future.value(Response(Buf.Utf8(stringer.toString)))
+      }
+    )
 
     val client = Mux.newService(server)
 
@@ -99,11 +102,14 @@ class EndToEndTest
   }
 
   test("(no) Dtab propagation") {
-    val server = Mux.serve("localhost:*", Service.mk[Request, Response] { _ =>
-      val buf = ChannelBuffers.buffer(4)
-      buf.writeInt(Dtab.local.size)
-      Future.value(Response(ChannelBufferBuf.Owned(buf)))
-    })
+    val server = Mux.serve(
+      "localhost:*",
+      Service.mk[Request, Response] { _ =>
+        val buf = ChannelBuffers.buffer(4)
+        buf.writeInt(Dtab.local.size)
+        Future.value(Response(ChannelBufferBuf.Owned(buf)))
+      }
+    )
 
     val client = Mux.newService(server)
 
@@ -157,7 +163,8 @@ class EndToEndTest
         Annotation.BinaryAnnotation("srv/mux/enabled", true),
         Annotation.ServerSend(),
         Annotation.ClientRecv()
-      ))
+      )
+    )
 
     Await.result(server.close(), 30.seconds)
     Await.result(client.close(), 30.seconds)

@@ -130,14 +130,17 @@ class ScProjectionType private (
                                                 types.Nothing,
                                                 types.Any)
               ScTypeVariable(name)
-            }))
+            })
+          )
           val s = actualSubst.followed(genericSubst)
           Some(
-            AliasType(ta,
-                      ta.lowerBound.map(scType =>
-                        ScExistentialType(s.subst(scType), args.toList)),
-                      ta.upperBound.map(scType =>
-                        ScExistentialType(s.subst(scType), args.toList))))
+            AliasType(
+              ta,
+              ta.lowerBound.map(scType =>
+                ScExistentialType(s.subst(scType), args.toList)),
+              ta.upperBound.map(scType =>
+                ScExistentialType(s.subst(scType), args.toList))
+            ))
         case _ => None
       }
     } else None
@@ -516,14 +519,16 @@ case class ScDesignatorType(element: PsiNamedElement) extends ValueType {
                                               types.Nothing,
                                               types.Any)
             ScTypeVariable(name)
-          }))
+          })
+        )
         Some(
           AliasType(
             ta,
             ta.lowerBound.map(scType =>
               ScExistentialType(genericSubst.subst(scType), args.toList)),
             ta.upperBound.map(scType =>
-              ScExistentialType(genericSubst.subst(scType), args.toList))))
+              ScExistentialType(genericSubst.subst(scType), args.toList))
+          ))
       case _ => None
     }
   }

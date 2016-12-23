@@ -174,12 +174,14 @@ object PairingRepo {
 
   def playingUserIds(tour: Tournament): Fu[Set[String]] =
     coll
-      .aggregate(Match(selectTour(tour.id) ++ selectPlaying),
-                 List(Project(
-                        BSONDocument("u" -> BSONBoolean(true),
-                                     "_id" -> BSONBoolean(false))),
-                      Unwind("u"),
-                      Group(BSONBoolean(true))("ids" -> AddToSet("u"))))
+      .aggregate(
+        Match(selectTour(tour.id) ++ selectPlaying),
+        List(Project(
+               BSONDocument("u" -> BSONBoolean(true),
+                            "_id" -> BSONBoolean(false))),
+             Unwind("u"),
+             Group(BSONBoolean(true))("ids" -> AddToSet("u")))
+      )
       .map(
         _.documents.headOption
           .flatMap(_.getAs[Set[String]]("ids"))

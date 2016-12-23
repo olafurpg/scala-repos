@@ -167,7 +167,8 @@ case class Game(
     },
     castles = castleLastMoveTime.castles,
     positionHashes = positionHashes,
-    checkCount = checkCount)
+    checkCount = checkCount
+  )
 
   def update(game: ChessGame,
              moveOrDrop: MoveOrDrop,
@@ -196,7 +197,8 @@ case class Game(
         castles = history.castles,
         lastMove = history.lastMove.map(_.origDest),
         lastMoveTime = Some(((nowMillis - createdAt.getMillis) / 100).toInt),
-        check = situation.kingPos ifTrue situation.check),
+        check = situation.kingPos ifTrue situation.check
+      ),
       binaryMoveTimes = isPgnImport.fold(
         ByteArray.empty,
         BinaryFormat.moveTime write lastMoveTime.fold(Vector(0)) { lmt =>
@@ -206,7 +208,8 @@ case class Game(
         }
       ),
       status = situation.status | status,
-      clock = game.clock)
+      clock = game.clock
+    )
 
     val state = Event.State(
       color = situation.color,
@@ -214,7 +217,8 @@ case class Game(
       status = (status != updated.status) option updated.status,
       winner = situation.winner,
       whiteOffersDraw = whitePlayer.isOfferingDraw,
-      blackOffersDraw = blackPlayer.isOfferingDraw)
+      blackOffersDraw = blackPlayer.isOfferingDraw
+    )
 
     val clockEvent =
       updated.clock map Event.Clock.apply orElse {
@@ -544,30 +548,32 @@ object Game {
            source: Source,
            pgnImport: Option[PgnImport],
            daysPerTurn: Option[Int] = None): Game =
-    Game(id = IdGenerator.game,
-         whitePlayer = whitePlayer,
-         blackPlayer = blackPlayer,
-         binaryPieces =
-           if (game.isStandardInit) BinaryFormat.piece.standard
-           else BinaryFormat.piece write game.board.pieces,
-         binaryPgn = ByteArray.empty,
-         status = Status.Created,
-         turns = game.turns,
-         startedAtTurn = game.startedAtTurn,
-         clock = game.clock,
-         castleLastMoveTime =
-           CastleLastMoveTime.init.copy(castles = game.board.history.castles),
-         daysPerTurn = daysPerTurn,
-         mode = mode,
-         variant = variant,
-         crazyData = (variant == Crazyhouse) option Crazyhouse.Data.init,
-         metadata = Metadata(source = source.some,
-                             pgnImport = pgnImport,
-                             tournamentId = none,
-                             simulId = none,
-                             tvAt = none,
-                             analysed = false),
-         createdAt = DateTime.now)
+    Game(
+      id = IdGenerator.game,
+      whitePlayer = whitePlayer,
+      blackPlayer = blackPlayer,
+      binaryPieces =
+        if (game.isStandardInit) BinaryFormat.piece.standard
+        else BinaryFormat.piece write game.board.pieces,
+      binaryPgn = ByteArray.empty,
+      status = Status.Created,
+      turns = game.turns,
+      startedAtTurn = game.startedAtTurn,
+      clock = game.clock,
+      castleLastMoveTime =
+        CastleLastMoveTime.init.copy(castles = game.board.history.castles),
+      daysPerTurn = daysPerTurn,
+      mode = mode,
+      variant = variant,
+      crazyData = (variant == Crazyhouse) option Crazyhouse.Data.init,
+      metadata = Metadata(source = source.some,
+                          pgnImport = pgnImport,
+                          tournamentId = none,
+                          simulId = none,
+                          tvAt = none,
+                          analysed = false),
+      createdAt = DateTime.now
+    )
 
   private[game] lazy val tube = lila.db.BsTube(BSONHandlers.gameBSONHandler)
 

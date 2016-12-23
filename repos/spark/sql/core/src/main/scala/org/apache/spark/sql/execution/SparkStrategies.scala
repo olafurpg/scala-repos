@@ -394,21 +394,25 @@ private[sql] abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
         // Thus, we must re-write the result expressions so that their attributes match up with
         // the attributes of the final result projection's input row:
         val rewrittenResultExpressions = resultExpressions.map { expr =>
-          expr.transformDown {
-            case AggregateExpression(aggregateFunction, _, isDistinct) =>
-              // The final aggregation buffer's attributes will be `finalAggregationAttributes`,
-              // so replace each aggregate expression by its corresponding attribute in the set:
-              aggregateFunctionToAttribute(aggregateFunction, isDistinct)
-            case expression =>
-              // Since we're using `namedGroupingAttributes` to extract the grouping key
-              // columns, we need to replace grouping key expressions with their corresponding
-              // attributes. We do not rely on the equality check at here since attributes may
-              // differ cosmetically. Instead, we use semanticEquals.
-              groupExpressionMap.collectFirst {
-                case (expr, ne) if expr semanticEquals expression =>
-                  ne.toAttribute
-              }.getOrElse(expression)
-          }.asInstanceOf[NamedExpression]
+          expr
+            .transformDown {
+              case AggregateExpression(aggregateFunction, _, isDistinct) =>
+                // The final aggregation buffer's attributes will be `finalAggregationAttributes`,
+                // so replace each aggregate expression by its corresponding attribute in the set:
+                aggregateFunctionToAttribute(aggregateFunction, isDistinct)
+              case expression =>
+                // Since we're using `namedGroupingAttributes` to extract the grouping key
+                // columns, we need to replace grouping key expressions with their corresponding
+                // attributes. We do not rely on the equality check at here since attributes may
+                // differ cosmetically. Instead, we use semanticEquals.
+                groupExpressionMap
+                  .collectFirst {
+                    case (expr, ne) if expr semanticEquals expression =>
+                      ne.toAttribute
+                  }
+                  .getOrElse(expression)
+            }
+            .asInstanceOf[NamedExpression]
         }
 
         val aggregateOperator =
@@ -440,7 +444,8 @@ private[sql] abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
               functionsWithoutDistinct,
               aggregateFunctionToAttribute,
               rewrittenResultExpressions,
-              planLater(child))
+              planLater(child)
+            )
           }
 
         aggregateOperator

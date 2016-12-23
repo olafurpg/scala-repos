@@ -223,7 +223,8 @@ class HttpClientDispatcherTest extends FunSuite {
       Read(Future.never),
       // Then we try to write the chunk
       Write(_.isInstanceOf[NettyHttp.HttpContent], chunkp),
-      Close(Future.Done))
+      Close(Future.Done)
+    )
 
     val disp = new HttpClientDispatcher(transport)
     val req = Request()

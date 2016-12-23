@@ -121,13 +121,15 @@ abstract class ScTypeDefinitionImpl protected (
       }
     } else {
       if (parentClass != null) {
-        Success(ScParameterizedType(
-                  ScProjectionType(ScThisType(parentClass),
-                                   this,
-                                   superReference = false),
-                  typeParameters.map(
-                    new ScTypeParameterType(_, ScSubstitutor.empty))),
-                Some(this))
+        Success(
+          ScParameterizedType(
+            ScProjectionType(ScThisType(parentClass),
+                             this,
+                             superReference = false),
+            typeParameters.map(
+              new ScTypeParameterType(_, ScSubstitutor.empty))),
+          Some(this)
+        )
       } else {
         Success(ScParameterizedType(
                   ScType.designator(this),

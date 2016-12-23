@@ -74,13 +74,15 @@ object TaskTest extends SpecLite {
   }
 
   "catches exceptions in a mapped function, created by delay" ! {
-    Task.delay { Thread.sleep(10); 42 }
+    Task
+      .delay { Thread.sleep(10); 42 }
       .map(_ => throw FailWhale)
       .unsafePerformSyncAttempt == -\/(FailWhale)
   }
 
   "catches exceptions in a mapped function, created with now" ! {
-    Task.now { Thread.sleep(10); 42 }
+    Task
+      .now { Thread.sleep(10); 42 }
       .map(_ => throw FailWhale)
       .unsafePerformSyncAttempt == -\/(FailWhale)
   }
@@ -92,13 +94,15 @@ object TaskTest extends SpecLite {
   }
 
   "catches exceptions in a flatMapped function, created with delay" ! {
-    Task.delay { Thread.sleep(10); 42 }
+    Task
+      .delay { Thread.sleep(10); 42 }
       .flatMap(_ => throw FailWhale)
       .unsafePerformSyncAttempt == -\/(FailWhale)
   }
 
   "catches exceptions in a flatMapped function, created with now" ! {
-    Task.now { Thread.sleep(10); 42 }
+    Task
+      .now { Thread.sleep(10); 42 }
       .flatMap(_ => throw FailWhale)
       .unsafePerformSyncAttempt == -\/(FailWhale)
   }
@@ -148,9 +152,11 @@ object TaskTest extends SpecLite {
   }
 
   "catches exceptions thrown by onFinish argument function" ! {
-    Task { Thread.sleep(10); 42 }.onFinish { _ =>
-      throw SadTrombone; Task.now(())
-    }.unsafePerformSyncAttemptFor(1000) == -\/(SadTrombone)
+    Task { Thread.sleep(10); 42 }
+      .onFinish { _ =>
+        throw SadTrombone; Task.now(())
+      }
+      .unsafePerformSyncAttemptFor(1000) == -\/(SadTrombone)
   }
 
   "evaluates Monad[Task].point lazily" in {
@@ -312,7 +318,8 @@ object TaskTest extends SpecLite {
   "retries a retriable task n times" ! forAll { xs: List[Byte] =>
     import scala.concurrent.duration._
     var x = 0
-    Task.delay { x += 1; sys.error("oops") }
+    Task
+      .delay { x += 1; sys.error("oops") }
       .unsafePerformRetry(xs.map(_ => 0.milliseconds))
       .attempt
       .unsafePerformSync

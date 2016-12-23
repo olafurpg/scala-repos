@@ -116,16 +116,19 @@ class CoGroupedRDD[K: ClassTag](
     val array = new Array[Partition](part.numPartitions)
     for (i <- 0 until array.length) {
       // Each CoGroupPartition will have a dependency per contributing RDD
-      array(i) = new CoGroupPartition(i, rdds.zipWithIndex.map {
-        case (rdd, j) =>
-          // Assume each RDD contributed a single dependency, and get it
-          dependencies(j) match {
-            case s: ShuffleDependency[_, _, _] =>
-              None
-            case _ =>
-              Some(new NarrowCoGroupSplitDep(rdd, i, rdd.partitions(i)))
-          }
-      }.toArray)
+      array(i) = new CoGroupPartition(
+        i,
+        rdds.zipWithIndex.map {
+          case (rdd, j) =>
+            // Assume each RDD contributed a single dependency, and get it
+            dependencies(j) match {
+              case s: ShuffleDependency[_, _, _] =>
+                None
+              case _ =>
+                Some(new NarrowCoGroupSplitDep(rdd, i, rdd.partitions(i)))
+            }
+        }.toArray
+      )
     }
     array
   }

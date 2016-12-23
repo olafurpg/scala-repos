@@ -114,11 +114,13 @@ private[mllib] object Loader {
         loadedFields.contains(field.name),
         s"Unable to parse model data." +
           s"  Expected field with name ${field.name} was missing in loaded schema:" +
-          s" ${loadedFields.mkString(", ")}")
+          s" ${loadedFields.mkString(", ")}"
+      )
       assert(
         loadedFields(field.name).sameType(field.dataType),
         s"Unable to parse model data.  Expected field $field but found field" +
-          s" with different type: ${loadedFields(field.name)}")
+          s" with different type: ${loadedFields(field.name)}"
+      )
     }
   }
 

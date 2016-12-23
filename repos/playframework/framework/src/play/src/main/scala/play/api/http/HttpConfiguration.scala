@@ -7,7 +7,12 @@ import javax.inject.{Singleton, Inject, Provider}
 
 import com.typesafe.config.ConfigMemorySize
 import play.api.{PlayConfig, Application, Play, Configuration}
-import play.core.netty.utils.{ServerCookieDecoder, ClientCookieEncoder, ClientCookieDecoder, ServerCookieEncoder}
+import play.core.netty.utils.{
+  ServerCookieDecoder,
+  ClientCookieEncoder,
+  ClientCookieDecoder,
+  ServerCookieEncoder
+}
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -22,8 +27,9 @@ import scala.concurrent.duration.FiniteDuration
 case class HttpConfiguration(
     context: String = "/",
     parser: ParserConfiguration = ParserConfiguration(),
-    actionComposition: ActionCompositionConfiguration = ActionCompositionConfiguration(
-          ),
+    actionComposition: ActionCompositionConfiguration =
+      ActionCompositionConfiguration(
+        ),
     cookies: CookiesConfiguration = CookiesConfiguration(),
     session: SessionConfiguration = SessionConfiguration(),
     flash: FlashConfiguration = FlashConfiguration())
@@ -85,8 +91,8 @@ case class FlashConfiguration(cookieName: String = "PLAY_FLASH",
   * @param maxMemoryBuffer The maximum size that a request body that should be buffered in memory.
   * @param maxDiskBuffer The maximum size that a request body should be buffered on disk.
   */
-case class ParserConfiguration(
-    maxMemoryBuffer: Int = 102400, maxDiskBuffer: Long = 10485760)
+case class ParserConfiguration(maxMemoryBuffer: Int = 102400,
+                               maxDiskBuffer: Long = 10485760)
 
 /**
   * Configuration for action composition.
@@ -110,55 +116,57 @@ object HttpConfiguration {
   def fromConfiguration(configuration: Configuration) = {
     val config = PlayConfig(configuration)
     val context = {
-      val ctx = config.getDeprecated[String](
-          "play.http.context", "application.context")
+      val ctx = config
+        .getDeprecated[String]("play.http.context", "application.context")
       if (!ctx.startsWith("/")) {
         throw configuration.globalError(
-            "play.http.context must start with a /")
+          "play.http.context must start with a /")
       }
       ctx
     }
 
     HttpConfiguration(
-        context = context,
-        parser = ParserConfiguration(
-              maxMemoryBuffer = config
-                  .getDeprecated[ConfigMemorySize](
-                      "play.http.parser.maxMemoryBuffer",
-                      "parsers.text.maxLength")
-                  .toBytes
-                  .toInt,
-              maxDiskBuffer = config
-                  .get[ConfigMemorySize]("play.http.parser.maxDiskBuffer")
-                  .toBytes
-            ),
-        actionComposition = ActionCompositionConfiguration(
-              controllerAnnotationsFirst = config.get[Boolean](
-                    "play.http.actionComposition.controllerAnnotationsFirst"),
-              executeActionCreatorActionFirst = config.get[Boolean](
-                    "play.http.actionComposition.executeActionCreatorActionFirst")
-          ),
-        cookies = CookiesConfiguration(
-              strict = config.get[Boolean]("play.http.cookies.strict")
-          ),
-        session = SessionConfiguration(
-              cookieName = config.getDeprecated[String](
-                    "play.http.session.cookieName", "session.cookieName"),
-              secure = config.getDeprecated[Boolean](
-                    "play.http.session.secure", "session.secure"),
-              maxAge = config.getDeprecated[Option[FiniteDuration]](
-                    "play.http.session.maxAge", "session.maxAge"),
-              httpOnly = config.getDeprecated[Boolean](
-                    "play.http.session.httpOnly", "session.httpOnly"),
-              domain = config.getDeprecated[Option[String]](
-                    "play.http.session.domain", "session.domain")
-          ),
-        flash = FlashConfiguration(
-              cookieName = config.getDeprecated[String](
-                    "play.http.flash.cookieName", "flash.cookieName"),
-              secure = config.get[Boolean]("play.http.flash.secure"),
-              httpOnly = config.get[Boolean]("play.http.flash.httpOnly")
-          )
+      context = context,
+      parser = ParserConfiguration(
+        maxMemoryBuffer = config
+          .getDeprecated[ConfigMemorySize]("play.http.parser.maxMemoryBuffer",
+                                           "parsers.text.maxLength")
+          .toBytes
+          .toInt,
+        maxDiskBuffer = config
+          .get[ConfigMemorySize]("play.http.parser.maxDiskBuffer")
+          .toBytes
+      ),
+      actionComposition = ActionCompositionConfiguration(
+        controllerAnnotationsFirst = config.get[Boolean](
+          "play.http.actionComposition.controllerAnnotationsFirst"),
+        executeActionCreatorActionFirst = config.get[Boolean](
+          "play.http.actionComposition.executeActionCreatorActionFirst")
+      ),
+      cookies = CookiesConfiguration(
+        strict = config.get[Boolean]("play.http.cookies.strict")
+      ),
+      session = SessionConfiguration(
+        cookieName =
+          config.getDeprecated[String]("play.http.session.cookieName",
+                                       "session.cookieName"),
+        secure = config.getDeprecated[Boolean]("play.http.session.secure",
+                                               "session.secure"),
+        maxAge = config.getDeprecated[Option[FiniteDuration]](
+          "play.http.session.maxAge",
+          "session.maxAge"),
+        httpOnly = config.getDeprecated[Boolean]("play.http.session.httpOnly",
+                                                 "session.httpOnly"),
+        domain =
+          config.getDeprecated[Option[String]]("play.http.session.domain",
+                                               "session.domain")
+      ),
+      flash = FlashConfiguration(
+        cookieName = config.getDeprecated[String]("play.http.flash.cookieName",
+                                                  "flash.cookieName"),
+        secure = config.get[Boolean]("play.http.flash.secure"),
+        httpOnly = config.get[Boolean]("play.http.flash.httpOnly")
+      )
     )
   }
 
@@ -170,5 +178,5 @@ object HttpConfiguration {
     */
   private[play] def current =
     Play.privateMaybeApplication.fold(HttpConfiguration())(
-        httpConfigurationCache)
+      httpConfigurationCache)
 }

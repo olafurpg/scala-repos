@@ -235,9 +235,11 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
       // Include compression codec used in test failure message
       // We need to catch Throwable here because assertion failures are not covered by Exceptions
       case t: Throwable =>
-        val compressionMessage = lastCompressionCodec.map { c =>
-          "with compression using codec " + c
-        }.getOrElse("without compression")
+        val compressionMessage = lastCompressionCodec
+          .map { c =>
+            "with compression using codec " + c
+          }
+          .getOrElse("without compression")
         val newException =
           new Exception(s"Test failed $compressionMessage:\n\n${t.getMessage}")
         newException.setStackTrace(t.getStackTrace)

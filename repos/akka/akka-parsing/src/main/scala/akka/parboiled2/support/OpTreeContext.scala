@@ -660,14 +660,17 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
 
   case class PushAction(argTree: Tree, hlTree: Tree) extends OpTree {
     def render(wrapped: Boolean): Tree =
-      block(hlTree match {
-        case q"support.this.HListable.fromUnit" ⇒ argTree
-        case q"support.this.HListable.fromHList[$t]" ⇒
-          q"valueStack.pushAll(${c.resetLocalAttrs(argTree)})"
-        case q"support.this.HListable.fromAnyRef[$t]" ⇒
-          q"valueStack.push(${c.resetLocalAttrs(argTree)})"
-        case x ⇒ c.abort(hlTree.pos, "Unexpected HListable: " + show(x))
-      }, q"true")
+      block(
+        hlTree match {
+          case q"support.this.HListable.fromUnit" ⇒ argTree
+          case q"support.this.HListable.fromHList[$t]" ⇒
+            q"valueStack.pushAll(${c.resetLocalAttrs(argTree)})"
+          case q"support.this.HListable.fromAnyRef[$t]" ⇒
+            q"valueStack.push(${c.resetLocalAttrs(argTree)})"
+          case x ⇒ c.abort(hlTree.pos, "Unexpected HListable: " + show(x))
+        },
+        q"true"
+      )
   }
 
   case class DropAction(hlTree: Tree) extends OpTree {
@@ -831,7 +834,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
     popToBuilder = q"builder += valueStack.pop()",
     pushBuilderResult = q"valueStack.push(builder.result()); true",
     pushSomePop = q"valueStack.push(Some(valueStack.pop()))",
-    pushNone = q"valueStack.push(None)")
+    pushNone = q"valueStack.push(None)"
+  )
 
   type Separator = Boolean ⇒ Tree
 

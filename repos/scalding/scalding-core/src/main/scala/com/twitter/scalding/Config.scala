@@ -145,18 +145,20 @@ trait Config extends Serializable {
     */
   def getKryoRegisteredClasses: Set[Class[_]] = {
     // Get an instance of the Kryo serializer (which is populated with registrations)
-    getKryo.map { kryo =>
-      val cr = kryo.newKryo.getClassResolver
+    getKryo
+      .map { kryo =>
+        val cr = kryo.newKryo.getClassResolver
 
-      @annotation.tailrec
-      def kryoClasses(idx: Int, acc: Set[Class[_]]): Set[Class[_]] =
-        Option(cr.getRegistration(idx)) match {
-          case Some(reg) => kryoClasses(idx + 1, acc + reg.getType)
-          case None => acc // The first null is the end of the line
-        }
+        @annotation.tailrec
+        def kryoClasses(idx: Int, acc: Set[Class[_]]): Set[Class[_]] =
+          Option(cr.getRegistration(idx)) match {
+            case Some(reg) => kryoClasses(idx + 1, acc + reg.getType)
+            case None => acc // The first null is the end of the line
+          }
 
-      kryoClasses(0, Set[Class[_]]())
-    }.getOrElse(Set())
+        kryoClasses(0, Set[Class[_]]())
+      }
+      .getOrElse(Set())
   }
 
   /*
@@ -179,7 +181,8 @@ trait Config extends Serializable {
     val first: Seq[Class[_ <: HSerialization[_]]] = Seq(
       classOf[org.apache.hadoop.io.serializer.WritableSerialization],
       classOf[cascading.tuple.hadoop.TupleSerialization],
-      classOf[serialization.WrappedSerialization[_]])
+      classOf[serialization.WrappedSerialization[_]]
+    )
     // this must come last
     val last: Seq[Class[_ <: HSerialization[_]]] = Seq(
       classOf[com.twitter.chill.hadoop.KryoSerialization])
@@ -237,9 +240,11 @@ trait Config extends Serializable {
         (AppProps.APP_FRAMEWORKS -> ("scalding:" + scaldingVersion.toString)))
 
   def getUniqueIds: Set[UniqueID] =
-    get(UniqueID.UNIQUE_JOB_ID).map { str =>
-      str.split(",").toSet[String].map(UniqueID(_))
-    }.getOrElse(Set.empty)
+    get(UniqueID.UNIQUE_JOB_ID)
+      .map { str =>
+        str.split(",").toSet[String].map(UniqueID(_))
+      }
+      .getOrElse(Set.empty)
 
   /**
     * The serialization of your data will be smaller if any classes passed between tasks in your job
@@ -362,8 +367,8 @@ trait Config extends Serializable {
       .toList
 
   def addFlowStepStrategy(
-      flowStrategyProvider: (Mode,
-                             Config) => FlowStepStrategy[JobConf]): Config = {
+      flowStrategyProvider: (Mode, Config) => FlowStepStrategy[JobConf])
+    : Config = {
     val serializedListener = flowStepStrategiesSerializer(flowStrategyProvider)
     update(Config.FlowStepStrategies) {
       case None => (Some(serializedListener), ())

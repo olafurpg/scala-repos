@@ -391,9 +391,9 @@ object TaskMacro {
         case _ => Converted.NotApplicable
       }
     val util = ContextUtil[c.type](c)
-    util.transformWrappers(t,
-                           (nme, tpe, tree,
-                            original) => expand(nme, tpe, tree))
+    util.transformWrappers(
+      t,
+      (nme, tpe, tree, original) => expand(nme, tpe, tree))
   }
 
   private[this] def iParserMacro[M[_], T](c: Context)(t: c.Expr[T])(
@@ -491,9 +491,9 @@ object TaskMacro {
       }
     }
 
-    val tx = util.transformWrappers(ttree,
-                                    (n, tpe, tree,
-                                     replace) => sub(n, tpe, tree, replace))
+    val tx = util.transformWrappers(
+      ttree,
+      (n, tpe, tree, replace) => sub(n, tpe, tree, replace))
     result match {
       case Some((p, tpe, param)) =>
         val fCore = util.createFunction(param :: Nil, tx, functionSym)

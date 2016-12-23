@@ -44,12 +44,14 @@ object FakesSpec extends PlaySpecification {
 
   "FakeRequest" should {
     def app =
-      GuiceApplicationBuilder().routes {
-        case (PUT, "/process") =>
-          Action { req =>
-            Results.Ok(req.headers.get(CONTENT_TYPE) getOrElse "")
-          }
-      }.build()
+      GuiceApplicationBuilder()
+        .routes {
+          case (PUT, "/process") =>
+            Action { req =>
+              Results.Ok(req.headers.get(CONTENT_TYPE) getOrElse "")
+            }
+        }
+        .build()
 
     "Define Content-Type header based on body" in new WithApplication(app) {
       val xml = <foo>

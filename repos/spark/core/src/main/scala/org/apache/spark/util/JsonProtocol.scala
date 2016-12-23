@@ -344,29 +344,36 @@ private[spark] object JsonProtocol {
   }
 
   def taskMetricsToJson(taskMetrics: TaskMetrics): JValue = {
-    val shuffleReadMetrics: JValue = taskMetrics.shuffleReadMetrics.map { rm =>
-      ("Remote Blocks Fetched" -> rm.remoteBlocksFetched) ~
-        ("Local Blocks Fetched" -> rm.localBlocksFetched) ~
-        ("Fetch Wait Time" -> rm.fetchWaitTime) ~
-        ("Remote Bytes Read" -> rm.remoteBytesRead) ~
-        ("Local Bytes Read" -> rm.localBytesRead) ~
-        ("Total Records Read" -> rm.recordsRead)
-    }.getOrElse(JNothing)
-    val shuffleWriteMetrics: JValue = taskMetrics.shuffleWriteMetrics.map {
-      wm =>
+    val shuffleReadMetrics: JValue = taskMetrics.shuffleReadMetrics
+      .map { rm =>
+        ("Remote Blocks Fetched" -> rm.remoteBlocksFetched) ~
+          ("Local Blocks Fetched" -> rm.localBlocksFetched) ~
+          ("Fetch Wait Time" -> rm.fetchWaitTime) ~
+          ("Remote Bytes Read" -> rm.remoteBytesRead) ~
+          ("Local Bytes Read" -> rm.localBytesRead) ~
+          ("Total Records Read" -> rm.recordsRead)
+      }
+      .getOrElse(JNothing)
+    val shuffleWriteMetrics: JValue = taskMetrics.shuffleWriteMetrics
+      .map { wm =>
         ("Shuffle Bytes Written" -> wm.bytesWritten) ~
           ("Shuffle Write Time" -> wm.writeTime) ~
           ("Shuffle Records Written" -> wm.recordsWritten)
-    }.getOrElse(JNothing)
-    val inputMetrics: JValue = taskMetrics.inputMetrics.map { im =>
-      ("Data Read Method" -> im.readMethod.toString) ~
-        ("Bytes Read" -> im.bytesRead) ~ ("Records Read" -> im.recordsRead)
-    }.getOrElse(JNothing)
-    val outputMetrics: JValue = taskMetrics.outputMetrics.map { om =>
-      ("Data Write Method" -> om.writeMethod.toString) ~
-        ("Bytes Written" -> om.bytesWritten) ~
-        ("Records Written" -> om.recordsWritten)
-    }.getOrElse(JNothing)
+      }
+      .getOrElse(JNothing)
+    val inputMetrics: JValue = taskMetrics.inputMetrics
+      .map { im =>
+        ("Data Read Method" -> im.readMethod.toString) ~
+          ("Bytes Read" -> im.bytesRead) ~ ("Records Read" -> im.recordsRead)
+      }
+      .getOrElse(JNothing)
+    val outputMetrics: JValue = taskMetrics.outputMetrics
+      .map { om =>
+        ("Data Write Method" -> om.writeMethod.toString) ~
+          ("Bytes Written" -> om.bytesWritten) ~
+          ("Records Written" -> om.recordsWritten)
+      }
+      .getOrElse(JNothing)
     val updatedBlocks = JArray(taskMetrics.updatedBlockStatuses.toList.map {
       case (id, status) =>
         ("Block ID" -> id.toString) ~ ("Status" -> blockStatusToJson(status))
@@ -471,9 +478,11 @@ private[spark] object JsonProtocol {
   }
 
   def propertiesToJson(properties: Properties): JValue = {
-    Option(properties).map { p =>
-      mapToJson(p.asScala)
-    }.getOrElse(JNothing)
+    Option(properties)
+      .map { p =>
+        mapToJson(p.asScala)
+      }
+      .getOrElse(JNothing)
   }
 
   def UUIDToJson(id: UUID): JValue = {
@@ -628,7 +637,8 @@ private[spark] object JsonProtocol {
       "JVM Information" -> mapFromJson(json \ "JVM Information").toSeq,
       "Spark Properties" -> mapFromJson(json \ "Spark Properties").toSeq,
       "System Properties" -> mapFromJson(json \ "System Properties").toSeq,
-      "Classpath Entries" -> mapFromJson(json \ "Classpath Entries").toSeq)
+      "Classpath Entries" -> mapFromJson(json \ "Classpath Entries").toSeq
+    )
     SparkListenerEnvironmentUpdate(environmentDetails)
   }
 

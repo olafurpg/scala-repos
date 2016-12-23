@@ -83,6 +83,7 @@ object ParserSettingsImpl
         kvp.getKey -> cacheConfig.getInt(kvp.getKey))(collection.breakOut),
       c getBoolean "tls-session-info-header",
       noCustomMethods,
-      noCustomStatusCodes)
+      noCustomStatusCodes
+    )
   }
 }

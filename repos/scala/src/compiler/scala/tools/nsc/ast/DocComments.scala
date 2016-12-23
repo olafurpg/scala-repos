@@ -70,27 +70,29 @@ trait DocComments { self: Global =>
     *  the doc comment of the overridden version is copied instead.
     */
   def cookedDocComment(sym: Symbol, docStr: String = ""): String =
-    cookedDocComments.getOrElseUpdate(sym, {
-      var ownComment =
-        if (docStr.length == 0)
-          docComments get sym map (_.template) getOrElse ""
-        else DocComment(docStr).template
-      ownComment = replaceInheritDocToInheritdoc(ownComment)
+    cookedDocComments.getOrElseUpdate(
+      sym, {
+        var ownComment =
+          if (docStr.length == 0)
+            docComments get sym map (_.template) getOrElse ""
+          else DocComment(docStr).template
+        ownComment = replaceInheritDocToInheritdoc(ownComment)
 
-      superComment(sym) match {
-        case None =>
-          // SI-8210 - The warning would be false negative when this symbol is a setter
-          if (ownComment.indexOf("@inheritdoc") != -1 && !sym.isSetter)
-            reporter.warning(
-              sym.pos,
-              s"The comment for ${sym} contains @inheritdoc, but no parent comment is available to inherit from.")
-          ownComment.replaceAllLiterally("@inheritdoc",
-                                         "<invalid inheritdoc annotation>")
-        case Some(sc) =>
-          if (ownComment == "") sc
-          else expandInheritdoc(sc, merge(sc, ownComment, sym), sym)
+        superComment(sym) match {
+          case None =>
+            // SI-8210 - The warning would be false negative when this symbol is a setter
+            if (ownComment.indexOf("@inheritdoc") != -1 && !sym.isSetter)
+              reporter.warning(
+                sym.pos,
+                s"The comment for ${sym} contains @inheritdoc, but no parent comment is available to inherit from.")
+            ownComment.replaceAllLiterally("@inheritdoc",
+                                           "<invalid inheritdoc annotation>")
+          case Some(sc) =>
+            if (ownComment == "") sc
+            else expandInheritdoc(sc, merge(sc, ownComment, sym), sym)
+        }
       }
-    })
+    )
 
   /** The cooked doc comment of symbol `sym` after variable expansion, or "" if missing.
     *
@@ -146,8 +148,7 @@ trait DocComments { self: Global =>
 
   /** The cooked doc comment of an overridden symbol */
   protected def superComment(sym: Symbol): Option[String] =
-    allInheritedOverriddenSymbols(sym).iterator map (x =>
-                                                       cookedDocComment(x)) find
+    allInheritedOverriddenSymbols(sym).iterator map (x => cookedDocComment(x)) find
       (_ != "")
 
   private def mapFind[A, B](xs: Iterable[A])(f: A => Option[B]): Option[B] =
@@ -273,7 +274,8 @@ trait DocComments { self: Global =>
                 sym.pos,
                 "The \"" + getSectionHeader + "\" annotation of the " + sym +
                   " comment contains @inheritdoc, but the corresponding section in the parent is not defined.",
-                force = true)
+                force = true
+              )
               "<invalid inheritdoc annotation>"
           }
 
@@ -522,7 +524,8 @@ trait DocComments { self: Global =>
             "Could not find the type " +
               variable + " points to while expanding it " +
               "for the usecase signature of " + sym + " in " + site + "." +
-              "In this context, " + variable + " = \"" + str + "\".")
+              "In this context, " + variable + " = \"" + str + "\"."
+          )
         result
       }
 

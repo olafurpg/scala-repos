@@ -161,7 +161,8 @@ private[akka] trait StashSupport {
           |  my-custom-mailbox {
           |    mailbox-type = "akka.dispatch.UnboundedDequeBasedMailbox"
           |  }
-          |""".stripMargin)
+          |""".stripMargin
+        )
     }
   }
 

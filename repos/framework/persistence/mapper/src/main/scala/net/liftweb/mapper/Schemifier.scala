@@ -304,17 +304,19 @@ object Schemifier extends Loggable {
       }
       if (!connection.driverType.pkDefinedByIndexColumn_?) {
         // Add primary key only when it has not been created by the index field itself.
-        table.mappedFields.filter { f =>
-          f.dbPrimaryKey_?
-        }.foreach { pkField =>
-          connection.driverType.primaryKeySetup(
-            table._dbTableNameLC,
-            pkField._dbColumnNameLC) foreach { command =>
-            cmds += maybeWrite(performWrite, logFunc, connection) { () =>
-              command
+        table.mappedFields
+          .filter { f =>
+            f.dbPrimaryKey_?
+          }
+          .foreach { pkField =>
+            connection.driverType.primaryKeySetup(
+              table._dbTableNameLC,
+              pkField._dbColumnNameLC) foreach { command =>
+              cmds += maybeWrite(performWrite, logFunc, connection) { () =>
+                command
+              }
             }
           }
-        }
       }
       hasTable_?(table, connection, actualTableNames)
       Collector(table.dbAddTable.toList, cmds.toList)
@@ -434,18 +436,21 @@ object Schemifier extends Loggable {
     }.toList
     //rs.close
 
-    val single = table.mappedFields.filter { f =>
-      f.dbIndexed_?
-    }.toList.flatMap { field =>
-      if (!indexedFields.contains(List(field._dbColumnNameLC.toLowerCase))) {
-        cmds += maybeWrite(performWrite, logFunc, connection) { () =>
-          "CREATE INDEX " +
-            (table._dbTableNameLC + "_" + field._dbColumnNameLC) + " ON " +
-            table._dbTableNameLC + " ( " + field._dbColumnNameLC + " )"
-        }
-        field.dbAddedIndex.toList
-      } else Nil
-    }
+    val single = table.mappedFields
+      .filter { f =>
+        f.dbIndexed_?
+      }
+      .toList
+      .flatMap { field =>
+        if (!indexedFields.contains(List(field._dbColumnNameLC.toLowerCase))) {
+          cmds += maybeWrite(performWrite, logFunc, connection) { () =>
+            "CREATE INDEX " +
+              (table._dbTableNameLC + "_" + field._dbColumnNameLC) + " ON " +
+              table._dbTableNameLC + " ( " + field._dbColumnNameLC + " )"
+          }
+          field.dbAddedIndex.toList
+        } else Nil
+      }
 
     table.dbIndexes.foreach { index =>
       val columns = index.columns.toList
@@ -488,43 +493,46 @@ object Schemifier extends Loggable {
     val ret =
       if (connection.supportsForeignKeys_? &&
           MapperRules.createForeignKeys_?(dbId)) {
-        table.mappedFields.flatMap { f =>
-          f match {
-            case f: BaseMappedField with BaseForeignKey => List(f);
-            case _ => Nil
-          }
-        }.toList.flatMap { field =>
-          val other = field.dbKeyToTable
-          val otherTable = actualTableNames(other._dbTableNameLC)
-          val myTable = actualTableNames(table._dbTableNameLC)
-
-          val md = connection.getMetaData
-          // val rs = md.getCrossReference(null, null,otherTable , null, null, myTable)
-          var foundIt = false
-          using(
-            md.getImportedKeys(null,
-                               getDefaultSchemaName(connection),
-                               myTable))(rs =>
-            //val rs = md.getCrossReference(null, null,myTable , null, null, otherTable)
-            while (!foundIt && rs.next) {
-              val pkName = rs.getString(4)
-              val fkName = rs.getString(8)
-              foundIt =
-                (field._dbColumnNameLC.toLowerCase == fkName.toLowerCase &&
-                  field.dbKeyToColumn._dbColumnNameLC.toLowerCase == pkName.toLowerCase)
-          })
-
-          if (!foundIt) {
-            cmds += maybeWrite(performWrite, logFunc, connection) { () =>
-              "ALTER TABLE " + table._dbTableNameLC + " ADD FOREIGN KEY ( " +
-                field._dbColumnNameLC + " ) REFERENCES " + other._dbTableNameLC +
-                " ( " + field.dbKeyToColumn._dbColumnNameLC + " ) "
+        table.mappedFields
+          .flatMap { f =>
+            f match {
+              case f: BaseMappedField with BaseForeignKey => List(f);
+              case _ => Nil
             }
-            field.dbAddedForeignKey.toList
-          } else {
-            Nil
           }
-        }
+          .toList
+          .flatMap { field =>
+            val other = field.dbKeyToTable
+            val otherTable = actualTableNames(other._dbTableNameLC)
+            val myTable = actualTableNames(table._dbTableNameLC)
+
+            val md = connection.getMetaData
+            // val rs = md.getCrossReference(null, null,otherTable , null, null, myTable)
+            var foundIt = false
+            using(
+              md.getImportedKeys(null,
+                                 getDefaultSchemaName(connection),
+                                 myTable))(rs =>
+              //val rs = md.getCrossReference(null, null,myTable , null, null, otherTable)
+              while (!foundIt && rs.next) {
+                val pkName = rs.getString(4)
+                val fkName = rs.getString(8)
+                foundIt =
+                  (field._dbColumnNameLC.toLowerCase == fkName.toLowerCase &&
+                    field.dbKeyToColumn._dbColumnNameLC.toLowerCase == pkName.toLowerCase)
+            })
+
+            if (!foundIt) {
+              cmds += maybeWrite(performWrite, logFunc, connection) { () =>
+                "ALTER TABLE " + table._dbTableNameLC + " ADD FOREIGN KEY ( " +
+                  field._dbColumnNameLC + " ) REFERENCES " + other._dbTableNameLC +
+                  " ( " + field.dbKeyToColumn._dbColumnNameLC + " ) "
+              }
+              field.dbAddedForeignKey.toList
+            } else {
+              Nil
+            }
+          }
       } else {
         Nil
       }

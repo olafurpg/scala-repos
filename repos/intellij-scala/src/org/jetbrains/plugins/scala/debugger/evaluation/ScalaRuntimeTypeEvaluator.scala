@@ -62,7 +62,8 @@ abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
               codeFragment,
               ContextUtil.getSourcePosition(evaluationContext))
           }
-        })
+        }
+      )
     val value: Value = evaluator.evaluate(evaluationContext)
     if (value != null) {
       inReadAction {

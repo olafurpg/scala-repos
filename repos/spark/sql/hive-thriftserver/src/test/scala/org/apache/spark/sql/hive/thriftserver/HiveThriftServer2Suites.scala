@@ -107,7 +107,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
         "DROP TABLE IF EXISTS test",
         "CREATE TABLE test(key INT, val STRING)",
         s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test",
-        "CACHE TABLE test")
+        "CACHE TABLE test"
+      )
 
       queries.foreach(statement.execute)
 
@@ -133,7 +134,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
       val queries = Seq(
         "DROP TABLE IF EXISTS test_null",
         "CREATE TABLE test_null(key INT, val STRING)",
-        s"LOAD DATA LOCAL INPATH '${TestData.smallKvWithNull}' OVERWRITE INTO TABLE test_null")
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKvWithNull}' OVERWRITE INTO TABLE test_null"
+      )
 
       queries.foreach(statement.execute)
 
@@ -155,7 +157,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
       val queries = Seq(
         "DROP TABLE IF EXISTS test_4292",
         "CREATE TABLE test_4292(key INT, val STRING)",
-        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_4292")
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_4292"
+      )
 
       queries.foreach(statement.execute)
 
@@ -175,7 +178,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
       val queries = Seq(
         "DROP TABLE IF EXISTS test_date",
         "CREATE TABLE test_date(key INT, value STRING)",
-        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_date")
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_date"
+      )
 
       queries.foreach(statement.execute)
 
@@ -193,7 +197,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
       val queries = Seq(
         "DROP TABLE IF EXISTS test_map",
         "CREATE TABLE test_map(key INT, value STRING)",
-        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map")
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map"
+      )
 
       queries.foreach(statement.execute)
 
@@ -227,7 +232,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
           "CREATE TABLE test_map(key INT, value STRING)",
           s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map",
           "CACHE TABLE test_table AS SELECT key FROM test_map ORDER BY key DESC",
-          "CREATE DATABASE db1")
+          "CREATE DATABASE db1"
+        )
 
         queries.foreach(statement.execute)
 
@@ -362,7 +368,8 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
       val queries = Seq(
         "DROP TABLE IF EXISTS test_map",
         "CREATE TABLE test_map(key INT, value STRING)",
-        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map")
+        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test_map"
+      )
 
       queries.foreach(statement.execute)
       implicit val ec = ExecutionContext.fromExecutorService(
@@ -417,48 +424,52 @@ class HiveThriftBinaryServerSuite extends HiveThriftJdbcTest {
   }
 
   test("test add jar") {
-    withMultipleConnectionJdbcStatement({ statement =>
-      val jarFile = "../hive/src/test/resources/hive-hcatalog-core-0.13.1.jar"
-        .split("/")
-        .mkString(File.separator)
+    withMultipleConnectionJdbcStatement(
+      { statement =>
+        val jarFile =
+          "../hive/src/test/resources/hive-hcatalog-core-0.13.1.jar"
+            .split("/")
+            .mkString(File.separator)
 
-      statement.executeQuery(s"ADD JAR $jarFile")
-    }, { statement =>
-      val queries = Seq(
-        "DROP TABLE IF EXISTS smallKV",
-        "CREATE TABLE smallKV(key INT, val STRING)",
-        s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE smallKV",
-        "DROP TABLE IF EXISTS addJar",
-        """CREATE TABLE addJar(key string)
+        statement.executeQuery(s"ADD JAR $jarFile")
+      }, { statement =>
+        val queries = Seq(
+          "DROP TABLE IF EXISTS smallKV",
+          "CREATE TABLE smallKV(key INT, val STRING)",
+          s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE smallKV",
+          "DROP TABLE IF EXISTS addJar",
+          """CREATE TABLE addJar(key string)
               |ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
-            """.stripMargin)
+            """.stripMargin
+        )
 
-      queries.foreach(statement.execute)
+        queries.foreach(statement.execute)
 
-      statement.executeQuery(
-        """
+        statement.executeQuery(
+          """
               |INSERT INTO TABLE addJar SELECT 'k1' as key FROM smallKV limit 1
             """.stripMargin)
 
-      val actualResult = statement.executeQuery("SELECT key FROM addJar")
-      val actualResultBuffer = new collection.mutable.ArrayBuffer[String]()
-      while (actualResult.next()) {
-        actualResultBuffer += actualResult.getString(1)
+        val actualResult = statement.executeQuery("SELECT key FROM addJar")
+        val actualResultBuffer = new collection.mutable.ArrayBuffer[String]()
+        while (actualResult.next()) {
+          actualResultBuffer += actualResult.getString(1)
+        }
+        actualResult.close()
+
+        val expectedResult = statement.executeQuery("SELECT 'k1'")
+        val expectedResultBuffer = new collection.mutable.ArrayBuffer[String]()
+        while (expectedResult.next()) {
+          expectedResultBuffer += expectedResult.getString(1)
+        }
+        expectedResult.close()
+
+        assert(expectedResultBuffer === actualResultBuffer)
+
+        statement.executeQuery("DROP TABLE IF EXISTS addJar")
+        statement.executeQuery("DROP TABLE IF EXISTS smallKV")
       }
-      actualResult.close()
-
-      val expectedResult = statement.executeQuery("SELECT 'k1'")
-      val expectedResultBuffer = new collection.mutable.ArrayBuffer[String]()
-      while (expectedResult.next()) {
-        expectedResultBuffer += expectedResult.getString(1)
-      }
-      expectedResult.close()
-
-      assert(expectedResultBuffer === actualResultBuffer)
-
-      statement.executeQuery("DROP TABLE IF EXISTS addJar")
-      statement.executeQuery("DROP TABLE IF EXISTS smallKV")
-    })
+    )
   }
 
   test("Checks Hive version via SET -v") {
@@ -549,40 +560,42 @@ class SingleSessionSuite extends HiveThriftJdbcTest {
     "--conf spark.sql.hive.thriftServer.singleSession=true" :: Nil
 
   test("test single session") {
-    withMultipleConnectionJdbcStatement({ statement =>
-      val jarPath = "../hive/src/test/resources/TestUDTF.jar"
-      val jarURL = s"file://${System.getProperty("user.dir")}/$jarPath"
+    withMultipleConnectionJdbcStatement(
+      { statement =>
+        val jarPath = "../hive/src/test/resources/TestUDTF.jar"
+        val jarURL = s"file://${System.getProperty("user.dir")}/$jarPath"
 
-      // Configurations and temporary functions added in this session should be visible to all
-      // the other sessions.
-      Seq(
-        "SET foo=bar",
-        s"ADD JAR $jarURL",
-        s"""CREATE TEMPORARY FUNCTION udtf_count2
+        // Configurations and temporary functions added in this session should be visible to all
+        // the other sessions.
+        Seq(
+          "SET foo=bar",
+          s"ADD JAR $jarURL",
+          s"""CREATE TEMPORARY FUNCTION udtf_count2
               |AS 'org.apache.spark.sql.hive.execution.GenericUDTFCount2'
            """.stripMargin
-      ).foreach(statement.execute)
-    }, { statement =>
-      val rs1 = statement.executeQuery("SET foo")
+        ).foreach(statement.execute)
+      }, { statement =>
+        val rs1 = statement.executeQuery("SET foo")
 
-      assert(rs1.next())
-      assert(rs1.getString(1) === "foo")
-      assert(rs1.getString(2) === "bar")
+        assert(rs1.next())
+        assert(rs1.getString(1) === "foo")
+        assert(rs1.getString(2) === "bar")
 
-      val rs2 = statement.executeQuery("DESCRIBE FUNCTION udtf_count2")
+        val rs2 = statement.executeQuery("DESCRIBE FUNCTION udtf_count2")
 
-      assert(rs2.next())
-      assert(rs2.getString(1) === "Function: udtf_count2")
+        assert(rs2.next())
+        assert(rs2.getString(1) === "Function: udtf_count2")
 
-      assert(rs2.next())
-      assertResult(
-        "Class: org.apache.spark.sql.hive.execution.GenericUDTFCount2") {
-        rs2.getString(1)
+        assert(rs2.next())
+        assertResult(
+          "Class: org.apache.spark.sql.hive.execution.GenericUDTFCount2") {
+          rs2.getString(1)
+        }
+
+        assert(rs2.next())
+        assert(rs2.getString(1) === "Usage: To be added.")
       }
-
-      assert(rs2.next())
-      assert(rs2.getString(1) === "Usage: To be added.")
-    })
+    )
   }
 }
 
@@ -596,7 +609,8 @@ class HiveThriftHttpServerSuite extends HiveThriftJdbcTest {
         "DROP TABLE IF EXISTS test",
         "CREATE TABLE test(key INT, val STRING)",
         s"LOAD DATA LOCAL INPATH '${TestData.smallKv}' OVERWRITE INTO TABLE test",
-        "CACHE TABLE test")
+        "CACHE TABLE test"
+      )
 
       queries.foreach(statement.execute)
 
@@ -710,7 +724,8 @@ abstract class HiveThriftServer2Test
           |log4j.appender.console.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n
         """.stripMargin,
         new File(s"$tempLog4jConf/log4j.properties"),
-        StandardCharsets.UTF_8)
+        StandardCharsets.UTF_8
+      )
 
       tempLog4jConf
     }
@@ -770,12 +785,14 @@ abstract class HiveThriftServer2Test
       val lines = Utils.executeAndGetOutput(
         command = command,
         extraEnvironment = Map(
-                               // Disables SPARK_TESTING to exclude log4j.properties in test directories.
-                               "SPARK_TESTING" -> "0",
-                               // Points SPARK_PID_DIR to SPARK_HOME, otherwise only 1 Thrift server instance can be
-                               // started at a time, which is not Jenkins friendly.
-                               "SPARK_PID_DIR" -> pidDir.getCanonicalPath),
-        redirectStderr = true)
+          // Disables SPARK_TESTING to exclude log4j.properties in test directories.
+          "SPARK_TESTING" -> "0",
+          // Points SPARK_PID_DIR to SPARK_HOME, otherwise only 1 Thrift server instance can be
+          // started at a time, which is not Jenkins friendly.
+          "SPARK_PID_DIR" -> pidDir.getCanonicalPath
+        ),
+        redirectStderr = true
+      )
 
       lines
         .split("\n")

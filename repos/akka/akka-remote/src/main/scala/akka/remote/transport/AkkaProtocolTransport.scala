@@ -169,8 +169,10 @@ private[transport] class AkkaProtocolManager(
             stateActorAssociationHandler,
             stateActorSettings,
             AkkaPduProtobufCodec,
-            failureDetector)),
-        actorNameFor(handle.remoteAddress))
+            failureDetector
+          )),
+        actorNameFor(handle.remoteAddress)
+      )
 
     case AssociateUnderlying(remoteAddress, statusPromise) ⇒
       createOutboundStateActor(remoteAddress, statusPromise, None)
@@ -201,8 +203,10 @@ private[transport] class AkkaProtocolManager(
           stateActorSettings,
           AkkaPduProtobufCodec,
           failureDetector,
-          refuseUid)),
-      actorNameFor(remoteAddress))
+          refuseUid
+        )),
+      actorNameFor(remoteAddress)
+    )
   }
 
   private def createTransportFailureDetector(): FailureDetector =
@@ -498,7 +502,8 @@ private[transport] class ProtocolStateActor(
                 s"Association attempt with mismatching cookie from [{}]. Expected [{}] but received [{}].",
                 info.origin,
                 localHandshakeInfo.cookie.getOrElse(""),
-                info.cookie.getOrElse(""))
+                info.cookie.getOrElse("")
+              )
             else
               log.warning(
                 s"Association attempt with mismatching cookie from [{}].",

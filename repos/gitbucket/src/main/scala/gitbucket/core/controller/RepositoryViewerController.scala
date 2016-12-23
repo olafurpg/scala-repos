@@ -168,19 +168,21 @@ trait RepositoryViewerControllerBase extends ControllerBase {
       git =>
         JGitUtil.getCommitLog(git, branchName, page, 30, path) match {
           case Right((logs, hasNext)) =>
-            html.commits(if (path.isEmpty) Nil else path.split("/").toList,
-                         branchName,
-                         repository,
-                         logs.splitWith { (commit1, commit2) =>
-                           view.helpers
-                             .date(commit1.commitTime) == view.helpers.date(
-                             commit2.commitTime)
-                         },
-                         page,
-                         hasNext,
-                         hasWritePermission(repository.owner,
-                                            repository.name,
-                                            context.loginAccount))
+            html.commits(
+              if (path.isEmpty) Nil else path.split("/").toList,
+              branchName,
+              repository,
+              logs.splitWith { (commit1, commit2) =>
+                view.helpers
+                  .date(commit1.commitTime) == view.helpers.date(
+                  commit2.commitTime)
+              },
+              page,
+              hasNext,
+              hasWritePermission(repository.owner,
+                                 repository.name,
+                                 context.loginAccount)
+            )
           case Left(_) => NotFound
         }
     }
@@ -351,7 +353,8 @@ trait RepositoryViewerControllerBase extends ControllerBase {
                   hasWritePermission(repository.owner,
                                      repository.name,
                                      context.loginAccount),
-                  request.paths(2) == "blame")
+                  request.paths(2) == "blame"
+                )
               }
           } getOrElse NotFound
       }
@@ -397,8 +400,10 @@ trait RepositoryViewerControllerBase extends ControllerBase {
                 "prevPath" -> blame.prevPath,
                 "commited" -> blame.commitTime.getTime,
                 "message" -> blame.message,
-                "lines" -> blame.lines)
-          })
+                "lines" -> blame.lines
+              )
+          }
+        )
     }
   })
 
@@ -416,21 +421,22 @@ trait RepositoryViewerControllerBase extends ControllerBase {
             revCommit =>
               JGitUtil.getDiffs(git, id) match {
                 case (diffs, oldCommitId) =>
-                  html.commit(id,
-                              new JGitUtil.CommitInfo(revCommit),
-                              JGitUtil.getBranchesOfCommit(git,
-                                                           revCommit.getName),
-                              JGitUtil.getTagsOfCommit(git, revCommit.getName),
-                              getCommitComments(repository.owner,
-                                                repository.name,
-                                                id,
-                                                false),
-                              repository,
-                              diffs,
-                              oldCommitId,
-                              hasWritePermission(repository.owner,
-                                                 repository.name,
-                                                 context.loginAccount))
+                  html.commit(
+                    id,
+                    new JGitUtil.CommitInfo(revCommit),
+                    JGitUtil.getBranchesOfCommit(git, revCommit.getName),
+                    JGitUtil.getTagsOfCommit(git, revCommit.getName),
+                    getCommitComments(repository.owner,
+                                      repository.name,
+                                      id,
+                                      false),
+                    repository,
+                    diffs,
+                    oldCommitId,
+                    hasWritePermission(repository.owner,
+                                       repository.name,
+                                       context.loginAccount)
+                  )
               }
           }
       }
@@ -693,7 +699,8 @@ trait RepositoryViewerControllerBase extends ControllerBase {
         case account: Option[Account] =>
           getGroupsByUserName(account.get.userName)
       }, // groups of current user
-      repository)
+      repository
+    )
   })
 
   /**
@@ -772,20 +779,22 @@ trait RepositoryViewerControllerBase extends ControllerBase {
                   val parentPath =
                     if (path == ".") Nil else path.split("/").toList
                   // process README.md or README.markdown
-                  val readme = files.find { file =>
-                    !file.isDirectory &&
-                    readmeFiles.contains(file.name.toLowerCase)
-                  }.map { file =>
-                    val path = (file.name :: parentPath.reverse).reverse
-                    path -> StringUtil.convertFromByteArray(
-                      JGitUtil
-                        .getContentFromId(Git.open(
-                                            getRepositoryDir(repository.owner,
-                                                             repository.name)),
-                                          file.id,
-                                          true)
-                        .get)
-                  }
+                  val readme = files
+                    .find { file =>
+                      !file.isDirectory &&
+                      readmeFiles.contains(file.name.toLowerCase)
+                    }
+                    .map { file =>
+                      val path = (file.name :: parentPath.reverse).reverse
+                      path -> StringUtil.convertFromByteArray(
+                        JGitUtil
+                          .getContentFromId(
+                            Git.open(getRepositoryDir(repository.owner,
+                                                      repository.name)),
+                            file.id,
+                            true)
+                          .get)
+                    }
 
                   html.files(
                     revision,
@@ -805,7 +814,8 @@ trait RepositoryViewerControllerBase extends ControllerBase {
                       revstr,
                       repository.repository.defaultBranch),
                     flash.get("info"),
-                    flash.get("error"))
+                    flash.get("error")
+                  )
               }
           } getOrElse NotFound
       }

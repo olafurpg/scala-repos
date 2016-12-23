@@ -23,14 +23,16 @@ import JsonDSL._
 
 object JodaTimeSerializers {
   def all =
-    List(DurationSerializer,
-         InstantSerializer,
-         DateTimeSerializer,
-         DateMidnightSerializer,
-         IntervalSerializer(),
-         LocalDateSerializer(),
-         LocalTimeSerializer(),
-         PeriodSerializer)
+    List(
+      DurationSerializer,
+      InstantSerializer,
+      DateTimeSerializer,
+      DateMidnightSerializer,
+      IntervalSerializer(),
+      LocalDateSerializer(),
+      LocalTimeSerializer(),
+      PeriodSerializer
+    )
 }
 
 case object PeriodSerializer

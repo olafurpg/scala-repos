@@ -264,7 +264,8 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                   qualifierType = qualifierType,
                   containingClass = probablyContinigClass,
                   isInStableCodeReference =
-                    ref.isInstanceOf[ScStableCodeReferenceElement])
+                    ref.isInstanceOf[ScStableCodeReferenceElement]
+                )
               lookupItems.foreach(applyVariant(_))
             }
 
@@ -368,7 +369,8 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
         if (position.getNode.getElementType == ScalaDocTokenType.DOC_TAG_VALUE_TOKEN)
           result.stopHere()
       }
-    })
+    }
+  )
 
   override def advertise(parameters: CompletionParameters): String = {
     if (!parameters.getOriginalFile.isInstanceOf[ScalaFile]) return null

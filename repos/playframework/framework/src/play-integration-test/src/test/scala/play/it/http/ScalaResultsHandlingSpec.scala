@@ -44,9 +44,13 @@ trait ScalaResultsHandlingSpec
 
     def withServer[T](result: Result)(block: Port => T) = {
       val port = testServerPort
-      running(TestServer(port, GuiceApplicationBuilder().routes {
-        case _ => Action(result)
-      }.build())) {
+      running(
+        TestServer(port,
+                   GuiceApplicationBuilder()
+                     .routes {
+                       case _ => Action(result)
+                     }
+                     .build())) {
         block(port)
       }
     }
@@ -216,18 +220,19 @@ trait ScalaResultsHandlingSpec
     }
 
     "allow sending trailers" in withServer(
-      Result(ResponseHeader(200,
-                            Map(TRANSFER_ENCODING -> CHUNKED,
-                                TRAILER -> "Chunks")),
-             HttpEntity.Chunked(
-               Source(
-                 List(
-                   chunk("aa"),
-                   chunk("bb"),
-                   chunk("cc"),
-                   HttpChunk.LastChunk(new Headers(Seq("Chunks" -> "3")))
-                 )),
-               None))
+      Result(
+        ResponseHeader(200,
+                       Map(TRANSFER_ENCODING -> CHUNKED, TRAILER -> "Chunks")),
+        HttpEntity.Chunked(
+          Source(
+            List(
+              chunk("aa"),
+              chunk("bb"),
+              chunk("cc"),
+              HttpChunk.LastChunk(new Headers(Seq("Chunks" -> "3")))
+            )),
+          None)
+      )
     ) { port =>
       val response = BasicHttpClient.makeRequests(port)(
         BasicRequest("GET", "/", "HTTP/1.1", Map(), "")
@@ -304,10 +309,11 @@ trait ScalaResultsHandlingSpec
       } { response =>
         response.allHeaders.get(SET_COOKIE) must beSome.like {
           case rawCookieHeaders =>
-            val decodedCookieHeaders: Set[Set[Cookie]] = rawCookieHeaders.map {
-              headerValue =>
+            val decodedCookieHeaders: Set[Set[Cookie]] = rawCookieHeaders
+              .map { headerValue =>
                 Cookies.decodeSetCookieHeader(headerValue).to[Set]
-            }.to[Set]
+              }
+              .to[Set]
             decodedCookieHeaders must_==
               (Set(Set(aCookie), Set(bCookie), Set(cCookie)))
         }

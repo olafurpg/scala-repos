@@ -37,19 +37,20 @@ class RemoveUnnecessaryParenthesesIntention
   }
 
   def invoke(project: Project, editor: Editor, element: PsiElement) {
-    Option(PsiTreeUtil.getParentOfType(element, classOf[ScParenthesisedExpr])).map {
-      case expr
-          if UnnecessaryParenthesesUtil.canBeStripped(
-            expr,
-            ignoreClarifying = false) =>
-        val stripped: String = UnnecessaryParenthesesUtil
-          .getTextOfStripped(expr, ignoreClarifying = false)
-        val newExpr = ScalaPsiElementFactory
-          .createExpressionFromText(stripped, expr.getManager)
-        inWriteAction {
-          expr.replaceExpression(newExpr, removeParenthesis = true)
-        }
-      case _ =>
-    }
+    Option(PsiTreeUtil.getParentOfType(element, classOf[ScParenthesisedExpr]))
+      .map {
+        case expr
+            if UnnecessaryParenthesesUtil.canBeStripped(expr,
+                                                        ignoreClarifying =
+                                                          false) =>
+          val stripped: String = UnnecessaryParenthesesUtil
+            .getTextOfStripped(expr, ignoreClarifying = false)
+          val newExpr = ScalaPsiElementFactory
+            .createExpressionFromText(stripped, expr.getManager)
+          inWriteAction {
+            expr.replaceExpression(newExpr, removeParenthesis = true)
+          }
+        case _ =>
+      }
   }
 }

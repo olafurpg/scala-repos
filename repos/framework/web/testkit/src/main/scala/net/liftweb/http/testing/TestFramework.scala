@@ -54,15 +54,17 @@ trait ToResponse { self: BaseGetPoster =>
         case (server, responseCode) =>
           val respHeaders = slurpApacheHeaders(getter.getResponseHeaders)
 
-          new HttpResponse(baseUrl,
-                           responseCode,
-                           getter.getStatusText,
-                           respHeaders,
-                           for {
-                             st <- Box !! getter.getResponseBodyAsStream
-                             bytes <- tryo(readWholeStream(st))
-                           } yield bytes,
-                           httpClient)
+          new HttpResponse(
+            baseUrl,
+            responseCode,
+            getter.getStatusText,
+            respHeaders,
+            for {
+              st <- Box !! getter.getResponseBodyAsStream
+              bytes <- tryo(readWholeStream(st))
+            } yield bytes,
+            httpClient
+          )
       }
     } catch {
       case e: IOException => new CompleteFailure(baseUrl + fullUrl, Full(e))
@@ -88,15 +90,17 @@ trait ToBoxTheResponse { self: BaseGetPoster =>
           val respHeaders = slurpApacheHeaders(getter.getResponseHeaders)
 
           Full(
-            new TheResponse(baseUrl,
-                            responseCode,
-                            getter.getStatusText,
-                            respHeaders,
-                            for {
-                              st <- Box !! getter.getResponseBodyAsStream
-                              bytes <- tryo(readWholeStream(st))
-                            } yield bytes,
-                            httpClient))
+            new TheResponse(
+              baseUrl,
+              responseCode,
+              getter.getStatusText,
+              respHeaders,
+              for {
+                st <- Box !! getter.getResponseBodyAsStream
+                bytes <- tryo(readWholeStream(st))
+              } yield bytes,
+              httpClient
+            ))
       }
     } catch {
       case e: IOException => Failure(baseUrl + fullUrl, Full(e), Empty)
@@ -141,8 +145,8 @@ trait BaseGetPoster {
           httpClient: HttpClient,
           headers: List[(String, String)],
           faux_params: (String, Any)*)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType = {
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType = {
     val params = faux_params.toList.map(x => (x._1, x._2.toString))
     val fullUrl =
       url +
@@ -169,8 +173,8 @@ trait BaseGetPoster {
              httpClient: HttpClient,
              headers: List[(String, String)],
              faux_params: (String, Any)*)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType = {
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType = {
     val params = faux_params.toList.map(x => (x._1, x._2.toString))
     val fullUrl =
       url +
@@ -197,8 +201,8 @@ trait BaseGetPoster {
            httpClient: HttpClient,
            headers: List[(String, String)],
            faux_params: (String, Any)*)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType = {
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType = {
     val params = faux_params.toList.map(x => (x._1, x._2.toString))
     val poster = new PostMethod(baseUrl + url)
     poster.getParams().setCookiePolicy(CookiePolicy.RFC_2965)
@@ -272,8 +276,8 @@ trait BaseGetPoster {
            headers: List[(String, String)],
            body: Array[Byte],
            contentType: String)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType = {
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType = {
     val poster = new PostMethod(baseUrl + url)
     poster.getParams().setCookiePolicy(CookiePolicy.RFC_2965)
     for ((name, value) <- headers) poster.setRequestHeader(name, value)
@@ -302,8 +306,8 @@ trait BaseGetPoster {
   def put(url: String,
           httpClient: HttpClient,
           headers: List[(String, String)])(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType = {
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType = {
     val poster = new PutMethod(baseUrl + url)
     poster.getParams().setCookiePolicy(CookiePolicy.RFC_2965)
     for ((name, value) <- headers) poster.setRequestHeader(name, value)
@@ -345,8 +349,8 @@ trait BaseGetPoster {
           headers: List[(String, String)],
           body: Array[Byte],
           contentType: String)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType = {
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType = {
     val poster = new PutMethod(baseUrl + url)
     poster.getParams().setCookiePolicy(CookiePolicy.RFC_2965)
     for ((name, value) <- headers) poster.setRequestHeader(name, value)
@@ -389,8 +393,8 @@ trait GetPosterHelper { self: BaseGetPoster =>
     * @param params the parameters to pass
     */
   def get(url: String, params: (String, Any)*)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType =
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType =
     get(url, theHttpClient, Nil, params: _*)(capture)
 
   /**
@@ -400,8 +404,8 @@ trait GetPosterHelper { self: BaseGetPoster =>
     * @param params the parameters to pass
     */
   def delete(url: String, params: (String, Any)*)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType =
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType =
     delete(url, theHttpClient, Nil, params: _*)(capture)
 
   /**
@@ -411,8 +415,8 @@ trait GetPosterHelper { self: BaseGetPoster =>
     * @param params the parameters to pass
     */
   def post(url: String, params: (String, Any)*)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType =
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType =
     post(url, theHttpClient, Nil, params: _*)(capture)
 
   /**
@@ -434,8 +438,8 @@ trait GetPosterHelper { self: BaseGetPoster =>
     * @param contentType the content type of the message
     */
   def post(url: String, body: Array[Byte], contentType: String)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType =
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType =
     post(url, theHttpClient, Nil, body, contentType)(capture)
 
   /**
@@ -457,8 +461,8 @@ trait GetPosterHelper { self: BaseGetPoster =>
     * @param contentType the content type of the message
     */
   def put(url: String, body: Array[Byte], contentType: String)(
-      implicit capture: (String, HttpClient,
-                         HttpMethodBase) => ResponseType): ResponseType =
+      implicit capture: (String, HttpClient, HttpMethodBase) => ResponseType)
+    : ResponseType =
     put(url, theHttpClient, Nil, body, contentType)(capture)
 }
 
@@ -617,7 +621,8 @@ object TestHelpers {
 
   def getCookie(headers: List[(String, String)],
                 respHeaders: Map[String, List[String]]): Box[String] = {
-    val ret = (headers.filter { case ("Cookie", _) => true; case _ => false }
+    val ret = (headers
+      .filter { case ("Cookie", _) => true; case _ => false }
       .map(_._2) ::: respHeaders
       .get("Set-Cookie")
       .toList
@@ -904,9 +909,13 @@ abstract class BaseResponse(override val baseUrl: String,
     * The content type header of the response
     */
   lazy val contentType: String =
-    headers.filter {
-      case (name, value) => name equalsIgnoreCase "content-type"
-    }.toList.headOption.map(_._2.head) getOrElse ""
+    headers
+      .filter {
+        case (name, value) => name equalsIgnoreCase "content-type"
+      }
+      .toList
+      .headOption
+      .map(_._2.head) getOrElse ""
 
   /**
     * The response body as a UTF-8 encoded String

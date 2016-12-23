@@ -205,7 +205,8 @@ class ShowImplicitParametersAction
                 ScalaRefactoringUtil.getShortText(expr)
               case _ => expr.getText.slice(0, 20)
             }
-          })
+          }
+        )
       }
     }
   }
@@ -235,24 +236,29 @@ class ShowImplicitParametersAction
 
     val succeeded: Ref[Boolean] = new Ref[Boolean]
     val commandProcessor: CommandProcessor = CommandProcessor.getInstance
-    commandProcessor.executeCommand(project, new Runnable {
-      def run(): Unit = {
-        if (selectedNode != null) {
-          if (selectedNode.canNavigateToSource) {
-            popup.cancel()
-            selectedNode.navigate(true)
-            succeeded.set(true)
+    commandProcessor.executeCommand(
+      project,
+      new Runnable {
+        def run(): Unit = {
+          if (selectedNode != null) {
+            if (selectedNode.canNavigateToSource) {
+              popup.cancel()
+              selectedNode.navigate(true)
+              succeeded.set(true)
+            } else {
+              succeeded.set(false)
+            }
           } else {
             succeeded.set(false)
           }
-        } else {
-          succeeded.set(false)
+          IdeDocumentHistory
+            .getInstance(project)
+            .includeCurrentCommandAsNavigation()
         }
-        IdeDocumentHistory
-          .getInstance(project)
-          .includeCurrentCommandAsNavigation()
-      }
-    }, "Navigate", null)
+      },
+      "Navigate",
+      null
+    )
     succeeded.get
   }
 

@@ -187,7 +187,8 @@ class SimpleFetchTest {
         .info
         .messageSet
         .head
-        .message)
+        .message
+    )
     assertEquals(
       "Reading any data can return messages up to the end of the log",
       messagesToLEO,
@@ -198,7 +199,8 @@ class SimpleFetchTest {
         .info
         .messageSet
         .head
-        .message)
+        .message
+    )
 
     assertEquals("Counts should increment after fetch",
                  initialTopicCount + 2,

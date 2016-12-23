@@ -270,12 +270,15 @@ object AdminUtils extends Logging {
 
   private[admin] def getInverseMap(
       brokerRackMap: Map[Int, String]): Map[String, Seq[Int]] = {
-    brokerRackMap.toSeq.map { case (id, rack) => (rack, id) }.groupBy {
-      case (rack, _) => rack
-    }.map {
-      case (rack, rackAndIdList) =>
-        (rack, rackAndIdList.map { case (_, id) => id }.sorted)
-    }
+    brokerRackMap.toSeq
+      .map { case (id, rack) => (rack, id) }
+      .groupBy {
+        case (rack, _) => rack
+      }
+      .map {
+        case (rack, rackAndIdList) =>
+          (rack, rackAndIdList.map { case (_, id) => id }.sorted)
+      }
   }
 
   /**

@@ -28,7 +28,8 @@ object ApiCommitListItem {
       )(commit.id, repositoryName),
       author = None,
       committer = None,
-      parents = commit.parents.map(Parent(_)(repositoryName)))(repositoryName)
+      parents = commit.parents.map(Parent(_)(repositoryName))
+    )(repositoryName)
 
   case class Parent(sha: String)(repositoryName: RepositoryName) {
     val url = ApiPath(

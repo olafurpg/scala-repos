@@ -96,7 +96,8 @@ private[sql] class CacheManager extends Logging {
                          sqlContext.conf.columnBatchSize,
                          storageLevel,
                          sqlContext.executePlan(planToCache).executedPlan,
-                         tableName))
+                         tableName)
+      )
     }
   }
 

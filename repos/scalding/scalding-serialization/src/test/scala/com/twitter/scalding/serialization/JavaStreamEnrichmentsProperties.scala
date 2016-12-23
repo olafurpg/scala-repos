@@ -82,7 +82,8 @@ object JavaStreamEnrichmentsProperties
       val bytes = new Array[Byte](is.readPosVarInt)
       is.readFully(bytes)
       bytes.toList
-    })
+    }
+  )
 
   property("Can (read/write)Boolean") = writeRead({ (i: Boolean, os) =>
     os.writeBoolean(i)

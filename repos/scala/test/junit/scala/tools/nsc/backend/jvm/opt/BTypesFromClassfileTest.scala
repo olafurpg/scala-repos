@@ -63,15 +63,18 @@ class BTypesFromClassfileTest {
   def sameInfo(fromSym: ClassInfo,
                fromClassfile: ClassInfo,
                checked: Set[InternalName]): Set[InternalName] = {
-    assert({
-      // Nested class symbols can undergo makeNotPrivate (ExplicitOuter). But this is only applied
-      // for symbols of class symbols that are being compiled, not those read from a pickle.
-      // So a class may be public in bytecode, but the symbol still says private.
-      if (fromSym.nestedInfo.isEmpty) fromSym.flags == fromClassfile.flags
-      else
-        (fromSym.flags | ACC_PRIVATE | ACC_PUBLIC) ==
-          (fromClassfile.flags | ACC_PRIVATE | ACC_PUBLIC)
-    }, s"class flags differ\n$fromSym\n$fromClassfile")
+    assert(
+      {
+        // Nested class symbols can undergo makeNotPrivate (ExplicitOuter). But this is only applied
+        // for symbols of class symbols that are being compiled, not those read from a pickle.
+        // So a class may be public in bytecode, but the symbol still says private.
+        if (fromSym.nestedInfo.isEmpty) fromSym.flags == fromClassfile.flags
+        else
+          (fromSym.flags | ACC_PRIVATE | ACC_PUBLIC) ==
+            (fromClassfile.flags | ACC_PRIVATE | ACC_PUBLIC)
+      },
+      s"class flags differ\n$fromSym\n$fromClassfile"
+    )
 
     // we don't compare InlineInfos in this test: in both cases (from symbol and from classfile) they
     // are actually created by looking at the classfile members, not the symbol's. InlineInfos are only

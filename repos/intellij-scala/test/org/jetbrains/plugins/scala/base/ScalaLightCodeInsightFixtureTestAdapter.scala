@@ -236,15 +236,20 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
       case Some(action) =>
         CommandProcessor
           .getInstance()
-          .executeCommand(myFixture.getProject, new Runnable {
-            def run() {
-              extensions.inWriteAction {
-                action.invoke(myFixture.getProject,
-                              myFixture.getEditor,
-                              myFixture.getFile)
+          .executeCommand(
+            myFixture.getProject,
+            new Runnable {
+              def run() {
+                extensions.inWriteAction {
+                  action.invoke(myFixture.getProject,
+                                myFixture.getEditor,
+                                myFixture.getFile)
+                }
               }
-            }
-          }, "", null)
+            },
+            "",
+            null
+          )
         myFixture.checkResult(assumedStub, /*stripTrailingSpaces = */ true)
       case _ => assert(false, "There is no fixes with such hint.")
     }

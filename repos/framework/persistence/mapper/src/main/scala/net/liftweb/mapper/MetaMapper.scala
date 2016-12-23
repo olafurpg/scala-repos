@@ -122,8 +122,8 @@ object MapperRules extends Factory {
     * used to easily localize fields based on the locale in the
     * current request
     */
-  val displayNameCalculator: FactoryMaker[(BaseMapper, Locale,
-                                           String) => String] =
+  val displayNameCalculator: FactoryMaker[
+    (BaseMapper, Locale, String) => String] =
     new FactoryMaker[(BaseMapper, Locale, String) => String](
       (m: BaseMapper, l: Locale, name: String) => name) {}
 
@@ -554,17 +554,20 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
             updatedWhat = updatedWhat + whereOrAnd +
                 MapperRules.quoteColumnName.vend(in.outerField._dbColumnNameLC) +
                 in.inKeyword + "(" + in.innerMeta
-                .addEndStuffs(in.innerMeta.addFields(
-                                "SELECT " + in.distinct +
-                                  MapperRules.quoteColumnName.vend(
-                                    in.innerField._dbColumnNameLC) +
-                                  " FROM " + MapperRules.quoteTableName.vend(
-                                  in.innerMeta._dbTableNameLC) + " ",
-                                false,
-                                in.queryParams,
-                                conn),
-                              in.queryParams,
-                              conn)
+                .addEndStuffs(
+                  in.innerMeta.addFields(
+                    "SELECT " + in.distinct +
+                      MapperRules.quoteColumnName.vend(
+                        in.innerField._dbColumnNameLC) +
+                      " FROM " + MapperRules.quoteTableName.vend(
+                      in.innerMeta._dbTableNameLC) + " ",
+                    false,
+                    in.queryParams,
+                    conn
+                  ),
+                  in.queryParams,
+                  conn
+                )
                 ._1 + " ) "
 
           // Executes a subquery with {@code query}
@@ -826,11 +829,15 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
   }
 
   def whatToSet(toSave: A): String = {
-    mappedColumns.filter { c =>
-      ??(c._2, toSave).dirty_?
-    }.map { c =>
-      c._1 + " = ?"
-    }.toList.mkString("", ",", "")
+    mappedColumns
+      .filter { c =>
+        ??(c._2, toSave).dirty_?
+      }
+      .map { c =>
+        c._1 + " = ?"
+      }
+      .toList
+      .mkString("", ",", "")
   }
 
   /**
@@ -838,13 +845,14 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     * without the notifications.  This method can be over-ridden.
     */
   protected def runValidationList(toValidate: A): List[FieldError] =
-    mappedFieldList.flatMap(f => ??(f.method, toValidate).validate) ::: validation.flatMap {
-      case pf: PartialFunction[A, List[FieldError]] =>
-        if (pf.isDefinedAt(toValidate)) pf(toValidate)
-        else Nil
+    mappedFieldList.flatMap(f => ??(f.method, toValidate).validate) ::: validation
+      .flatMap {
+        case pf: PartialFunction[A, List[FieldError]] =>
+          if (pf.isDefinedAt(toValidate)) pf(toValidate)
+          else Nil
 
-      case f => f(toValidate)
-    }
+        case f => f(toValidate)
+      }
 
   final def validate(toValidate: A): List[FieldError] = {
     logger.debug("Validating dbName=%s, entity=%s".format(dbName, toValidate))
@@ -869,10 +877,16 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
   val elemName = getClass.getSuperclass.getName.split("\\.").toList.last
 
   def toXml(what: A): Elem =
-    Elem(null, elemName, mappedFieldList.foldRight[MetaData](Null) { (p, md) =>
-      val fld = ??(p.method, what)
-      new UnprefixedAttribute(p.name, Text(fld.toString), md)
-    }, TopScope, true)
+    Elem(
+      null,
+      elemName,
+      mappedFieldList.foldRight[MetaData](Null) { (p, md) =>
+        val fld = ??(p.method, what)
+        new UnprefixedAttribute(p.name, Text(fld.toString), md)
+      },
+      TopScope,
+      true
+    )
 
   /**
     * Returns true if none of the fields are dirty
@@ -893,13 +907,13 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     * @param columnName The column name to use to retrieve the type and value
     * @param setObj A function that we can delegate to for setObject calls
     */
-  private def setPreparedStatementValue(conn: SuperConnection,
-                                        st: PreparedStatement,
-                                        index: Int,
-                                        field: MappedField[_, A],
-                                        columnName: String,
-                                        setObj: (PreparedStatement, Int,
-                                                 AnyRef, Int) => Unit) {
+  private def setPreparedStatementValue(
+      conn: SuperConnection,
+      st: PreparedStatement,
+      index: Int,
+      field: MappedField[_, A],
+      columnName: String,
+      setObj: (PreparedStatement, Int, AnyRef, Int) => Unit) {
     setPreparedStatementValue(conn,
                               st,
                               index,
@@ -921,14 +935,14 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     * @param value The value itself
     * @param setObj A function that we can delegate to for setObject calls
     */
-  private def setPreparedStatementValue(conn: SuperConnection,
-                                        st: PreparedStatement,
-                                        index: Int,
-                                        field: BaseMappedField,
-                                        columnType: Int,
-                                        value: Object,
-                                        setObj: (PreparedStatement, Int,
-                                                 AnyRef, Int) => Unit) {
+  private def setPreparedStatementValue(
+      conn: SuperConnection,
+      st: PreparedStatement,
+      index: Int,
+      field: BaseMappedField,
+      columnType: Int,
+      value: Object,
+      setObj: (PreparedStatement, Int, AnyRef, Int) => Unit) {
     // Remap the type if the driver wants
     val mappedColumnType = conn.driverType.columnTypeMap(columnType)
 
@@ -1033,7 +1047,8 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
                         " SET " + whatToSet(toSave) +
                         " WHERE " + thePrimaryKeyField.openOrThrowException(
                         "Cross your fingers") + " = ?",
-                      conn) { st =>
+                      conn
+                    ) { st =>
                       var colNum = 1
 
                       // Here we apply each column's value to the prepared statement
@@ -1083,8 +1098,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
 
                   for (col <- mappedColumns) {
                     if (!columnPrimaryKey_?(col._1)) {
-                      val colVal = col._2
-                        .invoke(toSave)
+                      val colVal = col._2.invoke(toSave)
                         .asInstanceOf[MappedField[AnyRef, A]]
                       setPreparedStatementValue(conn,
                                                 st,
@@ -1570,9 +1584,9 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     * map the fields titles and forms to generate a list
     * @param func called with displayHtml, fieldId, form
     */
-  def mapFieldTitleForm[T](toMap: A,
-                           func: (NodeSeq, Box[NodeSeq],
-                                  NodeSeq) => T): List[T] =
+  def mapFieldTitleForm[T](
+      toMap: A,
+      func: (NodeSeq, Box[NodeSeq], NodeSeq) => T): List[T] =
     formFields(toMap).flatMap(field =>
       field.toForm.map(fo => func(field.displayHtml, field.fieldId, fo)))
 
@@ -1580,9 +1594,9 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     * flat map the fields titles and forms to generate a list
     * @param func called with displayHtml, fieldId, form
     */
-  def flatMapFieldTitleForm[T](toMap: A,
-                               func: (NodeSeq, Box[NodeSeq],
-                                      NodeSeq) => Seq[T]): List[T] =
+  def flatMapFieldTitleForm[T](
+      toMap: A,
+      func: (NodeSeq, Box[NodeSeq], NodeSeq) => Seq[T]): List[T] =
     formFields(toMap).flatMap(field =>
       field.toForm.toList.flatMap(fo =>
         func(field.displayHtml, field.fieldId, fo)))
@@ -1591,9 +1605,9 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     * flat map the fields titles and forms to generate a list
     * @param func called with displayHtml, fieldId, form
     */
-  def flatMapFieldTitleForm2[T](toMap: A,
-                                func: (NodeSeq, MappedField[_, A],
-                                       NodeSeq) => Seq[T]): List[T] =
+  def flatMapFieldTitleForm2[T](
+      toMap: A,
+      func: (NodeSeq, MappedField[_, A], NodeSeq) => Seq[T]): List[T] =
     formFields(toMap).flatMap(field =>
       field.toForm.toList.flatMap(fo => func(field.displayHtml, field, fo)))
 
@@ -2336,7 +2350,8 @@ trait KeyedMetaMapper[Type, A <: KeyedMapper[Type, A]]
         "SELECT " + fields.map(_.dbSelectString).mkString(", ") + " FROM " +
           MapperRules.quoteTableName.vend(_dbTableNameLC) + " WHERE " +
           MapperRules.quoteColumnName.vend(field._dbColumnNameLC) + " = ?",
-        conn) { st =>
+        conn
+      ) { st =>
         if (field.dbIgnoreSQLType_?)
           st.setObject(1, field.makeKeyJDBCFriendly(key))
         else

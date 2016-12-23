@@ -544,7 +544,8 @@ object Run {
     "YUM",
     "ZION",
     "ZMH",
-    "ZTS")
+    "ZTS"
+  )
 
   val tickerList = Seq("GOOG",
                        "GOOGL",
@@ -612,6 +613,7 @@ object Run {
       servingClassOpt = Some(LFirstServing(classOf[EmptyStrategy])),
       evaluatorClassOpt = Some(classOf[BacktestingEvaluator]),
       evaluatorParams = evaluatorParams,
-      params = WorkflowParams(verbose = 0, batch = "Imagine: Stock II"))
+      params = WorkflowParams(verbose = 0, batch = "Imagine: Stock II")
+    )
   }
 }

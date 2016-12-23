@@ -484,7 +484,8 @@ class ScalaTestConfigurationProducer extends {
                     "should" -> shouldFqn2,
                     "must" -> mustFqn2,
                     "can" -> canFqn2),
-                checkFirstArgIsUnitOrString = true)
+                checkFirstArgIsUnitOrString = true
+              )
               lazy val checkInfixResult = checkInfix(
                 PsiTreeUtil
                   .getParentOfType(call, classOf[MethodInvocation], true),
@@ -493,7 +494,8 @@ class ScalaTestConfigurationProducer extends {
                     "should" -> shouldFqn,
                     "must" -> mustFqn,
                     "can" -> canFqn),
-                checkFirstArgIsUnitOrString = true)
+                checkFirstArgIsUnitOrString = true
+              )
               checkInfixResult2 match {
                 case SuccessResult(invoc, tName, refName) =>
                   call = invoc
@@ -671,30 +673,28 @@ class ScalaTestConfigurationProducer extends {
       val resFqn2 = "org.scalatest.words.ResultOfStringPassedToVerb"
       checkInfixTagged(
         PsiTreeUtil.getParentOfType(element, classOf[MethodInvocation], false),
-        Map("in" -> Set(itVTFqn,
-                        itVFqn,
-                        igVFqn,
-                        igVTFqn,
-                        inFqn,
-                        inTFqn,
-                        theyVFqn,
-                        theyVTFqn),
-            "is" -> Set(itVTFqn,
-                        itVFqn,
-                        igVFqn,
-                        igVTFqn,
-                        resFqn,
-                        resFqn2,
-                        theyVFqn,
-                        theyVTFqn),
-            "ignore" -> Set(itVFqn,
-                            itVTFqn,
-                            inFqn,
-                            inTFqn,
-                            theyVFqn,
-                            theyVTFqn)),
+        Map(
+          "in" -> Set(itVTFqn,
+                      itVFqn,
+                      igVFqn,
+                      igVTFqn,
+                      inFqn,
+                      inTFqn,
+                      theyVFqn,
+                      theyVTFqn),
+          "is" -> Set(itVTFqn,
+                      itVFqn,
+                      igVFqn,
+                      igVTFqn,
+                      resFqn,
+                      resFqn2,
+                      theyVFqn,
+                      theyVTFqn),
+          "ignore" -> Set(itVFqn, itVTFqn, inFqn, inTFqn, theyVFqn, theyVTFqn)
+        ),
         Set(itVFqn, igVFqn, resFqn, resFqn2, theyVFqn),
-        testNameIsAlwaysEmpty = true) match {
+        testNameIsAlwaysEmpty = true
+      ) match {
         case SuccessResult(_call, _testName, _) =>
           var testName = _testName
           var call = _call
@@ -713,14 +713,17 @@ class ScalaTestConfigurationProducer extends {
               case m: MethodInvocation =>
                 checkInfixWithIt(
                   m,
-                  Map("should" -> Set(shouldFqn,
-                                      shouldFqn2,
-                                      itFqn,
-                                      igFqn,
-                                      theyFqn),
-                      "must" -> Set(mustFqn, mustFqn2, itFqn, igFqn, theyFqn),
-                      "can" -> Set(canFqn, canFqn2, itFqn, igFqn, theyFqn)),
-                  checkFirstArgIsUnitOrString = true) match {
+                  Map(
+                    "should" -> Set(shouldFqn,
+                                    shouldFqn2,
+                                    itFqn,
+                                    igFqn,
+                                    theyFqn),
+                    "must" -> Set(mustFqn, mustFqn2, itFqn, igFqn, theyFqn),
+                    "can" -> Set(canFqn, canFqn2, itFqn, igFqn, theyFqn)
+                  ),
+                  checkFirstArgIsUnitOrString = true
+                ) match {
                   case SuccessResult(invoc, tName, middleName) =>
                     call = invoc
                     testName = tName + " " + middleName +

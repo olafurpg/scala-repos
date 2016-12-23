@@ -343,9 +343,12 @@ package com.twitter.scalding {
     val ADAPTIVE_CACHE_KEY = "scalding.mapsidecache.adaptive"
 
     private def getCacheSize(fp: FlowProcess[_]): Int =
-      Option(fp.getStringProperty(SIZE_CONFIG_KEY)).filterNot { _.isEmpty }.map {
-        _.toInt
-      }.getOrElse(DEFAULT_CACHE_SIZE)
+      Option(fp.getStringProperty(SIZE_CONFIG_KEY))
+        .filterNot { _.isEmpty }
+        .map {
+          _.toInt
+        }
+        .getOrElse(DEFAULT_CACHE_SIZE)
 
     def apply[K, V: Semigroup](
         cacheSize: Option[Int],
@@ -474,8 +477,7 @@ package com.twitter.scalding {
    */
   class SideEffectMapFunction[S, C, T](
       bf: => C, // begin function returns a context
-      @transient fn: (C,
-                      S) => T, // function that takes a context and a tuple and generate a new tuple
+      @transient fn: (C, S) => T, // function that takes a context and a tuple and generate a new tuple
       ef: C => Unit, // end function to clean up context object
       fields: Fields,
       conv: TupleConverter[S],
@@ -498,8 +500,7 @@ package com.twitter.scalding {
    */
   class SideEffectFlatMapFunction[S, C, T](
       bf: => C, // begin function returns a context
-      @transient fn: (C,
-                      S) => TraversableOnce[T], // function that takes a context and a tuple, returns TraversableOnce of T
+      @transient fn: (C, S) => TraversableOnce[T], // function that takes a context and a tuple, returns TraversableOnce of T
       ef: C => Unit, // end function to clean up context object
       fields: Fields,
       conv: TupleConverter[S],

@@ -178,18 +178,21 @@ package util {
           }
         })
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
-            bytes ++= grab(in)
-            pull(in)
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = {
+              bytes ++= grab(in)
+              pull(in)
+            }
+            override def onUpstreamFinish(): Unit = {
+              if (isAvailable(out)) {
+                push(out, HttpEntity.Strict(contentType, bytes.result()))
+                completeStage()
+              } else emptyStream = true
+            }
           }
-          override def onUpstreamFinish(): Unit = {
-            if (isAvailable(out)) {
-              push(out, HttpEntity.Strict(contentType, bytes.result()))
-              completeStage()
-            } else emptyStream = true
-          }
-        })
+        )
 
         override def onTimer(key: Any): Unit =
           failStage(new java.util.concurrent.TimeoutException(

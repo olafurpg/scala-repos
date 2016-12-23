@@ -182,7 +182,8 @@ object AnnotatorHighlighter {
             p.bindings.headOption.map(_.getName).orNull
           case _ => fun.getName
         },
-        fun.getProject)
+        fun.getProject
+      )
     }
 
     val c = ScalaPsiUtil.getParentOfType(refElement, classOf[ScConstructor])

@@ -271,7 +271,8 @@ trait PrepJSExports { this: PrepJSInterop =>
           "Member cannot be exported to function " +
             "application. It is available under the name apply instead. " +
             "Add @JSExport(\"apply\") to silence this warning. " +
-            "This will be enforced in 1.0.")
+            "This will be enforced in 1.0."
+        )
       }
 
       if (isNamedExport && jsInterop.isJSProperty(sym)) {
@@ -333,7 +334,8 @@ trait PrepJSExports { this: PrepJSInterop =>
             sym.pos,
             s"${trgSym.name} may not have a double underscore (`__`) in " +
               "its fully qualified name, since it is forced to be exported by " +
-              s"a @${trgAnnot.name} on $forcingSym")
+              s"a @${trgAnnot.name} on $forcingSym"
+          )
         }
 
         ExportInfo(name, sym.pos, false, ignoreInvalid)

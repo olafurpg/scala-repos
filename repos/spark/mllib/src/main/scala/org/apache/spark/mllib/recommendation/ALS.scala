@@ -253,7 +253,8 @@ class ALS private (
       intermediateRDDStorageLevel = intermediateRDDStorageLevel,
       finalRDDStorageLevel = StorageLevel.NONE,
       checkpointInterval = checkpointInterval,
-      seed = seed)
+      seed = seed
+    )
 
     val userFactors = floatUserFactors
       .mapValues(_.map(_.toDouble))

@@ -101,7 +101,8 @@ private[akka] trait StreamSubscriptionTimeoutSupport {
           new SubscriptionTimeoutException(
             s"Publisher ($p) you are trying to subscribe to has been shut-down " +
               s"because exceeding it's subscription-timeout.")
-          with NoStackTrace)
+          with NoStackTrace
+        )
     }
   }
 
@@ -110,7 +111,8 @@ private[akka] trait StreamSubscriptionTimeoutSupport {
       "Timed out {} detected (after {} ms)! You should investigate if you either cancel or consume all {} instances",
       target,
       timeout.toMillis,
-      target.getClass.getCanonicalName)
+      target.getClass.getCanonicalName
+    )
   }
 
   /**

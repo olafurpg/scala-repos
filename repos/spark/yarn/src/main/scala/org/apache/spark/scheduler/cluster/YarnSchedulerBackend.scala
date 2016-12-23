@@ -244,7 +244,8 @@ private[spark] abstract class YarnSchedulerBackend(
                 s"Attempted to get executor loss reason" +
                   s" for executor id ${executorId} at RPC address ${executorRpcAddress}," +
                   s" but got no response. Marking as slave lost.",
-                e)
+                e
+              )
               driverEndpoint.askWithRetry[Boolean](
                 RemoveExecutor(executorId, SlaveLost()))
             }

@@ -106,15 +106,17 @@ object ValidationSpec extends Specification {
       """Ken.O'Brian@company.com"""
     )
     "validate valid addresses" in {
-      valid.map { addr =>
-        Form("value" -> email)
-          .bind(Map("value" -> addr))
-          .fold(
-            formWithErrors => false, { _ =>
-              true
-            }
-          )
-      }.exists(_.unary_!) must beFalse
+      valid
+        .map { addr =>
+          Form("value" -> email)
+            .bind(Map("value" -> addr))
+            .fold(
+              formWithErrors => false, { _ =>
+                true
+              }
+            )
+        }
+        .exists(_.unary_!) must beFalse
     }
 
     val invalid = Seq(
@@ -126,15 +128,17 @@ object ValidationSpec extends Specification {
       "Ima Fool@example.com"
     )
     "invalidate invalid addresses" in {
-      invalid.map { addr =>
-        Form("value" -> email)
-          .bind(Map("value" -> addr))
-          .fold(
-            formWithErrors => true, { _ =>
-              false
-            }
-          )
-      }.exists(_.unary_!) must beFalse
+      invalid
+        .map { addr =>
+          Form("value" -> email)
+            .bind(Map("value" -> addr))
+            .fold(
+              formWithErrors => true, { _ =>
+                false
+              }
+            )
+        }
+        .exists(_.unary_!) must beFalse
     }
   }
 

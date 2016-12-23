@@ -29,9 +29,11 @@ object Opts {
     def externalAPI(mappings: Iterable[(File, URL)]): Seq[String] =
       if (mappings.isEmpty) Nil
       else
-        mappings.map {
-          case (f, u) => s"${f.getAbsolutePath}#${u.toExternalForm}"
-        }.mkString("-doc-external-doc:", ",", "") :: Nil
+        mappings
+          .map {
+            case (f, u) => s"${f.getAbsolutePath}#${u.toExternalForm}"
+          }
+          .mkString("-doc-external-doc:", ",", "") :: Nil
   }
   object resolver {
     import Path._
@@ -75,7 +77,8 @@ object DefaultOptions {
 
   @deprecated(
     "Use `credentials(State)` instead to make use of configuration path dynamically configured via `Keys.globalSettingsDirectory`; relying on ~/.ivy2 is not recommended anymore.",
-    "0.12.0")
+    "0.12.0"
+  )
   def credentials: Credentials =
     Credentials(userHome / ".ivy2" / ".credentials")
   def credentials(state: State): Credentials =

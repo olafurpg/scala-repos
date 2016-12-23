@@ -495,9 +495,7 @@ private class SelectorMap(binds: List[CssBind])
                             ids.contains(id)
                           } getOrElse (false)
                         val newIds =
-                          targetId filter (_ =>
-                                             keepId) map (i =>
-                                                            ids - i) getOrElse
+                          targetId filter (_ => keepId) map (i => ids - i) getOrElse
                             (ids)
                         val newElem =
                           new Elem(e.prefix,

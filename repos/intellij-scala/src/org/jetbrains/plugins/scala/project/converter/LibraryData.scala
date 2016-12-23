@@ -20,10 +20,12 @@ private case class LibraryData(name: String,
 
 private object LibraryData {
   def apply(prototype: Library): LibraryData = {
-    LibraryData(prototype.getName,
-                prototype.getUrls(OrderRootType.CLASSES).toSeq,
-                prototype.getUrls(OrderRootType.SOURCES).toSeq,
-                prototype.getUrls(JavadocOrderRootType.getInstance).toSeq)
+    LibraryData(
+      prototype.getName,
+      prototype.getUrls(OrderRootType.CLASSES).toSeq,
+      prototype.getUrls(OrderRootType.SOURCES).toSeq,
+      prototype.getUrls(JavadocOrderRootType.getInstance).toSeq
+    )
   }
 
   def apply(element: Element): LibraryData = {

@@ -72,21 +72,27 @@ class CreateScalaDocStubAction
 
     CommandProcessor
       .getInstance()
-      .executeCommand(project, new Runnable {
-        def run() {
-          extensions inWriteAction {
-            psiDocument insertString (docCommentEnd, newComment.getText + "\n")
-            PsiDocumentManager getInstance project commitDocument psiDocument
-          }
+      .executeCommand(
+        project,
+        new Runnable {
+          def run() {
+            extensions inWriteAction {
+              psiDocument insertString (docCommentEnd, newComment.getText + "\n")
+              PsiDocumentManager getInstance project commitDocument psiDocument
+            }
 
-          val docRange = docOwner.getDocComment.getTextRange
-          extensions inWriteAction {
-            CodeStyleManager getInstance project reformatText
-              (docOwner.getContainingFile, docRange.getStartOffset,
-              docRange.getEndOffset + 2)
+            val docRange = docOwner.getDocComment.getTextRange
+            extensions inWriteAction {
+              CodeStyleManager getInstance project reformatText
+                (docOwner.getContainingFile, docRange.getStartOffset,
+                docRange.getEndOffset + 2)
+            }
           }
-        }
-      }, "Create ScalaDoc stub", null, psiDocument)
+        },
+        "Create ScalaDoc stub",
+        null,
+        psiDocument
+      )
   }
 
   private def recreateStub(docOwner: ScDocCommentOwner,
@@ -141,30 +147,36 @@ class CreateScalaDocStubAction
     val project = docOwner.getProject
     CommandProcessor
       .getInstance()
-      .executeCommand(project, new Runnable {
-        def run() {
-          extensions inWriteAction {
-            docOwner match {
-              case fun: ScFunctionDefinition =>
-                processParams(List("@param", "@tparam"),
-                              List(fun.parameters, fun.typeParameters))
-              case clazz: ScClass =>
-                processParams(List("@param", "@tparam"),
-                              List(clazz.parameters, clazz.typeParameters))
-              case trt: ScTrait =>
-                processParams(List("@tparam"), List(trt.typeParameters))
-              case alias: ScTypeAlias =>
-                processParams(List("@tparam"), List(alias.typeParameters))
-              case _ =>
-            }
+      .executeCommand(
+        project,
+        new Runnable {
+          def run() {
+            extensions inWriteAction {
+              docOwner match {
+                case fun: ScFunctionDefinition =>
+                  processParams(List("@param", "@tparam"),
+                                List(fun.parameters, fun.typeParameters))
+                case clazz: ScClass =>
+                  processParams(List("@param", "@tparam"),
+                                List(clazz.parameters, clazz.typeParameters))
+                case trt: ScTrait =>
+                  processParams(List("@tparam"), List(trt.typeParameters))
+                case alias: ScTypeAlias =>
+                  processParams(List("@tparam"), List(alias.typeParameters))
+                case _ =>
+              }
 
-            PsiDocumentManager getInstance project commitDocument psiDocument
-            val range = docOwner.getDocComment.getTextRange
-            CodeStyleManager getInstance project reformatText
-              (docOwner.getContainingFile, range.getStartOffset,
-              range.getEndOffset)
+              PsiDocumentManager getInstance project commitDocument psiDocument
+              val range = docOwner.getDocComment.getTextRange
+              CodeStyleManager getInstance project reformatText
+                (docOwner.getContainingFile, range.getStartOffset,
+                range.getEndOffset)
+            }
           }
-        }
-      }, "Create ScalaDoc Stub", null, psiDocument)
+        },
+        "Create ScalaDoc Stub",
+        null,
+        psiDocument
+      )
   }
 }

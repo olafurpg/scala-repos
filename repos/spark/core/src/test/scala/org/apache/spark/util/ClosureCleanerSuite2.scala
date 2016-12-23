@@ -159,11 +159,13 @@ class ClosureCleanerSuite2
       1
     }
     val closure3 = (i: Int) => {
-      (1 to i).map { x =>
-        x + 1
-      }.filter { x =>
-        x > 5
-      }
+      (1 to i)
+        .map { x =>
+          x + 1
+        }
+        .filter { x =>
+          x > 5
+        }
     }
     val closure4 = (j: Int) => {
       (1 to j).flatMap { x =>

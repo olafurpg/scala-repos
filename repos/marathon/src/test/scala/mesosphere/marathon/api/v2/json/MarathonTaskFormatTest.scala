@@ -29,7 +29,8 @@ class MarathonTaskFormatTest extends MarathonSpec {
         Task.AgentInfo("agent1.mesos", Some("abcd-1234"), Iterable.empty),
       appVersion = time,
       status = Task.Status(time, None),
-      networking = Task.NoNetworking)
+      networking = Task.NoNetworking
+    )
 
     val taskWithMultipleIPs = new Task.LaunchedEphemeral(
       taskId = Task.Id("/foo/bar"),
@@ -37,7 +38,8 @@ class MarathonTaskFormatTest extends MarathonSpec {
         Task.AgentInfo("agent1.mesos", Some("abcd-1234"), Iterable.empty),
       appVersion = time,
       status = Task.Status(time, None),
-      networking = Task.NetworkInfoList(network))
+      networking = Task.NetworkInfoList(network)
+    )
 
     val taskWithLocalVolumes = new Task.LaunchedOnReservation(
       taskId = Task.Id("/foo/bar"),
@@ -48,7 +50,8 @@ class MarathonTaskFormatTest extends MarathonSpec {
       networking = Task.NoNetworking,
       reservation = Task.Reservation(
         Seq(Task.LocalVolumeId.unapply("appid#container#random")).flatten,
-        MarathonTestHelper.taskReservationStateNew))
+        MarathonTestHelper.taskReservationStateNew)
+    )
   }
 
   test("JSON serialization of a Task without IPs") {

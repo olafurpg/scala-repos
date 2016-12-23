@@ -33,12 +33,14 @@ object BundleBuilderSpec extends Specification with XmlMatchers {
   "BundleBuilder" should {
     "Build a Bundle" in {
       val b = BundleBuilder
-        .convert(<div>
+        .convert(
+          <div>
                                     <div name="dog" lang="en">Dog</div>
                                     <div name="dog" lang="fr">Chien</div>
                                     <div name="cat"><div>hi</div></div>
                                     </div>,
-                 Locale.US)
+          Locale.US
+        )
         .openOrThrowException("Test")
 
       b.getObject("dog") must_== "Dog"
@@ -47,12 +49,14 @@ object BundleBuilderSpec extends Specification with XmlMatchers {
 
     "Build a Bundle must support default" in {
       val b = BundleBuilder
-        .convert(<div>
+        .convert(
+          <div>
                                     <div name="dog" lang="zz">Dog</div>
                                     <div name="dog" lang="fr" default="true" >Chien</div>
                                     <div name="cat"><div>hi</div></div>
                                     </div>,
-                 Locale.US)
+          Locale.US
+        )
         .openOrThrowException("Test")
 
       b.getObject("dog") must_== "Chien"

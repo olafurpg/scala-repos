@@ -130,13 +130,17 @@ sealed trait Matrix2[R, C, V] extends Serializable {
     lazy val joinedBool =
       mj.join(this.asInstanceOf[Matrix2[R, C, Boolean]], vec)
     implicit val ord2: Ordering[C2] = vec.colOrd
-    lazy val resultPipe = joinedBool.flatMap {
-      case (key, ((row, bool), (col2, v))) =>
-        if (bool) Some((row, col2), v) else None // filter early
-    }.group // TODO we could be lazy with this group and combine with a sum
-    .sum.filter { kv =>
-      mon.isNonZero(kv._2)
-    }.map { case ((r, c2), v) => (r, c2, v) }
+    lazy val resultPipe = joinedBool
+      .flatMap {
+        case (key, ((row, bool), (col2, v))) =>
+          if (bool) Some((row, col2), v) else None // filter early
+      }
+      .group // TODO we could be lazy with this group and combine with a sum
+      .sum
+      .filter { kv =>
+        mon.isNonZero(kv._2)
+      }
+      .map { case ((r, c2), v) => (r, c2, v) }
     MatrixLiteral(resultPipe, this.sizeHint)
   }
 
@@ -151,12 +155,14 @@ sealed trait Matrix2[R, C, V] extends Serializable {
   // Binarize values, all x != 0 become 1
   def binarizeAs[NewValT](implicit mon: Monoid[V],
                           ring: Ring[NewValT]): Matrix2[R, C, NewValT] = {
-    lazy val newPipe = toTypedPipe.map {
-      case (r, c, x) =>
-        (r, c, if (mon.isNonZero(x)) { ring.one } else { ring.zero })
-    }.filter { kv =>
-      ring.isNonZero(kv._3)
-    }
+    lazy val newPipe = toTypedPipe
+      .map {
+        case (r, c, x) =>
+          (r, c, if (mon.isNonZero(x)) { ring.one } else { ring.zero })
+      }
+      .filter { kv =>
+        ring.isNonZero(kv._3)
+      }
     MatrixLiteral(newPipe, this.sizeHint)
   }
 
@@ -193,14 +199,20 @@ sealed trait Matrix2[R, C, V] extends Serializable {
   }
 
   def getRow(index: R): Matrix2[Unit, C, V] =
-    MatrixLiteral(toTypedPipe.filter {
-      case (r, c, v) => Ordering[R].equiv(r, index)
-    }.map { case (r, c, v) => ((), c, v) }, this.sizeHint.setRows(1L))
+    MatrixLiteral(toTypedPipe
+                    .filter {
+                      case (r, c, v) => Ordering[R].equiv(r, index)
+                    }
+                    .map { case (r, c, v) => ((), c, v) },
+                  this.sizeHint.setRows(1L))
 
   def getColumn(index: C): Matrix2[R, Unit, V] =
-    MatrixLiteral(toTypedPipe.filter {
-      case (r, c, v) => Ordering[C].equiv(c, index)
-    }.map { case (r, c, v) => (r, (), v) }, this.sizeHint.setCols(1L))
+    MatrixLiteral(toTypedPipe
+                    .filter {
+                      case (r, c, v) => Ordering[C].equiv(c, index)
+                    }
+                    .map { case (r, c, v) => (r, (), v) },
+                  this.sizeHint.setCols(1L))
 
   /**
     * Consider this Matrix as the r2 row of a matrix. The current matrix must be a row,
@@ -360,10 +372,12 @@ case class Product[R, C, C2, V](
     }
 
     if (leftMatrix) {
-      joined.map { case (r, v) => (r, (), v) }
+      joined
+        .map { case (r, v) => (r, (), v) }
         .asInstanceOf[TypedPipe[(R, C2, V)]] // we know C2 is Unit
     } else {
-      joined.map { case (c, v) => ((), c, v) }
+      joined
+        .map { case (c, v) => ((), c, v) }
         .asInstanceOf[TypedPipe[(R, C2, V)]] // we know R is Unit
     }
   }
@@ -532,12 +546,16 @@ case class Sum[R, C, V](left: Matrix2[R, C, V],
     Sum(left.sumColVectors, right.sumColVectors, mon)
 
   override def trace(implicit mon: Monoid[V], ev: =:=[R, C]): Scalar2[V] =
-    Scalar2(collectAddends(this).map { pipe =>
-      pipe
-        .asInstanceOf[TypedPipe[(R, R, V)]]
-        .filter { case (r, c, v) => Ordering[R].equiv(r, c) }
-        .map { _._3 }
-    }.reduce(_ ++ _).sum)
+    Scalar2(
+      collectAddends(this)
+        .map { pipe =>
+          pipe
+            .asInstanceOf[TypedPipe[(R, R, V)]]
+            .filter { case (r, c, v) => Ordering[R].equiv(r, c) }
+            .map { _._3 }
+        }
+        .reduce(_ ++ _)
+        .sum)
 }
 
 case class HadamardProduct[R, C, V](left: Matrix2[R, C, V],

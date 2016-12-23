@@ -73,7 +73,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
       checkAnswer(sql(convertedSQL), df)
     } catch {
       case cause: Throwable =>
-        fail(s"""Failed to execute converted SQL string or got wrong answer:
+        fail(
+          s"""Failed to execute converted SQL string or got wrong answer:
           |
           |# Converted SQL query string:
           |$convertedSQL
@@ -84,7 +85,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
           |# Resolved query plan:
           |${df.queryExecution.analyzed.treeString}
          """.stripMargin,
-             cause)
+          cause
+        )
     }
   }
 

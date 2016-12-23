@@ -44,10 +44,12 @@ private[sird] object QueryStringParameterMacros {
         val paramName = parts.head match {
           case paramEquals(param) => param
           case _ =>
-            c.abort(c.enclosingPosition.withPoint(startOfString),
-                    "Invalid start of string for query string extractor '" +
-                      parts.head + "', extractor string must have format " +
-                      name + "\"param=$extracted\"")
+            c.abort(
+              c.enclosingPosition.withPoint(startOfString),
+              "Invalid start of string for query string extractor '" +
+                parts.head + "', extractor string must have format " +
+                name + "\"param=$extracted\""
+            )
         }
 
         if (parts.length == 1) {
@@ -60,7 +62,8 @@ private[sird] object QueryStringParameterMacros {
           c.abort(
             c.enclosingPosition,
             "Query string extractor can only extract one parameter, extract multiple parameters using the & extractor, eg: " +
-              name + "\"param1=$param1\" & " + name + "\"param2=$param2\"")
+              name + "\"param1=$param1\" & " + name + "\"param2=$param2\""
+          )
         }
 
         if (parts(1).nonEmpty) {

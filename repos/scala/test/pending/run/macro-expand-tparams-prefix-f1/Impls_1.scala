@@ -12,7 +12,9 @@ object Impls {
         Apply(Select(Ident(definitions.PredefModule), TermName("println")),
               List(Literal(Constant(implicitly[c.WeakTypeTag[U]].toString)))),
         Apply(Select(Ident(definitions.PredefModule), TermName("println")),
-              List(Literal(Constant(V.toString))))),
-      Literal(Constant(())))
+              List(Literal(Constant(V.toString))))
+      ),
+      Literal(Constant(()))
+    )
   }
 }

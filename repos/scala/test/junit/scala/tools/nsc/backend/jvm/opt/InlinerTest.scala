@@ -29,10 +29,12 @@ object InlinerTest extends ClearAfterClass.Clearable {
 
   // allows inspecting the caches after a compilation run
   def notPerRun: List[Clearable] =
-    List(compiler.genBCode.bTypes.classBTypeFromInternalName,
-         compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
-         compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
-         compiler.genBCode.bTypes.callGraph.callsites)
+    List(
+      compiler.genBCode.bTypes.classBTypeFromInternalName,
+      compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
+      compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
+      compiler.genBCode.bTypes.callGraph.callsites
+    )
   notPerRun foreach compiler.perRunCaches.unrecordCache
 
   def clear(): Unit = { compiler = null; inlineOnlyCompiler = null }
@@ -114,18 +116,22 @@ class InlinerTest extends ClearAfterClass {
     val g = inlineTest(code)
 
     val gConv = convertMethod(g)
-    assertSameCode(gConv,
-                   List(VarOp(ALOAD, 0),
-                        VarOp(ASTORE, 1), // store this
-                        Op(ICONST_1),
-                        VarOp(ISTORE, 2),
-                        Jump(GOTO, Label(10)), // store return value
-                        Label(10),
-                        VarOp(ILOAD, 2), // load return value
-                        VarOp(ALOAD, 0),
-                        Invoke(INVOKEVIRTUAL, "C", "f", "()I", false),
-                        Op(IADD),
-                        Op(IRETURN)))
+    assertSameCode(
+      gConv,
+      List(
+        VarOp(ALOAD, 0),
+        VarOp(ASTORE, 1), // store this
+        Op(ICONST_1),
+        VarOp(ISTORE, 2),
+        Jump(GOTO, Label(10)), // store return value
+        Label(10),
+        VarOp(ILOAD, 2), // load return value
+        VarOp(ALOAD, 0),
+        Invoke(INVOKEVIRTUAL, "C", "f", "()I", false),
+        Op(IADD),
+        Op(IRETURN)
+      )
+    )
 
     // line numbers are kept, so there's a line 2 (from the inlined f)
     assert(gConv.instructions exists {
@@ -160,7 +166,8 @@ class InlinerTest extends ClearAfterClass {
              "scala/Predef$",
              "$qmark$qmark$qmark",
              "()Lscala/runtime/Nothing$;",
-             false))
+             false)
+    )
 
     val gBeforeLocalOpt =
       VarOp(ALOAD, 0) :: VarOp(ASTORE, 1) :: invokeQQQ ::: List(
@@ -540,7 +547,8 @@ class InlinerTest extends ClearAfterClass {
       """.stripMargin
     val warns = Set(
       "C::f()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
-      "T::f()I is annotated @inline but cannot be inlined: the method is not final and may be overridden")
+      "T::f()I is annotated @inline but cannot be inlined: the method is not final and may be overridden"
+    )
     var count = 0
     val List(c, t) = compile(code, allowMessage = i => {
       count += 1; warns.exists(i.msg contains _)
@@ -585,7 +593,8 @@ class InlinerTest extends ClearAfterClass {
       // SD-86 -- once the mixin-method O.f inlines the body of T.f, we can also inline O.g into class C.
       """O$::f()I is annotated @inline but could not be inlined:
         |The callee O$::f()I contains the instruction INVOKESPECIAL T.f ()I
-        |that would cause an IllegalAccessError when inlined into class C""".stripMargin)
+        |that would cause an IllegalAccessError when inlined into class C""".stripMargin
+    )
     var count = 0
     val List(c, oMirror, oModule, t) = compile(code, allowMessage = i => {
       count += 1; warns.exists(i.msg contains _)
@@ -698,7 +707,8 @@ class InlinerTest extends ClearAfterClass {
       "T2b::g2b()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
       "T1::g1()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
       "T2a::g2a()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
-      "T1::g1()I is annotated @inline but cannot be inlined: the method is not final and may be overridden")
+      "T1::g1()I is annotated @inline but cannot be inlined: the method is not final and may be overridden"
+    )
     var count = 0
     val List(ca, cb, t1, t2a, t2b) = compile(code, allowMessage = i => {
       count += 1; warnings.exists(i.msg contains _)

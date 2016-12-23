@@ -462,10 +462,12 @@ object TestGraphs {
 
     // compute the first store using the join stream as input
     val storeAfterFlatMap = MapAlgebra.sumByKey(
-      leftStream.flatMap {
-        case (k, opt) =>
-          opt.map { case (time, (u, optv)) => (time, (k, (u, optv))) }
-      }.flatMap(flatMapFn(_))
+      leftStream
+        .flatMap {
+          case (k, opt) =>
+            opt.map { case (time, (u, optv)) => (time, (k, (u, optv))) }
+        }
+        .flatMap(flatMapFn(_))
         .map { case (time, (k, v)) => (k, v) } // drop the time
     )
 
@@ -619,8 +621,9 @@ object TestGraphs {
   def lookupJobInScala[T, U](in: List[T],
                              srv: (T) => Option[U]): List[(T, U)] =
     in.map { t =>
-      (t, srv(t))
-    }.collect { case (t, Some(u)) => (t, u) }
+        (t, srv(t))
+      }
+      .collect { case (t, Some(u)) => (t, u) }
 
   def twoSumByKey[P <: Platform[P], K, V: Monoid, K2](
       source: Producer[P, (K, V)],
@@ -654,9 +657,11 @@ object TestGraphs {
     val origCounter = Counter(Group("counter.test"), Name("orig_counter"))
     val fmCounter = Counter(Group("counter.test"), Name("fm_counter"))
     val fltrCounter = Counter(Group("counter.test"), Name("fltr_counter"))
-    source.flatMap { x =>
-      origCounter.incr; fn(x)
-    }.name("FM")
+    source
+      .flatMap { x =>
+        origCounter.incr; fn(x)
+      }
+      .name("FM")
       .filter { x =>
         fmCounter.incrBy(2); true
       }
@@ -674,8 +679,8 @@ class TestGraphs[P <: Platform[P],
     store: () => P#Store[K, V])(sink: () => P#Sink[T])(
     sourceMaker: TraversableOnce[T] => Producer[P, T])(
     toLookupFn: P#Store[K, V] => (K => Option[V]))(
-    toSinkChecker: (P#Sink[T],
-                    List[T]) => Boolean)(run: (P, P#Plan[_]) => Unit) {
+    toSinkChecker: (P#Sink[T], List[T]) => Boolean)(
+    run: (P, P#Plan[_]) => Unit) {
 
   def diamondChecker(items: List[T],
                      fnA: T => List[(K, V)],

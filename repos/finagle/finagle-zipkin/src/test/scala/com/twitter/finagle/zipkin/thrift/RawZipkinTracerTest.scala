@@ -45,12 +45,14 @@ class RawZipkinTracerTest extends FunSuite {
       ZipkinAnnotation(Time.fromSeconds(123), "llamas", localEndpoint)
     )
 
-    val span = Span(traceId = traceId,
-                    annotations = annotations,
-                    _serviceName = Some("hickupquail"),
-                    _name = Some("foo"),
-                    bAnnotations = Seq.empty[BinaryAnnotation],
-                    endpoint = localEndpoint)
+    val span = Span(
+      traceId = traceId,
+      annotations = annotations,
+      _serviceName = Some("hickupquail"),
+      _name = Some("foo"),
+      bAnnotations = Seq.empty[BinaryAnnotation],
+      endpoint = localEndpoint
+    )
 
     val expected = LogEntry(
       category = "zipkin",
@@ -60,7 +62,8 @@ class RawZipkinTracerTest extends FunSuite {
           "XCwADAAAAC2hpY2t1cHF1YWlsAAAKAAEAAAAAB1TUwAsAAgAAAAJzcwwAAwgAAQAA" +
           "AU0GAAIAFgsAAwAAAAtoaWNrdXBxdWFpbAAACgABAAAAAAdkFwALAAIAAAACc3IMA" +
           "AMIAAEAAAFNBgACABYLAAMAAAALaGlja3VwcXVhaWwAAAoAAQAAAAAHVNTACwACAA" +
-          "AABmxsYW1hcwwAAwgAAQAACRMGAAIAFwsAAwAAAAtoaWNrdXBxdWFpbAAAAgAJAQA=\n")
+          "AABmxsYW1hcwwAAwgAAQAACRMGAAIAFwsAAwAAAAtoaWNrdXBxdWFpbAAAAgAJAQA=\n"
+    )
 
     tracer.logSpans(Seq(span))
     assert(scribe.messages == Seq(expected))

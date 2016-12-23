@@ -35,6 +35,7 @@ trait FunSpecScopeTest extends FunSpecGenerator {
       root =>
         checkResultTreeHasExactNamedPath(root, path1: _*) &&
           checkResultTreeHasExactNamedPath(root, path2: _*) &&
-          checkResultTreeDoesNotHaveNodes(root, "OtherScope"))
+          checkResultTreeDoesNotHaveNodes(root, "OtherScope")
+    )
   }
 }

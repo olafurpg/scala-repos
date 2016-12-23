@@ -640,8 +640,7 @@ trait Implicits { self: Analyzer =>
         ptres match {
           case HasMethodMatching(name, argtpes, restpe) =>
             (tpres.member(name) filter
-              (m =>
-                 isApplicableSafe(undet, m.tpe, argtpes, restpe))) != NoSymbol
+              (m => isApplicableSafe(undet, m.tpe, argtpes, restpe))) != NoSymbol
           case _ =>
             tpres <:< ptres
         }
@@ -1171,7 +1170,8 @@ trait Implicits { self: Analyzer =>
             setAddendum(
               pos,
               () =>
-                s"\n Note: implicit ${invalidImplicits.head} is not applicable here because it comes after the application point and it lacks an explicit result type")
+                s"\n Note: implicit ${invalidImplicits.head} is not applicable here because it comes after the application point and it lacks an explicit result type"
+            )
         }
 
         best
@@ -1559,14 +1559,16 @@ trait Implicits { self: Analyzer =>
               pos,
               sm"""to create a manifest here, it is necessary to interoperate with the type tag `$tagInScope` in scope.
                   |however typetag -> manifest conversion requires Scala reflection, which is not present on the classpath.
-                  |to proceed put scala-reflect.jar on your compilation classpath and recompile.""")
+                  |to proceed put scala-reflect.jar on your compilation classpath and recompile."""
+            )
           }
           if (resolveClassTag(pos, tp, allowMaterialization = true) == EmptyTree) {
             throw new TypeError(
               pos,
               sm"""to create a manifest here, it is necessary to interoperate with the type tag `$tagInScope` in scope.
                   |however typetag -> manifest conversion requires a class tag for the corresponding type to be present.
-                  |to proceed add a class tag to the type `$tp` (e.g. by introducing a context bound) and recompile.""")
+                  |to proceed add a class tag to the type `$tp` (e.g. by introducing a context bound) and recompile."""
+            )
           }
           val cm = typed(Ident(ReflectRuntimeCurrentMirror))
           val internal = gen.mkAttributedSelect(
@@ -1787,10 +1789,13 @@ trait Implicits { self: Analyzer =>
     private val Intersobralator = """\$\{\s*([^}\s]+)\s*\}""".r
 
     private def interpolate(text: String, vars: Map[String, String]) =
-      Intersobralator.replaceAllIn(text, (_: Regex.Match) match {
-        case Regex.Groups(v) => Regex quoteReplacement vars.getOrElse(v, "")
-        // #3915: need to quote replacement string since it may include $'s (such as the interpreter's $iw)
-      })
+      Intersobralator.replaceAllIn(
+        text,
+        (_: Regex.Match) match {
+          case Regex.Groups(v) => Regex quoteReplacement vars.getOrElse(v, "")
+          // #3915: need to quote replacement string since it may include $'s (such as the interpreter's $iw)
+        }
+      )
 
     private lazy val typeParamNames: List[String] =
       sym.typeParams.map(_.decodedName)

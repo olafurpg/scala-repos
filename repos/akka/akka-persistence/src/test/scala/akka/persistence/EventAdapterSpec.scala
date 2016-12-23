@@ -114,9 +114,10 @@ class EventAdapterSpec(journalName: String,
   import EventAdapterSpec._
 
   def this(journalName: String) {
-    this("inmem",
-         PersistenceSpec.config("inmem", "InmemPersistentTaggingSpec"),
-         ConfigFactory.parseString(s"""
+    this(
+      "inmem",
+      PersistenceSpec.config("inmem", "InmemPersistentTaggingSpec"),
+      ConfigFactory.parseString(s"""
          |akka.persistence.journal {
          |
          |  common-event-adapters {
@@ -160,7 +161,8 @@ class EventAdapterSpec(journalName: String,
          |    dir = "journal-3"
          |  }
          |}
-      """.stripMargin))
+      """.stripMargin)
+    )
   }
 
   def persister(name: String, journalId: String = journalName) =

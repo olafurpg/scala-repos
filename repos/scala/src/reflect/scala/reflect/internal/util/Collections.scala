@@ -80,8 +80,8 @@ trait Collections {
     loop(as)
   }
 
-  final def map2[A, B, C](xs1: List[A], xs2: List[B])(f: (A,
-                                                          B) => C): List[C] = {
+  final def map2[A, B, C](xs1: List[A], xs2: List[B])(
+      f: (A, B) => C): List[C] = {
     val lb = new ListBuffer[C]
     var ys1 = xs1
     var ys2 = xs2

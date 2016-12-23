@@ -82,15 +82,21 @@ private trait Balancer[Req, Rep] extends ServiceFactory[Req, Rep] { self =>
   // to store it as a member variable on this trait.
   protected[this] def maxEffortExhausted: Counter
 
-  private[this] val gauges = Seq(statsReceiver.addGauge("available") {
-    dist.vector.count(n => n.status == Status.Open)
-  }, statsReceiver.addGauge("busy") {
-    dist.vector.count(n => n.status == Status.Busy)
-  }, statsReceiver.addGauge("closed") {
-    dist.vector.count(n => n.status == Status.Closed)
-  }, statsReceiver.addGauge("load") {
-    dist.vector.map(_.pending).sum
-  }, statsReceiver.addGauge("size") { dist.vector.size })
+  private[this] val gauges = Seq(
+    statsReceiver.addGauge("available") {
+      dist.vector.count(n => n.status == Status.Open)
+    },
+    statsReceiver.addGauge("busy") {
+      dist.vector.count(n => n.status == Status.Busy)
+    },
+    statsReceiver.addGauge("closed") {
+      dist.vector.count(n => n.status == Status.Closed)
+    },
+    statsReceiver.addGauge("load") {
+      dist.vector.map(_.pending).sum
+    },
+    statsReceiver.addGauge("size") { dist.vector.size }
+  )
 
   private[this] val adds = statsReceiver.counter("adds")
   private[this] val removes = statsReceiver.counter("removes")

@@ -45,26 +45,31 @@ class EnsembleColorButton extends EnsembleExample {
     hgrow = Priority.Always
     spacing = 10
     padding = Insets(20)
-    children = List(new Button {
-      maxWidth = 200
-      maxHeight = 150
-      text = "Color Button 1"
-      style = "-fx-base: red"
-    }, new Button {
-      maxWidth = 200
-      maxHeight = 150
-      text = "Color Button 2"
-      style = "-fx-base: green "
-    }, new Button {
-      maxWidth = 200
-      maxHeight = 150
-      text = "Color Button 3"
-      style = "-fx-base: Yellow"
-    }, new Button {
-      maxWidth = 200
-      maxHeight = 150
-      text = "Color Button 4"
-      style = "-fx-base: Orange"
-    })
+    children = List(
+      new Button {
+        maxWidth = 200
+        maxHeight = 150
+        text = "Color Button 1"
+        style = "-fx-base: red"
+      },
+      new Button {
+        maxWidth = 200
+        maxHeight = 150
+        text = "Color Button 2"
+        style = "-fx-base: green "
+      },
+      new Button {
+        maxWidth = 200
+        maxHeight = 150
+        text = "Color Button 3"
+        style = "-fx-base: Yellow"
+      },
+      new Button {
+        maxWidth = 200
+        maxHeight = 150
+        text = "Color Button 4"
+        style = "-fx-base: Orange"
+      }
+    )
   }
 }

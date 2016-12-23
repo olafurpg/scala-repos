@@ -143,19 +143,22 @@ object ScalaOIUtil {
           }
         },
         clazz.getProject,
-        if (isImplement) "Implement method" else "Override method")
+        if (isImplement) "Implement method" else "Override method"
+      )
   }
 
   def getMembersToImplement(
       clazz: ScTemplateDefinition,
       withOwn: Boolean = false,
       withSelfType: Boolean = false): Iterable[ClassMember] = {
-    allMembers(clazz, withSelfType).filter {
-      case sign: PhysicalSignature => needImplement(sign, clazz, withOwn)
-      case (named: PsiNamedElement, subst: ScSubstitutor) =>
-        needImplement(named, clazz, withOwn)
-      case _ => false
-    }.flatMap(toClassMember(_, isImplement = true))
+    allMembers(clazz, withSelfType)
+      .filter {
+        case sign: PhysicalSignature => needImplement(sign, clazz, withOwn)
+        case (named: PsiNamedElement, subst: ScSubstitutor) =>
+          needImplement(named, clazz, withOwn)
+        case _ => false
+      }
+      .flatMap(toClassMember(_, isImplement = true))
   }
 
   def isProductAbstractMethod(
@@ -187,12 +190,14 @@ object ScalaOIUtil {
 
   def getMembersToOverride(clazz: ScTemplateDefinition,
                            withSelfType: Boolean): Iterable[ClassMember] = {
-    allMembers(clazz, withSelfType).filter {
-      case sign: PhysicalSignature => needOverride(sign, clazz)
-      case (named: PsiNamedElement, _: ScSubstitutor) =>
-        needOverride(named, clazz)
-      case _ => false
-    }.flatMap(toClassMember(_, isImplement = false))
+    allMembers(clazz, withSelfType)
+      .filter {
+        case sign: PhysicalSignature => needOverride(sign, clazz)
+        case (named: PsiNamedElement, _: ScSubstitutor) =>
+          needOverride(named, clazz)
+        case _ => false
+      }
+      .flatMap(toClassMember(_, isImplement = false))
   }
 
   def allMembers(clazz: ScTemplateDefinition,

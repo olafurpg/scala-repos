@@ -325,7 +325,8 @@ class AkkaHttpServer(config: ServerConfig,
         "Play SSlEngineProvider delegate",
         1d,
         "A provider that only implements the creation of SSL engines, and delegates to Play's SSLEngineProvider") {},
-      "Play SSLEngineProvider delegate") {}
+      "Play SSLEngineProvider delegate"
+    ) {}
   }
 }
 

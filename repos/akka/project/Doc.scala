@@ -117,16 +117,15 @@ object UnidocRoot extends AutoPlugin {
   override def trigger = noTrigger
 
   val akkaSettings = UnidocRoot.CliOptions.genjavadocEnabled
-    .ifTrue(
-      Seq(
-        javacOptions in (JavaUnidoc, unidoc) ++= Seq("-Xdoclint:none"),
-        // genjavadoc needs to generate synthetic methods since the java code uses them
-        scalacOptions += "-P:genjavadoc:suppressSynthetic=false",
-        // FIXME: see #18056
-        sources in (JavaUnidoc, unidoc) ~=
-          (_.filterNot(
-            _.getPath.contains("Access$minusControl$minusAllow$minusOrigin")))
-      ))
+    .ifTrue(Seq(
+      javacOptions in (JavaUnidoc, unidoc) ++= Seq("-Xdoclint:none"),
+      // genjavadoc needs to generate synthetic methods since the java code uses them
+      scalacOptions += "-P:genjavadoc:suppressSynthetic=false",
+      // FIXME: see #18056
+      sources in (JavaUnidoc, unidoc) ~=
+        (_.filterNot(
+          _.getPath.contains("Access$minusControl$minusAllow$minusOrigin")))
+    ))
     .getOrElse(Nil)
 
   def settings(ignoreAggregates: Seq[Project], ignoreProjects: Seq[Project]) = {
@@ -155,7 +154,8 @@ object UnidocRoot extends AutoPlugin {
           AkkaBuild.parsing,
           AkkaBuild.protobuf,
           AkkaBuild.osgiDiningHakkersSampleMavenTest,
-          AkkaBuild.akkaScalaNightly))
+          AkkaBuild.akkaScalaNightly)
+    )
 }
 
 /**

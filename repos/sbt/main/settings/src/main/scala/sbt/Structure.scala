@@ -581,8 +581,8 @@ object Scoped {
       t8: (ST[A], ST[B], ST[C], ST[D], ST[E], ST[F], ST[G], ST[H]))
       extends RichTaskables[AList.T8K[A, B, C, D, E, F, G, H]#l](t8)(
         AList.tuple8[A, B, C, D, E, F, G, H]) {
-    type Fun[M[_], Ret] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G],
-                           M[H]) => Ret
+    type Fun[M[_], Ret] =
+      (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H]) => Ret
     def identityMap = map(mkTuple8)
     protected def convert[M[_], R](z: Fun[M, R]) = z.tupled
   }
@@ -590,8 +590,8 @@ object Scoped {
       t9: (ST[A], ST[B], ST[C], ST[D], ST[E], ST[F], ST[G], ST[H], ST[I]))
       extends RichTaskables[AList.T9K[A, B, C, D, E, F, G, H, I]#l](t9)(
         AList.tuple9[A, B, C, D, E, F, G, H, I]) {
-    type Fun[M[_], Ret] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H],
-                           M[I]) => Ret
+    type Fun[M[_], Ret] =
+      (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H], M[I]) => Ret
     def identityMap = map(mkTuple9)
     protected def convert[M[_], R](z: Fun[M, R]) = z.tupled
   }
@@ -608,8 +608,8 @@ object Scoped {
              ST[J])))
       extends RichTaskables[AList.T10K[A, B, C, D, E, F, G, H, I, J]#l](t10)(
         AList.tuple10[A, B, C, D, E, F, G, H, I, J]) {
-    type Fun[M[_], Ret] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H],
-                           M[I], M[J]) => Ret
+    type Fun[M[_], Ret] =
+      (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H], M[I], M[J]) => Ret
     def identityMap = map(mkTuple10)
     protected def convert[M[_], R](z: Fun[M, R]) = z.tupled
   }
@@ -628,8 +628,8 @@ object Scoped {
              ST[K])))
       extends RichTaskables[AList.T11K[A, B, C, D, E, F, G, H, I, J, K]#l](
         t11)(AList.tuple11[A, B, C, D, E, F, G, H, I, J, K]) {
-    type Fun[M[_], Ret] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H],
-                           M[I], M[J], M[K]) => Ret
+    type Fun[M[_], Ret] =
+      (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H], M[I], M[J], M[K]) => Ret
     def identityMap = map(mkTuple11)
     protected def convert[M[_], R](z: Fun[M, R]) = z.tupled
   }

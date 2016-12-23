@@ -158,11 +158,11 @@ class TypedTutorial(args: Args) extends Job(args) {
       // get scores for each line (indexed by line number)
       val scoredLinesByNumber = scoredWords
       // select the line offset and score fields
-      .map { case (word, (offset, score)) => (offset, score) }
-      // group by line offset (groups all the words for a line together)
-      .group
-      // compute total score per line
-      .sum
+        .map { case (word, (offset, score)) => (offset, score) }
+        // group by line offset (groups all the words for a line together)
+        .group
+        // compute total score per line
+        .sum
       // Group and sum are often run together in this way.
       // The `sumByKey` operation performs performs both.
 

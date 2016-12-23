@@ -389,11 +389,13 @@ object AlterTableCommandParser {
         // Note: the AST doesn't contain information about which file format is being set here.
         // E.g. we can't differentiate between INPUTFORMAT and OUTPUTFORMAT if either is set.
         // Right now this just stores the values, but we should figure out how to get the keys.
-        val fFormat = fileFormat.map {
-          _.children.map { n =>
-            cleanAndUnquoteString(n.text)
+        val fFormat = fileFormat
+          .map {
+            _.children.map { n =>
+              cleanAndUnquoteString(n.text)
+            }
           }
-        }.getOrElse(Seq())
+          .getOrElse(Seq())
         val gFormat = genericFormat.map { f =>
           cleanAndUnquoteString(f.children(0).text)
         }
@@ -428,14 +430,14 @@ object AlterTableCommandParser {
       // column_type [COMMENT col_comment] [FIRST|AFTER column_name] [CASCADE|RESTRICT];
       case Token("TOK_ALTERTABLE_RENAMECOL",
                  oldName :: newName :: dataType :: args) :: _ =>
-        val afterColName: Option[String] = getClauseOption(
-          "TOK_ALTERTABLE_CHANGECOL_AFTER_POSITION",
-          args).map { ap =>
-          ap.children match {
-            case Token(col, Nil) :: Nil => col
-            case _ => parseFailed("Invalid ALTER TABLE command", node)
-          }
-        }
+        val afterColName: Option[String] =
+          getClauseOption("TOK_ALTERTABLE_CHANGECOL_AFTER_POSITION", args)
+            .map { ap =>
+              ap.children match {
+                case Token(col, Nil) :: Nil => col
+                case _ => parseFailed("Invalid ALTER TABLE command", node)
+              }
+            }
         val restrict = getClauseOption("TOK_RESTRICT", args).isDefined
         val cascade = getClauseOption("TOK_CASCADE", args).isDefined
         val comment = args.headOption.map {

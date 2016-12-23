@@ -184,25 +184,26 @@ object WorkflowUtils extends Logging {
           error(s"Unable to extract $field name and params $jv")
           throw e
       }
-      val extractedParams = np.params.map { p =>
-        try {
-          if (!classMap.contains(np.name)) {
-            error(
-              s"Unable to find $field class with name '${np.name}'" +
+      val extractedParams = np.params
+        .map { p =>
+          try {
+            if (!classMap.contains(np.name)) {
+              error(s"Unable to find $field class with name '${np.name}'" +
                 " defined in Engine.")
-            sys.exit(1)
+              sys.exit(1)
+            }
+            WorkflowUtils.extractParams(engineLanguage,
+                                        compact(render(p)),
+                                        classMap(np.name),
+                                        jsonExtractor,
+                                        formats)
+          } catch {
+            case e: Exception =>
+              error(s"Unable to extract $field params $p")
+              throw e
           }
-          WorkflowUtils.extractParams(engineLanguage,
-                                      compact(render(p)),
-                                      classMap(np.name),
-                                      jsonExtractor,
-                                      formats)
-        } catch {
-          case e: Exception =>
-            error(s"Unable to extract $field params $p")
-            throw e
         }
-      }.getOrElse(EmptyParams())
+        .getOrElse(EmptyParams())
 
       (np.name, extractedParams)
     } getOrElse ("", EmptyParams())

@@ -111,31 +111,34 @@ class DirectKafkaStreamSuite
     // hold a reference to the current offset ranges, so it can be used downstream
     var offsetRanges = Array[OffsetRange]()
 
-    stream.transform { rdd =>
-      // Get the offset ranges in the RDD
-      offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
-      rdd
-    }.foreachRDD { rdd =>
-      for (o <- offsetRanges) {
-        logInfo(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
+    stream
+      .transform { rdd =>
+        // Get the offset ranges in the RDD
+        offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
+        rdd
       }
-      val collected = rdd.mapPartitionsWithIndex { (i, iter) =>
-        // For each partition, get size of the range in the partition,
-        // and the number of items in the partition
-        val off = offsetRanges(i)
-        val all = iter.toSeq
-        val partSize = all.size
-        val rangeSize = off.untilOffset - off.fromOffset
-        Iterator((partSize, rangeSize))
-      }.collect
+      .foreachRDD { rdd =>
+        for (o <- offsetRanges) {
+          logInfo(
+            s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
+        }
+        val collected = rdd.mapPartitionsWithIndex { (i, iter) =>
+          // For each partition, get size of the range in the partition,
+          // and the number of items in the partition
+          val off = offsetRanges(i)
+          val all = iter.toSeq
+          val partSize = all.size
+          val rangeSize = off.untilOffset - off.fromOffset
+          Iterator((partSize, rangeSize))
+        }.collect
 
-      // Verify whether number of elements in each partition
-      // matches with the corresponding offset range
-      collected.foreach {
-        case (partSize, rangeSize) =>
-          assert(partSize === rangeSize, "offset ranges are wrong")
+        // Verify whether number of elements in each partition
+        // matches with the corresponding offset range
+        collected.foreach {
+          case (partSize, rangeSize) =>
+            assert(partSize === rangeSize, "offset ranges are wrong")
+        }
       }
-    }
     stream.foreachRDD { rdd =>
       allReceived.addAll(Arrays.asList(rdd.collect(): _*))
     }
@@ -521,9 +524,12 @@ class DirectKafkaStreamSuite
   /** Get the generated offset ranges from the DirectKafkaStream */
   private def getOffsetRanges[K, V](
       kafkaStream: DStream[(K, V)]): Seq[(Time, Array[OffsetRange])] = {
-    kafkaStream.generatedRDDs.mapValues { rdd =>
-      rdd.asInstanceOf[KafkaRDD[K, V, _, _, (K, V)]].offsetRanges
-    }.toSeq.sortBy { _._1 }
+    kafkaStream.generatedRDDs
+      .mapValues { rdd =>
+        rdd.asInstanceOf[KafkaRDD[K, V, _, _, (K, V)]].offsetRanges
+      }
+      .toSeq
+      .sortBy { _._1 }
   }
 
   private def getDirectKafkaStream(

@@ -368,7 +368,8 @@ class ReceivedBlockHandlerSuite
             "Message count not matches for a " +
               receivedBlock.getClass.getName +
               " being inserted using BlockManagerBasedBlockHandler with " +
-              sLevel)
+              sLevel
+          )
         }
       } else {
         // test received block with WAL based handler
@@ -381,7 +382,8 @@ class ReceivedBlockHandlerSuite
             "Message count not matches for a " +
               receivedBlock.getClass.getName +
               " being inserted using WriteAheadLogBasedBlockHandler with " +
-              sLevel)
+              sLevel
+          )
         }
       }
     } finally {

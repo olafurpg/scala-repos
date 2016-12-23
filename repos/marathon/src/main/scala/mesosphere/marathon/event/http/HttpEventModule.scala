@@ -25,7 +25,8 @@ trait HttpEventConfiguration extends ScallopConf {
     descr = "The URLs of the event endpoints added to the current list of subscribers on startup. " +
         "You can manage this list during runtime by using the /v2/eventSubscriptions API endpoint.",
     required = false,
-    noshort = true).map(parseHttpEventEndpoints)
+    noshort = true
+  ).map(parseHttpEventEndpoints)
 
   lazy val httpEventCallbackSlowConsumerTimeout = opt[Long](
     "http_event_callback_slow_consumer_timeout",
@@ -33,7 +34,8 @@ trait HttpEventConfiguration extends ScallopConf {
       "A http event callback consumer is considered slow, if the delivery takes longer than this timeout (ms)",
     required = false,
     noshort = true,
-    default = Some(10.seconds.toMillis))
+    default = Some(10.seconds.toMillis)
+  )
 
   private[this] def parseHttpEventEndpoints(str: String): List[String] =
     str.split(',').map(_.trim).toList

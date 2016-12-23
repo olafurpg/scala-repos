@@ -16,8 +16,10 @@ abstract class StatsService2 extends Actor {
       ClusterRouterGroupSettings(totalInstances = 100,
                                  routeesPaths = List("/user/statsWorker"),
                                  allowLocalRoutees = true,
-                                 useRole = Some("compute"))).props(),
-    name = "workerRouter2")
+                                 useRole = Some("compute"))
+    ).props(),
+    name = "workerRouter2"
+  )
   //#router-lookup-in-code
 }
 
@@ -35,6 +37,7 @@ abstract class StatsService3 extends Actor {
                                 maxInstancesPerNode = 3,
                                 allowLocalRoutees = false,
                                 useRole = None)).props(Props[StatsWorker]),
-    name = "workerRouter3")
+    name = "workerRouter3"
+  )
   //#router-deploy-in-code
 }

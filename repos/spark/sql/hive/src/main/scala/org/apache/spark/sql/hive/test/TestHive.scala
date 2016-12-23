@@ -45,15 +45,16 @@ import org.apache.spark.util.{ShutdownHookManager, Utils}
 // SPARK-3729: Test key required to check for initialization errors with config.
 object TestHive
     extends TestHiveContext(
-        new SparkContext(
-            System.getProperty("spark.sql.test.master", "local[1]"),
-            "TestSQLContext",
-            new SparkConf()
-              .set("spark.sql.test", "")
-              .set("spark.sql.hive.metastore.barrierPrefixes",
-                   "org.apache.spark.sql.hive.execution.PairSerDe")
-              // SPARK-8910
-              .set("spark.ui.enabled", "false")))
+      new SparkContext(
+        System.getProperty("spark.sql.test.master", "local[1]"),
+        "TestSQLContext",
+        new SparkConf()
+          .set("spark.sql.test", "")
+          .set("spark.sql.hive.metastore.barrierPrefixes",
+               "org.apache.spark.sql.hive.execution.PairSerDe")
+          // SPARK-8910
+          .set("spark.ui.enabled", "false")
+      ))
 
 trait TestHiveSingleton {
   protected val sqlContext: SQLContext = TestHive
@@ -91,15 +92,15 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
   }
 
   private lazy val temporaryConfig = newTemporaryConfiguration(
-      useInMemoryDerby = false)
+    useInMemoryDerby = false)
 
   /** Sets up the system initially or after a RESET command */
   protected override def configure(): Map[String, String] = {
     super.configure() ++ temporaryConfig ++ Map(
-        ConfVars.METASTOREWAREHOUSE.varname -> warehousePath.toURI.toString,
-        ConfVars.METASTORE_INTEGER_JDO_PUSHDOWN.varname -> "true",
-        ConfVars.SCRATCHDIR.varname -> scratchDirPath.toURI.toString,
-        ConfVars.METASTORE_CLIENT_CONNECT_RETRY_DELAY.varname -> "1"
+      ConfVars.METASTOREWAREHOUSE.varname -> warehousePath.toURI.toString,
+      ConfVars.METASTORE_INTEGER_JDO_PUSHDOWN.varname -> "true",
+      ConfVars.SCRATCHDIR.varname -> scratchDirPath.toURI.toString,
+      ConfVars.METASTORE_CLIENT_CONNECT_RETRY_DELAY.varname -> "1"
     )
   }
 
@@ -139,9 +140,9 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
 
     override lazy val functionRegistry = {
       new TestHiveFunctionRegistry(
-          org.apache.spark.sql.catalyst.analysis.FunctionRegistry.builtin
-            .copy(),
-          self.executionHive)
+        org.apache.spark.sql.catalyst.analysis.FunctionRegistry.builtin
+          .copy(),
+        self.executionHive)
     }
   }
 
@@ -176,10 +177,12 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
     if (System
           .getProperty("user.dir")
           .endsWith("sql" + File.separator + "hive")) {
-      new File("src" + File.separator + "test" + File.separator + "resources" +
+      new File(
+        "src" + File.separator + "test" + File.separator + "resources" +
           File.separator)
     } else {
-      new File("sql" + File.separator + "hive" + File.separator + "src" +
+      new File(
+        "sql" + File.separator + "hive" + File.separator + "src" +
           File.separator + "test" + File.separator + "resources")
     }
 
@@ -214,7 +217,7 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
         }
       val referencedTestTables = referencedTables.filter(testTables.contains)
       logDebug(
-          s"Query references test tables: ${referencedTestTables.mkString(", ")}")
+        s"Query references test tables: ${referencedTestTables.mkString(", ")}")
       referencedTestTables.foreach(loadTestTable)
       // Proceed with analysis.
       sessionState.analyzer.execute(logical)
@@ -245,48 +248,52 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
   // https://github.com/apache/hive/blob/branch-0.13/data/scripts/q_test_init.sql
   @transient
   val hiveQTestUtilTables = Seq(
-      TestTable(
-          "src",
-          "CREATE TABLE src (key INT, value STRING)".cmd,
-          s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/kv1.txt")}' INTO TABLE src".cmd),
-      TestTable(
-          "src1",
-          "CREATE TABLE src1 (key INT, value STRING)".cmd,
-          s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/kv3.txt")}' INTO TABLE src1".cmd),
-      TestTable("srcpart",
-                () =>
-                  {
-                    runSqlHive(
-                        "CREATE TABLE srcpart (key INT, value STRING) PARTITIONED BY (ds STRING, hr STRING)")
-                    for (ds <- Seq("2008-04-08", "2008-04-09");
-                    hr <- Seq("11", "12")) {
-                      runSqlHive(s"""LOAD DATA LOCAL INPATH '${getHiveFile(
-                                    "data/files/kv1.txt")}'
+    TestTable(
+      "src",
+      "CREATE TABLE src (key INT, value STRING)".cmd,
+      s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/kv1.txt")}' INTO TABLE src".cmd),
+    TestTable(
+      "src1",
+      "CREATE TABLE src1 (key INT, value STRING)".cmd,
+      s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/kv3.txt")}' INTO TABLE src1".cmd),
+    TestTable(
+      "srcpart",
+      () => {
+        runSqlHive(
+          "CREATE TABLE srcpart (key INT, value STRING) PARTITIONED BY (ds STRING, hr STRING)")
+        for (ds <- Seq("2008-04-08", "2008-04-09");
+             hr <- Seq("11", "12")) {
+          runSqlHive(
+            s"""LOAD DATA LOCAL INPATH '${getHiveFile("data/files/kv1.txt")}'
              |OVERWRITE INTO TABLE srcpart PARTITION (ds='$ds',hr='$hr')
            """.stripMargin)
-                    }
-                }),
-      TestTable(
-          "srcpart1",
-          () =>
-            {
-              runSqlHive(
-                  "CREATE TABLE srcpart1 (key INT, value STRING) PARTITIONED BY (ds STRING, hr INT)")
-              for (ds <- Seq("2008-04-08", "2008-04-09"); hr <- 11 to 12) {
-                runSqlHive(s"""LOAD DATA LOCAL INPATH '${getHiveFile(
-                              "data/files/kv1.txt")}'
+        }
+      }
+    ),
+    TestTable(
+      "srcpart1",
+      () => {
+        runSqlHive(
+          "CREATE TABLE srcpart1 (key INT, value STRING) PARTITIONED BY (ds STRING, hr INT)")
+        for (ds <- Seq("2008-04-08", "2008-04-09"); hr <- 11 to 12) {
+          runSqlHive(
+            s"""LOAD DATA LOCAL INPATH '${getHiveFile("data/files/kv1.txt")}'
              |OVERWRITE INTO TABLE srcpart1 PARTITION (ds='$ds',hr='$hr')
            """.stripMargin)
-              }
-          }),
-      TestTable("src_thrift",
-                () =>
-                  {
-                    import org.apache.hadoop.hive.serde2.thrift.ThriftDeserializer
-                    import org.apache.hadoop.mapred.{SequenceFileInputFormat, SequenceFileOutputFormat}
-                    import org.apache.thrift.protocol.TBinaryProtocol
+        }
+      }
+    ),
+    TestTable(
+      "src_thrift",
+      () => {
+        import org.apache.hadoop.hive.serde2.thrift.ThriftDeserializer
+        import org.apache.hadoop.mapred.{
+          SequenceFileInputFormat,
+          SequenceFileOutputFormat
+        }
+        import org.apache.thrift.protocol.TBinaryProtocol
 
-                    runSqlHive(s"""
+        runSqlHive(s"""
          |CREATE TABLE src_thrift(fake INT)
          |ROW FORMAT SERDE '${classOf[ThriftDeserializer].getName}'
          |WITH SERDEPROPERTIES(
@@ -298,18 +305,21 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
          |OUTPUTFORMAT '${classOf[SequenceFileOutputFormat[_, _]].getName}'
         """.stripMargin)
 
-                    runSqlHive(
-                        s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/complex.seq")}' INTO TABLE src_thrift")
-                }),
-      TestTable("serdeins",
-                s"""CREATE TABLE serdeins (key INT, value STRING)
+        runSqlHive(
+          s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/complex.seq")}' INTO TABLE src_thrift")
+      }
+    ),
+    TestTable(
+      "serdeins",
+      s"""CREATE TABLE serdeins (key INT, value STRING)
          |ROW FORMAT SERDE '${classOf[LazySimpleSerDe].getCanonicalName}'
          |WITH SERDEPROPERTIES ('field.delim'='\\t')
        """.stripMargin.cmd,
-                "INSERT OVERWRITE TABLE serdeins SELECT * FROM src".cmd),
-      TestTable(
-          "episodes",
-          s"""CREATE TABLE episodes (title STRING, air_date STRING, doctor INT)
+      "INSERT OVERWRITE TABLE serdeins SELECT * FROM src".cmd
+    ),
+    TestTable(
+      "episodes",
+      s"""CREATE TABLE episodes (title STRING, air_date STRING, doctor INT)
          |STORED AS avro
          |TBLPROPERTIES (
          |  'avro.schema.literal'='{
@@ -336,12 +346,13 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
          |  }'
          |)
        """.stripMargin.cmd,
-          s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/episodes.avro")}' INTO TABLE episodes".cmd),
-      // THIS TABLE IS NOT THE SAME AS THE HIVE TEST TABLE episodes_partitioned AS DYNAMIC PARITIONING
-      // IS NOT YET SUPPORTED
-      TestTable(
-          "episodes_part",
-          s"""CREATE TABLE episodes_part (title STRING, air_date STRING, doctor INT)
+      s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/episodes.avro")}' INTO TABLE episodes".cmd
+    ),
+    // THIS TABLE IS NOT THE SAME AS THE HIVE TEST TABLE episodes_partitioned AS DYNAMIC PARITIONING
+    // IS NOT YET SUPPORTED
+    TestTable(
+      "episodes_part",
+      s"""CREATE TABLE episodes_part (title STRING, air_date STRING, doctor INT)
          |PARTITIONED BY (doctor_pt INT)
          |STORED AS avro
          |TBLPROPERTIES (
@@ -369,9 +380,9 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
          |  }'
          |)
        """.stripMargin.cmd,
-          // WORKAROUND: Required to pass schema to SerDe for partitioned tables.
-          // TODO: Pass this automatically from the table to partitions.
-          s"""
+      // WORKAROUND: Required to pass schema to SerDe for partitioned tables.
+      // TODO: Pass this automatically from the table to partitions.
+      s"""
          |ALTER TABLE episodes_part SET SERDEPROPERTIES (
          |  'avro.schema.literal'='{
          |    "type": "record",
@@ -397,15 +408,17 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
          |  }'
          |)
         """.stripMargin.cmd,
-          s"""
+      s"""
         INSERT OVERWRITE TABLE episodes_part PARTITION (doctor_pt=1)
         SELECT title, air_date, doctor FROM episodes
-      """.cmd),
-      TestTable(
-          "src_json",
-          s"""CREATE TABLE src_json (json STRING) STORED AS TEXTFILE
+      """.cmd
+    ),
+    TestTable(
+      "src_json",
+      s"""CREATE TABLE src_json (json STRING) STORED AS TEXTFILE
        """.stripMargin.cmd,
-          s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/json.txt")}' INTO TABLE src_json".cmd)
+      s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/json.txt")}' INTO TABLE src_json".cmd
+    )
   )
 
   hiveQTestUtilTables.foreach(registerTestTable)
@@ -422,7 +435,7 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
         .get(name)
         .map(_.commands)
         .getOrElse(sys.error(s"Unknown test table $name"))
-      createCmds.foreach(_ ())
+      createCmds.foreach(_())
 
       if (cacheTables) {
         cacheTable(name)
@@ -491,8 +504,8 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
   }
 }
 
-private[hive] class TestHiveFunctionRegistry(
-    fr: SimpleFunctionRegistry, client: HiveClientImpl)
+private[hive] class TestHiveFunctionRegistry(fr: SimpleFunctionRegistry,
+                                             client: HiveClientImpl)
     extends HiveFunctionRegistry(fr, client) {
 
   private val removedFunctions = collection.mutable.ArrayBuffer
@@ -517,7 +530,7 @@ private[hive] object TestHiveContext {
     * A map used to store all confs that need to be overridden in sql/hive unit tests.
     */
   val overrideConfs: Map[String, String] = Map(
-      // Fewer shuffle partitions to speed up testing.
-      SQLConf.SHUFFLE_PARTITIONS.key -> "5"
+    // Fewer shuffle partitions to speed up testing.
+    SQLConf.SHUFFLE_PARTITIONS.key -> "5"
   )
 }

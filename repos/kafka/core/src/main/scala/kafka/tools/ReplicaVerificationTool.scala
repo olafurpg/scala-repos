@@ -216,7 +216,8 @@ object ReplicaVerificationTool extends Logging {
             fetchSize = fetchSize,
             maxWait = maxWaitMs,
             minBytes = 1,
-            doVerification = (brokerId == verificationBrokerId))
+            doVerification = (brokerId == verificationBrokerId)
+          )
       }
 
     Runtime.getRuntime.addShutdownHook(new Thread() {
@@ -339,7 +340,8 @@ private class ReplicaBuffer(
         "fetched " + fetchResponsePerReplica.size + " replicas for " +
           topicAndPartition + ", but expected " +
           expectedReplicasPerTopicAndPartition(topicAndPartition) +
-          " replicas")
+          " replicas"
+      )
       val messageIteratorMap = fetchResponsePerReplica.map {
         case (replicaId, fetchResponse) =>
           replicaId -> fetchResponse.messages

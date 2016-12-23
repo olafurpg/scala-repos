@@ -62,17 +62,19 @@ class LogSegment(val log: FileMessageSet,
            fileAlreadyExists: Boolean = false,
            initFileSize: Int = 0,
            preallocate: Boolean = false) =
-    this(new FileMessageSet(file = Log.logFilename(dir, startOffset),
-                            fileAlreadyExists = fileAlreadyExists,
-                            initFileSize = initFileSize,
-                            preallocate = preallocate),
-         new OffsetIndex(file = Log.indexFilename(dir, startOffset),
-                         baseOffset = startOffset,
-                         maxIndexSize = maxIndexSize),
-         startOffset,
-         indexIntervalBytes,
-         rollJitterMs,
-         time)
+    this(
+      new FileMessageSet(file = Log.logFilename(dir, startOffset),
+                         fileAlreadyExists = fileAlreadyExists,
+                         initFileSize = initFileSize,
+                         preallocate = preallocate),
+      new OffsetIndex(file = Log.indexFilename(dir, startOffset),
+                      baseOffset = startOffset,
+                      maxIndexSize = maxIndexSize),
+      startOffset,
+      indexIntervalBytes,
+      rollJitterMs,
+      time
+    )
 
   /* Return the size in bytes of this log segment */
   def size: Long = log.sizeInBytes()

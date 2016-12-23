@@ -216,38 +216,9 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
     import org.apache.thrift.protocol._
     import org.apache.thrift.transport._
 
-    val bytes = Array[Byte](102,
-                            100,
-                            125,
-                            -96,
-                            57,
-                            -55,
-                            -72,
-                            18,
-                            -21,
-                            15,
-                            -91,
-                            -36,
-                            104,
-                            111,
-                            111,
-                            -127,
-                            -21,
-                            15,
-                            -91,
-                            -36,
-                            104,
-                            111,
-                            111,
-                            -127,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0)
+    val bytes = Array[Byte](102, 100, 125, -96, 57, -55, -72, 18, -21, 15, -91,
+      -36, 104, 111, 111, -127, -21, 15, -91, -36, 104, 111, 111, -127, 0, 0,
+      0, 0, 0, 0, 0, 0)
     val pf = new TJSONProtocol.Factory()
 
     val json = {

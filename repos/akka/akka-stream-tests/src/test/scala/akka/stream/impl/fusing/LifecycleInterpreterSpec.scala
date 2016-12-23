@@ -15,9 +15,11 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
   "Interpreter" must {
 
     "call preStart in order on stages" in new OneBoundedSetup[String](
-      Seq(PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-a"),
-          PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-b"),
-          PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-c"))) {
+      Seq(
+        PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-a"),
+        PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-b"),
+        PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-c")
+      )) {
       expectMsg("start-a")
       expectMsg("start-b")
       expectMsg("start-c")
@@ -27,15 +29,17 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
     "call postStop in order on stages - when upstream completes" in new OneBoundedSetup[
       String](
-      Seq(PreStartAndPostStopIdentity(onUpstreamCompleted =
-                                        () ⇒ testActor ! "complete-a",
-                                      onStop = () ⇒ testActor ! "stop-a"),
-          PreStartAndPostStopIdentity(onUpstreamCompleted =
-                                        () ⇒ testActor ! "complete-b",
-                                      onStop = () ⇒ testActor ! "stop-b"),
-          PreStartAndPostStopIdentity(onUpstreamCompleted =
-                                        () ⇒ testActor ! "complete-c",
-                                      onStop = () ⇒ testActor ! "stop-c"))) {
+      Seq(
+        PreStartAndPostStopIdentity(onUpstreamCompleted =
+                                      () ⇒ testActor ! "complete-a",
+                                    onStop = () ⇒ testActor ! "stop-a"),
+        PreStartAndPostStopIdentity(onUpstreamCompleted =
+                                      () ⇒ testActor ! "complete-b",
+                                    onStop = () ⇒ testActor ! "stop-b"),
+        PreStartAndPostStopIdentity(onUpstreamCompleted =
+                                      () ⇒ testActor ! "complete-c",
+                                    onStop = () ⇒ testActor ! "stop-c")
+      )) {
       upstream.onComplete()
       expectMsg("complete-a")
       expectMsg("stop-a")
@@ -60,9 +64,11 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
     "call postStop in order on stages - when downstream cancels" in new OneBoundedSetup[
       String](
-      Seq(PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-a"),
-          PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-b"),
-          PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-c"))) {
+      Seq(
+        PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-a"),
+        PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-b"),
+        PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-c")
+      )) {
       downstream.cancel()
       expectMsg("stop-c")
       expectMsg("stop-b")

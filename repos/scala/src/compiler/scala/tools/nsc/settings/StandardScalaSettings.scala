@@ -71,7 +71,8 @@ trait StandardScalaSettings { self: AbsScalaSettings =>
     "target",
     "Target platform for object files. All JVM 1.5 - 1.7 targets are deprecated.",
     List("jvm-1.5", "jvm-1.6", "jvm-1.7", "jvm-1.8"),
-    "jvm-1.8")
+    "jvm-1.8"
+  )
   val unchecked = BooleanSetting(
     "-unchecked",
     "Enable additional warnings where generated code depends on assumptions.")

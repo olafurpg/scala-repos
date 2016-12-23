@@ -36,5 +36,6 @@ abstract class ProjectDataServiceTestCase extends PlatformTestCase {
                   true)
               }
             })
-      })
+      }
+    )
 }

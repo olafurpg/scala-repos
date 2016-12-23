@@ -67,7 +67,8 @@ class SunSignalHandler extends SignalHandler {
             }
             null
           }
-        })
+        }
+      )
       .asInstanceOf[Object]
 
     handleMethod.invoke(null, sunSignal, proxy)

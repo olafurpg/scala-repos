@@ -17,5 +17,6 @@ trait OfferMatcherManagerConfig extends ScallopConf {
       "DEPRECATED. NO EFFECT. Maximally launch this number of tasks per offer cycle.",
     default = Some(1000),
     hidden = true,
-    noshort = true)
+    noshort = true
+  )
 }

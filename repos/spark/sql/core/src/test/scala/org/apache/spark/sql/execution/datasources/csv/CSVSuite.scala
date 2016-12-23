@@ -359,9 +359,11 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
       .collect()
 
     val expected =
-      Seq(Seq(1, 2, 3, 4, 5.01D, Timestamp.valueOf("2015-08-20 15:57:00")),
-          Seq(6, 7, 8, 9, 0, Timestamp.valueOf("2015-08-21 16:58:01")),
-          Seq(1, 2, 3, 4, 5, Timestamp.valueOf("2015-08-23 18:00:42")))
+      Seq(
+        Seq(1, 2, 3, 4, 5.01D, Timestamp.valueOf("2015-08-20 15:57:00")),
+        Seq(6, 7, 8, 9, 0, Timestamp.valueOf("2015-08-21 16:58:01")),
+        Seq(1, 2, 3, 4, 5, Timestamp.valueOf("2015-08-23 18:00:42"))
+      )
 
     assert(results.toSeq.map(_.toSeq) === expected)
   }
@@ -382,11 +384,13 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
 
     // year,make,model,comment,blank
     val dataSchema = StructType(
-      List(StructField("year", IntegerType, nullable = true),
-           StructField("make", StringType, nullable = false),
-           StructField("model", StringType, nullable = false),
-           StructField("comment", StringType, nullable = true),
-           StructField("blank", StringType, nullable = true)))
+      List(
+        StructField("year", IntegerType, nullable = true),
+        StructField("make", StringType, nullable = false),
+        StructField("model", StringType, nullable = false),
+        StructField("comment", StringType, nullable = true),
+        StructField("blank", StringType, nullable = true)
+      ))
     val cars = sqlContext.read
       .format("csv")
       .schema(dataSchema)

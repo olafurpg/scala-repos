@@ -281,7 +281,8 @@ private[sql] object SQLTestUtils {
              s"== Expected Answer - ${expectedAnswer.size} ==" +: prepareAnswer(
                expectedAnswer).map(_.toString()),
              s"== Actual Answer - ${sparkAnswer.size} ==" +: prepareAnswer(
-               sparkAnswer).map(_.toString())).mkString("\n")}
+               sparkAnswer).map(_.toString())
+           ).mkString("\n")}
       """.stripMargin
       Some(errorMessage)
     } else {

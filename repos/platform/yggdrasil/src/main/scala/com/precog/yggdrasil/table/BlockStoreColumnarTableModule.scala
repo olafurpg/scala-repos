@@ -952,12 +952,14 @@ trait BlockStoreColumnarTableModule[M[+ _]]
       // We need some id that can be used to memoize then load table for each side.
       val initState = JDBMState.empty("alignSpace")
 
-      writeStreams(reduceSlices(sourceLeft.slices),
-                   composeSliceTransform(addGlobalId(alignOnL)),
-                   reduceSlices(sourceRight.slices),
-                   composeSliceTransform(addGlobalId(alignOnR)),
-                   initState,
-                   initState)
+      writeStreams(
+        reduceSlices(sourceLeft.slices),
+        composeSliceTransform(addGlobalId(alignOnL)),
+        reduceSlices(sourceRight.slices),
+        composeSliceTransform(addGlobalId(alignOnR)),
+        initState,
+        initState
+      )
     }
 
     /**

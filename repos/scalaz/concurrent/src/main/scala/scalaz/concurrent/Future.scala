@@ -271,16 +271,20 @@ sealed abstract class Future[+A] {
     async[Throwable \/ A] { cb =>
       val cancel = new AtomicBoolean(false)
       val done = new AtomicBoolean(false)
-      scheduler.schedule(new Runnable {
-        def run() {
-          if (done.compareAndSet(false, true)) {
-            cancel.set(true)
-            cb(
-              -\/(new TimeoutException(
-                s"Timed out after $timeoutInMillis milliseconds")))
+      scheduler.schedule(
+        new Runnable {
+          def run() {
+            if (done.compareAndSet(false, true)) {
+              cancel.set(true)
+              cb(
+                -\/(new TimeoutException(
+                  s"Timed out after $timeoutInMillis milliseconds")))
+            }
           }
-        }
-      }, timeoutInMillis, TimeUnit.MILLISECONDS)
+        },
+        timeoutInMillis,
+        TimeUnit.MILLISECONDS
+      )
 
       unsafePerformAsyncInterruptibly(
         a => if (done.compareAndSet(false, true)) cb(\/-(a)),

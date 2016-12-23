@@ -73,10 +73,16 @@ abstract class ScalaIntroduceFieldHandlerBase
             }
           }
           NavigationUtil
-            .getPsiElementPopup(classes, new PsiClassListCellRenderer() {
-              override def getElementText(element: PsiClass): String =
-                super.getElementText(element).replace("$", "")
-            }, title, processor, selection)
+            .getPsiElementPopup(
+              classes,
+              new PsiClassListCellRenderer() {
+                override def getElementText(element: PsiClass): String =
+                  super.getElementText(element).replace("$", "")
+              },
+              title,
+              processor,
+              selection
+            )
             .showInBestPositionFor(editor)
       }
     } catch {

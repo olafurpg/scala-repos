@@ -113,13 +113,13 @@ object Macros {
           Template(
             Ident(anon) :: Nil,
             noSelfType,
-            DefDef(
-              Modifiers(),
-              termNames.CONSTRUCTOR,
-              List(),
-              List(List()),
-              TypeTree(),
-              Block(List(pendingSuperCall), Literal(Constant(())))) :: Nil)
+            DefDef(Modifiers(),
+                   termNames.CONSTRUCTOR,
+                   List(),
+                   List(List()),
+                   TypeTree(),
+                   Block(List(pendingSuperCall), Literal(Constant(())))) :: Nil
+          )
         ),
         Apply(Select(New(Ident(wrapper)), termNames.CONSTRUCTOR), Nil)
       ))

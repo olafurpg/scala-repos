@@ -790,7 +790,8 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
         abort(
           "Task %d in stage %s failed %d times, most recent failure: %s\nDriver stacktrace:"
             .format(index, taskSet.id, maxTaskFailures, failureReason),
-          failureException)
+          failureException
+        )
         return
       }
     }

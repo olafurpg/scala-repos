@@ -163,7 +163,8 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
               assert(
                 row.numFields == columnBuilders.length,
                 s"Row column number mismatch, expected ${output.size} columns, " +
-                  s"but got ${row.numFields}." + s"\nRow content: $row")
+                  s"but got ${row.numFields}." + s"\nRow content: $row"
+              )
 
               var i = 0
               totalSize = 0
@@ -352,11 +353,13 @@ private[sql] case class InMemoryColumnarTableScan(
           cachedBatchIterator.filter { cachedBatch =>
             if (!partitionFilter(cachedBatch.stats)) {
               def statsString: String =
-                schemaIndex.map {
-                  case (a, i) =>
-                    val value = cachedBatch.stats.get(i, a.dataType)
-                    s"${a.name}: $value"
-                }.mkString(", ")
+                schemaIndex
+                  .map {
+                    case (a, i) =>
+                      val value = cachedBatch.stats.get(i, a.dataType)
+                      s"${a.name}: $value"
+                  }
+                  .mkString(", ")
               logInfo(s"Skipping partition based on stats $statsString")
               false
             } else {

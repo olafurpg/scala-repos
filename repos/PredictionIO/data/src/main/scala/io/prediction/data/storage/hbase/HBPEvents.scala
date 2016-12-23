@@ -70,14 +70,16 @@ class HBPEvents(client: HBClient,
     conf.set(TableInputFormat.INPUT_TABLE,
              HBEventsUtil.tableName(namespace, appId, channelId))
 
-    val scan = HBEventsUtil.createScan(startTime = startTime,
-                                       untilTime = untilTime,
-                                       entityType = entityType,
-                                       entityId = entityId,
-                                       eventNames = eventNames,
-                                       targetEntityType = targetEntityType,
-                                       targetEntityId = targetEntityId,
-                                       reversed = None)
+    val scan = HBEventsUtil.createScan(
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = entityType,
+      entityId = entityId,
+      eventNames = eventNames,
+      targetEntityType = targetEntityType,
+      targetEntityId = targetEntityId,
+      reversed = None
+    )
     scan.setCaching(500) // TODO
     scan.setCacheBlocks(false) // TODO
 
@@ -108,9 +110,11 @@ class HBPEvents(client: HBClient,
                   classOf[TableOutputFormat[Object]],
                   classOf[OutputFormat[Object, Writable]])
 
-    events.map { event =>
-      val (put, rowKey) = HBEventsUtil.eventToPut(event, appId)
-      (new ImmutableBytesWritable(rowKey.toBytes), put)
-    }.saveAsNewAPIHadoopDataset(conf)
+    events
+      .map { event =>
+        val (put, rowKey) = HBEventsUtil.eventToPut(event, appId)
+        (new ImmutableBytesWritable(rowKey.toBytes), put)
+      }
+      .saveAsNewAPIHadoopDataset(conf)
   }
 }

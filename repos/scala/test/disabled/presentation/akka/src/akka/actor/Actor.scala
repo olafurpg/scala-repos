@@ -181,24 +181,28 @@ object Actor extends ListenerManagement {
     *  </pre>
     */
   def actorOf(clazz: Class[_ <: Actor]): ActorRef =
-    new LocalActorRef(() => {
-      import ReflectiveAccess.{createInstance, noParams, noArgs}
-      createInstance[Actor](clazz.asInstanceOf[Class[_]], noParams, noArgs) match {
-        case Right(actor) => actor
-        case Left(exception) =>
-          val cause = exception match {
-            case i: InvocationTargetException => i.getTargetException
-            case _ => exception
-          }
+    new LocalActorRef(
+      () => {
+        import ReflectiveAccess.{createInstance, noParams, noArgs}
+        createInstance[Actor](clazz.asInstanceOf[Class[_]], noParams, noArgs) match {
+          case Right(actor) => actor
+          case Left(exception) =>
+            val cause = exception match {
+              case i: InvocationTargetException => i.getTargetException
+              case _ => exception
+            }
 
-          throw new ActorInitializationException(
-            "Could not instantiate Actor of " + clazz +
-              "\nMake sure Actor is NOT defined inside a class/trait," +
-              "\nif so put it outside the class/trait, f.e. in a companion object," +
-              "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.",
-            cause)
-      }
-    }, None)
+            throw new ActorInitializationException(
+              "Could not instantiate Actor of " + clazz +
+                "\nMake sure Actor is NOT defined inside a class/trait," +
+                "\nif so put it outside the class/trait, f.e. in a companion object," +
+                "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.",
+              cause
+            )
+        }
+      },
+      None
+    )
 
   /** Creates an ActorRef out of the Actor. Allows you to pass in a factory function
     *  that creates the Actor. Please note that this function can be invoked multiple

@@ -92,9 +92,11 @@ class DocResolver(
     val java = docType == Javadoc || docType == Javadoc8
     if (java) {
       val path = javaFqnToPath(sig.java.fqn)
-      val anchor = sig.java.member.map { s =>
-        "#" + { if (docType == Javadoc8) toJava8Anchor(s) else s }
-      }.getOrElse("")
+      val anchor = sig.java.member
+        .map { s =>
+          "#" + { if (docType == Javadoc8) toJava8Anchor(s) else s }
+        }
+        .getOrElse("")
       s"$prefix/$jarName/$path$anchor"
     } else {
       val scalaSig = maybeReplaceWithUsecase(jar, sig.scala)
@@ -151,15 +153,19 @@ class DocResolver(
         if (rawVersion.startsWith("1.8")) "8"
         else if (rawVersion.startsWith("1.7")) "7"
         else "6"
-      val anchor = sig.java.member.map { m =>
-        "#" + { if (version == "8") toJava8Anchor(m) else m }
-      }.getOrElse("")
+      val anchor = sig.java.member
+        .map { m =>
+          "#" + { if (version == "8") toJava8Anchor(m) else m }
+        }
+        .getOrElse("")
       Some(s"http://docs.oracle.com/javase/$version/docs/api/$path$anchor")
     } else if (sig.java.fqn.androidStdLib) {
       val path = javaFqnToPath(sig.java.fqn)
-      val anchor = sig.java.member.map { m =>
-        "#" + toAndroidAnchor(m)
-      }.getOrElse("")
+      val anchor = sig.java.member
+        .map { m =>
+          "#" + toAndroidAnchor(m)
+        }
+        .getOrElse("")
       Some(s"http://developer.android.com/reference/$path$anchor")
     } else None
   }

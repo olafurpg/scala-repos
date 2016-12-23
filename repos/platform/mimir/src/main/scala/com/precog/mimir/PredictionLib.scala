@@ -161,7 +161,8 @@ trait PredictionLibModule[M[+ _]]
                           predictionUpper),
                         ColumnRef(pathPredictionLower, CDouble) -> ArrayDoubleColumn(
                           definedModel,
-                          predictionLower))
+                          predictionLower)
+                      )
                   }
 
                 val identitiesResult = Model.idRes(cols, modelSet)

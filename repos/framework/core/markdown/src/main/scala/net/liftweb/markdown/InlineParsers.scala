@@ -655,7 +655,8 @@ trait InlineParsers extends BaseParsers {
     ("omega", 969),
     ("thetasym", 977),
     ("upsih", 978),
-    ("piv", 982))
+    ("piv", 982)
+  )
 
   private lazy val validEntitySet = Set(entList.map(_._1): _*)
 

@@ -47,12 +47,15 @@ class FieldFinder[T: ClassTag](metaMapper: AnyRef,
       case c =>
         // get the names of fields that represent the type we want
 
-        val fields = Map(c.getDeclaredFields.filter { f =>
-          val ret = typeFilter(f.getType)
-          logger.trace(
-            "typeFilter(" + f.getType + "); T=" + classTag[T].runtimeClass)
-          ret
-        }.map(f => (deMod(f.getName), f)): _*)
+        val fields = Map(
+          c.getDeclaredFields
+            .filter { f =>
+              val ret = typeFilter(f.getType)
+              logger.trace(
+                "typeFilter(" + f.getType + "); T=" + classTag[T].runtimeClass)
+              ret
+            }
+            .map(f => (deMod(f.getName), f)): _*)
 
         logger.trace("fields: " + fields)
 

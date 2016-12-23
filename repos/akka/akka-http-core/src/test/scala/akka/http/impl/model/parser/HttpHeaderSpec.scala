@@ -196,7 +196,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Authorization: QVFJQzV3TTJMWTRTZmN3Zk=" =!= ErrorInfo(
         "Illegal HTTP header 'Authorization': Invalid input '=', expected auth-param, OWS, token68, 'EOI' or tchar (line 1, column 23)",
         """QVFJQzV3TTJMWTRTZmN3Zk=
-            |                      ^""".stripMarginWithNewline("\n"))
+            |                      ^""".stripMarginWithNewline("\n")
+      )
     }
 
     "Cache-Control" in {
@@ -445,7 +446,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Location: https://spray.io/ sec" =!= ErrorInfo(
         "Illegal HTTP header 'Location': Invalid input ' ', " +
           "expected '/', 'EOI', '#', segment or '?' (line 1, column 18)",
-        "https://spray.io/ sec\n                 ^")
+        "https://spray.io/ sec\n                 ^"
+      )
     }
 
     "Link" in {
@@ -579,11 +581,13 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                              Map("client_max_window_bits" -> "",
                                  "server_max_window_bits" -> "10"))))
       "Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits; server_max_window_bits=10, permessage-deflate; client_max_window_bits" =!= `Sec-WebSocket-Extensions`(
-        Vector(WebSocketExtension("permessage-deflate",
-                                  Map("client_max_window_bits" -> "",
-                                      "server_max_window_bits" -> "10")),
-               WebSocketExtension("permessage-deflate",
-                                  Map("client_max_window_bits" -> ""))))
+        Vector(
+          WebSocketExtension("permessage-deflate",
+                             Map("client_max_window_bits" -> "",
+                                 "server_max_window_bits" -> "10")),
+          WebSocketExtension("permessage-deflate",
+                             Map("client_max_window_bits" -> ""))
+        ))
     }
     "Sec-WebSocket-Key" in {
       "Sec-WebSocket-Key: c2Zxb3JpbmgyMzA5dGpoMDIzOWdlcm5vZ2luCg==" =!= `Sec-WebSocket-Key`(

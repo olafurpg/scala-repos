@@ -217,6 +217,7 @@ final case class VectorClock(
     else this
 
   override def toString =
-    versions.map { case ((n, t)) ⇒ n + " -> " + t }
+    versions
+      .map { case ((n, t)) ⇒ n + " -> " + t }
       .mkString("VectorClock(", ", ", ")")
 }

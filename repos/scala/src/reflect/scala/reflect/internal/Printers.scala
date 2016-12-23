@@ -1349,43 +1349,48 @@ trait Printers extends api.Printers { self: SymbolTable =>
           def hasSymbolField = tree.hasSymbolField && tree.symbol != NoSymbol
           val isError =
             hasSymbolField && (tree.symbol.name string_== nme.ERROR)
-          printProduct(tree, preamble = _ => {
-            if (printPositions) print(tree.pos.show)
-            print(tree.productPrefix)
-            if (printTypes && tree.tpe != null) print(tree.tpe)
-          }, body = {
-            case name: Name =>
-              if (isError) {
-                if (isError) print("<")
-                print(name)
-                if (isError) print(": error>")
-              } else if (hasSymbolField) {
-                tree match {
-                  case refTree: RefTree =>
-                    if (tree.symbol.name != refTree.name)
-                      print("[", tree.symbol, " aka ", refTree.name, "]")
-                    else print(tree.symbol)
-                  case defTree: DefTree =>
-                    print(tree.symbol)
-                  case _ =>
-                    print(tree.symbol.name)
+          printProduct(
+            tree,
+            preamble = _ => {
+              if (printPositions) print(tree.pos.show)
+              print(tree.productPrefix)
+              if (printTypes && tree.tpe != null) print(tree.tpe)
+            },
+            body = {
+              case name: Name =>
+                if (isError) {
+                  if (isError) print("<")
+                  print(name)
+                  if (isError) print(": error>")
+                } else if (hasSymbolField) {
+                  tree match {
+                    case refTree: RefTree =>
+                      if (tree.symbol.name != refTree.name)
+                        print("[", tree.symbol, " aka ", refTree.name, "]")
+                      else print(tree.symbol)
+                    case defTree: DefTree =>
+                      print(tree.symbol)
+                    case _ =>
+                      print(tree.symbol.name)
+                  }
+                } else {
+                  print(name)
                 }
-              } else {
-                print(name)
-              }
-            case Constant(s: String) =>
-              print("Constant(\"" + s + "\")")
-            case Constant(null) =>
-              print("Constant(null)")
-            case Constant(value) =>
-              print("Constant(" + value + ")")
-            case arg =>
-              print(arg)
-          }, postamble = {
-            case tree @ TypeTree() if tree.original != null =>
-              print(".setOriginal(", tree.original, ")")
-            case _ => // do nothing
-          })
+              case Constant(s: String) =>
+                print("Constant(\"" + s + "\")")
+              case Constant(null) =>
+                print("Constant(null)")
+              case Constant(value) =>
+                print("Constant(" + value + ")")
+              case arg =>
+                print(arg)
+            },
+            postamble = {
+              case tree @ TypeTree() if tree.original != null =>
+                print(".setOriginal(", tree.original, ")")
+              case _ => // do nothing
+            }
+          )
         case sym: Symbol =>
           if (sym == NoSymbol) print("NoSymbol")
           else if (sym.isStatic && (sym.isClass || sym.isModule))

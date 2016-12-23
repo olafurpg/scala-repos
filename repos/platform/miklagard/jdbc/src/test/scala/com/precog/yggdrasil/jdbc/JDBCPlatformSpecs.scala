@@ -154,9 +154,12 @@ object JDBCPlatformSpecEngine extends Logging {
                 }
 
                 val ddlCreate =
-                  "CREATE TABLE %s (%s);".format(tableName, schema.map {
-                    case (p, t) => p + " " + t
-                  }.mkString(", "))
+                  "CREATE TABLE %s (%s);".format(tableName,
+                                                 schema
+                                                   .map {
+                                                     case (p, t) => p + " " + t
+                                                   }
+                                                   .mkString(", "))
 
                 logger.debug("Create = " + ddlCreate)
 
@@ -258,18 +261,23 @@ trait JDBCPlatformSpecs
                       apiKey: APIKey,
                       tpe: JType): Future[Table] = {
       // Rewrite paths of the form /foo/bar/baz to /test/foo_bar_baz
-      val pathFixTS = Map1(Leaf(Source), CF1P("fix_paths") {
-        case orig: StrColumn =>
-          new StrColumn {
-            def apply(row: Int): String = {
-              val newPath =
-                "/test/" + orig(row).replaceAll("^/|/$", "").replace('/', '_')
-              logger.debug("Fixed %s to %s".format(orig(row), newPath))
-              newPath
+      val pathFixTS = Map1(
+        Leaf(Source),
+        CF1P("fix_paths") {
+          case orig: StrColumn =>
+            new StrColumn {
+              def apply(row: Int): String = {
+                val newPath =
+                  "/test/" + orig(row)
+                    .replaceAll("^/|/$", "")
+                    .replace('/', '_')
+                logger.debug("Fixed %s to %s".format(orig(row), newPath))
+                newPath
+              }
+              def isDefinedAt(row: Int) = orig.isDefinedAt(row)
             }
-            def isDefinedAt(row: Int) = orig.isDefinedAt(row)
-          }
-      })
+        }
+      )
       val transformed = table.transform(pathFixTS)
       super.load(transformed, apiKey, tpe)
     }

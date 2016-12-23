@@ -219,14 +219,16 @@ sealed trait ExpressionDag[N[_]] { self =>
     * to the given N[T]
     */
   def find[T](node: N[T]): Option[Id[T]] =
-    nodeToId.getOrElseUpdate(node, {
-      val partial = new GenPartial[HMap[Id, E]#Pair, Id] {
-        def apply[T] = {
-          case (thisId, expr) if node == expr.evaluate(idToExp) => thisId
+    nodeToId.getOrElseUpdate(
+      node, {
+        val partial = new GenPartial[HMap[Id, E]#Pair, Id] {
+          def apply[T] = {
+            case (thisId, expr) if node == expr.evaluate(idToExp) => thisId
+          }
         }
+        idToExp.collect(partial).headOption.asInstanceOf[Option[Id[T]]]
       }
-      idToExp.collect(partial).headOption.asInstanceOf[Option[Id[T]]]
-    })
+    )
 
   /**
     * This throws if the node is missing, use find if this is not
@@ -281,14 +283,16 @@ sealed trait ExpressionDag[N[_]] { self =>
       sys.error("Could not evaluate: %s\nin %s".format(id, this)))
 
   def evaluateOption[T](id: Id[T]): Option[N[T]] =
-    idToN.getOrElseUpdate(id, {
-      val partial = new GenPartial[HMap[Id, E]#Pair, N] {
-        def apply[T] = {
-          case (thisId, expr) if (id == thisId) => expr.evaluate(idToExp)
+    idToN.getOrElseUpdate(
+      id, {
+        val partial = new GenPartial[HMap[Id, E]#Pair, N] {
+          def apply[T] = {
+            case (thisId, expr) if (id == thisId) => expr.evaluate(idToExp)
+          }
         }
+        idToExp.collect(partial).headOption.asInstanceOf[Option[N[T]]]
       }
-      idToExp.collect(partial).headOption.asInstanceOf[Option[N[T]]]
-    })
+    )
 
   /**
     * Return the number of nodes that depend on the

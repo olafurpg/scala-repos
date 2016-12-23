@@ -70,7 +70,8 @@ private[api] final class RoundApiBalancer(system: ActorSystem,
               api.userAnalysisJson(pov, pref, initialFen, orientation, owner)
           }
         })),
-      "api.round.router")
+      "api.round.router"
+    )
   }
 
   import implementation._

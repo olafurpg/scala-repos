@@ -205,7 +205,8 @@ class Dispatchers(val settings: ActorSystem.Settings,
                   "make sure it has constructor with [com.typesafe.config.Config] and " +
                   "[akka.dispatch.DispatcherPrerequisites] parameters")
                   .format(fqn, cfg.getString("id")),
-                exception)
+                exception
+              )
           })
           .get
     }
@@ -227,7 +228,8 @@ class DispatcherConfigurator(config: Config,
     config.getInt("throughput"),
     config.getNanosDuration("throughput-deadline-time"),
     configureExecutor(),
-    config.getMillisDuration("shutdown-timeout"))
+    config.getMillisDuration("shutdown-timeout")
+  )
 
   /**
     * Returns the same dispatcher instance for each invocation
@@ -294,7 +296,8 @@ class BalancingDispatcherConfigurator(_config: Config,
       mailboxType,
       configureExecutor(),
       config.getMillisDuration("shutdown-timeout"),
-      config.getBoolean("attempt-teamwork"))
+      config.getBoolean("attempt-teamwork")
+    )
 
   /**
     * Returns the same dispatcher instance for each invocation
@@ -319,7 +322,8 @@ class PinnedDispatcherConfigurator(config: Config,
           "PinnedDispatcherConfigurator",
           this.getClass,
           "PinnedDispatcher [%s] not configured to use ThreadPoolExecutor, falling back to default config."
-            .format(config.getString("id"))))
+            .format(config.getString("id"))
+        ))
       ThreadPoolConfig()
   }
 

@@ -114,7 +114,8 @@ class OperatorAndBacktickedSearcher
             !index.shouldBeFound(scope, virtualFile) ||
             processor.process(virtualFile)
           }
-        })
+        }
+      )
     }
 
     /**

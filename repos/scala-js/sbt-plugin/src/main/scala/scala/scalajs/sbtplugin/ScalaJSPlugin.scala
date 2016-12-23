@@ -266,7 +266,8 @@ object ScalaJSPlugin extends AutoPlugin {
       "persistLauncher",
       "Tell optimize/package tasks to write the laucher file to disk. " +
         "If this is set, your project may only have a single mainClass or you must explicitly set it",
-      AMinusSetting)
+      AMinusSetting
+    )
 
     val scalaJSOptimizerOptions = SettingKey[OptimizerOptions](
       "scalaJSOptimizerOptions",
@@ -283,7 +284,8 @@ object ScalaJSPlugin extends AutoPlugin {
       "scalaJSPhantomJSClassLoader",
       "Private class loader to load jetty8 without polluting classpath. Only use this " +
         "as the `jettyClassLoader` argument of the PhantomJSEnv",
-      KeyRanks.Invisible)
+      KeyRanks.Invisible
+    )
 
     /** Prints the content of a .sjsir file in human readable form. */
     val scalajsp = InputKey[Unit](

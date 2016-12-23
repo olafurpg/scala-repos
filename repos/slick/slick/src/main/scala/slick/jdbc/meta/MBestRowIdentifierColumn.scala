@@ -36,7 +36,8 @@ object MBestRowIdentifierColumn {
           case DatabaseMetaData.bestRowNotPseudo => Some(false)
           case DatabaseMetaData.bestRowPseudo => Some(true)
           case _ => None
-        })
+        }
+      )
     }
 
   sealed abstract class Scope(val value: Int)

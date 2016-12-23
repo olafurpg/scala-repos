@@ -65,7 +65,8 @@ final case class StructType(elements: ConstArray[(TermSymbol, Type)])
     extends Type {
   override def toString =
     "{" +
-      elements.iterator.map { case (s, t) => s + ": " + t }
+      elements.iterator
+        .map { case (s, t) => s + ": " + t }
         .mkString(", ") + "}"
   lazy val symbolToIndex: Map[TermSymbol, Int] = elements.zipWithIndex.map {
     case ((sym, _), idx) => (sym, idx)

@@ -51,7 +51,8 @@ class ScalaGoToSuperActionHandler extends LanguageCodeInsightActionHandler {
               }
               true
             }
-          })
+          }
+        )
         .showInBestPositionFor(editor)
     }
 

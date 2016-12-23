@@ -271,9 +271,11 @@ class LocalLDAModel private[spark] (
     */
   @Since("1.5.0")
   def logPerplexity(documents: RDD[(Long, Vector)]): Double = {
-    val corpusTokenCount = documents.map {
-      case (_, termCounts) => termCounts.toArray.sum
-    }.sum()
+    val corpusTokenCount = documents
+      .map {
+        case (_, termCounts) => termCounts.toArray.sum
+      }
+      .sum()
     -logLikelihood(documents) / corpusTokenCount
   }
 
@@ -672,23 +674,25 @@ class DistributedLDAModel private[clustering] (
       maxDocumentsPerTopic: Int): Array[(Array[Long], Array[Double])] = {
     val numTopics = k
     val topicsInQueues: Array[BoundedPriorityQueue[(Double, Long)]] =
-      topicDistributions.mapPartitions { docVertices =>
-        // For this partition, collect the most common docs for each topic in queues:
-        //  queues(topic) = queue of (doc topic, doc ID).
-        val queues = Array.fill(numTopics)(
-          new BoundedPriorityQueue[(Double, Long)](maxDocumentsPerTopic))
-        for ((docId, docTopics) <- docVertices) {
-          var topic = 0
-          while (topic < numTopics) {
-            queues(topic) += (docTopics(topic) -> docId)
-            topic += 1
+      topicDistributions
+        .mapPartitions { docVertices =>
+          // For this partition, collect the most common docs for each topic in queues:
+          //  queues(topic) = queue of (doc topic, doc ID).
+          val queues = Array.fill(numTopics)(
+            new BoundedPriorityQueue[(Double, Long)](maxDocumentsPerTopic))
+          for ((docId, docTopics) <- docVertices) {
+            var topic = 0
+            while (topic < numTopics) {
+              queues(topic) += (docTopics(topic) -> docId)
+              topic += 1
+            }
           }
+          Iterator(queues)
         }
-        Iterator(queues)
-      }.treeReduce { (q1, q2) =>
-        q1.zip(q2).foreach { case (a, b) => a ++= b }
-        q1
-      }
+        .treeReduce { (q1, q2) =>
+          q1.zip(q2).foreach { case (a, b) => a ++= b }
+          q1
+        }
     topicsInQueues.map { q =>
       val (docTopics, docs) = q.toArray.sortBy(-_._1).unzip
       (docs.toArray, docTopics.toArray)
@@ -728,8 +732,8 @@ class DistributedLDAModel private[clustering] (
         val term: Int = index2term(edgeContext.dstId)
         edgeContext.sendToSrc((Array(term), Array(topTopic)))
       }
-    val mergeMsg: ((Array[Int], Array[Int]),
-                   (Array[Int], Array[Int])) => (Array[Int], Array[Int]) =
+    val mergeMsg: ((Array[Int], Array[Int]), (Array[Int], Array[Int])) => (Array[Int],
+                                                                           Array[Int]) =
       (terms_topics0, terms_topics1) => {
         (terms_topics0._1 ++ terms_topics1._1,
          terms_topics0._2 ++ terms_topics1._2)
@@ -953,17 +957,25 @@ object DistributedLDAModel extends Loader[DistributedLDAModel] {
 
       val verticesPath =
         new Path(Loader.dataPath(path), "topicCounts").toUri.toString
-      graph.vertices.map {
-        case (ind, vertex) =>
-          VertexData(ind, Vectors.fromBreeze(vertex))
-      }.toDF().write.parquet(verticesPath)
+      graph.vertices
+        .map {
+          case (ind, vertex) =>
+            VertexData(ind, Vectors.fromBreeze(vertex))
+        }
+        .toDF()
+        .write
+        .parquet(verticesPath)
 
       val edgesPath =
         new Path(Loader.dataPath(path), "tokenCounts").toUri.toString
-      graph.edges.map {
-        case Edge(srcId, dstId, prop) =>
-          EdgeData(srcId, dstId, prop)
-      }.toDF().write.parquet(edgesPath)
+      graph.edges
+        .map {
+          case Edge(srcId, dstId, prop) =>
+            EdgeData(srcId, dstId, prop)
+        }
+        .toDF()
+        .write
+        .parquet(edgesPath)
     }
 
     def load(sc: SparkContext,
@@ -1047,11 +1059,13 @@ object DistributedLDAModel extends Loader[DistributedLDAModel] {
     require(
       model.docConcentration == docConcentration,
       s"DistributedLDAModel requires $docConcentration docConcentration, " +
-        s"got ${model.docConcentration} docConcentration")
+        s"got ${model.docConcentration} docConcentration"
+    )
     require(
       model.topicConcentration == topicConcentration,
       s"DistributedLDAModel requires $topicConcentration docConcentration, " +
-        s"got ${model.topicConcentration} docConcentration")
+        s"got ${model.topicConcentration} docConcentration"
+    )
     require(
       expectedK == model.k,
       s"DistributedLDAModel requires $expectedK topics, got ${model.k} topics")

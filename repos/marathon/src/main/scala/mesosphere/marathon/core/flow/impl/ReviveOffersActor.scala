@@ -83,7 +83,8 @@ private[impl] class ReviveOffersActor(
           "{} further revives still needed. Repeating reviveOffers according to --{} {}",
           revivesNeeded,
           conf.reviveOffersRepetitions.name,
-          conf.reviveOffersRepetitions())
+          conf.reviveOffersRepetitions()
+        )
         reviveOffers()
       }
     } else {
@@ -94,7 +95,8 @@ private[impl] class ReviveOffersActor(
           nextRevive,
           untilNextRevive,
           conf.minReviveOffersInterval.name,
-          conf.minReviveOffersInterval())
+          conf.minReviveOffersInterval()
+        )
         nextReviveCancellableOpt = Some(schedulerCheck(untilNextRevive))
       } else if (log.isDebugEnabled) {
         log.info("=> Next revive already scheduled at {} not yet due for {}",

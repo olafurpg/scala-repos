@@ -197,13 +197,15 @@ class BlockMatrix @Since("1.3.0")(
 
   /** Estimates the dimensions of the matrix. */
   private def estimateDim(): Unit = {
-    val (rows, cols) = blockInfo.map {
-      case ((blockRowIndex, blockColIndex), (m, n)) =>
-        (blockRowIndex.toLong * rowsPerBlock + m,
-         blockColIndex.toLong * colsPerBlock + n)
-    }.reduce { (x0, x1) =>
-      (math.max(x0._1, x1._1), math.max(x0._2, x1._2))
-    }
+    val (rows, cols) = blockInfo
+      .map {
+        case ((blockRowIndex, blockColIndex), (m, n)) =>
+          (blockRowIndex.toLong * rowsPerBlock + m,
+           blockColIndex.toLong * colsPerBlock + n)
+      }
+      .reduce { (x0, x1) =>
+        (math.max(x0._1, x1._1), math.max(x0._2, x1._2))
+      }
     if (nRows <= 0L) nRows = rows
     assert(rows <= nRows,
            s"The number of rows $rows is more than claimed $nRows.")
@@ -311,7 +313,8 @@ class BlockMatrix @Since("1.3.0")(
     require(
       numRows() * numCols() < Int.MaxValue,
       "The length of the values array must be " +
-        s"less than Int.MaxValue. Currently numRows * numCols: ${numRows() * numCols()}")
+        s"less than Int.MaxValue. Currently numRows * numCols: ${numRows() * numCols()}"
+    )
     val m = numRows().toInt
     val n = numCols().toInt
     val mem = m * n / 125000
@@ -484,7 +487,8 @@ class BlockMatrix @Since("1.3.0")(
       "The number of columns of A and the number of rows " +
         s"of B must be equal. A.numCols: ${numCols()}, B.numRows: ${other.numRows()}. If you " +
         "think they should be equal, try setting the dimensions of A and B explicitly while " +
-        "initializing them.")
+        "initializing them."
+    )
     if (colsPerBlock == other.rowsPerBlock) {
       val resultPartitioner = GridPartitioner(
         numRowBlocks,

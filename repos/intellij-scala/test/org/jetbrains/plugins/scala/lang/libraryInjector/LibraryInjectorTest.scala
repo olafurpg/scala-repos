@@ -131,12 +131,14 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
         |class Foo
       """.stripMargin
 
-    ZDir("META-INF",
-         Seq(
-           ZFile(LibraryInjectorLoader.INJECTOR_MANIFEST_NAME, manifest),
-           ZFile("Implementation.scala", implementationClass),
-           ZFile("Foo.scala", fooClass)
-         ))
+    ZDir(
+      "META-INF",
+      Seq(
+        ZFile(LibraryInjectorLoader.INJECTOR_MANIFEST_NAME, manifest),
+        ZFile("Implementation.scala", implementationClass),
+        ZFile("Foo.scala", fooClass)
+      )
+    )
   }
 
   val testData = Map("Simple" -> simpleInjector)

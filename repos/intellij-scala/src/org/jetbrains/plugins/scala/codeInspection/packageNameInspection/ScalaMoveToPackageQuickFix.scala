@@ -60,7 +60,8 @@ class ScalaMoveToPackageQuickFix(myFile: ScalaFile, packQualName: String)
         directory),
       false,
       false,
-      null).run()
+      null
+    ).run()
   }
 
   override def getFamilyName: String = "Move File To Package"

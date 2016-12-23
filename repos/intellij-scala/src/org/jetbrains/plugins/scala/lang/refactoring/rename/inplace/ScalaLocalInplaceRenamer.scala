@@ -66,7 +66,8 @@ class ScalaLocalInplaceRenamer(elementToRename: PsiNamedElement,
               }
               true
             }
-          })
+          }
+        )
     }
   }
 

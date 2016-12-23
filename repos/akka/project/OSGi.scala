@@ -64,17 +64,21 @@ object OSGi {
   val httpCore =
     exports(Seq("akka.http.*"), imports = Seq(scalaJava8CompatImport()))
 
-  val http = exports(Seq("akka.http.impl.server",
-                         "akka.http.scaladsl.server.*",
-                         "akka.http.javadsl.server.*",
-                         "akka.http.scaladsl.client",
-                         "akka.http.scaladsl.coding",
-                         "akka.http.scaladsl.common",
-                         "akka.http.scaladsl.marshalling",
-                         "akka.http.scaladsl.unmarshalling"),
-                     imports = Seq(scalaJava8CompatImport(),
-                                   akkaImport("akka.stream.*"),
-                                   akkaImport("akka.parboiled2.*")))
+  val http = exports(
+    Seq(
+      "akka.http.impl.server",
+      "akka.http.scaladsl.server.*",
+      "akka.http.javadsl.server.*",
+      "akka.http.scaladsl.client",
+      "akka.http.scaladsl.coding",
+      "akka.http.scaladsl.common",
+      "akka.http.scaladsl.marshalling",
+      "akka.http.scaladsl.unmarshalling"
+    ),
+    imports = Seq(scalaJava8CompatImport(),
+                  akkaImport("akka.stream.*"),
+                  akkaImport("akka.parboiled2.*"))
+  )
 
   val httpTestkit = exports(
     Seq("akka.http.scaladsl.testkit.*", "akka.http.javadsl.testkit.*"))

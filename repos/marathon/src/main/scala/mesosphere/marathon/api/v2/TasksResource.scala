@@ -152,12 +152,15 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
           EnrichedTask(task.taskId.appId, task, Seq.empty))))
       }
 
-      val tasksByAppId = tasksToAppId.flatMap {
-        case (taskId, appId) =>
-          taskTracker.tasksByAppSync.task(Task.Id(taskId))
-      }.groupBy { task =>
-        task.taskId.appId
-      }.map { case (appId, tasks) => appId -> tasks }
+      val tasksByAppId = tasksToAppId
+        .flatMap {
+          case (taskId, appId) =>
+            taskTracker.tasksByAppSync.task(Task.Id(taskId))
+        }
+        .groupBy { task =>
+          task.taskId.appId
+        }
+        .map { case (appId, tasks) => appId -> tasks }
 
       if (scale) scaleAppWithKill(tasksByAppId)
       else killTasks(tasksByAppId)

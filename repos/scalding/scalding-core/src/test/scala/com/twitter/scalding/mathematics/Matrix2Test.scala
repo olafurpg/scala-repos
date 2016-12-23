@@ -114,7 +114,8 @@ class Matrix2RowRowHad(args: Args) extends Job(args) {
 
   val row1 = mat1.getRow(1)
   val rowSum = row1 #*# row1
-  rowSum.toTypedPipe.map { case (x, idx, v) => (idx, v) }
+  rowSum.toTypedPipe
+    .map { case (x, idx, v) => (idx, v) }
     .write(TypedText.tsv[(Int, Double)]("rowRowHad"))
 }
 

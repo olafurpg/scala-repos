@@ -243,7 +243,8 @@ private[ml] object RandomForestRegressionModel {
     require(
       oldModel.algo == OldAlgo.Regression,
       "Cannot convert RandomForestModel" +
-        s" with algo=${oldModel.algo} (old API) to RandomForestRegressionModel (new API).")
+        s" with algo=${oldModel.algo} (old API) to RandomForestRegressionModel (new API)."
+    )
     val newTrees = oldModel.trees.map { tree =>
       // parent for each tree is null since there is no good way to set this.
       DecisionTreeRegressionModel.fromOld(tree, null, categoricalFeatures)

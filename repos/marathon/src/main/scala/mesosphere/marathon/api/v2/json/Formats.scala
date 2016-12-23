@@ -43,28 +43,34 @@ object Formats extends Formats {
   implicit class FormatAsSeconds(val format: OFormat[Long]) extends AnyVal {
     def asSeconds: OFormat[FiniteDuration] =
       format.inmap(
-          _.seconds,
-          _.toSeconds
+        _.seconds,
+        _.toSeconds
       )
   }
 }
 
 trait Formats
-    extends AppAndGroupFormats with HealthCheckFormats with FetchUriFormats
-    with ContainerFormats with DeploymentFormats with EventFormats
-    with EventSubscribersFormats with PluginFormats with IpAddressFormats {
+    extends AppAndGroupFormats
+    with HealthCheckFormats
+    with FetchUriFormats
+    with ContainerFormats
+    with DeploymentFormats
+    with EventFormats
+    with EventSubscribersFormats
+    with PluginFormats
+    with IpAddressFormats {
 
   implicit lazy val TaskFailureWrites: Writes[TaskFailure] = Writes {
     failure =>
       Json.obj(
-          "appId" -> failure.appId,
-          "host" -> failure.host,
-          "message" -> failure.message,
-          "state" -> failure.state.name(),
-          "taskId" -> failure.taskId.getValue,
-          "timestamp" -> failure.timestamp,
-          "version" -> failure.version,
-          "slaveId" ->
+        "appId" -> failure.appId,
+        "host" -> failure.host,
+        "message" -> failure.message,
+        "state" -> failure.state.name(),
+        "taskId" -> failure.taskId.getValue,
+        "timestamp" -> failure.timestamp,
+        "version" -> failure.version,
+        "slaveId" ->
           (if (failure.slaveId.isDefined) failure.slaveId.get.getValue
            else JsNull)
       )
@@ -88,7 +94,7 @@ trait Formats
           case Some(protocol) => JsSuccess(protocol)
           case None =>
             JsError(
-                s"'$protocolString' is not a valid protocol. Allowed values: $allowedProtocolString")
+              s"'$protocolString' is not a valid protocol. Allowed values: $allowedProtocolString")
         }
       }
     }
@@ -108,7 +114,7 @@ trait Formats
       (ipAddress.getIpAddress, ipAddress.getProtocol)
 
     ((__ \ "ipAddress").format[String] ~ (__ \ "protocol")
-          .format[mesos.NetworkInfo.Protocol])(toIpAddress, toTuple)
+      .format[mesos.NetworkInfo.Protocol])(toIpAddress, toTuple)
   }
 
   implicit lazy val TaskIdWrite: Writes[Task.Id] = Writes { id =>
@@ -117,33 +123,37 @@ trait Formats
   implicit lazy val LocalVolumeIdWrite: Writes[Task.LocalVolumeId] = Writes {
     id =>
       Json.obj(
-          "containerPath" -> id.containerPath,
-          "persistenceId" -> id.idString
+        "containerPath" -> id.containerPath,
+        "persistenceId" -> id.idString
       )
   }
 
   implicit lazy val TaskWrites: Writes[Task] = Writes { task =>
     val base = Json.obj(
-        "id" -> task.taskId,
-        "slaveId" -> task.agentInfo.agentId,
-        "host" -> task.agentInfo.host
+      "id" -> task.taskId,
+      "slaveId" -> task.agentInfo.agentId,
+      "host" -> task.agentInfo.host
     )
 
-    val launched = task.launched.map { launched =>
-      base ++ Json.obj(
+    val launched = task.launched
+      .map { launched =>
+        base ++ Json.obj(
           "startedAt" -> launched.status.startedAt,
           "stagedAt" -> launched.status.stagedAt,
           "ports" -> launched.ports,
           "ipAddresses" -> launched.ipAddresses,
           "version" -> launched.appVersion
-      )
-    }.getOrElse(base)
+        )
+      }
+      .getOrElse(base)
 
-    val reservation = task.reservationWithVolumes.map { reservation =>
-      launched ++ Json.obj(
+    val reservation = task.reservationWithVolumes
+      .map { reservation =>
+        launched ++ Json.obj(
           "localVolumes" -> reservation.volumeIds
-      )
-    }.getOrElse(launched)
+        )
+      }
+      .getOrElse(launched)
 
     reservation
   }
@@ -153,7 +163,7 @@ trait Formats
 
     val enrichedJson =
       taskJson ++ Json.obj(
-          "appId" -> task.appId
+        "appId" -> task.appId
       )
 
     val withServicePorts =
@@ -163,36 +173,36 @@ trait Formats
 
     if (task.healthCheckResults.nonEmpty)
       withServicePorts ++ Json.obj(
-          "healthCheckResults" -> task.healthCheckResults)
+        "healthCheckResults" -> task.healthCheckResults)
     else withServicePorts
   }
 
   implicit lazy val PathIdFormat: Format[PathId] = Format(
-      Reads.of[String](Reads.minLength[String](1)).map(PathId(_)),
-      Writes[PathId] { id =>
-        JsString(id.toString)
-      }
+    Reads.of[String](Reads.minLength[String](1)).map(PathId(_)),
+    Writes[PathId] { id =>
+      JsString(id.toString)
+    }
   )
 
   implicit lazy val TaskIdFormat: Format[Task.Id] = Format(
-      Reads.of[String](Reads.minLength[String](3)).map(Task.Id(_)),
-      Writes[Task.Id] { id =>
-        JsString(id.idString)
-      }
+    Reads.of[String](Reads.minLength[String](3)).map(Task.Id(_)),
+    Writes[Task.Id] { id =>
+      JsString(id.idString)
+    }
   )
 
   implicit lazy val TimestampFormat: Format[Timestamp] = Format(
-      Reads.of[String].map(Timestamp(_)),
-      Writes[Timestamp] { t =>
-        JsString(t.toString)
-      }
+    Reads.of[String].map(Timestamp(_)),
+    Writes[Timestamp] { t =>
+      JsString(t.toString)
+    }
   )
 
   implicit lazy val CommandFormat: Format[Command] = Json.format[Command]
 
   implicit lazy val ParameterFormat: Format[Parameter] =
-    ((__ \ "key").format[String] ~ (__ \ "value").format[String])(
-        Parameter(_, _), unlift(Parameter.unapply))
+    ((__ \ "key").format[String] ~ (__ \ "value")
+      .format[String])(Parameter(_, _), unlift(Parameter.unapply))
 
   /*
    * Helpers
@@ -207,10 +217,11 @@ trait Formats
 
   def nonEmpty[C <: Iterable[_]](implicit reads: Reads[C]): Reads[C] =
     Reads.filterNot[C](ValidationError(s"set must not be empty"))(_.isEmpty)(
-        reads)
+      reads)
 
   def enumFormat[A <: java.lang.Enum[A]](
-      read: String => A, errorMsg: String => String): Format[A] = {
+      read: String => A,
+      errorMsg: String => String): Format[A] = {
     val reads = Reads[A] {
       case JsString(str) =>
         try {
@@ -234,54 +245,55 @@ trait ContainerFormats {
   import Formats._
 
   implicit lazy val DockerNetworkFormat: Format[DockerInfo.Network] =
-    enumFormat(
-        DockerInfo.Network.valueOf, str => s"$str is not a valid network type")
+    enumFormat(DockerInfo.Network.valueOf,
+               str => s"$str is not a valid network type")
 
   implicit lazy val PortMappingFormat: Format[Docker.PortMapping] =
     ((__ \ "containerPort")
-          .formatNullable[Int]
-          .withDefault(AppDefinition.RandomPortValue) ~ (__ \ "hostPort")
-          .formatNullable[Int]
-          .withDefault(AppDefinition.RandomPortValue) ~ (__ \ "servicePort")
-          .formatNullable[Int]
-          .withDefault(AppDefinition.RandomPortValue) ~ (__ \ "protocol")
-          .formatNullable[String]
-          .withDefault("tcp") ~ (__ \ "name").formatNullable[String] ~
-        (__ \ "labels")
-          .formatNullable[Map[String, String]]
-          .withDefault(Map.empty[String, String]))(
-        PortMapping(_, _, _, _, _, _), unlift(PortMapping.unapply))
+      .formatNullable[Int]
+      .withDefault(AppDefinition.RandomPortValue) ~ (__ \ "hostPort")
+      .formatNullable[Int]
+      .withDefault(AppDefinition.RandomPortValue) ~ (__ \ "servicePort")
+      .formatNullable[Int]
+      .withDefault(AppDefinition.RandomPortValue) ~ (__ \ "protocol")
+      .formatNullable[String]
+      .withDefault("tcp") ~ (__ \ "name").formatNullable[String] ~
+      (__ \ "labels")
+        .formatNullable[Map[String, String]]
+        .withDefault(Map.empty[String, String]))(PortMapping(_, _, _, _, _, _),
+                                                 unlift(PortMapping.unapply))
 
   implicit lazy val DockerFormat: Format[Docker] = ((__ \ "image")
-        .format[String] ~ (__ \ "network").formatNullable[DockerInfo.Network] ~
-      (__ \ "portMappings").formatNullable[Seq[Docker.PortMapping]] ~
-      (__ \ "privileged").formatNullable[Boolean].withDefault(false) ~
-      (__ \ "parameters").formatNullable[Seq[Parameter]].withDefault(Seq.empty) ~
-      (__ \ "forcePullImage").formatNullable[Boolean].withDefault(false))(
-      Docker(_, _, _, _, _, _), unlift(Docker.unapply))
+    .format[String] ~ (__ \ "network").formatNullable[DockerInfo.Network] ~
+    (__ \ "portMappings").formatNullable[Seq[Docker.PortMapping]] ~
+    (__ \ "privileged").formatNullable[Boolean].withDefault(false) ~
+    (__ \ "parameters").formatNullable[Seq[Parameter]].withDefault(Seq.empty) ~
+    (__ \ "forcePullImage")
+      .formatNullable[Boolean]
+      .withDefault(false))(Docker(_, _, _, _, _, _), unlift(Docker.unapply))
 
-  implicit lazy val ModeFormat: Format[mesos.Volume.Mode] = enumFormat(
-      mesos.Volume.Mode.valueOf, str => s"$str is not a valid mde")
+  implicit lazy val ModeFormat: Format[mesos.Volume.Mode] =
+    enumFormat(mesos.Volume.Mode.valueOf, str => s"$str is not a valid mde")
 
   implicit lazy val PersistentVolumeInfoFormat: Format[PersistentVolumeInfo] =
     Json.format[PersistentVolumeInfo]
 
   implicit lazy val VolumeFormat: Format[Volume] = ((__ \ "containerPath")
-        .format[String] ~ (__ \ "hostPath").formatNullable[String] ~
-      (__ \ "mode").format[mesos.Volume.Mode] ~ (__ \ "persistent")
-        .formatNullable[PersistentVolumeInfo])(
-      Volume(_, _, _, _), unlift(Volume.unapply))
+    .format[String] ~ (__ \ "hostPath").formatNullable[String] ~
+    (__ \ "mode").format[mesos.Volume.Mode] ~ (__ \ "persistent")
+    .formatNullable[PersistentVolumeInfo])(Volume(_, _, _, _),
+                                           unlift(Volume.unapply))
 
   implicit lazy val ContainerTypeFormat: Format[mesos.ContainerInfo.Type] =
     enumFormat(mesos.ContainerInfo.Type.valueOf,
                str => s"$str is not a valid container type")
 
   implicit lazy val ContainerFormat: Format[Container] = ((__ \ "type")
-        .formatNullable[mesos.ContainerInfo.Type]
-        .withDefault(mesos.ContainerInfo.Type.DOCKER) ~ (__ \ "volumes")
-        .formatNullable[Seq[Volume]]
-        .withDefault(Nil) ~ (__ \ "docker").formatNullable[Docker])(
-      Container(_, _, _), unlift(Container.unapply))
+    .formatNullable[mesos.ContainerInfo.Type]
+    .withDefault(mesos.ContainerInfo.Type.DOCKER) ~ (__ \ "volumes")
+    .formatNullable[Seq[Volume]]
+    .withDefault(Nil) ~ (__ \ "docker")
+    .formatNullable[Docker])(Container(_, _, _), unlift(Container.unapply))
 }
 
 trait IpAddressFormats {
@@ -289,8 +301,8 @@ trait IpAddressFormats {
 
   private[this] lazy val ValidPortProtocol: Reads[String] = {
     implicitly[Reads[String]].filter(
-        ValidationError("Invalid protocol. Only 'udp' or 'tcp' are allowed."))(
-        DiscoveryInfo.Port.AllowedProtocols
+      ValidationError("Invalid protocol. Only 'udp' or 'tcp' are allowed."))(
+      DiscoveryInfo.Port.AllowedProtocols
     )
   }
 
@@ -305,73 +317,74 @@ trait IpAddressFormats {
 
     implicitly[Reads[Seq[DiscoveryInfo.Port]]]
       .filter(ValidationError("Port names are not unique."))(
-          hasUniquePortNames)
+        hasUniquePortNames)
       .filter(ValidationError(
-              "There may be only one port with a particular port number/protocol combination."))(
-          hasUniquePortNumberProtocol
+        "There may be only one port with a particular port number/protocol combination."))(
+        hasUniquePortNumberProtocol
       )
   }
 
   implicit lazy val PortFormat: Format[DiscoveryInfo.Port] =
     ((__ \ "number").format[Int] ~ (__ \ "name").format[String] ~
-        (__ \ "protocol").format[String](ValidPortProtocol))(
-        DiscoveryInfo.Port(_, _, _), unlift(DiscoveryInfo.Port.unapply))
+      (__ \ "protocol").format[String](ValidPortProtocol))(
+      DiscoveryInfo.Port(_, _, _),
+      unlift(DiscoveryInfo.Port.unapply))
 
   implicit lazy val DiscoveryInfoFormat: Format[DiscoveryInfo] = Format(
-      (__ \ "ports")
-        .read[Seq[DiscoveryInfo.Port]](ValidPorts)
-        .map(DiscoveryInfo(_)),
-      Writes[DiscoveryInfo] { discoveryInfo =>
-        Json.obj("ports" -> discoveryInfo.ports.map(PortFormat.writes))
-      }
+    (__ \ "ports")
+      .read[Seq[DiscoveryInfo.Port]](ValidPorts)
+      .map(DiscoveryInfo(_)),
+    Writes[DiscoveryInfo] { discoveryInfo =>
+      Json.obj("ports" -> discoveryInfo.ports.map(PortFormat.writes))
+    }
   )
 
   implicit lazy val IpAddressFormat: Format[IpAddress] =
     ((__ \ "groups").formatNullable[Seq[String]].withDefault(Nil) ~
-        (__ \ "labels")
-          .formatNullable[Map[String, String]]
-          .withDefault(Map.empty[String, String]) ~ (__ \ "discovery")
-          .formatNullable[DiscoveryInfo]
-          .withDefault(DiscoveryInfo.empty))(
-        IpAddress(_, _, _), unlift(IpAddress.unapply))
+      (__ \ "labels")
+        .formatNullable[Map[String, String]]
+        .withDefault(Map.empty[String, String]) ~ (__ \ "discovery")
+      .formatNullable[DiscoveryInfo]
+      .withDefault(DiscoveryInfo.empty))(IpAddress(_, _, _),
+                                         unlift(IpAddress.unapply))
 }
 
 trait DeploymentFormats {
   import Formats._
 
   implicit lazy val ByteArrayFormat: Format[Array[Byte]] = Format(
-      Reads.of[Seq[Int]].map(_.map(_.toByte).toArray),
-      Writes { xs =>
-        JsArray(xs.to[Seq].map(b => JsNumber(b.toInt)))
-      }
+    Reads.of[Seq[Int]].map(_.map(_.toByte).toArray),
+    Writes { xs =>
+      JsArray(xs.to[Seq].map(b => JsNumber(b.toInt)))
+    }
   )
 
   implicit lazy val GroupUpdateFormat: Format[GroupUpdate] =
     ((__ \ "id").formatNullable[PathId] ~ (__ \ "apps")
-          .formatNullable[Set[AppDefinition]] ~ (__ \ "groups")
-          .lazyFormatNullable(implicitly[Format[Set[GroupUpdate]]]) ~
-        (__ \ "dependencies").formatNullable[Set[PathId]] ~ (__ \ "scaleBy")
-          .formatNullable[Double] ~ (__ \ "version")
-          .formatNullable[Timestamp])(
-        GroupUpdate(_, _, _, _, _, _), unlift(GroupUpdate.unapply))
+      .formatNullable[Set[AppDefinition]] ~ (__ \ "groups")
+      .lazyFormatNullable(implicitly[Format[Set[GroupUpdate]]]) ~
+      (__ \ "dependencies").formatNullable[Set[PathId]] ~ (__ \ "scaleBy")
+      .formatNullable[Double] ~ (__ \ "version")
+      .formatNullable[Timestamp])(GroupUpdate(_, _, _, _, _, _),
+                                  unlift(GroupUpdate.unapply))
 
   implicit lazy val URLToStringMapFormat: Format[Map[java.net.URL, String]] =
     Format(
-        Reads
-          .of[Map[String, String]]
-          .map(
-              _.map { case (k, v) => new java.net.URL(k) -> v }
-          ),
-        Writes[Map[java.net.URL, String]] { m =>
-          Json.toJson(m)
-        }
+      Reads
+        .of[Map[String, String]]
+        .map(
+          _.map { case (k, v) => new java.net.URL(k) -> v }
+        ),
+      Writes[Map[java.net.URL, String]] { m =>
+        Json.toJson(m)
+      }
     )
 
   implicit lazy val DeploymentActionWrites: Writes[DeploymentAction] = Writes {
     action =>
       Json.obj(
-          "type" -> action.getClass.getSimpleName,
-          "app" -> action.app.id
+        "type" -> action.getClass.getSimpleName,
+        "app" -> action.app.id
       )
   }
 
@@ -388,22 +401,22 @@ trait EventFormats {
   implicit lazy val ApiPostEventWrites: Writes[ApiPostEvent] = Writes {
     event =>
       Json.obj(
-          "clientIp" -> event.clientIp,
-          "uri" -> event.uri,
-          "appDefinition" -> event.appDefinition,
-          "eventType" -> event.eventType,
-          "timestamp" -> event.timestamp
+        "clientIp" -> event.clientIp,
+        "uri" -> event.uri,
+        "appDefinition" -> event.appDefinition,
+        "eventType" -> event.eventType,
+        "timestamp" -> event.timestamp
       )
   }
 
   implicit lazy val DeploymentPlanWrites: Writes[DeploymentPlan] = Writes {
     plan =>
       Json.obj(
-          "id" -> plan.id,
-          "original" -> plan.original,
-          "target" -> plan.target,
-          "steps" -> plan.steps,
-          "version" -> plan.version
+        "id" -> plan.id,
+        "original" -> plan.original,
+        "target" -> plan.target,
+        "steps" -> plan.steps,
+        "version" -> plan.version
       )
   }
 
@@ -437,15 +450,15 @@ trait EventFormats {
   implicit lazy val DeploymentStepFailureWrites: Writes[DeploymentStepFailure] =
     Json.writes[DeploymentStepFailure]
   implicit lazy val MesosStatusUpdateEventWrites: Writes[
-      MesosStatusUpdateEvent] = Json.writes[MesosStatusUpdateEvent]
+    MesosStatusUpdateEvent] = Json.writes[MesosStatusUpdateEvent]
   implicit lazy val MesosFrameworkMessageEventWrites: Writes[
-      MesosFrameworkMessageEvent] = Json.writes[MesosFrameworkMessageEvent]
+    MesosFrameworkMessageEvent] = Json.writes[MesosFrameworkMessageEvent]
   implicit lazy val SchedulerDisconnectedEventWrites: Writes[
-      SchedulerDisconnectedEvent] = Json.writes[SchedulerDisconnectedEvent]
+    SchedulerDisconnectedEvent] = Json.writes[SchedulerDisconnectedEvent]
   implicit lazy val SchedulerRegisteredEventWritesWrites: Writes[
-      SchedulerRegisteredEvent] = Json.writes[SchedulerRegisteredEvent]
+    SchedulerRegisteredEvent] = Json.writes[SchedulerRegisteredEvent]
   implicit lazy val SchedulerReregisteredEventWritesWrites: Writes[
-      SchedulerReregisteredEvent] = Json.writes[SchedulerReregisteredEvent]
+    SchedulerReregisteredEvent] = Json.writes[SchedulerReregisteredEvent]
 
   //scalastyle:off cyclomatic.complexity
   def eventToJson(event: MarathonEvent): JsValue = event match {
@@ -480,7 +493,7 @@ trait EventSubscribersFormats {
   implicit lazy val EventSubscribersWrites: Writes[EventSubscribers] = Writes {
     eventSubscribers =>
       Json.obj(
-          "callbackUrls" -> eventSubscribers.urls
+        "callbackUrls" -> eventSubscribers.urls
       )
   }
 }
@@ -494,40 +507,40 @@ trait HealthCheckFormats {
 
   implicit lazy val HealthWrites: Writes[Health] = Writes { health =>
     Json.obj(
-        "alive" -> health.alive,
-        "consecutiveFailures" -> health.consecutiveFailures,
-        "firstSuccess" -> health.firstSuccess,
-        "lastFailure" -> health.lastFailure,
-        "lastSuccess" -> health.lastSuccess,
-        "taskId" -> health.taskId
+      "alive" -> health.alive,
+      "consecutiveFailures" -> health.consecutiveFailures,
+      "firstSuccess" -> health.firstSuccess,
+      "lastFailure" -> health.lastFailure,
+      "lastSuccess" -> health.lastSuccess,
+      "taskId" -> health.taskId
     )
   }
 
-  implicit lazy val HealthCheckProtocolFormat: Format[Protocol] = enumFormat(
-      Protocol.valueOf, str => s"$str is not a valid protocol")
+  implicit lazy val HealthCheckProtocolFormat: Format[Protocol] =
+    enumFormat(Protocol.valueOf, str => s"$str is not a valid protocol")
 
   implicit lazy val HealthCheckFormat: Format[HealthCheck] = {
     import mesosphere.marathon.health.HealthCheck._
 
     ((__ \ "path").formatNullable[String] ~ (__ \ "protocol")
-          .formatNullable[Protocol]
-          .withDefault(DefaultProtocol) ~ (__ \ "portIndex")
-          .formatNullable[Int] ~ (__ \ "command").formatNullable[Command] ~
-        (__ \ "gracePeriodSeconds")
-          .formatNullable[Long]
-          .withDefault(DefaultGracePeriod.toSeconds)
-          .asSeconds ~ (__ \ "intervalSeconds")
-          .formatNullable[Long]
-          .withDefault(DefaultInterval.toSeconds)
-          .asSeconds ~ (__ \ "timeoutSeconds")
-          .formatNullable[Long]
-          .withDefault(DefaultTimeout.toSeconds)
-          .asSeconds ~ (__ \ "maxConsecutiveFailures")
-          .formatNullable[Int]
-          .withDefault(DefaultMaxConsecutiveFailures) ~ (__ \ "ignoreHttp1xx")
-          .formatNullable[Boolean]
-          .withDefault(DefaultIgnoreHttp1xx) ~ (__ \ "port")
-          .formatNullable[Int])(HealthCheck.apply, unlift(HealthCheck.unapply))
+      .formatNullable[Protocol]
+      .withDefault(DefaultProtocol) ~ (__ \ "portIndex")
+      .formatNullable[Int] ~ (__ \ "command").formatNullable[Command] ~
+      (__ \ "gracePeriodSeconds")
+        .formatNullable[Long]
+        .withDefault(DefaultGracePeriod.toSeconds)
+        .asSeconds ~ (__ \ "intervalSeconds")
+      .formatNullable[Long]
+      .withDefault(DefaultInterval.toSeconds)
+      .asSeconds ~ (__ \ "timeoutSeconds")
+      .formatNullable[Long]
+      .withDefault(DefaultTimeout.toSeconds)
+      .asSeconds ~ (__ \ "maxConsecutiveFailures")
+      .formatNullable[Int]
+      .withDefault(DefaultMaxConsecutiveFailures) ~ (__ \ "ignoreHttp1xx")
+      .formatNullable[Boolean]
+      .withDefault(DefaultIgnoreHttp1xx) ~ (__ \ "port")
+      .formatNullable[Int])(HealthCheck.apply, unlift(HealthCheck.unapply))
   }
 }
 
@@ -536,12 +549,12 @@ trait FetchUriFormats {
 
   implicit lazy val FetchUriFormat: Format[FetchUri] = {
     ((__ \ "uri").format[String] ~ (__ \ "extract")
-          .formatNullable[Boolean]
-          .withDefault(true) ~ (__ \ "executable")
-          .formatNullable[Boolean]
-          .withDefault(false) ~ (__ \ "cache")
-          .formatNullable[Boolean]
-          .withDefault(false))(FetchUri(_, _, _, _), unlift(FetchUri.unapply))
+      .formatNullable[Boolean]
+      .withDefault(true) ~ (__ \ "executable")
+      .formatNullable[Boolean]
+      .withDefault(false) ~ (__ \ "cache")
+      .formatNullable[Boolean]
+      .withDefault(false))(FetchUri(_, _, _, _), unlift(FetchUri.unapply))
   }
 }
 
@@ -555,106 +568,108 @@ trait AppAndGroupFormats {
   implicit lazy val UpgradeStrategyReads: Reads[UpgradeStrategy] = {
     import mesosphere.marathon.state.AppDefinition._
     ((__ \ "minimumHealthCapacity")
-          .readNullable[Double]
-          .withDefault(DefaultUpgradeStrategy.minimumHealthCapacity) ~
-        (__ \ "maximumOverCapacity")
-          .readNullable[Double]
-          .withDefault(DefaultUpgradeStrategy.maximumOverCapacity))(
-        UpgradeStrategy(_, _))
+      .readNullable[Double]
+      .withDefault(DefaultUpgradeStrategy.minimumHealthCapacity) ~
+      (__ \ "maximumOverCapacity")
+        .readNullable[Double]
+        .withDefault(DefaultUpgradeStrategy.maximumOverCapacity))(
+      UpgradeStrategy(_, _))
   }
 
   implicit lazy val ConstraintFormat: Format[Constraint] = Format(
-      new Reads[Constraint] {
-        override def reads(json: JsValue): JsResult[Constraint] = {
-          val validOperators = Operator.values().map(_.toString)
+    new Reads[Constraint] {
+      override def reads(json: JsValue): JsResult[Constraint] = {
+        val validOperators = Operator.values().map(_.toString)
 
-          json.asOpt[Seq[String]] match {
-            case Some(seq) if seq.size >= 2 && seq.size <= 3 =>
-              if (validOperators.contains(seq(1))) {
-                val builder = Constraint
-                  .newBuilder()
-                  .setField(seq(0))
-                  .setOperator(Operator.valueOf(seq(1)))
-                if (seq.size == 3) builder.setValue(seq(2))
-                JsSuccess(builder.build())
-              } else {
-                JsError(
-                    s"Constraint operator must be one of the following: [${validOperators
-                  .mkString(", ")}]")
-              }
-            case _ =>
+        json.asOpt[Seq[String]] match {
+          case Some(seq) if seq.size >= 2 && seq.size <= 3 =>
+            if (validOperators.contains(seq(1))) {
+              val builder = Constraint
+                .newBuilder()
+                .setField(seq(0))
+                .setOperator(Operator.valueOf(seq(1)))
+              if (seq.size == 3) builder.setValue(seq(2))
+              JsSuccess(builder.build())
+            } else {
               JsError(
-                  "Constraint definition must be an array of strings in format: <key>, <operator>[, value]")
-          }
+                s"Constraint operator must be one of the following: [${validOperators
+                  .mkString(", ")}]")
+            }
+          case _ =>
+            JsError(
+              "Constraint definition must be an array of strings in format: <key>, <operator>[, value]")
         }
-      },
-      Writes[Constraint] { constraint =>
-        val builder = Seq.newBuilder[JsString]
-        builder += JsString(constraint.getField)
-        builder += JsString(constraint.getOperator.name)
-        if (constraint.hasValue) builder += JsString(constraint.getValue)
-        JsArray(builder.result())
       }
+    },
+    Writes[Constraint] { constraint =>
+      val builder = Seq.newBuilder[JsString]
+      builder += JsString(constraint.getField)
+      builder += JsString(constraint.getOperator.name)
+      if (constraint.hasValue) builder += JsString(constraint.getValue)
+      JsArray(builder.result())
+    }
   )
 
   implicit lazy val AppDefinitionReads: Reads[AppDefinition] = {
     val executorPattern = "^(//cmd)|(/?[^/]+(/[^/]+)*)|$".r
     ((__ \ "id").read[PathId].filterNot(_.isRoot) ~ (__ \ "cmd")
-          .readNullable[String](Reads.minLength(1)) ~ (__ \ "args")
-          .readNullable[Seq[String]] ~ (__ \ "user").readNullable[String] ~
-        (__ \ "env")
-          .readNullable[Map[String, String]]
-          .withDefault(AppDefinition.DefaultEnv) ~ (__ \ "instances")
-          .readNullable[Int]
-          .withDefault(AppDefinition.DefaultInstances) ~ (__ \ "cpus")
-          .readNullable[Double]
-          .withDefault(AppDefinition.DefaultCpus) ~ (__ \ "mem")
-          .readNullable[Double]
-          .withDefault(AppDefinition.DefaultMem) ~ (__ \ "disk")
-          .readNullable[Double]
-          .withDefault(AppDefinition.DefaultDisk) ~ (__ \ "executor")
-          .readNullable[String](Reads.pattern(executorPattern))
-          .withDefault(AppDefinition.DefaultExecutor) ~ (__ \ "constraints")
-          .readNullable[Set[Constraint]]
-          .withDefault(AppDefinition.DefaultConstraints) ~ (__ \ "storeUrls")
-          .readNullable[Seq[String]]
-          .withDefault(AppDefinition.DefaultStoreUrls) ~ (__ \ "requirePorts")
-          .readNullable[Boolean]
-          .withDefault(AppDefinition.DefaultRequirePorts) ~
-        (__ \ "backoffSeconds")
-          .readNullable[Long]
-          .withDefault(AppDefinition.DefaultBackoff.toSeconds)
-          .asSeconds ~ (__ \ "backoffFactor")
-          .readNullable[Double]
-          .withDefault(AppDefinition.DefaultBackoffFactor) ~
-        (__ \ "maxLaunchDelaySeconds")
-          .readNullable[Long]
-          .withDefault(AppDefinition.DefaultMaxLaunchDelay.toSeconds)
-          .asSeconds ~ (__ \ "container").readNullable[Container] ~
-        (__ \ "healthChecks")
-          .readNullable[Set[HealthCheck]]
-          .withDefault(AppDefinition.DefaultHealthChecks))((id, cmd, args,
-        maybeString, env, instances, cpus, mem, disk, executor, constraints,
-        storeUrls, requirePorts, backoff, backoffFactor, maxLaunchDelay,
-        container, checks) =>
-          AppDefinition(id = id,
-                        cmd = cmd,
-                        args = args,
-                        user = maybeString,
-                        env = env,
-                        instances = instances,
-                        cpus = cpus,
-                        mem = mem,
-                        disk = disk,
-                        executor = executor,
-                        constraints = constraints,
-                        storeUrls = storeUrls,
-                        requirePorts = requirePorts,
-                        backoff = backoff,
-                        backoffFactor = backoffFactor,
-                        maxLaunchDelay = maxLaunchDelay,
-                        container = container,
-                        healthChecks = checks)).flatMap { app =>
+      .readNullable[String](Reads.minLength(1)) ~ (__ \ "args")
+      .readNullable[Seq[String]] ~ (__ \ "user").readNullable[String] ~
+      (__ \ "env")
+        .readNullable[Map[String, String]]
+        .withDefault(AppDefinition.DefaultEnv) ~ (__ \ "instances")
+      .readNullable[Int]
+      .withDefault(AppDefinition.DefaultInstances) ~ (__ \ "cpus")
+      .readNullable[Double]
+      .withDefault(AppDefinition.DefaultCpus) ~ (__ \ "mem")
+      .readNullable[Double]
+      .withDefault(AppDefinition.DefaultMem) ~ (__ \ "disk")
+      .readNullable[Double]
+      .withDefault(AppDefinition.DefaultDisk) ~ (__ \ "executor")
+      .readNullable[String](Reads.pattern(executorPattern))
+      .withDefault(AppDefinition.DefaultExecutor) ~ (__ \ "constraints")
+      .readNullable[Set[Constraint]]
+      .withDefault(AppDefinition.DefaultConstraints) ~ (__ \ "storeUrls")
+      .readNullable[Seq[String]]
+      .withDefault(AppDefinition.DefaultStoreUrls) ~ (__ \ "requirePorts")
+      .readNullable[Boolean]
+      .withDefault(AppDefinition.DefaultRequirePorts) ~
+      (__ \ "backoffSeconds")
+        .readNullable[Long]
+        .withDefault(AppDefinition.DefaultBackoff.toSeconds)
+        .asSeconds ~ (__ \ "backoffFactor")
+      .readNullable[Double]
+      .withDefault(AppDefinition.DefaultBackoffFactor) ~
+      (__ \ "maxLaunchDelaySeconds")
+        .readNullable[Long]
+        .withDefault(AppDefinition.DefaultMaxLaunchDelay.toSeconds)
+        .asSeconds ~ (__ \ "container").readNullable[Container] ~
+      (__ \ "healthChecks")
+        .readNullable[Set[HealthCheck]]
+        .withDefault(AppDefinition.DefaultHealthChecks))(
+      (id, cmd, args, maybeString, env, instances, cpus, mem, disk, executor,
+       constraints, storeUrls, requirePorts, backoff, backoffFactor,
+       maxLaunchDelay, container, checks) =>
+        AppDefinition(
+          id = id,
+          cmd = cmd,
+          args = args,
+          user = maybeString,
+          env = env,
+          instances = instances,
+          cpus = cpus,
+          mem = mem,
+          disk = disk,
+          executor = executor,
+          constraints = constraints,
+          storeUrls = storeUrls,
+          requirePorts = requirePorts,
+          backoff = backoff,
+          backoffFactor = backoffFactor,
+          maxLaunchDelay = maxLaunchDelay,
+          container = container,
+          healthChecks = checks
+      )).flatMap { app =>
       // necessary because of case class limitations (good for another 21 fields)
       case class ExtraFields(
           uris: Seq[String],
@@ -671,49 +686,50 @@ trait AppAndGroupFormats {
         def upgradeStrategyOrDefault: UpgradeStrategy = {
           import UpgradeStrategy.{forResidentTasks, empty}
           upgradeStrategy.getOrElse(
-              if (residency.isDefined) forResidentTasks else empty)
+            if (residency.isDefined) forResidentTasks else empty)
         }
         def residencyOrDefault: Option[Residency] = {
-          residency.orElse(if (app.persistentVolumes.nonEmpty)
-                Some(Residency.defaultResidency) else None)
+          residency.orElse(
+            if (app.persistentVolumes.nonEmpty)
+              Some(Residency.defaultResidency)
+            else None)
         }
       }
 
       val extraReads: Reads[ExtraFields] = ((__ \ "uris")
-            .readNullable[Seq[String]]
-            .withDefault(AppDefinition.DefaultUris) ~ (__ \ "fetch")
-            .readNullable[Seq[FetchUri]]
-            .withDefault(AppDefinition.DefaultFetch) ~ (__ \ "dependencies")
-            .readNullable[Set[PathId]]
-            .withDefault(AppDefinition.DefaultDependencies) ~ (__ \ "ports")
-            .readNullable[Seq[Int]](uniquePorts) ~ (__ \ "upgradeStrategy")
-            .readNullable[UpgradeStrategy] ~ (__ \ "labels")
-            .readNullable[Map[String, String]]
-            .withDefault(AppDefinition.DefaultLabels) ~
-          (__ \ "acceptedResourceRoles").readNullable[Set[String]](nonEmpty) ~
-          (__ \ "ipAddress").readNullable[IpAddress] ~ (__ \ "version")
-            .readNullable[Timestamp]
-            .withDefault(Timestamp.now()) ~ (__ \ "residency")
-            .readNullable[Residency] ~ (__ \ "portDefinitions")
-            .readNullable[Seq[PortDefinition]])(ExtraFields)
+        .readNullable[Seq[String]]
+        .withDefault(AppDefinition.DefaultUris) ~ (__ \ "fetch")
+        .readNullable[Seq[FetchUri]]
+        .withDefault(AppDefinition.DefaultFetch) ~ (__ \ "dependencies")
+        .readNullable[Set[PathId]]
+        .withDefault(AppDefinition.DefaultDependencies) ~ (__ \ "ports")
+        .readNullable[Seq[Int]](uniquePorts) ~ (__ \ "upgradeStrategy")
+        .readNullable[UpgradeStrategy] ~ (__ \ "labels")
+        .readNullable[Map[String, String]]
+        .withDefault(AppDefinition.DefaultLabels) ~
+        (__ \ "acceptedResourceRoles").readNullable[Set[String]](nonEmpty) ~
+        (__ \ "ipAddress").readNullable[IpAddress] ~ (__ \ "version")
+        .readNullable[Timestamp]
+        .withDefault(Timestamp.now()) ~ (__ \ "residency")
+        .readNullable[Residency] ~ (__ \ "portDefinitions")
+        .readNullable[Seq[PortDefinition]])(ExtraFields)
         .filter(ValidationError(
-                "You cannot specify both uris and fetch fields")) { extra =>
+          "You cannot specify both uris and fetch fields")) { extra =>
           !(extra.uris.nonEmpty && extra.fetch.nonEmpty)
         }
         .filter(ValidationError(
-                "You cannot specify both an IP address and ports")) { extra =>
+          "You cannot specify both an IP address and ports")) { extra =>
           val appWithoutPorts =
             extra.maybePorts.forall(_.isEmpty) &&
-            extra.maybePortDefinitions.forall(_.isEmpty)
+              extra.maybePortDefinitions.forall(_.isEmpty)
           appWithoutPorts || extra.ipAddress.isEmpty
         }
         .filter(ValidationError(
-                "You cannot specify both ports and port definitions")) {
-          extra =>
-            val portDefinitionsIsEquivalentToPorts =
-              extra.maybePortDefinitions.map(_.map(_.port)) == extra.maybePorts
-            portDefinitionsIsEquivalentToPorts || extra.maybePorts.isEmpty ||
-            extra.maybePortDefinitions.isEmpty
+          "You cannot specify both ports and port definitions")) { extra =>
+          val portDefinitionsIsEquivalentToPorts =
+            extra.maybePortDefinitions.map(_.map(_.port)) == extra.maybePorts
+          portDefinitionsIsEquivalentToPorts || extra.maybePorts.isEmpty ||
+          extra.maybePortDefinitions.isEmpty
         }
 
       extraReads.map { extra =>
@@ -730,22 +746,24 @@ trait AppAndGroupFormats {
           case Some(ipAddress) => Seq.empty[PortDefinition]
           case None =>
             extra.maybePortDefinitions.getOrElse {
-              extra.maybePorts.map { ports =>
-                PortDefinitions.apply(ports: _*)
-              }.getOrElse(AppDefinition.DefaultPortDefinitions)
+              extra.maybePorts
+                .map { ports =>
+                  PortDefinitions.apply(ports: _*)
+                }
+                .getOrElse(AppDefinition.DefaultPortDefinitions)
             }
         }
 
         app.copy(
-            fetch = fetch,
-            dependencies = extra.dependencies,
-            portDefinitions = portDefinitions,
-            upgradeStrategy = extra.upgradeStrategyOrDefault,
-            labels = extra.labels,
-            acceptedResourceRoles = extra.acceptedResourceRoles,
-            ipAddress = extra.ipAddress,
-            versionInfo = AppDefinition.VersionInfo.OnlyVersion(extra.version),
-            residency = extra.residencyOrDefault
+          fetch = fetch,
+          dependencies = extra.dependencies,
+          portDefinitions = portDefinitions,
+          upgradeStrategy = extra.upgradeStrategyOrDefault,
+          labels = extra.labels,
+          acceptedResourceRoles = extra.acceptedResourceRoles,
+          ipAddress = extra.ipAddress,
+          versionInfo = AppDefinition.VersionInfo.OnlyVersion(extra.version),
+          residency = extra.residencyOrDefault
         )
       }
     }
@@ -762,11 +780,10 @@ trait AppAndGroupFormats {
     val hasPortMappings =
       app.container.exists(_.docker.exists(_.portMappings.exists(_.nonEmpty)))
     val portIndexesMakeSense = app.portDefinitions.nonEmpty || hasPortMappings
-    app.copy(
-        healthChecks = app.healthChecks.map { healthCheck =>
+    app.copy(healthChecks = app.healthChecks.map { healthCheck =>
       def needsDefaultPortIndex =
         healthCheck.port.isEmpty && healthCheck.portIndex.isEmpty &&
-        healthCheck.protocol != Protocol.COMMAND
+          healthCheck.protocol != Protocol.COMMAND
       if (portIndexesMakeSense && needsDefaultPortIndex)
         healthCheck.copy(portIndex = Some(0))
       else healthCheck
@@ -779,7 +796,7 @@ trait AppAndGroupFormats {
       healthChecks.map { healthCheck =>
         def needsDefaultPortIndex =
           healthCheck.port.isEmpty && healthCheck.portIndex.isEmpty &&
-          healthCheck.protocol != Protocol.COMMAND
+            healthCheck.protocol != Protocol.COMMAND
         if (needsDefaultPortIndex) healthCheck.copy(portIndex = Some(0))
         else healthCheck
       }
@@ -796,27 +813,28 @@ trait AppAndGroupFormats {
       Option(TaskLostBehavior.valueOf(behaviorString)) match {
         case Some(taskLostBehavior) => JsSuccess(taskLostBehavior)
         case None => {
-            val allowedTaskLostBehaviorString = TaskLostBehavior
-              .values()
-              .toSeq
-              .map(_.getDescriptorForType.getName)
-              .mkString(", ")
+          val allowedTaskLostBehaviorString = TaskLostBehavior
+            .values()
+            .toSeq
+            .map(_.getDescriptorForType.getName)
+            .mkString(", ")
 
-            JsError(
-                s"'$behaviorString' is not a valid taskLostBehavior. Allowed values: $allowedTaskLostBehaviorString")
-          }
+          JsError(
+            s"'$behaviorString' is not a valid taskLostBehavior. Allowed values: $allowedTaskLostBehaviorString")
+        }
       }
     }
   }
 
   implicit lazy val ResidencyFormat: Format[Residency] =
     ((__ \ "relaunchEscalationTimeoutSeconds")
-          .formatNullable[Long]
-          .withDefault(Residency.defaultRelaunchEscalationTimeoutSeconds) ~
-        (__ \ "taskLostBehavior")
-          .formatNullable[TaskLostBehavior]
-          .withDefault(Residency.defaultTaskLostBehaviour))(
-        Residency(_, _), unlift(Residency.unapply))
+      .formatNullable[Long]
+      .withDefault(Residency.defaultRelaunchEscalationTimeoutSeconds) ~
+      (__ \ "taskLostBehavior")
+        .formatNullable[TaskLostBehavior]
+        .withDefault(Residency.defaultTaskLostBehaviour))(
+      Residency(_, _),
+      unlift(Residency.unapply))
 
   implicit lazy val AppDefinitionWrites: Writes[AppDefinition] = {
     implicit lazy val durationWrites = Writes[FiniteDuration] { d =>
@@ -825,42 +843,42 @@ trait AppAndGroupFormats {
 
     Writes[AppDefinition] { app =>
       val appJson: JsObject = Json.obj(
-          "id" -> app.id.toString,
-          "cmd" -> app.cmd,
-          "args" -> app.args,
-          "user" -> app.user,
-          "env" -> app.env,
-          "instances" -> app.instances,
-          "cpus" -> app.cpus,
-          "mem" -> app.mem,
-          "disk" -> app.disk,
-          "executor" -> app.executor,
-          "constraints" -> app.constraints,
-          "uris" -> app.fetch.map(_.uri),
-          "fetch" -> app.fetch,
-          "storeUrls" -> app.storeUrls,
-          // the ports field was written incorrectly in old code if a container was specified
-          // it should contain the service ports
-          "ports" -> app.servicePorts,
-          "portDefinitions" -> app.portDefinitions
-            .zip(app.servicePorts)
-            .map {
-              case (portDefinition, servicePort) =>
-                portDefinition.copy(port = servicePort)
-            },
-          "requirePorts" -> app.requirePorts,
-          "backoffSeconds" -> app.backoff,
-          "backoffFactor" -> app.backoffFactor,
-          "maxLaunchDelaySeconds" -> app.maxLaunchDelay,
-          "container" -> app.container,
-          "healthChecks" -> app.healthChecks,
-          "dependencies" -> app.dependencies,
-          "upgradeStrategy" -> app.upgradeStrategy,
-          "labels" -> app.labels,
-          "acceptedResourceRoles" -> app.acceptedResourceRoles,
-          "ipAddress" -> app.ipAddress,
-          "version" -> app.version,
-          "residency" -> app.residency
+        "id" -> app.id.toString,
+        "cmd" -> app.cmd,
+        "args" -> app.args,
+        "user" -> app.user,
+        "env" -> app.env,
+        "instances" -> app.instances,
+        "cpus" -> app.cpus,
+        "mem" -> app.mem,
+        "disk" -> app.disk,
+        "executor" -> app.executor,
+        "constraints" -> app.constraints,
+        "uris" -> app.fetch.map(_.uri),
+        "fetch" -> app.fetch,
+        "storeUrls" -> app.storeUrls,
+        // the ports field was written incorrectly in old code if a container was specified
+        // it should contain the service ports
+        "ports" -> app.servicePorts,
+        "portDefinitions" -> app.portDefinitions
+          .zip(app.servicePorts)
+          .map {
+            case (portDefinition, servicePort) =>
+              portDefinition.copy(port = servicePort)
+          },
+        "requirePorts" -> app.requirePorts,
+        "backoffSeconds" -> app.backoff,
+        "backoffFactor" -> app.backoffFactor,
+        "maxLaunchDelaySeconds" -> app.maxLaunchDelay,
+        "container" -> app.container,
+        "healthChecks" -> app.healthChecks,
+        "dependencies" -> app.dependencies,
+        "upgradeStrategy" -> app.upgradeStrategy,
+        "labels" -> app.labels,
+        "acceptedResourceRoles" -> app.acceptedResourceRoles,
+        "ipAddress" -> app.ipAddress,
+        "version" -> app.version,
+        "residency" -> app.residency
       )
       Json.toJson(app.versionInfo) match {
         case JsNull => appJson
@@ -874,8 +892,8 @@ trait AppAndGroupFormats {
       case AppDefinition.VersionInfo
             .FullVersionInfo(_, lastScalingAt, lastConfigChangeAt) =>
         Json.obj(
-            "lastScalingAt" -> lastScalingAt,
-            "lastConfigChangeAt" -> lastConfigChangeAt
+          "lastScalingAt" -> lastScalingAt,
+          "lastConfigChangeAt" -> lastConfigChangeAt
         )
 
       case AppDefinition.VersionInfo.OnlyVersion(version) => JsNull
@@ -884,28 +902,28 @@ trait AppAndGroupFormats {
 
   implicit lazy val TaskCountsWrites: Writes[TaskCounts] = Writes { counts =>
     Json.obj(
-        "tasksStaged" -> counts.tasksStaged,
-        "tasksRunning" -> counts.tasksRunning,
-        "tasksHealthy" -> counts.tasksHealthy,
-        "tasksUnhealthy" -> counts.tasksUnhealthy
+      "tasksStaged" -> counts.tasksStaged,
+      "tasksRunning" -> counts.tasksRunning,
+      "tasksHealthy" -> counts.tasksHealthy,
+      "tasksUnhealthy" -> counts.tasksUnhealthy
     )
   }
 
   lazy val TaskCountsWritesWithoutPrefix: Writes[TaskCounts] = Writes {
     counts =>
       Json.obj(
-          "staged" -> counts.tasksStaged,
-          "running" -> counts.tasksRunning,
-          "healthy" -> counts.tasksHealthy,
-          "unhealthy" -> counts.tasksUnhealthy
+        "staged" -> counts.tasksStaged,
+        "running" -> counts.tasksRunning,
+        "healthy" -> counts.tasksHealthy,
+        "unhealthy" -> counts.tasksUnhealthy
       )
   }
 
   implicit lazy val TaskLifeTimeWrites: Writes[TaskLifeTime] = Writes {
     lifeTime =>
       Json.obj(
-          "averageSeconds" -> lifeTime.averageSeconds,
-          "medianSeconds" -> lifeTime.medianSeconds
+        "averageSeconds" -> lifeTime.averageSeconds,
+        "medianSeconds" -> lifeTime.medianSeconds
       )
   }
 
@@ -913,23 +931,23 @@ trait AppAndGroupFormats {
     val statsJson =
       Json.obj("counts" -> TaskCountsWritesWithoutPrefix.writes(stats.counts))
     Json.obj(
-        "stats" -> stats.maybeLifeTime.fold(ifEmpty = statsJson)(
-            lifeTime => statsJson ++ Json.obj("lifeTime" -> lifeTime))
+      "stats" -> stats.maybeLifeTime.fold(ifEmpty = statsJson)(lifeTime =>
+        statsJson ++ Json.obj("lifeTime" -> lifeTime))
     )
   }
 
   implicit lazy val TaskStatsByVersionWrites: Writes[TaskStatsByVersion] =
     Writes { byVersion =>
       val maybeJsons = Seq[(String, Option[TaskStats])](
-          "startedAfterLastScaling" -> byVersion.maybeStartedAfterLastScaling,
-          "withLatestConfig" -> byVersion.maybeWithLatestConfig,
-          "withOutdatedConfig" -> byVersion.maybeWithOutdatedConfig,
-          "totalSummary" -> byVersion.maybeTotalSummary
+        "startedAfterLastScaling" -> byVersion.maybeStartedAfterLastScaling,
+        "withLatestConfig" -> byVersion.maybeWithLatestConfig,
+        "withOutdatedConfig" -> byVersion.maybeWithOutdatedConfig,
+        "totalSummary" -> byVersion.maybeTotalSummary
       )
       Json.toJson(
-          maybeJsons.iterator.flatMap {
-            case (k, v) => v.map(k -> TaskStatsWrites.writes(_))
-          }.toMap
+        maybeJsons.iterator.flatMap {
+          case (k, v) => v.map(k -> TaskStatsWrites.writes(_))
+        }.toMap
       )
     }
 
@@ -937,14 +955,13 @@ trait AppAndGroupFormats {
     val appJson = AppDefinitionWrites.writes(info.app).as[JsObject]
 
     val maybeJson = Seq[Option[JsObject]](
-        info.maybeCounts.map(TaskCountsWrites.writes(_).as[JsObject]),
-        info.maybeDeployments.map(
-            deployments => Json.obj("deployments" -> deployments)),
-        info.maybeTasks.map(tasks => Json.obj("tasks" -> tasks)),
-        info.maybeLastTaskFailure.map(
-            lastFailure => Json.obj("lastTaskFailure" -> lastFailure)),
-        info.maybeTaskStats.map(
-            taskStats => Json.obj("taskStats" -> taskStats))
+      info.maybeCounts.map(TaskCountsWrites.writes(_).as[JsObject]),
+      info.maybeDeployments.map(deployments =>
+        Json.obj("deployments" -> deployments)),
+      info.maybeTasks.map(tasks => Json.obj("tasks" -> tasks)),
+      info.maybeLastTaskFailure.map(lastFailure =>
+        Json.obj("lastTaskFailure" -> lastFailure)),
+      info.maybeTaskStats.map(taskStats => Json.obj("taskStats" -> taskStats))
     ).flatten
 
     maybeJson.foldLeft(appJson)((result, obj) => result ++ obj)
@@ -952,14 +969,14 @@ trait AppAndGroupFormats {
 
   implicit lazy val GroupInfoWrites: Writes[GroupInfo] = Writes { info =>
     val maybeJson = Seq[Option[JsObject]](
-        info.maybeApps.map(apps => Json.obj("apps" -> apps)),
-        info.maybeGroups.map(groups => Json.obj("groups" -> groups))
+      info.maybeApps.map(apps => Json.obj("apps" -> apps)),
+      info.maybeGroups.map(groups => Json.obj("groups" -> groups))
     ).flatten
 
     val groupJson = Json.obj(
-        "id" -> info.group.id,
-        "dependencies" -> info.group.dependencies,
-        "version" -> info.group.version
+      "id" -> info.group.id,
+      "dependencies" -> info.group.dependencies,
+      "version" -> info.group.version
     )
 
     maybeJson.foldLeft(groupJson)((result, obj) => result ++ obj)
@@ -967,86 +984,86 @@ trait AppAndGroupFormats {
 
   implicit lazy val AppUpdateReads: Reads[AppUpdate] =
     ((__ \ "id").readNullable[PathId].filterNot(_.exists(_.isRoot)) ~
-        (__ \ "cmd").readNullable[String](Reads.minLength(1)) ~ (__ \ "args")
-          .readNullable[Seq[String]] ~ (__ \ "user").readNullable[String] ~
-        (__ \ "env").readNullable[Map[String, String]] ~ (__ \ "instances")
-          .readNullable[Int] ~ (__ \ "cpus").readNullable[Double] ~
-        (__ \ "mem").readNullable[Double] ~ (__ \ "disk").readNullable[Double] ~
-        (__ \ "executor").readNullable[String](
-            Reads.pattern("^(//cmd)|(/?[^/]+(/[^/]+)*)|$".r)) ~
-        (__ \ "constraints").readNullable[Set[Constraint]] ~ (__ \ "storeUrls")
-          .readNullable[Seq[String]] ~ (__ \ "requirePorts")
-          .readNullable[Boolean] ~ (__ \ "backoffSeconds")
-          .readNullable[Long]
-          .map(_.map(_.seconds)) ~ (__ \ "backoffFactor").readNullable[Double] ~
-        (__ \ "maxLaunchDelaySeconds").readNullable[Long].map(_.map(_.seconds)) ~
-        (__ \ "container").readNullable[Container] ~ (__ \ "healthChecks")
-          .readNullable[Set[HealthCheck]] ~ (__ \ "dependencies")
-          .readNullable[Set[PathId]])((id, cmd, args, user, env, instances,
-        cpus, mem, disk, executor, constraints, storeUrls, requirePorts,
-        backoffSeconds, backoffFactor, maxLaunchDelaySeconds, container,
-        healthChecks, dependencies) =>
-          AppUpdate(
-              id = id,
-              cmd = cmd,
-              args = args,
-              user = user,
-              env = env,
-              instances = instances,
-              cpus = cpus,
-              mem = mem,
-              disk = disk,
-              executor = executor,
-              constraints = constraints,
-              storeUrls = storeUrls,
-              requirePorts = requirePorts,
-              backoff = backoffSeconds,
-              backoffFactor = backoffFactor,
-              maxLaunchDelay = maxLaunchDelaySeconds,
-              container = container,
-              healthChecks = healthChecks,
-              dependencies = dependencies
-        )).flatMap { update =>
-      // necessary because of case class limitations (good for another 21 fields)
-      case class ExtraFields(uris: Option[Seq[String]],
-                             fetch: Option[Seq[FetchUri]],
-                             upgradeStrategy: Option[UpgradeStrategy],
-                             labels: Option[Map[String, String]],
-                             version: Option[Timestamp],
-                             acceptedResourceRoles: Option[Set[String]],
-                             ipAddress: Option[IpAddress],
-                             residency: Option[Residency],
-                             ports: Option[Seq[Int]],
-                             portDefinitions: Option[Seq[PortDefinition]])
+      (__ \ "cmd").readNullable[String](Reads.minLength(1)) ~ (__ \ "args")
+      .readNullable[Seq[String]] ~ (__ \ "user").readNullable[String] ~
+      (__ \ "env").readNullable[Map[String, String]] ~ (__ \ "instances")
+      .readNullable[Int] ~ (__ \ "cpus").readNullable[Double] ~
+      (__ \ "mem").readNullable[Double] ~ (__ \ "disk").readNullable[Double] ~
+      (__ \ "executor").readNullable[String](
+        Reads.pattern("^(//cmd)|(/?[^/]+(/[^/]+)*)|$".r)) ~
+      (__ \ "constraints").readNullable[Set[Constraint]] ~ (__ \ "storeUrls")
+      .readNullable[Seq[String]] ~ (__ \ "requirePorts")
+      .readNullable[Boolean] ~ (__ \ "backoffSeconds")
+      .readNullable[Long]
+      .map(_.map(_.seconds)) ~ (__ \ "backoffFactor").readNullable[Double] ~
+      (__ \ "maxLaunchDelaySeconds").readNullable[Long].map(_.map(_.seconds)) ~
+      (__ \ "container").readNullable[Container] ~ (__ \ "healthChecks")
+      .readNullable[Set[HealthCheck]] ~ (__ \ "dependencies")
+      .readNullable[Set[PathId]])(
+      (id, cmd, args, user, env, instances, cpus, mem, disk, executor,
+       constraints, storeUrls, requirePorts, backoffSeconds, backoffFactor,
+       maxLaunchDelaySeconds, container, healthChecks, dependencies) =>
+        AppUpdate(
+          id = id,
+          cmd = cmd,
+          args = args,
+          user = user,
+          env = env,
+          instances = instances,
+          cpus = cpus,
+          mem = mem,
+          disk = disk,
+          executor = executor,
+          constraints = constraints,
+          storeUrls = storeUrls,
+          requirePorts = requirePorts,
+          backoff = backoffSeconds,
+          backoffFactor = backoffFactor,
+          maxLaunchDelay = maxLaunchDelaySeconds,
+          container = container,
+          healthChecks = healthChecks,
+          dependencies = dependencies
+      ))
+      .flatMap { update =>
+        // necessary because of case class limitations (good for another 21 fields)
+        case class ExtraFields(uris: Option[Seq[String]],
+                               fetch: Option[Seq[FetchUri]],
+                               upgradeStrategy: Option[UpgradeStrategy],
+                               labels: Option[Map[String, String]],
+                               version: Option[Timestamp],
+                               acceptedResourceRoles: Option[Set[String]],
+                               ipAddress: Option[IpAddress],
+                               residency: Option[Residency],
+                               ports: Option[Seq[Int]],
+                               portDefinitions: Option[Seq[PortDefinition]])
 
-      val extraReads: Reads[ExtraFields] =
-        ((__ \ "uris").readNullable[Seq[String]] ~ (__ \ "fetch")
-              .readNullable[Seq[FetchUri]] ~ (__ \ "upgradeStrategy")
-              .readNullable[UpgradeStrategy] ~ (__ \ "labels")
-              .readNullable[Map[String, String]] ~ (__ \ "version")
-              .readNullable[Timestamp] ~ (__ \ "acceptedResourceRoles")
-              .readNullable[Set[String]](nonEmpty) ~ (__ \ "ipAddress")
-              .readNullable[IpAddress] ~ (__ \ "residency")
-              .readNullable[Residency] ~ (__ \ "ports").readNullable[Seq[Int]](
-                uniquePorts) ~ (__ \ "portDefinitions")
-              .readNullable[Seq[PortDefinition]])(ExtraFields)
+        val extraReads: Reads[ExtraFields] =
+          ((__ \ "uris").readNullable[Seq[String]] ~ (__ \ "fetch")
+            .readNullable[Seq[FetchUri]] ~ (__ \ "upgradeStrategy")
+            .readNullable[UpgradeStrategy] ~ (__ \ "labels")
+            .readNullable[Map[String, String]] ~ (__ \ "version")
+            .readNullable[Timestamp] ~ (__ \ "acceptedResourceRoles")
+            .readNullable[Set[String]](nonEmpty) ~ (__ \ "ipAddress")
+            .readNullable[IpAddress] ~ (__ \ "residency")
+            .readNullable[Residency] ~ (__ \ "ports").readNullable[Seq[Int]](
+            uniquePorts) ~ (__ \ "portDefinitions")
+            .readNullable[Seq[PortDefinition]])(ExtraFields)
 
-      extraReads
-        .filter(
+        extraReads
+          .filter(
             ValidationError("You cannot specify both uris and fetch fields")) {
-          extra =>
-            !(extra.uris.nonEmpty && extra.fetch.nonEmpty)
-        }
-        .filter(ValidationError(
-                "You cannot specify both ports and port definitions")) {
-          extra =>
+            extra =>
+              !(extra.uris.nonEmpty && extra.fetch.nonEmpty)
+          }
+          .filter(ValidationError(
+            "You cannot specify both ports and port definitions")) { extra =>
             val portDefinitionsIsEquivalentToPorts =
               extra.portDefinitions.map(_.map(_.port)) == extra.ports
             portDefinitionsIsEquivalentToPorts || extra.ports.isEmpty ||
             extra.portDefinitions.isEmpty
-        }
-        .map { extra =>
-          update.copy(
+          }
+          .map { extra =>
+            update.copy(
               upgradeStrategy = extra.upgradeStrategy,
               labels = extra.labels,
               version = extra.version,
@@ -1061,41 +1078,43 @@ trait AppAndGroupFormats {
                   PortDefinitions.apply(ports: _*)
                 }
               }
-          )
-        }
-    }.map(addHealthCheckPortIndexIfNecessary)
+            )
+          }
+      }
+      .map(addHealthCheckPortIndexIfNecessary)
 
   implicit lazy val GroupFormat: Format[Group] = ((__ \ "id").format[PathId] ~
-      (__ \ "apps")
-        .formatNullable[Set[AppDefinition]]
-        .withDefault(Group.defaultApps) ~ (__ \ "groups")
-        .lazyFormatNullable(implicitly[Format[Set[Group]]])
-        .withDefault(Group.defaultGroups) ~ (__ \ "dependencies")
-        .formatNullable[Set[PathId]]
-        .withDefault(Group.defaultDependencies) ~ (__ \ "version")
-        .formatNullable[Timestamp]
-        .withDefault(Group.defaultVersion))(
-      Group(_, _, _, _, _), unlift(Group.unapply))
+    (__ \ "apps")
+      .formatNullable[Set[AppDefinition]]
+      .withDefault(Group.defaultApps) ~ (__ \ "groups")
+    .lazyFormatNullable(implicitly[Format[Set[Group]]])
+    .withDefault(Group.defaultGroups) ~ (__ \ "dependencies")
+    .formatNullable[Set[PathId]]
+    .withDefault(Group.defaultDependencies) ~ (__ \ "version")
+    .formatNullable[Timestamp]
+    .withDefault(Group.defaultVersion))(Group(_, _, _, _, _),
+                                        unlift(Group.unapply))
 
   implicit lazy val PortDefinitionFormat: Format[PortDefinition] =
     ((__ \ "port")
-          .formatNullable[Int]
-          .withDefault(AppDefinition.RandomPortValue) ~ (__ \ "protocol")
-          .formatNullable[String]
-          .withDefault("tcp") ~ (__ \ "name").formatNullable[String] ~
-        (__ \ "labels")
-          .formatNullable[Map[String, String]]
-          .withDefault(Map.empty[String, String]))(
-        PortDefinition(_, _, _, _), unlift(PortDefinition.unapply))
+      .formatNullable[Int]
+      .withDefault(AppDefinition.RandomPortValue) ~ (__ \ "protocol")
+      .formatNullable[String]
+      .withDefault("tcp") ~ (__ \ "name").formatNullable[String] ~
+      (__ \ "labels")
+        .formatNullable[Map[String, String]]
+        .withDefault(Map.empty[String, String]))(
+      PortDefinition(_, _, _, _),
+      unlift(PortDefinition.unapply))
 }
 
 trait PluginFormats {
 
   implicit lazy val pluginDefinitionFormat: Writes[PluginDefinition] =
     ((__ \ "id").write[String] ~ (__ \ "plugin").write[String] ~
-        (__ \ "implementation").write[String] ~ (__ \ "tags")
-          .writeNullable[Set[String]] ~ (__ \ "info").writeNullable[JsObject])(
-        d => (d.id, d.plugin, d.implementation, d.tags, d.info))
+      (__ \ "implementation").write[String] ~ (__ \ "tags")
+      .writeNullable[Set[String]] ~ (__ \ "info").writeNullable[JsObject])(d =>
+      (d.id, d.plugin, d.implementation, d.tags, d.info))
 
   implicit lazy val pluginDefinitionsFormat: Writes[PluginDefinitions] =
     Json.writes[PluginDefinitions]

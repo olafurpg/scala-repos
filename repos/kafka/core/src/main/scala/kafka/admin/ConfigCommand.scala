@@ -175,7 +175,8 @@ object ConfigCommand {
           nl + LogConfig.configNames.map("\t" + _).mkString(nl) + nl +
           "For entity_type '" + ConfigType.Client + "': " + nl +
           "\t" + ClientConfigOverride.ProducerOverride + nl + "\t" +
-          ClientConfigOverride.ConsumerOverride)
+          ClientConfigOverride.ConsumerOverride
+      )
       .withRequiredArg
       .ofType(classOf[String])
       .withValuesSeparatedBy(',')

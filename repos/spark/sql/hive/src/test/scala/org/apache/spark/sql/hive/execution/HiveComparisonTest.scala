@@ -285,10 +285,12 @@ abstract class HiveComparisonTest
 
       lazy val consoleTestCase = {
         val quotes = "\"\"\""
-        queryList.zipWithIndex.map {
-          case (query, i) =>
-            s"""val q$i = sql($quotes$query$quotes); q$i.collect()"""
-        }.mkString("\n== Console version of this test ==\n", "\n", "\n")
+        queryList.zipWithIndex
+          .map {
+            case (query, i) =>
+              s"""val q$i = sql($quotes$query$quotes); q$i.collect()"""
+          }
+          .mkString("\n== Console version of this test ==\n", "\n", "\n")
       }
 
       def doTest(reset: Boolean, isSpeculative: Boolean = false): Unit = {
@@ -327,19 +329,21 @@ abstract class HiveComparisonTest
             new File(answerCache, cachedAnswerName)
         }
 
-        val hiveCachedResults = hiveCacheFiles.flatMap { cachedAnswerFile =>
-          logDebug(s"Looking for cached answer file $cachedAnswerFile.")
-          if (cachedAnswerFile.exists) {
-            Some(fileToString(cachedAnswerFile))
-          } else {
-            logDebug(s"File $cachedAnswerFile not found")
-            None
+        val hiveCachedResults = hiveCacheFiles
+          .flatMap { cachedAnswerFile =>
+            logDebug(s"Looking for cached answer file $cachedAnswerFile.")
+            if (cachedAnswerFile.exists) {
+              Some(fileToString(cachedAnswerFile))
+            } else {
+              logDebug(s"File $cachedAnswerFile not found")
+              None
+            }
           }
-        }.map {
-          case "" => Nil
-          case "\n" => Seq("")
-          case other => other.split("\n").toSeq
-        }
+          .map {
+            case "" => Nil
+            case "\n" => Seq("")
+            case other => other.split("\n").toSeq
+          }
 
         val hiveResults: Seq[Seq[String]] =
           if (hiveCachedResults.size == queryList.size) {
@@ -420,7 +424,8 @@ abstract class HiveComparisonTest
                       new SQLBuilder(originalQuery.analyzed, TestHive).toSQL
                     } catch {
                       case NonFatal(e) =>
-                        fail(s"""Cannot convert the following HiveQL query plan back to SQL query string:
+                        fail(
+                          s"""Cannot convert the following HiveQL query plan back to SQL query string:
                         |
                         |# Original HiveQL query string:
                         |$queryString
@@ -428,7 +433,8 @@ abstract class HiveComparisonTest
                         |# Resolved query plan:
                         |${originalQuery.analyzed.treeString}
                      """.stripMargin,
-                             e)
+                          e
+                        )
                     }
 
                     try {
@@ -439,7 +445,8 @@ abstract class HiveComparisonTest
                       queryExecution
                     } catch {
                       case NonFatal(e) =>
-                        fail(s"""Failed to analyze the converted SQL string:
+                        fail(
+                          s"""Failed to analyze the converted SQL string:
                         |
                         |# Original HiveQL query string:
                         |$queryString
@@ -450,7 +457,8 @@ abstract class HiveComparisonTest
                         |# Converted SQL query string:
                         |$convertedSQL
                      """.stripMargin,
-                             e)
+                          e
+                        )
                     }
                   }
                 }
@@ -519,16 +527,18 @@ abstract class HiveComparisonTest
                     }
                 }
 
-                tablesGenerated.map {
-                  case (hiveql, execution, insert) =>
-                    s"""
+                tablesGenerated
+                  .map {
+                    case (hiveql, execution, insert) =>
+                      s"""
                      |=== Generated Table ===
                      |$hiveql
                      |$execution
                      |== Results ==
                      |${insert.child.execute().collect().mkString("\n")}
                    """.stripMargin
-                }.mkString("\n")
+                  }
+                  .mkString("\n")
               } catch {
                 case NonFatal(e) =>
                   logError("Failed to compute generated tables", e)

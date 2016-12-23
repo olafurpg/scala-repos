@@ -109,7 +109,8 @@ private[hive] class HadoopTableReader(
     assert(
       !hiveTable.isPartitioned,
       """makeRDDForTable() cannot be called on a partitioned table,
-      since input formats may differ across partitions. Use makeRDDForTablePartitions() instead.""")
+      since input formats may differ across partitions. Use makeRDDForTablePartitions() instead."""
+    )
 
     // Create local references to member variables, so that the entire `this` object won't be
     // serialized in the closure below.
@@ -315,7 +316,8 @@ private[hive] class HadoopTableReader(
       inputFormatClass,
       classOf[Writable],
       classOf[Writable],
-      _minSplitsPerRDD)
+      _minSplitsPerRDD
+    )
 
     // Only take the value (skip the key) because Hive works only with values.
     rdd.map(_._2)

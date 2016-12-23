@@ -265,16 +265,20 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
       (if (x.parameterList.clauses.length == 1 &&
            x.parameterList.clauses.head.isImplicit) "()"
        else "") +
-        x.parameterList.clauses.map { c =>
-          val start = if (c.isImplicit) "(implicit " else "("
-          c.parameters.map { p =>
-            val paramType = p.typeElement match {
-              case Some(te) => te.getText
-              case None => "Any"
-            }
-            p.name + " : " + paramType + " = this." + p.name
-          }.mkString(start, ", ", ")")
-        }.mkString("")
+        x.parameterList.clauses
+          .map { c =>
+            val start = if (c.isImplicit) "(implicit " else "("
+            c.parameters
+              .map { p =>
+                val paramType = p.typeElement match {
+                  case Some(te) => te.getText
+                  case None => "Any"
+                }
+                p.name + " : " + paramType + " = this." + p.name
+              }
+              .mkString(start, ", ", ")")
+          }
+          .mkString("")
 
     val returnType = name + typeParameters.map(_.name).mkString("[", ",", "]")
     "def copy" + typeParamString + paramString + " : " + returnType +
@@ -305,15 +309,17 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
       .getOrElse("")
     val parametersText = constr.parameterList.clauses.map {
       case clause: ScParameterClause =>
-        clause.parameters.map {
-          case parameter: ScParameter =>
-            val paramText =
-              s"${parameter.name} : ${parameter.typeElement.map(_.getText).getOrElse("Nothing")}"
-            parameter.getDefaultExpression match {
-              case Some(expr) => s"$paramText = ${expr.getText}"
-              case _ => paramText
-            }
-        }.mkString(if (clause.isImplicit) "(implicit " else "(", ", ", ")")
+        clause.parameters
+          .map {
+            case parameter: ScParameter =>
+              val paramText =
+                s"${parameter.name} : ${parameter.typeElement.map(_.getText).getOrElse("Nothing")}"
+              parameter.getDefaultExpression match {
+                case Some(expr) => s"$paramText = ${expr.getText}"
+                case _ => paramText
+              }
+          }
+          .mkString(if (clause.isImplicit) "(implicit " else "(", ", ", ")")
     }.mkString
     getModifierList.accessModifier.map(am => am.getText + " ").getOrElse("") +
       "implicit def " + name + typeParametersText + parametersText + " : " +

@@ -39,7 +39,8 @@ private[serverset2] object Stabilizer {
                                true /*daemons*/ ),
     HashedWheelTimer.TickDuration.inMilliseconds,
     TimeUnit.MILLISECONDS,
-    HashedWheelTimer.TicksPerWheel)
+    HashedWheelTimer.TicksPerWheel
+  )
   private val epochTimer = HashedWheelTimer(nettyHwt)
 
   TimerStats.deviation(nettyHwt,

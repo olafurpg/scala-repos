@@ -146,17 +146,21 @@ class CSVIngestProcessing(apiKey: APIKey,
             hdrs + (h -> pos)
         }
 
-      positions.toList.flatMap {
-        case (h, Nil) =>
-          Nil
-        case (h, pos :: Nil) =>
-          (pos -> JPath(JPathField(h))) :: Nil
-        case (h, ps) =>
-          ps.reverse.zipWithIndex map {
-            case (pos, i) =>
-              (pos -> JPath(JPathField(h), JPathIndex(i)))
-          }
-      }.sortBy(_._1).map(_._2).toArray
+      positions.toList
+        .flatMap {
+          case (h, Nil) =>
+            Nil
+          case (h, pos :: Nil) =>
+            (pos -> JPath(JPathField(h))) :: Nil
+          case (h, ps) =>
+            ps.reverse.zipWithIndex map {
+              case (pos, i) =>
+                (pos -> JPath(JPathField(h), JPathIndex(i)))
+            }
+        }
+        .sortBy(_._1)
+        .map(_._2)
+        .toArray
     }
 
     def ingestSync(reader: CSVReader,

@@ -176,45 +176,50 @@ trait ScBlock
                       if (s.typeParams.length == 0) TypeParameter.EMPTY_ARRAY
                       else s.typeParams.map(updateTypeParam)
                     val rt: ScType = existize(tp, visitedWithT)
-                    (new Signature(s.name,
-                                   pTypes,
-                                   s.paramLength,
-                                   tParams,
-                                   ScSubstitutor.empty,
-                                   s.namedElement match {
-                                     case fun: ScFunction =>
-                                       ScFunction.getCompoundCopy(
-                                         pTypes.map(_.map(_()).toList),
-                                         tParams.toList,
-                                         rt,
-                                         fun)
-                                     case b: ScBindingPattern =>
-                                       ScBindingPattern.getCompoundCopy(rt, b)
-                                     case f: ScFieldId =>
-                                       ScFieldId.getCompoundCopy(rt, f)
-                                     case named => named
-                                   },
-                                   s.hasRepeatedParam),
+                    (new Signature(
+                       s.name,
+                       pTypes,
+                       s.paramLength,
+                       tParams,
+                       ScSubstitutor.empty,
+                       s.namedElement match {
+                         case fun: ScFunction =>
+                           ScFunction.getCompoundCopy(
+                             pTypes.map(_.map(_()).toList),
+                             tParams.toList,
+                             rt,
+                             fun)
+                         case b: ScBindingPattern =>
+                           ScBindingPattern.getCompoundCopy(rt, b)
+                         case f: ScFieldId =>
+                           ScFieldId.getCompoundCopy(rt, f)
+                         case named => named
+                       },
+                       s.hasRepeatedParam
+                     ),
                      rt)
                 },
                 typesMap.map {
                   case (s, sign) =>
                     (s, sign.updateTypes(existize(_, visitedWithT)))
-                })
+                }
+              )
             case JavaArrayType(arg) =>
               JavaArrayType(existize(arg, visitedWithT))
             case ScParameterizedType(des, typeArgs) =>
               ScParameterizedType(existize(des, visitedWithT),
                                   typeArgs.map(existize(_, visitedWithT)))
             case ex @ ScExistentialType(q, wildcards) =>
-              new ScExistentialType(existize(q, visitedWithT), wildcards.map {
-                ex =>
+              new ScExistentialType(
+                existize(q, visitedWithT),
+                wildcards.map { ex =>
                   new ScExistentialArgument(
                     ex.name,
                     ex.args,
                     existize(ex.lowerBound, visitedWithT),
                     existize(ex.upperBound, visitedWithT))
-              })
+                }
+              )
             case _ => t
           }
         }

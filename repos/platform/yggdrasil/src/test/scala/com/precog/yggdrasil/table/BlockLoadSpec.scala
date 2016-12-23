@@ -204,13 +204,15 @@ trait BlockLoadSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (3,
-         List(JPath(".f.bn[0]") -> CNull,
-              JPath(".f.wei") -> CLong,
-              JPath(".f.wei") -> CDouble,
-              JPath(".ljz[0]") -> CNull,
-              JPath(".ljz[1][0]") -> CString,
-              JPath(".ljz[2]") -> CBoolean,
-              JPath(".jmy") -> CDouble))
+         List(
+           JPath(".f.bn[0]") -> CNull,
+           JPath(".f.wei") -> CLong,
+           JPath(".f.wei") -> CDouble,
+           JPath(".ljz[0]") -> CNull,
+           JPath(".ljz[1][0]") -> CString,
+           JPath(".ljz[2]") -> CBoolean,
+           JPath(".jmy") -> CDouble
+         ))
       )
     )
 
@@ -345,13 +347,15 @@ trait BlockLoadSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (1,
-         List((JPath(".o8agyghfjxe") -> CEmptyArray),
-              (JPath(".fg[0]") -> CBoolean),
-              (JPath(".fg[1]") -> CNum),
-              (JPath(".fg[1]") -> CLong),
-              (JPath(".fg[2]") -> CNum),
-              (JPath(".fg[2]") -> CLong),
-              (JPath(".cfnYTg92dg") -> CString))))
+         List(
+           (JPath(".o8agyghfjxe") -> CEmptyArray),
+           (JPath(".fg[0]") -> CBoolean),
+           (JPath(".fg[1]") -> CNum),
+           (JPath(".fg[1]") -> CLong),
+           (JPath(".fg[2]") -> CNum),
+           (JPath(".fg[2]") -> CLong),
+           (JPath(".cfnYTg92dg") -> CString)
+         )))
     )
 
     testLoadDense(sampleData)

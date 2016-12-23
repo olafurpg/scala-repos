@@ -847,7 +847,8 @@ object TypeDefinitionMembers {
           isSupers = false,
           isObject = clazz.isInstanceOf[ScObject],
           signaturesForJava = () => signaturesForJava,
-          syntheticMethods = () => syntheticMethods)) return false
+          syntheticMethods = () => syntheticMethods
+        )) return false
 
     if (!(types.AnyRef
           .asClass(clazz.getProject)
@@ -869,15 +870,17 @@ object TypeDefinitionMembers {
                                state: ResolveState,
                                lastParent: PsiElement,
                                place: PsiElement): Boolean = {
-    if (!privateProcessDeclarations(processor,
-                                    state,
-                                    lastParent,
-                                    place,
-                                    () => getSignatures(td),
-                                    () => getParameterlessSignatures(td),
-                                    () => getTypes(td),
-                                    isSupers = true,
-                                    isObject = td.isInstanceOf[ScObject]))
+    if (!privateProcessDeclarations(
+          processor,
+          state,
+          lastParent,
+          place,
+          () => getSignatures(td),
+          () => getParameterlessSignatures(td),
+          () => getTypes(td),
+          isSupers = true,
+          isObject = td.isInstanceOf[ScObject]
+        ))
       return false
 
     if (!(types.AnyRef
@@ -908,7 +911,8 @@ object TypeDefinitionMembers {
           () => getParameterlessSignatures(comp, compoundTypeThisType, place),
           () => getTypes(comp, compoundTypeThisType, place),
           isSupers = false,
-          isObject = false)) return false
+          isObject = false
+        )) return false
 
     val project =
       if (lastParent != null) lastParent.getProject

@@ -246,13 +246,15 @@ private[streaming] class StreamingJobProgressListener(ssc: StreamingContext)
   def lastReceivedBatchRecords: Map[Int, Long] = synchronized {
     val lastReceivedBlockInfoOption =
       lastReceivedBatch.map(_.streamIdToInputInfo.mapValues(_.numRecords))
-    lastReceivedBlockInfoOption.map { lastReceivedBlockInfo =>
-      streamIds.map { streamId =>
-        (streamId, lastReceivedBlockInfo.getOrElse(streamId, 0L))
-      }.toMap
-    }.getOrElse {
-      streamIds.map(streamId => (streamId, 0L)).toMap
-    }
+    lastReceivedBlockInfoOption
+      .map { lastReceivedBlockInfo =>
+        streamIds.map { streamId =>
+          (streamId, lastReceivedBlockInfo.getOrElse(streamId, 0L))
+        }.toMap
+      }
+      .getOrElse {
+        streamIds.map(streamId => (streamId, 0L)).toMap
+      }
   }
 
   def receiverInfo(receiverId: Int): Option[ReceiverInfo] = synchronized {

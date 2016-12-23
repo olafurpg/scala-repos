@@ -263,9 +263,11 @@ class JsonProtocolSuite extends SparkFunSuite {
     // Fields added after 1.0.0.
     assert(info.details.nonEmpty)
     assert(info.accumulables.nonEmpty)
-    val oldJson = newJson.removeField { case (field, _) => field == "Details" }.removeField {
-      case (field, _) => field == "Accumulables"
-    }
+    val oldJson = newJson
+      .removeField { case (field, _) => field == "Details" }
+      .removeField {
+        case (field, _) => field == "Accumulables"
+      }
 
     val newInfo = JsonProtocol.stageInfoFromJson(oldJson)
 
@@ -307,9 +309,11 @@ class JsonProtocolSuite extends SparkFunSuite {
     assert(metrics.inputMetrics.nonEmpty)
     assert(metrics.outputMetrics.nonEmpty)
     val newJson = JsonProtocol.taskMetricsToJson(metrics)
-    val oldJson = newJson.removeField {
-      case (field, _) => field == "Records Read"
-    }.removeField { case (field, _) => field == "Records Written" }
+    val oldJson = newJson
+      .removeField {
+        case (field, _) => field == "Records Read"
+      }
+      .removeField { case (field, _) => field == "Records Written" }
     val newMetrics = JsonProtocol.taskMetricsFromJson(oldJson)
     assert(newMetrics.inputMetrics.get.recordsRead == 0)
     assert(newMetrics.outputMetrics.get.recordsWritten == 0)
@@ -329,9 +333,11 @@ class JsonProtocolSuite extends SparkFunSuite {
     assert(metrics.shuffleReadMetrics.nonEmpty)
     assert(metrics.shuffleWriteMetrics.nonEmpty)
     val newJson = JsonProtocol.taskMetricsToJson(metrics)
-    val oldJson = newJson.removeField {
-      case (field, _) => field == "Total Records Read"
-    }.removeField { case (field, _) => field == "Shuffle Records Written" }
+    val oldJson = newJson
+      .removeField {
+        case (field, _) => field == "Total Records Read"
+      }
+      .removeField { case (field, _) => field == "Shuffle Records Written" }
     val newMetrics = JsonProtocol.taskMetricsFromJson(oldJson)
     assert(newMetrics.shuffleReadMetrics.get.recordsRead == 0)
     assert(newMetrics.shuffleWriteMetrics.get.recordsWritten == 0)
@@ -589,9 +595,11 @@ class JsonProtocolSuite extends SparkFunSuite {
     val exceptionFailureJson =
       JsonProtocol.taskEndReasonToJson(exceptionFailure)
     val tmFieldJson: JValue = "Task Metrics" -> tmJson
-    val oldExceptionFailureJson: JValue = exceptionFailureJson.removeField {
-      _._1 == "Accumulator Updates"
-    }.merge(tmFieldJson)
+    val oldExceptionFailureJson: JValue = exceptionFailureJson
+      .removeField {
+        _._1 == "Accumulator Updates"
+      }
+      .merge(tmFieldJson)
     val oldExceptionFailure = JsonProtocol
       .taskEndReasonFromJson(oldExceptionFailureJson)
       .asInstanceOf[ExceptionFailure]
@@ -771,7 +779,8 @@ private[spark] object JsonProtocolSuite extends Assertions {
             assertSeqEquals[AccumulableInfo](updates1,
                                              updates2,
                                              (a, b) => a.equals(b))
-          })
+          }
+        )
       case (e1, e2) =>
         assert(e1 === e2)
       case _ => fail("Events don't match in types!")

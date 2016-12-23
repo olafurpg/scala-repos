@@ -390,8 +390,8 @@ trait Parser[+T] extends ParserResults[T] with Precedence {
     */
   def parse(input: String,
             index: Int = 0,
-            instrument: (Parser[_], Int,
-                         () => Parsed[_]) => Unit = null): Parsed[T] = {
+            instrument: (Parser[_], Int, () => Parsed[_]) => Unit = null)
+    : Parsed[T] = {
     parseRec(new ParseCtx(input, 0, -1, this, index, instrument), index).toResult
   }
 

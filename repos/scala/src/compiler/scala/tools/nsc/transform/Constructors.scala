@@ -804,7 +804,8 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
           primaryConstrBody,
           paramInits ::: constructorPrefix ::: uptoSuperStats ::: guardSpecializedInitializer(
             remainingConstrStatsDelayedInit),
-          primaryConstrBody.expr)
+          primaryConstrBody.expr
+        )
       })
 
       val constructors = primaryConstructor :: auxConstructors

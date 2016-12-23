@@ -107,22 +107,25 @@ trait ScType {
 
   def removeVarianceAbstracts(variance: Int): ScType = {
     var index = 0
-    recursiveVarianceUpdate((tp: ScType, i: Int) => {
-      tp match {
-        case ScAbstractType(_, lower, upper) =>
-          i match {
-            case -1 => (true, lower)
-            case 1 => (true, upper)
-            case 0 =>
-              (true,
-               ScSkolemizedType(s"_$$${ index += 1; index }",
-                                Nil,
-                                lower,
-                                upper))
-          }
-        case _ => (false, tp)
-      }
-    }, variance).unpackedType
+    recursiveVarianceUpdate(
+      (tp: ScType, i: Int) => {
+        tp match {
+          case ScAbstractType(_, lower, upper) =>
+            i match {
+              case -1 => (true, lower)
+              case 1 => (true, upper)
+              case 0 =>
+                (true,
+                 ScSkolemizedType(s"_$$${ index += 1; index }",
+                                  Nil,
+                                  lower,
+                                  upper))
+            }
+          case _ => (false, tp)
+        }
+      },
+      variance
+    ).unpackedType
   }
 
   def removeUndefines(): ScType = {
@@ -166,10 +169,10 @@ trait ScType {
     }, variance)
   }
 
-  def recursiveVarianceUpdateModifiable[T](data: T,
-                                           update: (ScType, Int,
-                                                    T) => (Boolean, ScType, T),
-                                           variance: Int = 1): ScType = {
+  def recursiveVarianceUpdateModifiable[T](
+      data: T,
+      update: (ScType, Int, T) => (Boolean, ScType, T),
+      variance: Int = 1): ScType = {
     val res = update(this, variance, data)
     if (res._1) res._2
     else this

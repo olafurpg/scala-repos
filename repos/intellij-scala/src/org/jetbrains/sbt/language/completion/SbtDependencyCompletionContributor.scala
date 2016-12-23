@@ -87,5 +87,6 @@ class SbtDependencyCompletionContributor extends ScalaCompletionContributor {
           case _ => // do nothing
         }
       }
-    })
+    }
+  )
 }

@@ -88,12 +88,11 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
 
   test("deterministic cardinality estimation") {
     val repeats = 10
-    testCardinalityEstimates(
-      Seq(0.1, 0.05, 0.025, 0.01),
-      Seq(100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000).map(
-        _ * repeats),
-      i => i / repeats,
-      i => i / repeats)
+    testCardinalityEstimates(Seq(0.1, 0.05, 0.025, 0.01),
+                             Seq(100, 500, 1000, 5000, 10000, 50000, 100000,
+                               500000, 1000000).map(_ * repeats),
+                             i => i / repeats,
+                             i => i / repeats)
   }
 
   test("random cardinality estimation") {

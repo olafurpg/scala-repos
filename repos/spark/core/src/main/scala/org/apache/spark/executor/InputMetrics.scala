@@ -43,12 +43,14 @@ class InputMetrics private (_bytesRead: Accumulator[Long],
     extends Serializable {
 
   private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
-    this(TaskMetrics
-           .getAccum[Long](accumMap, InternalAccumulator.input.BYTES_READ),
-         TaskMetrics
-           .getAccum[Long](accumMap, InternalAccumulator.input.RECORDS_READ),
-         TaskMetrics
-           .getAccum[String](accumMap, InternalAccumulator.input.READ_METHOD))
+    this(
+      TaskMetrics
+        .getAccum[Long](accumMap, InternalAccumulator.input.BYTES_READ),
+      TaskMetrics
+        .getAccum[Long](accumMap, InternalAccumulator.input.RECORDS_READ),
+      TaskMetrics
+        .getAccum[String](accumMap, InternalAccumulator.input.READ_METHOD)
+    )
   }
 
   /**

@@ -42,49 +42,59 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   @transient lazy val logger = Logger[this.type]
 
   def train(sc: SparkContext, data: PreparedData): ALSModel = {
-    require(data.followEvents.take(1).nonEmpty,
-            s"followEvents in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
-    require(data.users.take(1).nonEmpty,
-            s"users in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
+    require(
+      data.followEvents.take(1).nonEmpty,
+      s"followEvents in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly."
+    )
+    require(
+      data.users.take(1).nonEmpty,
+      s"users in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly."
+    )
     // create User String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val similarUserStringIntMap = userStringIntMap
 
     // collect SimilarUser as Map and convert ID to Int index
-    val similarUsers: Map[Int, User] = data.users.map {
-      case (id, similarUser) =>
-        (similarUserStringIntMap(id), similarUser)
-    }.collectAsMap().toMap
+    val similarUsers: Map[Int, User] = data.users
+      .map {
+        case (id, similarUser) =>
+          (similarUserStringIntMap(id), similarUser)
+      }
+      .collectAsMap()
+      .toMap
 
-    val mllibRatings = data.followEvents.map { r =>
-      // Convert user and user String IDs to Int index for MLlib
-      val uindex = userStringIntMap.getOrElse(r.user, -1)
-      val iindex = similarUserStringIntMap.getOrElse(r.followedUser, -1)
+    val mllibRatings = data.followEvents
+      .map { r =>
+        // Convert user and user String IDs to Int index for MLlib
+        val uindex = userStringIntMap.getOrElse(r.user, -1)
+        val iindex = similarUserStringIntMap.getOrElse(r.followedUser, -1)
 
-      if (uindex == -1)
-        logger.info(
-          s"Couldn't convert nonexistent user ID ${r.user}" +
+        if (uindex == -1)
+          logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
             " to Int index.")
 
-      if (iindex == -1)
-        logger.info(
-          s"Couldn't convert nonexistent followedUser ID ${r.followedUser}" +
-            " to Int index.")
+        if (iindex == -1)
+          logger.info(
+            s"Couldn't convert nonexistent followedUser ID ${r.followedUser}" +
+              " to Int index.")
 
-      ((uindex, iindex), 1)
-    }.filter {
-      case ((u, i), v) =>
-        // keep events with valid user and user index
-        (u != -1) && (i != -1)
-    }.map {
-      case ((u, i), v) =>
-        // MLlibRating requires integer index for user and user
-        MLlibRating(u, i, v)
-    }.cache()
+        ((uindex, iindex), 1)
+      }
+      .filter {
+        case ((u, i), v) =>
+          // keep events with valid user and user index
+          (u != -1) && (i != -1)
+      }
+      .map {
+        case ((u, i), v) =>
+          // MLlibRating requires integer index for user and user
+          MLlibRating(u, i, v)
+      }
+      .cache()
 
     // MLLib ALS cannot handle empty training data.
     require(
@@ -138,11 +148,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         Array[(Int, Double)]()
       } else {
         similarUserFeatures.par // convert to parallel collection
-        .mapValues { f =>
-          queryFeatures.map { qf =>
-            cosine(qf, f)
-          }.sum
-        }.filter(_._2 > 0) // keep similarUsers with score > 0
+          .mapValues { f =>
+            queryFeatures.map { qf =>
+              cosine(qf, f)
+            }.sum
+          }
+          .filter(_._2 > 0) // keep similarUsers with score > 0
           .seq // convert back to sequential collection
           .toArray
       }

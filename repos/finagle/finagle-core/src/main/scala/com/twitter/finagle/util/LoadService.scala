@@ -211,7 +211,8 @@ object loadServiceDenied
     extends GlobalFlag[Set[String]](
       Set.empty,
       "A deny list of implementations to ignore. Keys are the fully qualified class names. " +
-        "Any other implementations that are found via `LoadService.apply` are eligible to be used.")
+        "Any other implementations that are found via `LoadService.apply` are eligible to be used."
+    )
 
 /**
   * Load a singleton class in the manner of [[java.util.ServiceLoader]]. It is
@@ -241,39 +242,40 @@ object LoadService {
     } yield line
 
     val buffer = mutable.ListBuffer.empty[String]
-    val result = (classNames ++ classNamesFromResources).distinct.filterNot {
-      className =>
+    val result = (classNames ++ classNamesFromResources).distinct
+      .filterNot { className =>
         val isDenied = denied.contains(className)
         if (isDenied)
           DefaultLogger.info(
             s"LoadService: skipped $className due to deny list flag")
         isDenied
-    }.flatMap { className =>
-      val cls = Class.forName(className)
-      if (!iface.isAssignableFrom(cls))
-        throw new ServiceConfigurationError(
-          s"$className not a subclass of $ifaceName")
-
-      DefaultLogger.log(
-        Level.DEBUG,
-        s"LoadService: loaded instance of class $className for requested service $ifaceName"
-      )
-
-      try {
-        val instance = cls.newInstance().asInstanceOf[T]
-        buffer += className
-        Some(instance)
-      } catch {
-        case NonFatal(ex) =>
-          DefaultLogger.log(
-            Level.FATAL,
-            s"LoadService: failed to instantiate '$className' for the requested " +
-              s"service '$ifaceName'",
-            ex
-          )
-          None
       }
-    }
+      .flatMap { className =>
+        val cls = Class.forName(className)
+        if (!iface.isAssignableFrom(cls))
+          throw new ServiceConfigurationError(
+            s"$className not a subclass of $ifaceName")
+
+        DefaultLogger.log(
+          Level.DEBUG,
+          s"LoadService: loaded instance of class $className for requested service $ifaceName"
+        )
+
+        try {
+          val instance = cls.newInstance().asInstanceOf[T]
+          buffer += className
+          Some(instance)
+        } catch {
+          case NonFatal(ex) =>
+            DefaultLogger.log(
+              Level.FATAL,
+              s"LoadService: failed to instantiate '$className' for the requested " +
+                s"service '$ifaceName'",
+              ex
+            )
+            None
+        }
+      }
 
     GlobalRegistry.get.put(Seq("loadservice", ifaceName), buffer.mkString(","))
     result

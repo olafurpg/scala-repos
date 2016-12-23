@@ -125,9 +125,11 @@ class RelationalMiscTest extends AsyncTest[RelationalTestDB] {
         .result
         .map(_ shouldBe Set((1, 1), (2, 1), (3, 2), (4, 0)))
 
-      q4 = t1s.map { t1 =>
-        Case.If(t1.a < 3) Then t1.b Else t1.a.?
-      }.to[Set]
+      q4 = t1s
+        .map { t1 =>
+          Case.If(t1.a < 3) Then t1.b Else t1.a.?
+        }
+        .to[Set]
       _ <- mark("q4", q4.result)
         .map(_ shouldBe Set(Some(11), None, Some(3), Some(4)))
     } yield ()

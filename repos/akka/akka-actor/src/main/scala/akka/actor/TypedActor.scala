@@ -235,7 +235,8 @@ object TypedActor
             }
 
             deserializedParameters
-        })
+        }
+      )
     }
   }
 
@@ -788,7 +789,8 @@ class TypedActorExtension(val system: ExtendedActorSystem)
         new TypedActorInvocationHandler(
           this,
           actorVar,
-          props.timeout getOrElse DefaultReturnTimeout))
+          props.timeout getOrElse DefaultReturnTimeout)
+      )
       .asInstanceOf[R]
 
     if (proxyVar eq null) {

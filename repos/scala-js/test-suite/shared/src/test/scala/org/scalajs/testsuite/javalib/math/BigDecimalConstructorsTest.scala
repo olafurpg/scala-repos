@@ -65,22 +65,8 @@ class BigDecimalConstructorsTest {
   }
 
   @Test def testConstrChar(): Unit = {
-    val value = Array('-',
-                      '1',
-                      '2',
-                      '3',
-                      '8',
-                      '0',
-                      '.',
-                      '4',
-                      '7',
-                      '3',
-                      '8',
-                      'E',
-                      '-',
-                      '4',
-                      '2',
-                      '3')
+    val value = Array('-', '1', '2', '3', '8', '0', '.', '4', '7', '3', '8',
+      'E', '-', '4', '2', '3')
     val result = new BigDecimal(value)
     val res = "-1.23804738E-419"
     val resScale = 427
@@ -90,22 +76,8 @@ class BigDecimalConstructorsTest {
   }
 
   @Test def testConstrCharIntInt(): Unit = {
-    val value = Array('-',
-                      '1',
-                      '2',
-                      '3',
-                      '8',
-                      '0',
-                      '.',
-                      '4',
-                      '7',
-                      '3',
-                      '8',
-                      'E',
-                      '-',
-                      '4',
-                      '2',
-                      '3')
+    val value = Array('-', '1', '2', '3', '8', '0', '.', '4', '7', '3', '8',
+      'E', '-', '4', '2', '3')
     val offset = 3
     val len = 12
     val result = new BigDecimal(value, offset, len)
@@ -118,22 +90,8 @@ class BigDecimalConstructorsTest {
   }
 
   @Test def testConstrCharIntIntMathContext(): Unit = {
-    val value = Array('-',
-                      '1',
-                      '2',
-                      '3',
-                      '8',
-                      '0',
-                      '.',
-                      '4',
-                      '7',
-                      '3',
-                      '8',
-                      'E',
-                      '-',
-                      '4',
-                      '2',
-                      '3')
+    val value = Array('-', '1', '2', '3', '8', '0', '.', '4', '7', '3', '8',
+      'E', '-', '4', '2', '3')
     val offset = 3
     val len = 12
     val precision = 4
@@ -149,22 +107,8 @@ class BigDecimalConstructorsTest {
   }
 
   @Test def testConstrCharIntIntMathContextException1(): Unit = {
-    val value = Array('-',
-                      '1',
-                      '2',
-                      '3',
-                      '8',
-                      '0',
-                      '.',
-                      '4',
-                      '7',
-                      '3',
-                      '8',
-                      'E',
-                      '-',
-                      '4',
-                      '2',
-                      '3')
+    val value = Array('-', '1', '2', '3', '8', '0', '.', '4', '7', '3', '8',
+      'E', '-', '4', '2', '3')
     val offset = 3
     val len = 120
     val precision = 4
@@ -175,22 +119,8 @@ class BigDecimalConstructorsTest {
   }
 
   @Test def testConstrCharIntIntMathContextException2(): Unit = {
-    val value = Array('-',
-                      '1',
-                      '2',
-                      '3',
-                      '8',
-                      '0',
-                      ',',
-                      '4',
-                      '7',
-                      '3',
-                      '8',
-                      'E',
-                      '-',
-                      '4',
-                      '2',
-                      '3')
+    val value = Array('-', '1', '2', '3', '8', '0', ',', '4', '7', '3', '8',
+      'E', '-', '4', '2', '3')
     val offset = 3
     val len = 120
     val precision = 4

@@ -414,12 +414,16 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
                                    (1, 0.99504))
 
     val actualPredictions = ldaModel.topicDistributions(docs).cache()
-    val topTopics = actualPredictions.map {
-      case (id, topics) =>
-        // convert results to expectedPredictions format, which only has highest probability topic
-        val topicsBz = topics.toBreeze.toDenseVector
-        (id, (argmax(topicsBz), max(topicsBz)))
-    }.sortByKey().values.collect()
+    val topTopics = actualPredictions
+      .map {
+        case (id, topics) =>
+          // convert results to expectedPredictions format, which only has highest probability topic
+          val topicsBz = topics.toBreeze.toDenseVector
+          (id, (argmax(topicsBz), max(topicsBz)))
+      }
+      .sortByKey()
+      .values
+      .collect()
 
     expectedPredictions.zip(topTopics).foreach {
       case (expected, actual) =>
@@ -587,12 +591,18 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
         graph.vertices.sortByKey().collect() === sameGraph.vertices
           .sortByKey()
           .collect())
-      val edge = graph.edges.map {
-        case Edge(sid: Long, did: Long, nos: Double) => (sid, did, nos)
-      }.sortBy(x => (x._1, x._2)).collect()
-      val sameEdge = sameGraph.edges.map {
-        case Edge(sid: Long, did: Long, nos: Double) => (sid, did, nos)
-      }.sortBy(x => (x._1, x._2)).collect()
+      val edge = graph.edges
+        .map {
+          case Edge(sid: Long, did: Long, nos: Double) => (sid, did, nos)
+        }
+        .sortBy(x => (x._1, x._2))
+        .collect()
+      val sameEdge = sameGraph.edges
+        .map {
+          case Edge(sid: Long, did: Long, nos: Double) => (sid, did, nos)
+        }
+        .sortBy(x => (x._1, x._2))
+        .collect()
       assert(edge === sameEdge)
     } finally {
       Utils.deleteRecursively(tempDir1)
@@ -705,20 +715,13 @@ private[clustering] object LDASuite {
     val alpha = 0.01
     val eta = 0.01
     val gammaShape = 100
-    val topics = new DenseMatrix(numRows = vocabSize,
-                                 numCols = k,
-                                 values = Array(1.86738052,
-                                                1.94056535,
-                                                1.89981687,
-                                                0.0833265,
-                                                0.07405918,
-                                                0.07940597,
-                                                0.15081551,
-                                                0.08637973,
-                                                0.12428538,
-                                                1.9474897,
-                                                1.94615165,
-                                                1.95204124))
+    val topics = new DenseMatrix(
+      numRows = vocabSize,
+      numCols = k,
+      values = Array(1.86738052, 1.94056535, 1.89981687, 0.0833265, 0.07405918,
+        0.07940597, 0.15081551, 0.08637973, 0.12428538, 1.9474897, 1.94615165,
+        1.95204124)
+    )
     val ldaModel: LocalLDAModel = new LocalLDAModel(
       topics,
       Vectors.dense(Array.fill(k)(alpha)),

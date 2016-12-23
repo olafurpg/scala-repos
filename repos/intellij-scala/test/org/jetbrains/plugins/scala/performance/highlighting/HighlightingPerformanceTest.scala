@@ -31,7 +31,8 @@ class HighlightingPerformanceTest extends ScalaFixtureTestCase {
             case e: RuntimeException =>
           }
         }
-      })
+      }
+    )
   }
 
   def testPerformance() {

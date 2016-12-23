@@ -273,9 +273,9 @@ class SolvingTest {
     val solutions = findAllModelsFor(solvable)
     val expanded = solutions.flatMap(expandUnassigned).sorted
     val expected = Seq(
-        Map(pSym -> false, qSym -> false),
-        Map(pSym -> true, qSym -> false),
-        Map(pSym -> true, qSym -> true)
+      Map(pSym -> false, qSym -> false),
+      Map(pSym -> true, qSym -> false),
+      Map(pSym -> true, qSym -> true)
     ).sorted
 
     assertEquals(expected, expanded)
@@ -284,311 +284,467 @@ class SolvingTest {
   @Test
   def testTseitinVsExpansionFrom_t7020() {
     val formulas = Seq(
-        And(And(And(Not(sym("V1=null")),
-                    sym("V1=scala.collection.immutable.::[?]")),
-                And(Not(sym("V1=null")),
-                    And(Or(sym("V2=4"), Or(sym("V2=5"), sym("V2=6"))),
-                        sym("V3=Nil")))),
-            And(And(Or(Not(sym("V1=scala.collection.immutable.::[?]")),
-                       Not(sym("V1=null"))),
-                    And(Or(sym("V3=scala.collection.immutable.::[?]"),
-                           Or(sym("V3=Nil"), sym("V3=null"))),
-                        And(Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
-                            And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-                                   Not(sym("V3=null"))),
-                                And(Or(Not(sym("V1=Nil")),
-                                       Not(sym("V1=null"))),
-                                    Or(sym("V1=scala.collection.immutable.::[?]"),
-                                       Or(sym("V1=Nil"), sym("V1=null")))))))),
-                And(Or(Or(sym("V1=null"),
-                          Not(sym("V1=scala.collection.immutable.::[?]"))),
-                       Or(sym("V1=null"),
-                          Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
-                    Or(Or(sym("V1=null"),
-                          Not(sym("V1=scala.collection.immutable.::[?]"))),
-                       Or(sym("V1=null"),
-                          Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))))),
-        And(And(And(Not(sym("V1=null")),
-                    sym("V1=scala.collection.immutable.::[?]")),
-                And(Not(sym("V1=null")), And(sym("V2=7"), sym("V3=Nil")))),
-            And(And(Or(Not(sym("V1=scala.collection.immutable.::[?]")),
-                       Not(sym("V1=null"))),
-                    And(Or(sym("V3=scala.collection.immutable.::[?]"),
-                           Or(sym("V3=Nil"), sym("V3=null"))),
-                        And(Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
-                            And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-                                   Not(sym("V3=null"))),
-                                And(Or(Not(sym("V1=Nil")),
-                                       Not(sym("V1=null"))),
-                                    Or(sym("V1=scala.collection.immutable.::[?]"),
-                                       Or(sym("V1=Nil"), sym("V1=null")))))))),
-                And(And(Or(Or(sym("V1=null"),
-                              Not(sym("V1=scala.collection.immutable.::[?]"))),
-                           Or(sym("V1=null"),
-                              Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
-                        Or(Or(sym("V1=null"),
-                              Not(sym("V1=scala.collection.immutable.::[?]"))),
-                           Or(sym("V1=null"),
-                              Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))),
-                    Or(Or(sym("V1=null"),
-                          Not(sym("V1=scala.collection.immutable.::[?]"))),
-                       Or(sym("V1=null"),
-                          Or(And(Not(sym("V2=4")),
-                                 And(Not(sym("V2=5")), Not(sym("V2=6")))),
-                             Not(sym("V3=Nil")))))))),
-        And(And(Not(sym("V1=null")),
-                sym("V1=scala.collection.immutable.::[?]")),
-            And(Not(sym("V1=null")),
-                And(Or(sym("V2=4"), Or(sym("V2=5"), sym("V2=6"))),
-                    sym("V3=Nil")))),
+      And(
+        And(
+          And(Not(sym("V1=null")), sym("V1=scala.collection.immutable.::[?]")),
+          And(Not(sym("V1=null")),
+              And(Or(sym("V2=4"), Or(sym("V2=5"), sym("V2=6"))),
+                  sym("V3=Nil")))
+        ),
+        And(
+          And(
+            Or(Not(sym("V1=scala.collection.immutable.::[?]")),
+               Not(sym("V1=null"))),
+            And(
+              Or(sym("V3=scala.collection.immutable.::[?]"),
+                 Or(sym("V3=Nil"), sym("V3=null"))),
+              And(
+                Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
+                And(
+                  Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+                     Not(sym("V3=null"))),
+                  And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+                      Or(sym("V1=scala.collection.immutable.::[?]"),
+                         Or(sym("V1=Nil"), sym("V1=null"))))
+                )
+              )
+            )
+          ),
+          And(
+            Or(Or(sym("V1=null"),
+                  Not(sym("V1=scala.collection.immutable.::[?]"))),
+               Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+            Or(Or(sym("V1=null"),
+                  Not(sym("V1=scala.collection.immutable.::[?]"))),
+               Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+          )
+        )
+      ),
+      And(
         And(And(Not(sym("V1=null")),
                 sym("V1=scala.collection.immutable.::[?]")),
             And(Not(sym("V1=null")), And(sym("V2=7"), sym("V3=Nil")))),
-        And(And(Or(Not(sym("V1=scala.collection.immutable.::[?]")),
-                   Not(sym("V1=null"))),
-                And(Or(sym("V3=scala.collection.immutable.::[?]"),
-                       Or(sym("V3=Nil"), sym("V3=null"))),
-                    And(Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
-                        And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-                               Not(sym("V3=null"))),
-                            And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-                                Or(
-                                    sym("V1=scala.collection.immutable.::[?]"),
-                                    Or(sym("V1=Nil"), sym("V1=null")))))))),
+        And(
+          And(
+            Or(Not(sym("V1=scala.collection.immutable.::[?]")),
+               Not(sym("V1=null"))),
             And(
+              Or(sym("V3=scala.collection.immutable.::[?]"),
+                 Or(sym("V3=Nil"), sym("V3=null"))),
+              And(
+                Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
                 And(
-                    Or(Or(sym("V1=null"),
-                          Not(sym("V1=scala.collection.immutable.::[?]"))),
-                       Or(
-                           sym("V1=null"),
-                           Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
-                    Or(Or(sym("V1=null"),
-                          Not(sym("V1=scala.collection.immutable.::[?]"))),
-                       Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))), Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil"))))))),
-
-      And(And(Or(Not(sym("V1=scala.collection.immutable.::[?]")),
-        Not(sym("V1=null"))), And(Or(sym("V3=scala.collection.immutable.::[?]"),
-        Or(sym("V3=Nil"), sym("V3=null"))), And(Or(Not(sym("V3=Nil")),
-        Not(sym("V3=null"))),
-        And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-          Not(sym("V3=null"))), And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-          Or(sym("V1=scala.collection.immutable.::[?]"), Or(sym("V1=Nil"),
-            sym("V1=null")))))))), And(Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=2")), Not(sym("V3=Nil"))))))),
-
-      And(And(Or(Not(sym("V1=scala.collection.immutable.::[?]")),
-        Not(sym("V1=null"))), And(Or(sym("V3=scala.collection.immutable.::[?]"),
-        Or(sym("V3=Nil"), sym("V3=null"))), And(Or(Not(sym("V3=Nil")),
-        Not(sym("V3=null"))),
-        And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-          Not(sym("V3=null"))), And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-          Or(sym("V1=scala.collection.immutable.::[?]"), Or(sym("V1=Nil"),
-            sym("V1=null")))))))), And(sym("V1=Nil"), And(Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil"))))), And(Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=2")), Not(sym("V3=Nil"))))))))),
-
-      And(And(Or(Or(False,
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(False,
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))), And(Or(Or(False,
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil"))))), And(Or(Or(False,
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))), Not(sym("V1=Nil"))))),
-
-      And(And(Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))), Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil")))))),
-
-      And(And(Or(sym("V3=scala.collection.immutable.::[?]"), sym("V3=Nil")),
-        Or(sym("V1=scala.collection.immutable.::[?]"), sym("V1=Nil"))),
-        And(And(Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
-          Or(False, Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(False,
-          Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-          Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))), And(Or(Or(False,
-          Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-          Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-            Not(sym("V3=Nil"))))), And(Or(Or(False,
-          Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-          Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))), Not(sym("V1=Nil")))))),
-
-      And(Not(sym("V1=null")), And(Or(sym("V2=4"), Or(sym("V2=5"), sym("V2=6"))),
-        sym("V3=Nil"))),
-
+                  Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+                     Not(sym("V3=null"))),
+                  And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+                      Or(sym("V1=scala.collection.immutable.::[?]"),
+                         Or(sym("V1=Nil"), sym("V1=null"))))
+                )
+              )
+            )
+          ),
+          And(
+            And(
+              Or(Or(sym("V1=null"),
+                    Not(sym("V1=scala.collection.immutable.::[?]"))),
+                 Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+              Or(Or(sym("V1=null"),
+                    Not(sym("V1=scala.collection.immutable.::[?]"))),
+                 Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+            ),
+            Or(
+              Or(sym("V1=null"),
+                 Not(sym("V1=scala.collection.immutable.::[?]"))),
+              Or(sym("V1=null"),
+                 Or(And(Not(sym("V2=4")),
+                        And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                    Not(sym("V3=Nil"))))
+            )
+          )
+        )
+      ),
+      And(
+        And(Not(sym("V1=null")), sym("V1=scala.collection.immutable.::[?]")),
+        And(Not(sym("V1=null")),
+            And(Or(sym("V2=4"), Or(sym("V2=5"), sym("V2=6"))), sym("V3=Nil")))
+      ),
+      And(And(Not(sym("V1=null")), sym("V1=scala.collection.immutable.::[?]")),
+          And(Not(sym("V1=null")), And(sym("V2=7"), sym("V3=Nil")))),
+      And(
+        And(
+          Or(Not(sym("V1=scala.collection.immutable.::[?]")),
+             Not(sym("V1=null"))),
+          And(
+            Or(sym("V3=scala.collection.immutable.::[?]"),
+               Or(sym("V3=Nil"), sym("V3=null"))),
+            And(
+              Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
+              And(
+                Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+                   Not(sym("V3=null"))),
+                And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+                    Or(sym("V1=scala.collection.immutable.::[?]"),
+                       Or(sym("V1=Nil"), sym("V1=null"))))
+              )
+            )
+          )
+        ),
+        And(
+          And(
+            Or(Or(sym("V1=null"),
+                  Not(sym("V1=scala.collection.immutable.::[?]"))),
+               Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+            Or(Or(sym("V1=null"),
+                  Not(sym("V1=scala.collection.immutable.::[?]"))),
+               Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+          ),
+          Or(
+            Or(sym("V1=null"),
+               Not(sym("V1=scala.collection.immutable.::[?]"))),
+            Or(sym("V1=null"),
+               Or(And(Not(sym("V2=4")),
+                      And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                  Not(sym("V3=Nil"))))
+          )
+        )
+      ),
+      And(
+        And(
+          Or(Not(sym("V1=scala.collection.immutable.::[?]")),
+             Not(sym("V1=null"))),
+          And(
+            Or(sym("V3=scala.collection.immutable.::[?]"),
+               Or(sym("V3=Nil"), sym("V3=null"))),
+            And(
+              Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
+              And(
+                Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+                   Not(sym("V3=null"))),
+                And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+                    Or(sym("V1=scala.collection.immutable.::[?]"),
+                       Or(sym("V1=Nil"), sym("V1=null"))))
+              )
+            )
+          )
+        ),
+        And(
+          Or(Or(sym("V1=null"),
+                Not(sym("V1=scala.collection.immutable.::[?]"))),
+             Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+          Or(Or(sym("V1=null"),
+                Not(sym("V1=scala.collection.immutable.::[?]"))),
+             Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+        )
+      ),
+      And(
+        And(
+          Or(Not(sym("V1=scala.collection.immutable.::[?]")),
+             Not(sym("V1=null"))),
+          And(
+            Or(sym("V3=scala.collection.immutable.::[?]"),
+               Or(sym("V3=Nil"), sym("V3=null"))),
+            And(
+              Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
+              And(
+                Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+                   Not(sym("V3=null"))),
+                And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+                    Or(sym("V1=scala.collection.immutable.::[?]"),
+                       Or(sym("V1=Nil"), sym("V1=null"))))
+              )
+            )
+          )
+        ),
+        And(
+          sym("V1=Nil"),
+          And(
+            Or(
+              Or(sym("V1=null"),
+                 Not(sym("V1=scala.collection.immutable.::[?]"))),
+              Or(sym("V1=null"),
+                 Or(And(Not(sym("V2=4")),
+                        And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                    Not(sym("V3=Nil"))))
+            ),
+            And(
+              Or(Or(sym("V1=null"),
+                    Not(sym("V1=scala.collection.immutable.::[?]"))),
+                 Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+              Or(Or(sym("V1=null"),
+                    Not(sym("V1=scala.collection.immutable.::[?]"))),
+                 Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+            )
+          )
+        )
+      ),
+      And(
+        And(
+          Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+             Or(False, Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+          Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+             Or(False, Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+        ),
+        And(
+          Or(
+            Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+            Or(False,
+               Or(And(Not(sym("V2=4")),
+                      And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                  Not(sym("V3=Nil"))))
+          ),
+          And(Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+                 Or(False, Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))),
+              Not(sym("V1=Nil")))
+        )
+      ),
+      And(
+        And(
+          Or(Or(sym("V1=null"),
+                Not(sym("V1=scala.collection.immutable.::[?]"))),
+             Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+          Or(Or(sym("V1=null"),
+                Not(sym("V1=scala.collection.immutable.::[?]"))),
+             Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+        ),
+        Or(
+          Or(sym("V1=null"), Not(sym("V1=scala.collection.immutable.::[?]"))),
+          Or(sym("V1=null"),
+             Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                Not(sym("V3=Nil"))))
+        )
+      ),
+      And(
+        And(Or(sym("V3=scala.collection.immutable.::[?]"), sym("V3=Nil")),
+            Or(sym("V1=scala.collection.immutable.::[?]"), sym("V1=Nil"))),
+        And(
+          And(
+            Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+               Or(False, Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+            Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+               Or(False, Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+          ),
+          And(
+            Or(
+              Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+              Or(False,
+                 Or(And(Not(sym("V2=4")),
+                        And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                    Not(sym("V3=Nil"))))
+            ),
+            And(Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+                   Or(False, Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))),
+                Not(sym("V1=Nil")))
+          )
+        )
+      ),
+      And(Not(sym("V1=null")),
+          And(Or(sym("V2=4"), Or(sym("V2=5"), sym("V2=6"))), sym("V3=Nil"))),
       And(Not(sym("V1=null")), And(sym("V2=7"), sym("V3=Nil"))),
-
       And(Not(sym("V1=null")), sym("V1=scala.collection.immutable.::[?]")),
-
       And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-
       And(Not(sym("V2=5")), Not(sym("V2=6"))),
-
       And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-        Or(sym("V1=scala.collection.immutable.::[?]"), Or(sym("V1=Nil"),
-          sym("V1=null")))),
-
-      And(Or(Not(sym("V1=scala.collection.immutable.::[?]")),
-        Not(sym("V1=null"))), And(Or(sym("V3=scala.collection.immutable.::[?]"),
-        Or(sym("V3=Nil"), sym("V3=null"))), And(Or(Not(sym("V3=Nil")),
-        Not(sym("V3=null"))),
-        And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-          Not(sym("V3=null"))), And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-          Or(sym("V1=scala.collection.immutable.::[?]"), Or(sym("V1=Nil"),
-            sym("V1=null")))))))),
-
-      And(Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
-        And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-          Not(sym("V3=null"))), And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-          Or(sym("V1=scala.collection.immutable.::[?]"), Or(sym("V1=Nil"),
-            sym("V1=null")))))),
-
-      And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-        Not(sym("V3=null"))), And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-        Or(sym("V1=scala.collection.immutable.::[?]"), Or(sym("V1=Nil"),
-          sym("V1=null"))))),
-
-      And(Or(Or(False,
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil"))))), And(Or(Or(False,
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))), Not(sym("V1=Nil")))),
-
-      And(Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(False,
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))),
-
-      And(Or(Or(False,
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))), Not(sym("V1=Nil"))),
-
-      And(Or(Or(sym("V1=null"), Not(sym("V1=scala.collection.immutable.::[?]"))),
-        Or(sym("V1=null"), Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")),
-          Not(sym("V2=6")))), Not(sym("V3=Nil"))))), And(Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=2")), Not(sym("V3=Nil"))))))),
-
-      And(Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))),
-
-      And(Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))),
-        And(And(Or(Not(sym("V1=scala.collection.immutable.::[?]")),
-          Not(sym("V1=null"))), And(Or(sym("V3=scala.collection.immutable.::[?]"),
-          Or(sym("V3=Nil"), sym("V3=null"))), And(Or(Not(sym("V3=Nil")),
-          Not(sym("V3=null"))),
-          And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-            Not(sym("V3=null"))), And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-            Or(sym("V1=scala.collection.immutable.::[?]"), Or(sym("V1=Nil"),
-              sym("V1=null")))))))), And(sym("V1=Nil"), And(Or(Or(sym("V1=null"),
-          Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-          Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-            Not(sym("V3=Nil"))))), And(Or(Or(sym("V1=null"),
-          Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-          Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(sym("V1=null"),
-          Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-          Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))))))),
-
+          Or(sym("V1=scala.collection.immutable.::[?]"),
+             Or(sym("V1=Nil"), sym("V1=null")))),
+      And(
+        Or(Not(sym("V1=scala.collection.immutable.::[?]")),
+           Not(sym("V1=null"))),
+        And(
+          Or(sym("V3=scala.collection.immutable.::[?]"),
+             Or(sym("V3=Nil"), sym("V3=null"))),
+          And(
+            Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
+            And(
+              Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+                 Not(sym("V3=null"))),
+              And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+                  Or(sym("V1=scala.collection.immutable.::[?]"),
+                     Or(sym("V1=Nil"), sym("V1=null"))))
+            )
+          )
+        )
+      ),
+      And(
+        Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
+        And(
+          Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+             Not(sym("V3=null"))),
+          And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+              Or(sym("V1=scala.collection.immutable.::[?]"),
+                 Or(sym("V1=Nil"), sym("V1=null"))))
+        )
+      ),
+      And(
+        Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+           Not(sym("V3=null"))),
+        And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+            Or(sym("V1=scala.collection.immutable.::[?]"),
+               Or(sym("V1=Nil"), sym("V1=null"))))
+      ),
+      And(
+        Or(
+          Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+          Or(False,
+             Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                Not(sym("V3=Nil"))))
+        ),
+        And(Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+               Or(False, Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))),
+            Not(sym("V1=Nil")))
+      ),
+      And(
+        Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+           Or(False, Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+        Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+           Or(False, Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+      ),
+      And(Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+             Or(False, Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))),
+          Not(sym("V1=Nil"))),
+      And(
+        Or(
+          Or(sym("V1=null"), Not(sym("V1=scala.collection.immutable.::[?]"))),
+          Or(sym("V1=null"),
+             Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                Not(sym("V3=Nil"))))
+        ),
+        And(
+          Or(Or(sym("V1=null"),
+                Not(sym("V1=scala.collection.immutable.::[?]"))),
+             Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+          Or(Or(sym("V1=null"),
+                Not(sym("V1=scala.collection.immutable.::[?]"))),
+             Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+        )
+      ),
+      And(
+        Or(Or(sym("V1=null"), Not(sym("V1=scala.collection.immutable.::[?]"))),
+           Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+        Or(Or(sym("V1=null"), Not(sym("V1=scala.collection.immutable.::[?]"))),
+           Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+      ),
+      And(
+        Or(Or(sym("V1=null"), Not(sym("V1=scala.collection.immutable.::[?]"))),
+           Or(sym("V1=null"), Or(Not(sym("V2=7")), Not(sym("V3=Nil"))))),
+        And(
+          And(
+            Or(Not(sym("V1=scala.collection.immutable.::[?]")),
+               Not(sym("V1=null"))),
+            And(
+              Or(sym("V3=scala.collection.immutable.::[?]"),
+                 Or(sym("V3=Nil"), sym("V3=null"))),
+              And(
+                Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
+                And(
+                  Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+                     Not(sym("V3=null"))),
+                  And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+                      Or(sym("V1=scala.collection.immutable.::[?]"),
+                         Or(sym("V1=Nil"), sym("V1=null"))))
+                )
+              )
+            )
+          ),
+          And(
+            sym("V1=Nil"),
+            And(
+              Or(
+                Or(sym("V1=null"),
+                   Not(sym("V1=scala.collection.immutable.::[?]"))),
+                Or(sym("V1=null"),
+                   Or(And(Not(sym("V2=4")),
+                          And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                      Not(sym("V3=Nil"))))
+              ),
+              And(
+                Or(Or(sym("V1=null"),
+                      Not(sym("V1=scala.collection.immutable.::[?]"))),
+                   Or(sym("V1=null"),
+                      Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+                Or(Or(sym("V1=null"),
+                      Not(sym("V1=scala.collection.immutable.::[?]"))),
+                   Or(sym("V1=null"),
+                      Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+              )
+            )
+          )
+        )
+      ),
       And(Or(sym("V2=4"), Or(sym("V2=5"), sym("V2=6"))), sym("V3=Nil")),
-
-      And(Or(sym("V3=scala.collection.immutable.::[?]"), Or(sym("V3=Nil"),
-        sym("V3=null"))), And(Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
-        And(Or(Not(sym("V3=scala.collection.immutable.::[?]")),
-          Not(sym("V3=null"))), And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-          Or(sym("V1=scala.collection.immutable.::[?]"), Or(sym("V1=Nil"),
-            sym("V1=null"))))))),
-
-      And(Or(sym("V3=scala.collection.immutable.::[?]"),
-        sym("V3=Nil")), Or(sym("V1=scala.collection.immutable.::[?]"),
-        sym("V1=Nil"))),
-
-      And(sym("V1=Nil"), And(Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil"))))), And(Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))), Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))))),
-
+      And(
+        Or(sym("V3=scala.collection.immutable.::[?]"),
+           Or(sym("V3=Nil"), sym("V3=null"))),
+        And(
+          Or(Not(sym("V3=Nil")), Not(sym("V3=null"))),
+          And(
+            Or(Not(sym("V3=scala.collection.immutable.::[?]")),
+               Not(sym("V3=null"))),
+            And(Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
+                Or(sym("V1=scala.collection.immutable.::[?]"),
+                   Or(sym("V1=Nil"), sym("V1=null"))))
+          )
+        )
+      ),
+      And(Or(sym("V3=scala.collection.immutable.::[?]"), sym("V3=Nil")),
+          Or(sym("V1=scala.collection.immutable.::[?]"), sym("V1=Nil"))),
+      And(
+        sym("V1=Nil"),
+        And(
+          Or(
+            Or(sym("V1=null"),
+               Not(sym("V1=scala.collection.immutable.::[?]"))),
+            Or(sym("V1=null"),
+               Or(And(Not(sym("V2=4")),
+                      And(Not(sym("V2=5")), Not(sym("V2=6")))),
+                  Not(sym("V3=Nil"))))
+          ),
+          And(
+            Or(Or(sym("V1=null"),
+                  Not(sym("V1=scala.collection.immutable.::[?]"))),
+               Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+            Or(Or(sym("V1=null"),
+                  Not(sym("V1=scala.collection.immutable.::[?]"))),
+               Or(sym("V1=null"), Or(Not(sym("V2=2")), Not(sym("V3=Nil")))))
+          )
+        )
+      ),
       And(sym("V2=7"), sym("V3=Nil")),
-
       False,
-
       Not(sym("V1=Nil")),
-
-      Or(And(Not(sym("V2=4")),
-        And(Not(sym("V2=5")), Not(sym("V2=6")))), Not(sym("V3=Nil"))),
-
+      Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
+         Not(sym("V3=Nil"))),
       Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
-
       Or(False,
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil")))),
-
+         Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
+            Not(sym("V3=Nil")))),
       Or(False, Or(Not(sym("V2=1")), Not(sym("V3=Nil")))),
-
       Or(Not(sym("V1=Nil")), Not(sym("V1=null"))),
-
       Or(Not(sym("V3=scala.collection.immutable.::[?]")), Not(sym("V3=null"))),
-
-      Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil"))))),
-
-      Or(Or(False,
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(False,
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
-
-      Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil"))))),
-
-      Or(Or(sym("V1=null"),
-        Not(sym("V1=scala.collection.immutable.::[?]"))), Or(sym("V1=null"),
-        Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
-
+      Or(
+        Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+        Or(False,
+           Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
+              Not(sym("V3=Nil"))))
+      ),
+      Or(Or(False, Not(sym("V1=scala.collection.immutable.::[?]"))),
+         Or(False, Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
+      Or(
+        Or(sym("V1=null"), Not(sym("V1=scala.collection.immutable.::[?]"))),
+        Or(sym("V1=null"),
+           Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
+              Not(sym("V3=Nil"))))
+      ),
+      Or(Or(sym("V1=null"), Not(sym("V1=scala.collection.immutable.::[?]"))),
+         Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil"))))),
       Or(sym("V1=null"), Not(sym("V1=scala.collection.immutable.::[?]"))),
-
       Or(sym("V1=null"),
-        Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
-          Not(sym("V3=Nil")))),
-
+         Or(And(Not(sym("V2=4")), And(Not(sym("V2=5")), Not(sym("V2=6")))),
+            Not(sym("V3=Nil")))),
       Or(sym("V1=null"), Or(Not(sym("V2=1")), Not(sym("V3=Nil")))),
-
       Or(sym("V1=scala.collection.immutable.::[?]"),
-        Or(sym("V1=Nil"), sym("V1=null"))),
-
+         Or(sym("V1=Nil"), sym("V1=null"))),
       Or(sym("V1=scala.collection.immutable.::[?]"), sym("V1=Nil")),
-
       Or(sym("V2=4"), Or(sym("V2=5"), sym("V2=6"))),
-
       sym("V3=scala.collection.immutable.::[?]")
     )
 
@@ -613,12 +769,12 @@ class SolvingTest {
 
   def pairWiseEncoding(ops: List[Sym]) = {
     And(
-        ops
-          .combinations(2)
-          .collect {
-        case a :: b :: Nil => Or(Not(a), Not(b))
-      }
-          .toSet[TestSolver.TestSolver.Prop])
+      ops
+        .combinations(2)
+        .collect {
+          case a :: b :: Nil => Or(Not(a), Not(b))
+        }
+        .toSet[TestSolver.TestSolver.Prop])
   }
 
   @Test

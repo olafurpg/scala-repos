@@ -55,29 +55,33 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                                         r,
                                         r.substitutor)
       }),
-      noImplicit = false).map(_.repr)
+      noImplicit = false
+    ).map(_.repr)
   }
 
   def mostSpecificForImplicitParameters(
       applicable: Set[(ScalaResolveResult, ScSubstitutor)])
     : Option[ScalaResolveResult] = {
-    mostSpecificGeneric(applicable.map {
-      case (r, subst) =>
-        r.innerResolveResult match {
-          case Some(rr) =>
-            new InnerScalaResolveResult(rr.element,
-                                        rr.implicitConversionClass,
-                                        r,
-                                        subst,
-                                        implicitCase = true)
-          case None =>
-            new InnerScalaResolveResult(r.element,
-                                        r.implicitConversionClass,
-                                        r,
-                                        subst,
-                                        implicitCase = true)
-        }
-    }, noImplicit = true).map(_.repr)
+    mostSpecificGeneric(
+      applicable.map {
+        case (r, subst) =>
+          r.innerResolveResult match {
+            case Some(rr) =>
+              new InnerScalaResolveResult(rr.element,
+                                          rr.implicitConversionClass,
+                                          r,
+                                          subst,
+                                          implicitCase = true)
+            case None =>
+              new InnerScalaResolveResult(r.element,
+                                          r.implicitConversionClass,
+                                          r,
+                                          subst,
+                                          implicitCase = true)
+          }
+      },
+      noImplicit = true
+    ).map(_.repr)
   }
 
   def nextLayerSpecificForImplicitParameters(
@@ -108,27 +112,30 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
 
   def mostSpecificForImplicit(applicable: Set[ImplicitResolveResult])
     : Option[ImplicitResolveResult] = {
-    mostSpecificGeneric(applicable.map(r => {
-      var callByName = false
-      def checkCallByName(clauses: Seq[ScParameterClause]): Unit = {
-        if (clauses.length > 0 && clauses(0).parameters.length == 1 &&
-            clauses(0).parameters(0).isCallByNameParameter) {
-          callByName = true
+    mostSpecificGeneric(
+      applicable.map(r => {
+        var callByName = false
+        def checkCallByName(clauses: Seq[ScParameterClause]): Unit = {
+          if (clauses.length > 0 && clauses(0).parameters.length == 1 &&
+              clauses(0).parameters(0).isCallByNameParameter) {
+            callByName = true
+          }
         }
-      }
-      r.element match {
-        case f: ScFunction => checkCallByName(f.paramClauses.clauses)
-        case f: ScPrimaryConstructor =>
-          checkCallByName(f.effectiveParameterClauses)
-        case _ =>
-      }
-      new InnerScalaResolveResult(r.element,
-                                  None,
-                                  r,
-                                  r.implicitDependentSubst followed r.subst,
-                                  callByName,
-                                  implicitCase = true)
-    }), noImplicit = true).map(_.repr)
+        r.element match {
+          case f: ScFunction => checkCallByName(f.paramClauses.clauses)
+          case f: ScPrimaryConstructor =>
+            checkCallByName(f.effectiveParameterClauses)
+          case _ =>
+        }
+        new InnerScalaResolveResult(r.element,
+                                    None,
+                                    r,
+                                    r.implicitDependentSubst followed r.subst,
+                                    callByName,
+                                    implicitCase = true)
+      }),
+      noImplicit = true
+    ).map(_.repr)
   }
 
   private class InnerScalaResolveResult[T](

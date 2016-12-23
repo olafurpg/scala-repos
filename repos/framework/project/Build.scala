@@ -105,18 +105,20 @@ object BuildDef extends Build {
 
   lazy val util = coreProject("util")
     .dependsOn(actor, json, markdown)
-    .settings(description := "Utilities Library",
-              parallelExecution in Test := false,
-              libraryDependencies <++= scalaVersion { sv =>
-                Seq(scala_compiler(sv),
-                    joda_time,
-                    joda_convert,
-                    commons_codec,
-                    javamail,
-                    log4j,
-                    htmlparser,
-                    xerces)
-              })
+    .settings(
+      description := "Utilities Library",
+      parallelExecution in Test := false,
+      libraryDependencies <++= scalaVersion { sv =>
+        Seq(scala_compiler(sv),
+            joda_time,
+            joda_convert,
+            commons_codec,
+            javamail,
+            log4j,
+            htmlparser,
+            xerces)
+      }
+    )
 
   // Web Projects
   // ------------
@@ -131,39 +133,41 @@ object BuildDef extends Build {
     .settings(libraryDependencies ++=
       Seq(mockito_all, jquery, jasmineCore, jasmineAjax))
     .settings(yuiCompressor.Plugin.yuiSettings: _*)
-    .settings(description := "Webkit Library",
-              parallelExecution in Test := false,
-              libraryDependencies <++= scalaVersion { sv =>
-                Seq(commons_fileupload,
-                    rhino,
-                    servlet_api,
-                    specs2.copy(configurations = Some("provided")),
-                    jetty6,
-                    jwebunit)
-              },
-              initialize in Test <<= (sourceDirectory in Test) { src =>
-                System.setProperty("net.liftweb.webapptest.src.test.webapp",
-                                   (src / "webapp").absString)
-              },
-              (compile in Compile) <<= (compile in Compile) dependsOn
-                (WebKeys.assets),
-              /**
-                * This is to ensure that the tests in net.liftweb.webapptest run last
-                * so that other tests (MenuSpec in particular) run before the SiteMap
-                * is set.
-                */
-              testGrouping in Test <<= (definedTests in Test).map { tests =>
-                import Tests._
+    .settings(
+      description := "Webkit Library",
+      parallelExecution in Test := false,
+      libraryDependencies <++= scalaVersion { sv =>
+        Seq(commons_fileupload,
+            rhino,
+            servlet_api,
+            specs2.copy(configurations = Some("provided")),
+            jetty6,
+            jwebunit)
+      },
+      initialize in Test <<= (sourceDirectory in Test) { src =>
+        System.setProperty("net.liftweb.webapptest.src.test.webapp",
+                           (src / "webapp").absString)
+      },
+      (compile in Compile) <<= (compile in Compile) dependsOn
+        (WebKeys.assets),
+      /**
+        * This is to ensure that the tests in net.liftweb.webapptest run last
+        * so that other tests (MenuSpec in particular) run before the SiteMap
+        * is set.
+        */
+      testGrouping in Test <<= (definedTests in Test).map { tests =>
+        import Tests._
 
-                val (webapptests, others) = tests.partition { test =>
-                  test.name.startsWith("net.liftweb.webapptest")
-                }
+        val (webapptests, others) = tests.partition { test =>
+          test.name.startsWith("net.liftweb.webapptest")
+        }
 
-                Seq(
-                  new Group("others", others, InProcess),
-                  new Group("webapptests", webapptests, InProcess)
-                )
-              })
+        Seq(
+          new Group("others", others, InProcess),
+          new Group("webapptests", webapptests, InProcess)
+        )
+      }
+    )
     .enablePlugins(SbtWeb)
 
   // Persistence Projects
@@ -179,13 +183,15 @@ object BuildDef extends Build {
 
   lazy val mapper = persistenceProject("mapper")
     .dependsOn(db, proto)
-    .settings(description := "Mapper Library",
-              parallelExecution in Test := false,
-              libraryDependencies ++= Seq(h2, derby),
-              initialize in Test <<= (crossTarget in Test) { ct =>
-                System.setProperty("derby.stream.error.file",
-                                   (ct / "derby.log").absolutePath)
-              })
+    .settings(
+      description := "Mapper Library",
+      parallelExecution in Test := false,
+      libraryDependencies ++= Seq(h2, derby),
+      initialize in Test <<= (crossTarget in Test) { ct =>
+        System.setProperty("derby.stream.error.file",
+                           (ct / "derby.log").absolutePath)
+      }
+    )
 
   lazy val record = persistenceProject("record").dependsOn(proto)
 
@@ -195,12 +201,14 @@ object BuildDef extends Build {
 
   lazy val mongodb = persistenceProject("mongodb")
     .dependsOn(json_ext, util)
-    .settings(parallelExecution in Test := false,
-              libraryDependencies += mongo_driver,
-              initialize in Test <<= (resourceDirectory in Test) { rd =>
-                System.setProperty("java.util.logging.config.file",
-                                   (rd / "logging.properties").absolutePath)
-              })
+    .settings(
+      parallelExecution in Test := false,
+      libraryDependencies += mongo_driver,
+      initialize in Test <<= (resourceDirectory in Test) { rd =>
+        System.setProperty("java.util.logging.config.file",
+                           (rd / "logging.properties").absolutePath)
+      }
+    )
 
   lazy val mongodb_record = persistenceProject("mongodb-record")
     .dependsOn(record, mongodb)

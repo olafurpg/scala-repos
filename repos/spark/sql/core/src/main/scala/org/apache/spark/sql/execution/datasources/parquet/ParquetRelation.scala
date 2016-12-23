@@ -147,7 +147,8 @@ private[sql] class DefaultSource
         .getOrElse(compressionCodec.getOrElse(
                      sqlContext.conf.parquetCompressionCodec.toLowerCase),
                    CompressionCodecName.UNCOMPRESSED)
-        .name())
+        .name()
+    )
 
     new OutputWriterFactory {
       override def newInstance(path: String,
@@ -251,17 +252,21 @@ private[sql] class DefaultSource
 
   private def splitFiles(allFiles: Seq[FileStatus]): FileTypes = {
     // Lists `FileStatus`es of all leaf nodes (files) under all base directories.
-    val leaves = allFiles.filter { f =>
-      isSummaryFile(f.getPath) || !(f.getPath.getName.startsWith("_") ||
-        f.getPath.getName.startsWith("."))
-    }.toArray.sortBy(_.getPath.toString)
+    val leaves = allFiles
+      .filter { f =>
+        isSummaryFile(f.getPath) || !(f.getPath.getName.startsWith("_") ||
+          f.getPath.getName.startsWith("."))
+      }
+      .toArray
+      .sortBy(_.getPath.toString)
 
     FileTypes(
       data = leaves.filterNot(f => isSummaryFile(f.getPath)),
       metadata = leaves.filter(
         _.getPath.getName == ParquetFileWriter.PARQUET_METADATA_FILE),
       commonMetadata = leaves.filter(
-        _.getPath.getName == ParquetFileWriter.PARQUET_COMMON_METADATA_FILE))
+        _.getPath.getName == ParquetFileWriter.PARQUET_COMMON_METADATA_FILE)
+    )
   }
 
   private def isSummaryFile(file: Path): Boolean = {
@@ -307,13 +312,14 @@ private[sql] class DefaultSource
       .initializeDriverSideJobFunc(inputFiles, parquetBlockSize) _
 
     Utils.withDummyCallSite(sqlContext.sparkContext) {
-      new SqlNewHadoopRDD(sqlContext = sqlContext,
-                          broadcastedConf = broadcastedConf,
-                          initDriverSideJobFuncOpt = Some(setInputPaths),
-                          initLocalJobFuncOpt = Some(initLocalJobFuncOpt),
-                          inputFormatClass =
-                            classOf[ParquetInputFormat[InternalRow]],
-                          valueClass = classOf[InternalRow]) {
+      new SqlNewHadoopRDD(
+        sqlContext = sqlContext,
+        broadcastedConf = broadcastedConf,
+        initDriverSideJobFuncOpt = Some(setInputPaths),
+        initLocalJobFuncOpt = Some(initLocalJobFuncOpt),
+        inputFormatClass = classOf[ParquetInputFormat[InternalRow]],
+        valueClass = classOf[InternalRow]
+      ) {
 
         val cacheMetadata = useMetadataCache
 
@@ -322,16 +328,18 @@ private[sql] class DefaultSource
           // (which does happen in some S3N credentials), we need to use the string returned by the
           // URI of the path to create a new Path.
           val pathWithEscapedAuthority = escapePathUserInfo(f.getPath)
-          new FileStatus(f.getLen,
-                         f.isDirectory,
-                         f.getReplication,
-                         f.getBlockSize,
-                         f.getModificationTime,
-                         f.getAccessTime,
-                         f.getPermission,
-                         f.getOwner,
-                         f.getGroup,
-                         pathWithEscapedAuthority)
+          new FileStatus(
+            f.getLen,
+            f.isDirectory,
+            f.getReplication,
+            f.getBlockSize,
+            f.getModificationTime,
+            f.getAccessTime,
+            f.getPermission,
+            f.getOwner,
+            f.getGroup,
+            pathWithEscapedAuthority
+          )
         }.toSeq
 
         private def escapePathUserInfo(path: Path): Path = {
@@ -482,10 +490,12 @@ private[sql] object ParquetRelation extends Logging {
         .foreach(ParquetInputFormat.setFilterPredicate(conf, _))
     }
 
-    conf.set(CatalystReadSupport.SPARK_ROW_REQUESTED_SCHEMA, {
-      val requestedSchema = StructType(requiredColumns.map(dataSchema(_)))
-      CatalystSchemaConverter.checkFieldNames(requestedSchema).json
-    })
+    conf.set(
+      CatalystReadSupport.SPARK_ROW_REQUESTED_SCHEMA, {
+        val requestedSchema = StructType(requiredColumns.map(dataSchema(_)))
+        CatalystSchemaConverter.checkFieldNames(requestedSchema).json
+      }
+    )
 
     conf.set(CatalystWriteSupport.SPARK_ROW_SCHEMA,
              CatalystSchemaConverter.checkFieldNames(dataSchema).json)
@@ -541,23 +551,27 @@ private[sql] object ParquetRelation extends Logging {
 
         // Don't throw even if we failed to parse the serialized Spark schema. Just fallback to
         // whatever is available.
-        Some(Try(DataType.fromJson(serializedSchema.get)).recover {
-          case _: Throwable =>
-            logInfo(
-              s"Serialized Spark schema in Parquet key-value metadata is not in JSON format, " +
-                "falling back to the deprecated DataType.fromCaseClassString parser.")
-            LegacyTypeStringParser.parse(serializedSchema.get)
-        }.recover {
-          case cause: Throwable =>
-            logWarning(
-              s"""Failed to parse serialized Spark schema in Parquet key-value metadata:
+        Some(Try(DataType.fromJson(serializedSchema.get))
+          .recover {
+            case _: Throwable =>
+              logInfo(
+                s"Serialized Spark schema in Parquet key-value metadata is not in JSON format, " +
+                  "falling back to the deprecated DataType.fromCaseClassString parser.")
+              LegacyTypeStringParser.parse(serializedSchema.get)
+          }
+          .recover {
+            case cause: Throwable =>
+              logWarning(
+                s"""Failed to parse serialized Spark schema in Parquet key-value metadata:
                  |\t$serializedSchema
                """.stripMargin,
-              cause)
-        }.map(_.asInstanceOf[StructType]).getOrElse {
-          // Falls back to Parquet schema if Spark SQL schema can't be parsed.
-          parseParquetSchema(metadata.getSchema)
-        })
+                cause)
+          }
+          .map(_.asInstanceOf[StructType])
+          .getOrElse {
+            // Falls back to Parquet schema if Spark SQL schema can't be parsed.
+            parseParquetSchema(metadata.getSchema)
+          })
       } else {
         None
       }
@@ -771,18 +785,23 @@ private[sql] object ParquetRelation extends Logging {
       schemaString: String): Option[StructType] = {
     // Tries to deserialize the schema string as JSON first, then falls back to the case class
     // string parser (data generated by older versions of Spark SQL uses this format).
-    Try(DataType.fromJson(schemaString).asInstanceOf[StructType]).recover {
-      case _: Throwable =>
-        logInfo(s"Serialized Spark schema in Parquet key-value metadata is not in JSON format, " +
-          "falling back to the deprecated DataType.fromCaseClassString parser.")
-        LegacyTypeStringParser.parse(schemaString).asInstanceOf[StructType]
-    }.recoverWith {
-      case cause: Throwable =>
-        logWarning("Failed to parse and ignored serialized Spark schema in " +
-                     s"Parquet key-value metadata:\n\t$schemaString",
-                   cause)
-        Failure(cause)
-    }.toOption
+    Try(DataType.fromJson(schemaString).asInstanceOf[StructType])
+      .recover {
+        case _: Throwable =>
+          logInfo(
+            s"Serialized Spark schema in Parquet key-value metadata is not in JSON format, " +
+              "falling back to the deprecated DataType.fromCaseClassString parser.")
+          LegacyTypeStringParser.parse(schemaString).asInstanceOf[StructType]
+      }
+      .recoverWith {
+        case cause: Throwable =>
+          logWarning(
+            "Failed to parse and ignored serialized Spark schema in " +
+              s"Parquet key-value metadata:\n\t$schemaString",
+            cause)
+          Failure(cause)
+      }
+      .toOption
   }
 
   // JUL loggers must be held by a strong reference, otherwise they may get destroyed by GC.
@@ -828,5 +847,6 @@ private[sql] object ParquetRelation extends Logging {
     "uncompressed" -> CompressionCodecName.UNCOMPRESSED,
     "snappy" -> CompressionCodecName.SNAPPY,
     "gzip" -> CompressionCodecName.GZIP,
-    "lzo" -> CompressionCodecName.LZO)
+    "lzo" -> CompressionCodecName.LZO
+  )
 }

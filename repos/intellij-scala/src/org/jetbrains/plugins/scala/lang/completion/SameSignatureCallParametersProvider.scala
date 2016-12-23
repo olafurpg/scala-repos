@@ -53,45 +53,53 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
     .withSuperParent(2, classOf[ScArgumentExprList])
     .withSuperParent(3, classOf[ScMethodCall])
 
-  extend(CompletionType.BASIC,
-         constructorFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addConstructorCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    constructorFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addConstructorCompletions(parameters, result)
+      }
+    }
+  )
 
-  extend(CompletionType.SMART,
-         constructorFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addConstructorCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.SMART,
+    constructorFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addConstructorCompletions(parameters, result)
+      }
+    }
+  )
 
-  extend(CompletionType.BASIC,
-         superCallFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addSuperCallCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    superCallFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addSuperCallCompletions(parameters, result)
+      }
+    }
+  )
 
-  extend(CompletionType.SMART,
-         superCallFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addSuperCallCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.SMART,
+    superCallFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addSuperCallCompletions(parameters, result)
+      }
+    }
+  )
 
   private def addSuperCallCompletions(parameters: CompletionParameters,
                                       result: CompletionResultSet): Unit = {
@@ -113,28 +121,29 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
               val variants = ref.getSimpleVariants(implicits = false,
                                                    filterNotNamedVariants =
                                                      false)
-              val signatures = variants.toSeq.map {
-                case ScalaResolveResult(fun: ScMethodLike, subst) =>
-                  val params = fun.effectiveParameterClauses
-                  if (params.length > index)
-                    params(index).effectiveParameters.map(
-                      p =>
+              val signatures = variants.toSeq
+                .map {
+                  case ScalaResolveResult(fun: ScMethodLike, subst) =>
+                    val params = fun.effectiveParameterClauses
+                    if (params.length > index)
+                      params(index).effectiveParameters.map(p =>
                         (p.name,
                          subst.subst(p.getType(TypingContext.empty).getOrAny)))
-                  else Seq.empty
-                case ScalaResolveResult(method: PsiMethod, subst) =>
-                  if (index != 0) Seq.empty
-                  else
-                    method.getParameterList.getParameters.toSeq.map {
-                      case p: PsiParameter =>
-                        (p.name,
-                         subst.subst(
-                           ScType.create(p.getType,
-                                         position.getProject,
-                                         position.getResolveScope)))
-                    }
-                case _ => Seq.empty
-              }.filter(_.length > 1)
+                    else Seq.empty
+                  case ScalaResolveResult(method: PsiMethod, subst) =>
+                    if (index != 0) Seq.empty
+                    else
+                      method.getParameterList.getParameters.toSeq.map {
+                        case p: PsiParameter =>
+                          (p.name,
+                           subst.subst(
+                             ScType.create(p.getType,
+                                           position.getProject,
+                                           position.getResolveScope)))
+                      }
+                  case _ => Seq.empty
+                }
+                .filter(_.length > 1)
 
               if (signatures.isEmpty) return
 
@@ -167,34 +176,38 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
                     if !clazz.hasTypeParameters ||
                       (clazz.hasTypeParameters && typeElement
                         .isInstanceOf[ScParameterizedTypeElement]) =>
-                  clazz.constructors.toSeq.map {
-                    case fun: ScMethodLike =>
-                      val params = fun.effectiveParameterClauses
-                      if (params.length > index)
-                        params(index).effectiveParameters.map(
-                          p =>
-                            (p.name,
-                             subst.subst(
-                               p.getType(TypingContext.empty).getOrAny)))
-                      else Seq.empty
-                  }.filter(_.length > 1)
+                  clazz.constructors.toSeq
+                    .map {
+                      case fun: ScMethodLike =>
+                        val params = fun.effectiveParameterClauses
+                        if (params.length > index)
+                          params(index).effectiveParameters.map(
+                            p =>
+                              (p.name,
+                               subst.subst(
+                                 p.getType(TypingContext.empty).getOrAny)))
+                        else Seq.empty
+                    }
+                    .filter(_.length > 1)
                 case Some((clazz: PsiClass, subst))
                     if !clazz.hasTypeParameters ||
                       (clazz.hasTypeParameters && typeElement
                         .isInstanceOf[ScParameterizedTypeElement]) =>
-                  clazz.getConstructors.toSeq.map {
-                    case c: PsiMethod =>
-                      if (index != 0) Seq.empty
-                      else
-                        c.getParameterList.getParameters.toSeq.map {
-                          case p: PsiParameter =>
-                            (p.name,
-                             subst.subst(
-                               ScType.create(p.getType,
-                                             typeElement.getProject,
-                                             typeElement.getResolveScope)))
-                        }
-                  }.filter(_.length > 1)
+                  clazz.getConstructors.toSeq
+                    .map {
+                      case c: PsiMethod =>
+                        if (index != 0) Seq.empty
+                        else
+                          c.getParameterList.getParameters.toSeq.map {
+                            case p: PsiParameter =>
+                              (p.name,
+                               subst.subst(
+                                 ScType.create(p.getType,
+                                               typeElement.getProject,
+                                               typeElement.getResolveScope)))
+                          }
+                    }
+                    .filter(_.length > 1)
                 case _ => Seq.empty
               }
 
@@ -215,16 +228,21 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
                               result: CompletionResultSet): Unit = {
     for (signature <- signatures if signature.forall(_._1 != null)) {
       val names = new ArrayBuffer[String]()
-      val res = signature.map {
-        case (name: String, tp: ScType) =>
-          methodLike.parameterList.params.find(_.name == name) match {
-            case Some(param)
-                if param.getType(TypingContext.empty).getOrAny.conforms(tp) =>
-              names += name
-              name
-            case _ => names += ""
-          }
-      }.mkString(", ")
+      val res = signature
+        .map {
+          case (name: String, tp: ScType) =>
+            methodLike.parameterList.params.find(_.name == name) match {
+              case Some(param)
+                  if param
+                    .getType(TypingContext.empty)
+                    .getOrAny
+                    .conforms(tp) =>
+                names += name
+                name
+              case _ => names += ""
+            }
+        }
+        .mkString(", ")
       if (!names.contains("")) {
         val w: Int = Icons.PARAMETER.getIconWidth
         val icon: LayeredIcon = new LayeredIcon(2)

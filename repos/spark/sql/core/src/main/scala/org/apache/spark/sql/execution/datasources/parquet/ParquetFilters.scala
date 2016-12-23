@@ -213,9 +213,9 @@ private[sql] object ParquetFilters {
    */
   }
 
-  private val makeInSet: PartialFunction[DataType,
-                                         (String,
-                                          Set[Any]) => FilterPredicate] = {
+  private val makeInSet: PartialFunction[
+    DataType,
+    (String, Set[Any]) => FilterPredicate] = {
     case IntegerType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(
@@ -258,10 +258,12 @@ private[sql] object ParquetFilters {
   private def getFieldMap(dataType: DataType): Array[(String, DataType)] =
     dataType match {
       case StructType(fields) =>
-        fields.filter { f =>
-          !f.metadata.contains(StructType.metadataKeyForOptionalField) ||
-          !f.metadata.getBoolean(StructType.metadataKeyForOptionalField)
-        }.map(f => f.name -> f.dataType) ++ fields.flatMap { f =>
+        fields
+          .filter { f =>
+            !f.metadata.contains(StructType.metadataKeyForOptionalField) ||
+            !f.metadata.getBoolean(StructType.metadataKeyForOptionalField)
+          }
+          .map(f => f.name -> f.dataType) ++ fields.flatMap { f =>
           getFieldMap(f.dataType)
         }
       case _ => Array.empty[(String, DataType)]

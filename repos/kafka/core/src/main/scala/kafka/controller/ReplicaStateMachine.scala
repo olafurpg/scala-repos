@@ -345,41 +345,42 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
                                                              deletePartition =
                                                                false)
           // As an optimization, the controller removes dead replicas from the ISR
-          val leaderAndIsrIsEmpty: Boolean = controllerContext.partitionLeadershipInfo
-            .get(topicAndPartition) match {
-            case Some(currLeaderIsrAndControllerEpoch) =>
-              controller
-                .removeReplicaFromIsr(topic, partition, replicaId) match {
-                case Some(updatedLeaderIsrAndControllerEpoch) =>
-                  // send the shrunk ISR state change request to all the remaining alive replicas of the partition.
-                  val currentAssignedReplicas =
-                    controllerContext.partitionReplicaAssignment(
-                      topicAndPartition)
-                  if (!controller.deleteTopicManager.isPartitionToBeDeleted(
-                        topicAndPartition)) {
-                    brokerRequestBatch.addLeaderAndIsrRequestForBrokers(
-                      currentAssignedReplicas.filterNot(_ == replicaId),
-                      topic,
-                      partition,
-                      updatedLeaderIsrAndControllerEpoch,
-                      replicaAssignment)
-                  }
-                  replicaState.put(partitionAndReplica, OfflineReplica)
-                  stateChangeLogger.trace(
-                    "Controller %d epoch %d changed state of replica %d for partition %s from %s to %s"
-                      .format(controllerId,
-                              controller.epoch,
-                              replicaId,
-                              topicAndPartition,
-                              currState,
-                              targetState))
-                  false
-                case None =>
-                  true
-              }
-            case None =>
-              true
-          }
+          val leaderAndIsrIsEmpty: Boolean =
+            controllerContext.partitionLeadershipInfo
+              .get(topicAndPartition) match {
+              case Some(currLeaderIsrAndControllerEpoch) =>
+                controller
+                  .removeReplicaFromIsr(topic, partition, replicaId) match {
+                  case Some(updatedLeaderIsrAndControllerEpoch) =>
+                    // send the shrunk ISR state change request to all the remaining alive replicas of the partition.
+                    val currentAssignedReplicas =
+                      controllerContext.partitionReplicaAssignment(
+                        topicAndPartition)
+                    if (!controller.deleteTopicManager.isPartitionToBeDeleted(
+                          topicAndPartition)) {
+                      brokerRequestBatch.addLeaderAndIsrRequestForBrokers(
+                        currentAssignedReplicas.filterNot(_ == replicaId),
+                        topic,
+                        partition,
+                        updatedLeaderIsrAndControllerEpoch,
+                        replicaAssignment)
+                    }
+                    replicaState.put(partitionAndReplica, OfflineReplica)
+                    stateChangeLogger.trace(
+                      "Controller %d epoch %d changed state of replica %d for partition %s from %s to %s"
+                        .format(controllerId,
+                                controller.epoch,
+                                replicaId,
+                                topicAndPartition,
+                                currState,
+                                targetState))
+                    false
+                  case None =>
+                    true
+                }
+              case None =>
+                true
+            }
           if (leaderAndIsrIsEmpty &&
               !controller.deleteTopicManager.isPartitionToBeDeleted(
                 topicAndPartition))
@@ -398,7 +399,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
                     partition,
                     currState,
                     targetState),
-          t)
+          t
+        )
     }
   }
 
@@ -446,8 +448,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
       fromStates.contains(replicaState(partitionAndReplica)),
       "Replica %s should be in the %s states before moving to %s state"
         .format(partitionAndReplica, fromStates.mkString(","), targetState) +
-        ". Instead it is in %s state".format(
-          replicaState(partitionAndReplica)))
+        ". Instead it is in %s state".format(replicaState(partitionAndReplica))
+    )
   }
 
   private def registerBrokerChangeListener() = {

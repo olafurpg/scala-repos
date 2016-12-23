@@ -209,9 +209,11 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
       PlayRunners.mutex.synchronized {
         def testStartAndStop(i: Int) = {
           val resultString = s"result-$i"
-          val app = GuiceApplicationBuilder().routes {
-            case ("GET", "/") => Action(Ok(resultString))
-          }.build()
+          val app = GuiceApplicationBuilder()
+            .routes {
+              case ("GET", "/") => Action(Ok(resultString))
+            }
+            .build()
           val server =
             TestServer(testServerPort,
                        app,

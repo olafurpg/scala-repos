@@ -46,7 +46,8 @@ abstract class ScalaDocEnterActionTestBase
             case _ => null
           }
         }
-      })
+      }
+    )
 
     assert(transform(getFileAdapter.getText).equals(assumedStub))
   }

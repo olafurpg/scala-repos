@@ -35,8 +35,8 @@ trait Dependent {
     * The Cell notifies the Dependent of the dependency
     */
   def youDependOnMe(who: Cell[_]): Unit = synchronized {
-    _iDependOn = new WeakReference(who.asInstanceOf[Object]) :: _iDependOn
-        .filter(_.get match {
+    _iDependOn = new WeakReference(who.asInstanceOf[Object]) :: _iDependOn.filter(
+        _.get match {
         case null => false
         case x => x ne who
       })
@@ -58,12 +58,10 @@ trait Dependent {
     * Get a list of all the cells this Dependency depends on
     */
   protected def whoDoIDependOn: Seq[Cell[_]] = synchronized {
-    _iDependOn
-      .flatMap(_.get match {
-        case null => Nil
-        case x => List(x)
-      })
-      .asInstanceOf[List[Cell[_]]]
+    _iDependOn.flatMap(_.get match {
+      case null => Nil
+      case x => List(x)
+    }).asInstanceOf[List[Cell[_]]]
   }
 
   private var _iDependOn: List[WeakReference[Object]] = Nil

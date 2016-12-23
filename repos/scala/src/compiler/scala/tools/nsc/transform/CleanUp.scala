@@ -144,7 +144,8 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
               ApplyDynamic(gen.mkAttributedIdent(StructuralCallSite_dummy),
                            LIT(StructuralCallSite_bootstrap) :: LIT(
                              dummyMethodType) :: Nil)
-                .setType(StructuralCallSite.tpe)),
+                .setType(StructuralCallSite.tpe)
+            ),
             ValDef(methodSym,
                    (REF(methodCache) DOT StructuralCallSite_find)(
                      REF(forReceiverSym))),
@@ -380,7 +381,8 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
               reporter.warning(
                 ad.pos,
                 s"Overloaded type reached the backend! This is a bug in scalac.\n     Symbol: ${ad.symbol}\n  Overloads: $tpe\n  Arguments: " +
-                  ad.args.map(_.tpe))
+                  ad.args.map(_.tpe)
+              )
               alts filter (_.paramss.flatten.size == params.length) map (_.tpe) match {
                 case mt @ MethodType(mparams, resType) :: Nil =>
                   reporter.warning(

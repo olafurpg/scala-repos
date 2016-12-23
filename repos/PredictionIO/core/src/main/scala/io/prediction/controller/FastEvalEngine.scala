@@ -130,30 +130,34 @@ object FastEvalEngineWorkflow {
       prefix: AlgorithmsPrefix): Map[EX, RDD[(QX, Seq[P])]] = {
 
     val algoMap: Map[AX, BaseAlgorithm[PD, _, Q, P]] =
-      prefix.algorithmParamsList.map {
-        case (algoName, algoParams) => {
-          try {
-            Doer(workflow.engine.algorithmClassMap(algoName), algoParams)
-          } catch {
-            case e: NoSuchElementException => {
-              val algorithmClassMap = workflow.engine.algorithmClassMap
-              if (algoName == "") {
-                logger.error(
-                  "Empty algorithm name supplied but it could not " +
-                    "match with any algorithm in the engine's definition. " +
-                    "Existing algorithm name(s) are: " +
-                    s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
-              } else {
-                logger.error(
-                  s"${algoName} cannot be found in the engine's " +
-                    "definition. Existing algorithm name(s) are: " +
-                    s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
+      prefix.algorithmParamsList
+        .map {
+          case (algoName, algoParams) => {
+            try {
+              Doer(workflow.engine.algorithmClassMap(algoName), algoParams)
+            } catch {
+              case e: NoSuchElementException => {
+                val algorithmClassMap = workflow.engine.algorithmClassMap
+                if (algoName == "") {
+                  logger.error(
+                    "Empty algorithm name supplied but it could not " +
+                      "match with any algorithm in the engine's definition. " +
+                      "Existing algorithm name(s) are: " +
+                      s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
+                } else {
+                  logger.error(
+                    s"${algoName} cannot be found in the engine's " +
+                      "definition. Existing algorithm name(s) are: " +
+                      s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
+                }
+                sys.exit(1)
               }
-              sys.exit(1)
             }
           }
         }
-      }.zipWithIndex.map(_.swap).toMap
+        .zipWithIndex
+        .map(_.swap)
+        .toMap
 
     val algoCount = algoMap.size
 
@@ -169,38 +173,41 @@ object FastEvalEngineWorkflow {
       workflow = workflow,
       prefix = new DataSourcePrefix(prefix))
 
-    val algoResult: Map[EX, RDD[(QX, Seq[P])]] = dataSourceResult.par.map {
-      case (ex, (td, ei, iqaRDD)) => {
-        val modelsMap: Map[AX, Any] = algoModelsMap(ex)
-        val qs: RDD[(QX, Q)] = iqaRDD.mapValues(_._1)
+    val algoResult: Map[EX, RDD[(QX, Seq[P])]] = dataSourceResult.par
+      .map {
+        case (ex, (td, ei, iqaRDD)) => {
+          val modelsMap: Map[AX, Any] = algoModelsMap(ex)
+          val qs: RDD[(QX, Q)] = iqaRDD.mapValues(_._1)
 
-        val algoPredicts: Seq[RDD[(QX, (AX, P))]] = (0 until algoCount).map {
-          ax =>
-            {
-              val algo = algoMap(ax)
-              val model = modelsMap(ax)
-              val rawPredicts: RDD[(QX, P)] =
-                algo.batchPredictBase(workflow.sc, model, qs)
+          val algoPredicts: Seq[RDD[(QX, (AX, P))]] = (0 until algoCount).map {
+            ax =>
+              {
+                val algo = algoMap(ax)
+                val model = modelsMap(ax)
+                val rawPredicts: RDD[(QX, P)] =
+                  algo.batchPredictBase(workflow.sc, model, qs)
 
-              val predicts: RDD[(QX, (AX, P))] = rawPredicts.map {
-                case (qx, p) => (qx, (ax, p))
+                val predicts: RDD[(QX, (AX, P))] = rawPredicts.map {
+                  case (qx, p) => (qx, (ax, p))
+                }
+                predicts
               }
-              predicts
-            }
-        }
-
-        val unionAlgoPredicts: RDD[(QX, Seq[P])] =
-          workflow.sc.union(algoPredicts).groupByKey.mapValues { ps =>
-            {
-              assert(ps.size == algoCount,
-                     "Must have same length as algoCount")
-              // TODO. Check size == algoCount
-              ps.toSeq.sortBy(_._1).map(_._2)
-            }
           }
-        (ex, unionAlgoPredicts)
+
+          val unionAlgoPredicts: RDD[(QX, Seq[P])] =
+            workflow.sc.union(algoPredicts).groupByKey.mapValues { ps =>
+              {
+                assert(ps.size == algoCount,
+                       "Must have same length as algoCount")
+                // TODO. Check size == algoCount
+                ps.toSeq.sortBy(_._1).map(_._2)
+              }
+            }
+          (ex, unionAlgoPredicts)
+        }
       }
-    }.seq.toMap
+      .seq
+      .toMap
 
     algoResult
   }

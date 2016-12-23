@@ -188,12 +188,16 @@ private[deploy] object IvyTestUtils {
                     |   <modelVersion>4.0.0</modelVersion>
                   """.stripMargin.trim
     content += pomArtifactWriter(artifact)
-    content += dependencies.map { deps =>
-      val inside = deps.map { dep =>
-        "\t<dependency>" + pomArtifactWriter(dep, 3) + "\n\t</dependency>"
-      }.mkString("\n")
-      "\n  <dependencies>\n" + inside + "\n  </dependencies>"
-    }.getOrElse("")
+    content += dependencies
+      .map { deps =>
+        val inside = deps
+          .map { dep =>
+            "\t<dependency>" + pomArtifactWriter(dep, 3) + "\n\t</dependency>"
+          }
+          .mkString("\n")
+        "\n  <dependencies>\n" + inside + "\n  </dependencies>"
+      }
+      .getOrElse("")
     content += "\n</project>"
     writeFile(dir, artifactName(artifact, false, ".pom"), content.trim)
   }
@@ -229,10 +233,12 @@ private[deploy] object IvyTestUtils {
         |               conf="master"/>
         |  </publications>
       """.stripMargin.trim
-    content += dependencies.map { deps =>
-      val inside = deps.map(ivyArtifactWriter).mkString("\n")
-      "\n  <dependencies>\n" + inside + "\n  </dependencies>"
-    }.getOrElse("")
+    content += dependencies
+      .map { deps =>
+        val inside = deps.map(ivyArtifactWriter).mkString("\n")
+        "\n  <dependencies>\n" + inside + "\n  </dependencies>"
+      }
+      .getOrElse("")
     content += "\n</ivy-module>"
     writeFile(dir, "ivy.xml", content.trim)
   }

@@ -146,14 +146,19 @@ class ScalaGenerateAnonymousFunctionInsertHandler(params: Seq[ScType],
                           commonParent.getTextRange.getEndOffset)
     TemplateManager
       .getInstance(context.getProject)
-      .startTemplate(editor, template, new TemplateEditingAdapter {
-        override def templateFinished(template: Template, brokenOff: Boolean) {
-          if (!brokenOff) {
-            val offset = editor.getCaretModel.getOffset
-            document.insertString(offset, " ")
-            editor.getCaretModel.moveToOffset(offset + 1)
+      .startTemplate(
+        editor,
+        template,
+        new TemplateEditingAdapter {
+          override def templateFinished(template: Template,
+                                        brokenOff: Boolean) {
+            if (!brokenOff) {
+              val offset = editor.getCaretModel.getOffset
+              document.insertString(offset, " ")
+              editor.getCaretModel.moveToOffset(offset + 1)
+            }
           }
         }
-      })
+      )
   }
 }

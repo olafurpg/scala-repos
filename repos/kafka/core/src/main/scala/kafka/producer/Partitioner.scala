@@ -26,7 +26,8 @@ package kafka.producer
 @deprecated(
   "This trait has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.Partitioner instead.",
-  "0.10.0.0")
+  "0.10.0.0"
+)
 trait Partitioner {
 
   /**

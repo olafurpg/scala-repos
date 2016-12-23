@@ -128,7 +128,8 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
           entity = HttpEntity(
             ContentTypes.`text/html(UTF-8)`,
             "The requested resource temporarily resides under <a href=\"/foo\">this URI</a>."),
-          headers = Location("/foo") :: Nil)
+          headers = Location("/foo") :: Nil
+        )
       }
     }
 

@@ -263,7 +263,8 @@ object CrossValidator extends MLReadable[CrossValidator] {
                 uidToInstance.contains(p.parent),
                 s"CrossValidator save requires all Params in" +
                   s" estimatorParamMaps to apply to this CrossValidator, its Estimator, or its" +
-                  s" Evaluator.  An extraneous Param was found: $p")
+                  s" Evaluator.  An extraneous Param was found: $p"
+              )
           }
       }
     }

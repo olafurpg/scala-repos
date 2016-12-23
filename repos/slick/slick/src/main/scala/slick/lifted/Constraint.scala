@@ -83,12 +83,14 @@ class ForeignKeyQuery[E <: AbstractTable[_], U](
     * satisfies the constraints of both. */
   def &(other: ForeignKeyQuery[E, U]): ForeignKeyQuery[E, U] = {
     val newFKs = fks ++ other.fks
-    val conditions = newFKs.map { fk =>
-      val sh =
-        fk.columnsShape.asInstanceOf[Shape[FlatShapeLevel, Any, Any, Any]]
-      Library.==.typed[Boolean](sh.toNode(fk.targetColumns(aliasedValue)),
-                                sh.toNode(fk.sourceColumns))
-    }.reduceLeft[Node]((a, b) => Library.And.typed[Boolean](a, b))
+    val conditions = newFKs
+      .map { fk =>
+        val sh =
+          fk.columnsShape.asInstanceOf[Shape[FlatShapeLevel, Any, Any, Any]]
+        Library.==.typed[Boolean](sh.toNode(fk.targetColumns(aliasedValue)),
+                                  sh.toNode(fk.sourceColumns))
+      }
+      .reduceLeft[Node]((a, b) => Library.And.typed[Boolean](a, b))
     val newDelegate =
       Filter.ifRefutable(generator, targetBaseQuery.toNode, conditions)
     new ForeignKeyQuery[E, U](newDelegate,

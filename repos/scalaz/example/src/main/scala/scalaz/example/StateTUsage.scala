@@ -133,9 +133,11 @@ object LaunchburyInterpreter extends App {
             .map(tpl => tpl.copy(_2 = tpl._1._2, _1 = tpl._2))
             .toList
           e3 <- freshen(subs(e2))
-          freshendBs <- bs2.traverseS {
-            case (x, e) => freshen(subs(e)).map((x, _))
-          }.map(_.toMap)
+          freshendBs <- bs2
+            .traverseS {
+              case (x, e) => freshen(subs(e)).map((x, _))
+            }
+            .map(_.toMap)
         } yield Let(freshendBs, e3)
     }
   }

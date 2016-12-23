@@ -221,33 +221,26 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         4,
         "D",
         4,
-        "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
+        "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil
+    )
 
-    checkAnswer(upperCaseData.join(lowerCaseData,
-                                   $"n" === $"N" && $"n" > 1,
-                                   "left"),
-                Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(
-                  3,
-                  "C",
-                  3,
-                  "c") :: Row(4, "D", 4, "d") :: Row(5, "E", null, null) :: Row(
-                  6,
-                  "F",
-                  null,
-                  null) :: Nil)
+    checkAnswer(
+      upperCaseData.join(lowerCaseData, $"n" === $"N" && $"n" > 1, "left"),
+      Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(3, "C", 3, "c") :: Row(
+        4,
+        "D",
+        4,
+        "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil
+    )
 
-    checkAnswer(upperCaseData.join(lowerCaseData,
-                                   $"n" === $"N" && $"N" > 1,
-                                   "left"),
-                Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(
-                  3,
-                  "C",
-                  3,
-                  "c") :: Row(4, "D", 4, "d") :: Row(5, "E", null, null) :: Row(
-                  6,
-                  "F",
-                  null,
-                  null) :: Nil)
+    checkAnswer(
+      upperCaseData.join(lowerCaseData, $"n" === $"N" && $"N" > 1, "left"),
+      Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(3, "C", 3, "c") :: Row(
+        4,
+        "D",
+        4,
+        "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil
+    )
 
     checkAnswer(
       upperCaseData.join(lowerCaseData, $"n" === $"N" && $"l" > $"L", "left"),
@@ -255,7 +248,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         4,
         "D",
         4,
-        "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
+        "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil
+    )
 
     // Make sure we are choosing left.outputPartitioning as the
     // outputPartitioning for the outer join operator.
@@ -267,7 +261,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
       """.stripMargin),
       Row(1, 1) :: Row(2, 1) :: Row(3, 1) :: Row(4, 1) :: Row(5, 1) :: Row(
         6,
-        1) :: Nil)
+        1) :: Nil
+    )
 
     checkAnswer(
       sql("""
@@ -275,7 +270,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           |FROM upperCaseData l LEFT OUTER JOIN allNulls r ON (l.N = r.a)
           |GROUP BY r.a
         """.stripMargin),
-      Row(null, 6) :: Nil)
+      Row(null, 6) :: Nil
+    )
   }
 
   test("right outer join") {
@@ -285,38 +281,32 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         4,
         "d",
         4,
-        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
-    checkAnswer(lowerCaseData.join(upperCaseData,
-                                   $"n" === $"N" && $"n" > 1,
-                                   "right"),
-                Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(
-                  3,
-                  "c",
-                  3,
-                  "C") :: Row(4, "d", 4, "D") :: Row(null, null, 5, "E") :: Row(
-                  null,
-                  null,
-                  6,
-                  "F") :: Nil)
-    checkAnswer(lowerCaseData.join(upperCaseData,
-                                   $"n" === $"N" && $"N" > 1,
-                                   "right"),
-                Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(
-                  3,
-                  "c",
-                  3,
-                  "C") :: Row(4, "d", 4, "D") :: Row(null, null, 5, "E") :: Row(
-                  null,
-                  null,
-                  6,
-                  "F") :: Nil)
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil
+    )
+    checkAnswer(
+      lowerCaseData.join(upperCaseData, $"n" === $"N" && $"n" > 1, "right"),
+      Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(3, "c", 3, "C") :: Row(
+        4,
+        "d",
+        4,
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil
+    )
+    checkAnswer(
+      lowerCaseData.join(upperCaseData, $"n" === $"N" && $"N" > 1, "right"),
+      Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(3, "c", 3, "C") :: Row(
+        4,
+        "d",
+        4,
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil
+    )
     checkAnswer(
       lowerCaseData.join(upperCaseData, $"n" === $"N" && $"l" > $"L", "right"),
       Row(1, "a", 1, "A") :: Row(2, "b", 2, "B") :: Row(3, "c", 3, "C") :: Row(
         4,
         "d",
         4,
-        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil
+    )
 
     // Make sure we are choosing right.outputPartitioning as the
     // outputPartitioning for the outer join operator.
@@ -326,7 +316,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           |FROM allNulls l RIGHT OUTER JOIN upperCaseData r ON (l.a = r.N)
           |GROUP BY l.a
         """.stripMargin),
-      Row(null, 6))
+      Row(null, 6)
+    )
 
     checkAnswer(
       sql("""
@@ -336,7 +327,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         """.stripMargin),
       Row(1, 1) :: Row(2, 1) :: Row(3, 1) :: Row(4, 1) :: Row(5, 1) :: Row(
         6,
-        1) :: Nil)
+        1) :: Nil
+    )
   }
 
   test("full outer join") {
@@ -346,16 +338,14 @@ class JoinSuite extends QueryTest with SharedSQLContext {
     val left = UnresolvedRelation(TableIdentifier("left"), None)
     val right = UnresolvedRelation(TableIdentifier("right"), None)
 
-    checkAnswer(left.join(right, $"left.N" === $"right.N", "full"),
-                Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(
-                  3,
-                  "C",
-                  3,
-                  "C") :: Row(4, "D", 4, "D") :: Row(null, null, 5, "E") :: Row(
-                  null,
-                  null,
-                  6,
-                  "F") :: Nil)
+    checkAnswer(
+      left.join(right, $"left.N" === $"right.N", "full"),
+      Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(3, "C", 3, "C") :: Row(
+        4,
+        "D",
+        4,
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil
+    )
 
     checkAnswer(
       left.join(right,
@@ -369,7 +359,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         null,
         null,
         5,
-        "E") :: Row(null, null, 6, "F") :: Nil)
+        "E") :: Row(null, null, 6, "F") :: Nil
+    )
 
     checkAnswer(
       left.join(right,
@@ -383,7 +374,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         null,
         null,
         5,
-        "E") :: Row(null, null, 6, "F") :: Nil)
+        "E") :: Row(null, null, 6, "F") :: Nil
+    )
 
     // Make sure we are UnknownPartitioning as the outputPartitioning for the outer join
     // operator.
@@ -393,7 +385,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         |FROM allNulls l FULL OUTER JOIN upperCaseData r ON (l.a = r.N)
         |GROUP BY l.a
       """.stripMargin),
-      Row(null, 10))
+      Row(null, 10)
+    )
 
     checkAnswer(
       sql("""
@@ -403,7 +396,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         """.stripMargin),
       Row(1, 1) :: Row(2, 1) :: Row(3, 1) :: Row(4, 1) :: Row(5, 1) :: Row(
         6,
-        1) :: Row(null, 4) :: Nil)
+        1) :: Row(null, 4) :: Nil
+    )
 
     checkAnswer(
       sql("""
@@ -413,7 +407,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         """.stripMargin),
       Row(1, 1) :: Row(2, 1) :: Row(3, 1) :: Row(4, 1) :: Row(5, 1) :: Row(
         6,
-        1) :: Row(null, 4) :: Nil)
+        1) :: Row(null, 4) :: Nil
+    )
 
     checkAnswer(
       sql("""
@@ -421,7 +416,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         |FROM upperCaseData l FULL OUTER JOIN allNulls r ON (l.N = r.a)
         |GROUP BY r.a
       """.stripMargin),
-      Row(null, 10))
+      Row(null, 10)
+    )
   }
 
   test("broadcasted left semi join operator selection") {
@@ -499,29 +495,35 @@ class JoinSuite extends QueryTest with SharedSQLContext {
          classOf[BroadcastNestedLoopJoin])
       ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
             SELECT x.value, y.a, y.b FROM testData x JOIN testData2 y WHERE x.key = 2
           """.stripMargin),
-                  Row("2", 1, 1) :: Row("2", 1, 2) :: Row("2", 2, 1) :: Row(
-                    "2",
-                    2,
-                    2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
+        Row("2", 1, 1) :: Row("2", 1, 2) :: Row("2", 2, 1) :: Row("2", 2, 2) :: Row(
+          "2",
+          3,
+          1) :: Row("2", 3, 2) :: Nil
+      )
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
             SELECT x.value, y.a, y.b FROM testData x JOIN testData2 y WHERE x.key < y.a
           """.stripMargin),
-                  Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row(
-                    "1",
-                    3,
-                    2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
+        Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row("1", 3, 2) :: Row(
+          "2",
+          3,
+          1) :: Row("2", 3, 2) :: Nil
+      )
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
             SELECT x.value, y.a, y.b FROM testData x JOIN testData2 y ON x.key < y.a
           """.stripMargin),
-                  Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row(
-                    "1",
-                    3,
-                    2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
+        Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row("1", 3, 2) :: Row(
+          "2",
+          3,
+          1) :: Row("2", 3, 2) :: Nil
+      )
     }
 
     sql("UNCACHE TABLE testData")

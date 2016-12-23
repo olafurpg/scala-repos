@@ -214,21 +214,23 @@ object Finagle extends Build {
     settings = Defaults.coreDefaultSettings ++ sharedSettings
   ).settings(
     name := "finagle-core",
-    libraryDependencies ++= Seq(util("app"),
-                                util("cache"),
-                                util("codec"),
-                                util("collection"),
-                                util("core"),
-                                util("hashing"),
-                                util("jvm"),
-                                util("lint"),
-                                util("logging"),
-                                util("registry"),
-                                util("stats"),
-                                commonsCodecLib,
-                                guavaLib,
-                                jsr166eLib,
-                                nettyLib)
+    libraryDependencies ++= Seq(
+      util("app"),
+      util("cache"),
+      util("codec"),
+      util("collection"),
+      util("core"),
+      util("hashing"),
+      util("jvm"),
+      util("lint"),
+      util("logging"),
+      util("registry"),
+      util("stats"),
+      commonsCodecLib,
+      guavaLib,
+      jsr166eLib,
+      nettyLib
+    )
   )
 
   lazy val finagleNetty4 = Project(
@@ -619,8 +621,8 @@ object Finagle extends Build {
         testGrouping <<= definedTests in Test map partitionTests,
         testGrouping in DocTest <<=
           definedTests in DocTest map partitionTests
-      ))
-    .configs(DocTest)
+      )
+  ).configs(DocTest)
     .settings(inConfig(DocTest)(Defaults.testSettings): _*)
     .settings(
       unmanagedSourceDirectories in DocTest <+=

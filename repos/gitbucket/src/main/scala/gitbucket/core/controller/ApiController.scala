@@ -282,26 +282,27 @@ trait ApiControllerBase extends ControllerBase {
         data <- extractFromJsonBody[CreateALabel] if data.isValid
       } yield {
         LockUtil.lock(RepositoryName(repository).fullName) {
-          getLabel(repository.owner, repository.name, params("labelName")).map {
-            label =>
-              if (getLabel(repository.owner, repository.name, data.name).isEmpty) {
-                updateLabel(repository.owner,
-                            repository.name,
-                            label.labelId,
-                            data.name,
-                            data.color)
-                JsonFormat(
-                  ApiLabel(getLabel(repository.owner,
-                                    repository.name,
-                                    label.labelId).get,
-                           RepositoryName(repository)))
-              } else {
-                // TODO ApiError should support errors field to enhance compatibility of GitHub API
-                UnprocessableEntity(ApiError(
-                  "Validation Failed",
-                  Some("https://developer.github.com/v3/issues/labels/#create-a-label")))
-              }
-          } getOrElse NotFound()
+          getLabel(repository.owner, repository.name, params("labelName"))
+            .map {
+              label =>
+                if (getLabel(repository.owner, repository.name, data.name).isEmpty) {
+                  updateLabel(repository.owner,
+                              repository.name,
+                              label.labelId,
+                              data.name,
+                              data.color)
+                  JsonFormat(
+                    ApiLabel(getLabel(repository.owner,
+                                      repository.name,
+                                      label.labelId).get,
+                             RepositoryName(repository)))
+                } else {
+                  // TODO ApiError should support errors field to enhance compatibility of GitHub API
+                  UnprocessableEntity(ApiError(
+                    "Validation Failed",
+                    Some("https://developer.github.com/v3/issues/labels/#create-a-label")))
+                }
+            } getOrElse NotFound()
         }
       }) getOrElse NotFound()
     })
@@ -385,24 +386,26 @@ trait ApiControllerBase extends ControllerBase {
     repository =>
       val owner = repository.owner
       val name = repository.name
-      params("id").toIntOpt.flatMap { issueId =>
-        getPullRequest(owner, name, issueId) map {
-          case (issue, pullreq) =>
-            using(Git.open(getRepositoryDir(owner, name))) {
-              git =>
-                val oldId = git.getRepository.resolve(pullreq.commitIdFrom)
-                val newId = git.getRepository.resolve(pullreq.commitIdTo)
-                val repoFullName = RepositoryName(repository)
-                val commits = git.log
-                  .addRange(oldId, newId)
-                  .call
-                  .iterator
-                  .asScala
-                  .map(c => ApiCommitListItem(new CommitInfo(c), repoFullName))
-                  .toList
-                JsonFormat(commits)
-            }
-        }
+      params("id").toIntOpt.flatMap {
+        issueId =>
+          getPullRequest(owner, name, issueId) map {
+            case (issue, pullreq) =>
+              using(Git.open(getRepositoryDir(owner, name))) {
+                git =>
+                  val oldId = git.getRepository.resolve(pullreq.commitIdFrom)
+                  val newId = git.getRepository.resolve(pullreq.commitIdTo)
+                  val repoFullName = RepositoryName(repository)
+                  val commits = git.log
+                    .addRange(oldId, newId)
+                    .call
+                    .iterator
+                    .asScala
+                    .map(c =>
+                      ApiCommitListItem(new CommitInfo(c), repoFullName))
+                    .toList
+                  JsonFormat(commits)
+              }
+          }
       } getOrElse NotFound
   })
 
@@ -447,22 +450,20 @@ trait ApiControllerBase extends ControllerBase {
     * ref is Ref to list the statuses from. It can be a SHA, a branch name, or a tag name.
     */
   val listStatusesRoute =
-    get("/api/v3/repos/:owner/:repo/commits/:ref/statuses")(
-      referrersOnly {
-        repository =>
-          (for {
-            ref <- params.get("ref")
-            sha <- JGitUtil.getShaByRef(repository.owner, repository.name, ref)
-          } yield {
-            JsonFormat(
-              getCommitStatuesWithCreator(repository.owner,
-                                          repository.name,
-                                          sha).map {
+    get("/api/v3/repos/:owner/:repo/commits/:ref/statuses")(referrersOnly {
+      repository =>
+        (for {
+          ref <- params.get("ref")
+          sha <- JGitUtil.getShaByRef(repository.owner, repository.name, ref)
+        } yield {
+          JsonFormat(
+            getCommitStatuesWithCreator(repository.owner, repository.name, sha)
+              .map {
                 case (status, creator) =>
                   ApiCommitStatus(status, ApiUser(creator))
               })
-          }) getOrElse NotFound
-      })
+        }) getOrElse NotFound
+    })
 
   /**
     * https://developer.github.com/v3/repos/statuses/#list-statuses-for-a-specific-ref

@@ -308,24 +308,30 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
         .map(_.toSeq)
         .getOrElse(Seq[FileStatus]())
       // scan for modified applications, replay and merge them
-      val logInfos: Seq[FileStatus] = statusList.filter { entry =>
-        try {
-          val prevFileSize =
-            fileToAppInfo.get(entry.getPath()).map { _.fileSize }.getOrElse(0L)
-          !entry.isDirectory() && prevFileSize < entry.getLen()
-        } catch {
-          case e: AccessControlException =>
-            // Do not use "logInfo" since these messages can get pretty noisy if printed on
-            // every poll.
-            logDebug(s"No permission to read $entry, ignoring.")
-            false
+      val logInfos: Seq[FileStatus] = statusList
+        .filter { entry =>
+          try {
+            val prevFileSize =
+              fileToAppInfo
+                .get(entry.getPath())
+                .map { _.fileSize }
+                .getOrElse(0L)
+            !entry.isDirectory() && prevFileSize < entry.getLen()
+          } catch {
+            case e: AccessControlException =>
+              // Do not use "logInfo" since these messages can get pretty noisy if printed on
+              // every poll.
+              logDebug(s"No permission to read $entry, ignoring.")
+              false
+          }
         }
-      }.flatMap { entry =>
-        Some(entry)
-      }.sortWith {
-        case (entry1, entry2) =>
-          entry1.getModificationTime() >= entry2.getModificationTime()
-      }
+        .flatMap { entry =>
+          Some(entry)
+        }
+        .sortWith {
+          case (entry1, entry2) =>
+            entry1.getModificationTime() >= entry2.getModificationTime()
+        }
 
       if (logInfos.nonEmpty) {
         logDebug(
@@ -407,15 +413,17 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
       case Some(appInfo) =>
         try {
           // If no attempt is specified, or there is no attemptId for attempts, return all attempts
-          appInfo.attempts.filter { attempt =>
-            attempt.attemptId.isEmpty || attemptId.isEmpty ||
-            attempt.attemptId.get == attemptId.get
-          }.foreach { attempt =>
-            val logPath = new Path(logDir, attempt.logPath)
-            zipFileToStream(new Path(logDir, attempt.logPath),
-                            attempt.logPath,
-                            zipStream)
-          }
+          appInfo.attempts
+            .filter { attempt =>
+              attempt.attemptId.isEmpty || attemptId.isEmpty ||
+              attempt.attemptId.get == attemptId.get
+            }
+            .foreach { attempt =>
+              val logPath = new Path(logDir, attempt.logPath)
+              zipFileToStream(new Path(logDir, attempt.logPath),
+                              attempt.logPath,
+                              zipStream)
+            }
         } finally {
           zipStream.close()
         }

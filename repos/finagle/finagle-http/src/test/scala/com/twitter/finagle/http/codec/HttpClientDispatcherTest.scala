@@ -259,13 +259,14 @@ class HttpClientDispatcherTest extends FunSuite {
     val chunkp = new Promise[Unit]
     val transport =
       OpTransport[Any, Any](
-                            // First write the initial request.
-                            Write(_.isInstanceOf[HttpRequest], Future.Done),
-                            // Read the response
-                            Read(Future.never),
-                            // Then we try to write the chunk
-                            Write(_.isInstanceOf[HttpChunk], chunkp),
-                            Close(Future.Done))
+        // First write the initial request.
+        Write(_.isInstanceOf[HttpRequest], Future.Done),
+        // Read the response
+        Read(Future.never),
+        // Then we try to write the chunk
+        Write(_.isInstanceOf[HttpChunk], chunkp),
+        Close(Future.Done)
+      )
 
     val disp = new HttpClientDispatcher(transport)
     val req = Request()

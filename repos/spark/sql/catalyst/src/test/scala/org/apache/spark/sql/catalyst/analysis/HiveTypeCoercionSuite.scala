@@ -237,25 +237,31 @@ class HiveTypeCoercionSuite extends PlanTest {
              AnyTypeUnaryExpression(Literal.create(null, NullType)),
              AnyTypeUnaryExpression(Literal.create(null, NullType)))
 
-    ruleTest(HiveTypeCoercion.ImplicitTypeCasts,
-             NumericTypeUnaryExpression(Literal.create(null, NullType)),
-             NumericTypeUnaryExpression(Literal.create(null, DoubleType)))
+    ruleTest(
+      HiveTypeCoercion.ImplicitTypeCasts,
+      NumericTypeUnaryExpression(Literal.create(null, NullType)),
+      NumericTypeUnaryExpression(Literal.create(null, DoubleType))
+    )
   }
 
   test("cast NullType for binary operators") {
     import HiveTypeCoercionSuite._
 
-    ruleTest(HiveTypeCoercion.ImplicitTypeCasts,
-             AnyTypeBinaryOperator(Literal.create(null, NullType),
-                                   Literal.create(null, NullType)),
-             AnyTypeBinaryOperator(Literal.create(null, NullType),
-                                   Literal.create(null, NullType)))
+    ruleTest(
+      HiveTypeCoercion.ImplicitTypeCasts,
+      AnyTypeBinaryOperator(Literal.create(null, NullType),
+                            Literal.create(null, NullType)),
+      AnyTypeBinaryOperator(Literal.create(null, NullType),
+                            Literal.create(null, NullType))
+    )
 
-    ruleTest(HiveTypeCoercion.ImplicitTypeCasts,
-             NumericTypeBinaryOperator(Literal.create(null, NullType),
-                                       Literal.create(null, NullType)),
-             NumericTypeBinaryOperator(Literal.create(null, DoubleType),
-                                       Literal.create(null, DoubleType)))
+    ruleTest(
+      HiveTypeCoercion.ImplicitTypeCasts,
+      NumericTypeBinaryOperator(Literal.create(null, NullType),
+                                Literal.create(null, NullType)),
+      NumericTypeBinaryOperator(Literal.create(null, DoubleType),
+                                Literal.create(null, DoubleType))
+    )
   }
 
   test("coalesce casts") {
@@ -266,39 +272,46 @@ class HiveTypeCoercionSuite extends PlanTest {
       Coalesce(
         Cast(Literal(1.0), DoubleType) :: Cast(Literal(1), DoubleType) :: Cast(
           Literal.create(1.0, FloatType),
-          DoubleType) :: Nil))
-    ruleTest(HiveTypeCoercion.FunctionArgumentConversion,
-             Coalesce(
-               Literal(1L) :: Literal(1) :: Literal(
-                 new java.math.BigDecimal("1000000000000000000000")) :: Nil),
-             Coalesce(
-               Cast(Literal(1L), DecimalType(22, 0)) :: Cast(
-                 Literal(1),
-                 DecimalType(22, 0)) :: Cast(
-                 Literal(new java.math.BigDecimal("1000000000000000000000")),
-                 DecimalType(22, 0)) :: Nil))
+          DoubleType) :: Nil)
+    )
+    ruleTest(
+      HiveTypeCoercion.FunctionArgumentConversion,
+      Coalesce(
+        Literal(1L) :: Literal(1) :: Literal(
+          new java.math.BigDecimal("1000000000000000000000")) :: Nil),
+      Coalesce(
+        Cast(Literal(1L), DecimalType(22, 0)) :: Cast(
+          Literal(1),
+          DecimalType(22, 0)) :: Cast(
+          Literal(new java.math.BigDecimal("1000000000000000000000")),
+          DecimalType(22, 0)) :: Nil)
+    )
   }
 
   test("greatest/least cast") {
     for (operator <- Seq[(Seq[Expression] => Expression)](Greatest, Least)) {
-      ruleTest(HiveTypeCoercion.FunctionArgumentConversion,
-               operator(
-                 Literal(1.0) :: Literal(1) :: Literal
-                   .create(1.0, FloatType) :: Nil),
-               operator(Cast(Literal(1.0), DoubleType) :: Cast(
-                 Literal(1),
-                 DoubleType) :: Cast(Literal.create(1.0, FloatType),
-                                     DoubleType) :: Nil))
-      ruleTest(HiveTypeCoercion.FunctionArgumentConversion,
-               operator(
-                 Literal(1L) :: Literal(1) :: Literal(
-                   new java.math.BigDecimal("1000000000000000000000")) :: Nil),
-               operator(
-                 Cast(Literal(1L), DecimalType(22, 0)) :: Cast(
-                   Literal(1),
-                   DecimalType(22, 0)) :: Cast(
-                   Literal(new java.math.BigDecimal("1000000000000000000000")),
-                   DecimalType(22, 0)) :: Nil))
+      ruleTest(
+        HiveTypeCoercion.FunctionArgumentConversion,
+        operator(
+          Literal(1.0) :: Literal(1) :: Literal
+            .create(1.0, FloatType) :: Nil),
+        operator(
+          Cast(Literal(1.0), DoubleType) :: Cast(Literal(1), DoubleType) :: Cast(
+            Literal.create(1.0, FloatType),
+            DoubleType) :: Nil)
+      )
+      ruleTest(
+        HiveTypeCoercion.FunctionArgumentConversion,
+        operator(
+          Literal(1L) :: Literal(1) :: Literal(
+            new java.math.BigDecimal("1000000000000000000000")) :: Nil),
+        operator(
+          Cast(Literal(1L), DecimalType(22, 0)) :: Cast(
+            Literal(1),
+            DecimalType(22, 0)) :: Cast(
+            Literal(new java.math.BigDecimal("1000000000000000000000")),
+            DecimalType(22, 0)) :: Nil)
+      )
     }
   }
 
@@ -307,16 +320,19 @@ class HiveTypeCoercionSuite extends PlanTest {
       HiveTypeCoercion.FunctionArgumentConversion,
       NaNvl(Literal.create(1.0, FloatType), Literal.create(1.0, DoubleType)),
       NaNvl(Cast(Literal.create(1.0, FloatType), DoubleType),
-            Literal.create(1.0, DoubleType)))
+            Literal.create(1.0, DoubleType))
+    )
     ruleTest(
       HiveTypeCoercion.FunctionArgumentConversion,
       NaNvl(Literal.create(1.0, DoubleType), Literal.create(1.0, FloatType)),
       NaNvl(Literal.create(1.0, DoubleType),
-            Cast(Literal.create(1.0, FloatType), DoubleType)))
+            Cast(Literal.create(1.0, FloatType), DoubleType))
+    )
     ruleTest(
       HiveTypeCoercion.FunctionArgumentConversion,
       NaNvl(Literal.create(1.0, DoubleType), Literal.create(1.0, DoubleType)),
-      NaNvl(Literal.create(1.0, DoubleType), Literal.create(1.0, DoubleType)))
+      NaNvl(Literal.create(1.0, DoubleType), Literal.create(1.0, DoubleType))
+    )
   }
 
   test("type coercion for If") {
@@ -331,24 +347,29 @@ class HiveTypeCoercionSuite extends PlanTest {
   }
 
   test("type coercion for CaseKeyWhen") {
-    ruleTest(HiveTypeCoercion.ImplicitTypeCasts,
-             CaseKeyWhen(Literal(1.toShort), Seq(Literal(1), Literal("a"))),
-             CaseKeyWhen(Cast(Literal(1.toShort), IntegerType),
-                         Seq(Literal(1), Literal("a"))))
+    ruleTest(
+      HiveTypeCoercion.ImplicitTypeCasts,
+      CaseKeyWhen(Literal(1.toShort), Seq(Literal(1), Literal("a"))),
+      CaseKeyWhen(Cast(Literal(1.toShort), IntegerType),
+                  Seq(Literal(1), Literal("a")))
+    )
     ruleTest(HiveTypeCoercion.CaseWhenCoercion,
              CaseKeyWhen(Literal(true), Seq(Literal(1), Literal("a"))),
              CaseKeyWhen(Literal(true), Seq(Literal(1), Literal("a"))))
-    ruleTest(HiveTypeCoercion.CaseWhenCoercion,
-             CaseWhen(Seq((Literal(true), Literal(1.2))),
-                      Literal.create(1, DecimalType(7, 2))),
-             CaseWhen(Seq((Literal(true), Literal(1.2))),
-                      Cast(Literal.create(1, DecimalType(7, 2)), DoubleType)))
+    ruleTest(
+      HiveTypeCoercion.CaseWhenCoercion,
+      CaseWhen(Seq((Literal(true), Literal(1.2))),
+               Literal.create(1, DecimalType(7, 2))),
+      CaseWhen(Seq((Literal(true), Literal(1.2))),
+               Cast(Literal.create(1, DecimalType(7, 2)), DoubleType))
+    )
     ruleTest(
       HiveTypeCoercion.CaseWhenCoercion,
       CaseWhen(Seq((Literal(true), Literal(100L))),
                Literal.create(1, DecimalType(7, 2))),
       CaseWhen(Seq((Literal(true), Cast(Literal(100L), DecimalType(22, 2)))),
-               Cast(Literal.create(1, DecimalType(7, 2)), DecimalType(22, 2))))
+               Cast(Literal.create(1, DecimalType(7, 2)), DecimalType(22, 2)))
+    )
   }
 
   test("BooleanEquality type cast") {
@@ -409,15 +430,19 @@ class HiveTypeCoercionSuite extends PlanTest {
 
   test("WidenSetOperationTypes for except and intersect") {
     val firstTable =
-      LocalRelation(AttributeReference("i", IntegerType)(),
-                    AttributeReference("u", DecimalType.SYSTEM_DEFAULT)(),
-                    AttributeReference("b", ByteType)(),
-                    AttributeReference("d", DoubleType)())
+      LocalRelation(
+        AttributeReference("i", IntegerType)(),
+        AttributeReference("u", DecimalType.SYSTEM_DEFAULT)(),
+        AttributeReference("b", ByteType)(),
+        AttributeReference("d", DoubleType)()
+      )
     val secondTable =
-      LocalRelation(AttributeReference("s", StringType)(),
-                    AttributeReference("d", DecimalType(2, 1))(),
-                    AttributeReference("f", FloatType)(),
-                    AttributeReference("l", LongType)())
+      LocalRelation(
+        AttributeReference("s", StringType)(),
+        AttributeReference("d", DecimalType(2, 1))(),
+        AttributeReference("f", FloatType)(),
+        AttributeReference("l", LongType)()
+      )
 
     val wt = HiveTypeCoercion.WidenSetOperationTypes
     val expectedTypes =
@@ -451,25 +476,33 @@ class HiveTypeCoercionSuite extends PlanTest {
 
   test("WidenSetOperationTypes for union") {
     val firstTable =
-      LocalRelation(AttributeReference("i", IntegerType)(),
-                    AttributeReference("u", DecimalType.SYSTEM_DEFAULT)(),
-                    AttributeReference("b", ByteType)(),
-                    AttributeReference("d", DoubleType)())
+      LocalRelation(
+        AttributeReference("i", IntegerType)(),
+        AttributeReference("u", DecimalType.SYSTEM_DEFAULT)(),
+        AttributeReference("b", ByteType)(),
+        AttributeReference("d", DoubleType)()
+      )
     val secondTable =
-      LocalRelation(AttributeReference("s", StringType)(),
-                    AttributeReference("d", DecimalType(2, 1))(),
-                    AttributeReference("f", FloatType)(),
-                    AttributeReference("l", LongType)())
+      LocalRelation(
+        AttributeReference("s", StringType)(),
+        AttributeReference("d", DecimalType(2, 1))(),
+        AttributeReference("f", FloatType)(),
+        AttributeReference("l", LongType)()
+      )
     val thirdTable =
-      LocalRelation(AttributeReference("m", StringType)(),
-                    AttributeReference("n", DecimalType.SYSTEM_DEFAULT)(),
-                    AttributeReference("p", FloatType)(),
-                    AttributeReference("q", DoubleType)())
+      LocalRelation(
+        AttributeReference("m", StringType)(),
+        AttributeReference("n", DecimalType.SYSTEM_DEFAULT)(),
+        AttributeReference("p", FloatType)(),
+        AttributeReference("q", DoubleType)()
+      )
     val forthTable =
-      LocalRelation(AttributeReference("m", StringType)(),
-                    AttributeReference("n", DecimalType.SYSTEM_DEFAULT)(),
-                    AttributeReference("p", ByteType)(),
-                    AttributeReference("q", DoubleType)())
+      LocalRelation(
+        AttributeReference("m", StringType)(),
+        AttributeReference("n", DecimalType.SYSTEM_DEFAULT)(),
+        AttributeReference("p", ByteType)(),
+        AttributeReference("q", DoubleType)()
+      )
 
     val wt = HiveTypeCoercion.WidenSetOperationTypes
     val expectedTypes =
@@ -610,7 +643,8 @@ class HiveTypeCoercionSuite extends PlanTest {
       inConversion,
       In(Literal("a"), Seq(Literal(1), Literal("b"))),
       In(Cast(Literal("a"), StringType),
-         Seq(Cast(Literal(1), StringType), Cast(Literal("b"), StringType))))
+         Seq(Cast(Literal(1), StringType), Cast(Literal("b"), StringType)))
+    )
   }
 }
 

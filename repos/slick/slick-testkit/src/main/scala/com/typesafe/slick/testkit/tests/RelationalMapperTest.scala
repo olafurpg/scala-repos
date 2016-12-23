@@ -51,21 +51,23 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
     case object EnumValue2 extends EnumType
     case object EnumValue3 extends EnumType
 
-    implicit val enumTypeMapper = MappedColumnType.base[EnumType, Char]({ t =>
-      t shouldNotBe null
-      t match {
-        case EnumValue1 => 'A'
-        case EnumValue2 => 'B'
-        case _ => 'C'
+    implicit val enumTypeMapper = MappedColumnType.base[EnumType, Char](
+      { t =>
+        t shouldNotBe null
+        t match {
+          case EnumValue1 => 'A'
+          case EnumValue2 => 'B'
+          case _ => 'C'
+        }
+      }, { c =>
+        c shouldNotBe null
+        c match {
+          case 'A' => EnumValue1
+          case 'B' => EnumValue2
+          case _ => EnumValue3
+        }
       }
-    }, { c =>
-      c shouldNotBe null
-      c match {
-        case 'A' => EnumValue1
-        case 'B' => EnumValue2
-        case _ => EnumValue3
-      }
-    })
+    )
 
     class T(tag: Tag)
         extends Table[(Int, EnumType, Option[EnumType])](tag, "t32") {

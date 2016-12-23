@@ -8,8 +8,9 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
   def testValString() = {
     val testClassName = "ValStringTest"
     val valFileName = testClassName + ".scala"
-    addFileToProject(valFileName,
-                     """
+    addFileToProject(
+      valFileName,
+      """
       |import org.specs2.mutable.Specification
       |
       |class ValStringTest extends Specification {
@@ -21,7 +22,8 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
       |    }
       |  }
       |}
-      |    """.stripMargin)
+      |    """.stripMargin
+    )
 
     assert(
       checkConfigAndSettings(createTestFromLocation(7, 7, valFileName),
@@ -32,8 +34,9 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
   def testStringSum() = {
     val testClassName = "StringSumTest"
     val sumFileName = testClassName + ".scala"
-    addFileToProject(sumFileName,
-                     """
+    addFileToProject(
+      sumFileName,
+      """
       |import org.specs2.mutable.Specification
       |
       |class StringSumTest extends Specification {
@@ -44,7 +47,8 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
       |    }
       |  }
       |}
-    """.stripMargin)
+    """.stripMargin
+    )
 
     assert(
       checkConfigAndSettings(createTestFromLocation(6, 7, sumFileName),
@@ -55,8 +59,9 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
   def testNonConst() = {
     val testClassName = "BadStringTest"
     val badFileName = testClassName + ".scala"
-    addFileToProject(badFileName,
-                     """
+    addFileToProject(
+      badFileName,
+      """
       |import org.specs2.mutable.Specification
       |
       |class BadStringTest extends Specification {
@@ -71,7 +76,8 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
       |    }
       |  }
       |}
-    """.stripMargin)
+    """.stripMargin
+    )
 
     assert(
       checkConfigAndSettings(createTestFromLocation(6, 7, badFileName),
@@ -82,8 +88,9 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
   val methodsTestFileName = methodsTestClassName + ".scala"
 
   def addMethodsTest() = {
-    addFileToProject(methodsTestFileName,
-                     """
+    addFileToProject(
+      methodsTestFileName,
+      """
         |import org.specs2.mutable.Specification
         |
         |class SpecsMethodsTest extends Specification {
@@ -117,7 +124,8 @@ abstract class Specs2StaticStringTest extends Specs2TestCase {
         |    }
         |  }
         |}
-      """.stripMargin.trim)
+      """.stripMargin.trim
+    )
   }
 
   def testTrim() = {

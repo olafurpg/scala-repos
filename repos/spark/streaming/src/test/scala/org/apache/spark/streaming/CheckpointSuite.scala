@@ -102,7 +102,8 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
     require(
       numBatchesBeforeRestart < expectedOutput.size,
       "Number of batches before context restart less than number of expected output " +
-        "(i.e. number of total batches to run)")
+        "(i.e. number of total batches to run)"
+    )
     require(StreamingContext.getActive().isEmpty,
             "Cannot run test with already active streaming context")
 
@@ -225,7 +226,8 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
       setComparison,
       s"set comparison failed\n" +
         s"Expected output items:\n${expectedPartialOutput.mkString("\n")}\n" +
-        s"Generated output items: ${output.mkString("\n")}")
+        s"Generated output items: ${output.mkString("\n")}"
+    )
   }
 }
 

@@ -514,11 +514,13 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
 
       lazy val groupedDomains: List[Set[Sym]] = {
         val subtypes = enumerateSubtypes(staticTp, grouped = true)
-        subtypes.map { subTypes =>
-          val syms =
-            subTypes.flatMap(tpe => symForEqualsTo.get(TypeConst(tpe))).toSet
-          if (mayBeNull) syms + symForEqualsTo(NullConst) else syms
-        }.filter(_.nonEmpty)
+        subtypes
+          .map { subTypes =>
+            val syms =
+              subTypes.flatMap(tpe => symForEqualsTo.get(TypeConst(tpe))).toSet
+            if (mayBeNull) syms + symForEqualsTo(NullConst) else syms
+          }
+          .filter(_.nonEmpty)
       }
 
       // populate equalitySyms

@@ -304,12 +304,15 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
     /** Creates a new symbol and assigns it to the tree, returning the symbol
       */
     def assignSymbol(tree: Tree): Symbol =
-      logAssignSymbol(tree, tree match {
-        case PackageDef(pid, _) => createPackageSymbol(tree.pos, pid)
-        case Import(_, _) => createImportSymbol(tree)
-        case mdef: MemberDef => createMemberSymbol(mdef, mdef.name, -1L)
-        case _ => abort("Unexpected tree: " + tree)
-      })
+      logAssignSymbol(
+        tree,
+        tree match {
+          case PackageDef(pid, _) => createPackageSymbol(tree.pos, pid)
+          case Import(_, _) => createImportSymbol(tree)
+          case mdef: MemberDef => createMemberSymbol(mdef, mdef.name, -1L)
+          case _ => abort("Unexpected tree: " + tree)
+        }
+      )
     def assignSymbol(tree: MemberDef, name: Name, mask: Long): Symbol =
       logAssignSymbol(tree, createMemberSymbol(tree, name, mask))
 
@@ -456,7 +459,8 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
         reporter.error(
           tree.pos,
           (s"Companions '$clazz' and '$module' must be defined in same file:\n" +
-            s"  Found in ${clazz.sourceFile.canonicalPath} and ${module.sourceFile.canonicalPath}"))
+            s"  Found in ${clazz.sourceFile.canonicalPath} and ${module.sourceFile.canonicalPath}")
+        )
       }
     }
 
@@ -753,7 +757,8 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
           tree.pos,
           "it is not recommended to define classes/objects inside of package objects.\n" +
             "If possible, define " + tree.symbol + " in " +
-            owner.skipPackageObject + " instead.")
+            owner.skipPackageObject + " instead."
+        )
       }
 
       // Suggested location only.

@@ -136,7 +136,8 @@ class ReplicaManagerTest {
         messagesPerPartition = Map(
           new TopicPartition("test1", 0) -> new ByteBufferMessageSet(
             new Message("first message".getBytes))),
-        responseCallback = callback)
+        responseCallback = callback
+      )
     } finally {
       rm.shutdown(checkpointHW = false)
       metrics.close()
@@ -213,7 +214,8 @@ class ReplicaManagerTest {
                                                                brokerSet))
           .asJava,
         Set(new BrokerEndPoint(0, "host1", 0),
-            new BrokerEndPoint(1, "host2", 1)).asJava)
+            new BrokerEndPoint(1, "host2", 1)).asJava
+      )
       rm.becomeLeaderOrFollower(0,
                                 leaderAndIsrRequest1,
                                 metadataCache,
@@ -228,7 +230,8 @@ class ReplicaManagerTest {
         messagesPerPartition = Map(
           new TopicPartition(topic, 0) -> new ByteBufferMessageSet(
             new Message("first message".getBytes))),
-        responseCallback = produceCallback)
+        responseCallback = produceCallback
+      )
 
       // Fetch some messages
       rm.fetchMessages(
@@ -238,7 +241,8 @@ class ReplicaManagerTest {
         fetchInfo = collection.immutable.Map(
           new TopicAndPartition(topic, 0) -> new PartitionFetchInfo(0,
                                                                     100000)),
-        responseCallback = fetchCallback)
+        responseCallback = fetchCallback
+      )
 
       // Make this replica the follower
       val leaderAndIsrRequest2 = new LeaderAndIsrRequest(
@@ -254,7 +258,8 @@ class ReplicaManagerTest {
                                                                brokerSet))
           .asJava,
         Set(new BrokerEndPoint(0, "host1", 0),
-            new BrokerEndPoint(1, "host2", 1)).asJava)
+            new BrokerEndPoint(1, "host2", 1)).asJava
+      )
       rm.becomeLeaderOrFollower(1,
                                 leaderAndIsrRequest2,
                                 metadataCache,

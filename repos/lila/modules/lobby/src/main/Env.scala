@@ -43,17 +43,19 @@ final class Env(config: Config,
                                  maxPerPage = SeekMaxPerPage,
                                  maxPerUser = SeekMaxPerUser)
 
-  val lobby = system.actorOf(Props(
-                               new Lobby(
-                                 socket = socket,
-                                 seekApi = seekApi,
-                                 blocking = blocking,
-                                 playban = playban,
-                                 onStart = onStart,
-                                 broomPeriod = BroomPeriod,
-                                 resyncIdsPeriod = ResyncIdsPeriod
-                               )),
-                             name = ActorName)
+  val lobby = system.actorOf(
+    Props(
+      new Lobby(
+        socket = socket,
+        seekApi = seekApi,
+        blocking = blocking,
+        playban = playban,
+        onStart = onStart,
+        broomPeriod = BroomPeriod,
+        resyncIdsPeriod = ResyncIdsPeriod
+      )),
+    name = ActorName
+  )
 
   lazy val socketHandler = new SocketHandler(hub = hub,
                                              lobby = lobby,
@@ -84,5 +86,6 @@ object Env {
       blocking = lila.relation.Env.current.api.fetchBlocking,
       playban = lila.playban.Env.current.api.currentBan _,
       system = lila.common.PlayApp.system,
-      scheduler = lila.common.PlayApp.scheduler)
+      scheduler = lila.common.PlayApp.scheduler
+    )
 }

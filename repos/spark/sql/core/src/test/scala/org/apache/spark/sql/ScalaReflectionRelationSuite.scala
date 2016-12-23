@@ -144,7 +144,8 @@ class ScalaReflectionRelationSuite
            Seq(Some(10), Some(20), None),
            Map(10 -> 100L, 20 -> 200L),
            Map(10 -> Some(100L), 20 -> Some(200L), 30 -> None),
-           Nested(None, "abc")))
+           Nested(None, "abc"))
+    )
 
     Seq(data).toDF().registerTempTable("reflectComplexData")
     assert(
@@ -157,6 +158,7 @@ class ScalaReflectionRelationSuite
             Seq(10, 20, null),
             Map(10 -> 100L, 20 -> 200L),
             Map(10 -> 100L, 20 -> 200L, 30 -> null),
-            Row(null, "abc"))))
+            Row(null, "abc"))
+      ))
   }
 }

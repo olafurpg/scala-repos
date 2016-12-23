@@ -98,7 +98,8 @@ object ForwarderService {
       arguments = List(ForwarderService.className,
                        "forwarder",
                        forwardToPort.toString) ++ args,
-      upWhen = _.contains("ServerConnector@"))
+      upWhen = _.contains("ServerConnector@")
+    )
   }
 
   def main(args: Array[String]) {

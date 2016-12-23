@@ -45,7 +45,8 @@ class ScalaUnusedImportPass(val file: PsiFile,
         throw new AssertionError(s"File text range is null: ${file.getClass}")
       else file.getTextRange,
       true,
-      highlightInfoProcessor)
+      highlightInfoProcessor
+    )
     with ScalaUnusedImportPassBase {
   protected def getFixes: List[IntentionAction] =
     List(new ScalaOptimizeImportsFix,
@@ -131,7 +132,8 @@ object ScalaUnusedImportPass {
                 "Import optimizer  hasn't optimized any imports",
                 file.getViewProvider.getVirtualFile.getPath,
                 AttachmentFactory.createAttachment(
-                  file.getViewProvider.getVirtualFile)))
+                  file.getViewProvider.getVirtualFile)
+              ))
           }
         }
       }
@@ -180,7 +182,8 @@ object ScalaUnusedImportPass {
         new Processor[HighlightInfo] {
           def process(error: HighlightInfo): Boolean =
             false //todo: only unresolved ref issues?
-        })
+        }
+      )
     hasErrorsExceptUnresolvedImports
   }
 }

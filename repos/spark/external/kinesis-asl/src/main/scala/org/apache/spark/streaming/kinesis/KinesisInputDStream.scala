@@ -47,7 +47,8 @@ private[kinesis] class KinesisInputDStream[T: ClassTag](
       blockInfos: Seq[ReceivedBlockInfo]): RDD[T] = {
 
     // This returns true even for when blockInfos is empty
-    val allBlocksHaveRanges = blockInfos.map { _.metadataOption }
+    val allBlocksHaveRanges = blockInfos
+      .map { _.metadataOption }
       .forall(_.nonEmpty)
 
     if (allBlocksHaveRanges) {
@@ -60,16 +61,17 @@ private[kinesis] class KinesisInputDStream[T: ClassTag](
       logDebug(
         s"Creating KinesisBackedBlockRDD for $time with ${seqNumRanges.length} " +
           s"seq number ranges: ${seqNumRanges.mkString(", ")} ")
-      new KinesisBackedBlockRDD(context.sc,
-                                regionName,
-                                endpointUrl,
-                                blockIds,
-                                seqNumRanges,
-                                isBlockIdValid = isBlockIdValid,
-                                retryTimeoutMs =
-                                  ssc.graph.batchDuration.milliseconds.toInt,
-                                messageHandler = messageHandler,
-                                awsCredentialsOption = awsCredentialsOption)
+      new KinesisBackedBlockRDD(
+        context.sc,
+        regionName,
+        endpointUrl,
+        blockIds,
+        seqNumRanges,
+        isBlockIdValid = isBlockIdValid,
+        retryTimeoutMs = ssc.graph.batchDuration.milliseconds.toInt,
+        messageHandler = messageHandler,
+        awsCredentialsOption = awsCredentialsOption
+      )
     } else {
       logWarning(
         "Kinesis sequence number information was not present with some block metadata," +

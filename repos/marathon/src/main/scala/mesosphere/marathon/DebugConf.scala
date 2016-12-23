@@ -21,7 +21,8 @@ trait DebugConf extends ScallopConf {
     descrNo = "(Default) Disable trace logging of service method calls.",
     default = Some(false),
     noshort = true,
-    prefix = "disable_")
+    prefix = "disable_"
+  )
 
   lazy val deprecatedDebugTracing =
     opt[Boolean]("enable_tracing", hidden = true)
@@ -39,7 +40,8 @@ trait DebugConf extends ScallopConf {
         "This does not turn off reporting of other metrics.",
     default = Some(true),
     noshort = true,
-    prefix = "disable_")
+    prefix = "disable_"
+  )
 
   lazy val deprecatedEnableMetrics =
     opt[Boolean]("enable_metrics", default = Some(false), hidden = true)

@@ -46,9 +46,11 @@ trait WebSocketSpec
   def withServer[A](webSocket: Application => Handler)(
       block: Application => A): A = {
     val currentApp = new AtomicReference[Application]
-    val app = GuiceApplicationBuilder().routes {
-      case _ => webSocket(currentApp.get())
-    }.build()
+    val app = GuiceApplicationBuilder()
+      .routes {
+        case _ => webSocket(currentApp.get())
+      }
+      .build()
     currentApp.set(app)
     running(TestServer(testServerPort, app))(block(app))
   }

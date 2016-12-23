@@ -114,10 +114,10 @@ trait Plugin {
       case (extension, renderer) =>
         registry.addRenderer(extension, renderer)
     }
-    (repositoryRoutings ++ repositoryRoutings(registry, context, settings)).foreach {
-      routing =>
+    (repositoryRoutings ++ repositoryRoutings(registry, context, settings))
+      .foreach { routing =>
         registry.addRepositoryRouting(routing)
-    }
+      }
     (receiveHooks ++ receiveHooks(registry, context, settings)).foreach {
       receiveHook =>
         registry.addReceiveHook(receiveHook)

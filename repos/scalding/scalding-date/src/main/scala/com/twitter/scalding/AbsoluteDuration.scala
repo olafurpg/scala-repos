@@ -84,10 +84,12 @@ object AbsoluteDuration extends java.io.Serializable {
           // We can't go any further, try to jam the rest into this unit:
           val (fn, cnt) = tc
           val theseUnits = diffInMs / cnt
-          require((theseUnits <= Int.MaxValue) && (theseUnits >= Int.MinValue),
-                  "diff not representable in an Int: " + theseUnits +
-                    AbsoluteDurationList(acc) + "total: " +
-                    (diffInMs + AbsoluteDurationList(acc).toMillisecs))
+          require(
+            (theseUnits <= Int.MaxValue) && (theseUnits >= Int.MinValue),
+            "diff not representable in an Int: " + theseUnits +
+              AbsoluteDurationList(acc) + "total: " +
+              (diffInMs + AbsoluteDurationList(acc).toMillisecs)
+          )
           val thisPart = fn(theseUnits.toInt)
           if (acc.isEmpty) thisPart
           else AbsoluteDurationList(thisPart :: acc)

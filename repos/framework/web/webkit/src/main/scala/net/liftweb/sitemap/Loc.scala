@@ -58,10 +58,13 @@ trait Loc[T] {
     * uses it.
     */
   protected lazy val cacheCssClassForMenuItem: Box[() => String] =
-    allParams.flatMap {
-      case a: Loc.MenuCssClass => List(a)
-      case _ => Nil
-    }.headOption.map(_.cssClass.func)
+    allParams
+      .flatMap {
+        case a: Loc.MenuCssClass => List(a)
+        case _ => Nil
+      }
+      .headOption
+      .map(_.cssClass.func)
 
   /**
     * Given a value calculate the HREF to this item
@@ -264,9 +267,12 @@ trait Loc[T] {
   /**
     * The snippets provided by `LocParam`s
     */
-  lazy val calcSnippets: SnippetTest = allParams.collect {
-    case v: Loc.ValueSnippets[T] => v.snippets
-  }.reduceLeftOption(_ orElse _).getOrElse(Map.empty)
+  lazy val calcSnippets: SnippetTest = allParams
+    .collect {
+      case v: Loc.ValueSnippets[T] => v.snippets
+    }
+    .reduceLeftOption(_ orElse _)
+    .getOrElse(Map.empty)
 
   /**
     * Look up a snippet by name, taking into account the current

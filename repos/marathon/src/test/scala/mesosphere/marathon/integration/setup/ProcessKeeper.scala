@@ -71,9 +71,10 @@ object ProcessKeeper {
     val credentialsPath = write(mesosWorkDirFile,
                                 fileName = "credentials",
                                 content = "principal1 secret1")
-    val aclsPath = write(mesosWorkDirFile,
-                         fileName = "acls.json",
-                         content = """
+    val aclsPath = write(
+      mesosWorkDirFile,
+      fileName = "acls.json",
+      content = """
         |{
         |  "run_tasks": [{
         |    "principals": { "type": "ANY" },
@@ -94,15 +95,18 @@ object ProcessKeeper {
         |    "volume_types": { "type": "ANY" }
         |  }]
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
 
     log.info(s">>> credentialsPath = $credentialsPath")
-    val mesosEnv = Seq(ENV_MESOS_WORK_DIR -> mesosWorkDirForMesos,
-                       "MESOS_LAUNCHER" -> "posix",
-                       "MESOS_CONTAINERIZERS" -> "docker,mesos",
-                       "MESOS_ROLES" -> "public,foo",
-                       "MESOS_ACLS" -> s"file://$aclsPath",
-                       "MESOS_CREDENTIALS" -> s"file://$credentialsPath")
+    val mesosEnv = Seq(
+      ENV_MESOS_WORK_DIR -> mesosWorkDirForMesos,
+      "MESOS_LAUNCHER" -> "posix",
+      "MESOS_CONTAINERIZERS" -> "docker,mesos",
+      "MESOS_ROLES" -> "public,foo",
+      "MESOS_ACLS" -> s"file://$aclsPath",
+      "MESOS_CREDENTIALS" -> s"file://$credentialsPath"
+    )
     startProcess(
       "mesos",
       Process(Seq("mesos-local", "--ip=127.0.0.1"), cwd = None, mesosEnv: _*),

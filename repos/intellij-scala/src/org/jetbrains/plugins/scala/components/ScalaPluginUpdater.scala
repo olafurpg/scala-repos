@@ -277,10 +277,12 @@ object ScalaPluginUpdater {
             }
           ))
       case Some(result) =>
-        Some(GROUP.createNotification(
-          s"Your IDEA is outdated to use with Scala plugin $branch branch.<br/>" +
-            s"Please update IDEA to at least $suggestedVersion to use latest Scala plugin.",
-          NotificationType.WARNING))
+        Some(
+          GROUP.createNotification(
+            s"Your IDEA is outdated to use with Scala plugin $branch branch.<br/>" +
+              s"Please update IDEA to at least $suggestedVersion to use latest Scala plugin.",
+            NotificationType.WARNING
+          ))
       case None => None
     }
     notification.foreach(Notifications.Bus.notify)
@@ -406,7 +408,8 @@ object ScalaPluginUpdater {
                 applicationSettings.ASK_USE_LATEST_PLUGIN_BUILDS = true
             }
           }
-        })
+        }
+      )
       Notifications.Bus.notify(notification)
     }
   }

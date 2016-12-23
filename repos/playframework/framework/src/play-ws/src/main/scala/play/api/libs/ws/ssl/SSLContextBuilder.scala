@@ -171,23 +171,27 @@ class ConfigSSLContextBuilder(info: SSLConfig,
   // Get either a string or file based keystore builder from config.
   def keyStoreBuilder(ksc: KeyStoreConfig): KeyStoreBuilder = {
     val password = ksc.password.map(_.toCharArray)
-    ksc.filePath.map { f =>
-      fileBuilder(ksc.storeType, f, password)
-    }.getOrElse {
-      val data = ksc.data.getOrElse(
-        throw new IllegalStateException("No keystore builder found!"))
-      stringBuilder(data)
-    }
+    ksc.filePath
+      .map { f =>
+        fileBuilder(ksc.storeType, f, password)
+      }
+      .getOrElse {
+        val data = ksc.data.getOrElse(
+          throw new IllegalStateException("No keystore builder found!"))
+        stringBuilder(data)
+      }
   }
 
   def trustStoreBuilder(tsc: TrustStoreConfig): KeyStoreBuilder = {
-    tsc.filePath.map { f =>
-      fileBuilder(tsc.storeType, f, None)
-    }.getOrElse {
-      val data = tsc.data.getOrElse(
-        throw new IllegalStateException("No truststore builder found!"))
-      stringBuilder(data)
-    }
+    tsc.filePath
+      .map { f =>
+        fileBuilder(tsc.storeType, f, None)
+      }
+      .getOrElse {
+        val data = tsc.data.getOrElse(
+          throw new IllegalStateException("No truststore builder found!"))
+        stringBuilder(data)
+      }
   }
 
   def fileBuilder(storeType: String,

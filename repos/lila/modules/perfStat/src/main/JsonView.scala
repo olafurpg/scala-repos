@@ -24,7 +24,8 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
           case (under, sum) => Math.round(under * 1000.0 / sum) / 10.0
         }
       },
-      "stat" -> stat.copy(playStreak = stat.playStreak.checkCurrent))
+      "stat" -> stat.copy(playStreak = stat.playStreak.checkCurrent)
+    )
 
   private def truncate(v: Double) = lila.common.Maths.truncateAt(v, 2)
 

@@ -264,12 +264,14 @@ class DefaultHttpErrorHandler(environment: Environment,
     */
   protected def logServerError(request: RequestHeader,
                                usefulException: UsefulException) {
-    Logger.error("""
+    Logger.error(
+      """
                     |
                     |! @%s - Internal server error, for (%s) [%s] ->
                     | """.stripMargin
-                   .format(usefulException.id, request.method, request.uri),
-                 usefulException)
+        .format(usefulException.id, request.method, request.uri),
+      usefulException
+    )
   }
 
   /**

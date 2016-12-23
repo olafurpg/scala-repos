@@ -187,9 +187,9 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
           case _ => Other
         }
 
-        val transformed = transformTypeTagEvidenceParams(macroImplRef,
-                                                         (param,
-                                                          tparam) => tparam)
+        val transformed = transformTypeTagEvidenceParams(
+          macroImplRef,
+          (param, tparam) => tparam)
         mmap(transformed)(p =>
           if (p.isTerm) fingerprint(p.info) else Tagged(p.paramPos))
       }
@@ -334,8 +334,7 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
                       case SingleType(SingleType(NoPrefix, implParam), value)
                           if value == ExprValue =>
                         implToDef get implParam map
-                          (defParam =>
-                             SingleType(NoPrefix, defParam.symbol)) getOrElse pre
+                          (defParam => SingleType(NoPrefix, defParam.symbol)) getOrElse pre
                       case _ =>
                         pre
                     }
@@ -981,20 +980,22 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
       expandee: Tree): scala.collection.mutable.Set[Int] =
     if (forced(expandee)) scala.collection.mutable.Set[Int]()
     else
-      delayed.getOrElse(expandee, {
-        val calculated = scala.collection.mutable.Set[Symbol]()
-        expandee foreach
-          (sub => {
-             def traverse(sym: Symbol) =
-               if (sym != null && (undetparams contains sym.id))
-                 calculated += sym
-             if (sub.symbol != null) traverse(sub.symbol)
-             if (sub.tpe != null)
-               sub.tpe foreach (sub => traverse(sub.typeSymbol))
-           })
-        macroLogVerbose("calculateUndetparams: %s".format(calculated))
-        calculated map (_.id)
-      })
+      delayed.getOrElse(
+        expandee, {
+          val calculated = scala.collection.mutable.Set[Symbol]()
+          expandee foreach
+            (sub => {
+               def traverse(sym: Symbol) =
+                 if (sym != null && (undetparams contains sym.id))
+                   calculated += sym
+               if (sub.symbol != null) traverse(sub.symbol)
+               if (sub.tpe != null)
+                 sub.tpe foreach (sub => traverse(sub.typeSymbol))
+             })
+          macroLogVerbose("calculateUndetparams: %s".format(calculated))
+          calculated map (_.id)
+        }
+      )
   private val undetparams = perRunCaches.newSet[Int]()
   def notifyUndetparamsAdded(newUndets: List[Symbol]): Unit = {
     undetparams ++= newUndets map (_.id)

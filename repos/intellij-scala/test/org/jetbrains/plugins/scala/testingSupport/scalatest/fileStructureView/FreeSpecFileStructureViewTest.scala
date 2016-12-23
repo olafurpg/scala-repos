@@ -12,8 +12,9 @@ trait FreeSpecFileStructureViewTest extends ScalaTestTestCase {
   private val className = "FreeSpecViewTest"
 
   def addFreeSpecViewTest(): Unit = {
-    addFileToProject(className + ".scala",
-                     """
+    addFileToProject(
+      className + ".scala",
+      """
         |import org.scalatest._
         |
         |class FreeSpecViewTest extends FreeSpec {
@@ -37,7 +38,8 @@ trait FreeSpecFileStructureViewTest extends ScalaTestTestCase {
         |
         |  "level3" ignore pending
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testFreeSpecNormal(): Unit = {

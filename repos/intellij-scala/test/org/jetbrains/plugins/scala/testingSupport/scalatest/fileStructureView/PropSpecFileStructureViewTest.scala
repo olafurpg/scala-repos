@@ -11,8 +11,9 @@ trait PropSpecFileStructureViewTest extends ScalaTestTestCase {
   private val className = "PropSpecViewTest"
 
   def addPropSpecViewTest(): Unit = {
-    addFileToProject(className + ".scala",
-                     """
+    addFileToProject(
+      className + ".scala",
+      """
         |import org.scalatest._
         |
         |class PropSpecViewTest extends PropSpec {
@@ -24,7 +25,8 @@ trait PropSpecFileStructureViewTest extends ScalaTestTestCase {
         |
         |  ignore("pending and ignore") (pending)
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testPropSpecNormal(): Unit = {

@@ -547,7 +547,8 @@ trait CommentFactoryBase { this: MemberLookupBase =>
       "I. " -> (OrderedList(_, "upperRoman")),
       "i. " -> (OrderedList(_, "lowerRoman")),
       "A. " -> (OrderedList(_, "upperAlpha")),
-      "a. " -> (OrderedList(_, "lowerAlpha")))
+      "a. " -> (OrderedList(_, "lowerAlpha"))
+    )
 
     /** Checks if the current line is formed with more than one space and one the listStyles */
     def checkList =
@@ -842,8 +843,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
     def normalizeIndentation(_code: String): String = {
 
       val code =
-        _code
-          .replaceAll("\\s+$", "")
+        _code.replaceAll("\\s+$", "")
           .dropWhile(_ == '\n') // right-trim + remove all leading '\n'
       val lines = code.split("\n")
 

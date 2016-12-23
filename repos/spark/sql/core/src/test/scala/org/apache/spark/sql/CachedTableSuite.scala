@@ -415,7 +415,8 @@ class CachedTableSuite
     checkAnswer(
       sql("SELECT key, count(*) FROM orderedTable GROUP BY key ORDER BY key"),
       sql("SELECT key, count(*) FROM testData3x GROUP BY key ORDER BY key")
-        .collect())
+        .collect()
+    )
     sqlContext.uncacheTable("orderedTable")
     sqlContext.dropTempTable("orderedTable")
 

@@ -179,12 +179,13 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
 
     // Task end with a few dropped blocks
     val metrics2 = new TaskMetrics
-    metrics2.setUpdatedBlockStatuses(Seq(
-      (RDDBlockId(0, 100), BlockStatus(none, 0L, 0L)),
-      (RDDBlockId(1, 20), BlockStatus(none, 0L, 0L)),
-      (RDDBlockId(2, 40), BlockStatus(none, 0L, 0L)), // doesn't actually exist
-      (RDDBlockId(4, 80), BlockStatus(none, 0L, 0L)) // doesn't actually exist
-    ))
+    metrics2.setUpdatedBlockStatuses(
+      Seq(
+        (RDDBlockId(0, 100), BlockStatus(none, 0L, 0L)),
+        (RDDBlockId(1, 20), BlockStatus(none, 0L, 0L)),
+        (RDDBlockId(2, 40), BlockStatus(none, 0L, 0L)), // doesn't actually exist
+        (RDDBlockId(4, 80), BlockStatus(none, 0L, 0L)) // doesn't actually exist
+      ))
     bus.postToAll(
       SparkListenerTaskEnd(2, 0, "obliteration", Success, taskInfo, metrics2))
     assert(storageListener._rddInfoMap(0).memSize === 0L)

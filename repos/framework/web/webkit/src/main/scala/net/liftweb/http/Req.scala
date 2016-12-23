@@ -417,16 +417,18 @@ object Req {
         StatelessReqTest(wholePath, original.request),
         otherStatelessTest) or NamedPF.applyBox(wholePath, statelessTest)
 
-    new Req(rewritten.path,
-            original.contextPath,
-            original.requestType,
-            original.contentType,
-            original.request,
-            original.nanoStart,
-            original.nanoEnd,
-            stateless openOr original.stateless_?,
-            original.paramCalculator,
-            original.addlParams ++ rewritten.params)
+    new Req(
+      rewritten.path,
+      original.contextPath,
+      original.requestType,
+      original.contentType,
+      original.request,
+      original.nanoStart,
+      original.nanoEnd,
+      stateless openOr original.stateless_?,
+      original.paramCalculator,
+      original.addlParams ++ rewritten.params
+    )
   }
 
   def apply(request: HTTPRequest,
@@ -546,9 +548,11 @@ object Req {
       } else if (contentType.dmap(false)(_.toLowerCase.startsWith(
                    "application/x-www-form-urlencoded"))) {
         val params =
-          localParams ++ (request.params.sortWith { (s1, s2) =>
-            s1.name < s2.name
-          }).map(n => (n.name, n.values))
+          localParams ++ (request.params
+            .sortWith { (s1, s2) =>
+              s1.name < s2.name
+            })
+            .map(n => (n.name, n.values))
         ParamCalcInfo(request.paramNames, params, Nil, Empty)
       } else {
         ParamCalcInfo(queryStringParam._1,
@@ -722,7 +726,8 @@ object Req {
       List("Content-Type" -> "text/html; charset=utf-8"),
       Nil,
       404,
-      S.legacyIeCompatibilityMode)
+      S.legacyIeCompatibilityMode
+    )
 
   def unapply(in: Req): Option[(List[String], String, RequestType)] =
     Some((in.path.partPath, in.path.suffix, in.requestType))

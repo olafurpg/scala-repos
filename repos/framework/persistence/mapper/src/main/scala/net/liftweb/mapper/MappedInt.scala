@@ -63,42 +63,46 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = ENUM#Value } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = ENUM#Value
+        /**
+          * The type of the field
+          */
+        type T = ENUM#Value
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = v.toString
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = v.toString
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Full(JsonAST.JInt(v.id))
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Full(JsonAST.JInt(v.id))
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   protected def real_i_set_!(value: ENUM#Value): ENUM#Value = {
     if (value != data) {
@@ -304,42 +308,46 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = Int } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = Int
+        /**
+          * The type of the field
+          */
+        type T = Int
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = v.toString
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = v.toString
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Full(JsonAST.JInt(v))
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Full(JsonAST.JInt(v))
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   protected def i_is_! = data
   protected def i_was_! = orgData

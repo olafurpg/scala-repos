@@ -129,14 +129,16 @@ object HttpSpec extends Specification {
         "foo=bar; Path=/; HTTPOnly;;bar=qux; Path=/; HTTPOnly")
     }
     "merge and remove duplicates" in withApplication {
-      val cookies = Seq(Cookie("foo", "bar"),
-                        Cookie("foo", "baz"),
-                        Cookie("foo", "bar", domain = Some("Foo")),
-                        Cookie("foo", "baz", domain = Some("FoO")),
-                        Cookie("foo", "baz", secure = true),
-                        Cookie("foo", "baz", httpOnly = false),
-                        Cookie("foo", "bar", path = "/blah"),
-                        Cookie("foo", "baz", path = "/blah"))
+      val cookies = Seq(
+        Cookie("foo", "bar"),
+        Cookie("foo", "baz"),
+        Cookie("foo", "bar", domain = Some("Foo")),
+        Cookie("foo", "baz", domain = Some("FoO")),
+        Cookie("foo", "baz", secure = true),
+        Cookie("foo", "baz", httpOnly = false),
+        Cookie("foo", "bar", path = "/blah"),
+        Cookie("foo", "baz", path = "/blah")
+      )
 
       Cookies.mergeSetCookieHeader("", cookies) must ===(
         "foo=baz; Path=/; Domain=FoO; HTTPOnly" + ";;" +

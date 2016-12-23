@@ -178,8 +178,8 @@ sealed abstract class EphemeralStreamInstances {
       override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(
           implicit M: Monoid[B]) =
         this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
-      override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B,
-                                                                    A) => B) =
+      override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(
+          f: (B, A) => B) =
         fa.foldLeft(z)(b => a => f(b, a))
       override def zipWithL[A, B, C](
           fa: EphemeralStream[A],

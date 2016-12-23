@@ -133,11 +133,13 @@ object FileSource {
            conf: Configuration,
            filter: PathFilter = AcceptAllPathFilter): Iterable[FileStatus] = {
     val path = new Path(glob)
-    Option(path.getFileSystem(conf).globStatus(path, filter)).map {
-      _.toIterable // convert java Array to scala Iterable
-    }.getOrElse {
-      Iterable.empty
-    }
+    Option(path.getFileSystem(conf).globStatus(path, filter))
+      .map {
+        _.toIterable // convert java Array to scala Iterable
+      }
+      .getOrElse {
+        Iterable.empty
+      }
   }
 
   /**
@@ -240,14 +242,17 @@ abstract class FileSource
             CastHfsTap(createHfsTap(hdfsScheme, hdfsWritePath, sinkMode))
         }
       case _ => {
-        val tryTtp = Try(TestTapFactory(this, hdfsScheme, sinkMode)).map {
-          // these java types are invariant, so we cast here
-          _.createTap(readOrWrite).asInstanceOf[Tap[Any, Any, Any]]
-        }.orElse {
-          Try(TestTapFactory(this, localScheme.getSourceFields, sinkMode)).map {
+        val tryTtp = Try(TestTapFactory(this, hdfsScheme, sinkMode))
+          .map {
+            // these java types are invariant, so we cast here
             _.createTap(readOrWrite).asInstanceOf[Tap[Any, Any, Any]]
           }
-        }
+          .orElse {
+            Try(TestTapFactory(this, localScheme.getSourceFields, sinkMode))
+              .map {
+                _.createTap(readOrWrite).asInstanceOf[Tap[Any, Any, Any]]
+              }
+          }
 
         tryTtp match {
           case Success(s) => s

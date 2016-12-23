@@ -40,13 +40,15 @@ object Chart {
     }
 
     def games = povs.map { pov =>
-      Json.obj("id" -> pov.game.id,
-               "fen" ->
-                 (chess.format.Forsyth exportBoard pov.game.toChess.board),
-               "color" -> pov.player.color.name,
-               "lastMove" -> ~pov.game.castleLastMoveTime.lastMoveString,
-               "user1" -> gameUserJson(pov.player),
-               "user2" -> gameUserJson(pov.opponent))
+      Json.obj(
+        "id" -> pov.game.id,
+        "fen" ->
+          (chess.format.Forsyth exportBoard pov.game.toChess.board),
+        "color" -> pov.player.color.name,
+        "lastMove" -> ~pov.game.castleLastMoveTime.lastMoveString,
+        "user1" -> gameUserJson(pov.player),
+        "user2" -> gameUserJson(pov.opponent)
+      )
     }
 
     def xAxis =
@@ -66,26 +68,32 @@ object Chart {
             cluster.insight match {
               case Insight.Single(point) =>
                 val key = metric.name
-                acc.updated(key, acc.get(key) match {
-                  case None =>
-                    Serie(name = metric.name,
-                          dataType = metric.dataType.name,
-                          stack = none,
-                          data = List(point.y))
-                  case Some(s) => s.copy(data = point.y :: s.data)
-                })
+                acc.updated(
+                  key,
+                  acc.get(key) match {
+                    case None =>
+                      Serie(name = metric.name,
+                            dataType = metric.dataType.name,
+                            stack = none,
+                            data = List(point.y))
+                    case Some(s) => s.copy(data = point.y :: s.data)
+                  }
+                )
               case Insight.Stacked(points) =>
                 points.foldLeft(acc) {
                   case (acc, (metricValueName, point)) =>
                     val key = s"${metric.name}/${metricValueName.name}"
-                    acc.updated(key, acc.get(key) match {
-                      case None =>
-                        Serie(name = metricValueName.name,
-                              dataType = metric.dataType.name,
-                              stack = metric.name.some,
-                              data = List(point.y))
-                      case Some(s) => s.copy(data = point.y :: s.data)
-                    })
+                    acc.updated(
+                      key,
+                      acc.get(key) match {
+                        case None =>
+                          Serie(name = metricValueName.name,
+                                dataType = metric.dataType.name,
+                                stack = metric.name.some,
+                                data = List(point.y))
+                        case Some(s) => s.copy(data = point.y :: s.data)
+                      }
+                    )
                 }
             }
         }
@@ -102,12 +110,14 @@ object Chart {
       }
     }
 
-    Chart(question = JsonQuestion fromQuestion question,
-          xAxis = xAxis,
-          valueYaxis = Yaxis(metric.name, metric.dataType.name),
-          sizeYaxis = Yaxis(metric.per.tellNumber, Metric.DataType.Count.name),
-          series = sortedSeries,
-          sizeSerie = sizeSerie,
-          games = games)
+    Chart(
+      question = JsonQuestion fromQuestion question,
+      xAxis = xAxis,
+      valueYaxis = Yaxis(metric.name, metric.dataType.name),
+      sizeYaxis = Yaxis(metric.per.tellNumber, Metric.DataType.Count.name),
+      series = sortedSeries,
+      sizeSerie = sizeSerie,
+      games = games
+    )
   }
 }

@@ -43,6 +43,7 @@ object ConnectionPoolSettingsImpl
       c getInt "max-open-requests",
       c getInt "pipelining-limit",
       c getPotentiallyInfiniteDuration "idle-timeout",
-      ClientConnectionSettingsImpl.fromSubConfig(root, c.getConfig("client")))
+      ClientConnectionSettingsImpl.fromSubConfig(root, c.getConfig("client"))
+    )
   }
 }

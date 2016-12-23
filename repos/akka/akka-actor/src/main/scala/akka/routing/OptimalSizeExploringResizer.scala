@@ -71,7 +71,8 @@ case object OptimalSizeExploringResizer {
       exploreStepSize = resizerCfg.getDouble("explore-step-size"),
       explorationProbability = resizerCfg.getDouble("chance-of-exploration"),
       weightOfLatestMetric = resizerCfg.getDouble("weight-of-latest-metric"),
-      downsizeRatio = resizerCfg.getDouble("downsize-ratio"))
+      downsizeRatio = resizerCfg.getDouble("downsize-ratio")
+    )
 }
 
 /**

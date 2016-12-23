@@ -54,6 +54,7 @@ private object ScalaFacetData {
       compilerLibraryId,
       maximumHeapSize = properties.int("maximumHeapSize", 512),
       vmOptions = properties.seq("vmOptions", Seq("-Xss1m", "-server")),
-      compilerSettings = compilerSettings)
+      compilerSettings = compilerSettings
+    )
   }
 }

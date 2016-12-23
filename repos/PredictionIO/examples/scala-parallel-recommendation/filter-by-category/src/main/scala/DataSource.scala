@@ -50,25 +50,30 @@ class DataSource(val dsp: DataSourceParams)
       entityType = Some("user"),
       eventNames = Some(List("rate", "buy")), // read "rate" and "buy" event
       // targetEntityType is optional field of an event.
-      targetEntityType = Some(Some("item")))(sc)
+      targetEntityType = Some(Some("item"))
+    )(sc)
 
-    val ratingsRDD: RDD[Rating] = rateEventsRDD.map { event =>
-      val rating = try {
-        val ratingValue: Double = event.event match {
-          case "rate" => event.properties.get[Double]("rating")
-          case "buy" => 4.0 // map buy event to rating value of 4
-          case _ => throw new Exception(s"Unexpected event ${event} is read.")
+    val ratingsRDD: RDD[Rating] = rateEventsRDD
+      .map { event =>
+        val rating = try {
+          val ratingValue: Double = event.event match {
+            case "rate" => event.properties.get[Double]("rating")
+            case "buy" => 4.0 // map buy event to rating value of 4
+            case _ =>
+              throw new Exception(s"Unexpected event ${event} is read.")
+          }
+          // entityId and targetEntityId is String
+          Rating(event.entityId, event.targetEntityId.get, ratingValue)
+        } catch {
+          case e: Exception => {
+            logger.error(
+              s"Cannot convert ${event} to Rating. Exception: ${e}.")
+            throw e
+          }
         }
-        // entityId and targetEntityId is String
-        Rating(event.entityId, event.targetEntityId.get, ratingValue)
-      } catch {
-        case e: Exception => {
-          logger.error(s"Cannot convert ${event} to Rating. Exception: ${e}.")
-          throw e
-        }
+        rating
       }
-      rating
-    }.cache()
+      .cache()
 
     new TrainingData(itemsRDD, ratingsRDD)
   }

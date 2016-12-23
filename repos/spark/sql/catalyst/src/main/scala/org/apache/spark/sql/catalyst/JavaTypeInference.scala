@@ -250,16 +250,18 @@ object JavaTypeInference {
           case _ => None
         }
 
-        primitiveMethod.map { method =>
-          Invoke(getPath, method, ObjectType(c))
-        }.getOrElse {
-          Invoke(MapObjects(
-                   p => constructorFor(typeToken.getComponentType, Some(p)),
-                   getPath,
-                   inferDataType(elementType)._1),
-                 "array",
-                 ObjectType(c))
-        }
+        primitiveMethod
+          .map { method =>
+            Invoke(getPath, method, ObjectType(c))
+          }
+          .getOrElse {
+            Invoke(MapObjects(
+                     p => constructorFor(typeToken.getComponentType, Some(p)),
+                     getPath,
+                     inferDataType(elementType)._1),
+                   "array",
+                   ObjectType(c))
+          }
 
       case c if listType.isAssignableFrom(typeToken) =>
         val et = elementType(typeToken)
@@ -291,7 +293,8 @@ object JavaTypeInference {
                      Invoke(getPath, "valueArray", ArrayType(valueDataType)),
                      valueDataType),
           "array",
-          ObjectType(classOf[Array[Any]]))
+          ObjectType(classOf[Array[Any]])
+        )
 
         StaticInvoke(ArrayBasedMapData.getClass,
                      ObjectType(classOf[JMap[_, _]]),

@@ -386,8 +386,8 @@ sealed abstract class ZipperInstances {
     override def traverseImpl[G[_]: Applicative, A, B](za: Zipper[A])(
         f: A => G[B]): G[Zipper[B]] =
       za traverse f
-    override def foldRight[A, B](fa: Zipper[A], z: => B)(f: (A,
-                                                             => B) => B): B =
+    override def foldRight[A, B](fa: Zipper[A], z: => B)(
+        f: (A, => B) => B): B =
       fa.foldRight(z)(f)
     override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
       fa.foldLeft(z)(f)

@@ -68,11 +68,14 @@ private[serverset2] object HealthStabilizer {
         }
       }
 
-      val notify = stateChanges.collect {
-        // re-map to the underlying health status
-        case Healthy | Probation(_) => ClientHealth.Healthy
-        case Unhealthy => ClientHealth.Unhealthy
-      }.dedup.register(Witness(u))
+      val notify = stateChanges
+        .collect {
+          // re-map to the underlying health status
+          case Healthy | Probation(_) => ClientHealth.Healthy
+          case Unhealthy => ClientHealth.Unhealthy
+        }
+        .dedup
+        .register(Witness(u))
 
       Closable.all(notify, gaugeListener, Closable.make { _ =>
         gauge.remove()

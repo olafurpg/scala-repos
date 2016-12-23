@@ -504,28 +504,30 @@ package object collections {
   def isIterator(expr: ScExpression) =
     isExpressionOfType("scala.collection.Iterator", expr)
 
-  private val sideEffectsCollectionMethods = Set("append",
-                                                 "appendAll",
-                                                 "clear",
-                                                 "insert",
-                                                 "insertAll",
-                                                 "prepend",
-                                                 "prependAll",
-                                                 "reduceToSize",
-                                                 "remove",
-                                                 "retain",
-                                                 "transform",
-                                                 "trimEnd",
-                                                 "trimStart",
-                                                 "update",
-                                                 "push",
-                                                 "pushAll",
-                                                 "pop",
-                                                 "dequeue",
-                                                 "dequeueAll",
-                                                 "dequeueFirst",
-                                                 "enqueue",
-                                                 "next")
+  private val sideEffectsCollectionMethods = Set(
+    "append",
+    "appendAll",
+    "clear",
+    "insert",
+    "insertAll",
+    "prepend",
+    "prependAll",
+    "reduceToSize",
+    "remove",
+    "retain",
+    "transform",
+    "trimEnd",
+    "trimStart",
+    "update",
+    "push",
+    "pushAll",
+    "pop",
+    "dequeue",
+    "dequeueAll",
+    "dequeueFirst",
+    "enqueue",
+    "next"
+  )
 
   private class SideEffectsProvider(expr: ScExpression)
       extends CachedValueProvider[Seq[ScExpression]] {

@@ -74,11 +74,12 @@ class DataSource(val dsp: DataSourceParams)
     // get all "user" "rate" "item" events
     val rateEventsRDD: RDD[RateEvent] = eventsDb
       .find( // MODIFIED
-            appId = dsp.appId,
-            entityType = Some("user"),
-            eventNames = Some(List("rate")), // MODIFIED
-            // targetEntityType is optional field of an event.
-            targetEntityType = Some(Some("item")))(sc)
+        appId = dsp.appId,
+        entityType = Some("user"),
+        eventNames = Some(List("rate")), // MODIFIED
+        // targetEntityType is optional field of an event.
+        targetEntityType = Some(Some("item"))
+      )(sc)
       // eventsDb.find() returns RDD[Event]
       .map { event =>
         val rateEvent = try {

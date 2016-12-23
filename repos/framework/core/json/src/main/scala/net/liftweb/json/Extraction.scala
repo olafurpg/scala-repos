@@ -125,9 +125,11 @@ object Extraction {
                       val s =
                         serializer.serializer orElse Map(
                           (n, fieldVal) -> Some(n, fieldVal))
-                      s((n, fieldVal)).map {
-                        case (name, value) => JField(name, decompose(value))
-                      }.getOrElse(JField(n, JNothing))
+                      s((n, fieldVal))
+                        .map {
+                          case (name, value) => JField(name, decompose(value))
+                        }
+                        .getOrElse(JField(n, JNothing))
                   }
                 } getOrElse Nil
               val uniqueFields =

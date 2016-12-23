@@ -25,8 +25,9 @@ class TellOnlyBenchmark {
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    system = ActorSystem("TellOnlyBenchmark",
-                         ConfigFactory.parseString(s"""| akka {
+    system = ActorSystem(
+      "TellOnlyBenchmark",
+      ConfigFactory.parseString(s"""| akka {
           |   log-dead-letters = off
           |   actor {
           |     default-dispatcher {
@@ -45,7 +46,8 @@ class TellOnlyBenchmark {
           |   type = "akka.actor.TellOnlyBenchmark$$DroppingDispatcherConfigurator"
           |   mailbox-type = "akka.actor.TellOnlyBenchmark$$UnboundedDroppingMailbox"
           | }
-          | """.stripMargin))
+          | """.stripMargin)
+    )
   }
 
   @TearDown(Level.Trial)
@@ -158,6 +160,7 @@ object TellOnlyBenchmark {
         config.getInt("throughput"),
         config.getNanosDuration("throughput-deadline-time"),
         configureExecutor(),
-        config.getMillisDuration("shutdown-timeout"))
+        config.getMillisDuration("shutdown-timeout")
+      )
   }
 }

@@ -25,8 +25,9 @@ class EnsimeConfigSpec extends EnsimeSpec {
     abc.mkdirs()
     cache.mkdirs()
 
-    test(dir,
-         s"""
+    test(
+      dir,
+      s"""
 (:name "project"
  :scala-version "2.10.4"
  :java-home "$javaHome"
@@ -44,14 +45,15 @@ class EnsimeConfigSpec extends EnsimeSpec {
                 :compiler-args ()
                 :runtime-deps ()
                 :test-deps ())))""", { implicit config =>
-           config.name shouldBe "project"
-           config.scalaVersion shouldBe "2.10.4"
-           val module1 = config.modules("module1")
-           module1.name shouldBe "module1"
-           module1.dependencies shouldBe empty
-           config.sourceMode shouldBe false
-           config.debugVMArgs shouldBe List("-Dthis=that")
-         })
+        config.name shouldBe "project"
+        config.scalaVersion shouldBe "2.10.4"
+        val module1 = config.modules("module1")
+        module1.name shouldBe "module1"
+        module1.dependencies shouldBe empty
+        config.sourceMode shouldBe false
+        config.debugVMArgs shouldBe List("-Dthis=that")
+      }
+    )
   }
 
   it should "parse a minimal config for a binary only project" in withTempDir {
@@ -63,8 +65,9 @@ class EnsimeConfigSpec extends EnsimeSpec {
       abc.mkdirs()
       cache.mkdirs()
 
-      test(dir,
-           s"""
+      test(
+        dir,
+        s"""
 (:name "project"
  :scala-version "2.10.4"
  :java-home "$javaHome"
@@ -73,13 +76,14 @@ class EnsimeConfigSpec extends EnsimeSpec {
  :subprojects ((:name "module1"
                 :scala-version "2.10.4"
                 :targets ("$abc"))))""", { implicit config =>
-             config.name shouldBe "project"
-             config.scalaVersion shouldBe "2.10.4"
-             val module1 = config.modules("module1")
-             module1.name shouldBe "module1"
-             module1.dependencies shouldBe empty
-             module1.targetDirs should have size 1
-           })
+          config.name shouldBe "project"
+          config.scalaVersion shouldBe "2.10.4"
+          val module1 = config.modules("module1")
+          module1.name shouldBe "module1"
+          module1.dependencies shouldBe empty
+          module1.targetDirs should have size 1
+        }
+      )
   }
 
   it should "base class paths on source-mode value" in {
@@ -92,8 +96,9 @@ class EnsimeConfigSpec extends EnsimeSpec {
         abc.mkdirs()
         cache.mkdirs()
 
-        test(dir,
-             s"""
+        test(
+          dir,
+          s"""
 (:name "project"
  :scala-version "2.10.4"
  :java-home "$javaHome"
@@ -103,11 +108,12 @@ class EnsimeConfigSpec extends EnsimeSpec {
  :subprojects ((:name "module1"
                 :scala-version "2.10.4"
                 :targets ("$abc"))))""", { implicit config =>
-               config.sourceMode shouldBe sourceMode
-               config.runtimeClasspath shouldBe Set(abc)
-               config.compileClasspath shouldBe
-                 (if (sourceMode) Set.empty else Set(abc))
-             })
+            config.sourceMode shouldBe sourceMode
+            config.runtimeClasspath shouldBe Set(abc)
+            config.compileClasspath shouldBe
+              (if (sourceMode) Set.empty else Set(abc))
+          }
+        )
       }
     }
   }

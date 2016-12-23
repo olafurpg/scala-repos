@@ -42,7 +42,8 @@ abstract class ScalaUnnecessaryParenthesesInspectionBase
         new UnnecessaryParenthesesQuickFix(
           parenthesized,
           UnnecessaryParenthesesUtil.getTextOfStripped(parenthesized,
-                                                       getIgnoreClarifying)))
+                                                       getIgnoreClarifying))
+      )
   }
 
   override def createOptionsPanel(): JComponent = {

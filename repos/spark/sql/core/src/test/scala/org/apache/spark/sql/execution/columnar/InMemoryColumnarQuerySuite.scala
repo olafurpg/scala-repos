@@ -151,23 +151,25 @@ class InMemoryColumnarQuerySuite extends QueryTest with SharedSQLContext {
       StructField("f1", FloatType, true) :: StructField("f2",
                                                         ArrayType(BooleanType),
                                                         true) :: Nil)
-    val dataTypes = Seq(StringType,
-                        BinaryType,
-                        NullType,
-                        BooleanType,
-                        ByteType,
-                        ShortType,
-                        IntegerType,
-                        LongType,
-                        FloatType,
-                        DoubleType,
-                        DecimalType(25, 5),
-                        DecimalType(6, 5),
-                        DateType,
-                        TimestampType,
-                        ArrayType(IntegerType),
-                        MapType(StringType, LongType),
-                        struct)
+    val dataTypes = Seq(
+      StringType,
+      BinaryType,
+      NullType,
+      BooleanType,
+      ByteType,
+      ShortType,
+      IntegerType,
+      LongType,
+      FloatType,
+      DoubleType,
+      DecimalType(25, 5),
+      DecimalType(6, 5),
+      DateType,
+      TimestampType,
+      ArrayType(IntegerType),
+      MapType(StringType, LongType),
+      struct
+    )
     val fields = dataTypes.zipWithIndex.map {
       case (dataType, index) =>
         StructField(s"col$index", dataType, true)
@@ -177,23 +179,25 @@ class InMemoryColumnarQuerySuite extends QueryTest with SharedSQLContext {
 
     // Create a RDD for the schema
     val rdd = sparkContext.parallelize((1 to 10000), 10).map { i =>
-      Row(s"str${i}: test cache.",
-          s"binary${i}: test cache.".getBytes(StandardCharsets.UTF_8),
-          null,
-          i % 2 == 0,
-          i.toByte,
-          i.toShort,
-          i,
-          Long.MaxValue - i.toLong,
-          (i + 0.25).toFloat,
-          (i + 0.75),
-          BigDecimal(Long.MaxValue.toString + ".12345"),
-          new java.math.BigDecimal(s"${i % 9 + 1}" + ".23456"),
-          new Date(i),
-          new Timestamp(i * 1000000L),
-          (i to i + 10).toSeq,
-          (i to i + 10).map(j => s"map_key_$j" -> (Long.MaxValue - j)).toMap,
-          Row((i - 0.25).toFloat, Seq(true, false, null)))
+      Row(
+        s"str${i}: test cache.",
+        s"binary${i}: test cache.".getBytes(StandardCharsets.UTF_8),
+        null,
+        i % 2 == 0,
+        i.toByte,
+        i.toShort,
+        i,
+        Long.MaxValue - i.toLong,
+        (i + 0.25).toFloat,
+        (i + 0.75),
+        BigDecimal(Long.MaxValue.toString + ".12345"),
+        new java.math.BigDecimal(s"${i % 9 + 1}" + ".23456"),
+        new Date(i),
+        new Timestamp(i * 1000000L),
+        (i to i + 10).toSeq,
+        (i to i + 10).map(j => s"map_key_$j" -> (Long.MaxValue - j)).toMap,
+        Row((i - 0.25).toFloat, Seq(true, false, null))
+      )
     }
     sqlContext
       .createDataFrame(rdd, schema)

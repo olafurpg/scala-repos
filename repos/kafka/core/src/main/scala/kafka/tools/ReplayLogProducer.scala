@@ -116,7 +116,8 @@ object ReplayLogProducer extends Logging {
       .accepts(
         "property",
         "A mechanism to pass properties in the form key=value to the producer. " +
-          "This allows the user to override producer properties that are not exposed by the existing command line arguments")
+          "This allows the user to override producer properties that are not exposed by the existing command line arguments"
+      )
       .withRequiredArg
       .describedAs("producer properties")
       .ofType(classOf[String])

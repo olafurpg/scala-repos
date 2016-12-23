@@ -151,12 +151,14 @@ object gen {
               closedInterval[A])
 
   def interval[A: Arbitrary: Order: AdditiveMonoid]: Gen[Interval[A]] =
-    Gen.frequency[Interval[A]]((1, Gen.const(Interval.all[A])),
-                               (1, arbitrary[A].map(Interval.above(_))),
-                               (1, arbitrary[A].map(Interval.atOrAbove(_))),
-                               (1, arbitrary[A].map(Interval.below(_))),
-                               (1, arbitrary[A].map(Interval.atOrBelow(_))),
-                               (15, boundedInterval[A]))
+    Gen.frequency[Interval[A]](
+      (1, Gen.const(Interval.all[A])),
+      (1, arbitrary[A].map(Interval.above(_))),
+      (1, arbitrary[A].map(Interval.atOrAbove(_))),
+      (1, arbitrary[A].map(Interval.below(_))),
+      (1, arbitrary[A].map(Interval.atOrBelow(_))),
+      (15, boundedInterval[A])
+    )
 
   def freeMonoid[A: Arbitrary]: Gen[FreeMonoid[A]] =
     for {

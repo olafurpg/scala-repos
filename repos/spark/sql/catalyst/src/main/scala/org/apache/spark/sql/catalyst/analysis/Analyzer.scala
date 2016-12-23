@@ -85,7 +85,8 @@ class Analyzer(catalog: Catalog,
     Batch(
       "Resolution",
       fixedPoint,
-      ResolveRelations :: ResolveReferences :: ResolveGroupingAnalytics :: ResolvePivot :: ResolveUpCast :: ResolveSortReferences :: ResolveGenerate :: ResolveFunctions :: ResolveAliases :: ResolveSubquery :: ResolveWindowOrder :: ResolveWindowFrame :: ResolveNaturalAndUsingJoin :: ExtractWindowExpressions :: GlobalAggregates :: ResolveAggregateFunctions :: HiveTypeCoercion.typeCoercionRules ++ extendedResolutionRules: _*),
+      ResolveRelations :: ResolveReferences :: ResolveGroupingAnalytics :: ResolvePivot :: ResolveUpCast :: ResolveSortReferences :: ResolveGenerate :: ResolveFunctions :: ResolveAliases :: ResolveSubquery :: ResolveWindowOrder :: ResolveWindowFrame :: ResolveNaturalAndUsingJoin :: ExtractWindowExpressions :: GlobalAggregates :: ResolveAggregateFunctions :: HiveTypeCoercion.typeCoercionRules ++ extendedResolutionRules: _*
+    ),
     Batch("Nondeterministic", Once, PullOutNondeterministic),
     Batch("UDF", Once, HandleNullInputsForUDF),
     Batch("Cleanup", fixedPoint, CleanupAliases)
@@ -155,23 +156,26 @@ class Analyzer(catalog: Catalog,
     */
   object ResolveAliases extends Rule[LogicalPlan] {
     private def assignAliases(exprs: Seq[NamedExpression]) = {
-      exprs.zipWithIndex.map {
-        case (expr, i) =>
-          expr transformUp {
-            case u @ UnresolvedAlias(child, optionalAliasName) =>
-              child match {
-                case ne: NamedExpression => ne
-                case e if !e.resolved => u
-                case g: Generator => MultiAlias(g, Nil)
-                case c @ Cast(ne: NamedExpression, _) => Alias(c, ne.name)()
-                case e: ExtractValue => Alias(e, usePrettyExpression(e).sql)()
-                case e =>
-                  Alias(
-                    e,
-                    optionalAliasName.getOrElse(usePrettyExpression(e).sql))()
-              }
-          }
-      }.asInstanceOf[Seq[NamedExpression]]
+      exprs.zipWithIndex
+        .map {
+          case (expr, i) =>
+            expr transformUp {
+              case u @ UnresolvedAlias(child, optionalAliasName) =>
+                child match {
+                  case ne: NamedExpression => ne
+                  case e if !e.resolved => u
+                  case g: Generator => MultiAlias(g, Nil)
+                  case c @ Cast(ne: NamedExpression, _) => Alias(c, ne.name)()
+                  case e: ExtractValue =>
+                    Alias(e, usePrettyExpression(e).sql)()
+                  case e =>
+                    Alias(e,
+                          optionalAliasName.getOrElse(
+                            usePrettyExpression(e).sql))()
+                }
+            }
+        }
+        .asInstanceOf[Seq[NamedExpression]]
     }
 
     private def hasUnresolvedAlias(exprs: Seq[NamedExpression]) =
@@ -282,45 +286,48 @@ class Analyzer(catalog: Catalog,
             def isPartOfAggregation(e: Expression): Boolean = {
               aggsBuffer.exists(a => a.find(_ eq e).isDefined)
             }
-            expr.transformDown {
-              // AggregateExpression should be computed on the unmodified value of its argument
-              // expressions, so we should not replace any references to grouping expression
-              // inside it.
-              case e: AggregateExpression =>
-                aggsBuffer += e
-                e
-              case e if isPartOfAggregation(e) => e
-              case e: GroupingID =>
-                if (e.groupByExprs.isEmpty ||
-                    e.groupByExprs == x.groupByExprs) {
-                  gid
-                } else {
-                  throw new AnalysisException(
-                    s"Columns of grouping_id (${e.groupByExprs.mkString(",")}) does not match " +
-                      s"grouping columns (${x.groupByExprs.mkString(",")})")
-                }
-              case Grouping(col: Expression) =>
-                val idx = x.groupByExprs.indexOf(col)
-                if (idx >= 0) {
-                  Cast(BitwiseAnd(
-                         ShiftRight(gid,
-                                    Literal(x.groupByExprs.length - 1 - idx)),
-                         Literal(1)),
-                       ByteType)
-                } else {
-                  throw new AnalysisException(
-                    s"Column of grouping ($col) can't be found " +
-                      s"in grouping columns ${x.groupByExprs.mkString(",")}")
-                }
-              case e =>
-                val index =
-                  groupByAliases.indexWhere(_.child.semanticEquals(e))
-                if (index == -1) {
+            expr
+              .transformDown {
+                // AggregateExpression should be computed on the unmodified value of its argument
+                // expressions, so we should not replace any references to grouping expression
+                // inside it.
+                case e: AggregateExpression =>
+                  aggsBuffer += e
                   e
-                } else {
-                  groupByAttributes(index)
-                }
-            }.asInstanceOf[NamedExpression]
+                case e if isPartOfAggregation(e) => e
+                case e: GroupingID =>
+                  if (e.groupByExprs.isEmpty ||
+                      e.groupByExprs == x.groupByExprs) {
+                    gid
+                  } else {
+                    throw new AnalysisException(
+                      s"Columns of grouping_id (${e.groupByExprs.mkString(",")}) does not match " +
+                        s"grouping columns (${x.groupByExprs.mkString(",")})")
+                  }
+                case Grouping(col: Expression) =>
+                  val idx = x.groupByExprs.indexOf(col)
+                  if (idx >= 0) {
+                    Cast(
+                      BitwiseAnd(
+                        ShiftRight(gid,
+                                   Literal(x.groupByExprs.length - 1 - idx)),
+                        Literal(1)),
+                      ByteType)
+                  } else {
+                    throw new AnalysisException(
+                      s"Column of grouping ($col) can't be found " +
+                        s"in grouping columns ${x.groupByExprs.mkString(",")}")
+                  }
+                case e =>
+                  val index =
+                    groupByAliases.indexWhere(_.child.semanticEquals(e))
+                  if (index == -1) {
+                    e
+                  } else {
+                    groupByAttributes(index)
+                  }
+              }
+              .asInstanceOf[NamedExpression]
         }
 
         Aggregate(
@@ -506,33 +513,36 @@ class Analyzer(catalog: Catalog,
 
       // If the projection list contains Stars, expand it.
       case p @ Project(projectList, child) if containsStar(projectList) =>
-        Project(projectList.flatMap {
-          case s: Star => s.expand(child, resolver)
-          case UnresolvedAlias(f @ UnresolvedFunction(_, args, _), _)
-              if containsStar(args) =>
-            val newChildren = expandStarExpressions(args, child)
-            UnresolvedAlias(child = f.copy(children = newChildren)) :: Nil
-          case a @ Alias(f @ UnresolvedFunction(_, args, _), name)
-              if containsStar(args) =>
-            val newChildren = expandStarExpressions(args, child)
-            Alias(child = f.copy(children = newChildren), name)(
-              isGenerated = a.isGenerated) :: Nil
-          case UnresolvedAlias(c @ CreateArray(args), _)
-              if containsStar(args) =>
-            val expandedArgs = args.flatMap {
-              case s: Star => s.expand(child, resolver)
-              case o => o :: Nil
-            }
-            UnresolvedAlias(c.copy(children = expandedArgs)) :: Nil
-          case UnresolvedAlias(c @ CreateStruct(args), _)
-              if containsStar(args) =>
-            val expandedArgs = args.flatMap {
-              case s: Star => s.expand(child, resolver)
-              case o => o :: Nil
-            }
-            UnresolvedAlias(c.copy(children = expandedArgs)) :: Nil
-          case o => o :: Nil
-        }, child)
+        Project(
+          projectList.flatMap {
+            case s: Star => s.expand(child, resolver)
+            case UnresolvedAlias(f @ UnresolvedFunction(_, args, _), _)
+                if containsStar(args) =>
+              val newChildren = expandStarExpressions(args, child)
+              UnresolvedAlias(child = f.copy(children = newChildren)) :: Nil
+            case a @ Alias(f @ UnresolvedFunction(_, args, _), name)
+                if containsStar(args) =>
+              val newChildren = expandStarExpressions(args, child)
+              Alias(child = f.copy(children = newChildren), name)(
+                isGenerated = a.isGenerated) :: Nil
+            case UnresolvedAlias(c @ CreateArray(args), _)
+                if containsStar(args) =>
+              val expandedArgs = args.flatMap {
+                case s: Star => s.expand(child, resolver)
+                case o => o :: Nil
+              }
+              UnresolvedAlias(c.copy(children = expandedArgs)) :: Nil
+            case UnresolvedAlias(c @ CreateStruct(args), _)
+                if containsStar(args) =>
+              val expandedArgs = args.flatMap {
+                case s: Star => s.expand(child, resolver)
+                case o => o :: Nil
+              }
+              UnresolvedAlias(c.copy(children = expandedArgs)) :: Nil
+            case o => o :: Nil
+          },
+          child
+        )
 
       case t: ScriptTransformation if containsStar(t.input) =>
         t.copy(
@@ -1038,7 +1048,8 @@ class Analyzer(catalog: Catalog,
               outer = false,
               qualifier = None,
               generatorOutput = makeGeneratorOutput(generator, names),
-              child)
+              child
+            )
 
             resolvedGenerator.generatorOutput
           case other => other :: Nil

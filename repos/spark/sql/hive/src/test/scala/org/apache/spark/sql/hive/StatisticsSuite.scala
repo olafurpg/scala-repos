@@ -151,7 +151,8 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
         sizes.size === 2 &&
           sizes(0) <= hiveContext.conf.autoBroadcastJoinThreshold &&
           sizes(1) <= hiveContext.conf.autoBroadcastJoinThreshold,
-        s"query should contain two relations, each of which has size smaller than autoConvertSize")
+        s"query should contain two relations, each of which has size smaller than autoConvertSize"
+      )
 
       // Using `sparkPlan` because for relevant patterns in HashJoin to be
       // matched, other strategies need to be applied.
@@ -222,7 +223,8 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       sizes.size === 2 &&
         sizes(1) <= hiveContext.conf.autoBroadcastJoinThreshold &&
         sizes(0) <= hiveContext.conf.autoBroadcastJoinThreshold,
-      s"query should contain two relations, each of which has size smaller than autoConvertSize")
+      s"query should contain two relations, each of which has size smaller than autoConvertSize"
+    )
 
     // Using `sparkPlan` because for relevant patterns in HashJoin to be
     // matched, other strategies need to be applied.

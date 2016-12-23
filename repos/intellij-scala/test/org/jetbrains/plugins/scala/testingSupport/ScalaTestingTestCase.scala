@@ -260,16 +260,18 @@ abstract class ScalaTestingTestCase(
           _.getClass == classOf[DefaultJavaProgramRunner]
         }.get
         val (handler, runContentDescriptor) =
-          runProcess(runConfig,
-                     classOf[DefaultRunExecutor],
-                     new ProcessAdapter {
-                       override def onTextAvailable(event: ProcessEvent,
-                                                    outputType: Key[_]) {
-                         val text = event.getText
-                         if (debug) print(text)
-                       }
-                     },
-                     runner)
+          runProcess(
+            runConfig,
+            classOf[DefaultRunExecutor],
+            new ProcessAdapter {
+              override def onTextAvailable(event: ProcessEvent,
+                                           outputType: Key[_]) {
+                val text = event.getText
+                if (debug) print(text)
+              }
+            },
+            runner
+          )
 
         runContentDescriptor.getExecutionConsole match {
           case descriptor: SMTRunnerConsoleView =>
@@ -301,23 +303,26 @@ abstract class ScalaTestingTestCase(
     val contentDescriptor: AtomicReference[RunContentDescriptor] =
       new AtomicReference[RunContentDescriptor]
     runner
-      .execute(executionEnvironmentBuilder.build, new ProgramRunner.Callback {
-        def processStarted(descriptor: RunContentDescriptor) {
-          System.setProperty("idea.dynamic.classpath",
-                             useDynamicClassPath.toString)
-          disposeOnTearDown(new Disposable {
-            def dispose() {
-              descriptor.dispose()
-            }
-          })
-          val handler: ProcessHandler = descriptor.getProcessHandler
-          assert(handler != null)
-          handler.addProcessListener(listener)
-          processHandler.set(handler)
-          contentDescriptor.set(descriptor)
-          semaphore.up()
+      .execute(
+        executionEnvironmentBuilder.build,
+        new ProgramRunner.Callback {
+          def processStarted(descriptor: RunContentDescriptor) {
+            System.setProperty("idea.dynamic.classpath",
+                               useDynamicClassPath.toString)
+            disposeOnTearDown(new Disposable {
+              def dispose() {
+                descriptor.dispose()
+              }
+            })
+            val handler: ProcessHandler = descriptor.getProcessHandler
+            assert(handler != null)
+            handler.addProcessListener(listener)
+            processHandler.set(handler)
+            contentDescriptor.set(descriptor)
+            semaphore.up()
+          }
         }
-      })
+      )
     semaphore.waitFor()
     (processHandler.get, contentDescriptor.get)
   }

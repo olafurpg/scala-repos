@@ -74,7 +74,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
              uniqueAddressFromBinary(bytes))),
       classOf[GossipStatus] -> gossipStatusFromBinary,
       classOf[GossipEnvelope] -> gossipEnvelopeFromBinary,
-      classOf[MetricsGossipEnvelope] -> metricsGossipEnvelopeFromBinary)
+      classOf[MetricsGossipEnvelope] -> metricsGossipEnvelopeFromBinary
+    )
 
   def includeManifest: Boolean = true
 
@@ -220,7 +221,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
       MemberStatus.Exiting -> cm.MemberStatus.Exiting_VALUE,
       MemberStatus.Down -> cm.MemberStatus.Down_VALUE,
       MemberStatus.Removed -> cm.MemberStatus.Removed_VALUE,
-      MemberStatus.WeaklyUp -> cm.MemberStatus.WeaklyUp_VALUE)
+      MemberStatus.WeaklyUp -> cm.MemberStatus.WeaklyUp_VALUE
+    )
 
   private val memberStatusFromInt = memberStatusToInt.map {
     case (a, b) ⇒ (b, a)
@@ -230,7 +232,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
     scala.collection.immutable.HashMap[Reachability.ReachabilityStatus, Int](
       Reachability.Reachable -> cm.ReachabilityStatus.Reachable_VALUE,
       Reachability.Unreachable -> cm.ReachabilityStatus.Unreachable_VALUE,
-      Reachability.Terminated -> cm.ReachabilityStatus.Terminated_VALUE)
+      Reachability.Terminated -> cm.ReachabilityStatus.Terminated_VALUE
+    )
 
   private val reachabilityStatusFromInt = reachabilityStatusToInt.map {
     case (a, b) ⇒ (b, a)
@@ -408,7 +411,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
         addressMapping(member.getAddressIndex),
         member.getUpNumber,
         memberStatusFromInt(member.getStatus.getNumber),
-        member.getRolesIndexesList.asScala.map(roleMapping(_))(breakOut))
+        member.getRolesIndexesList.asScala.map(roleMapping(_))(breakOut)
+      )
 
     val members: immutable.SortedSet[Member] =
       gossip.getMembersList.asScala.map(memberFromProto)(breakOut)
@@ -442,7 +446,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
       Deadline.now + GossipTimeToLive,
       () ⇒
         gossipFromProto(
-          cm.Gossip.parseFrom(decompress(serializedGossip.toByteArray))))
+          cm.Gossip.parseFrom(decompress(serializedGossip.toByteArray)))
+    )
   }
 
   private def gossipStatusFromProto(status: cm.GossipStatus): GossipStatus =

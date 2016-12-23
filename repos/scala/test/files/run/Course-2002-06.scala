@@ -219,15 +219,17 @@ object M0 {
   // A small test painter.
   def house(canvas: Graphics)(frame: Frame): Unit = {
     canvas.drawPolySegment(frame)(
-      List(new Vector(0.0, 0.0),
-           new Vector(1.0, 0.0),
-           new Vector(1.0, 2.0 / 3.0),
-           new Vector(0.0, 2.0 / 3.0),
-           new Vector(0.5, 1.0),
-           new Vector(1.0, 2.0 / 3.0),
-           new Vector(0.0, 0.0),
-           new Vector(0.0, 2.0 / 3.0),
-           new Vector(1.0, 0.0)));
+      List(
+        new Vector(0.0, 0.0),
+        new Vector(1.0, 0.0),
+        new Vector(1.0, 2.0 / 3.0),
+        new Vector(0.0, 2.0 / 3.0),
+        new Vector(0.5, 1.0),
+        new Vector(1.0, 2.0 / 3.0),
+        new Vector(0.0, 0.0),
+        new Vector(0.0, 2.0 / 3.0),
+        new Vector(1.0, 0.0)
+      ));
     canvas.repaint
   }
 

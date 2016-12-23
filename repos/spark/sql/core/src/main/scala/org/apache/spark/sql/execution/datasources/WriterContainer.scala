@@ -196,34 +196,37 @@ private[sql] abstract class BaseWriterContainer(
         null,
         classOf[OutputCommitter])
 
-      Option(committerClass).map { clazz =>
-        logInfo(
-          s"Using user defined output committer class ${clazz.getCanonicalName}")
+      Option(committerClass)
+        .map { clazz =>
+          logInfo(
+            s"Using user defined output committer class ${clazz.getCanonicalName}")
 
-        // Every output format based on org.apache.hadoop.mapreduce.lib.output.OutputFormat
-        // has an associated output committer. To override this output committer,
-        // we will first try to use the output committer set in SQLConf.OUTPUT_COMMITTER_CLASS.
-        // If a data source needs to override the output committer, it needs to set the
-        // output committer in prepareForWrite method.
-        if (classOf[MapReduceFileOutputCommitter].isAssignableFrom(clazz)) {
-          // The specified output committer is a FileOutputCommitter.
-          // So, we will use the FileOutputCommitter-specified constructor.
-          val ctor = clazz.getDeclaredConstructor(classOf[Path],
-                                                  classOf[TaskAttemptContext])
-          ctor.newInstance(new Path(outputPath), context)
-        } else {
-          // The specified output committer is just a OutputCommitter.
-          // So, we will use the no-argument constructor.
-          val ctor = clazz.getDeclaredConstructor()
-          ctor.newInstance()
+          // Every output format based on org.apache.hadoop.mapreduce.lib.output.OutputFormat
+          // has an associated output committer. To override this output committer,
+          // we will first try to use the output committer set in SQLConf.OUTPUT_COMMITTER_CLASS.
+          // If a data source needs to override the output committer, it needs to set the
+          // output committer in prepareForWrite method.
+          if (classOf[MapReduceFileOutputCommitter].isAssignableFrom(clazz)) {
+            // The specified output committer is a FileOutputCommitter.
+            // So, we will use the FileOutputCommitter-specified constructor.
+            val ctor =
+              clazz.getDeclaredConstructor(classOf[Path],
+                                           classOf[TaskAttemptContext])
+            ctor.newInstance(new Path(outputPath), context)
+          } else {
+            // The specified output committer is just a OutputCommitter.
+            // So, we will use the no-argument constructor.
+            val ctor = clazz.getDeclaredConstructor()
+            ctor.newInstance()
+          }
         }
-      }.getOrElse {
-        // If output committer class is not set, we will use the one associated with the
-        // file output format.
-        logInfo(
-          s"Using output committer class ${defaultOutputCommitter.getClass.getCanonicalName}")
-        defaultOutputCommitter
-      }
+        .getOrElse {
+          // If output committer class is not set, we will use the one associated with the
+          // file output format.
+          logInfo(
+            s"Using output committer class ${defaultOutputCommitter.getClass.getCanonicalName}")
+          defaultOutputCommitter
+        }
     }
   }
 

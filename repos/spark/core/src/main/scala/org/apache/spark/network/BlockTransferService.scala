@@ -89,19 +89,25 @@ private[spark] abstract class BlockTransferService
                      blockId: String): ManagedBuffer = {
     // A monitor for the thread to wait on.
     val result = Promise[ManagedBuffer]()
-    fetchBlocks(host, port, execId, Array(blockId), new BlockFetchingListener {
-      override def onBlockFetchFailure(blockId: String,
-                                       exception: Throwable): Unit = {
-        result.failure(exception)
+    fetchBlocks(
+      host,
+      port,
+      execId,
+      Array(blockId),
+      new BlockFetchingListener {
+        override def onBlockFetchFailure(blockId: String,
+                                         exception: Throwable): Unit = {
+          result.failure(exception)
+        }
+        override def onBlockFetchSuccess(blockId: String,
+                                         data: ManagedBuffer): Unit = {
+          val ret = ByteBuffer.allocate(data.size.toInt)
+          ret.put(data.nioByteBuffer())
+          ret.flip()
+          result.success(new NioManagedBuffer(ret))
+        }
       }
-      override def onBlockFetchSuccess(blockId: String,
-                                       data: ManagedBuffer): Unit = {
-        val ret = ByteBuffer.allocate(data.size.toInt)
-        ret.put(data.nioByteBuffer())
-        ret.flip()
-        result.success(new NioManagedBuffer(ret))
-      }
-    })
+    )
 
     Await.result(result.future, Duration.Inf)
   }

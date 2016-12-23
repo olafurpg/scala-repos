@@ -151,10 +151,12 @@ object PortMappingSerializer {
         .setServicePort(mapping.servicePort)
 
     mapping.name.foreach(builder.setName)
-    mapping.labels.map {
-      case (key, value) =>
-        mesos.Protos.Label.newBuilder.setKey(key).setValue(value).build
-    }.foreach(builder.addLabels)
+    mapping.labels
+      .map {
+        case (key, value) =>
+          mesos.Protos.Label.newBuilder.setKey(key).setValue(value).build
+      }
+      .foreach(builder.addLabels)
 
     builder.build
   }

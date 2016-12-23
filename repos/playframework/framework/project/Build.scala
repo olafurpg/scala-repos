@@ -416,17 +416,19 @@ object PlayBuild extends Build {
 
   lazy val SbtForkRunPluginProject =
     PlaySbtPluginProject("SBT-Fork-Run-Plugin", "sbt-fork-run-plugin")
-      .settings(libraryDependencies ++= sbtForkRunPluginDependencies(
-                  sbtVersion.value,
-                  scalaVersion.value),
-                // This only publishes the sbt plugin projects on each scripted run.
-                // The runtests script does a full publish before running tests.
-                // When developing the sbt plugins, run a publishLocal in the root project first.
-                scriptedDependencies := {
-                  val () = publishLocal.value
-                  val () = (publishLocal in SbtPluginProject).value
-                  val () = (publishLocal in SbtRoutesCompilerProject).value
-                })
+      .settings(
+        libraryDependencies ++= sbtForkRunPluginDependencies(
+          sbtVersion.value,
+          scalaVersion.value),
+        // This only publishes the sbt plugin projects on each scripted run.
+        // The runtests script does a full publish before running tests.
+        // When developing the sbt plugins, run a publishLocal in the root project first.
+        scriptedDependencies := {
+          val () = publishLocal.value
+          val () = (publishLocal in SbtPluginProject).value
+          val () = (publishLocal in SbtRoutesCompilerProject).value
+        }
+      )
       .dependsOn(SbtForkRunProtocolProject, SbtPluginProject)
 
   lazy val PlayLogback = PlayCrossBuiltProject("Play-Logback", "play-logback")

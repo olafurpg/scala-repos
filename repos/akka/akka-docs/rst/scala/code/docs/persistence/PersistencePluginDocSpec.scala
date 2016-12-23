@@ -228,8 +228,8 @@ object PersistenceTCKDoc {
         new File(
           system.settings.config
             .getString("akka.persistence.journal.leveldb.dir")),
-        new File(
-          config.getString("akka.persistence.snapshot-store.local.dir")))
+        new File(config.getString("akka.persistence.snapshot-store.local.dir"))
+      )
 
       override def beforeAll() {
         super.beforeAll()

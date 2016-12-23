@@ -98,7 +98,8 @@ private[classification] trait LogisticRegressionParams
         ts.length == 2,
         "Logistic Regression getThreshold only applies to" +
           " binary classification, but thresholds has length != 2.  thresholds: " +
-          ts.mkString(","))
+          ts.mkString(",")
+      )
       1.0 / (1.0 + ts(0) / ts(1))
     } else {
       $(threshold)
@@ -154,12 +155,14 @@ private[classification] trait LogisticRegressionParams
         "Logistic Regression found inconsistent values for threshold and" +
           s" thresholds.  Param threshold is set (${$(threshold)}), indicating binary" +
           s" classification, but Param thresholds is set with length ${ts.length}." +
-          " Clear one Param value to fix this problem.")
+          " Clear one Param value to fix this problem."
+      )
       val t = 1.0 / (1.0 + ts(0) / ts(1))
       require(
         math.abs($(threshold) - t) < 1E-5,
         "Logistic Regression getThreshold found" +
-          s" inconsistent values for threshold (${$(threshold)}) and thresholds (equivalent to $t)")
+          s" inconsistent values for threshold (${$(threshold)}) and thresholds (equivalent to $t)"
+      )
     }
   }
 

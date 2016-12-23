@@ -53,7 +53,8 @@ class LocalConcurrencySpec(_system: ActorSystem)
           """
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.remote.netty.tcp.port=0
-      """)))
+      """)
+      ))
   }
 
   override def afterAll(): Unit = {

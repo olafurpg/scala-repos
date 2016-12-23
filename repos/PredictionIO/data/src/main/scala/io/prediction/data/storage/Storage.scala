@@ -311,16 +311,18 @@ object Storage extends Logging {
       constructor.newInstance(ctorArgs: _*).asInstanceOf[T]
     } catch {
       case e: IllegalArgumentException =>
-        error("Unable to instantiate data object with class '" +
-                constructor.getDeclaringClass.getName +
-                " because its constructor" +
-                " does not have the right number of arguments." +
-                " Number of required constructor arguments: " + ctorArgs.size +
-                "." + " Number of existing constructor arguments: " +
-                constructor.getParameterTypes.size + "." +
-                s" Storage source name: ${sourceName}." +
-                s" Exception message: ${e.getMessage}).",
-              e)
+        error(
+          "Unable to instantiate data object with class '" +
+            constructor.getDeclaringClass.getName +
+            " because its constructor" +
+            " does not have the right number of arguments." +
+            " Number of required constructor arguments: " + ctorArgs.size +
+            "." + " Number of existing constructor arguments: " +
+            constructor.getParameterTypes.size + "." +
+            s" Storage source name: ${sourceName}." +
+            s" Exception message: ${e.getMessage}).",
+          e
+        )
         errors += 1
         throw e
       case e: java.lang.reflect.InvocationTargetException =>
@@ -400,14 +402,16 @@ object Storage extends Logging {
   def config: Map[String, Map[String, Map[String, String]]] = Map(
     "sources" -> s2cm.toMap.map {
       case (source, clientMeta) =>
-        source -> clientMeta.map { cm =>
-          Map(
-            "type" -> cm.sourceType,
-            "config" -> cm.config.properties
-              .map(t => s"${t._1} -> ${t._2}")
-              .mkString(", ")
-          )
-        }.getOrElse(Map.empty)
+        source -> clientMeta
+          .map { cm =>
+            Map(
+              "type" -> cm.sourceType,
+              "config" -> cm.config.properties
+                .map(t => s"${t._1} -> ${t._2}")
+                .mkString(", ")
+            )
+          }
+          .getOrElse(Map.empty)
     }
   )
 }

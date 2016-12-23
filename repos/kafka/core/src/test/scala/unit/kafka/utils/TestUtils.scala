@@ -174,18 +174,20 @@ object TestUtils extends Logging {
       enableSaslSsl: Boolean = false,
       rackInfo: Map[Int, String] = Map()): Seq[Properties] = {
     (0 until numConfigs).map { node =>
-      createBrokerConfig(node,
-                         zkConnect,
-                         enableControlledShutdown,
-                         enableDeleteTopic,
-                         RandomPort,
-                         interBrokerSecurityProtocol,
-                         trustStoreFile,
-                         enablePlaintext = enablePlaintext,
-                         enableSsl = enableSsl,
-                         enableSaslPlaintext = enableSaslPlaintext,
-                         enableSaslSsl = enableSaslSsl,
-                         rack = rackInfo.get(node))
+      createBrokerConfig(
+        node,
+        zkConnect,
+        enableControlledShutdown,
+        enableDeleteTopic,
+        RandomPort,
+        interBrokerSecurityProtocol,
+        trustStoreFile,
+        enablePlaintext = enablePlaintext,
+        enableSsl = enableSsl,
+        enableSaslPlaintext = enableSaslPlaintext,
+        enableSaslSsl = enableSaslSsl,
+        rack = rackInfo.get(node)
+      )
     }
   }
 
@@ -232,10 +234,12 @@ object TestUtils extends Logging {
     if (enableSaslSsl || shouldEnable(SecurityProtocol.SASL_SSL))
       protocolAndPorts += SecurityProtocol.SASL_SSL -> saslSslPort
 
-    val listeners = protocolAndPorts.map {
-      case (protocol, port) =>
-        s"${protocol.name}://localhost:$port"
-    }.mkString(",")
+    val listeners = protocolAndPorts
+      .map {
+        case (protocol, port) =>
+          s"${protocol.name}://localhost:$port"
+      }
+      .mkString(",")
 
     val props = new Properties
     if (nodeId >= 0) props.put("broker.id", nodeId.toString)
@@ -618,7 +622,8 @@ object TestUtils extends Logging {
       ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG -> "org.apache.kafka.common.serialization.ByteArrayDeserializer",
       ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG -> partitionAssignmentStrategy,
       ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG -> sessionTimeout.toString,
-      ConsumerConfig.GROUP_ID_CONFIG -> groupId)
+      ConsumerConfig.GROUP_ID_CONFIG -> groupId
+    )
 
     defaultProps.foreach {
       case (key, value) =>
@@ -956,7 +961,8 @@ object TestUtils extends Logging {
       },
       "Partition [%s,%d] metadata not propagated after %d ms"
         .format(topic, partition, timeout),
-      waitTime = timeout)
+      waitTime = timeout
+    )
 
     leader
   }
@@ -974,7 +980,8 @@ object TestUtils extends Logging {
       },
       "Partition [%s,%d] leaders not made yet after %d ms"
         .format(topic, partition, timeout),
-      waitTime = timeout)
+      waitTime = timeout
+    )
   }
 
   def writeNonsenseToFile(fileName: File, position: Long, size: Int) {
@@ -1016,7 +1023,8 @@ object TestUtils extends Logging {
         inSyncReplicas.size == assignedReplicas.size
       },
       "Reassigned partition [%s,%d] is under replicated"
-        .format(topic, partitionToBeReassigned))
+        .format(topic, partitionToBeReassigned)
+    )
     var leader: Option[Int] = None
     TestUtils.waitUntilTrue(
       () => {
@@ -1024,7 +1032,8 @@ object TestUtils extends Logging {
         leader.isDefined
       },
       "Reassigned partition [%s,%d] is unavailable"
-        .format(topic, partitionToBeReassigned))
+        .format(topic, partitionToBeReassigned)
+    )
     TestUtils.waitUntilTrue(
       () => {
         val leaderBroker =
@@ -1032,7 +1041,8 @@ object TestUtils extends Logging {
         leaderBroker.replicaManager.underReplicatedPartitionCount() == 0
       },
       "Reassigned partition [%s,%d] is under-replicated as reported by the leader %d"
-        .format(topic, partitionToBeReassigned, leader.get))
+        .format(topic, partitionToBeReassigned, leader.get)
+    )
   }
 
   def checkIfReassignPartitionPathExists(zkUtils: ZkUtils): Boolean = {
@@ -1058,17 +1068,19 @@ object TestUtils extends Logging {
                        cleanerConfig: CleanerConfig = CleanerConfig(
                          enableCleaner = false),
                        time: MockTime = new MockTime()): LogManager = {
-    new LogManager(logDirs = logDirs,
-                   topicConfigs = Map(),
-                   defaultConfig = defaultConfig,
-                   cleanerConfig = cleanerConfig,
-                   ioThreads = 4,
-                   flushCheckMs = 1000L,
-                   flushCheckpointMs = 10000L,
-                   retentionCheckMs = 1000L,
-                   scheduler = time.scheduler,
-                   time = time,
-                   brokerState = new BrokerState())
+    new LogManager(
+      logDirs = logDirs,
+      topicConfigs = Map(),
+      defaultConfig = defaultConfig,
+      cleanerConfig = cleanerConfig,
+      ioThreads = 4,
+      flushCheckMs = 1000L,
+      flushCheckpointMs = 10000L,
+      retentionCheckMs = 1000L,
+      scheduler = time.scheduler,
+      time = time,
+      brokerState = new BrokerState()
+    )
   }
 
   @deprecated(
@@ -1092,7 +1104,8 @@ object TestUtils extends Logging {
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[IntEncoder].getName,
         partitioner = classOf[FixedValuePartitioner].getName,
-        producerProps = props)
+        producerProps = props
+      )
 
       producer.send(
         ms.map(m => new KeyedMessage[Int, String](topic, partition, m)): _*)
@@ -1108,7 +1121,8 @@ object TestUtils extends Logging {
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[DefaultPartitioner].getName,
-        producerProps = props)
+        producerProps = props
+      )
       producer.send(
         ms.map(m => new KeyedMessage[String, String](topic, topic, m)): _*)
       producer.close()
@@ -1210,11 +1224,13 @@ object TestUtils extends Logging {
     TestUtils.waitUntilTrue(
       () => !zkUtils.pathExists(getDeleteTopicPath(topic)),
       "Admin path /admin/delete_topic/%s path not deleted even after a replica is restarted"
-        .format(topic))
+        .format(topic)
+    )
     TestUtils.waitUntilTrue(
       () => !zkUtils.pathExists(getTopicPath(topic)),
       "Topic path /brokers/topics/%s not deleted after /admin/delete_topic/%s path is deleted"
-        .format(topic, topic))
+        .format(topic, topic)
+    )
     // ensure that the topic-partition has been deleted from all brokers' replica managers
     TestUtils.waitUntilTrue(
       () =>
@@ -1223,12 +1239,15 @@ object TestUtils extends Logging {
             topicAndPartitions.forall(tp =>
               server.replicaManager
                 .getPartition(tp.topic, tp.partition) == None)),
-      "Replica manager's should have deleted all of this topic's partitions")
+      "Replica manager's should have deleted all of this topic's partitions"
+    )
     // ensure that logs from all replicas are deleted if delete topic is marked successful in zookeeper
-    assertTrue("Replica logs not deleted after delete topic is complete",
-               servers.forall(server =>
-                 topicAndPartitions.forall(tp =>
-                   server.getLogManager().getLog(tp).isEmpty)))
+    assertTrue(
+      "Replica logs not deleted after delete topic is complete",
+      servers.forall(server =>
+        topicAndPartitions.forall(tp =>
+          server.getLogManager().getLog(tp).isEmpty))
+    )
     // ensure that topic is removed from all cleaner offsets
     TestUtils.waitUntilTrue(
       () =>
@@ -1241,7 +1260,8 @@ object TestUtils extends Logging {
             checkpoints.forall(checkpointsPerLogDir =>
               !checkpointsPerLogDir.contains(tp))
         }),
-      "Cleaner offset for deleted partition should have been removed")
+      "Cleaner offset for deleted partition should have been removed"
+    )
   }
 
   /**

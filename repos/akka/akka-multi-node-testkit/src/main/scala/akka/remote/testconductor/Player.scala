@@ -187,13 +187,15 @@ private[akka] class ClientFSM(name: RoleName,
   val settings = TestConductor().Settings
 
   val handler =
-    new PlayerHandler(controllerAddr,
-                      settings.ClientReconnects,
-                      settings.ReconnectBackoff,
-                      settings.ClientSocketWorkerPoolSize,
-                      self,
-                      Logging(context.system, classOf[PlayerHandler].getName),
-                      context.system.scheduler)(context.dispatcher)
+    new PlayerHandler(
+      controllerAddr,
+      settings.ClientReconnects,
+      settings.ReconnectBackoff,
+      settings.ClientSocketWorkerPoolSize,
+      self,
+      Logging(context.system, classOf[PlayerHandler].getName),
+      context.system.scheduler
+    )(context.dispatcher)
 
   startWith(Connecting, Data(None, None))
 

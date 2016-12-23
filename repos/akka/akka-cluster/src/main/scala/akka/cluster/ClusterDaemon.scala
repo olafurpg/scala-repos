@@ -559,7 +559,8 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
           logInfo(
             "New incarnation of existing member [{}] is trying to join. " +
               "Existing will be removed from the cluster and then new member will be allowed to join.",
-            m)
+            m
+          )
           if (m.status != Down) downing(m.address)
         case None ⇒
           // remove the node from the failure detector
@@ -822,7 +823,8 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
           """Couldn't establish a causal relationship between "remote" gossip and "local" gossip - Remote[{}] - Local[{}] - merged them into [{}]""",
           remoteGossip,
           localGossip,
-          winningGossip)
+          winningGossip
+        )
       }
 
       if (statsEnabled) {
@@ -950,7 +952,8 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
             latestGossip.members
               .map(m ⇒
                 s"${m.address} ${m.status} seen=${latestGossip.seenByNode(m.uniqueAddress)}")
-              .mkString(", "))
+              .mkString(", ")
+          )
       }
     }
     shutdownSelfWhenDown()
@@ -1475,19 +1478,23 @@ private[cluster] final case class GossipStats(receivedGossipCount: Long = 0L,
          receivedGossipCount = receivedGossipCount + 1)
 
   def :+(that: GossipStats): GossipStats = {
-    GossipStats(this.receivedGossipCount + that.receivedGossipCount,
-                this.mergeCount + that.mergeCount,
-                this.sameCount + that.sameCount,
-                this.newerCount + that.newerCount,
-                this.olderCount + that.olderCount)
+    GossipStats(
+      this.receivedGossipCount + that.receivedGossipCount,
+      this.mergeCount + that.mergeCount,
+      this.sameCount + that.sameCount,
+      this.newerCount + that.newerCount,
+      this.olderCount + that.olderCount
+    )
   }
 
   def :-(that: GossipStats): GossipStats = {
-    GossipStats(this.receivedGossipCount - that.receivedGossipCount,
-                this.mergeCount - that.mergeCount,
-                this.sameCount - that.sameCount,
-                this.newerCount - that.newerCount,
-                this.olderCount - that.olderCount)
+    GossipStats(
+      this.receivedGossipCount - that.receivedGossipCount,
+      this.mergeCount - that.mergeCount,
+      this.sameCount - that.sameCount,
+      this.newerCount - that.newerCount,
+      this.olderCount - that.olderCount
+    )
   }
 }
 

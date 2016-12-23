@@ -105,21 +105,19 @@ class DriverActor(schedulerProps: Props) extends Actor {
       .setFrameworkId(FrameworkID.newBuilder().setValue("notanidframework"))
       .setSlaveId(SlaveID.newBuilder().setValue("notanidslave"))
       .setHostname("hostname")
-      .addAllResources(
-        Seq(
-          resource("cpus", 100),
-          resource("mem", 500000),
-          resource("disk", 1000000000),
-          Resource
+      .addAllResources(Seq(
+        resource("cpus", 100),
+        resource("mem", 500000),
+        resource("disk", 1000000000),
+        Resource
+          .newBuilder()
+          .setName("ports")
+          .setType(Value.Type.RANGES)
+          .setRanges(Value.Ranges
             .newBuilder()
-            .setName("ports")
-            .setType(Value.Type.RANGES)
-            .setRanges(Value.Ranges
-              .newBuilder()
-              .addRange(
-                Value.Range.newBuilder().setBegin(10000).setEnd(20000)))
-            .build()
-        ))
+            .addRange(Value.Range.newBuilder().setBegin(10000).setEnd(20000)))
+          .build()
+      ))
       .build()
   }
   private[this] def offers: ResourceOffers =

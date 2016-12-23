@@ -51,7 +51,8 @@ object TestOffsetManager {
           commitThreads.map(_.timer.max()).max,
           commitThreads.map(_.timer.min()).min,
           commitThreads.map(_.timer.mean()).sum / commitThreads.size,
-          commitThreads.map(_.numCommits.get).sum))
+          commitThreads.map(_.numCommits.get).sum
+        ))
       println(
         "--------------------------------------------------------------------------------")
       commitThreads.foreach(t => println(t.stats))

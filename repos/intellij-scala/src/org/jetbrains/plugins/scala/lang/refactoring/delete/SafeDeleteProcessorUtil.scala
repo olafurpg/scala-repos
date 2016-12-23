@@ -454,7 +454,8 @@ object SafeDeleteProcessorUtil {
                   false,
                   PsiTreeUtil.getParentOfType(
                     element,
-                    classOf[PsiImportStaticStatement]) != null))
+                    classOf[PsiImportStaticStatement]) != null
+                ))
           }
         }
         true

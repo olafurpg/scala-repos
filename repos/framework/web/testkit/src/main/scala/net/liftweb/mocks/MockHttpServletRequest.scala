@@ -428,7 +428,8 @@ class MockHttpServletRequest(val url: String = null,
         newMap += k -> (newMap(k) ::: v :: Nil) // Ugly, but it works and keeps order
     }
 
-    newMap.map { case (k, v) => (k, v.toArray) }
+    newMap
+      .map { case (k, v) => (k, v.toArray) }
       .asInstanceOf[Map[String, Array[String]]]
 //    asMap(newMap.map{case (k,v) => (k,v.toArray)}.asInstanceOf[Map[Object,Object]])
   }
@@ -487,12 +488,14 @@ class MockHttpServletRequest(val url: String = null,
     }
 
     Helpers
-      .tryo(handler, {
-        // Have to use internetDateFormatter directly since parseInternetDate returns the epoch date on failure
-        Box
-          .!!(getHeader(h))
-          .map(Helpers.internetDateFormatter.parse(_).getTime)
-      })
+      .tryo(
+        handler, {
+          // Have to use internetDateFormatter directly since parseInternetDate returns the epoch date on failure
+          Box
+            .!!(getHeader(h))
+            .map(Helpers.internetDateFormatter.parse(_).getTime)
+        }
+      )
       .flatMap(x => x) openOr -1L
   }
 

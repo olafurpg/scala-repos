@@ -138,10 +138,12 @@ private[ml] object DecisionTreeModelReadWrite {
                              leftCategoriesOrThreshold,
                              numCategories)
       } else {
-        assert(leftCategoriesOrThreshold.length == 1,
-               s"DecisionTree split data expected" +
-                 s" 1 threshold for ContinuousSplit, but found thresholds: " +
-                 leftCategoriesOrThreshold.mkString(", "))
+        assert(
+          leftCategoriesOrThreshold.length == 1,
+          s"DecisionTree split data expected" +
+            s" 1 threshold for ContinuousSplit, but found thresholds: " +
+            leftCategoriesOrThreshold.mkString(", ")
+        )
         new ContinuousSplit(featureIndex, leftCategoriesOrThreshold(0))
       }
     }

@@ -81,28 +81,32 @@ class FsHistoryProviderSuite
 
     // Write a new-style application log.
     val newAppComplete = newLogFile("new1", None, inProgress = false)
-    writeFile(newAppComplete,
-              true,
-              None,
-              SparkListenerApplicationStart(newAppComplete.getName(),
-                                            Some("new-app-complete"),
-                                            1L,
-                                            "test",
-                                            None),
-              SparkListenerApplicationEnd(5L))
+    writeFile(
+      newAppComplete,
+      true,
+      None,
+      SparkListenerApplicationStart(newAppComplete.getName(),
+                                    Some("new-app-complete"),
+                                    1L,
+                                    "test",
+                                    None),
+      SparkListenerApplicationEnd(5L)
+    )
 
     // Write a new-style application log.
     val newAppCompressedComplete =
       newLogFile("new1compressed", None, inProgress = false, Some("lzf"))
-    writeFile(newAppCompressedComplete,
-              true,
-              None,
-              SparkListenerApplicationStart(newAppCompressedComplete.getName(),
-                                            Some("new-complete-lzf"),
-                                            1L,
-                                            "test",
-                                            None),
-              SparkListenerApplicationEnd(4L))
+    writeFile(
+      newAppCompressedComplete,
+      true,
+      None,
+      SparkListenerApplicationStart(newAppCompressedComplete.getName(),
+                                    Some("new-complete-lzf"),
+                                    1L,
+                                    "test",
+                                    None),
+      SparkListenerApplicationEnd(4L)
+    )
 
     // Write an unfinished app, new-style.
     val newAppIncomplete = newLogFile("new2", None, inProgress = true)

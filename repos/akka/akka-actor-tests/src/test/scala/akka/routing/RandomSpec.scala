@@ -62,7 +62,8 @@ class RandomSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
             case "end" ⇒ doneLatch.countDown()
           }
         })),
-        name = "random")
+        name = "random"
+      )
 
       for (i ← 0 until iterationCount) {
         for (k ← 0 until connectionCount) {
@@ -85,15 +86,18 @@ class RandomSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       val stopLatch = new TestLatch(6)
 
       val actor =
-        system.actorOf(RandomPool(6).props(routeeProps = Props(new Actor {
-          def receive = {
-            case "hello" ⇒ helloLatch.countDown()
-          }
+        system.actorOf(
+          RandomPool(6).props(routeeProps = Props(new Actor {
+            def receive = {
+              case "hello" ⇒ helloLatch.countDown()
+            }
 
-          override def postStop() {
-            stopLatch.countDown()
-          }
-        })), "random-broadcast")
+            override def postStop() {
+              stopLatch.countDown()
+            }
+          })),
+          "random-broadcast"
+        )
 
       actor ! akka.routing.Broadcast("hello")
       Await.ready(helloLatch, 5 seconds)

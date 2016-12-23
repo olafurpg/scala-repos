@@ -157,13 +157,15 @@ abstract class AdaptiveLoadBalancingRouterSpec
 
   def startRouter(name: String): ActorRef = {
     val router = system.actorOf(
-      ClusterRouterPool(local = AdaptiveLoadBalancingPool(HeapMetricsSelector),
-                        settings = ClusterRouterPoolSettings(
-                          totalInstances = 10,
-                          maxInstancesPerNode = 1,
-                          allowLocalRoutees = true,
-                          useRole = None)).props(Props[Echo]),
-      name)
+      ClusterRouterPool(
+        local = AdaptiveLoadBalancingPool(HeapMetricsSelector),
+        settings = ClusterRouterPoolSettings(totalInstances = 10,
+                                             maxInstancesPerNode = 1,
+                                             allowLocalRoutees = true,
+                                             useRole = None)
+      ).props(Props[Echo]),
+      name
+    )
     // it may take some time until router receives cluster member events
     awaitAssert { currentRoutees(router).size should ===(roles.size) }
     val routees = currentRoutees(router)

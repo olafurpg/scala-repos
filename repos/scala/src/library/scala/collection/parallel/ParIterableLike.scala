@@ -311,8 +311,8 @@ trait ParIterableLike[
           def map(r: R): R1 = mapping(r)
         }
 
-      def compose[R3, R2, Tp2](t2: SSCTask[R2, Tp2])(resCombiner: (R,
-                                                                   R2) => R3) =
+      def compose[R3, R2, Tp2](t2: SSCTask[R2, Tp2])(
+          resCombiner: (R, R2) => R3) =
         new SeqComposite[R, R2, R3, SSCTask[R, Tp], SSCTask[R2, Tp2]](tsk, t2) {
           def combineResults(fr: R, sr: R2): R3 = resCombiner(fr, sr)
         }

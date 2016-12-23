@@ -244,8 +244,8 @@ trait KeyedListLike[K, +T, +This[K, +T] <: KeyedListLike[K, T, This]]
   }
 
   /** Like the above, but with a less than operation for the ordering */
-  def sortWithTake[U >: T](k: Int)(lessThan: (U,
-                                              U) => Boolean): This[K, Seq[T]] =
+  def sortWithTake[U >: T](k: Int)(
+      lessThan: (U, U) => Boolean): This[K, Seq[T]] =
     sortedTake(k)(Ordering.fromLessThan(lessThan))
 
   /** For each key, Return the product of all the values */

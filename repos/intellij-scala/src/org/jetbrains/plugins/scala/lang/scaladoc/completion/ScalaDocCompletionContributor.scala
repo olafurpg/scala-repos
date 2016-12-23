@@ -60,5 +60,6 @@ class ScalaDocCompletionContributor extends ScalaCompletionContributor {
         }
         result.stopHere()
       }
-    })
+    }
+  )
 }

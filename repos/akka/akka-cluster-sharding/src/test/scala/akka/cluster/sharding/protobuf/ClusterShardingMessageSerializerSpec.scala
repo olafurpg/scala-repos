@@ -31,12 +31,14 @@ class ClusterShardingMessageSerializerSpec extends AkkaSpec {
 
     "be able to serializable ShardCoordinator snapshot State" in {
       val state =
-        State(shards = Map("a" -> region1, "b" -> region2, "c" -> region2),
-              regions = Map(region1 -> Vector("a"),
-                            region2 -> Vector("b", "c"),
-                            region3 -> Vector.empty[String]),
-              regionProxies = Set(regionProxy1, regionProxy2),
-              unallocatedShards = Set("d"))
+        State(
+          shards = Map("a" -> region1, "b" -> region2, "c" -> region2),
+          regions = Map(region1 -> Vector("a"),
+                        region2 -> Vector("b", "c"),
+                        region3 -> Vector.empty[String]),
+          regionProxies = Set(regionProxy1, regionProxy2),
+          unallocatedShards = Set("d")
+        )
       checkSerialization(state)
     }
 

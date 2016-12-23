@@ -57,7 +57,8 @@ class PersistentActorDeleteFailureSpec
         extraConfig = Some(
           """
   akka.persistence.journal.inmem.class = "akka.persistence.PersistentActorDeleteFailureSpec$DeleteFailingInmemJournal"
-  """)))
+  """)
+      ))
     with ImplicitSender {
   import PersistentActorDeleteFailureSpec._
 

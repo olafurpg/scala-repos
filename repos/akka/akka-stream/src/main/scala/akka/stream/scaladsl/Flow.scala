@@ -2001,8 +2001,8 @@ trait FlowOpsMat[+Out, +Mat] extends FlowOps[Out, Mat] {
     * where appropriate instead of manually writing functions that pass through one of the values.
     */
   def zipWithMat[Out2, Out3, Mat2, Mat3](that: Graph[SourceShape[Out2], Mat2])(
-      combine: (Out,
-                Out2) ⇒ Out3)(matF: (Mat, Mat2) ⇒ Mat3): ReprMat[Out3, Mat3] =
+      combine: (Out, Out2) ⇒ Out3)(
+      matF: (Mat, Mat2) ⇒ Mat3): ReprMat[Out3, Mat3] =
     viaMat(zipWithGraph(that)(combine))(matF)
 
   /**

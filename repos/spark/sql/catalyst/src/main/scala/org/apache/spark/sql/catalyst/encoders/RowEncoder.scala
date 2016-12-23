@@ -66,7 +66,8 @@ object RowEncoder {
           udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt(),
           Nil,
           dataType = ObjectType(
-            udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt()))
+            udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt())
+        )
         Invoke(obj, "serialize", udt.sqlType, inputObject :: Nil)
 
       case TimestampType =>
@@ -137,13 +138,15 @@ object RowEncoder {
               } else {
                 "get"
               }
-            If(Invoke(inputObject, "isNullAt", BooleanType, Literal(i) :: Nil),
-               Literal.create(null, f.dataType),
-               extractorsFor(Invoke(inputObject,
-                                    method,
-                                    externalDataTypeFor(f.dataType),
-                                    Literal(i) :: Nil),
-                             f.dataType))
+            If(
+              Invoke(inputObject, "isNullAt", BooleanType, Literal(i) :: Nil),
+              Literal.create(null, f.dataType),
+              extractorsFor(Invoke(inputObject,
+                                   method,
+                                   externalDataTypeFor(f.dataType),
+                                   Literal(i) :: Nil),
+                            f.dataType)
+            )
         }
         If(IsNull(inputObject),
            Literal.create(null, inputType),
@@ -193,7 +196,8 @@ object RowEncoder {
           udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt(),
           Nil,
           dataType = ObjectType(
-            udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt()))
+            udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt())
+        )
         Invoke(obj, "deserialize", ObjectType(udt.userClass), input :: Nil)
 
       case TimestampType =>

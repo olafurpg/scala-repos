@@ -107,12 +107,14 @@ case class CssUrlPrefixer(prefix: String) extends Parsers {
   lazy val spaces = (elem(' ') | elem('\t') | elem('\n') | elem('\r')).*
 
   def pathWith(additionalCharacters: Char*) = {
-    elem("path",
-         c =>
-           c.isLetterOrDigit || c == '?' || c == '/' || c == '&' || c == '@' ||
-             c == ';' || c == '.' || c == '+' || c == '-' || c == '=' ||
-             c == ':' || c == ' ' || c == '_' || c == '#' ||
-             c == ',' || c == '%' || additionalCharacters.contains(c)).+ ^^ {
+    elem(
+      "path",
+      c =>
+        c.isLetterOrDigit || c == '?' || c == '/' || c == '&' || c == '@' ||
+          c == ';' || c == '.' || c == '+' || c == '-' || c == '=' ||
+          c == ':' || c == ' ' || c == '_' || c == '#' ||
+          c == ',' || c == '%' || additionalCharacters.contains(c)
+    ).+ ^^ {
       case l =>
         l.mkString("")
     }

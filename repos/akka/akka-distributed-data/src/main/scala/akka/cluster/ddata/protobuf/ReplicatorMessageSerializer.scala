@@ -194,7 +194,8 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
       ReadManifest -> readFromBinary,
       ReadResultManifest -> readResultFromBinary,
       StatusManifest -> statusFromBinary,
-      GossipManifest -> gossipFromBinary)
+      GossipManifest -> gossipFromBinary
+    )
 
   override def manifest(obj: AnyRef): String = obj match {
     case _: DataEnvelope ⇒ DataEnvelopeManifest

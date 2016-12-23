@@ -144,48 +144,54 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
               selectedType,
               replaceAll,
               asVar)
-            CommandProcessor.getInstance.executeCommand(project, new Runnable {
-              def run() {
-                val newDeclaration: PsiElement =
-                  ApplicationManager.getApplication
-                    .runWriteAction(introduceRunnable)
-                    .getElement
-                val namedElement: PsiNamedElement = newDeclaration match {
-                  case holder: ScDeclaredElementsHolder =>
-                    holder.declaredElements.headOption.orNull
-                  case enum: ScEnumerator =>
-                    enum.pattern.bindings.headOption.orNull
-                  case _ => null
-                }
-                if (namedElement != null && namedElement.isValid) {
-                  editor.getCaretModel.moveToOffset(namedElement.getTextOffset)
-                  editor.getSelectionModel.removeSelection()
-                  if (ScalaRefactoringUtil.isInplaceAvailable(editor)) {
-                    PsiDocumentManager
-                      .getInstance(project)
-                      .commitDocument(editor.getDocument)
-                    PsiDocumentManager
-                      .getInstance(project)
-                      .doPostponedOperationsAndUnblockDocument(
-                        editor.getDocument)
-                    val checkedExpr = if (expr.isValid) expr else null
-                    val variableIntroducer =
-                      new ScalaInplaceVariableIntroducer(
-                        project,
-                        editor,
-                        checkedExpr,
-                        types,
-                        namedElement,
-                        INTRODUCE_VARIABLE_REFACTORING_NAME,
-                        replaceAll,
-                        asVar,
-                        forceInferType)
-                    variableIntroducer.performInplaceRefactoring(
-                      suggestedNamesSet)
+            CommandProcessor.getInstance.executeCommand(
+              project,
+              new Runnable {
+                def run() {
+                  val newDeclaration: PsiElement =
+                    ApplicationManager.getApplication
+                      .runWriteAction(introduceRunnable)
+                      .getElement
+                  val namedElement: PsiNamedElement = newDeclaration match {
+                    case holder: ScDeclaredElementsHolder =>
+                      holder.declaredElements.headOption.orNull
+                    case enum: ScEnumerator =>
+                      enum.pattern.bindings.headOption.orNull
+                    case _ => null
+                  }
+                  if (namedElement != null && namedElement.isValid) {
+                    editor.getCaretModel.moveToOffset(
+                      namedElement.getTextOffset)
+                    editor.getSelectionModel.removeSelection()
+                    if (ScalaRefactoringUtil.isInplaceAvailable(editor)) {
+                      PsiDocumentManager
+                        .getInstance(project)
+                        .commitDocument(editor.getDocument)
+                      PsiDocumentManager
+                        .getInstance(project)
+                        .doPostponedOperationsAndUnblockDocument(
+                          editor.getDocument)
+                      val checkedExpr = if (expr.isValid) expr else null
+                      val variableIntroducer =
+                        new ScalaInplaceVariableIntroducer(
+                          project,
+                          editor,
+                          checkedExpr,
+                          types,
+                          namedElement,
+                          INTRODUCE_VARIABLE_REFACTORING_NAME,
+                          replaceAll,
+                          asVar,
+                          forceInferType)
+                      variableIntroducer.performInplaceRefactoring(
+                        suggestedNamesSet)
+                    }
                   }
                 }
-              }
-            }, INTRODUCE_VARIABLE_REFACTORING_NAME, null)
+              },
+              INTRODUCE_VARIABLE_REFACTORING_NAME,
+              null
+            )
           }
         }
 

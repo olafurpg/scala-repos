@@ -177,8 +177,8 @@ class RuntimeReducerEstimatorTest
         .addReducerEstimator(classOf[EmptyRuntimeEstimator])
         .addReducerEstimator(classOf[DummyEstimator])
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -188,7 +188,7 @@ class RuntimeReducerEstimatorTest
           // so it should have fallen back to DummyEstimator,
           // which returns 42.
           assert(conf.getNumReduceTasks == 42)
-      }
+        }
     }
 
     "not set reducers when history service fails" in {
@@ -196,8 +196,8 @@ class RuntimeReducerEstimatorTest
         .addReducerEstimator(classOf[ErrorRuntimeEstimator])
         .addReducerEstimator(classOf[DummyEstimator])
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -207,7 +207,7 @@ class RuntimeReducerEstimatorTest
           // so it should have fallen back to DummyEstimator,
           // which returns 42.
           assert(conf.getNumReduceTasks == 42)
-      }
+        }
     }
   }
 }

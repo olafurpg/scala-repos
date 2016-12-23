@@ -59,15 +59,17 @@ trait WikiControllerBase extends ControllerBase {
   get("/:owner/:repository/wiki")(referrersOnly { repository =>
     getWikiPage(repository.owner, repository.name, "Home").map {
       page =>
-        html.page("Home",
-                  page,
-                  getWikiPageList(repository.owner, repository.name),
-                  repository,
-                  hasWritePermission(repository.owner,
-                                     repository.name,
-                                     context.loginAccount),
-                  getWikiPage(repository.owner, repository.name, "_Sidebar"),
-                  getWikiPage(repository.owner, repository.name, "_Footer"))
+        html.page(
+          "Home",
+          page,
+          getWikiPageList(repository.owner, repository.name),
+          repository,
+          hasWritePermission(repository.owner,
+                             repository.name,
+                             context.loginAccount),
+          getWikiPage(repository.owner, repository.name, "_Sidebar"),
+          getWikiPage(repository.owner, repository.name, "_Footer")
+        )
     } getOrElse redirect(
       s"/${repository.owner}/${repository.name}/wiki/Home/_edit")
   })
@@ -77,15 +79,17 @@ trait WikiControllerBase extends ControllerBase {
 
     getWikiPage(repository.owner, repository.name, pageName).map {
       page =>
-        html.page(pageName,
-                  page,
-                  getWikiPageList(repository.owner, repository.name),
-                  repository,
-                  hasWritePermission(repository.owner,
-                                     repository.name,
-                                     context.loginAccount),
-                  getWikiPage(repository.owner, repository.name, "_Sidebar"),
-                  getWikiPage(repository.owner, repository.name, "_Footer"))
+        html.page(
+          pageName,
+          page,
+          getWikiPageList(repository.owner, repository.name),
+          repository,
+          hasWritePermission(repository.owner,
+                             repository.name,
+                             context.loginAccount),
+          getWikiPage(repository.owner, repository.name, "_Sidebar"),
+          getWikiPage(repository.owner, repository.name, "_Footer")
+        )
     } getOrElse redirect(
       s"/${repository.owner}/${repository.name}/wiki/${StringUtil.urlEncode(pageName)}/_edit")
   })
@@ -112,17 +116,19 @@ trait WikiControllerBase extends ControllerBase {
         using(
           Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
           git =>
-            html.compare(Some(pageName),
-                         from,
-                         to,
-                         JGitUtil
-                           .getDiffs(git, from, to, true)
-                           .filter(_.newPath == pageName + ".md"),
-                         repository,
-                         hasWritePermission(repository.owner,
-                                            repository.name,
-                                            context.loginAccount),
-                         flash.get("info"))
+            html.compare(
+              Some(pageName),
+              from,
+              to,
+              JGitUtil
+                .getDiffs(git, from, to, true)
+                .filter(_.newPath == pageName + ".md"),
+              repository,
+              hasWritePermission(repository.owner,
+                                 repository.name,
+                                 context.loginAccount),
+              flash.get("info")
+            )
         }
     })
 
@@ -134,15 +140,17 @@ trait WikiControllerBase extends ControllerBase {
         using(
           Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
           git =>
-            html.compare(None,
-                         from,
-                         to,
-                         JGitUtil.getDiffs(git, from, to, true),
-                         repository,
-                         hasWritePermission(repository.owner,
-                                            repository.name,
-                                            context.loginAccount),
-                         flash.get("info"))
+            html.compare(
+              None,
+              from,
+              to,
+              JGitUtil.getDiffs(git, from, to, true),
+              repository,
+              hasWritePermission(repository.owner,
+                                 repository.name,
+                                 context.loginAccount),
+              flash.get("info")
+            )
         }
     })
 

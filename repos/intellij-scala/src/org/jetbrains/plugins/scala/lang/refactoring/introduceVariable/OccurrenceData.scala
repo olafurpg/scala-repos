@@ -29,21 +29,25 @@ object OccurrenceData {
             scopeItem: ScopeItem): OccurrenceData = {
     scopeItem match {
       case simpleScope: SimpleScopeItem =>
-        new OccurrenceData(typeElement,
-                           simpleScope.usualOccurrences,
-                           isReplaceAllUsual,
-                           simpleScope.occurrencesInCompanion,
-                           isReplaceOccurrenceIncompanionObject,
-                           simpleScope.occurrencesFromInheretors,
-                           isReplaceOccurrenceInInheritors)
+        new OccurrenceData(
+          typeElement,
+          simpleScope.usualOccurrences,
+          isReplaceAllUsual,
+          simpleScope.occurrencesInCompanion,
+          isReplaceOccurrenceIncompanionObject,
+          simpleScope.occurrencesFromInheretors,
+          isReplaceOccurrenceInInheritors
+        )
       case packageScope: PackageScopeItem =>
-        new OccurrenceData(typeElement,
-                           packageScope.occurrences,
-                           isReplaceAllUsual,
-                           Array[ScTypeElement](),
-                           isReplaceOccurrenceIncompanionObject,
-                           Array[ScTypeElement](),
-                           isReplaceOccurrenceInInheritors)
+        new OccurrenceData(
+          typeElement,
+          packageScope.occurrences,
+          isReplaceAllUsual,
+          Array[ScTypeElement](),
+          isReplaceOccurrenceIncompanionObject,
+          Array[ScTypeElement](),
+          isReplaceOccurrenceInInheritors
+        )
     }
   }
 }

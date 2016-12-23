@@ -436,75 +436,80 @@ class BlockManagerReplicationSuite
         s"master did not have ${storageLevel.replication} locations for $blockId")
 
       // Test state of the stores that contain the block
-      stores.filter { testStore =>
-        blockLocations.contains(testStore.blockManagerId.executorId)
-      }.foreach { testStore =>
-        val testStoreName = testStore.blockManagerId.executorId
-        assert(testStore.getLocalValues(blockId).isDefined,
-               s"$blockId was not found in $testStoreName")
-        testStore.releaseLock(blockId)
-        assert(
-          master
-            .getLocations(blockId)
-            .map(_.executorId)
-            .toSet
-            .contains(testStoreName),
-          s"master does not have status for ${blockId.name} in $testStoreName")
-
-        val blockStatus =
-          master.getBlockStatus(blockId)(testStore.blockManagerId)
-
-        // Assert that block status in the master for this store has expected storage level
-        assert(
-          blockStatus.storageLevel.useDisk === storageLevel.useDisk &&
-            blockStatus.storageLevel.useMemory === storageLevel.useMemory &&
-            blockStatus.storageLevel.useOffHeap === storageLevel.useOffHeap &&
-            blockStatus.storageLevel.deserialized === storageLevel.deserialized,
-          s"master does not know correct storage level for ${blockId.name} in $testStoreName")
-
-        // Assert that the block status in the master for this store has correct memory usage info
-        assert(
-          !blockStatus.storageLevel.useMemory ||
-            blockStatus.memSize >= blockSize,
-          s"master does not know size of ${blockId.name} stored in memory of $testStoreName")
-
-        // If the block is supposed to be in memory, then drop the copy of the block in
-        // this store test whether master is updated with zero memory usage this store
-        if (storageLevel.useMemory) {
-          // Force the block to be dropped by adding a number of dummy blocks
-          (1 to 10).foreach { i =>
-            testStore.putSingle(s"dummy-block-$i",
-                                new Array[Byte](1000),
-                                MEMORY_ONLY_SER)
-          }
-          (1 to 10).foreach { i =>
-            testStore.removeBlock(s"dummy-block-$i")
-          }
-
-          val newBlockStatusOption =
-            master.getBlockStatus(blockId).get(testStore.blockManagerId)
-
-          // Assert that the block status in the master either does not exist (block removed
-          // from every store) or has zero memory usage for this store
-          assert(
-            newBlockStatusOption.isEmpty ||
-              newBlockStatusOption.get.memSize === 0,
-            s"after dropping, master does not know size of ${blockId.name} " +
-              s"stored in memory of $testStoreName"
-          )
+      stores
+        .filter { testStore =>
+          blockLocations.contains(testStore.blockManagerId.executorId)
         }
-
-        // If the block is supposed to be in disk (after dropping or otherwise, then
-        // test whether master has correct disk usage for this store
-        if (storageLevel.useDisk) {
+        .foreach { testStore =>
+          val testStoreName = testStore.blockManagerId.executorId
+          assert(testStore.getLocalValues(blockId).isDefined,
+                 s"$blockId was not found in $testStoreName")
+          testStore.releaseLock(blockId)
           assert(
             master
-              .getBlockStatus(blockId)(testStore.blockManagerId)
-              .diskSize >= blockSize,
-            s"after dropping, master does not know size of ${blockId.name} " +
-              s"stored in disk of $testStoreName")
+              .getLocations(blockId)
+              .map(_.executorId)
+              .toSet
+              .contains(testStoreName),
+            s"master does not have status for ${blockId.name} in $testStoreName")
+
+          val blockStatus =
+            master.getBlockStatus(blockId)(testStore.blockManagerId)
+
+          // Assert that block status in the master for this store has expected storage level
+          assert(
+            blockStatus.storageLevel.useDisk === storageLevel.useDisk &&
+              blockStatus.storageLevel.useMemory === storageLevel.useMemory &&
+              blockStatus.storageLevel.useOffHeap === storageLevel.useOffHeap &&
+              blockStatus.storageLevel.deserialized === storageLevel.deserialized,
+            s"master does not know correct storage level for ${blockId.name} in $testStoreName"
+          )
+
+          // Assert that the block status in the master for this store has correct memory usage info
+          assert(
+            !blockStatus.storageLevel.useMemory ||
+              blockStatus.memSize >= blockSize,
+            s"master does not know size of ${blockId.name} stored in memory of $testStoreName"
+          )
+
+          // If the block is supposed to be in memory, then drop the copy of the block in
+          // this store test whether master is updated with zero memory usage this store
+          if (storageLevel.useMemory) {
+            // Force the block to be dropped by adding a number of dummy blocks
+            (1 to 10).foreach { i =>
+              testStore.putSingle(s"dummy-block-$i",
+                                  new Array[Byte](1000),
+                                  MEMORY_ONLY_SER)
+            }
+            (1 to 10).foreach { i =>
+              testStore.removeBlock(s"dummy-block-$i")
+            }
+
+            val newBlockStatusOption =
+              master.getBlockStatus(blockId).get(testStore.blockManagerId)
+
+            // Assert that the block status in the master either does not exist (block removed
+            // from every store) or has zero memory usage for this store
+            assert(
+              newBlockStatusOption.isEmpty ||
+                newBlockStatusOption.get.memSize === 0,
+              s"after dropping, master does not know size of ${blockId.name} " +
+                s"stored in memory of $testStoreName"
+            )
+          }
+
+          // If the block is supposed to be in disk (after dropping or otherwise, then
+          // test whether master has correct disk usage for this store
+          if (storageLevel.useDisk) {
+            assert(
+              master
+                .getBlockStatus(blockId)(testStore.blockManagerId)
+                .diskSize >= blockSize,
+              s"after dropping, master does not know size of ${blockId.name} " +
+                s"stored in disk of $testStoreName"
+            )
+          }
         }
-      }
       master.removeBlock(blockId)
     }
   }

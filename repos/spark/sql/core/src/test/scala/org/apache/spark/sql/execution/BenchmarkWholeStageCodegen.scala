@@ -452,7 +452,8 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
             Long.MaxValue,
             Long.MaxValue,
             1),
-          0)
+          0
+        )
         val map = new BytesToBytesMap(taskMemoryManager, 1024, 64L << 20)
         val keyBytes = new Array[Byte](16)
         val valueBytes = new Array[Byte](16)

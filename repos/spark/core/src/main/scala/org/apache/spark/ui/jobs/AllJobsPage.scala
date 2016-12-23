@@ -67,31 +67,34 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
   }
 
   private def makeJobEvent(jobUIDatas: Seq[JobUIData]): Seq[String] = {
-    jobUIDatas.filter { jobUIData =>
-      jobUIData.status != JobExecutionStatus.UNKNOWN &&
-      jobUIData.submissionTime.isDefined
-    }.map { jobUIData =>
-      val jobId = jobUIData.jobId
-      val status = jobUIData.status
-      val (jobName, jobDescription) = getLastStageNameAndDescription(jobUIData)
-      val displayJobDescription =
-        if (jobDescription.isEmpty) jobName else jobDescription
-      val submissionTime = jobUIData.submissionTime.get
-      val completionTimeOpt = jobUIData.completionTime
-      val completionTime =
-        completionTimeOpt.getOrElse(System.currentTimeMillis())
-      val classNameByStatus = status match {
-        case JobExecutionStatus.SUCCEEDED => "succeeded"
-        case JobExecutionStatus.FAILED => "failed"
-        case JobExecutionStatus.RUNNING => "running"
-        case JobExecutionStatus.UNKNOWN => "unknown"
+    jobUIDatas
+      .filter { jobUIData =>
+        jobUIData.status != JobExecutionStatus.UNKNOWN &&
+        jobUIData.submissionTime.isDefined
       }
+      .map { jobUIData =>
+        val jobId = jobUIData.jobId
+        val status = jobUIData.status
+        val (jobName, jobDescription) =
+          getLastStageNameAndDescription(jobUIData)
+        val displayJobDescription =
+          if (jobDescription.isEmpty) jobName else jobDescription
+        val submissionTime = jobUIData.submissionTime.get
+        val completionTimeOpt = jobUIData.completionTime
+        val completionTime =
+          completionTimeOpt.getOrElse(System.currentTimeMillis())
+        val classNameByStatus = status match {
+          case JobExecutionStatus.SUCCEEDED => "succeeded"
+          case JobExecutionStatus.FAILED => "failed"
+          case JobExecutionStatus.RUNNING => "running"
+          case JobExecutionStatus.UNKNOWN => "unknown"
+        }
 
-      // The timeline library treats contents as HTML, so we have to escape them; for the
-      // data-title attribute string we have to escape them twice since that's in a string.
-      val escapedDesc = Utility.escape(displayJobDescription)
-      val jobEventJsonAsStr =
-        s"""
+        // The timeline library treats contents as HTML, so we have to escape them; for the
+        // data-title attribute string we have to escape them twice since that's in a string.
+        val escapedDesc = Utility.escape(displayJobDescription)
+        val jobEventJsonAsStr =
+          s"""
            |{
            |  'className': 'job application-timeline-object ${classNameByStatus}',
            |  'group': 'jobs',
@@ -103,15 +106,16 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
            |     'Status: ${status}<br>' +
            |     'Submitted: ${UIUtils.formatDate(new Date(submissionTime))}' +
            |     '${if (status != JobExecutionStatus.RUNNING) {
-             s"""<br>Completed: ${UIUtils.formatDate(new Date(completionTime))}"""
-           } else {
-             ""
-           }}">' +
+               s"""<br>Completed: ${UIUtils.formatDate(
+                 new Date(completionTime))}"""
+             } else {
+               ""
+             }}">' +
            |    '${escapedDesc} (Job ${jobId})</div>'
            |}
          """.stripMargin
-      jobEventJsonAsStr
-    }
+        jobEventJsonAsStr
+      }
   }
 
   private def makeExecutorEvent(

@@ -83,8 +83,7 @@ trait ProdConsAnalyzerImpl {
                          slot: Int): Set[AbstractInsnNode] = {
     producersForValueAt(insn, slot).flatMap(prod => {
       val outputNumber = outputValueSlots(prod).indexOf(slot)
-      _consumersOfOutputsFrom
-        .get(prod)
+      _consumersOfOutputsFrom.get(prod)
         .map(v => {
           v(outputNumber)
         })
@@ -107,8 +106,7 @@ trait ProdConsAnalyzerImpl {
       case ExceptionProducer(handlerLabel, handlerFrame) =>
         consumersOfValueAt(handlerLabel, handlerFrame.stackTop)
       case _ =>
-        _consumersOfOutputsFrom
-          .get(insn)
+        _consumersOfOutputsFrom.get(insn)
           .map(v =>
             v.indices
               .flatMap(v.apply)(collection.breakOut): Set[AbstractInsnNode])
@@ -128,16 +126,18 @@ trait ProdConsAnalyzerImpl {
                          producedSlot: Int): Set[AbstractInsnNode] = {
       if (isCopyOperation(insn)) {
         val key = (insn, producedSlot)
-        _initialProducersCache.getOrElseUpdate(key, {
-          // prevent infinite recursion if an instruction is its own producer or consumer
-          // see cyclicProdCons in ProdConsAnalyzerTest
-          _initialProducersCache(key) = Set.empty
-          val (sourceValue, sourceValueSlot) =
-            copyOperationSourceValue(insn, producedSlot)
-          sourceValue.insns.iterator.asScala
-            .flatMap(initialProducers(_, sourceValueSlot))
-            .toSet
-        })
+        _initialProducersCache.getOrElseUpdate(
+          key, {
+            // prevent infinite recursion if an instruction is its own producer or consumer
+            // see cyclicProdCons in ProdConsAnalyzerTest
+            _initialProducersCache(key) = Set.empty
+            val (sourceValue, sourceValueSlot) =
+              copyOperationSourceValue(insn, producedSlot)
+            sourceValue.insns.iterator.asScala
+              .flatMap(initialProducers(_, sourceValueSlot))
+              .toSet
+          }
+        )
       } else {
         Set(insn)
       }
@@ -155,16 +155,19 @@ trait ProdConsAnalyzerImpl {
                           consumedSlot: Int): Set[AbstractInsnNode] = {
       if (isCopyOperation(insn)) {
         val key = (insn, consumedSlot)
-        _ultimateConsumersCache.getOrElseUpdate(key, {
-          // prevent infinite recursion if an instruction is its own producer or consumer
-          // see cyclicProdCons in ProdConsAnalyzerTest
-          _ultimateConsumersCache(key) = Set.empty
-          for {
-            producedSlot <- copyOperationProducedValueSlots(insn, consumedSlot)
-            consumer <- consumersOfValueAt(insn.getNext, producedSlot)
-            ultimateConsumer <- ultimateConsumers(consumer, producedSlot)
-          } yield ultimateConsumer
-        })
+        _ultimateConsumersCache.getOrElseUpdate(
+          key, {
+            // prevent infinite recursion if an instruction is its own producer or consumer
+            // see cyclicProdCons in ProdConsAnalyzerTest
+            _ultimateConsumersCache(key) = Set.empty
+            for {
+              producedSlot <- copyOperationProducedValueSlots(insn,
+                                                              consumedSlot)
+              consumer <- consumersOfValueAt(insn.getNext, producedSlot)
+              ultimateConsumer <- ultimateConsumers(consumer, producedSlot)
+            } yield ultimateConsumer
+          }
+        )
       } else {
         Set(insn)
       }

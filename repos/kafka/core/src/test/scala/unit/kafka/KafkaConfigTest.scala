@@ -120,14 +120,15 @@ class KafkaTest {
   def testKafkaSslPasswords(): Unit = {
     val propertiesFile = prepareDefaultConfig()
     val config = KafkaConfig.fromProps(
-      Kafka.getPropsFromArgs(
-        Array(propertiesFile,
-              "--override",
-              "ssl.keystore.password=keystore_password",
-              "--override",
-              "ssl.key.password=key_password",
-              "--override",
-              "ssl.truststore.password=truststore_password")))
+      Kafka.getPropsFromArgs(Array(
+        propertiesFile,
+        "--override",
+        "ssl.keystore.password=keystore_password",
+        "--override",
+        "ssl.key.password=key_password",
+        "--override",
+        "ssl.truststore.password=truststore_password"
+      )))
     assertEquals(Password.HIDDEN, config.sslKeyPassword.toString)
     assertEquals(Password.HIDDEN, config.sslKeystorePassword.toString)
     assertEquals(Password.HIDDEN, config.sslTruststorePassword.toString)

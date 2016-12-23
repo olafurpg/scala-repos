@@ -89,7 +89,8 @@ class MetadataCacheTest {
                                                          2,
                                                          asList(2),
                                                          zkVersion,
-                                                         asSet(2)))
+                                                         asSet(2))
+    )
 
     val updateMetadataRequest = new UpdateMetadataRequest(
       controllerId,

@@ -1183,8 +1183,8 @@ object ==>> extends MapInstances {
       t.insert(x._1, x._2)
     }
 
-  final def fromListWith[A: Order, B](l: List[(A, B)])(f: (B,
-                                                           B) => B): A ==>> B =
+  final def fromListWith[A: Order, B](l: List[(A, B)])(
+      f: (B, B) => B): A ==>> B =
     fromListWithKey(l)((_, x, y) => f(x, y))
 
   final def fromListWithKey[A: Order, B](l: List[(A, B)])(

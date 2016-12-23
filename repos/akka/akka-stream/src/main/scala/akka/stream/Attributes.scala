@@ -230,9 +230,11 @@ object Attributes {
   def createLogLevels(onElement: Logging.LogLevel,
                       onFinish: Logging.LogLevel,
                       onFailure: Logging.LogLevel) =
-    logLevels(onElement = Option(onElement).getOrElse(Logging.DebugLevel),
-              onFinish = Option(onFinish).getOrElse(Logging.DebugLevel),
-              onFailure = Option(onFailure).getOrElse(Logging.ErrorLevel))
+    logLevels(
+      onElement = Option(onElement).getOrElse(Logging.DebugLevel),
+      onFinish = Option(onFinish).getOrElse(Logging.DebugLevel),
+      onFailure = Option(onFailure).getOrElse(Logging.ErrorLevel)
+    )
 
   /**
     * Configures `log()` stage log-levels to be used when logging.
@@ -300,9 +302,11 @@ object ActorAttributes {
   def createLogLevels(onElement: Logging.LogLevel,
                       onFinish: Logging.LogLevel,
                       onFailure: Logging.LogLevel) =
-    logLevels(onElement = Option(onElement).getOrElse(Logging.DebugLevel),
-              onFinish = Option(onFinish).getOrElse(Logging.DebugLevel),
-              onFailure = Option(onFailure).getOrElse(Logging.ErrorLevel))
+    logLevels(
+      onElement = Option(onElement).getOrElse(Logging.DebugLevel),
+      onFinish = Option(onFinish).getOrElse(Logging.DebugLevel),
+      onFailure = Option(onFailure).getOrElse(Logging.ErrorLevel)
+    )
 
   /**
     * Configures `log()` stage log-levels to be used when logging.

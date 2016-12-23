@@ -230,7 +230,8 @@ object CanConvolve extends SerializableLogging {
           range.start >= 0 &&
             range.last <= (data.length - kernel.length + 1),
           logger.error(
-            s"range (start ${range.start}, end ${range.end}, step ${range.step}, inclusive ${range.isInclusive}) is OOB for data (length ${data.length}) and kernel (length ${kernel.length})!"))
+            s"range (start ${range.start}, end ${range.end}, step ${range.step}, inclusive ${range.isInclusive}) is OOB for data (length ${data.length}) and kernel (length ${kernel.length})!")
+        )
 
         val dataVect = data.toScalaVector() //make immutable
         val kernelVect = kernel.toScalaVector()
@@ -273,7 +274,8 @@ object CanConvolve extends SerializableLogging {
           range.start >= 0 &&
             range.last <= (data.length - kernel.length + 1),
           logger.error(
-            s"range (start ${range.start}, end ${range.end}, step ${range.step}, inclusive ${range.isInclusive}) is OOB for data (length ${data.length}) and kernel (length ${kernel.length})!"))
+            s"range (start ${range.start}, end ${range.end}, step ${range.step}, inclusive ${range.isInclusive}) is OOB for data (length ${data.length}) and kernel (length ${kernel.length})!")
+        )
 
         val dataL = convert(data, Long).toScalaVector() //make immutable
         val kernelL = convert(kernel, Long).toScalaVector()

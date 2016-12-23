@@ -41,11 +41,13 @@ private[ui] class AllStagesPage(parent: StagesTab) extends WebUIPage("") {
       val now = System.currentTimeMillis
 
       val activeStagesTable =
-        new StageTableBase(activeStages.sortBy(_.submissionTime).reverse,
-                           parent.basePath,
-                           parent.progressListener,
-                           isFairScheduler = parent.isFairScheduler,
-                           killEnabled = parent.killEnabled)
+        new StageTableBase(
+          activeStages.sortBy(_.submissionTime).reverse,
+          parent.basePath,
+          parent.progressListener,
+          isFairScheduler = parent.isFairScheduler,
+          killEnabled = parent.killEnabled
+        )
       val pendingStagesTable =
         new StageTableBase(pendingStages.sortBy(_.submissionTime).reverse,
                            parent.basePath,

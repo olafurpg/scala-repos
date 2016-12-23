@@ -13,7 +13,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       import java.lang.StringBuilder
       val xs: List[StringBuilder] = Nil
       q"$xs"
-    """)
+    """
+  )
 
   property("unquote typename into typedef with default bounds") = fails(
     "reflect.runtime.universe.Name expected but reflect.runtime.universe.TypeDef found",
@@ -23,7 +24,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       val t = EmptyTree
       q"type $T1[$T2 >: _root_.scala.Any <: _root_.scala.Nothing] = $t" ≈
         TypeDef(Modifiers(), T1, List(T2), t)
-    """)
+    """
+  )
 
   property("can't unquote annotations with ... rank") =
     fails("Can't unquote with ... here", """
@@ -50,7 +52,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       import java.lang.StringBuilder
       val bazs = List(new StringBuilder)
       q"f(..$bazs)"
-    """)
+    """
+  )
 
   property("non-liftable type ...") = fails(
     "Can't unquote List[List[StringBuilder]] with .., consider using ... or providing an implicit instance of Liftable[StringBuilder]",
@@ -58,7 +61,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       import java.lang.StringBuilder
       val bazs = List(List(new StringBuilder))
       q"f(..$bazs)"
-    """)
+    """
+  )
 
   property("use .. rank or provide liftable") = fails(
     "Can't unquote List[StringBuilder], consider using .. or providing an implicit instance of Liftable[List[StringBuilder]]",
@@ -66,7 +70,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       import java.lang.StringBuilder
       val lst: List[StringBuilder] = Nil
       q"f($lst)"
-    """)
+    """
+  )
 
   property("use ... rank or provide liftable") = fails(
     "Can't unquote List[List[StringBuilder]], consider using ... or providing an implicit instance of Liftable[List[List[StringBuilder]]]",
@@ -74,7 +79,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       import java.lang.StringBuilder
       val xs: List[List[StringBuilder]] = Nil
       q"$xs"
-    """)
+    """
+  )
 
   property("not liftable or natively supported") = fails(
     "Can't unquote StringBuilder, consider providing an implicit instance of Liftable[StringBuilder]",
@@ -82,7 +88,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       import java.lang.StringBuilder
       val sb = new StringBuilder
       q"f($sb)"
-    """)
+    """
+  )
 
   property("can't unquote with ... rank here") = fails(
     "Can't unquote with ... here",
@@ -103,21 +110,24 @@ object ErrorProps extends QuasiquoteProperties("errors") {
     """
       val t = EmptyTree
       q"$t def foo"
-    """)
+    """
+  )
 
   property("cant unquote flags together with mods") = fails(
     "Can't unquote flags together with modifiers, consider merging flags into modifiers",
     """
       val f = Flag.IMPLICIT; val m = NoMods
       q"$f $m def foo"
-    """)
+    """
+  )
 
   property("can't unquote mods with annots") = fails(
     "Can't unquote modifiers together with annotations, consider merging annotations into modifiers",
     """
       val m = NoMods
       q"@annot $m def foo"
-    """)
+    """
+  )
 
   property("can't unquote modifiers with inline flags") = fails(
     "Can't unquote modifiers together with flags, consider merging flags into modifiers",
@@ -131,7 +141,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
     """
       val m1 = NoMods; val m2 = NoMods
       q"$m1 $m2 def foo"
-    """)
+    """
+  )
 
   property("can't extract mods with annots") = fails(
     "Can't extract modifiers together with annotations, consider extracting just modifiers",
@@ -176,7 +187,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       """
       val l: List[Symbol] = Nil
       q"f(..$l)"
-    """)
+    """
+    )
 
   property(
     "SI-8420: don't crash on splicing of non-unliftable native type (2)") =
@@ -185,7 +197,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       """
       val l: List[FlagSet] = Nil
       q"f(..$l)"
-    """)
+    """
+    )
 
   property(
     "SI-8420: don't crash on splicing of non-unliftable native type (3)") =
@@ -194,7 +207,8 @@ object ErrorProps extends QuasiquoteProperties("errors") {
       """
       val l: List[Modifiers] = Nil
       q"f(..$l)"
-    """)
+    """
+    )
 
   property(
     "SI-8451 construction: disallow everything except for constructor calls in secondary constructor bodies") =

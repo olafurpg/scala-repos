@@ -43,7 +43,8 @@ private[setup] object UserConfig {
         ai = r.getO[AiConfig]("ai") | AiConfig.default,
         friend = r.getO[FriendConfig]("friend") | FriendConfig.default,
         hook = r.getO[HookConfig]("hook") | HookConfig.default,
-        filter = r.getO[FilterConfig]("filter") | FilterConfig.default)
+        filter = r.getO[FilterConfig]("filter") | FilterConfig.default
+      )
 
     def writes(w: BSON.Writer, o: UserConfig) =
       BSONDocument("_id" -> o.id,

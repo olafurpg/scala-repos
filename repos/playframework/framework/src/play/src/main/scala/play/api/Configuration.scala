@@ -913,10 +913,13 @@ case class Configuration(underlying: Config) {
   private[play] def getDeprecatedStringOpt(
       key: String,
       deprecatedKey: String): Option[String] = {
-    getString(deprecatedKey).map { value =>
-      Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
-      value
-    }.orElse(getString(key)).filter(_.nonEmpty)
+    getString(deprecatedKey)
+      .map { value =>
+        Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
+        value
+      }
+      .orElse(getString(key))
+      .filter(_.nonEmpty)
   }
 
   /**
@@ -944,7 +947,8 @@ case class Configuration(underlying: Config) {
         Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
         value
       },
-      TimeUnit.NANOSECONDS)
+      TimeUnit.NANOSECONDS
+    )
   }
 
   /**
@@ -954,12 +958,15 @@ case class Configuration(underlying: Config) {
   private[play] def getDeprecatedDurationOpt(
       key: String,
       deprecatedKey: String): Option[FiniteDuration] = {
-    getNanoseconds(deprecatedKey).map { value =>
-      Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
-      value
-    }.orElse(getNanoseconds(key)).map { value =>
-      new FiniteDuration(value, TimeUnit.NANOSECONDS)
-    }
+    getNanoseconds(deprecatedKey)
+      .map { value =>
+        Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
+        value
+      }
+      .orElse(getNanoseconds(key))
+      .map { value =>
+        new FiniteDuration(value, TimeUnit.NANOSECONDS)
+      }
   }
 }
 
@@ -1040,13 +1047,15 @@ private[play] class PlayConfig(val underlying: Config) {
     */
   def getDeprecated[A: ConfigLoader](path: String,
                                      deprecatedPaths: String*): A = {
-    deprecatedPaths.collectFirst {
-      case deprecated if underlying.hasPath(deprecated) =>
-        reportDeprecation(path, deprecated)
-        get[A](deprecated)
-    }.getOrElse {
-      get[A](path)
-    }
+    deprecatedPaths
+      .collectFirst {
+        case deprecated if underlying.hasPath(deprecated) =>
+          reportDeprecation(path, deprecated)
+          get[A](deprecated)
+      }
+      .getOrElse {
+        get[A](path)
+      }
   }
 
   /**

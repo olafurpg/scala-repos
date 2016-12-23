@@ -214,7 +214,8 @@ trait Importers { to: SymbolTable =>
                   !result.isOverloaded,
                   "import failure: cannot determine unique overloaded method alternative from\n " +
                     (result.alternatives map (_.defString) mkString "\n") +
-                    "\n that matches " + their + ":" + their.tpe)
+                    "\n that matches " + their + ":" + their.tpe
+                )
                 result
               }
 

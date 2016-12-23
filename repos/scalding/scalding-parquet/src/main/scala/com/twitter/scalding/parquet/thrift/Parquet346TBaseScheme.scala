@@ -85,7 +85,8 @@ class Parquet346TBaseRecordConverter[T <: TBase[_, _]](
       requestedParquetSchema,
       // this is the fix -- we add in the missing structOrUnionType metadata
       // before passing it along
-      Parquet346StructTypeRepairer.repair(thriftType))
+      Parquet346StructTypeRepairer.repair(thriftType)
+    )
 
 /**
   * Takes a ThriftType with potentially missing structOrUnionType metadata,

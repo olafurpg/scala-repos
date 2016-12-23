@@ -75,16 +75,18 @@ object CompilationData {
 
       val outputGroups = createOutputGroups(chunk)
 
-      CompilationData(sources,
-                      classpath,
-                      output,
-                      commonOptions ++ scalaOptions,
-                      commonOptions ++ javaOptions,
-                      order,
-                      cacheFile,
-                      relevantOutputToCacheMap,
-                      outputGroups,
-                      Some(compilerSettings.getSbtIncrementalOptions))
+      CompilationData(
+        sources,
+        classpath,
+        output,
+        commonOptions ++ scalaOptions,
+        commonOptions ++ javaOptions,
+        order,
+        cacheFile,
+        relevantOutputToCacheMap,
+        outputGroups,
+        Some(compilerSettings.getSbtIncrementalOptions)
+      )
     }
   }
 

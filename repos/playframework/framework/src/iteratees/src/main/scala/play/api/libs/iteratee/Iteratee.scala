@@ -592,11 +592,12 @@ trait Iteratee[E, +A] { self =>
           ec /* still on same thread; let executeIteratee do preparation */ )
       case Step.Done(a, e) =>
         executeIteratee(f(a))(
-          ec /* still on same thread; let executeIteratee do preparation */ ).pureFlatFold {
-          case Step.Done(a, _) => Done(a, e)
-          case Step.Cont(k) => k(e)
-          case Step.Error(msg, e) => Error(msg, e)
-        }(dec)
+          ec /* still on same thread; let executeIteratee do preparation */ )
+          .pureFlatFold {
+            case Step.Done(a, _) => Done(a, e)
+            case Step.Cont(k) => k(e)
+            case Step.Error(msg, e) => Error(msg, e)
+          }(dec)
       case Step.Cont(k) => {
         implicit val pec = ec.prepare()
         Cont((in: Input[E]) => executeIteratee(k(in))(dec).flatMap(f)(pec))

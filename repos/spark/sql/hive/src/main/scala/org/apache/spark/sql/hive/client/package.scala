@@ -40,7 +40,8 @@ package object client {
           extraDeps =
             Seq("org.apache.calcite:calcite-core:1.3.0-incubating",
                 "org.apache.calcite:calcite-avatica:1.3.0-incubating"),
-          exclusions = Seq("org.pentaho:pentaho-aggdesigner-algorithm"))
+          exclusions = Seq("org.pentaho:pentaho-aggdesigner-algorithm")
+        )
 
     case object v1_0
         extends HiveVersion("1.0.0",
@@ -54,22 +55,24 @@ package object client {
     // library. org.apache.curator:curator is a pom dependency but ivy tries to find the jar for it,
     // and fails.
     case object v1_1
-        extends HiveVersion("1.1.0",
-                            exclusions =
-                              Seq("eigenbase:eigenbase-properties",
-                                  "org.apache.curator:*",
-                                  "org.pentaho:pentaho-aggdesigner-algorithm",
-                                  "net.hydromatic:linq4j",
-                                  "net.hydromatic:quidem"))
+        extends HiveVersion(
+          "1.1.0",
+          exclusions = Seq("eigenbase:eigenbase-properties",
+                           "org.apache.curator:*",
+                           "org.pentaho:pentaho-aggdesigner-algorithm",
+                           "net.hydromatic:linq4j",
+                           "net.hydromatic:quidem")
+        )
 
     case object v1_2
-        extends HiveVersion("1.2.1",
-                            exclusions =
-                              Seq("eigenbase:eigenbase-properties",
-                                  "org.apache.curator:*",
-                                  "org.pentaho:pentaho-aggdesigner-algorithm",
-                                  "net.hydromatic:linq4j",
-                                  "net.hydromatic:quidem"))
+        extends HiveVersion(
+          "1.2.1",
+          exclusions = Seq("eigenbase:eigenbase-properties",
+                           "org.apache.curator:*",
+                           "org.pentaho:pentaho-aggdesigner-algorithm",
+                           "net.hydromatic:linq4j",
+                           "net.hydromatic:quidem")
+        )
   }
   // scalastyle:on
 }

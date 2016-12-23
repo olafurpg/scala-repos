@@ -115,7 +115,8 @@ object SecurityHeadersConfig {
       permittedCrossDomainPolicies =
         config.get[Option[String]]("permittedCrossDomainPolicies"),
       contentSecurityPolicy =
-        config.get[Option[String]]("contentSecurityPolicy"))
+        config.get[Option[String]]("contentSecurityPolicy")
+    )
   }
 }
 

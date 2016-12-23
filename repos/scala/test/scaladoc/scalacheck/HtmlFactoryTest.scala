@@ -409,15 +409,15 @@ object Test extends Properties("HtmlFactory") {
     "SI-5054: Use cases should keep their flags - traits should not be affected") =
     checkText("SI_5054_q6.scala")((None, """abstract def test(): Int""", true))
 
-  property("SI-5054: Use case individual signature test") = checkText(
-    "SI_5054_q7.scala")(
-    (None,
-     """abstract def test2(explicit: Int): Int [use case] This takes the explicit value passed.""",
-     true),
-    (None,
-     """abstract def test1(): Int [use case] This takes the implicit value in scope.""",
-     true)
-  )
+  property("SI-5054: Use case individual signature test") =
+    checkText("SI_5054_q7.scala")(
+      (None,
+       """abstract def test2(explicit: Int): Int [use case] This takes the explicit value passed.""",
+       true),
+      (None,
+       """abstract def test1(): Int [use case] This takes the implicit value in scope.""",
+       true)
+    )
 
   property("SI-5287: Display correct \"Definition classes\"") =
     checkText("SI_5287.scala")(
@@ -579,7 +579,8 @@ object Test extends Properties("HtmlFactory") {
         Note       StartNote Be careful! EndNote
         See also   StartSee The Manual EndSee
      """,
-       true))
+       true)
+    )
 
   property("Comment inheritance: Correct explicit inheritance for usecase") =
     checkText("explicit-inheritance-usecase.scala")(
@@ -607,7 +608,8 @@ object Test extends Properties("HtmlFactory") {
         Note       StartNote Be careful! EndNote
         See also   StartSee The Manual EndSee
      """,
-       true))
+       true)
+    )
 
   property("Comment inheritance: Correct explicit inheritance in corner cases") =
     checkText("inheritdoc-corner-cases.scala")(

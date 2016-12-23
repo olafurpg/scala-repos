@@ -548,8 +548,8 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       // into a hash table, leading to more objects in the old gen.
       val createCombiner = (v: V) => CompactBuffer(v)
       val mergeValue = (buf: CompactBuffer[V], v: V) => buf += v
-      val mergeCombiners = (c1: CompactBuffer[V],
-                            c2: CompactBuffer[V]) => c1 ++= c2
+      val mergeCombiners =
+        (c1: CompactBuffer[V], c2: CompactBuffer[V]) => c1 ++= c2
       val bufs =
         combineByKeyWithClassTag[CompactBuffer[V]](createCombiner,
                                                    mergeValue,

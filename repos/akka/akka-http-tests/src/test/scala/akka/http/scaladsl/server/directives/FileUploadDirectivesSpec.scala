@@ -99,7 +99,8 @@ class FileUploadDirectivesSpec extends RoutingSpec {
         Multipart.FormData.BodyPart.Strict(
           "field1",
           HttpEntity(ContentTypes.`text/plain(UTF-8)`, str2),
-          Map("filename" -> "data2.txt")))
+          Map("filename" -> "data2.txt"))
+      )
 
       Post("/", multipartForm) ~> route ~> check {
         status shouldEqual StatusCodes.OK

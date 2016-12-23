@@ -24,34 +24,36 @@ class FlowInitialDelaySpec extends AkkaSpec {
                    1.second) should ===(1 to 10)
     }
 
-    "delay elements by the specified time but not more" in Utils.assertAllStagesStopped {
-      a[TimeoutException] shouldBe thrownBy {
-        Await.result(Source(1 to 10)
-                       .initialDelay(2.seconds)
-                       .initialTimeout(1.second)
-                       .runWith(Sink.ignore),
-                     2.seconds)
+    "delay elements by the specified time but not more" in Utils
+      .assertAllStagesStopped {
+        a[TimeoutException] shouldBe thrownBy {
+          Await.result(Source(1 to 10)
+                         .initialDelay(2.seconds)
+                         .initialTimeout(1.second)
+                         .runWith(Sink.ignore),
+                       2.seconds)
+        }
+
+        Await.ready(Source(1 to 10)
+                      .initialDelay(1.seconds)
+                      .initialTimeout(2.second)
+                      .runWith(Sink.ignore),
+                    2.seconds)
       }
 
-      Await.ready(Source(1 to 10)
-                    .initialDelay(1.seconds)
-                    .initialTimeout(2.second)
-                    .runWith(Sink.ignore),
-                  2.seconds)
-    }
+    "properly ignore timer while backpressured" in Utils
+      .assertAllStagesStopped {
+        val probe = TestSubscriber.probe[Int]()
+        Source(1 to 10)
+          .initialDelay(0.5.second)
+          .runWith(Sink.fromSubscriber(probe))
 
-    "properly ignore timer while backpressured" in Utils.assertAllStagesStopped {
-      val probe = TestSubscriber.probe[Int]()
-      Source(1 to 10)
-        .initialDelay(0.5.second)
-        .runWith(Sink.fromSubscriber(probe))
+        probe.ensureSubscription()
+        probe.expectNoMsg(1.5.second)
+        probe.request(20)
+        probe.expectNextN(1 to 10)
 
-      probe.ensureSubscription()
-      probe.expectNoMsg(1.5.second)
-      probe.request(20)
-      probe.expectNextN(1 to 10)
-
-      probe.expectComplete()
-    }
+        probe.expectComplete()
+      }
   }
 }

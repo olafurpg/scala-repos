@@ -135,12 +135,15 @@ class SocketServer(val config: KafkaConfig,
       }
     }
 
-    newGauge("NetworkProcessorAvgIdlePercent", new Gauge[Double] {
-      def value =
-        allMetricNames
-          .map(metricName => metrics.metrics().get(metricName).value())
-          .sum / totalProcessorThreads
-    })
+    newGauge(
+      "NetworkProcessorAvgIdlePercent",
+      new Gauge[Double] {
+        def value =
+          allMetricNames
+            .map(metricName => metrics.metrics().get(metricName).value())
+            .sum / totalProcessorThreads
+      }
+    )
 
     info("Started " + acceptors.size + " acceptor threads")
   }
@@ -364,12 +367,14 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
 
       debug(
         "Accepted connection from %s on %s. sendBufferSize [actual|requested]: [%d|%d] recvBufferSize [actual|requested]: [%d|%d]"
-          .format(socketChannel.socket.getInetAddress,
-                  socketChannel.socket.getLocalSocketAddress,
-                  socketChannel.socket.getSendBufferSize,
-                  sendBufferSize,
-                  socketChannel.socket.getReceiveBufferSize,
-                  recvBufferSize))
+          .format(
+            socketChannel.socket.getInetAddress,
+            socketChannel.socket.getLocalSocketAddress,
+            socketChannel.socket.getSendBufferSize,
+            sendBufferSize,
+            socketChannel.socket.getReceiveBufferSize,
+            recvBufferSize
+          ))
 
       processor.accept(socketChannel)
     } catch {
@@ -434,15 +439,19 @@ private[kafka] class Processor(val id: Int,
   private val metricTags = new util.HashMap[String, String]()
   metricTags.put("networkProcessor", id.toString)
 
-  newGauge("IdlePercent", new Gauge[Double] {
-    def value = {
-      metrics
-        .metrics()
-        .get(metrics
-          .metricName("io-wait-ratio", "socket-server-metrics", metricTags))
-        .value()
-    }
-  }, metricTags.asScala)
+  newGauge(
+    "IdlePercent",
+    new Gauge[Double] {
+      def value = {
+        metrics
+          .metrics()
+          .get(metrics
+            .metricName("io-wait-ratio", "socket-server-metrics", metricTags))
+          .value()
+      }
+    },
+    metricTags.asScala
+  )
 
   private val selector = new KSelector(maxRequestSize,
                                        connectionsMaxIdleMs,

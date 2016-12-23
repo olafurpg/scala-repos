@@ -50,7 +50,8 @@ trait Logging { self: App =>
     "log.rollPolicy",
     defaultRollPolicy,
     "When or how frequently to roll the logfile. " +
-      "See com.twitter.logging.Policy#parse documentation for DSL details.")
+      "See com.twitter.logging.Policy#parse documentation for DSL details."
+  )
   protected[this] val appendFlag = flag(
     "log.append",
     defaultAppend,

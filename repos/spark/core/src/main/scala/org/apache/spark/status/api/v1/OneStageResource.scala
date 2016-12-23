@@ -86,9 +86,12 @@ private[v1] class OneStageResource(ui: SparkUI) {
                @DefaultValue("ID") @QueryParam("sortBy") sortBy: TaskSorting)
     : Seq[TaskData] = {
     withStageAttempt(stageId, stageAttemptId) { stage =>
-      val tasks = stage.ui.taskData.values.map {
-        AllStagesResource.convertTaskData
-      }.toIndexedSeq.sorted(OneStageResource.ordering(sortBy))
+      val tasks = stage.ui.taskData.values
+        .map {
+          AllStagesResource.convertTaskData
+        }
+        .toIndexedSeq
+        .sorted(OneStageResource.ordering(sortBy))
       tasks.slice(offset, offset + length)
     }
   }
@@ -116,7 +119,8 @@ private[v1] class OneStageResource(ui: SparkUI) {
             (info.stageId, info.attemptId),
             // this is an internal error -- we should always have uiData
             throw new SparkException(
-              s"no stage ui data found for stage: ${info.stageId}:${info.attemptId}"))
+              s"no stage ui data found for stage: ${info.stageId}:${info.attemptId}")
+          )
           StageStatusInfoUi(status, info, ui)
         }
       }

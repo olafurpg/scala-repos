@@ -563,7 +563,8 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
   )
 
   private def flatten(attributes: Map[String, String]) =
-    attributes.map { case (key, value) => key + "=\"" + value + "\"" }
+    attributes
+      .map { case (key, value) => key + "=\"" + value + "\"" }
       .mkString(", ")
 
   private val graphAttributesStr = graphAttributes.map {

@@ -99,7 +99,9 @@ object JsonTests extends TestSuite {
         assert(
           value == Js.Obj("omg" -> Js.Str("123"), "wtf" -> Js.Num(12.4123)))
       }
-      'bigJsonExpr - test(jsonExpr, """
+      'bigJsonExpr - test(
+        jsonExpr,
+        """
             {
                 "firstName": "John",
                 "lastName": "Smith",
@@ -121,7 +123,8 @@ object JsonTests extends TestSuite {
                     }
                 ]
             }
-      """)
+      """
+      )
     }
     'fail {
       def check(s: String, expectedError: String) = {

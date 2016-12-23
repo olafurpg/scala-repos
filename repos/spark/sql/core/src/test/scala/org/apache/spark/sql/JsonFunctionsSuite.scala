@@ -60,13 +60,17 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
                                                              null,
                                                              null) :: Nil
 
-    checkAnswer(df.select($"key",
-                          functions.get_json_object($"jstring", "$.f1"),
-                          functions.get_json_object($"jstring", "$.f2"),
-                          functions.get_json_object($"jstring", "$.f3"),
-                          functions.get_json_object($"jstring", "$.f4"),
-                          functions.get_json_object($"jstring", "$.f5")),
-                expected)
+    checkAnswer(
+      df.select(
+        $"key",
+        functions.get_json_object($"jstring", "$.f1"),
+        functions.get_json_object($"jstring", "$.f2"),
+        functions.get_json_object($"jstring", "$.f3"),
+        functions.get_json_object($"jstring", "$.f4"),
+        functions.get_json_object($"jstring", "$.f5")
+      ),
+      expected
+    )
   }
 
   test("json_tuple select") {

@@ -99,7 +99,8 @@ class OrcQuerySuite extends QueryTest with BeforeAndAfterAll with OrcTest {
         (0 until i).map(Option(_).filter(_ % 3 == 0)),
         (0 until i).map(i => i -> i.toLong).toMap,
         (0 until i).map(i => i -> Option(i.toLong)).toMap + (i -> None),
-        (0 until i, (i, s"$i")))
+        (0 until i, (i, s"$i"))
+      )
     }
 
     withOrcFile(data) { file =>

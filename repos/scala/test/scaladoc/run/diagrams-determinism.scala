@@ -74,7 +74,8 @@ object Test extends ScaladocModelTest {
           subclasses == subclasses.filter(_.isThisNode) ::: subclasses.filter(
             node => node.isNormalNode || node.isOutsideNode) ::: subclasses
             .filter(_.isImplicitNode),
-          "Diagram order for " + template + ": " + subclasses)
+          "Diagram order for " + template + ": " + subclasses
+        )
 
     val base = rootPackage
       ._package("scala")

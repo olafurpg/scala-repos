@@ -15,7 +15,9 @@ import play.twirl.api.{Html, HtmlFormat}
   * Provides helper methods for Twirl templates.
   */
 object helpers
-    extends AvatarImageProvider with LinkConverter with RequestCache {
+    extends AvatarImageProvider
+    with LinkConverter
+    with RequestCache {
 
   /**
     * Format java.util.Date to "yyyy-MM-dd HH:mm:ss".
@@ -24,12 +26,12 @@ object helpers
     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date)
 
   val timeUnits = List(
-      (1000L, "second"),
-      (1000L * 60, "minute"),
-      (1000L * 60 * 60, "hour"),
-      (1000L * 60 * 60 * 24, "day"),
-      (1000L * 60 * 60 * 24 * 30, "month"),
-      (1000L * 60 * 60 * 24 * 365, "year")
+    (1000L, "second"),
+    (1000L * 60, "minute"),
+    (1000L * 60 * 60, "hour"),
+    (1000L * 60 * 60 * 24, "day"),
+    (1000L * 60 * 60 * 24 * 30, "month"),
+    (1000L * 60 * 60 * 24 * 365, "year")
   ).reverse
 
   /**
@@ -84,7 +86,8 @@ object helpers
     */
   def plural(count: Int, singular: String, plural: String = ""): String =
     if (count == 1) singular
-    else if (plural.isEmpty) singular + "s" else plural
+    else if (plural.isEmpty) singular + "s"
+    else plural
 
   /**
     * Converts Markdown of Wiki pages to HTML.
@@ -99,17 +102,17 @@ object helpers
                hasWritePermission: Boolean = false,
                pages: List[String] = Nil)(implicit context: Context): Html =
     Html(
-        Markdown.toHtml(
-            markdown = markdown,
-            repository = repository,
-            enableWikiLink = enableWikiLink,
-            enableRefsLink = enableRefsLink,
-            enableAnchor = enableAnchor,
-            enableLineBreaks = enableLineBreaks,
-            enableTaskList = enableTaskList,
-            hasWritePermission = hasWritePermission,
-            pages = pages
-        ))
+      Markdown.toHtml(
+        markdown = markdown,
+        repository = repository,
+        enableWikiLink = enableWikiLink,
+        enableRefsLink = enableRefsLink,
+        enableAnchor = enableAnchor,
+        enableLineBreaks = enableLineBreaks,
+        enableTaskList = enableTaskList,
+        hasWritePermission = hasWritePermission,
+        pages = pages
+      ))
 
   /**
     * Render the given source (only markdown is supported in default) as HTML.
@@ -127,14 +130,14 @@ object helpers
     val extension = FileUtil.getExtension(fileName)
     val renderer = PluginRegistry().getRenderer(extension)
     renderer.render(
-        RenderRequest(filePath,
-                      fileContent,
-                      branch,
-                      repository,
-                      enableWikiLink,
-                      enableRefsLink,
-                      enableAnchor,
-                      context))
+      RenderRequest(filePath,
+                    fileContent,
+                    branch,
+                    repository,
+                    enableWikiLink,
+                    enableRefsLink,
+                    enableAnchor,
+                    context))
   }
 
   /**
@@ -197,34 +200,39 @@ object helpers
     */
   def activityMessage(message: String)(implicit context: Context): Html =
     Html(
-        message
-          .replaceAll(
-              "\\[issue:([^\\s]+?)/([^\\s]+?)#((\\d+))\\]",
-              s"""<a href="${context.path}/$$1/$$2/issues/$$3">$$1/$$2#$$3</a>""")
-          .replaceAll(
-              "\\[pullreq:([^\\s]+?)/([^\\s]+?)#((\\d+))\\]",
-              s"""<a href="${context.path}/$$1/$$2/pull/$$3">$$1/$$2#$$3</a>""")
-          .replaceAll("\\[repo:([^\\s]+?)/([^\\s]+?)\\]",
-                      s"""<a href="${context.path}/$$1/$$2\">$$1/$$2</a>""")
-          .replaceAll(
-              "\\[branch:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
-              (m: Match) =>
-                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/tree/${encodeRefName(
-                m.group(3))}">${m.group(3)}</a>""")
-          .replaceAll(
-              "\\[tag:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
-              (m: Match) =>
-                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/tree/${encodeRefName(
-                m.group(3))}">${m.group(3)}</a>""")
-          .replaceAll("\\[user:([^\\s]+?)\\]",
-                      (m: Match) => user(m.group(1)).body)
-          .replaceAll(
-              "\\[commit:([^\\s]+?)/([^\\s]+?)\\@([^\\s]+?)\\]",
-              (m: Match) =>
-                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/commit/${m
+      message
+        .replaceAll(
+          "\\[issue:([^\\s]+?)/([^\\s]+?)#((\\d+))\\]",
+          s"""<a href="${context.path}/$$1/$$2/issues/$$3">$$1/$$2#$$3</a>""")
+        .replaceAll(
+          "\\[pullreq:([^\\s]+?)/([^\\s]+?)#((\\d+))\\]",
+          s"""<a href="${context.path}/$$1/$$2/pull/$$3">$$1/$$2#$$3</a>""")
+        .replaceAll("\\[repo:([^\\s]+?)/([^\\s]+?)\\]",
+                    s"""<a href="${context.path}/$$1/$$2\">$$1/$$2</a>""")
+        .replaceAll(
+          "\\[branch:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
+          (m: Match) =>
+            s"""<a href="${context.path}/${m.group(1)}/${m
+              .group(2)}/tree/${encodeRefName(m.group(3))}">${m
+              .group(3)}</a>"""
+        )
+        .replaceAll(
+          "\\[tag:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
+          (m: Match) =>
+            s"""<a href="${context.path}/${m.group(1)}/${m
+              .group(2)}/tree/${encodeRefName(m.group(3))}">${m
+              .group(3)}</a>"""
+        )
+        .replaceAll("\\[user:([^\\s]+?)\\]",
+                    (m: Match) => user(m.group(1)).body)
+        .replaceAll(
+          "\\[commit:([^\\s]+?)/([^\\s]+?)\\@([^\\s]+?)\\]",
+          (m: Match) =>
+            s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/commit/${m
               .group(3)}">${m.group(1)}/${m.group(2)}@${m
               .group(3)
-              .substring(0, 7)}</a>"""))
+              .substring(0, 7)}</a>"""
+        ))
 
   /**
     * Remove html tags from the given Html instance.
@@ -264,9 +272,9 @@ object helpers
     * Generates the text link to the account page.
     * If user does not exist or disabled, this method returns user name as text without link.
     */
-  def user(
-      userName: String, mailAddress: String = "", styleClass: String = "")(
-      implicit context: Context): Html =
+  def user(userName: String,
+           mailAddress: String = "",
+           styleClass: String = "")(implicit context: Context): Html =
     userWithContent(userName, mailAddress, styleClass)(Html(userName))
 
   /**
@@ -278,7 +286,7 @@ object helpers
                  mailAddress: String = "",
                  tooltip: Boolean = false)(implicit context: Context): Html =
     userWithContent(userName, mailAddress)(
-        avatar(userName, size, tooltip, mailAddress))
+      avatar(userName, size, tooltip, mailAddress))
 
   /**
     * Generates the avatar link to the account page.
@@ -287,18 +295,19 @@ object helpers
   def avatarLink(commit: JGitUtil.CommitInfo, size: Int)(
       implicit context: Context): Html =
     userWithContent(commit.authorName, commit.authorEmailAddress)(
-        avatar(commit, size))
+      avatar(commit, size))
 
-  private def userWithContent(
-      userName: String, mailAddress: String = "", styleClass: String = "")(
-      content: Html)(implicit context: Context): Html =
+  private def userWithContent(userName: String,
+                              mailAddress: String = "",
+                              styleClass: String = "")(content: Html)(
+      implicit context: Context): Html =
     (if (mailAddress.isEmpty) {
        getAccountByUserName(userName)
      } else {
        getAccountByMailAddress(mailAddress)
      }).map { account =>
       Html(
-          s"""<a href="${url(account.userName)}" class="${styleClass}">${content}</a>""")
+        s"""<a href="${url(account.userName)}" class="${styleClass}">${content}</a>""")
     } getOrElse content
 
   /**
@@ -346,7 +355,7 @@ object helpers
 
   def pre(value: Html): Html =
     Html(
-        s"<pre>${value.body.trim.split("\n").map(_.trim).mkString("\n")}</pre>")
+      s"<pre>${value.body.trim.split("\n").map(_.trim).mkString("\n")}</pre>")
 
   /**
     * Implicit conversion to add mkHtml() to Seq[Html].
@@ -390,12 +399,12 @@ object helpers
           val url = m.group(0)
           val href = url.replace("\"", "&quot;")
           (x ++
-           (Seq(
-                   if (pos < m.start)
-                     Some(HtmlFormat.escape(text.substring(pos, m.start)))
-                   else None,
-                   Some(Html(s"""<a href="${href}">${url}</a>"""))
-               ).flatten),
+             (Seq(
+               if (pos < m.start)
+                 Some(HtmlFormat.escape(text.substring(pos, m.start)))
+               else None,
+               Some(Html(s"""<a href="${href}">${url}</a>"""))
+             ).flatten),
            m.end)
       }
     // append rest fragment

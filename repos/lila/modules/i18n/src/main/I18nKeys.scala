@@ -1059,7 +1059,8 @@ final class I18nKeys(translator: Translator) {
       `nbPerfTypePlayersThisWeek`,
       `yourPerfTypeRatingisRating`,
       `youAreBetterThanPercentOfPerfTypePlayers`,
-      `youDoNotHaveAnEstablishedPerfTypeRating`)
+      `youDoNotHaveAnEstablishedPerfTypeRating`
+    )
 
   lazy val count = keys.size
 }

@@ -403,17 +403,20 @@ final class DataFrameNaFunctions private[sql] (df: DataFrame) {
 
     val columnEquals = df.sqlContext.sessionState.analyzer.resolver
     val projections = df.schema.fields.map { f =>
-      values.find { case (k, _) => columnEquals(k, f.name) }.map {
-        case (_, v) =>
-          v match {
-            case v: jl.Float => fillCol[Double](f, v.toDouble)
-            case v: jl.Double => fillCol[Double](f, v)
-            case v: jl.Long => fillCol[Double](f, v.toDouble)
-            case v: jl.Integer => fillCol[Double](f, v.toDouble)
-            case v: jl.Boolean => fillCol[Boolean](f, v.booleanValue())
-            case v: String => fillCol[String](f, v)
-          }
-      }.getOrElse(df.col(f.name))
+      values
+        .find { case (k, _) => columnEquals(k, f.name) }
+        .map {
+          case (_, v) =>
+            v match {
+              case v: jl.Float => fillCol[Double](f, v.toDouble)
+              case v: jl.Double => fillCol[Double](f, v)
+              case v: jl.Long => fillCol[Double](f, v.toDouble)
+              case v: jl.Integer => fillCol[Double](f, v.toDouble)
+              case v: jl.Boolean => fillCol[Boolean](f, v.booleanValue())
+              case v: String => fillCol[String](f, v)
+            }
+        }
+        .getOrElse(df.col(f.name))
     }
     df.select(projections: _*)
   }

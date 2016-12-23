@@ -55,26 +55,28 @@ object HistoryServiceWithData {
            finishTime = startTime + time)
     }
 
-    FlowStepHistory(keys = null,
-                    submitTime = 0,
-                    launchTime = 0L,
-                    finishTime = 0L,
-                    totalMaps = 0L,
-                    totalReduces = 0L,
-                    finishedMaps = 0L,
-                    finishedReduces = 0L,
-                    failedMaps = 0L,
-                    failedReduces = 0L,
-                    mapFileBytesRead = 0L,
-                    mapFileBytesWritten = 0L,
-                    reduceFileBytesRead = inputHdfsReduceFileBytesRead,
-                    hdfsBytesRead = inputHdfsBytesRead,
-                    hdfsBytesWritten = 0L,
-                    mapperTimeMillis = 0L,
-                    reducerTimeMillis = 0L,
-                    reduceShuffleBytes = 0L,
-                    cost = 1.1,
-                    tasks = tasks)
+    FlowStepHistory(
+      keys = null,
+      submitTime = 0,
+      launchTime = 0L,
+      finishTime = 0L,
+      totalMaps = 0L,
+      totalReduces = 0L,
+      finishedMaps = 0L,
+      finishedReduces = 0L,
+      failedMaps = 0L,
+      failedReduces = 0L,
+      mapFileBytesRead = 0L,
+      mapFileBytesWritten = 0L,
+      reduceFileBytesRead = inputHdfsReduceFileBytesRead,
+      hdfsBytesRead = inputHdfsBytesRead,
+      hdfsBytesWritten = 0L,
+      mapperTimeMillis = 0L,
+      reducerTimeMillis = 0L,
+      reduceShuffleBytes = 0L,
+      cost = 1.1,
+      tasks = tasks
+    )
   }
 
   def inputSize = HipJob.InSrcFileSize

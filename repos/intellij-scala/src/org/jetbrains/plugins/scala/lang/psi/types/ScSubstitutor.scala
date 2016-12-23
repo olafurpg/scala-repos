@@ -192,7 +192,8 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
               () => substInternal(tp.lowerType()),
               () => substInternal(tp.upperType()),
               tp.ptp)
-          }))
+          })
+        )
       }
 
       override def visitAbstractType(a: ScAbstractType): Unit = {
@@ -215,7 +216,8 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
               p.copy(paramType = substInternal(p.paramType),
                      expectedType = substInternal(p.expectedType),
                      defaultType = p.defaultType.map(substInternal))),
-          isImplicit)(m.project, m.scope)
+          isImplicit
+        )(m.project, m.scope)
       }
 
       override def visitUndefinedType(u: ScUndefinedType): Unit = {
@@ -491,37 +493,43 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
                             tp.ptp)
         }
         val middleRes =
-          ScCompoundType(comps.map(substInternal), signatureMap.map {
-            case (s: Signature, tp: ScType) =>
-              val pTypes: List[Seq[() => ScType]] =
-                s.substitutedTypes.map(_.map(f => () => substInternal(f())))
-              val tParams: Array[TypeParameter] =
-                if (s.typeParams.length == 0) TypeParameter.EMPTY_ARRAY
-                else s.typeParams.map(substTypeParam)
-              val rt: ScType = substInternal(tp)
-              (new Signature(s.name,
-                             pTypes,
-                             s.paramLength,
-                             tParams,
-                             ScSubstitutor.empty,
-                             s.namedElement match {
-                               case fun: ScFunction =>
-                                 ScFunction.getCompoundCopy(
-                                   pTypes.map(_.map(_()).toList),
-                                   tParams.toList,
-                                   rt,
-                                   fun)
-                               case b: ScBindingPattern =>
-                                 ScBindingPattern.getCompoundCopy(rt, b)
-                               case f: ScFieldId =>
-                                 ScFieldId.getCompoundCopy(rt, f)
-                               case named => named
-                             },
-                             s.hasRepeatedParam),
-               rt)
-          }, typeMap.map {
-            case (s, sign) => (s, sign.updateTypes(substInternal))
-          })
+          ScCompoundType(
+            comps.map(substInternal),
+            signatureMap.map {
+              case (s: Signature, tp: ScType) =>
+                val pTypes: List[Seq[() => ScType]] =
+                  s.substitutedTypes.map(_.map(f => () => substInternal(f())))
+                val tParams: Array[TypeParameter] =
+                  if (s.typeParams.length == 0) TypeParameter.EMPTY_ARRAY
+                  else s.typeParams.map(substTypeParam)
+                val rt: ScType = substInternal(tp)
+                (new Signature(
+                   s.name,
+                   pTypes,
+                   s.paramLength,
+                   tParams,
+                   ScSubstitutor.empty,
+                   s.namedElement match {
+                     case fun: ScFunction =>
+                       ScFunction.getCompoundCopy(
+                         pTypes.map(_.map(_()).toList),
+                         tParams.toList,
+                         rt,
+                         fun)
+                     case b: ScBindingPattern =>
+                       ScBindingPattern.getCompoundCopy(rt, b)
+                     case f: ScFieldId =>
+                       ScFieldId.getCompoundCopy(rt, f)
+                     case named => named
+                   },
+                   s.hasRepeatedParam
+                 ),
+                 rt)
+            },
+            typeMap.map {
+              case (s, sign) => (s, sign.updateTypes(substInternal))
+            }
+          )
         //todo: this is ugly workaround for
         result = updateThisType match {
           case Some(thisType @ ScDesignatorType(param: ScParameter)) =>
@@ -605,30 +613,33 @@ class ScUndefinedSubstitutor(
         if (absLower.equiv(Nothing)) return this
         absLower //upper will be added separately
       case _ =>
-        _lower.recursiveVarianceUpdate((tp: ScType, i: Int) => {
-          tp match {
-            case ScAbstractType(_, absLower, upper) =>
-              i match {
-                case -1 => (true, absLower)
-                case 1 => (true, upper)
-                case 0 =>
-                  (true,
-                   absLower /*ScSkolemizedType(s"_$$${index += 1; index}", Nil, absLower, upper)*/ ) //todo: why this is right?
-              }
-            case ScSkolemizedType(_, _, skoLower, upper) =>
-              i match {
-                case -1 => (true, skoLower)
-                case 1 => (true, upper)
-                case 0 =>
-                  (true,
-                   ScSkolemizedType(s"_$$${ index += 1; index }",
-                                    Nil,
-                                    skoLower,
-                                    upper))
-              }
-            case _ => (false, tp)
-          }
-        }, variance)
+        _lower.recursiveVarianceUpdate(
+          (tp: ScType, i: Int) => {
+            tp match {
+              case ScAbstractType(_, absLower, upper) =>
+                i match {
+                  case -1 => (true, absLower)
+                  case 1 => (true, upper)
+                  case 0 =>
+                    (true,
+                     absLower /*ScSkolemizedType(s"_$$${index += 1; index}", Nil, absLower, upper)*/ ) //todo: why this is right?
+                }
+              case ScSkolemizedType(_, _, skoLower, upper) =>
+                i match {
+                  case -1 => (true, skoLower)
+                  case 1 => (true, upper)
+                  case 0 =>
+                    (true,
+                     ScSkolemizedType(s"_$$${ index += 1; index }",
+                                      Nil,
+                                      skoLower,
+                                      upper))
+                }
+              case _ => (false, tp)
+            }
+          },
+          variance
+        )
     }).unpackedType
     val lMap = if (additional) lowerAdditionalMap else lowerMap
     lMap.get(name) match {
@@ -656,33 +667,36 @@ class ScUndefinedSubstitutor(
           if variance == 1 && absUpper.equiv(Any) =>
         return this
       case _ =>
-        _upper.recursiveVarianceUpdate((tp: ScType, i: Int) => {
-          tp match {
-            case ScAbstractType(_, lower, absUpper) =>
-              i match {
-                case -1 => (true, lower)
-                case 1 => (true, absUpper)
-                case 0 =>
-                  (true,
-                   ScSkolemizedType(s"_$$${ index += 1; index }",
-                                    Nil,
-                                    lower,
-                                    absUpper)) //todo: why this is right?
-              }
-            case ScSkolemizedType(_, _, lower, skoUpper) =>
-              i match {
-                case -1 => (true, lower)
-                case 1 => (true, skoUpper)
-                case 0 =>
-                  (true,
-                   ScSkolemizedType(s"_$$${ index += 1; index }",
-                                    Nil,
-                                    lower,
-                                    skoUpper))
-              }
-            case _ => (false, tp)
-          }
-        }, variance)
+        _upper.recursiveVarianceUpdate(
+          (tp: ScType, i: Int) => {
+            tp match {
+              case ScAbstractType(_, lower, absUpper) =>
+                i match {
+                  case -1 => (true, lower)
+                  case 1 => (true, absUpper)
+                  case 0 =>
+                    (true,
+                     ScSkolemizedType(s"_$$${ index += 1; index }",
+                                      Nil,
+                                      lower,
+                                      absUpper)) //todo: why this is right?
+                }
+              case ScSkolemizedType(_, _, lower, skoUpper) =>
+                i match {
+                  case -1 => (true, lower)
+                  case 1 => (true, skoUpper)
+                  case 0 =>
+                    (true,
+                     ScSkolemizedType(s"_$$${ index += 1; index }",
+                                      Nil,
+                                      lower,
+                                      skoUpper))
+                }
+              case _ => (false, tp)
+            }
+          },
+          variance
+        )
     }).unpackedType
     val uMap = if (additional) upperAdditionalMap else upperMap
     uMap.get(name) match {

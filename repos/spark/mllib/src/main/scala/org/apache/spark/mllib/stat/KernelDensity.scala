@@ -91,20 +91,23 @@ class KernelDensity extends Serializable {
     val logStandardDeviationPlusHalfLog2Pi =
       math.log(bandwidth) + 0.5 * math.log(2 * math.Pi)
     val (densities, count) =
-      sample.aggregate((new Array[Double](n), 0L))((x, y) => {
-        var i = 0
-        while (i < n) {
-          x._1(i) += normPdf(y,
-                             bandwidth,
-                             logStandardDeviationPlusHalfLog2Pi,
-                             points(i))
-          i += 1
+      sample.aggregate((new Array[Double](n), 0L))(
+        (x, y) => {
+          var i = 0
+          while (i < n) {
+            x._1(i) += normPdf(y,
+                               bandwidth,
+                               logStandardDeviationPlusHalfLog2Pi,
+                               points(i))
+            i += 1
+          }
+          (x._1, x._2 + 1)
+        },
+        (x, y) => {
+          blas.daxpy(n, 1.0, y._1, 1, x._1, 1)
+          (x._1, x._2 + y._2)
         }
-        (x._1, x._2 + 1)
-      }, (x, y) => {
-        blas.daxpy(n, 1.0, y._1, 1, x._1, 1)
-        (x._1, x._2 + y._2)
-      })
+      )
     blas.dscal(n, 1.0 / count, densities, 1)
     densities
   }

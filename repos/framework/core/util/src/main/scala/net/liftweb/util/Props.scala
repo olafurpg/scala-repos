@@ -255,7 +255,8 @@ private[util] trait Props extends Logger {
           "org.specs2.specification.core.Execution"
         )
         st.exists(e => names.exists(e.getClassName.startsWith))
-      })
+      }
+    )
 
   /**
     * When the `run.mode` environment variable isn't set or recognised, this function is invoked to determine the
@@ -345,7 +346,8 @@ private[util] trait Props extends Logger {
     () => "/" + _modeName + _userName + _hostName,
     () => "/" + _modeName + _userName,
     () => "/" + _modeName + _hostName,
-    () => "/" + _modeName + "default.")
+    () => "/" + _modeName + "default."
+  )
 
   /**
     * This is a function that returns the first places to look for a props file.

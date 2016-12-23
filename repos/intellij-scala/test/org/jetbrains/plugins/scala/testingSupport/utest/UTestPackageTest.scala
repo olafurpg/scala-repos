@@ -9,8 +9,9 @@ trait UTestPackageTest extends UTestTestCase {
   val secondPackageName = "otherPackage"
 
   protected def addPackageTest(): Unit = {
-    addFileToProject(packageName + "/Test1.scala",
-                     """
+    addFileToProject(
+      packageName + "/Test1.scala",
+      """
         |package myPackage
         |
         |import utest.framework.TestSuite
@@ -23,10 +24,12 @@ trait UTestPackageTest extends UTestTestCase {
         |    "test2" - {}
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
 
-    addFileToProject(packageName + "/Test2.scala",
-                     """
+    addFileToProject(
+      packageName + "/Test2.scala",
+      """
         |package myPackage
         |
         |import utest.framework.TestSuite
@@ -39,10 +42,12 @@ trait UTestPackageTest extends UTestTestCase {
         |    "test2" - {}
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
 
-    addFileToProject(secondPackageName + "/Test1.scala",
-                     """
+    addFileToProject(
+      secondPackageName + "/Test1.scala",
+      """
         |package otherPackage
         |
         |import utest.framework.TestSuite
@@ -53,7 +58,8 @@ trait UTestPackageTest extends UTestTestCase {
         |    "test" - {}
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   def testPackageTestRun(): Unit = {
@@ -82,7 +88,8 @@ trait UTestPackageTest extends UTestTestCase {
                                            "Test2",
                                            "tests",
                                            "test2") &&
-          checkResultTreeDoesNotHaveNodes(root, "[root]", "test"))
+          checkResultTreeDoesNotHaveNodes(root, "[root]", "test")
+    )
   }
 
   def testModuleTestRun(): Unit = {
@@ -115,6 +122,7 @@ trait UTestPackageTest extends UTestTestCase {
                                            "[root]",
                                            "Test2",
                                            "tests",
-                                           "test"))
+                                           "test")
+    )
   }
 }

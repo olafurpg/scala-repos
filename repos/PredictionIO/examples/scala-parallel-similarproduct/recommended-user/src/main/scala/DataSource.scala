@@ -48,11 +48,13 @@ class DataSource(val dsp: DataSourceParams)
 
     // get all "user" "follow" "followedUser" events
     val followEventsRDD: RDD[FollowEvent] = eventsDb
-      .find(appId = dsp.appId,
-            entityType = Some("user"),
-            eventNames = Some(List("follow")),
-            // targetEntityType is optional field of an event.
-            targetEntityType = Some(Some("user")))(sc)
+      .find(
+        appId = dsp.appId,
+        entityType = Some("user"),
+        eventNames = Some(List("follow")),
+        // targetEntityType is optional field of an event.
+        targetEntityType = Some(Some("user"))
+      )(sc)
       // eventsDb.find() returns RDD[Event]
       .map { event =>
         val followEvent = try {

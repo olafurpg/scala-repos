@@ -166,17 +166,20 @@ class MapToGroupBySizeSumMaxTest extends WordSpec with Matchers {
       (i.toString, r.nextDouble.toString)
     }
     //Here is our expected output:
-    val goldenOutput = input.map {
-      case (line: String, x: String) =>
-        val xv = x.toDouble;
-        ((xv > 0.5), xv)
-    }.groupBy { case (kx: Boolean, x: Double) => kx }.mapValues { vals =>
-      val vlist = vals.map { case (k: Boolean, x: Double) => x }.toList
-      val size = vlist.size
-      val sum = vlist.sum
-      val max = vlist.max
-      (size, sum, max)
-    }
+    val goldenOutput = input
+      .map {
+        case (line: String, x: String) =>
+          val xv = x.toDouble;
+          ((xv > 0.5), xv)
+      }
+      .groupBy { case (kx: Boolean, x: Double) => kx }
+      .mapValues { vals =>
+        val vlist = vals.map { case (k: Boolean, x: Double) => x }.toList
+        val size = vlist.size
+        val sum = vlist.sum
+        val max = vlist.max
+        (size, sum, max)
+      }
     //Now we have the expected input and output:
     JobTest(new MapToGroupBySizeSumMaxJob(_))
       .arg("input", "fakeInput")
@@ -685,26 +688,30 @@ class SizeAveStdSpec extends WordSpec with Matchers {
     val input = (0 to 10000).map { i =>
       (i.toString, r.nextDouble.toString + " " + powerLawRand.toString)
     }
-    val output = input.map { numline =>
-      numline._2.split(" ").map { _.toDouble }
-    }.map { vec =>
-      ((vec(0) * 4).toInt, vec(1))
-    }.groupBy { tup =>
-      tup._1
-    }.mapValues { tups =>
-      val all = tups.map { tup =>
-        tup._2.toDouble
-      }.toList
-      val size = all.size.toLong
-      val ave = all.sum / size
-      //Compute the standard deviation:
-      val vari =
-        all.map { x =>
-          (x - ave) * (x - ave)
-        }.sum / (size)
-      val stdev = scala.math.sqrt(vari)
-      (size, ave, stdev)
-    }
+    val output = input
+      .map { numline =>
+        numline._2.split(" ").map { _.toDouble }
+      }
+      .map { vec =>
+        ((vec(0) * 4).toInt, vec(1))
+      }
+      .groupBy { tup =>
+        tup._1
+      }
+      .mapValues { tups =>
+        val all = tups.map { tup =>
+          tup._2.toDouble
+        }.toList
+        val size = all.size.toLong
+        val ave = all.sum / size
+        //Compute the standard deviation:
+        val vari =
+          all.map { x =>
+            (x - ave) * (x - ave)
+          }.sum / (size)
+        val stdev = scala.math.sqrt(vari)
+        (size, ave, stdev)
+      }
     JobTest(new SizeAveStdJob(_))
       .arg("input", "fakeInput")
       .arg("output", "fakeOutput")
@@ -1828,9 +1835,12 @@ class SampleWithReplacementTest extends WordSpec with Matchers {
   import com.twitter.scalding.mathematics.Poisson
 
   val p = new Poisson(1.0, 0)
-  val simulated = (1 to 100).map { i =>
-    i -> p.nextInt
-  }.filterNot(_._2 == 0).toSet
+  val simulated = (1 to 100)
+    .map { i =>
+      i -> p.nextInt
+    }
+    .filterNot(_._2 == 0)
+    .toSet
 
   "A SampleWithReplacementJob" should {
     JobTest(new SampleWithReplacementJob(_))
@@ -2023,7 +2033,8 @@ class CounterJobTest extends WordSpec with Matchers {
                      ("s smith", 12),
                      ("jill q", 55),
                      ("some child", 8))
-    val expectedOutput = input.collect { case (name, age) if age > 18 => age }.sum.toString
+    val expectedOutput =
+      input.collect { case (name, age) if age > 18 => age }.sum.toString
 
     "have the right counter and output values" in {
       JobTest(new CounterJob(_))

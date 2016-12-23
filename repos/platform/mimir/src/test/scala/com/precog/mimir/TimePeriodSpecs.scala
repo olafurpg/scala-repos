@@ -118,13 +118,14 @@ trait TimePeriodSpecs[M[+ _]]
 
       result mustEqual Set(
         (Vector(),
-         SArray(
-           Vector(SString("1987-12-09T18:33:02.037Z"),
-                  SString("1991-06-14T07:03:07.037Z"),
-                  SString("1994-12-18T19:33:12.037Z"),
-                  SString("1998-06-23T08:03:17.037Z"),
-                  SString("2001-12-27T20:33:22.037Z"),
-                  SString("2005-07-02T09:03:27.037Z")))))
+         SArray(Vector(
+           SString("1987-12-09T18:33:02.037Z"),
+           SString("1991-06-14T07:03:07.037Z"),
+           SString("1994-12-18T19:33:12.037Z"),
+           SString("1998-06-23T08:03:17.037Z"),
+           SString("2001-12-27T20:33:22.037Z"),
+           SString("2005-07-02T09:03:27.037Z")
+         ))))
     }
 
     "compute correct range given end earlier than start" in {
@@ -202,18 +203,20 @@ trait TimePeriodSpecs[M[+ _]]
       result must haveSize(4)
 
       val expected: Map[SValue, SArray] =
-        Map(SString("PT1H") -> SArray(
-              Vector(SString("1991-06-14T07:03:07.037Z"),
-                     SString("1991-06-14T08:03:07.037Z"))),
-            SString("P1Y") -> SArray(
-              Vector(SString("1991-06-14T07:03:07.037Z"))),
-            SString("PT5S") -> SArray(
-              Vector(SString("1991-06-14T07:03:07.037Z"),
-                     SString("1991-06-14T07:03:12.037Z"))),
-            SString("P2M") -> SArray(
-              Vector(SString("1991-06-14T07:03:07.037Z"),
-                     SString("1991-08-14T07:03:07.037Z"),
-                     SString("1991-10-14T07:03:07.037Z"))))
+        Map(
+          SString("PT1H") -> SArray(
+            Vector(SString("1991-06-14T07:03:07.037Z"),
+                   SString("1991-06-14T08:03:07.037Z"))),
+          SString("P1Y") -> SArray(
+            Vector(SString("1991-06-14T07:03:07.037Z"))),
+          SString("PT5S") -> SArray(
+            Vector(SString("1991-06-14T07:03:07.037Z"),
+                   SString("1991-06-14T07:03:12.037Z"))),
+          SString("P2M") -> SArray(
+            Vector(SString("1991-06-14T07:03:07.037Z"),
+                   SString("1991-08-14T07:03:07.037Z"),
+                   SString("1991-10-14T07:03:07.037Z")))
+        )
 
       result must haveAllElementsLike {
         case (ids, obj) =>

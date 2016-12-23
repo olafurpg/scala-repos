@@ -108,7 +108,8 @@ class ScalateSupportSpec extends ScalatraSpec {
         response.setHeader("X-Template-Output", layoutTemplate("simple"))
       }
     },
-    "/*")
+    "/*"
+  )
 
   def e1 = get("/barf") {
     body must contain("id=\"scalate-error\"")

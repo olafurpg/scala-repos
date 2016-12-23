@@ -345,18 +345,20 @@ object PlayDocsValidation {
       }
     val (matchingFiles, changedPathFiles) =
       matchingFilesByName.partition(f => f._1.name == f._2.name)
-    val (codeSampleIssues, okFiles) = matchingFiles.map {
-      case (actualFile, upstreamFile) =>
-        val missingCodeSamples = upstreamFile.codeSamples.filterNot(
-          hasCodeSample(actualFile.codeSamples))
-        val introducedCodeSamples = actualFile.codeSamples.filterNot(
-          hasCodeSample(actualFile.codeSamples))
-        TranslationCodeSamples(actualFile.name,
-                               missingCodeSamples,
-                               introducedCodeSamples,
-                               upstreamFile.codeSamples.size)
-    }.partition(c =>
-      c.missingCodeSamples.nonEmpty || c.introducedCodeSamples.nonEmpty)
+    val (codeSampleIssues, okFiles) = matchingFiles
+      .map {
+        case (actualFile, upstreamFile) =>
+          val missingCodeSamples = upstreamFile.codeSamples.filterNot(
+            hasCodeSample(actualFile.codeSamples))
+          val introducedCodeSamples = actualFile.codeSamples.filterNot(
+            hasCodeSample(actualFile.codeSamples))
+          TranslationCodeSamples(actualFile.name,
+                                 missingCodeSamples,
+                                 introducedCodeSamples,
+                                 upstreamFile.codeSamples.size)
+      }
+      .partition(c =>
+        c.missingCodeSamples.nonEmpty || c.introducedCodeSamples.nonEmpty)
 
     val result = TranslationReport(
       untranslatedFiles,
@@ -460,7 +462,8 @@ object PlayDocsValidation {
         validationConfig.downstreamWikiPages(link.link) ||
         combinedRepo.findFileWithName(link.link + ".md").nonEmpty
       },
-      "Could not find link")
+      "Could not find link"
+    )
 
     def relativeLinkOk(link: LinkRef) = {
       link match {
@@ -517,10 +520,14 @@ object PlayDocsValidation {
       }
     }
 
-    assertLinksNotMissing("Missing source segments test", existing.collect {
-      case sample if !segmentExists(sample) =>
-        LinkRef(sample.segment, sample.file, sample.segmentPosition)
-    }, "Could not find source segment")
+    assertLinksNotMissing(
+      "Missing source segments test",
+      existing.collect {
+        case sample if !segmentExists(sample) =>
+          LinkRef(sample.segment, sample.file, sample.segmentPosition)
+      },
+      "Could not find source segment"
+    )
 
     val allLinks = report.wikiLinks.map(_.link).toSet
 
@@ -548,10 +555,14 @@ object PlayDocsValidation {
     val log = streams.value.log
     val report = generateMarkdownRefReport.value
 
-    val grouped = report.externalLinks.groupBy { _.link }.filterNot { e =>
-      e._1.startsWith("http://localhost:") || e._1.contains("example.com") ||
-      e._1.startsWith("http://127.0.0.1")
-    }.toSeq.sortBy { _._1 }
+    val grouped = report.externalLinks
+      .groupBy { _.link }
+      .filterNot { e =>
+        e._1.startsWith("http://localhost:") || e._1.contains("example.com") ||
+        e._1.startsWith("http://127.0.0.1")
+      }
+      .toSeq
+      .sortBy { _._1 }
 
     implicit val ec =
       ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(50))

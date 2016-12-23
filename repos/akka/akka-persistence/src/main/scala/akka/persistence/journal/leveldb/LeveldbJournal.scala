@@ -33,8 +33,8 @@ private[persistence] class LeveldbJournal extends {
       import context.dispatcher
       val readHighestSequenceNrFrom = math.max(0L, fromSequenceNr - 1)
       asyncReadHighestSequenceNr(tagAsPersistenceId(tag),
-                                 readHighestSequenceNrFrom).flatMap {
-        highSeqNr ⇒
+                                 readHighestSequenceNrFrom)
+        .flatMap { highSeqNr ⇒
           val toSeqNr = math.min(toSequenceNr, highSeqNr)
           if (highSeqNr == 0L || fromSequenceNr > toSeqNr)
             Future.successful(highSeqNr)
@@ -49,11 +49,14 @@ private[persistence] class LeveldbJournal extends {
                 }
             }.map(_ ⇒ highSeqNr)
           }
-      }.map { highSeqNr ⇒
-        RecoverySuccess(highSeqNr)
-      }.recover {
-        case e ⇒ ReplayMessagesFailure(e)
-      }.pipeTo(replyTo)
+        }
+        .map { highSeqNr ⇒
+          RecoverySuccess(highSeqNr)
+        }
+        .recover {
+          case e ⇒ ReplayMessagesFailure(e)
+        }
+        .pipeTo(replyTo)
 
     case SubscribePersistenceId(persistenceId: String) ⇒
       addPersistenceIdSubscriber(sender(), persistenceId)

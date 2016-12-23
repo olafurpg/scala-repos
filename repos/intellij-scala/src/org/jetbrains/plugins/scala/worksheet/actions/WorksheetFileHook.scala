@@ -53,34 +53,37 @@ class WorksheetFileHook(private val project: Project)
                  WorksheetEditorListener)
     project.getMessageBus
       .connect(project)
-      .subscribe(DumbService.DUMB_MODE, new DumbModeListener {
-        override def enteredDumbMode() {}
+      .subscribe(
+        DumbService.DUMB_MODE,
+        new DumbModeListener {
+          override def enteredDumbMode() {}
 
-        override def exitDumbMode() {
-          val editor =
-            FileEditorManager.getInstance(project).getSelectedTextEditor
-          if (editor == null) return
+          override def exitDumbMode() {
+            val editor =
+              FileEditorManager.getInstance(project).getSelectedTextEditor
+            if (editor == null) return
 
-          val file =
-            PsiDocumentManager
-              .getInstance(project) getPsiFile editor.getDocument
-          if (file == null) return
+            val file =
+              PsiDocumentManager
+                .getInstance(project) getPsiFile editor.getDocument
+            if (file == null) return
 
-          val vFile = file.getVirtualFile
-          if (vFile == null) return
+            val vFile = file.getVirtualFile
+            if (vFile == null) return
 
-          WorksheetFileHook getPanel vFile foreach {
-            case ref =>
-              val panel = ref.get()
-              if (panel != null) {
-                panel.getComponents.foreach {
-                  case ab: ActionButton => ab.addNotify()
-                  case _ =>
+            WorksheetFileHook getPanel vFile foreach {
+              case ref =>
+                val panel = ref.get()
+                if (panel != null) {
+                  panel.getComponents.foreach {
+                    case ab: ActionButton => ab.addNotify()
+                    case _ =>
+                  }
                 }
-              }
+            }
           }
         }
-      })
+      )
   }
 
   override def getComponentName: String = "Clean worksheet on editor close"

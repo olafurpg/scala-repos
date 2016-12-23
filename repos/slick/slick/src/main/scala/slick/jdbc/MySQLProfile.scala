@@ -180,15 +180,19 @@ trait MySQLProfile extends JdbcProfile { profile =>
             StructNode(
               ConstArray(new AnonSymbol -> RowNumGen(countSym, offset - 1))))),
         JoinType.Inner,
-        LiteralNode(true))
+        LiteralNode(true)
+      )
       var first = true
-      Subquery(Bind(s1, j, p.replace {
-        case Select(Ref(s), ElementSymbol(2)) if s == s1 =>
-          val r = RowNum(countSym, first)
-          first = false
-          r
-        case r @ Ref(s) if s == s1 => r.untyped
-      }), Subquery.Default).infer()
+      Subquery(
+        Bind(s1, j, p.replace {
+          case Select(Ref(s), ElementSymbol(2)) if s == s1 =>
+            val r = RowNum(countSym, first)
+            first = false
+            r
+          case r @ Ref(s) if s == s1 => r.untyped
+        }),
+        Subquery.Default
+      ).infer()
     }
   }
 
@@ -306,10 +310,13 @@ trait MySQLProfile extends JdbcProfile { profile =>
           "create function " + quoteIdentifier(seq.name + "_currval") +
             "() returns " +
             sqlType + " begin " + "select max(id) into @v from " +
-            quoteIdentifier(seq.name + "_seq") + "; return @v; end"),
-        Iterable("drop function " + quoteIdentifier(seq.name + "_currval"),
-                 "drop function " + quoteIdentifier(seq.name + "_nextval"),
-                 "drop table " + quoteIdentifier(seq.name + "_seq"))
+            quoteIdentifier(seq.name + "_seq") + "; return @v; end"
+        ),
+        Iterable(
+          "drop function " + quoteIdentifier(seq.name + "_currval"),
+          "drop function " + quoteIdentifier(seq.name + "_nextval"),
+          "drop table " + quoteIdentifier(seq.name + "_seq")
+        )
       )
     }
   }

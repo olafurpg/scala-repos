@@ -31,11 +31,13 @@ package scalaguide.http.scalabodyparsers {
           val jsonBody: Option[JsValue] = body.asJson
 
           // Expecting json body
-          jsonBody.map { json =>
-            Ok("Got: " + (json \ "name").as[String])
-          }.getOrElse {
-            BadRequest("Expecting application/json request body")
-          }
+          jsonBody
+            .map { json =>
+              Ok("Got: " + (json \ "name").as[String])
+            }
+            .getOrElse {
+              BadRequest("Expecting application/json request body")
+            }
         }
         //#access-json-body
         testAction(save, helloRequest)

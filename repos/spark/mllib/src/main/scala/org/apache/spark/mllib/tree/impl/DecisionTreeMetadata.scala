@@ -142,7 +142,8 @@ private[spark] object DecisionTreeMetadata extends Logging {
         s"DecisionTree requires maxBins (= $maxPossibleBins) to be at least as large as the " +
           s"number of values in each categorical feature, but categorical feature $maxCategory " +
           s"has $maxCategoriesPerFeature values. Considering remove this and other categorical " +
-          "features with a large number of values, or add more training examples.")
+          "features with a large number of values, or add more training examples."
+      )
     }
 
     val unorderedFeatures = new mutable.HashSet[Int]()
@@ -201,20 +202,22 @@ private[spark] object DecisionTreeMetadata extends Logging {
       case "onethird" => (numFeatures / 3.0).ceil.toInt
     }
 
-    new DecisionTreeMetadata(numFeatures,
-                             numExamples,
-                             numClasses,
-                             numBins.max,
-                             strategy.categoricalFeaturesInfo,
-                             unorderedFeatures.toSet,
-                             numBins,
-                             strategy.impurity,
-                             strategy.quantileCalculationStrategy,
-                             strategy.maxDepth,
-                             strategy.minInstancesPerNode,
-                             strategy.minInfoGain,
-                             numTrees,
-                             numFeaturesPerNode)
+    new DecisionTreeMetadata(
+      numFeatures,
+      numExamples,
+      numClasses,
+      numBins.max,
+      strategy.categoricalFeaturesInfo,
+      unorderedFeatures.toSet,
+      numBins,
+      strategy.impurity,
+      strategy.quantileCalculationStrategy,
+      strategy.maxDepth,
+      strategy.minInstancesPerNode,
+      strategy.minInfoGain,
+      numTrees,
+      numFeaturesPerNode
+    )
   }
 
   /**

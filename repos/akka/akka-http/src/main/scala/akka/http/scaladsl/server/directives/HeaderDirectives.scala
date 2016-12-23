@@ -31,11 +31,12 @@ trait HeaderDirectives {
                                        Some(e))))
     }
 
-    extract(_.request.headers.collectFirst(Function.unlift(protectedF))).flatMap {
-      case Some(Right(a)) ⇒ provide(a)
-      case Some(Left(rejection)) ⇒ reject(rejection)
-      case None ⇒ reject
-    }
+    extract(_.request.headers.collectFirst(Function.unlift(protectedF)))
+      .flatMap {
+        case Some(Right(a)) ⇒ provide(a)
+        case Some(Left(rejection)) ⇒ reject(rejection)
+        case None ⇒ reject
+      }
   }
 
   /**

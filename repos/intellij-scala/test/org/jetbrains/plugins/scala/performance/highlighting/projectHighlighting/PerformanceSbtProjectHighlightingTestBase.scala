@@ -50,7 +50,8 @@ abstract class PerformanceSbtProjectHighlightingTestBase
             psiFile.accept(visitor)
             fileManager.cleanupForNextTest()
           }
-        })
+        }
+      )
       .cpuBound()
       .assertTiming()
   }

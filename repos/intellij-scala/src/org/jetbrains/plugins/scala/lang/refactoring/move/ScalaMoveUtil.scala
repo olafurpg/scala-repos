@@ -196,11 +196,13 @@ object ScalaMoveUtil {
       case p: ScPackage => p.getClasses.toSeq
       case _ => Nil
     }
-    classes.flatMap {
-      case td: ScTypeDefinition =>
-        td :: ScalaPsiUtil.getBaseCompanionModule(td).toList
-      case e => List(e)
-    }.foreach(_.putUserData(MOVE_DESTINATION, moveDestination))
+    classes
+      .flatMap {
+        case td: ScTypeDefinition =>
+          td :: ScalaPsiUtil.getBaseCompanionModule(td).toList
+        case e => List(e)
+      }
+      .foreach(_.putUserData(MOVE_DESTINATION, moveDestination))
   }
 
   def getMoveDestination(@NotNull element: PsiElement): PsiDirectory =

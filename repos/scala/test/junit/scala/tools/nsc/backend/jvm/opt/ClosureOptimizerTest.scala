@@ -83,20 +83,24 @@ class ClosureOptimizerTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compileClasses(compiler)(code)
-    assertSameCode(getSingleMethod(c, "t"),
-                   List(VarOp(ALOAD, 1),
-                        Invoke(INVOKEVIRTUAL,
-                               "scala/collection/immutable/List",
-                               "head",
-                               "()Ljava/lang/Object;",
-                               false),
-                        TypeOp(CHECKCAST, "java/lang/String"),
-                        Invoke(INVOKESTATIC,
-                               "C",
-                               "C$$$anonfun$1",
-                               "(Ljava/lang/String;)Ljava/lang/String;",
-                               false),
-                        Op(ARETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t"),
+      List(
+        VarOp(ALOAD, 1),
+        Invoke(INVOKEVIRTUAL,
+               "scala/collection/immutable/List",
+               "head",
+               "()Ljava/lang/Object;",
+               false),
+        TypeOp(CHECKCAST, "java/lang/String"),
+        Invoke(INVOKESTATIC,
+               "C",
+               "C$$$anonfun$1",
+               "(Ljava/lang/String;)Ljava/lang/String;",
+               false),
+        Op(ARETURN)
+      )
+    )
   }
 
   @Test

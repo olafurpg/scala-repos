@@ -184,29 +184,34 @@ class BisectingKMeans private (private var k: Int,
       }
       // If we don't need all divisible clusters, take the larger ones.
       if (divisibleClusters.size > numLeafClustersNeeded) {
-        divisibleClusters = divisibleClusters.toSeq.sortBy {
-          case (_, summary) =>
-            -summary.size
-        }.take(numLeafClustersNeeded).toMap
+        divisibleClusters = divisibleClusters.toSeq
+          .sortBy {
+            case (_, summary) =>
+              -summary.size
+          }
+          .take(numLeafClustersNeeded)
+          .toMap
       }
       if (divisibleClusters.nonEmpty) {
         val divisibleIndices = divisibleClusters.keys.toSet
         logInfo(s"Dividing ${divisibleIndices.size} clusters on level $level.")
-        var newClusterCenters = divisibleClusters.flatMap {
-          case (index, summary) =>
-            val (left, right) = splitCenter(summary.center, random)
-            Iterator((leftChildIndex(index), left),
-                     (rightChildIndex(index), right))
-        }.map(identity) // workaround for a Scala bug (SI-7005) that produces a not serializable map
+        var newClusterCenters = divisibleClusters
+          .flatMap {
+            case (index, summary) =>
+              val (left, right) = splitCenter(summary.center, random)
+              Iterator((leftChildIndex(index), left),
+                       (rightChildIndex(index), right))
+          }
+          .map(identity) // workaround for a Scala bug (SI-7005) that produces a not serializable map
         var newClusters: Map[Long, ClusterSummary] = null
         var newAssignments: RDD[(Long, VectorWithNorm)] = null
         for (iter <- 0 until maxIterations) {
-          newAssignments = updateAssignments(assignments,
-                                             divisibleIndices,
-                                             newClusterCenters).filter {
-            case (index, _) =>
-              divisibleIndices.contains(parentIndex(index))
-          }
+          newAssignments =
+            updateAssignments(assignments, divisibleIndices, newClusterCenters)
+              .filter {
+                case (index, _) =>
+                  divisibleIndices.contains(parentIndex(index))
+              }
           newClusters = summarize(d, newAssignments)
           newClusterCenters = newClusters.mapValues(_.center).map(identity)
         }
@@ -508,10 +513,12 @@ private[clustering] class ClusteringTreeNode private[clustering] (
     if (isLeaf) {
       (index, cost)
     } else {
-      val (selectedChild, minCost) = children.map { child =>
-        (child,
-         KMeans.fastSquaredDistance(child.centerWithNorm, pointWithNorm))
-      }.minBy(_._2)
+      val (selectedChild, minCost) = children
+        .map { child =>
+          (child,
+           KMeans.fastSquaredDistance(child.centerWithNorm, pointWithNorm))
+        }
+        .minBy(_._2)
       selectedChild.predict(pointWithNorm, minCost)
     }
   }

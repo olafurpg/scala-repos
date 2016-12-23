@@ -40,7 +40,8 @@ import org.apache.spark.unsafe.Platform
 @ExpressionDescription(
   usage =
     "_FUNC_(input) - Returns an MD5 128-bit checksum as a hex string of the input",
-  extended = "> SELECT _FUNC_('Spark');\n '8cde774d6f7333752ed72cacddb05126'")
+  extended = "> SELECT _FUNC_('Spark');\n '8cde774d6f7333752ed72cacddb05126'"
+)
 case class Md5(child: Expression)
     extends UnaryExpression
     with ImplicitCastInputTypes {
@@ -76,7 +77,8 @@ case class Md5(child: Expression)
             SHA-224, SHA-256, SHA-384, and SHA-512 are supported. Bit length of 0 is equivalent to 256.""",
   extended =
     """> SELECT _FUNC_('Spark', 0);
-               '529bc3b07127ecb7e53a4dcf1991d9152c24537d919178022b2c42657f79a26b'""")
+               '529bc3b07127ecb7e53a4dcf1991d9152c24537d919178022b2c42657f79a26b'"""
+)
 // scalastyle:on line.size.limit
 case class Sha2(left: Expression, right: Expression)
     extends BinaryExpression
@@ -114,8 +116,11 @@ case class Sha2(left: Expression, right: Expression)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val digestUtils = "org.apache.commons.codec.digest.DigestUtils"
-    nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (eval1, eval2) => {
+        s"""
         if ($eval2 == 224) {
           try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-224");
@@ -137,7 +142,8 @@ case class Sha2(left: Expression, right: Expression)
           ${ev.isNull} = true;
         }
       """
-    })
+      }
+    )
   }
 }
 
@@ -149,7 +155,8 @@ case class Sha2(left: Expression, right: Expression)
   usage =
     "_FUNC_(input) - Returns a sha1 hash value as a hex string of the input",
   extended =
-    "> SELECT _FUNC_('Spark');\n '85f5955f4b27a9a4c2aab6ffe5d7189fc298b92c'")
+    "> SELECT _FUNC_('Spark');\n '85f5955f4b27a9a4c2aab6ffe5d7189fc298b92c'"
+)
 case class Sha1(child: Expression)
     extends UnaryExpression
     with ImplicitCastInputTypes {
@@ -196,13 +203,17 @@ case class Crc32(child: Expression)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val CRC32 = "java.util.zip.CRC32"
-    nullSafeCodeGen(ctx, ev, value => {
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      value => {
+        s"""
         $CRC32 checksum = new $CRC32();
         checksum.update($value, 0, $value.length);
         ${ev.value} = checksum.getValue();
       """
-    })
+      }
+    )
   }
 }
 
@@ -356,12 +367,14 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     ev.isNull = "false"
-    val childrenHash = children.map { child =>
-      val childGen = child.gen(ctx)
-      childGen.code + ctx.nullSafeExec(child.nullable, childGen.isNull) {
-        computeHash(childGen.value, child.dataType, ev.value, ctx)
+    val childrenHash = children
+      .map { child =>
+        val childGen = child.gen(ctx)
+        childGen.code + ctx.nullSafeExec(child.nullable, childGen.isNull) {
+          computeHash(childGen.value, child.dataType, ev.value, ctx)
+        }
       }
-    }.mkString("\n")
+      .mkString("\n")
 
     s"""
       int ${ev.value} = $seed;
@@ -454,15 +467,17 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
         """
 
       case StructType(fields) =>
-        fields.zipWithIndex.map {
-          case (field, index) =>
-            nullSafeElementHash(input,
-                                index.toString,
-                                field.nullable,
-                                field.dataType,
-                                result,
-                                ctx)
-        }.mkString("\n")
+        fields.zipWithIndex
+          .map {
+            case (field, index) =>
+              nullSafeElementHash(input,
+                                  index.toString,
+                                  field.nullable,
+                                  field.dataType,
+                                  result,
+                                  ctx)
+          }
+          .mkString("\n")
 
       case udt: UserDefinedType[_] =>
         computeHash(input, udt.sqlType, result, ctx)

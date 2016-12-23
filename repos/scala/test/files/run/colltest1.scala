@@ -129,21 +129,8 @@ object Test extends App {
     assert(ten contains 10)
     assert(!(ten contains 0))
     assert(
-      (empty ++ (1 to 7) union empty ++ (3 to 10)) == List(1,
-                                                           2,
-                                                           3,
-                                                           4,
-                                                           5,
-                                                           6,
-                                                           7,
-                                                           3,
-                                                           4,
-                                                           5,
-                                                           6,
-                                                           7,
-                                                           8,
-                                                           9,
-                                                           10))
+      (empty ++ (1 to 7) union empty ++ (3 to 10)) == List(1, 2, 3, 4, 5, 6, 7,
+        3, 4, 5, 6, 7, 8, 9, 10))
     assert((ten diff ten).isEmpty)
     assert((ten diff List()) == ten)
     assert(

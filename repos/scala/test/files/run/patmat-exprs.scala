@@ -522,10 +522,10 @@ trait Pattern {
     override lazy val hashCode = ScalaRunTime._hashCode(this);
   }
 
-  abstract class Compare[T](left: Expr[T],
-                            right: Expr[T],
-                            cmp: (T,
-                                  T) => Boolean)(implicit num: NumericOps[T])
+  abstract class Compare[T](
+      left: Expr[T],
+      right: Expr[T],
+      cmp: (T, T) => Boolean)(implicit num: NumericOps[T])
       extends Expr[Boolean] {
     def derivative(v: Var[Boolean]) =
       throw new IllegalStateException("Derivative of Boolean not allowed")

@@ -40,19 +40,22 @@ class RecipeByteStrings extends RecipeSpec {
                 else pull(in)
               }
             })
-            setHandler(in, new InHandler {
-              override def onPush(): Unit = {
-                val elem = grab(in)
-                buffer ++= elem
-                emitChunk()
-              }
+            setHandler(
+              in,
+              new InHandler {
+                override def onPush(): Unit = {
+                  val elem = grab(in)
+                  buffer ++= elem
+                  emitChunk()
+                }
 
-              override def onUpstreamFinish(): Unit = {
-                if (buffer.isEmpty) completeStage()
-                // elements left in buffer, keep accepting downstream pulls
-                // and push from buffer until buffer is emitted
+                override def onUpstreamFinish(): Unit = {
+                  if (buffer.isEmpty) completeStage()
+                  // elements left in buffer, keep accepting downstream pulls
+                  // and push from buffer until buffer is emitted
+                }
               }
-            })
+            )
 
             private def emitChunk(): Unit = {
               if (buffer.isEmpty) {
@@ -95,20 +98,24 @@ class RecipeByteStrings extends RecipeSpec {
           new GraphStageLogic(shape) {
             private var count = 0
 
-            setHandlers(in, out, new InHandler with OutHandler {
+            setHandlers(
+              in,
+              out,
+              new InHandler with OutHandler {
 
-              override def onPull(): Unit = {
-                pull(in)
-              }
+                override def onPull(): Unit = {
+                  pull(in)
+                }
 
-              override def onPush(): Unit = {
-                val chunk = grab(in)
-                count += chunk.size
-                if (count > maximumBytes)
-                  failStage(new IllegalStateException("Too much bytes"))
-                else push(out, chunk)
+                override def onPush(): Unit = {
+                  val chunk = grab(in)
+                  count += chunk.size
+                  if (count > maximumBytes)
+                    failStage(new IllegalStateException("Too much bytes"))
+                  else push(out, chunk)
+                }
               }
-            })
+            )
           }
       }
 

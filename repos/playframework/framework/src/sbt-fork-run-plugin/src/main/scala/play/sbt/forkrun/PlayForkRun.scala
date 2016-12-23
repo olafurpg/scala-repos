@@ -93,26 +93,28 @@ object PlayForkRun extends AutoPlugin {
   }
 
   def forkOptionsTask = Def.task[PlayForkOptions] {
-    PlayForkOptions(workingDirectory = baseDirectory.value,
-                    jvmOptions = (javaOptions in (Compile, run)).value,
-                    classpath = (managedClasspath in ForkRun).value.files,
-                    baseDirectory = (baseDirectory in ThisBuild).value,
-                    configKey = thisProjectRef.value.project + "/" +
-                        playForkConfig.key.label,
-                    logLevel =
-                      ((logLevel in (Compile, run)) ?? Level.Info).value,
-                    logSbtEvents = playForkLogSbtEvents.value,
-                    shutdownTimeout = playForkShutdownTimeout.value)
+    PlayForkOptions(
+      workingDirectory = baseDirectory.value,
+      jvmOptions = (javaOptions in (Compile, run)).value,
+      classpath = (managedClasspath in ForkRun).value.files,
+      baseDirectory = (baseDirectory in ThisBuild).value,
+      configKey = thisProjectRef.value.project + "/" +
+          playForkConfig.key.label,
+      logLevel = ((logLevel in (Compile, run)) ?? Level.Info).value,
+      logSbtEvents = playForkLogSbtEvents.value,
+      shutdownTimeout = playForkShutdownTimeout.value
+    )
   }
 
   def forkRunTask = Def.inputTask[Unit] {
     val args = Def.spaceDelimited().parsed
     val jobService = BackgroundJobServiceKeys.jobService.value
-    val handle = jobService.runInBackgroundThread(resolvedScoped.value, {
-      (_, uiContext) =>
+    val handle = jobService.runInBackgroundThread(
+      resolvedScoped.value, { (_, uiContext) =>
         // use normal task streams log rather than the background run logger
         PlayForkProcess(playForkOptions.value, args, streams.value.log)
-    })
+      }
+    )
     PlayConsoleInteractionMode.waitForCancel()
     jobService.stop(handle)
     jobService.waitFor(handle)

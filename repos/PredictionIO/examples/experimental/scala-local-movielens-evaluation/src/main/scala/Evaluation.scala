@@ -17,14 +17,16 @@ import io.prediction.controller.EngineParams
 import com.github.nscala_time.time.Imports._
 
 object CommonParams {
-  val DataSourceAttributeNames = AttributeNames(user = "pio_user",
-                                                item = "pio_item",
-                                                u2iActions = Set("rate"),
-                                                itypes = "pio_itypes",
-                                                starttime = "pio_starttime",
-                                                endtime = "pio_endtime",
-                                                inactive = "pio_inactive",
-                                                rating = "pio_rating")
+  val DataSourceAttributeNames = AttributeNames(
+    user = "pio_user",
+    item = "pio_item",
+    u2iActions = Set("rate"),
+    itypes = "pio_itypes",
+    starttime = "pio_starttime",
+    endtime = "pio_endtime",
+    inactive = "pio_inactive",
+    rating = "pio_rating"
+  )
 
   val PreparatorParams =
     new PreparatorParams(actions = Map("rate" -> None), conflict = "latest")
@@ -39,7 +41,8 @@ object CommonParams {
     numUserActions = 50,
     freshness = 0,
     freshnessTimeUnit = 86400,
-    recommendationTime = Some(DateTime.now.millis))
+    recommendationTime = Some(DateTime.now.millis)
+  )
 
   val CompleteDataSourceParams = EventsDataSourceParams(
     appId = 9,
@@ -49,7 +52,8 @@ object CommonParams {
       new EventsSlidingEvalParams(firstTrainingUntilTime =
                                     new DateTime(1998, 2, 1, 0, 0),
                                   evalDuration = Duration.standardDays(7),
-                                  evalCount = 12)))
+                                  evalCount = 12))
+  )
 }
 
 object Evaluation1 {

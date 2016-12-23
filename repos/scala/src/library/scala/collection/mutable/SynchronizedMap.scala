@@ -26,7 +26,8 @@ import scala.annotation.migration
   */
 @deprecated(
   "Synchronization via traits is deprecated as it is inherently unreliable.  Consider java.util.concurrent.ConcurrentHashMap as an alternative.",
-  "2.11.0")
+  "2.11.0"
+)
 trait SynchronizedMap[A, B] extends Map[A, B] {
 
   abstract override def get(key: A): Option[B] = synchronized {

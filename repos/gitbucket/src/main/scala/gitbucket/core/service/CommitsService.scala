@@ -38,17 +38,19 @@ trait CommitsService {
                           oldLine: Option[Int],
                           newLine: Option[Int],
                           issueId: Option[Int])(implicit s: Session): Int =
-    CommitComments.autoInc insert CommitComment(userName = owner,
-                                                repositoryName = repository,
-                                                commitId = commitId,
-                                                commentedUserName = loginUser,
-                                                content = content,
-                                                fileName = fileName,
-                                                oldLine = oldLine,
-                                                newLine = newLine,
-                                                registeredDate = currentDate,
-                                                updatedDate = currentDate,
-                                                issueId = issueId)
+    CommitComments.autoInc insert CommitComment(
+      userName = owner,
+      repositoryName = repository,
+      commitId = commitId,
+      commentedUserName = loginUser,
+      content = content,
+      fileName = fileName,
+      oldLine = oldLine,
+      newLine = newLine,
+      registeredDate = currentDate,
+      updatedDate = currentDate,
+      issueId = issueId
+    )
 
   def updateCommitComment(commentId: Int, content: String)(
       implicit s: Session) =

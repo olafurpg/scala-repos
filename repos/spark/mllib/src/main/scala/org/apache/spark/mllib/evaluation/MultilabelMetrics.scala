@@ -41,10 +41,13 @@ class MultilabelMetrics @Since("1.2.0")(
 
   private lazy val numDocs: Long = predictionAndLabels.count()
 
-  private lazy val numLabels: Long = predictionAndLabels.flatMap {
-    case (_, labels) =>
-      labels
-  }.distinct().count()
+  private lazy val numLabels: Long = predictionAndLabels
+    .flatMap {
+      case (_, labels) =>
+        labels
+    }
+    .distinct()
+    .count()
 
   /**
     * Returns subset accuracy
@@ -52,10 +55,13 @@ class MultilabelMetrics @Since("1.2.0")(
     */
   @Since("1.2.0")
   lazy val subsetAccuracy: Double =
-    predictionAndLabels.filter {
-      case (predictions, labels) =>
-        predictions.deep == labels.deep
-    }.count().toDouble / numDocs
+    predictionAndLabels
+      .filter {
+        case (predictions, labels) =>
+          predictions.deep == labels.deep
+      }
+      .count()
+      .toDouble / numDocs
 
   /**
     * Returns accuracy
@@ -115,20 +121,26 @@ class MultilabelMetrics @Since("1.2.0")(
           (predictions.length + labels.length)
     }.sum / numDocs
 
-  private lazy val tpPerClass = predictionAndLabels.flatMap {
-    case (predictions, labels) =>
-      predictions.intersect(labels)
-  }.countByValue()
+  private lazy val tpPerClass = predictionAndLabels
+    .flatMap {
+      case (predictions, labels) =>
+        predictions.intersect(labels)
+    }
+    .countByValue()
 
-  private lazy val fpPerClass = predictionAndLabels.flatMap {
-    case (predictions, labels) =>
-      predictions.diff(labels)
-  }.countByValue()
+  private lazy val fpPerClass = predictionAndLabels
+    .flatMap {
+      case (predictions, labels) =>
+        predictions.diff(labels)
+    }
+    .countByValue()
 
-  private lazy val fnPerClass = predictionAndLabels.flatMap {
-    case (predictions, labels) =>
-      labels.diff(predictions)
-  }.countByValue()
+  private lazy val fnPerClass = predictionAndLabels
+    .flatMap {
+      case (predictions, labels) =>
+        labels.diff(predictions)
+    }
+    .countByValue()
 
   /**
     * Returns precision for a given label (category)

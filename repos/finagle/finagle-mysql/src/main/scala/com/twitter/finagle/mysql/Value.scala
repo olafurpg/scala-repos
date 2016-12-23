@@ -227,7 +227,8 @@ class TimestampValue(val injectionTimeZone: TimeZone,
   "Injects `java.sql.Timestamp`s in local time and extracts them in UTC." +
     "To use a different time zone, create an instance of " +
     "TimestampValue(InjectionTimeZone, ExtractionTimeZone)",
-  "6.20.2")
+  "6.20.2"
+)
 object TimestampValue
     extends TimestampValue(
       TimeZone.getDefault(),

@@ -173,14 +173,15 @@ abstract class ClusterShardingCustomShardAllocationSpec(
   }
 
   def startSharding(): Unit = {
-    ClusterSharding(system).start(typeName = "Entity",
-                                  entityProps = Props[Entity],
-                                  settings = ClusterShardingSettings(system),
-                                  extractEntityId = extractEntityId,
-                                  extractShardId = extractShardId,
-                                  allocationStrategy =
-                                    TestAllocationStrategy(allocator),
-                                  handOffStopMessage = PoisonPill)
+    ClusterSharding(system).start(
+      typeName = "Entity",
+      entityProps = Props[Entity],
+      settings = ClusterShardingSettings(system),
+      extractEntityId = extractEntityId,
+      extractShardId = extractShardId,
+      allocationStrategy = TestAllocationStrategy(allocator),
+      handOffStopMessage = PoisonPill
+    )
   }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")

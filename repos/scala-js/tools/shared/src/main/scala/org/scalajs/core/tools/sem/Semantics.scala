@@ -131,6 +131,7 @@ object Semantics {
       moduleInit = sw("moduleInit", Compliant, moduleInit),
       strictFloats = sw("strictFloats", true, strictFloats),
       productionMode = false,
-      runtimeClassName = Defaults.runtimeClassName)
+      runtimeClassName = Defaults.runtimeClassName
+    )
   }
 }

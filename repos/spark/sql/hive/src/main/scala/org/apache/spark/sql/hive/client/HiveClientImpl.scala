@@ -345,7 +345,8 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
           ),
           properties = h.getParameters.asScala.toMap,
           viewOriginalText = Option(h.getViewOriginalText),
-          viewText = Option(h.getViewExpandedText))
+          viewText = Option(h.getViewExpandedText)
+        )
       }
     }
 
@@ -412,11 +413,13 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
       val hiveTable = toHiveTable(catalogTable)
       specs.zip(newSpecs).foreach {
         case (oldSpec, newSpec) =>
-          val hivePart = getPartitionOption(catalogTable, oldSpec).map { p =>
-            toHivePartition(p.copy(spec = newSpec), hiveTable)
-          }.getOrElse {
-            throw new NoSuchPartitionException(db, table, oldSpec)
-          }
+          val hivePart = getPartitionOption(catalogTable, oldSpec)
+            .map { p =>
+              toHivePartition(p.copy(spec = newSpec), hiveTable)
+            }
+            .getOrElse {
+              throw new NoSuchPartitionException(db, table, oldSpec)
+            }
           client.renamePartition(hiveTable, oldSpec.asJava, hivePart)
       }
     }
@@ -744,6 +747,8 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
         outputFormat = Option(apiPartition.getSd.getOutputFormat),
         serde = Option(apiPartition.getSd.getSerdeInfo.getSerializationLib),
         serdeProperties =
-          apiPartition.getSd.getSerdeInfo.getParameters.asScala.toMap))
+          apiPartition.getSd.getSerdeInfo.getParameters.asScala.toMap
+      )
+    )
   }
 }

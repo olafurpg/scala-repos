@@ -189,10 +189,10 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
              "Repeated pivot key fields: " + outputList.toString)
       val values = fieldDef._2.iterator.asScala
       // Look up this key:
-      .map { fname =>
-        asMap.getOrElse(fname.asInstanceOf[String],
-                        defaultVal.asInstanceOf[AnyRef])
-      }
+        .map { fname =>
+          asMap.getOrElse(fname.asInstanceOf[String],
+                          defaultVal.asInstanceOf[AnyRef])
+        }
       // Create the cascading tuple
       new CTuple(values.toSeq: _*)
     }

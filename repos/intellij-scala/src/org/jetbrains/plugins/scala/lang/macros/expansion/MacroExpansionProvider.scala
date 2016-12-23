@@ -55,7 +55,8 @@ class MacroExpansionProvider extends LineMarkerProvider {
             }
           },
           GutterIconRenderer.Alignment.RIGHT,
-          util.Arrays.asList[GotoRelatedItem]())
+          util.Arrays.asList[GotoRelatedItem]()
+        )
     }
     result.addAll(res)
   }

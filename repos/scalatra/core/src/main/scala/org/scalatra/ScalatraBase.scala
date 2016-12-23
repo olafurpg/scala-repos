@@ -215,19 +215,22 @@ trait ScalatraBase
       }
     }
 
-    cradleHalt(result = runActions, e => {
-      cradleHalt({
-        result = errorHandler(e)
-        rendered = false
-      }, e => {
-        runCallbacks(Failure(e))
-        try {
-          renderUncaughtException(e)
-        } finally {
-          runRenderCallbacks(Failure(e))
-        }
-      })
-    })
+    cradleHalt(
+      result = runActions,
+      e => {
+        cradleHalt({
+          result = errorHandler(e)
+          rendered = false
+        }, e => {
+          runCallbacks(Failure(e))
+          try {
+            renderUncaughtException(e)
+          } finally {
+            runRenderCallbacks(Failure(e))
+          }
+        })
+      }
+    )
 
     if (!rendered) renderResponse(result)
   }
@@ -435,9 +438,12 @@ trait ScalatraBase
     case is: java.io.InputStream => MimeTypes(is)
     case file: File => MimeTypes(file)
     case actionResult: ActionResult =>
-      actionResult.headers.find {
-        case (name, value) => name equalsIgnoreCase "CONTENT-TYPE"
-      }.getOrElse(("Content-Type", contentTypeInferrer(actionResult.body)))._2
+      actionResult.headers
+        .find {
+          case (name, value) => name equalsIgnoreCase "CONTENT-TYPE"
+        }
+        .getOrElse(("Content-Type", contentTypeInferrer(actionResult.body)))
+        ._2
     //    case Unit | _: Unit => null
     case _ => "text/html"
   }

@@ -44,7 +44,8 @@ object ScalaLanguageLevel {
     Scala_2_10 -> ScalaLanguageLevelProxy.Scala_2_10,
     Scala_2_11 -> ScalaLanguageLevelProxy.Scala_2_11,
     Scala_2_12 -> ScalaLanguageLevelProxy.Scala_2_12,
-    Dotty -> ScalaLanguageLevelProxy.Dotty)
+    Dotty -> ScalaLanguageLevelProxy.Dotty
+  )
 
   private val ProxyToLevel = LevelToProxy.map(_.swap)
 

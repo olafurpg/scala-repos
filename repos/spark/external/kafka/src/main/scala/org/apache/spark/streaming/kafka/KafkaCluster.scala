@@ -264,12 +264,12 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
       topicAndPartitions: Set[TopicAndPartition],
       consumerApiVersion: Short
   ): Either[Err, Map[TopicAndPartition, Long]] = {
-    getConsumerOffsetMetadata(groupId, topicAndPartitions, consumerApiVersion).right.map {
-      r =>
+    getConsumerOffsetMetadata(groupId, topicAndPartitions, consumerApiVersion).right
+      .map { r =>
         r.map { kv =>
           kv._1 -> kv._2.offset
         }
-    }
+      }
   }
 
   /** Requires Kafka >= 0.8.1.1.  Defaults to the original ZooKeeper backed api version. */

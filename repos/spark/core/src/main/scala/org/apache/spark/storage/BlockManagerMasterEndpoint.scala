@@ -413,9 +413,12 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
   private def getPeers(blockManagerId: BlockManagerId): Seq[BlockManagerId] = {
     val blockManagerIds = blockManagerInfo.keySet
     if (blockManagerIds.contains(blockManagerId)) {
-      blockManagerIds.filterNot { _.isDriver }.filterNot {
-        _ == blockManagerId
-      }.toSeq
+      blockManagerIds
+        .filterNot { _.isDriver }
+        .filterNot {
+          _ == blockManagerId
+        }
+        .toSeq
     } else {
       Seq.empty
     }

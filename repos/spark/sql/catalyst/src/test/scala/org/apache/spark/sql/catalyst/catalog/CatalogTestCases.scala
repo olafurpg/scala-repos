@@ -414,7 +414,8 @@ abstract class CatalogTestCases extends SparkFunSuite with BeforeAndAfterEach {
         Seq(oldPart1.copy(
               storage = storageFormat.copy(locationUri = Some(newLocation))),
             oldPart2.copy(
-              storage = storageFormat.copy(locationUri = Some(newLocation)))))
+              storage = storageFormat.copy(locationUri = Some(newLocation))))
+      )
       val newPart1 = catalog.getPartition("db2", "tbl2", part1.spec)
       val newPart2 = catalog.getPartition("db2", "tbl2", part2.spec)
       assert(newPart1.storage.locationUri == Some(newLocation))
@@ -632,7 +633,8 @@ abstract class CatalogTestUtils {
       schema =
         Seq(CatalogColumn("col1", "int"), CatalogColumn("col2", "string")),
       partitionColumns =
-        Seq(CatalogColumn("a", "int"), CatalogColumn("b", "string")))
+        Seq(CatalogColumn("a", "int"), CatalogColumn("b", "string"))
+    )
   }
 
   def newFunc(name: String, database: Option[String] = None): CatalogFunction = {

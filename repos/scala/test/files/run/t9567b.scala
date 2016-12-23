@@ -25,29 +25,8 @@ object Test {
                                f22: Int,
                                f23: Int)
 
-    val instance = MethodLocalWide(0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0,
-                                   0)
+    val instance = MethodLocalWide(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0)
     val result = instance match {
       case MethodLocalWide(0,
                            0,

@@ -49,5 +49,6 @@ object ApiIssue {
       state = if (issue.closed) { "closed" } else { "open" },
       body = issue.content.getOrElse(""),
       created_at = issue.registeredDate,
-      updated_at = issue.updatedDate)(repositoryName, issue.isPullRequest)
+      updated_at = issue.updatedDate
+    )(repositoryName, issue.isPullRequest)
 }

@@ -45,7 +45,8 @@ class InlinerSeparateCompilationTest {
       // TODO SD-85
       """O$::f()I is annotated @inline but could not be inlined:
         |The callee O$::f()I contains the instruction INVOKESPECIAL T.f ()I
-        |that would cause an IllegalAccessError when inlined into class C""".stripMargin)
+        |that would cause an IllegalAccessError when inlined into class C""".stripMargin
+    )
     val List(c, o, oMod, t) = compileClassesSeparately(
       List(codeA, codeB),
       args + " -Yopt-warnings",

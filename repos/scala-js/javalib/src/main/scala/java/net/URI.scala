@@ -259,12 +259,14 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
       if (uriN.getRawPath().startsWith(thisN.getRawPath())) {
         val newPath = uriN.getRawPath().stripPrefix(thisN.getRawPath())
 
-        new URI(scheme = null,
-                authority = null,
-                // never produce an abs path if we relativized
-                path = newPath.stripPrefix("/"),
-                query = uri.getQuery(),
-                fragment = uri.getFragment())
+        new URI(
+          scheme = null,
+          authority = null,
+          // never produce an abs path if we relativized
+          path = newPath.stripPrefix("/"),
+          query = uri.getQuery(),
+          fragment = uri.getFragment()
+        )
       } else uri
     }
   }
@@ -705,7 +707,8 @@ object URI {
     "[\u0000- \"#/<>?@\\[-\\^`{-}" +
       "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
       "%(?![0-9a-f]{2})",
-    "ig")
+    "ig"
+  )
 
   /** Quote any character not in unreserved, punct, escaped or other */
   private def quoteUserInfo(str: String) = {
@@ -722,7 +725,8 @@ object URI {
     "[\u0000- \"#<>?\\[-\\^`{-}" +
       "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
       "%(?![0-9a-f]{2})",
-    "ig")
+    "ig"
+  )
 
   /** Quote any character not in unreserved, punct, escaped, other or equal
     *  to '/' or '@'
@@ -745,7 +749,8 @@ object URI {
     "[\u0000- \"#/<>?\\^`{-}" +
       "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
       "%(?![0-9a-f]{2})",
-    "ig")
+    "ig"
+  )
 
   /** Quote any character not in unreserved, punct, escaped, other or equal
     *  to '@'
@@ -762,7 +767,8 @@ object URI {
     "[\u0000- \"#<>@\\^`{-}" +
       "\u007f-\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\u2028\u2029]|" +
       "%(?![0-9a-f]{2})",
-    "ig")
+    "ig"
+  )
 
   /** Quote any character not in unreserved, reserved, escaped or other */
   private def quoteIllegal(str: String) = {

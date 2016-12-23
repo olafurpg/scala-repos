@@ -85,18 +85,21 @@ class ScFunctionDefinitionImplTest extends SimpleTestCase {
   }
 
   def testDeeperInfixOperator() {
-    assertRecursionTypeIs("""
+    assertRecursionTypeIs(
+      """
         |def f(n: Int): Boolean =
         |  n >=0 && n match {
         |    case 1234 => f(n - 1)
         |    case _ => 1234
         |  }
       """.stripMargin,
-                          TailRecursion)
+      TailRecursion
+    )
   }
 
   def testGetReturnUsages() {
-    assertUsages("""
+    assertUsages(
+      """
         def f[A](n: Int)(body: => A): Option[A] = {
           try
             return Some(body)
@@ -106,9 +109,10 @@ class ScFunctionDefinitionImplTest extends SimpleTestCase {
           f[A](n - 1)(body)
         }
       """,
-                 "return Some(body)",
-                 "return None",
-                 "f[A](n - 1)(body)")
+      "return Some(body)",
+      "return None",
+      "f[A](n - 1)(body)"
+    )
   }
 
   private def assertUsages(@Language("Scala") code: String,

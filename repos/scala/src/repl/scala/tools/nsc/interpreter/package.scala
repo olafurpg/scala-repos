@@ -58,12 +58,15 @@ package object interpreter extends ReplConfig with ReplStrings {
   private val ourClassloader = getClass.getClassLoader
 
   def staticTypeTag[T: ClassTag]: ru.TypeTag[T] =
-    ru.TypeTag[T](ru.runtimeMirror(ourClassloader), new TypeCreator {
-      def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
-        m.staticClass(classTag[T].runtimeClass.getName)
-          .toTypeConstructor
-          .asInstanceOf[U#Type]
-    })
+    ru.TypeTag[T](
+      ru.runtimeMirror(ourClassloader),
+      new TypeCreator {
+        def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
+          m.staticClass(classTag[T].runtimeClass.getName)
+            .toTypeConstructor
+            .asInstanceOf[U#Type]
+      }
+    )
 
   /** This class serves to trick the compiler into treating a var
     *  (intp, in ILoop) as a stable identifier.

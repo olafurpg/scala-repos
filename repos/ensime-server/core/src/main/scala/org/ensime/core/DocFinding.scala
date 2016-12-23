@@ -83,10 +83,12 @@ trait DocFinding { self: RichPresentationCompiler =>
         DocFqn("", datatype.toLowerCase)
       case DocFqn("scala", ScalaAny(datatype)) => DocFqn("java.lang", "Object")
       case DocFqn("scala", "Array") =>
-        tpe.typeArgs.headOption.map { tpe =>
-          val fqn = javaFqn(tpe)
-          fqn.copy(typeName = fqn.typeName + "[]")
-        }.getOrElse(s)
+        tpe.typeArgs.headOption
+          .map { tpe =>
+            val fqn = javaFqn(tpe)
+            fqn.copy(typeName = fqn.typeName + "[]")
+          }
+          .getOrElse(s)
       case _ => s
     }
   }

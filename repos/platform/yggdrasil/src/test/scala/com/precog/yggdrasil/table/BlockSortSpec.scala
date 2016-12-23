@@ -69,9 +69,15 @@ trait BlockSortSpec[M[+ _]]
 
     val original =
       if (unique) {
-        sample.data.map { jv =>
-          JArray(sortKeys.map(_.extract(jv \ "value")).toList) -> jv
-        }.toMap.toList.unzip._2.toStream
+        sample.data
+          .map { jv =>
+            JArray(sortKeys.map(_.extract(jv \ "value")).toList) -> jv
+          }
+          .toMap
+          .toList
+          .unzip
+          ._2
+          .toStream
       } else {
         sample.data
       }
@@ -79,13 +85,17 @@ trait BlockSortSpec[M[+ _]]
     // We have to add in and then later remove the global Id (insert
     // order) to match real sort semantics for disambiguation of equal
     // values
-    val sorted = original.zipWithIndex.map {
-      case (jv, i) => JValue.unsafeInsert(jv, globalIdPath, JNum(i))
-    }.sortBy { v =>
-      JArray(
-        sortKeys.map(_.extract(v \ "value")).toList ::: List(v \ "globalId"))
-        .asInstanceOf[JValue]
-    }(desiredJValueOrder).map(_.delete(globalIdPath).get).toList
+    val sorted = original.zipWithIndex
+      .map {
+        case (jv, i) => JValue.unsafeInsert(jv, globalIdPath, JNum(i))
+      }
+      .sortBy { v =>
+        JArray(
+          sortKeys.map(_.extract(v \ "value")).toList ::: List(v \ "globalId"))
+          .asInstanceOf[JValue]
+      }(desiredJValueOrder)
+      .map(_.delete(globalIdPath).get)
+      .toList
 
     //def xyz(v: JValue): JValue = {
     //  JArray(sortKeys.map(_.extract(v \ "value")).toList ::: List(v \ "globalId"))
@@ -268,7 +278,8 @@ trait BlockSortSpec[M[+ _]]
               JPath(".f") -> CBoolean,
               JPath(".u") -> CDouble,
               JPath(".q") -> CNum,
-              JPath(".vxu") -> CEmptyArray))))
+              JPath(".vxu") -> CEmptyArray)))
+    )
     testSortDense(sampleData, SortAscending, false, JPath("q"))
   }
 
@@ -281,7 +292,8 @@ trait BlockSortSpec[M[+ _]]
         {"key":[1,4,4],"value":{"y":false,"qvd":[],"aden":{}}},
         {"key":[3,3,3],"value":{"b0":["gxy",{"alxk":-1},6.614267528783459E+307],"y":{"pvbT":[1,{}]}}}
       ]""") --> classOf[JArray]).elements.toStream,
-      None)
+      None
+    )
 
     testSortDense(sampleData, SortDescending, false, JPath(".y"))
   }
@@ -293,7 +305,8 @@ trait BlockSortSpec[M[+ _]]
         {"key":[2],"value":{"y":false}},
         {"key":[3],"value":{"y":{"pvbT":1}}}
       ]""") --> classOf[JArray]).elements.toStream,
-      None)
+      None
+    )
 
     testSortDense(sampleData, SortDescending, false, JPath(".y"))
   }
@@ -305,7 +318,8 @@ trait BlockSortSpec[M[+ _]]
         {"key":[2],"value":{"y":false}},
         {"key":[3],"value":{"y":{"pvbT":1}}}
       ]""") --> classOf[JArray]).elements.toStream,
-      None)
+      None
+    )
 
     testSortDense(sampleData, SortAscending, false, JPath(".y"))
   }
@@ -341,14 +355,16 @@ trait BlockSortSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (3,
-         List(JPath(".uid") -> CLong,
-              JPath(".uid") -> CDouble,
-              JPath(".f.bn[0]") -> CNull,
-              JPath(".f.wei") -> CDouble,
-              JPath(".ljz[0]") -> CNull,
-              JPath(".ljz[1][0]") -> CString,
-              JPath(".ljz[2]") -> CBoolean,
-              JPath(".jmy") -> CDouble))
+         List(
+           JPath(".uid") -> CLong,
+           JPath(".uid") -> CDouble,
+           JPath(".f.bn[0]") -> CNull,
+           JPath(".f.wei") -> CDouble,
+           JPath(".ljz[0]") -> CNull,
+           JPath(".ljz[1][0]") -> CString,
+           JPath(".ljz[2]") -> CBoolean,
+           JPath(".jmy") -> CDouble
+         ))
       )
     )
 

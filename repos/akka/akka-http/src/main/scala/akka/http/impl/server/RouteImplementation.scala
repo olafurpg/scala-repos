@@ -97,64 +97,70 @@ private[http] object RouteImplementation
       case MethodFilter(m) ⇒ method(m.asScala)
       case Extract(extractions) ⇒
         extractRequestContext.flatMap { ctx ⇒
-          extractions.map { e ⇒
-            e.directive.flatMap(
-              addExtraction(e.asInstanceOf[RequestVal[Any]], _))
-          }.reduce(_ & _)
+          extractions
+            .map { e ⇒
+              e.directive.flatMap(
+                addExtraction(e.asInstanceOf[RequestVal[Any]], _))
+            }
+            .reduce(_ & _)
         }
 
       case BasicAuthentication(authenticator) ⇒
-        authenticateBasicAsync(authenticator.realm, { creds ⇒
-          val javaCreds = creds match {
-            case Credentials.Missing ⇒
-              new BasicCredentials {
-                def available: Boolean = false
-                def identifier: String =
-                  throw new IllegalStateException("Credentials missing")
-                def verify(secret: String): Boolean =
-                  throw new IllegalStateException("Credentials missing")
-              }
-            case p @ Credentials.Provided(name) ⇒
-              new BasicCredentials {
-                def available: Boolean = true
-                def identifier: String = name
-                def verify(secret: String): Boolean = p.verify(secret)
-              }
-          }
+        authenticateBasicAsync(
+          authenticator.realm, { creds ⇒
+            val javaCreds = creds match {
+              case Credentials.Missing ⇒
+                new BasicCredentials {
+                  def available: Boolean = false
+                  def identifier: String =
+                    throw new IllegalStateException("Credentials missing")
+                  def verify(secret: String): Boolean =
+                    throw new IllegalStateException("Credentials missing")
+                }
+              case p @ Credentials.Provided(name) ⇒
+                new BasicCredentials {
+                  def available: Boolean = true
+                  def identifier: String = name
+                  def verify(secret: String): Boolean = p.verify(secret)
+                }
+            }
 
-          authenticator
-            .authenticate(javaCreds)
-            .toScala
-            .map(_.asScala)(
-              akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
-        }).flatMap { user ⇒
+            authenticator
+              .authenticate(javaCreds)
+              .toScala
+              .map(_.asScala)(
+                akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
+          }
+        ).flatMap { user ⇒
           addExtraction(authenticator.asInstanceOf[RequestVal[Any]], user)
         }
 
       case OAuth2Authentication(authenticator) ⇒
-        authenticateOAuth2Async(authenticator.realm, { creds ⇒
-          val javaCreds = creds match {
-            case Credentials.Missing ⇒
-              new OAuth2Credentials {
-                def available: Boolean = false
-                def identifier: String =
-                  throw new IllegalStateException("Credentials missing")
-                def verify(secret: String): Boolean =
-                  throw new IllegalStateException("Credentials missing")
-              }
-            case p @ Credentials.Provided(name) ⇒
-              new OAuth2Credentials {
-                def available: Boolean = true
-                def identifier: String = name
-                def verify(secret: String): Boolean = p.verify(secret)
-              }
-          }
+        authenticateOAuth2Async(
+          authenticator.realm, { creds ⇒
+            val javaCreds = creds match {
+              case Credentials.Missing ⇒
+                new OAuth2Credentials {
+                  def available: Boolean = false
+                  def identifier: String =
+                    throw new IllegalStateException("Credentials missing")
+                  def verify(secret: String): Boolean =
+                    throw new IllegalStateException("Credentials missing")
+                }
+              case p @ Credentials.Provided(name) ⇒
+                new OAuth2Credentials {
+                  def available: Boolean = true
+                  def identifier: String = name
+                  def verify(secret: String): Boolean = p.verify(secret)
+                }
+            }
 
-          authenticator
-            .authenticate(javaCreds)
-            .toScala
-            .map(_.asScala)(sameThreadExecutionContext)
-        }).flatMap { user ⇒
+            authenticator
+              .authenticate(javaCreds)
+              .toScala
+              .map(_.asScala)(sameThreadExecutionContext)
+          }
+        ).flatMap { user ⇒
           addExtraction(authenticator.asInstanceOf[RequestVal[Any]], user)
         }
 

@@ -31,24 +31,25 @@ import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
   * @author Pavel Fatin
   */
 class ScalaAotCompletionContributor extends ScalaCompletionContributor {
-  extend(CompletionType.BASIC,
-         PlatformPatterns
-           .psiElement(ScalaTokenTypes.tIDENTIFIER)
-           .withParent(classOf[ScParameter]),
-         new CompletionProvider[CompletionParameters] {
+  extend(
+    CompletionType.BASIC,
+    PlatformPatterns
+      .psiElement(ScalaTokenTypes.tIDENTIFIER)
+      .withParent(classOf[ScParameter]),
+    new CompletionProvider[CompletionParameters] {
 
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addCompletions0(parameters, result, typed = true) {
-               (text, element) =>
-                 val parameter = createParameterFrom(text, element)
-                 val context = element.getContext.getContext
-                 parameter.setContext(context, context.getLastChild)
-                 typeIdentifierIn(parameter)
-             }
-           }
-         })
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addCompletions0(parameters, result, typed = true) { (text, element) =>
+          val parameter = createParameterFrom(text, element)
+          val context = element.getContext.getContext
+          parameter.setContext(context, context.getLastChild)
+          typeIdentifierIn(parameter)
+        }
+      }
+    }
+  )
 
   extend(
     CompletionType.BASIC,
@@ -73,7 +74,8 @@ class ScalaAotCompletionContributor extends ScalaCompletionContributor {
           typeIdentifierIn(declaration)
         }
       }
-    })
+    }
+  )
 
   private def addCompletions0(
       parameters: CompletionParameters,

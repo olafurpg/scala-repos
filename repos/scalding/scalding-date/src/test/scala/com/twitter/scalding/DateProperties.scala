@@ -44,9 +44,9 @@ object DateProperties extends Properties("Date Properties") {
     // Ignore Longs that are too big to fit, and make sure we can add any random 3 together
     // Long.MaxValue / 1200 ms is the biggest that will fit, we divide by 3 to make sure
     // we can add three together in tests
-    .map { ms =>
-      fromMillisecs(ms / (1200 * 3))
-    }
+      .map { ms =>
+        fromMillisecs(ms / (1200 * 3))
+      }
   }
 
   property("Shifting DateRanges breaks containment") = forAll {
@@ -130,11 +130,15 @@ object DateProperties extends Properties("Date Properties") {
     }).r
 
   def matches(l: List[String], arg: String): Int =
-    l.map { toRegex _ }.map {
-      _.findFirstMatchIn(arg).map { _ =>
-        1
-      }.getOrElse(0)
-    }.sum
+    l.map { toRegex _ }
+      .map {
+        _.findFirstMatchIn(arg)
+          .map { _ =>
+            1
+          }
+          .getOrElse(0)
+      }
+      .sum
 
   // Make sure globifier always contains:
   val pattern = "%1$tY/%1$tm/%1$td/%1$tH"

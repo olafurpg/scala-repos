@@ -254,7 +254,8 @@ trait IssuesService { self: AccountService =>
             } toList,
             milestone,
             commentCount,
-            status.get(issue.userName, issue.repositoryName, issue.issueId))
+            status.get(issue.userName, issue.repositoryName, issue.issueId)
+          )
       }
     } toList
   }
@@ -329,9 +330,11 @@ trait IssuesService { self: AccountService =>
                                condition: IssueSearchCondition,
                                pullRequest: Boolean)(implicit s: Session) =
     Issues filter { t1 =>
-      repos.map {
-        case (owner, repository) => t1.byRepository(owner, repository)
-      }.foldLeft[Column[Boolean]](false)(_ || _) &&
+      repos
+        .map {
+          case (owner, repository) => t1.byRepository(owner, repository)
+        }
+        .foldLeft[Column[Boolean]](false)(_ || _) &&
       (t1.closed === (condition.state == "closed").bind) &&
       //(t1.milestoneId      === condition.milestoneId.get.get.bind, condition.milestoneId.flatten.isDefined) &&
       (t1.milestoneId.? isEmpty, condition.milestone == Some(None)) &&
@@ -418,14 +421,16 @@ trait IssuesService { self: AccountService =>
                     issueId: Int,
                     content: String,
                     action: String)(implicit s: Session): Int =
-    IssueComments.autoInc insert IssueComment(userName = owner,
-                                              repositoryName = repository,
-                                              issueId = issueId,
-                                              action = action,
-                                              commentedUserName = loginUser,
-                                              content = content,
-                                              registeredDate = currentDate,
-                                              updatedDate = currentDate)
+    IssueComments.autoInc insert IssueComment(
+      userName = owner,
+      repositoryName = repository,
+      issueId = issueId,
+      action = action,
+      commentedUserName = loginUser,
+      content = content,
+      registeredDate = currentDate,
+      updatedDate = currentDate
+    )
 
   def updateIssue(owner: String,
                   repository: String,
@@ -503,10 +508,12 @@ trait IssuesService { self: AccountService =>
       }
       .filter {
         case (t1, t2) =>
-          keywords.map { keyword =>
-            (t1.title.toLowerCase like (s"%${likeEncode(keyword)}%", '^')) ||
-            (t1.content.toLowerCase like (s"%${likeEncode(keyword)}%", '^'))
-          }.reduceLeft(_ && _)
+          keywords
+            .map { keyword =>
+              (t1.title.toLowerCase like (s"%${likeEncode(keyword)}%", '^')) ||
+              (t1.content.toLowerCase like (s"%${likeEncode(keyword)}%", '^'))
+            }
+            .reduceLeft(_ && _)
       }
       .map {
         case (t1, t2) =>
@@ -528,9 +535,11 @@ trait IssuesService { self: AccountService =>
       }
       .filter {
         case ((t1, t2), t3) =>
-          keywords.map { query =>
-            t1.content.toLowerCase like (s"%${likeEncode(query)}%", '^')
-          }.reduceLeft(_ && _)
+          keywords
+            .map { query =>
+              t1.content.toLowerCase like (s"%${likeEncode(query)}%", '^')
+            }
+            .reduceLeft(_ && _)
       }
       .map {
         case ((t1, t2), t3) =>

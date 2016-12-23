@@ -256,7 +256,8 @@ object LBFGS extends Logging {
             case ((grad1, loss1), (grad2, loss2)) =>
               axpy(1.0, grad2, grad1)
               (grad1, loss1 + loss2)
-        })
+        }
+      )
 
       /**
         * regVal is sum of weight squares if it's L2 updater;

@@ -28,14 +28,16 @@ object Test extends App {
 
   def patch(file: File, line: Int, prevResult: String, result: String) {
     amend(file) { content =>
-      content.lines.toList.zipWithIndex.map {
-        case (content, i) if i == line - 1 =>
-          val newContent =
-            content.replaceAllLiterally(quote(prevResult), quote(result))
-          if (newContent != content) println(s"- $content\n+ $newContent\n")
-          newContent
-        case (content, _) => content
-      }.mkString("\n")
+      content.lines.toList.zipWithIndex
+        .map {
+          case (content, i) if i == line - 1 =>
+            val newContent =
+              content.replaceAllLiterally(quote(prevResult), quote(result))
+            if (newContent != content) println(s"- $content\n+ $newContent\n")
+            newContent
+          case (content, _) => content
+        }
+        .mkString("\n")
     }
   }
 
@@ -48,9 +50,11 @@ object Test extends App {
     val newComment =
       s"  // Generated on $timestamp with Scala ${scala.util.Properties.versionString})"
     amend(file) { content =>
-      content.lines.toList.map { f =>
-        f.replaceAll("""^ +// Generated on.*""", newComment)
-      }.mkString("\n")
+      content.lines.toList
+        .map { f =>
+          f.replaceAll("""^ +// Generated on.*""", newComment)
+        }
+        .mkString("\n")
     }
   }
 
@@ -274,5 +278,6 @@ object Test extends App {
 
   check("...".r)(
     "rO0ABXNyABlzY2FsYS51dGlsLm1hdGNoaW5nLlJlZ2V44u3Vap7wIb8CAAJMAAdwYXR0ZXJudAAZTGphdmEvdXRpbC9yZWdleC9QYXR0ZXJuO0wAJXNjYWxhJHV0aWwkbWF0Y2hpbmckUmVnZXgkJGdyb3VwTmFtZXN0ABZMc2NhbGEvY29sbGVjdGlvbi9TZXE7eHBzcgAXamF2YS51dGlsLnJlZ2V4LlBhdHRlcm5GZ9VrbkkCDQIAAkkABWZsYWdzTAAHcGF0dGVybnQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAHQAAy4uLnNyADJzY2FsYS5jb2xsZWN0aW9uLmltbXV0YWJsZS5MaXN0JFNlcmlhbGl6YXRpb25Qcm94eQAAAAAAAAABAwAAeHBzcgAsc2NhbGEuY29sbGVjdGlvbi5pbW11dGFibGUuTGlzdFNlcmlhbGl6ZUVuZCSKXGNb91MLbQIAAHhweA==",
-    r => (r.toString))
+    r => (r.toString)
+  )
 }

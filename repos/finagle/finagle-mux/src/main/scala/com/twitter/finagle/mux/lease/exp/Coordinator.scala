@@ -73,20 +73,23 @@ private[lease] class Coordinator(
   ) {
     val elapsed = Stopwatch.start()
     // TODO: if grabbing memory info is slow, rewrite this to only check memory info occasionally
-    Alarm.armAndExecute({ () =>
-      new BytesAlarm(counter, () => space.left) min new DurationAlarm((maxWait -
-        elapsed()) / 2) min new GenerationAlarm(counter) min new PredicateAlarm(
-        () => npending() == 0)
-    }, { () =>
-      // TODO MN: reenable
-      if (verbose) {
-        log.info(
-          "DRAIN-LOOP: target=" +
-            ((counter.info.remaining - space.minDiscount) / 100).inBytes +
-            "; n=" + npending() + "; counter=" + counter + "; maxMs=" +
-            ((maxWait - elapsed()) / 2).inMilliseconds.toInt)
+    Alarm.armAndExecute(
+      { () =>
+        new BytesAlarm(counter, () => space.left) min new DurationAlarm(
+          (maxWait -
+            elapsed()) / 2) min new GenerationAlarm(counter) min new PredicateAlarm(
+          () => npending() == 0)
+      }, { () =>
+        // TODO MN: reenable
+        if (verbose) {
+          log.info(
+            "DRAIN-LOOP: target=" +
+              ((counter.info.remaining - space.minDiscount) / 100).inBytes +
+              "; n=" + npending() + "; counter=" + counter + "; maxMs=" +
+              ((maxWait - elapsed()) / 2).inMilliseconds.toInt)
+        }
       }
-    })
+    )
   }
 }
 

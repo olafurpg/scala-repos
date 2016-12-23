@@ -256,7 +256,8 @@ private object PartitionAssignorTest extends Logging {
         assertTrue(
           "Scenario %s: assignment is not uniform (partition counts per stream are in the range [%d, %d])"
             .format(scenario, minCount, maxCount),
-          (maxCount - minCount) <= 1)
+          (maxCount - minCount) <= 1
+        )
       }
     }
   }

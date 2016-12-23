@@ -513,8 +513,8 @@ private[akka] class LocalActorRefProvider private[akka] (
   private[akka] val log: LoggingAdapter =
     Logging(eventStream, getClass.getName + "(" + rootPath.address + ")")
 
-  override val deadLetters: InternalActorRef = _deadLetters
-    .getOrElse((p: ActorPath) ⇒ new DeadLetterActorRef(this, p, eventStream))
+  override val deadLetters: InternalActorRef = _deadLetters.getOrElse(
+    (p: ActorPath) ⇒ new DeadLetterActorRef(this, p, eventStream))
     .apply(rootPath / "deadLetters")
 
   private[this] final val terminationPromise: Promise[Terminated] =
@@ -645,7 +645,8 @@ private[akka] class LocalActorRefProvider private[akka] (
     defaultDispatcher,
     defaultMailbox,
     theOneWhoWalksTheBubblesOfSpaceTime,
-    rootPath) {
+    rootPath
+  ) {
     override def getParent: InternalActorRef = this
     override def getSingleChild(name: String): InternalActorRef = name match {
       case "temp" ⇒ tempContainer
@@ -668,7 +669,8 @@ private[akka] class LocalActorRefProvider private[akka] (
       defaultDispatcher,
       defaultMailbox,
       rootGuardian,
-      rootPath / "user")
+      rootPath / "user"
+    )
     cell.initChild(ref)
     ref.start()
     ref
@@ -685,7 +687,8 @@ private[akka] class LocalActorRefProvider private[akka] (
       defaultDispatcher,
       defaultMailbox,
       rootGuardian,
-      rootPath / "system")
+      rootPath / "system"
+    )
     cell.initChild(ref)
     ref.start()
     ref
@@ -902,7 +905,8 @@ private[akka] class LocalActorRefProvider private[akka] (
             throw new ConfigurationException(
               s"configuration problem while creating [$path] with router dispatcher [${routerProps.dispatcher}] and mailbox [${routerProps.mailbox}] " +
                 s"and routee dispatcher [${routeeProps.dispatcher}] and mailbox [${routeeProps.mailbox}]",
-              e)
+              e
+            )
         }
     }
   }

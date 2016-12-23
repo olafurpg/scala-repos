@@ -532,7 +532,8 @@ private final class Analyzer(semantics: Semantics,
            else Map.empty),
         instantiatedClasses =
           (if (returnsChar) List(BoxedCharacterClass)
-           else Nil))
+           else Nil)
+      )
       val m = new MethodInfo(this, syntheticInfo)
       m.syntheticKind = MethodSyntheticKind.ReflectiveProxy(targetName)
       methodInfos += proxyName -> m

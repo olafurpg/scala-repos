@@ -17,9 +17,8 @@ class EmulateOuterJoins(val useLeftJoin: Boolean, val useRightJoin: Boolean)
   val name = "emulateOuterJoins"
 
   def apply(state: CompilerState) =
-    state.map(
-        tree =>
-          ClientSideOp.mapServerSide(tree, true) { n =>
+    state.map(tree =>
+      ClientSideOp.mapServerSide(tree, true) { n =>
         val n2 = convert(n)
         if (n2 eq n) n2 else Phase.forceOuterBinds.apply(n2)
     })
@@ -32,57 +31,73 @@ class EmulateOuterJoins(val useLeftJoin: Boolean, val useRightJoin: Boolean)
       val on2 = on.replace({
         case r @ Ref(sym) =>
           if (sym == leftGen) Ref(lgen2)
-          else if (sym == rightGen) Ref(rgen2) else r
+          else if (sym == rightGen) Ref(rgen2)
+          else r
       }, true)
       convert(
-          Union(Join(leftGen, rightGen, left, right, JoinType.Inner, on),
-                Bind(bgen,
-                     Filter(
-                         lgen2,
-                         assignFreshSymbols(left),
-                         Library.Not.typed(on.nodeType,
-                                           Library.Exists
-                                             .typed(
-                                               on.nodeType, Filter(rgen2, assignFreshSymbols(right), on2)))
+        Union(
+          Join(leftGen, rightGen, left, right, JoinType.Inner, on),
+          Bind(
+            bgen,
+            Filter(
+              lgen2,
+              assignFreshSymbols(left),
+              Library.Not.typed(
+                on.nodeType,
+                Library.Exists
+                  .typed(on.nodeType,
+                         Filter(rgen2, assignFreshSymbols(right), on2)))
+            ),
+            Pure(
+              ProductNode(
+                ConstArray(
+                  Ref(bgen),
+                  nullStructFor(
+                    right.nodeType.structural.asCollectionType.elementType))))
           ),
-          Pure(ProductNode(ConstArray(Ref(bgen), nullStructFor(right.nodeType.structural.asCollectionType.elementType))))
-        ), true).infer())
+          true
+        ).infer())
     case Join(leftGen, rightGen, left, right, JoinType.Right, on)
         if !useRightJoin =>
       // as rightJoin bs on e => bs leftJoin as on { (b, a) => e(a, b) } map { case (b, a) => (a, b) }
       val bgen = new AnonSymbol
       convert(
-          Bind(bgen,
-               Join(rightGen, leftGen, right, left, JoinType.Left, on),
-               Pure(ProductNode(ConstArray(
-                           Select(Ref(bgen), ElementSymbol(2)),
-                           Select(Ref(bgen), ElementSymbol(1)))))).infer())
+        Bind(
+          bgen,
+          Join(rightGen, leftGen, right, left, JoinType.Left, on),
+          Pure(ProductNode(ConstArray(Select(Ref(bgen), ElementSymbol(2)),
+                                      Select(Ref(bgen), ElementSymbol(1)))))
+        ).infer())
     case Join(leftGen, rightGen, left, right, JoinType.Outer, on) =>
       // as fullJoin bs on e => (as leftJoin bs on e) unionAll bs.filter(b => !exists(as.filter(a => e(a, b)))).map(b => (nulls, b))
       val lgen2, rgen2, bgen = new AnonSymbol
       val on2 = on.replace({
         case r @ Ref(sym) =>
           if (sym == leftGen) Ref(lgen2)
-          else if (sym == rightGen) Ref(rgen2) else r
+          else if (sym == rightGen) Ref(rgen2)
+          else r
       }, true)
       convert(
-          Union(Join(leftGen, rightGen, left, right, JoinType.Left, on),
-                Bind(
-                    bgen,
-                    Filter(rgen2,
-                           assignFreshSymbols(right),
-                           Library.Not.typed(on.nodeType,
-                                             Library.Exists
-                                               .typed(on.nodeType,
-                                                      Filter(lgen2,
-                                                             assignFreshSymbols(
-                                                                 left),
-                                                             on2)))),
-                    Pure(ProductNode(ConstArray(
-                                nullStructFor(
-                                    left.nodeType.structural.asCollectionType.elementType),
-                                Ref(bgen))))),
-                true).infer())
+        Union(
+          Join(leftGen, rightGen, left, right, JoinType.Left, on),
+          Bind(
+            bgen,
+            Filter(rgen2,
+                   assignFreshSymbols(right),
+                   Library.Not.typed(
+                     on.nodeType,
+                     Library.Exists
+                       .typed(on.nodeType,
+                              Filter(lgen2, assignFreshSymbols(left), on2)))),
+            Pure(
+              ProductNode(
+                ConstArray(
+                  nullStructFor(
+                    left.nodeType.structural.asCollectionType.elementType),
+                  Ref(bgen))))
+          ),
+          true
+        ).infer())
     case n => n.mapChildren(convert, true)
   }
 
@@ -109,14 +124,17 @@ class EmulateOuterJoins(val useLeftJoin: Boolean, val useRightJoin: Boolean)
         case t => t
       }).mapChildren(replaceTS)
     //repl.foreach { case (ts1, ts2) => global.get(ts1).foreach(t => global += ts2 -> replaceTS(t)) }
-    n.replace({
-        case n: TableNode =>
-          n.copy(
+    n.replace(
+        {
+          case n: TableNode =>
+            n.copy(
               identity = repl(n.identity).asInstanceOf[TableIdentitySymbol])(
               n.profileTable) :@ replaceTS(n.nodeType)
-        case n: Pure => n.copy(identity = repl(n.identity))
-        case n: GroupBy => n.copy(identity = repl(n.identity))
-      }, bottomUp = true)
+          case n: Pure => n.copy(identity = repl(n.identity))
+          case n: GroupBy => n.copy(identity = repl(n.identity))
+        },
+        bottomUp = true
+      )
       .infer()
   }
 }

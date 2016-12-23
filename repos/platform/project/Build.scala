@@ -76,9 +76,11 @@ object PlatformBuild extends Build {
     scalacOptions ++= {
       //Seq("-Ywarn-value-discard", "-unchecked", "-g:none") ++
       Seq("-unchecked", "-g:none") ++ Option(
-        System.getProperty("com.precog.build.optimize")).map { _ =>
-        Seq("-optimize")
-      }.getOrElse(Seq())
+        System.getProperty("com.precog.build.optimize"))
+        .map { _ =>
+          Seq("-optimize")
+        }
+        .getOrElse(Seq())
     },
     javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
     scalaVersion := "2.9.2",

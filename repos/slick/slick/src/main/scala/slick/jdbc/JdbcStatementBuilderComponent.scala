@@ -669,14 +669,17 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       val newIndices = order.zipWithIndex.groupBy(_._1)
       lazy val reordering: ConstArray[IndexedSeq[Int]] =
         syms.map(fs => newIndices(fs).map(_._2 + 1))
-      n.replace({
-        case InsertColumn(ConstArray(Select(ref, ElementSymbol(idx))),
-                          fs,
-                          tpe) =>
-          val newPaths =
-            reordering(idx - 1).map(i => Select(ref, ElementSymbol(i)))
-          InsertColumn(ConstArray.from(newPaths), fs, tpe) :@ tpe
-      }, keepType = true)
+      n.replace(
+        {
+          case InsertColumn(ConstArray(Select(ref, ElementSymbol(idx))),
+                            fs,
+                            tpe) =>
+            val newPaths =
+              reordering(idx - 1).map(i => Select(ref, ElementSymbol(i)))
+            InsertColumn(ConstArray.from(newPaths), fs, tpe) :@ tpe
+        },
+        keepType = true
+      )
     }
   }
 
@@ -738,7 +741,8 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
         "update " +
           tableName + " set " + softNames.map(n => s"$n=?").mkString(",") +
           " where " + pkNames.map(n => s"$n=?").mkString(" and "),
-        ConstArray.from(softSyms ++ pkSyms))
+        ConstArray.from(softSyms ++ pkSyms)
+      )
 
     override def transformMapping(n: Node) =
       reorderColumns(n, softSyms ++ pkSyms)

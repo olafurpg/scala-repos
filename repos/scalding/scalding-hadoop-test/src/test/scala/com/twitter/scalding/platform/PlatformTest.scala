@@ -705,7 +705,8 @@ class PlatformTest
             "write",
             // should see the .group and the .write show up as line numbers
             "com.twitter.scalding.platform.TypedPipeWithDescriptionJob.<init>(PlatformTest.scala:137)",
-            "com.twitter.scalding.platform.TypedPipeWithDescriptionJob.<init>(PlatformTest.scala:141)")
+            "com.twitter.scalding.platform.TypedPipeWithDescriptionJob.<init>(PlatformTest.scala:141)"
+          )
 
           val foundDescs = steps.map(_.getConfig.get(Config.StepDescriptions))
           descs.foreach { d =>

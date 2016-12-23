@@ -158,6 +158,7 @@ object Challenge {
       rematchOf = rematchOf,
       createdAt = DateTime.now,
       seenAt = DateTime.now,
-      expiresAt = inTwoWeeks)
+      expiresAt = inTwoWeeks
+    )
   }
 }

@@ -211,7 +211,8 @@ private[spark] final class ShuffleBlockFetcherIterator(
               e)
             results.put(new FailureFetchResult(BlockId(blockId), address, e))
           }
-        })
+        }
+      )
   }
 
   private[this] def splitLocalRemoteBlocks(): ArrayBuffer[FetchRequest] = {
@@ -312,7 +313,8 @@ private[spark] final class ShuffleBlockFetcherIterator(
       (0 == reqsInFlight) == (0 == bytesInFlight),
       "expected reqsInFlight = 0 but found reqsInFlight = " + reqsInFlight +
         ", expected bytesInFlight = 0 but found bytesInFlight = " +
-        bytesInFlight)
+        bytesInFlight
+    )
 
     // Send out initial requests for blocks, up to our maxBytesInFlight
     fetchUpToMaxBytes()

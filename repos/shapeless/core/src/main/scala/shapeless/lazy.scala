@@ -208,8 +208,8 @@ class LazyMacros(val c: whitebox.Context)
 
   def mkStrictImpl[I](implicit iTag: WeakTypeTag[I]): Tree =
     mkImpl[I](
-      (tree,
-       actualType) => q"_root_.shapeless.Strict.apply[$actualType]($tree)",
+      (tree, actualType) =>
+        q"_root_.shapeless.Strict.apply[$actualType]($tree)",
       q"null.asInstanceOf[_root_.shapeless.Strict[_root_.scala.Nothing]]"
     )
 
@@ -436,12 +436,14 @@ class LazyMacros(val c: whitebox.Context)
       }
 
     def resolve(state: State)(inst: Instance): Option[(State, Instance)] =
-      resolve0(state)(inst.instTpe).filter {
-        case (_, tree, _) => !tree.equalsStructure(inst.ident)
-      }.map {
-        case (state0, extInst, actualTpe) =>
-          state0.closeInst(inst.instTpe, extInst, actualTpe)
-      }
+      resolve0(state)(inst.instTpe)
+        .filter {
+          case (_, tree, _) => !tree.equalsStructure(inst.ident)
+        }
+        .map {
+          case (state0, extInst, actualTpe) =>
+            state0.closeInst(inst.instTpe, extInst, actualTpe)
+        }
 
     def resolve0(state: State)(tpe: Type): Option[(State, Tree, Type)] = {
       val extInstOpt = State

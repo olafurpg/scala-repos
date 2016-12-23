@@ -175,14 +175,17 @@ object FieldsProviderImpl {
       }
 
     def expandMethod(outerTpe: Type): Vector[(Type, String)] =
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
-        val fieldName = accessorMethod.name.toTermName.toString
-        val fieldType = accessorMethod.returnType
-          .asSeenFrom(outerTpe, outerTpe.typeSymbol.asClass)
-        (fieldType, fieldName)
-      }.toVector
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .map { accessorMethod =>
+          val fieldName = accessorMethod.name.toTermName.toString
+          val fieldType = accessorMethod.returnType
+            .asSeenFrom(outerTpe, outerTpe.typeSymbol.asClass)
+          (fieldType, fieldName)
+        }
+        .toVector
 
     val builder = matchField(T.tpe, "")
     if (builder.columnTypes.isEmpty)

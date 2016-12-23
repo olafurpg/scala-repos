@@ -191,7 +191,8 @@ class GroupMetadataManager(val brokerId: Int,
       key = GroupMetadataManager.groupMetadataKey(group.groupId),
       bytes = GroupMetadataManager.groupMetadataValue(group, groupAssignment),
       timestamp = timestamp,
-      magicValue = magicValue)
+      magicValue = magicValue
+    )
 
     val groupMetadataPartition = new TopicPartition(
       TopicConstants.GROUP_METADATA_TOPIC_NAME,
@@ -267,7 +268,8 @@ class GroupMetadataManager(val brokerId: Int,
       config.offsetCommitRequiredAcks,
       true, // allow appending to internal offset topic
       delayedAppend.messageSet,
-      delayedAppend.callback)
+      delayedAppend.callback
+    )
   }
 
   /**
@@ -486,7 +488,8 @@ class GroupMetadataManager(val brokerId: Int,
                                 config.offsetsRetentionMs
                             else value.expireTimestamp
                           }
-                        ))
+                        )
+                      )
                       trace("Loaded offset %s for %s.".format(value, key))
                     }
                   } else {
@@ -651,28 +654,30 @@ class GroupMetadataManager(val brokerId: Int,
       debug("Found %d expired offsets.".format(expiredOffsets.size))
 
       // delete the expired offsets from the table and generate tombstone messages to remove them from the log
-      val tombstonesForPartition = expiredOffsets.map {
-        case (groupTopicAndPartition, offsetAndMetadata) =>
-          val offsetsPartition = partitionFor(groupTopicAndPartition.group)
-          trace(
-            "Removing expired offset and metadata for %s: %s"
-              .format(groupTopicAndPartition, offsetAndMetadata))
+      val tombstonesForPartition = expiredOffsets
+        .map {
+          case (groupTopicAndPartition, offsetAndMetadata) =>
+            val offsetsPartition = partitionFor(groupTopicAndPartition.group)
+            trace(
+              "Removing expired offset and metadata for %s: %s"
+                .format(groupTopicAndPartition, offsetAndMetadata))
 
-          offsetsCache.remove(groupTopicAndPartition)
+            offsetsCache.remove(groupTopicAndPartition)
 
-          val commitKey = GroupMetadataManager.offsetCommitKey(
-            groupTopicAndPartition.group,
-            groupTopicAndPartition.topicPartition.topic,
-            groupTopicAndPartition.topicPartition.partition)
+            val commitKey = GroupMetadataManager.offsetCommitKey(
+              groupTopicAndPartition.group,
+              groupTopicAndPartition.topicPartition.topic,
+              groupTopicAndPartition.topicPartition.partition)
 
-          val (magicValue, timestamp) =
-            getMessageFormatVersionAndTimestamp(offsetsPartition)
-          (offsetsPartition,
-           new Message(bytes = null,
-                       key = commitKey,
-                       timestamp = timestamp,
-                       magicValue = magicValue))
-      }.groupBy { case (partition, tombstone) => partition }
+            val (magicValue, timestamp) =
+              getMessageFormatVersionAndTimestamp(offsetsPartition)
+            (offsetsPartition,
+             new Message(bytes = null,
+                         key = commitKey,
+                         timestamp = timestamp,
+                         magicValue = magicValue))
+        }
+        .groupBy { case (partition, tombstone) => partition }
 
       // Append the tombstone messages to the offset partitions. It is okay if the replicas don't receive these (say,
       // if we crash or leaders move) since the new leaders will get rid of expired offsets during their own purge cycles.
@@ -719,12 +724,14 @@ class GroupMetadataManager(val brokerId: Int,
     val partitionOpt = replicaManager
       .getPartition(TopicConstants.GROUP_METADATA_TOPIC_NAME, partitionId)
 
-    val hw = partitionOpt.map { partition =>
-      partition
-        .leaderReplicaIfLocal()
-        .map(_.highWatermark.messageOffset)
-        .getOrElse(-1L)
-    }.getOrElse(-1L)
+    val hw = partitionOpt
+      .map { partition =>
+        partition
+          .leaderReplicaIfLocal()
+          .map(_.highWatermark.messageOffset)
+          .getOrElse(-1L)
+      }
+      .getOrElse(-1L)
 
     hw
   }
@@ -847,7 +854,8 @@ object GroupMetadataManager {
     new Field("client_host", STRING),
     new Field("session_timeout", INT32),
     new Field("subscription", BYTES),
-    new Field("assignment", BYTES))
+    new Field("assignment", BYTES)
+  )
   private val MEMBER_METADATA_MEMBER_ID_V0 =
     MEMBER_METADATA_V0.get("member_id")
   private val MEMBER_METADATA_CLIENT_ID_V0 =
@@ -866,7 +874,8 @@ object GroupMetadataManager {
     new Field("generation", INT32),
     new Field("protocol", STRING),
     new Field("leader", STRING),
-    new Field("members", new ArrayOf(MEMBER_METADATA_V0)))
+    new Field("members", new ArrayOf(MEMBER_METADATA_V0))
+  )
   private val GROUP_METADATA_PROTOCOL_TYPE_V0 =
     GROUP_METADATA_VALUE_SCHEMA_V0.get("protocol_type")
   private val GROUP_METADATA_GENERATION_V0 =

@@ -42,25 +42,27 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
                       .add(pov.game, moveOrDrop)) >>- notifyMove(
                     moveOrDrop,
                     progress.game) >> progress.game.finished
-                    .fold(moveFinish(progress.game, color) map {
-                      progress.events ::: _
-                    }, {
-                      cheatDetector(progress.game) addEffect {
-                        case Some(color) => round ! Cheat(color)
-                        case None =>
-                          if (progress.game.playableByAi)
-                            requestFishnet(progress.game)
-                          if (pov.opponent.isOfferingDraw)
-                            round ! DrawNo(pov.player.id)
-                          if (pov.player.isProposingTakeback)
-                            round ! TakebackNo(pov.player.id)
-                          moveOrDrop.left.toOption
-                            .ifTrue(pov.game.forecastable)
-                            .foreach { move =>
-                              round ! ForecastPlay(move)
-                            }
-                      } inject progress.events
-                    }) >>- promiseOption.foreach(_.success(()))
+                    .fold(
+                      moveFinish(progress.game, color) map {
+                        progress.events ::: _
+                      }, {
+                        cheatDetector(progress.game) addEffect {
+                          case Some(color) => round ! Cheat(color)
+                          case None =>
+                            if (progress.game.playableByAi)
+                              requestFishnet(progress.game)
+                            if (pov.opponent.isOfferingDraw)
+                              round ! DrawNo(pov.player.id)
+                            if (pov.player.isProposingTakeback)
+                              round ! TakebackNo(pov.player.id)
+                            moveOrDrop.left.toOption
+                              .ifTrue(pov.game.forecastable)
+                              .foreach { move =>
+                                round ! ForecastPlay(move)
+                              }
+                        } inject progress.events
+                      }
+                    ) >>- promiseOption.foreach(_.success(()))
               } addFailureEffect { e =>
               promiseOption.foreach(_ failure e)
             }
@@ -117,16 +119,18 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
 
   private def notifyMove(moveOrDrop: MoveOrDrop, game: Game) {
     val color = moveOrDrop.fold(_.color, _.color)
-    bus.publish(MoveEvent(
-                  gameId = game.id,
-                  color = color,
-                  fen = Forsyth exportBoard game.toChess.board,
-                  move = moveOrDrop.fold(_.toUci.keys, _.toUci.uci),
-                  mobilePushable = game.mobilePushable,
-                  opponentUserId = game.player(!color).userId,
-                  simulId = game.simulId
-                ),
-                'moveEvent)
+    bus.publish(
+      MoveEvent(
+        gameId = game.id,
+        color = color,
+        fen = Forsyth exportBoard game.toChess.board,
+        move = moveOrDrop.fold(_.toUci.keys, _.toUci.uci),
+        mobilePushable = game.mobilePushable,
+        opponentUserId = game.player(!color).userId,
+        simulId = game.simulId
+      ),
+      'moveEvent
+    )
   }
 
   private def moveFinish(game: Game, color: Color): Fu[Events] = {

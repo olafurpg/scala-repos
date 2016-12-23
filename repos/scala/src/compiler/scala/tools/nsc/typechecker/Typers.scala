@@ -931,7 +931,8 @@ trait Typers
             // approximate types that depend on arguments since dependency on implicit argument is like dependency on type parameter
             mt.approximate,
             keepNothings = false,
-            useWeaklyCompatible = true) // #3808
+            useWeaklyCompatible = true
+          ) // #3808
         }
 
         // avoid throwing spurious DivergentImplicit errors
@@ -1274,8 +1275,7 @@ trait Typers
                  TypeApply(
                    tree,
                    tparams1 map
-                     (tparam =>
-                        TypeTree(tparam.tpeHK) setPos tree.pos.focus)) setPos tree.pos)
+                     (tparam => TypeTree(tparam.tpeHK) setPos tree.pos.focus)) setPos tree.pos)
             context.undetparams ++= tparams1
             notifyUndetparamsAdded(tparams1)
             adapt(tree1 setType restpe.substSym(tparams, tparams1),
@@ -1455,7 +1455,8 @@ trait Typers
             clazz.pos,
             ("case %s has case ancestor %s, but case-to-case inheritance is prohibited." +
               " To overcome this limitation, use extractors to pattern match on non-leaf nodes.")
-              .format(clazz, ancestor.fullName))
+              .format(clazz, ancestor.fullName)
+          )
         }
       }
     }
@@ -1951,8 +1952,7 @@ trait Typers
           }
 
           if (parents exists
-                (p =>
-                   p != parent && p.tpe.typeSymbol == psym && !psym.isError))
+                (p => p != parent && p.tpe.typeSymbol == psym && !psym.isError))
             pending += ParentInheritedTwiceError(parent, psym)
 
           validateDynamicParent(psym, parent.pos)
@@ -2014,7 +2014,8 @@ trait Typers
             unit,
             """|subclassing Classfile does not
              |make your annotation visible at runtime.  If that is what
-             |you want, you must write the annotation class in Java.""".stripMargin)
+             |you want, you must write the annotation class in Java.""".stripMargin
+          )
       }
 
       warnTypeParameterShadow(tparams1, clazz)
@@ -3076,12 +3077,14 @@ trait Typers
       members foreach (m => anonClass.info.decls enter m.symbol)
 
       val typedBlock = typedPos(tree.pos, mode, pt) {
-        Block(ClassDef(anonClass, NoMods, ListOfNil, members, tree.pos.focus),
-              atPos(tree.pos.focus)(
-                Apply(Select(New(Ident(anonClass.name).setSymbol(anonClass)),
-                             nme.CONSTRUCTOR),
-                      List())
-              ))
+        Block(
+          ClassDef(anonClass, NoMods, ListOfNil, members, tree.pos.focus),
+          atPos(tree.pos.focus)(
+            Apply(Select(New(Ident(anonClass.name).setSymbol(anonClass)),
+                         nme.CONSTRUCTOR),
+                  List())
+          )
+        )
       }
 
       if (typedBlock.isErrorTyped) typedBlock
@@ -3166,7 +3169,8 @@ trait Typers
         Nil,
         List(fun.vparams.map(_.duplicate)), // must duplicate as we're also using them for `samDef`
         TypeTree(samDefTp) setPos sampos.focus,
-        fun.body)
+        fun.body
+      )
 
       // If we need to enter the sym for the body def before type checking the block,
       // we'll create a nested context, as explained below.
@@ -3253,7 +3257,8 @@ trait Typers
         Nil,
         List(fun.vparams),
         TypeTree(samMethTp.finalResultType) setPos sampos.focus,
-        Apply(Ident(bodyName), fun.vparams map gen.paramToArg))
+        Apply(Ident(bodyName), fun.vparams map gen.paramToArg)
+      )
 
       val serializableParentAddendum =
         if (typeIsSubTypeOfSerializable(samClassTp)) Nil
@@ -3270,7 +3275,8 @@ trait Typers
           vparamss = ListOfNil,
           body = List(samDef),
           superPos = sampos.focus
-        ))
+        )
+      )
 
       // type checking the whole block, so that everything is packaged together nicely
       // and we don't have to create any symbols by hand
@@ -4261,7 +4267,8 @@ trait Typers
                 "Usage of named or default arguments transformed this annotation\n" +
                   "constructor call into a block. The corresponding AnnotationInfo\n" +
                   "will contain references to local values and default getters instead\n" +
-                  "of the actual argument trees")
+                  "of the actual argument trees"
+              )
               annInfo(expr)
 
             case Apply(fun, args) =>
@@ -5490,7 +5497,8 @@ trait Typers
                               "")
                   qual // you only get to see the wrapped tree after running this check :-p
                 }) setType qual.tpe setPos qual.pos,
-                name)
+                name
+              )
             case _ if accessibleError.isDefined =>
               // don't adapt constructor, SI-6074
               val qual1 =
@@ -6077,7 +6085,8 @@ trait Typers
           devWarning(
             tree.pos,
             s"Assigning Any type to TypeTree because tree.original is null: tree is $tree/${System
-              .identityHashCode(tree)}, sym=${tree.symbol}, tpe=${tree.tpe}")
+              .identityHashCode(tree)}, sym=${tree.symbol}, tpe=${tree.tpe}"
+          )
           tree setType AnyTpe
         }
       }

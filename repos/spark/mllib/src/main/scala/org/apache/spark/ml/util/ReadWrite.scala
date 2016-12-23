@@ -292,10 +292,12 @@ private[ml] object DefaultParamsReader {
       implicit val format = DefaultFormats
       params match {
         case JObject(pairs) =>
-          val values = pairs.filter {
-            case (pName, jsonValue) =>
-              pName == paramName
-          }.map(_._2)
+          val values = pairs
+            .filter {
+              case (pName, jsonValue) =>
+                pName == paramName
+            }
+            .map(_._2)
           assert(values.length == 1,
                  s"Expected one instance of Param '$paramName' but found" +
                    s" ${values.length} in JSON Params: " +

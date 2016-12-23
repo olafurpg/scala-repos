@@ -559,7 +559,8 @@ class ScribeHandler(hostname: String,
             sent / period.inSeconds,
             dropped,
             failed,
-            skipped)
+            skipped
+          )
 
           _lastLogStats = Time.now
         }

@@ -65,7 +65,8 @@ object ColumnDefinitionProviderImpl {
       c.abort(
         c.enclosingPosition,
         s"""We cannot enforce ${T.tpe} is a case class, either it is not a case class or this macro call is possibly enclosed in a class.
-        This will mean the macro is operating on a non-resolved type.""")
+        This will mean the macro is operating on a non-resolved type."""
+      )
 
     // Field To JDBCColumn
     def matchField(
@@ -161,10 +162,13 @@ object ColumnDefinitionProviderImpl {
       // We have to build this up front as if the case class definition moves to another file
       // the annotation moves from the value onto the getter method?
       val annotationData: Map[String, List[(Type, List[Tree])]] =
-        outerTpe.declarations.map { m =>
-          val mappedAnnotations = m.annotations.map(t => (t.tpe, t.scalaArgs))
-          m.name.toString.trim -> mappedAnnotations
-        }.groupBy(_._1)
+        outerTpe.declarations
+          .map { m =>
+            val mappedAnnotations =
+              m.annotations.map(t => (t.tpe, t.scalaArgs))
+            m.name.toString.trim -> mappedAnnotations
+          }
+          .groupBy(_._1)
           .map {
             case (k, l) =>
               (k, l.map(_._2).reduce(_ ++ _))
@@ -174,38 +178,42 @@ object ColumnDefinitionProviderImpl {
               !v.isEmpty
           }
 
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { m =>
-        val fieldName = m.name.toTermName.toString.trim
-        val defaultVal = defaultArgs.get(fieldName)
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .map { m =>
+          val fieldName = m.name.toTermName.toString.trim
+          val defaultVal = defaultArgs.get(fieldName)
 
-        val annotationInfo: List[(Type, Option[Int])] =
-          annotationData.getOrElse(m.name.toString.trim, Nil).collect {
-            case (tpe, List(Literal(Constant(siz: Int))))
-                if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
-              (tpe, Some(siz))
-            case (tpe, _)
-                if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
-              c.abort(
-                c.enclosingPosition,
-                "Hit a size macro where we couldn't parse the value. Probably not a literal constant. Only literal constants are supported.")
-            case (tpe, _)
-                if tpe <:< typeOf[
-                  com.twitter.scalding.db.macros.ScaldingDBAnnotation] =>
-              (tpe, None)
-          }
-        (m, fieldName, defaultVal, annotationInfo)
-      }.map {
-        case (accessorMethod, fieldName, defaultVal, annotationInfo) =>
-          matchField(outerAccessorTree :+ accessorMethod,
-                     accessorMethod.returnType,
-                     FieldName(fieldName),
-                     defaultVal,
-                     annotationInfo,
-                     false)
-      }.toList
-      // This algorithm returns the error from the first exception we run into.
+          val annotationInfo: List[(Type, Option[Int])] =
+            annotationData.getOrElse(m.name.toString.trim, Nil).collect {
+              case (tpe, List(Literal(Constant(siz: Int))))
+                  if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
+                (tpe, Some(siz))
+              case (tpe, _)
+                  if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
+                c.abort(
+                  c.enclosingPosition,
+                  "Hit a size macro where we couldn't parse the value. Probably not a literal constant. Only literal constants are supported.")
+              case (tpe, _)
+                  if tpe <:< typeOf[
+                    com.twitter.scalding.db.macros.ScaldingDBAnnotation] =>
+                (tpe, None)
+            }
+          (m, fieldName, defaultVal, annotationInfo)
+        }
+        .map {
+          case (accessorMethod, fieldName, defaultVal, annotationInfo) =>
+            matchField(outerAccessorTree :+ accessorMethod,
+                       accessorMethod.returnType,
+                       FieldName(fieldName),
+                       defaultVal,
+                       annotationInfo,
+                       false)
+        }
+        .toList
+        // This algorithm returns the error from the first exception we run into.
         .foldLeft(scala.util.Try[List[ColumnFormat[c.type]]](Nil)) {
           case (pTry, nxt) =>
             (pTry, nxt) match {
@@ -225,11 +233,13 @@ object ColumnDefinitionProviderImpl {
       formats.map(_.fieldName).groupBy(identity).filter(_._2.size > 1).keys
 
     if (duplicateFields.nonEmpty) {
-      c.abort(c.enclosingPosition,
-              s"""
+      c.abort(
+        c.enclosingPosition,
+        s"""
         Duplicate field names found: ${duplicateFields.mkString(",")}.
         Please check your nested case classes.
-        """)
+        """
+      )
     } else {
       formats
     }

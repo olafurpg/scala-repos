@@ -110,7 +110,8 @@ private[ml] object Node {
         leftChild = fromOld(oldNode.leftNode.get, categoricalFeatures),
         rightChild = fromOld(oldNode.rightNode.get, categoricalFeatures),
         split = Split.fromOld(oldNode.split.get, categoricalFeatures),
-        impurityStats = null)
+        impurityStats = null
+      )
     }
   }
 }
@@ -226,7 +227,8 @@ final class InternalNode private[ml] (
           leftChild.impurity,
           rightChild.impurity,
           new OldPredict(leftChild.prediction, prob = 0.0),
-          new OldPredict(rightChild.prediction, prob = 0.0))))
+          new OldPredict(rightChild.prediction, prob = 0.0)))
+    )
   }
 
   override private[ml] def maxSplitFeatureIndex(): Int = {

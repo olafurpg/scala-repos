@@ -285,7 +285,8 @@ trait TestShardService
 
 class ShardServiceSpec extends TestShardService {
   def syncClient(query: String, apiKey: Option[String] = Some(testAPIKey)) = {
-    apiKey.map { queryService.query("apiKey", _) }
+    apiKey
+      .map { queryService.query("apiKey", _) }
       .getOrElse(queryService)
       .query("q", query)
   }
@@ -301,7 +302,8 @@ class ShardServiceSpec extends TestShardService {
   def asyncQuery(query: String,
                  apiKey: Option[String] = Some(testAPIKey),
                  path: String = ""): Future[HttpResponse[QueryResult]] = {
-    apiKey.map { asyncService.query("apiKey", _) }
+    apiKey
+      .map { asyncService.query("apiKey", _) }
       .getOrElse(asyncService)
       .query("q", query)
       .query("prefixPath", path)
@@ -313,7 +315,8 @@ class ShardServiceSpec extends TestShardService {
   def asyncQueryResults(jobId: JobId,
                         apiKey: Option[String] = Some(testAPIKey))
     : Future[HttpResponse[QueryResult]] = {
-    apiKey.map { asyncService.query("apiKey", _) }
+    apiKey
+      .map { asyncService.query("apiKey", _) }
       .getOrElse(asyncService)
       .get(jobId)
   }
@@ -454,14 +457,16 @@ class ShardServiceSpec extends TestShardService {
 
   def meta(apiKey: Option[String] = Some(testAPIKey),
            path: String = "/test"): Future[HttpResponse[QueryResult]] = {
-    apiKey.map { metaService.query("apiKey", _) }
+    apiKey
+      .map { metaService.query("apiKey", _) }
       .getOrElse(metadataService)
       .get(path)
   }
 
   def browse(apiKey: Option[String] = Some(testAPIKey),
              path: String = "/test"): Future[HttpResponse[QueryResult]] = {
-    apiKey.map { metaService.query("apiKey", _) }
+    apiKey
+      .map { metaService.query("apiKey", _) }
       .getOrElse(metaService)
       .get(path)
   }
@@ -470,7 +475,8 @@ class ShardServiceSpec extends TestShardService {
       apiKey: Option[String] = Some(testAPIKey),
       path: String = "/test",
       cpath: CPath = CPath.Identity): Future[HttpResponse[QueryResult]] = {
-    apiKey.map { metaService.query("apiKey", _) }
+    apiKey
+      .map { metaService.query("apiKey", _) }
       .getOrElse(metaService)
       .query("type", "structure")
       .query("property", cpath.toString)

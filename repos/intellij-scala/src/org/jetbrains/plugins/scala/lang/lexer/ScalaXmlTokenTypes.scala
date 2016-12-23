@@ -104,7 +104,8 @@ object ScalaXmlTokenTypes {
     XML_CDATA_START,
     XML_PI_START,
     XML_DATA_CHARACTERS,
-    XML_COMMENT_CHARACTERS)
+    XML_COMMENT_CHARACTERS
+  )
 
   val XML_COMMENTS =
     TokenSet.create(XML_COMMENT_START, XML_COMMENT_CHARACTERS, XML_COMMENT_END)
@@ -118,7 +119,8 @@ object ScalaXmlTokenTypes {
     XmlTokenType.XML_TAG_CHARACTERS,
     XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN,
     XmlTokenType.XML_PI_TARGET,
-    XmlTokenType.XML_COMMENT_CHARACTERS)
+    XmlTokenType.XML_COMMENT_CHARACTERS
+  )
 
   class PatchedXmlLexer
       extends MergingLexerAdapter(

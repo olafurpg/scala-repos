@@ -56,6 +56,7 @@ object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
         .first,
       itemStringIntMap = sc.get
         .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
-        .first)
+        .first
+    )
   }
 }

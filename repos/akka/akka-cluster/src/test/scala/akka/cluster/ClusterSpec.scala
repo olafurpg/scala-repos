@@ -119,7 +119,8 @@ class ClusterSpec extends AkkaSpec(ClusterSpec.config) with ImplicitSender {
           """
         akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
         akka.remote.netty.tcp.port = 0
-        """))
+        """)
+      )
       try {
         val ref = sys2.actorOf(Props.empty)
         Cluster(sys2).join(ref.path.address) // address doesn't contain full address information

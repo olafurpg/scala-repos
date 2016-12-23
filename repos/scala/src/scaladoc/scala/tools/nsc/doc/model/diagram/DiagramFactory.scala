@@ -72,10 +72,12 @@ trait DiagramFactory extends DiagramDirectiveParser {
           }
 
         // subclasses
-        var subclasses: List[Node] = tpl.directSubClasses.collect {
-          case d: TemplateImpl if !classExcluded(d) =>
-            NormalNode(makeType(d.sym.tpe, tpl), Some(d))()
-        }.sortBy(_.tpl.get.name)(implicitly[Ordering[String]].reverse)
+        var subclasses: List[Node] = tpl.directSubClasses
+          .collect {
+            case d: TemplateImpl if !classExcluded(d) =>
+              NormalNode(makeType(d.sym.tpe, tpl), Some(d))()
+          }
+          .sortBy(_.tpl.get.name)(implicitly[Ordering[String]].reverse)
 
         // outgoing implicit conversions
         lazy val outgoingImplicitNodes =
@@ -106,12 +108,14 @@ trait DiagramFactory extends DiagramDirectiveParser {
           else outgoingImplicitNodes
 
         // final diagram filter
-        filterDiagram(InheritanceDiagram(thisNode,
-                                         filteredSuperclasses.reverse,
-                                         filteredSubclasses.reverse,
-                                         filteredIncomingImplicits,
-                                         filteredImplicitOutgoingNodes),
-                      diagramFilter)
+        filterDiagram(
+          InheritanceDiagram(thisNode,
+                             filteredSuperclasses.reverse,
+                             filteredSubclasses.reverse,
+                             filteredIncomingImplicits,
+                             filteredImplicitOutgoingNodes),
+          diagramFilter
+        )
       }
 
     tModel += System.currentTimeMillis
@@ -263,11 +267,13 @@ trait DiagramFactory extends DiagramDirectiveParser {
             // println(superClasses.map(cl => "super: " + cl + "  " + hideOutgoing(cl)).mkString("\n"))
             // println(subClasses.map(cl => "sub: " + cl + "  " + hideIncoming(cl)).mkString("\n"))
             Some(
-              InheritanceDiagram(thisNode,
-                                 superClasses.filterNot(hideOutgoing(_)),
-                                 subClasses.filterNot(hideIncoming(_)),
-                                 incomingImplicits.filterNot(hideIncoming(_)),
-                                 outgoingImplicits.filterNot(hideOutgoing(_))))
+              InheritanceDiagram(
+                thisNode,
+                superClasses.filterNot(hideOutgoing(_)),
+                subClasses.filterNot(hideIncoming(_)),
+                incomingImplicits.filterNot(hideIncoming(_)),
+                outgoingImplicits.filterNot(hideOutgoing(_))
+              ))
 
           case ContentDiagram(nodes0, edges0) =>
             // Filter out all edges that:

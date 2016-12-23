@@ -190,16 +190,19 @@ private[http] object WebSocket {
     def createLogic(effectiveAttributes: Attributes) =
       new GraphStageLogic(shape) {
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
-            grab(in) match {
-              case b: BypassEvent with MessagePart ⇒
-                emit(bypass, b, () ⇒ emit(user, b, pullIn))
-              case b: BypassEvent ⇒ emit(bypass, b, pullIn)
-              case m: MessagePart ⇒ emit(user, m, pullIn)
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = {
+              grab(in) match {
+                case b: BypassEvent with MessagePart ⇒
+                  emit(bypass, b, () ⇒ emit(user, b, pullIn))
+                case b: BypassEvent ⇒ emit(bypass, b, pullIn)
+                case m: MessagePart ⇒ emit(user, m, pullIn)
+              }
             }
           }
-        })
+        )
         val pullIn = () ⇒ tryPull(in)
 
         setHandler(bypass, eagerTerminateOutput)
@@ -261,13 +264,16 @@ private[http] object WebSocket {
         setHandler(out, new OutHandler {
           override def onPull(): Unit = pull(in)
         })
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = push(out, grab(in))
-          override def onUpstreamFinish(): Unit =
-            emit(out, UserHandlerCompleted, () ⇒ completeStage())
-          override def onUpstreamFailure(ex: Throwable): Unit =
-            emit(out, UserHandlerErredOut(ex), () ⇒ completeStage())
-        })
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = push(out, grab(in))
+            override def onUpstreamFinish(): Unit =
+              emit(out, UserHandlerCompleted, () ⇒ completeStage())
+            override def onUpstreamFailure(ex: Throwable): Unit =
+              emit(out, UserHandlerErredOut(ex), () ⇒ completeStage())
+          }
+        )
       }
   }
 

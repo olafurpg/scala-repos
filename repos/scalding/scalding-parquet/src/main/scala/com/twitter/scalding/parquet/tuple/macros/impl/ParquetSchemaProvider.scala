@@ -13,7 +13,8 @@ object ParquetSchemaProvider {
       c.abort(
         c.enclosingPosition,
         s"""We cannot enforce ${T.tpe} is a case class, either it is not a case class or this macro call is possibly enclosed in a class.
-        This will mean the macro is operating on a non-resolved type.""")
+        This will mean the macro is operating on a non-resolved type."""
+      )
 
     def matchField(fieldType: Type,
                    fieldName: String,
@@ -79,13 +80,16 @@ object ParquetSchemaProvider {
     }
 
     def expandMethod(outerTpe: Type): List[Tree] = {
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
-        val fieldName = accessorMethod.name.toTermName.toString
-        val fieldType = accessorMethod.returnType
-        matchField(fieldType, fieldName, isOption = false)
-      }.toList
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .map { accessorMethod =>
+          val fieldName = accessorMethod.name.toTermName.toString
+          val fieldType = accessorMethod.returnType
+          matchField(fieldType, fieldName, isOption = false)
+        }
+        .toList
     }
 
     val expanded = expandMethod(T.tpe)

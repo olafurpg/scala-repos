@@ -76,7 +76,8 @@ object JSDependencyManifest {
         obj.fld[Origin]("origin"),
         obj.opt[List[JSDependency]]("libDeps").getOrElse(Nil),
         obj.opt[Boolean]("requiresDOM").getOrElse(false),
-        obj.opt[List[String]]("compliantSemantics").getOrElse(Nil))
+        obj.opt[List[String]]("compliantSemantics").getOrElse(Nil)
+      )
     }
   }
 

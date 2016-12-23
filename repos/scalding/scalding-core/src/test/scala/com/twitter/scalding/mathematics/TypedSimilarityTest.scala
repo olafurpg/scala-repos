@@ -35,17 +35,18 @@ class TypedCosineSimJob(args: Args) extends Job(args) {
     }
   }
   // Just keep the degree
-  .map { edge =>
-    edge.mapData { _._2 }
-  }
+    .map { edge =>
+      edge.mapData { _._2 }
+    }
 
   simOf(graph, { n: Int =>
     n % 2 == 0
   }, { n: Int =>
     n % 2 == 1
   }).map { edge =>
-    (edge.from, edge.to, edge.data)
-  }.write(TypedTsv[(Int, Int, Double)]("out"))
+      (edge.from, edge.to, edge.data)
+    }
+    .write(TypedTsv[(Int, Int, Double)]("out"))
 }
 
 class TypedDimsumCosineSimJob(args: Args) extends Job(args) {
@@ -62,8 +63,10 @@ class TypedDimsumCosineSimJob(args: Args) extends Job(args) {
   }, { n: Int =>
     n % 2 == 1
   }).map { edge =>
-    (edge.from, edge.to, edge.data)
-  }.toPipe('from, 'to, 'data).write(TypedTsv[(Int, Int, Double)]("out"))
+      (edge.from, edge.to, edge.data)
+    }
+    .toPipe('from, 'to, 'data)
+    .write(TypedTsv[(Int, Int, Double)]("out"))
 }
 
 class TypedSimilarityTest extends WordSpec with Matchers {

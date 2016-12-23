@@ -27,26 +27,34 @@ import scalaz._
 trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
   private def wrapper(request: Request[String])
     : EitherT[M, HttpClientError, Response[String]] = {
-    val response = Response(200, "OK", request.body map (_.data) map { data =>
-      val json = JParser.parseUnsafe(data)
-      val JString(field) = json \ "field"
-      val JArray(elems) = json \ "data"
-      val out = jobject("data" -> JArray(elems map { e =>
-        jobject(jfield(field, e))
-      }))
-      out.renderCompact
-    })
+    val response = Response(
+      200,
+      "OK",
+      request.body map (_.data) map { data =>
+        val json = JParser.parseUnsafe(data)
+        val JString(field) = json \ "field"
+        val JArray(elems) = json \ "data"
+        val out = jobject("data" -> JArray(elems map { e =>
+          jobject(jfield(field, e))
+        }))
+        out.renderCompact
+      }
+    )
     EitherT(M point \/-(response))
   }
 
   private def options(request: Request[String])
     : EitherT[M, HttpClientError, Response[String]] = {
-    val response = Response(200, "OK", request.body map (_.data) map { data =>
-      val json = JParser.parseUnsafe(data).asInstanceOf[JObject]
-      val JArray(elems) = json \ "data"
-      val options = List.fill(elems.size)(json - "data")
-      jobject("data" -> JArray(options)).renderCompact
-    })
+    val response = Response(
+      200,
+      "OK",
+      request.body map (_.data) map { data =>
+        val json = JParser.parseUnsafe(data).asInstanceOf[JObject]
+        val JArray(elems) = json \ "data"
+        val options = List.fill(elems.size)(json - "data")
+        jobject("data" -> JArray(options)).renderCompact
+      }
+    )
     EitherT(M point \/-(response))
   }
 

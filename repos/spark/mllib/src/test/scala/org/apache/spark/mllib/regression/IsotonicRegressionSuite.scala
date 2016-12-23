@@ -74,15 +74,8 @@ class IsotonicRegressionSuite
     val model = runIsotonicRegression(Seq(1, 2, 3, 1, 6, 17, 16, 17, 18), true)
 
     assert(
-      Array.tabulate(9)(x => model.predict(x)) === Array(1,
-                                                         2,
-                                                         2,
-                                                         2,
-                                                         6,
-                                                         16.5,
-                                                         16.5,
-                                                         17,
-                                                         18))
+      Array.tabulate(9)(x => model.predict(x)) === Array(1, 2, 2, 2, 6, 16.5,
+        16.5, 17, 18))
 
     assert(model.boundaries === Array(0, 1, 3, 4, 5, 6, 7, 8))
     assert(model.predictions === Array(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))

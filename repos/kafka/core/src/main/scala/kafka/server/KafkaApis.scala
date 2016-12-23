@@ -489,12 +489,14 @@ class KafkaApis(val requestChannel: RequestChannel,
           // the request, since no response is expected by the producer, the server will close socket server so that
           // the producer client will know that some error has happened and will refresh its metadata
           if (errorInResponse) {
-            val exceptionsSummary = mergedResponseStatus.map {
-              case (topicPartition, status) =>
-                topicPartition -> Errors
-                  .forCode(status.errorCode)
-                  .exceptionName
-            }.mkString(", ")
+            val exceptionsSummary = mergedResponseStatus
+              .map {
+                case (topicPartition, status) =>
+                  topicPartition -> Errors
+                    .forCode(status.errorCode)
+                    .exceptionName
+              }
+              .mkString(", ")
             info(
               s"Closing connection due to error during produce request with correlation id ${request.header.correlationId} " +
                 s"from client id ${request.header.clientId} with ack=0\n" +
@@ -1226,7 +1228,8 @@ class KafkaApis(val requestChannel: RequestChannel,
         JoinGroupResponse.UNKNOWN_PROTOCOL,
         JoinGroupResponse.UNKNOWN_MEMBER_ID, // memberId
         JoinGroupResponse.UNKNOWN_MEMBER_ID, // leaderId
-        Map.empty[String, ByteBuffer])
+        Map.empty[String, ByteBuffer]
+      )
       requestChannel.sendResponse(
         new RequestChannel.Response(request,
                                     new ResponseSend(request.connectionId,
@@ -1238,14 +1241,16 @@ class KafkaApis(val requestChannel: RequestChannel,
         .groupProtocols()
         .map(protocol => (protocol.name, Utils.toArray(protocol.metadata)))
         .toList
-      coordinator.handleJoinGroup(joinGroupRequest.groupId,
-                                  joinGroupRequest.memberId,
-                                  request.header.clientId,
-                                  request.session.clientAddress.toString,
-                                  joinGroupRequest.sessionTimeout,
-                                  joinGroupRequest.protocolType,
-                                  protocols,
-                                  sendResponseCallback)
+      coordinator.handleJoinGroup(
+        joinGroupRequest.groupId,
+        joinGroupRequest.memberId,
+        request.header.clientId,
+        request.session.clientAddress.toString,
+        joinGroupRequest.sessionTimeout,
+        joinGroupRequest.protocolType,
+        protocols,
+        sendResponseCallback
+      )
     }
   }
 

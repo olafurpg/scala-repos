@@ -15,12 +15,7 @@ class SelectTest extends FunSuite {
     var testArray = Array(7, 3, 2, 5, 1, 4, 2, -1)
     assert(
       DenseVector(Range(0, 6).map(quickSelect(testArray, _)).toArray) == DenseVector(
-        -1,
-        1,
-        2,
-        2,
-        3,
-        4))
+          -1, 1, 2, 2, 3, 4))
 
     testArray = shuffle(testArray)
     quickSelect.inPlace(testArray, 3)
@@ -33,12 +28,7 @@ class SelectTest extends FunSuite {
     var testArray = ArrayBuffer(7, 3, 2, 5, 1, 4, 2, -1)
     assert(
       DenseVector(Range(0, 6).map(quickSelect(testArray, _)).toArray) == DenseVector(
-        -1,
-        1,
-        2,
-        2,
-        3,
-        4))
+          -1, 1, 2, 2, 3, 4))
 
     testArray = shuffle(testArray)
     quickSelect.inPlace(testArray, 3)

@@ -248,7 +248,8 @@ class RequestSendThread(val controllerId: Int,
                                                     controllerContext.epoch,
                                                     request.toString,
                                                     brokerNode.toString()),
-                e)
+                e
+              )
               networkClient.close(brokerNode.idString)
               isSendSuccessful = false
               backoff()
@@ -377,12 +378,12 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
       Set(TopicAndPartition(topic, partition)))
   }
 
-  def addStopReplicaRequestForBrokers(brokerIds: Seq[Int],
-                                      topic: String,
-                                      partition: Int,
-                                      deletePartition: Boolean,
-                                      callback: (AbstractRequestResponse,
-                                                 Int) => Unit = null) {
+  def addStopReplicaRequestForBrokers(
+      brokerIds: Seq[Int],
+      topic: String,
+      partition: Int,
+      deletePartition: Boolean,
+      callback: (AbstractRequestResponse, Int) => Unit = null) {
     brokerIds.filter(b => b >= 0).foreach { brokerId =>
       stopReplicaRequestMap.getOrElseUpdate(brokerId,
                                             Seq.empty[StopReplicaRequestInfo])
@@ -507,7 +508,8 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
                 leaderIsr.leaderEpoch,
                 leaderIsr.isr.map(Integer.valueOf).asJava,
                 leaderIsr.zkVersion,
-                partitionStateInfo.allReplicas.map(Integer.valueOf).asJava)
+                partitionStateInfo.allReplicas.map(Integer.valueOf).asJava
+              )
               topicPartition -> partitionState
           }
           val leaderAndIsrRequest =
@@ -544,7 +546,8 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
                 leaderIsr.leaderEpoch,
                 leaderIsr.isr.map(Integer.valueOf).asJava,
                 leaderIsr.zkVersion,
-                partitionStateInfo.allReplicas.map(Integer.valueOf).asJava)
+                partitionStateInfo.allReplicas.map(Integer.valueOf).asJava
+              )
               topicPartition -> partitionState
           }
 

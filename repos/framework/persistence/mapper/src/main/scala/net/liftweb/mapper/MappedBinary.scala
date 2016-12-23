@@ -47,42 +47,46 @@ abstract class MappedBinary[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = Array[Byte] } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = Array[Byte]
+        /**
+          * The type of the field
+          */
+        type T = Array[Byte]
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = ""
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = ""
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Empty
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Empty
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Empty
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Empty
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   def dbFieldClass = classOf[Array[Byte]]
 
@@ -131,16 +135,19 @@ abstract class MappedBinary[T <: Mapper[T]](val fieldOwner: T)
                           inst: AnyRef,
                           columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
-        case f: MappedBinary[T] =>
-          val toSet = v match {
-            case null => null
-            case ba: Array[Byte] => ba
-            case other => other.toString.getBytes("UTF-8")
-          }
-          f.data() = toSet
-          f.orgData() = toSet
-      })
+      doField(
+        inst,
+        accessor, {
+          case f: MappedBinary[T] =>
+            val toSet = v match {
+              case null => null
+              case ba: Array[Byte] => ba
+              case other => other.toString.getBytes("UTF-8")
+            }
+            f.data() = toSet
+            f.orgData() = toSet
+        }
+    )
 
   def buildSetLongValue(accessor: Method,
                         columnName: String): (T, Long, Boolean) => Unit = null
@@ -177,42 +184,46 @@ abstract class MappedText[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = String } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = String
+        /**
+          * The type of the field
+          */
+        type T = String
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = v
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = v
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(v))
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(v))
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Full(JString(v))
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Full(JString(v))
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   def dbFieldClass = classOf[String]
 
@@ -270,18 +281,22 @@ abstract class MappedText[T <: Mapper[T]](val fieldOwner: T)
                           inst: AnyRef,
                           columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
-        case f: MappedText[T] =>
-          val toSet = v match {
-            case null => null
-            case s: String => s
-            case ba: Array[Byte] => new String(ba, "UTF-8")
-            case clob: java.sql.Clob => clob.getSubString(1, clob.length.toInt)
-            case other => other.toString
-          }
-          f.data() = toSet
-          f.orgData() = toSet
-      })
+      doField(
+        inst,
+        accessor, {
+          case f: MappedText[T] =>
+            val toSet = v match {
+              case null => null
+              case s: String => s
+              case ba: Array[Byte] => new String(ba, "UTF-8")
+              case clob: java.sql.Clob =>
+                clob.getSubString(1, clob.length.toInt)
+              case other => other.toString
+            }
+            f.data() = toSet
+            f.orgData() = toSet
+        }
+    )
 
   def buildSetLongValue(accessor: Method,
                         columnName: String): (T, Long, Boolean) => Unit = null
@@ -330,42 +345,46 @@ abstract class MappedFakeClob[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = String } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = String
+        /**
+          * The type of the field
+          */
+        type T = String
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = v
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = v
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(v))
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(v))
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Full(JString(v))
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Full(JString(v))
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   /**
     * Get the JDBC SQL Type for this field
@@ -421,17 +440,21 @@ abstract class MappedFakeClob[T <: Mapper[T]](val fieldOwner: T)
                           inst: AnyRef,
                           columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
-        case f: MappedFakeClob[T] =>
-          val toSet = v match {
-            case null => null
-            case ba: Array[Byte] => new String(ba, "UTF-8")
-            case clob: java.sql.Clob => clob.getSubString(1, clob.length.toInt)
-            case other => other.toString
-          }
-          f.data() = toSet
-          f.orgData() = toSet
-      })
+      doField(
+        inst,
+        accessor, {
+          case f: MappedFakeClob[T] =>
+            val toSet = v match {
+              case null => null
+              case ba: Array[Byte] => new String(ba, "UTF-8")
+              case clob: java.sql.Clob =>
+                clob.getSubString(1, clob.length.toInt)
+              case other => other.toString
+            }
+            f.data() = toSet
+            f.orgData() = toSet
+        }
+    )
 
   def buildSetLongValue(accessor: Method,
                         columnName: String): (T, Long, Boolean) => Unit = null

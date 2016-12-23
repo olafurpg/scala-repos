@@ -250,10 +250,12 @@ class MarathonHealthCheckManager @Inject()(
       case None => Future.successful(Nil)
       case Some(appVersion) =>
         Future.sequence(
-          listActive(appId, appVersion).iterator.collect {
-            case ActiveHealthCheck(_, actor) =>
-              (actor ? GetTaskHealth(taskId)).mapTo[Health]
-          }.to[Seq]
+          listActive(appId, appVersion).iterator
+            .collect {
+              case ActiveHealthCheck(_, actor) =>
+                (actor ? GetTaskHealth(taskId)).mapTo[Health]
+            }
+            .to[Seq]
         )
     }
   }

@@ -56,15 +56,15 @@ class HttpModelIntegrationSpec
       // own HTTP model.
 
       val request =
-        HttpRequest(method = HttpMethods.POST,
-                    uri = Uri("/greeting"),
-                    headers =
-                      List(Host("localhost"), RawHeader("Origin", "null")),
-                    entity =
-                      HttpEntity.Default(contentType =
-                                           ContentTypes.`application/json`,
-                                         contentLength = 5,
-                                         Source(List(ByteString("hello")))))
+        HttpRequest(
+          method = HttpMethods.POST,
+          uri = Uri("/greeting"),
+          headers = List(Host("localhost"), RawHeader("Origin", "null")),
+          entity = HttpEntity.Default(contentType =
+                                        ContentTypes.`application/json`,
+                                      contentLength = 5,
+                                      Source(List(ByteString("hello"))))
+        )
 
       // Our library uses a simple model of headers: a Seq[(String, String)].
       // The body is represented as an Array[Byte]. To get the headers in

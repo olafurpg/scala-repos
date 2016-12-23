@@ -46,7 +46,8 @@ class PrimitivePickler[T: FastTypeTag](name: String)
                                    |tag in unpickle: '${tag}'
                                    |message:
                                    |$msg""".stripMargin,
-          cause)
+          cause
+        )
     }
   }
 }

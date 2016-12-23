@@ -209,19 +209,21 @@ private[json] object Meta {
     if (primitive_?(clazz)) {
       Value(rawClassOf(clazz))
     } else {
-      mappings.memoize((clazz, typeArgs), {
-        case (t, _) =>
-          val c = rawClassOf(t)
-          val (pt, typeInfo) =
-            if (typeArgs.isEmpty) {
-              (t, TypeInfo(c, None))
-            } else {
-              val t = mkParameterizedType(c, typeArgs)
-              (t, TypeInfo(c, Some(t)))
-            }
+      mappings.memoize(
+        (clazz, typeArgs), {
+          case (t, _) =>
+            val c = rawClassOf(t)
+            val (pt, typeInfo) =
+              if (typeArgs.isEmpty) {
+                (t, TypeInfo(c, None))
+              } else {
+                val t = mkParameterizedType(c, typeArgs)
+                (t, TypeInfo(c, Some(t)))
+              }
 
-          Constructor(typeInfo, constructors(pt, Set(), None))
-      })
+            Constructor(typeInfo, constructors(pt, Set(), None))
+        }
+      )
     }
   }
 
@@ -271,29 +273,31 @@ private[json] object Meta {
 
     val primitives =
       Map[Class[_], Unit]() ++
-        (List[Class[_]](classOf[String],
-                        classOf[Int],
-                        classOf[Long],
-                        classOf[Double],
-                        classOf[Float],
-                        classOf[Byte],
-                        classOf[BigInt],
-                        classOf[Boolean],
-                        classOf[Short],
-                        classOf[java.lang.Integer],
-                        classOf[java.lang.Long],
-                        classOf[java.lang.Double],
-                        classOf[java.lang.Float],
-                        classOf[java.lang.Byte],
-                        classOf[java.lang.Boolean],
-                        classOf[Number],
-                        classOf[java.lang.Short],
-                        classOf[Date],
-                        classOf[Timestamp],
-                        classOf[Symbol],
-                        classOf[JValue],
-                        classOf[JObject],
-                        classOf[JArray]).map((_, ())))
+        (List[Class[_]](
+          classOf[String],
+          classOf[Int],
+          classOf[Long],
+          classOf[Double],
+          classOf[Float],
+          classOf[Byte],
+          classOf[BigInt],
+          classOf[Boolean],
+          classOf[Short],
+          classOf[java.lang.Integer],
+          classOf[java.lang.Long],
+          classOf[java.lang.Double],
+          classOf[java.lang.Float],
+          classOf[java.lang.Byte],
+          classOf[java.lang.Boolean],
+          classOf[Number],
+          classOf[java.lang.Short],
+          classOf[Date],
+          classOf[Timestamp],
+          classOf[Symbol],
+          classOf[JValue],
+          classOf[JObject],
+          classOf[JArray]
+        ).map((_, ())))
 
     private val primaryConstructorArgumentsMemo =
       new Memo[Class[_], List[(String, Type)]]

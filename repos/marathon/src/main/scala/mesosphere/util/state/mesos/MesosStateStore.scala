@@ -85,7 +85,8 @@ class MesosStateStore(state: State, timeout: Duration)
           s"Exception while calling $getClass.allIds(). " +
             s"This problem should occur only with an empty zookeeper state. " +
             s"In that case, you can ignore this message",
-          ex)
+          ex
+        )
         Seq.empty[ID]
     }
   }

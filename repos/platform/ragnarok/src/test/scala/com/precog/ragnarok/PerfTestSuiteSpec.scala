@@ -63,9 +63,12 @@ class PerfTestSuiteSpec extends Specification {
                                     ))
                         )),
               Tree.leaf[PerfTest](RunQuery("3"))
-            ))
-        ))
-    ))
+            )
+          )
+        )
+      )
+    )
+  )
 
   "the DSL" should {
     "create an initial group based on the class" in {

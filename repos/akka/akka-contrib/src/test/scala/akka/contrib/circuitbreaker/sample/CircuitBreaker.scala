@@ -74,7 +74,8 @@ class CircuitBreaker(potentiallyFailingService: ActorRef)
         }
       })
       .props(potentiallyFailingService),
-    "serviceCircuitBreaker")
+    "serviceCircuitBreaker"
+  )
 
   override def receive: Receive = {
     case AskFor(requestToForward) ⇒
@@ -121,7 +122,8 @@ class CircuitBreakerAsk(potentiallyFailingService: ActorRef)
         Left(s"Circuit open when processing ${failure.failedMsg}")
       })
       .props(potentiallyFailingService),
-    "serviceCircuitBreaker")
+    "serviceCircuitBreaker"
+  )
 
   import context.dispatcher
 
@@ -161,7 +163,8 @@ class CircuitBreakerAskWithFailure(potentiallyFailingService: ActorRef)
       maxFailures = 3,
       callTimeout = askTimeout,
       resetTimeout = 30.seconds).props(target = potentiallyFailingService),
-    "serviceCircuitBreaker")
+    "serviceCircuitBreaker"
+  )
 
   import context.dispatcher
 
@@ -196,7 +199,8 @@ class CircuitBreakerAskWithCircuitBreaker(potentiallyFailingService: ActorRef)
       maxFailures = 3,
       callTimeout = askTimeout,
       resetTimeout = 30.seconds).props(target = potentiallyFailingService),
-    "serviceCircuitBreaker")
+    "serviceCircuitBreaker"
+  )
 
   import context.dispatcher
 

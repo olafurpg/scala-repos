@@ -461,15 +461,18 @@ class MasterSuite
 
     val killedExecutors = new ConcurrentLinkedQueue[(String, Int)]()
     val killedDrivers = new ConcurrentLinkedQueue[String]()
-    val fakeWorker = master.rpcEnv.setupEndpoint("worker", new RpcEndpoint {
-      override val rpcEnv: RpcEnv = master.rpcEnv
+    val fakeWorker = master.rpcEnv.setupEndpoint(
+      "worker",
+      new RpcEndpoint {
+        override val rpcEnv: RpcEnv = master.rpcEnv
 
-      override def receive: PartialFunction[Any, Unit] = {
-        case KillExecutor(_, appId, execId) =>
-          killedExecutors.add(appId, execId)
-        case KillDriver(driverId) => killedDrivers.add(driverId)
+        override def receive: PartialFunction[Any, Unit] = {
+          case KillExecutor(_, appId, execId) =>
+            killedExecutors.add(appId, execId)
+          case KillDriver(driverId) => killedDrivers.add(driverId)
+        }
       }
-    })
+    )
 
     master.self.ask(
       RegisterWorker("1",

@@ -300,7 +300,8 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
       (StringRef.internalName, MethodBType(Nil, UNIT).descriptor),
       (StringRef.internalName, MethodBType(List(StringRef), UNIT).descriptor),
       (StringRef.internalName,
-       MethodBType(List(ArrayBType(CHAR)), UNIT).descriptor))
+       MethodBType(List(ArrayBType(CHAR)), UNIT).descriptor)
+    )
   }
 
   def isSideEffectFreeConstructorCall(insn: MethodInsnNode): Boolean = {

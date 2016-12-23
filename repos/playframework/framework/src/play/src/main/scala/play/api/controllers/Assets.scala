@@ -192,14 +192,17 @@ private[controllers] class AssetInfo(val name: String,
 
   val lastModified: Option[String] = {
     def getLastModified[T <: URLConnection](f: (T) => Long): Option[String] = {
-      Option(url.openConnection).map {
-        case urlConnection: T @unchecked =>
-          try {
-            f(urlConnection)
-          } finally {
-            Resources.closeUrlConnection(urlConnection)
-          }
-      }.filterNot(_ == -1).map(httpDateFormat.print)
+      Option(url.openConnection)
+        .map {
+          case urlConnection: T @unchecked =>
+            try {
+              f(urlConnection)
+            } finally {
+              Resources.closeUrlConnection(urlConnection)
+            }
+        }
+        .filterNot(_ == -1)
+        .map(httpDateFormat.print)
     }
 
     url.getProtocol match {
@@ -277,13 +280,16 @@ object Assets extends AssetsBuilder(LazyHttpErrorHandler) {
   val digestCache = TrieMap[String, Option[String]]()
 
   private[controllers] def digest(path: String): Option[String] = {
-    digestCache.getOrElse(path, {
-      val maybeDigestUrl: Option[URL] = resource(path + "." + digestAlgorithm)
-      val maybeDigest: Option[String] =
-        maybeDigestUrl.map(Source.fromURL(_).mkString)
-      if (!isDev && maybeDigest.isDefined) digestCache.put(path, maybeDigest)
-      maybeDigest
-    })
+    digestCache.getOrElse(
+      path, {
+        val maybeDigestUrl: Option[URL] =
+          resource(path + "." + digestAlgorithm)
+        val maybeDigest: Option[String] =
+          maybeDigestUrl.map(Source.fromURL(_).mkString)
+        if (!isDev && maybeDigest.isDefined) digestCache.put(path, maybeDigest)
+        maybeDigest
+      }
+    )
   }
 
   // Sames goes for the minified paths cache.
@@ -293,22 +299,24 @@ object Assets extends AssetsBuilder(LazyHttpErrorHandler) {
     config(_.getBoolean("assets.checkForMinified")).getOrElse(true)
 
   private[controllers] def minifiedPath(path: String): String = {
-    minifiedPathsCache.getOrElse(path, {
-      def minifiedPathFor(delim: Char): Option[String] = {
-        val ext = path.reverse.takeWhile(_ != '.').reverse
-        val noextPath = path.dropRight(ext.size + 1)
-        val minPath = noextPath + delim + "min." + ext
-        resource(minPath).map(_ => minPath)
-      }
-      val maybeMinifiedPath =
-        if (checkForMinified) {
-          minifiedPathFor('.').orElse(minifiedPathFor('-')).getOrElse(path)
-        } else {
-          path
+    minifiedPathsCache.getOrElse(
+      path, {
+        def minifiedPathFor(delim: Char): Option[String] = {
+          val ext = path.reverse.takeWhile(_ != '.').reverse
+          val noextPath = path.dropRight(ext.size + 1)
+          val minPath = noextPath + delim + "min." + ext
+          resource(minPath).map(_ => minPath)
         }
-      if (!isDev) minifiedPathsCache.put(path, maybeMinifiedPath)
-      maybeMinifiedPath
-    })
+        val maybeMinifiedPath =
+          if (checkForMinified) {
+            minifiedPathFor('.').orElse(minifiedPathFor('-')).getOrElse(path)
+          } else {
+            path
+          }
+        if (!isDev) minifiedPathsCache.put(path, maybeMinifiedPath)
+        maybeMinifiedPath
+      }
+    )
   }
 
   private[controllers] lazy val assetInfoCache =

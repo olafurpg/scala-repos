@@ -59,9 +59,11 @@ case class HandlerCall(packageName: String,
   val dynamic = if (instantiate) "@" else ""
   override def toString =
     dynamic + packageName + "." + controller + dynamic + "." + method +
-      parameters.map { params =>
-        "(" + params.mkString(", ") + ")"
-      }.getOrElse("")
+      parameters
+        .map { params =>
+          "(" + params.mkString(", ") + ")"
+        }
+        .getOrElse("")
 }
 
 /**

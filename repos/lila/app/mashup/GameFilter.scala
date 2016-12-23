@@ -45,18 +45,20 @@ object GameFilterMenu {
 
     val user = info.user
 
-    val filters = NonEmptyList.nel(All,
-                                   List(
-                                     (info.nbWithMe > 0) option Me,
-                                     (info.nbRated > 0) option Rated,
-                                     (info.user.count.win > 0) option Win,
-                                     (info.user.count.loss > 0) option Loss,
-                                     (info.user.count.draw > 0) option Draw,
-                                     (info.nbPlaying > 0) option Playing,
-                                     (info.nbBookmark > 0) option Bookmark,
-                                     (info.nbImported > 0) option Imported,
-                                     (info.user.count.game > 0) option Search
-                                   ).flatten)
+    val filters = NonEmptyList.nel(
+      All,
+      List(
+        (info.nbWithMe > 0) option Me,
+        (info.nbRated > 0) option Rated,
+        (info.user.count.win > 0) option Win,
+        (info.user.count.loss > 0) option Loss,
+        (info.user.count.draw > 0) option Draw,
+        (info.nbPlaying > 0) option Playing,
+        (info.nbBookmark > 0) option Bookmark,
+        (info.nbImported > 0) option Imported,
+        (info.user.count.game > 0) option Search
+      ).flatten
+    )
 
     val currentName =
       currentNameOption | info.hasSimul

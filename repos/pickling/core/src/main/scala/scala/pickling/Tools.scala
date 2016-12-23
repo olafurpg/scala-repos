@@ -144,13 +144,16 @@ class Tools[C <: Context](val c: C) {
           if (sym.isFinal || sym.isModuleClass) {
             Nil
           } else if (treatAsSealed(sym)) {
-            val syms: List[ClassSymbol] = directSubclasses(sym).map {
-              case csym: ClassSymbol => csym
-              case msym: ModuleSymbol => msym.moduleClass.asClass
-              case osym =>
-                throw new Exception(
-                  s"unexpected known direct subclass: $osym <: $sym")
-            }.toList.flatMap(loop)
+            val syms: List[ClassSymbol] = directSubclasses(sym)
+              .map {
+                case csym: ClassSymbol => csym
+                case msym: ModuleSymbol => msym.moduleClass.asClass
+                case osym =>
+                  throw new Exception(
+                    s"unexpected known direct subclass: $osym <: $sym")
+              }
+              .toList
+              .flatMap(loop)
             syms
           } else {
             hierarchyIsSealed = false
@@ -168,45 +171,47 @@ class Tools[C <: Context](val c: C) {
     def sourcepathAndClasspathScan(): List[Symbol] = {
       println(s"full classpath scan: $tpe")
       lazy val classpathCache = Tools
-        .subclassCache(mirror, {
-          val cache = MutableMap[Symbol, MutableList[Symbol]]()
-          def updateCache(bc: Symbol, c: Symbol) = {
-            if (bc != c &&
-                isRelevantSubclass(bc, c)) // TODO: what else do we want to ignore?
-              cache.getOrElseUpdate(bc, MutableList()) += c
-          }
-          def loop(pkg: Symbol): Unit = {
-            // NOTE: only looking for top-level classes!
-            val pkgMembers = pkg.typeSignature.members
-            pkgMembers foreach
-              (m => {
-                 def analyze(m: Symbol): Unit = {
-                   if (m.name.decoded.contains("$")) () // SI-7251
-                   else if (m.isClass)
-                     m.asClass.baseClasses foreach
-                       (bc => updateCache(bc, m))
-                   else if (m.isModule) analyze(m.asModule.moduleClass)
-                   else ()
-                 }
-                 analyze(m)
-               })
-            def recurIntoPackage(pkg: Symbol) = {
-              pkg.name.toString != "_root_" &&
-              pkg.name.toString != "quicktime" &&
-              // TODO: pesky thing on my classpath, crashes ClassfileParser
-              pkg.name.toString != "j3d" &&
-              // TODO: another ClassfileParser crash
-              pkg.name.toString != "jansi" &&
-              // TODO: and another one (jline.jar)
-              pkg.name.toString != "jsoup" // TODO: SI-3809
+        .subclassCache(
+          mirror, {
+            val cache = MutableMap[Symbol, MutableList[Symbol]]()
+            def updateCache(bc: Symbol, c: Symbol) = {
+              if (bc != c &&
+                  isRelevantSubclass(bc, c)) // TODO: what else do we want to ignore?
+                cache.getOrElseUpdate(bc, MutableList()) += c
             }
-            val subpackages =
-              pkgMembers filter (m => m.isPackage && recurIntoPackage(m))
-            subpackages foreach loop
+            def loop(pkg: Symbol): Unit = {
+              // NOTE: only looking for top-level classes!
+              val pkgMembers = pkg.typeSignature.members
+              pkgMembers foreach
+                (m => {
+                   def analyze(m: Symbol): Unit = {
+                     if (m.name.decoded.contains("$")) () // SI-7251
+                     else if (m.isClass)
+                       m.asClass.baseClasses foreach
+                         (bc => updateCache(bc, m))
+                     else if (m.isModule) analyze(m.asModule.moduleClass)
+                     else ()
+                   }
+                   analyze(m)
+                 })
+              def recurIntoPackage(pkg: Symbol) = {
+                pkg.name.toString != "_root_" &&
+                pkg.name.toString != "quicktime" &&
+                // TODO: pesky thing on my classpath, crashes ClassfileParser
+                pkg.name.toString != "j3d" &&
+                // TODO: another ClassfileParser crash
+                pkg.name.toString != "jansi" &&
+                // TODO: and another one (jline.jar)
+                pkg.name.toString != "jsoup" // TODO: SI-3809
+              }
+              val subpackages =
+                pkgMembers filter (m => m.isPackage && recurIntoPackage(m))
+              subpackages foreach loop
+            }
+            loop(mirror.RootClass)
+            cache // NOTE: 126873 cache entries for my classpath
           }
-          loop(mirror.RootClass)
-          cache // NOTE: 126873 cache entries for my classpath
-        })
+        )
         .asInstanceOf[MutableMap[Symbol, MutableList[Symbol]]]
       classpathCache.getOrElse(baseSym, Nil).toList
     }

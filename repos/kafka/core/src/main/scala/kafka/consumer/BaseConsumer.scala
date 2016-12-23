@@ -111,13 +111,15 @@ class OldConsumer(topicFilter: TopicFilter, consumerProps: Properties)
     if (!iter.hasNext()) throw new StreamEndException
 
     val messageAndMetadata = iter.next
-    BaseConsumerRecord(messageAndMetadata.topic,
-                       messageAndMetadata.partition,
-                       messageAndMetadata.offset,
-                       messageAndMetadata.timestamp,
-                       messageAndMetadata.timestampType,
-                       messageAndMetadata.key,
-                       messageAndMetadata.message)
+    BaseConsumerRecord(
+      messageAndMetadata.topic,
+      messageAndMetadata.partition,
+      messageAndMetadata.offset,
+      messageAndMetadata.timestamp,
+      messageAndMetadata.timestampType,
+      messageAndMetadata.key,
+      messageAndMetadata.message
+    )
   }
 
   override def stop() {

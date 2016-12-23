@@ -141,7 +141,8 @@ object Run {
       algorithmClassMapOpt = Some(Map("" -> classOf[LocalAlgorithm])),
       algorithmParamsList = Seq(("", EmptyParams())),
       servingClassOpt = Some(classOf[LFirstServing[Vector[Double], Double]]),
-      evaluatorClassOpt = Some(classOf[MeanSquareError]))
+      evaluatorClassOpt = Some(classOf[MeanSquareError])
+    )
   }
 
   def runEngine() {

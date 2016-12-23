@@ -318,15 +318,19 @@ class ZkClientTest extends WordSpec with MockitoSugar {
 
       "only retry when instructed to" in {
         var i = 0
-        Await.ready(zkClient.retrying { _ =>
-          i += 1
-          Future.exception(connectionLoss)
-        }.onSuccess { _ =>
-          fail("Shouldn't have succeeded")
-        }.handle {
-          case e: KeeperException.ConnectionLossException =>
-            assert(i == 1)
-        })
+        Await.ready(
+          zkClient
+            .retrying { _ =>
+              i += 1
+              Future.exception(connectionLoss)
+            }
+            .onSuccess { _ =>
+              fail("Shouldn't have succeeded")
+            }
+            .handle {
+              case e: KeeperException.ConnectionLossException =>
+                assert(i == 1)
+            })
       }
     }
 
@@ -690,10 +694,12 @@ class ZkClientTest extends WordSpec with MockitoSugar {
       "monitor" in {
         val znode = zkClient("/characters")
         val results =
-          List(Seq("Angel", "Buffy", "Giles", "Willow", "Xander"),
-               Seq("Angel", "Buffy", "Giles", "Spike", "Willow", "Xander"),
-               Seq("Buffy", "Giles", "Willow", "Xander"),
-               Seq("Angel", "Spike")) map {
+          List(
+            Seq("Angel", "Buffy", "Giles", "Willow", "Xander"),
+            Seq("Angel", "Buffy", "Giles", "Spike", "Willow", "Xander"),
+            Seq("Buffy", "Giles", "Willow", "Xander"),
+            Seq("Angel", "Spike")
+          ) map {
             ZNode.Children(znode, new Stat, _)
           }
         results foreach { r =>
@@ -810,15 +816,17 @@ class ZkClientTest extends WordSpec with MockitoSugar {
         })
 
       val treeChildren =
-        treeRoot +: ('a' to 'e').map { c =>
-          ZNode.Children(treeRoot(c.toString), new Stat, 'a' to c map {
-            _.toString
-          })
-        }.flatMap { z =>
-          z +: z.children.map { c =>
-            ZNode.Children(c, new Stat, Nil)
+        treeRoot +: ('a' to 'e')
+          .map { c =>
+            ZNode.Children(treeRoot(c.toString), new Stat, 'a' to c map {
+              _.toString
+            })
           }
-        }
+          .flatMap { z =>
+            z +: z.children.map { c =>
+              ZNode.Children(c, new Stat, Nil)
+            }
+          }
 
       // Lay out node updates for the tree: Add a 'z' node to all nodes named 'a'
       val updateTree = treeChildren.collect {

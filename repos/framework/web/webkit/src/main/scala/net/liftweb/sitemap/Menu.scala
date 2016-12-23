@@ -120,27 +120,29 @@ object Menu extends MenuSingleton {
       * for example "/foo/bar" or "/foo/ * /bar"
       */
     def path(pathElement: String): ParamMenuable[T] =
-      new ParamMenuable[T](name,
-                           linkText,
-                           parser,
-                           encoder,
-                           pathElement
-                             .charSplit('/')
-                             .drop(if (pathElement.startsWith("/")) 1
-                             else 0)
-                             .map(_.trim)
-                             .filter(_ != "**")
-                             .map {
-                               case "*" => *
-                               case "" => NormalLocPath("index")
-                               case str => NormalLocPath(str)
-                             } match {
-                             case Nil => List(NormalLocPath("index"))
-                             case xs => xs
-                           },
-                           pathElement.endsWith("**"),
-                           Nil,
-                           Nil)
+      new ParamMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        pathElement
+          .charSplit('/')
+          .drop(if (pathElement.startsWith("/")) 1
+          else 0)
+          .map(_.trim)
+          .filter(_ != "**")
+          .map {
+            case "*" => *
+            case "" => NormalLocPath("index")
+            case str => NormalLocPath(str)
+          } match {
+          case Nil => List(NormalLocPath("index"))
+          case xs => xs
+        },
+        pathElement.endsWith("**"),
+        Nil,
+        Nil
+      )
   }
 
   class ParamMenuable[T](val name: String,

@@ -179,61 +179,68 @@ class BytecodeTest extends ClearAfterClass {
                         Op(IRETURN)))
 
     // t2: no unnecessary GOTOs
-    assertSameCode(getSingleMethod(c, "t2"),
-                   List(VarOp(ILOAD, 1),
-                        IntOp(SIPUSH, 393),
-                        Jump(IF_ICMPNE, Label(7)),
-                        Op(ICONST_1),
-                        Jump(GOTO, Label(10)),
-                        Label(7),
-                        Op(ICONST_2),
-                        Label(10),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t2"),
+      List(VarOp(ILOAD, 1),
+           IntOp(SIPUSH, 393),
+           Jump(IF_ICMPNE, Label(7)),
+           Op(ICONST_1),
+           Jump(GOTO, Label(10)),
+           Label(7),
+           Op(ICONST_2),
+           Label(10),
+           Op(IRETURN))
+    )
 
     // t3: Array == is translated to reference equality, AnyRef == to null checks and equals
-    assertSameCode(getSingleMethod(c, "t3"),
-                   List(
-                        // Array ==
-                        VarOp(ALOAD, 1),
-                        VarOp(ALOAD, 2),
-                        Jump(IF_ACMPEQ, Label(23)),
-                        // AnyRef ==
-                        VarOp(ALOAD, 2),
-                        VarOp(ALOAD, 1),
-                        VarOp(ASTORE, 3),
-                        Op(DUP),
-                        Jump(IFNONNULL, Label(14)),
-                        Op(POP),
-                        VarOp(ALOAD, 3),
-                        Jump(IFNULL, Label(19)),
-                        Jump(GOTO, Label(23)),
-                        Label(14),
-                        VarOp(ALOAD, 3),
-                        Invoke(INVOKEVIRTUAL,
-                               "java/lang/Object",
-                               "equals",
-                               "(Ljava/lang/Object;)Z",
-                               false),
-                        Jump(IFEQ, Label(23)),
-                        Label(19),
-                        Op(ICONST_1),
-                        Jump(GOTO, Label(26)),
-                        Label(23),
-                        Op(ICONST_0),
-                        Label(26),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t3"),
+      List(
+        // Array ==
+        VarOp(ALOAD, 1),
+        VarOp(ALOAD, 2),
+        Jump(IF_ACMPEQ, Label(23)),
+        // AnyRef ==
+        VarOp(ALOAD, 2),
+        VarOp(ALOAD, 1),
+        VarOp(ASTORE, 3),
+        Op(DUP),
+        Jump(IFNONNULL, Label(14)),
+        Op(POP),
+        VarOp(ALOAD, 3),
+        Jump(IFNULL, Label(19)),
+        Jump(GOTO, Label(23)),
+        Label(14),
+        VarOp(ALOAD, 3),
+        Invoke(INVOKEVIRTUAL,
+               "java/lang/Object",
+               "equals",
+               "(Ljava/lang/Object;)Z",
+               false),
+        Jump(IFEQ, Label(23)),
+        Label(19),
+        Op(ICONST_1),
+        Jump(GOTO, Label(26)),
+        Label(23),
+        Op(ICONST_0),
+        Label(26),
+        Op(IRETURN)
+      )
+    )
 
-    val t4t5 = List(VarOp(ALOAD, 1),
-                    Jump(IFNULL, Label(6)),
-                    VarOp(ALOAD, 1),
-                    Jump(IFNULL, Label(10)),
-                    Label(6),
-                    Op(ICONST_1),
-                    Jump(GOTO, Label(13)),
-                    Label(10),
-                    Op(ICONST_0),
-                    Label(13),
-                    Op(IRETURN))
+    val t4t5 = List(
+      VarOp(ALOAD, 1),
+      Jump(IFNULL, Label(6)),
+      VarOp(ALOAD, 1),
+      Jump(IFNULL, Label(10)),
+      Label(6),
+      Op(ICONST_1),
+      Jump(GOTO, Label(13)),
+      Label(10),
+      Op(ICONST_0),
+      Label(13),
+      Op(IRETURN)
+    )
 
     // t4: one side is known null, so just a null check on the other
     assertSameCode(getSingleMethod(c, "t4"), t4t5)
@@ -242,23 +249,27 @@ class BytecodeTest extends ClearAfterClass {
     assertSameCode(getSingleMethod(c, "t5"), t4t5)
 
     // t6: no unnecessary GOTOs
-    assertSameCode(getSingleMethod(c, "t6"),
-                   List(VarOp(ILOAD, 1),
-                        IntOp(BIPUSH, 10),
-                        Jump(IF_ICMPNE, Label(7)),
-                        VarOp(ILOAD, 2),
-                        Jump(IFNE, Label(12)),
-                        Label(7),
-                        VarOp(ILOAD, 1),
-                        Op(ICONST_1),
-                        Jump(IF_ICMPEQ, Label(16)),
-                        Label(12),
-                        Op(ICONST_1),
-                        Jump(GOTO, Label(19)),
-                        Label(16),
-                        Op(ICONST_2),
-                        Label(19),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t6"),
+      List(
+        VarOp(ILOAD, 1),
+        IntOp(BIPUSH, 10),
+        Jump(IF_ICMPNE, Label(7)),
+        VarOp(ILOAD, 2),
+        Jump(IFNE, Label(12)),
+        Label(7),
+        VarOp(ILOAD, 1),
+        Op(ICONST_1),
+        Jump(IF_ICMPEQ, Label(16)),
+        Label(12),
+        Op(ICONST_1),
+        Jump(GOTO, Label(19)),
+        Label(16),
+        Op(ICONST_2),
+        Label(19),
+        Op(IRETURN)
+      )
+    )
 
     // t7: universal equality
     assertInvoke(getSingleMethod(c, "t7"),
@@ -266,32 +277,36 @@ class BytecodeTest extends ClearAfterClass {
                  "equals")
 
     // t8: no null checks invoking equals on modules and constants
-    assertSameCode(getSingleMethod(c, "t8"),
-                   List(Field(GETSTATIC,
-                              "scala/collection/immutable/Nil$",
-                              "MODULE$",
-                              "Lscala/collection/immutable/Nil$;"),
-                        VarOp(ALOAD, 1),
-                        Invoke(INVOKEVIRTUAL,
-                               "java/lang/Object",
-                               "equals",
-                               "(Ljava/lang/Object;)Z",
-                               false),
-                        Jump(IFNE, Label(10)),
-                        Ldc(LDC, ""),
-                        VarOp(ALOAD, 1),
-                        Invoke(INVOKEVIRTUAL,
-                               "java/lang/Object",
-                               "equals",
-                               "(Ljava/lang/Object;)Z",
-                               false),
-                        Jump(IFNE, Label(14)),
-                        Label(10),
-                        Op(ICONST_1),
-                        Jump(GOTO, Label(17)),
-                        Label(14),
-                        Op(ICONST_0),
-                        Label(17),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t8"),
+      List(
+        Field(GETSTATIC,
+              "scala/collection/immutable/Nil$",
+              "MODULE$",
+              "Lscala/collection/immutable/Nil$;"),
+        VarOp(ALOAD, 1),
+        Invoke(INVOKEVIRTUAL,
+               "java/lang/Object",
+               "equals",
+               "(Ljava/lang/Object;)Z",
+               false),
+        Jump(IFNE, Label(10)),
+        Ldc(LDC, ""),
+        VarOp(ALOAD, 1),
+        Invoke(INVOKEVIRTUAL,
+               "java/lang/Object",
+               "equals",
+               "(Ljava/lang/Object;)Z",
+               false),
+        Jump(IFNE, Label(14)),
+        Label(10),
+        Op(ICONST_1),
+        Jump(GOTO, Label(17)),
+        Label(14),
+        Op(ICONST_0),
+        Label(17),
+        Op(IRETURN)
+      )
+    )
   }
 }

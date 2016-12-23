@@ -280,9 +280,9 @@ class BasicOperationsSuite extends TestSuiteBase {
       val t1 = s1.map(x => (x, 1))
       val t2 = s2.map(x => (x, "x"))
       t1.transformWith( // RDD.join in transform
-                       t2,
-                       (rdd1: RDD[(String, Int)],
-                        rdd2: RDD[(String, String)]) => rdd1.join(rdd2))
+        t2,
+        (rdd1: RDD[(String, Int)], rdd2: RDD[(String, String)]) =>
+          rdd1.join(rdd2))
     }
     testOperation(inputData1, inputData2, operation, outputData, true)
   }
@@ -298,9 +298,8 @@ class BasicOperationsSuite extends TestSuiteBase {
 
     val operation = (s1: DStream[String], s2: DStream[String]) => {
       s1.transformWith( // RDD.join in transform
-                       s2,
-                       (rdd1: RDD[String],
-                        rdd2: RDD[String]) => rdd1.union(rdd2))
+        s2,
+        (rdd1: RDD[String], rdd2: RDD[String]) => rdd1.union(rdd2))
     }
 
     intercept[SparkException] {

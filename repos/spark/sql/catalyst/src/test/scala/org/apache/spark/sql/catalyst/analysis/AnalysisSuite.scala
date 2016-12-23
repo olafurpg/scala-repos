@@ -71,13 +71,15 @@ class AnalysisSuite extends AnalysisTest {
       Project(Seq(UnresolvedAttribute("TbL.a")),
               UnresolvedRelation(TableIdentifier("TaBlE"), Some("TbL"))),
       Project(testRelation.output, testRelation),
-      caseSensitive = false)
+      caseSensitive = false
+    )
 
     checkAnalysis(
       Project(Seq(UnresolvedAttribute("tBl.a")),
               UnresolvedRelation(TableIdentifier("TaBlE"), Some("TbL"))),
       Project(testRelation.output, testRelation),
-      caseSensitive = false)
+      caseSensitive = false
+    )
   }
 
   test("resolve sort references - filter/limit") {

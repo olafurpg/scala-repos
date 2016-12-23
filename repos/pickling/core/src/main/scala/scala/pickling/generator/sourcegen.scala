@@ -358,12 +358,14 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
         CaseDef(
           Ident(nme.WILDCARD),
           EmptyTree,
-          q"_root_.scala.pickling.internal.`package`.currentRuntime.picklers.genUnpickler(_root_.scala.pickling.internal.`package`.currentMirror, tagKey)")
+          q"_root_.scala.pickling.internal.`package`.currentRuntime.picklers.genUnpickler(_root_.scala.pickling.internal.`package`.currentMirror, tagKey)"
+        )
       else
         CaseDef(
           Ident(nme.WILDCARD),
           EmptyTree,
-          q"""throw new _root_.scala.pickling.PicklingException("Cannot unpickle, Unexpected tag: " + tagKey + " not recognized.")""")
+          q"""throw new _root_.scala.pickling.PicklingException("Cannot unpickle, Unexpected tag: " + tagKey + " not recognized.")"""
+        )
     val subClassCases =
       x.subClasses.toList map { sc =>
         val stpe = sc.tpe[c.universe.type](c.universe)

@@ -116,7 +116,8 @@ class ScalaImportOptimizer extends ImportOptimizer {
 
               true
             }
-          })
+          }
+        )
     }
 
     processAllElementsConcurrentlyUnderProgress { element =>
@@ -181,11 +182,13 @@ class ScalaImportOptimizer extends ImportOptimizer {
       }
 
       def sameInfosWithUpdatedRanges(): Seq[(TextRange, Seq[ImportInfo])] = {
-        optimized.zip {
-          collectRanges(_ => Set.empty, _ => Seq.empty)
-        }.map {
-          case ((_, infos), (range, _)) => (range, infos)
-        }
+        optimized
+          .zip {
+            collectRanges(_ => Set.empty, _ => Seq.empty)
+          }
+          .map {
+            case ((_, infos), (range, _)) => (range, infos)
+          }
       }
     }
   }
@@ -232,12 +235,15 @@ class ScalaImportOptimizer extends ImportOptimizer {
       }
     }
 
-    val text = importInfos.map { info =>
-      val index: Int = findGroupIndex(info.prefixQualifier, settings)
-      val blankLines = groupSeparatorsBefore(info, index)
-      prevGroupIndex = index
-      blankLines + textCreator.getImportText(info, settings)
-    }.mkString(newLineWithIndent).replaceAll("""\n[ \t]+\n""", "\n\n")
+    val text = importInfos
+      .map { info =>
+        val index: Int = findGroupIndex(info.prefixQualifier, settings)
+        val blankLines = groupSeparatorsBefore(info, index)
+        prevGroupIndex = index
+        blankLines + textCreator.getImportText(info, settings)
+      }
+      .mkString(newLineWithIndent)
+      .replaceAll("""\n[ \t]+\n""", "\n\n")
 
     val newRange: TextRange =
       if (text.isEmpty) {

@@ -1062,9 +1062,11 @@ object SQLContext {
     }
     data.map { element =>
       new GenericInternalRow(
-        methodsToConverts.map {
-          case (e, convert) => convert(e.invoke(element))
-        }.toArray[Any]
+        methodsToConverts
+          .map {
+            case (e, convert) => convert(e.invoke(element))
+          }
+          .toArray[Any]
       ): InternalRow
     }
   }

@@ -44,7 +44,8 @@ object StronglyConnectedComponents {
     // the graph we update with final SCC ids, and the graph we return at the end
     var sccGraph = graph.mapVertices { case (vid, _) => vid }
     // graph we are going to work with in our iterations
-    var sccWorkGraph = graph.mapVertices { case (vid, _) => (vid, false) }
+    var sccWorkGraph = graph
+      .mapVertices { case (vid, _) => (vid, false) }
       .cache()
 
     var numVertices = sccWorkGraph.numVertices
@@ -65,11 +66,13 @@ object StronglyConnectedComponents {
           .cache()
 
         // get all vertices to be removed
-        val finalVertices = sccWorkGraph.vertices.filter {
-          case (vid, (scc, isFinal)) => isFinal
-        }.mapValues { (vid, data) =>
-          data._1
-        }
+        val finalVertices = sccWorkGraph.vertices
+          .filter {
+            case (vid, (scc, isFinal)) => isFinal
+          }
+          .mapValues { (vid, data) =>
+            data._1
+          }
 
         // write values to sccGraph
         sccGraph = sccGraph.outerJoinVertices(finalVertices) {
@@ -92,8 +95,8 @@ object StronglyConnectedComponents {
                                                   Long.MaxValue,
                                                   activeDirection =
                                                     EdgeDirection.Out)(
-          (vid, myScc,
-           neighborScc) => (math.min(myScc._1, neighborScc), myScc._2),
+          (vid, myScc, neighborScc) =>
+            (math.min(myScc._1, neighborScc), myScc._2),
           e => {
             if (e.srcAttr._1 < e.dstAttr._1) {
               Iterator((e.dstId, e.srcAttr._1))
@@ -101,7 +104,8 @@ object StronglyConnectedComponents {
               Iterator()
             }
           },
-          (vid1, vid2) => math.min(vid1, vid2))
+          (vid1, vid2) => math.min(vid1, vid2)
+        )
 
       // start at root of SCCs. Traverse values in reverse, notify all my neighbors
       // do not propagate if colors do not match!
@@ -126,7 +130,8 @@ object StronglyConnectedComponents {
               Iterator()
             }
           },
-          (final1, final2) => final1 || final2)
+          (final1, final2) => final1 || final2
+        )
     }
     sccGraph
   }

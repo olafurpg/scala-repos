@@ -182,20 +182,22 @@ object DisplayAppScalingResults {
 
         val rateUnits: String =
           (jsObject \ "rate_units").asOpt[String].getOrElse("-")
-        IndexedSeq[Any](shortenName(timer),
-                        dFull("count"),
-                        d1000("mean"),
-                        d1000("min"),
-                        d1000("p50"),
-                        d1000("p75"),
-                        d1000("p95"),
-                        d1000("p98"),
-                        d1000("p99"),
-                        d1000("p999"),
-                        d1000("max"),
-                        d1000("stddev"),
-                        dFull("mean_rate"),
-                        rateUnits)
+        IndexedSeq[Any](
+          shortenName(timer),
+          dFull("count"),
+          d1000("mean"),
+          d1000("min"),
+          d1000("p50"),
+          d1000("p75"),
+          d1000("p95"),
+          d1000("p98"),
+          d1000("p99"),
+          d1000("p999"),
+          d1000("max"),
+          d1000("stddev"),
+          dFull("mean_rate"),
+          rateUnits
+        )
     }.toSeq
 
     val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])

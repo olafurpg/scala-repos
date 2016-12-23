@@ -170,17 +170,16 @@ private[ui] class ThriftServerSessionPage(parent: ThriftServerTab)
         val dataRows = sessionList
           .sortBy(_.startTimestamp)
           .reverse
-          .map(
-            session =>
-              Seq(
-                session.userName,
-                session.ip,
-                session.sessionId,
-                formatDate(session.startTimestamp),
-                formatDate(session.finishTimestamp),
-                formatDurationOption(Some(session.totalTime)),
-                session.totalExecution.toString
-            ))
+          .map(session =>
+            Seq(
+              session.userName,
+              session.ip,
+              session.sessionId,
+              formatDate(session.startTimestamp),
+              formatDate(session.finishTimestamp),
+              formatDurationOption(Some(session.totalTime)),
+              session.totalExecution.toString
+          ))
           .toSeq
         val headerRow = Seq("User",
                             "IP",

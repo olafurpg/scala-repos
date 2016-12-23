@@ -965,7 +965,8 @@ trait SHtml extends Loggable {
           attrs.foldLeft(<input type="radio" name={groupName}
                                      value={Helpers.nextFuncName}/>)(_ % _) % checked(
             deflt == Full(v)) %
-            ("onclick" -> ajaxCall(Str(""), ignore => ajaxFunc(v))._2.toJsCmd))
+            ("onclick" -> ajaxCall(Str(""), ignore => ajaxFunc(v))._2.toJsCmd)
+        )
       }
     }
     ChoiceHolder(itemList)
@@ -2493,14 +2494,16 @@ trait SHtml extends Loggable {
     }
 
     S.fmapFunc(selectionHandler _)(funcName => {
-      cssSelToValue.map {
-        case (cssSel, value) =>
-          s"$cssSel [name]" #> funcName & s"$cssSel [value]" #> radioOptions(
-            value) & s"$cssSel [checked]" #> {
-            if (initialValue === value) Some("true")
-            else None
-          }
-      }.reduceLeft(_ & _)
+      cssSelToValue
+        .map {
+          case (cssSel, value) =>
+            s"$cssSel [name]" #> funcName & s"$cssSel [value]" #> radioOptions(
+              value) & s"$cssSel [checked]" #> {
+              if (initialValue === value) Some("true")
+              else None
+            }
+        }
+        .reduceLeft(_ & _)
     })
   }
 

@@ -1094,7 +1094,8 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
           EasyMock.anyShort(),
           EasyMock.anyBoolean(),
           EasyMock.anyObject().asInstanceOf[Map[TopicPartition, MessageSet]],
-          EasyMock.capture(capturedArgument)))
+          EasyMock.capture(capturedArgument)
+        ))
       .andAnswer(new IAnswer[Unit] {
         override def answer = capturedArgument.getValue.apply(
           Map(
@@ -1201,7 +1202,8 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
           EasyMock.anyShort(),
           EasyMock.anyBoolean(),
           EasyMock.anyObject().asInstanceOf[Map[TopicPartition, MessageSet]],
-          EasyMock.capture(capturedArgument)))
+          EasyMock.capture(capturedArgument)
+        ))
       .andAnswer(new IAnswer[Unit] {
         override def answer = capturedArgument.getValue.apply(
           Map(

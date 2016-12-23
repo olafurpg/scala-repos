@@ -110,19 +110,21 @@ private[prediction] case class EventOp(
           unset.fields.filter { case (k, v) => (v >= set.fields(k).t) }.keySet)
         .getOrElse(Set())
 
-      val combinedFields = deleteEntity.map { delete =>
-        if (delete.t >= set.t) {
-          None
-        } else {
-          val deleteKeys: Set[String] = set.fields.filter {
-            case (k, PropTime(kv, t)) =>
-              (delete.t >= t)
-          }.keySet
-          Some(set.fields -- unsetKeys -- deleteKeys)
+      val combinedFields = deleteEntity
+        .map { delete =>
+          if (delete.t >= set.t) {
+            None
+          } else {
+            val deleteKeys: Set[String] = set.fields.filter {
+              case (k, PropTime(kv, t)) =>
+                (delete.t >= t)
+            }.keySet
+            Some(set.fields -- unsetKeys -- deleteKeys)
+          }
         }
-      }.getOrElse {
-        Some(set.fields -- unsetKeys)
-      }
+        .getOrElse {
+          Some(set.fields -- unsetKeys)
+        }
 
       // Note: mapValues() doesn't return concrete Map and causes
       // NotSerializableException issue. Use map(identity) to work around this.
@@ -187,10 +189,9 @@ class PBatchView(val appId: Int,
       untilTimeOpt: Option[DateTime] = None
   ): RDD[(String, DataMap)] = {
 
-    _events
-      .filter(e =>
-        ((e.entityType == entityType) &&
-          (EventValidation.isSpecialEvents(e.event))))
+    _events.filter(e =>
+      ((e.entityType == entityType) &&
+        (EventValidation.isSpecialEvents(e.event))))
       .map(e => (e.entityId, EventOp(e)))
       .aggregateByKey[EventOp](EventOp())(
         // within same partition

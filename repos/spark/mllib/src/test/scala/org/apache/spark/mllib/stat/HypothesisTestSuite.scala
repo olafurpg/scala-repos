@@ -90,18 +90,8 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("chi squared pearson matrix independence") {
-    val data = Array(40.0,
-                     24.0,
-                     29.0,
-                     56.0,
-                     32.0,
-                     42.0,
-                     31.0,
-                     10.0,
-                     0.0,
-                     30.0,
-                     15.0,
-                     12.0)
+    val data = Array(40.0, 24.0, 29.0, 56.0, 32.0, 42.0, 31.0, 10.0, 0.0, 30.0,
+      15.0, 12.0)
     // [[40.0, 56.0, 31.0, 30.0],
     //  [24.0, 32.0, 10.0, 15.0],
     //  [29.0, 42.0, 0.0,  12.0]]
@@ -136,12 +126,14 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // labels: 1.0 (2 / 6), 0.0 (4 / 6)
     // feature1: 0.5 (1 / 6), 1.5 (2 / 6), 3.5 (3 / 6)
     // feature2: 10.0 (1 / 6), 20.0 (1 / 6), 30.0 (2 / 6), 40.0 (2 / 6)
-    val data = Seq(LabeledPoint(0.0, Vectors.dense(0.5, 10.0)),
-                   LabeledPoint(0.0, Vectors.dense(1.5, 20.0)),
-                   LabeledPoint(1.0, Vectors.dense(1.5, 30.0)),
-                   LabeledPoint(0.0, Vectors.dense(3.5, 30.0)),
-                   LabeledPoint(0.0, Vectors.dense(3.5, 40.0)),
-                   LabeledPoint(1.0, Vectors.dense(3.5, 40.0)))
+    val data = Seq(
+      LabeledPoint(0.0, Vectors.dense(0.5, 10.0)),
+      LabeledPoint(0.0, Vectors.dense(1.5, 20.0)),
+      LabeledPoint(1.0, Vectors.dense(1.5, 30.0)),
+      LabeledPoint(0.0, Vectors.dense(3.5, 30.0)),
+      LabeledPoint(0.0, Vectors.dense(3.5, 40.0)),
+      LabeledPoint(1.0, Vectors.dense(3.5, 40.0))
+    )
     for (numParts <- List(2, 4, 6, 8)) {
       val chi = Statistics.chiSqTest(sc.parallelize(data, numParts))
       val feature1 = chi(0)

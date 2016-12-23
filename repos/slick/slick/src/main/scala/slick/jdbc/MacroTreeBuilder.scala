@@ -99,7 +99,8 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                    TypeName("Tuple" + resultTypes.size)),
             resultTypeTrees.toList
           ),
-          GetResultTypeTree)
+          GetResultTypeTree
+        )
       case n =>
         val rtypeTree = {
           val zero = TypeTree(

@@ -122,7 +122,8 @@ package object simul extends PackageObject with WithPlay with WithSocket {
       "Xenon",
       "Ytterbium",
       "Yttrium",
-      "Zinc")
+      "Zinc"
+    )
     private val size = names.size
 
     def apply(): String = names(scala.util.Random nextInt size)

@@ -127,13 +127,15 @@ private[report] final class ReportApi {
             multi = true) >>- monitorUnprocessed
 
   def processTroll(userId: String, byModId: String): Funit =
-    $update(Json.obj(
-              "user" -> userId,
-              "reason" -> $in(
-                List(Reason.Insult.name, Reason.Troll.name, Reason.Other.name))
-            ) ++ unprocessedSelect,
-            $set("processedBy" -> byModId),
-            multi = true) >>- monitorUnprocessed
+    $update(
+      Json.obj(
+        "user" -> userId,
+        "reason" -> $in(
+          List(Reason.Insult.name, Reason.Troll.name, Reason.Other.name))
+      ) ++ unprocessedSelect,
+      $set("processedBy" -> byModId),
+      multi = true
+    ) >>- monitorUnprocessed
 
   def autoInsultReport(userId: String, text: String): Funit = {
     UserRepo byId userId zip UserRepo.lichess flatMap {

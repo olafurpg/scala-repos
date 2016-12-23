@@ -33,25 +33,27 @@ object MColumn {
                             tablePattern.schema_?,
                             tablePattern.name,
                             columnPattern)) { r =>
-      MColumn(MQName.from(r),
-              r.<<,
-              r.<<,
-              r.<<,
-              r.<<,
-              r.skip.<<,
-              r.<<,
-              r.nextInt match {
-                case DatabaseMetaData.columnNoNulls => Some(false)
-                case DatabaseMetaData.columnNullable => Some(true)
-                case _ => None
-              },
-              r.<<,
-              r.<<,
-              r.skip.skip.<<,
-              r.<<,
-              DatabaseMeta.yesNoOpt(r),
-              if (r.hasMoreColumns) MQName.optionalFrom(r) else None,
-              r.<<?,
-              if (r.hasMoreColumns) DatabaseMeta.yesNoOpt(r) else None)
+      MColumn(
+        MQName.from(r),
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.skip.<<,
+        r.<<,
+        r.nextInt match {
+          case DatabaseMetaData.columnNoNulls => Some(false)
+          case DatabaseMetaData.columnNullable => Some(true)
+          case _ => None
+        },
+        r.<<,
+        r.<<,
+        r.skip.skip.<<,
+        r.<<,
+        DatabaseMeta.yesNoOpt(r),
+        if (r.hasMoreColumns) MQName.optionalFrom(r) else None,
+        r.<<?,
+        if (r.hasMoreColumns) DatabaseMeta.yesNoOpt(r) else None
+      )
     }
 }

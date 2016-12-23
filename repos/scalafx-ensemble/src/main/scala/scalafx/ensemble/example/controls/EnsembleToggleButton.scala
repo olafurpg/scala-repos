@@ -60,19 +60,23 @@ class EnsembleToggleButton extends EnsembleExample {
       children = List(
         new HBox {
           spacing = 10
-          children = List(new ToggleButton {
-            minWidth = 100
-            text = "Hi"
-            toggleGroup = tog
-          }, new ToggleButton {
-            minWidth = 100
-            text = "ScalaFX"
-            toggleGroup = tog
-          }, new ToggleButton {
-            minWidth = 100
-            text = "Ensemble"
-            toggleGroup = tog
-          })
+          children = List(
+            new ToggleButton {
+              minWidth = 100
+              text = "Hi"
+              toggleGroup = tog
+            },
+            new ToggleButton {
+              minWidth = 100
+              text = "ScalaFX"
+              toggleGroup = tog
+            },
+            new ToggleButton {
+              minWidth = 100
+              text = "Ensemble"
+              toggleGroup = tog
+            }
+          )
         },
         toggleLabel
       )

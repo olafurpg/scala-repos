@@ -56,7 +56,8 @@ class ScalaPrefixPackageCompletionContributor
             result)
         }
       }
-    })
+    }
+  )
 }
 
 object ScalaPrefixPackageCompletionContributor {

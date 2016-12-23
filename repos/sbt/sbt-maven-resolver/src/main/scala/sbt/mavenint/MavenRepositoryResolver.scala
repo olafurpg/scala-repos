@@ -262,7 +262,8 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
             // a basic ivy file is written containing default data
             XmlModuleDescriptorWriter.write(md, dest);
           }
-        })
+        }
+      )
       rmr
     } catch {
       case e: org.eclipse.aether.resolution.ArtifactDescriptorException =>
@@ -410,7 +411,8 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
               dd: DependencyDescriptor): DependencyDescriptor = {
             super.mediate(dd)
           }
-        })
+        }
+      )
     }
   }
 
@@ -492,14 +494,17 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
         val excludedModule = new ModuleId(e.getGroupId, e.getArtifactId)
         for (conf <- dd.getModuleConfigurations) {
           // TODO - Do we need extra attributes for this?
-          dd.addExcludeRule(conf,
-                            new DefaultExcludeRule(
-                              new ArtifactId(excludedModule,
-                                             PatternMatcher.ANY_EXPRESSION,
-                                             PatternMatcher.ANY_EXPRESSION,
-                                             PatternMatcher.ANY_EXPRESSION),
-                              ExactPatternMatcher.INSTANCE,
-                              null))
+          dd.addExcludeRule(
+            conf,
+            new DefaultExcludeRule(
+              new ArtifactId(excludedModule,
+                             PatternMatcher.ANY_EXPRESSION,
+                             PatternMatcher.ANY_EXPRESSION,
+                             PatternMatcher.ANY_EXPRESSION),
+              ExactPatternMatcher.INSTANCE,
+              null
+            )
+          )
         }
       }
       md.addDependency(dd)

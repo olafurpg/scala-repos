@@ -56,8 +56,10 @@ abstract class AbstractTable[T](val tableTag: Tag,
 
   protected[this] def collectFieldSymbols(n: Node): Iterable[FieldSymbol] =
     n.collect {
-      case Select(in, f: FieldSymbol) if in == tableNode => f
-    }.toSeq.distinct
+        case Select(in, f: FieldSymbol) if in == tableNode => f
+      }
+      .toSeq
+      .distinct
 
   /** Define a foreign key relationship.
     *
@@ -123,11 +125,16 @@ abstract class AbstractTable[T](val tableTag: Tag,
     } yield q
 
   final def foreignKeys: Iterable[ForeignKey] =
-    tableConstraints.collect { case q: ForeignKeyQuery[_, _] => q.fks }.flatten.toIndexedSeq
+    tableConstraints
+      .collect { case q: ForeignKeyQuery[_, _] => q.fks }
+      .flatten
+      .toIndexedSeq
       .sortBy(_.name)
 
   final def primaryKeys: Iterable[PrimaryKey] =
-    tableConstraints.collect { case k: PrimaryKey => k }.toIndexedSeq
+    tableConstraints
+      .collect { case k: PrimaryKey => k }
+      .toIndexedSeq
       .sortBy(_.name)
 
   /** Define an index or a unique constraint. */

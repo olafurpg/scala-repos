@@ -61,10 +61,16 @@ object ExtractSuperUtil {
             }
           }
           NavigationUtil
-            .getPsiElementPopup(classes, new PsiClassListCellRenderer() {
-              override def getElementText(element: PsiClass): String =
-                super.getElementText(element).replace("$", "")
-            }, "Choose class", processor, selection)
+            .getPsiElementPopup(
+              classes,
+              new PsiClassListCellRenderer() {
+                override def getElementText(element: PsiClass): String =
+                  super.getElementText(element).replace("$", "")
+              },
+              "Choose class",
+              processor,
+              selection
+            )
             .showInBestPositionFor(editor)
       }
     } catch {
@@ -170,13 +176,16 @@ object ExtractSuperUtil {
 
   def possibleMembersToExtract(
       clazz: ScTemplateDefinition): util.List[ScalaExtractMemberInfo] = {
-    clazz.members.filter {
-      case m if m.isPrivate => false
-      case fun: ScFunction if fun.isConstructor => false
-      case td: ScTypeDefinition => false
-      case _: ScPrimaryConstructor => false
-      case _ => true
-    }.map(new ScalaExtractMemberInfo(_)).asJava
+    clazz.members
+      .filter {
+        case m if m.isPrivate => false
+        case fun: ScFunction if fun.isConstructor => false
+        case td: ScTypeDefinition => false
+        case _: ScPrimaryConstructor => false
+        case _ => true
+      }
+      .map(new ScalaExtractMemberInfo(_))
+      .asJava
   }
 
   def declarationScope(m: ScMember): Seq[PsiElement] = {

@@ -30,10 +30,12 @@ class TestTransport(val localAddress: Address,
     extends Transport {
 
   def this(system: ExtendedActorSystem, conf: Config) = {
-    this(AddressFromURIString(conf.getString("local-address")),
-         AssociationRegistry.get(conf.getString("registry-key")),
-         conf.getBytes("maximum-payload-bytes").toInt,
-         conf.getString("scheme-identifier"))
+    this(
+      AddressFromURIString(conf.getString("local-address")),
+      AssociationRegistry.get(conf.getString("registry-key")),
+      conf.getBytes("maximum-payload-bytes").toInt,
+      conf.getString("scheme-identifier")
+    )
   }
 
   import akka.remote.transport.TestTransport._
@@ -173,7 +175,8 @@ class TestTransport(val localAddress: Address,
         case (handle, payload) ⇒
           registry.logActivity(
             WriteAttempt(handle.localAddress, handle.remoteAddress, payload))
-      })
+      }
+    )
 
   /**
     * The [[akka.remote.transport.TestTransport.SwitchableLoggedBehavior]] for the disassociate() method on handles. All

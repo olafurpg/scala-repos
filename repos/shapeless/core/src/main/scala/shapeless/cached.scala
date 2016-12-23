@@ -86,7 +86,8 @@ class CachedMacros(override val c: whitebox.Context)
         c.enclosingPosition,
         s"Cached[$tpe] called from a Lazy/Strict, you might want to consider caching " +
           "an implicit earlier, so that the whole Lazy/Strict itself gets cached. Caching " +
-          "is disabled here.")
+          "is disabled here."
+      )
 
     if (CachedMacros.deriving || concurrentLazy) {
       // Caching only the first (root) Cached, not subsequent ones as here
@@ -108,8 +109,8 @@ class CachedMacros(override val c: whitebox.Context)
           // Trying to derive them in a standalone way raised
           // https://github.com/fommil/spray-json-shapeless/issues/14.
           val tree = mkImpl[T](
-            (tree,
-             actualType) => q"_root_.shapeless.Cached[$actualType]($tree)",
+            (tree, actualType) =>
+              q"_root_.shapeless.Cached[$actualType]($tree)",
             q"null.asInstanceOf[_root_.shapeless.Cached[_root_.scala.Nothing]]"
           )
 

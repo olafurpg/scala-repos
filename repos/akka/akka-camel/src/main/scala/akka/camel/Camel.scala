@@ -101,17 +101,19 @@ class CamelSettings private[camel] (config: Config,
     val conversions =
       (Map[String, Class[_ <: AnyRef]]() /: specifiedConversions) {
         case (m, (key, fqcn)) ⇒
-          m.updated(key,
-                    dynamicAccess
-                      .getClassFor[AnyRef](fqcn)
-                      .recover {
-                        case e ⇒
-                          throw new ConfigurationException(
-                            "Could not find/load Camel Converter class [" +
-                              fqcn + "]",
-                            e)
-                      }
-                      .get)
+          m.updated(
+            key,
+            dynamicAccess
+              .getClassFor[AnyRef](fqcn)
+              .recover {
+                case e ⇒
+                  throw new ConfigurationException(
+                    "Could not find/load Camel Converter class [" +
+                      fqcn + "]",
+                    e)
+              }
+              .get
+          )
       }
 
     (s: String, r: RouteDefinition) ⇒

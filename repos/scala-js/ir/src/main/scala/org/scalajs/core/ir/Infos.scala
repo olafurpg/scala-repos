@@ -70,17 +70,19 @@ object Infos {
               accessedModules: List[String] = Nil,
               usedInstanceTests: List[String] = Nil,
               accessedClassData: List[String] = Nil): MethodInfo = {
-      new MethodInfo(encodedName,
-                     isStatic,
-                     isAbstract,
-                     isExported,
-                     methodsCalled,
-                     methodsCalledStatically,
-                     staticMethodsCalled,
-                     instantiatedClasses,
-                     accessedModules,
-                     usedInstanceTests,
-                     accessedClassData)
+      new MethodInfo(
+        encodedName,
+        isStatic,
+        isAbstract,
+        isExported,
+        methodsCalled,
+        methodsCalledStatically,
+        staticMethodsCalled,
+        instantiatedClasses,
+        accessedModules,
+        usedInstanceTests,
+        accessedClassData
+      )
     }
   }
 

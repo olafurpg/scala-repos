@@ -458,7 +458,8 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
           annotatedNoInline = false,
           samParamTypes =
             callGraph.samParamTypes(bodyMethodNode, bodyDeclClassType),
-          calleeInfoWarning = None)
+          calleeInfoWarning = None
+        )
     })
     val argInfos =
       closureInit.capturedArgInfos ++ originalCallsite

@@ -235,7 +235,8 @@ package object plot {
             label = (i: Int) => null,
             tip = (i: Int) => null
           ),
-          width)
+          width
+        )
 
         val renderer = new org.jfree.chart.renderer.xy.XYBarRenderer
         renderer.setSeriesPaint(0, defaultColor(0))

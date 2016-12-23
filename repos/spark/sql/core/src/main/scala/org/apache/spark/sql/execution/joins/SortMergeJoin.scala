@@ -107,11 +107,13 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
 
     left.execute().zipPartitions(right.execute()) { (leftIter, rightIter) =>
       val boundCondition: (InternalRow) => Boolean = {
-        condition.map { cond =>
-          newPredicate(cond, left.output ++ right.output)
-        }.getOrElse { (r: InternalRow) =>
-          true
-        }
+        condition
+          .map { cond =>
+            newPredicate(cond, left.output ++ right.output)
+          }
+          .getOrElse { (r: InternalRow) =>
+            true
+          }
       }
       // An ordering that can be used to compare keys from both sides.
       val keyOrdering = newNaturalAscendingOrdering(leftKeys.map(_.dataType))
@@ -220,7 +222,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
             rightIter = RowIterator.fromScala(rightIter),
             boundCondition,
             leftNullRow,
-            rightNullRow)
+            rightNullRow
+          )
 
           new FullOuterIterator(smjScanner, resultProj, numOutputRows).toScala
 
@@ -303,8 +306,9 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     // Copy the left keys as class members so they could be used in next function call.
     val matchedKeyVars = copyKeys(ctx, leftKeyVars)
 
-    ctx.addNewFunction("findNextInnerJoinRows",
-                       s"""
+    ctx.addNewFunction(
+      "findNextInnerJoinRows",
+      s"""
          |private boolean findNextInnerJoinRows(
          |    scala.collection.Iterator leftIter,
          |    scala.collection.Iterator rightIter) {
@@ -357,7 +361,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
          |  }
          |  return false; // unreachable
          |}
-       """.stripMargin)
+       """.stripMargin
+    )
 
     (leftRow, matches)
   }

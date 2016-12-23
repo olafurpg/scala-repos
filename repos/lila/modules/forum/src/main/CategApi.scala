@@ -28,17 +28,19 @@ private[forum] final class CategApi(env: Env) {
 
   def makeTeam(slug: String, name: String): Funit =
     CategRepo.nextPosition flatMap { position =>
-      val categ = Categ(id = teamSlug(slug),
-                        name = name,
-                        desc = "Forum of the team " + name,
-                        pos = position,
-                        team = slug.some,
-                        nbTopics = 0,
-                        nbPosts = 0,
-                        lastPostId = "",
-                        nbTopicsTroll = 0,
-                        nbPostsTroll = 0,
-                        lastPostIdTroll = "")
+      val categ = Categ(
+        id = teamSlug(slug),
+        name = name,
+        desc = "Forum of the team " + name,
+        pos = position,
+        team = slug.some,
+        nbTopics = 0,
+        nbPosts = 0,
+        lastPostId = "",
+        nbTopicsTroll = 0,
+        nbPostsTroll = 0,
+        lastPostIdTroll = ""
+      )
       val topic = Topic.make(categId = categ.slug,
                              slug = slug + "-forum",
                              name = name + " forum",
@@ -54,7 +56,8 @@ private[forum] final class CategApi(env: Env) {
         troll = false,
         hidden = topic.hidden,
         lang = "en".some,
-        categId = categ.id)
+        categId = categ.id
+      )
       $insert(categ) >> $insert(post) >> $insert(topic withPost post) >> $update(
         categ withTopic post)
     }

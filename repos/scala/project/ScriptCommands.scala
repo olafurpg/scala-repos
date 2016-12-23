@@ -21,6 +21,7 @@ object ScriptCommands {
             publishArtifact in (Compile, packageDoc) in ThisBuild := false,
             scalacOptions in Compile in ThisBuild += "-optimise"
           ),
-          state)
+          state
+        )
   }
 }

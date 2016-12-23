@@ -47,7 +47,8 @@ private[feature] trait StringIndexerBase
     require(
       inputDataType == StringType || inputDataType.isInstanceOf[NumericType],
       s"The input column $inputColName must be either string type or numeric type, " +
-        s"but got $inputDataType.")
+        s"but got $inputDataType."
+    )
     val inputFields = schema.fields
     val outputColName = $(outputCol)
     require(inputFields.forall(_.name != outputColName),
@@ -287,7 +288,8 @@ class IndexToString private[ml] (override val uid: String)
     this,
     "labels",
     "Optional array of labels specifying index-string mapping." +
-      " If not provided or if empty, then metadata from inputCol is used instead.")
+      " If not provided or if empty, then metadata from inputCol is used instead."
+  )
   setDefault(labels, Array.empty[String])
 
   /** @group getParam */

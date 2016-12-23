@@ -123,9 +123,11 @@ class GroupBuilder(val groupFields: Fields)
   }
 
   protected def overrideReducers(p: Pipe): Pipe = {
-    numReducers.map { r =>
-      RichPipe.setReducers(p, r)
-    }.getOrElse(p)
+    numReducers
+      .map { r =>
+        RichPipe.setReducers(p, r)
+      }
+      .getOrElse(p)
   }
 
   protected def overrideDescription(p: Pipe): Pipe = {
@@ -302,7 +304,8 @@ class GroupBuilder(val groupFields: Fields)
       (i: X, it: Iterator[T]) => new ScanLeftIterator(it, i, fn),
       outFields,
       conv,
-      setter)
+      setter
+    )
     every(
       pipe => new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
   }
@@ -332,7 +335,8 @@ class GroupBuilder(val groupFields: Fields)
   }
 
   def schedule(name: String, pipe: Pipe): Pipe = {
-    val maybeProjectedPipe = projectFields.map { pipe.project(_) }
+    val maybeProjectedPipe = projectFields
+      .map { pipe.project(_) }
       .getOrElse(pipe)
     groupMode match {
       case GroupByMode =>

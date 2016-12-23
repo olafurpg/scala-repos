@@ -168,13 +168,15 @@ trait FieldConversions extends LowPriorityFieldConversions {
       val leftSetSyms = leftSet.map { f =>
         Symbol(f.toString)
       }
-      val (_, reversedRename) = asList(right).map { f =>
-        Symbol(f.toString)
-      }.foldLeft((leftSetSyms, List[Symbol]())) { (takenRename, name) =>
-        val (taken, renames) = takenRename
-        val newName = newSymbol(taken, name)
-        (taken + newName, newName :: renames)
-      }
+      val (_, reversedRename) = asList(right)
+        .map { f =>
+          Symbol(f.toString)
+        }
+        .foldLeft((leftSetSyms, List[Symbol]())) { (takenRename, name) =>
+          val (taken, renames) = takenRename
+          val newName = newSymbol(taken, name)
+          (taken + newName, newName :: renames)
+        }
       val newRight =
         fields(reversedRename.reverse) // We pushed in as a stack, so we need to reverse
       (newRight, RichPipe(rightPipe).rename(right -> newRight))

@@ -40,7 +40,8 @@ object sessionFailureDetector
     extends GlobalFlag[String](
       "threshold:5.seconds:2:100:4.seconds",
       "The failure detector used to determine session liveness " +
-        "[none|threshold:minPeriod:threshold:win:closeTimeout]")
+        "[none|threshold:minPeriod:threshold:win:closeTimeout]"
+    )
 
 /**
   * Companion object capable of creating a FailureDetector based on parameterized config.

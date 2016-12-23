@@ -235,9 +235,12 @@ class FlowDocSpec extends AkkaSpec {
     val flow = Flow[Int].map(_ * 2).filter(_ > 500)
     val fused = Fusing.aggressive(flow)
 
-    Source.fromIterator { () =>
-      Iterator from 0
-    }.via(fused).take(1000)
+    Source
+      .fromIterator { () =>
+        Iterator from 0
+      }
+      .via(fused)
+      .take(1000)
     //#explicit-fusing
   }
 

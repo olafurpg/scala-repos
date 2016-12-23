@@ -34,7 +34,8 @@ trait ApplicativeTests[F[_]] extends ApplyTests[F] {
       "monoidal left identity" -> forAll(
         (fa: F[A]) => iso.leftIdentity(laws.monoidalLeftIdentity(fa))),
       "monoidal right identity" -> forAll(
-        (fa: F[A]) => iso.rightIdentity(laws.monoidalRightIdentity(fa))))
+        (fa: F[A]) => iso.rightIdentity(laws.monoidalRightIdentity(fa)))
+    )
   }
 }
 

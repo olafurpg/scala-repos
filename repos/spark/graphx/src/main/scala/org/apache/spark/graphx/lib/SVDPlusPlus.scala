@@ -168,7 +168,8 @@ object SVDPlusPlus {
           val out2 = g2._2.clone()
           blas.daxpy(out2.length, 1.0, g2._2, 1, out2, 1)
           (out1, out2, g1._3 + g2._3)
-        })
+        }
+      )
       val gJoinT2 = g
         .outerJoinVertices(t2) {
           (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),

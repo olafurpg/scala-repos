@@ -33,7 +33,8 @@ object CallGraphTest extends ClearAfterClass.Clearable {
     compiler.genBCode.bTypes.classBTypeFromInternalName,
     compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
     compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
-    compiler.genBCode.bTypes.callGraph.callsites)
+    compiler.genBCode.bTypes.callGraph.callsites
+  )
   notPerRun foreach compiler.perRunCaches.unrecordCache
 }
 
@@ -121,7 +122,8 @@ class CallGraphTest extends ClearAfterClass {
       "C::f3()I is annotated @inline but cannot be inlined: the method is not final and may be overridden", // only one warning for C.f3: D.f3 does not have @inline (and it would also be safe to inline)
       "C::f7()I is annotated @inline but cannot be inlined: the method is not final and may be overridden", // two warnings (the error message mentions C.f7 even if the receiver type is D, because f7 is inherited from C)
       "operand stack at the callsite in Test::t1(LC;)I contains more values",
-      "operand stack at the callsite in Test::t2(LD;)I contains more values")
+      "operand stack at the callsite in Test::t2(LD;)I contains more values"
+    )
     var msgCount = 0
     val checkMsg = (m: StoreReporter#Info) => {
       msgCount += 1

@@ -41,7 +41,8 @@ object PlayMagicForJava {
         play.api.data
           .FormError(jE.key, jE.messages.asScala, jE.arguments.asScala)
       },
-      Option(jField.value)) {
+      Option(jField.value)
+    ) {
 
       override def apply(key: String) = {
         javaFieldtoScalaField(jField.sub(key))

@@ -207,7 +207,8 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
                 "Using the default Java serializer for class [{}] which is not recommended because of " +
                   "performance implications. Use another serializer or disable this warning using the setting " +
                   "'akka.actor.warn-about-java-serializer-usage'",
-                clazz.getName)
+                clazz.getName
+              )
             }
             log.debug("Using serializer[{}] for message [{}]",
                       ser.getClass.getName,

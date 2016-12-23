@@ -177,13 +177,15 @@ abstract class UnreachableNodeJoinsAgainSpec
         Await.ready(system.whenTerminated, 10 seconds)
         // create new ActorSystem with same host:port
         val freshSystem =
-          ActorSystem(system.name,
-                      ConfigFactory.parseString(s"""
+          ActorSystem(
+            system.name,
+            ConfigFactory.parseString(s"""
             akka.remote.netty.tcp {
               hostname = ${victimAddress.host.get}
               port = ${victimAddress.port.get}
             }
-            """).withFallback(system.settings.config))
+            """).withFallback(system.settings.config)
+          )
 
         try {
           Cluster(freshSystem).join(masterAddress)

@@ -461,9 +461,11 @@ class StreamingContextSuite
   test("awaitTermination with error in task") {
     ssc = new StreamingContext(master, appName, batchDuration)
     val inputStream = addInputStream(ssc)
-    inputStream.map { x =>
-      throw new TestException("error in map task"); x
-    }.foreachRDD(_.count())
+    inputStream
+      .map { x =>
+        throw new TestException("error in map task"); x
+      }
+      .foreachRDD(_.count())
 
     val exception = intercept[Exception] {
       ssc.start()
@@ -476,9 +478,11 @@ class StreamingContextSuite
   test("awaitTermination with error in job generation") {
     ssc = new StreamingContext(master, appName, batchDuration)
     val inputStream = addInputStream(ssc)
-    inputStream.transform { rdd =>
-      throw new TestException("error in transform"); rdd
-    }.register()
+    inputStream
+      .transform { rdd =>
+        throw new TestException("error in transform"); rdd
+      }
+      .register()
     val exception = intercept[TestException] {
       ssc.start()
       ssc.awaitTerminationOrTimeout(5000)

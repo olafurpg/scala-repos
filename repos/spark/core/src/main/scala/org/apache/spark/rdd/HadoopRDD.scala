@@ -126,14 +126,16 @@ class HadoopRDD[K, V](sc: SparkContext,
            keyClass: Class[K],
            valueClass: Class[V],
            minPartitions: Int) = {
-    this(sc,
-         sc.broadcast(new SerializableConfiguration(conf))
-           .asInstanceOf[Broadcast[SerializableConfiguration]],
-         initLocalJobConfFuncOpt = None,
-         inputFormatClass,
-         keyClass,
-         valueClass,
-         minPartitions)
+    this(
+      sc,
+      sc.broadcast(new SerializableConfiguration(conf))
+        .asInstanceOf[Broadcast[SerializableConfiguration]],
+      initLocalJobConfFuncOpt = None,
+      inputFormatClass,
+      keyClass,
+      valueClass,
+      minPartitions
+    )
   }
 
   protected val jobConfCacheKey = "rdd_%d_job_conf".format(id)

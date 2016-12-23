@@ -13,10 +13,12 @@ case class IpAddress(groups: Seq[String] = Nil,
   def toProto: Protos.IpAddress = {
     val builder = Protos.IpAddress.newBuilder
     groups.foreach(builder.addGroups)
-    labels.map {
-      case (key, value) =>
-        mesos.Label.newBuilder.setKey(key).setValue(value).build
-    }.foreach(builder.addLabels)
+    labels
+      .map {
+        case (key, value) =>
+          mesos.Label.newBuilder.setKey(key).setValue(value).build
+      }
+      .foreach(builder.addLabels)
     builder.setDiscoveryInfo(discoveryInfo.toProto)
     builder.build
   }

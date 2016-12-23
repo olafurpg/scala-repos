@@ -490,7 +490,8 @@ class PlannerSuite extends SharedSQLContext {
                          outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
-      None)
+      None
+    )
 
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
@@ -513,7 +514,8 @@ class PlannerSuite extends SharedSQLContext {
                          outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
-      None)
+      None
+    )
 
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
@@ -536,7 +538,8 @@ class PlannerSuite extends SharedSQLContext {
                          outputPartitioning = childPartitioning) :: Nil,
                      requiredChildDistribution = Seq(distribution),
                      requiredChildOrdering = Seq(Seq.empty)),
-      None)
+      None
+    )
 
     val inputPlan = SortMergeJoin(Literal(1) :: Nil,
                                   Literal(1) :: Nil,

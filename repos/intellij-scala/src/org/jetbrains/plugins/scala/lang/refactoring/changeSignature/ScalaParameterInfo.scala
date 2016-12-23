@@ -33,13 +33,15 @@ class ScalaParameterInfo(@BeanProperty var name: String,
     extends JavaParameterInfo {
 
   def this(p: ScParameter) {
-    this(p.name,
-         p.index,
-         p.getType(TypingContext.empty).getOrAny,
-         p.getProject,
-         p.isRepeatedParameter,
-         p.isCallByNameParameter,
-         keywordsAndAnnotations = ScalaParameterInfo.keywordsAndAnnotations(p))
+    this(
+      p.name,
+      p.index,
+      p.getType(TypingContext.empty).getOrAny,
+      p.getProject,
+      p.isRepeatedParameter,
+      p.isCallByNameParameter,
+      keywordsAndAnnotations = ScalaParameterInfo.keywordsAndAnnotations(p)
+    )
   }
 
   var defaultForJava = defaultValue

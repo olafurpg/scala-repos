@@ -89,13 +89,15 @@ case class FetchRequest(
            maxWait: Int,
            minBytes: Int,
            requestInfo: Map[TopicAndPartition, PartitionFetchInfo]) {
-    this(versionId = FetchRequest.CurrentVersion,
-         correlationId = correlationId,
-         clientId = clientId,
-         replicaId = Request.OrdinaryConsumerId,
-         maxWait = maxWait,
-         minBytes = minBytes,
-         requestInfo = requestInfo)
+    this(
+      versionId = FetchRequest.CurrentVersion,
+      correlationId = correlationId,
+      clientId = clientId,
+      replicaId = Request.OrdinaryConsumerId,
+      maxWait = maxWait,
+      minBytes = minBytes,
+      requestInfo = requestInfo
+    )
   }
 
   def writeTo(buffer: ByteBuffer) {

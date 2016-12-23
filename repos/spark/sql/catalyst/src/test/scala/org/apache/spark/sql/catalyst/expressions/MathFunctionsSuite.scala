@@ -601,34 +601,21 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     val longPi: Long = 31415926535897932L
     val bdPi: BigDecimal = BigDecimal(31415927L, 7)
 
-    val doubleResults: Seq[Double] = Seq(0.0,
-                                         0.0,
-                                         0.0,
-                                         0.0,
-                                         0.0,
-                                         0.0,
-                                         3.0,
-                                         3.1,
-                                         3.14,
-                                         3.142,
-                                         3.1416,
-                                         3.14159,
-                                         3.141593)
+    val doubleResults: Seq[Double] = Seq(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0,
+      3.1, 3.14, 3.142, 3.1416, 3.14159, 3.141593)
 
     val shortResults: Seq[Short] =
       Seq[Short](0, 0, 30000, 31000, 31400, 31420) ++ Seq.fill[Short](7)(31415)
 
     val intResults: Seq[Int] =
-      Seq(314000000, 314200000, 314160000, 314159000, 314159300, 314159270) ++ Seq
+      Seq(314000000, 314200000, 314160000, 314159000, 314159300,
+        314159270) ++ Seq
         .fill(7)(314159265)
 
     val longResults: Seq[Long] =
-      Seq(31415926536000000L,
-          31415926535900000L,
-          31415926535900000L,
-          31415926535898000L,
-          31415926535897900L,
-          31415926535897930L) ++ Seq.fill(7)(31415926535897932L)
+      Seq(31415926536000000L, 31415926535900000L, 31415926535900000L,
+        31415926535898000L, 31415926535897900L,
+        31415926535897930L) ++ Seq.fill(7)(31415926535897932L)
 
     scales.zipWithIndex.foreach {
       case (scale, i) =>
