@@ -34,7 +34,8 @@ trait ProfunctorTests[F[_, _]] extends Laws {
       "profunctor lmap composition" -> forAll(
         laws.profunctorLmapComposition[A, B, C, D] _),
       "profunctor rmap composition" -> forAll(
-        laws.profunctorRmapComposition[A, D, C, B] _))
+        laws.profunctorRmapComposition[A, D, C, B] _)
+    )
 }
 
 object ProfunctorTests {

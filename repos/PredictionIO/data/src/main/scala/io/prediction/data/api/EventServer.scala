@@ -91,44 +91,48 @@ class EventServiceActor(val eventClient: LEvents,
       val channelParamOpt = ctx.request.uri.query.get("channel")
       Future {
         // with accessKey in query, return appId if succeed
-        accessKeyParamOpt.map { accessKeyParam =>
-          accessKeysClient
-            .get(accessKeyParam)
-            .map { k =>
-              channelParamOpt.map { ch =>
-                val channelMap = channelsClient
-                  .getByAppid(k.appid)
-                  .map(c => (c.name, c.id))
-                  .toMap
-                if (channelMap.contains(ch)) {
-                  Right(AuthData(k.appid, Some(channelMap(ch)), k.events))
-                } else {
-                  Left(ChannelRejection(s"Invalid channel '$ch'."))
-                }
-              }.getOrElse {
-                Right(AuthData(k.appid, None, k.events))
-              }
-            }
-            .getOrElse(FailedAuth)
-        }.getOrElse {
-          // with accessKey in header, return appId if succeed
-          ctx.request.headers
-            .find(_.name == "Authorization")
-            .map { authHeader ⇒
-              authHeader.value.split("Basic ") match {
-                case Array(_, value) ⇒
-                  val appAccessKey = new String(
-                    base64Decoder.decodeBuffer(value)).trim.split(":")(0)
-                  accessKeysClient.get(appAccessKey) match {
-                    case Some(k) ⇒ Right(AuthData(k.appid, None, k.events))
-                    case None ⇒ FailedAuth
+        accessKeyParamOpt
+          .map { accessKeyParam =>
+            accessKeysClient
+              .get(accessKeyParam)
+              .map { k =>
+                channelParamOpt
+                  .map { ch =>
+                    val channelMap = channelsClient
+                      .getByAppid(k.appid)
+                      .map(c => (c.name, c.id))
+                      .toMap
+                    if (channelMap.contains(ch)) {
+                      Right(AuthData(k.appid, Some(channelMap(ch)), k.events))
+                    } else {
+                      Left(ChannelRejection(s"Invalid channel '$ch'."))
+                    }
                   }
-
-                case _ ⇒ FailedAuth
+                  .getOrElse {
+                    Right(AuthData(k.appid, None, k.events))
+                  }
               }
-            }
-            .getOrElse(MissedAuth)
-        }
+              .getOrElse(FailedAuth)
+          }
+          .getOrElse {
+            // with accessKey in header, return appId if succeed
+            ctx.request.headers
+              .find(_.name == "Authorization")
+              .map { authHeader ⇒
+                authHeader.value.split("Basic ") match {
+                  case Array(_, value) ⇒
+                    val appAccessKey = new String(
+                      base64Decoder.decodeBuffer(value)).trim.split(":")(0)
+                    accessKeysClient.get(appAccessKey) match {
+                      case Some(k) ⇒ Right(AuthData(k.appid, None, k.events))
+                      case None ⇒ FailedAuth
+                    }
+
+                  case _ ⇒ FailedAuth
+                }
+              }
+              .getOrElse(MissedAuth)
+          }
       }
   }
 
@@ -316,15 +320,17 @@ class EventServiceActor(val eventClient: LEvents,
             authenticate(withAccessKey) { authData =>
               val appId = authData.appId
               val channelId = authData.channelId
-              parameters('startTime.as[Option[String]],
-                         'untilTime.as[Option[String]],
-                         'entityType.as[Option[String]],
-                         'entityId.as[Option[String]],
-                         'event.as[Option[String]],
-                         'targetEntityType.as[Option[String]],
-                         'targetEntityId.as[Option[String]],
-                         'limit.as[Option[Int]],
-                         'reversed.as[Option[Boolean]]) {
+              parameters(
+                'startTime.as[Option[String]],
+                'untilTime.as[Option[String]],
+                'entityType.as[Option[String]],
+                'entityId.as[Option[String]],
+                'event.as[Option[String]],
+                'targetEntityType.as[Option[String]],
+                'targetEntityId.as[Option[String]],
+                'limit.as[Option[Int]],
+                'reversed.as[Option[Boolean]]
+              ) {
                 (startTimeStr, untilTimeStr, entityType, entityId,
                  eventName, // only support one event name
                  targetEntityType, targetEntityId, limit, reversed) =>
@@ -336,10 +342,12 @@ class EventServiceActor(val eventClient: LEvents,
                           s"et=${entityType} eid=${entityId} " +
                           s"li=${limit} rev=${reversed} ")
 
-                      require(!((reversed == Some(true)) &&
-                                (entityType.isEmpty || entityId.isEmpty)),
-                              "the parameter reversed can only be used with" +
-                                " both entityType and entityId specified.")
+                      require(
+                        !((reversed == Some(true)) &&
+                          (entityType.isEmpty || entityId.isEmpty)),
+                        "the parameter reversed can only be used with" +
+                          " both entityType and entityId specified."
+                      )
 
                       val parseTime = Future {
                         val startTime =
@@ -349,35 +357,38 @@ class EventServiceActor(val eventClient: LEvents,
                         (startTime, untilTime)
                       }
 
-                      parseTime.flatMap {
-                        case (startTime, untilTime) =>
-                          val data = eventClient
-                            .futureFind(appId = appId,
-                                        channelId = channelId,
-                                        startTime = startTime,
-                                        untilTime = untilTime,
-                                        entityType = entityType,
-                                        entityId = entityId,
-                                        eventNames = eventName.map(List(_)),
-                                        targetEntityType =
-                                          targetEntityType.map(Some(_)),
-                                        targetEntityId =
-                                          targetEntityId.map(Some(_)),
-                                        limit = limit.orElse(Some(20)),
-                                        reversed = reversed)
-                            .map { eventIter =>
-                              if (eventIter.hasNext) {
-                                (StatusCodes.OK, eventIter.toArray)
-                              } else {
-                                (StatusCodes.NotFound,
-                                 Map("message" -> "Not Found"))
+                      parseTime
+                        .flatMap {
+                          case (startTime, untilTime) =>
+                            val data = eventClient
+                              .futureFind(
+                                appId = appId,
+                                channelId = channelId,
+                                startTime = startTime,
+                                untilTime = untilTime,
+                                entityType = entityType,
+                                entityId = entityId,
+                                eventNames = eventName.map(List(_)),
+                                targetEntityType =
+                                  targetEntityType.map(Some(_)),
+                                targetEntityId = targetEntityId.map(Some(_)),
+                                limit = limit.orElse(Some(20)),
+                                reversed = reversed
+                              )
+                              .map { eventIter =>
+                                if (eventIter.hasNext) {
+                                  (StatusCodes.OK, eventIter.toArray)
+                                } else {
+                                  (StatusCodes.NotFound,
+                                   Map("message" -> "Not Found"))
+                                }
                               }
-                            }
-                          data
-                      }.recover {
-                        case e: Exception =>
-                          (StatusCodes.BadRequest, Map("message" -> s"${e}"))
-                      }
+                            data
+                        }
+                        .recover {
+                          case e: Exception =>
+                            (StatusCodes.BadRequest, Map("message" -> s"${e}"))
+                        }
                     }
                   }
               }

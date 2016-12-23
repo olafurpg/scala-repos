@@ -111,7 +111,8 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
             val summed = s.map {
               case (k, deltaV) =>
                 val oldV = store.get(k)
-                val newV = oldV.map { semigroup.plus(_, deltaV) }
+                val newV = oldV
+                  .map { semigroup.plus(_, deltaV) }
                   .getOrElse(deltaV)
                 store.update(k, newV)
                 (k, (oldV, deltaV))

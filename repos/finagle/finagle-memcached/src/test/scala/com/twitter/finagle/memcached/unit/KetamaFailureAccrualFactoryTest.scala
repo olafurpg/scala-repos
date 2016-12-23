@@ -190,7 +190,8 @@ class KetamaFailureAccrualFactoryTest extends FunSuite with MockitoSugar {
           ChannelWriteException(new CancelledRequestException(new Exception))),
         Future.exception(
           ChannelWriteException(
-            new CancelledConnectionException(new Exception))))
+            new CancelledConnectionException(new Exception)))
+      )
 
     successes.foreach { rep =>
       val h = new Helper(false, rep)

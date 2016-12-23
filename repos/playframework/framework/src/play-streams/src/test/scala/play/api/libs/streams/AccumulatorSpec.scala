@@ -65,9 +65,12 @@ object AccumulatorSpec extends Specification {
 
       "when the exception comes from the stream" in withMaterializer {
         implicit m =>
-          await(sum.recover {
-            case e => 20
-          }.run(errorSource)) must_== 20
+          await(
+            sum
+              .recover {
+                case e => 20
+              }
+              .run(errorSource)) must_== 20
       }
     }
 
@@ -86,9 +89,12 @@ object AccumulatorSpec extends Specification {
 
       "when the exception comes from the stream" in withMaterializer {
         implicit m =>
-          await(sum.recoverWith {
-            case e => Future(20)
-          }.run(errorSource)) must_== 20
+          await(
+            sum
+              .recoverWith {
+                case e => Future(20)
+              }
+              .run(errorSource)) must_== 20
       }
     }
 

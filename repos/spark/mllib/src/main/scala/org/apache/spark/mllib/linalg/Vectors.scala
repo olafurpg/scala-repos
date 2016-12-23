@@ -202,14 +202,16 @@ class VectorUDT extends UserDefinedType[Vector] {
     // vectors. The "values" field is nullable because we might want to add binary vectors later,
     // which uses "size" and "indices", but not "values".
     StructType(
-      Seq(StructField("type", ByteType, nullable = false),
-          StructField("size", IntegerType, nullable = true),
-          StructField("indices",
-                      ArrayType(IntegerType, containsNull = false),
-                      nullable = true),
-          StructField("values",
-                      ArrayType(DoubleType, containsNull = false),
-                      nullable = true)))
+      Seq(
+        StructField("type", ByteType, nullable = false),
+        StructField("size", IntegerType, nullable = true),
+        StructField("indices",
+                    ArrayType(IntegerType, containsNull = false),
+                    nullable = true),
+        StructField("values",
+                    ArrayType(DoubleType, containsNull = false),
+                    nullable = true)
+      ))
   }
 
   override def serialize(obj: Vector): InternalRow = {
@@ -338,10 +340,13 @@ object Vectors {
   @Since("1.0.0")
   def sparse(size: Int,
              elements: JavaIterable[(JavaInteger, JavaDouble)]): Vector = {
-    sparse(size, elements.asScala.map {
-      case (i, x) =>
-        (i.intValue(), x.doubleValue())
-    }.toSeq)
+    sparse(size,
+           elements.asScala
+             .map {
+               case (i, x) =>
+                 (i.intValue(), x.doubleValue())
+             }
+             .toSeq)
   }
 
   /**
@@ -738,7 +743,8 @@ class SparseVector @Since("1.0.0")(@Since("1.0.0") override val size: Int,
     indices.length == values.length,
     "Sparse vectors require that the dimension of the" +
       s" indices match the dimension of the values. You provided ${indices.length} indices and " +
-      s" ${values.length} values.")
+      s" ${values.length} values."
+  )
   require(indices.length <= size,
           s"You provided ${indices.length} indices and values, " +
             s"which exceeds the specified vector size ${size}.")
@@ -889,17 +895,19 @@ class SparseVector @Since("1.0.0")(@Since("1.0.0") override val size: Int,
     */
   private[spark] def slice(selectedIndices: Array[Int]): SparseVector = {
     var currentIdx = 0
-    val (sliceInds, sliceVals) = selectedIndices.flatMap { origIdx =>
-      val iIdx = java.util.Arrays.binarySearch(this.indices, origIdx)
-      val i_v =
-        if (iIdx >= 0) {
-          Iterator((currentIdx, this.values(iIdx)))
-        } else {
-          Iterator()
-        }
-      currentIdx += 1
-      i_v
-    }.unzip
+    val (sliceInds, sliceVals) = selectedIndices
+      .flatMap { origIdx =>
+        val iIdx = java.util.Arrays.binarySearch(this.indices, origIdx)
+        val i_v =
+          if (iIdx >= 0) {
+            Iterator((currentIdx, this.values(iIdx)))
+          } else {
+            Iterator()
+          }
+        currentIdx += 1
+        i_v
+      }
+      .unzip
     new SparseVector(selectedIndices.length,
                      sliceInds.toArray,
                      sliceVals.toArray)

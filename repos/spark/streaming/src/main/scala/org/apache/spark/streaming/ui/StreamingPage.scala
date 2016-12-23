@@ -54,10 +54,12 @@ private[ui] class GraphUIData(timelineDivId: String,
   private var dataJavaScriptName: String = _
 
   def generateDataJs(jsCollector: JsCollector): Unit = {
-    val jsForData = data.map {
-      case (x, y) =>
-        s"""{"x": $x, "y": $y}"""
-    }.mkString("[", ",", "]")
+    val jsForData = data
+      .map {
+        case (x, y) =>
+          s"""{"x": $x, "y": $y}"""
+      }
+      .mkString("[", ",", "]")
     dataJavaScriptName = jsCollector.nextVariableName
     jsCollector.addPreparedStatement(s"var $dataJavaScriptName = $jsForData;")
   }
@@ -201,12 +203,14 @@ private[ui] class StreamingPage(parent: StreamingTab)
     */
   private def generateTimeMap(times: Seq[Long]): Seq[Node] = {
     val js =
-      "var timeFormat = {};\n" + times.map { time =>
-        val formattedTime = UIUtils.formatBatchTime(time,
-                                                    listener.batchDuration,
-                                                    showYYYYMMSS = false)
-        s"timeFormat[$time] = '$formattedTime';"
-      }.mkString("\n")
+      "var timeFormat = {};\n" + times
+        .map { time =>
+          val formattedTime = UIUtils.formatBatchTime(time,
+                                                      listener.batchDuration,
+                                                      showYYYYMMSS = false)
+          s"timeFormat[$time] = '$formattedTime';"
+        }
+        .mkString("\n")
 
     <script>{Unparsed(js)}</script>
   }
@@ -264,7 +268,8 @@ private[ui] class StreamingPage(parent: StreamingTab)
       maxBatchTime,
       minEventRate,
       maxEventRate,
-      "events/sec")
+      "events/sec"
+    )
     graphUIDataForEventRateOfAllStreams.generateDataJs(jsCollector)
 
     val graphUIDataForSchedulingDelay = new GraphUIData(
@@ -275,7 +280,8 @@ private[ui] class StreamingPage(parent: StreamingTab)
       maxBatchTime,
       minTime,
       maxTime,
-      formattedUnit)
+      formattedUnit
+    )
     graphUIDataForSchedulingDelay.generateDataJs(jsCollector)
 
     val graphUIDataForProcessingTime = new GraphUIData(
@@ -287,7 +293,8 @@ private[ui] class StreamingPage(parent: StreamingTab)
       minTime,
       maxTime,
       formattedUnit,
-      Some(batchInterval))
+      Some(batchInterval)
+    )
     graphUIDataForProcessingTime.generateDataJs(jsCollector)
 
     val graphUIDataForTotalDelay = new GraphUIData(
@@ -395,10 +402,14 @@ private[ui] class StreamingPage(parent: StreamingTab)
                                          minY: Double,
                                          maxY: Double): Seq[Node] = {
     val maxYCalculated =
-      listener.receivedEventRateWithBatchTime.values.flatMap {
-        case streamAndRates =>
-          streamAndRates.map { case (_, eventRate) => eventRate }
-      }.reduceOption[Double](math.max).map(_.ceil.toLong).getOrElse(0L)
+      listener.receivedEventRateWithBatchTime.values
+        .flatMap {
+          case streamAndRates =>
+            streamAndRates.map { case (_, eventRate) => eventRate }
+        }
+        .reduceOption[Double](math.max)
+        .map(_.ceil.toLong)
+        .getOrElse(0L)
 
     val content = listener.receivedEventRateWithBatchTime.toList
       .sortBy(_._1)
@@ -446,23 +457,31 @@ private[ui] class StreamingPage(parent: StreamingTab)
       .map(_.name)
       .orElse(listener.streamName(streamId))
       .getOrElse(s"Stream-$streamId")
-    val receiverActive = receiverInfo.map { info =>
-      if (info.active) "ACTIVE" else "INACTIVE"
-    }.getOrElse(emptyCell)
-    val receiverLocation = receiverInfo.map { info =>
-      val executorId =
-        if (info.executorId.isEmpty) emptyCell else info.executorId
-      val location = if (info.location.isEmpty) emptyCell else info.location
-      s"$executorId / $location"
-    }.getOrElse(emptyCell)
-    val receiverLastError = receiverInfo.map { info =>
-      val msg = s"${info.lastErrorMessage} - ${info.lastError}"
-      if (msg.length > 100) msg.take(97) + "..." else msg
-    }.getOrElse(emptyCell)
-    val receiverLastErrorTime = receiverInfo.map { r =>
-      if (r.lastErrorTime < 0) "-"
-      else SparkUIUtils.formatDate(r.lastErrorTime)
-    }.getOrElse(emptyCell)
+    val receiverActive = receiverInfo
+      .map { info =>
+        if (info.active) "ACTIVE" else "INACTIVE"
+      }
+      .getOrElse(emptyCell)
+    val receiverLocation = receiverInfo
+      .map { info =>
+        val executorId =
+          if (info.executorId.isEmpty) emptyCell else info.executorId
+        val location = if (info.location.isEmpty) emptyCell else info.location
+        s"$executorId / $location"
+      }
+      .getOrElse(emptyCell)
+    val receiverLastError = receiverInfo
+      .map { info =>
+        val msg = s"${info.lastErrorMessage} - ${info.lastError}"
+        if (msg.length > 100) msg.take(97) + "..." else msg
+      }
+      .getOrElse(emptyCell)
+    val receiverLastErrorTime = receiverInfo
+      .map { r =>
+        if (r.lastErrorTime < 0) "-"
+        else SparkUIUtils.formatDate(r.lastErrorTime)
+      }
+      .getOrElse(emptyCell)
     val receivedRecords = new EventRateUIData(eventRates)
 
     val graphUIDataForEventRate = new GraphUIData(

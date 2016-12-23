@@ -65,7 +65,8 @@ object MongoCache {
         cache = LruCache(maxCapacity, initialCapacity, timeToLive),
         coll = coll,
         f = f,
-        keyToString = keyToString)
+        keyToString = keyToString
+      )
 
     def single[V: Handler](prefix: String,
                            f: => Fu[V],

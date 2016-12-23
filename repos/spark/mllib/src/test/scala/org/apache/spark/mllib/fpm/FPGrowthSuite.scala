@@ -85,24 +85,26 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
        17       {s}    3
        18       {r}    3
      */
-    val expected = Set((Set("s"), 3L),
-                       (Set("z"), 5L),
-                       (Set("x"), 4L),
-                       (Set("t"), 3L),
-                       (Set("y"), 3L),
-                       (Set("r"), 3L),
-                       (Set("x", "z"), 3L),
-                       (Set("t", "y"), 3L),
-                       (Set("t", "x"), 3L),
-                       (Set("s", "x"), 3L),
-                       (Set("y", "x"), 3L),
-                       (Set("y", "z"), 3L),
-                       (Set("t", "z"), 3L),
-                       (Set("y", "x", "z"), 3L),
-                       (Set("t", "x", "z"), 3L),
-                       (Set("t", "y", "z"), 3L),
-                       (Set("t", "y", "x"), 3L),
-                       (Set("t", "y", "x", "z"), 3L))
+    val expected = Set(
+      (Set("s"), 3L),
+      (Set("z"), 5L),
+      (Set("x"), 4L),
+      (Set("t"), 3L),
+      (Set("y"), 3L),
+      (Set("r"), 3L),
+      (Set("x", "z"), 3L),
+      (Set("t", "y"), 3L),
+      (Set("t", "x"), 3L),
+      (Set("s", "x"), 3L),
+      (Set("y", "x"), 3L),
+      (Set("y", "z"), 3L),
+      (Set("t", "z"), 3L),
+      (Set("y", "x", "z"), 3L),
+      (Set("t", "x", "z"), 3L),
+      (Set("t", "y", "z"), 3L),
+      (Set("t", "y", "x"), 3L),
+      (Set("t", "y", "x", "z"), 3L)
+    )
     assert(freqItemsets3.toSet === expected)
 
     val model2 = fpg.setMinSupport(0.3).setNumPartitions(4).run(rdd)

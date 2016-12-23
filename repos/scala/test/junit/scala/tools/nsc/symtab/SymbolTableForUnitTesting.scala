@@ -44,14 +44,16 @@ class SymbolTableForUnitTesting extends SymbolTable {
     lazy val classPath: ClassPath[AbstractFile] = {
       assert(
         settings.YclasspathImpl.value == ClassPathRepresentationType.Recursive,
-        "It's not possible to use the recursive classpath representation, when it's not the chosen classpath scanning method")
+        "It's not possible to use the recursive classpath representation, when it's not the chosen classpath scanning method"
+      )
       new PathResolver(settings).result
     }
 
     private[nsc] lazy val flatClassPath: FlatClassPath = {
       assert(
         settings.YclasspathImpl.value == ClassPathRepresentationType.Flat,
-        "It's not possible to use the flat classpath representation, when it's not the chosen classpath scanning method")
+        "It's not possible to use the flat classpath representation, when it's not the chosen classpath scanning method"
+      )
       new FlatClassPathResolver(settings).result
     }
 

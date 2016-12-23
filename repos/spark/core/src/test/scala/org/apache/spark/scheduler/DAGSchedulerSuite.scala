@@ -181,12 +181,14 @@ class DAGSchedulerSuite
   val blockManagerMaster = new BlockManagerMaster(null, conf, true) {
     override def getLocations(
         blockIds: Array[BlockId]): IndexedSeq[Seq[BlockManagerId]] = {
-      blockIds.map {
-        _.asRDDId
-          .map(id => (id.rddId -> id.splitIndex))
-          .flatMap(key => cacheLocations.get(key))
-          .getOrElse(Seq())
-      }.toIndexedSeq
+      blockIds
+        .map {
+          _.asRDDId
+            .map(id => (id.rddId -> id.splitIndex))
+            .flatMap(key => cacheLocations.get(key))
+            .getOrElse(Seq())
+        }
+        .toIndexedSeq
     }
     override def removeExecutor(execId: String) {
       // don't need to propagate to the driver, which we don't have
@@ -665,11 +667,15 @@ class DAGSchedulerSuite
       numShufflePartitions: Int): Unit = {
     val stageAttempt = taskSets.last
     checkStageId(stageId, attemptIdx, stageAttempt)
-    complete(stageAttempt, stageAttempt.tasks.zipWithIndex.map {
-      case (task, idx) =>
-        (Success,
-         makeMapStatus("host" + ('A' + idx).toChar, numShufflePartitions))
-    }.toSeq)
+    complete(
+      stageAttempt,
+      stageAttempt.tasks.zipWithIndex
+        .map {
+          case (task, idx) =>
+            (Success,
+             makeMapStatus("host" + ('A' + idx).toChar, numShufflePartitions))
+        }
+        .toSeq)
   }
 
   /**
@@ -686,15 +692,20 @@ class DAGSchedulerSuite
       shuffleDep: ShuffleDependency[_, _, _]): Unit = {
     val stageAttempt = taskSets.last
     checkStageId(stageId, attemptIdx, stageAttempt)
-    complete(stageAttempt, stageAttempt.tasks.zipWithIndex.map {
-      case (task, idx) =>
-        (FetchFailed(makeBlockManagerId("hostA"),
-                     shuffleDep.shuffleId,
-                     0,
-                     idx,
-                     "ignored"),
-         null)
-    }.toSeq)
+    complete(
+      stageAttempt,
+      stageAttempt.tasks.zipWithIndex
+        .map {
+          case (task, idx) =>
+            (FetchFailed(makeBlockManagerId("hostA"),
+                         shuffleDep.shuffleId,
+                         0,
+                         idx,
+                         "ignored"),
+             null)
+        }
+        .toSeq
+    )
   }
 
   /**
@@ -751,9 +762,12 @@ class DAGSchedulerSuite
     // Confirm job finished successfully
     sc.listenerBus.waitUntilEmpty(1000)
     assert(ended === true)
-    assert(results === (0 until parts).map { idx =>
-      idx -> 42
-    }.toMap)
+    assert(
+      results === (0 until parts)
+        .map { idx =>
+          idx -> 42
+        }
+        .toMap)
     assertDataStructuresEmpty()
   }
 
@@ -1328,7 +1342,8 @@ class DAGSchedulerSuite
         (Success, makeMapStatus("hostB", shuffleMapRdd.partitions.length)),
         (Success, makeMapStatus("hostB", shuffleMapRdd.partitions.length)),
         (Success, makeMapStatus("hostA", shuffleMapRdd.partitions.length))
-      ))
+      )
+    )
 
     // then one executor dies, and a task fails in stage 1
     runEvent(ExecutorLost("exec-hostA"))
@@ -1440,12 +1455,14 @@ class DAGSchedulerSuite
     runEvent(makeCompletionEvent(taskSets(0).tasks(1), Resubmitted, null))
 
     // now complete everything on a different host
-    complete(taskSets(0),
-             Seq(
-               (Success, makeMapStatus("hostB", reduceRdd.partitions.length)),
-               (Success, makeMapStatus("hostB", reduceRdd.partitions.length)),
-               (Success, makeMapStatus("hostB", reduceRdd.partitions.length))
-             ))
+    complete(
+      taskSets(0),
+      Seq(
+        (Success, makeMapStatus("hostB", reduceRdd.partitions.length)),
+        (Success, makeMapStatus("hostB", reduceRdd.partitions.length)),
+        (Success, makeMapStatus("hostB", reduceRdd.partitions.length))
+      )
+    )
 
     // now we should submit stage 1, and the map output from stage 0 should be registered
 
@@ -1755,13 +1772,16 @@ class DAGSchedulerSuite
   }
 
   test("misbehaved accumulator should not crash DAGScheduler and SparkContext") {
-    val acc = new Accumulator[Int](0, new AccumulatorParam[Int] {
-      override def addAccumulator(t1: Int, t2: Int): Int = t1 + t2
-      override def zero(initialValue: Int): Int = 0
-      override def addInPlace(r1: Int, r2: Int): Int = {
-        throw new DAGSchedulerSuiteDummyException
+    val acc = new Accumulator[Int](
+      0,
+      new AccumulatorParam[Int] {
+        override def addAccumulator(t1: Int, t2: Int): Int = t1 + t2
+        override def zero(initialValue: Int): Int = 0
+        override def addInPlace(r1: Int, r2: Int): Int = {
+          throw new DAGSchedulerSuiteDummyException
+        }
       }
-    })
+    )
 
     // Run this on executors
     sc.parallelize(1 to 10, 2).foreach { item =>
@@ -1789,7 +1809,8 @@ class DAGSchedulerSuite
         // For a robust test assertion, limit number of job tasks to 1; that is,
         // if multiple RDD partitions, use id of any one partition, say, first partition id=0
         Seq(0),
-        (part: Int, result: Int) => throw new DAGSchedulerSuiteDummyException)
+        (part: Int, result: Int) => throw new DAGSchedulerSuiteDummyException
+      )
     }
     assert(e.getCause.isInstanceOf[DAGSchedulerSuiteDummyException])
 

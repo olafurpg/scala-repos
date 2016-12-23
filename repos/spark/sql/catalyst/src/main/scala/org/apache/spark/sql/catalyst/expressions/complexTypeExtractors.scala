@@ -137,21 +137,25 @@ case class GetStructField(child: Expression,
     input.asInstanceOf[InternalRow].get(ordinal, childSchema(ordinal).dataType)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, eval => {
-      if (nullable) {
-        s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      eval => {
+        if (nullable) {
+          s"""
           if ($eval.isNullAt($ordinal)) {
             ${ev.isNull} = true;
           } else {
             ${ev.value} = ${ctx.getValue(eval, dataType, ordinal.toString)};
           }
         """
-      } else {
-        s"""
+        } else {
+          s"""
           ${ev.value} = ${ctx.getValue(eval, dataType, ordinal.toString)};
         """
+        }
       }
-    })
+    )
   }
 }
 
@@ -196,12 +200,15 @@ case class GetArrayStructFields(child: Expression,
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val arrayClass = classOf[GenericArrayData].getName
-    nullSafeCodeGen(ctx, ev, eval => {
-      val n = ctx.freshName("n")
-      val values = ctx.freshName("values")
-      val j = ctx.freshName("j")
-      val row = ctx.freshName("row")
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      eval => {
+        val n = ctx.freshName("n")
+        val values = ctx.freshName("values")
+        val j = ctx.freshName("j")
+        val row = ctx.freshName("row")
+        s"""
         final int $n = $eval.numElements();
         final Object[] $values = new Object[$n];
         for (int $j = 0; $j < $n; $j++) {
@@ -213,13 +220,14 @@ case class GetArrayStructFields(child: Expression,
               $values[$j] = null;
             } else {
               $values[$j] = ${ctx
-        .getValue(row, field.dataType, ordinal.toString)};
+          .getValue(row, field.dataType, ordinal.toString)};
             }
           }
         }
         ${ev.value} = new $arrayClass($values);
       """
-    })
+      }
+    )
   }
 }
 
@@ -261,9 +269,12 @@ case class GetArrayItem(child: Expression, ordinal: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
-      val index = ctx.freshName("index")
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (eval1, eval2) => {
+        val index = ctx.freshName("index")
+        s"""
         final int $index = (int) $eval2;
         if ($index >= $eval1.numElements() || $index < 0 || $eval1.isNullAt($index)) {
           ${ev.isNull} = true;
@@ -271,7 +282,8 @@ case class GetArrayItem(child: Expression, ordinal: Expression)
           ${ev.value} = ${ctx.getValue(eval1, dataType, index)};
         }
       """
-    })
+      }
+    )
   }
 }
 
@@ -333,8 +345,11 @@ case class GetMapValue(child: Expression, key: Expression)
     val found = ctx.freshName("found")
     val key = ctx.freshName("key")
     val values = ctx.freshName("values")
-    nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (eval1, eval2) => {
+        s"""
         final int $length = $eval1.numElements();
         final ArrayData $keys = $eval1.keyArray();
         final ArrayData $values = $eval1.valueArray();
@@ -343,7 +358,7 @@ case class GetMapValue(child: Expression, key: Expression)
         boolean $found = false;
         while ($index < $length && !$found) {
           final ${ctx.javaType(keyType)} $key = ${ctx
-        .getValue(keys, keyType, index)};
+          .getValue(keys, keyType, index)};
           if (${ctx.genEqual(keyType, key, eval2)}) {
             $found = true;
           } else {
@@ -357,6 +372,7 @@ case class GetMapValue(child: Expression, key: Expression)
           ${ev.value} = ${ctx.getValue(values, dataType, index)};
         }
       """
-    })
+      }
+    )
   }
 }

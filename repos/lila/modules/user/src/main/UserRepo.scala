@@ -110,11 +110,14 @@ object UserRepo {
       )
       .cursor[BSONDocument]()
       .collect[List]() map { docs =>
-      docs.sortBy {
-        _.getAs[BSONDocument](F.count)
-          .flatMap(_.getAs[BSONNumberLike]("game"))
-          .??(_.toInt)
-      }.map(_.getAs[String]("_id")).flatten match {
+      docs
+        .sortBy {
+          _.getAs[BSONDocument](F.count)
+            .flatMap(_.getAs[BSONNumberLike]("game"))
+            .??(_.toInt)
+        }
+        .map(_.getAs[String]("_id"))
+        .flatten match {
         case List(u1, u2) => (u1, u2).some
         case _ => none
       }
@@ -432,20 +435,22 @@ object UserRepo {
     implicit def perfsHandler = Perfs.perfsBSONHandler
     import lila.db.BSON.BSONJodaDateTimeHandler
 
-    BSONDocument(F.id -> normalize(username),
-                 F.username -> username,
-                 F.email -> email,
-                 F.mustConfirmEmail ->
-                   (email.isDefined &&
-                     mobileApiVersion.isEmpty).option(DateTime.now),
-                 "password" -> hash(password, salt),
-                 "salt" -> salt,
-                 F.perfs -> Json.obj(),
-                 F.count -> Count.default,
-                 F.enabled -> true,
-                 F.createdAt -> DateTime.now,
-                 F.createdWithApiVersion -> mobileApiVersion,
-                 F.seenAt -> DateTime.now) ++ {
+    BSONDocument(
+      F.id -> normalize(username),
+      F.username -> username,
+      F.email -> email,
+      F.mustConfirmEmail ->
+        (email.isDefined &&
+          mobileApiVersion.isEmpty).option(DateTime.now),
+      "password" -> hash(password, salt),
+      "salt" -> salt,
+      F.perfs -> Json.obj(),
+      F.count -> Count.default,
+      F.enabled -> true,
+      F.createdAt -> DateTime.now,
+      F.createdWithApiVersion -> mobileApiVersion,
+      F.seenAt -> DateTime.now
+    ) ++ {
       if (blind) BSONDocument("blind" -> true) else BSONDocument()
     }
   }

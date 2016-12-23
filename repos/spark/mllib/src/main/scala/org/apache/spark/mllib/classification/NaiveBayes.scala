@@ -315,11 +315,14 @@ object NaiveBayesModel extends Loader[NaiveBayesModel] {
     assert(
       model.theta.length == numClasses,
       s"NaiveBayesModel.load expected $numClasses classes," +
-        s" but class conditionals array theta had ${model.theta.length} elements")
-    assert(model.theta.forall(_.length == numFeatures),
-           s"NaiveBayesModel.load expected $numFeatures features," +
-             s" but class conditionals array theta had elements of size:" +
-             s" ${model.theta.map(_.length).mkString(",")}")
+        s" but class conditionals array theta had ${model.theta.length} elements"
+    )
+    assert(
+      model.theta.forall(_.length == numFeatures),
+      s"NaiveBayesModel.load expected $numFeatures features," +
+        s" but class conditionals array theta had elements of size:" +
+        s" ${model.theta.map(_.length).mkString(",")}"
+    )
     model
   }
 }
@@ -421,11 +424,11 @@ class NaiveBayes private (private var lambda: Double,
           BLAS.axpy(1.0, v, c._2)
           (c._1 + 1L, c._2)
         },
-        mergeCombiners = (c1: (Long, DenseVector),
-                          c2: (Long, DenseVector)) => {
-          BLAS.axpy(1.0, c2._2, c1._2)
-          (c1._1 + c2._1, c1._2)
-        }
+        mergeCombiners =
+          (c1: (Long, DenseVector), c2: (Long, DenseVector)) => {
+            BLAS.axpy(1.0, c2._2, c1._2)
+            (c1._1 + c2._1, c1._2)
+          }
       )
       .collect()
       .sortBy(_._1)

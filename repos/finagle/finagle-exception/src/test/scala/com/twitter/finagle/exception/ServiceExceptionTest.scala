@@ -254,13 +254,15 @@ class ServiceExceptionTest extends FunSuite {
 
   test(
     "with both client and source endpoint reporting with >1 cardinality serialize to JSON in the proper format") {
-    val tse = new TestServiceException("service16",
-                                       "my cool message",
-                                       Some(Time.now),
-                                       Some(124564L),
-                                       clientAddress = Some("myClientAddress"),
-                                       sourceAddress = Some("mySourceAddress"),
-                                       cardinality = Some(8))
+    val tse = new TestServiceException(
+      "service16",
+      "my cool message",
+      Some(Time.now),
+      Some(124564L),
+      clientAddress = Some("myClientAddress"),
+      sourceAddress = Some("mySourceAddress"),
+      cardinality = Some(8)
+    )
     assert(tse.verifyJSON(tse.serviceException.toJson))
   }
 }

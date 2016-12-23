@@ -216,22 +216,26 @@ class FutureSpec
       "has actions applied" must {
         "pass checks" in {
           filterException[ArithmeticException] {
-            check({ (future: Future[Int], actions: List[FutureAction]) ⇒
-              def wrap[T](f: Future[T]): Try[T] =
-                FutureSpec.ready(f, timeout.duration).value.get
-              val result = (future /: actions)(_ /: _)
-              val expected = (wrap(future) /: actions)(_ /: _)
-              ((wrap(result), expected) match {
-                case (Success(a), Success(b)) ⇒ a == b
-                case (Failure(a), Failure(b)) if a.toString == b.toString ⇒
-                  true
-                case (Failure(a), Failure(b))
-                    if a.getStackTrace.isEmpty || b.getStackTrace.isEmpty ⇒
-                  a.getClass.toString == b.getClass.toString
-                case _ ⇒ false
-              }) :| result.value.get.toString + " is expected to be " +
-                expected.toString
-            }, minSuccessful(10000), workers(4))
+            check(
+              { (future: Future[Int], actions: List[FutureAction]) ⇒
+                def wrap[T](f: Future[T]): Try[T] =
+                  FutureSpec.ready(f, timeout.duration).value.get
+                val result = (future /: actions)(_ /: _)
+                val expected = (wrap(future) /: actions)(_ /: _)
+                ((wrap(result), expected) match {
+                  case (Success(a), Success(b)) ⇒ a == b
+                  case (Failure(a), Failure(b)) if a.toString == b.toString ⇒
+                    true
+                  case (Failure(a), Failure(b))
+                      if a.getStackTrace.isEmpty || b.getStackTrace.isEmpty ⇒
+                    a.getClass.toString == b.getClass.toString
+                  case _ ⇒ false
+                }) :| result.value.get.toString + " is expected to be " +
+                  expected.toString
+              },
+              minSuccessful(10000),
+              workers(4)
+            )
           }
         }
       }

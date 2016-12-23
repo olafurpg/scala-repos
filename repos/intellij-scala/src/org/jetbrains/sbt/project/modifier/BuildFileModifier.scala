@@ -48,27 +48,32 @@ trait BuildFileModifier {
     var res = false
     val project = module.getProject
     val vfsFileToCopy = mutable.Map[VirtualFile, LightVirtualFile]()
-    CommandProcessor.getInstance.executeCommand(project, new Runnable {
-      def run(): Unit = {
-        modifyInner(module, vfsFileToCopy) match {
-          case Some(changes) =>
-            if (!needPreviewChanges) {
-              applyChanges(changes, project, vfsFileToCopy)
-              res = true
-            } else {
-              previewChanges(module.getProject, changes, vfsFileToCopy) match {
-                case Some(acceptedChanges) if acceptedChanges.nonEmpty =>
-                  applyChanges(acceptedChanges, project, vfsFileToCopy)
-                  res = true
-                case _ =>
-                  res = false
+    CommandProcessor.getInstance.executeCommand(
+      project,
+      new Runnable {
+        def run(): Unit = {
+          modifyInner(module, vfsFileToCopy) match {
+            case Some(changes) =>
+              if (!needPreviewChanges) {
+                applyChanges(changes, project, vfsFileToCopy)
+                res = true
+              } else {
+                previewChanges(module.getProject, changes, vfsFileToCopy) match {
+                  case Some(acceptedChanges) if acceptedChanges.nonEmpty =>
+                    applyChanges(acceptedChanges, project, vfsFileToCopy)
+                    res = true
+                  case _ =>
+                    res = false
+                }
               }
-            }
-          case None =>
-            res = false
+            case None =>
+              res = false
+          }
         }
-      }
-    }, "Sbt build file modification", this)
+      },
+      "Sbt build file modification",
+      this
+    )
     if (res)
       ExternalSystemUtil.refreshProjects(
         new ImportSpecBuilder(project, SbtProjectSystem.Id))

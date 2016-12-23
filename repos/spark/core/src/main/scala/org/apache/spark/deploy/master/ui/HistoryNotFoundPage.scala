@@ -55,17 +55,23 @@ private[ui] class HistoryNotFoundPage(parent: MasterWebUI)
       </div>
 
     val title = Option(titleParam).getOrElse(defaultTitle)
-    val content = Option(msgParam).map { msg =>
-      URLDecoder.decode(msg, "UTF-8")
-    }.map { msg =>
-      <div class="row-fluid">
+    val content = Option(msgParam)
+      .map { msg =>
+        URLDecoder.decode(msg, "UTF-8")
+      }
+      .map { msg =>
+        <div class="row-fluid">
           <div class="span12" style="font-size:14px">{msg}</div>
-        </div> ++ Option(exceptionParam).map { e =>
-        URLDecoder.decode(e, "UTF-8")
-      }.map { e =>
-        <pre>{e}</pre>
-      }.getOrElse(Seq.empty)
-    }.getOrElse(defaultContent)
+        </div> ++ Option(exceptionParam)
+          .map { e =>
+            URLDecoder.decode(e, "UTF-8")
+          }
+          .map { e =>
+            <pre>{e}</pre>
+          }
+          .getOrElse(Seq.empty)
+      }
+      .getOrElse(defaultContent)
 
     UIUtils.basicSparkPage(content, title)
   }

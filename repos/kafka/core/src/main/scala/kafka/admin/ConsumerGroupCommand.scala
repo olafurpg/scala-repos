@@ -111,15 +111,17 @@ object ConsumerGroupCommand {
         topicPartitions: Seq[TopicAndPartition],
         getPartitionOffset: TopicAndPartition => Option[Long],
         getOwner: TopicAndPartition => Option[String]): Unit = {
-      topicPartitions.sortBy {
-        case topicPartition => topicPartition.partition
-      }.foreach { topicPartition =>
-        describePartition(group,
-                          topicPartition.topic,
-                          topicPartition.partition,
-                          getPartitionOffset(topicPartition),
-                          getOwner(topicPartition))
-      }
+      topicPartitions
+        .sortBy {
+          case topicPartition => topicPartition.partition
+        }
+        .foreach { topicPartition =>
+          describePartition(group,
+                            topicPartition.topic,
+                            topicPartition.partition,
+                            getPartitionOffset(topicPartition),
+                            getOwner(topicPartition))
+        }
     }
 
     protected def printDescribeHeader() {
@@ -211,15 +213,17 @@ object ConsumerGroupCommand {
                               channelRetryBackoffMs: Int) {
       val topicPartitions = getTopicPartitions(topic)
       val groupDirs = new ZKGroupTopicDirs(group, topic)
-      val ownerByTopicPartition = topicPartitions.flatMap { topicPartition =>
-        zkUtils
-          .readDataMaybeNull(
-            groupDirs.consumerOwnerDir + "/" + topicPartition.partition)
-          ._1
-          .map { owner =>
-            topicPartition -> owner
-          }
-      }.toMap
+      val ownerByTopicPartition = topicPartitions
+        .flatMap { topicPartition =>
+          zkUtils
+            .readDataMaybeNull(
+              groupDirs.consumerOwnerDir + "/" + topicPartition.partition)
+            ._1
+            .map { owner =>
+              topicPartition -> owner
+            }
+        }
+        .toMap
       val partitionOffsets = getPartitionOffsets(group,
                                                  topicPartitions,
                                                  channelSocketTimeoutMs,
@@ -241,21 +245,23 @@ object ConsumerGroupCommand {
       zkUtils.getLeaderForPartition(topic, partition) match {
         case Some(-1) => LogEndOffsetResult.Unknown
         case Some(brokerId) =>
-          getZkConsumer(brokerId).map { consumer =>
-            val topicAndPartition = new TopicAndPartition(topic, partition)
-            val request = OffsetRequest(
-              Map(
-                topicAndPartition -> PartitionOffsetRequestInfo(
-                  OffsetRequest.LatestTime,
-                  1)))
-            val logEndOffset = consumer
-              .getOffsetsBefore(request)
-              .partitionErrorAndOffsets(topicAndPartition)
-              .offsets
-              .head
-            consumer.close()
-            LogEndOffsetResult.LogEndOffset(logEndOffset)
-          }.getOrElse(LogEndOffsetResult.Ignore)
+          getZkConsumer(brokerId)
+            .map { consumer =>
+              val topicAndPartition = new TopicAndPartition(topic, partition)
+              val request = OffsetRequest(
+                Map(
+                  topicAndPartition -> PartitionOffsetRequestInfo(
+                    OffsetRequest.LatestTime,
+                    1)))
+              val logEndOffset = consumer
+                .getOffsetsBefore(request)
+                .partitionErrorAndOffsets(topicAndPartition)
+                .offsets
+                .head
+              consumer.close()
+              LogEndOffsetResult.LogEndOffset(logEndOffset)
+            }
+            .getOrElse(LogEndOffsetResult.Ignore)
         case None =>
           println(
             s"No broker for partition ${new TopicPartition(topic, partition)}")
@@ -423,15 +429,17 @@ object ConsumerGroupCommand {
         consumerSummaries.foreach { consumerSummary =>
           val topicPartitions = consumerSummary.assignment.map(tp =>
             TopicAndPartition(tp.topic, tp.partition))
-          val partitionOffsets = topicPartitions.flatMap { topicPartition =>
-            Option(
-              consumer.committed(
-                new TopicPartition(topicPartition.topic,
-                                   topicPartition.partition))).map {
-              offsetAndMetadata =>
-                topicPartition -> offsetAndMetadata.offset
+          val partitionOffsets = topicPartitions
+            .flatMap { topicPartition =>
+              Option(
+                consumer.committed(
+                  new TopicPartition(topicPartition.topic,
+                                     topicPartition.partition))).map {
+                offsetAndMetadata =>
+                  topicPartition -> offsetAndMetadata.offset
+              }
             }
-          }.toMap
+            .toMap
           describeTopicPartition(
             group,
             topicPartitions,
@@ -578,7 +586,8 @@ object ConsumerGroupCommand {
             parser,
             s"Option $deleteOpt is not valid with $newConsumerOpt. Note that " +
               "there's no need to delete group metadata for the new consumer as it is automatically deleted when the last " +
-              "member leaves")
+              "member leaves"
+          )
       } else {
         CommandLineUtils.checkRequiredArgs(parser, options, zkConnectOpt)
 

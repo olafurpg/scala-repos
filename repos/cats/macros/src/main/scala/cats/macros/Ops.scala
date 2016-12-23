@@ -17,7 +17,8 @@ object Ops extends machinist.Ops {
     ("|+|", "combine"),
     ("|-|", "remove")
   ).map {
-    case (k, v) =>
-      (NameTransformer.encode(k), v)
-  }.toMap
+      case (k, v) =>
+        (NameTransformer.encode(k), v)
+    }
+    .toMap
 }

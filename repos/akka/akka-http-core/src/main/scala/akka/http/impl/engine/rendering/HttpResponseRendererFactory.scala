@@ -79,19 +79,22 @@ private[http] class HttpResponseRendererFactory(
           if (cond) closeMode = CloseConnection
         var transferring = false
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit =
-            render(grab(in)) match {
-              case Strict(outElement) ⇒
-                push(out, outElement)
-                if (close) completeStage()
-              case Streamed(outStream) ⇒ transfer(outStream)
-            }
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit =
+              render(grab(in)) match {
+                case Strict(outElement) ⇒
+                  push(out, outElement)
+                  if (close) completeStage()
+                case Streamed(outStream) ⇒ transfer(outStream)
+              }
 
-          override def onUpstreamFinish(): Unit =
-            if (transferring) closeMode = CloseConnection
-            else completeStage()
-        })
+            override def onUpstreamFinish(): Unit =
+              if (transferring) closeMode = CloseConnection
+              else completeStage()
+          }
+        )
         val waitForDemandHandler = new OutHandler {
           def onPull(): Unit = pull(in)
         }
@@ -300,11 +303,13 @@ private[http] class HttpResponseRendererFactory(
                     (if (close) CloseBytes else KeepAliveBytes) ~~ CrLf
                 else if (connHeader != null && connHeader.hasUpgrade) {
                   r ~~ connHeader ~~ CrLf
-                  headers.collectFirst {
-                    case u: UpgradeToWebSocketResponseHeader ⇒ u
-                  }.foreach { header ⇒
-                    closeMode = SwitchToWebSocket(header.handler)
-                  }
+                  headers
+                    .collectFirst {
+                      case u: UpgradeToWebSocketResponseHeader ⇒ u
+                    }
+                    .foreach { header ⇒
+                      closeMode = SwitchToWebSocket(header.handler)
+                    }
                 }
                 if (mustRenderTransferEncodingChunkedHeader &&
                     !transferEncodingSeen)

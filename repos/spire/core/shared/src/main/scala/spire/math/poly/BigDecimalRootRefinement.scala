@@ -196,12 +196,14 @@ object BigDecimalRootRefinement {
     def shift(poly: Polynomial[BigDecimal],
               h: Rational): Polynomial[BigDecimal] = {
       val n = poly.degree
-      poly.mapTerms {
-        case Term(coeff, k) =>
-          val a = BigDecimal(h.denominator.toBigInteger.pow(n - k),
-                             MathContext.UNLIMITED)
-          Term(coeff * a, k)
-      }.compose(Polynomial.linear[BigDecimal](
+      poly
+        .mapTerms {
+          case Term(coeff, k) =>
+            val a = BigDecimal(h.denominator.toBigInteger.pow(n - k),
+                               MathContext.UNLIMITED)
+            Term(coeff * a, k)
+        }
+        .compose(Polynomial.linear[BigDecimal](
           BigDecimal(h.denominator.toBigInteger, MathContext.UNLIMITED),
           BigDecimal(h.numerator.toBigInteger, MathContext.UNLIMITED)))
         .removeZeroRoots

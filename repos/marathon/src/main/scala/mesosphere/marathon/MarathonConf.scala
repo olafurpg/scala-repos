@@ -53,7 +53,8 @@ trait MarathonConf
     descrNo = "Run Marathon in single node mode.",
     prefix = "disable_",
     noshort = true,
-    default = Some(true))
+    default = Some(true)
+  )
 
   lazy val checkpoint = toggle(
     "checkpoint",
@@ -63,7 +64,8 @@ trait MarathonConf
     descrNo = "Disable checkpointing of tasks.",
     prefix = "disable_",
     noshort = true,
-    default = Some(true))
+    default = Some(true)
+  )
 
   lazy val localPortMin = opt[Int](
     "local_port_min",
@@ -87,7 +89,8 @@ trait MarathonConf
     "hostname",
     descr = "The advertised hostname that is used for the communication with the Mesos master. " +
         "The value is also stored in the persistent store so another standby host can redirect to the elected leader.",
-    default = Some(java.net.InetAddress.getLocalHost.getHostName))
+    default = Some(java.net.InetAddress.getLocalHost.getHostName)
+  )
 
   lazy val webuiUrl = opt[String](
     "webui_url",
@@ -109,14 +112,16 @@ trait MarathonConf
         "Example values are \"*\", or " +
         "\"http://localhost:8888, http://domain.com\"",
     noshort = true,
-    default = None)
+    default = None
+  )
 
   lazy val eventStreamMaxOutstandingMessages = opt[Int](
     "event_stream_max_outstanding_messages",
     descr = "The event stream buffers events, that are not already consumed by clients. " +
         "This number defines the number of events that get buffered on the server side, before messages are dropped.",
     noshort = true,
-    default = Some(50))
+    default = Some(50)
+  )
 
   def executor: Executor = Executor.dispatch(defaultExecutor())
 
@@ -125,7 +130,8 @@ trait MarathonConf
     descr = "Mesos role for this framework. " +
         "If set, Marathon receives resource offers for the specified role in addition to " +
         "resources with the role designation '*'.",
-    default = None)
+    default = None
+  )
 
   def expectedResourceRoles: Set[String] = mesosRole.get match {
     case Some(role) => Set(role, "*")
@@ -141,8 +147,8 @@ trait MarathonConf
         " as a comma-separated list of strings. " +
         "This defaults to all roles for which this Marathon instance is configured to receive offers.",
     default = None,
-    validate = validateDefaultAcceptedResourceRoles)
-    .map(parseDefaultAcceptedResourceRoles)
+    validate = validateDefaultAcceptedResourceRoles
+  ).map(parseDefaultAcceptedResourceRoles)
 
   private[this] def parseDefaultAcceptedResourceRoles(
       str: String): Set[String] =
@@ -158,7 +164,8 @@ trait MarathonConf
     require(
       parsed.forall(expectedResourceRoles),
       "--default_accepted_resource_roles contains roles for which we will not receive offers: " +
-        (parsed -- expectedResourceRoles).mkString(", "))
+        (parsed -- expectedResourceRoles).mkString(", ")
+    )
 
     true
   }
@@ -167,7 +174,8 @@ trait MarathonConf
     "task_launch_confirm_timeout",
     descr = "Time, in milliseconds, to wait for a task to enter " +
         "the TASK_STAGING state before killing it.",
-    default = Some(300000L))
+    default = Some(300000L)
+  )
 
   lazy val taskLaunchTimeout = opt[Long](
     "task_launch_timeout",
@@ -179,7 +187,8 @@ trait MarathonConf
     "reconciliation_initial_delay",
     descr = "This is the length of time, in milliseconds, before Marathon " +
         "begins to periodically perform task reconciliation operations",
-    default = Some(15000L)) // 15 seconds
+    default = Some(15000L)
+  ) // 15 seconds
 
   lazy val reconciliationInterval = opt[Long](
     "reconciliation_interval",
@@ -191,7 +200,8 @@ trait MarathonConf
     "scale_apps_initial_delay",
     descr = "This is the length of time, in milliseconds, before Marathon " +
         "begins to periodically attempt to scale apps.",
-    default = Some(15000L)) // 15 seconds
+    default = Some(15000L)
+  ) // 15 seconds
 
   lazy val scaleAppsInterval = opt[Long](
     "scale_apps_interval",
@@ -207,7 +217,8 @@ trait MarathonConf
     descr = "(deprecated) Maximum time, in milliseconds, to wait for persistent storage " +
         "operations to complete. This option is no longer used and " +
         "will be removed in a later release.",
-    default = None)
+    default = None
+  )
 
   lazy val mesosUser = opt[String]("mesos_user",
                                    descr = "Mesos user for this framework.",
@@ -226,7 +237,8 @@ trait MarathonConf
         .mkString(", ")}. """ +
         s"""Example: ${StorageProvider.examples.values.mkString(", ")}""",
     validate = StorageProvider.isValidUrl,
-    noshort = true)
+    noshort = true
+  )
 
   lazy val mesosAuthenticationPrincipal = opt[String](
     "mesos_authentication_principal",
@@ -250,7 +262,8 @@ trait MarathonConf
     descr = "The backend storage system to use. One of zk, mesos_zk, mem.",
     hidden = true,
     validate = Set("zk", "mesos_zk", "mem").contains,
-    default = Some("zk"))
+    default = Some("zk")
+  )
 
   lazy val maxApps = opt[Int](
     "max_apps",
@@ -263,7 +276,8 @@ trait MarathonConf
     noshort = true,
     descrYes = "(Default) Enable an in-memory cache for the storage layer.",
     descrNo = "Disable the in-memory cache for the storage layer. ",
-    prefix = "disable_")
+    prefix = "disable_"
+  )
 
   lazy val onElectedPrepareTimeout = opt[Long](
     "on_elected_prepare_timeout",
@@ -278,5 +292,6 @@ trait MarathonConf
         "The maximum number of root group updates that we queue before rejecting updates.",
     noshort = true,
     hidden = true,
-    default = Some(500))
+    default = Some(500)
+  )
 }

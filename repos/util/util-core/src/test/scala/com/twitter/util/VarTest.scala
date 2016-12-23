@@ -249,9 +249,12 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("Var.collect[Set]") {
     val vars = Seq(Var(1), Var(2), Var(3))
 
-    val coll = Var.collect(vars.map { v =>
-      v: Var[Int]
-    }.toSet)
+    val coll = Var.collect(
+      vars
+        .map { v =>
+          v: Var[Int]
+        }
+        .toSet)
     val ref = new AtomicReference[Set[Int]]
     coll.changes.register(Witness(ref))
     assert(ref.get == Set(1, 2, 3))

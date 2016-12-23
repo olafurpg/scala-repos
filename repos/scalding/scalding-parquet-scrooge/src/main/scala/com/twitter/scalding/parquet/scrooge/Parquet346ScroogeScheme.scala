@@ -88,4 +88,5 @@ class Parquet346ScroogeRecordConverter[T <: ThriftStruct](
       parquetSchema,
       // this is the fix -- we add in the missing structOrUnionType metadata
       // before passing it along
-      Parquet346StructTypeRepairer.repair(thriftType))
+      Parquet346StructTypeRepairer.repair(thriftType)
+    )

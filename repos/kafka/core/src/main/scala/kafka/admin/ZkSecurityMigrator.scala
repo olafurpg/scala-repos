@@ -193,12 +193,14 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
       Code.get(rc) match {
         case Code.OK =>
           // Set ACL for each child
-          children.asScala.map { child =>
-            path match {
-              case "/" => s"/$child"
-              case path => s"$path/$child"
+          children.asScala
+            .map { child =>
+              path match {
+                case "/" => s"/$child"
+                case path => s"$path/$child"
+              }
             }
-          }.foreach(setAclsRecursively)
+            .foreach(setAclsRecursively)
           promise success "done"
         case Code.CONNECTIONLOSS =>
           zkHandle.getChildren(path, false, GetChildrenCallback, ctx)

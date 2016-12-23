@@ -19,7 +19,8 @@ trait CategoryTests[F[_, _]] extends ComposeTests[F] {
       name = "category",
       parent = Some(compose[A, B, C, D]),
       "category left identity" -> forAll(laws.categoryLeftIdentity[A, B] _),
-      "category right identity" -> forAll(laws.categoryRightIdentity[A, B] _))
+      "category right identity" -> forAll(laws.categoryRightIdentity[A, B] _)
+    )
 }
 
 object CategoryTests {

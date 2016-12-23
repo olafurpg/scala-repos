@@ -349,11 +349,14 @@ private[r] class BufferedStreamThread(in: InputStream,
   }
 
   def getLines(): String = synchronized {
-    (0 until errBufferSize).filter { x =>
-      lines((x + lineIdx) % errBufferSize) != null
-    }.map { x =>
-      lines((x + lineIdx) % errBufferSize)
-    }.mkString("\n")
+    (0 until errBufferSize)
+      .filter { x =>
+        lines((x + lineIdx) % errBufferSize) != null
+      }
+      .map { x =>
+        lines((x + lineIdx) % errBufferSize)
+      }
+      .mkString("\n")
   }
 }
 

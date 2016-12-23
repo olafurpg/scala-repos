@@ -82,9 +82,11 @@ class PrimitiveApiTest
     producer.send(new KeyedMessage[String, String](topic, "test-message"))
 
     val replica = servers.head.replicaManager.getReplica(topic, 0).get
-    assertTrue("HighWatermark should equal logEndOffset with just 1 replica",
-               replica.logEndOffset.messageOffset > 0 &&
-                 replica.logEndOffset.equals(replica.highWatermark))
+    assertTrue(
+      "HighWatermark should equal logEndOffset with just 1 replica",
+      replica.logEndOffset.messageOffset > 0 &&
+        replica.logEndOffset.equals(replica.highWatermark)
+    )
 
     val request = new FetchRequestBuilder()
       .clientId("test-client")
@@ -115,7 +117,8 @@ class PrimitiveApiTest
       encoder = classOf[StringEncoder].getName,
       keyEncoder = classOf[StringEncoder].getName,
       partitioner = classOf[StaticPartitioner].getName,
-      producerProps = props)
+      producerProps = props
+    )
 
     stringProducer1.send(
       new KeyedMessage[String, String](topic, "test-message"))
@@ -262,7 +265,8 @@ class PrimitiveApiTest
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName,
-        producerProps = props)
+        producerProps = props
+      )
 
     // send some messages
     val messages = new mutable.HashMap[String, Seq[String]]

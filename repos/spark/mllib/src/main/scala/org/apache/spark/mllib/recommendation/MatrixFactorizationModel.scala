@@ -111,7 +111,8 @@ class MatrixFactorizationModel @Since("0.8.0")(
           h1._1.addAll(h2._1)
           h1._2.addAll(h2._2)
           h1
-        })
+        }
+      )
     (aggregated._1.cardinality(), aggregated._2.cardinality())
   }
 

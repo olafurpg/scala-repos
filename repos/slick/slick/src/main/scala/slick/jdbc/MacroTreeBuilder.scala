@@ -99,7 +99,8 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                    TypeName("Tuple" + resultTypes.size)),
             resultTypeTrees.toList
           ),
-          GetResultTypeTree)
+          GetResultTypeTree
+        )
       case n =>
         val rtypeTree = {
           val zero = TypeTree(
@@ -126,13 +127,15 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                        TypeTree(),
                        EmptyTree)),
               Block(
-                zipped.map { tup =>
-                  val (i: Int, typ: Tree) = tup
-                  ValDef(Modifiers(),
-                         TermName("gr" + i),
-                         TypeTree(),
-                         implicitTree(typ, GetResultTypeTree))
-                }.toList,
+                zipped
+                  .map { tup =>
+                    val (i: Int, typ: Tree) = tup
+                    ValDef(Modifiers(),
+                           TermName("gr" + i),
+                           TypeTree(),
+                           implicitTree(typ, GetResultTypeTree))
+                  }
+                  .toList,
                 zipped.foldRight[Tree](zero) { (tup, prev) =>
                   val (i: Int, typ: Tree) = tup
                   Block(

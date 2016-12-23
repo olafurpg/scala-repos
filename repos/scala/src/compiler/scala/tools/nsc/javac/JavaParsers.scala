@@ -861,19 +861,23 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
                List(),
                List(List(makeParam("x", TypeTree(StringTpe)))),
                enumType,
-               blankExpr))
+               blankExpr)
+      )
       accept(RBRACE)
       val superclazz = AppliedTypeTree(javaLangDot(tpnme.Enum), List(enumType))
       val finalFlag = if (enumIsFinal) Flags.FINAL else 0l
-      addCompanionObject(consts ::: statics ::: predefs, atPos(pos) {
-        // Marking the enum class SEALED | ABSTRACT enables exhaustiveness checking. See also ClassfileParser.
-        // This is a bit of a hack and requires excluding the ABSTRACT flag in the backend, see method javaClassfileFlags.
-        ClassDef(
-          mods | Flags.JAVA_ENUM | Flags.SEALED | Flags.ABSTRACT | finalFlag,
-          name,
-          List(),
-          makeTemplate(superclazz :: interfaces, body))
-      })
+      addCompanionObject(
+        consts ::: statics ::: predefs,
+        atPos(pos) {
+          // Marking the enum class SEALED | ABSTRACT enables exhaustiveness checking. See also ClassfileParser.
+          // This is a bit of a hack and requires excluding the ABSTRACT flag in the backend, see method javaClassfileFlags.
+          ClassDef(
+            mods | Flags.JAVA_ENUM | Flags.SEALED | Flags.ABSTRACT | finalFlag,
+            name,
+            List(),
+            makeTemplate(superclazz :: interfaces, body))
+        }
+      )
     }
 
     def enumConst(enumType: Tree): (ValDef, Boolean) = {

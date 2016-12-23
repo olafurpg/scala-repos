@@ -56,7 +56,8 @@ class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
                 "All text from header closing tag to end of line will be lost",
                 ProblemHighlightType.WEAK_WARNING,
                 isOnTheFly,
-                new ScalaDocMoveTextToNewLineQuickFix(firstSibl)))
+                new ScalaDocMoveTextToNewLineQuickFix(firstSibl)
+              ))
             sibl = sibl.getNextSibling
           }
         }

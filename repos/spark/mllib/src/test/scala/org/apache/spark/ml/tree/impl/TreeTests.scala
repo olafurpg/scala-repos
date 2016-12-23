@@ -49,15 +49,17 @@ private[ml] object TreeTests extends SparkFunSuite {
     import sqlContext.implicits._
     val df = data.toDF()
     val numFeatures = data.first().features.size
-    val featuresAttributes = Range(0, numFeatures).map { feature =>
-      if (categoricalFeatures.contains(feature)) {
-        NominalAttribute.defaultAttr
-          .withIndex(feature)
-          .withNumValues(categoricalFeatures(feature))
-      } else {
-        NumericAttribute.defaultAttr.withIndex(feature)
+    val featuresAttributes = Range(0, numFeatures)
+      .map { feature =>
+        if (categoricalFeatures.contains(feature)) {
+          NominalAttribute.defaultAttr
+            .withIndex(feature)
+            .withNumValues(categoricalFeatures(feature))
+        } else {
+          NumericAttribute.defaultAttr.withIndex(feature)
+        }
       }
-    }.toArray
+      .toArray
     val featuresMetadata =
       new AttributeGroup("features", featuresAttributes).toMetadata()
     val labelAttribute =
@@ -198,14 +200,16 @@ private[ml] object TreeTests extends SparkFunSuite {
 
   /** Data for tree read/write tests which produces a non-trivial tree. */
   def getTreeReadWriteData(sc: SparkContext): RDD[LabeledPoint] = {
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
-                    LabeledPoint(1.0, Vectors.dense(0.0, 1.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0, 2.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0, 0.0)),
-                    LabeledPoint(1.0, Vectors.dense(1.0, 1.0)),
-                    LabeledPoint(1.0, Vectors.dense(1.0, 0.0)),
-                    LabeledPoint(1.0, Vectors.dense(1.0, 2.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0, 1.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0, 2.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0, 0.0)),
+      LabeledPoint(1.0, Vectors.dense(1.0, 1.0)),
+      LabeledPoint(1.0, Vectors.dense(1.0, 0.0)),
+      LabeledPoint(1.0, Vectors.dense(1.0, 2.0))
+    )
     sc.parallelize(arr)
   }
 }

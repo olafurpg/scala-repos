@@ -103,7 +103,8 @@ class ScalaAttachSourcesNotificationProvider(
                     o2: AttachSourcesProvider.AttachSourcesAction): Int = {
           o1.getName.compareToIgnoreCase(o2.getName)
         }
-      })
+      }
+    )
 
     actions.add(defaultAction)
 
@@ -138,7 +139,8 @@ class ScalaAttachSourcesNotificationProvider(
             callback.doWhenRejected(onFinish)
             callback.doWhenDone(onFinish)
           }
-        })
+        }
+      )
     }
     panel
   }

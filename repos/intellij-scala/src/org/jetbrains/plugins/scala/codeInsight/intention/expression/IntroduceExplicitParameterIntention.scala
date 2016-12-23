@@ -114,7 +114,8 @@ class IntroduceExplicitParameterIntention
             res = name + index
             res
           }
-        })
+        }
+      )
 
       var un = names(0)
       if (macros.contains(un)) {
@@ -218,86 +219,90 @@ class IntroduceExplicitParameterIntention
 
       TemplateManager
         .getInstance(project)
-        .startTemplate(editor, template, new TemplateEditingAdapter {
-          override def waitingForInput(template: Template) {
-            markCurrentVariables(1)
-          }
-
-          override def currentVariableChanged(templateState: TemplateState,
-                                              template: Template,
-                                              oldIndex: Int,
-                                              newIndex: Int) {
-            if (oldIndex >= 0) clearHighlighters()
-            if (newIndex > 0) markCurrentVariables(newIndex + 1)
-          }
-
-          override def templateCancelled(template: Template) {
-            clearHighlighters()
-          }
-
-          override def templateFinished(template: Template,
-                                        brokenOff: Boolean) {
-            clearHighlighters()
-          }
-
-          private def addHighlights(
-              ranges: mutable.HashMap[TextRange, TextAttributes],
-              editor: Editor,
-              highlighters: ArrayBuffer[RangeHighlighter],
-              highlightManager: HighlightManager) {
-            for ((range, attributes) <- ranges) {
-              import scala.collection.JavaConversions._
-              highlightManager.addOccurrenceHighlight(editor,
-                                                      range.getStartOffset,
-                                                      range.getEndOffset,
-                                                      attributes,
-                                                      0,
-                                                      highlighters,
-                                                      null)
+        .startTemplate(
+          editor,
+          template,
+          new TemplateEditingAdapter {
+            override def waitingForInput(template: Template) {
+              markCurrentVariables(1)
             }
-            for (highlighter <- highlighters) {
-              highlighter.setGreedyToLeft(true)
-              highlighter.setGreedyToRight(true)
+
+            override def currentVariableChanged(templateState: TemplateState,
+                                                template: Template,
+                                                oldIndex: Int,
+                                                newIndex: Int) {
+              if (oldIndex >= 0) clearHighlighters()
+              if (newIndex > 0) markCurrentVariables(newIndex + 1)
             }
-          }
 
-          private def markCurrentVariables(index: Int) {
-            val colorsManager: EditorColorsManager =
-              EditorColorsManager.getInstance
-            val templateState: TemplateState =
-              TemplateManagerImpl.getTemplateState(editor)
-            var i: Int = 0
+            override def templateCancelled(template: Template) {
+              clearHighlighters()
+            }
 
-            while (i < templateState.getSegmentsCount) {
-              val segmentOffset: TextRange = templateState.getSegmentRange(i)
-              val name: String = template.getSegmentName(i)
-              var attributes: TextAttributes = null
-              if (name == params.get(index).get) {
-                attributes = colorsManager.getGlobalScheme.getAttributes(
-                  EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
-              } else if (name == depends.get(index).get) {
-                attributes = colorsManager.getGlobalScheme.getAttributes(
-                  EditorColors.SEARCH_RESULT_ATTRIBUTES)
+            override def templateFinished(template: Template,
+                                          brokenOff: Boolean) {
+              clearHighlighters()
+            }
+
+            private def addHighlights(
+                ranges: mutable.HashMap[TextRange, TextAttributes],
+                editor: Editor,
+                highlighters: ArrayBuffer[RangeHighlighter],
+                highlightManager: HighlightManager) {
+              for ((range, attributes) <- ranges) {
+                import scala.collection.JavaConversions._
+                highlightManager.addOccurrenceHighlight(editor,
+                                                        range.getStartOffset,
+                                                        range.getEndOffset,
+                                                        attributes,
+                                                        0,
+                                                        highlighters,
+                                                        null)
               }
-              if (attributes != null)
-                rangesToHighlight.put(segmentOffset, attributes)
-              i += 1
+              for (highlighter <- highlighters) {
+                highlighter.setGreedyToLeft(true)
+                highlighter.setGreedyToRight(true)
+              }
             }
-            addHighlights(rangesToHighlight,
-                          editor,
-                          myHighlighters,
-                          HighlightManager.getInstance(project))
-          }
 
-          private def clearHighlighters() {
-            val highlightManager = HighlightManager.getInstance(project)
-            myHighlighters.foreach { a =>
-              highlightManager.removeSegmentHighlighter(editor, a)
+            private def markCurrentVariables(index: Int) {
+              val colorsManager: EditorColorsManager =
+                EditorColorsManager.getInstance
+              val templateState: TemplateState =
+                TemplateManagerImpl.getTemplateState(editor)
+              var i: Int = 0
+
+              while (i < templateState.getSegmentsCount) {
+                val segmentOffset: TextRange = templateState.getSegmentRange(i)
+                val name: String = template.getSegmentName(i)
+                var attributes: TextAttributes = null
+                if (name == params.get(index).get) {
+                  attributes = colorsManager.getGlobalScheme.getAttributes(
+                    EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
+                } else if (name == depends.get(index).get) {
+                  attributes = colorsManager.getGlobalScheme.getAttributes(
+                    EditorColors.SEARCH_RESULT_ATTRIBUTES)
+                }
+                if (attributes != null)
+                  rangesToHighlight.put(segmentOffset, attributes)
+                i += 1
+              }
+              addHighlights(rangesToHighlight,
+                            editor,
+                            myHighlighters,
+                            HighlightManager.getInstance(project))
             }
-            rangesToHighlight.clear()
-            myHighlighters.clear()
+
+            private def clearHighlighters() {
+              val highlightManager = HighlightManager.getInstance(project)
+              myHighlighters.foreach { a =>
+                highlightManager.removeSegmentHighlighter(editor, a)
+              }
+              rangesToHighlight.clear()
+              myHighlighters.clear()
+            }
           }
-        })
+        )
 
       PsiDocumentManager.getInstance(project).commitDocument(document)
     }

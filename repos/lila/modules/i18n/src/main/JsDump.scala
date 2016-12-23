@@ -22,38 +22,40 @@ private[i18n] final class JsDump(path: String, pool: I18nPool, keys: I18nKeys) {
       writeFullJson
     } void
 
-  private val jsMessages = List(keys.standard,
-                                keys.rated,
-                                keys.casual,
-                                keys.thisGameIsRated,
-                                keys.whiteCreatesTheGame,
-                                keys.blackCreatesTheGame,
-                                keys.whiteJoinsTheGame,
-                                keys.blackJoinsTheGame,
-                                keys.drawOfferSent,
-                                keys.drawOfferDeclined,
-                                keys.drawOfferAccepted,
-                                keys.drawOfferCanceled,
-                                keys.rematchOfferSent,
-                                keys.rematchOfferAccepted,
-                                keys.rematchOfferCanceled,
-                                keys.rematchOfferDeclined,
-                                keys.takebackPropositionSent,
-                                keys.takebackPropositionDeclined,
-                                keys.takebackPropositionAccepted,
-                                keys.takebackPropositionCanceled,
-                                keys.gameOver,
-                                keys.yourTurn,
-                                keys.waitingForOpponent,
-                                keys.accept,
-                                keys.decline,
-                                keys.challengeToPlay,
-                                keys.youNeedAnAccountToDoThat,
-                                keys.createANewTournament,
-                                keys.withdraw,
-                                keys.join,
-                                keys.joinTheGame,
-                                keys.tournamentIsStarting)
+  private val jsMessages = List(
+    keys.standard,
+    keys.rated,
+    keys.casual,
+    keys.thisGameIsRated,
+    keys.whiteCreatesTheGame,
+    keys.blackCreatesTheGame,
+    keys.whiteJoinsTheGame,
+    keys.blackJoinsTheGame,
+    keys.drawOfferSent,
+    keys.drawOfferDeclined,
+    keys.drawOfferAccepted,
+    keys.drawOfferCanceled,
+    keys.rematchOfferSent,
+    keys.rematchOfferAccepted,
+    keys.rematchOfferCanceled,
+    keys.rematchOfferDeclined,
+    keys.takebackPropositionSent,
+    keys.takebackPropositionDeclined,
+    keys.takebackPropositionAccepted,
+    keys.takebackPropositionCanceled,
+    keys.gameOver,
+    keys.yourTurn,
+    keys.waitingForOpponent,
+    keys.accept,
+    keys.decline,
+    keys.challengeToPlay,
+    keys.youNeedAnAccountToDoThat,
+    keys.createANewTournament,
+    keys.withdraw,
+    keys.join,
+    keys.joinTheGame,
+    keys.tournamentIsStarting
+  )
 
   private val pathFile = new File(path)
 
@@ -67,15 +69,19 @@ private[i18n] final class JsDump(path: String, pool: I18nPool, keys: I18nKeys) {
   }
 
   private def dumpFromDefault(messages: List[I18nKey], lang: Lang): String =
-    messages.map { key =>
-      """"%s":"%s"""".format(escape(key.to(pool.default)()),
-                             escape(key.to(lang)()))
-    }.mkString("{", ",", "}")
+    messages
+      .map { key =>
+        """"%s":"%s"""".format(escape(key.to(pool.default)()),
+                               escape(key.to(lang)()))
+      }
+      .mkString("{", ",", "}")
 
   private def dumpFromKey(messages: List[I18nKey], lang: Lang): String =
-    messages.map { key =>
-      """"%s":"%s"""".format(key.key, escape(key.to(lang)()))
-    }.mkString("{", ",", "}")
+    messages
+      .map { key =>
+        """"%s":"%s"""".format(key.key, escape(key.to(lang)()))
+      }
+      .mkString("{", ",", "}")
 
   private def writeRefs {
     val code = pool.names.toList

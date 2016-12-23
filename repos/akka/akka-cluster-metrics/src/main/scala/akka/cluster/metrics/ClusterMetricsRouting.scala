@@ -141,10 +141,12 @@ final case class AdaptiveLoadBalancingPool(
     extends Pool {
 
   def this(config: Config, dynamicAccess: DynamicAccess) =
-    this(nrOfInstances =
-           ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
-         metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances =
+        ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
+      metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
+      usePoolDispatcher = config.hasPath("pool-dispatcher")
+    )
 
   /**
     * Java API
@@ -278,14 +280,16 @@ case object HeapMetricsSelector extends CapacityMetricsSelector {
   def getInstance = this
 
   override def capacity(nodeMetrics: Set[NodeMetrics]): Map[Address, Double] = {
-    nodeMetrics.collect {
-      case HeapMemory(address, _, used, committed, max) ⇒
-        val capacity = max match {
-          case None ⇒ (committed - used).toDouble / committed
-          case Some(m) ⇒ (m - used).toDouble / m
-        }
-        (address, capacity)
-    }.toMap
+    nodeMetrics
+      .collect {
+        case HeapMemory(address, _, used, committed, max) ⇒
+          val capacity = max match {
+            case None ⇒ (committed - used).toDouble / committed
+            case Some(m) ⇒ (m - used).toDouble / m
+          }
+          (address, capacity)
+      }
+      .toMap
   }
 }
 
@@ -319,13 +323,15 @@ case object CpuMetricsSelector extends CapacityMetricsSelector {
   require(0.0 <= factor, s"factor must be non negative: ${factor}")
 
   override def capacity(nodeMetrics: Set[NodeMetrics]): Map[Address, Double] = {
-    nodeMetrics.collect {
-      case Cpu(address, _, _, Some(cpuCombined), Some(cpuStolen), _) ⇒
-        // Arbitrary load rating function which skews in favor of stolen time.
-        val load = cpuCombined + cpuStolen * (1.0 + factor)
-        val capacity = if (load >= 1.0) 0.0 else 1.0 - load
-        (address, capacity)
-    }.toMap
+    nodeMetrics
+      .collect {
+        case Cpu(address, _, _, Some(cpuCombined), Some(cpuStolen), _) ⇒
+          // Arbitrary load rating function which skews in favor of stolen time.
+          val load = cpuCombined + cpuStolen * (1.0 + factor)
+          val capacity = if (load >= 1.0) 0.0 else 1.0 - load
+          (address, capacity)
+      }
+      .toMap
   }
 }
 
@@ -346,11 +352,13 @@ case object SystemLoadAverageMetricsSelector extends CapacityMetricsSelector {
   def getInstance = this
 
   override def capacity(nodeMetrics: Set[NodeMetrics]): Map[Address, Double] = {
-    nodeMetrics.collect {
-      case Cpu(address, _, Some(systemLoadAverage), _, _, processors) ⇒
-        val capacity = 1.0 - math.min(1.0, systemLoadAverage / processors)
-        (address, capacity)
-    }.toMap
+    nodeMetrics
+      .collect {
+        case Cpu(address, _, Some(systemLoadAverage), _, _, processors) ⇒
+          val capacity = 1.0 - math.min(1.0, systemLoadAverage / processors)
+          (address, capacity)
+      }
+      .toMap
   }
 }
 
@@ -428,7 +436,8 @@ object MetricsSelector {
                 (s"Cannot instantiate metrics-selector [$fqn], " +
                   "make sure it extends [akka.cluster.routing.MetricsSelector] and " +
                   "has constructor with [com.typesafe.config.Config] parameter"),
-                exception)
+                exception
+              )
           })
           .get
     }

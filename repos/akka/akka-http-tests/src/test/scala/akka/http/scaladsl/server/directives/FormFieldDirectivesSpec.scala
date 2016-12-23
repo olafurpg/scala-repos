@@ -31,10 +31,12 @@ class FormFieldDirectivesSpec extends RoutingSpec {
         "VIPBoolean" -> HttpEntity("true"))
   }
   val multipartFormWithTextHtml = Multipart.FormData {
-    Map("firstName" -> HttpEntity("Mike"),
-        "age" -> HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>42</int>"),
-        "VIP" -> HttpEntity(ContentTypes.`text/html(UTF-8)`, "<b>yes</b>"),
-        "super" -> HttpEntity("no"))
+    Map(
+      "firstName" -> HttpEntity("Mike"),
+      "age" -> HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>42</int>"),
+      "VIP" -> HttpEntity(ContentTypes.`text/html(UTF-8)`, "<b>yes</b>"),
+      "super" -> HttpEntity("no")
+    )
   }
   val multipartFormWithFile = Multipart.FormData(
     Multipart.FormData.BodyPart.Strict(

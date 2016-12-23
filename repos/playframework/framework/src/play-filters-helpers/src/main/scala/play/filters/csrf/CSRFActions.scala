@@ -157,31 +157,34 @@ class CSRFAction(next: EssentialAction,
     Accumulator(
       Flow[ByteString]
         .transform(() =>
-          new BodyHandler(config, { body =>
-            if (extractor(body, tokenName).fold(false)(
-                  tokenProvider.compareTokens(_, tokenFromHeader))) {
-              filterLogger.trace("[CSRF] Valid token found in body")
-              true
-            } else {
-              filterLogger.trace(
-                "[CSRF] Check failed because no or invalid token found in body")
-              false
+          new BodyHandler(
+            config, { body =>
+              if (extractor(body, tokenName).fold(false)(
+                    tokenProvider.compareTokens(_, tokenFromHeader))) {
+                filterLogger.trace("[CSRF] Valid token found in body")
+                true
+              } else {
+                filterLogger.trace(
+                  "[CSRF] Check failed because no or invalid token found in body")
+                false
+              }
             }
-          }))
+        ))
         .splitWhen(_ => false)
         .prefixAndTail(0)
         .map(_._2)
         .concatSubstreams
         .toMat(Sink.head[Source[ByteString, _]])(Keep.right)
     ).mapFuture { validatedBodySource =>
-      action(request).run(validatedBodySource)
-    }.recoverWith {
-      case NoTokenInBody =>
-        clearTokenIfInvalid(request,
-                            config,
-                            errorHandler,
-                            "No CSRF token found in body")
-    }
+        action(request).run(validatedBodySource)
+      }
+      .recoverWith {
+        case NoTokenInBody =>
+          clearTokenIfInvalid(request,
+                              config,
+                              errorHandler,
+                              "No CSRF token found in body")
+      }
   }
 
   /**
@@ -538,17 +541,19 @@ object CSRFAction {
       CSRF
         .getToken(request)
         .fold(
-          config.cookieName.flatMap { cookie =>
-            request.cookies.get(cookie).map { token =>
-              result.discardingCookies(
-                DiscardingCookie(cookie,
-                                 domain = Session.domain,
-                                 path = Session.path,
-                                 secure = config.secureCookie))
+          config.cookieName
+            .flatMap { cookie =>
+              request.cookies.get(cookie).map { token =>
+                result.discardingCookies(
+                  DiscardingCookie(cookie,
+                                   domain = Session.domain,
+                                   path = Session.path,
+                                   secure = config.secureCookie))
+              }
             }
-          }.getOrElse {
-            result.withSession(result.session(request) - config.tokenName)
-          }
+            .getOrElse {
+              result.withSession(result.session(request) - config.tokenName)
+            }
         )(_ => result)
     }
   }

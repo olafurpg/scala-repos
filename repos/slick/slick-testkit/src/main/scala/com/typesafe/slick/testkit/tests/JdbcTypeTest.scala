@@ -91,16 +91,18 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
     case class Serialized[T](value: T)
 
     implicit def serializedType[T] =
-      MappedColumnType.base[Serialized[T], Blob]({ s =>
-        val b = new ByteArrayOutputStream
-        val out = new ObjectOutputStream(b)
-        out.writeObject(s.value)
-        out.flush
-        new SerialBlob(b.toByteArray)
-      }, { b =>
-        val in = new ObjectInputStream(b.getBinaryStream)
-        Serialized[T](in.readObject().asInstanceOf[T])
-      })
+      MappedColumnType.base[Serialized[T], Blob](
+        { s =>
+          val b = new ByteArrayOutputStream
+          val out = new ObjectOutputStream(b)
+          out.writeObject(s.value)
+          out.flush
+          new SerialBlob(b.toByteArray)
+        }, { b =>
+          val in = new ObjectInputStream(b.getBinaryStream)
+          Serialized[T](in.readObject().asInstanceOf[T])
+        }
+      )
 
     class T(tag: Tag) extends Table[(Int, Serialized[List[Int]])](tag, "t") {
       def id = column[Int]("id", O.PrimaryKey, O.AutoInc)

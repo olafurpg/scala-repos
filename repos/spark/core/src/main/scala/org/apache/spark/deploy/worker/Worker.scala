@@ -319,7 +319,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
               },
               PROLONGED_REGISTRATION_RETRY_INTERVAL_SECONDS,
               PROLONGED_REGISTRATION_RETRY_INTERVAL_SECONDS,
-              TimeUnit.SECONDS))
+              TimeUnit.SECONDS
+            ))
         }
       } else {
         logError("All masters are unresponsive! Giving up.")
@@ -357,7 +358,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
             },
             INITIAL_REGISTRATION_RETRY_INTERVAL_SECONDS,
             INITIAL_REGISTRATION_RETRY_INTERVAL_SECONDS,
-            TimeUnit.SECONDS))
+            TimeUnit.SECONDS
+          ))
       case Some(_) =>
         logInfo(
           "Not spawning another attempt to register with the master, since there is an" +
@@ -413,7 +415,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
               },
               CLEANUP_INTERVAL_MILLIS,
               CLEANUP_INTERVAL_MILLIS,
-              TimeUnit.MILLISECONDS)
+              TimeUnit.MILLISECONDS
+            )
           }
 
           val execs = executors.values.map { e =>
@@ -447,18 +450,20 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
         if (appDirs == null) {
           throw new IOException("ERROR: Failed to list files in " + appDirs)
         }
-        appDirs.filter { dir =>
-          // the directory is used by an application - check that the application is not running
-          // when cleaning up
-          val appIdFromDir = dir.getName
-          val isAppStillRunning = appIds.contains(appIdFromDir)
-          dir.isDirectory && !isAppStillRunning &&
-          !Utils.doesDirectoryContainAnyNewFiles(dir,
-                                                 APP_DATA_RETENTION_SECONDS)
-        }.foreach { dir =>
-          logInfo(s"Removing directory: ${dir.getPath}")
-          Utils.deleteRecursively(dir)
-        }
+        appDirs
+          .filter { dir =>
+            // the directory is used by an application - check that the application is not running
+            // when cleaning up
+            val appIdFromDir = dir.getName
+            val isAppStillRunning = appIds.contains(appIdFromDir)
+            dir.isDirectory && !isAppStillRunning &&
+            !Utils.doesDirectoryContainAnyNewFiles(dir,
+                                                   APP_DATA_RETENTION_SECONDS)
+          }
+          .foreach { dir =>
+            logInfo(s"Removing directory: ${dir.getPath}")
+            Utils.deleteRecursively(dir)
+          }
       }(cleanupThreadExecutor)
 
       cleanupFuture.onFailure {
@@ -513,7 +518,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
                 Utils.chmod700(appDir)
                 appDir.getAbsolutePath()
               }
-              .toSeq)
+              .toSeq
+          )
           appDirectories(appId) = appLocalDirs
           val manager = new ExecutorRunner(
             appId,
@@ -532,7 +538,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
             workerUri,
             conf,
             appLocalDirs,
-            ExecutorState.RUNNING)
+            ExecutorState.RUNNING
+          )
           executors(appId + "/" + execId) = manager
           manager.start()
           coresUsed += cores_
@@ -626,19 +633,21 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
       context: RpcCallContext): PartialFunction[Any, Unit] = {
     case RequestWorkerState =>
       context.reply(
-        WorkerStateResponse(host,
-                            port,
-                            workerId,
-                            executors.values.toList,
-                            finishedExecutors.values.toList,
-                            drivers.values.toList,
-                            finishedDrivers.values.toList,
-                            activeMasterUrl,
-                            cores,
-                            memory,
-                            coresUsed,
-                            memoryUsed,
-                            activeMasterWebUiUrl))
+        WorkerStateResponse(
+          host,
+          port,
+          workerId,
+          executors.values.toList,
+          finishedExecutors.values.toList,
+          drivers.values.toList,
+          finishedDrivers.values.toList,
+          activeMasterUrl,
+          cores,
+          memory,
+          coresUsed,
+          memoryUsed,
+          activeMasterWebUiUrl
+        ))
   }
 
   override def onDisconnected(remoteAddress: RpcAddress): Unit = {
@@ -838,9 +847,10 @@ private[deploy] object Worker extends Logging {
     val useNLC = "spark.ssl.useNodeLocalConf"
     if (isUseLocalNodeSSLConfig(cmd)) {
       val newJavaOpts =
-        cmd.javaOpts.filter(opt => !opt.startsWith(s"-D$prefix")) ++ conf.getAll.collect {
-          case (key, value) if key.startsWith(prefix) => s"-D$key=$value"
-        } :+ s"-D$useNLC=true"
+        cmd.javaOpts.filter(opt => !opt.startsWith(s"-D$prefix")) ++ conf.getAll
+          .collect {
+            case (key, value) if key.startsWith(prefix) => s"-D$key=$value"
+          } :+ s"-D$useNLC=true"
       cmd.copy(javaOpts = newJavaOpts)
     } else {
       cmd

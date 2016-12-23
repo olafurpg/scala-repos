@@ -60,15 +60,18 @@ final class InsightApi(storage: Storage,
       .count()
 
   def updateGame(g: Game) =
-    Pov(g).map { pov =>
-      pov.player.userId ?? { userId =>
-        storage find Entry.povToId(pov) flatMap {
-          _ ?? { old =>
-            indexer.update(g, userId, old)
+    Pov(g)
+      .map { pov =>
+        pov.player.userId ?? { userId =>
+          storage find Entry.povToId(pov) flatMap {
+            _ ?? { old =>
+              indexer.update(g, userId, old)
+            }
           }
         }
       }
-    }.sequenceFu.void
+      .sequenceFu
+      .void
 }
 
 object InsightApi {

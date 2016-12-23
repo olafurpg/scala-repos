@@ -715,7 +715,8 @@ trait SwaggerSupport
         responseMessages =
           (errors ::: swaggerDefaultMessages ::: swaggerDefaultErrors).distinct,
         produces = produces,
-        consumes = consumes)
+        consumes = consumes
+      )
     }
   }
 }

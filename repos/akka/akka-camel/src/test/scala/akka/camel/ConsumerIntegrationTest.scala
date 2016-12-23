@@ -59,13 +59,16 @@ class ConsumerIntegrationTest
       val SHORT_TIMEOUT = 10 millis
       val LONG_WAIT = 1 second
 
-      val ref = start(new Consumer {
-        override def replyTimeout = SHORT_TIMEOUT
-        def endpointUri = "direct:a3"
-        def receive = {
-          case _ ⇒ { Thread.sleep(LONG_WAIT.toMillis); sender() ! "done" }
-        }
-      }, name = "ignore-this-deadletter-timeout-consumer-reply")
+      val ref = start(
+        new Consumer {
+          override def replyTimeout = SHORT_TIMEOUT
+          def endpointUri = "direct:a3"
+          def receive = {
+            case _ ⇒ { Thread.sleep(LONG_WAIT.toMillis); sender() ! "done" }
+          }
+        },
+        name = "ignore-this-deadletter-timeout-consumer-reply"
+      )
 
       intercept[CamelExecutionException] {
         camel.sendTo("direct:a3", msg = "some msg 3")
@@ -76,18 +79,21 @@ class ConsumerIntegrationTest
 
     "Consumer must process messages even after actor restart" in {
       val restarted = TestLatch()
-      val consumer = start(new Consumer {
-        def endpointUri = "direct:a2"
+      val consumer = start(
+        new Consumer {
+          def endpointUri = "direct:a2"
 
-        def receive = {
-          case "throw" ⇒ throw new TestException("")
-          case m: CamelMessage ⇒ sender() ! "received " + m.bodyAs[String]
-        }
+          def receive = {
+            case "throw" ⇒ throw new TestException("")
+            case m: CamelMessage ⇒ sender() ! "received " + m.bodyAs[String]
+          }
 
-        override def postRestart(reason: Throwable) {
-          restarted.countDown()
-        }
-      }, "direct-a2")
+          override def postRestart(reason: Throwable) {
+            restarted.countDown()
+          }
+        },
+        "direct-a2"
+      )
       filterEvents(EventFilter[TestException](occurrences = 1)) {
         consumer ! "throw"
         Await.ready(restarted, defaultTimeoutDuration)
@@ -126,15 +132,18 @@ class ConsumerIntegrationTest
     }
 
     "Error passing consumer supports error handling through route modification" in {
-      val ref = start(new ErrorThrowingConsumer("direct:error-handler-test") {
-        override def onRouteDefinition =
-          (rd: RouteDefinition) ⇒ {
-            rd.onException(classOf[TestException])
-              .handled(true)
-              .transform(Builder.exceptionMessage)
-              .end
-          }
-      }, name = "direct-error-handler-test")
+      val ref = start(
+        new ErrorThrowingConsumer("direct:error-handler-test") {
+          override def onRouteDefinition =
+            (rd: RouteDefinition) ⇒ {
+              rd.onException(classOf[TestException])
+                .handled(true)
+                .transform(Builder.exceptionMessage)
+                .end
+            }
+        },
+        name = "direct-error-handler-test"
+      )
       filterEvents(EventFilter[TestException](occurrences = 1)) {
         camel.sendTo("direct:error-handler-test", msg = "hello") should ===(
           "error: hello")
@@ -143,12 +152,15 @@ class ConsumerIntegrationTest
     }
 
     "Error passing consumer supports redelivery through route modification" in {
-      val ref = start(new FailingOnceConsumer("direct:failing-once-concumer") {
-        override def onRouteDefinition =
-          (rd: RouteDefinition) ⇒ {
-            rd.onException(classOf[TestException]).maximumRedeliveries(1).end
-          }
-      }, name = "direct-failing-once-consumer")
+      val ref = start(
+        new FailingOnceConsumer("direct:failing-once-concumer") {
+          override def onRouteDefinition =
+            (rd: RouteDefinition) ⇒ {
+              rd.onException(classOf[TestException]).maximumRedeliveries(1).end
+            }
+        },
+        name = "direct-failing-once-consumer"
+      )
       filterEvents(EventFilter[TestException](occurrences = 1)) {
         camel.sendTo("direct:failing-once-concumer", msg = "hello") should ===(
           "accepted: hello")

@@ -149,5 +149,6 @@ class LawTests extends FunSuite with Discipline {
                                       Arbitrary(arbitrary[Perm].map(_.map)),
                                       implicitly,
                                       implicitly)
-      .groupPartialAction)
+      .groupPartialAction
+  )
 }

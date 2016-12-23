@@ -394,12 +394,14 @@ object ShapedValue {
         q"${rSym.name.toTermName}" // This can happen for case classes defined inside of methods
       case s => q"$s"
     }
-    val fields = rTag.tpe.decls.collect {
-      case s: TermSymbol if s.isVal && s.isCaseAccessor =>
-        (TermName(s.name.toString.trim),
-         s.typeSignature,
-         TermName(c.freshName()))
-    }.toIndexedSeq
+    val fields = rTag.tpe.decls
+      .collect {
+        case s: TermSymbol if s.isVal && s.isCaseAccessor =>
+          (TermName(s.name.toString.trim),
+           s.typeSignature,
+           TermName(c.freshName()))
+      }
+      .toIndexedSeq
     val (f, g) =
       if (uTag.tpe <:< c.typeOf[slick.collection.heterogeneous.HList]) {
         // Map from HList

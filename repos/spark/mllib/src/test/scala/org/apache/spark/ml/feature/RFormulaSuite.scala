@@ -110,10 +110,12 @@ class RFormulaSuite
     val resultSchema = model.transformSchema(original.schema)
     val expected = sqlContext
       .createDataFrame(
-        Seq((1, "foo", 4, Vectors.dense(0.0, 1.0, 4.0), 1.0),
-            (2, "bar", 4, Vectors.dense(1.0, 0.0, 4.0), 2.0),
-            (3, "bar", 5, Vectors.dense(1.0, 0.0, 5.0), 3.0),
-            (4, "baz", 5, Vectors.dense(0.0, 0.0, 5.0), 4.0))
+        Seq(
+          (1, "foo", 4, Vectors.dense(0.0, 1.0, 4.0), 1.0),
+          (2, "bar", 4, Vectors.dense(1.0, 0.0, 4.0), 2.0),
+          (3, "bar", 5, Vectors.dense(1.0, 0.0, 5.0), 3.0),
+          (4, "baz", 5, Vectors.dense(0.0, 0.0, 5.0), 4.0)
+        )
       )
       .toDF("id", "a", "b", "features", "label")
     assert(result.schema.toString == resultSchema.toString)
@@ -135,10 +137,12 @@ class RFormulaSuite
     val resultSchema = model.transformSchema(original.schema)
     val expected = sqlContext
       .createDataFrame(
-        Seq(("male", "foo", 4, Vectors.dense(0.0, 1.0, 4.0), 1.0),
-            ("female", "bar", 4, Vectors.dense(1.0, 0.0, 4.0), 0.0),
-            ("female", "bar", 5, Vectors.dense(1.0, 0.0, 5.0), 0.0),
-            ("male", "baz", 5, Vectors.dense(0.0, 0.0, 5.0), 1.0))
+        Seq(
+          ("male", "foo", 4, Vectors.dense(0.0, 1.0, 4.0), 1.0),
+          ("female", "bar", 4, Vectors.dense(1.0, 0.0, 4.0), 0.0),
+          ("female", "bar", 5, Vectors.dense(1.0, 0.0, 5.0), 0.0),
+          ("male", "baz", 5, Vectors.dense(0.0, 0.0, 5.0), 1.0)
+        )
       )
       .toDF("id", "a", "b", "features", "label")
     // assert(result.schema.toString == resultSchema.toString)
@@ -242,12 +246,14 @@ class RFormulaSuite
     val result = model.transform(original)
     val expected = sqlContext
       .createDataFrame(
-        Seq((1, "foo", 4, Vectors.dense(0.0, 0.0, 4.0), 1.0),
-            (2, "bar", 4, Vectors.dense(0.0, 4.0, 0.0), 2.0),
-            (3, "bar", 5, Vectors.dense(0.0, 5.0, 0.0), 3.0),
-            (4, "baz", 5, Vectors.dense(5.0, 0.0, 0.0), 4.0),
-            (4, "baz", 5, Vectors.dense(5.0, 0.0, 0.0), 4.0),
-            (4, "baz", 5, Vectors.dense(5.0, 0.0, 0.0), 4.0))
+        Seq(
+          (1, "foo", 4, Vectors.dense(0.0, 0.0, 4.0), 1.0),
+          (2, "bar", 4, Vectors.dense(0.0, 4.0, 0.0), 2.0),
+          (3, "bar", 5, Vectors.dense(0.0, 5.0, 0.0), 3.0),
+          (4, "baz", 5, Vectors.dense(5.0, 0.0, 0.0), 4.0),
+          (4, "baz", 5, Vectors.dense(5.0, 0.0, 0.0), 4.0),
+          (4, "baz", 5, Vectors.dense(5.0, 0.0, 0.0), 4.0)
+        )
       )
       .toDF("id", "a", "b", "features", "label")
     assert(result.collect() === expected.collect())
@@ -256,7 +262,8 @@ class RFormulaSuite
       "features",
       Array[Attribute](new NumericAttribute(Some("a_baz:b"), Some(1)),
                        new NumericAttribute(Some("a_bar:b"), Some(2)),
-                       new NumericAttribute(Some("a_foo:b"), Some(3))))
+                       new NumericAttribute(Some("a_foo:b"), Some(3)))
+    )
     assert(attrs === expectedAttrs)
   }
 
@@ -280,10 +287,13 @@ class RFormulaSuite
     val attrs = AttributeGroup.fromStructField(result.schema("features"))
     val expectedAttrs = new AttributeGroup(
       "features",
-      Array[Attribute](new NumericAttribute(Some("a_bar:b_zq"), Some(1)),
-                       new NumericAttribute(Some("a_bar:b_zz"), Some(2)),
-                       new NumericAttribute(Some("a_foo:b_zq"), Some(3)),
-                       new NumericAttribute(Some("a_foo:b_zz"), Some(4))))
+      Array[Attribute](
+        new NumericAttribute(Some("a_bar:b_zq"), Some(1)),
+        new NumericAttribute(Some("a_bar:b_zz"), Some(2)),
+        new NumericAttribute(Some("a_foo:b_zq"), Some(3)),
+        new NumericAttribute(Some("a_foo:b_zz"), Some(4))
+      )
+    )
     assert(attrs === expectedAttrs)
   }
 

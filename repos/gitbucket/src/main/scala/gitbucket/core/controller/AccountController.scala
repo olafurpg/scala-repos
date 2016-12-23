@@ -196,7 +196,8 @@ trait AccountControllerBase extends AccountManagementControllerBase {
             context.loginAccount.exists(x =>
               members.exists { member =>
                 member.userName == x.userName && member.isManager
-            }))
+            })
+          )
         }
       }
     } getOrElse NotFound

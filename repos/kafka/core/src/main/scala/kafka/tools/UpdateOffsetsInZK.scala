@@ -80,7 +80,8 @@ object UpdateOffsetsInZK {
             brokerInfo.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).port,
             10000,
             100 * 1024,
-            "UpdateOffsetsInZk")
+            "UpdateOffsetsInZk"
+          )
           val topicAndPartition = TopicAndPartition(topic, partition)
           val request = OffsetRequest(Map(
             topicAndPartition -> PartitionOffsetRequestInfo(offsetOption, 1)))

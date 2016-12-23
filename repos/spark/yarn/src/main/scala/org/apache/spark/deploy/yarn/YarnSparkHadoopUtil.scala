@@ -538,7 +538,8 @@ object YarnSparkHadoopUtil {
         initialNumExecutors >= minNumExecutors &&
           initialNumExecutors <= maxNumExecutors,
         s"initial executor number $initialNumExecutors must between min executor number" +
-          s"$minNumExecutors and max executor number $maxNumExecutors")
+          s"$minNumExecutors and max executor number $maxNumExecutors"
+      )
 
       initialNumExecutors
     } else {

@@ -69,12 +69,14 @@ trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
       failureLogRoot <- config.get[File]("failure_log_root")
       if config[Boolean]("enabled", false)
     } yield {
-      IngestConfig(bufferSize = config[Int]("buffer_size", 1024 * 1024),
-                   maxParallel = config[Int]("max_parallel", 5),
-                   batchTimeout = config[Int]("timeout", 120) seconds,
-                   maxConsecutiveFailures =
-                     config[Int]("ingest.max_consecutive_failures", 3),
-                   failureLogRoot = failureLogRoot)
+      IngestConfig(
+        bufferSize = config[Int]("buffer_size", 1024 * 1024),
+        maxParallel = config[Int]("max_parallel", 5),
+        batchTimeout = config[Int]("timeout", 120) seconds,
+        maxConsecutiveFailures =
+          config[Int]("ingest.max_consecutive_failures", 3),
+        failureLogRoot = failureLogRoot
+      )
     }
   }
 
@@ -130,7 +132,8 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
             idleDelay = yggConfig.batchStoreDelay,
             ingestTimeout = conf.batchTimeout,
             maxCacheSize = conf.maxParallel,
-            maxConsecutiveFailures = conf.maxConsecutiveFailures) {
+            maxConsecutiveFailures = conf.maxConsecutiveFailures
+          ) {
 
             implicit val M = new FutureMonad(
               ExecutionContext.defaultExecutionContext(actorSystem))
@@ -141,7 +144,8 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
               logger.info("Saved checkpoint: " + ck)
             }
           }),
-        "ingest")
+        "ingest"
+      )
     }
   }
 

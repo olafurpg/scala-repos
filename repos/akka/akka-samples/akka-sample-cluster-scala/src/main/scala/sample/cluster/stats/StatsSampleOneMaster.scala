@@ -37,7 +37,8 @@ object StatsSampleOneMaster {
           terminationMessage = PoisonPill,
           settings =
             ClusterSingletonManagerSettings(system).withRole("compute")),
-        name = "statsService")
+        name = "statsService"
+      )
       //#create-singleton-manager
 
       //#singleton-proxy
@@ -46,7 +47,8 @@ object StatsSampleOneMaster {
           .props(singletonManagerPath = "/user/statsService",
                  settings =
                    ClusterSingletonProxySettings(system).withRole("compute")),
-        name = "statsServiceProxy")
+        name = "statsServiceProxy"
+      )
       //#singleton-proxy
     }
   }

@@ -40,12 +40,14 @@ class CachedTableSuite
 
   def rddIdOf(tableName: String): Int = {
     val plan = sqlContext.table(tableName).queryExecution.sparkPlan
-    plan.collect {
-      case InMemoryColumnarTableScan(_, _, relation) =>
-        relation.cachedColumnBuffers.id
-      case _ =>
-        fail(s"Table $tableName is not cached\n" + plan)
-    }.head
+    plan
+      .collect {
+        case InMemoryColumnarTableScan(_, _, relation) =>
+          relation.cachedColumnBuffers.id
+        case _ =>
+          fail(s"Table $tableName is not cached\n" + plan)
+      }
+      .head
   }
 
   def isMaterialized(rddId: Int): Boolean = {
@@ -394,9 +396,12 @@ class CachedTableSuite
     * Verifies that the plan for `df` contains `expected` number of Exchange operators.
     */
   private def verifyNumExchanges(df: DataFrame, expected: Int): Unit = {
-    assert(df.queryExecution.executedPlan.collect {
-      case e: ShuffleExchange => e
-    }.size == expected)
+    assert(
+      df.queryExecution.executedPlan
+        .collect {
+          case e: ShuffleExchange => e
+        }
+        .size == expected)
   }
 
   test(
@@ -415,7 +420,8 @@ class CachedTableSuite
     checkAnswer(
       sql("SELECT key, count(*) FROM orderedTable GROUP BY key ORDER BY key"),
       sql("SELECT key, count(*) FROM testData3x GROUP BY key ORDER BY key")
-        .collect())
+        .collect()
+    )
     sqlContext.uncacheTable("orderedTable")
     sqlContext.dropTempTable("orderedTable")
 

@@ -157,14 +157,16 @@ class FileSourceStrategySuite
   }
 
   test("bucketed table") {
-    val table = createTable(files = Seq("p1=1/file1_0000" -> 1,
-                                        "p1=1/file2_0000" -> 1,
-                                        "p1=1/file3_0002" -> 1,
-                                        "p1=2/file4_0002" -> 1,
-                                        "p1=2/file5_0000" -> 1,
-                                        "p1=2/file6_0000" -> 1,
-                                        "p1=2/file7_0000" -> 1),
-                            buckets = 3)
+    val table = createTable(
+      files = Seq("p1=1/file1_0000" -> 1,
+                  "p1=1/file2_0000" -> 1,
+                  "p1=1/file3_0002" -> 1,
+                  "p1=2/file4_0002" -> 1,
+                  "p1=2/file5_0000" -> 1,
+                  "p1=2/file6_0000" -> 1,
+                  "p1=2/file7_0000" -> 1),
+      buckets = 3
+    )
 
     // No partition pruning
     checkScan(table) { partitions =>
@@ -212,18 +214,24 @@ class FileSourceStrategySuite
 
   /** Returns a set with all the filters present in the physical plan. */
   def getPhysicalFilters(df: DataFrame): ExpressionSet = {
-    ExpressionSet(df.queryExecution.executedPlan.collect {
-      case execution.Filter(f, _) => splitConjunctivePredicates(f)
-    }.flatten)
+    ExpressionSet(
+      df.queryExecution.executedPlan
+        .collect {
+          case execution.Filter(f, _) => splitConjunctivePredicates(f)
+        }
+        .flatten)
   }
 
   /** Plans the query and calls the provided validation function with the planned partitioning. */
   def checkScan(df: DataFrame)(func: Seq[FilePartition] => Unit): Unit = {
-    val fileScan = df.queryExecution.executedPlan.collect {
-      case DataSourceScan(_, scan: FileScanRDD, _, _) => scan
-    }.headOption.getOrElse {
-      fail(s"No FileScan in query\n${df.queryExecution}")
-    }
+    val fileScan = df.queryExecution.executedPlan
+      .collect {
+        case DataSourceScan(_, scan: FileScanRDD, _, _) => scan
+      }
+      .headOption
+      .getOrElse {
+        fail(s"No FileScan in query\n${df.queryExecution}")
+      }
 
     func(fileScan.filePartitions)
   }

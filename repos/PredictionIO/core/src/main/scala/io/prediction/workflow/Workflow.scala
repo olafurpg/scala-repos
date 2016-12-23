@@ -116,7 +116,8 @@ object Workflow {
       evaluationInstance = evaluationInstance,
       evaluator = evaluator.asInstanceOf[BaseEvaluator[EI, Q, P, A, ER]],
       env = env,
-      params = params)
+      params = params
+    )
   }
 
   /** :: Experimental :: */

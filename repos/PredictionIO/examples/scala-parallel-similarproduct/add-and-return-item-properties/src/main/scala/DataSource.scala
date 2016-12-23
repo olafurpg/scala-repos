@@ -58,10 +58,12 @@ class DataSource(val dsp: DataSourceParams)
         case (entityId, properties) =>
           val item = try {
             // Assume categories is optional property of item.
-            Item(title = properties.get[String]("title"),
-                 date = properties.get[String]("date"),
-                 imdbUrl = properties.get[String]("imdbUrl"),
-                 categories = properties.getOpt[List[String]]("categories"))
+            Item(
+              title = properties.get[String]("title"),
+              date = properties.get[String]("date"),
+              imdbUrl = properties.get[String]("imdbUrl"),
+              categories = properties.getOpt[List[String]]("categories")
+            )
           } catch {
             case e: Exception => {
               logger.error(
@@ -76,11 +78,13 @@ class DataSource(val dsp: DataSourceParams)
 
     // get all "user" "view" "item" events
     val viewEventsRDD: RDD[ViewEvent] = eventsDb
-      .find(appId = dsp.appId,
-            entityType = Some("user"),
-            eventNames = Some(List("view")),
-            // targetEntityType is optional field of an event.
-            targetEntityType = Some(Some("item")))(sc)
+      .find(
+        appId = dsp.appId,
+        entityType = Some("user"),
+        eventNames = Some(List("view")),
+        // targetEntityType is optional field of an event.
+        targetEntityType = Some(Some("item"))
+      )(sc)
       // eventsDb.find() returns RDD[Event]
       .map { event =>
         val viewEvent = try {

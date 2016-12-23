@@ -68,7 +68,8 @@ private[ml] trait NaiveBayesParams extends PredictorParams {
     "modelType",
     "The model type " +
       "which is a string (case-sensitive). Supported options: multinomial (default) and bernoulli.",
-    ParamValidators.inArray[String](OldNaiveBayes.supportedModelTypes.toArray))
+    ParamValidators.inArray[String](OldNaiveBayes.supportedModelTypes.toArray)
+  )
 
   /** @group getParam */
   final def getModelType: String = $(modelType)

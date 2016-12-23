@@ -30,14 +30,17 @@ object MultiLabelMetricsExample {
     val sc = new SparkContext(conf)
     // $example on$
     val scoreAndLabels: RDD[(Array[Double], Array[Double])] = sc.parallelize(
-      Seq((Array(0.0, 1.0), Array(0.0, 2.0)),
-          (Array(0.0, 2.0), Array(0.0, 1.0)),
-          (Array.empty[Double], Array(0.0)),
-          (Array(2.0), Array(2.0)),
-          (Array(2.0, 0.0), Array(2.0, 0.0)),
-          (Array(0.0, 1.0, 2.0), Array(0.0, 1.0)),
-          (Array(1.0), Array(1.0, 2.0))),
-      2)
+      Seq(
+        (Array(0.0, 1.0), Array(0.0, 2.0)),
+        (Array(0.0, 2.0), Array(0.0, 1.0)),
+        (Array.empty[Double], Array(0.0)),
+        (Array(2.0), Array(2.0)),
+        (Array(2.0, 0.0), Array(2.0, 0.0)),
+        (Array(0.0, 1.0, 2.0), Array(0.0, 1.0)),
+        (Array(1.0), Array(1.0, 2.0))
+      ),
+      2
+    )
 
     // Instantiate metrics object
     val metrics = new MultilabelMetrics(scoreAndLabels)

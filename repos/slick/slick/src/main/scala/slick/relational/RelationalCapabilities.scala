@@ -73,25 +73,27 @@ object RelationalCapabilities {
   val other = Capability("relational.other")
 
   /** All relational capabilities */
-  val all = Set(other,
-                columnDefaults,
-                foreignKeyActions,
-                functionDatabase,
-                functionUser,
-                joinFull,
-                joinLeft,
-                joinRight,
-                likeEscape,
-                pagingDrop,
-                pagingNested,
-                pagingPreciseTake,
-                setByteArrayNull,
-                typeBigDecimal,
-                typeBlob,
-                typeLong,
-                zip,
-                replace,
-                reverse,
-                indexOf,
-                repeat)
+  val all = Set(
+    other,
+    columnDefaults,
+    foreignKeyActions,
+    functionDatabase,
+    functionUser,
+    joinFull,
+    joinLeft,
+    joinRight,
+    likeEscape,
+    pagingDrop,
+    pagingNested,
+    pagingPreciseTake,
+    setByteArrayNull,
+    typeBigDecimal,
+    typeBlob,
+    typeLong,
+    zip,
+    replace,
+    reverse,
+    indexOf,
+    repeat
+  )
 }

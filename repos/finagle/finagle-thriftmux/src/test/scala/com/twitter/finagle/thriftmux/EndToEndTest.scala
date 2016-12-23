@@ -83,7 +83,8 @@ class EndToEndTest
             case (_, dtab) =>
               Future.value(dtab.show)
           }
-      })
+      }
+    )
   }
 
   test("end-to-end thriftmux") {
@@ -365,7 +366,8 @@ class EndToEndTest
       new TestService.FutureIface {
         def query(x: String) =
           Future.value(ClientId.current map { _.name } getOrElse (""))
-      })
+      }
+    )
 
     val clientId = "test.service"
     val client = Thrift.client
@@ -387,7 +389,8 @@ class EndToEndTest
       new TestService.FutureIface {
         def query(x: String) =
           Future.value(ClientId.current map { _.name } getOrElse (""))
-      })
+      }
+    )
 
     val clientId = ClientId("test.service")
     val otherClientId = ClientId("other.bar")
@@ -437,7 +440,8 @@ class EndToEndTest
       new TestService.FutureIface {
         def query(x: String) =
           Future.value(ClientId.current map { _.name } getOrElse (""))
-      })
+      }
+    )
 
     val clientId = ClientId("test.service")
     val otherClientId = ClientId("other.bar")
@@ -739,7 +743,8 @@ class EndToEndTest
         def query(x: String) = {
           Future.value(ClientId.current.map(_.name).getOrElse(""))
         }
-      })
+      }
+    )
 
     val client = ThriftMux.client
       .withClientId(ClientId("foo.bar"))
@@ -952,14 +957,16 @@ class EndToEndTest
   test("gracefully reject sessions") {
     @volatile var n = 0
     val server =
-      ThriftMux.serve(new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
-                      new ServiceFactory {
-                        def apply(conn: ClientConnection) = {
-                          n += 1
-                          Future.exception(new Exception)
-                        }
-                        def close(deadline: Time) = Future.Done
-                      })
+      ThriftMux.serve(
+        new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
+        new ServiceFactory {
+          def apply(conn: ClientConnection) = {
+            n += 1
+            Future.exception(new Exception)
+          }
+          def close(deadline: Time) = Future.Done
+        }
+      )
 
     val client = ThriftMux.newIface[TestService.FutureIface](
       Name.bound(Address(server.boundAddress.asInstanceOf[InetSocketAddress])),

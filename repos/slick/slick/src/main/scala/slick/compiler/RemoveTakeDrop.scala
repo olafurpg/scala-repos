@@ -39,19 +39,23 @@ class RemoveTakeDrop(val translateTake: Boolean = true,
         val bs1 = new AnonSymbol
         val b1 = Bind(bs1, j, Pure(Ref(bs1)))
         val fs = new AnonSymbol
-        val f = Filter(fs, b1, (t, d) match {
-          case (None, Some(d)) =>
-            Library.>.typed[Boolean](Select(Ref(fs), ElementSymbol(2)), d)
-          case (Some(t), None) =>
-            Library.<=.typed[Boolean](Select(Ref(fs), ElementSymbol(2)), t)
-          case (Some(t), Some(d)) =>
-            Library.And.typed[Boolean](
-              Library.>.typed[Boolean](Select(Ref(fs), ElementSymbol(2)), d),
-              Library.<=.typed[Boolean](Select(Ref(fs), ElementSymbol(2)),
-                                        constOp[Long]("+")(_ + _)(t, d))
-            )
-          case _ => throw new SlickException("Unexpected empty Take/Drop")
-        })
+        val f = Filter(
+          fs,
+          b1,
+          (t, d) match {
+            case (None, Some(d)) =>
+              Library.>.typed[Boolean](Select(Ref(fs), ElementSymbol(2)), d)
+            case (Some(t), None) =>
+              Library.<=.typed[Boolean](Select(Ref(fs), ElementSymbol(2)), t)
+            case (Some(t), Some(d)) =>
+              Library.And.typed[Boolean](
+                Library.>.typed[Boolean](Select(Ref(fs), ElementSymbol(2)), d),
+                Library.<=.typed[Boolean](Select(Ref(fs), ElementSymbol(2)),
+                                          constOp[Long]("+")(_ + _)(t, d))
+              )
+            case _ => throw new SlickException("Unexpected empty Take/Drop")
+          }
+        )
         val bs2 = new AnonSymbol
         val b2 = Bind(bs2, f, Pure(Select(Ref(bs2), ElementSymbol(1))))
         logger.debug(

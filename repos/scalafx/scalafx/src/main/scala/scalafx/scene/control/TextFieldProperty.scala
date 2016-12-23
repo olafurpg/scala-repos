@@ -36,11 +36,13 @@ import scalafx.delegate.{AlignmentPropertyDelegate, SFXDelegate}
 
 @deprecated(
   "Use of TextFieldProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
-  "8.0.60-R10")
+  "8.0.60-R10"
+)
 object TextFieldProperty {
   @deprecated(
     "Use of TextFieldProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
-    "8.0.60-R10")
+    "8.0.60-R10"
+  )
   implicit def sfxTextFieldProperty2jfx(
       p: TextFieldProperty): jfxbp.ReadOnlyObjectProperty[jfxsc.TextField] =
     if (p != null) p.delegate else null
@@ -48,7 +50,8 @@ object TextFieldProperty {
 
 @deprecated(
   "Use of TextFieldProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
-  "8.0.60-R10")
+  "8.0.60-R10"
+)
 class TextFieldProperty(
     override val delegate: jfxbp.ReadOnlyObjectProperty[jfxsc.TextField])
     extends ReadOnlyObjectProperty[jfxsc.TextField](delegate)
@@ -57,21 +60,25 @@ class TextFieldProperty(
 
   @deprecated(
     "Use of TextFieldProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
-    "8.0.60-R10")
+    "8.0.60-R10"
+  )
   def onAction = jfxbb.Bindings.select[jfxe.ActionEvent](delegate, "onAction")
   @deprecated(
     "Use of TextFieldProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
-    "8.0.60-R10")
+    "8.0.60-R10"
+  )
   def prefColumnCount =
     jfxbb.Bindings.selectInteger(delegate, "prefColumnCount")
 
   // todo - these need to be moved to TextInputControl:
   @deprecated(
     "Use of TextFieldProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
-    "8.0.60-R10")
+    "8.0.60-R10"
+  )
   def promptText = jfxbb.Bindings.selectString(delegate, "promptText")
   @deprecated(
     "Use of TextFieldProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
-    "8.0.60-R10")
+    "8.0.60-R10"
+  )
   def text = jfxbb.Bindings.selectString(delegate, "text")
 }

@@ -24,15 +24,16 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     val en = 3
 
     val engineParams =
-      EngineParams(dataSourceParams =
-                     PDataSource2.Params(id = 0, en = en, qn = qn),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(
-                     ("PAlgo2", PAlgo2.Params(20)),
-                     ("PAlgo2", PAlgo2.Params(21)),
-                     ("PAlgo3", PAlgo3.Params(22))
-                   ),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = PDataSource2.Params(id = 0, en = en, qn = qn),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(
+          ("PAlgo2", PAlgo2.Params(20)),
+          ("PAlgo2", PAlgo2.Params(21)),
+          ("PAlgo3", PAlgo3.Params(22))
+        ),
+        servingParams = LServing1.Params(3)
+      )
 
     val algoCount = engineParams.algorithmParamsList.size
     val pd = ProcessedData(1, TrainingData(0))
@@ -90,11 +91,12 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     val en = 3
 
     val baseEngineParams =
-      EngineParams(dataSourceParams =
-                     PDataSource2.Params(id = 0, en = en, qn = qn),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = PDataSource2.Params(id = 0, en = en, qn = qn),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+        servingParams = LServing1.Params(3)
+      )
 
     val ep0 = baseEngineParams
     val ep1 =
@@ -146,11 +148,12 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     val en = 3
 
     val baseEngineParams =
-      EngineParams(dataSourceParams =
-                     new PDataSource4.Params(id = 0, en = en, qn = qn),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = new PDataSource4.Params(id = 0, en = en, qn = qn),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+        servingParams = LServing1.Params(3)
+      )
 
     val ep0 = baseEngineParams
     val ep1 =

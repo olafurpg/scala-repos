@@ -163,13 +163,17 @@ class CompoundTypeCheckSignatureProcessor(s: Signature,
               Unit)) return false
       case method: PsiMethod =>
         val sign1 = new PhysicalSignature(method, subst)
-        if (!checkSignature(sign1, method.getTypeParameters, method match {
-              case fun: ScFunction => fun.returnType.getOrNothing
-              case method: PsiMethod =>
-                ScType.create(method.getReturnType,
-                              method.getProject,
-                              method.getResolveScope)
-            })) return false
+        if (!checkSignature(
+              sign1,
+              method.getTypeParameters,
+              method match {
+                case fun: ScFunction => fun.returnType.getOrNothing
+                case method: PsiMethod =>
+                  ScType.create(method.getReturnType,
+                                method.getProject,
+                                method.getResolveScope)
+              }
+            )) return false
       case _ =>
     }
     true

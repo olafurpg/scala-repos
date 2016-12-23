@@ -324,14 +324,16 @@ object Load {
       index => BuildUtil(structure.root, structure.units, index, newData),
       structure.units)
     val newStreams = mkStreams(structure.units, structure.root, newData)
-    new sbt.BuildStructure(units = structure.units,
-                           root = structure.root,
-                           settings = transformed,
-                           data = newData,
-                           index = newIndex,
-                           streams = newStreams,
-                           delegates = structure.delegates,
-                           scopeLocal = structure.scopeLocal)
+    new sbt.BuildStructure(
+      units = structure.units,
+      root = structure.root,
+      settings = transformed,
+      data = newData,
+      index = newIndex,
+      streams = newStreams,
+      delegates = structure.delegates,
+      scopeLocal = structure.scopeLocal
+    )
   }
 
   def isProjectThis(s: Setting[_]) = s.key.scope.project match {

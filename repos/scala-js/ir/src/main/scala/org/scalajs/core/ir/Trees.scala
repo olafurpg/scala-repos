@@ -193,12 +193,15 @@ object Trees {
 
   case class Assign(lhs: Tree, rhs: Tree)(implicit val pos: Position)
       extends Tree {
-    require(lhs match {
-      case _: VarRef | _: Select | _: ArraySelect | _: JSDotSelect |
-          _: JSBracketSelect | _: JSSuperBracketSelect =>
-        true
-      case _ => false
-    }, s"Invalid lhs for Assign: $lhs")
+    require(
+      lhs match {
+        case _: VarRef | _: Select | _: ArraySelect | _: JSDotSelect |
+            _: JSBracketSelect | _: JSSuperBracketSelect =>
+          true
+        case _ => false
+      },
+      s"Invalid lhs for Assign: $lhs"
+    )
 
     val tpe = NoType // cannot be in expression position
   }

@@ -36,25 +36,25 @@ import scala.language.existentials
 
 object CreateWorkflow extends Logging {
 
-  case class WorkflowConfig(
-      deployMode: String = "",
-      batch: String = "",
-      engineId: String = "",
-      engineVersion: String = "",
-      engineVariant: String = "",
-      engineFactory: String = "",
-      engineParamsKey: String = "",
-      evaluationClass: Option[String] = None,
-      engineParamsGeneratorClass: Option[String] = None,
-      env: Option[String] = None,
-      skipSanityCheck: Boolean = false,
-      stopAfterRead: Boolean = false,
-      stopAfterPrepare: Boolean = false,
-      verbosity: Int = 0,
-      verbose: Boolean = false,
-      debug: Boolean = false,
-      logFile: Option[String] = None,
-      jsonExtractor: JsonExtractorOption = JsonExtractorOption.Both)
+  case class WorkflowConfig(deployMode: String = "",
+                            batch: String = "",
+                            engineId: String = "",
+                            engineVersion: String = "",
+                            engineVariant: String = "",
+                            engineFactory: String = "",
+                            engineParamsKey: String = "",
+                            evaluationClass: Option[String] = None,
+                            engineParamsGeneratorClass: Option[String] = None,
+                            env: Option[String] = None,
+                            skipSanityCheck: Boolean = false,
+                            stopAfterRead: Boolean = false,
+                            stopAfterPrepare: Boolean = false,
+                            verbosity: Int = 0,
+                            verbose: Boolean = false,
+                            debug: Boolean = false,
+                            logFile: Option[String] = None,
+                            jsonExtractor: JsonExtractorOption =
+                              JsonExtractorOption.Both)
 
   case class AlgorithmParams(name: String, params: JValue)
 
@@ -93,7 +93,7 @@ object CreateWorkflow extends Logging {
     opt[String]("env") action { (x, c) =>
       c.copy(env = Some(x))
     } text
-    ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
+      ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
         "format) to pass to the Spark execution environment.")
     opt[Unit]("verbose") action { (x, c) =>
       c.copy(verbose = true)
@@ -157,7 +157,7 @@ object CreateWorkflow extends Logging {
       } catch {
         case e @ (_: ClassNotFoundException | _: NoSuchMethodException) =>
           error(s"Unable to obtain engine parameters generator $epg. " +
-                "Aborting workflow.",
+                  "Aborting workflow.",
                 e)
           sys.exit(1)
       }
@@ -165,14 +165,14 @@ object CreateWorkflow extends Logging {
 
     val pioEnvVars = wfc.env
       .map(
-          e =>
-            e.split(',')
-              .flatMap(p =>
-                    p.split('=') match {
-              case Array(k, v) => List(k -> v)
-              case _ => Nil
-          })
-              .toMap)
+        e =>
+          e.split(',')
+            .flatMap(p =>
+              p.split('=') match {
+                case Array(k, v) => List(k -> v)
+                case _ => Nil
+            })
+            .toMap)
       .getOrElse(Map())
 
     if (evaluation.isEmpty) {
@@ -183,7 +183,7 @@ object CreateWorkflow extends Logging {
             case JString(s) => s
             case _ =>
               error(
-                  "Unable to read engine factory class name from " +
+                "Unable to read engine factory class name from " +
                   s"${wfc.engineVariant}. Aborting.")
               sys.exit(1)
           }
@@ -192,7 +192,7 @@ object CreateWorkflow extends Logging {
         case JString(s) => s
         case _ =>
           error(
-              "Unable to read engine variant ID from " +
+            "Unable to read engine variant ID from " +
               s"${wfc.engineVariant}. Aborting.")
           sys.exit(1)
       }
@@ -201,7 +201,7 @@ object CreateWorkflow extends Logging {
       } catch {
         case e @ (_: ClassNotFoundException | _: NoSuchMethodException) =>
           error(
-              s"Unable to obtain engine: ${e.getMessage}. Aborting workflow.")
+            s"Unable to obtain engine: ${e.getMessage}. Aborting workflow.")
           sys.exit(1)
       }
 
@@ -209,11 +209,12 @@ object CreateWorkflow extends Logging {
 
       val customSparkConf = WorkflowUtils.extractSparkConf(variantJson)
       val workflowParams = WorkflowParams(
-          verbose = wfc.verbosity,
-          skipSanityCheck = wfc.skipSanityCheck,
-          stopAfterRead = wfc.stopAfterRead,
-          stopAfterPrepare = wfc.stopAfterPrepare,
-          sparkEnv = WorkflowParams().sparkEnv ++ customSparkConf)
+        verbose = wfc.verbosity,
+        skipSanityCheck = wfc.skipSanityCheck,
+        stopAfterRead = wfc.stopAfterRead,
+        stopAfterPrepare = wfc.stopAfterPrepare,
+        sparkEnv = WorkflowParams().sparkEnv ++ customSparkConf
+      )
 
       // Evaluator Not Specified. Do training.
       if (!engine.isInstanceOf[Engine[_, _, _, _, _, _]]) {
@@ -230,48 +231,53 @@ object CreateWorkflow extends Logging {
         }
 
       val engineInstance = EngineInstance(
-          id = "",
-          status = "INIT",
-          startTime = DateTime.now,
-          endTime = DateTime.now,
-          engineId = wfc.engineId,
-          engineVersion = wfc.engineVersion,
-          engineVariant = variantId,
-          engineFactory = engineFactory,
-          batch = wfc.batch,
-          env = pioEnvVars,
-          sparkConf = workflowParams.sparkEnv,
-          dataSourceParams = JsonExtractor.paramToJson(
-                wfc.jsonExtractor, engineParams.dataSourceParams),
-          preparatorParams = JsonExtractor.paramToJson(
-                wfc.jsonExtractor, engineParams.preparatorParams),
-          algorithmsParams = JsonExtractor.paramsToJson(
-                wfc.jsonExtractor, engineParams.algorithmParamsList),
-          servingParams = JsonExtractor.paramToJson(
-                wfc.jsonExtractor, engineParams.servingParams))
+        id = "",
+        status = "INIT",
+        startTime = DateTime.now,
+        endTime = DateTime.now,
+        engineId = wfc.engineId,
+        engineVersion = wfc.engineVersion,
+        engineVariant = variantId,
+        engineFactory = engineFactory,
+        batch = wfc.batch,
+        env = pioEnvVars,
+        sparkConf = workflowParams.sparkEnv,
+        dataSourceParams =
+          JsonExtractor.paramToJson(wfc.jsonExtractor,
+                                    engineParams.dataSourceParams),
+        preparatorParams =
+          JsonExtractor.paramToJson(wfc.jsonExtractor,
+                                    engineParams.preparatorParams),
+        algorithmsParams =
+          JsonExtractor.paramsToJson(wfc.jsonExtractor,
+                                     engineParams.algorithmParamsList),
+        servingParams = JsonExtractor.paramToJson(wfc.jsonExtractor,
+                                                  engineParams.servingParams)
+      )
 
       val engineInstanceId =
         Storage.getMetaDataEngineInstances.insert(engineInstance)
 
-      CoreWorkflow.runTrain(
-          env = pioEnvVars,
-          params = workflowParams,
-          engine = trainableEngine,
-          engineParams = engineParams,
-          engineInstance = engineInstance.copy(id = engineInstanceId))
+      CoreWorkflow.runTrain(env = pioEnvVars,
+                            params = workflowParams,
+                            engine = trainableEngine,
+                            engineParams = engineParams,
+                            engineInstance =
+                              engineInstance.copy(id = engineInstanceId))
     } else {
       val workflowParams = WorkflowParams(
-          verbose = wfc.verbosity,
-          skipSanityCheck = wfc.skipSanityCheck,
-          stopAfterRead = wfc.stopAfterRead,
-          stopAfterPrepare = wfc.stopAfterPrepare,
-          sparkEnv = WorkflowParams().sparkEnv)
+        verbose = wfc.verbosity,
+        skipSanityCheck = wfc.skipSanityCheck,
+        stopAfterRead = wfc.stopAfterRead,
+        stopAfterPrepare = wfc.stopAfterPrepare,
+        sparkEnv = WorkflowParams().sparkEnv
+      )
       val evaluationInstance = EvaluationInstance(
-          evaluationClass = wfc.evaluationClass.get,
-          engineParamsGeneratorClass = wfc.engineParamsGeneratorClass.get,
-          batch = wfc.batch,
-          env = pioEnvVars,
-          sparkConf = workflowParams.sparkEnv
+        evaluationClass = wfc.evaluationClass.get,
+        engineParamsGeneratorClass = wfc.engineParamsGeneratorClass.get,
+        batch = wfc.batch,
+        env = pioEnvVars,
+        sparkConf = workflowParams.sparkEnv
       )
       Workflow.runEvaluation(evaluation = evaluation.get,
                              engineParamsGenerator = engineParamsGenerator.get,

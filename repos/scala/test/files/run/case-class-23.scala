@@ -25,29 +25,8 @@ case class TwentyThree(
 )
 
 object Test extends App {
-  val x = new TwentyThree(1,
-                          2,
-                          3,
-                          4,
-                          5,
-                          6,
-                          7,
-                          8,
-                          9,
-                          10,
-                          11,
-                          12,
-                          13,
-                          14,
-                          15,
-                          16,
-                          17,
-                          18,
-                          19,
-                          20,
-                          21,
-                          22,
-                          23)
+  val x = new TwentyThree(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, 20, 21, 22, 23)
   println(x._23)
   assert(x.copy(_1 = 1) == x)
   val TwentyThree(a,

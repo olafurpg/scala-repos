@@ -354,29 +354,31 @@ class DefaultEvolutionsConfigParser @Inject()(configuration: Configuration)
     // from db.
     val datasourceConfigMap =
       datasources.map(_ -> config).toMap ++ config.getPrototypedMap("db", "")
-    val datasourceConfig = datasourceConfigMap.map {
-      case (datasource, dsConfig) =>
-        val enabled = dsConfig.get[Boolean]("enabled")
-        val schema = dsConfig.get[String]("schema")
-        val autocommit = dsConfig.get[Boolean]("autocommit")
-        val useLocks = dsConfig.get[Boolean]("useLocks")
-        val autoApply =
-          getDeprecated[Boolean](dsConfig,
-                                 s"play.evolutions.db.$datasource",
-                                 "autoApply",
-                                 s"applyEvolutions.$datasource")
-        val autoApplyDowns =
-          getDeprecated[Boolean](dsConfig,
-                                 s"play.evolutions.db.$datasource",
-                                 "autoApplyDowns",
-                                 s"applyDownEvolutions.$datasource")
-        datasource -> new DefaultEvolutionsDatasourceConfig(enabled,
-                                                            schema,
-                                                            autocommit,
-                                                            useLocks,
-                                                            autoApply,
-                                                            autoApplyDowns)
-    }.toMap
+    val datasourceConfig = datasourceConfigMap
+      .map {
+        case (datasource, dsConfig) =>
+          val enabled = dsConfig.get[Boolean]("enabled")
+          val schema = dsConfig.get[String]("schema")
+          val autocommit = dsConfig.get[Boolean]("autocommit")
+          val useLocks = dsConfig.get[Boolean]("useLocks")
+          val autoApply =
+            getDeprecated[Boolean](dsConfig,
+                                   s"play.evolutions.db.$datasource",
+                                   "autoApply",
+                                   s"applyEvolutions.$datasource")
+          val autoApplyDowns =
+            getDeprecated[Boolean](dsConfig,
+                                   s"play.evolutions.db.$datasource",
+                                   "autoApplyDowns",
+                                   s"applyDownEvolutions.$datasource")
+          datasource -> new DefaultEvolutionsDatasourceConfig(enabled,
+                                                              schema,
+                                                              autocommit,
+                                                              useLocks,
+                                                              autoApply,
+                                                              autoApplyDowns)
+      }
+      .toMap
 
     new DefaultEvolutionsConfig(defaultConfig, datasourceConfig)
   }

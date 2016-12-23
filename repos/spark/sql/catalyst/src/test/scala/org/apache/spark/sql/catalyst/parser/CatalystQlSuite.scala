@@ -53,10 +53,14 @@ class CatalystQlSuite extends PlanTest {
       SubqueryAlias(
         "u_1",
         Distinct(
-          Union(Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
-                        UnresolvedRelation(TableIdentifier("t0"), None)),
-                Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
-                        UnresolvedRelation(TableIdentifier("t1"), None))))))
+          Union(
+            Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
+                    UnresolvedRelation(TableIdentifier("t0"), None)),
+            Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
+                    UnresolvedRelation(TableIdentifier("t1"), None))
+          ))
+      )
+    )
     comparePlans(parsed1, expected)
     comparePlans(parsed2, expected)
   }
@@ -68,10 +72,14 @@ class CatalystQlSuite extends PlanTest {
       UnresolvedAlias(UnresolvedStar(None)) :: Nil,
       SubqueryAlias(
         "u_1",
-        Union(Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
-                      UnresolvedRelation(TableIdentifier("t0"), None)),
-              Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
-                      UnresolvedRelation(TableIdentifier("t1"), None)))))
+        Union(
+          Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
+                  UnresolvedRelation(TableIdentifier("t0"), None)),
+          Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
+                  UnresolvedRelation(TableIdentifier("t1"), None))
+        )
+      )
+    )
     comparePlans(parsed, expected)
   }
 
@@ -161,7 +169,8 @@ class CatalystQlSuite extends PlanTest {
                                     "o",
                                     UnresolvedAttribute("bar") :: Nil,
                                     false) :: Nil,
-                                  false)))
+                                  false))
+    )
 
     intercept[AnalysisException](
       parser.parseExpression("1 - f('o', o(bar)) hello * world"))

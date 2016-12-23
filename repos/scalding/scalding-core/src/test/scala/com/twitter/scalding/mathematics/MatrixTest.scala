@@ -184,12 +184,16 @@ class MatrixMapWithVal(args: Args) extends Job(args) {
   val mat = TypedTsv[(Int, Int, Int)]("graph").toMatrix
   val row = TypedTsv[(Int, Double)]("row").toRow
 
-  mat.mapWithIndex { (v, r, c) =>
-    if (r == c) v else 0
-  }.write(Tsv("diag"))
-  row.mapWithIndex { (v, c) =>
-    if (c == 0) v else 0.0
-  }.write(Tsv("first"))
+  mat
+    .mapWithIndex { (v, r, c) =>
+      if (r == c) v else 0
+    }
+    .write(Tsv("diag"))
+  row
+    .mapWithIndex { (v, c) =>
+      if (c == 0) v else 0.0
+    }
+    .write(Tsv("first"))
 }
 
 class RowMatProd(args: Args) extends Job(args) {
@@ -442,14 +446,18 @@ class MatrixTest extends WordSpec with Matchers {
 
   def toSparseMat[Row, Col, V](
       iter: Iterable[(Row, Col, V)]): Map[(Row, Col), V] = {
-    iter.map { it =>
-      ((it._1, it._2), it._3)
-    }.toMap
+    iter
+      .map { it =>
+        ((it._1, it._2), it._3)
+      }
+      .toMap
   }
   def oneDtoSparseMat[Idx, V](iter: Iterable[(Idx, V)]): Map[(Idx, Idx), V] = {
-    iter.map { it =>
-      ((it._1, it._1), it._2)
-    }.toMap
+    iter
+      .map { it =>
+        ((it._1, it._1), it._2)
+      }
+      .toMap
   }
 
   "A MatrixProd job" should {
@@ -473,25 +481,29 @@ class MatrixTest extends WordSpec with Matchers {
   "A MatrixBlockProd job" should {
     TUtil.printStack {
       JobTest(new MatrixBlockProd(_))
-        .source(Tsv("mat1", ('x1, 'y1, 'v1)),
-                List(("alpha1", 1, 1.0),
-                     ("alpha1", 2, 2.0),
-                     ("beta1", 1, 5.0),
-                     ("beta1", 2, 6.0),
-                     ("alpha2", 1, 3.0),
-                     ("alpha2", 2, 4.0),
-                     ("beta2", 1, 7.0),
-                     ("beta2", 2, 8.0)))
+        .source(
+          Tsv("mat1", ('x1, 'y1, 'v1)),
+          List(("alpha1", 1, 1.0),
+               ("alpha1", 2, 2.0),
+               ("beta1", 1, 5.0),
+               ("beta1", 2, 6.0),
+               ("alpha2", 1, 3.0),
+               ("alpha2", 2, 4.0),
+               ("beta2", 1, 7.0),
+               ("beta2", 2, 8.0))
+        )
         .sink[(String, String, Double)](Tsv("product")) { ob =>
           "correctly compute block products" in {
-            toSparseMat(ob) shouldBe Map(("alpha1", "alpha1") -> 5.0,
-                                         ("alpha1", "alpha2") -> 11.0,
-                                         ("alpha2", "alpha1") -> 11.0,
-                                         ("alpha2", "alpha2") -> 25.0,
-                                         ("beta1", "beta1") -> 61.0,
-                                         ("beta1", "beta2") -> 83.0,
-                                         ("beta2", "beta1") -> 83.0,
-                                         ("beta2", "beta2") -> 113.0)
+            toSparseMat(ob) shouldBe Map(
+              ("alpha1", "alpha1") -> 5.0,
+              ("alpha1", "alpha2") -> 11.0,
+              ("alpha2", "alpha1") -> 11.0,
+              ("alpha2", "alpha2") -> 25.0,
+              ("beta1", "beta1") -> 61.0,
+              ("beta1", "beta2") -> 83.0,
+              ("beta2", "beta1") -> 83.0,
+              ("beta2", "beta2") -> 113.0
+            )
           }
         }
         .run

@@ -348,39 +348,47 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
                           shiftRight('f, 1)),
                 Row(21.toLong, 21, 21.toShort, 21.toByte, null))
 
-    checkAnswer(df.selectExpr("shiftRight(a, 1)",
-                              "shiftRight(b, 1)",
-                              "shiftRight(c, 1)",
-                              "shiftRight(d, 1)",
-                              "shiftRight(f, 1)"),
-                Row(21.toLong, 21, 21.toShort, 21.toByte, null))
+    checkAnswer(
+      df.selectExpr("shiftRight(a, 1)",
+                    "shiftRight(b, 1)",
+                    "shiftRight(c, 1)",
+                    "shiftRight(d, 1)",
+                    "shiftRight(f, 1)"),
+      Row(21.toLong, 21, 21.toShort, 21.toByte, null)
+    )
   }
 
   test("shift right unsigned") {
     val df = Seq[(Long, Integer, Short, Byte, Integer, Integer)](
       (-42, 42, 42, 42, 42, null)).toDF("a", "b", "c", "d", "e", "f")
 
-    checkAnswer(df.select(shiftRightUnsigned('a, 1),
-                          shiftRightUnsigned('b, 1),
-                          shiftRightUnsigned('c, 1),
-                          shiftRightUnsigned('d, 1),
-                          shiftRightUnsigned('f, 1)),
-                Row(9223372036854775787L, 21, 21.toShort, 21.toByte, null))
+    checkAnswer(
+      df.select(shiftRightUnsigned('a, 1),
+                shiftRightUnsigned('b, 1),
+                shiftRightUnsigned('c, 1),
+                shiftRightUnsigned('d, 1),
+                shiftRightUnsigned('f, 1)),
+      Row(9223372036854775787L, 21, 21.toShort, 21.toByte, null)
+    )
 
-    checkAnswer(df.selectExpr("shiftRightUnsigned(a, 1)",
-                              "shiftRightUnsigned(b, 1)",
-                              "shiftRightUnsigned(c, 1)",
-                              "shiftRightUnsigned(d, 1)",
-                              "shiftRightUnsigned(f, 1)"),
-                Row(9223372036854775787L, 21, 21.toShort, 21.toByte, null))
+    checkAnswer(
+      df.selectExpr("shiftRightUnsigned(a, 1)",
+                    "shiftRightUnsigned(b, 1)",
+                    "shiftRightUnsigned(c, 1)",
+                    "shiftRightUnsigned(d, 1)",
+                    "shiftRightUnsigned(f, 1)"),
+      Row(9223372036854775787L, 21, 21.toShort, 21.toByte, null)
+    )
   }
 
   test("binary log") {
     val df = Seq[(Integer, Integer)]((123, null)).toDF("a", "b")
-    checkAnswer(df.select(org.apache.spark.sql.functions.log("a"),
-                          org.apache.spark.sql.functions.log(2.0, "a"),
-                          org.apache.spark.sql.functions.log("b")),
-                Row(math.log(123), math.log(123) / math.log(2), null))
+    checkAnswer(
+      df.select(org.apache.spark.sql.functions.log("a"),
+                org.apache.spark.sql.functions.log(2.0, "a"),
+                org.apache.spark.sql.functions.log("b")),
+      Row(math.log(123), math.log(123) / math.log(2), null)
+    )
 
     checkAnswer(df.selectExpr("log(a)", "log(2.0, a)", "log(b)"),
                 Row(math.log(123), math.log(123) / math.log(2), null))

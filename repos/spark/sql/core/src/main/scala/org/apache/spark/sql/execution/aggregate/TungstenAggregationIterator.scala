@@ -85,8 +85,7 @@ class TungstenAggregationIterator(
     aggregateAttributes: Seq[Attribute],
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
-    newMutableProjection: (Seq[Expression],
-                           Seq[Attribute]) => (() => MutableProjection),
+    newMutableProjection: (Seq[Expression], Seq[Attribute]) => (() => MutableProjection),
     originalInputAttributes: Seq[Attribute],
     inputIter: Iterator[InternalRow],
     testFallbackStartsAt: Option[Int],
@@ -128,7 +127,8 @@ class TungstenAggregationIterator(
     // Initialize declarative aggregates' buffer values
     expressionAggInitialProjection.target(buffer)(EmptyRow)
     // Initialize imperative aggregates' buffer values
-    aggregateFunctions.collect { case f: ImperativeAggregate => f }
+    aggregateFunctions
+      .collect { case f: ImperativeAggregate => f }
       .foreach(_.initialize(buffer))
     buffer
   }

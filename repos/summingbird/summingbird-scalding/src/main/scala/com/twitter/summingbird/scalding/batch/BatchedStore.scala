@@ -245,13 +245,15 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
             BinaryOrdering.ordSer[BatchID])
       }
 
-      sorted.mapValueStream { it: Iterator[(BatchID, (Timestamp, V))] =>
-        // each BatchID appears at most once, so it fits in RAM
-        val batched: Map[BatchID, (Timestamp, V)] = groupedSum(it).toMap
-        partials((inBatch :: batches).iterator.map { bid =>
-          (bid, batched.get(bid))
-        })
-      }.toTypedPipe
+      sorted
+        .mapValueStream { it: Iterator[(BatchID, (Timestamp, V))] =>
+          // each BatchID appears at most once, so it fits in RAM
+          val batched: Map[BatchID, (Timestamp, V)] = groupedSum(it).toMap
+          partials((inBatch :: batches).iterator.map { bid =>
+            (bid, batched.get(bid))
+          })
+        }
+        .toTypedPipe
     }
 
     /**

@@ -47,12 +47,14 @@ object BrokerEndPoint {
     */
   def createBrokerEndPoint(brokerId: Int,
                            connectionString: String): BrokerEndPoint = {
-    parseHostPort(connectionString).map {
-      case (host, port) => new BrokerEndPoint(brokerId, host, port)
-    }.getOrElse {
-      throw new KafkaException(
-        "Unable to parse " + connectionString + " to a broker endpoint")
-    }
+    parseHostPort(connectionString)
+      .map {
+        case (host, port) => new BrokerEndPoint(brokerId, host, port)
+      }
+      .getOrElse {
+        throw new KafkaException(
+          "Unable to parse " + connectionString + " to a broker endpoint")
+      }
   }
 
   def readFrom(buffer: ByteBuffer): BrokerEndPoint = {

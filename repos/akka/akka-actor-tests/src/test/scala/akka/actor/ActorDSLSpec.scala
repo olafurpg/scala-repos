@@ -55,13 +55,18 @@ class ActorDSLSpec extends AkkaSpec {
     "support queueing multiple queries" in {
       val i = inbox()
       import system.dispatcher
-      val res = Future.sequence(Seq(Future { i.receive() } recover {
-        case x ⇒ x
-      }, Future {
-        Thread.sleep(100); i.select() { case "world" ⇒ 1 }
-      } recover { case x ⇒ x }, Future {
-        Thread.sleep(200); i.select() { case "hello" ⇒ 2 }
-      } recover { case x ⇒ x }))
+      val res = Future.sequence(
+        Seq(
+          Future { i.receive() } recover {
+            case x ⇒ x
+          },
+          Future {
+            Thread.sleep(100); i.select() { case "world" ⇒ 1 }
+          } recover { case x ⇒ x },
+          Future {
+            Thread.sleep(200); i.select() { case "hello" ⇒ 2 }
+          } recover { case x ⇒ x }
+        ))
       Thread.sleep(1000)
       res.isCompleted should ===(false)
       i.receiver ! 42

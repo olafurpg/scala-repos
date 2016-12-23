@@ -9,7 +9,8 @@ object Test extends App {
     () => typeOf[Map[Int, Object]] <:< typeOf[Iterable[(Int, String)]],
     () =>
       typeOf[Expr[Any] { val mirror: rootMirror.type }] <:< typeOf[
-        Expr[List[List[List[Int]]]] { val mirror: rootMirror.type }])
+        Expr[List[List[List[Int]]]] { val mirror: rootMirror.type }]
+  )
   val perms = tasks.permutations.toList
   val diceRolls = List.fill(n)(rng.nextInt(perms.length))
   val threads =

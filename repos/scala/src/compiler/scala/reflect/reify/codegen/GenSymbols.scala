@@ -149,7 +149,8 @@ trait GenSymbols { self: Reifier =>
                           reify(sym.name.toString),
                           capturedBinding,
                           mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                          reify(origin(sym))))
+                          reify(origin(sym)))
+        )
       } else {
         Reification(
           name,
@@ -192,7 +193,8 @@ trait GenSymbols { self: Reifier =>
                         reify(sym.name),
                         reify(sym.pos),
                         mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                        reify(sym.isClass)))
+                        reify(sym.isClass))
+      )
     }
 
   case class Reification(name: Name, binding: Tree, tree: Tree)

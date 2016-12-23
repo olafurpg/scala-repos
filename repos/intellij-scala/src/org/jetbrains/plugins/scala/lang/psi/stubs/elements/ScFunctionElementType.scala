@@ -56,16 +56,18 @@ abstract class ScFunctionElementType[Func <: ScFunction](debugName: String)
       }
     }
     val isImplicit = psi.hasModifierProperty("implicit")
-    new ScFunctionStubImpl[ParentPsi](parentStub,
-                                      this,
-                                      psi.name,
-                                      psi.isInstanceOf[ScFunctionDeclaration],
-                                      psi.annotationNames.toArray,
-                                      returnTypeText,
-                                      bodyText,
-                                      assign,
-                                      isImplicit,
-                                      psi.containingClass == null)
+    new ScFunctionStubImpl[ParentPsi](
+      parentStub,
+      this,
+      psi.name,
+      psi.isInstanceOf[ScFunctionDeclaration],
+      psi.annotationNames.toArray,
+      returnTypeText,
+      bodyText,
+      assign,
+      isImplicit,
+      psi.containingClass == null
+    )
   }
 
   def serialize(stub: ScFunctionStub, dataStream: StubOutputStream) {

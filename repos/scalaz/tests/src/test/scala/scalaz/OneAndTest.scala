@@ -81,8 +81,7 @@ object OneAndTest extends SpecLite {
     Foldable1[OneAndNel].foldRight1(llst)(_ ++ _) must_=== (lst)
   }
 
-  "traverse1 on traverse" ! forAll { (ints: OneAnd[List, Int], f: Int => List[
-                                        Int]) =>
+  "traverse1 on traverse" ! forAll { (ints: OneAnd[List, Int], f: Int => List[Int]) =>
     (Traverse1[OneAndList].traverse1(ints)(f) must_==
       (Traverse[OneAndList].traverse(ints)(f)))
   }

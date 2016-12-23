@@ -94,23 +94,25 @@ trait ScTypePsiTypeBridge {
               case Array() => des
               case _ if classType.isRaw =>
                 var index = 0
-                ScParameterizedType(des, tps.map({ tp =>
-                  {
-                    val arrayOfTypes: Array[PsiClassType] =
-                      tp.getExtendsListTypes ++ tp.getImplementsListTypes
-                    ScSkolemizedType(s"_$$${ index += 1; index }",
-                                     Nil,
-                                     types.Nothing,
-                                     arrayOfTypes.length match {
-                                       case 0 => types.Any
-                                       case 1 =>
-                                         create(arrayOfTypes.apply(0),
-                                                project,
-                                                scope,
-                                                visitedRawTypes + clazz)
-                                       case _ =>
-                                         ScCompoundType(
-                                           arrayOfTypes.map(
+                ScParameterizedType(
+                  des,
+                  tps.map({ tp =>
+                    {
+                      val arrayOfTypes: Array[PsiClassType] =
+                        tp.getExtendsListTypes ++ tp.getImplementsListTypes
+                      ScSkolemizedType(
+                        s"_$$${ index += 1; index }",
+                        Nil,
+                        types.Nothing,
+                        arrayOfTypes.length match {
+                          case 0 => types.Any
+                          case 1 =>
+                            create(arrayOfTypes.apply(0),
+                                   project,
+                                   scope,
+                                   visitedRawTypes + clazz)
+                          case _ =>
+                            ScCompoundType(arrayOfTypes.map(
                                              create(_,
                                                     project,
                                                     scope,
@@ -118,9 +120,11 @@ trait ScTypePsiTypeBridge {
                                                       clazz)),
                                            Map.empty,
                                            Map.empty)
-                                     })
-                  }
-                })).unpackedType
+                        }
+                      )
+                    }
+                  })
+                ).unpackedType
               case _ =>
                 var index = 0
                 ScParameterizedType(
@@ -130,43 +134,48 @@ trait ScTypePsiTypeBridge {
                       val psiType = substitutor.substitute(tp)
                       psiType match {
                         case wild: PsiWildcardType =>
-                          ScSkolemizedType(s"_$$${ index += 1; index }",
-                                           Nil,
-                                           if (wild.isSuper)
-                                             create(wild.getSuperBound,
-                                                    project,
-                                                    scope,
-                                                    visitedRawTypes)
-                                           else types.Nothing,
-                                           if (wild.isExtends)
-                                             create(wild.getExtendsBound,
-                                                    project,
-                                                    scope,
-                                                    visitedRawTypes)
-                                           else types.Any)
+                          ScSkolemizedType(
+                            s"_$$${ index += 1; index }",
+                            Nil,
+                            if (wild.isSuper)
+                              create(wild.getSuperBound,
+                                     project,
+                                     scope,
+                                     visitedRawTypes)
+                            else types.Nothing,
+                            if (wild.isExtends)
+                              create(wild.getExtendsBound,
+                                     project,
+                                     scope,
+                                     visitedRawTypes)
+                            else types.Any
+                          )
                         case capture: PsiCapturedWildcardType =>
                           val wild = capture.getWildcard
-                          ScSkolemizedType(s"_$$${ index += 1; index }",
-                                           Nil,
-                                           if (wild.isSuper)
-                                             create(capture.getLowerBound,
-                                                    project,
-                                                    scope,
-                                                    visitedRawTypes)
-                                           else types.Nothing,
-                                           if (wild.isExtends)
-                                             create(capture.getUpperBound,
-                                                    project,
-                                                    scope,
-                                                    visitedRawTypes)
-                                           else types.Any)
+                          ScSkolemizedType(
+                            s"_$$${ index += 1; index }",
+                            Nil,
+                            if (wild.isSuper)
+                              create(capture.getLowerBound,
+                                     project,
+                                     scope,
+                                     visitedRawTypes)
+                            else types.Nothing,
+                            if (wild.isExtends)
+                              create(capture.getUpperBound,
+                                     project,
+                                     scope,
+                                     visitedRawTypes)
+                            else types.Any
+                          )
                         case _ if psiType != null =>
                           ScType
                             .create(psiType, project, scope, visitedRawTypes)
                         case _ => ScalaPsiManager.typeVariable(tp)
                       }
                     })
-                    .toSeq).unpackedType
+                    .toSeq
+                ).unpackedType
             }
           case _ => types.Nothing
         }
@@ -191,7 +200,8 @@ trait ScTypePsiTypeBridge {
           else types.Nothing,
           if (wild.isExtends)
             create(wild.getExtendsBound, project, scope, visitedRawTypes)
-          else types.Any)
+          else types.Any
+        )
       case capture: PsiCapturedWildcardType =>
         val wild = capture.getWildcard
         ScExistentialType.simpleExistential(
@@ -202,7 +212,8 @@ trait ScTypePsiTypeBridge {
           else types.Nothing,
           if (wild.isExtends)
             create(capture.getUpperBound, project, scope, visitedRawTypes)
-          else types.Any)
+          else types.Any
+        )
       case null => types.Any
       case d: PsiDisjunctionType => types.Any
       case d: PsiDiamondType =>

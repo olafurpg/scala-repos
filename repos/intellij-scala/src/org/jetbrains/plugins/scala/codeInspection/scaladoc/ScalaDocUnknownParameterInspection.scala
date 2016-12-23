@@ -114,7 +114,8 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
                 ProblemHighlightType.GENERIC_ERROR,
                 isOnTheFly,
                 new ScalaDocDeleteDuplicatingParamQuickFix(duplicatingParam,
-                                                           true)))
+                                                           true)
+              ))
           }
         }
 
@@ -167,7 +168,8 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
                   isOnTheFly,
                   new ScalaDocDeleteDuplicatingParamQuickFix(
                     tag.asInstanceOf[ScDocTag],
-                    false)))
+                    false)
+                ))
             }
         }
       }

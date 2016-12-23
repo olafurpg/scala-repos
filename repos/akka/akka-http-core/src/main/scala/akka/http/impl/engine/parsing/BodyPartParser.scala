@@ -36,7 +36,8 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
     "'boundary' parameter of multipart Content-Type must not end with a space char")
   require(
     boundaryChar matchesAll boundary,
-    s"'boundary' parameter of multipart Content-Type contains illegal character '${boundaryChar.firstMismatch(boundary).get}'")
+    s"'boundary' parameter of multipart Content-Type contains illegal character '${boundaryChar.firstMismatch(boundary).get}'"
+  )
 
   sealed trait StateResult // phantom type for ensuring soundness of our parsing method setup
 
@@ -197,27 +198,27 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
       lineStart: Int): StateResult =
     parseHeaderLines(input, lineStart, headers, headerCount, cth)
 
-  def parseEntity(headers: List[HttpHeader],
-                  contentType: ContentType,
-                  emitPartChunk: (List[HttpHeader], ContentType,
-                                  ByteString) ⇒ Unit = { (headers, ct, bytes) ⇒
-                    emit(
-                      BodyPartStart(
-                        headers,
-                        entityParts ⇒
-                          HttpEntity.IndefiniteLength(ct, entityParts.collect {
-                            case EntityPart(data) ⇒ data
-                          })))
-                    emit(bytes)
-                  },
-                  emitFinalPartChunk: (List[HttpHeader], ContentType,
-                                       ByteString) ⇒ Unit = {
-                    (headers, ct, bytes) ⇒
-                      emit(BodyPartStart(headers, { rest ⇒
-                        SubSource.kill(rest)
-                        HttpEntity.Strict(ct, bytes)
-                      }))
-                  })(input: ByteString, offset: Int): StateResult =
+  def parseEntity(
+      headers: List[HttpHeader],
+      contentType: ContentType,
+      emitPartChunk: (List[HttpHeader], ContentType, ByteString) ⇒ Unit = {
+        (headers, ct, bytes) ⇒
+          emit(
+            BodyPartStart(
+              headers,
+              entityParts ⇒
+                HttpEntity.IndefiniteLength(ct, entityParts.collect {
+                  case EntityPart(data) ⇒ data
+                })))
+          emit(bytes)
+      },
+      emitFinalPartChunk: (List[HttpHeader], ContentType, ByteString) ⇒ Unit = {
+        (headers, ct, bytes) ⇒
+          emit(BodyPartStart(headers, { rest ⇒
+            SubSource.kill(rest)
+            HttpEntity.Strict(ct, bytes)
+          }))
+      })(input: ByteString, offset: Int): StateResult =
     try {
       @tailrec def rec(index: Int): StateResult = {
         val currentPartEnd = boyerMoore.nextIndex(input, index)

@@ -127,20 +127,22 @@ trait DenseMatrixMultiplyStuff
 
       val rv = DenseVector.zeros[Double](a.rows)
 
-      blas.dgemv(transposeString(a),
-                 if (a.isTranspose) a.cols else a.rows,
-                 if (a.isTranspose) a.rows else a.cols,
-                 1.0,
-                 a.data,
-                 a.offset,
-                 a.majorStride,
-                 b.data,
-                 b.offset,
-                 b.stride,
-                 0.0,
-                 rv.data,
-                 rv.offset,
-                 rv.stride)
+      blas.dgemv(
+        transposeString(a),
+        if (a.isTranspose) a.cols else a.rows,
+        if (a.isTranspose) a.rows else a.cols,
+        1.0,
+        a.data,
+        a.offset,
+        a.majorStride,
+        b.data,
+        b.offset,
+        b.stride,
+        0.0,
+        rv.data,
+        rv.offset,
+        rv.stride
+      )
       rv
     }
   }
@@ -406,20 +408,22 @@ trait DenseMatrixFloatMultiplyStuff
 
       require(a.cols == b.length, "Dimension mismatch!")
       val rv = DenseVector.zeros[Float](a.rows)
-      blas.sgemv(transposeString(a),
-                 if (a.isTranspose) a.cols else a.rows,
-                 if (a.isTranspose) a.rows else a.cols,
-                 1.0f,
-                 a.data,
-                 a.offset,
-                 a.majorStride,
-                 b.data,
-                 b.offset,
-                 b.stride,
-                 0.0f,
-                 rv.data,
-                 rv.offset,
-                 rv.stride)
+      blas.sgemv(
+        transposeString(a),
+        if (a.isTranspose) a.cols else a.rows,
+        if (a.isTranspose) a.rows else a.cols,
+        1.0f,
+        a.data,
+        a.offset,
+        a.majorStride,
+        b.data,
+        b.offset,
+        b.stride,
+        0.0f,
+        rv.data,
+        rv.offset,
+        rv.stride
+      )
       rv
     }
   }
@@ -1237,7 +1241,8 @@ trait LowPriorityDenseMatrix extends LowPriorityDenseMatrix1 {
       require(
         a.rows == b.length && a.cols == 1 || a.cols == b.length &&
           a.rows == 1,
-        "DenseMatrix must have same number of rows, or same number of columns, as DenseVector, and the other dim must be 1.")
+        "DenseMatrix must have same number of rows, or same number of columns, as DenseVector, and the other dim must be 1."
+      )
 
       val ad: Array[V] = a.data
       val bd: Array[V] = b.data
@@ -1398,7 +1403,8 @@ trait LowPriorityDenseMatrix1 {
       require(
         a.rows == b.length && a.cols == 1 || a.cols == b.length &&
           a.rows == 1,
-        "DenseMatrix must have same number of rows, or same number of columns, as DenseVector, and the other dim must be 1.")
+        "DenseMatrix must have same number of rows, or same number of columns, as DenseVector, and the other dim must be 1."
+      )
       val ad = a.data
       var i = 0
       var c = 0

@@ -209,7 +209,8 @@ trait ArrayLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
                      ),
                      paths.Key.name),
           WrapObject(DerefObjectStatic(Leaf(Source), paths.Value),
-                     paths.Value.name))
+                     paths.Value.name)
+        )
 
         finalTable transform spec
       }

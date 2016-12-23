@@ -69,7 +69,8 @@ class GoToExpandedMacroCallProviderExt extends LineMarkerProvider {
               }
             },
             GutterIconRenderer.Alignment.RIGHT,
-            util.Arrays.asList[GotoRelatedItem]())
+            util.Arrays.asList[GotoRelatedItem]()
+          )
 
         result add markerInfo
         ScalaMacroDebuggingUtil.allMacroCalls.add(macroCall)

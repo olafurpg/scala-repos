@@ -248,33 +248,38 @@ object StreamLayout {
         outPorts(from),
         if (downstreams.contains(from))
           s"The output port [$from] is already connected"
-        else s"The output port [$from] is not part of the underlying graph.")
+        else s"The output port [$from] is not part of the underlying graph."
+      )
       require(inPorts(to),
               if (upstreams.contains(to))
                 s"The input port [$to] is already connected"
               else
                 s"The input port [$to] is not part of the underlying graph.")
 
-      CompositeModule(if (isSealed) Set(this) else subModules,
-                      AmorphousShape(shape.inlets.filterNot(_ == to),
-                                     shape.outlets.filterNot(_ == from)),
-                      downstreams.updated(from, to),
-                      upstreams.updated(to, from),
-                      materializedValueComputation,
-                      if (isSealed) Attributes.none else attributes)
+      CompositeModule(
+        if (isSealed) Set(this) else subModules,
+        AmorphousShape(shape.inlets.filterNot(_ == to),
+                       shape.outlets.filterNot(_ == from)),
+        downstreams.updated(from, to),
+        upstreams.updated(to, from),
+        materializedValueComputation,
+        if (isSealed) Attributes.none else attributes
+      )
     }
 
     final def transformMaterializedValue(f: Any ⇒ Any): Module = {
       if (Debug) validate(this)
 
-      CompositeModule(if (this.isSealed) Set(this) else this.subModules,
-                      shape,
-                      downstreams,
-                      upstreams,
-                      Transform(f,
-                                if (this.isSealed) Atomic(this)
-                                else this.materializedValueComputation),
-                      if (this.isSealed) Attributes.none else attributes)
+      CompositeModule(
+        if (this.isSealed) Set(this) else this.subModules,
+        shape,
+        downstreams,
+        upstreams,
+        Transform(f,
+                  if (this.isSealed) Atomic(this)
+                  else this.materializedValueComputation),
+        if (this.isSealed) Attributes.none else attributes
+      )
     }
 
     /**
@@ -326,13 +331,15 @@ object StreamLayout {
         else comp
       }
 
-      CompositeModule(modulesLeft ++ modulesRight,
-                      AmorphousShape(shape.inlets ++ that.shape.inlets,
-                                     shape.outlets ++ that.shape.outlets),
-                      downstreams ++ that.downstreams,
-                      upstreams ++ that.upstreams,
-                      mat,
-                      Attributes.none)
+      CompositeModule(
+        modulesLeft ++ modulesRight,
+        AmorphousShape(shape.inlets ++ that.shape.inlets,
+                       shape.outlets ++ that.shape.outlets),
+        downstreams ++ that.downstreams,
+        upstreams ++ that.upstreams,
+        mat,
+        Attributes.none
+      )
     }
 
     /**
@@ -364,14 +371,16 @@ object StreamLayout {
       val matComputation =
         if (this.isSealed) Atomic(this) else this.materializedValueComputation
 
-      CompositeModule(modules1 ++ modules2,
-                      AmorphousShape(shape.inlets ++ that.shape.inlets,
-                                     shape.outlets ++ that.shape.outlets),
-                      downstreams ++ that.downstreams,
-                      upstreams ++ that.upstreams,
-                      // would like to optimize away this allocation for Keep.{left,right} but that breaks side-effecting transformations
-                      matComputation,
-                      Attributes.none)
+      CompositeModule(
+        modules1 ++ modules2,
+        AmorphousShape(shape.inlets ++ that.shape.inlets,
+                       shape.outlets ++ that.shape.outlets),
+        downstreams ++ that.downstreams,
+        upstreams ++ that.upstreams,
+        // would like to optimize away this allocation for Keep.{left,right} but that breaks side-effecting transformations
+        matComputation,
+        Attributes.none
+      )
     }
 
     def subModules: Set[Module]
@@ -481,12 +490,16 @@ object StreamLayout {
              s"(${m.attributes.nameLifted.getOrElse("unnamed")}) ${m.toString
                .replaceAll("\n", "\n    ")}")
            .mkString("\n    ")}
-         |  Downstreams: ${downstreams.iterator.map {
-           case (in, out) ⇒ s"\n    $in -> $out"
-         }.mkString("")}
-         |  Upstreams: ${upstreams.iterator.map {
-           case (out, in) ⇒ s"\n    $out -> $in"
-         }.mkString("")}
+         |  Downstreams: ${downstreams.iterator
+           .map {
+             case (in, out) ⇒ s"\n    $in -> $out"
+           }
+           .mkString("")}
+         |  Upstreams: ${upstreams.iterator
+           .map {
+             case (out, in) ⇒ s"\n    $out -> $in"
+           }
+           .mkString("")}
          |  MatValue: $materializedValueComputation""".stripMargin
   }
 
@@ -534,12 +547,16 @@ object StreamLayout {
                m.attributes.nameLifted.getOrElse(
                  m.toString.replaceAll("\n", "\n    ")))
            .mkString("\n    ")}
-         |  Downstreams: ${downstreams.iterator.map {
-           case (in, out) ⇒ s"\n    $in -> $out"
-         }.mkString("")}
-         |  Upstreams: ${upstreams.iterator.map {
-           case (out, in) ⇒ s"\n    $out -> $in"
-         }.mkString("")}
+         |  Downstreams: ${downstreams.iterator
+           .map {
+             case (in, out) ⇒ s"\n    $in -> $out"
+           }
+           .mkString("")}
+         |  Upstreams: ${upstreams.iterator
+           .map {
+             case (out, in) ⇒ s"\n    $out -> $in"
+           }
+           .mkString("")}
          |  MatValue: $materializedValueComputation""".stripMargin
   }
 
@@ -960,7 +977,8 @@ private[stream] abstract class MaterializerSession(
     require(
       topLevel.isRunnable,
       s"The top level module cannot be materialized because it has unconnected ports: ${(topLevel.inPorts ++ topLevel.outPorts)
-        .mkString(", ")}")
+        .mkString(", ")}"
+    )
     try materializeModule(topLevel, initialAttributes and topLevel.attributes)
     catch {
       case NonFatal(cause) ⇒

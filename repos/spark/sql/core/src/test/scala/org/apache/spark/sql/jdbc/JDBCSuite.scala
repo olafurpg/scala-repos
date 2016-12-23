@@ -735,18 +735,23 @@ class JDBCSuite
   }
 
   test("Aggregated dialects") {
-    val agg = new AggregatedDialect(List(new JdbcDialect {
-      override def canHandle(url: String): Boolean = url.startsWith("jdbc:h2:")
-      override def getCatalystType(sqlType: Int,
-                                   typeName: String,
-                                   size: Int,
-                                   md: MetadataBuilder): Option[DataType] =
-        if (sqlType % 2 == 0) {
-          Some(LongType)
-        } else {
-          None
-        }
-    }, testH2Dialect))
+    val agg = new AggregatedDialect(
+      List(
+        new JdbcDialect {
+          override def canHandle(url: String): Boolean =
+            url.startsWith("jdbc:h2:")
+          override def getCatalystType(sqlType: Int,
+                                       typeName: String,
+                                       size: Int,
+                                       md: MetadataBuilder): Option[DataType] =
+            if (sqlType % 2 == 0) {
+              Some(LongType)
+            } else {
+              None
+            }
+        },
+        testH2Dialect
+      ))
     assert(agg.canHandle("jdbc:h2:xxx"))
     assert(!agg.canHandle("jdbc:h2"))
     assert(agg.getCatalystType(0, "", 1, null) === Some(LongType))

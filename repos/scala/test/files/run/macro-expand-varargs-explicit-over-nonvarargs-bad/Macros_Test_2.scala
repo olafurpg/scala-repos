@@ -11,7 +11,8 @@ object Test extends App {
     List(
       Typed(Apply(Ident(definitions.ListModule),
                   List(Literal(Constant(1)), Literal(Constant(2)))),
-            Ident(typeNames.WILDCARD_STAR))))
+            Ident(typeNames.WILDCARD_STAR)))
+  )
   try cm.mkToolBox().eval(tree)
   catch {
     case ex: Throwable => println(ex.getMessage)

@@ -595,7 +595,8 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
     val q8 = as.sortBy(_.id.desc).map(_.a)
     val q9a = as.sortBy(_.b).sortBy(_.a.desc).map(_.id)
     val q9b = as.sortBy(a => (a.a.desc, a.b)).map(_.id)
-    val q10 = (as join as).map { case (a1, a2) => a1.id * 3 + a2.id - 3 }.sorted
+    val q10 =
+      (as join as).map { case (a1, a2) => a1.id * 3 + a2.id - 3 }.sorted
     val q11a = q10.take(5)
     val q11b = q10.take(5).take(3)
     val q11c = q10.take(5).take(3).drop(1)

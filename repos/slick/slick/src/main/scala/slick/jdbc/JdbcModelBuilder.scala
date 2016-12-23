@@ -368,7 +368,8 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
              else None) ++ length.map(
             RelationalProfile.ColumnOption.Length
               .apply(_, varying = varying)) ++
-            (if (!autoInc) convenientDefault else None))
+            (if (!autoInc) convenientDefault else None)
+      )
   }
 
   class PrimaryKeyBuilder(tableBuilder: TableBuilder, meta: Seq[MPrimaryKey]) {

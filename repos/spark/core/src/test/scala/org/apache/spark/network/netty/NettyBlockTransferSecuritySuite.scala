@@ -159,7 +159,8 @@ class NettyBlockTransferSecuritySuite
                                          data: ManagedBuffer): Unit = {
           promise.success(data.retain())
         }
-      })
+      }
+    )
 
     Await.ready(promise.future, FiniteDuration(10, TimeUnit.SECONDS))
     promise.future.value.get

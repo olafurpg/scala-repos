@@ -90,12 +90,14 @@ object CORSConfig {
   /**
     *
     */
-  val denyAll: CORSConfig = CORSConfig(allowedOrigins = Origins.None,
-                                       isHttpMethodAllowed = _ => false,
-                                       isHttpHeaderAllowed = _ => false,
-                                       exposedHeaders = Seq.empty,
-                                       supportsCredentials = true,
-                                       preflightMaxAge = 0.seconds)
+  val denyAll: CORSConfig = CORSConfig(
+    allowedOrigins = Origins.None,
+    isHttpMethodAllowed = _ => false,
+    isHttpHeaderAllowed = _ => false,
+    exposedHeaders = Seq.empty,
+    supportsCredentials = true,
+    preflightMaxAge = 0.seconds
+  )
 
   /**
     * Build a [[CORSConfig]]from a [[play.api.Configuration]]

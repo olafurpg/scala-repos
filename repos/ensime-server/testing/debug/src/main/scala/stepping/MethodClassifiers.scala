@@ -71,28 +71,9 @@ class MethodClassifiers {
     c.abstractMethodWithDefault()
     c.concreteTraitMethod4(42, 42.0, "42", new Object)
     val maxArgs = new MaxArgsC
-    maxArgs.manyArgs(42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0)
+    maxArgs.manyArgs(42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0,
+      42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0,
+      42.0)
   }
 }
 

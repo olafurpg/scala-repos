@@ -34,7 +34,8 @@ trait FlatSpecGenerator extends ScalaTestTestCase {
         |   print(">>TEST: FAILED<<")
         | }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   def addBehaviorFlatSpec() = {
@@ -54,6 +55,7 @@ trait FlatSpecGenerator extends ScalaTestTestCase {
         |
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 }

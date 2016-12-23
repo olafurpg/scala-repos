@@ -53,7 +53,8 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
       classOf[ScFinallyBlock],
       classOf[ScWhileStmt],
       classOf[ScDoStmt],
-      classOf[ScCaseClause])
+      classOf[ScCaseClause]
+    )
 
     def isAncestorOfElement(ancestor: PsiElement) =
       PsiTreeUtil.isContextAncestor(ancestor, element, false)

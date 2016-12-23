@@ -107,7 +107,8 @@ private[deploy] object CommandUtils extends Logging {
       Seq[String](), // library path already captured in environment variable
       // filter out auth secret from java options
       command.javaOpts.filterNot(
-        _.startsWith("-D" + SecurityManager.SPARK_AUTH_SECRET_CONF)))
+        _.startsWith("-D" + SecurityManager.SPARK_AUTH_SECRET_CONF))
+    )
   }
 
   /** Spawn a thread that will redirect a given stream to a file */

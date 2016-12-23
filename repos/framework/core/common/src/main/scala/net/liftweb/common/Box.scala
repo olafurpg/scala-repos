@@ -88,11 +88,13 @@ object Box extends BoxTrait with Tryo {
       **/
     def toSingleBox(failureErrorMessage: String): Box[List[T]] = {
       if (theListOfBoxes.exists(_.isInstanceOf[Failure])) {
-        val failureChain = theListOfBoxes.collect {
-          case fail: Failure => fail
-        }.reduceRight { (topmostFailure, latestFailure) =>
-          topmostFailure.copy(chain = Full(latestFailure))
-        }
+        val failureChain = theListOfBoxes
+          .collect {
+            case fail: Failure => fail
+          }
+          .reduceRight { (topmostFailure, latestFailure) =>
+            topmostFailure.copy(chain = Full(latestFailure))
+          }
 
         ParamFailure(
           failureErrorMessage,
@@ -119,7 +121,8 @@ sealed trait BoxTrait {
     java.lang.Float.TYPE -> classOf[java.lang.Float],
     java.lang.Integer.TYPE -> classOf[java.lang.Integer],
     java.lang.Long.TYPE -> classOf[java.lang.Long],
-    java.lang.Short.TYPE -> classOf[java.lang.Short])
+    java.lang.Short.TYPE -> classOf[java.lang.Short]
+  )
 
   @deprecated("Use the correctly-spelled primitiveMap instead.", "3.0")
   val primativeMap = primitiveMap

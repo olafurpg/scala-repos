@@ -175,10 +175,12 @@ object GaussianMixtureModel extends Loader[GaussianMixtureModel] {
       Loader.checkSchema[Data](dataFrame.schema)
       val dataArray = dataFrame.select("weight", "mu", "sigma").collect()
 
-      val (weights, gaussians) = dataArray.map {
-        case Row(weight: Double, mu: Vector, sigma: Matrix) =>
-          (weight, new MultivariateGaussian(mu, sigma))
-      }.unzip
+      val (weights, gaussians) = dataArray
+        .map {
+          case Row(weight: Double, mu: Vector, sigma: Matrix) =>
+            (weight, new MultivariateGaussian(mu, sigma))
+        }
+        .unzip
 
       new GaussianMixtureModel(weights.toArray, gaussians.toArray)
     }

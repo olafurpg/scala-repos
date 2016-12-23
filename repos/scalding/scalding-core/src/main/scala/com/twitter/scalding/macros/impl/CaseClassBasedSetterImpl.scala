@@ -122,17 +122,20 @@ object CaseClassBasedSetterImpl {
       }
     }
     def expandMethod(outerTpe: Type): Vector[(Tree => Tree, Type)] =
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
-        val fieldType = normalized(
-          accessorMethod.returnType.asSeenFrom(outerTpe,
-                                               outerTpe.typeSymbol.asClass))
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .map { accessorMethod =>
+          val fieldType = normalized(
+            accessorMethod.returnType.asSeenFrom(outerTpe,
+                                                 outerTpe.typeSymbol.asClass))
 
-        ({ pTree: Tree =>
-          q"""$pTree.$accessorMethod"""
-        }, fieldType)
-      }.toVector
+          ({ pTree: Tree =>
+            q"""$pTree.$accessorMethod"""
+          }, fieldType)
+        }
+        .toVector
 
     // in TupleSetterImpl, the outer-most input val is called t, so we pass that in here:
     val sb = matchField(normalized(T.tpe))

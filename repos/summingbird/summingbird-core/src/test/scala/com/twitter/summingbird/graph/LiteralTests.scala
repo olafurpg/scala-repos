@@ -48,8 +48,8 @@ object LiteralTests extends Properties("Literal") {
   def genBinary: Gen[Literal[Int, Box]] =
     for {
       fn <- Arbitrary.arbitrary[(Int, Int) => (Int)]
-      bfn = { case (Box(l), Box(r)) => Box(fn(l, r)) }: (Box[Int],
-                                                         Box[Int]) => Box[Int]
+      bfn = { case (Box(l), Box(r)) => Box(fn(l, r)) }: (Box[Int], Box[Int]) => Box[
+        Int]
       left <- genLiteral
       // We have to make dags, so select from the closure of left sometimes
       right <- Gen

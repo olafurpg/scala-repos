@@ -36,26 +36,8 @@ class HandshakeInitTest extends FunSuite {
     assert(h.status == 2)
     assert(h.salt.length == 20)
     assert(
-      h.salt === Array[Byte](100,
-                             118,
-                             72,
-                             64,
-                             73,
-                             45,
-                             67,
-                             74,
-                             42,
-                             52,
-                             100,
-                             124,
-                             99,
-                             90,
-                             119,
-                             107,
-                             52,
-                             94,
-                             93,
-                             58))
+      h.salt === Array[Byte](100, 118, 72, 64, 73, 45, 67, 74, 42, 52, 100,
+        124, 99, 90, 119, 107, 52, 94, 93, 58))
   })
 
   test("decode protocol version 10 with auth plugin name")(new HexDump {

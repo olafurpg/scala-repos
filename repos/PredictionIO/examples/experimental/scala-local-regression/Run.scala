@@ -105,9 +105,10 @@ class VectorSerializer
       ({
         case JArray(s) =>
           s.map {
-            case JDouble(x) => x
-            case _ => 0
-          }.toVector
+              case JDouble(x) => x
+              case _ => 0
+            }
+            .toVector
       }, {
         case x: Vector[Double] =>
           JArray(x.toList.map(y => JDouble(y)))
@@ -141,7 +142,8 @@ object Run {
       algorithmClassMapOpt = Some(Map("" -> classOf[LocalAlgorithm])),
       algorithmParamsList = Seq(("", EmptyParams())),
       servingClassOpt = Some(classOf[LFirstServing[Vector[Double], Double]]),
-      evaluatorClassOpt = Some(classOf[MeanSquareError]))
+      evaluatorClassOpt = Some(classOf[MeanSquareError])
+    )
   }
 
   def runEngine() {

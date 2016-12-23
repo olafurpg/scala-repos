@@ -14,26 +14,30 @@ trait ScalaTestWholeSuiteTest
     with FunSuiteGenerator
     with PropSpecGenerator
     with WordSpecGenerator {
-  val featureSpecTestPaths = List(List("[root]",
-                                       "FeatureSpecTest",
-                                       "Feature: Feature 1",
-                                       "Scenario: Scenario A"),
-                                  List("[root]",
-                                       "FeatureSpecTest",
-                                       "Feature: Feature 1",
-                                       "Scenario: Scenario B"),
-                                  List("[root]",
-                                       "FeatureSpecTest",
-                                       "Feature: Feature 2",
-                                       "Scenario: Scenario C"))
-  val flatSpecTestPaths = List(List("[root]",
-                                    "FlatSpecTest",
-                                    "A FlatSpecTest",
-                                    "should be able to run single test"),
-                               List("[root]",
-                                    "FlatSpecTest",
-                                    "A FlatSpecTest",
-                                    "should not run other tests"))
+  val featureSpecTestPaths = List(
+    List("[root]",
+         "FeatureSpecTest",
+         "Feature: Feature 1",
+         "Scenario: Scenario A"),
+    List("[root]",
+         "FeatureSpecTest",
+         "Feature: Feature 1",
+         "Scenario: Scenario B"),
+    List("[root]",
+         "FeatureSpecTest",
+         "Feature: Feature 2",
+         "Scenario: Scenario C")
+  )
+  val flatSpecTestPaths = List(
+    List("[root]",
+         "FlatSpecTest",
+         "A FlatSpecTest",
+         "should be able to run single test"),
+    List("[root]",
+         "FlatSpecTest",
+         "A FlatSpecTest",
+         "should not run other tests")
+  )
   val freeSpecTestPaths = List(
     List("[root]",
          "FreeSpecTest",
@@ -42,14 +46,16 @@ trait ScalaTestWholeSuiteTest
     List("[root]",
          "FreeSpecTest",
          "A FreeSpecTest",
-         "should not run tests that are not selected"))
+         "should not run tests that are not selected")
+  )
   val funSpecTestPaths = List(
     List("[root]", "FunSpecTest", "FunSpecTest", "should launch single test"),
     List("[root]",
          "FunSpecTest",
          "FunSpecTest",
          "should not launch other tests"),
-    List("[root]", "FunSpecTest", "OtherScope", "is here"))
+    List("[root]", "FunSpecTest", "OtherScope", "is here")
+  )
   val funSuiteTestPaths = List(
     List("[root]", "FunSuiteTest", "should run single test"),
     List("[root]", "FunSuiteTest", "should not run other tests"))
@@ -59,18 +65,20 @@ trait ScalaTestWholeSuiteTest
   val wordSpecTestPaths = List(
     List("[root]", "WordSpecTest", "WordSpecTest", "Run single test"),
     List("[root]", "WordSpecTest", "WordSpecTest", "ignore other tests"),
-    List("[root]", "WordSpecTest", "outer", "inner"))
+    List("[root]", "WordSpecTest", "outer", "inner")
+  )
 
   def testFeatureSpec() {
     addFeatureSpec()
 
-    runTestByLocation(2,
-                      10,
-                      "FeatureSpecTest.scala",
-                      checkConfigAndSettings(_, "FeatureSpecTest"),
-                      root =>
-                        featureSpecTestPaths.forall(
-                          checkResultTreeHasExactNamedPath(root, _: _*))
+    runTestByLocation(
+      2,
+      10,
+      "FeatureSpecTest.scala",
+      checkConfigAndSettings(_, "FeatureSpecTest"),
+      root =>
+        featureSpecTestPaths.forall(
+          checkResultTreeHasExactNamedPath(root, _: _*))
 //        checkResultTreeHasExactNamedPath(root, "[root]", "FeatureSpecTest", "Feature: Feature 1", "Scenario: Scenario A") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FeatureSpecTest", "Feature: Feature 1", "Scenario: Scenario B") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FeatureSpecTest", "Feature: Feature 2", "Scenario: Scenario C")

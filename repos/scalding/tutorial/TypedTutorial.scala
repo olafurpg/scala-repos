@@ -140,16 +140,17 @@ class TypedTutorial(args: Args) extends Job(args) {
         TypedPipe.from(OffsetTextLine(args("input")))
 
       // Split lines into words, but keep their original line offset with them.
-      val wordsWithLine: Grouped[String, Long] = lines.flatMap {
-        case (offset, line) =>
-          // split into words
-          line
-            .split("\\s")
-            // keep the line offset with them
-            .map(word => (word.toLowerCase, offset))
-      }
-      // make the 'word' field the key
-      .group
+      val wordsWithLine: Grouped[String, Long] = lines
+        .flatMap {
+          case (offset, line) =>
+            // split into words
+            line
+              .split("\\s")
+              // keep the line offset with them
+              .map(word => (word.toLowerCase, offset))
+        }
+        // make the 'word' field the key
+        .group
 
       // Associate scores with each word; merges the two value types into
       // a tuple: [String,Long] join [String,Double] -> [String,(Long,Double)]
@@ -158,11 +159,11 @@ class TypedTutorial(args: Args) extends Job(args) {
       // get scores for each line (indexed by line number)
       val scoredLinesByNumber = scoredWords
       // select the line offset and score fields
-      .map { case (word, (offset, score)) => (offset, score) }
-      // group by line offset (groups all the words for a line together)
-      .group
-      // compute total score per line
-      .sum
+        .map { case (word, (offset, score)) => (offset, score) }
+        // group by line offset (groups all the words for a line together)
+        .group
+        // compute total score per line
+        .sum
       // Group and sum are often run together in this way.
       // The `sumByKey` operation performs performs both.
 

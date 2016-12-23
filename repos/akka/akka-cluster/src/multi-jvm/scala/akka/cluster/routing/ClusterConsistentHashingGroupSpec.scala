@@ -88,8 +88,10 @@ abstract class ClusterConsistentHashingGroupSpec
           settings = ClusterRouterGroupSettings(totalInstances = 10,
                                                 paths,
                                                 allowLocalRoutees = true,
-                                                useRole = None)).props(),
-        "router")
+                                                useRole = None)
+        ).props(),
+        "router"
+      )
       // it may take some time until router receives cluster member events
       awaitAssert { currentRoutees(router).size should ===(3) }
       val keys = List("A", "B", "C", "D", "E", "F", "G")

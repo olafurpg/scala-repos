@@ -216,38 +216,9 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
     import org.apache.thrift.protocol._
     import org.apache.thrift.transport._
 
-    val bytes = Array[Byte](102,
-                            100,
-                            125,
-                            -96,
-                            57,
-                            -55,
-                            -72,
-                            18,
-                            -21,
-                            15,
-                            -91,
-                            -36,
-                            104,
-                            111,
-                            111,
-                            -127,
-                            -21,
-                            15,
-                            -91,
-                            -36,
-                            104,
-                            111,
-                            111,
-                            -127,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0)
+    val bytes = Array[Byte](102, 100, 125, -96, 57, -55, -72, 18, -21, 15, -91,
+      -36, 104, 111, 111, -127, -21, 15, -91, -36, 104, 111, 111, -127, 0, 0,
+      0, 0, 0, 0, 0, 0)
     val pf = new TJSONProtocol.Factory()
 
     val json = {
@@ -291,43 +262,76 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
 
       // Verify the count of the annotations. Order may change.
       // These are set twice - by client and server
-      assert(traces.collect {
-        case Record(_, _, Annotation.BinaryAnnotation(k, v), _) => ()
-      }.size == 3)
-      assert(traces.collect {
-        case Record(_, _, Annotation.Rpc("multiply"), _) => ()
-      }.size == 2)
-      assert(traces.collect {
-        case Record(_, _, Annotation.ServerAddr(_), _) => ()
-      }.size == 2)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.BinaryAnnotation(k, v), _) => ()
+          }
+          .size == 3)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.Rpc("multiply"), _) => ()
+          }
+          .size == 2)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.ServerAddr(_), _) => ()
+          }
+          .size == 2)
       // With Stack, we get an extra ClientAddr because of the
       // TTwitter upgrade request (ThriftTracing.CanTraceMethodName)
-      assert(traces.collect {
-        case Record(_, _, Annotation.ClientAddr(_), _) => ()
-      }.size >= 2)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.ClientAddr(_), _) => ()
+          }
+          .size >= 2)
       // LocalAddr is set on the server side only.
-      assert(traces.collect {
-        case Record(_, _, Annotation.LocalAddr(_), _) => ()
-      }.size == 1)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.LocalAddr(_), _) => ()
+          }
+          .size == 1)
       // These are set by one side only.
-      assert(traces.collect {
-        case Record(_, _, Annotation.ServiceName("thriftclient"), _) => ()
-      }.size == 1)
-      assert(traces.collect {
-        case Record(_, _, Annotation.ServiceName("thriftserver"), _) => ()
-      }.size == 1)
-      assert(traces.collect {
-        case Record(_, _, Annotation.ClientSend(), _) => ()
-      }.size == 1)
-      assert(traces.collect {
-        case Record(_, _, Annotation.ServerRecv(), _) => ()
-      }.size == 1)
-      assert(traces.collect {
-        case Record(_, _, Annotation.ServerSend(), _) => ()
-      }.size == 1)
-      assert(traces.collect {
-        case Record(_, _, Annotation.ClientRecv(), _) => ()
-      }.size == 1)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.ServiceName("thriftclient"), _) => ()
+          }
+          .size == 1)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.ServiceName("thriftserver"), _) => ()
+          }
+          .size == 1)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.ClientSend(), _) => ()
+          }
+          .size == 1)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.ServerRecv(), _) => ()
+          }
+          .size == 1)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.ServerSend(), _) => ()
+          }
+          .size == 1)
+      assert(
+        traces
+          .collect {
+            case Record(_, _, Annotation.ClientRecv(), _) => ()
+          }
+          .size == 1)
 
       assert(
         Await.result(client.complex_return("a string")).arg_two == "%s".format(

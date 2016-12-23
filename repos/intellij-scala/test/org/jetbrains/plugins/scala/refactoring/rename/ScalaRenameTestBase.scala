@@ -43,7 +43,8 @@ abstract class ScalaRenameTestBase
     val element = TargetElementUtil.findTargetElement(
       InjectedLanguageUtil
         .getEditorForInjectedLanguageNoCommit(getEditorAdapter, scalaFile),
-      TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED)
+      TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED
+    )
     assert(element != null, "Reference is not specified.")
     val searchInComments = element.getText.contains("Comments")
 
@@ -51,19 +52,23 @@ abstract class ScalaRenameTestBase
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
 
     //start to inline
-    ScalaUtils.runWriteAction(new Runnable {
-      def run() {
-        val subst = RenamePsiElementProcessor
-          .forElement(element)
-          .substituteElementToRename(element, getEditorAdapter)
-        if (subst == null) return
-        new RenameProcessor(getProjectAdapter,
-                            subst,
-                            "NameAfterRename",
-                            searchInComments,
-                            false).run()
-      }
-    }, getProjectAdapter, "Test")
+    ScalaUtils.runWriteAction(
+      new Runnable {
+        def run() {
+          val subst = RenamePsiElementProcessor
+            .forElement(element)
+            .substituteElementToRename(element, getEditorAdapter)
+          if (subst == null) return
+          new RenameProcessor(getProjectAdapter,
+                              subst,
+                              "NameAfterRename",
+                              searchInComments,
+                              false).run()
+        }
+      },
+      getProjectAdapter,
+      "Test"
+    )
     res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
 
     val text = lastPsi.getText

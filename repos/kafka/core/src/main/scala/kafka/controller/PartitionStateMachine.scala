@@ -309,7 +309,8 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
                     topicAndPartition,
                     currState,
                     targetState),
-          t)
+          t
+        )
     }
   }
 
@@ -390,7 +391,8 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
                                               topicAndPartition.partition),
             zkUtils.leaderAndIsrZkData(
               leaderIsrAndControllerEpoch.leaderAndIsr,
-              controller.epoch))
+              controller.epoch)
+          )
           // NOTE: the above write can fail only if the current controller lost its zk session and the new controller
           // took over and initialized this partition. This can happen if the current controller went into a long
           // GC pause

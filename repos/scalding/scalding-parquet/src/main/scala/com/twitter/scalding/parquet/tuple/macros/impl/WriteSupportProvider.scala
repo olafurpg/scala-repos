@@ -12,10 +12,12 @@ object WriteSupportProvider {
     import ctx.universe._
 
     if (!IsCaseClassImpl.isCaseClassType(ctx)(T.tpe))
-      ctx.abort(ctx.enclosingPosition,
-                s"""We cannot enforce ${T.tpe} is a case class,
+      ctx.abort(
+        ctx.enclosingPosition,
+        s"""We cannot enforce ${T.tpe} is a case class,
             either it is not a case class or this macro call is possibly enclosed in a class.
-            This will mean the macro is operating on a non-resolved type.""")
+            This will mean the macro is operating on a non-resolved type."""
+      )
 
     def matchField(idx: Int,
                    fieldType: Type,
@@ -77,15 +79,17 @@ object WriteSupportProvider {
           val newGroupName = createGroupName()
           val (_, subTree) = matchField(0, innerType, q"element", newGroupName)
           (idx + 1,
-           writeCollectionField(newGroupName,
-                                q"""
+           writeCollectionField(
+             newGroupName,
+             q"""
                           rc.startField("list", 0)
                           $fValue.foreach{ element =>
                             rc.startGroup()
                             $subTree
                             rc.endGroup
                           }
-                          rc.endField("list", 0)"""))
+                          rc.endField("list", 0)"""
+           ))
         case tpe if tpe.erasure =:= typeOf[Map[_, Any]] =>
           val List(keyType, valueType) = tpe.asInstanceOf[TypeRefApi].args
           val newGroupName = createGroupName()
@@ -93,8 +97,9 @@ object WriteSupportProvider {
           val (_, valueSubTree) =
             matchField(1, valueType, q"value", newGroupName)
           (idx + 1,
-           writeCollectionField(newGroupName,
-                                q"""
+           writeCollectionField(
+             newGroupName,
+             q"""
                           rc.startField("map", 0)
                           $fValue.foreach{ case(key, value) =>
                             rc.startGroup()
@@ -102,7 +107,8 @@ object WriteSupportProvider {
                             $valueSubTree
                             rc.endGroup
                           }
-                          rc.endField("map", 0)"""))
+                          rc.endField("map", 0)"""
+           ))
         case tpe if IsCaseClassImpl.isCaseClassType(ctx)(tpe) =>
           val newGroupName = createGroupName()
           val (_, subTree) = expandMethod(tpe, fValue, newGroupName)
@@ -120,20 +126,22 @@ object WriteSupportProvider {
     def expandMethod(outerTpe: Type,
                      pValueTree: Tree,
                      groupName: TermName): (Int, Tree) = {
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.foldLeft((0, q"")) {
-        case ((idx, existingTree), getter) =>
-          val (newIdx, subTree) = matchField(idx,
-                                             getter.returnType,
-                                             q"$pValueTree.$getter",
-                                             groupName)
-          (newIdx,
-           q"""
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .foldLeft((0, q"")) {
+          case ((idx, existingTree), getter) =>
+            val (newIdx, subTree) = matchField(idx,
+                                               getter.returnType,
+                                               q"$pValueTree.$getter",
+                                               groupName)
+            (newIdx,
+             q"""
                       $existingTree
                       $subTree
                     """)
-      }
+        }
     }
 
     def createGroupName(): TermName = newTermName(ctx.fresh("group"))

@@ -8,14 +8,16 @@ package testingSupport.specs2
 abstract class SCL7228Test extends Specs2TestCase {
 
   def testScl7228() {
-    addFileToProject("SCL7228Test.scala",
-                     """
+    addFileToProject(
+      "SCL7228Test.scala",
+      """
     |import org.specs2.mutable.Specification
     |
     |class SCL7228Test extends Specification {
     |  override def is = "foo (bar)" ! (true == true)
     |}
-  """.stripMargin)
+  """.stripMargin
+    )
 
     runTestByLocation(3,
                       1,

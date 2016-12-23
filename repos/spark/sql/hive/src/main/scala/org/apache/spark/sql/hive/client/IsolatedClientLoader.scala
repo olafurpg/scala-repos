@@ -82,14 +82,16 @@ private[hive] object IsolatedClientLoader extends Logging {
           resolvedVersions((resolvedVersion, actualHadoopVersion))
         }
 
-      new IsolatedClientLoader(hiveVersion(hiveMetastoreVersion),
-                               sparkConf,
-                               execJars = files,
-                               hadoopConf = hadoopConf,
-                               config = config,
-                               sharesHadoopClasses = sharesHadoopClasses,
-                               sharedPrefixes = sharedPrefixes,
-                               barrierPrefixes = barrierPrefixes)
+      new IsolatedClientLoader(
+        hiveVersion(hiveMetastoreVersion),
+        sparkConf,
+        execJars = files,
+        hadoopConf = hadoopConf,
+        config = config,
+        sharesHadoopClasses = sharesHadoopClasses,
+        sharedPrefixes = sharedPrefixes,
+        barrierPrefixes = barrierPrefixes
+      )
     }
 
   def hiveVersion(version: String): HiveVersion = version match {

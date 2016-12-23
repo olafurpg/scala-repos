@@ -18,9 +18,11 @@ private[tv] final class TvActor(rendererActor: ActorSelection,
 
   implicit private def timeout = makeTimeout(100 millis)
 
-  val channelActors: Map[Tv.Channel, ActorRef] = Tv.Channel.all.map { c =>
-    c -> context.actorOf(Props(classOf[ChannelActor], c), name = c.toString)
-  }.toMap
+  val channelActors: Map[Tv.Channel, ActorRef] = Tv.Channel.all
+    .map { c =>
+      c -> context.actorOf(Props(classOf[ChannelActor], c), name = c.toString)
+    }
+    .toMap
 
   var channelChampions = Map[Tv.Channel, Tv.Champion]()
 
@@ -53,24 +55,33 @@ private[tv] final class TvActor(rendererActor: ActorSelection,
       (user |@| player.rating) apply {
         case (u, r) => channelChampions += (channel -> Tv.Champion(u, r))
       }
-      channelActors.collect {
-        case (c, actor) if c != channel =>
-          actor ? ChannelActor.GetGameId mapTo manifest[Option[String]]
-      }.sequenceFu.foreach { otherIds =>
-        val gameIds = (previousId.toList ::: otherIds.toList.flatten).distinct
-        roundSocket ! TellIds(gameIds, {
-          lila.hub.actorApi.tv.Select(
-            makeMessage("tvSelect",
-                        Json.obj("channel" -> channel.key,
-                                 "id" -> game.id,
-                                 "color" -> game.firstColor.name,
-                                 "player" -> user.map { u =>
-                                   Json.obj("name" -> u.name,
-                                            "title" -> u.title,
-                                            "rating" -> player.rating)
-                                 })))
-        })
-      }
+      channelActors
+        .collect {
+          case (c, actor) if c != channel =>
+            actor ? ChannelActor.GetGameId mapTo manifest[Option[String]]
+        }
+        .sequenceFu
+        .foreach { otherIds =>
+          val gameIds =
+            (previousId.toList ::: otherIds.toList.flatten).distinct
+          roundSocket ! TellIds(
+            gameIds, {
+              lila.hub.actorApi.tv.Select(makeMessage(
+                "tvSelect",
+                Json.obj(
+                  "channel" -> channel.key,
+                  "id" -> game.id,
+                  "color" -> game.firstColor.name,
+                  "player" -> user.map { u =>
+                    Json.obj("name" -> u.name,
+                             "title" -> u.title,
+                             "rating" -> player.rating)
+                  }
+                )
+              ))
+            }
+          )
+        }
       if (channel == Tv.Channel.Best)
         rendererActor ? actorApi.RenderFeaturedJs(game) onSuccess {
           case html: play.twirl.api.Html =>

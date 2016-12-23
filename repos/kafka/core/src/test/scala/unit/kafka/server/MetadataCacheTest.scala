@@ -65,11 +65,13 @@ class MetadataCacheTest {
       )
     }
 
-    val brokers = (0 to 2).map { brokerId =>
-      new Broker(brokerId,
-                 securityProtocolToEndPoint(brokerId).asJava,
-                 "rack1")
-    }.toSet
+    val brokers = (0 to 2)
+      .map { brokerId =>
+        new Broker(brokerId,
+                   securityProtocolToEndPoint(brokerId).asJava,
+                   "rack1")
+      }
+      .toSet
 
     val partitionStates = Map(
       new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
@@ -89,7 +91,8 @@ class MetadataCacheTest {
                                                          2,
                                                          asList(2),
                                                          zkVersion,
-                                                         asSet(2)))
+                                                         asSet(2))
+    )
 
     val updateMetadataRequest = new UpdateMetadataRequest(
       controllerId,

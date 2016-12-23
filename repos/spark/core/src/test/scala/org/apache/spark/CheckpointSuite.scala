@@ -403,10 +403,13 @@ class CheckpointSuite
   }
 
   runTest("ShuffleRDD") { reliableCheckpoint: Boolean =>
-    testRDD(rdd => {
-      // Creating ShuffledRDD directly as PairRDDFunctions.combineByKey produces a MapPartitionedRDD
-      new ShuffledRDD[Int, Int, Int](rdd.map(x => (x % 2, 1)), partitioner)
-    }, reliableCheckpoint)
+    testRDD(
+      rdd => {
+        // Creating ShuffledRDD directly as PairRDDFunctions.combineByKey produces a MapPartitionedRDD
+        new ShuffledRDD[Int, Int, Int](rdd.map(x => (x % 2, 1)), partitioner)
+      },
+      reliableCheckpoint
+    )
   }
 
   runTest("UnionRDD") { reliableCheckpoint: Boolean =>

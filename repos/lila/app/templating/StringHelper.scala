@@ -56,11 +56,14 @@ trait StringHelper { self: NumberHelper =>
     """(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s<>]+|\(([^\s<>]+|(\([^\s<>]+\)))*\))+(?:\(([^\s<>]+|(\([^\s<>]+\)))*\)|[^\s`!\[\]{};:'".,<>?«»“”‘’]))""".r
 
   def addLinks(text: String) =
-    urlRegex.replaceAllIn(text, m => {
-      val url = delocalize(quoteReplacement(m group 1))
-      val target = if (url contains netDomain) "" else " target='blank'"
-      s"""<a$target rel="nofollow" href="${prependHttp(url)}">$url</a>"""
-    })
+    urlRegex.replaceAllIn(
+      text,
+      m => {
+        val url = delocalize(quoteReplacement(m group 1))
+        val target = if (url contains netDomain) "" else " target='blank'"
+        s"""<a$target rel="nofollow" href="${prependHttp(url)}">$url</a>"""
+      }
+    )
 
   private def prependHttp(url: String): String =
     url startsWith "http" fold (url, "http://" + url)

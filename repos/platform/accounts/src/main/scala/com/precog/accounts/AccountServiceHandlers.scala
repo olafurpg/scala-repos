@@ -150,9 +150,14 @@ class AccountServiceHandlers(
           request.parameters.get('email) match {
             case Some(email) =>
               accountManager.findAccountByEmail(email).map { found =>
-                HttpResponse(HttpStatus(OK), content = found.map { account =>
-                  JArray(JObject("accountId" -> account.accountId.serialize))
-                }.orElse { Some(JArray()) })
+                HttpResponse(
+                  HttpStatus(OK),
+                  content = found
+                    .map { account =>
+                      JArray(
+                        JObject("accountId" -> account.accountId.serialize))
+                    }
+                    .orElse { Some(JArray()) })
               }
 
             case None =>
@@ -534,9 +539,9 @@ class AccountServiceHandlers(
             .toSuccess(NonEmptyList("Missing account ID in request URI")) |@| request.parameters
             .get('resetToken)
             .toSuccess(NonEmptyList("Missing reset token in request URI")) |@| request.content
-            .toSuccess(NonEmptyList(
-              "Missing POST body (new password) in request"))).apply {
-            (accountId, resetToken, futureContent) =>
+            .toSuccess(
+              NonEmptyList("Missing POST body (new password) in request")))
+            .apply { (accountId, resetToken, futureContent) =>
               futureContent.flatMap { jvalue =>
                 jvalue.validated[String]("password") match {
                   case Success(newPassword) =>
@@ -576,7 +581,7 @@ class AccountServiceHandlers(
                         "Missing/invalid password in request body"))
                 }
               }
-          } valueOr { errors =>
+            } valueOr { errors =>
             Future(Responses.failure(BadRequest, errors.list.mkString("\n")))
           }
         }
@@ -586,7 +591,8 @@ class AccountServiceHandlers(
       AboutMetadata(
         ParameterMetadata('resetToken, None),
         DescriptionMetadata(
-          "The account reset token sent to the email address of the account whose password is being reset.")),
+          "The account reset token sent to the email address of the account whose password is being reset.")
+      ),
       DescriptionMetadata(
         """The request body must be of the form: {"password": "my new password"}"""),
       DescriptionMetadata(

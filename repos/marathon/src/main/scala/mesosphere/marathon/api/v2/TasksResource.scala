@@ -73,13 +73,17 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
       val appIdsToApps =
         appIds.map(appId => appId -> result(groupManager.app(appId))).toMap
 
-      val appToPorts = appIdsToApps.map {
-        case (appId, app) => appId -> app.map(_.servicePorts).getOrElse(Nil)
-      }.toMap
+      val appToPorts = appIdsToApps
+        .map {
+          case (appId, app) => appId -> app.map(_.servicePorts).getOrElse(Nil)
+        }
+        .toMap
 
-      val health = appIds.flatMap { appId =>
-        result(healthCheckManager.statuses(appId))
-      }.toMap
+      val health = appIds
+        .flatMap { appId =>
+          result(healthCheckManager.statuses(appId))
+        }
+        .toMap
 
       val enrichedTasks: IterableView[EnrichedTask, Iterable[_]] = for {
         (appId, task) <- tasks
@@ -126,12 +130,14 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
                 @Context req: HttpServletRequest): Response =
     authenticated(req) { implicit identity =>
       val taskIds = (Json.parse(body) \ "ids").as[Set[String]]
-      val tasksToAppId = taskIds.map { id =>
-        try { id -> Task.Id.appId(id) } catch {
-          case e: MatchError =>
-            throw new BadRequestException(s"Invalid task id '$id'.")
+      val tasksToAppId = taskIds
+        .map { id =>
+          try { id -> Task.Id.appId(id) } catch {
+            case e: MatchError =>
+              throw new BadRequestException(s"Invalid task id '$id'.")
+          }
         }
-      }.toMap
+        .toMap
 
       def scaleAppWithKill(toKill: Map[PathId, Iterable[Task]]): Response = {
         deploymentResult(result(taskKiller.killAndScale(toKill, force)))
@@ -152,12 +158,15 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
           EnrichedTask(task.taskId.appId, task, Seq.empty))))
       }
 
-      val tasksByAppId = tasksToAppId.flatMap {
-        case (taskId, appId) =>
-          taskTracker.tasksByAppSync.task(Task.Id(taskId))
-      }.groupBy { task =>
-        task.taskId.appId
-      }.map { case (appId, tasks) => appId -> tasks }
+      val tasksByAppId = tasksToAppId
+        .flatMap {
+          case (taskId, appId) =>
+            taskTracker.tasksByAppSync.task(Task.Id(taskId))
+        }
+        .groupBy { task =>
+          task.taskId.appId
+        }
+        .map { case (appId, tasks) => appId -> tasks }
 
       if (scale) scaleAppWithKill(tasksByAppId)
       else killTasks(tasksByAppId)

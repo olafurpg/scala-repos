@@ -84,11 +84,13 @@ class Code extends UsefulStuff {
   def objects1(method: String): Tree = {
     OBJECTDEF(method) withParents
       ("""BIF1(Vector("std", "math"), "%s")""".format(method)) :=
-      BLOCK(VAL("operandType") := (REF("Some(SDecimal)")),
-            VAL("operation", sym.PartialFunction1) :=
-              BLOCK(
-                CASE(REF("SDecimal(num)")) ==> REF(
-                  """SDecimal(Math.%s(num.toDouble))""".format(method))))
+      BLOCK(
+        VAL("operandType") := (REF("Some(SDecimal)")),
+        VAL("operation", sym.PartialFunction1) :=
+          BLOCK(
+            CASE(REF("SDecimal(num)")) ==> REF(
+              """SDecimal(Math.%s(num.toDouble))""".format(method)))
+      )
   }
 
   def objects2(method: String): Tree = {
@@ -99,7 +101,8 @@ class Code extends UsefulStuff {
         BLOCK(
           CASE(REF("(SDecimal(num1), SDecimal(num2))")) ==> REF(
             """SDecimal(Math.%s(num1.toDouble, num2.toDouble))""".format(
-              method))))
+              method)))
+    )
   }
 
   val methodsOneGen =

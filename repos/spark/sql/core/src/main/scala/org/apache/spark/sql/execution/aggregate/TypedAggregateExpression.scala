@@ -42,7 +42,8 @@ object TypedAggregateExpression {
       encoderFor[C].asInstanceOf[ExpressionEncoder[Any]],
       Nil,
       0,
-      0)
+      0
+    )
   }
 }
 

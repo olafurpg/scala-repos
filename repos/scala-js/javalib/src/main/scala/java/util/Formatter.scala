@@ -237,14 +237,17 @@ final class Formatter(private val dest: Appendable)
 
           def sciNotation(precision: Int) = {
             val exp = numberArg.toExponential(precision)
-            with_+({
-              // check if we need additional 0 padding in exponent
-              // JavaDoc: at least 2 digits
-              if ('e' == exp.charAt(exp.length - 3)) {
-                exp.substring(0, exp.length - 1) + "0" +
-                  exp.charAt(exp.length - 1)
-              } else exp
-            }, numberArg.isNaN || numberArg.isInfinite)
+            with_+(
+              {
+                // check if we need additional 0 padding in exponent
+                // JavaDoc: at least 2 digits
+                if ('e' == exp.charAt(exp.length - 3)) {
+                  exp.substring(0, exp.length - 1) + "0" +
+                    exp.charAt(exp.length - 1)
+                } else exp
+              },
+              numberArg.isNaN || numberArg.isInfinite
+            )
           }
       }
     }

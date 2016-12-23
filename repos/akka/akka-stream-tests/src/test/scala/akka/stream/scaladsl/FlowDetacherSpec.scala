@@ -34,14 +34,15 @@ class FlowDetacherSpec extends AkkaSpec {
       } should ===(ex)
     }
 
-    "emit the last element when completed without demand" in Utils.assertAllStagesStopped {
-      Source
-        .single(42)
-        .detach
-        .runWith(TestSink.probe)
-        .ensureSubscription()
-        .expectNoMsg(500.millis)
-        .requestNext() should ===(42)
-    }
+    "emit the last element when completed without demand" in Utils
+      .assertAllStagesStopped {
+        Source
+          .single(42)
+          .detach
+          .runWith(TestSink.probe)
+          .ensureSubscription()
+          .expectNoMsg(500.millis)
+          .requestNext() should ===(42)
+      }
   }
 }

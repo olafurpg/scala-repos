@@ -6,8 +6,9 @@ package org.jetbrains.plugins.scala.testingSupport.specs2
   */
 abstract class Specs2WholeSuiteTest extends Specs2TestCase {
   def testSpecification() {
-    addFileToProject("SpecificationTest.scala",
-                     """
+    addFileToProject(
+      "SpecificationTest.scala",
+      """
         |import org.specs2.mutable.Specification
         |
         |class SpecificationTest extends Specification {
@@ -23,7 +24,8 @@ abstract class Specs2WholeSuiteTest extends Specs2TestCase {
         |    }
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
 
     runTestByLocation(
       3,
@@ -40,6 +42,7 @@ abstract class Specs2WholeSuiteTest extends Specs2TestCase {
                                            "[root]",
                                            "SpecificationTest",
                                            "The 'SpecificationTest' should",
-                                           "ignore other test"))
+                                           "ignore other test")
+    )
   }
 }

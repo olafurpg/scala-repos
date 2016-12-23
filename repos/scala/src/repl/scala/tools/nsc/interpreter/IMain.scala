@@ -443,8 +443,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     // enough to just redefine them together but that may not always
     // be what people want so I'm waiting until I can do it better.
     exitingTyper {
-      req.defines filterNot (s =>
-                               req.defines contains s.companionSymbol) foreach {
+      req.defines filterNot (s => req.defines contains s.companionSymbol) foreach {
         newSym =>
           val oldSym = replScope lookup newSym.name.companionName
           if (Seq(oldSym, newSym).permutations exists {

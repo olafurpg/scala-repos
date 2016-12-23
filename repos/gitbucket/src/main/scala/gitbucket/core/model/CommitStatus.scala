@@ -53,17 +53,19 @@ case class CommitStatus(
 )
 object CommitStatus {
   def pending(owner: String, repository: String, context: String) =
-    CommitStatus(commitStatusId = 0,
-                 userName = owner,
-                 repositoryName = repository,
-                 commitId = "",
-                 context = context,
-                 state = CommitState.PENDING,
-                 targetUrl = None,
-                 description = Some("Waiting for status to be reported"),
-                 creator = "",
-                 registeredDate = new java.util.Date(),
-                 updatedDate = new java.util.Date())
+    CommitStatus(
+      commitStatusId = 0,
+      userName = owner,
+      repositoryName = repository,
+      commitId = "",
+      context = context,
+      state = CommitState.PENDING,
+      targetUrl = None,
+      description = Some("Waiting for status to be reported"),
+      creator = "",
+      registeredDate = new java.util.Date(),
+      updatedDate = new java.util.Date()
+    )
 }
 
 sealed abstract class CommitState(val name: String)

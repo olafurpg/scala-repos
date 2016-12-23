@@ -18,10 +18,15 @@ object MProcedure {
       _.metaData.getProcedures(namePattern.catalog_?,
                                namePattern.schema_?,
                                namePattern.name)) { r =>
-      MProcedure(MQName.from(r), r.skip.skip.skip.<<, r.nextShort match {
-        case DatabaseMetaData.procedureNoResult => Some(false)
-        case DatabaseMetaData.procedureReturnsResult => Some(true)
-        case _ => None
-      }, r.<<?)
+      MProcedure(
+        MQName.from(r),
+        r.skip.skip.skip.<<,
+        r.nextShort match {
+          case DatabaseMetaData.procedureNoResult => Some(false)
+          case DatabaseMetaData.procedureReturnsResult => Some(true)
+          case _ => None
+        },
+        r.<<?
+      )
     }
 }

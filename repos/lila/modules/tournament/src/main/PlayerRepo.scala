@@ -193,14 +193,18 @@ object PlayerRepo {
 
   private def rankPlayers(players: List[Player],
                           ranking: Ranking): RankedPlayers =
-    players.flatMap { p =>
-      ranking get p.userId map { RankedPlayer(_, p) }
-    }.sortBy(_.rank)
+    players
+      .flatMap { p =>
+        ranking get p.userId map { RankedPlayer(_, p) }
+      }
+      .sortBy(_.rank)
 
   def rankedByTourAndUserIds(tourId: String,
                              userIds: Iterable[String],
                              ranking: Ranking): Fu[RankedPlayers] =
-    byTourAndUserIds(tourId, userIds).map { rankPlayers(_, ranking) }.chronometer
+    byTourAndUserIds(tourId, userIds)
+      .map { rankPlayers(_, ranking) }
+      .chronometer
       .logIfSlow(200, logger) { players =>
         s"PlayerRepo.rankedByTourAndUserIds $tourId ${userIds.size} user IDs, ${ranking.size} ranking, ${players.size} players"
       }

@@ -27,9 +27,11 @@ import cascading.tuple.{Fields, TupleEntry}
   */
 case class TemplatePartition(partitionFields: Fields, template: String)
     extends Partition {
-  assert(partitionFields.size == "%s".r.findAllIn(template).length,
-         "Number of partition fields %s does not correspond to template (%s)"
-           .format(partitionFields, template))
+  assert(
+    partitionFields.size == "%s".r.findAllIn(template).length,
+    "Number of partition fields %s does not correspond to template (%s)"
+      .format(partitionFields, template)
+  )
 
   /** Regex pattern created from the template to extract the partition values from a path.*/
   lazy val pattern = template.replaceAll("%s", "(.*)").r.pattern

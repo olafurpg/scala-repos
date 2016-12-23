@@ -101,16 +101,18 @@ object SbtExternalSystemManager {
     val environment =
       Map.empty ++ getAndroidEnvironmentVariables(projectJdkName)
 
-    new SbtExecutionSettings(realProjectPath,
-                             vmExecutable,
-                             vmOptions,
-                             environment,
-                             customLauncher,
-                             customSbtStructureFile,
-                             projectJdkName,
-                             projectSettings.resolveClassifiers,
-                             projectSettings.resolveJavadocs,
-                             projectSettings.resolveSbtClassifiers)
+    new SbtExecutionSettings(
+      realProjectPath,
+      vmExecutable,
+      vmOptions,
+      environment,
+      customLauncher,
+      customSbtStructureFile,
+      projectJdkName,
+      projectSettings.resolveClassifiers,
+      projectSettings.resolveJavadocs,
+      projectSettings.resolveSbtClassifiers
+    )
   }
 
   private def getProjectJdkName(

@@ -116,7 +116,8 @@ class FaultHandlingDocSpec(_system: ActorSystem)
         loggers = ["akka.testkit.TestEventListener"]
         loglevel = "WARNING"
       }
-      """)))
+      """)
+      ))
 
   override def afterAll {
     TestKit.shutdownActorSystem(system)

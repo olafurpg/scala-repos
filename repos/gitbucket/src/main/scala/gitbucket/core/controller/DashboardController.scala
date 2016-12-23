@@ -109,7 +109,8 @@ trait DashboardControllerBase extends ControllerBase {
       } else
         session
           .getAs[IssueSearchCondition](key)
-          .getOrElse(IssueSearchCondition()))
+          .getOrElse(IssueSearchCondition())
+    )
 
     filter match {
       case "assigned" =>
@@ -149,7 +150,8 @@ trait DashboardControllerBase extends ControllerBase {
         case _ => condition.copy(author = Some(userName))
       },
       filter,
-      getGroupNames(userName))
+      getGroupNames(userName)
+    )
   }
 
   private def searchPullRequests(filter: String) = {
@@ -177,6 +179,7 @@ trait DashboardControllerBase extends ControllerBase {
         case _ => condition.copy(author = Some(userName))
       },
       filter,
-      getGroupNames(userName))
+      getGroupNames(userName)
+    )
   }
 }

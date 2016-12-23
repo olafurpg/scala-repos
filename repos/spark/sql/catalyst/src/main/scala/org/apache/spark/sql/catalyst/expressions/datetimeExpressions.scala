@@ -288,21 +288,27 @@ case class WeekOfYear(child: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, time => {
-      val cal = classOf[Calendar].getName
-      val c = ctx.freshName("cal")
-      ctx.addMutableState(cal,
-                          c,
-                          s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      time => {
+        val cal = classOf[Calendar].getName
+        val c = ctx.freshName("cal")
+        ctx.addMutableState(
+          cal,
+          c,
+          s"""
           $c = $cal.getInstance(java.util.TimeZone.getTimeZone("UTC"));
           $c.setFirstDayOfWeek($cal.MONDAY);
           $c.setMinimalDaysInFirstWeek(4);
-         """)
-      s"""
+         """
+        )
+        s"""
         $c.setTimeInMillis($time * 1000L * 3600L * 24L);
         ${ev.value} = $c.get($cal.WEEK_OF_YEAR);
       """
-    })
+      }
+    )
   }
 }
 
@@ -451,8 +457,11 @@ abstract class UnixTime extends BinaryExpression with ExpectsInputTypes {
         }
       case StringType =>
         val sdf = classOf[SimpleDateFormat].getName
-        nullSafeCodeGen(ctx, ev, (string, format) => {
-          s"""
+        nullSafeCodeGen(
+          ctx,
+          ev,
+          (string, format) => {
+            s"""
             try {
               ${ev.value} =
                 (new $sdf($format.toString())).parse($string.toString()).getTime() / 1000L;
@@ -460,7 +469,8 @@ abstract class UnixTime extends BinaryExpression with ExpectsInputTypes {
               ${ev.isNull} = true;
             }
           """
-        })
+          }
+        )
       case TimestampType =>
         val eval1 = left.gen(ctx)
         s"""
@@ -569,15 +579,19 @@ case class FromUnixTime(sec: Expression, format: Expression)
         """
       }
     } else {
-      nullSafeCodeGen(ctx, ev, (seconds, f) => {
-        s"""
+      nullSafeCodeGen(
+        ctx,
+        ev,
+        (seconds, f) => {
+          s"""
         try {
           ${ev.value} = UTF8String.fromString((new $sdf($f.toString())).format(
             new java.util.Date($seconds * 1000L)));
         } catch (java.lang.Throwable e) {
           ${ev.isNull} = true;
         }""".stripMargin
-      })
+        }
+      )
     }
   }
 }
@@ -637,26 +651,29 @@ case class NextDay(startDate: Expression, dayOfWeek: Expression)
   }
 
   override protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (sd, dowS) => {
-      val dateTimeUtilClass =
-        DateTimeUtils.getClass.getName.stripSuffix("$")
-      val dayOfWeekTerm = ctx.freshName("dayOfWeek")
-      if (dayOfWeek.foldable) {
-        val input = dayOfWeek.eval().asInstanceOf[UTF8String]
-        if ((input eq null) ||
-            DateTimeUtils.getDayOfWeekFromString(input) == -1) {
-          s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (sd, dowS) => {
+        val dateTimeUtilClass =
+          DateTimeUtils.getClass.getName.stripSuffix("$")
+        val dayOfWeekTerm = ctx.freshName("dayOfWeek")
+        if (dayOfWeek.foldable) {
+          val input = dayOfWeek.eval().asInstanceOf[UTF8String]
+          if ((input eq null) ||
+              DateTimeUtils.getDayOfWeekFromString(input) == -1) {
+            s"""
              |${ev.isNull} = true;
            """.stripMargin
-        } else {
-          val dayOfWeekValue =
-            DateTimeUtils.getDayOfWeekFromString(input)
-          s"""
+          } else {
+            val dayOfWeekValue =
+              DateTimeUtils.getDayOfWeekFromString(input)
+            s"""
              |${ev.value} = $dateTimeUtilClass.getNextDateForDayOfWeek($sd, $dayOfWeekValue);
            """.stripMargin
-        }
-      } else {
-        s"""
+          }
+        } else {
+          s"""
            |int $dayOfWeekTerm = $dateTimeUtilClass.getDayOfWeekFromString($dowS);
            |if ($dayOfWeekTerm == -1) {
            |  ${ev.isNull} = true;
@@ -664,8 +681,9 @@ case class NextDay(startDate: Expression, dayOfWeek: Expression)
            |  ${ev.value} = $dateTimeUtilClass.getNextDateForDayOfWeek($sd, $dayOfWeekTerm);
            |}
          """.stripMargin
+        }
       }
-    })
+    )
   }
 
   override def prettyName: String = "next_day"
@@ -973,9 +991,12 @@ case class TruncDate(date: Expression, format: Expression)
         """
       }
     } else {
-      nullSafeCodeGen(ctx, ev, (dateVal, fmt) => {
-        val form = ctx.freshName("form")
-        s"""
+      nullSafeCodeGen(
+        ctx,
+        ev,
+        (dateVal, fmt) => {
+          val form = ctx.freshName("form")
+          s"""
           int $form = $dtu.parseTruncLevel($fmt);
           if ($form == -1) {
             ${ev.isNull} = true;
@@ -983,7 +1004,8 @@ case class TruncDate(date: Expression, format: Expression)
             ${ev.value} = $dtu.truncDate($dateVal, $form);
           }
         """
-      })
+        }
+      )
     }
   }
 }

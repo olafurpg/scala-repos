@@ -180,7 +180,8 @@ abstract class GuiceBuilder[Self] protected (environment: Environment,
         // the default application loader and the Java Guice builders
         bind[play.inject.Injector].to[play.inject.DelegateInjector]
       ),
-      binderOptions)
+      binderOptions
+    )
     val enabledModules = modules.map(_.disable(disabled))
     val bindingModules =
       GuiceableModule.guiced(environment, configuration, binderOptions)(

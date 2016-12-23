@@ -29,19 +29,22 @@ trait HandleCommentService {
       case (owner, name) =>
         val userName = context.loginAccount.get.userName
 
-        val (action, recordActivity) = actionOpt.collect {
-          case "close" if (!issue.closed) =>
-            true ->
-              (Some("close") -> Some(
-                if (issue.isPullRequest) recordClosePullRequestActivity _
-                else recordCloseIssueActivity _))
-          case "reopen" if (issue.closed) =>
-            false -> (Some("reopen") -> Some(recordReopenIssueActivity _))
-        }.map {
-          case (closed, t) =>
-            updateClosed(owner, name, issue.issueId, closed)
-            t
-        }.getOrElse(None -> None)
+        val (action, recordActivity) = actionOpt
+          .collect {
+            case "close" if (!issue.closed) =>
+              true ->
+                (Some("close") -> Some(
+                  if (issue.isPullRequest) recordClosePullRequestActivity _
+                  else recordCloseIssueActivity _))
+            case "reopen" if (issue.closed) =>
+              false -> (Some("reopen") -> Some(recordReopenIssueActivity _))
+          }
+          .map {
+            case (closed, t) =>
+              updateClosed(owner, name, issue.issueId, closed)
+              t
+          }
+          .getOrElse(None -> None)
 
         val commentId = (content, action) match {
           case (None, None) => None

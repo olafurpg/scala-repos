@@ -20,9 +20,10 @@ trait BuildFileModificationLocationProvider {
                                elementType: BuildFileElementType,
                                elementCondition: PsiElement => Boolean,
                                buildFile: PsiFile): Option[PsiElement] = {
-    findLocationInFile(buildFile, module, elementType, Some(elementCondition)).map {
-      case (parent, index) => parent.getChildren.apply(index)
-    }
+    findLocationInFile(buildFile, module, elementType, Some(elementCondition))
+      .map {
+        case (parent, index) => parent.getChildren.apply(index)
+      }
   }
 
   def findLocationInFile(file: PsiFile,

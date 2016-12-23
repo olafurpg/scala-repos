@@ -114,7 +114,8 @@ object FunctionZero extends Function(0) {
  *      def apply(): String = sys.props("java.version")
  *    }
  *    assert(javaVersion() == anonfun0())
- * """)
+ * """
+    )
   override def moreMethods = ""
 }
 
@@ -128,13 +129,17 @@ object FunctionOne extends Function(1) {
 
   override def descriptiveComment =
     "  " + functionNTemplate
-      .format("succ", "anonfun1", """
+      .format(
+        "succ",
+        "anonfun1",
+        """
  *    val succ = (x: Int) => x + 1
  *    val anonfun1 = new Function1[Int, Int] {
  *      def apply(x: Int): Int = x + 1
  *    }
  *    assert(succ(0) == anonfun1(0))
- * """) + """
+ * """
+      ) + """
  *
  *  Note that the difference between `Function1` and [[scala.PartialFunction]]
  *  is that the latter can specify inputs which it will not handle."""
@@ -176,7 +181,8 @@ object FunctionTwo extends Function(2) {
  *      def apply(x: Int, y: Int): Int = if (x < y) y else x
  *    }
  *    assert(max(0, 1) == anonfun2(0, 1))
- * """)
+ * """
+    )
 }
 
 object Function {

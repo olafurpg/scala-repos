@@ -37,7 +37,8 @@ trait StaticLibrary extends Library {
     Reduction(Vector(), "forall", 0x2011),
     Reduction(Vector("std", "lib"), "sum", 0x0010),
     Reduction(Vector("ack"), "ook", 0x0011),
-    Reduction(Vector("one", "two", "three"), "qnd", 0x0012))
+    Reduction(Vector("one", "two", "three"), "qnd", 0x0012)
+  )
 
   lazy val lib1 = Set(
     Op1(Vector(), "bin", 0x0000),
@@ -48,13 +49,16 @@ trait StaticLibrary extends Library {
     Op1(Vector("std", "math"), "floor", 0x0005),
     Op1(Vector("std", "time"), "minuteOfHour", 0x0010),
     Op1(Vector("std", "time"), "hourOfDay", 0x0012),
-    Op1(Vector("std", "time"), "getMillis", 0x0014))
+    Op1(Vector("std", "time"), "getMillis", 0x0014)
+  )
 
-  lazy val lib2 = Set(Op2(Vector(), "bin2", 0x0000),
-                      Op2(Vector("std"), "bin2", 0x0001),
-                      Op2(Vector(), "bar2", 0x0002),
-                      Op2(Vector("std", "lib"), "baz2", 0x0003),
-                      Op2(Vector("std", "time"), "millisToISO", 0x0013))
+  lazy val lib2 = Set(
+    Op2(Vector(), "bin2", 0x0000),
+    Op2(Vector("std"), "bin2", 0x0001),
+    Op2(Vector(), "bar2", 0x0002),
+    Op2(Vector("std", "lib"), "baz2", 0x0003),
+    Op2(Vector("std", "time"), "millisToISO", 0x0013)
+  )
 
   lazy val libMorphism1 = Set(M1Product,
                               M1Retain,

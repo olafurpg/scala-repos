@@ -31,15 +31,18 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       val stopLatch = new TestLatch(5)
 
       val actor =
-        system.actorOf(RoundRobinPool(5).props(routeeProps = Props(new Actor {
-          def receive = {
-            case "hello" ⇒ helloLatch.countDown()
-          }
+        system.actorOf(
+          RoundRobinPool(5).props(routeeProps = Props(new Actor {
+            def receive = {
+              case "hello" ⇒ helloLatch.countDown()
+            }
 
-          override def postStop() {
-            stopLatch.countDown()
-          }
-        })), "round-robin-shutdown")
+            override def postStop() {
+              stopLatch.countDown()
+            }
+          })),
+          "round-robin-shutdown"
+        )
 
       actor ! "hello"
       actor ! "hello"
@@ -68,7 +71,8 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
             case "end" ⇒ doneLatch.countDown()
           }
         })),
-        "round-robin")
+        "round-robin"
+      )
 
       for (_ ← 1 to iterationCount; _ ← 1 to connectionCount) {
         val id = Await.result((actor ? "hit").mapTo[Int], timeout.duration)
@@ -88,15 +92,18 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       val stopLatch = new TestLatch(5)
 
       val actor =
-        system.actorOf(RoundRobinPool(5).props(routeeProps = Props(new Actor {
-          def receive = {
-            case "hello" ⇒ helloLatch.countDown()
-          }
+        system.actorOf(
+          RoundRobinPool(5).props(routeeProps = Props(new Actor {
+            def receive = {
+              case "hello" ⇒ helloLatch.countDown()
+            }
 
-          override def postStop() {
-            stopLatch.countDown()
-          }
-        })), "round-robin-broadcast")
+            override def postStop() {
+              stopLatch.countDown()
+            }
+          })),
+          "round-robin-broadcast"
+        )
 
       actor ! akka.routing.Broadcast("hello")
       Await.ready(helloLatch, 5 seconds)

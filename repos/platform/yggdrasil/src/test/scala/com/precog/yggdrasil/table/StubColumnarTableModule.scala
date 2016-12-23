@@ -85,9 +85,11 @@ trait StubColumnarTableModule[M[+ _]]
           JValue.order.toScalaOrdering.reverse
         }
 
-      tableWithSortKey.toJson.map { jvals =>
-        fromJson(jvals.toList.sortBy(_ \ "0").toStream)
-      }.map(_.transform(DerefObjectStatic(Leaf(Source), CPathField("1"))))
+      tableWithSortKey.toJson
+        .map { jvals =>
+          fromJson(jvals.toList.sortBy(_ \ "0").toStream)
+        }
+        .map(_.transform(DerefObjectStatic(Leaf(Source), CPathField("1"))))
     }
 
     override def load(apiKey: APIKey, jtpe: JType) = EitherT {

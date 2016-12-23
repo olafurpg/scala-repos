@@ -5,9 +5,12 @@ object Test extends App {
 
   def findRegionsWithSymbolType(rawSymbolInfos: Seq[SymbolInfo],
                                 symbolType: SymbolType): Set[Region] =
-    rawSymbolInfos.collect {
-      case SymbolInfo(`symbolType`, regions, _) => regions
-    }.flatten.toSet
+    rawSymbolInfos
+      .collect {
+        case SymbolInfo(`symbolType`, regions, _) => regions
+      }
+      .flatten
+      .toSet
 
   val stp = new SymbolType
   val stp2 = new SymbolType

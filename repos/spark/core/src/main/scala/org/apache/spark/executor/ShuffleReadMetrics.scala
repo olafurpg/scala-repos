@@ -51,8 +51,9 @@ class ShuffleReadMetrics private (_remoteBlocksFetched: Accumulator[Int],
       TaskMetrics.getAccum[Long](
         accumMap,
         InternalAccumulator.shuffleRead.FETCH_WAIT_TIME),
-      TaskMetrics.getAccum[Long](accumMap,
-                                 InternalAccumulator.shuffleRead.RECORDS_READ))
+      TaskMetrics
+        .getAccum[Long](accumMap, InternalAccumulator.shuffleRead.RECORDS_READ)
+    )
   }
 
   /**

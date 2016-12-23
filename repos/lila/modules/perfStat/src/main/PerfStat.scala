@@ -93,11 +93,15 @@ case class Streak(v: Int, from: Option[RatingAt], to: Option[RatingAt]) {
   def apply(cont: Boolean, pov: Pov)(v: Int) =
     cont.fold(inc(pov, v), Streak.init)
   private def inc(pov: Pov, by: Int) =
-    copy(v = v + by, from = from orElse pov.player.rating.map {
-      RatingAt(_, pov.game.createdAt, pov.gameId)
-    }, to = pov.player.ratingAfter.map {
-      RatingAt(_, pov.game.updatedAtOrCreatedAt, pov.gameId)
-    })
+    copy(
+      v = v + by,
+      from = from orElse pov.player.rating.map {
+        RatingAt(_, pov.game.createdAt, pov.gameId)
+      },
+      to = pov.player.ratingAfter.map {
+        RatingAt(_, pov.game.updatedAtOrCreatedAt, pov.gameId)
+      }
+    )
 }
 object Streak {
   val init = Streak(0, none, none)
@@ -116,22 +120,24 @@ case class Count(all: Int,
                  seconds: Int,
                  disconnects: Int) {
   def apply(pov: Pov) =
-    copy(all = all + 1,
-         rated = rated + pov.game.rated.fold(1, 0),
-         win = win + pov.win.contains(true).fold(1, 0),
-         loss = loss + pov.win.contains(false).fold(1, 0),
-         draw = draw + pov.win.isEmpty.fold(1, 0),
-         tour = tour + pov.game.isTournament.fold(1, 0),
-         berserk = berserk + pov.player.berserk.fold(1, 0),
-         opAvg = pov.opponent.stableRating.fold(opAvg)(opAvg.agg),
-         seconds = seconds +
-             (pov.game.durationSeconds match {
-             case s if s > 3 * 60 * 60 => 0
-             case s => s
-           }),
-         disconnects = disconnects + {
-           ~pov.loss && pov.game.status == chess.Status.Timeout
-         }.fold(1, 0))
+    copy(
+      all = all + 1,
+      rated = rated + pov.game.rated.fold(1, 0),
+      win = win + pov.win.contains(true).fold(1, 0),
+      loss = loss + pov.win.contains(false).fold(1, 0),
+      draw = draw + pov.win.isEmpty.fold(1, 0),
+      tour = tour + pov.game.isTournament.fold(1, 0),
+      berserk = berserk + pov.player.berserk.fold(1, 0),
+      opAvg = pov.opponent.stableRating.fold(opAvg)(opAvg.agg),
+      seconds = seconds +
+          (pov.game.durationSeconds match {
+          case s if s > 3 * 60 * 60 => 0
+          case s => s
+        }),
+      disconnects = disconnects + {
+        ~pov.loss && pov.game.status == chess.Status.Timeout
+      }.fold(1, 0)
+    )
 }
 object Count {
   val init = Count(all = 0,
@@ -153,13 +159,15 @@ case class Avg(avg: Double, pop: Int) {
 case class RatingAt(int: Int, at: DateTime, gameId: String)
 object RatingAt {
   def agg(cur: Option[RatingAt], pov: Pov, comp: Int) =
-    pov.player.stableRatingAfter.filter { r =>
-      cur.fold(true) { c =>
-        r.compare(c.int) == comp
+    pov.player.stableRatingAfter
+      .filter { r =>
+        cur.fold(true) { c =>
+          r.compare(c.int) == comp
+        }
       }
-    }.map {
-      RatingAt(_, pov.game.updatedAtOrCreatedAt, pov.game.id)
-    } orElse cur
+      .map {
+        RatingAt(_, pov.game.updatedAtOrCreatedAt, pov.game.id)
+      } orElse cur
 }
 
 case class Result(opInt: Int, opId: UserId, at: DateTime, gameId: String)

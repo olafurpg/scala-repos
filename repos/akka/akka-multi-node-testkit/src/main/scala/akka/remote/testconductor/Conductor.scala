@@ -452,7 +452,8 @@ private[akka] class Controller(private var initialParticipants: Int,
     new ConductorHandler(
       settings.QueryTimeout,
       self,
-      Logging(context.system, classOf[ConductorHandler].getName)))
+      Logging(context.system, classOf[ConductorHandler].getName))
+  )
 
   /*
    * Supervision of the BarrierCoordinator means to catch all his bad emotions

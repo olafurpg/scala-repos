@@ -11,8 +11,9 @@ trait FeatureSpecStaticStringTest extends ScalaTestTestCase {
   val featureSpecFileName = featureSpecClassName + ".scala"
 
   def addFeatureSpec() {
-    addFileToProject(featureSpecFileName,
-                     """
+    addFileToProject(
+      featureSpecFileName,
+      """
         |import org.scalatest._
         |
         |class FeatureSpecStringTest extends FeatureSpec {
@@ -35,7 +36,8 @@ trait FeatureSpecStaticStringTest extends ScalaTestTestCase {
         |   scenario("Failed " + System.currentTimeMillis()) {}
         | }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   def testFeatureSpecSumString() = {

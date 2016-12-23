@@ -34,7 +34,8 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
             | }
             |}
             |
-          """.stripMargin)
+          """.stripMargin
+    )
 
   def testComma(): Unit = {
     val testName = "TestComma"
@@ -51,7 +52,8 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                          "[root]",
                                          testName,
                                          "Special characters test should",
-                                         "Comma , " + "test"))
+                                         "Comma , " + "test")
+    )
   }
 
   def testExclamation(): Unit = {
@@ -69,7 +71,8 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                          "[root]",
                                          testName,
                                          "Special characters test should",
-                                         "! test"))
+                                         "! test")
+    )
   }
 
   def testTick(): Unit = {
@@ -87,7 +90,8 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                          "[root]",
                                          testName,
                                          "Special characters test should",
-                                         "tick ' " + "test"))
+                                         "tick ' " + "test")
+    )
   }
 
   def testBacktick(): Unit = {
@@ -105,7 +109,8 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                          "[root]",
                                          testName,
                                          "Special characters test should",
-                                         "backtick " + "` test"))
+                                         "backtick " + "` test")
+    )
   }
 
   def testTilde(): Unit = {
@@ -123,6 +128,7 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                          "[root]",
                                          testName,
                                          "Special characters test should",
-                                         "tilde ~ " + "test"))
+                                         "tilde ~ " + "test")
+    )
   }
 }

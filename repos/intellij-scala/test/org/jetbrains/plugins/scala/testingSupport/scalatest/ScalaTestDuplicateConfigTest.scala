@@ -16,7 +16,8 @@ trait ScalaTestDuplicateConfigTest extends ScalaTestTestCase {
         | }
         | "Dummy test" should "do nothing, here just for fun"{}
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
 
     runDuplicateConfigTest(
       4,

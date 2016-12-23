@@ -127,16 +127,18 @@ trait BaseBlockStoreTestModule[M[+ _]]
       slice map { s =>
         val s0 = new Slice {
           val size = s.size
-          val columns = colSelection.map { reqCols =>
-            s.columns.filter {
-              case (ref @ ColumnRef(jpath, ctype), _) =>
-                jpath.nodes.head == CPathField("key") || reqCols.exists {
-                  ref =>
-                    (CPathField("value") \ ref.selector) == jpath &&
-                    ref.ctype == ctype
-                }
+          val columns = colSelection
+            .map { reqCols =>
+              s.columns.filter {
+                case (ref @ ColumnRef(jpath, ctype), _) =>
+                  jpath.nodes.head == CPathField("key") || reqCols.exists {
+                    ref =>
+                      (CPathField("value") \ ref.selector) == jpath &&
+                      ref.ctype == ctype
+                  }
+              }
             }
-          }.getOrElse(s.columns)
+            .getOrElse(s.columns)
         }
 
         BlockProjectionData[JArray, Slice](

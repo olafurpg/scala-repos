@@ -59,12 +59,16 @@ class ChangesConfirmationDialog private (
       ActionManager.getInstance.getAction(IdeActions.ACTION_EDIT_SOURCE))
     rootPane.add(changesBrowser)
 
-    val diffDetails = new ShortDiffDetails(project, new Getter[Array[Change]] {
-      def get: Array[Change] = {
-        val selectedChanges = changesBrowser.getViewer.getSelectedChanges
-        selectedChanges.toArray(new Array[Change](selectedChanges.size))
-      }
-    }, VcsChangeDetailsManager.getInstance(project))
+    val diffDetails = new ShortDiffDetails(
+      project,
+      new Getter[Array[Change]] {
+        def get: Array[Change] = {
+          val selectedChanges = changesBrowser.getViewer.getSelectedChanges
+          selectedChanges.toArray(new Array[Change](selectedChanges.size))
+        }
+      },
+      VcsChangeDetailsManager.getInstance(project)
+    )
     diffDetails.setParent(changesBrowser)
 
     rootPane

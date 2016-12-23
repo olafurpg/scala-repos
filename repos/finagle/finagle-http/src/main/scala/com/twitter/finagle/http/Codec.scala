@@ -108,17 +108,19 @@ case class Http(
       _maxHeaderSize: StorageUnit,
       _streaming: Boolean
   ) =
-    this(_compressionLevel,
-         _maxRequestSize,
-         _maxResponseSize,
-         _decompressionEnabled,
-         _channelBufferUsageTracker,
-         _annotateCipherHeader,
-         _enableTracing,
-         _maxInitialLineLength,
-         _maxHeaderSize,
-         _streaming,
-         NullStatsReceiver)
+    this(
+      _compressionLevel,
+      _maxRequestSize,
+      _maxResponseSize,
+      _decompressionEnabled,
+      _channelBufferUsageTracker,
+      _annotateCipherHeader,
+      _enableTracing,
+      _maxInitialLineLength,
+      _maxHeaderSize,
+      _streaming,
+      NullStatsReceiver
+    )
 
   require(
     _maxRequestSize < 2.gigabytes,

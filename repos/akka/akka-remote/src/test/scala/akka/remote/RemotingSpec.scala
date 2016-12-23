@@ -214,11 +214,13 @@ class RemotingSpec
 
   override def atStartup() = {
     muteSystem(system);
-    remoteSystem.eventStream.publish(TestEvent.Mute(
-      EventFilter[EndpointException](),
-      EventFilter.error(start = "AssociationError"),
-      EventFilter.warning(pattern =
-        "received dead letter.*(InboundPayload|Disassociate|HandleListener)")))
+    remoteSystem.eventStream.publish(
+      TestEvent.Mute(
+        EventFilter[EndpointException](),
+        EventFilter.error(start = "AssociationError"),
+        EventFilter.warning(pattern =
+          "received dead letter.*(InboundPayload|Disassociate|HandleListener)")
+      ))
   }
 
   private def byteStringOfSize(size: Int) =
@@ -746,7 +748,8 @@ class RemotingSpec
             Future.successful(new Transport.AssociationEventListener {
               override def notify(ev: Transport.AssociationEvent): Unit =
                 remoteTransportProbe.ref ! ev
-            }))
+            })
+        )
 
         val outboundHandle = new TestAssociationHandle(rawLocalAddress,
                                                        rawRemoteAddress,
@@ -842,7 +845,8 @@ class RemotingSpec
             Future.successful(new Transport.AssociationEventListener {
               override def notify(ev: Transport.AssociationEvent): Unit =
                 remoteTransportProbe.ref ! ev
-            }))
+            })
+        )
 
         val outboundHandle = new TestAssociationHandle(rawLocalAddress,
                                                        rawRemoteAddress,

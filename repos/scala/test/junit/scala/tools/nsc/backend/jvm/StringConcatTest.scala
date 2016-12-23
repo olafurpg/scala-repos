@@ -84,7 +84,9 @@ class StringConcatTest extends ClearAfterClass {
         "append(Ljava/lang/StringBuffer;)Ljava/lang/StringBuilder;",
         "append(Ljava/lang/CharSequence;)Ljava/lang/StringBuilder;",
         "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;", // test that we're not using the [C overload
-        "toString()Ljava/lang/String;"))
+        "toString()Ljava/lang/String;"
+      )
+    )
 
     assertEquals(
       invokeNameDesc("t2"),
@@ -105,7 +107,9 @@ class StringConcatTest extends ClearAfterClass {
         "append(Ljava/lang/StringBuffer;)Ljava/lang/StringBuilder;",
         "append(Ljava/lang/CharSequence;)Ljava/lang/StringBuilder;",
         "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;", // test that we're not using the [C overload
-        "toString()Ljava/lang/String;"))
+        "toString()Ljava/lang/String;"
+      )
+    )
   }
 
   @Test

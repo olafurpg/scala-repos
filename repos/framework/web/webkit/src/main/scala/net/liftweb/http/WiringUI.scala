@@ -83,11 +83,10 @@ object WiringUI {
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
-  def apply[T](
-      in: NodeSeq,
-      cell: Cell[T],
-      jsEffect: (String, Boolean,
-                 JsCmd) => JsCmd)(f: T => NodeSeq => NodeSeq): NodeSeq =
+  def apply[T](in: NodeSeq,
+               cell: Cell[T],
+               jsEffect: (String, Boolean, JsCmd) => JsCmd)(
+      f: T => NodeSeq => NodeSeq): NodeSeq =
     toNode(in, cell, jsEffect)((t, ns) => f(t)(ns))
 
   /**
@@ -128,17 +127,19 @@ object WiringUI {
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
-  def toNode[T](in: NodeSeq, cell: Cell[T])(f: (T,
-                                                NodeSeq) => NodeSeq): NodeSeq =
+  def toNode[T](in: NodeSeq, cell: Cell[T])(
+      f: (T, NodeSeq) => NodeSeq): NodeSeq =
     toNode(in, cell, (id, first, js) => js)(f)
 
-  def history[T](cell: Cell[T])(f: (Box[T], T,
-                                    NodeSeq) => JsCmd): NodeSeq => NodeSeq =
+  def history[T](cell: Cell[T])(
+      f: (Box[T], T, NodeSeq) => JsCmd): NodeSeq => NodeSeq =
     in => {
-      val myElem: Elem = in.find {
-        case e: Elem => true
-        case _ => false
-      }.map(_.asInstanceOf[Elem])
+      val myElem: Elem = in
+        .find {
+          case e: Elem => true
+          case _ => false
+        }
+        .map(_.asInstanceOf[Elem])
         .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
       addHistJsFunc(cell, (old: Box[T], nw: T) => f(old, nw, in))
@@ -163,8 +164,8 @@ object WiringUI {
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
-  def toNode[T](cell: Cell[T])(f: (T,
-                                   NodeSeq) => NodeSeq): NodeSeq => NodeSeq =
+  def toNode[T](cell: Cell[T])(
+      f: (T, NodeSeq) => NodeSeq): NodeSeq => NodeSeq =
     in => toNode(in, cell, (id, first, js) => js)(f)
 
   /**
@@ -235,9 +236,9 @@ object WiringUI {
     * @return a function that will mutate the NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
-  def asText[T](cell: Cell[T],
-                jsEffect: (String, Boolean,
-                           JsCmd) => JsCmd): NodeSeq => NodeSeq =
+  def asText[T](
+      cell: Cell[T],
+      jsEffect: (String, Boolean, JsCmd) => JsCmd): NodeSeq => NodeSeq =
     in => toNode(in, cell, jsEffect)((t, ns) => Text(t.toString))
 
   /**
@@ -261,15 +262,16 @@ object WiringUI {
     * @return the mutated NodeSeq (an id attribute may be added if
     * there's none already defined)
     */
-  def toNode[T](
-      in: NodeSeq,
-      cell: Cell[T],
-      jsEffect: (String, Boolean,
-                 JsCmd) => JsCmd)(f: (T, NodeSeq) => NodeSeq): NodeSeq = {
-    val myElem: Elem = in.find {
-      case e: Elem => true
-      case _ => false
-    }.map(_.asInstanceOf[Elem])
+  def toNode[T](in: NodeSeq,
+                cell: Cell[T],
+                jsEffect: (String, Boolean, JsCmd) => JsCmd)(
+      f: (T, NodeSeq) => NodeSeq): NodeSeq = {
+    val myElem: Elem = in
+      .find {
+        case e: Elem => true
+        case _ => false
+      }
+      .map(_.asInstanceOf[Elem])
       .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
     val (elem: Elem, id: String) = Helpers.findOrAddId(myElem)
@@ -302,10 +304,12 @@ object WiringUI {
   def toNode[T](cell: Cell[T], jsEffect: (String, Boolean, JsCmd) => JsCmd)(
       f: (T, NodeSeq) => NodeSeq): NodeSeq => NodeSeq =
     in => {
-      val myElem: Elem = in.find {
-        case e: Elem => true
-        case _ => false
-      }.map(_.asInstanceOf[Elem])
+      val myElem: Elem = in
+        .find {
+          case e: Elem => true
+          case _ => false
+        }
+        .map(_.asInstanceOf[Elem])
         .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
       val (elem: Elem, id: String) = Helpers.findOrAddId(myElem)

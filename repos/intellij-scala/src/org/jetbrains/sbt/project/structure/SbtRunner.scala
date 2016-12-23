@@ -84,7 +84,8 @@ class SbtRunner(vmExecutable: File,
         s"""set SettingKey[String]("sbt-structure-options") in Global := "${options}" """,
         s"""apply -cp "${path(pluginFile)}" org.jetbrains.sbt.CreateTasks""",
         s"""*/*:dump-structure""",
-        s"""exit""")
+        s"""exit"""
+      )
 
       val processCommandsRaw =
         path(vmExecutable) +: "-Djline.terminal=jline.UnsupportedTerminal" +: "-Dsbt.log.noformat=true" +: "-Dfile.encoding=UTF-8" +:
@@ -107,11 +108,12 @@ class SbtRunner(vmExecutable: File,
             sbtCommands.foreach(writer.println)
             writer.flush()
             val result = handle(process, listener)
-            result.map { output =>
-              (structureFile.length > 0).either(
-                XML.load(structureFile.toURI.toURL))(
-                SbtException.fromSbtLog(output))
-            }.getOrElse(Left(new ImportCancelledException))
+            result
+              .map { output =>
+                (structureFile.length > 0).either(XML.load(
+                  structureFile.toURI.toURL))(SbtException.fromSbtLog(output))
+              }
+              .getOrElse(Left(new ImportCancelledException))
         }
       } catch {
         case e: Exception => Left(e)

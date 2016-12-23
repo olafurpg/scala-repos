@@ -43,7 +43,8 @@ object ClusterSingletonManagerSettings {
       role = roleOption(config.getString("role")),
       removalMargin = Duration.Zero, // defaults to ClusterSettins.DownRemovalMargin
       handOverRetryInterval =
-        config.getDuration("hand-over-retry-interval", MILLISECONDS).millis)
+        config.getDuration("hand-over-retry-interval", MILLISECONDS).millis
+    )
 
   /**
     * Java API: Create settings from the default configuration

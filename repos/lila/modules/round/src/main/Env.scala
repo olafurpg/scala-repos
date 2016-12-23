@@ -59,60 +59,70 @@ final class Env(config: Config,
 
   lazy val eventHistory = History(db(CollectionHistory)) _
 
-  val roundMap = system.actorOf(Props(new lila.hub.ActorMap {
-    def mkActor(id: String) =
-      new Round(gameId = id,
-                messenger = messenger,
-                takebacker = takebacker,
-                finisher = finisher,
-                rematcher = rematcher,
-                player = player,
-                drawer = drawer,
-                forecastApi = forecastApi,
-                socketHub = socketHub,
-                monitorMove = moveMonitor.record,
-                moretimeDuration = Moretime,
-                activeTtl = ActiveTtl)
-    def receive: Receive =
-      ({
-        case actorApi.GetNbRounds =>
-          nbRounds = size
-          system.lilaBus.publish(lila.hub.actorApi.round.NbRounds(nbRounds),
-                                 'nbRounds)
-      }: Receive) orElse actorMapReceive
-  }), name = ActorMapName)
+  val roundMap = system.actorOf(
+    Props(new lila.hub.ActorMap {
+      def mkActor(id: String) =
+        new Round(
+          gameId = id,
+          messenger = messenger,
+          takebacker = takebacker,
+          finisher = finisher,
+          rematcher = rematcher,
+          player = player,
+          drawer = drawer,
+          forecastApi = forecastApi,
+          socketHub = socketHub,
+          monitorMove = moveMonitor.record,
+          moretimeDuration = Moretime,
+          activeTtl = ActiveTtl
+        )
+      def receive: Receive =
+        ({
+          case actorApi.GetNbRounds =>
+            nbRounds = size
+            system.lilaBus.publish(lila.hub.actorApi.round.NbRounds(nbRounds),
+                                   'nbRounds)
+        }: Receive) orElse actorMapReceive
+    }),
+    name = ActorMapName
+  )
 
   private var nbRounds = 0
   def count() = nbRounds
 
   private val socketHub = {
-    val actor = system.actorOf(Props(new lila.socket.SocketHubActor[Socket] {
-      private var historyPersistenceEnabled = false
-      def mkActor(id: String) =
-        new Socket(gameId = id,
-                   history = eventHistory(id, historyPersistenceEnabled),
-                   lightUser = lightUser,
-                   uidTimeout = UidTimeout,
-                   socketTimeout = SocketTimeout,
-                   disconnectTimeout = PlayerDisconnectTimeout,
-                   ragequitTimeout = PlayerRagequitTimeout,
-                   simulActor = hub.actor.simul)
-      def receive: Receive =
-        ({
-          case msg @ lila.chat.actorApi.ChatLine(id, line) =>
-            self ! Tell(id take 8, msg)
-          case _: lila.hub.actorApi.Deploy =>
-            logger.warn("Enable history persistence")
-            historyPersistenceEnabled = true
-            // if the deploy didn't go through, cancel persistence
-            system.scheduler.scheduleOnce(10.minutes) {
-              logger.warn("Disabling round history persistence!")
-              historyPersistenceEnabled = false
-            }
-          case msg: lila.game.actorApi.StartGame =>
-            self ! Tell(msg.game.id, msg)
-        }: Receive) orElse socketHubReceive
-    }), name = SocketName)
+    val actor = system.actorOf(
+      Props(new lila.socket.SocketHubActor[Socket] {
+        private var historyPersistenceEnabled = false
+        def mkActor(id: String) =
+          new Socket(
+            gameId = id,
+            history = eventHistory(id, historyPersistenceEnabled),
+            lightUser = lightUser,
+            uidTimeout = UidTimeout,
+            socketTimeout = SocketTimeout,
+            disconnectTimeout = PlayerDisconnectTimeout,
+            ragequitTimeout = PlayerRagequitTimeout,
+            simulActor = hub.actor.simul
+          )
+        def receive: Receive =
+          ({
+            case msg @ lila.chat.actorApi.ChatLine(id, line) =>
+              self ! Tell(id take 8, msg)
+            case _: lila.hub.actorApi.Deploy =>
+              logger.warn("Enable history persistence")
+              historyPersistenceEnabled = true
+              // if the deploy didn't go through, cancel persistence
+              system.scheduler.scheduleOnce(10.minutes) {
+                logger.warn("Disabling round history persistence!")
+                historyPersistenceEnabled = false
+              }
+            case msg: lila.game.actorApi.StartGame =>
+              self ! Tell(msg.game.id, msg)
+          }: Receive) orElse socketHubReceive
+      }),
+      name = SocketName
+    )
     system.lilaBus.subscribe(actor, 'tvSelect, 'startGame, 'deploy)
     actor
   }
@@ -129,13 +139,15 @@ final class Env(config: Config,
     coll = db(CollectionForecast),
     roundMap = hub.actor.roundMap)
 
-  private lazy val finisher = new Finisher(messenger = messenger,
-                                           perfsUpdater = perfsUpdater,
-                                           crosstableApi = crosstableApi,
-                                           playban = playban,
-                                           bus = system.lilaBus,
-                                           timeline = hub.actor.timeline,
-                                           casualOnly = CasualOnly)
+  private lazy val finisher = new Finisher(
+    messenger = messenger,
+    perfsUpdater = perfsUpdater,
+    crosstableApi = crosstableApi,
+    playban = playban,
+    bus = system.lilaBus,
+    timeline = hub.actor.timeline,
+    casualOnly = CasualOnly
+  )
 
   private lazy val rematcher = new Rematcher(messenger = messenger,
                                              onStart = onStart,
@@ -166,13 +178,15 @@ final class Env(config: Config,
   private def getSocketStatus(gameId: String): Fu[SocketStatus] =
     socketHub ? Ask(gameId, GetSocketStatus) mapTo manifest[SocketStatus]
 
-  lazy val jsonView = new JsonView(chatApi = chatApi,
-                                   noteApi = noteApi,
-                                   userJsonView = userJsonView,
-                                   getSocketStatus = getSocketStatus,
-                                   canTakeback = takebacker.isAllowedByPrefs,
-                                   baseAnimationDuration = AnimationDuration,
-                                   moretimeSeconds = Moretime.toSeconds.toInt)
+  lazy val jsonView = new JsonView(
+    chatApi = chatApi,
+    noteApi = noteApi,
+    userJsonView = userJsonView,
+    getSocketStatus = getSocketStatus,
+    canTakeback = takebacker.isAllowedByPrefs,
+    baseAnimationDuration = AnimationDuration,
+    moretimeSeconds = Moretime.toSeconds.toInt
+  )
 
   lazy val noteApi = new NoteApi(db(CollectionNote))
 
@@ -202,26 +216,26 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "round" boot new Env(config = lila.common.PlayApp loadConfig "round",
-                         system = lila.common.PlayApp.system,
-                         db = lila.db.Env.current,
-                         hub = lila.hub.Env.current,
-                         fishnetPlayer = lila.fishnet.Env.current.player,
-                         aiPerfApi = lila.fishnet.Env.current.aiPerfApi,
-                         crosstableApi = lila.game.Env.current.crosstableApi,
-                         playban = lila.playban.Env.current.api,
-                         lightUser = lila.user.Env.current.lightUser,
-                         userJsonView = lila.user.Env.current.jsonView,
-                         rankingApi = lila.user.Env.current.rankingApi,
-                         uciMemo = lila.game.Env.current.uciMemo,
-                         rematch960Cache =
-                           lila.game.Env.current.cached.rematch960,
-                         isRematchCache =
-                           lila.game.Env.current.cached.isRematch,
-                         onStart = lila.game.Env.current.onStart,
-                         i18nKeys = lila.i18n.Env.current.keys,
-                         prefApi = lila.pref.Env.current.api,
-                         chatApi = lila.chat.Env.current.api,
-                         historyApi = lila.history.Env.current.api,
-                         scheduler = lila.common.PlayApp.scheduler)
+    "round" boot new Env(
+      config = lila.common.PlayApp loadConfig "round",
+      system = lila.common.PlayApp.system,
+      db = lila.db.Env.current,
+      hub = lila.hub.Env.current,
+      fishnetPlayer = lila.fishnet.Env.current.player,
+      aiPerfApi = lila.fishnet.Env.current.aiPerfApi,
+      crosstableApi = lila.game.Env.current.crosstableApi,
+      playban = lila.playban.Env.current.api,
+      lightUser = lila.user.Env.current.lightUser,
+      userJsonView = lila.user.Env.current.jsonView,
+      rankingApi = lila.user.Env.current.rankingApi,
+      uciMemo = lila.game.Env.current.uciMemo,
+      rematch960Cache = lila.game.Env.current.cached.rematch960,
+      isRematchCache = lila.game.Env.current.cached.isRematch,
+      onStart = lila.game.Env.current.onStart,
+      i18nKeys = lila.i18n.Env.current.keys,
+      prefApi = lila.pref.Env.current.api,
+      chatApi = lila.chat.Env.current.api,
+      historyApi = lila.history.Env.current.api,
+      scheduler = lila.common.PlayApp.scheduler
+    )
 }

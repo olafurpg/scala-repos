@@ -134,15 +134,19 @@ trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
     * exists at this path, an empty Config object is returned. */
   protected[this] def loadProfileConfig: Config = {
     def findConfigName(classes: Vector[Class[_]]): Option[String] =
-      classes.iterator.map { cl =>
-        val n = cl.getName
-        if (n.startsWith("slick.") && n.endsWith("Profile")) Some(n) else None
-      }.find(_.isDefined).getOrElse {
-        val parents = classes.flatMap { cl =>
-          Option(cl.getSuperclass) ++: cl.getInterfaces.toVector
+      classes.iterator
+        .map { cl =>
+          val n = cl.getName
+          if (n.startsWith("slick.") && n.endsWith("Profile")) Some(n)
+          else None
         }
-        if (parents.isEmpty) None else findConfigName(parents)
-      }
+        .find(_.isDefined)
+        .getOrElse {
+          val parents = classes.flatMap { cl =>
+            Option(cl.getSuperclass) ++: cl.getInterfaces.toVector
+          }
+          if (parents.isEmpty) None else findConfigName(parents)
+        }
     GlobalConfig.profileConfig(findConfigName(Vector(getClass)).get)
   }
 

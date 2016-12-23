@@ -21,12 +21,15 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
   private def sourceInputStream(cls: Class[_]): Option[java.io.InputStream] = {
     val filename = cls.getName.split('$').head.replace(".", "/") + ".java"
-    sourceJars.map { sourceJar =>
-      sourceJar.getJarEntry(filename) match {
-        case null => Nil
-        case entry => List(sourceJar.getInputStream(entry))
+    sourceJars
+      .map { sourceJar =>
+        sourceJar.getJarEntry(filename) match {
+          case null => Nil
+          case entry => List(sourceJar.getInputStream(entry))
+        }
       }
-    }.flatten.headOption
+      .flatten
+      .headOption
   }
 
   private def sourceExists(cls: Class[_]) = sourceInputStream(cls).isDefined
@@ -60,17 +63,21 @@ object AndroidClassExtractor extends JavaConversionHelpers {
       .map(toScalaType)
       .filter(_.name.startsWith("android"))
 
-    val superProps: Set[String] = superClass.map {
-      Introspector
-        .getBeanInfo(_)
-        .getPropertyDescriptors
-        .map(propDescSignature)
-        .toSet[String]
-    }.getOrElse(Set())
+    val superProps: Set[String] = superClass
+      .map {
+        Introspector
+          .getBeanInfo(_)
+          .getPropertyDescriptors
+          .map(propDescSignature)
+          .toSet[String]
+      }
+      .getOrElse(Set())
 
-    val superMethods: Set[String] = superClass.map {
-      _.getMethods.map(methodSignature).toSet
-    }.getOrElse(Set())
+    val superMethods: Set[String] = superClass
+      .map {
+        _.getMethods.map(methodSignature).toSet
+      }
+      .getOrElse(Set())
 
     def toAndroidMethod(m: Method): AndroidMethod = {
       val name = m.getName
@@ -125,21 +132,23 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
     val props: List[AndroidProperty] = {
       val clsMethods = cls.getMethods
-      val accessors = clsMethods.filter { m =>
-        val name = m.getName
-        val arity = m.getParameterTypes.length
-        !superMethods(methodSignature(m)) &&
-        ((arity == 0 && isGetter(name)) || (arity == 1 && isSetter(name)))
-      }.filter { m =>
-        (!cls.getName.endsWith("Service") ||
-        !m.getName.equals("setForeground")) &&
-        // Android 2.1.1 has a weird undocumented method. manually ignore this.
-        (!cls.getName.endsWith("WebView") ||
-        !m.getName.equals("getZoomControls")) &&
-        //https://github.com/pocorall/scaloid/issues/56
-        (!cls.getName.endsWith("View") ||
-        !m.getName.equals("setBackground")) // manually specifies this method
-      }
+      val accessors = clsMethods
+        .filter { m =>
+          val name = m.getName
+          val arity = m.getParameterTypes.length
+          !superMethods(methodSignature(m)) &&
+          ((arity == 0 && isGetter(name)) || (arity == 1 && isSetter(name)))
+        }
+        .filter { m =>
+          (!cls.getName.endsWith("Service") ||
+          !m.getName.equals("setForeground")) &&
+          // Android 2.1.1 has a weird undocumented method. manually ignore this.
+          (!cls.getName.endsWith("WebView") ||
+          !m.getName.equals("getZoomControls")) &&
+          //https://github.com/pocorall/scaloid/issues/56
+          (!cls.getName.endsWith("View") ||
+          !m.getName.equals("setBackground")) // manually specifies this method
+        }
 
       val allMethodNames = clsMethods.map(_.getName).toSet
 
@@ -147,9 +156,11 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         .groupBy(m => propName(m.getName))
         .map {
           case (name, methods) =>
-            val (_setters, _getters) = methods.filter {
-              !_.toGenericString.contains("static")
-            }.partition(_.getName.startsWith("set"))
+            val (_setters, _getters) = methods
+              .filter {
+                !_.toGenericString.contains("static")
+              }
+              .partition(_.getName.startsWith("set"))
             val setters =
               _setters.map(toAndroidMethod).sortBy(_.argTypes.head.name).toList
             val getter = _getters.map(toAndroidMethod).headOption
@@ -238,21 +249,23 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         }
       }
 
-      callbackMethods.map { cm =>
-        AndroidListener(
-          listenerName(cm, androidCallbackMethods, setter),
-          callbackMethods.find(_.name == cm.name).get.retType,
-          cm.argTypes,
-          cm.argTypes.nonEmpty,
-          setter,
-          setterArgTypes.map(toScalaType),
-          toScalaType(listenerCls).name,
-          androidCallbackMethods.map { icm =>
-            if (icm.name == cm.name) icm.copy(hasBody = true) else icm
-          },
-          cm.isDeprecated
-        )
-      }.filter(_.isSafe)
+      callbackMethods
+        .map { cm =>
+          AndroidListener(
+            listenerName(cm, androidCallbackMethods, setter),
+            callbackMethods.find(_.name == cm.name).get.retType,
+            cm.argTypes,
+            cm.argTypes.nonEmpty,
+            setter,
+            setterArgTypes.map(toScalaType),
+            toScalaType(listenerCls).name,
+            androidCallbackMethods.map { icm =>
+              if (icm.name == cm.name) icm.copy(hasBody = true) else icm
+            },
+            cm.isDeprecated
+          )
+        }
+        .filter(_.isSafe)
     }
 
     def resolveListenerDuplication(listeners: List[AndroidListener]) =
@@ -292,12 +305,14 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
     // Find constructor not by fully qualified name
     def looseConstructorLookup(types: List[String]): Option[List[String]] =
-      constructorNames.find {
-        case (key, _) =>
-          types.zip(key).forall {
-            case (t, k) => t.endsWith(k)
-          }
-      }.map(_._2)
+      constructorNames
+        .find {
+          case (key, _) =>
+            types.zip(key).forall {
+              case (t, k) => t.endsWith(k)
+            }
+        }
+        .map(_._2)
 
     def toScalaConstructor(cons: Constructor[_]): ScalaConstructor = {
 

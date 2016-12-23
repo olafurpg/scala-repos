@@ -63,13 +63,15 @@ case class Simul(_id: Simul.ID,
   def startable = isCreated && applicants.count(_.accepted) > 1
 
   def start =
-    startable option copy(status = SimulStatus.Started,
-                          startedAt = DateTime.now.some,
-                          applicants = Nil,
-                          pairings = applicants collect {
-                            case a if a.accepted => SimulPairing(a.player)
-                          },
-                          hostSeenAt = none)
+    startable option copy(
+      status = SimulStatus.Started,
+      startedAt = DateTime.now.some,
+      applicants = Nil,
+      pairings = applicants collect {
+        case a if a.accepted => SimulPairing(a.player)
+      },
+      hostSeenAt = none
+    )
 
   def updatePairing(gameId: String, f: SimulPairing => SimulPairing) =
     copy(pairings = pairings collect {
@@ -145,5 +147,6 @@ object Simul {
       startedAt = none,
       finishedAt = none,
       hostSeenAt = DateTime.now.some,
-      color = color.some)
+      color = color.some
+    )
 }

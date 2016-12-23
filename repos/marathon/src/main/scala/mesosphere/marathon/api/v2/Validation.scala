@@ -50,18 +50,21 @@ object Validation {
   }
 
   implicit lazy val failureWrites: Writes[Failure] = Writes { f =>
-    Json.obj("message" -> "Object is not valid", "details" -> {
-      f.violations
-        .flatMap(allRuleViolationsWithFullDescription(_))
-        .groupBy(_.description)
-        .map {
-          case (description, ruleViolation) =>
-            Json.obj(
-              "path" -> description,
-              "errors" -> ruleViolation.map(r => JsString(r.constraint))
-            )
-        }
-    })
+    Json.obj(
+      "message" -> "Object is not valid",
+      "details" -> {
+        f.violations
+          .flatMap(allRuleViolationsWithFullDescription(_))
+          .groupBy(_.description)
+          .map {
+            case (description, ruleViolation) =>
+              Json.obj(
+                "path" -> description,
+                "errors" -> ruleViolation.map(r => JsString(r.constraint))
+              )
+          }
+      }
+    )
   }
 
   def allRuleViolationsWithFullDescription(

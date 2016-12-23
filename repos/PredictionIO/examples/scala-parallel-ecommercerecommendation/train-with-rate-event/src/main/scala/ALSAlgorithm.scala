@@ -60,55 +60,65 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   @transient lazy val lEventsDb = Storage.getLEvents()
 
   def train(sc: SparkContext, data: PreparedData): ALSModel = {
-    require(!data.rateEvents.take(1).isEmpty, // MODIFIED
-            s"rateEvents in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
-    require(!data.users.take(1).isEmpty,
-            s"users in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
-    require(!data.items.take(1).isEmpty,
-            s"items in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
+    require(
+      !data.rateEvents.take(1).isEmpty, // MODIFIED
+      s"rateEvents in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly."
+    )
+    require(
+      !data.users.take(1).isEmpty,
+      s"users in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly."
+    )
+    require(
+      !data.items.take(1).isEmpty,
+      s"items in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly."
+    )
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
 
     val mllibRatings = data.rateEvents // MODIFIED
-    .map { r =>
-      // Convert user and item String IDs to Int index for MLlib
-      val uindex = userStringIntMap.getOrElse(r.user, -1)
-      val iindex = itemStringIntMap.getOrElse(r.item, -1)
+      .map { r =>
+        // Convert user and item String IDs to Int index for MLlib
+        val uindex = userStringIntMap.getOrElse(r.user, -1)
+        val iindex = itemStringIntMap.getOrElse(r.item, -1)
 
-      if (uindex == -1)
-        logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
-          " to Int index.")
+        if (uindex == -1)
+          logger.info(s"Couldn't convert nonexistent user ID ${r.user}" +
+            " to Int index.")
 
-      if (iindex == -1)
-        logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
-          " to Int index.")
+        if (iindex == -1)
+          logger.info(s"Couldn't convert nonexistent item ID ${r.item}" +
+            " to Int index.")
 
-      ((uindex, iindex), (r.rating, r.t)) // MODIFIED
-    }.filter {
-      case ((u, i), v) =>
-        // keep events with valid user and item index
-        (u != -1) && (i != -1)
-    }.reduceByKey {
-      case (v1, v2) => // MODIFIED
-        // if a user may rate same item with different value at different times,
-        // use the latest value for this case.
-        // Can remove this reduceByKey() if no need to support this case.
-        val (rating1, t1) = v1
-        val (rating2, t2) = v2
-        // keep the latest value
-        if (t1 > t2) v1 else v2
-    }.map {
-      case ((u, i), (rating, t)) => // MODIFIED
-        // MLlibRating requires integer index for user and item
-        MLlibRating(u, i, rating) // MODIFIED
-    }.cache()
+        ((uindex, iindex), (r.rating, r.t)) // MODIFIED
+      }
+      .filter {
+        case ((u, i), v) =>
+          // keep events with valid user and item index
+          (u != -1) && (i != -1)
+      }
+      .reduceByKey {
+        case (v1, v2) => // MODIFIED
+          // if a user may rate same item with different value at different times,
+          // use the latest value for this case.
+          // Can remove this reduceByKey() if no need to support this case.
+          val (rating1, t1) = v1
+          val (rating2, t2) = v2
+          // keep the latest value
+          if (t1 > t2) v1 else v2
+      }
+      .map {
+        case ((u, i), (rating, t)) => // MODIFIED
+          // MLlibRating requires integer index for user and item
+          MLlibRating(u, i, rating) // MODIFIED
+      }
+      .cache()
 
     // MLLib ALS cannot handle empty training data.
     require(!mllibRatings.take(1).isEmpty,
@@ -179,16 +189,18 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
           }
         }
 
-        seenEvents.map { event =>
-          try {
-            event.targetEntityId.get
-          } catch {
-            case e => {
-              logger.error(s"Can't get targetEntityId of event ${event}.")
-              throw e
+        seenEvents
+          .map { event =>
+            try {
+              event.targetEntityId.get
+            } catch {
+              case e => {
+                logger.error(s"Can't get targetEntityId of event ${event}.")
+                throw e
+              }
             }
           }
-        }.toSet
+          .toSet
       } else {
         Set[String]()
       }
@@ -237,22 +249,24 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         val uf = userFeature.get
         val indexScores: Map[Int, Double] =
           productFeatures.par // convert to parallel collection
-          .filter {
-            case (i, (item, feature)) =>
-              feature.isDefined && isCandidateItem(
-                i = i,
-                item = item,
-                categories = query.categories,
-                whiteList = whiteList,
-                blackList = finalBlackList
-              )
-          }.map {
-            case (i, (item, feature)) =>
-              // NOTE: feature must be defined, so can call .get
-              val s = dotProduct(uf, feature.get)
-              // Can adjust score here
-              (i, s)
-          }.filter(_._2 > 0) // only keep items with score > 0
+            .filter {
+              case (i, (item, feature)) =>
+                feature.isDefined && isCandidateItem(
+                  i = i,
+                  item = item,
+                  categories = query.categories,
+                  whiteList = whiteList,
+                  blackList = finalBlackList
+                )
+            }
+            .map {
+              case (i, (item, feature)) =>
+                // NOTE: feature must be defined, so can call .get
+                val s = dotProduct(uf, feature.get)
+                // Can adjust score here
+                (i, s)
+            }
+            .filter(_._2 > 0) // only keep items with score > 0
             .seq // convert back to sequential collection
 
         val ord = Ordering.by[(Int, Double), Double](_._2).reverse
@@ -312,25 +326,28 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       }
     }
 
-    val recentItems: Set[String] = recentEvents.map { event =>
-      try {
-        event.targetEntityId.get
-      } catch {
-        case e => {
-          logger.error("Can't get targetEntityId of event ${event}.")
-          throw e
+    val recentItems: Set[String] = recentEvents
+      .map { event =>
+        try {
+          event.targetEntityId.get
+        } catch {
+          case e => {
+            logger.error("Can't get targetEntityId of event ${event}.")
+            throw e
+          }
         }
       }
-    }.toSet
+      .toSet
 
     val recentList: Set[Int] =
       recentItems.map(x => model.itemStringIntMap.get(x)).flatten
 
     val recentFeatures: Vector[Array[Double]] = recentList.toVector
     // productFeatures may not contain the requested item
-    .map { i =>
-      productFeatures.get(i).map { case (item, f) => f }.flatten
-    }.flatten
+      .map { i =>
+        productFeatures.get(i).map { case (item, f) => f }.flatten
+      }
+      .flatten
 
     val indexScores: Map[Int, Double] =
       if (recentFeatures.isEmpty) {
@@ -339,23 +356,27 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         Map[Int, Double]()
       } else {
         productFeatures.par // convert to parallel collection
-        .filter {
-          case (i, (item, feature)) =>
-            feature.isDefined && isCandidateItem(
-              i = i,
-              item = item,
-              categories = query.categories,
-              whiteList = whiteList,
-              blackList = blackList
-            )
-        }.map {
-          case (i, (item, feature)) =>
-            val s = recentFeatures.map { rf =>
-              cosine(rf, feature.get) // feature is defined
-            }.reduce(_ + _)
-            // Can adjust score here
-            (i, s)
-        }.filter(_._2 > 0) // keep items with score > 0
+          .filter {
+            case (i, (item, feature)) =>
+              feature.isDefined && isCandidateItem(
+                i = i,
+                item = item,
+                categories = query.categories,
+                whiteList = whiteList,
+                blackList = blackList
+              )
+          }
+          .map {
+            case (i, (item, feature)) =>
+              val s = recentFeatures
+                .map { rf =>
+                  cosine(rf, feature.get) // feature is defined
+                }
+                .reduce(_ + _)
+              // Can adjust score here
+              (i, s)
+          }
+          .filter(_._2 > 0) // keep items with score > 0
           .seq // convert back to sequential collection
       }
 
@@ -421,11 +442,15 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     // can add other custom filtering here
     whiteList.map(_.contains(i)).getOrElse(true) && !blackList.contains(i) &&
     // filter categories
-    categories.map { cat =>
-      item.categories.map { itemCat =>
-        // keep this item if has ovelap categories with the query
-        !(itemCat.toSet.intersect(cat).isEmpty)
-      }.getOrElse(false) // discard this item if it has no categories
-    }.getOrElse(true)
+    categories
+      .map { cat =>
+        item.categories
+          .map { itemCat =>
+            // keep this item if has ovelap categories with the query
+            !(itemCat.toSet.intersect(cat).isEmpty)
+          }
+          .getOrElse(false) // discard this item if it has no categories
+      }
+      .getOrElse(true)
   }
 }

@@ -601,7 +601,8 @@ class UriSpec extends WordSpec with Matchers {
       the[IllegalUriException] thrownBy Uri("http://user:ö@host") shouldBe {
         IllegalUriException(
           "Illegal URI reference: Invalid input 'ö', expected userinfo-char, pct-encoded, '@' or port (line 1, column 13)",
-          "http://user:ö@host\n" + "            ^")
+          "http://user:ö@host\n" + "            ^"
+        )
       }
 
       // illegal percent-encoding
@@ -617,7 +618,8 @@ class UriSpec extends WordSpec with Matchers {
         IllegalUriException(
           "Illegal URI reference: Invalid input ' ', expected '/', 'EOI', '#', '?' or pchar (line 1, column 28)",
           "http://www.example.com/name with spaces/\n" +
-            "                           ^")
+            "                           ^"
+        )
       }
 
       // illegal path with control character

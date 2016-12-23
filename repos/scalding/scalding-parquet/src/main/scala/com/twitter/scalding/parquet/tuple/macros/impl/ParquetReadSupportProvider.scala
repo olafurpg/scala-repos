@@ -18,10 +18,12 @@ object ParquetReadSupportProvider {
     import ctx.universe._
 
     if (!IsCaseClassImpl.isCaseClassType(ctx)(T.tpe))
-      ctx.abort(ctx.enclosingPosition,
-                s"""We cannot enforce ${T.tpe} is a case class,
+      ctx.abort(
+        ctx.enclosingPosition,
+        s"""We cannot enforce ${T.tpe} is a case class,
             either it is not a case class or this macro call is possibly enclosed in a class.
-            This will mean the macro is operating on a non-resolved type.""")
+            This will mean the macro is operating on a non-resolved type."""
+      )
 
     def buildGroupConverter(tpe: Type,
                             converters: List[Tree],
@@ -200,13 +202,17 @@ object ParquetReadSupportProvider {
     }
 
     def expandMethod(outerTpe: Type): List[(Tree, Tree, Tree, Tree)] =
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.zipWithIndex.map {
-        case (accessorMethod, idx) =>
-          val fieldType = accessorMethod.returnType
-          matchField(idx, fieldType, NOT_A_COLLECTION)
-      }.toList
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .zipWithIndex
+        .map {
+          case (accessorMethod, idx) =>
+            val fieldType = accessorMethod.returnType
+            matchField(idx, fieldType, NOT_A_COLLECTION)
+        }
+        .toList
 
     def unzip(treeTuples: List[(Tree, Tree, Tree, Tree)])
       : (List[Tree], List[Tree], List[Tree], List[Tree]) = {

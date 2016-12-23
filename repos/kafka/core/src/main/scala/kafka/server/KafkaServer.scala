@@ -418,15 +418,17 @@ class KafkaServer(val config: KafkaConfig,
                                  LoginType.SERVER,
                                  config.values)
         )
-        new NetworkClient(selector,
-                          metadataUpdater,
-                          config.brokerId.toString,
-                          1,
-                          0,
-                          Selectable.USE_DEFAULT_BUFFER_SIZE,
-                          Selectable.USE_DEFAULT_BUFFER_SIZE,
-                          config.requestTimeoutMs,
-                          kafkaMetricsTime)
+        new NetworkClient(
+          selector,
+          metadataUpdater,
+          config.brokerId.toString,
+          1,
+          0,
+          Selectable.USE_DEFAULT_BUFFER_SIZE,
+          Selectable.USE_DEFAULT_BUFFER_SIZE,
+          config.requestTimeoutMs,
+          kafkaMetricsTime
+        )
       }
 
       var shutdownSucceeded: Boolean = false
@@ -553,7 +555,8 @@ class KafkaServer(val config: KafkaConfig,
                     .port,
                   BlockingChannel.UseDefaultBufferSize,
                   BlockingChannel.UseDefaultBufferSize,
-                  config.controllerSocketTimeoutMs)
+                  config.controllerSocketTimeoutMs
+                )
                 channel.connect()
                 prevController = broker
               }
@@ -713,19 +716,21 @@ class KafkaServer(val config: KafkaConfig,
       maxMessageSize = config.messageMaxBytes,
       maxIoBytesPerSecond = config.logCleanerIoMaxBytesPerSecond,
       backOffMs = config.logCleanerBackoffMs,
-      enableCleaner = config.logCleanerEnable)
-    new LogManager(logDirs = config.logDirs.map(new File(_)).toArray,
-                   topicConfigs = configs,
-                   defaultConfig = defaultLogConfig,
-                   cleanerConfig = cleanerConfig,
-                   ioThreads = config.numRecoveryThreadsPerDataDir,
-                   flushCheckMs = config.logFlushSchedulerIntervalMs,
-                   flushCheckpointMs =
-                     config.logFlushOffsetCheckpointIntervalMs,
-                   retentionCheckMs = config.logCleanupIntervalMs,
-                   scheduler = kafkaScheduler,
-                   brokerState = brokerState,
-                   time = time)
+      enableCleaner = config.logCleanerEnable
+    )
+    new LogManager(
+      logDirs = config.logDirs.map(new File(_)).toArray,
+      topicConfigs = configs,
+      defaultConfig = defaultLogConfig,
+      cleanerConfig = cleanerConfig,
+      ioThreads = config.numRecoveryThreadsPerDataDir,
+      flushCheckMs = config.logFlushSchedulerIntervalMs,
+      flushCheckpointMs = config.logFlushOffsetCheckpointIntervalMs,
+      retentionCheckMs = config.logCleanupIntervalMs,
+      scheduler = kafkaScheduler,
+      brokerState = brokerState,
+      time = time
+    )
   }
 
   /**

@@ -349,7 +349,8 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
         case e: CertPathValidatorException =>
           logger.warn(
             "You are using ws.ssl.default=true and have a weak certificate in your default trust store!  (You can modify ws.ssl.disabledKeyAlgorithms to remove this message.)",
-            e)
+            e
+          )
       }
     }
   }

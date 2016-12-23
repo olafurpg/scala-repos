@@ -45,13 +45,15 @@ trait CompactSpec[M[+ _]]
     case cTable: ColumnarTable =>
       val slices = cTable.slices.toStream.copoint
       val sizes = slices.map(_.size).toList
-      val undefined = slices.map { slice =>
-        (0 until slice.size).foldLeft(0) {
-          case (acc, i) =>
-            if (!slice.columns.values.exists(_.isDefinedAt(i))) acc + 1
-            else acc
+      val undefined = slices
+        .map { slice =>
+          (0 until slice.size).foldLeft(0) {
+            case (acc, i) =>
+              if (!slice.columns.values.exists(_.isDefinedAt(i))) acc + 1
+              else acc
+          }
         }
-      }.toList
+        .toList
 
       sizes zip undefined
   }
@@ -129,9 +131,11 @@ trait CompactSpec[M[+ _]]
             if (numSlices > 1 && Random.nextDouble < 0.25)
               (col |> cf.util.filter(0, slice.size, new BitSet)).get
             else {
-              val retained = (0 until slice.size).map { (x: Int) =>
-                if (scala.util.Random.nextDouble < 0.75) Some(x) else None
-              }.flatten
+              val retained = (0 until slice.size)
+                .map { (x: Int) =>
+                  if (scala.util.Random.nextDouble < 0.75) Some(x) else None
+                }
+                .flatten
               (col |> cf.util.filter(0,
                                      slice.size,
                                      BitSetUtil.create(retained))).get

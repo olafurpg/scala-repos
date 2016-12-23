@@ -112,13 +112,17 @@ case class Like(left: Expression, right: Expression)
         """
       }
     } else {
-      nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
-        s"""
+      nullSafeCodeGen(
+        ctx,
+        ev,
+        (eval1, eval2) => {
+          s"""
           String rightStr = ${eval2}.toString();
           ${patternClass} $pattern = ${patternClass}.compile($escapeFunc(rightStr));
           ${ev.value} = $pattern.matcher(${eval1}.toString()).matches();
         """
-      })
+        }
+      )
     }
   }
 }
@@ -163,13 +167,17 @@ case class RLike(left: Expression, right: Expression)
         """
       }
     } else {
-      nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
-        s"""
+      nullSafeCodeGen(
+        ctx,
+        ev,
+        (eval1, eval2) => {
+          s"""
           String rightStr = ${eval2}.toString();
           ${patternClass} $pattern = ${patternClass}.compile(rightStr);
           ${ev.value} = $pattern.matcher(${eval1}.toString()).find(0);
         """
-      })
+        }
+      )
     }
   }
 }
@@ -199,7 +207,8 @@ case class StringSplit(str: Expression, pattern: Expression)
       ev,
       (str, pattern) =>
         // Array in java is covariant, so we don't need to cast UTF8String[] to Object[].
-        s"""${ev.value} = new $arrayClass($str.split($pattern, -1));""")
+        s"""${ev.value} = new $arrayClass($str.split($pattern, -1));"""
+    )
   }
 
   override def prettyName: String = "split"
@@ -283,8 +292,11 @@ case class RegExpReplace(subject: Expression,
                         termResult,
                         s"${termResult} = new $classNameStringBuffer();")
 
-    nullSafeCodeGen(ctx, ev, (subject, regexp, rep) => {
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (subject, regexp, rep) => {
+        s"""
       if (!$regexp.equals(${termLastRegex})) {
         // regex value changed
         ${termLastRegex} = $regexp.clone();
@@ -305,7 +317,8 @@ case class RegExpReplace(subject: Expression,
       ${ev.value} = UTF8String.fromString(${termResult}.toString());
       ${ev.isNull} = false;
     """
-    })
+      }
+    )
   }
 }
 
@@ -359,8 +372,11 @@ case class RegExpExtract(subject: Expression,
                         termPattern,
                         s"${termPattern} = null;")
 
-    nullSafeCodeGen(ctx, ev, (subject, regexp, idx) => {
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (subject, regexp, idx) => {
+        s"""
       if (!$regexp.equals(${termLastRegex})) {
         // regex value changed
         ${termLastRegex} = $regexp.clone();
@@ -376,6 +392,7 @@ case class RegExpExtract(subject: Expression,
         ${ev.value} = UTF8String.EMPTY_UTF8;
         ${ev.isNull} = false;
       }"""
-    })
+      }
+    )
   }
 }

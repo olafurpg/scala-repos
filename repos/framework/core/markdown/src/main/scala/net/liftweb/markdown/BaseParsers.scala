@@ -246,7 +246,8 @@ trait BaseParsers extends RegexParsers {
     '\u2C00' -> '\u2FEF',
     '\u3001' -> '\uD7FF',
     '\uF900' -> '\uFDCF',
-    '\uFDF0' -> '\uFFFD') //'\u10000' -> '\uEFFFF'
+    '\uFDF0' -> '\uFFFD'
+  ) //'\u10000' -> '\uEFFFF'
 
   val xmlNameCharRanges: SortedMap[Char, Char] =
     xmlNameStartCharRanges ++ SortedMap('-' -> '-',

@@ -279,19 +279,21 @@ object ScalaReflection extends ScalaReflection {
             case _ => None
           }
 
-          primitiveMethod.map { method =>
-            Invoke(getPath, method, arrayClassFor(elementType))
-          }.getOrElse {
-            val className = getClassNameFromType(elementType)
-            val newTypePath =
-              s"""- array element class: "$className"""" +: walkedTypePath
-            Invoke(MapObjects(
-                     p => constructorFor(elementType, Some(p), newTypePath),
-                     getPath,
-                     schemaFor(elementType).dataType),
-                   "array",
-                   arrayClassFor(elementType))
-          }
+          primitiveMethod
+            .map { method =>
+              Invoke(getPath, method, arrayClassFor(elementType))
+            }
+            .getOrElse {
+              val className = getClassNameFromType(elementType)
+              val newTypePath =
+                s"""- array element class: "$className"""" +: walkedTypePath
+              Invoke(MapObjects(
+                       p => constructorFor(elementType, Some(p), newTypePath),
+                       getPath,
+                       schemaFor(elementType).dataType),
+                     "array",
+                     arrayClassFor(elementType))
+            }
 
         case t if t <:< localTypeOf[Seq[_]] =>
           val TypeRef(_, _, Seq(elementType)) = t
@@ -329,17 +331,21 @@ object ScalaReflection extends ScalaReflection {
                               ArrayType(schemaFor(keyType).dataType)),
                        schemaFor(keyType).dataType),
             "array",
-            ObjectType(classOf[Array[Any]]))
+            ObjectType(classOf[Array[Any]])
+          )
 
           val valueData =
-            Invoke(MapObjects(
-                     p => constructorFor(valueType, Some(p), walkedTypePath),
-                     Invoke(getPath,
-                            "valueArray",
-                            ArrayType(schemaFor(valueType).dataType)),
-                     schemaFor(valueType).dataType),
-                   "array",
-                   ObjectType(classOf[Array[Any]]))
+            Invoke(
+              MapObjects(
+                p => constructorFor(valueType, Some(p), walkedTypePath),
+                Invoke(getPath,
+                       "valueArray",
+                       ArrayType(schemaFor(valueType).dataType)),
+                schemaFor(valueType).dataType
+              ),
+              "array",
+              ObjectType(classOf[Array[Any]])
+            )
 
           StaticInvoke(ArrayBasedMapData.getClass,
                        ObjectType(classOf[Map[_, _]]),
@@ -403,7 +409,8 @@ object ScalaReflection extends ScalaReflection {
             udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt(),
             Nil,
             dataType = ObjectType(
-              udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt()))
+              udt.userClass.getAnnotation(classOf[SQLUserDefinedType]).udt())
+          )
           Invoke(obj, "deserialize", ObjectType(udt.userClass), getPath :: Nil)
       }
     }
@@ -634,7 +641,8 @@ object ScalaReflection extends ScalaReflection {
               dataType = ObjectType(
                 udt.userClass
                   .getAnnotation(classOf[SQLUserDefinedType])
-                  .udt()))
+                  .udt())
+            )
             Invoke(obj, "serialize", udt.sqlType, inputObject :: Nil)
 
           case other =>
@@ -765,11 +773,14 @@ trait ScalaReflection {
                nullable = true)
       case t if t <:< localTypeOf[Product] =>
         val params = getConstructorParameters(t)
-        Schema(StructType(params.map {
-          case (fieldName, fieldType) =>
-            val Schema(dataType, nullable) = schemaFor(fieldType)
-            StructField(fieldName, dataType, nullable)
-        }), nullable = true)
+        Schema(
+          StructType(params.map {
+            case (fieldName, fieldType) =>
+              val Schema(dataType, nullable) = schemaFor(fieldType)
+              StructField(fieldName, dataType, nullable)
+          }),
+          nullable = true
+        )
       case t if t <:< localTypeOf[String] =>
         Schema(StringType, nullable = true)
       case t if t <:< localTypeOf[java.sql.Timestamp] =>

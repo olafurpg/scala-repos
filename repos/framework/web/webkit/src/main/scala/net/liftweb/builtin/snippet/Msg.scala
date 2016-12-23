@@ -99,7 +99,8 @@ object Msg extends DispatchSnippet {
     val msgs: List[NodeSeq] = List(
       (S.messagesById(id)(S.errors), MsgErrorMeta.get.get(id)),
       (S.messagesById(id)(S.warnings), MsgWarningMeta.get.get(id)),
-      (S.messagesById(id)(S.notices), MsgNoticeMeta.get.get(id))).flatMap {
+      (S.messagesById(id)(S.notices), MsgNoticeMeta.get.get(id))
+    ).flatMap {
       case (msg, style) =>
         msg.toList match {
           case Nil => Nil

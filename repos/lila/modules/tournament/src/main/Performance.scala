@@ -13,9 +13,11 @@ private final class Performance {
     else {
       val opponentIds = pairings.flatMap(_ opponentOf player.userId).distinct
       PlayerRepo.byTourAndUserIds(tour.id, opponentIds) flatMap { opponents =>
-        val ratingMap = opponents.map { o =>
-          o.userId -> o.finalRating
-        }.toMap
+        val ratingMap = opponents
+          .map { o =>
+            o.userId -> o.finalRating
+          }
+          .toMap
         val performance =
           pairings.foldLeft(0) {
             case (acc, pairing) =>

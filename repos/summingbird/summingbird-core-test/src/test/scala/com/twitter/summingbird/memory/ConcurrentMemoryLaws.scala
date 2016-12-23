@@ -238,12 +238,15 @@ class ConcurrentMemoryLaws extends WordSpec {
         new ConcurrentHashMap[Int, Int]()
       val sink: ConcurrentMemory#Sink[Int] = new LinkedBlockingQueue[Int]()
 
-      val summed = source.map { v =>
-        (v, v)
-      }.sumByKey(store).map {
-        case (_, (None, currentEvent)) => currentEvent
-        case (_, (Some(old), currentEvent)) => old + currentEvent
-      }
+      val summed = source
+        .map { v =>
+          (v, v)
+        }
+        .sumByKey(store)
+        .map {
+          case (_, (None, currentEvent)) => currentEvent
+          case (_, (Some(old), currentEvent)) => old + currentEvent
+        }
 
       val write1 = summed.write(sink)
       val write2 = summed.write(sink)

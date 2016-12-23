@@ -92,7 +92,8 @@ trait ScalacPatternExpanders {
           val name = "unapply" + (if (isSeq) "Seq" else "")
           context.error(
             context.tree.pos,
-            s"The result type of an $name method must contain a member `get` to be used as an extractor pattern, no such member exists in ${result}")
+            s"The result type of an $name method must contain a member `get` to be used as an extractor pattern, no such member exists in ${result}"
+          )
         }
         val expanded = getResult match {
           case global.NoType => noGetError(); Nil

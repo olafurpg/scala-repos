@@ -248,7 +248,8 @@ private[akka] class Mailboxes(val settings: ActorSystem.Settings,
                       throw new IllegalArgumentException(
                         s"Cannot instantiate MailboxType [$fqcn], defined in [$id], make sure it has a public" +
                           " constructor with [akka.actor.ActorSystem.Settings, com.typesafe.config.Config] parameters",
-                        exception)
+                        exception
+                      )
                   })
                   .get
             }

@@ -505,14 +505,16 @@ class CleanerTest extends JUnitSuite {
 
   def makeCleaner(capacity: Int,
                   checkDone: (TopicAndPartition) => Unit = noOpCheckDone) =
-    new Cleaner(id = 0,
-                offsetMap = new FakeOffsetMap(capacity),
-                ioBufferSize = 64 * 1024,
-                maxIoBufferSize = 64 * 1024,
-                dupBufferLoadFactor = 0.75,
-                throttler = throttler,
-                time = time,
-                checkDone = checkDone)
+    new Cleaner(
+      id = 0,
+      offsetMap = new FakeOffsetMap(capacity),
+      ioBufferSize = 64 * 1024,
+      maxIoBufferSize = 64 * 1024,
+      dupBufferLoadFactor = 0.75,
+      throttler = throttler,
+      time = time,
+      checkDone = checkDone
+    )
 
   def writeToLog(log: Log, seq: Iterable[(Int, Int)]): Iterable[Long] = {
     for ((key, value) <- seq) yield log.append(message(key, value)).firstOffset

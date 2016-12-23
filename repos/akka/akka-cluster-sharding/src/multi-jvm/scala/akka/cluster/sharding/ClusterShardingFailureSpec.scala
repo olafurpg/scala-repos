@@ -148,7 +148,8 @@ abstract class ClusterShardingFailureSpec(
       entityProps = Props[Entity],
       settings = ClusterShardingSettings(system).withRememberEntities(true),
       extractEntityId = extractEntityId,
-      extractShardId = extractShardId)
+      extractShardId = extractShardId
+    )
   }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")

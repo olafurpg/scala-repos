@@ -49,10 +49,12 @@ object DeveloperApiExample {
 
     // Prepare training data.
     val training = sc.parallelize(
-      Seq(LabeledPoint(1.0, Vectors.dense(0.0, 1.1, 0.1)),
-          LabeledPoint(0.0, Vectors.dense(2.0, 1.0, -1.0)),
-          LabeledPoint(0.0, Vectors.dense(2.0, 1.3, 1.0)),
-          LabeledPoint(1.0, Vectors.dense(0.0, 1.2, -0.5))))
+      Seq(
+        LabeledPoint(1.0, Vectors.dense(0.0, 1.1, 0.1)),
+        LabeledPoint(0.0, Vectors.dense(2.0, 1.0, -1.0)),
+        LabeledPoint(0.0, Vectors.dense(2.0, 1.3, 1.0)),
+        LabeledPoint(1.0, Vectors.dense(0.0, 1.2, -0.5))
+      ))
 
     // Create a LogisticRegression instance.  This instance is an Estimator.
     val lr = new MyLogisticRegression()

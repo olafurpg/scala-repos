@@ -37,9 +37,11 @@ private[tv] final class ChannelActor(channel: Tv.Channel) extends Actor {
             rematch(game) orElse feature(candidates) foreach elect
           case _ => feature(candidates) foreach elect
         }
-        manyIds = candidates.sortBy { g =>
-          -(~g.averageUsersRating)
-        }.map(_.id)
+        manyIds = candidates
+          .sortBy { g =>
+            -(~g.averageUsersRating)
+          }
+          .map(_.id)
       }
   }
 

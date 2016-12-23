@@ -103,15 +103,11 @@ abstract class Optimizer extends RuleExecutor[LogicalPlan] {
         EliminateSorts,
         SimplifyCasts,
         SimplifyCaseConversionExpressions,
-        EliminateSerialization) :: Batch(
-        "Decimal Optimizations",
+        EliminateSerialization
+      ) :: Batch("Decimal Optimizations", FixedPoint(100), DecimalAggregates) :: Batch(
+        "LocalRelation",
         FixedPoint(100),
-        DecimalAggregates) :: Batch("LocalRelation",
-                                    FixedPoint(100),
-                                    ConvertToLocalRelation) :: Batch(
-        "Subquery",
-        Once,
-        OptimizeSubqueries) :: Nil
+        ConvertToLocalRelation) :: Batch("Subquery", Once, OptimizeSubqueries) :: Nil
   }
 
   /**
@@ -407,10 +403,12 @@ object ColumnPruning extends Rule[LogicalPlan] {
         val newOutput = prunedChild(firstChild, p.references).output
         // pruning the columns of all children based on the pruned first child.
         val newChildren = u.children.map { p =>
-          val selected = p.output.zipWithIndex.filter {
-            case (a, i) =>
-              newOutput.contains(firstChild.output(i))
-          }.map(_._1)
+          val selected = p.output.zipWithIndex
+            .filter {
+              case (a, i) =>
+                newOutput.contains(firstChild.output(i))
+            }
+            .map(_._1)
           Project(selected, p)
         }
         p.copy(child = u.withNewChildren(newChildren))

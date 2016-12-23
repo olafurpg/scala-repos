@@ -46,6 +46,7 @@ object ClientConnectionSettingsImpl
       socketOptions = SocketOptionSettings
         .fromSubConfig(root, c.getConfig("socket-options")),
       parserSettings =
-        ParserSettingsImpl.fromSubConfig(root, c.getConfig("parsing")))
+        ParserSettingsImpl.fromSubConfig(root, c.getConfig("parsing"))
+    )
   }
 }

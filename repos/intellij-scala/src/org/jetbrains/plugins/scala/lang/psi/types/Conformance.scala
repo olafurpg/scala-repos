@@ -216,10 +216,15 @@ object Conformance {
       override def visitParameterizedType(p: ScParameterizedType) {
         p.designator match {
           case a: ScAbstractType =>
-            val subst = new ScSubstitutor(Map(a.tpt.args.zip(p.typeArgs).map {
-              case (tpt: ScTypeParameterType, tp: ScType) =>
-                ((tpt.param.name, ScalaPsiUtil.getPsiElementId(tpt.param)), tp)
-            }: _*), Map.empty, None)
+            val subst = new ScSubstitutor(
+              Map(a.tpt.args.zip(p.typeArgs).map {
+                case (tpt: ScTypeParameterType, tp: ScType) =>
+                  ((tpt.param.name, ScalaPsiUtil.getPsiElementId(tpt.param)),
+                   tp)
+              }: _*),
+              Map.empty,
+              None
+            )
             val lower: ScType = subst.subst(a.lower) match {
               case ScParameterizedType(lower, _) =>
                 ScParameterizedType(lower, p.typeArgs)
@@ -1020,10 +1025,14 @@ object Conformance {
 
       p.designator match {
         case a: ScAbstractType =>
-          val subst = new ScSubstitutor(Map(a.tpt.args.zip(p.typeArgs).map {
-            case (tpt: ScTypeParameterType, tp: ScType) =>
-              ((tpt.param.name, ScalaPsiUtil.getPsiElementId(tpt.param)), tp)
-          }: _*), Map.empty, None)
+          val subst = new ScSubstitutor(
+            Map(a.tpt.args.zip(p.typeArgs).map {
+              case (tpt: ScTypeParameterType, tp: ScType) =>
+                ((tpt.param.name, ScalaPsiUtil.getPsiElementId(tpt.param)), tp)
+            }: _*),
+            Map.empty,
+            None
+          )
           val upper: ScType = subst.subst(a.upper) match {
             case ScParameterizedType(upper, _) =>
               ScParameterizedType(upper, p.typeArgs)
@@ -1450,11 +1459,15 @@ object Conformance {
               }
             case (_, t: ScTypeParameterType)
                 if t.args.length == p2.typeArgs.length =>
-              val subst = new ScSubstitutor(Map(t.args.zip(p.typeArgs).map {
-                case (tpt: ScTypeParameterType, tp: ScType) =>
-                  ((tpt.param.name, ScalaPsiUtil.getPsiElementId(tpt.param)),
-                   tp)
-              }: _*), Map.empty, None)
+              val subst = new ScSubstitutor(
+                Map(t.args.zip(p.typeArgs).map {
+                  case (tpt: ScTypeParameterType, tp: ScType) =>
+                    ((tpt.param.name, ScalaPsiUtil.getPsiElementId(tpt.param)),
+                     tp)
+                }: _*),
+                Map.empty,
+                None
+              )
               result = conformsInner(l,
                                      subst.subst(t.upper.v),
                                      visited,
@@ -1496,10 +1509,14 @@ object Conformance {
 
       p.designator match {
         case t: ScTypeParameterType if t.args.length == p.typeArgs.length =>
-          val subst = new ScSubstitutor(Map(t.args.zip(p.typeArgs).map {
-            case (tpt: ScTypeParameterType, tp: ScType) =>
-              ((tpt.param.name, ScalaPsiUtil.getPsiElementId(tpt.param)), tp)
-          }: _*), Map.empty, None)
+          val subst = new ScSubstitutor(
+            Map(t.args.zip(p.typeArgs).map {
+              case (tpt: ScTypeParameterType, tp: ScType) =>
+                ((tpt.param.name, ScalaPsiUtil.getPsiElementId(tpt.param)), tp)
+            }: _*),
+            Map.empty,
+            None
+          )
           result = conformsInner(subst.subst(t.lower.v),
                                  r,
                                  visited,
@@ -1561,7 +1578,9 @@ object Conformance {
                       wild.name,
                       PsiManager
                         .getInstance(DecompilerUtil.obtainProject) //todo: remove obtainProject?
-                    )))
+                    )
+                  )
+                )
                 (true, tpt)
               case _ => (false, t)
             }
@@ -1579,7 +1598,9 @@ object Conformance {
                     ScalaPsiElementFactory.createTypeParameterFromText(
                       wild.name,
                       PsiManager.getInstance(ta.getProject)
-                    )))
+                    )
+                  )
+                )
                 (true, tpt)
               case _ => (false, tp)
             }
@@ -1634,7 +1655,8 @@ object Conformance {
                 unSubst.upperMap.filter(filterFunction),
                 unSubst.lowerMap.filter(filterFunction),
                 unSubst.upperAdditionalMap.filter(filterFunction),
-                unSubst.lowerAdditionalMap.filter(filterFunction))
+                unSubst.lowerAdditionalMap.filter(filterFunction)
+              )
               undefinedSubst += newUndefSubst
               result = (true, undefinedSubst)
             }
@@ -2010,32 +2032,28 @@ object Conformance {
             i = i + 1
           }
           val subst =
-            new ScSubstitutor(new collection.immutable.HashMap[
-                                (String, PsiElement),
-                                ScType] ++ typeParameters1
-                                .zip(typeParameters2)
-                                .map({
-                                  tuple =>
-                                    ((tuple._1.name,
-                                      ScalaPsiUtil.getPsiElementId(
-                                        tuple._1.ptp)),
-                                     new ScTypeParameterType(
-                                       tuple._2.name,
-                                       tuple._2.ptp match {
-                                         case p: ScTypeParam =>
-                                           p.typeParameters.toList.map {
-                                             new ScTypeParameterType(
-                                               _,
-                                               ScSubstitutor.empty)
-                                           }
-                                         case _ => Nil
-                                       },
-                                       new Suspension(tuple._2.lowerType),
-                                       new Suspension(tuple._2.upperType),
-                                       tuple._2.ptp))
-                                }),
-                              Map.empty,
-                              None)
+            new ScSubstitutor(
+              new collection.immutable.HashMap[(String, PsiElement), ScType] ++ typeParameters1
+                .zip(typeParameters2)
+                .map({ tuple =>
+                  ((tuple._1.name, ScalaPsiUtil.getPsiElementId(tuple._1.ptp)),
+                   new ScTypeParameterType(
+                     tuple._2.name,
+                     tuple._2.ptp match {
+                       case p: ScTypeParam =>
+                         p.typeParameters.toList.map {
+                           new ScTypeParameterType(_, ScSubstitutor.empty)
+                         }
+                       case _ => Nil
+                     },
+                     new Suspension(tuple._2.lowerType),
+                     new Suspension(tuple._2.upperType),
+                     tuple._2.ptp
+                   ))
+                }),
+              Map.empty,
+              None
+            )
           val t = conformsInner(subst.subst(internalType1),
                                 internalType2,
                                 HashSet.empty,

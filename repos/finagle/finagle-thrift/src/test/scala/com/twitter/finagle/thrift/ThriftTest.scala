@@ -17,8 +17,8 @@ trait ThriftTest { self: FunSuite =>
   type Iface <: AnyRef
   def ifaceManifest: ClassTag[Iface]
   val processor: Iface
-  val ifaceToService: (Iface,
-                       TProtocolFactory) => Service[Array[Byte], Array[Byte]]
+  val ifaceToService: (Iface, TProtocolFactory) => Service[Array[Byte],
+                                                           Array[Byte]]
   val serviceToIface: (Service[ThriftClientRequest, Array[Byte]],
                        TProtocolFactory) => Iface
   val loopback = InetAddress.getLoopbackAddress
@@ -129,11 +129,11 @@ trait ThriftTest { self: FunSuite =>
   )
 
   // For some reason, the compiler needs some help here.
-  private type NewClient = (TProtocolFactory, SocketAddress,
-                            Option[ClientId]) => {
-    def close()
-    val client: Iface
-  }
+  private type NewClient =
+    (TProtocolFactory, SocketAddress, Option[ClientId]) => {
+      def close()
+      val client: Iface
+    }
 
   private type NewServer = (TProtocolFactory) => {
     def close()

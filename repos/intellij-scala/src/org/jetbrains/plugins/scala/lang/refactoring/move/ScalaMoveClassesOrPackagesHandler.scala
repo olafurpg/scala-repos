@@ -119,14 +119,16 @@ class ScalaMoveClassesOrPackagesHandler
       JavaRefactoringSettings.getInstance.MOVE_SEARCH_IN_COMMENTS
     val searchForTextOccurences: Boolean =
       JavaRefactoringSettings.getInstance.MOVE_SEARCH_FOR_TEXT
-    moveDialog.setData(adjustedElements,
-                       initialTargetPackageName,
-                       initialTargetDirectory,
-                       isTargetDirectoryFixed,
-                       initialTargetElement == null,
-                       searchInComments,
-                       searchForTextOccurences,
-                       HelpID.getMoveHelpID(adjustedElements(0)))
+    moveDialog.setData(
+      adjustedElements,
+      initialTargetPackageName,
+      initialTargetDirectory,
+      isTargetDirectoryFixed,
+      initialTargetElement == null,
+      searchInComments,
+      searchForTextOccurences,
+      HelpID.getMoveHelpID(adjustedElements(0))
+    )
     moveDialog.show()
   }
 

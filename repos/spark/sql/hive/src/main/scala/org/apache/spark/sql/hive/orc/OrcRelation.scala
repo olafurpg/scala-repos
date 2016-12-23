@@ -132,9 +132,12 @@ private[orc] class OrcOutputWriter(path: String,
   private val serializer = {
     val table = new Properties()
     table.setProperty("columns", dataSchema.fieldNames.mkString(","))
-    table.setProperty("columns.types", dataSchema.map { f =>
-      HiveMetastoreTypes.toMetastoreType(f.dataType)
-    }.mkString(":"))
+    table.setProperty("columns.types",
+                      dataSchema
+                        .map { f =>
+                          HiveMetastoreTypes.toMetastoreType(f.dataType)
+                        }
+                        .mkString(":"))
 
     val serde = new OrcSerde
     val configuration = context.getConfiguration
@@ -250,30 +253,34 @@ private[orc] case class OrcTableScan(@transient sqlContext: SQLContext,
     // SPARK-8501: ORC writes an empty schema ("struct<>") to an ORC file if the file contains zero
     // rows, and thus couldn't give a proper ObjectInspector.  In this case we just return an empty
     // partition since we know that this file is empty.
-    maybeStructOI.map { soi =>
-      val (fieldRefs, fieldOrdinals) = nonPartitionKeyAttrs.zipWithIndex.map {
-        case (attr, ordinal) =>
-          soi.getStructFieldRef(attr.name) -> ordinal
-      }.unzip
-      val unwrappers = fieldRefs.map(unwrapperFor)
-      // Map each tuple to a row object
-      iterator.map { value =>
-        val raw = deserializer.deserialize(value)
-        var i = 0
-        while (i < fieldRefs.length) {
-          val fieldValue = soi.getStructFieldData(raw, fieldRefs(i))
-          if (fieldValue == null) {
-            mutableRow.setNullAt(fieldOrdinals(i))
-          } else {
-            unwrappers(i)(fieldValue, mutableRow, fieldOrdinals(i))
+    maybeStructOI
+      .map { soi =>
+        val (fieldRefs, fieldOrdinals) = nonPartitionKeyAttrs.zipWithIndex
+          .map {
+            case (attr, ordinal) =>
+              soi.getStructFieldRef(attr.name) -> ordinal
           }
-          i += 1
+          .unzip
+        val unwrappers = fieldRefs.map(unwrapperFor)
+        // Map each tuple to a row object
+        iterator.map { value =>
+          val raw = deserializer.deserialize(value)
+          var i = 0
+          while (i < fieldRefs.length) {
+            val fieldValue = soi.getStructFieldData(raw, fieldRefs(i))
+            if (fieldValue == null) {
+              mutableRow.setNullAt(fieldOrdinals(i))
+            } else {
+              unwrappers(i)(fieldValue, mutableRow, fieldOrdinals(i))
+            }
+            i += 1
+          }
+          unsafeProjection(mutableRow)
         }
-        unsafeProjection(mutableRow)
       }
-    }.getOrElse {
-      Iterator.empty
-    }
+      .getOrElse {
+        Iterator.empty
+      }
   }
 
   def execute(): RDD[InternalRow] = {
@@ -340,7 +347,8 @@ private[orc] object OrcRelation {
     "uncompressed" -> CompressionKind.NONE,
     "snappy" -> CompressionKind.SNAPPY,
     "zlib" -> CompressionKind.ZLIB,
-    "lzo" -> CompressionKind.LZO)
+    "lzo" -> CompressionKind.LZO
+  )
 
   // The extensions for ORC compression codecs
   val extensionsForCompressionCodecNames = Map(

@@ -327,9 +327,11 @@ object ZUnionStore extends ZStoreCompanion {
   */
 case class ZRangeResults(entries: Array[ChannelBuffer], scores: Array[Double]) {
   def asTuples(): Seq[(ChannelBuffer, Double)] =
-    (entries, scores).zipped.map { (entry, score) =>
-      (entry, score)
-    }.toSeq
+    (entries, scores).zipped
+      .map { (entry, score) =>
+        (entry, score)
+      }
+      .toSeq
 }
 object ZRangeResults {
   def apply(tuples: Seq[(ChannelBuffer, ChannelBuffer)]): ZRangeResults = {
@@ -397,20 +399,24 @@ sealed trait StrictZMembersCommand extends ZMembersCommand {
     RequireClientProtocol(member != null, "Empty member found")
   }
   def membersByteArray: Seq[Array[Byte]] = {
-    members.map { member =>
-      Seq(
-        StringToBytes(member.score.toString),
-        member.member.array
-      )
-    }.flatten
+    members
+      .map { member =>
+        Seq(
+          StringToBytes(member.score.toString),
+          member.member.array
+        )
+      }
+      .flatten
   }
   def membersChannelBuffers: Seq[ChannelBuffer] = {
-    members.map { member =>
-      Seq(
-        StringToChannelBuffer(member.score.toString),
-        member.member
-      )
-    }.flatten
+    members
+      .map { member =>
+        Seq(
+          StringToChannelBuffer(member.score.toString),
+          member.member
+        )
+      }
+      .flatten
   }
 }
 

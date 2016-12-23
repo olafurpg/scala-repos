@@ -54,7 +54,8 @@ object Message {
         MagicLength + AttributesLength + KeySizeLength + ValueSizeLength),
     (1: Byte) ->
       (CrcLength + MagicLength + AttributesLength + TimestampLength +
-        KeySizeLength + ValueSizeLength))
+        KeySizeLength + ValueSizeLength)
+  )
 
   /**
     * The amount of overhead bytes in a message

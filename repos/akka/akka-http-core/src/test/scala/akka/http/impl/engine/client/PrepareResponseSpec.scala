@@ -35,7 +35,8 @@ class PrepareResponseSpec extends AkkaSpec {
       HttpEntity.Chunked(ContentTypes.`application/octet-stream`,
                          HttpEntity.limitableChunkSource(chunks))
     },
-    closeRequested = false)
+    closeRequested = false
+  )
 
   val strictStart = ParserOutput.ResponseStart(
     StatusCodes.OK,

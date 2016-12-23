@@ -39,5 +39,6 @@ object Ticket543Test extends Build {
         if (!exists)
           sys.error("Null or invalid error had been returned previously")
       }
-      ))
+      )
+  )
 }

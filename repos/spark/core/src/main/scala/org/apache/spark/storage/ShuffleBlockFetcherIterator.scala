@@ -166,9 +166,11 @@ private[spark] final class ShuffleBlockFetcherIterator(
     reqsInFlight += 1
 
     // so we can look up the size of each blockID
-    val sizeMap = req.blocks.map {
-      case (blockId, size) => (blockId.toString, size)
-    }.toMap
+    val sizeMap = req.blocks
+      .map {
+        case (blockId, size) => (blockId.toString, size)
+      }
+      .toMap
     val remainingBlocks = new HashSet[String]() ++= sizeMap.keys
     val blockIds = req.blocks.map(_._1.toString)
 
@@ -211,7 +213,8 @@ private[spark] final class ShuffleBlockFetcherIterator(
               e)
             results.put(new FailureFetchResult(BlockId(blockId), address, e))
           }
-        })
+        }
+      )
   }
 
   private[this] def splitLocalRemoteBlocks(): ArrayBuffer[FetchRequest] = {
@@ -312,7 +315,8 @@ private[spark] final class ShuffleBlockFetcherIterator(
       (0 == reqsInFlight) == (0 == bytesInFlight),
       "expected reqsInFlight = 0 but found reqsInFlight = " + reqsInFlight +
         ", expected bytesInFlight = 0 but found bytesInFlight = " +
-        bytesInFlight)
+        bytesInFlight
+    )
 
     // Send out initial requests for blocks, up to our maxBytesInFlight
     fetchUpToMaxBytes()

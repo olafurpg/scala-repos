@@ -110,17 +110,20 @@ class MongoAPIKeyManagerSpec
     }
 
     "list children API keys" in new TestAPIKeyManager {
-      val (result, expected) = Await.result(for {
-        k1 <- apiKeyManager.createAPIKey(Some("blah1"),
-                                         None,
-                                         child2.apiKey,
-                                         Set.empty)
-        k2 <- apiKeyManager.createAPIKey(Some("blah2"),
-                                         None,
-                                         child2.apiKey,
-                                         Set.empty)
-        kids <- apiKeyManager.findAPIKeyChildren(child2.apiKey)
-      } yield (kids, List(k1, k2)), timeout)
+      val (result, expected) = Await.result(
+        for {
+          k1 <- apiKeyManager.createAPIKey(Some("blah1"),
+                                           None,
+                                           child2.apiKey,
+                                           Set.empty)
+          k2 <- apiKeyManager.createAPIKey(Some("blah2"),
+                                           None,
+                                           child2.apiKey,
+                                           Set.empty)
+          kids <- apiKeyManager.findAPIKeyChildren(child2.apiKey)
+        } yield (kids, List(k1, k2)),
+        timeout
+      )
 
       result must haveTheSameElementsAs(expected)
     }

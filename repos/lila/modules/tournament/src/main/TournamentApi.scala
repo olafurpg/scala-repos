@@ -53,7 +53,8 @@ private[tournament] final class TournamentApi(
       variant = variant,
       position = StartingPosition
           .byEco(setup.position)
-          .ifTrue(variant.standard) | StartingPosition.initial)
+          .ifTrue(variant.standard) | StartingPosition.initial
+    )
     TournamentRepo.insert(tour) >>- join(tour.id, me) inject tour
   }
 
@@ -75,12 +76,14 @@ private[tournament] final class TournamentApi(
                 s"Give up making http://lichess.org/tournament/${tour.id} ${pairings.size} pairings in ${nowMillis - startAt}ms")
               funit
             case pairings =>
-              pairings.map { pairing =>
-                PairingRepo.insert(pairing) >> autoPairing(tour, pairing) addEffect {
-                  game =>
-                    sendTo(tour.id, StartGame(game))
+              pairings
+                .map { pairing =>
+                  PairingRepo.insert(pairing) >> autoPairing(tour, pairing) addEffect {
+                    game =>
+                      sendTo(tour.id, StartGame(game))
+                  }
                 }
-              }.sequenceFu >> featureOneOf(tour, pairings, ranking) >>- {
+                .sequenceFu >> featureOneOf(tour, pairings, ranking) >>- {
                 lila.mon.tournament.pairing.create(pairings.size)
               }
           } >>- {
@@ -395,21 +398,24 @@ private[tournament] final class TournamentApi(
   }
 
   private object publish {
-    private val debouncer = system.actorOf(Props(new Debouncer(10 seconds, {
-      (_: Debouncer.Nothing) =>
-        fetchVisibleTournaments foreach { vis =>
-          site ! SendToFlag("tournament",
-                            Json.obj(
-                              "t" -> "reload",
-                              "d" -> scheduleJsonView(vis)
-                            ))
-        }
-        TournamentRepo.promotable foreach { tours =>
-          renderer ? TournamentTable(tours) map {
-            case view: play.twirl.api.Html => ReloadTournaments(view.body)
-          } pipeToSelection lobby
-        }
-    })))
+    private val debouncer = system.actorOf(
+      Props(
+        new Debouncer(
+          10 seconds, { (_: Debouncer.Nothing) =>
+            fetchVisibleTournaments foreach { vis =>
+              site ! SendToFlag("tournament",
+                                Json.obj(
+                                  "t" -> "reload",
+                                  "d" -> scheduleJsonView(vis)
+                                ))
+            }
+            TournamentRepo.promotable foreach { tours =>
+              renderer ? TournamentTable(tours) map {
+                case view: play.twirl.api.Html => ReloadTournaments(view.body)
+              } pipeToSelection lobby
+            }
+          }
+        )))
     def apply() { debouncer ! Debouncer.Nothing }
   }
 

@@ -34,9 +34,11 @@ private object PoolConductor {
 
     override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
                                outlets: immutable.Seq[Outlet[_]]): Shape =
-      Ports(inlets.head.asInstanceOf[Inlet[RequestContext]],
-            inlets.last.asInstanceOf[Inlet[RawSlotEvent]],
-            outlets.asInstanceOf[immutable.Seq[Outlet[RequestContext]]])
+      Ports(
+        inlets.head.asInstanceOf[Inlet[RequestContext]],
+        inlets.last.asInstanceOf[Inlet[RawSlotEvent]],
+        outlets.asInstanceOf[immutable.Seq[Outlet[RequestContext]]]
+      )
   }
 
   /*
@@ -130,35 +132,41 @@ private object PoolConductor {
         val slotStates = Array.fill[SlotState](slotCount)(Unconnected)
         var nextSlot = 0
 
-        setHandler(ctxIn, new InHandler {
-          override def onPush(): Unit = {
-            val ctx = grab(ctxIn)
-            val slot = nextSlot
-            slotStates(slot) =
-              slotStateAfterDispatch(slotStates(slot), ctx.request.method)
-            nextSlot = bestSlot()
-            emit(out, SwitchCommand(ctx, slot), tryPullCtx)
-          }
-        })
-
-        setHandler(slotIn, new InHandler {
-          override def onPush(): Unit = {
-            grab(slotIn) match {
-              case SlotEvent.RequestCompleted(slotIx) ⇒
-                slotStates(slotIx) =
-                  slotStateAfterRequestCompleted(slotStates(slotIx))
-              case SlotEvent.Disconnected(slotIx, failed) ⇒
-                slotStates(slotIx) =
-                  slotStateAfterDisconnect(slotStates(slotIx), failed)
+        setHandler(
+          ctxIn,
+          new InHandler {
+            override def onPush(): Unit = {
+              val ctx = grab(ctxIn)
+              val slot = nextSlot
+              slotStates(slot) =
+                slotStateAfterDispatch(slotStates(slot), ctx.request.method)
+              nextSlot = bestSlot()
+              emit(out, SwitchCommand(ctx, slot), tryPullCtx)
             }
-            pull(slotIn)
-            val wasBlocked = nextSlot == -1
-            nextSlot = bestSlot()
-            val nowUnblocked = nextSlot != -1
-            if (wasBlocked && nowUnblocked)
-              pull(ctxIn) // get next request context
           }
-        })
+        )
+
+        setHandler(
+          slotIn,
+          new InHandler {
+            override def onPush(): Unit = {
+              grab(slotIn) match {
+                case SlotEvent.RequestCompleted(slotIx) ⇒
+                  slotStates(slotIx) =
+                    slotStateAfterRequestCompleted(slotStates(slotIx))
+                case SlotEvent.Disconnected(slotIx, failed) ⇒
+                  slotStates(slotIx) =
+                    slotStateAfterDisconnect(slotStates(slotIx), failed)
+              }
+              pull(slotIn)
+              val wasBlocked = nextSlot == -1
+              nextSlot = bestSlot()
+              val nowUnblocked = nextSlot != -1
+              if (wasBlocked && nowUnblocked)
+                pull(ctxIn) // get next request context
+            }
+          }
+        )
 
         setHandler(out, eagerTerminateOutput)
 

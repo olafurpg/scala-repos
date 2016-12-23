@@ -40,13 +40,15 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
       }
       .map { aggs =>
         ChartData {
-          aggs.flatMap { agg =>
-            PerfType.byId get agg._id map {
-              _ -> ChartData.PerfResult(nb = agg.nb,
-                                        points = ChartData.Ints(agg.points),
-                                        rank = ChartData.Ints(agg.ratios))
+          aggs
+            .flatMap { agg =>
+              PerfType.byId get agg._id map {
+                _ -> ChartData.PerfResult(nb = agg.nb,
+                                          points = ChartData.Ints(agg.points),
+                                          rank = ChartData.Ints(agg.ratios))
+              }
             }
-          }.sortLike(PerfType.leaderboardable, _._1)
+            .sortLike(PerfType.leaderboardable, _._1)
         }
       }
   }
@@ -54,14 +56,16 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
   private def paginator(user: User,
                         page: Int,
                         sort: BSONDocument): Fu[Paginator[TourEntry]] =
-    Paginator(adapter = new BSONAdapter[Entry](
-                  collection = coll,
-                  selector = BSONDocument("u" -> user.id),
-                  projection = BSONDocument(),
-                  sort = sort
-                ) mapFutureList withTournaments,
-              currentPage = page,
-              maxPerPage = maxPerPage)
+    Paginator(
+      adapter = new BSONAdapter[Entry](
+          collection = coll,
+          selector = BSONDocument("u" -> user.id),
+          projection = BSONDocument(),
+          sort = sort
+        ) mapFutureList withTournaments,
+      currentPage = page,
+      maxPerPage = maxPerPage
+    )
 
   private def withTournaments(entries: Seq[Entry]): Fu[Seq[TourEntry]] =
     TournamentRepo byIds entries.map(_.tourId) map { tours =>

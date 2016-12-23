@@ -761,11 +761,13 @@ class TaskSetManagerSuite
     val sched =
       new FakeTaskScheduler(sc, ("execA", "host1"), ("execB", "host2"))
     val taskSet =
-      FakeTask.createTaskSet(4,
-                             Seq(TaskLocation("host1")),
-                             Seq(TaskLocation("host2")),
-                             Seq(ExecutorCacheTaskLocation("host1", "execA")),
-                             Seq(ExecutorCacheTaskLocation("host2", "execB")))
+      FakeTask.createTaskSet(
+        4,
+        Seq(TaskLocation("host1")),
+        Seq(TaskLocation("host2")),
+        Seq(ExecutorCacheTaskLocation("host1", "execA")),
+        Seq(ExecutorCacheTaskLocation("host2", "execB"))
+      )
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
 

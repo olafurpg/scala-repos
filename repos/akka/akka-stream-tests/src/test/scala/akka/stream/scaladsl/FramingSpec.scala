@@ -149,19 +149,8 @@ class FramingSpec extends AkkaSpec {
     val referenceChunk = ByteString(scala.util.Random.nextString(0x100001))
 
     val byteOrders = List(ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN)
-    val frameLengths = List(0,
-                            1,
-                            2,
-                            3,
-                            0xFF,
-                            0x100,
-                            0x101,
-                            0xFFF,
-                            0x1000,
-                            0x1001,
-                            0xFFFF,
-                            0x10000,
-                            0x10001)
+    val frameLengths = List(0, 1, 2, 3, 0xFF, 0x100, 0x101, 0xFFF, 0x1000,
+      0x1001, 0xFFFF, 0x10000, 0x10001)
     val fieldLengths = List(1, 2, 3, 4)
     val fieldOffsets = List(0, 1, 2, 3, 15, 16, 31, 32, 44, 107)
 
@@ -202,7 +191,8 @@ class FramingSpec extends AkkaSpec {
               .lengthField(fieldLength, fieldOffset, Int.MaxValue, byteOrder))
             .grouped(10000)
             .runWith(Sink.head),
-          3.seconds) should ===(encodedFrames)
+          3.seconds
+        ) should ===(encodedFrames)
       }
     }
 
@@ -222,7 +212,8 @@ class FramingSpec extends AkkaSpec {
               encode(referenceChunk.take(100), 0, 1, ByteOrder.BIG_ENDIAN))
             .via(Framing.lengthField(1, 0, 99, ByteOrder.BIG_ENDIAN))
             .runFold(Vector.empty[ByteString])(_ :+ _),
-          3.seconds)
+          3.seconds
+        )
       }
 
       an[FramingException] should be thrownBy {
@@ -232,7 +223,8 @@ class FramingSpec extends AkkaSpec {
               encode(referenceChunk.take(100), 49, 1, ByteOrder.BIG_ENDIAN))
             .via(Framing.lengthField(1, 0, 100, ByteOrder.BIG_ENDIAN))
             .runFold(Vector.empty[ByteString])(_ :+ _),
-          3.seconds)
+          3.seconds
+        )
       }
     }
 
@@ -253,16 +245,18 @@ class FramingSpec extends AkkaSpec {
         val partialFrame = fullFrame.dropRight(1)
 
         an[FramingException] should be thrownBy {
-          Await.result(Source(List(fullFrame, partialFrame))
-                         .via(rechunk)
-                         .via(
-                           Framing.lengthField(fieldLength,
-                                               fieldOffset,
-                                               Int.MaxValue,
-                                               byteOrder))
-                         .grouped(10000)
-                         .runWith(Sink.head),
-                       3.seconds)
+          Await.result(
+            Source(List(fullFrame, partialFrame))
+              .via(rechunk)
+              .via(
+                Framing.lengthField(fieldLength,
+                                    fieldOffset,
+                                    Int.MaxValue,
+                                    byteOrder))
+              .grouped(10000)
+              .runWith(Sink.head),
+            3.seconds
+          )
         }
       }
     }

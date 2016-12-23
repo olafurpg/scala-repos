@@ -53,41 +53,45 @@ object Permission {
                               UserSearch))
 
   case object Admin
-      extends Permission("ROLE_ADMIN",
-                         List(Hunter,
-                              ModerateForum,
-                              IpBan,
-                              CloseAccount,
-                              ReopenAccount,
-                              MarkTroll,
-                              SetTitle,
-                              SetEmail,
-                              ModerateQa,
-                              StreamConfig,
-                              MessageAnyone,
-                              CloseTeam,
-                              TerminateTournament))
+      extends Permission(
+        "ROLE_ADMIN",
+        List(Hunter,
+             ModerateForum,
+             IpBan,
+             CloseAccount,
+             ReopenAccount,
+             MarkTroll,
+             SetTitle,
+             SetEmail,
+             ModerateQa,
+             StreamConfig,
+             MessageAnyone,
+             CloseTeam,
+             TerminateTournament)
+      )
 
   case object SuperAdmin extends Permission("ROLE_SUPER_ADMIN", List(Admin))
 
-  private lazy val all: List[Permission] = List(SuperAdmin,
-                                                Admin,
-                                                Hunter,
-                                                ViewBlurs,
-                                                StaffForum,
-                                                ModerateForum,
-                                                UserSpy,
-                                                MarkTroll,
-                                                MarkEngine,
-                                                MarkBooster,
-                                                IpBan,
-                                                ModerateQa,
-                                                StreamConfig,
-                                                Beta,
-                                                MessageAnyone,
-                                                UserSearch,
-                                                CloseTeam,
-                                                TerminateTournament)
+  private lazy val all: List[Permission] = List(
+    SuperAdmin,
+    Admin,
+    Hunter,
+    ViewBlurs,
+    StaffForum,
+    ModerateForum,
+    UserSpy,
+    MarkTroll,
+    MarkEngine,
+    MarkBooster,
+    IpBan,
+    ModerateQa,
+    StreamConfig,
+    Beta,
+    MessageAnyone,
+    UserSearch,
+    CloseTeam,
+    TerminateTournament
+  )
 
   private lazy val allByName: Map[String, Permission] = all map { p =>
     (p.name, p)

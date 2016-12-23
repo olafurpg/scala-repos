@@ -87,7 +87,8 @@ class NIHDBFileStoreSpec
                          MimeType("text", "plain"),
                          RawUTF8Encoding),
              Clock.System.instant,
-             StreamRef.Create(UUID.randomUUID, true)))))).copoint must beLike {
+             StreamRef.Create(UUID.randomUUID, true)
+           ))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }
 
@@ -115,7 +116,8 @@ class NIHDBFileStoreSpec
              Seq(IngestRecord(EventId.fromLong(42L), JString("Foo!"))),
              None,
              Clock.System.instant,
-             StreamRef.Create(streamId, false)))))).copoint must beLike {
+             StreamRef.Create(streamId, false)
+           ))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }
 
@@ -136,7 +138,8 @@ class NIHDBFileStoreSpec
              Seq(IngestRecord(EventId.fromLong(42L), JString("Foo!"))),
              None,
              Clock.System.instant,
-             StreamRef.Create(streamId, true)))))).copoint must beLike {
+             StreamRef.Create(streamId, true)
+           ))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }
 

@@ -55,16 +55,18 @@ private class DNSSD {
   val registrationStopMethod = RegistrationClass.getMethod("stop")
 
   val RegisterListenerClass = classNamed("RegisterListener")
-  val registerMethod = DNSSDClass.getDeclaredMethod("register",
-                                                    classOf[Int],
-                                                    classOf[Int],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[Int],
-                                                    TXTRecordClass,
-                                                    RegisterListenerClass)
+  val registerMethod = DNSSDClass.getDeclaredMethod(
+    "register",
+    classOf[Int],
+    classOf[Int],
+    classOf[String],
+    classOf[String],
+    classOf[String],
+    classOf[String],
+    classOf[Int],
+    TXTRecordClass,
+    RegisterListenerClass
+  )
 
   val ResolveListenerClass = classNamed("ResolveListener")
   val resolveMethod = DNSSDClass.getMethod("resolve",
@@ -106,16 +108,18 @@ private class DNSSD {
         reply.setException(new Exception("Registration failed"))
     }
 
-    registerMethod.invoke(DNSSDClass,
-                          UNIQUE.asInstanceOf[Object],
-                          LOCALHOST_ONLY.asInstanceOf[Object],
-                          serviceName,
-                          regType,
-                          domain,
-                          host,
-                          port.asInstanceOf[Object],
-                          BlankTXTRecord,
-                          proxy)
+    registerMethod.invoke(
+      DNSSDClass,
+      UNIQUE.asInstanceOf[Object],
+      LOCALHOST_ONLY.asInstanceOf[Object],
+      serviceName,
+      regType,
+      domain,
+      host,
+      port.asInstanceOf[Object],
+      BlankTXTRecord,
+      proxy
+    )
 
     reply
   }
@@ -125,11 +129,13 @@ private class DNSSD {
     val proxy = newProxy(ResolveListenerClass) {
       case ("serviceResolved", args) =>
         reply.setValue(
-          ResolvedRecord(flags = args(1).asInstanceOf[Int],
-                         ifIndex = args(2).asInstanceOf[Int],
-                         fullName = args(3).asInstanceOf[String],
-                         hostName = args(4).asInstanceOf[String],
-                         port = args(5).asInstanceOf[Int]))
+          ResolvedRecord(
+            flags = args(1).asInstanceOf[Int],
+            ifIndex = args(2).asInstanceOf[Int],
+            fullName = args(3).asInstanceOf[String],
+            hostName = args(4).asInstanceOf[String],
+            port = args(5).asInstanceOf[Int]
+          ))
 
       case ("operationFailed", _) =>
         reply.setException(new Exception("Resolve failed"))
@@ -162,11 +168,13 @@ private object DNSSD {
 
     def mkRecord(args: Array[Object]) = {
       assert(args.size > 5)
-      Record(flags = args(1).asInstanceOf[Int],
-             ifIndex = args(2).asInstanceOf[Int],
-             serviceName = args(3).asInstanceOf[String],
-             regType = args(4).asInstanceOf[String],
-             domain = args(5).asInstanceOf[String])
+      Record(
+        flags = args(1).asInstanceOf[Int],
+        ifIndex = args(2).asInstanceOf[Int],
+        serviceName = args(3).asInstanceOf[String],
+        regType = args(4).asInstanceOf[String],
+        domain = args(5).asInstanceOf[String]
+      )
     }
 
     val proxy = instance.newProxy(instance.BrowseListenerClass) {
@@ -193,12 +201,14 @@ private object DNSSD {
         }
     }
 
-    instance.browseMethod.invoke(instance.DNSSDClass,
-                                 instance.UNIQUE.asInstanceOf[Object],
-                                 instance.LOCALHOST_ONLY.asInstanceOf[Object],
-                                 regType.asInstanceOf[String],
-                                 domain.asInstanceOf[String],
-                                 proxy)
+    instance.browseMethod.invoke(
+      instance.DNSSDClass,
+      instance.UNIQUE.asInstanceOf[Object],
+      instance.LOCALHOST_ONLY.asInstanceOf[Object],
+      regType.asInstanceOf[String],
+      domain.asInstanceOf[String],
+      proxy
+    )
 
     v
   }

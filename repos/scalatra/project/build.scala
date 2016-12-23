@@ -65,26 +65,28 @@ object ScalatraBuild extends Build {
         Unidoc.unidocExclude := Seq("scalatra-example"),
         previousArtifacts := Set.empty
       ),
-    aggregate = Seq(scalatraCore,
-                    scalatraAuth,
-                    scalatraFileupload,
-                    scalatraCommands,
-                    scalatraScalate,
-                    scalatraJson,
-                    scalatraSlf4j,
-                    scalatraAtmosphere,
-                    scalatraTest,
-                    scalatraScalatest,
-                    scalatraSpecs2,
-                    scalatraExample,
-                    scalatraSwagger,
-                    scalatraJetty,
-                    scalatraCommon,
-                    scalatraSwaggerExt,
-                    scalatraSpring,
-                    scalatraMetrics,
-                    scalatraCache,
-                    scalatraCacheGuava)
+    aggregate = Seq(
+      scalatraCore,
+      scalatraAuth,
+      scalatraFileupload,
+      scalatraCommands,
+      scalatraScalate,
+      scalatraJson,
+      scalatraSlf4j,
+      scalatraAtmosphere,
+      scalatraTest,
+      scalatraScalatest,
+      scalatraSpecs2,
+      scalatraExample,
+      scalatraSwagger,
+      scalatraJetty,
+      scalatraCommon,
+      scalatraSwaggerExt,
+      scalatraSpring,
+      scalatraMetrics,
+      scalatraCache,
+      scalatraCacheGuava
+    )
   )
 
   lazy val scalatraCommon = Project(
@@ -154,13 +156,15 @@ object ScalatraBuild extends Build {
       base = file("atmosphere"),
       settings = scalatraSettings ++ Seq(
           libraryDependencies ++= Seq(akkaActor, akkaTestkit % "test"),
-          libraryDependencies ++= Seq(atmosphereRuntime,
-                                      atmosphereRedis,
-                                      atmosphereCompatJbossweb,
-                                      atmosphereCompatTomcat,
-                                      atmosphereCompatTomcat7,
-                                      atmosphereClient % "test",
-                                      jettyWebsocket % "test"),
+          libraryDependencies ++= Seq(
+            atmosphereRuntime,
+            atmosphereRedis,
+            atmosphereCompatJbossweb,
+            atmosphereCompatTomcat,
+            atmosphereCompatTomcat7,
+            atmosphereClient % "test",
+            jettyWebsocket % "test"
+          ),
           description := "Atmosphere integration for scalatra"
         )
     ) dependsOn (scalatraJson % "compile;test->test;provided->provided")

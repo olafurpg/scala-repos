@@ -64,9 +64,11 @@ class MigrationTo0_16Test
 
     def appProtoIsInNewFormat(version: Option[Long]): Unit = {
       def fetchAppProto(version: Option[Long]): Protos.ServiceDefinition = {
-        val suffix = version.map { version =>
-          s":${Timestamp(version)}"
-        }.getOrElse("")
+        val suffix = version
+          .map { version =>
+            s":${Timestamp(version)}"
+          }
+          .getOrElse("")
         val entity = f.store.load(s"app:test$suffix").futureValue.get
         Protos.ServiceDefinition.parseFrom(entity.bytes.toArray)
       }
@@ -76,9 +78,11 @@ class MigrationTo0_16Test
 
     def groupProtoIsInNewFormat(version: Option[Long]): Unit = {
       def fetchGroupProto(version: Option[Long]): Protos.GroupDefinition = {
-        val suffix = version.map { version =>
-          s":${Timestamp(version)}"
-        }.getOrElse("")
+        val suffix = version
+          .map { version =>
+            s":${Timestamp(version)}"
+          }
+          .getOrElse("")
         val entity = f.store.load(s"group:root$suffix").futureValue.get
         Protos.GroupDefinition.parseFrom(entity.bytes.toArray)
       }

@@ -132,9 +132,12 @@ with AbstractTestConfigurationProducer {
             val patterns = patternDef.pList.patterns
             if (patterns.size == 1 &&
                 patterns.head.isInstanceOf[ScTuplePattern]) {
-              val index = tuple.exprs.zipWithIndex.find {
-                case (expr, _) => expr == testSuite
-              }.map(_._2).get
+              val index = tuple.exprs.zipWithIndex
+                .find {
+                  case (expr, _) => expr == testSuite
+                }
+                .map(_._2)
+                .get
               val bindings = patternDef.bindings
               if (bindings.size > index) Some(bindings(index).getName)
               else None
@@ -211,25 +214,27 @@ with AbstractTestConfigurationProducer {
         TestNodeProvider.isUTestInfixExpr(e) ||
           TestNodeProvider.isUTestSuiteApplyCall(e) ||
           TestNodeProvider.isUTestApplyCall(e))
-    val testName = nameContainer.flatMap {
-      case infixExpr: ScInfixExpr =>
-        //test location is a scope defined through infix '-'
-        buildPathFromTestExpr(infixExpr)
-      case methodCall: ScMethodCall
-          if TestNodeProvider.isUTestApplyCall(methodCall) =>
-        //test location is a scope define without use of '-' method
-        buildPathFromTestExpr(methodCall)
-      case methodCall: ScMethodCall =>
-        //test location is a test method definition
-        getTestSuiteName(methodCall)
-      case _ => None
-    }.getOrElse(
-      //it is also possible that element is on left-hand of test suite definition
-      TestNodeProvider
-        .getUTestLeftHandTestDefinition(element)
-        .flatMap(getTestSuiteName)
-        .orNull
-    )
+    val testName = nameContainer
+      .flatMap {
+        case infixExpr: ScInfixExpr =>
+          //test location is a scope defined through infix '-'
+          buildPathFromTestExpr(infixExpr)
+        case methodCall: ScMethodCall
+            if TestNodeProvider.isUTestApplyCall(methodCall) =>
+          //test location is a scope define without use of '-' method
+          buildPathFromTestExpr(methodCall)
+        case methodCall: ScMethodCall =>
+          //test location is a test method definition
+          getTestSuiteName(methodCall)
+        case _ => None
+      }
+      .getOrElse(
+        //it is also possible that element is on left-hand of test suite definition
+        TestNodeProvider
+          .getUTestLeftHandTestDefinition(element)
+          .flatMap(getTestSuiteName)
+          .orNull
+      )
     (containingObject, testName)
   }
 }

@@ -262,7 +262,8 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
       !isWildcardSelection,
       "Delivering to wildcard actor selections is not supported by AtLeastOnceDelivery. " +
         "Introduce an mediator Actor which this AtLeastOnceDelivery Actor will deliver the messages to," +
-        "and will handle the logic of fan-out and collecting individual confirmations, until it can signal confirmation back to this Actor.")
+        "and will handle the logic of fan-out and collecting individual confirmations, until it can signal confirmation back to this Actor."
+    )
     deliver(ActorPath.fromString(destination.toSerializationFormat))(
       deliveryIdToMessage)
   }
@@ -290,17 +291,20 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
     val deadline = now - redeliverInterval.toNanos
     var warnings = Vector.empty[UnconfirmedDelivery]
 
-    unconfirmed.iterator.filter {
-      case (_, delivery) ⇒ delivery.timestamp <= deadline
-    }.take(redeliveryBurstLimit).foreach {
-      case (deliveryId, delivery) ⇒
-        send(deliveryId, delivery, now)
+    unconfirmed.iterator
+      .filter {
+        case (_, delivery) ⇒ delivery.timestamp <= deadline
+      }
+      .take(redeliveryBurstLimit)
+      .foreach {
+        case (deliveryId, delivery) ⇒
+          send(deliveryId, delivery, now)
 
-        if (delivery.attempt == warnAfterNumberOfUnconfirmedAttempts)
-          warnings :+= UnconfirmedDelivery(deliveryId,
-                                           delivery.destination,
-                                           delivery.message)
-    }
+          if (delivery.attempt == warnAfterNumberOfUnconfirmedAttempts)
+            warnings :+= UnconfirmedDelivery(deliveryId,
+                                             delivery.destination,
+                                             delivery.message)
+      }
 
     if (warnings.nonEmpty) self ! UnconfirmedWarning(warnings)
   }

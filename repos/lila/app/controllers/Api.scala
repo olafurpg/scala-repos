@@ -15,12 +15,14 @@ object Api extends LilaController {
     val app = lila.api.Mobile.App
     Ok(
       Json.obj(
-        "api" -> Json.obj("current" -> api.currentVersion,
-                          "olds" -> api.oldVersions.map { old =>
-                            Json.obj("version" -> old.version,
-                                     "deprecatedAt" -> old.deprecatedAt,
-                                     "unsupportedAt" -> old.unsupportedAt)
-                          }),
+        "api" -> Json.obj(
+          "current" -> api.currentVersion,
+          "olds" -> api.oldVersions.map { old =>
+            Json.obj("version" -> old.version,
+                     "deprecatedAt" -> old.deprecatedAt,
+                     "unsupportedAt" -> old.unsupportedAt)
+          }
+        ),
         "app" -> Json.obj(
           "current" -> app.currentVersion
         )
@@ -63,13 +65,15 @@ object Api extends LilaController {
   }
 
   def game(id: String) = ApiResult { implicit ctx =>
-    gameApi.one(id = id take lila.game.Game.gameIdSize,
-                withAnalysis = getBool("with_analysis"),
-                withMoves = getBool("with_moves"),
-                withOpening = getBool("with_opening"),
-                withFens = getBool("with_fens"),
-                withMoveTimes = getBool("with_movetimes"),
-                token = get("token"))
+    gameApi.one(
+      id = id take lila.game.Game.gameIdSize,
+      withAnalysis = getBool("with_analysis"),
+      withMoves = getBool("with_moves"),
+      withOpening = getBool("with_opening"),
+      withFens = getBool("with_fens"),
+      withMoveTimes = getBool("with_movetimes"),
+      token = get("token")
+    )
   }
 
   private def ApiResult(js: lila.api.Context => Fu[Option[JsValue]]) = Open {

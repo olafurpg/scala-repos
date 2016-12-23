@@ -291,19 +291,23 @@ private[play] class PlayRequestHandler(val server: NettyServer)
         bodyParser.run(source)
     }
 
-    resultFuture.recoverWith {
-      case error =>
-        logger.error("Cannot invoke the action", error)
-        errorHandler(app).onServerError(requestHeader, error)
-    }.map {
-      case result =>
-        val cleanedResult =
-          ServerResultUtils.cleanFlashCookie(requestHeader, result)
-        val validated =
-          ServerResultUtils.validateResult(requestHeader, cleanedResult)
-        modelConversion
-          .convertResult(validated, requestHeader, request.getProtocolVersion)
-    }
+    resultFuture
+      .recoverWith {
+        case error =>
+          logger.error("Cannot invoke the action", error)
+          errorHandler(app).onServerError(requestHeader, error)
+      }
+      .map {
+        case result =>
+          val cleanedResult =
+            ServerResultUtils.cleanFlashCookie(requestHeader, result)
+          val validated =
+            ServerResultUtils.validateResult(requestHeader, cleanedResult)
+          modelConversion
+            .convertResult(validated,
+                           requestHeader,
+                           request.getProtocolVersion)
+      }
   }
 
   /**

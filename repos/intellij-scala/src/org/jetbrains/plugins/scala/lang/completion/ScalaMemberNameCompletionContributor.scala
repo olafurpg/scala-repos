@@ -62,5 +62,6 @@ class ScalaMemberNameCompletionContributor extends ScalaCompletionContributor {
           case _ =>
         }
       }
-    })
+    }
+  )
 }

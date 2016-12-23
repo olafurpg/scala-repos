@@ -147,16 +147,18 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
   def getInnerClasses: Array[PsiClass] = {
     definition match {
       case o: ScObject =>
-        o.members.flatMap {
-          case o: ScObject =>
-            o.fakeCompanionClass match {
-              case Some(clazz) => Seq(o, clazz)
-              case None => Seq(o)
-            }
-          case t: ScTrait => Seq(t, t.fakeCompanionClass)
-          case c: ScClass => Seq(c)
-          case _ => Seq.empty
-        }.toArray
+        o.members
+          .flatMap {
+            case o: ScObject =>
+              o.fakeCompanionClass match {
+                case Some(clazz) => Seq(o, clazz)
+                case None => Seq(o)
+              }
+            case t: ScTrait => Seq(t, t.fakeCompanionClass)
+            case c: ScClass => Seq(c)
+            case _ => Seq.empty
+          }
+          .toArray
       case _ => definition.getInnerClasses //todo:
     }
   }

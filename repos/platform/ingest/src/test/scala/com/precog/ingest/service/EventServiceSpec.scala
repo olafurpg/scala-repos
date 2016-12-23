@@ -198,9 +198,11 @@ class EventServiceSpec
           events flatMap {
             _.data.map(v => JParser.parseUnsafe(v.renderCompact))
           } must_==
-            List(JParser.parseUnsafe("""{ "a": 1, "b": 2, "c": "3" }"""),
-                 JParser.parseUnsafe("""{ "a": 4, "b": null, "c": "a" }"""),
-                 JParser.parseUnsafe("""{ "a": 6, "b": 7, "c": "8" }"""))
+            List(
+              JParser.parseUnsafe("""{ "a": 1, "b": 2, "c": "3" }"""),
+              JParser.parseUnsafe("""{ "a": 4, "b": null, "c": "a" }"""),
+              JParser.parseUnsafe("""{ "a": 6, "b": 7, "c": "8" }""")
+            )
       }
     }
 

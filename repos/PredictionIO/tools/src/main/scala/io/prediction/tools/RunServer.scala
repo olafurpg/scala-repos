@@ -102,17 +102,19 @@ object RunServer extends Logging {
                "spark.serializer=org.apache.spark.serializer.KryoSerializer")
          } else {
            Seq()
-         }) ++ Seq(mainJar,
-                   "--engineInstanceId",
-                   engineInstanceId,
-                   "--ip",
-                   ca.deploy.ip,
-                   "--port",
-                   ca.deploy.port.toString,
-                   "--event-server-ip",
-                   ca.eventServer.ip,
-                   "--event-server-port",
-                   ca.eventServer.port.toString) ++
+         }) ++ Seq(
+        mainJar,
+        "--engineInstanceId",
+        engineInstanceId,
+        "--ip",
+        ca.deploy.ip,
+        "--port",
+        ca.deploy.port.toString,
+        "--event-server-ip",
+        ca.eventServer.ip,
+        "--event-server-port",
+        ca.eventServer.port.toString
+      ) ++
         (if (ca.accessKey.accessKey != "") {
            Seq("--accesskey", ca.accessKey.accessKey)
          } else {
@@ -151,18 +153,20 @@ object RunServer extends Logging {
         .getOrElse(Array.empty[File])
         .map(_.toURI)
     val args =
-      Seq("--engineInstanceId",
-          engineInstanceId,
-          "--engine-variant",
-          ca.common.variantJson.toURI.toString,
-          "--ip",
-          ca.deploy.ip,
-          "--port",
-          ca.deploy.port.toString,
-          "--event-server-ip",
-          ca.eventServer.ip,
-          "--event-server-port",
-          ca.eventServer.port.toString) ++
+      Seq(
+        "--engineInstanceId",
+        engineInstanceId,
+        "--engine-variant",
+        ca.common.variantJson.toURI.toString,
+        "--ip",
+        ca.deploy.ip,
+        "--port",
+        ca.deploy.port.toString,
+        "--event-server-ip",
+        ca.eventServer.ip,
+        "--event-server-port",
+        ca.eventServer.port.toString
+      ) ++
         (if (ca.accessKey.accessKey != "") {
            Seq("--accesskey", ca.accessKey.accessKey)
          } else {

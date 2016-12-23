@@ -107,14 +107,17 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
 
   private def addTestFileToModuleSources(): Unit = {
     ModuleRootModificationUtil
-      .updateModel(getModule, new Consumer[ModifiableRootModel] {
-        override def consume(model: ModifiableRootModel): Unit = {
-          val testdataUrl = VfsUtilCore.pathToUrl(testdataPath)
-          model
-            .addContentEntry(testdataUrl)
-            .addSourceFolder(testdataUrl, false)
+      .updateModel(
+        getModule,
+        new Consumer[ModifiableRootModel] {
+          override def consume(model: ModifiableRootModel): Unit = {
+            val testdataUrl = VfsUtilCore.pathToUrl(testdataPath)
+            model
+              .addContentEntry(testdataUrl)
+              .addSourceFolder(testdataUrl, false)
+          }
         }
-      })
+      )
     preventLeakageOfVfsPointers()
   }
 }

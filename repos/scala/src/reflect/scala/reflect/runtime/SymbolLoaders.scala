@@ -38,10 +38,10 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
     *  @param name    The simple name of the newly created class
     *  @param completer  The completer to be used to set the info of the class and the module
     */
-  protected def initAndEnterClassAndModule(owner: Symbol,
-                                           name: TypeName,
-                                           completer: (Symbol,
-                                                       Symbol) => LazyType) = {
+  protected def initAndEnterClassAndModule(
+      owner: Symbol,
+      name: TypeName,
+      completer: (Symbol, Symbol) => LazyType) = {
     assert(!(name.toString endsWith "[]"), name)
     val clazz = owner.newClass(name)
     val module = owner.newModule(name.toTermName)

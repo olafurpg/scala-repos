@@ -167,7 +167,8 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
           dirs(0)),
         true,
         true,
-        null).run()
+        null
+      ).run()
     }
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
   }

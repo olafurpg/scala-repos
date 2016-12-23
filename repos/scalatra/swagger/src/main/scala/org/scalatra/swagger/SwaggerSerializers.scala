@@ -41,14 +41,16 @@ object SwaggerSerializers {
 
   object SwaggerFormats {
     val serializers =
-      JodaTimeSerializers.all ++ Seq(new EnumNameSerializer(ParamType),
-                                     new HttpMethodSerializer,
-                                     new AllowableValuesSerializer,
-                                     new ModelPropertySerializer,
-                                     new ModelSerializer,
-                                     new ResponseMessageSerializer,
-                                     new ParameterSerializer,
-                                     new GrantTypeSerializer)
+      JodaTimeSerializers.all ++ Seq(
+        new EnumNameSerializer(ParamType),
+        new HttpMethodSerializer,
+        new AllowableValuesSerializer,
+        new ModelPropertySerializer,
+        new ModelSerializer,
+        new ResponseMessageSerializer,
+        new ParameterSerializer,
+        new GrantTypeSerializer
+      )
   }
   trait SwaggerFormats extends DefaultFormats {
 
@@ -296,18 +298,20 @@ object SwaggerSerializers {
       extends CustomSerializer[ModelProperty](implicit formats =>
         ({
           case json: JObject =>
-            ModelProperty(`type` = readDataType(json),
-                          position = (json \ "position").getAsOrElse(0),
-                          json \ "required" match {
-                            case JString(s) => s.toCheckboxBool
-                            case JBool(value) => value
-                            case _ => false
-                          },
-                          description = (json \ "description")
-                            .getAs[String]
-                            .flatMap(_.blankOption),
-                          allowableValues = json.extract[AllowableValues],
-                          items = None)
+            ModelProperty(
+              `type` = readDataType(json),
+              position = (json \ "position").getAsOrElse(0),
+              json \ "required" match {
+                case JString(s) => s.toCheckboxBool
+                case JBool(value) => value
+                case _ => false
+              },
+              description = (json \ "description")
+                .getAs[String]
+                .flatMap(_.blankOption),
+              allowableValues = json.extract[AllowableValues],
+              items = None
+            )
         }, {
           case x: ModelProperty =>
             val json: JValue =
@@ -537,9 +541,9 @@ object SwaggerSerializers {
                 (value \ "tokenRequestEndpoint" \ "clientSecretName")
                   .as[String]
               ),
-              TokenEndpoint(
-                (value \ "tokenEndpoint" \ "url").as[String],
-                (value \ "tokenEndpoint" \ "tokenName").as[String]))
+              TokenEndpoint((value \ "tokenEndpoint" \ "url").as[String],
+                            (value \ "tokenEndpoint" \ "tokenName").as[String])
+            )
         }, {
           case ImplicitGrant(login, tokenName) =>
             ("type" -> "implicit") ~

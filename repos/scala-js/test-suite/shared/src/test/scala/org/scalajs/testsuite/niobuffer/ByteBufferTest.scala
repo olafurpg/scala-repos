@@ -940,29 +940,31 @@ abstract class ByteBufferTest extends BaseBufferTest {
   }
 
   @Test def relative_getDouble(): Unit = {
-    val buf = withContent(pos = 0,
-                          limit = 20,
-                          capacity = 20,
-                          0x40,
-                          0x09,
-                          0x21,
-                          0xfb.toByte,
-                          0x54,
-                          0x44,
-                          0x2d,
-                          0x18,
-                          0x40,
-                          0x97.toByte,
-                          0x9c.toByte,
-                          0xcb.toByte,
-                          0xac.toByte,
-                          0x71,
-                          0x0c,
-                          0xb3.toByte,
-                          0x20,
-                          0xe8.toByte,
-                          0x74,
-                          0xb5.toByte)
+    val buf = withContent(
+      pos = 0,
+      limit = 20,
+      capacity = 20,
+      0x40,
+      0x09,
+      0x21,
+      0xfb.toByte,
+      0x54,
+      0x44,
+      0x2d,
+      0x18,
+      0x40,
+      0x97.toByte,
+      0x9c.toByte,
+      0xcb.toByte,
+      0xac.toByte,
+      0x71,
+      0x0c,
+      0xb3.toByte,
+      0x20,
+      0xe8.toByte,
+      0x74,
+      0xb5.toByte
+    )
 
     buf.order(ByteOrder.BIG_ENDIAN)
     assertEquals(Math.PI, buf.getDouble(), 0.0)
@@ -1023,29 +1025,31 @@ abstract class ByteBufferTest extends BaseBufferTest {
   }
 
   @Test def absolute_getDouble(): Unit = {
-    val buf = withContent(pos = 0,
-                          limit = 20,
-                          capacity = 20,
-                          0x40,
-                          0x09,
-                          0x21,
-                          0xfb.toByte,
-                          0x54,
-                          0x44,
-                          0x2d,
-                          0x18,
-                          0x40,
-                          0x97.toByte,
-                          0x9c.toByte,
-                          0xcb.toByte,
-                          0xac.toByte,
-                          0x71,
-                          0x0c,
-                          0xb3.toByte,
-                          0x20,
-                          0xe8.toByte,
-                          0x74,
-                          0xb5.toByte)
+    val buf = withContent(
+      pos = 0,
+      limit = 20,
+      capacity = 20,
+      0x40,
+      0x09,
+      0x21,
+      0xfb.toByte,
+      0x54,
+      0x44,
+      0x2d,
+      0x18,
+      0x40,
+      0x97.toByte,
+      0x9c.toByte,
+      0xcb.toByte,
+      0xac.toByte,
+      0x71,
+      0x0c,
+      0xb3.toByte,
+      0x20,
+      0xe8.toByte,
+      0x74,
+      0xb5.toByte
+    )
 
     buf.order(ByteOrder.BIG_ENDIAN)
     assertEquals(Math.PI, buf.getDouble(0), 0.0)
@@ -1110,29 +1114,31 @@ abstract class ByteBufferTest extends BaseBufferTest {
   }
 
   @Test def asDoubleBuffer_Bytes_to_Doubles(): Unit = {
-    val buf = withContent(pos = 0,
-                          limit = 20,
-                          capacity = 20,
-                          0x20,
-                          0xe8.toByte,
-                          0x40,
-                          0x09,
-                          0x21,
-                          0xfb.toByte,
-                          0x54,
-                          0x44,
-                          0x2d,
-                          0x18,
-                          0xb3.toByte,
-                          0x0c,
-                          0x71,
-                          0xac.toByte,
-                          0xcb.toByte,
-                          0x9c.toByte,
-                          0x97.toByte,
-                          0x40,
-                          0x74,
-                          0xb5.toByte)
+    val buf = withContent(
+      pos = 0,
+      limit = 20,
+      capacity = 20,
+      0x20,
+      0xe8.toByte,
+      0x40,
+      0x09,
+      0x21,
+      0xfb.toByte,
+      0x54,
+      0x44,
+      0x2d,
+      0x18,
+      0xb3.toByte,
+      0x0c,
+      0x71,
+      0xac.toByte,
+      0xcb.toByte,
+      0x9c.toByte,
+      0x97.toByte,
+      0x40,
+      0x74,
+      0xb5.toByte
+    )
     buf.limit(19).position(2)
 
     buf.order(ByteOrder.BIG_ENDIAN)

@@ -227,7 +227,8 @@ class HiveContext private[hive] (
         hadoopConf = sc.hadoopConfiguration,
         config = newTemporaryConfiguration(useInMemoryDerby = true),
         isolationOn = false,
-        baseClassLoader = Utils.getContextOrSparkClassLoader)
+        baseClassLoader = Utils.getContextOrSparkClassLoader
+      )
       loader.createClient().asInstanceOf[HiveClientImpl]
     }
 
@@ -306,7 +307,8 @@ class HiveContext private[hive] (
             config = allConfig,
             isolationOn = true,
             barrierPrefixes = hiveMetastoreBarrierPrefixes,
-            sharedPrefixes = hiveMetastoreSharedPrefixes)
+            sharedPrefixes = hiveMetastoreSharedPrefixes
+          )
         } else if (hiveMetastoreJars == "maven") {
           // TODO: Support for loading the jars from an already downloaded location.
           logInfo(
@@ -318,7 +320,8 @@ class HiveContext private[hive] (
             hadoopConf = sc.hadoopConfiguration,
             config = allConfig,
             barrierPrefixes = hiveMetastoreBarrierPrefixes,
-            sharedPrefixes = hiveMetastoreSharedPrefixes)
+            sharedPrefixes = hiveMetastoreSharedPrefixes
+          )
         } else {
           // Convert to files and expand any directories.
           val jars = hiveMetastoreJars
@@ -348,7 +351,8 @@ class HiveContext private[hive] (
             config = allConfig,
             isolationOn = true,
             barrierPrefixes = hiveMetastoreBarrierPrefixes,
-            sharedPrefixes = hiveMetastoreSharedPrefixes)
+            sharedPrefixes = hiveMetastoreSharedPrefixes
+          )
         }
       isolatedLoader.createClient()
     }
@@ -534,9 +538,10 @@ class HiveContext private[hive] (
       ConfVars.SPARK_RPC_CLIENT_CONNECT_TIMEOUT -> TimeUnit.MILLISECONDS,
       ConfVars.SPARK_RPC_CLIENT_HANDSHAKE_TIMEOUT -> TimeUnit.MILLISECONDS
     ).map {
-      case (confVar, unit) =>
-        confVar.varname -> hiveconf.getTimeVar(confVar, unit).toString
-    }.toMap
+        case (confVar, unit) =>
+          confVar.varname -> hiveconf.getTimeVar(confVar, unit).toString
+      }
+      .toMap
   }
 
   /**
@@ -647,16 +652,18 @@ private[hive] object HiveContext {
     "spark.sql.hive.metastore.version",
     defaultValue = Some(hiveExecutionVersion),
     doc = "Version of the Hive metastore. Available options are " +
-        s"<code>0.12.0</code> through <code>$hiveExecutionVersion</code>.")
+        s"<code>0.12.0</code> through <code>$hiveExecutionVersion</code>."
+  )
 
   val HIVE_EXECUTION_VERSION = stringConf(
     key = "spark.sql.hive.version",
     defaultValue = Some(hiveExecutionVersion),
     doc = "Version of Hive used internally by Spark SQL.")
 
-  val HIVE_METASTORE_JARS = stringConf("spark.sql.hive.metastore.jars",
-                                       defaultValue = Some("builtin"),
-                                       doc = s"""
+  val HIVE_METASTORE_JARS = stringConf(
+    "spark.sql.hive.metastore.jars",
+    defaultValue = Some("builtin"),
+    doc = s"""
       | Location of the jars that should be used to instantiate the HiveMetastoreClient.
       | This property can be one of three options: "
       | 1. "builtin"
@@ -667,25 +674,29 @@ private[hive] object HiveContext {
       | 2. "maven"
       |   Use Hive jars of specified version downloaded from Maven repositories.
       | 3. A classpath in the standard format for both Hive and Hadoop.
-    """.stripMargin)
+    """.stripMargin
+  )
   val CONVERT_METASTORE_PARQUET = booleanConf(
     "spark.sql.hive.convertMetastoreParquet",
     defaultValue = Some(true),
     doc = "When set to false, Spark SQL will use the Hive SerDe for parquet tables instead of " +
-        "the built in support.")
+        "the built in support."
+  )
 
   val CONVERT_METASTORE_PARQUET_WITH_SCHEMA_MERGING = booleanConf(
     "spark.sql.hive.convertMetastoreParquet.mergeSchema",
     defaultValue = Some(false),
     doc = "When true, also tries to merge possibly different but compatible Parquet schemas in " +
         "different Parquet data files. This configuration is only effective " +
-        "when \"spark.sql.hive.convertMetastoreParquet\" is true.")
+        "when \"spark.sql.hive.convertMetastoreParquet\" is true."
+  )
 
   val CONVERT_CTAS = booleanConf(
     "spark.sql.hive.convertCTAS",
     defaultValue = Some(false),
     doc = "When true, a table created by a Hive CTAS statement (no USING clause) will be " +
-        "converted to a data source table, using the data source set by spark.sql.sources.default.")
+        "converted to a data source table, using the data source set by spark.sql.sources.default."
+  )
 
   val HIVE_METASTORE_SHARED_PREFIXES = stringSeqConf(
     "spark.sql.hive.metastore.sharedPrefixes",
@@ -694,7 +705,8 @@ private[hive] object HiveContext {
         "that is shared between Spark SQL and a specific version of Hive. An example of classes " +
         "that should be shared is JDBC drivers that are needed to talk to the metastore. Other " +
         "classes that need to be shared are those that interact with classes that are already " +
-        "shared. For example, custom appenders that are used by log4j.")
+        "shared. For example, custom appenders that are used by log4j."
+  )
 
   private def jdbcPrefixes =
     Seq("com.mysql.jdbc",
@@ -707,7 +719,8 @@ private[hive] object HiveContext {
     defaultValue = Some(Seq()),
     doc = "A comma separated list of class prefixes that should explicitly be reloaded for each " +
         "version of Hive that Spark SQL is communicating with. For example, Hive UDFs that are " +
-        "declared in a prefix that typically would be shared (i.e. <code>org.apache.spark.*</code>).")
+        "declared in a prefix that typically would be shared (i.e. <code>org.apache.spark.*</code>)."
+  )
 
   val HIVE_THRIFT_SERVER_ASYNC = booleanConf(
     "spark.sql.hive.thriftServer.async",
@@ -781,11 +794,15 @@ private[hive] object HiveContext {
     case (seq: Seq[_], ArrayType(typ, _)) =>
       seq.map(v => (v, typ)).map(toHiveStructString).mkString("[", ",", "]")
     case (map: Map[_, _], MapType(kType, vType, _)) =>
-      map.map {
-        case (key, value) =>
-          toHiveStructString((key, kType)) + ":" +
-            toHiveStructString((value, vType))
-      }.toSeq.sorted.mkString("{", ",", "}")
+      map
+        .map {
+          case (key, value) =>
+            toHiveStructString((key, kType)) + ":" +
+              toHiveStructString((value, vType))
+        }
+        .toSeq
+        .sorted
+        .mkString("{", ",", "}")
     case (null, _) => "NULL"
     case (d: Int, DateType) => new DateWritable(d).toString
     case (t: Timestamp, TimestampType) => new TimestampWritable(t).toString
@@ -810,11 +827,15 @@ private[hive] object HiveContext {
     case (seq: Seq[_], ArrayType(typ, _)) =>
       seq.map(v => (v, typ)).map(toHiveStructString).mkString("[", ",", "]")
     case (map: Map[_, _], MapType(kType, vType, _)) =>
-      map.map {
-        case (key, value) =>
-          toHiveStructString((key, kType)) + ":" +
-            toHiveStructString((value, vType))
-      }.toSeq.sorted.mkString("{", ",", "}")
+      map
+        .map {
+          case (key, value) =>
+            toHiveStructString((key, kType)) + ":" +
+              toHiveStructString((value, vType))
+        }
+        .toSeq
+        .sorted
+        .mkString("{", ",", "}")
     case (null, _) => "null"
     case (s: String, StringType) => "\"" + s + "\""
     case (decimal, DecimalType()) => decimal.toString

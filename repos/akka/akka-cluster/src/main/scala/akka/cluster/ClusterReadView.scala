@@ -95,7 +95,8 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
         })
         .withDispatcher(cluster.settings.UseDispatcher)
         .withDeploy(Deploy.local),
-      name = "clusterEventBusListener")
+      name = "clusterEventBusListener"
+    )
   }
 
   def state: CurrentClusterState = _state

@@ -245,11 +245,14 @@ object ValidatePullRequest extends AutoPlugin {
           changedDirectoryIsDependency(
             changedDirs,
             name.value,
-            Seq(graphFor((update in Compile).value, Compile),
-                graphFor((update in Test).value, Test),
-                graphFor((update in Runtime).value, Runtime),
-                graphFor((update in Provided).value, Provided),
-                graphFor((update in Optional).value, Optional)))(log)
+            Seq(
+              graphFor((update in Compile).value, Compile),
+              graphFor((update in Test).value, Test),
+              graphFor((update in Runtime).value, Runtime),
+              graphFor((update in Provided).value, Provided),
+              graphFor((update in Optional).value, Optional)
+            )
+          )(log)
 
         if (githubCommandEnforcedBuildAll.isDefined)
           githubCommandEnforcedBuildAll.get
@@ -258,39 +261,41 @@ object ValidatePullRequest extends AutoPlugin {
         else BuildSkip
       },
       additionalTasks in ValidatePR := Seq.empty,
-      validatePullRequest := Def.taskDyn {
-        val log = streams.value.log
-        val buildMode = (projectBuildMode in ValidatePR).value
+      validatePullRequest := Def
+        .taskDyn {
+          val log = streams.value.log
+          val buildMode = (projectBuildMode in ValidatePR).value
 
-        buildMode.log(name.value, log)
+          buildMode.log(name.value, log)
 
-        val validationTasks =
-          buildMode.task.toSeq ++
-            (buildMode match {
-              case BuildSkip =>
-                Seq.empty // do not run the additional task if project is skipped during pr validation
-              case _ => (additionalTasks in ValidatePR).value
-            })
+          val validationTasks =
+            buildMode.task.toSeq ++
+              (buildMode match {
+                case BuildSkip =>
+                  Seq.empty // do not run the additional task if project is skipped during pr validation
+                case _ => (additionalTasks in ValidatePR).value
+              })
 
-        // Create a task for every validation task key and
-        // then zip all of the tasks together discarding outputs.
-        // Task failures are propagated as normal.
-        val zero: Def.Initialize[Seq[Task[Any]]] = Def.setting {
-          Seq(task())
-        }
-        validationTasks
-          .map(taskKey => Def.task { taskKey.value })
-          .foldLeft(zero) { (acc, current) =>
-            acc.zipWith(current) {
-              case (taskSeq, task) =>
-                taskSeq :+ task.asInstanceOf[Task[Any]]
+          // Create a task for every validation task key and
+          // then zip all of the tasks together discarding outputs.
+          // Task failures are propagated as normal.
+          val zero: Def.Initialize[Seq[Task[Any]]] = Def.setting {
+            Seq(task())
+          }
+          validationTasks
+            .map(taskKey => Def.task { taskKey.value })
+            .foldLeft(zero) { (acc, current) =>
+              acc.zipWith(current) {
+                case (taskSeq, task) =>
+                  taskSeq :+ task.asInstanceOf[Task[Any]]
+              }
+            } apply { tasks: Seq[Task[Any]] =>
+            tasks.join map { seq =>
+              () /* Ignore the sequence of unit returned */
             }
-          } apply { tasks: Seq[Task[Any]] =>
-          tasks.join map { seq =>
-            () /* Ignore the sequence of unit returned */
           }
         }
-      }.value
+        .value
     )
 }
 

@@ -214,9 +214,11 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
           if (usedBinders.isEmpty) in
           else {
             // only store binders actually used
-            val (subPatBindersStored, subPatRefsStored) = stored.filter {
-              case (b, _) => usedBinders(b)
-            }.unzip
+            val (subPatBindersStored, subPatRefsStored) = stored
+              .filter {
+                case (b, _) => usedBinders(b)
+              }
+              .unzip
             Block(map2(subPatBindersStored.toList, subPatRefsStored.toList)(
                     ValDef(_, _)),
                   in)

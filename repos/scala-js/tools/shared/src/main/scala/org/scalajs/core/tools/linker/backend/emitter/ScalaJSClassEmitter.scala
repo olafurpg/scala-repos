@@ -519,39 +519,44 @@ private[scalajs] final class ScalaJSClassEmitter(
         envFieldDef(
           "is",
           className,
-          js.Function(List(objParam), js.Return(className match {
-            case Definitions.ObjectClass =>
-              js.BinaryOp(JSBinaryOp.!==, obj, js.Null())
+          js.Function(
+            List(objParam),
+            js.Return(className match {
+              case Definitions.ObjectClass =>
+                js.BinaryOp(JSBinaryOp.!==, obj, js.Null())
 
-            case Definitions.StringClass =>
-              js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral("string")
+              case Definitions.StringClass =>
+                js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                  "string")
 
-            case Definitions.RuntimeNothingClass =>
-              // Even null is not an instance of Nothing
-              js.BooleanLiteral(false)
+              case Definitions.RuntimeNothingClass =>
+                // Even null is not an instance of Nothing
+                js.BooleanLiteral(false)
 
-            case _ =>
-              var test = {
-                genIsScalaJSObject(obj) && genIsClassNameInAncestors(
-                  className,
-                  obj DOT "$classData" DOT "ancestors")
-              }
+              case _ =>
+                var test = {
+                  genIsScalaJSObject(obj) && genIsClassNameInAncestors(
+                    className,
+                    obj DOT "$classData" DOT "ancestors")
+                }
 
-              if (isAncestorOfString)
-                test = test ||
-                    (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                      "string"))
-              if (isAncestorOfHijackedNumberClass)
-                test = test ||
-                    (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                      "number"))
-              if (isAncestorOfBoxedBooleanClass)
-                test = test ||
-                    (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                      "boolean"))
+                if (isAncestorOfString)
+                  test = test ||
+                      (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                        "string"))
+                if (isAncestorOfHijackedNumberClass)
+                  test = test ||
+                      (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                        "number"))
+                if (isAncestorOfBoxedBooleanClass)
+                  test = test ||
+                      (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                        "boolean"))
 
-              !(!test)
-          })))
+                !(!test)
+            })
+          )
+        )
       }
 
       val createAsStat =
@@ -561,28 +566,32 @@ private[scalajs] final class ScalaJSClassEmitter(
           envFieldDef(
             "as",
             className,
-            js.Function(List(objParam), js.Return(className match {
-              case Definitions.ObjectClass =>
-                obj
+            js.Function(
+              List(objParam),
+              js.Return(className match {
+                case Definitions.ObjectClass =>
+                  obj
 
-              case _ =>
-                val throwError = {
-                  genCallHelper("throwClassCastException",
-                                obj,
-                                js.StringLiteral(displayName))
-                }
-                if (className == RuntimeNothingClass) {
-                  // Always throw for .asInstanceOf[Nothing], even for null
-                  throwError
-                } else {
-                  js.If(js.Apply(envField("is", className), List(obj)) ||
-                          (obj === js.Null()), {
-                          obj
-                        }, {
-                          throwError
-                        })
-                }
-            })))
+                case _ =>
+                  val throwError = {
+                    genCallHelper("throwClassCastException",
+                                  obj,
+                                  js.StringLiteral(displayName))
+                  }
+                  if (className == RuntimeNothingClass) {
+                    // Always throw for .asInstanceOf[Nothing], even for null
+                    throwError
+                  } else {
+                    js.If(js.Apply(envField("is", className), List(obj)) ||
+                            (obj === js.Null()), {
+                            obj
+                          }, {
+                            throwError
+                          })
+                  }
+              })
+            )
+          )
         }
 
       js.Block(createIsStat, createAsStat)
@@ -610,39 +619,52 @@ private[scalajs] final class ScalaJSClassEmitter(
       envFieldDef(
         "isArrayOf",
         className,
-        js.Function(List(objParam, depthParam), className match {
-          case Definitions.ObjectClass =>
-            val dataVarDef = genLet(Ident("data"), mutable = false, {
-              obj && (obj DOT "$classData")
-            })
-            val data = dataVarDef.ref
-            js.Block(dataVarDef, js.If(!data, {
-              js.Return(js.BooleanLiteral(false))
-            }, {
-              val arrayDepthVarDef =
-                genLet(Ident("arrayDepth"), mutable = false, {
-                  (data DOT "arrayDepth") || js.IntLiteral(0)
-                })
-              val arrayDepth = arrayDepthVarDef.ref
-              js.Block(arrayDepthVarDef, js.Return {
-                // Array[A] </: Array[Array[A]]
-                !js.BinaryOp(JSBinaryOp.<, arrayDepth, depth) &&
-                (// Array[Array[A]] <: Array[Object]
-                js.BinaryOp(JSBinaryOp.>, arrayDepth, depth) ||
-                // Array[Int] </: Array[Object]
-                !genIdentBracketSelect(data DOT "arrayBase", "isPrimitive"))
+        js.Function(
+          List(objParam, depthParam),
+          className match {
+            case Definitions.ObjectClass =>
+              val dataVarDef = genLet(Ident("data"), mutable = false, {
+                obj && (obj DOT "$classData")
               })
-            }))
+              val data = dataVarDef.ref
+              js.Block(
+                dataVarDef,
+                js.If(
+                  !data, {
+                    js.Return(js.BooleanLiteral(false))
+                  }, {
+                    val arrayDepthVarDef =
+                      genLet(Ident("arrayDepth"), mutable = false, {
+                        (data DOT "arrayDepth") || js.IntLiteral(0)
+                      })
+                    val arrayDepth = arrayDepthVarDef.ref
+                    js.Block(
+                      arrayDepthVarDef,
+                      js.Return {
+                        // Array[A] </: Array[Array[A]]
+                        !js.BinaryOp(JSBinaryOp.<, arrayDepth, depth) &&
+                        (// Array[Array[A]] <: Array[Object]
+                        js.BinaryOp(JSBinaryOp.>, arrayDepth, depth) ||
+                        // Array[Int] </: Array[Object]
+                        !genIdentBracketSelect(data DOT "arrayBase",
+                                               "isPrimitive"))
+                      }
+                    )
+                  }
+                )
+              )
 
-          case _ =>
-            js.Return(!(!({
-              genIsScalaJSObject(obj) &&
-              ((obj DOT "$classData" DOT "arrayDepth") === depth) &&
-              genIsClassNameInAncestors(
-                className,
-                obj DOT "$classData" DOT "arrayBase" DOT "ancestors")
-            })))
-        }))
+            case _ =>
+              js.Return(!(!({
+                genIsScalaJSObject(obj) &&
+                ((obj DOT "$classData" DOT "arrayDepth") === depth) &&
+                genIsClassNameInAncestors(
+                  className,
+                  obj DOT "$classData" DOT "arrayBase" DOT "ancestors")
+              })))
+          }
+        )
+      )
     }
 
     val createAsArrayOfStat =
@@ -652,17 +674,23 @@ private[scalajs] final class ScalaJSClassEmitter(
         envFieldDef(
           "asArrayOf",
           className,
-          js.Function(List(objParam, depthParam), js.Return {
-              js.If(js.Apply(envField("isArrayOf", className),
-                             List(obj, depth)) || (obj === js.Null()), {
-                      obj
-                    }, {
-                      genCallHelper("throwArrayCastException",
-                                    obj,
-                                    js.StringLiteral("L" + displayName + ";"),
-                                    depth)
-                    })
-            }))
+          js.Function(
+            List(objParam, depthParam),
+            js.Return {
+              js.If(
+                js.Apply(envField("isArrayOf", className), List(obj, depth)) || (obj === js
+                  .Null()), {
+                  obj
+                }, {
+                  genCallHelper("throwArrayCastException",
+                                obj,
+                                js.StringLiteral("L" + displayName + ";"),
+                                depth)
+                }
+              )
+            }
+          )
+        )
       }
 
     js.Block(createIsArrayOfStat, createAsArrayOfStat)
@@ -817,25 +845,31 @@ private[scalajs] final class ScalaJSClassEmitter(
                 ),
                 js.Skip())
         case CheckedBehavior.Fatal =>
-          js.If(moduleInstanceVar === js.Undefined(), {
-            js.Block(
-              moduleInstanceVar := js.Null(),
-              assignModule
+          js.If(
+            moduleInstanceVar === js.Undefined(), {
+              js.Block(
+                moduleInstanceVar := js.Null(),
+                assignModule
+              )
+            },
+            js.If(
+              moduleInstanceVar === js.Null(), {
+                // throw new UndefinedBehaviorError(
+                //     "Initializer of $className called before completion of its" +
+                //     "super constructor")
+                val decodedName =
+                  Definitions.decodeClassName(className).stripSuffix("$")
+                val msg =
+                  s"Initializer of $decodedName called before completion " +
+                    "of its super constructor"
+                val obj =
+                  js.New(encodeClassVar("sjsr_UndefinedBehaviorError"), Nil)
+                val ctor = obj DOT js.Ident("init___T")
+                js.Throw(js.Apply(ctor, js.StringLiteral(msg) :: Nil))
+              },
+              js.Skip()
             )
-          }, js.If(moduleInstanceVar === js.Null(), {
-            // throw new UndefinedBehaviorError(
-            //     "Initializer of $className called before completion of its" +
-            //     "super constructor")
-            val decodedName =
-              Definitions.decodeClassName(className).stripSuffix("$")
-            val msg =
-              s"Initializer of $decodedName called before completion " +
-                "of its super constructor"
-            val obj =
-              js.New(encodeClassVar("sjsr_UndefinedBehaviorError"), Nil)
-            val ctor = obj DOT js.Ident("init___T")
-            js.Throw(js.Apply(ctor, js.StringLiteral(msg) :: Nil))
-          }, js.Skip()))
+          )
       }
 
       val body = js.Block(initBlock, js.Return(moduleInstanceVar))

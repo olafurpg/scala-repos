@@ -1129,10 +1129,13 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                     tryo {
                       val clz = this.getClass.getClassLoader
                         .loadClass("java.util.ResourceBundle")
-                      val meth = clz.getDeclaredMethods.filter { m =>
-                        m.getName == "clearCache" &&
-                        m.getParameterTypes.length == 0
-                      }.toList.head
+                      val meth = clz.getDeclaredMethods
+                        .filter { m =>
+                          m.getName == "clearCache" &&
+                          m.getParameterTypes.length == 0
+                        }
+                        .toList
+                        .head
                       meth.invoke(null)
                     }
                   }
@@ -1215,10 +1218,14 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def ?(str: String, params: Any*): String =
     if (params.length == 0) ?(str)
     else
-      String.format(locale, ?(str), params.flatMap {
-        case s: AnyRef => List(s)
-        case _ => Nil
-      }.toArray: _*)
+      String.format(locale,
+                    ?(str),
+                    params
+                      .flatMap {
+                        case s: AnyRef => List(s)
+                        case _ => Nil
+                      }
+                      .toArray: _*)
 
   private def ?!(str: String, resBundle: List[ResourceBundle]): String =
     resBundle
@@ -1551,8 +1558,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   private[http] def unsetSnippetForClass(cls: String): Unit =
     _statefulSnip.set(_statefulSnip.is - cls)
 
-  private var _queryAnalyzer: List[(Box[Req], Long,
-                                    List[(String, Long)]) => Any] = Nil
+  private var _queryAnalyzer: List[
+    (Box[Req], Long, List[(String, Long)]) => Any] = Nil
 
   /**
     * Add a query analyzer (passed queries for analysis or logging). The analyzer
@@ -1894,7 +1901,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                 if (Props.devMode)
                   LiftRules.siteMap // materialize the sitemap very early
                 _innerInit(request, f)
-              }))
+              }
+            )
+          )
         }
       }
     }
@@ -1990,14 +1999,17 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def prefixedAttrsToMap(prefix: String,
                          start: Map[String, String]): Map[String, String] =
-    attrs.reverse.flatMap {
-      case (Right((pre, name)), value) if pre == prefix => List((name, value))
-      case (Left(name), value) if name.startsWith(prefix + ":") =>
-        List(name.substring(prefix.length + 1) -> value)
-      case _ => Nil
-    }.foldRight(start) {
-      case ((name, value), at) => at + (name -> value)
-    }
+    attrs.reverse
+      .flatMap {
+        case (Right((pre, name)), value) if pre == prefix =>
+          List((name, value))
+        case (Left(name), value) if name.startsWith(prefix + ":") =>
+          List(name.substring(prefix.length + 1) -> value)
+        case _ => Nil
+      }
+      .foldRight(start) {
+        case ((name, value), at) => at + (name -> value)
+      }
 
   /**
     * Returns the S attributes that are prefixed by 'prefix' parameter as a Map[String, String]
@@ -2231,16 +2243,20 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     type Info = String
 
     protected def findAttr(key: String): Option[Info] =
-      attrs.find {
-        case (Left(v), _) if v == key => true
-        case _ => false
-      }.map(_._2)
+      attrs
+        .find {
+          case (Left(v), _) if v == key => true
+          case _ => false
+        }
+        .map(_._2)
 
     protected def findAttr(prefix: String, key: String): Option[Info] =
-      attrs.find {
-        case (Right((p, n)), _) if (p == prefix && n == key) => true
-        case _ => false
-      }.map(_._2)
+      attrs
+        .find {
+          case (Right((p, n)), _) if (p == prefix && n == key) => true
+          case _ => false
+        }
+        .map(_._2)
 
     protected def convert[T](in: Option[T]): Box[T] = Box(in)
 
@@ -2374,7 +2390,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       currentAttrs.toList.find { _.key == key }.map(_.value.text)
 
     protected def findAttr(prefix: String, key: String): Option[Info] =
-      currentAttrs.toList.find { _.prefixedKey == (prefix + ":" + key) }
+      currentAttrs.toList
+        .find { _.prefixedKey == (prefix + ":" + key) }
         .map(_.value.text)
 
     protected def convert[T](in: Option[T]): Box[T] = Box(in)
@@ -2683,92 +2700,101 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     testFunctionMap {
       (autoCleanUp.box, _oneShot.box) match {
         case (Full(true), _) => {
-          updateFunctionMap(name, new S.ProxyFuncHolder(value) {
-            var shot = false
+          updateFunctionMap(
+            name,
+            new S.ProxyFuncHolder(value) {
+              var shot = false
 
-            override def apply(in: List[String]): Any = {
-              synchronized {
-                if (!shot) {
-                  shot = true
-                  S.session.map(_.removeFunction(name))
-                  value.apply(in)
-                } else {
-                  js.JsCmds.Noop
+              override def apply(in: List[String]): Any = {
+                synchronized {
+                  if (!shot) {
+                    shot = true
+                    S.session.map(_.removeFunction(name))
+                    value.apply(in)
+                  } else {
+                    js.JsCmds.Noop
+                  }
+                }
+              }
+
+              override def apply(in: FileParamHolder): Any = {
+                synchronized {
+                  if (!shot) {
+                    shot = true
+                    S.session.map(_.removeFunction(name))
+                    value.apply(in)
+                  } else {
+                    js.JsCmds.Noop
+                  }
                 }
               }
             }
-
-            override def apply(in: FileParamHolder): Any = {
-              synchronized {
-                if (!shot) {
-                  shot = true
-                  S.session.map(_.removeFunction(name))
-                  value.apply(in)
-                } else {
-                  js.JsCmds.Noop
-                }
-              }
-            }
-          })
+          )
         }
 
         case (_, Full(true)) => {
-          updateFunctionMap(name, new S.ProxyFuncHolder(value) {
-            var shot = false
-            lazy val theFuture: LAFuture[Any] = {
-              S.session.map(_.removeFunction(name))
-              val future: LAFuture[Any] = new LAFuture
+          updateFunctionMap(
+            name,
+            new S.ProxyFuncHolder(value) {
+              var shot = false
+              lazy val theFuture: LAFuture[Any] = {
+                S.session.map(_.removeFunction(name))
+                val future: LAFuture[Any] = new LAFuture
 
-              updateFunctionMap(name, new S.ProxyFuncHolder(value) {
-                override def apply(in: List[String]): Any =
-                  future.get(5000).openOrThrowException("legacy code")
+                updateFunctionMap(
+                  name,
+                  new S.ProxyFuncHolder(value) {
+                    override def apply(in: List[String]): Any =
+                      future.get(5000).openOrThrowException("legacy code")
 
-                override def apply(in: FileParamHolder): Any =
-                  future.get(5000).openOrThrowException("legacy code")
-              })
+                    override def apply(in: FileParamHolder): Any =
+                      future.get(5000).openOrThrowException("legacy code")
+                  }
+                )
 
-              future
-            }
+                future
+              }
 
-            def fixShot(): Boolean = synchronized {
-              val ret = shot
-              shot = true
-              ret
-            }
+              def fixShot(): Boolean = synchronized {
+                val ret = shot
+                shot = true
+                ret
+              }
 
-            override def apply(in: List[String]): Any = {
-              val ns = fixShot()
-              if (ns) {
-                theFuture.get(5000).openOrThrowException("legacy code")
-              } else {
-                val future = theFuture
-                try {
-                  val ret = value.apply(in)
-                  future.satisfy(ret)
-                  ret
-                } catch {
-                  case e: Exception => future.satisfy(e); throw e
+              override def apply(in: List[String]): Any = {
+                val ns = fixShot()
+                if (ns) {
+                  theFuture.get(5000).openOrThrowException("legacy code")
+                } else {
+                  val future = theFuture
+                  try {
+                    val ret = value.apply(in)
+                    future.satisfy(ret)
+                    ret
+                  } catch {
+                    case e: Exception => future.satisfy(e); throw e
+                  }
+                }
+              }
+
+              override def apply(in: FileParamHolder): Any = {
+                val ns = fixShot()
+
+                if (ns) {
+                  theFuture.get(5000).openOrThrowException("legacy code")
+                } else {
+                  val future = theFuture
+                  try {
+                    val ret = value.apply(in)
+                    future.satisfy(ret)
+                    ret
+                  } catch {
+                    case e: Exception => future.satisfy(e); throw e
+                  }
                 }
               }
             }
-
-            override def apply(in: FileParamHolder): Any = {
-              val ns = fixShot()
-
-              if (ns) {
-                theFuture.get(5000).openOrThrowException("legacy code")
-              } else {
-                val future = theFuture
-                try {
-                  val ret = value.apply(in)
-                  future.satisfy(ret)
-                  ret
-                } catch {
-                  case e: Exception => future.satisfy(e); throw e
-                }
-              }
-            }
-          })
+          )
         }
 
         case _ =>

@@ -271,21 +271,23 @@ object FastTypeTag {
     if (clazz == null) FastTypeTag.Null
     else
       try {
-        raw.getOrElse(clazz, {
-          // debug(s"!!! could not find primitive tag for class ${clazz.getName} !!!")
-          // handle arrays of non-primitive element type
-          if (clazz.isArray) mkRawArray(clazz, mirror)
-          else {
-            val clazzName0 = clazz.getName()
-            val clazzName =
-              if (clazzName0.contains("anonfun$") ||
-                  clazzName0.contains("$colon$colon") ||
-                  clazzName0.endsWith("$") || clazzName0.endsWith("$sp"))
-                clazzName0
-              else clazzName0.replace('$', '.')
-            apply(mirror, clazzName)
+        raw.getOrElse(
+          clazz, {
+            // debug(s"!!! could not find primitive tag for class ${clazz.getName} !!!")
+            // handle arrays of non-primitive element type
+            if (clazz.isArray) mkRawArray(clazz, mirror)
+            else {
+              val clazzName0 = clazz.getName()
+              val clazzName =
+                if (clazzName0.contains("anonfun$") ||
+                    clazzName0.contains("$colon$colon") ||
+                    clazzName0.endsWith("$") || clazzName0.endsWith("$sp"))
+                  clazzName0
+                else clazzName0.replace('$', '.')
+              apply(mirror, clazzName)
+            }
           }
-        })
+        )
       } catch {
         case t: Throwable =>
           sys.error(

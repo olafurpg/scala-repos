@@ -82,11 +82,14 @@ class NormalizerSuite
   }
 
   def assertTypeOfVector(lhs: Array[Vector], rhs: Array[Vector]): Unit = {
-    assert((lhs, rhs).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after normalization.")
+    assert(
+      (lhs, rhs).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after normalization."
+    )
   }
 
   def assertValues(lhs: Array[Vector], rhs: Array[Vector]): Unit = {

@@ -33,7 +33,8 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
             |    }
             |  }
             |}
-          """.stripMargin)
+          """.stripMargin
+    )
 
   def testGoToSuccessfulLocation(): Unit = {
     val testName = "SuccessfulGoToLocationTest"

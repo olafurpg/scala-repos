@@ -31,7 +31,9 @@ class MonitorFilter[Req, Rep](monitor: Monitor)
   private[this] val OnFailureFn: Throwable => Unit = exc => monitor.handle(exc)
 
   def apply(request: Req, service: Service[Req, Rep]): Future[Rep] =
-    Future.monitored {
-      service(request)
-    }.onFailure(OnFailureFn)
+    Future
+      .monitored {
+        service(request)
+      }
+      .onFailure(OnFailureFn)
 }

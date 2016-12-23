@@ -116,13 +116,16 @@ class ParquetHiveCompatibilitySuite
 
   test("array") {
     testParquetHiveCompatibility(
-      Row(Seq[Integer](1: Integer, null, 2: Integer, null),
-          Seq[String]("foo", null, "bar", null),
-          Seq[Seq[Integer]](Seq[Integer](1: Integer, null),
-                            Seq[Integer](2: Integer, null))),
+      Row(
+        Seq[Integer](1: Integer, null, 2: Integer, null),
+        Seq[String]("foo", null, "bar", null),
+        Seq[Seq[Integer]](Seq[Integer](1: Integer, null),
+                          Seq[Integer](2: Integer, null))
+      ),
       "ARRAY<INT>",
       "ARRAY<STRING>",
-      "ARRAY<ARRAY<INT>>")
+      "ARRAY<ARRAY<INT>>"
+    )
   }
 
   test("map") {

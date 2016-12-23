@@ -542,7 +542,8 @@ object Compatibility {
           },
           exprs = exprs,
           checkWithImplicits = checkWithImplicits,
-          isShapesResolve = isShapesResolve)
+          isShapesResolve = isShapesResolve
+        )
       case fun: ScFunction =>
         if (!fun.hasParameterClause && argClauses.nonEmpty)
           return ConformanceExtResult(Seq(new DoesNotTakeParameters))
@@ -585,7 +586,8 @@ object Compatibility {
           parameters = parameters.map(toParameter(_, substitutor)),
           exprs = exprs,
           checkWithImplicits = checkWithImplicits,
-          isShapesResolve = isShapesResolve)
+          isShapesResolve = isShapesResolve
+        )
         res
       case constructor: ScPrimaryConstructor =>
         val parameters: Seq[ScParameter] =
@@ -618,28 +620,31 @@ object Compatibility {
         if (shortage > 0) {
           val part = obligatory.takeRight(shortage).map { p =>
             val t = p.getType(TypingContext.empty).getOrAny
-            new Parameter(p.name,
-                          p.deprecatedName,
-                          t,
-                          t,
-                          p.isDefaultParam,
-                          p.isRepeatedParameter,
-                          p.isCallByNameParameter,
-                          p.index,
-                          Some(p),
-                          p.getDefaultExpression.flatMap(_.getType().toOption))
+            new Parameter(
+              p.name,
+              p.deprecatedName,
+              t,
+              t,
+              p.isDefaultParam,
+              p.isRepeatedParameter,
+              p.isCallByNameParameter,
+              p.index,
+              Some(p),
+              p.getDefaultExpression.flatMap(_.getType().toOption)
+            )
           }
           return ConformanceExtResult(part.map(new MissedValueParameter(_)))
         }
 
-        val res = checkConformanceExt(checkNames = true,
-                                      parameters = parameters.map {
-                                        param: ScParameter =>
-                                          toParameter(param, substitutor)
-                                      },
-                                      exprs = exprs,
-                                      checkWithImplicits = checkWithImplicits,
-                                      isShapesResolve = isShapesResolve)
+        val res = checkConformanceExt(
+          checkNames = true,
+          parameters = parameters.map { param: ScParameter =>
+            toParameter(param, substitutor)
+          },
+          exprs = exprs,
+          checkWithImplicits = checkWithImplicits,
+          isShapesResolve = isShapesResolve
+        )
         res
 
       case method: PsiMethod =>
@@ -677,7 +682,8 @@ object Compatibility {
           },
           exprs = exprs,
           checkWithImplicits = checkWithImplicits,
-          isShapesResolve = isShapesResolve)
+          isShapesResolve = isShapesResolve
+        )
 
       case _ => ConformanceExtResult(Seq(new ApplicabilityProblem("22")))
     }

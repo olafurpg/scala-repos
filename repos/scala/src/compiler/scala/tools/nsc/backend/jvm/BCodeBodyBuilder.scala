@@ -348,7 +348,8 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           val symIsModuleClass = tree.symbol.isModuleClass
           assert(
             tree.symbol == claszSymbol || symIsModuleClass,
-            s"Trying to access the this of another class: tree.symbol = ${tree.symbol}, class symbol = $claszSymbol compilation unit: $cunit")
+            s"Trying to access the this of another class: tree.symbol = ${tree.symbol}, class symbol = $claszSymbol compilation unit: $cunit"
+          )
           if (symIsModuleClass && tree.symbol != claszSymbol) {
             generatedType = genLoadModule(tree)
           } else {
@@ -1511,7 +1512,8 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
         else asm.Opcodes.H_INVOKEVIRTUAL,
         classBTypeFromSymbol(lambdaTarget.owner).internalName,
         lambdaTarget.name.toString,
-        methodBTypeFromSymbol(lambdaTarget).descriptor)
+        methodBTypeFromSymbol(lambdaTarget).descriptor
+      )
       val receiver = if (isStaticMethod) Nil else lambdaTarget.owner :: Nil
       val (capturedParams, lambdaParams) = lambdaTarget.paramss.head
         .splitAt(lambdaTarget.paramss.head.length - arity)
@@ -1545,7 +1547,8 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
         /* flags                  = */ flags.asInstanceOf[AnyRef],
         /* markerInterfaceCount   = */ 1.asInstanceOf[AnyRef],
         /* markerInterfaces[0]    = */ ScalaSerializable,
-        /* bridgeCount            = */ 0.asInstanceOf[AnyRef])
+        /* bridgeCount            = */ 0.asInstanceOf[AnyRef]
+      )
       indyLambdaHosts += cnode.name
     }
   }

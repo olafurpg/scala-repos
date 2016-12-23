@@ -43,6 +43,7 @@ trait FreeSpecScopeTest extends FreeSpecGenerator {
           checkResultTreeHasExactNamedPath(root, path2: _*) &&
           checkResultTreeDoesNotHaveNodes(root,
                                           "Innermost scope",
-                                          "Outer scope 3"))
+                                          "Outer scope 3")
+    )
   }
 }

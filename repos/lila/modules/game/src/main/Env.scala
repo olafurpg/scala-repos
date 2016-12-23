@@ -82,13 +82,15 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "game" boot new Env(config = lila.common.PlayApp loadConfig "game",
-                        db = lila.db.Env.current,
-                        mongoCache = lila.memo.Env.current.mongoCache,
-                        system = lila.common.PlayApp.system,
-                        hub = lila.hub.Env.current,
-                        getLightUser = lila.user.Env.current.lightUser,
-                        appPath = play.api.Play.current.path.getCanonicalPath,
-                        isProd = lila.common.PlayApp.isProd,
-                        scheduler = lila.common.PlayApp.scheduler)
+    "game" boot new Env(
+      config = lila.common.PlayApp loadConfig "game",
+      db = lila.db.Env.current,
+      mongoCache = lila.memo.Env.current.mongoCache,
+      system = lila.common.PlayApp.system,
+      hub = lila.hub.Env.current,
+      getLightUser = lila.user.Env.current.lightUser,
+      appPath = play.api.Play.current.path.getCanonicalPath,
+      isProd = lila.common.PlayApp.isProd,
+      scheduler = lila.common.PlayApp.scheduler
+    )
 }

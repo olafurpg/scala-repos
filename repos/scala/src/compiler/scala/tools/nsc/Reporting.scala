@@ -133,7 +133,8 @@ trait Reporting extends scala.reflect.internal.Reporting {
         reporter.warning(
           NoPosition,
           "some macros could not be expanded and code fell back to overridden methods;" +
-            "\nrecompiling with generated classfiles on the classpath might help.")
+            "\nrecompiling with generated classfiles on the classpath might help."
+        )
 
       // todo: migrationWarnings
 

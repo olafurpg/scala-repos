@@ -38,7 +38,8 @@ object ClusterSingletonProxySettings {
       singletonIdentificationInterval = config
         .getDuration("singleton-identification-interval", MILLISECONDS)
         .millis,
-      bufferSize = config.getInt("buffer-size"))
+      bufferSize = config.getInt("buffer-size")
+    )
 
   /**
     * Java API: Create settings from the default configuration
@@ -188,9 +189,10 @@ final class ClusterSingletonProxy(singletonManagerPath: String,
 
   def handleInitial(state: CurrentClusterState): Unit = {
     trackChange { () ⇒
-      membersByAge = immutable.SortedSet.empty(ageOrdering) union state.members.collect {
-        case m if m.status == MemberStatus.Up && matchingRole(m) ⇒ m
-      }
+      membersByAge = immutable.SortedSet.empty(ageOrdering) union state.members
+          .collect {
+          case m if m.status == MemberStatus.Up && matchingRole(m) ⇒ m
+        }
     }
   }
 

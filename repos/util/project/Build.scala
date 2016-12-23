@@ -373,13 +373,15 @@ object Util extends Build {
         zkDependency
       )
     )
-    .dependsOn(utilCore,
-               utilLogging,
-               utilZk,
-               // These are depended on to provide transitive dependencies
-               // that would otherwise cause incompatibilities. See above comment.
-               utilCollection,
-               utilHashing)
+    .dependsOn(
+      utilCore,
+      utilLogging,
+      utilZk,
+      // These are depended on to provide transitive dependencies
+      // that would otherwise cause incompatibilities. See above comment.
+      utilCollection,
+      utilHashing
+    )
 
   lazy val utilZkTest = Project(
     id = "util-zk-test",

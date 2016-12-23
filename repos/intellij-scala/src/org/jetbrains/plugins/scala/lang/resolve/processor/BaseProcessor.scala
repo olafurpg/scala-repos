@@ -221,7 +221,8 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
                 .put(BaseProcessor.COMPOUND_TYPE_THIS_TYPE_KEY, Some(t))
                 .put(ScSubstitutor.key, thisSubst),
               visitedAliases = visitedAliases,
-              visitedTypeParameter = visitedTypeParameter)
+              visitedTypeParameter = visitedTypeParameter
+            )
           } else if (clazzType.conforms(selfType)) {
             processElement(clazz,
                            thisSubst,
@@ -235,7 +236,8 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
               place,
               state.put(BaseProcessor.COMPOUND_TYPE_THIS_TYPE_KEY, Some(t)),
               visitedAliases = visitedAliases,
-              visitedTypeParameter = visitedTypeParameter)
+              visitedTypeParameter = visitedTypeParameter
+            )
           }
         }
       case d @ ScDesignatorType(e: PsiClass)
@@ -299,16 +301,19 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
           place,
           state,
           visitedAliases = visitedAliases,
-          visitedTypeParameter = visitedTypeParameter)
+          visitedTypeParameter = visitedTypeParameter
+        )
       case p @ ScParameterizedType(des, typeArgs) =>
         p.designator match {
           case tpt @ ScTypeParameterType(_, _, _, upper, _) =>
             if (visitedTypeParameter.contains(tpt)) return true
-            processType(p.substitutor.subst(upper.v),
-                        place,
-                        state.put(ScSubstitutor.key, new ScSubstitutor(p)),
-                        visitedAliases = visitedAliases,
-                        visitedTypeParameter = visitedTypeParameter + tpt)
+            processType(
+              p.substitutor.subst(upper.v),
+              place,
+              state.put(ScSubstitutor.key, new ScSubstitutor(p)),
+              visitedAliases = visitedAliases,
+              visitedTypeParameter = visitedTypeParameter + tpt
+            )
           case _ =>
             ScType.extractDesignated(p, withoutAliases = false) match {
               case Some((designator, subst)) =>
@@ -410,11 +415,13 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
     e match {
       case ta: ScTypeAlias =>
         if (visitedAliases.contains(ta)) return true
-        processType(s.subst(ta.upperBound.getOrAny),
-                    place,
-                    state.put(ScSubstitutor.key, ScSubstitutor.empty),
-                    visitedAliases = visitedAliases + ta,
-                    visitedTypeParameter = visitedTypeParameter)
+        processType(
+          s.subst(ta.upperBound.getOrAny),
+          place,
+          state.put(ScSubstitutor.key, ScSubstitutor.empty),
+          visitedAliases = visitedAliases + ta,
+          visitedTypeParameter = visitedTypeParameter
+        )
       //need to process scala way
       case clazz: PsiClass =>
         TypeDefinitionMembers.processDeclarations(
@@ -430,12 +437,14 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         }
         typeResult match {
           case Success(tp, _) =>
-            processType(newSubst subst tp,
-                        place,
-                        state.put(ScSubstitutor.key, ScSubstitutor.empty),
-                        updateWithProjectionSubst = false,
-                        visitedAliases = visitedAliases,
-                        visitedTypeParameter = visitedTypeParameter)
+            processType(
+              newSubst subst tp,
+              place,
+              state.put(ScSubstitutor.key, ScSubstitutor.empty),
+              updateWithProjectionSubst = false,
+              visitedAliases = visitedAliases,
+              visitedTypeParameter = visitedTypeParameter
+            )
           case _ => true
         }
       case pack: ScPackage =>

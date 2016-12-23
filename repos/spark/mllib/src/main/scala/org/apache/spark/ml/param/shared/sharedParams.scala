@@ -147,7 +147,8 @@ private[ml] trait HasProbabilityCol extends Params {
   final val probabilityCol: Param[String] = new Param[String](
     this,
     "probabilityCol",
-    "Column name for predicted class conditional probabilities. Note: Not all models output well-calibrated probability estimates! These probabilities should be treated as confidences, not precise probabilities")
+    "Column name for predicted class conditional probabilities. Note: Not all models output well-calibrated probability estimates! These probabilities should be treated as confidences, not precise probabilities"
+  )
 
   setDefault(probabilityCol, "probability")
 
@@ -207,7 +208,8 @@ private[ml] trait HasThresholds extends Params {
     this,
     "thresholds",
     "Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values >= 0. The class with largest value p/t is predicted, where p is the original probability of that class and t is the class' threshold",
-    (t: Array[Double]) => t.forall(_ >= 0))
+    (t: Array[Double]) => t.forall(_ >= 0)
+  )
 
   /** @group getParam */
   def getThresholds: Array[Double] = $(thresholds)
@@ -276,7 +278,8 @@ private[ml] trait HasCheckpointInterval extends Params {
     this,
     "checkpointInterval",
     "set checkpoint interval (>= 1) or disable checkpoint (-1). E.g. 10 means that the cache will get checkpointed every 10 iterations",
-    (interval: Int) => interval == -1 || interval >= 1)
+    (interval: Int) => interval == -1 || interval >= 1
+  )
 
   /** @group getParam */
   final def getCheckpointInterval: Int = $(checkpointInterval)
@@ -313,7 +316,8 @@ private[ml] trait HasHandleInvalid extends Params {
     this,
     "handleInvalid",
     "how to handle invalid entries. Options are skip (which will filter out rows with bad values), or error (which will throw an errror). More options may be added later",
-    ParamValidators.inArray(Array("skip", "error")))
+    ParamValidators.inArray(Array("skip", "error"))
+  )
 
   /** @group getParam */
   final def getHandleInvalid: String = $(handleInvalid)
@@ -369,7 +373,8 @@ private[ml] trait HasElasticNetParam extends Params {
     this,
     "elasticNetParam",
     "the ElasticNet mixing parameter, in range [0, 1]. For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty",
-    ParamValidators.inRange(0, 1))
+    ParamValidators.inRange(0, 1)
+  )
 
   /** @group getParam */
   final def getElasticNetParam: Double = $(elasticNetParam)

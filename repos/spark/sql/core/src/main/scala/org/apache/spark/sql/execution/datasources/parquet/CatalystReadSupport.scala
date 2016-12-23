@@ -173,17 +173,20 @@ private[parquet] object CatalystReadSupport {
         parquetList.isRepetition(Repetition.REPEATED)) {
       clipParquetType(parquetList, elementType)
     } else {
-      assert(parquetList.getOriginalType == OriginalType.LIST,
-             "Invalid Parquet schema. " +
-               "Original type of annotated Parquet lists must be LIST: " +
-               parquetList.toString)
+      assert(
+        parquetList.getOriginalType == OriginalType.LIST,
+        "Invalid Parquet schema. " +
+          "Original type of annotated Parquet lists must be LIST: " +
+          parquetList.toString
+      )
 
       assert(
         parquetList.getFieldCount == 1 &&
           parquetList.getType(0).isRepetition(Repetition.REPEATED),
         "Invalid Parquet schema. " +
           "LIST-annotated group should only have exactly one repeated field: " +
-          parquetList)
+          parquetList
+      )
 
       // Precondition of this method, should only be called for lists with nested element types.
       assert(!parquetList.getType(0).isPrimitive)

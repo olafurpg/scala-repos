@@ -41,9 +41,11 @@ class QueueResourceTest
     response.getStatus should be(200)
     val json = Json.parse(response.getEntity.asInstanceOf[String])
     val queuedApps = (json \ "queue").as[Seq[JsObject]]
-    val jsonApp1 = queuedApps.find { apps =>
-      (apps \ "app" \ "id").as[String] == "/app"
-    }.get
+    val jsonApp1 = queuedApps
+      .find { apps =>
+        (apps \ "app" \ "id").as[String] == "/app"
+      }
+      .get
 
     (jsonApp1 \ "app").as[AppDefinition] should be(app)
     (jsonApp1 \ "count").as[Int] should be(23)
@@ -71,9 +73,11 @@ class QueueResourceTest
     response.getStatus should be(200)
     val json = Json.parse(response.getEntity.asInstanceOf[String])
     val queuedApps = (json \ "queue").as[Seq[JsObject]]
-    val jsonApp1 = queuedApps.find { apps =>
-      (apps \ "app" \ "id").get == JsString("/app")
-    }.get
+    val jsonApp1 = queuedApps
+      .find { apps =>
+        (apps \ "app" \ "id").get == JsString("/app")
+      }
+      .get
 
     (jsonApp1 \ "app").as[AppDefinition] should be(app)
     (jsonApp1 \ "count").as[Int] should be(23)

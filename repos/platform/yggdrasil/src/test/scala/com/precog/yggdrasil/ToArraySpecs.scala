@@ -30,18 +30,17 @@ trait ToArraySpec[M[+ _]]
     extends ColumnarTableModuleTestSupport[M]
     with Specification {
   def testToArrayHomogeneous = {
-    val data: Stream[JValue] = Stream(JObject(
-                                        JField("value", JNum(23.4)) :: JField(
-                                          "key",
-                                          JArray(JNum(1) :: Nil)) :: Nil),
-                                      JObject(
-                                        JField("value", JNum(12.4)) :: JField(
-                                          "key",
-                                          JArray(JNum(2) :: Nil)) :: Nil),
-                                      JObject(
-                                        JField("value", JNum(-12.4)) :: JField(
-                                          "key",
-                                          JArray(JNum(3) :: Nil)) :: Nil))
+    val data: Stream[JValue] = Stream(
+      JObject(JField("value", JNum(23.4)) :: JField(
+        "key",
+        JArray(JNum(1) :: Nil)) :: Nil),
+      JObject(JField("value", JNum(12.4)) :: JField(
+        "key",
+        JArray(JNum(2) :: Nil)) :: Nil),
+      JObject(JField("value", JNum(-12.4)) :: JField(
+        "key",
+        JArray(JNum(3) :: Nil)) :: Nil)
+    )
 
     val sample = SampleData(data)
     val table = fromSample(sample)
@@ -74,7 +73,8 @@ trait ToArraySpec[M[+ _]]
         JObject(
           JField("value", JObject(JField("bar", JNum(44.4)) :: Nil)) :: JField(
             "key",
-            JArray(JNum(3) :: Nil)) :: Nil))
+            JArray(JNum(3) :: Nil)) :: Nil)
+      )
 
     val sample = SampleData(data)
     val table = fromSample(sample)

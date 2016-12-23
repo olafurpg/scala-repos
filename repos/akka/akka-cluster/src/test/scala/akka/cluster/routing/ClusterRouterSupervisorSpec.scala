@@ -44,9 +44,10 @@ class ClusterRouterSupervisorSpec
           ClusterRouterPoolSettings(totalInstances = 1,
                                     maxInstancesPerNode = 1,
                                     allowLocalRoutees = true,
-                                    useRole = None))
-          .props(Props(classOf[KillableActor], testActor)),
-        name = "therouter")
+                                    useRole = None)
+        ).props(Props(classOf[KillableActor], testActor)),
+        name = "therouter"
+      )
 
       router ! "go away"
       expectMsg("supervised")

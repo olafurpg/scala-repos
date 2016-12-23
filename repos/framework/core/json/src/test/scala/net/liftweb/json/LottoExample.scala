@@ -53,9 +53,9 @@ object LottoExample extends Specification {
           "id" -> 5,
           "winning-numbers" -> List(2, 45, 34, 23, 7, 5, 3),
           "draw-date" -> None,
-          "winners" -> List(Map("winner-id" -> 23,
-                                "numbers" -> List(2, 45, 34, 23, 3, 5)),
-                            Map("winner-id" -> 54,
-                                "numbers" -> List(52, 3, 12, 11, 18, 22))))))
+          "winners" -> List(
+            Map("winner-id" -> 23, "numbers" -> List(2, 45, 34, 23, 3, 5)),
+            Map("winner-id" -> 54, "numbers" -> List(52, 3, 12, 11, 18, 22)))
+        )))
   }
 }

@@ -136,7 +136,8 @@ class HttpServerSpec
         uri = "http://example.com/strict",
         headers = List(Host("example.com")),
         entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`,
-                                   ByteString("abcdefghijkl")))
+                                   ByteString("abcdefghijkl"))
+      )
     }
 
     "deliver the request entity as it comes in for a Default entity" in new TestSetup {
@@ -195,7 +196,8 @@ class HttpServerSpec
         uri = "http://example.com/strict",
         headers = List(Host("example.com")),
         entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`,
-                                   ByteString("abcdefghijkl")))
+                                   ByteString("abcdefghijkl"))
+      )
 
       send("""POST /next-strict HTTP/1.1
              |Host: example.com
@@ -208,7 +210,8 @@ class HttpServerSpec
         uri = "http://example.com/next-strict",
         headers = List(Host("example.com")),
         entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`,
-                                   ByteString("mnopqrstuvwx")))
+                                   ByteString("mnopqrstuvwx"))
+      )
     }
 
     "deliver the second message properly after a Default entity" in new TestSetup {

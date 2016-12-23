@@ -118,9 +118,11 @@ object WeightedPageRankFromMatrixSpec {
 
   def toSparseMap[Row, Col, V](
       iterable: Iterable[(Row, Col, V)]): Map[(Row, Col), V] =
-    iterable.map { entry =>
-      ((entry._1, entry._2), entry._3)
-    }.toMap
+    iterable
+      .map { entry =>
+        ((entry._1, entry._2), entry._3)
+      }
+      .toMap
 
   def filledColumnVector(value: Double, size: Int): List[(Int, Double)] = {
     val vector = mutable.ListBuffer[(Int, Double)]()

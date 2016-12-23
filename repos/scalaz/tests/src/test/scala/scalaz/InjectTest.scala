@@ -76,11 +76,14 @@ object InjectTest extends SpecLite {
 
   "inj" in {
     def run[A](algebra: Free[T, A]): A =
-      algebra.resume.fold({
-        case Coproduct(-\/(Test3(k, h))) => run(h(k.length))
-        case Coproduct(\/-(Coproduct(-\/(Test1(k, h))))) => run(h(k.length))
-        case Coproduct(\/-(Coproduct(\/-(Test2(k, h))))) => run(h(k.length))
-      }, a => a)
+      algebra.resume.fold(
+        {
+          case Coproduct(-\/(Test3(k, h))) => run(h(k.length))
+          case Coproduct(\/-(Coproduct(-\/(Test1(k, h))))) => run(h(k.length))
+          case Coproduct(\/-(Coproduct(\/-(Test2(k, h))))) => run(h(k.length))
+        },
+        a => a
+      )
 
     val res = for {
       a <- test1[T](Seq("a1", "a2", "a3"))

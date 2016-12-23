@@ -35,8 +35,8 @@ class DefaultClientTest
     val qIn = new AsyncQueue[Int]()
     val qOut = new AsyncQueue[Int]()
 
-    val transporter: (SocketAddress,
-                      StatsReceiver) => Future[Transport[Int, Int]] = {
+    val transporter: (SocketAddress, StatsReceiver) => Future[
+      Transport[Int, Int]] = {
       case (_, _) =>
         Future.value(new QueueTransport(qIn, qOut))
     }

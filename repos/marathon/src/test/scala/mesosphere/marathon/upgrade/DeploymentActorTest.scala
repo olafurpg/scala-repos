@@ -95,15 +95,17 @@ class DeploymentActorTest
       .thenAnswer(new Answer[Status] {
         def answer(invocation: InvocationOnMock): Status = {
           system.eventStream.publish(
-            MesosStatusUpdateEvent(slaveId = "",
-                                   taskId = Task.Id("task1_2"),
-                                   taskStatus = "TASK_KILLED",
-                                   message = "",
-                                   appId = app1.id,
-                                   host = "",
-                                   ipAddresses = Nil,
-                                   ports = Nil,
-                                   version = app1New.version.toString))
+            MesosStatusUpdateEvent(
+              slaveId = "",
+              taskId = Task.Id("task1_2"),
+              taskStatus = "TASK_KILLED",
+              message = "",
+              appId = app1.id,
+              host = "",
+              ipAddresses = Nil,
+              ports = Nil,
+              version = app1New.version.toString
+            ))
           Status.DRIVER_RUNNING
         }
       })
@@ -112,15 +114,17 @@ class DeploymentActorTest
       .thenAnswer(new Answer[Status] {
         def answer(invocation: InvocationOnMock): Status = {
           system.eventStream.publish(
-            MesosStatusUpdateEvent(slaveId = "",
-                                   taskId = Task.Id("task2_1"),
-                                   taskStatus = "TASK_KILLED",
-                                   message = "",
-                                   appId = app2.id,
-                                   host = "",
-                                   ipAddresses = Nil,
-                                   ports = Nil,
-                                   version = app2.version.toString))
+            MesosStatusUpdateEvent(
+              slaveId = "",
+              taskId = Task.Id("task2_1"),
+              taskStatus = "TASK_KILLED",
+              message = "",
+              appId = app2.id,
+              host = "",
+              ipAddresses = Nil,
+              ports = Nil,
+              version = app2.version.toString
+            ))
           Status.DRIVER_RUNNING
         }
       })
@@ -130,15 +134,17 @@ class DeploymentActorTest
         println(invocation.getArguments.toSeq)
         for (i <- 0 until invocation.getArguments()(1).asInstanceOf[Int])
           system.eventStream.publish(
-            MesosStatusUpdateEvent(slaveId = "",
-                                   taskId = Task.Id.forApp(app2New.id),
-                                   taskStatus = "TASK_RUNNING",
-                                   message = "",
-                                   appId = app2.id,
-                                   host = "",
-                                   ipAddresses = Nil,
-                                   ports = Nil,
-                                   version = app2New.version.toString))
+            MesosStatusUpdateEvent(
+              slaveId = "",
+              taskId = Task.Id.forApp(app2New.id),
+              taskStatus = "TASK_RUNNING",
+              message = "",
+              appId = app2.id,
+              host = "",
+              ipAddresses = Nil,
+              ports = Nil,
+              version = app2New.version.toString
+            ))
         true
       }
     })
@@ -154,15 +160,17 @@ class DeploymentActorTest
     when(scheduler.scale(driver, app3)).thenAnswer(new Answer[Future[Unit]] {
       def answer(invocation: InvocationOnMock): Future[Unit] = {
         system.eventStream.publish(
-          MesosStatusUpdateEvent(slaveId = "",
-                                 taskId = Task.Id("task3_1"),
-                                 taskStatus = "TASK_RUNNING",
-                                 message = "",
-                                 appId = app3.id,
-                                 host = "",
-                                 ipAddresses = Nil,
-                                 ports = Nil,
-                                 version = app3.version.toString))
+          MesosStatusUpdateEvent(
+            slaveId = "",
+            taskId = Task.Id("task3_1"),
+            taskStatus = "TASK_RUNNING",
+            message = "",
+            appId = app3.id,
+            host = "",
+            ipAddresses = Nil,
+            ports = Nil,
+            version = app3.version.toString
+          ))
         Future.successful(())
       }
     })

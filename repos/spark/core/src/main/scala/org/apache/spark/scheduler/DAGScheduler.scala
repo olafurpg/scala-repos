@@ -900,14 +900,14 @@ private[spark] class DAGScheduler(
     submitWaitingStages()
   }
 
-  private[scheduler] def handleJobSubmitted(jobId: Int,
-                                            finalRDD: RDD[_],
-                                            func: (TaskContext,
-                                                   Iterator[_]) => _,
-                                            partitions: Array[Int],
-                                            callSite: CallSite,
-                                            listener: JobListener,
-                                            properties: Properties) {
+  private[scheduler] def handleJobSubmitted(
+      jobId: Int,
+      finalRDD: RDD[_],
+      func: (TaskContext, Iterator[_]) => _,
+      partitions: Array[Int],
+      callSite: CallSite,
+      listener: JobListener,
+      properties: Properties) {
     var finalStage: ResultStage = null
     try {
       // New stage creation may throw an exception if, for example, jobs are run on a
@@ -1066,15 +1066,19 @@ private[spark] class DAGScheduler(
     val taskIdToLocations: Map[Int, Seq[TaskLocation]] = try {
       stage match {
         case s: ShuffleMapStage =>
-          partitionsToCompute.map { id =>
-            (id, getPreferredLocs(stage.rdd, id))
-          }.toMap
+          partitionsToCompute
+            .map { id =>
+              (id, getPreferredLocs(stage.rdd, id))
+            }
+            .toMap
         case s: ResultStage =>
           val job = s.activeJob.get
-          partitionsToCompute.map { id =>
-            val p = s.partitions(id)
-            (id, getPreferredLocs(stage.rdd, p))
-          }.toMap
+          partitionsToCompute
+            .map { id =>
+              val p = s.partitions(id)
+              (id, getPreferredLocs(stage.rdd, p))
+            }
+            .toMap
       }
     } catch {
       case NonFatal(e) =>
@@ -1428,12 +1432,14 @@ private[spark] class DAGScheduler(
               None)
           } else if (failedStage.failedOnFetchAndShouldAbort(
                        task.stageAttemptId)) {
-            abortStage(failedStage,
-                       s"$failedStage (${failedStage.name}) " +
-                         s"has failed the maximum allowable number of " +
-                         s"times: ${Stage.MAX_CONSECUTIVE_FETCH_FAILURES}. " +
-                         s"Most recent failure reason: ${failureMessage}",
-                       None)
+            abortStage(
+              failedStage,
+              s"$failedStage (${failedStage.name}) " +
+                s"has failed the maximum allowable number of " +
+                s"times: ${Stage.MAX_CONSECUTIVE_FETCH_FAILURES}. " +
+                s"Most recent failure reason: ${failureMessage}",
+              None
+            )
           } else if (failedStages.isEmpty) {
             // Don't schedule an event to resubmit failed stages if failed isn't empty, because
             // in that case the event will already have been scheduled.

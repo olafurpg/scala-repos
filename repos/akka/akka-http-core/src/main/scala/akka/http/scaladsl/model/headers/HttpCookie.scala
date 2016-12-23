@@ -84,7 +84,8 @@ final case class HttpCookie(name: String,
     s"'${pathOrExtChars.firstMismatch(path.get).get}' not allowed in cookie path ('${path.get}')")
   require(
     extension.forall(pathOrExtChars.matchesAll),
-    s"'${pathOrExtChars.firstMismatch(extension.get).get}' not allowed in cookie extension ('${extension.get}')")
+    s"'${pathOrExtChars.firstMismatch(extension.get).get}' not allowed in cookie extension ('${extension.get}')"
+  )
 
   def render[R <: Rendering](r: R): r.type = {
     r ~~ name ~~ '=' ~~ value

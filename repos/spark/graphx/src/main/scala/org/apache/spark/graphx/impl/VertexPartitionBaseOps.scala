@@ -177,8 +177,8 @@ Self[X] <: VertexPartitionBase[X]: VertexPartitionBaseOpsConstructor](
     * Inner join an iterator of messages.
     */
   def innerJoin[U: ClassTag, VD2: ClassTag](
-      iter: Iterator[Product2[VertexId, U]])(f: (VertexId, VD,
-                                                 U) => VD2): Self[VD2] = {
+      iter: Iterator[Product2[VertexId, U]])(
+      f: (VertexId, VD, U) => VD2): Self[VD2] = {
     innerJoin(createUsingIndex(iter))(f)
   }
 

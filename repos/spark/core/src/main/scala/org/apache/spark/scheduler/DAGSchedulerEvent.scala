@@ -34,14 +34,14 @@ import org.apache.spark.util.CallSite
 private[scheduler] sealed trait DAGSchedulerEvent
 
 /** A result-yielding job was submitted on a target RDD */
-private[scheduler] case class JobSubmitted(jobId: Int,
-                                           finalRDD: RDD[_],
-                                           func: (TaskContext,
-                                                  Iterator[_]) => _,
-                                           partitions: Array[Int],
-                                           callSite: CallSite,
-                                           listener: JobListener,
-                                           properties: Properties = null)
+private[scheduler] case class JobSubmitted(
+    jobId: Int,
+    finalRDD: RDD[_],
+    func: (TaskContext, Iterator[_]) => _,
+    partitions: Array[Int],
+    callSite: CallSite,
+    listener: JobListener,
+    properties: Properties = null)
     extends DAGSchedulerEvent
 
 /** A map stage as submitted to run as a separate job */

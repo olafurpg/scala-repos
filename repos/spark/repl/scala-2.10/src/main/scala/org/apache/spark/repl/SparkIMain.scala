@@ -1083,11 +1083,15 @@ class SparkIMain(initialSettings: Settings,
         throw t
 
       val unwrapped = unwrap(t)
-      withLastExceptionLock[String]({
-        directBind[Throwable]("lastException", unwrapped)(tagOfThrowable,
-                                                          classTag[Throwable])
+      withLastExceptionLock[String](
+        {
+          directBind[Throwable]("lastException", unwrapped)(
+            tagOfThrowable,
+            classTag[Throwable])
+          util.stackTraceString(unwrapped)
+        },
         util.stackTraceString(unwrapped)
-      }, util.stackTraceString(unwrapped))
+      )
     }
 
     // TODO: split it out into a package object and a regular

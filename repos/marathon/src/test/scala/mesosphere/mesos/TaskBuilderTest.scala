@@ -390,13 +390,15 @@ class TaskBuilderTest extends MarathonSpec with Matchers {
     val expectedLabels =
       MesosProtos.Labels.newBuilder
         .addAllLabels(
-          labels.map {
-            case (mKey, mValue) =>
-              MesosProtos.Label.newBuilder
-                .setKey(mKey)
-                .setValue(mValue)
-                .build()
-          }.asJava
+          labels
+            .map {
+              case (mKey, mValue) =>
+                MesosProtos.Label.newBuilder
+                  .setKey(mKey)
+                  .setValue(mValue)
+                  .build()
+            }
+            .asJava
         )
         .build()
     assert(taskInfo.hasLabels)
@@ -1288,13 +1290,15 @@ class TaskBuilderTest extends MarathonSpec with Matchers {
 
     val nonPrefixedEnvVars = env.filterKeys(!_.startsWith("P_"))
 
-    val whiteList = Seq("MESOS_TASK_ID",
-                        "MARATHON_APP_ID",
-                        "MARATHON_APP_VERSION",
-                        "MARATHON_APP_RESOURCE_CPUS",
-                        "MARATHON_APP_RESOURCE_MEM",
-                        "MARATHON_APP_RESOURCE_DISK",
-                        "MARATHON_APP_LABELS")
+    val whiteList = Seq(
+      "MESOS_TASK_ID",
+      "MARATHON_APP_ID",
+      "MARATHON_APP_VERSION",
+      "MARATHON_APP_RESOURCE_CPUS",
+      "MARATHON_APP_RESOURCE_MEM",
+      "MARATHON_APP_RESOURCE_DISK",
+      "MARATHON_APP_LABELS"
+    )
 
     assert(nonPrefixedEnvVars.keySet.forall(whiteList.contains))
   }
@@ -1304,21 +1308,20 @@ class TaskBuilderTest extends MarathonSpec with Matchers {
       app = AppDefinition(
         container = Some(
           Container(
-            docker = Some(
-              Docker(
-                network = Some(DockerInfo.Network.BRIDGE),
-                portMappings = Some(
-                  Seq(
-                    PortMapping(containerPort = 8080,
-                                hostPort = 0,
-                                servicePort = 9000,
-                                protocol = "tcp"),
-                    PortMapping(containerPort = 8081,
-                                hostPort = 0,
-                                servicePort = 9000,
-                                protocol = "tcp")
-                  ))
-              ))
+            docker = Some(Docker(
+              network = Some(DockerInfo.Network.BRIDGE),
+              portMappings = Some(
+                Seq(
+                  PortMapping(containerPort = 8080,
+                              hostPort = 0,
+                              servicePort = 9000,
+                              protocol = "tcp"),
+                  PortMapping(containerPort = 8081,
+                              hostPort = 0,
+                              servicePort = 9000,
+                              protocol = "tcp")
+                ))
+            ))
           ))
       ),
       taskId = Some(Task.Id("task-123")),
@@ -1341,21 +1344,20 @@ class TaskBuilderTest extends MarathonSpec with Matchers {
         portDefinitions = PortDefinitions(22, 23),
         container = Some(
           Container(
-            docker = Some(
-              Docker(
-                network = Some(DockerInfo.Network.BRIDGE),
-                portMappings = Some(
-                  Seq(
-                    PortMapping(containerPort = 8080,
-                                hostPort = 0,
-                                servicePort = 9000,
-                                protocol = "tcp"),
-                    PortMapping(containerPort = 8081,
-                                hostPort = 0,
-                                servicePort = 9000,
-                                protocol = "tcp")
-                  ))
-              ))
+            docker = Some(Docker(
+              network = Some(DockerInfo.Network.BRIDGE),
+              portMappings = Some(
+                Seq(
+                  PortMapping(containerPort = 8080,
+                              hostPort = 0,
+                              servicePort = 9000,
+                              protocol = "tcp"),
+                  PortMapping(containerPort = 8081,
+                              hostPort = 0,
+                              servicePort = 9000,
+                              protocol = "tcp")
+                ))
+            ))
           ))
       ),
       taskId = Some(Task.Id("task-123")),
@@ -1461,7 +1463,8 @@ class TaskBuilderTest extends MarathonSpec with Matchers {
       MarathonTestHelper.defaultConfig(mesosRole = mesosRole,
                                        acceptedResourceRoles =
                                          acceptedResourceRoles,
-                                       envVarsPrefix = envVarsPrefix))
+                                       envVarsPrefix = envVarsPrefix)
+    )
 
     builder.buildIfMatches(offer, Iterable.empty)
   }

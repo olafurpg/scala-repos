@@ -3870,13 +3870,15 @@ trait Types
 
     /* Disabled - causes cycles in tcpoly tests. */
     if (false && isDefinitionsInitialized) {
-      assert(isUseableAsTypeArgs(args), {
-        val tapp_s = s"""$tycon[${args mkString ", "}]"""
-        val arg_s =
-          args filterNot isUseableAsTypeArg map
-            (t => t + "/" + t.getClass) mkString ", "
-        s"$tapp_s includes illegal type argument $arg_s"
-      })
+      assert(
+        isUseableAsTypeArgs(args), {
+          val tapp_s = s"""$tycon[${args mkString ", "}]"""
+          val arg_s =
+            args filterNot isUseableAsTypeArg map
+              (t => t + "/" + t.getClass) mkString ", "
+          s"$tapp_s includes illegal type argument $arg_s"
+        }
+      )
     }
 
     tycon match {
@@ -4759,8 +4761,7 @@ trait Types
             val args = argss map (_.head)
             if (args.tail forall (_ =:= args.head))
               typeRef(pre, sym, List(args.head))
-            else if (args exists (arg =>
-                                    isPrimitiveValueClass(arg.typeSymbol)))
+            else if (args exists (arg => isPrimitiveValueClass(arg.typeSymbol)))
               ObjectTpe
             else typeRef(pre, sym, List(lub(args)))
           }
@@ -4968,14 +4969,16 @@ trait Types
       case _ =>
     }
 
-  val shorthands = Set("scala.collection.immutable.List",
-                       "scala.collection.immutable.Nil",
-                       "scala.collection.Seq",
-                       "scala.collection.Traversable",
-                       "scala.collection.Iterable",
-                       "scala.collection.mutable.StringBuilder",
-                       "scala.collection.IndexedSeq",
-                       "scala.collection.Iterator")
+  val shorthands = Set(
+    "scala.collection.immutable.List",
+    "scala.collection.immutable.Nil",
+    "scala.collection.Seq",
+    "scala.collection.Traversable",
+    "scala.collection.Iterable",
+    "scala.collection.mutable.StringBuilder",
+    "scala.collection.IndexedSeq",
+    "scala.collection.Iterator"
+  )
 
 // ----- Hoisted closures and convenience methods, for compile time reductions -------
 

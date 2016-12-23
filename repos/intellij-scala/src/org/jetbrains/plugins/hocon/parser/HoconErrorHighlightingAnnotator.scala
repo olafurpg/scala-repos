@@ -20,15 +20,17 @@ class HoconErrorHighlightingAnnotator extends Annotator {
         val lexer = new StringLiteralLexer('"', QuotedString)
         lexer.start(element.getText)
 
-        Iterator.continually {
-          val range = TextRange(lexer.getTokenStart, lexer.getTokenEnd)
-            .shiftRight(element.getTextRange.getStartOffset)
-          val result = (lexer.getTokenType, range)
-          lexer.advance()
-          result
-        }.takeWhile {
-          case (tokenType, _) => tokenType != null
-        } foreach {
+        Iterator
+          .continually {
+            val range = TextRange(lexer.getTokenStart, lexer.getTokenEnd)
+              .shiftRight(element.getTextRange.getStartOffset)
+            val result = (lexer.getTokenType, range)
+            lexer.advance()
+            result
+          }
+          .takeWhile {
+            case (tokenType, _) => tokenType != null
+          } foreach {
           case (StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN,
                 range) =>
             holder.createErrorAnnotation(range, "invalid escape character")

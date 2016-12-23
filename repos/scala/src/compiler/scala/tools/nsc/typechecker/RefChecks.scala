@@ -183,7 +183,8 @@ abstract class RefChecks
                  else
                    ".\nThe members with defaults are defined in " + owners
                      .map(_.fullLocationString)
-                     .mkString("", " and ", ".")))
+                     .mkString("", " and ", "."))
+            )
           }
         }
       }
@@ -194,14 +195,14 @@ abstract class RefChecks
                (_.typeParams.length)) {
           reporter.error(
             m1.pos,
-            "implementation restriction: applyDynamic cannot be overloaded except by methods with different numbers of type parameters, e.g. applyDynamic[T1](method: String)(arg: T1) and applyDynamic[T1, T2](method: String)(arg1: T1, arg2: T2)")
+            "implementation restriction: applyDynamic cannot be overloaded except by methods with different numbers of type parameters, e.g. applyDynamic[T1](method: String)(arg: T1) and applyDynamic[T1, T2](method: String)(arg1: T1, arg2: T2)"
+          )
         }
       }
 
       // This has become noisy with implicit classes.
       if (settings.warnPolyImplicitOverload && settings.developer) {
-        clazz.info.decls filter (x =>
-                                   x.isImplicit && x.typeParams.nonEmpty) foreach {
+        clazz.info.decls filter (x => x.isImplicit && x.typeParams.nonEmpty) foreach {
           sym =>
             // implicit classes leave both a module symbol and a method symbol as residue
             val alts =
@@ -595,7 +596,8 @@ abstract class RefChecks
                   " " + member.varianceString + member.nameString +
                   " does not conform to the expected kind of " +
                   other.defString + other.locationString + "." +
-                  kindErrors.toList.mkString("\n", ", ", ""))
+                  kindErrors.toList.mkString("\n", ", ", "")
+              )
           }
           // check a type alias's RHS corresponds to its declaration
           // this overlaps somewhat with validateVariance
@@ -606,12 +608,14 @@ abstract class RefChecks
                                         low.owner) match {
               case Nil =>
               case kindErrors =>
-                reporter.error(member.pos,
-                               "The kind of the right-hand side " +
-                                 lowType.normalize + " of " + low.keyString +
-                                 " " + low.varianceString + low.nameString +
-                                 " does not conform to its expected kind." +
-                                 kindErrors.toList.mkString("\n", ", ", ""))
+                reporter.error(
+                  member.pos,
+                  "The kind of the right-hand side " +
+                    lowType.normalize + " of " + low.keyString +
+                    " " + low.varianceString + low.nameString +
+                    " does not conform to its expected kind." +
+                    kindErrors.toList.mkString("\n", ", ", "")
+                )
             }
           } else if (low.isAbstractType && lowType.isVolatile &&
                      !highInfo.bounds.hi.isVolatile)
@@ -1608,7 +1612,8 @@ abstract class RefChecks
           accessFlagsToString(otherSym),
           otherSym
         ) + "\nClasses which cannot access %s %s %s."
-          .format(otherSym.decodedName, cannot, memberSym.decodedName))
+          .format(otherSym.decodedName, cannot, memberSym.decodedName)
+      )
     }
 
     /** Warn about situations where a method signature will include a type which

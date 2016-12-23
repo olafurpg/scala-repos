@@ -56,19 +56,21 @@ private final class LeaderboardIndexer(tournamentColl: Coll,
             perfType <- tour.perfType
             nb <- nbGames get player.userId
           } yield
-            Entry(id = player._id,
-                  tourId = tour.id,
-                  userId = player.userId,
-                  nbGames = nb,
-                  score = player.score,
-                  rank = rank,
-                  rankRatio = Ratio(
-                    if (tour.nbPlayers > 0)
-                      rank.toDouble / tour.nbPlayers
-                    else 0),
-                  freq = tour.schedule.map(_.freq),
-                  speed = tour.schedule.map(_.speed),
-                  perf = perfType,
-                  date = tour.startsAt)
+            Entry(
+              id = player._id,
+              tourId = tour.id,
+              userId = player.userId,
+              nbGames = nb,
+              score = player.score,
+              rank = rank,
+              rankRatio = Ratio(
+                if (tour.nbPlayers > 0)
+                  rank.toDouble / tour.nbPlayers
+                else 0),
+              freq = tour.schedule.map(_.freq),
+              speed = tour.schedule.map(_.speed),
+              perf = perfType,
+              date = tour.startsAt
+            )
       }
 }

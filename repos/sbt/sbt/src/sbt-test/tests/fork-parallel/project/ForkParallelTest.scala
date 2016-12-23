@@ -31,5 +31,6 @@ object ForkParallelTest extends Build {
           }
         }
       }
-      ))
+      )
+  )
 }

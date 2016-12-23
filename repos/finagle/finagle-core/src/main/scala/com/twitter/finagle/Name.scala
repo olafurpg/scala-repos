@@ -123,25 +123,28 @@ object Name {
   def fromGroup(g: Group[SocketAddress]): Name.Bound = g match {
     case NameGroup(name) => name
     case group =>
-      Name.Bound({
-        // Group doesn't support the abstraction of "not yet bound" so
-        // this is a bit of a hack
-        @volatile var first = true
+      Name.Bound(
+        {
+          // Group doesn't support the abstraction of "not yet bound" so
+          // this is a bit of a hack
+          @volatile var first = true
 
-        group.set map {
-          case newSet if first && newSet.isEmpty => Addr.Pending
-          case newSet =>
-            first = false
-            newSet.foldLeft[Addr](Addr.Bound()) {
-              case (Addr.Bound(set, metadata), ia: InetSocketAddress) =>
-                Addr.Bound(set + Address(ia), metadata)
-              case (Addr.Bound(_, _), sa) =>
-                Addr.Failed(new IllegalArgumentException(
-                  s"Unsupported SocketAddress of type '${sa.getClass.getName}': $sa"))
-              case (addr, _) => addr
-            }
-        }
-      }, group)
+          group.set map {
+            case newSet if first && newSet.isEmpty => Addr.Pending
+            case newSet =>
+              first = false
+              newSet.foldLeft[Addr](Addr.Bound()) {
+                case (Addr.Bound(set, metadata), ia: InetSocketAddress) =>
+                  Addr.Bound(set + Address(ia), metadata)
+                case (Addr.Bound(_, _), sa) =>
+                  Addr.Failed(new IllegalArgumentException(
+                    s"Unsupported SocketAddress of type '${sa.getClass.getName}': $sa"))
+                case (addr, _) => addr
+              }
+          }
+        },
+        group
+      )
   }
 
   /**
@@ -169,10 +172,12 @@ object Name {
           case addrs if addrs.exists({
                 case Addr.Bound(_, _) => true; case _ => false
               }) =>
-            val endpointAddrs = addrs.flatMap {
-              case Addr.Bound(as, _) => as
-              case _ => Set.empty[Address]
-            }.toSet
+            val endpointAddrs = addrs
+              .flatMap {
+                case Addr.Bound(as, _) => as
+                case _ => Set.empty[Address]
+              }
+              .toSet
             Addr.Bound(endpointAddrs, Addr.Metadata.empty)
 
           case addrs if addrs.forall(_ == Addr.Neg) => Addr.Neg

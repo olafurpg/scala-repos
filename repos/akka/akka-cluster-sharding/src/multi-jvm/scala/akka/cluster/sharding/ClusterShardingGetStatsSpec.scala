@@ -90,7 +90,8 @@ abstract class ClusterShardingGetStatsSpec
       entityProps = Props(new ShardedActor),
       settings = ClusterShardingSettings(system).withRole("shard"),
       extractEntityId = extractEntityId,
-      extractShardId = extractShardId)
+      extractShardId = extractShardId
+    )
   }
 
   def startProxy(): ActorRef = {

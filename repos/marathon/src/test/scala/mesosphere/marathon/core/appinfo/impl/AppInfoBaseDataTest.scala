@@ -106,14 +106,16 @@ class AppInfoBaseDataTest
       Set("task1", "task2", "task3"))
 
     appInfo should be(
-      AppInfo(app,
-              maybeTasks = Some(
-                Seq(
-                  EnrichedTask(app.id, running1, Seq.empty),
-                  EnrichedTask(app.id, running2, Seq(alive)),
-                  EnrichedTask(app.id, running3, Seq(unhealthy))
-                )
-              )))
+      AppInfo(
+        app,
+        maybeTasks = Some(
+          Seq(
+            EnrichedTask(app.id, running1, Seq.empty),
+            EnrichedTask(app.id, running2, Seq(alive)),
+            EnrichedTask(app.id, running3, Seq(unhealthy))
+          )
+        )
+      ))
 
     And("the taskTracker should have been called")
     verify(f.taskTracker, times(1)).tasksByApp()(global)

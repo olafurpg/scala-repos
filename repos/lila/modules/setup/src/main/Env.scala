@@ -39,12 +39,14 @@ final class Env(config: AppConfig,
 object Env {
 
   lazy val current =
-    "setup" boot new Env(config = lila.common.PlayApp loadConfig "setup",
-                         db = lila.db.Env.current,
-                         hub = lila.hub.Env.current,
-                         fishnetPlayer = lila.fishnet.Env.current.player,
-                         onStart = lila.game.Env.current.onStart,
-                         prefApi = lila.pref.Env.current.api,
-                         relationApi = lila.relation.Env.current.api,
-                         system = lila.common.PlayApp.system)
+    "setup" boot new Env(
+      config = lila.common.PlayApp loadConfig "setup",
+      db = lila.db.Env.current,
+      hub = lila.hub.Env.current,
+      fishnetPlayer = lila.fishnet.Env.current.player,
+      onStart = lila.game.Env.current.onStart,
+      prefApi = lila.pref.Env.current.api,
+      relationApi = lila.relation.Env.current.api,
+      system = lila.common.PlayApp.system
+    )
 }

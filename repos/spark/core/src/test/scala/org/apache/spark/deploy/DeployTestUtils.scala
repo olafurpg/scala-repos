@@ -79,22 +79,24 @@ private[deploy] object DeployTestUtils {
   }
 
   def createExecutorRunner(execId: Int): ExecutorRunner = {
-    new ExecutorRunner("appId",
-                       execId,
-                       createAppDesc(),
-                       4,
-                       1234,
-                       null,
-                       "workerId",
-                       "host",
-                       123,
-                       "publicAddress",
-                       new File("sparkHome"),
-                       new File("workDir"),
-                       "spark://worker",
-                       new SparkConf,
-                       Seq("localDir"),
-                       ExecutorState.RUNNING)
+    new ExecutorRunner(
+      "appId",
+      execId,
+      createAppDesc(),
+      4,
+      1234,
+      null,
+      "workerId",
+      "host",
+      123,
+      "publicAddress",
+      new File("sparkHome"),
+      new File("workDir"),
+      "spark://worker",
+      new SparkConf,
+      Seq("localDir"),
+      ExecutorState.RUNNING
+    )
   }
 
   def createDriverRunner(driverId: String): DriverRunner = {

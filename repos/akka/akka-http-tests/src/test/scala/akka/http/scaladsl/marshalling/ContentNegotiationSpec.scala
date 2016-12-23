@@ -192,7 +192,8 @@ class ContentNegotiationSpec extends FreeSpec with Matchers {
           .recover {
             case _: Marshal.UnacceptableResponseContentTypeException ⇒ None
           },
-        1.second)
+        1.second
+      )
     }
   }
 

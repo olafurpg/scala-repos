@@ -74,9 +74,11 @@ abstract class InputDStream[T: ClassTag](_ssc: StreamingContext)
     */
   protected[streaming] override val baseScope: Option[String] = {
     val scopeName =
-      Option(ssc.sc.getLocalProperty(SparkContext.RDD_SCOPE_KEY)).map { json =>
-        RDDOperationScope.fromJson(json).name + s" [$id]"
-      }.getOrElse(name.toLowerCase)
+      Option(ssc.sc.getLocalProperty(SparkContext.RDD_SCOPE_KEY))
+        .map { json =>
+          RDDOperationScope.fromJson(json).name + s" [$id]"
+        }
+        .getOrElse(name.toLowerCase)
     Some(new RDDOperationScope(scopeName).toJson)
   }
 

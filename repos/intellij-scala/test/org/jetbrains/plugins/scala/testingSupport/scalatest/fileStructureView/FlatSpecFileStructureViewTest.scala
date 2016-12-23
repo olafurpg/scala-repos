@@ -11,8 +11,9 @@ trait FlatSpecFileStructureViewTest extends ScalaTestTestCase {
   private val className = "FlatSpecViewTest"
 
   def addFlatSpecViewTest() {
-    addFileToProject(className + ".scala",
-                     """
+    addFileToProject(
+      className + ".scala",
+      """
         |import org.scalatest._
         |
         |class FlatSpecViewTest extends FlatSpec {
@@ -34,7 +35,8 @@ trait FlatSpecFileStructureViewTest extends ScalaTestTestCase {
         |
         |  it should "ignore and pend2" ignore pending
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testFlatSpecNormal(): Unit = {

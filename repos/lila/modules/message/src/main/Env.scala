@@ -54,5 +54,6 @@ object Env {
       blocks = lila.relation.Env.current.api.fetchBlocks,
       follows = lila.relation.Env.current.api.fetchFollows,
       getPref = lila.pref.Env.current.api.getPref,
-      system = lila.common.PlayApp.system)
+      system = lila.common.PlayApp.system
+    )
 }

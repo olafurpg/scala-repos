@@ -567,14 +567,16 @@ object MixinNodes {
         clazz match {
           case td: ScTemplateDefinition => td.superTypes
           case clazz: PsiClass =>
-            clazz.getSuperTypes.map {
-              case ctp: PsiClassType =>
-                val cl = ctp.resolve()
-                if (cl != null && cl.qualifiedName == "java.lang.Object")
-                  ScDesignatorType(cl)
-                else ScType.create(ctp, clazz.getProject)
-              case ctp => ScType.create(ctp, clazz.getProject)
-            }.toSeq
+            clazz.getSuperTypes
+              .map {
+                case ctp: PsiClassType =>
+                  val cl = ctp.resolve()
+                  if (cl != null && cl.qualifiedName == "java.lang.Object")
+                    ScDesignatorType(cl)
+                  else ScType.create(ctp, clazz.getProject)
+                case ctp => ScType.create(ctp, clazz.getProject)
+              }
+              .toSeq
         }
       }
 

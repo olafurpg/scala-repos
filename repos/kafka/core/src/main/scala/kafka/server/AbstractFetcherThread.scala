@@ -284,13 +284,15 @@ object AbstractFetcherThread {
 class FetcherLagMetrics(metricId: ClientIdTopicPartition)
     extends KafkaMetricsGroup {
   private[this] val lagVal = new AtomicLong(-1L)
-  newGauge("ConsumerLag",
-           new Gauge[Long] {
-             def value = lagVal.get
-           },
-           Map("clientId" -> metricId.clientId,
-               "topic" -> metricId.topic,
-               "partition" -> metricId.partitionId.toString))
+  newGauge(
+    "ConsumerLag",
+    new Gauge[Long] {
+      def value = lagVal.get
+    },
+    Map("clientId" -> metricId.clientId,
+        "topic" -> metricId.topic,
+        "partition" -> metricId.partitionId.toString)
+  )
 
   def lag_=(newLag: Long) {
     lagVal.set(newLag)

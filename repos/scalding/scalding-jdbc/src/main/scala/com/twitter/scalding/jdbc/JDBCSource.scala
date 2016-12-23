@@ -82,7 +82,8 @@ abstract class JDBCSource extends Source with ColumnDefiner with JdbcDriver {
         passwd.get,
         driver.get,
         getTableDesc(tableName, columnNames, columnDefinitions),
-        getJDBCScheme(columnNames, filterCondition, updateBy, replaceOnInsert))
+        getJDBCScheme(columnNames, filterCondition, updateBy, replaceOnInsert)
+      )
       tap.setConcurrentReads(maxConcurrentReads)
       tap.setBatchSize(batchSize)
       tap
@@ -102,10 +103,12 @@ abstract class JDBCSource extends Source with ColumnDefiner with JdbcDriver {
   // Generate SQL statement to create the DB table if not existing.
   def toSqlCreateString: String = {
     def addBackTicks(str: String) = "`" + str + "`"
-    val allCols = columns.map {
-      case ColumnDefinition(ColumnName(name), Definition(defn)) =>
-        addBackTicks(name) + " " + defn
-    }.mkString(",\n")
+    val allCols = columns
+      .map {
+        case ColumnDefinition(ColumnName(name), Definition(defn)) =>
+          addBackTicks(name) + " " + defn
+      }
+      .mkString(",\n")
 
     "CREATE TABLE " + addBackTicks(tableName.get) + " (\n" + allCols +
       ",\n PRIMARY KEY HERE!!!!"

@@ -79,7 +79,8 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
       PNCounterMapKeyManifest ->
         (bytes ⇒ PNCounterMapKey(keyIdFromBinary(bytes))),
       ORMultiMapKeyManifest ->
-        (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes))))
+        (bytes ⇒ ORMultiMapKey(keyIdFromBinary(bytes)))
+    )
 
   override def manifest(obj: AnyRef): String = obj match {
     case _: ORSet[_] ⇒ ORSetManifest
@@ -402,14 +403,16 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     val b = rd.PNCounterMap
       .newBuilder()
       .setKeys(orsetToProto(pncountermap.underlying.keys))
-    pncountermap.underlying.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
-      case (key, value: PNCounter) ⇒
-        b.addEntries(
-          rd.PNCounterMap.Entry
-            .newBuilder()
-            .setKey(key)
-            .setValue(pncounterToProto(value)))
-    }
+    pncountermap.underlying.entries.toVector
+      .sortBy { case (key, _) ⇒ key }
+      .foreach {
+        case (key, value: PNCounter) ⇒
+          b.addEntries(
+            rd.PNCounterMap.Entry
+              .newBuilder()
+              .setKey(key)
+              .setValue(pncounterToProto(value)))
+      }
     b.build()
   }
 
@@ -430,14 +433,16 @@ class ReplicatedDataSerializer(val system: ExtendedActorSystem)
     val b = rd.ORMultiMap
       .newBuilder()
       .setKeys(orsetToProto(multimap.underlying.keys))
-    multimap.underlying.entries.toVector.sortBy { case (key, _) ⇒ key }.foreach {
-      case (key, value) ⇒
-        b.addEntries(
-          rd.ORMultiMap.Entry
-            .newBuilder()
-            .setKey(key)
-            .setValue(orsetToProto(value)))
-    }
+    multimap.underlying.entries.toVector
+      .sortBy { case (key, _) ⇒ key }
+      .foreach {
+        case (key, value) ⇒
+          b.addEntries(
+            rd.ORMultiMap.Entry
+              .newBuilder()
+              .setKey(key)
+              .setValue(orsetToProto(value)))
+      }
     b.build()
   }
 

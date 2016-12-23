@@ -124,16 +124,17 @@ private[spark] object InternalAccumulator {
     * Accumulators for tracking internal metrics.
     */
   def createAll(): Seq[Accumulator[_]] = {
-    Seq[String](EXECUTOR_DESERIALIZE_TIME,
-                EXECUTOR_RUN_TIME,
-                RESULT_SIZE,
-                JVM_GC_TIME,
-                RESULT_SERIALIZATION_TIME,
-                MEMORY_BYTES_SPILLED,
-                DISK_BYTES_SPILLED,
-                PEAK_EXECUTION_MEMORY,
-                UPDATED_BLOCK_STATUSES)
-      .map(create) ++ createShuffleReadAccums() ++ createShuffleWriteAccums() ++ createInputAccums() ++ createOutputAccums() ++ sys.props
+    Seq[String](
+      EXECUTOR_DESERIALIZE_TIME,
+      EXECUTOR_RUN_TIME,
+      RESULT_SIZE,
+      JVM_GC_TIME,
+      RESULT_SERIALIZATION_TIME,
+      MEMORY_BYTES_SPILLED,
+      DISK_BYTES_SPILLED,
+      PEAK_EXECUTION_MEMORY,
+      UPDATED_BLOCK_STATUSES
+    ).map(create) ++ createShuffleReadAccums() ++ createShuffleWriteAccums() ++ createInputAccums() ++ createOutputAccums() ++ sys.props
       .get("spark.testing")
       .map(_ => create(TEST_ACCUM))
       .toSeq
@@ -143,12 +144,14 @@ private[spark] object InternalAccumulator {
     * Accumulators for tracking shuffle read metrics.
     */
   def createShuffleReadAccums(): Seq[Accumulator[_]] = {
-    Seq[String](shuffleRead.REMOTE_BLOCKS_FETCHED,
-                shuffleRead.LOCAL_BLOCKS_FETCHED,
-                shuffleRead.REMOTE_BYTES_READ,
-                shuffleRead.LOCAL_BYTES_READ,
-                shuffleRead.FETCH_WAIT_TIME,
-                shuffleRead.RECORDS_READ).map(create)
+    Seq[String](
+      shuffleRead.REMOTE_BLOCKS_FETCHED,
+      shuffleRead.LOCAL_BLOCKS_FETCHED,
+      shuffleRead.REMOTE_BYTES_READ,
+      shuffleRead.LOCAL_BYTES_READ,
+      shuffleRead.FETCH_WAIT_TIME,
+      shuffleRead.RECORDS_READ
+    ).map(create)
   }
 
   /**

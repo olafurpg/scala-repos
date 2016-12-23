@@ -41,13 +41,16 @@ object EstimatorApp extends App {
     case Array("kalman", n, error) =>
       new KalmanGaussianError(n.toInt, error.toDouble)
     case Array("windowed", n, windows) =>
-      new WindowedMeans(n.toInt, windows.split(",") map { w =>
-        w.split(":") match {
-          case Array(w, i) => (w.toInt, i.toInt)
-          case _ =>
-            throw new IllegalArgumentException("bad weight, count pair " + w)
+      new WindowedMeans(
+        n.toInt,
+        windows.split(",") map { w =>
+          w.split(":") match {
+            case Array(w, i) => (w.toInt, i.toInt)
+            case _ =>
+              throw new IllegalArgumentException("bad weight, count pair " + w)
+          }
         }
-      })
+      )
     case Array("load", interval) =>
       new LoadAverage(interval.toDouble)
     case _ => throw new IllegalArgumentException("bad args ")

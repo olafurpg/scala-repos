@@ -681,11 +681,12 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     ("true" :: "false" :: Nil).foreach { vectorized =>
       withSQLConf(SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key -> vectorized) {
         checkAnswer(
-                    // Decimal column in this file is encoded using plain dictionary
-                    readResourceParquetFile("dec-in-i32.parquet"),
-                    sqlContext
-                      .range(1 << 4)
-                      .select('id % 10 cast DecimalType(5, 2) as 'i32_dec))
+          // Decimal column in this file is encoded using plain dictionary
+          readResourceParquetFile("dec-in-i32.parquet"),
+          sqlContext
+            .range(1 << 4)
+            .select('id % 10 cast DecimalType(5, 2) as 'i32_dec)
+        )
       }
     }
   }
@@ -694,11 +695,12 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     ("true" :: "false" :: Nil).foreach { vectorized =>
       withSQLConf(SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key -> vectorized) {
         checkAnswer(
-                    // Decimal column in this file is encoded using plain dictionary
-                    readResourceParquetFile("dec-in-i64.parquet"),
-                    sqlContext
-                      .range(1 << 4)
-                      .select('id % 10 cast DecimalType(10, 2) as 'i64_dec))
+          // Decimal column in this file is encoded using plain dictionary
+          readResourceParquetFile("dec-in-i64.parquet"),
+          sqlContext
+            .range(1 << 4)
+            .select('id % 10 cast DecimalType(10, 2) as 'i64_dec)
+        )
       }
     }
   }
@@ -711,7 +713,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
           readResourceParquetFile("dec-in-fixed-len.parquet"),
           sqlContext
             .range(1 << 4)
-            .select('id % 10 cast DecimalType(10, 2) as 'fixed_len_dec))
+            .select('id % 10 cast DecimalType(10, 2) as 'fixed_len_dec)
+        )
       }
     }
   }

@@ -40,8 +40,8 @@ trait StreamInstances {
         implicit M: Monoid[B]) =
       this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
 
-    override def foldRight[A, B](fa: Stream[A], z: => B)(f: (A,
-                                                             => B) => B): B =
+    override def foldRight[A, B](fa: Stream[A], z: => B)(
+        f: (A, => B) => B): B =
       if (fa.isEmpty) z
       else f(fa.head, foldRight(fa.tail, z)(f))
 
@@ -55,8 +55,8 @@ trait StreamInstances {
         Stream.cons(f(fa.head, fb.headOption), zipWithL(fa.tail, bTail)(f))
       }
 
-    override def zipWithR[A, B, C](fa: Stream[A], fb: Stream[B])(f: (Option[A],
-                                                                     B) => C) =
+    override def zipWithR[A, B, C](fa: Stream[A], fb: Stream[B])(
+        f: (Option[A], B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
 
     override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] =

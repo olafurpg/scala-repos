@@ -253,10 +253,12 @@ class MarathonHealthCheckManagerTest
         .setHealthy(false)
         .build
     val healthChecks = List(0, 1, 2).map { i =>
-      (0 until i).map { j =>
-        HealthCheck(protocol = Protocol.COMMAND,
-                    gracePeriod = (i * 3 + j).seconds)
-      }.toSet
+      (0 until i)
+        .map { j =>
+          HealthCheck(protocol = Protocol.COMMAND,
+                      gracePeriod = (i * 3 + j).seconds)
+        }
+        .toSet
     }
     val versions = List(0L, 1L, 2L).map { Timestamp(_) }.toArray
     val tasks = List(0, 1, 2).map { i =>

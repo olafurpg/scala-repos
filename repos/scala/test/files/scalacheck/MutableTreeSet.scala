@@ -147,8 +147,7 @@ package scala.collection.mutable {
     }
 
     property("++=") = forAll {
-      (set: mutable.TreeSet[K], ks: Seq[K], from: Option[K],
-       until: Option[K]) =>
+      (set: mutable.TreeSet[K], ks: Seq[K], from: Option[K], until: Option[K]) =>
         val setView = set.rangeImpl(from, until)
         setView ++= ks
         ks.toSet.forall { k =>
@@ -169,8 +168,7 @@ package scala.collection.mutable {
     }
 
     property("--=") = forAll {
-      (set: mutable.TreeSet[K], ks: Seq[K], from: Option[K],
-       until: Option[K]) =>
+      (set: mutable.TreeSet[K], ks: Seq[K], from: Option[K], until: Option[K]) =>
         val setView = set.rangeImpl(from, until)
         setView --= ks
         ks.toSet.forall { k =>

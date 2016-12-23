@@ -204,59 +204,61 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         52   <{1},{2,3},{1}>    0.50
         53     <{1},{2},{1}>    0.50
      */
-    val expectedValue = Array((Array(0, 1, 0), 4L),
-                              (Array(0, 2, 0), 4L),
-                              (Array(0, 3, 0), 4L),
-                              (Array(0, 4, 0), 3L),
-                              (Array(0, 5, 0), 3L),
-                              (Array(0, 6, 0), 3L),
-                              (Array(0, 1, 0, 6, 0), 2L),
-                              (Array(0, 2, 0, 6, 0), 2L),
-                              (Array(0, 5, 0, 6, 0), 2L),
-                              (Array(0, 1, 2, 0, 6, 0), 2L),
-                              (Array(0, 1, 0, 4, 0), 2L),
-                              (Array(0, 2, 0, 4, 0), 2L),
-                              (Array(0, 1, 2, 0, 4, 0), 2L),
-                              (Array(0, 1, 0, 3, 0), 4L),
-                              (Array(0, 2, 0, 3, 0), 3L),
-                              (Array(0, 2, 3, 0), 2L),
-                              (Array(0, 3, 0, 3, 0), 3L),
-                              (Array(0, 4, 0, 3, 0), 3L),
-                              (Array(0, 5, 0, 3, 0), 2L),
-                              (Array(0, 6, 0, 3, 0), 2L),
-                              (Array(0, 5, 0, 6, 0, 3, 0), 2L),
-                              (Array(0, 6, 0, 2, 0, 3, 0), 2L),
-                              (Array(0, 5, 0, 2, 0, 3, 0), 2L),
-                              (Array(0, 5, 0, 1, 0, 3, 0), 2L),
-                              (Array(0, 2, 0, 4, 0, 3, 0), 2L),
-                              (Array(0, 1, 0, 4, 0, 3, 0), 2L),
-                              (Array(0, 1, 2, 0, 4, 0, 3, 0), 2L),
-                              (Array(0, 1, 0, 3, 0, 3, 0), 3L),
-                              (Array(0, 1, 2, 0, 3, 0), 2L),
-                              (Array(0, 1, 0, 2, 0, 3, 0), 2L),
-                              (Array(0, 1, 0, 2, 3, 0), 2L),
-                              (Array(0, 1, 0, 2, 0), 4L),
-                              (Array(0, 1, 2, 0), 2L),
-                              (Array(0, 3, 0, 2, 0), 3L),
-                              (Array(0, 4, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 2, 0), 2L),
-                              (Array(0, 6, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 6, 0, 2, 0), 2L),
-                              (Array(0, 6, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 1, 0, 2, 0), 2L),
-                              (Array(0, 4, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 1, 0, 3, 0, 2, 0), 3L),
-                              (Array(0, 5, 0, 6, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 1, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 1, 0, 1, 0), 2L),
-                              (Array(0, 2, 0, 1, 0), 2L),
-                              (Array(0, 3, 0, 1, 0), 2L),
-                              (Array(0, 5, 0, 1, 0), 2L),
-                              (Array(0, 2, 3, 0, 1, 0), 2L),
-                              (Array(0, 1, 0, 3, 0, 1, 0), 2L),
-                              (Array(0, 1, 0, 2, 3, 0, 1, 0), 2L),
-                              (Array(0, 1, 0, 2, 0, 1, 0), 2L))
+    val expectedValue = Array(
+      (Array(0, 1, 0), 4L),
+      (Array(0, 2, 0), 4L),
+      (Array(0, 3, 0), 4L),
+      (Array(0, 4, 0), 3L),
+      (Array(0, 5, 0), 3L),
+      (Array(0, 6, 0), 3L),
+      (Array(0, 1, 0, 6, 0), 2L),
+      (Array(0, 2, 0, 6, 0), 2L),
+      (Array(0, 5, 0, 6, 0), 2L),
+      (Array(0, 1, 2, 0, 6, 0), 2L),
+      (Array(0, 1, 0, 4, 0), 2L),
+      (Array(0, 2, 0, 4, 0), 2L),
+      (Array(0, 1, 2, 0, 4, 0), 2L),
+      (Array(0, 1, 0, 3, 0), 4L),
+      (Array(0, 2, 0, 3, 0), 3L),
+      (Array(0, 2, 3, 0), 2L),
+      (Array(0, 3, 0, 3, 0), 3L),
+      (Array(0, 4, 0, 3, 0), 3L),
+      (Array(0, 5, 0, 3, 0), 2L),
+      (Array(0, 6, 0, 3, 0), 2L),
+      (Array(0, 5, 0, 6, 0, 3, 0), 2L),
+      (Array(0, 6, 0, 2, 0, 3, 0), 2L),
+      (Array(0, 5, 0, 2, 0, 3, 0), 2L),
+      (Array(0, 5, 0, 1, 0, 3, 0), 2L),
+      (Array(0, 2, 0, 4, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 4, 0, 3, 0), 2L),
+      (Array(0, 1, 2, 0, 4, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 3, 0, 3, 0), 3L),
+      (Array(0, 1, 2, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 2, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 2, 3, 0), 2L),
+      (Array(0, 1, 0, 2, 0), 4L),
+      (Array(0, 1, 2, 0), 2L),
+      (Array(0, 3, 0, 2, 0), 3L),
+      (Array(0, 4, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 2, 0), 2L),
+      (Array(0, 6, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 6, 0, 2, 0), 2L),
+      (Array(0, 6, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 1, 0, 2, 0), 2L),
+      (Array(0, 4, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 1, 0, 3, 0, 2, 0), 3L),
+      (Array(0, 5, 0, 6, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 1, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 1, 0, 1, 0), 2L),
+      (Array(0, 2, 0, 1, 0), 2L),
+      (Array(0, 3, 0, 1, 0), 2L),
+      (Array(0, 5, 0, 1, 0), 2L),
+      (Array(0, 2, 3, 0, 1, 0), 2L),
+      (Array(0, 1, 0, 3, 0, 1, 0), 2L),
+      (Array(0, 1, 0, 2, 3, 0, 1, 0), 2L),
+      (Array(0, 1, 0, 2, 0, 1, 0), 2L)
+    )
 
     compareInternalResults(expectedValue, result.collect())
   }
@@ -266,18 +268,20 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rdd = sc.parallelize(sequences, 2)
     val prefixSpan = new PrefixSpan().setMinSupport(1.0).setMaxPatternLength(2)
     val model = prefixSpan.run(rdd)
-    val expected = Array((Array(Array(1)), 1L),
-                         (Array(Array(1, 2)), 1L),
-                         (Array(Array(1), Array(1)), 1L),
-                         (Array(Array(1), Array(2)), 1L),
-                         (Array(Array(1), Array(3)), 1L),
-                         (Array(Array(1, 3)), 1L),
-                         (Array(Array(2)), 1L),
-                         (Array(Array(2, 3)), 1L),
-                         (Array(Array(2), Array(1)), 1L),
-                         (Array(Array(2), Array(2)), 1L),
-                         (Array(Array(2), Array(3)), 1L),
-                         (Array(Array(3)), 1L))
+    val expected = Array(
+      (Array(Array(1)), 1L),
+      (Array(Array(1, 2)), 1L),
+      (Array(Array(1), Array(1)), 1L),
+      (Array(Array(1), Array(2)), 1L),
+      (Array(Array(1), Array(3)), 1L),
+      (Array(Array(1, 3)), 1L),
+      (Array(Array(2)), 1L),
+      (Array(Array(2, 3)), 1L),
+      (Array(Array(2), Array(1)), 1L),
+      (Array(Array(2), Array(2)), 1L),
+      (Array(Array(2), Array(3)), 1L),
+      (Array(Array(3)), 1L)
+    )
     compareResults(expected, model.freqSequences.collect())
   }
 
@@ -358,13 +362,17 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
   private def compareResults[Item](
       expectedValue: Array[(Array[Array[Item]], Long)],
       actualValue: Array[PrefixSpan.FreqSequence[Item]]): Unit = {
-    val expectedSet = expectedValue.map {
-      case (pattern: Array[Array[Item]], count: Long) =>
-        (pattern.map(itemSet => itemSet.toSet).toSeq, count)
-    }.toSet
-    val actualSet = actualValue.map { x =>
-      (x.sequence.map(_.toSet).toSeq, x.freq)
-    }.toSet
+    val expectedSet = expectedValue
+      .map {
+        case (pattern: Array[Array[Item]], count: Long) =>
+          (pattern.map(itemSet => itemSet.toSet).toSeq, count)
+      }
+      .toSet
+    val actualSet = actualValue
+      .map { x =>
+        (x.sequence.map(_.toSet).toSeq, x.freq)
+      }
+      .toSet
     assert(expectedSet === actualSet)
   }
 

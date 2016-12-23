@@ -75,14 +75,15 @@ object GenerateOrdering
     * Generates the code for ordering based on the given order.
     */
   def genComparisons(ctx: CodegenContext, ordering: Seq[SortOrder]): String = {
-    val comparisons = ordering.map { order =>
-      val eval = order.child.gen(ctx)
-      val asc = order.direction == Ascending
-      val isNullA = ctx.freshName("isNullA")
-      val primitiveA = ctx.freshName("primitiveA")
-      val isNullB = ctx.freshName("isNullB")
-      val primitiveB = ctx.freshName("primitiveB")
-      s"""
+    val comparisons = ordering
+      .map { order =>
+        val eval = order.child.gen(ctx)
+        val asc = order.direction == Ascending
+        val isNullA = ctx.freshName("isNullA")
+        val primitiveA = ctx.freshName("primitiveA")
+        val isNullB = ctx.freshName("isNullB")
+        val primitiveB = ctx.freshName("primitiveB")
+        s"""
           ${ctx.INPUT_ROW} = a;
           boolean $isNullA;
           ${ctx.javaType(order.child.dataType)} $primitiveA;
@@ -114,7 +115,8 @@ object GenerateOrdering
             }
           }
       """
-    }.mkString("\n")
+      }
+      .mkString("\n")
     comparisons
   }
 

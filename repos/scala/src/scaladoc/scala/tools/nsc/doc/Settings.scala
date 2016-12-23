@@ -377,7 +377,8 @@ class Settings(error: String => Unit,
       "scala.Predef.any2stringadd",
       "scala.Predef.ArrowAssoc",
       "scala.Predef.Ensuring",
-      "scala.collection.TraversableOnce.alternateImplicit")
+      "scala.collection.TraversableOnce.alternateImplicit"
+    )
 
     // included as names as here we don't have access to a Global with Definitions :(
     def valueClassList =

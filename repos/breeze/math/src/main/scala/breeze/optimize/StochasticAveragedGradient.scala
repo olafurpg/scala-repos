@@ -82,11 +82,13 @@ class StochasticAveragedGradient[T](maxIter: Int = -1,
         stepSize
       }
     d += newGrad
-    History(newStepSize,
-            range,
-            d,
-            previousGradients.updated(nextPos, newGrad),
-            if (oldState.iter < previousGradients.length - 1) oldState.iter + 1
-            else Rand.choose(range).draw())
+    History(
+      newStepSize,
+      range,
+      d,
+      previousGradients.updated(nextPos, newGrad),
+      if (oldState.iter < previousGradients.length - 1) oldState.iter + 1
+      else Rand.choose(range).draw()
+    )
   }
 }

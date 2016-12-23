@@ -15,29 +15,31 @@ object Reflector {
   private[this] val descriptors = new Memo[ScalaType, ObjectDescriptor]
 
   private[this] val primitives = {
-    Set[Type](classOf[String],
-              classOf[Char],
-              classOf[Int],
-              classOf[Long],
-              classOf[Double],
-              classOf[Float],
-              classOf[Byte],
-              classOf[BigInt],
-              classOf[Boolean],
-              classOf[Short],
-              classOf[java.lang.Integer],
-              classOf[java.lang.Long],
-              classOf[java.lang.Double],
-              classOf[java.lang.Float],
-              classOf[java.lang.Character],
-              classOf[java.lang.Byte],
-              classOf[java.lang.Boolean],
-              classOf[Number],
-              classOf[java.lang.Short],
-              classOf[Date],
-              classOf[Timestamp],
-              classOf[Symbol],
-              classOf[Unit])
+    Set[Type](
+      classOf[String],
+      classOf[Char],
+      classOf[Int],
+      classOf[Long],
+      classOf[Double],
+      classOf[Float],
+      classOf[Byte],
+      classOf[BigInt],
+      classOf[Boolean],
+      classOf[Short],
+      classOf[java.lang.Integer],
+      classOf[java.lang.Long],
+      classOf[java.lang.Double],
+      classOf[java.lang.Float],
+      classOf[java.lang.Character],
+      classOf[java.lang.Byte],
+      classOf[java.lang.Boolean],
+      classOf[Number],
+      classOf[java.lang.Short],
+      classOf[Date],
+      classOf[Timestamp],
+      classOf[Symbol],
+      classOf[Unit]
+    )
   }
 
   private[this] val defaultExcluded = Set(classOf[Nothing], classOf[Null])
@@ -131,17 +133,20 @@ object Reflector {
             val mod = f.getModifiers
             if (!(Modifier.isStatic(mod) || Modifier.isTransient(mod) ||
                   Modifier.isVolatile(mod) || f.isSynthetic)) {
-              val st = ManifestScalaType(f.getType, f.getGenericType match {
-                case p: ParameterizedType =>
-                  p.getActualTypeArguments.toSeq.zipWithIndex map {
-                    case (cc, i) =>
-                      if (cc == classOf[java.lang.Object])
-                        Reflector.scalaTypeOf(
-                          ScalaSigReader.readField(f.getName, clazz, i))
-                      else Reflector.scalaTypeOf(cc)
-                  }
-                case _ => Nil
-              })
+              val st = ManifestScalaType(
+                f.getType,
+                f.getGenericType match {
+                  case p: ParameterizedType =>
+                    p.getActualTypeArguments.toSeq.zipWithIndex map {
+                      case (cc, i) =>
+                        if (cc == classOf[java.lang.Object])
+                          Reflector.scalaTypeOf(
+                            ScalaSigReader.readField(f.getName, clazz, i))
+                        else Reflector.scalaTypeOf(cc)
+                    }
+                  case _ => Nil
+                }
+              )
               val decoded = unmangleName(f.getName)
               f.setAccessible(true)
               lb += PropertyDescriptor(decoded, f.getName, st, f)

@@ -49,27 +49,33 @@ class EnsembleAdvancedLabel extends EnsembleExample {
     new VBox {
       spacing = 10
       padding = Insets(20)
-      children = List(new Label {
-        text = "Image above"
-        graphic = new ImageView(icon)
-        contentDisplay = ContentDisplay.Top
-      }, new Label {
-        text = "Image on the right"
-        graphic = new ImageView(icon)
-        contentDisplay = ContentDisplay.Right
-      }, new Label {
-        text = "Image below"
-        graphic = new ImageView(icon)
-        contentDisplay = ContentDisplay.Bottom
-      }, new Label {
-        text = "Image on the left"
-        graphic = new ImageView(icon)
-        contentDisplay = ContentDisplay.Left
-      }, new Label {
-        text = "Image centered"
-        graphic = new ImageView(icon)
-        contentDisplay = ContentDisplay.Center
-      })
+      children = List(
+        new Label {
+          text = "Image above"
+          graphic = new ImageView(icon)
+          contentDisplay = ContentDisplay.Top
+        },
+        new Label {
+          text = "Image on the right"
+          graphic = new ImageView(icon)
+          contentDisplay = ContentDisplay.Right
+        },
+        new Label {
+          text = "Image below"
+          graphic = new ImageView(icon)
+          contentDisplay = ContentDisplay.Bottom
+        },
+        new Label {
+          text = "Image on the left"
+          graphic = new ImageView(icon)
+          contentDisplay = ContentDisplay.Left
+        },
+        new Label {
+          text = "Image centered"
+          graphic = new ImageView(icon)
+          contentDisplay = ContentDisplay.Center
+        }
+      )
     }
   }
 }

@@ -110,14 +110,16 @@ class ConsumerIterator[K, V](
     item.message
       .ensureValid() // validate checksum of message to ensure it is valid
 
-    new MessageAndMetadata(currentTopicInfo.topic,
-                           currentTopicInfo.partitionId,
-                           item.message,
-                           item.offset,
-                           item.message.timestamp,
-                           item.message.timestampType,
-                           keyDecoder,
-                           valueDecoder)
+    new MessageAndMetadata(
+      currentTopicInfo.topic,
+      currentTopicInfo.partitionId,
+      item.message,
+      item.offset,
+      item.message.timestamp,
+      item.message.timestampType,
+      keyDecoder,
+      valueDecoder
+    )
   }
 
   def clearCurrentChunk() {

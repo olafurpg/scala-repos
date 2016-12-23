@@ -593,7 +593,8 @@ trait ProtoUser {
     MenuItem(S.?("change.password"), changePasswordPath, true),
     MenuItem(S.?("log.out"), logoutPath, true),
     MenuItem(S.?("edit.profile"), editPath, true),
-    MenuItem("", validateUserPath, false))
+    MenuItem("", validateUserPath, false)
+  )
 
   var onLogIn: List[TheUserType => Unit] = Nil
 

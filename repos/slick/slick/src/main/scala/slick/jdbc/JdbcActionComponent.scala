@@ -292,7 +292,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
           c.extra.asInstanceOf[SQLBuilder.Result].sql
         case ParameterSwitch(cases, default) =>
           findSql(
-            cases.find { case (f, n) => f(param) }
+            cases
+              .find { case (f, n) => f(param) }
               .map(_._2)
               .getOrElse(default))
       }
@@ -704,13 +705,16 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
         if (!useBatchUpdates(ctx.session) ||
             (values.isInstanceOf[IndexedSeq[_]] &&
             values.asInstanceOf[IndexedSeq[_]].length < 2))
-          retMany(values, values.map { v =>
-            preparedInsert(sql1, ctx.session) { st =>
-              st.clearParameters()
-              a.converter.set(v, st)
-              retOne(st, v, st.executeUpdate())
-            }
-          }(collection.breakOut): Vector[SingleInsertResult])
+          retMany(
+            values,
+            values.map { v =>
+              preparedInsert(sql1, ctx.session) { st =>
+                st.clearParameters()
+                a.converter.set(v, st)
+                retOne(st, v, st.executeUpdate())
+              }
+            }(collection.breakOut): Vector[SingleInsertResult]
+          )
         else
           preparedInsert(a.sql, ctx.session) { st =>
             st.clearParameters()
@@ -731,7 +735,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
           else
             Vector(compiled.checkInsert.sql,
                    compiled.updateInsert.sql,
-                   compiled.standardInsert.sql)) {
+                   compiled.standardInsert.sql)
+        ) {
 
       def run(ctx: Backend#Context, sql: Vector[String]) = {
         def f: SingleInsertOrUpdateResult =

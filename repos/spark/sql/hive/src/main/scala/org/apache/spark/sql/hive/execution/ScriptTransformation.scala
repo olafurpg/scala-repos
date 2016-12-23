@@ -471,9 +471,11 @@ private[hive] case class HiveScriptIOSchema(
     val serdeClassSQL = serdeClass.map("'" + _ + "'").getOrElse("")
     val serdePropsSQL =
       if (serdeClass.nonEmpty) {
-        val props = serdeProps.map { p =>
-          s"'${p._1}' = '${p._2}'"
-        }.mkString(", ")
+        val props = serdeProps
+          .map { p =>
+            s"'${p._1}' = '${p._2}'"
+          }
+          .mkString(", ")
         if (props.nonEmpty) " WITH SERDEPROPERTIES(" + props + ")" else ""
       } else {
         ""

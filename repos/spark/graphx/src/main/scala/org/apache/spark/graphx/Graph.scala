@@ -317,9 +317,9 @@ abstract class Graph[VD: ClassTag, ED: ClassTag] protected ()
     * @return the subgraph containing only the vertices and edges that
     * satisfy the predicates
     */
-  def subgraph(epred: EdgeTriplet[VD, ED] => Boolean = (x => true),
-               vpred: (VertexId,
-                       VD) => Boolean = ((v, d) => true)): Graph[VD, ED]
+  def subgraph(
+      epred: EdgeTriplet[VD, ED] => Boolean = (x => true),
+      vpred: (VertexId, VD) => Boolean = ((v, d) => true)): Graph[VD, ED]
 
   /**
     * Restricts the graph to only the vertices and edges that are also in `other`, but keeps the

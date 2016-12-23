@@ -204,42 +204,12 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
     val nPoints = 10000
     val pi = Array(0.5, 0.3, 0.2).map(math.log)
     val theta = Array(
-      Array(0.50,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.40), // label 0
-      Array(0.02,
-            0.70,
-            0.10,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02), // label 1
-      Array(0.02,
-            0.02,
-            0.60,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.30) // label 2
+      Array(0.50, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02,
+        0.40), // label 0
+      Array(0.02, 0.70, 0.10, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02,
+        0.02), // label 1
+      Array(0.02, 0.02, 0.60, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02,
+        0.30) // label 2
     ).map(_.map(math.log))
 
     val testData = NaiveBayesSuite
@@ -305,18 +275,22 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
       NaiveBayes.train(sc.makeRDD(dense, 2))
     }
     val sparse =
-      Seq(LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
-          LabeledPoint(0.0, Vectors.sparse(1, Array(0), Array(-1.0))),
-          LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
-          LabeledPoint(1.0, Vectors.sparse(1, Array.empty, Array.empty)))
+      Seq(
+        LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
+        LabeledPoint(0.0, Vectors.sparse(1, Array(0), Array(-1.0))),
+        LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
+        LabeledPoint(1.0, Vectors.sparse(1, Array.empty, Array.empty))
+      )
     intercept[SparkException] {
       NaiveBayes.train(sc.makeRDD(sparse, 2))
     }
     val nan =
-      Seq(LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
-          LabeledPoint(0.0, Vectors.sparse(1, Array(0), Array(Double.NaN))),
-          LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
-          LabeledPoint(1.0, Vectors.sparse(1, Array.empty, Array.empty)))
+      Seq(
+        LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
+        LabeledPoint(0.0, Vectors.sparse(1, Array(0), Array(Double.NaN))),
+        LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
+        LabeledPoint(1.0, Vectors.sparse(1, Array.empty, Array.empty))
+      )
     intercept[SparkException] {
       NaiveBayes.train(sc.makeRDD(nan, 2))
     }

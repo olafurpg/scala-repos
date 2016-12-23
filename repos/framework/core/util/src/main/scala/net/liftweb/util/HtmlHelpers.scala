@@ -123,11 +123,13 @@ trait HtmlHelpers extends CssBindImplicits {
     * to Full
     */
   def findBox[T](nodes: Seq[Node])(f: Elem => Box[T]): Box[T] = {
-    nodes.view.flatMap {
-      case Group(g) => findBox(g)(f)
-      case e: Elem => f(e) or findBox(e.child)(f)
-      case _ => Empty
-    }.headOption
+    nodes.view
+      .flatMap {
+        case Group(g) => findBox(g)(f)
+        case e: Elem => f(e) or findBox(e.child)(f)
+        case _ => Empty
+      }
+      .headOption
   }
 
   /**
@@ -136,11 +138,13 @@ trait HtmlHelpers extends CssBindImplicits {
     * to Some
     */
   def findOption[T](nodes: Seq[Node])(f: Elem => Option[T]): Option[T] = {
-    nodes.view.flatMap {
-      case Group(g) => findOption(g)(f)
-      case e: Elem => f(e) orElse findOption(e.child)(f)
-      case _ => None
-    }.headOption
+    nodes.view
+      .flatMap {
+        case Group(g) => findOption(g)(f)
+        case e: Elem => f(e) orElse findOption(e.child)(f)
+        case _ => None
+      }
+      .headOption
   }
 
   /**

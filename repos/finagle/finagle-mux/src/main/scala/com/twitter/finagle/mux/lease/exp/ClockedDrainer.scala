@@ -155,16 +155,18 @@ private[finagle] class ClockedDrainer(
 
     upkeep("open", init)
 
-    coord.sleepUntilDiscountRemaining(space, { () =>
-      if (verbose) {
-        log.info(
-          "AWAIT-DISCOUNT: discount=" + space.discount() + "; clock=" +
-            coord.counter + "; space=" + space)
-      }
+    coord.sleepUntilDiscountRemaining(
+      space, { () =>
+        if (verbose) {
+          log.info(
+            "AWAIT-DISCOUNT: discount=" + space.discount() + "; clock=" +
+              coord.counter + "; space=" + space)
+        }
 
-      // discount (bytes) / rate (bytes / second) == expiry (seconds)
-      issueAll((space.discount.inBytes / coord.counter.rate).toLong.seconds)
-    })
+        // discount (bytes) / rate (bytes / second) == expiry (seconds)
+        issueAll((space.discount.inBytes / coord.counter.rate).toLong.seconds)
+      }
+    )
   }
 
   // DRAINING

@@ -68,12 +68,14 @@ object CSVRelation extends Logging {
         requiredFields
       }
     val safeRequiredIndices = new Array[Int](safeRequiredFields.length)
-    schemaFields.zipWithIndex.filter {
-      case (field, _) => safeRequiredFields.contains(field)
-    }.foreach {
-      case (field, index) =>
-        safeRequiredIndices(safeRequiredFields.indexOf(field)) = index
-    }
+    schemaFields.zipWithIndex
+      .filter {
+        case (field, _) => safeRequiredFields.contains(field)
+      }
+      .foreach {
+        case (field, index) =>
+          safeRequiredIndices(safeRequiredFields.indexOf(field)) = index
+      }
     val requiredSize = requiredFields.length
     val row = new GenericMutableRow(requiredSize)
     tokenizedRDD.flatMap { tokens =>

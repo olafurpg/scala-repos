@@ -108,33 +108,35 @@ object CassandraTest {
       case (word, count) => println(word + ":" + count)
     }
 
-    counts.map {
-      case (word, count) => {
-        val colWord = new org.apache.cassandra.thrift.Column()
-        colWord.setName(ByteBufferUtil.bytes("word"))
-        colWord.setValue(ByteBufferUtil.bytes(word))
-        colWord.setTimestamp(System.currentTimeMillis)
+    counts
+      .map {
+        case (word, count) => {
+          val colWord = new org.apache.cassandra.thrift.Column()
+          colWord.setName(ByteBufferUtil.bytes("word"))
+          colWord.setValue(ByteBufferUtil.bytes(word))
+          colWord.setTimestamp(System.currentTimeMillis)
 
-        val colCount = new org.apache.cassandra.thrift.Column()
-        colCount.setName(ByteBufferUtil.bytes("wcount"))
-        colCount.setValue(ByteBufferUtil.bytes(count.toLong))
-        colCount.setTimestamp(System.currentTimeMillis)
+          val colCount = new org.apache.cassandra.thrift.Column()
+          colCount.setName(ByteBufferUtil.bytes("wcount"))
+          colCount.setValue(ByteBufferUtil.bytes(count.toLong))
+          colCount.setTimestamp(System.currentTimeMillis)
 
-        val outputkey =
-          ByteBufferUtil.bytes(word + "-COUNT-" + System.currentTimeMillis)
+          val outputkey =
+            ByteBufferUtil.bytes(word + "-COUNT-" + System.currentTimeMillis)
 
-        val mutations = Arrays.asList(new Mutation(), new Mutation())
-        mutations.get(0).setColumn_or_supercolumn(new ColumnOrSuperColumn())
-        mutations.get(0).column_or_supercolumn.setColumn(colWord)
-        mutations.get(1).setColumn_or_supercolumn(new ColumnOrSuperColumn())
-        mutations.get(1).column_or_supercolumn.setColumn(colCount)
-        (outputkey, mutations)
+          val mutations = Arrays.asList(new Mutation(), new Mutation())
+          mutations.get(0).setColumn_or_supercolumn(new ColumnOrSuperColumn())
+          mutations.get(0).column_or_supercolumn.setColumn(colWord)
+          mutations.get(1).setColumn_or_supercolumn(new ColumnOrSuperColumn())
+          mutations.get(1).column_or_supercolumn.setColumn(colCount)
+          (outputkey, mutations)
+        }
       }
-    }.saveAsNewAPIHadoopFile("casDemo",
-                             classOf[ByteBuffer],
-                             classOf[List[Mutation]],
-                             classOf[ColumnFamilyOutputFormat],
-                             job.getConfiguration)
+      .saveAsNewAPIHadoopFile("casDemo",
+                              classOf[ByteBuffer],
+                              classOf[List[Mutation]],
+                              classOf[ColumnFamilyOutputFormat],
+                              job.getConfiguration)
 
     sc.stop()
   }

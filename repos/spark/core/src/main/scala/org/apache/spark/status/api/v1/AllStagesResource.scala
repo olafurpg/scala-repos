@@ -109,9 +109,11 @@ private[v1] object AllStagesResource {
         None
       }
 
-    val accumulableInfo = stageUiData.accumulables.values.map {
-      convertAccumulableInfo
-    }.toSeq
+    val accumulableInfo = stageUiData.accumulables.values
+      .map {
+        convertAccumulableInfo
+      }
+      .toSeq
 
     new StageData(
       status = status,

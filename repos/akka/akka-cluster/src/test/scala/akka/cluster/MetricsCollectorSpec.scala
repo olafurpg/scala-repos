@@ -131,15 +131,16 @@ trait MetricsCollectorFactory { this: AkkaSpec ⇒
       new SigarMetricsCollector(
         selfAddress,
         defaultDecayFactor,
-        extendedActorSystem.dynamicAccess.createInstanceFor[AnyRef](
-          "org.hyperic.sigar.Sigar",
-          Nil))).recover {
-      case e ⇒
-        log.debug(
-          "Metrics will be retreived from MBeans, Sigar failed to load. Reason: " +
-            e)
-        new JmxMetricsCollector(selfAddress, defaultDecayFactor)
-    }.get
+        extendedActorSystem.dynamicAccess
+          .createInstanceFor[AnyRef]("org.hyperic.sigar.Sigar", Nil)))
+      .recover {
+        case e ⇒
+          log.debug(
+            "Metrics will be retreived from MBeans, Sigar failed to load. Reason: " +
+              e)
+          new JmxMetricsCollector(selfAddress, defaultDecayFactor)
+      }
+      .get
 
   private[cluster] def isSigar(collector: MetricsCollector): Boolean =
     collector.isInstanceOf[SigarMetricsCollector]

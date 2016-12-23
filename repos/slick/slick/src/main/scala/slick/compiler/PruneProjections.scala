@@ -20,11 +20,12 @@ class PruneProjections extends Phase {
       logger.debug(
         s"Unreferenced: ${unrefTSyms.mkString(", ")}; Field refs: ${referenced.mkString(", ")}")
       n.replaceInvalidate {
-        case Pure(s @ StructNode(ch), pts) if !unrefTSyms.contains(pts) =>
-          val ch2 = ch.filter(d => referenced.contains((pts, d._1)))
-          if (ch2.length == ch.length) null
-          else (Pure(StructNode(ch2), pts), pts)
-      }.infer()
+          case Pure(s @ StructNode(ch), pts) if !unrefTSyms.contains(pts) =>
+            val ch2 = ch.filter(d => referenced.contains((pts, d._1)))
+            if (ch2.length == ch.length) null
+            else (Pure(StructNode(ch2), pts), pts)
+        }
+        .infer()
     }
   }
 }

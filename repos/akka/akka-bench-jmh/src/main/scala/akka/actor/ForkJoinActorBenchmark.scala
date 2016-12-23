@@ -29,8 +29,9 @@ class ForkJoinActorBenchmark {
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    system = ActorSystem("ForkJoinActorBenchmark",
-                         ConfigFactory.parseString(s"""| akka {
+    system = ActorSystem(
+      "ForkJoinActorBenchmark",
+      ConfigFactory.parseString(s"""| akka {
         |   log-dead-letters = off
         |   actor {
         |     default-dispatcher {
@@ -44,7 +45,8 @@ class ForkJoinActorBenchmark {
         |     }
         |   }
         | }
-      """.stripMargin))
+      """.stripMargin)
+    )
   }
 
   @TearDown(Level.Trial)

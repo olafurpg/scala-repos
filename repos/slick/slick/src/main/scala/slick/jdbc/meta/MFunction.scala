@@ -22,11 +22,16 @@ object MFunction {
         case _: AbstractMethodError => null
       }
     } { r =>
-      MFunction(MQName.from(r), r.<<, r.nextShort match {
-        case DatabaseMetaData.functionNoTable => Some(false)
-        case DatabaseMetaData.functionReturnsTable => Some(true)
-        case _ => None
-      }, r.<<)
+      MFunction(
+        MQName.from(r),
+        r.<<,
+        r.nextShort match {
+          case DatabaseMetaData.functionNoTable => Some(false)
+          case DatabaseMetaData.functionReturnsTable => Some(true)
+          case _ => None
+        },
+        r.<<
+      )
     }
   }
 }

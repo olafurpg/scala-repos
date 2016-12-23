@@ -106,13 +106,15 @@ class MesosSchedulerUtilsSuite
 
   test("subset match is performed for set attributes") {
     val supersetConstraint =
-      Map("tachyon" -> Value.Text.newBuilder().setValue("true").build(),
-          "zone" -> Value.Set
-            .newBuilder()
-            .addItem("us-east-1a")
-            .addItem("us-east-1b")
-            .addItem("us-east-1c")
-            .build())
+      Map(
+        "tachyon" -> Value.Text.newBuilder().setValue("true").build(),
+        "zone" -> Value.Set
+          .newBuilder()
+          .addItem("us-east-1a")
+          .addItem("us-east-1b")
+          .addItem("us-east-1c")
+          .build()
+      )
 
     val zoneConstraintStr = "tachyon:;zone:us-east-1a,us-east-1c"
     val parsedConstraints = utils.parseConstraintString(zoneConstraintStr)

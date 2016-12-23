@@ -233,26 +233,32 @@ private[streaming] class StreamingJobProgressListener(ssc: StreamingContext)
         (batchUIData.batchTime.milliseconds,
          batchUIData.streamIdToInputInfo.mapValues(_.numRecords))
       }
-      streamIds.map { streamId =>
-        val eventRates = latestBatches.map {
-          case (batchTime, streamIdToNumRecords) =>
-            val numRecords = streamIdToNumRecords.getOrElse(streamId, 0L)
-            (batchTime, numRecords * 1000.0 / batchDuration)
+      streamIds
+        .map { streamId =>
+          val eventRates = latestBatches.map {
+            case (batchTime, streamIdToNumRecords) =>
+              val numRecords = streamIdToNumRecords.getOrElse(streamId, 0L)
+              (batchTime, numRecords * 1000.0 / batchDuration)
+          }
+          (streamId, eventRates)
         }
-        (streamId, eventRates)
-      }.toMap
+        .toMap
     }
 
   def lastReceivedBatchRecords: Map[Int, Long] = synchronized {
     val lastReceivedBlockInfoOption =
       lastReceivedBatch.map(_.streamIdToInputInfo.mapValues(_.numRecords))
-    lastReceivedBlockInfoOption.map { lastReceivedBlockInfo =>
-      streamIds.map { streamId =>
-        (streamId, lastReceivedBlockInfo.getOrElse(streamId, 0L))
-      }.toMap
-    }.getOrElse {
-      streamIds.map(streamId => (streamId, 0L)).toMap
-    }
+    lastReceivedBlockInfoOption
+      .map { lastReceivedBlockInfo =>
+        streamIds
+          .map { streamId =>
+            (streamId, lastReceivedBlockInfo.getOrElse(streamId, 0L))
+          }
+          .toMap
+      }
+      .getOrElse {
+        streamIds.map(streamId => (streamId, 0L)).toMap
+      }
   }
 
   def receiverInfo(receiverId: Int): Option[ReceiverInfo] = synchronized {

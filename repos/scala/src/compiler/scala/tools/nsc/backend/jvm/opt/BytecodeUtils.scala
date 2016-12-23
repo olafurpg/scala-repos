@@ -361,16 +361,15 @@ object BytecodeUtils {
     methodNode.localVariables
       .iterator()
       .asScala
-      .map(
-        localVariable =>
-          new LocalVariableNode(
-            prefix + localVariable.name,
-            localVariable.desc,
-            localVariable.signature,
-            labelMap(localVariable.start),
-            labelMap(localVariable.end),
-            localVariable.index + shift
-        ))
+      .map(localVariable =>
+        new LocalVariableNode(
+          prefix + localVariable.name,
+          localVariable.desc,
+          localVariable.signature,
+          labelMap(localVariable.start),
+          labelMap(localVariable.end),
+          localVariable.index + shift
+      ))
       .toList
   }
 

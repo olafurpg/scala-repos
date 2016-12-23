@@ -173,7 +173,8 @@ trait ConstraintReads {
   def email(implicit reads: Reads[String]): Reads[String] =
     pattern(
       """^[a-zA-Z0-9\.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$""".r,
-      "error.email")
+      "error.email"
+    )
 
   def verifying[A](cond: A => Boolean)(implicit rds: Reads[A]) =
     filter[A](ValidationError("error.invalid"))(cond)(rds)
@@ -183,10 +184,12 @@ trait ConstraintReads {
     Reads[A] { js =>
       rds.reads(js).flatMap { t =>
         (scala.util.control.Exception.catching(classOf[MatchError]) opt cond(
-          t)).flatMap { b =>
-          if (b) Some(subreads.reads(js).map(_ => t))
-          else None
-        }.getOrElse(JsSuccess(t))
+          t))
+          .flatMap { b =>
+            if (b) Some(subreads.reads(js).map(_ => t))
+            else None
+          }
+          .getOrElse(JsSuccess(t))
       }
     }
 

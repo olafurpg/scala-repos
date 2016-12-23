@@ -35,7 +35,7 @@ private[slick] object SlickTreeException {
     else
       msg + {
         try {
-          val mark = if (_mark eq null) ((_: Dumpable) => false) else _mark
+          val mark = if (_mark eq null)((_: Dumpable) => false) else _mark
           val tp = treePrinter.copy(mark = mark)
           val markedTop =
             if (!removeUnmarked || (_mark eq null)) detail

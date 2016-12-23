@@ -151,13 +151,15 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
        |$parquetType
        |Catalyst schema:
        |${catalystType.prettyJson}
-     """.stripMargin)
+     """.stripMargin
+  )
 
   assert(
     !catalystType.existsRecursively(_.isInstanceOf[UserDefinedType[_]]),
     s"""User-defined types in Catalyst schema should have already been expanded:
        |${catalystType.prettyJson}
-     """.stripMargin)
+     """.stripMargin
+  )
 
   logDebug(s"""Building row converter for the following schema:
        |
@@ -629,7 +631,8 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
                      new ParentContainerUpdater {
                        override def set(value: Any): Unit =
                          currentValue = value
-                     }))
+                     })
+      )
 
       override def getConverter(fieldIndex: Int): Converter =
         converters(fieldIndex)

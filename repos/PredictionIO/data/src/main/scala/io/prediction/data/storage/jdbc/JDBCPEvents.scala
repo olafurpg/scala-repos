@@ -17,7 +17,12 @@ package io.prediction.data.storage.jdbc
 import java.sql.{DriverManager, ResultSet}
 
 import com.github.nscala_time.time.Imports._
-import io.prediction.data.storage.{DataMap, Event, PEvents, StorageClientConfig}
+import io.prediction.data.storage.{
+  DataMap,
+  Event,
+  PEvents,
+  StorageClientConfig
+}
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.{JdbcRDD, RDD}
 import org.apache.spark.sql.{SQLContext, SaveMode}
@@ -25,8 +30,9 @@ import org.json4s.JObject
 import org.json4s.native.Serialization
 
 /** JDBC implementation of [[PEvents]] */
-class JDBCPEvents(
-    client: String, config: StorageClientConfig, namespace: String)
+class JDBCPEvents(client: String,
+                  config: StorageClientConfig,
+                  namespace: String)
     extends PEvents {
   @transient private implicit lazy val formats = org.json4s.DefaultFormats
   def find(appId: Int,
@@ -58,12 +64,14 @@ class JDBCPEvents(
       .map("and (" + _.map(y => s"event = '$y'").mkString(" or ") + ")")
       .getOrElse("")
     val targetEntityTypeClause = targetEntityType
-      .map(_.map(x => s"and targetEntityType = '$x'")
-            .getOrElse("and targetEntityType is null"))
+      .map(
+        _.map(x => s"and targetEntityType = '$x'")
+          .getOrElse("and targetEntityType is null"))
       .getOrElse("")
     val targetEntityIdClause = targetEntityId
-      .map(_.map(x => s"and targetEntityId = '$x'")
-            .getOrElse("and targetEntityId is null"))
+      .map(
+        _.map(x => s"and targetEntityId = '$x'")
+          .getOrElse("and targetEntityId is null"))
       .getOrElse("")
     val q = s"""
       select
@@ -91,39 +99,40 @@ class JDBCPEvents(
       $targetEntityIdClause
       """.replace("\n", " ")
     new JdbcRDD(
-        sc,
-        () =>
-          {
-            DriverManager.getConnection(client,
-                                        config.properties("USERNAME"),
-                                        config.properties("PASSWORD"))
-        },
-        q,
-        lower / 1000,
-        upper / 1000,
-        par,
-        (r: ResultSet) =>
-          {
-            Event(eventId = Option(r.getString("id")),
-                  event = r.getString("event"),
-                  entityType = r.getString("entityType"),
-                  entityId = r.getString("entityId"),
-                  targetEntityType = Option(r.getString("targetEntityType")),
-                  targetEntityId = Option(r.getString("targetEntityId")),
-                  properties = Option(r.getString("properties"))
-                      .map(x => DataMap(Serialization.read[JObject](x)))
-                      .getOrElse(DataMap()),
-                  eventTime = new DateTime(
-                        r.getTimestamp("eventTime").getTime,
-                        DateTimeZone.forID(r.getString("eventTimeZone"))),
-                  tags = Option(r.getString("tags"))
-                      .map(x => x.split(",").toList)
-                      .getOrElse(Nil),
-                  prId = Option(r.getString("prId")),
-                  creationTime = new DateTime(
-                        r.getTimestamp("creationTime").getTime,
-                        DateTimeZone.forID(r.getString("creationTimeZone"))))
-        }).cache()
+      sc,
+      () => {
+        DriverManager.getConnection(client,
+                                    config.properties("USERNAME"),
+                                    config.properties("PASSWORD"))
+      },
+      q,
+      lower / 1000,
+      upper / 1000,
+      par,
+      (r: ResultSet) => {
+        Event(
+          eventId = Option(r.getString("id")),
+          event = r.getString("event"),
+          entityType = r.getString("entityType"),
+          entityId = r.getString("entityId"),
+          targetEntityType = Option(r.getString("targetEntityType")),
+          targetEntityId = Option(r.getString("targetEntityId")),
+          properties = Option(r.getString("properties"))
+            .map(x => DataMap(Serialization.read[JObject](x)))
+            .getOrElse(DataMap()),
+          eventTime =
+            new DateTime(r.getTimestamp("eventTime").getTime,
+                         DateTimeZone.forID(r.getString("eventTimeZone"))),
+          tags = Option(r.getString("tags"))
+            .map(x => x.split(",").toList)
+            .getOrElse(Nil),
+          prId = Option(r.getString("prId")),
+          creationTime =
+            new DateTime(r.getTimestamp("creationTime").getTime,
+                         DateTimeZone.forID(r.getString("creationTimeZone")))
+        )
+      }
+    ).cache()
   }
 
   def write(events: RDD[Event], appId: Int, channelId: Option[Int])(
@@ -134,36 +143,41 @@ class JDBCPEvents(
 
     val tableName = JDBCUtils.eventTableName(namespace, appId, channelId)
 
-    val eventTableColumns = Seq[String]("id",
-                                        "event",
-                                        "entityType",
-                                        "entityId",
-                                        "targetEntityType",
-                                        "targetEntityId",
-                                        "properties",
-                                        "eventTime",
-                                        "eventTimeZone",
-                                        "tags",
-                                        "prId",
-                                        "creationTime",
-                                        "creationTimeZone")
+    val eventTableColumns = Seq[String](
+      "id",
+      "event",
+      "entityType",
+      "entityId",
+      "targetEntityType",
+      "targetEntityId",
+      "properties",
+      "eventTime",
+      "eventTimeZone",
+      "tags",
+      "prId",
+      "creationTime",
+      "creationTimeZone"
+    )
 
-    val eventDF = events.map { event =>
-      (event.eventId.getOrElse(JDBCUtils.generateId),
-       event.event,
-       event.entityType,
-       event.entityId,
-       event.targetEntityType.orNull,
-       event.targetEntityId.orNull,
-       if (!event.properties.isEmpty)
-         Serialization.write(event.properties.toJObject) else null,
-       new java.sql.Timestamp(event.eventTime.getMillis),
-       event.eventTime.getZone.getID,
-       if (event.tags.nonEmpty) Some(event.tags.mkString(",")) else null,
-       event.prId,
-       new java.sql.Timestamp(event.creationTime.getMillis),
-       event.creationTime.getZone.getID)
-    }.toDF(eventTableColumns: _*)
+    val eventDF = events
+      .map { event =>
+        (event.eventId.getOrElse(JDBCUtils.generateId),
+         event.event,
+         event.entityType,
+         event.entityId,
+         event.targetEntityType.orNull,
+         event.targetEntityId.orNull,
+         if (!event.properties.isEmpty)
+           Serialization.write(event.properties.toJObject)
+         else null,
+         new java.sql.Timestamp(event.eventTime.getMillis),
+         event.eventTime.getZone.getID,
+         if (event.tags.nonEmpty) Some(event.tags.mkString(",")) else null,
+         event.prId,
+         new java.sql.Timestamp(event.creationTime.getMillis),
+         event.creationTime.getZone.getID)
+      }
+      .toDF(eventTableColumns: _*)
 
     // spark version 1.4.0 or higher
     val prop = new java.util.Properties

@@ -129,7 +129,8 @@ object ResolveUtils {
           if (pt.equalsToText("java.lang.Object")) types.Any
           else s.subst(ScType.create(pt, m.getProject, scope))
         })
-        .toSeq)(m.getProject, scope)
+        .toSeq
+    )(m.getProject, scope)
 
   def javaMethodType(m: PsiMethod,
                      s: ScSubstitutor,
@@ -141,22 +142,26 @@ object ResolveUtils {
         s.subst(ScType.create(m.getReturnType, m.getProject, scope))
       case (_, Some(x)) => x
     }
-    new ScMethodType(retType, m match {
-      case f: FakePsiMethod => f.params.toSeq
-      case _ =>
-        m.getParameterList.getParameters.map { param =>
-          val scType = s.subst(param.exactParamType())
-          new Parameter("",
-                        None,
-                        scType,
-                        scType,
-                        false,
-                        param.isVarArgs,
-                        false,
-                        param.index,
-                        Some(param))
-        }
-    }, false)(m.getProject, scope)
+    new ScMethodType(
+      retType,
+      m match {
+        case f: FakePsiMethod => f.params.toSeq
+        case _ =>
+          m.getParameterList.getParameters.map { param =>
+            val scType = s.subst(param.exactParamType())
+            new Parameter("",
+                          None,
+                          scType,
+                          scType,
+                          false,
+                          param.isVarArgs,
+                          false,
+                          param.index,
+                          Some(param))
+          }
+      },
+      false
+    )(m.getProject, scope)
   }
 
   def javaPolymorphicType(m: PsiMethod,

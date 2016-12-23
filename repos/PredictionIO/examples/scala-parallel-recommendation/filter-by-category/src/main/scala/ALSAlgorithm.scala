@@ -26,10 +26,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
   def train(sc: SparkContext, data: PreparedData): ALSModel = {
     // MLLib ALS cannot handle empty training data.
-    require(data.ratings.take(1).nonEmpty,
-            s"RDD[Rating] in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
+    require(
+      data.ratings.take(1).nonEmpty,
+      s"RDD[Rating] in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly."
+    )
     // Convert user and item String IDs to Int index for MLlib
     val userStringIntMap = BiMap.stringInt(data.ratings.map(_.user))
     val itemStringIntMap = BiMap.stringInt(data.ratings.map(_.item))
@@ -64,20 +66,24 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val categories =
       data.items.flatMap(_.categories).distinct().collect().toSet
 
-    val categoriesMap = categories.map { category =>
-      category -> data.items
-        .filter(_.categories.contains(category))
-        .map(item => itemStringIntMap(item.id))
-        .collect()
-        .toSet
-    }.toMap
+    val categoriesMap = categories
+      .map { category =>
+        category -> data.items
+          .filter(_.categories.contains(category))
+          .map(item => itemStringIntMap(item.id))
+          .collect()
+          .toSet
+      }
+      .toMap
 
-    new ALSModel(rank = m.rank,
-                 userFeatures = m.userFeatures,
-                 productFeatures = m.productFeatures,
-                 userStringIntMap = userStringIntMap,
-                 itemStringIntMap = itemStringIntMap,
-                 categoryItemsMap = categoriesMap)
+    new ALSModel(
+      rank = m.rank,
+      userFeatures = m.userFeatures,
+      productFeatures = m.productFeatures,
+      userStringIntMap = userStringIntMap,
+      itemStringIntMap = itemStringIntMap,
+      categoryItemsMap = categoriesMap
+    )
   }
 
   def predict(model: ALSModel, query: Query): PredictedResult = {

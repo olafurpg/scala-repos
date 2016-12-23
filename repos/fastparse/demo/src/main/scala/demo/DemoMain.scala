@@ -53,9 +53,10 @@ object DemoMain {
   }
   @JSExport
   def json(container: html.Div) = {
-    helper(container,
-           fastparse.JsonTests.jsonExpr,
-           """{
+    helper(
+      container,
+      fastparse.JsonTests.jsonExpr,
+      """{
         |  "firstName": "John",
         |  "lastName": "Smith",
         |  "age": 25,
@@ -75,7 +76,8 @@ object DemoMain {
         |          "number": "646 555-4567"
         |      }
         |  ]
-        |}""".stripMargin)
+        |}""".stripMargin
+    )
   }
   def helper(container: html.Div, parser: Parser[_], default: String) = {
     import scalatags.JsDom.all._

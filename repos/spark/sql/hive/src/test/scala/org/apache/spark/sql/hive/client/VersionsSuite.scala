@@ -69,12 +69,14 @@ class VersionsSuite extends SparkFunSuite with Logging {
 
   test("success sanity check") {
     val badClient = IsolatedClientLoader
-      .forVersion(hiveMetastoreVersion = HiveContext.hiveExecutionVersion,
-                  hadoopVersion = VersionInfo.getVersion,
-                  sparkConf = sparkConf,
-                  hadoopConf = new Configuration(),
-                  config = buildConf(),
-                  ivyPath = ivyPath)
+      .forVersion(
+        hiveMetastoreVersion = HiveContext.hiveExecutionVersion,
+        hadoopVersion = VersionInfo.getVersion,
+        sparkConf = sparkConf,
+        hadoopConf = new Configuration(),
+        config = buildConf(),
+        ivyPath = ivyPath
+      )
       .createClient()
     val db = new CatalogDatabase("default", "desc", "loc", Map())
     badClient.createDatabase(db, ignoreIfExists = true)
@@ -84,12 +86,14 @@ class VersionsSuite extends SparkFunSuite with Logging {
     val hadoopConf = new Configuration();
     hadoopConf.set("test", "success")
     val client = IsolatedClientLoader
-      .forVersion(hiveMetastoreVersion = HiveContext.hiveExecutionVersion,
-                  hadoopVersion = VersionInfo.getVersion,
-                  sparkConf = sparkConf,
-                  hadoopConf = hadoopConf,
-                  config = buildConf(),
-                  ivyPath = ivyPath)
+      .forVersion(
+        hiveMetastoreVersion = HiveContext.hiveExecutionVersion,
+        hadoopVersion = VersionInfo.getVersion,
+        sparkConf = sparkConf,
+        hadoopConf = hadoopConf,
+        config = buildConf(),
+        ivyPath = ivyPath
+      )
       .createClient()
     assert("success" === client.getConf("test", null))
   }
@@ -142,12 +146,14 @@ class VersionsSuite extends SparkFunSuite with Logging {
       client = null
       System.gc() // Hack to avoid SEGV on some JVM versions.
       client = IsolatedClientLoader
-        .forVersion(hiveMetastoreVersion = version,
-                    hadoopVersion = VersionInfo.getVersion,
-                    sparkConf = sparkConf,
-                    hadoopConf = new Configuration(),
-                    config = buildConf(),
-                    ivyPath = ivyPath)
+        .forVersion(
+          hiveMetastoreVersion = version,
+          hadoopVersion = VersionInfo.getVersion,
+          sparkConf = sparkConf,
+          hadoopConf = new Configuration(),
+          config = buildConf(),
+          ivyPath = ivyPath
+        )
         .createClient()
     }
 
@@ -173,7 +179,8 @@ class VersionsSuite extends SparkFunSuite with Logging {
             classOf[org.apache.hadoop.hive.serde2.`lazy`.LazySimpleSerDe]
               .getName()),
           serdeProperties = Map.empty
-        ))
+        )
+      )
 
       client.createTable(table, ignoreIfExists = false)
     }

@@ -151,10 +151,12 @@ object PortMappingSerializer {
         .setServicePort(mapping.servicePort)
 
     mapping.name.foreach(builder.setName)
-    mapping.labels.map {
-      case (key, value) =>
-        mesos.Protos.Label.newBuilder.setKey(key).setValue(value).build
-    }.foreach(builder.addLabels)
+    mapping.labels
+      .map {
+        case (key, value) =>
+          mesos.Protos.Label.newBuilder.setKey(key).setValue(value).build
+      }
+      .foreach(builder.addLabels)
 
     builder.build
   }
@@ -167,9 +169,11 @@ object PortMappingSerializer {
       proto.getServicePort,
       proto.getProtocol,
       if (proto.hasName) Some(proto.getName) else None,
-      proto.getLabelsList.asScala.map { p =>
-        p.getKey -> p.getValue
-      }.toMap
+      proto.getLabelsList.asScala
+        .map { p =>
+          p.getKey -> p.getValue
+        }
+        .toMap
     )
 
   def toMesos(mapping: Container.Docker.PortMapping)

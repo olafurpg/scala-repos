@@ -317,12 +317,15 @@ trait GrouperSpec[M[+ _]]
       SourceKey.Single,
       Some(TransSpec1.Id),
       groupId,
-      GroupKeySpecAnd(GroupKeySpecSource(tic_a,
-                                         DerefObjectStatic(SourceValue.Single,
-                                                           CPathField("a"))),
-                      GroupKeySpecSource(tic_b,
-                                         DerefObjectStatic(SourceValue.Single,
-                                                           CPathField("b")))))
+      GroupKeySpecAnd(
+        GroupKeySpecSource(tic_a,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("a"))),
+        GroupKeySpecSource(tic_b,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("b")))
+      )
+    )
 
     val result = Table.merge(spec) { (key, map) =>
       for {
@@ -381,12 +384,15 @@ trait GrouperSpec[M[+ _]]
       SourceKey.Single,
       Some(TransSpec1.Id),
       groupId,
-      GroupKeySpecOr(GroupKeySpecSource(tic_a,
-                                        DerefObjectStatic(SourceValue.Single,
-                                                          CPathField("a"))),
-                     GroupKeySpecSource(tic_b,
-                                        DerefObjectStatic(SourceValue.Single,
-                                                          CPathField("b")))))
+      GroupKeySpecOr(
+        GroupKeySpecSource(tic_a,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("a"))),
+        GroupKeySpecSource(tic_b,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("b")))
+      )
+    )
 
     val result = Table.merge(spec) { (key, map) =>
       for {
@@ -467,10 +473,13 @@ trait GrouperSpec[M[+ _]]
             Filter(Map1(DerefObjectStatic(SourceValue.Single, CPathField("a")),
                         eq12F1),
                    Map1(DerefObjectStatic(SourceValue.Single, CPathField("a")),
-                        eq12F1))),
+                        eq12F1))
+          ),
           GroupKeySpecSource(tic_b,
                              DerefObjectStatic(SourceValue.Single,
-                                               CPathField("b")))))
+                                               CPathField("b")))
+        )
+      )
 
     val result = Table.merge(spec) { (key, map) =>
       for {
@@ -518,10 +527,13 @@ trait GrouperSpec[M[+ _]]
           Filter(Map1(DerefObjectStatic(SourceValue.Single, CPathField("a")),
                       eq12F1),
                  Map1(DerefObjectStatic(SourceValue.Single, CPathField("a")),
-                      eq12F1))),
+                      eq12F1))
+        ),
         GroupKeySpecSource(tic_b,
                            DerefObjectStatic(SourceValue.Single,
-                                             CPathField("b")))))
+                                             CPathField("b")))
+      )
+    )
 
     val result = Table.merge(spec) { (key, map) =>
       for {
@@ -661,12 +673,15 @@ trait GrouperSpec[M[+ _]]
       SourceKey.Single,
       Some(SourceValue.Single),
       groupId1,
-      GroupKeySpecAnd(GroupKeySpecSource(tic_a,
-                                         DerefObjectStatic(SourceValue.Single,
-                                                           CPathField("a"))),
-                      GroupKeySpecSource(tic_b,
-                                         DerefObjectStatic(SourceValue.Single,
-                                                           CPathField("b")))))
+      GroupKeySpecAnd(
+        GroupKeySpecSource(tic_a,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("a"))),
+        GroupKeySpecSource(tic_b,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("b")))
+      )
+    )
 
     val spec2 = GroupingSource(
       table2,
@@ -779,12 +794,15 @@ trait GrouperSpec[M[+ _]]
       SourceKey.Single,
       Some(SourceValue.Single),
       groupId1,
-      GroupKeySpecOr(GroupKeySpecSource(tic_a,
-                                        DerefObjectStatic(SourceValue.Single,
-                                                          CPathField("a"))),
-                     GroupKeySpecSource(tic_b,
-                                        DerefObjectStatic(SourceValue.Single,
-                                                          CPathField("b")))))
+      GroupKeySpecOr(
+        GroupKeySpecSource(tic_a,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("a"))),
+        GroupKeySpecSource(tic_b,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("b")))
+      )
+    )
 
     val spec2 = GroupingSource(
       table2,
@@ -934,12 +952,15 @@ trait GrouperSpec[M[+ _]]
       SourceKey.Single,
       Some(SourceValue.Single),
       fooGroup,
-      GroupKeySpecAnd(GroupKeySpecSource(tic_a,
-                                         DerefObjectStatic(SourceValue.Single,
-                                                           CPathField("a"))),
-                      GroupKeySpecSource(tic_b,
-                                         DerefObjectStatic(SourceValue.Single,
-                                                           CPathField("b")))))
+      GroupKeySpecAnd(
+        GroupKeySpecSource(tic_a,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("a"))),
+        GroupKeySpecSource(tic_b,
+                           DerefObjectStatic(SourceValue.Single,
+                                             CPathField("b")))
+      )
+    )
 
     val barSpec = GroupingSource(
       fromJson(bar.toStream),
@@ -948,7 +969,8 @@ trait GrouperSpec[M[+ _]]
       barGroup,
       GroupKeySpecSource(
         tic_a,
-        DerefObjectStatic(SourceValue.Single, CPathField("a"))))
+        DerefObjectStatic(SourceValue.Single, CPathField("a")))
+    )
 
     val bazSpec = GroupingSource(
       fromJson(baz.toStream),
@@ -957,7 +979,8 @@ trait GrouperSpec[M[+ _]]
       bazGroup,
       GroupKeySpecSource(
         tic_b,
-        DerefObjectStatic(SourceValue.Single, CPathField("b"))))
+        DerefObjectStatic(SourceValue.Single, CPathField("b")))
+    )
 
     val spec = GroupingAlignment(
       DerefObjectStatic(Leaf(Source), tic_b),
@@ -968,7 +991,8 @@ trait GrouperSpec[M[+ _]]
                         barSpec,
                         GroupingSpec.Intersection),
       bazSpec,
-      GroupingSpec.Intersection)
+      GroupingSpec.Intersection
+    )
 
     val forallResult = Table.merge(spec) { (key, map) =>
       val a = key.toJValue(tic_aj)
@@ -1068,75 +1092,50 @@ trait GrouperSpec[M[+ _]]
       Stream(1948335811, -528723320, 1))
     "compute ctr with simple datasets" in testCtr(
       Stream(1, 2147483647, 2126441435, -1, 0, 0),
-      Stream(2006322377,
-             -2147483648,
-             -1456034303,
-             2147483647,
-             0,
-             2147483647,
-             -1904025337))
+      Stream(2006322377, -2147483648, -1456034303, 2147483647, 0, 2147483647,
+        -1904025337))
 
     "compute ctr on one field of a composite value" >> {
       "and" >> propNoShrink(testCtrPartialJoinAnd _)
       "and with un-joinable datasets" >> testCtrPartialJoinAnd(
         Stream((0, Some(1)), (1123021019, Some(-2147483648))),
-        Stream(-1675865668,
-               889796884,
-               2147483647,
-               -1099860336,
-               -2147483648,
-               -2147483648,
-               1,
-               1496400141)
+        Stream(-1675865668, 889796884, 2147483647, -1099860336, -2147483648,
+          -2147483648, 1, 1496400141)
       )
       "and with joinable datasets" >> testCtrPartialJoinAnd(
-        Stream((-1, Some(-1771882715)),
-               (-2091150211, Some(1)),
-               (1, Some(-1161386492)),
-               (0, Some(-1)),
-               (-1, Some(-1)),
-               (-2147483648, Some(-2147483648)),
-               (-1, Some(1)),
-               (0, Some(391541906)),
-               (-2147483648, Some(725820706)),
-               (0, Some(-2147483648)),
-               (1286585203, Some(560695941))),
-        Stream(0,
-               -297579588,
-               -1,
-               2147483647,
-               -1,
-               -1536865491,
-               1049246142,
-               -2147483648,
-               -2147483648,
-               766980226,
-               -1047565460)
+        Stream(
+          (-1, Some(-1771882715)),
+          (-2091150211, Some(1)),
+          (1, Some(-1161386492)),
+          (0, Some(-1)),
+          (-1, Some(-1)),
+          (-2147483648, Some(-2147483648)),
+          (-1, Some(1)),
+          (0, Some(391541906)),
+          (-2147483648, Some(725820706)),
+          (0, Some(-2147483648)),
+          (1286585203, Some(560695941))
+        ),
+        Stream(0, -297579588, -1, 2147483647, -1, -1536865491, 1049246142,
+          -2147483648, -2147483648, 766980226, -1047565460)
       )
       "and with repeated group keys in joinable datasets" >> testCtrPartialJoinAnd(
-        Stream((1, Some(-421523375)),
-               (1381663801, Some(2145939312)),
-               (975603510, Some(-456843566)),
-               (-260964705, Some(-811947401)),
-               (-1643830562, Some(0)),
-               (382901678, Some(-2147483648)),
-               (-1770905652, Some(-1)),
-               (1172197808, Some(1)),
-               (-206421051, Some(307500840)),
-               (2147483647, Some(-1)),
-               (2147483647, Some(-1)),
-               (-1775980054, Some(2147483647))),
-        Stream(1,
-               -1,
-               -2005746103,
-               720318134,
-               852618110,
-               1813748094,
-               -1,
-               -1676020815,
-               -627348537,
-               2147483647,
-               -2147483648)
+        Stream(
+          (1, Some(-421523375)),
+          (1381663801, Some(2145939312)),
+          (975603510, Some(-456843566)),
+          (-260964705, Some(-811947401)),
+          (-1643830562, Some(0)),
+          (382901678, Some(-2147483648)),
+          (-1770905652, Some(-1)),
+          (1172197808, Some(1)),
+          (-206421051, Some(307500840)),
+          (2147483647, Some(-1)),
+          (2147483647, Some(-1)),
+          (-1775980054, Some(2147483647))
+        ),
+        Stream(1, -1, -2005746103, 720318134, 852618110, 1813748094, -1,
+          -1676020815, -627348537, 2147483647, -2147483648)
       )
 
       // TODO: the performance of the following is too awful to run under scalacheck, even with a minimal
@@ -1156,145 +1155,98 @@ trait GrouperSpec[M[+ _]]
 
       // runs a bit long
       "or with a pathological example" >> {
-        val s1 = Stream((-954410459, Some(0)),
-                        (-1, Some(2007696701)),
-                        (2105675940, Some(-1245674830)),
-                        (-1582587372, Some(1940093023)),
-                        (63198658, Some(2068956190)),
-                        (0, Some(-189150978)),
-                        (2000592976, Some(-222301652)),
-                        (523154377, Some(0)),
-                        (-2147483648, Some(1632775270)),
-                        (1092038023, Some(1819439617)),
-                        (-2147483648, Some(2147483647)),
-                        (0, Some(0)),
-                        (2147483647, Some(0)),
-                        (-1143657189, Some(-2147483648)),
-                        (-1958852329, Some(2147483647)),
-                        (-2147483648, Some(608866931)),
-                        (-273338630, Some(-2147483648)),
-                        (-2147483648, Some(-1841559997)),
-                        (-2147483648, Some(1601378038)),
-                        (0, Some(-1)),
-                        (1, Some(1)),
-                        (-670756012, Some(-106440741)),
-                        (-2147483648, Some(-431649434)),
-                        (0, Some(585196920)),
-                        (0, Some(143242157)),
-                        (2147483647, Some(0)),
-                        (-1002181171, Some(2147483647)),
-                        (260767290, Some(2147483647)),
-                        (2147483647, Some(0)),
-                        (1502519219, Some(-80993454)),
-                        (-2147483648, Some(1)),
-                        (26401216, Some(1737006538)),
-                        (459053133, Some(1)),
-                        (1, Some(222440292)),
-                        (2147483647, Some(-1)),
-                        (-785490772, Some(2147483647)),
-                        (-1519510933, Some(1)),
-                        (1064945303, Some(2015037890)),
-                        (2147483647, Some(-1888515244)),
-                        (-2147483648, Some(0)),
-                        (-1782288738, Some(-2147483648)),
-                        (-1243866137, Some(-2036899743)),
-                        (2147483647, Some(-2147483648)),
-                        (152217775, Some(1)),
-                        (-1, Some(1822038570)),
-                        (-557295510, Some(-2147483648)),
-                        (0, Some(0)),
-                        (-1389729666, Some(407111520)),
-                        (0, Some(1110392883)),
-                        (-2042103283, Some(-1366550515)),
-                        (-1309507483, Some(-2147483648)),
-                        (2147483647, Some(0)),
-                        (1322668865, Some(1)),
-                        (1, Some(1)),
-                        (1296673327, Some(341152609)),
-                        (1040120825, Some(-1731488506)),
-                        (-951605740, Some(1)),
-                        (690140640, Some(-1783450717)),
-                        (1395849695, Some(768982688)),
-                        (-1, Some(-894395447)),
-                        (2147483647, Some(2147483647)),
-                        (-1, Some(-2016297234)),
-                        (-1416825502, Some(-2147483648)),
-                        (1727813995, Some(1)),
-                        (-1178284872, Some(-2147483648)),
-                        (2147483647, Some(-1468556846)),
-                        (-361436734, Some(0)),
-                        (960146451, Some(-2147483648)),
-                        (-2147483648, Some(-2147483648)),
-                        (973715803, Some(603648248)),
-                        (2147483647, Some(0)),
-                        (-2147483648, Some(-36955603)),
-                        (2005706222, Some(-242403982)),
-                        (-1274227445, Some(1156421302)),
-                        (-2147483648, Some(385347685)),
-                        (-2147483648, Some(926114223)),
-                        (1690927871, Some(1)),
-                        (-330611474, Some(-2147483648)),
-                        (-1801526113, Some(922619077)),
-                        (-2147483648, Some(-1903319530)),
-                        (2147483647, Some(0)))
+        val s1 = Stream(
+          (-954410459, Some(0)),
+          (-1, Some(2007696701)),
+          (2105675940, Some(-1245674830)),
+          (-1582587372, Some(1940093023)),
+          (63198658, Some(2068956190)),
+          (0, Some(-189150978)),
+          (2000592976, Some(-222301652)),
+          (523154377, Some(0)),
+          (-2147483648, Some(1632775270)),
+          (1092038023, Some(1819439617)),
+          (-2147483648, Some(2147483647)),
+          (0, Some(0)),
+          (2147483647, Some(0)),
+          (-1143657189, Some(-2147483648)),
+          (-1958852329, Some(2147483647)),
+          (-2147483648, Some(608866931)),
+          (-273338630, Some(-2147483648)),
+          (-2147483648, Some(-1841559997)),
+          (-2147483648, Some(1601378038)),
+          (0, Some(-1)),
+          (1, Some(1)),
+          (-670756012, Some(-106440741)),
+          (-2147483648, Some(-431649434)),
+          (0, Some(585196920)),
+          (0, Some(143242157)),
+          (2147483647, Some(0)),
+          (-1002181171, Some(2147483647)),
+          (260767290, Some(2147483647)),
+          (2147483647, Some(0)),
+          (1502519219, Some(-80993454)),
+          (-2147483648, Some(1)),
+          (26401216, Some(1737006538)),
+          (459053133, Some(1)),
+          (1, Some(222440292)),
+          (2147483647, Some(-1)),
+          (-785490772, Some(2147483647)),
+          (-1519510933, Some(1)),
+          (1064945303, Some(2015037890)),
+          (2147483647, Some(-1888515244)),
+          (-2147483648, Some(0)),
+          (-1782288738, Some(-2147483648)),
+          (-1243866137, Some(-2036899743)),
+          (2147483647, Some(-2147483648)),
+          (152217775, Some(1)),
+          (-1, Some(1822038570)),
+          (-557295510, Some(-2147483648)),
+          (0, Some(0)),
+          (-1389729666, Some(407111520)),
+          (0, Some(1110392883)),
+          (-2042103283, Some(-1366550515)),
+          (-1309507483, Some(-2147483648)),
+          (2147483647, Some(0)),
+          (1322668865, Some(1)),
+          (1, Some(1)),
+          (1296673327, Some(341152609)),
+          (1040120825, Some(-1731488506)),
+          (-951605740, Some(1)),
+          (690140640, Some(-1783450717)),
+          (1395849695, Some(768982688)),
+          (-1, Some(-894395447)),
+          (2147483647, Some(2147483647)),
+          (-1, Some(-2016297234)),
+          (-1416825502, Some(-2147483648)),
+          (1727813995, Some(1)),
+          (-1178284872, Some(-2147483648)),
+          (2147483647, Some(-1468556846)),
+          (-361436734, Some(0)),
+          (960146451, Some(-2147483648)),
+          (-2147483648, Some(-2147483648)),
+          (973715803, Some(603648248)),
+          (2147483647, Some(0)),
+          (-2147483648, Some(-36955603)),
+          (2005706222, Some(-242403982)),
+          (-1274227445, Some(1156421302)),
+          (-2147483648, Some(385347685)),
+          (-2147483648, Some(926114223)),
+          (1690927871, Some(1)),
+          (-330611474, Some(-2147483648)),
+          (-1801526113, Some(922619077)),
+          (-2147483648, Some(-1903319530)),
+          (2147483647, Some(0))
+        )
 
-        val s2 = Stream(0,
-                        0,
-                        0,
-                        1,
-                        1,
-                        434608913,
-                        193294286,
-                        0,
-                        -1921860406,
-                        2147483647,
-                        -2147483648,
-                        1,
-                        -1,
-                        0,
-                        -2147483648,
-                        0,
-                        -113276442,
-                        -1564947365,
-                        2147483647,
-                        -54676151,
-                        -1,
-                        49986682,
-                        -391210112,
-                        1,
-                        -1,
-                        2147483647,
-                        0,
-                        -1,
-                        0,
-                        0,
-                        2147483647,
-                        -225140804,
-                        1245119802,
-                        1,
-                        -548778232,
-                        -1138847365,
-                        1,
-                        73483948,
-                        0,
-                        -1,
-                        -996046474,
-                        -695581403,
-                        2147483647,
-                        -2147483648,
-                        -1,
-                        1563916971,
-                        -2147483648,
-                        0,
-                        1,
-                        607908889,
-                        -2009071663,
-                        -1382431435,
-                        778550183,
-                        2147483647,
-                        -2147483648,
-                        0,
-                        -1)
+        val s2 = Stream(0, 0, 0, 1, 1, 434608913, 193294286, 0, -1921860406,
+          2147483647, -2147483648, 1, -1, 0, -2147483648, 0, -113276442,
+          -1564947365, 2147483647, -54676151, -1, 49986682, -391210112, 1, -1,
+          2147483647, 0, -1, 0, 0, 2147483647, -225140804, 1245119802, 1,
+          -548778232, -1138847365, 1, 73483948, 0, -1, -996046474, -695581403,
+          2147483647, -2147483648, -1, 1563916971, -2147483648, 0, 1,
+          607908889, -2009071663, -1382431435, 778550183, 2147483647,
+          -2147483648, 0, -1)
 
         //println("s1.size = %d, s2.size = %d".format(s1.size, s2.size))
         //println("distinct s1.size = %d, s2.size = %d".format(s1.map(_._1).toSet.size, s2.toSet.size))
@@ -1302,17 +1254,19 @@ trait GrouperSpec[M[+ _]]
       }
 
       "or with a simple join in datasets" >> testCtrPartialJoinOr(
-        Stream((436413513, Some(-477784155)),
-               (1693516917, Some(1537597532)),
-               (-33300192, Some(1)),
-               (-1, Some(417911606)),
-               (941828761, Some(-1)),
-               (-116426729, Some(0)),
-               (0, Some(1)),
-               (-1, Some(175860194)),
-               (-2147483648, Some(-2014951990)),
-               (2147483647, Some(293027634)),
-               (-1964286008, Some(132426726))),
+        Stream(
+          (436413513, Some(-477784155)),
+          (1693516917, Some(1537597532)),
+          (-33300192, Some(1)),
+          (-1, Some(417911606)),
+          (941828761, Some(-1)),
+          (-116426729, Some(0)),
+          (0, Some(1)),
+          (-1, Some(175860194)),
+          (-2147483648, Some(-2014951990)),
+          (2147483647, Some(293027634)),
+          (-1964286008, Some(132426726))
+        ),
         Stream(-1)
       )
     }

@@ -103,19 +103,22 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
   private[mllib] def multiplyGramianMatrixBy(v: BDV[Double]): BDV[Double] = {
     val n = numCols().toInt
     val vbr = rows.context.broadcast(v)
-    rows.treeAggregate(BDV.zeros[Double](n))(seqOp = (U, r) => {
-      val rBrz = r.toBreeze
-      val a = rBrz.dot(vbr.value)
-      rBrz match {
-        // use specialized axpy for better performance
-        case _: BDV[_] => brzAxpy(a, rBrz.asInstanceOf[BDV[Double]], U)
-        case _: BSV[_] => brzAxpy(a, rBrz.asInstanceOf[BSV[Double]], U)
-        case _ =>
-          throw new UnsupportedOperationException(
-            s"Do not support vector operation from type ${rBrz.getClass.getName}.")
-      }
-      U
-    }, combOp = (U1, U2) => U1 += U2)
+    rows.treeAggregate(BDV.zeros[Double](n))(
+      seqOp = (U, r) => {
+        val rBrz = r.toBreeze
+        val a = rBrz.dot(vbr.value)
+        rBrz match {
+          // use specialized axpy for better performance
+          case _: BDV[_] => brzAxpy(a, rBrz.asInstanceOf[BDV[Double]], U)
+          case _: BSV[_] => brzAxpy(a, rBrz.asInstanceOf[BSV[Double]], U)
+          case _ =>
+            throw new UnsupportedOperationException(
+              s"Do not support vector operation from type ${rBrz.getClass.getName}.")
+        }
+        U
+      },
+      combOp = (U1, U2) => U1 += U2
+    )
   }
 
   /**
@@ -359,10 +362,10 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
 
     val (m, mean) =
       rows.treeAggregate[(Long, BDV[Double])]((0L, BDV.zeros[Double](n)))(
-        seqOp = (s: (Long, BDV[Double]),
-                 v: Vector) => (s._1 + 1L, s._2 += v.toBreeze),
-        combOp = (s1: (Long, BDV[Double]),
-                  s2: (Long, BDV[Double])) => (s1._1 + s2._1, s1._2 += s2._2)
+        seqOp = (s: (Long, BDV[Double]), v: Vector) =>
+          (s._1 + 1L, s._2 += v.toBreeze),
+        combOp = (s1: (Long, BDV[Double]), s2: (Long, BDV[Double])) =>
+          (s1._1 + s2._1, s1._2 += s2._2)
       )
 
     if (m <= 1) {
@@ -644,71 +647,74 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     val pBV = sc.broadcast(colMagsCorrected.map(c => sg / c))
     val qBV = sc.broadcast(colMagsCorrected.map(c => math.min(sg, c)))
 
-    val sims = rows.mapPartitionsWithIndex { (indx, iter) =>
-      val p = pBV.value
-      val q = qBV.value
+    val sims = rows
+      .mapPartitionsWithIndex { (indx, iter) =>
+        val p = pBV.value
+        val q = qBV.value
 
-      val rand = new XORShiftRandom(indx)
-      val scaled = new Array[Double](p.size)
-      iter.flatMap { row =>
-        row match {
-          case SparseVector(size, indices, values) =>
-            val nnz = indices.size
-            var k = 0
-            while (k < nnz) {
-              scaled(k) = values(k) / q(indices(k))
-              k += 1
-            }
+        val rand = new XORShiftRandom(indx)
+        val scaled = new Array[Double](p.size)
+        iter.flatMap { row =>
+          row match {
+            case SparseVector(size, indices, values) =>
+              val nnz = indices.size
+              var k = 0
+              while (k < nnz) {
+                scaled(k) = values(k) / q(indices(k))
+                k += 1
+              }
 
-            Iterator
-              .tabulate(nnz) { k =>
-                val buf = new ListBuffer[((Int, Int), Double)]()
-                val i = indices(k)
-                val iVal = scaled(k)
-                if (iVal != 0 && rand.nextDouble() < p(i)) {
-                  var l = k + 1
-                  while (l < nnz) {
-                    val j = indices(l)
-                    val jVal = scaled(l)
-                    if (jVal != 0 && rand.nextDouble() < p(j)) {
-                      buf += (((i, j), iVal * jVal))
+              Iterator
+                .tabulate(nnz) { k =>
+                  val buf = new ListBuffer[((Int, Int), Double)]()
+                  val i = indices(k)
+                  val iVal = scaled(k)
+                  if (iVal != 0 && rand.nextDouble() < p(i)) {
+                    var l = k + 1
+                    while (l < nnz) {
+                      val j = indices(l)
+                      val jVal = scaled(l)
+                      if (jVal != 0 && rand.nextDouble() < p(j)) {
+                        buf += (((i, j), iVal * jVal))
+                      }
+                      l += 1
                     }
-                    l += 1
                   }
+                  buf
                 }
-                buf
+                .flatten
+            case DenseVector(values) =>
+              val n = values.size
+              var i = 0
+              while (i < n) {
+                scaled(i) = values(i) / q(i)
+                i += 1
               }
-              .flatten
-          case DenseVector(values) =>
-            val n = values.size
-            var i = 0
-            while (i < n) {
-              scaled(i) = values(i) / q(i)
-              i += 1
-            }
-            Iterator
-              .tabulate(n) { i =>
-                val buf = new ListBuffer[((Int, Int), Double)]()
-                val iVal = scaled(i)
-                if (iVal != 0 && rand.nextDouble() < p(i)) {
-                  var j = i + 1
-                  while (j < n) {
-                    val jVal = scaled(j)
-                    if (jVal != 0 && rand.nextDouble() < p(j)) {
-                      buf += (((i, j), iVal * jVal))
+              Iterator
+                .tabulate(n) { i =>
+                  val buf = new ListBuffer[((Int, Int), Double)]()
+                  val iVal = scaled(i)
+                  if (iVal != 0 && rand.nextDouble() < p(i)) {
+                    var j = i + 1
+                    while (j < n) {
+                      val jVal = scaled(j)
+                      if (jVal != 0 && rand.nextDouble() < p(j)) {
+                        buf += (((i, j), iVal * jVal))
+                      }
+                      j += 1
                     }
-                    j += 1
                   }
+                  buf
                 }
-                buf
-              }
-              .flatten
+                .flatten
+          }
         }
       }
-    }.reduceByKey(_ + _).map {
-      case ((i, j), sim) =>
-        MatrixEntry(i.toLong, j.toLong, sim)
-    }
+      .reduceByKey(_ + _)
+      .map {
+        case ((i, j), sim) =>
+          MatrixEntry(i.toLong, j.toLong, sim)
+      }
     new CoordinateMatrix(sims, numCols(), numCols())
   }
 

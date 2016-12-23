@@ -505,81 +505,87 @@ private[akka] final case class Batch[In, Out](max: Long,
 
       override def preStart() = pull(in)
 
-      setHandler(in, new InHandler {
+      setHandler(
+        in,
+        new InHandler {
 
-        override def onPush(): Unit = {
-          val elem = grab(in)
-          val cost = costFn(elem)
+          override def onPush(): Unit = {
+            val elem = grab(in)
+            val cost = costFn(elem)
 
-          if (agg == null) {
-            try {
-              agg = seed(elem)
-              left -= cost
-            } catch {
-              case NonFatal(ex) ⇒
-                decider(ex) match {
-                  case Supervision.Stop ⇒ failStage(ex)
-                  case Supervision.Restart ⇒
-                    restartState()
-                  case Supervision.Resume ⇒
-                }
-            }
-          } else if (left < cost) {
-            pending = elem
-          } else {
-            try {
-              agg = aggregate(agg, elem)
-              left -= cost
-            } catch {
-              case NonFatal(ex) ⇒
-                decider(ex) match {
-                  case Supervision.Stop ⇒ failStage(ex)
-                  case Supervision.Restart ⇒
-                    restartState()
-                  case Supervision.Resume ⇒
-                }
-            }
-          }
-
-          if (isAvailable(out)) flush()
-          if (pending == null) pull(in)
-        }
-
-        override def onUpstreamFinish(): Unit = {
-          if (agg == null) completeStage()
-        }
-      })
-
-      setHandler(out, new OutHandler {
-
-        override def onPull(): Unit = {
-          if (agg == null) {
-            if (isClosed(in)) completeStage()
-            else if (!hasBeenPulled(in)) pull(in)
-          } else if (isClosed(in)) {
-            push(out, agg)
-            if (pending == null) completeStage()
-            else {
+            if (agg == null) {
               try {
-                agg = seed(pending)
+                agg = seed(elem)
+                left -= cost
               } catch {
                 case NonFatal(ex) ⇒
                   decider(ex) match {
                     case Supervision.Stop ⇒ failStage(ex)
-                    case Supervision.Resume ⇒
                     case Supervision.Restart ⇒
                       restartState()
-                      if (!hasBeenPulled(in)) pull(in)
+                    case Supervision.Resume ⇒
                   }
               }
-              pending = null.asInstanceOf[In]
+            } else if (left < cost) {
+              pending = elem
+            } else {
+              try {
+                agg = aggregate(agg, elem)
+                left -= cost
+              } catch {
+                case NonFatal(ex) ⇒
+                  decider(ex) match {
+                    case Supervision.Stop ⇒ failStage(ex)
+                    case Supervision.Restart ⇒
+                      restartState()
+                    case Supervision.Resume ⇒
+                  }
+              }
             }
-          } else {
-            flush()
-            if (!hasBeenPulled(in)) pull(in)
+
+            if (isAvailable(out)) flush()
+            if (pending == null) pull(in)
+          }
+
+          override def onUpstreamFinish(): Unit = {
+            if (agg == null) completeStage()
           }
         }
-      })
+      )
+
+      setHandler(
+        out,
+        new OutHandler {
+
+          override def onPull(): Unit = {
+            if (agg == null) {
+              if (isClosed(in)) completeStage()
+              else if (!hasBeenPulled(in)) pull(in)
+            } else if (isClosed(in)) {
+              push(out, agg)
+              if (pending == null) completeStage()
+              else {
+                try {
+                  agg = seed(pending)
+                } catch {
+                  case NonFatal(ex) ⇒
+                    decider(ex) match {
+                      case Supervision.Stop ⇒ failStage(ex)
+                      case Supervision.Resume ⇒
+                      case Supervision.Restart ⇒
+                        restartState()
+                        if (!hasBeenPulled(in)) pull(in)
+                    }
+                }
+                pending = null.asInstanceOf[In]
+              }
+            } else {
+              flush()
+              if (!hasBeenPulled(in)) pull(in)
+            }
+          }
+        }
+      )
 
       private def restartState(): Unit = {
         agg = null.asInstanceOf[Out]
@@ -606,40 +612,46 @@ private[akka] final class Expand[In, Out](extrapolate: In ⇒ Iterator[Out])
 
     override def preStart(): Unit = pull(in)
 
-    setHandler(in, new InHandler {
-      override def onPush(): Unit = {
-        iterator = extrapolate(grab(in))
-        if (iterator.hasNext) {
-          if (isAvailable(out)) {
-            expanded = true
-            pull(in)
-            push(out, iterator.next())
-          } else expanded = false
-        } else pull(in)
-      }
-      override def onUpstreamFinish(): Unit = {
-        if (iterator.hasNext && !expanded) () // need to wait
-        else completeStage()
-      }
-    })
-
-    setHandler(out, new OutHandler {
-      override def onPull(): Unit = {
-        if (iterator.hasNext) {
-          if (expanded == false) {
-            expanded = true
-            if (isClosed(in)) {
-              push(out, iterator.next())
-              completeStage()
-            } else {
-              // expand needs to pull first to be “fair” when upstream is not actually slow
+    setHandler(
+      in,
+      new InHandler {
+        override def onPush(): Unit = {
+          iterator = extrapolate(grab(in))
+          if (iterator.hasNext) {
+            if (isAvailable(out)) {
+              expanded = true
               pull(in)
               push(out, iterator.next())
-            }
-          } else push(out, iterator.next())
+            } else expanded = false
+          } else pull(in)
+        }
+        override def onUpstreamFinish(): Unit = {
+          if (iterator.hasNext && !expanded) () // need to wait
+          else completeStage()
         }
       }
-    })
+    )
+
+    setHandler(
+      out,
+      new OutHandler {
+        override def onPull(): Unit = {
+          if (iterator.hasNext) {
+            if (expanded == false) {
+              expanded = true
+              if (isClosed(in)) {
+                push(out, iterator.next())
+                completeStage()
+              } else {
+                // expand needs to pull first to be “fair” when upstream is not actually slow
+                pull(in)
+                push(out, iterator.next())
+              }
+            } else push(out, iterator.next())
+          }
+        }
+      }
+    )
   }
 }
 
@@ -715,24 +727,27 @@ private[akka] final case class MapAsync[In, Out](parallelism: Int,
           }
       })
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          try {
-            val future = f(grab(in))
-            val holder = new Holder[Try[Out]](NotYetThere)
-            buffer.enqueue(holder)
-            future.onComplete(result ⇒ futureCB.invoke(holder -> result))(
-              akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
-          } catch {
-            case NonFatal(ex) ⇒
-              if (decider(ex) == Supervision.Stop) failStage(ex)
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            try {
+              val future = f(grab(in))
+              val holder = new Holder[Try[Out]](NotYetThere)
+              buffer.enqueue(holder)
+              future.onComplete(result ⇒ futureCB.invoke(holder -> result))(
+                akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
+            } catch {
+              case NonFatal(ex) ⇒
+                if (decider(ex) == Supervision.Stop) failStage(ex)
+            }
+            if (todo < parallelism) tryPull(in)
           }
-          if (todo < parallelism) tryPull(in)
+          override def onUpstreamFinish(): Unit = {
+            if (todo == 0) completeStage()
+          }
         }
-        override def onUpstreamFinish(): Unit = {
-          if (todo == 0) completeStage()
-        }
-      })
+      )
 
       setHandler(out, new OutHandler {
         override def onPull(): Unit = pushOne()
@@ -791,31 +806,37 @@ private[akka] final case class MapAsyncUnordered[In, Out](parallelism: Int,
         }
       }).invoke _
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          try {
-            val future = f(grab(in))
-            inFlight += 1
-            future.onComplete(futureCB)(
-              akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
-          } catch {
-            case NonFatal(ex) ⇒
-              if (decider(ex) == Supervision.Stop) failStage(ex)
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            try {
+              val future = f(grab(in))
+              inFlight += 1
+              future.onComplete(futureCB)(
+                akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
+            } catch {
+              case NonFatal(ex) ⇒
+                if (decider(ex) == Supervision.Stop) failStage(ex)
+            }
+            if (todo < parallelism) tryPull(in)
           }
-          if (todo < parallelism) tryPull(in)
+          override def onUpstreamFinish(): Unit = {
+            if (todo == 0) completeStage()
+          }
         }
-        override def onUpstreamFinish(): Unit = {
-          if (todo == 0) completeStage()
-        }
-      })
+      )
 
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          if (!buffer.isEmpty) push(out, buffer.dequeue())
-          else if (isClosed(in) && todo == 0) completeStage()
-          if (todo < parallelism && !hasBeenPulled(in)) tryPull(in)
+      setHandler(
+        out,
+        new OutHandler {
+          override def onPull(): Unit = {
+            if (!buffer.isEmpty) push(out, buffer.dequeue())
+            else if (isClosed(in) && todo == 0) completeStage()
+            if (todo < parallelism && !hasBeenPulled(in)) tryPull(in)
+          }
         }
-      })
+      )
     }
 }
 
@@ -846,7 +867,8 @@ private[akka] final case class Log[T](name: String,
             throw new RuntimeException(
               "Log stage can only provide LoggingAdapter when used with ActorMaterializer! " +
                 "Provide a LoggingAdapter explicitly or use the actor based flow materializer.",
-              ex)
+              ex
+            )
         }
 
         Logging(mat.system, ctx)(fromLifecycleContext)
@@ -992,17 +1014,20 @@ private[stream] final class GroupedWithin[T](n: Int, d: FiniteDuration)
         else if (!hasBeenPulled(in)) pull(in)
       }
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit =
-          if (!groupClosed)
-            nextElement(grab(in)) // otherwise keep the element for next round
-        override def onUpstreamFinish(): Unit = {
-          finished = true
-          if (!groupClosed && elements > 0) closeGroup()
-          else completeStage()
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit =
+            if (!groupClosed)
+              nextElement(grab(in)) // otherwise keep the element for next round
+          override def onUpstreamFinish(): Unit = {
+            finished = true
+            if (!groupClosed && elements > 0) closeGroup()
+            else completeStage()
+          }
+          override def onUpstreamFailure(ex: Throwable): Unit = failStage(ex)
         }
-        override def onUpstreamFailure(ex: Throwable): Unit = failStage(ex)
-      })
+      )
 
       setHandler(out, new OutHandler {
         override def onPull(): Unit = if (groupClosed) emitGroup()
@@ -1034,62 +1059,69 @@ private[stream] final class Delay[T](d: FiniteDuration,
 
       override def preStart(): Unit = buffer = BufferImpl(size, materializer)
 
-      setHandler(in, handler = new InHandler {
-        //FIXME rewrite into distinct strategy functions to avoid matching on strategy for every input when full
-        override def onPush(): Unit = {
-          if (buffer.isFull)
-            strategy match {
-              case EmitEarly ⇒
-                if (!isTimerActive(timerName)) push(out, buffer.dequeue()._2)
-                else {
-                  cancelTimer(timerName)
-                  onTimer(timerName)
-                }
-              case DropHead ⇒
-                buffer.dropHead()
-                grabAndPull(true)
-              case DropTail ⇒
-                buffer.dropTail()
-                grabAndPull(true)
-              case DropNew ⇒
-                grab(in)
-                if (!isTimerActive(timerName)) scheduleOnce(timerName, d)
-              case DropBuffer ⇒
-                buffer.clear()
-                grabAndPull(true)
-              case Fail ⇒
-                failStage(new BufferOverflowException(
-                  s"Buffer overflow for delay combinator (max capacity was: $size)!"))
-              case Backpressure ⇒
-                throw new IllegalStateException(
-                  "Delay buffer must never overflow in Backpressure mode")
-            } else {
-            grabAndPull(strategy != Backpressure || buffer.capacity < size - 1)
-            if (!isTimerActive(timerName)) scheduleOnce(timerName, d)
+      setHandler(
+        in,
+        handler = new InHandler {
+          //FIXME rewrite into distinct strategy functions to avoid matching on strategy for every input when full
+          override def onPush(): Unit = {
+            if (buffer.isFull)
+              strategy match {
+                case EmitEarly ⇒
+                  if (!isTimerActive(timerName)) push(out, buffer.dequeue()._2)
+                  else {
+                    cancelTimer(timerName)
+                    onTimer(timerName)
+                  }
+                case DropHead ⇒
+                  buffer.dropHead()
+                  grabAndPull(true)
+                case DropTail ⇒
+                  buffer.dropTail()
+                  grabAndPull(true)
+                case DropNew ⇒
+                  grab(in)
+                  if (!isTimerActive(timerName)) scheduleOnce(timerName, d)
+                case DropBuffer ⇒
+                  buffer.clear()
+                  grabAndPull(true)
+                case Fail ⇒
+                  failStage(new BufferOverflowException(
+                    s"Buffer overflow for delay combinator (max capacity was: $size)!"))
+                case Backpressure ⇒
+                  throw new IllegalStateException(
+                    "Delay buffer must never overflow in Backpressure mode")
+              } else {
+              grabAndPull(
+                strategy != Backpressure || buffer.capacity < size - 1)
+              if (!isTimerActive(timerName)) scheduleOnce(timerName, d)
+            }
+          }
+
+          def grabAndPull(pullCondition: Boolean): Unit = {
+            buffer.enqueue((System.nanoTime(), grab(in)))
+            if (pullCondition) pull(in)
+          }
+
+          override def onUpstreamFinish(): Unit = {
+            if (isAvailable(out) && isTimerActive(timerName)) willStop = true
+            else completeStage()
           }
         }
+      )
 
-        def grabAndPull(pullCondition: Boolean): Unit = {
-          buffer.enqueue((System.nanoTime(), grab(in)))
-          if (pullCondition) pull(in)
+      setHandler(
+        out,
+        new OutHandler {
+          override def onPull(): Unit = {
+            if (!isTimerActive(timerName) &&
+                !buffer.isEmpty && nextElementWaitTime() < 0)
+              push(out, buffer.dequeue()._2)
+
+            if (!willStop && !hasBeenPulled(in)) pull(in)
+            completeIfReady()
+          }
         }
-
-        override def onUpstreamFinish(): Unit = {
-          if (isAvailable(out) && isTimerActive(timerName)) willStop = true
-          else completeStage()
-        }
-      })
-
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          if (!isTimerActive(timerName) &&
-              !buffer.isEmpty && nextElementWaitTime() < 0)
-            push(out, buffer.dequeue()._2)
-
-          if (!willStop && !hasBeenPulled(in)) pull(in)
-          completeIfReady()
-        }
-      })
+      )
 
       def completeIfReady(): Unit =
         if (willStop && buffer.isEmpty) completeStage()

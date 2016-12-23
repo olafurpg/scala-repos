@@ -147,7 +147,8 @@ private[sql] case class InsertIntoHadoopFsRelation(
               inputSchema = query.output,
               PartitioningUtils.DEFAULT_PARTITION_NAME,
               sqlContext.conf.getConf(SQLConf.PARTITION_MAX_FILES),
-              isAppend)
+              isAppend
+            )
           }
 
         // This call shouldn't be put into the `try` block below because it only initializes and

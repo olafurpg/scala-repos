@@ -170,15 +170,17 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
                                 declarationClassBType,
                                 call.owner,
                                 source)
-              Callee(callee = method,
-                     calleeDeclarationClass = declarationClassBType,
-                     safeToInline = safeToInline,
-                     safeToRewrite = false,
-                     canInlineFromSource = canInlineFromSource,
-                     annotatedInline = annotatedInline,
-                     annotatedNoInline = annotatedNoInline,
-                     samParamTypes = samParamTypes,
-                     calleeInfoWarning = warning)
+              Callee(
+                callee = method,
+                calleeDeclarationClass = declarationClassBType,
+                safeToInline = safeToInline,
+                safeToRewrite = false,
+                canInlineFromSource = canInlineFromSource,
+                annotatedInline = annotatedInline,
+                annotatedNoInline = annotatedNoInline,
+                samParamTypes = samParamTypes,
+                calleeInfoWarning = warning
+              )
             }
 
             val argInfos = computeArgInfos(callee, call, prodCons)
@@ -402,7 +404,8 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
             annotatedInline = methodInlineInfo.annotatedInline,
             annotatedNoInline = methodInlineInfo.annotatedNoInline,
             samParamTypes = samParamTypes(calleeMethodNode, receiverType),
-            warning = warning)
+            warning = warning
+          )
 
         case None =>
           val warning = MethodInlineInfoMissing(

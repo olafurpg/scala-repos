@@ -455,13 +455,17 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
 
   /* this is a quiescent method! */
   def string(lev: Int) =
-    "%sINode -> %s".format("  " * lev, mainnode match {
-      case null => "<null>"
-      case tn: TNode[_, _] => "TNode(%s, %s, %d, !)".format(tn.k, tn.v, tn.hc)
-      case cn: CNode[_, _] => cn.string(lev)
-      case ln: LNode[_, _] => ln.string(lev)
-      case x => "<elem: %s>".format(x)
-    })
+    "%sINode -> %s".format(
+      "  " * lev,
+      mainnode match {
+        case null => "<null>"
+        case tn: TNode[_, _] =>
+          "TNode(%s, %s, %d, !)".format(tn.k, tn.v, tn.hc)
+        case cn: CNode[_, _] => cn.string(lev)
+        case ln: LNode[_, _] => ln.string(lev)
+        case x => "<elem: %s>".format(x)
+      }
+    )
 }
 
 private[concurrent] object INode {

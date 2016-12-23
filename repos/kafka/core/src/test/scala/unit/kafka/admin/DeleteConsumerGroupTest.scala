@@ -63,7 +63,8 @@ class DeleteConsumerGroupTest extends KafkaServerTestHarness {
 
     TestUtils.waitUntilTrue(
       () => groupDirExists(new ZKGroupDirs(groupToDelete)),
-      "DeleteConsumerGroupInZK should not delete the provided consumer group's directory if the consumer group is still active")
+      "DeleteConsumerGroupInZK should not delete the provided consumer group's directory if the consumer group is still active"
+    )
     TestUtils.waitUntilTrue(
       () => groupDirExists(new ZKGroupDirs(otherGroup)),
       "DeleteConsumerGroupInZK should not delete unrelated consumer group directories")
@@ -83,12 +84,14 @@ class DeleteConsumerGroupTest extends KafkaServerTestHarness {
 
     TestUtils.waitUntilTrue(
       () => !groupDirExists(new ZKGroupDirs(groupToDelete)),
-      "DeleteConsumerGroupInfoForTopicInZK should delete the provided consumer group's directory if it just consumes from one topic")
+      "DeleteConsumerGroupInfoForTopicInZK should delete the provided consumer group's directory if it just consumes from one topic"
+    )
     TestUtils.waitUntilTrue(
       () =>
         groupTopicOffsetAndOwnerDirsExist(
           new ZKGroupTopicDirs(otherGroup, topic)),
-      "DeleteConsumerGroupInfoForTopicInZK should not delete unrelated consumer group owner and offset directories")
+      "DeleteConsumerGroupInfoForTopicInZK should not delete unrelated consumer group owner and offset directories"
+    )
   }
 
   @Test
@@ -127,17 +130,20 @@ class DeleteConsumerGroupTest extends KafkaServerTestHarness {
       () =>
         !groupTopicOffsetAndOwnerDirsExist(
           new ZKGroupTopicDirs(groupToDelete, topicToDelete)),
-      "DeleteConsumerGroupInfoForTopicInZK should delete the provided consumer group's owner and offset directories for the given topic")
+      "DeleteConsumerGroupInfoForTopicInZK should delete the provided consumer group's owner and offset directories for the given topic"
+    )
     TestUtils.waitUntilTrue(
       () =>
         groupTopicOffsetAndOwnerDirsExist(
           new ZKGroupTopicDirs(groupToDelete, otherTopic)),
-      "DeleteConsumerGroupInfoForTopicInZK should not delete the provided consumer group's owner and offset directories for unrelated topics")
+      "DeleteConsumerGroupInfoForTopicInZK should not delete the provided consumer group's owner and offset directories for unrelated topics"
+    )
     TestUtils.waitUntilTrue(
       () =>
         groupTopicOffsetAndOwnerDirsExist(
           new ZKGroupTopicDirs(otherGroup, topicToDelete)),
-      "DeleteConsumerGroupInfoForTopicInZK should not delete unrelated consumer group owner and offset directories")
+      "DeleteConsumerGroupInfoForTopicInZK should not delete unrelated consumer group owner and offset directories"
+    )
   }
 
   @Test
@@ -159,12 +165,14 @@ class DeleteConsumerGroupTest extends KafkaServerTestHarness {
       () =>
         groupTopicOffsetAndOwnerDirsExist(
           new ZKGroupTopicDirs(group, topicToDelete)),
-      "DeleteConsumerGroupInfoForTopicInZK should not delete the provided consumer group's owner and offset directories for the given topic if the consumer group is still active")
+      "DeleteConsumerGroupInfoForTopicInZK should not delete the provided consumer group's owner and offset directories for the given topic if the consumer group is still active"
+    )
     TestUtils.waitUntilTrue(
       () =>
         groupTopicOffsetAndOwnerDirsExist(
           new ZKGroupTopicDirs(group, otherTopic)),
-      "DeleteConsumerGroupInfoForTopicInZK should not delete the provided consumer group's owner and offset directories for unrelated topics")
+      "DeleteConsumerGroupInfoForTopicInZK should not delete the provided consumer group's owner and offset directories for unrelated topics"
+    )
   }
 
   @Test
@@ -196,11 +204,13 @@ class DeleteConsumerGroupTest extends KafkaServerTestHarness {
       () =>
         !groupTopicDirsForTopicToDelete.exists(
           groupTopicOffsetAndOwnerDirsExist),
-      "Consumer group info on deleted topic topic should be deleted by DeleteAllConsumerGroupInfoForTopicInZK")
+      "Consumer group info on deleted topic topic should be deleted by DeleteAllConsumerGroupInfoForTopicInZK"
+    )
     TestUtils.waitUntilTrue(
       () =>
         groupTopicDirsForOtherTopic.forall(groupTopicOffsetAndOwnerDirsExist),
-      "Consumer group info on unrelated topics should not be deleted by DeleteAllConsumerGroupInfoForTopicInZK")
+      "Consumer group info on unrelated topics should not be deleted by DeleteAllConsumerGroupInfoForTopicInZK"
+    )
   }
 
   @Test

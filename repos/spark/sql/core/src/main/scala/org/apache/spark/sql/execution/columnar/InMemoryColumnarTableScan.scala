@@ -143,12 +143,14 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
       .mapPartitionsInternal { rowIterator =>
         new Iterator[CachedBatch] {
           def next(): CachedBatch = {
-            val columnBuilders = output.map { attribute =>
-              ColumnBuilder(attribute.dataType,
-                            batchSize,
-                            attribute.name,
-                            useCompression)
-            }.toArray
+            val columnBuilders = output
+              .map { attribute =>
+                ColumnBuilder(attribute.dataType,
+                              batchSize,
+                              attribute.name,
+                              useCompression)
+              }
+              .toArray
 
             var rowCount = 0
             var totalSize = 0L
@@ -163,7 +165,8 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
               assert(
                 row.numFields == columnBuilders.length,
                 s"Row column number mismatch, expected ${output.size} columns, " +
-                  s"but got ${row.numFields}." + s"\nRow content: $row")
+                  s"but got ${row.numFields}." + s"\nRow content: $row"
+              )
 
               var i = 0
               totalSize = 0
@@ -341,10 +344,11 @@ private[sql] case class InMemoryColumnarTableScan(
         schema)
 
       // Find the ordinals and data types of the requested columns.
-      val (requestedColumnIndices, requestedColumnDataTypes) = attributes.map {
-        a =>
+      val (requestedColumnIndices, requestedColumnDataTypes) = attributes
+        .map { a =>
           relOutput.indexWhere(_.exprId == a.exprId) -> a.dataType
-      }.unzip
+        }
+        .unzip
 
       // Do partition batch pruning if enabled
       val cachedBatchesToScan =
@@ -352,11 +356,13 @@ private[sql] case class InMemoryColumnarTableScan(
           cachedBatchIterator.filter { cachedBatch =>
             if (!partitionFilter(cachedBatch.stats)) {
               def statsString: String =
-                schemaIndex.map {
-                  case (a, i) =>
-                    val value = cachedBatch.stats.get(i, a.dataType)
-                    s"${a.name}: $value"
-                }.mkString(", ")
+                schemaIndex
+                  .map {
+                    case (a, i) =>
+                      val value = cachedBatch.stats.get(i, a.dataType)
+                      s"${a.name}: $value"
+                  }
+                  .mkString(", ")
               logInfo(s"Skipping partition based on stats $statsString")
               false
             } else {
@@ -376,10 +382,12 @@ private[sql] case class InMemoryColumnarTableScan(
         batch
       }
 
-      val columnTypes = requestedColumnDataTypes.map {
-        case udt: UserDefinedType[_] => udt.sqlType
-        case other => other
-      }.toArray
+      val columnTypes = requestedColumnDataTypes
+        .map {
+          case udt: UserDefinedType[_] => udt.sqlType
+          case other => other
+        }
+        .toArray
       val columnarIterator = GenerateColumnAccessor.generate(columnTypes)
       columnarIterator
         .initialize(withMetrics, columnTypes, requestedColumnIndices.toArray)

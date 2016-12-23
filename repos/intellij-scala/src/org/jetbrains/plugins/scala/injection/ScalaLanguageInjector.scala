@@ -72,13 +72,16 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
       case _ =>
     }
 
-    val expressions = host.depthFirst {
-      case injectedExpr: ScExpression
-          if injectedExpr.getParent
-            .isInstanceOf[ScInterpolatedStringLiteral] =>
-        false
-      case _ => true
-    }.filter(_.isInstanceOf[ScExpression]).toList
+    val expressions = host
+      .depthFirst {
+        case injectedExpr: ScExpression
+            if injectedExpr.getParent
+              .isInstanceOf[ScInterpolatedStringLiteral] =>
+          false
+        case _ => true
+      }
+      .filter(_.isInstanceOf[ScExpression])
+      .toList
 
     val suitable =
       expressions forall {

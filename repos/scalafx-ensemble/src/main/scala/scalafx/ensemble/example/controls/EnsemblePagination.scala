@@ -77,18 +77,22 @@ class EnsemblePagination extends EnsembleExample {
       alignment = Pos.Center
       spacing = 10
       padding = Insets(20)
-      children = List(pagination, new Button {
-        maxWidth = Region.USE_PREF_SIZE
-        maxHeight = Region.USE_PREF_SIZE
-        text = "Toggle Pagination Button"
-        onAction = (ae: ActionEvent) => {
-          if (pagination.styleClass.contains(Pagination.STYLE_CLASS_BULLET)) {
-            pagination.styleClass -= Pagination.STYLE_CLASS_BULLET
-          } else {
-            pagination.styleClass += Pagination.STYLE_CLASS_BULLET
+      children = List(
+        pagination,
+        new Button {
+          maxWidth = Region.USE_PREF_SIZE
+          maxHeight = Region.USE_PREF_SIZE
+          text = "Toggle Pagination Button"
+          onAction = (ae: ActionEvent) => {
+            if (pagination.styleClass
+                  .contains(Pagination.STYLE_CLASS_BULLET)) {
+              pagination.styleClass -= Pagination.STYLE_CLASS_BULLET
+            } else {
+              pagination.styleClass += Pagination.STYLE_CLASS_BULLET
+            }
           }
         }
-      })
+      )
     }
   }
 }

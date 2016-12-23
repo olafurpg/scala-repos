@@ -140,11 +140,13 @@ class ExpressionTypeCheckingSuite extends SparkFunSuite {
       CaseWhen(
         Seq(('booleanField.attr, 'intField.attr),
             ('booleanField.attr, 'mapField.attr))),
-      "THEN and ELSE expressions should all be same type or coercible to a common type")
+      "THEN and ELSE expressions should all be same type or coercible to a common type"
+    )
     assertError(
       CaseKeyWhen('intField,
                   Seq('intField, 'stringField, 'intField, 'mapField)),
-      "THEN and ELSE expressions should all be same type or coercible to a common type")
+      "THEN and ELSE expressions should all be same type or coercible to a common type"
+    )
     assertError(CaseWhen(
                   Seq(('booleanField.attr, 'intField.attr),
                       ('intField.attr, 'intField.attr))),

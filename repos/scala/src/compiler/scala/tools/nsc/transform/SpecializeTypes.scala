@@ -1092,7 +1092,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                 reporter.error(
                   derivedTvar.pos,
                   "Type parameter has to be specialized at least for the same types as in the overridden method. Missing "
-                    + "types: " + missing.mkString("", ", ", ""))
+                    + "types: " + missing.mkString("", ", ", "")
+                )
               }
           }
         }
@@ -1842,7 +1843,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
               tree,
               parents1 /*currentOwner.info.parents.map(tpe => TypeTree(tpe) setPos parents.head.pos)*/,
               self,
-              atOwner(currentOwner)(transformTrees(body ::: specMembers)))
+              atOwner(currentOwner)(transformTrees(body ::: specMembers))
+            )
           }
           transformTemplate
 
@@ -1906,19 +1908,22 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                   debuglog(
                     "completing specialized " + symbol.fullName + " calling " + original)
                   debuglog("special overload " + original + " -> " + env)
-                  val t = DefDef(symbol, { vparamss: List[List[Symbol]] =>
-                    val fun = Apply(Select(This(symbol.owner), original),
-                                    makeArguments(original, vparamss.head))
+                  val t = DefDef(
+                    symbol, { vparamss: List[List[Symbol]] =>
+                      val fun = Apply(Select(This(symbol.owner), original),
+                                      makeArguments(original, vparamss.head))
 
-                    debuglog(
-                      "inside defdef: " + symbol + "; type: " + symbol.tpe + "; owner: " + symbol.owner)
-                    gen.maybeMkAsInstanceOf(
-                      fun,
-                      symbol.owner.thisType.memberType(symbol).finalResultType,
-                      symbol.owner.thisType
-                        .memberType(original)
-                        .finalResultType)
-                  })
+                      debuglog(
+                        "inside defdef: " + symbol + "; type: " + symbol.tpe + "; owner: " + symbol.owner)
+                      gen.maybeMkAsInstanceOf(fun,
+                                              symbol.owner.thisType
+                                                .memberType(symbol)
+                                                .finalResultType,
+                                              symbol.owner.thisType
+                                                .memberType(original)
+                                                .finalResultType)
+                    }
+                  )
                   debuglog("created special overload tree " + t)
                   debuglog("created " + t)
                   reportError {

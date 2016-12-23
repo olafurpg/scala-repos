@@ -116,13 +116,18 @@ private[kafka] class KafkaTestUtils extends Logging {
     assert(zkReady, "Zookeeper should be set up beforehand")
 
     // Kafka broker startup
-    Utils.startServiceOnPort(brokerPort, port => {
-      brokerPort = port
-      brokerConf = new KafkaConfig(brokerConfiguration)
-      server = new KafkaServer(brokerConf)
-      server.startup()
-      (server, port)
-    }, new SparkConf(), "KafkaBroker")
+    Utils.startServiceOnPort(
+      brokerPort,
+      port => {
+        brokerPort = port
+        brokerConf = new KafkaConfig(brokerConfiguration)
+        server = new KafkaServer(brokerConf)
+        server.startup()
+        (server, port)
+      },
+      new SparkConf(),
+      "KafkaBroker"
+    )
 
     brokerReady = true
   }
@@ -183,9 +188,11 @@ private[kafka] class KafkaTestUtils extends Logging {
 
   /** Send the messages to the Kafka broker */
   def sendMessages(topic: String, messageToFreq: Map[String, Int]): Unit = {
-    val messages = messageToFreq.flatMap {
-      case (s, freq) => Seq.fill(freq)(s)
-    }.toArray
+    val messages = messageToFreq
+      .flatMap {
+        case (s, freq) => Seq.fill(freq)(s)
+      }
+      .toArray
     sendMessages(topic, messages)
   }
 

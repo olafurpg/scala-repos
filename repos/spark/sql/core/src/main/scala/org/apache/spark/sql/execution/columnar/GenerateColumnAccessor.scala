@@ -78,54 +78,57 @@ object GenerateColumnAccessor
   protected def create(columnTypes: Seq[DataType]): ColumnarIterator = {
     val ctx = newCodeGenContext()
     val numFields = columnTypes.size
-    val (initializeAccessors, extractors) = columnTypes.zipWithIndex.map {
-      case (dt, index) =>
-        val accessorName = ctx.freshName("accessor")
-        val accessorCls = dt match {
-          case NullType => classOf[NullColumnAccessor].getName
-          case BooleanType => classOf[BooleanColumnAccessor].getName
-          case ByteType => classOf[ByteColumnAccessor].getName
-          case ShortType => classOf[ShortColumnAccessor].getName
-          case IntegerType | DateType => classOf[IntColumnAccessor].getName
-          case LongType | TimestampType => classOf[LongColumnAccessor].getName
-          case FloatType => classOf[FloatColumnAccessor].getName
-          case DoubleType => classOf[DoubleColumnAccessor].getName
-          case StringType => classOf[StringColumnAccessor].getName
-          case BinaryType => classOf[BinaryColumnAccessor].getName
-          case dt: DecimalType if dt.precision <= Decimal.MAX_LONG_DIGITS =>
-            classOf[CompactDecimalColumnAccessor].getName
-          case dt: DecimalType => classOf[DecimalColumnAccessor].getName
-          case struct: StructType => classOf[StructColumnAccessor].getName
-          case array: ArrayType => classOf[ArrayColumnAccessor].getName
-          case t: MapType => classOf[MapColumnAccessor].getName
-        }
-        ctx.addMutableState(accessorCls,
-                            accessorName,
-                            s"$accessorName = null;")
+    val (initializeAccessors, extractors) = columnTypes.zipWithIndex
+      .map {
+        case (dt, index) =>
+          val accessorName = ctx.freshName("accessor")
+          val accessorCls = dt match {
+            case NullType => classOf[NullColumnAccessor].getName
+            case BooleanType => classOf[BooleanColumnAccessor].getName
+            case ByteType => classOf[ByteColumnAccessor].getName
+            case ShortType => classOf[ShortColumnAccessor].getName
+            case IntegerType | DateType => classOf[IntColumnAccessor].getName
+            case LongType | TimestampType =>
+              classOf[LongColumnAccessor].getName
+            case FloatType => classOf[FloatColumnAccessor].getName
+            case DoubleType => classOf[DoubleColumnAccessor].getName
+            case StringType => classOf[StringColumnAccessor].getName
+            case BinaryType => classOf[BinaryColumnAccessor].getName
+            case dt: DecimalType if dt.precision <= Decimal.MAX_LONG_DIGITS =>
+              classOf[CompactDecimalColumnAccessor].getName
+            case dt: DecimalType => classOf[DecimalColumnAccessor].getName
+            case struct: StructType => classOf[StructColumnAccessor].getName
+            case array: ArrayType => classOf[ArrayColumnAccessor].getName
+            case t: MapType => classOf[MapColumnAccessor].getName
+          }
+          ctx.addMutableState(accessorCls,
+                              accessorName,
+                              s"$accessorName = null;")
 
-        val createCode = dt match {
-          case t if ctx.isPrimitiveType(dt) =>
-            s"$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder));"
-          case NullType | StringType | BinaryType =>
-            s"$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder));"
-          case other =>
-            s"""$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder),
+          val createCode = dt match {
+            case t if ctx.isPrimitiveType(dt) =>
+              s"$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder));"
+            case NullType | StringType | BinaryType =>
+              s"$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder));"
+            case other =>
+              s"""$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder),
              (${dt.getClass.getName}) columnTypes[$index]);"""
-        }
+          }
 
-        val extract = s"$accessorName.extractTo(mutableRow, $index);"
-        val patch = dt match {
-          case DecimalType.Fixed(p, s) if p > Decimal.MAX_LONG_DIGITS =>
-            // For large Decimal, it should have 16 bytes for future update even it's null now.
-            s"""
+          val extract = s"$accessorName.extractTo(mutableRow, $index);"
+          val patch = dt match {
+            case DecimalType.Fixed(p, s) if p > Decimal.MAX_LONG_DIGITS =>
+              // For large Decimal, it should have 16 bytes for future update even it's null now.
+              s"""
             if (mutableRow.isNullAt($index)) {
               rowWriter.write($index, (Decimal) null, $p, $s);
             }
            """
-          case other => ""
-        }
-        (createCode, extract + patch)
-    }.unzip
+            case other => ""
+          }
+          (createCode, extract + patch)
+      }
+      .unzip
 
     val code = s"""
       import java.nio.ByteBuffer;

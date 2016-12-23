@@ -59,7 +59,8 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
         servers
           .filter(s => s.config.brokerId != follower.config.brokerId)
           .forall(_.getLogManager().getLog(topicAndPartition).isEmpty),
-      "Replicas 0,1 have not deleted log.")
+      "Replicas 0,1 have not deleted log."
+    )
     // ensure topic deletion is halted
     TestUtils.waitUntilTrue(
       () => zkUtils.pathExists(getDeleteTopicPath(topic)),
@@ -145,16 +146,19 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     assertTrue("Partition reassignment should fail for [test,0]",
                reassignPartitionsCommand.reassignPartitions())
     // wait until reassignment is completed
-    TestUtils.waitUntilTrue(() => {
-      val partitionsBeingReassigned =
-        zkUtils.getPartitionsBeingReassigned().mapValues(_.newReplicas);
-      ReassignPartitionsCommand.checkIfPartitionReassignmentSucceeded(
-        zkUtils,
-        topicAndPartition,
-        newReplicas,
-        Map(topicAndPartition -> newReplicas),
-        partitionsBeingReassigned) == ReassignmentFailed;
-    }, "Partition reassignment shouldn't complete.")
+    TestUtils.waitUntilTrue(
+      () => {
+        val partitionsBeingReassigned =
+          zkUtils.getPartitionsBeingReassigned().mapValues(_.newReplicas);
+        ReassignPartitionsCommand.checkIfPartitionReassignmentSucceeded(
+          zkUtils,
+          topicAndPartition,
+          newReplicas,
+          Map(topicAndPartition -> newReplicas),
+          partitionsBeingReassigned) == ReassignmentFailed;
+      },
+      "Partition reassignment shouldn't complete."
+    )
     val controllerId = zkUtils.getController()
     val controller =
       servers.filter(s => s.config.brokerId == controllerId).head
@@ -192,7 +196,8 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     // verify that new partition doesn't exist on any broker either
     TestUtils.waitUntilTrue(
       () => servers.forall(_.getLogManager().getLog(newPartition).isEmpty),
-      "Replica logs not for new partition [test,1] not deleted after delete topic is complete.")
+      "Replica logs not for new partition [test,1] not deleted after delete topic is complete."
+    )
     servers.foreach(_.shutdown())
   }
 

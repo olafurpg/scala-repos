@@ -82,12 +82,14 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
   require(
     _blockIds.length == walRecordHandles.length,
     s"Number of block Ids (${_blockIds.length}) must be " +
-      s" same as number of WAL record handles (${walRecordHandles.length})")
+      s" same as number of WAL record handles (${walRecordHandles.length})"
+  )
 
   require(
     isBlockIdValid.isEmpty || isBlockIdValid.length == _blockIds.length,
     s"Number of elements in isBlockIdValid (${isBlockIdValid.length}) must be " +
-      s" same as number of block Ids (${_blockIds.length})")
+      s" same as number of block Ids (${_blockIds.length})"
+  )
 
   // Hadoop configuration is not serializable, so broadcast it as a serializable.
   @transient private val hadoopConfig = sc.hadoopConfiguration

@@ -319,18 +319,22 @@ trait LEvents {
                                reversed: Option[Boolean] = None,
                                timeout: Duration = defaultTimeout)(
       implicit ec: ExecutionContext): Iterator[Event] = {
-    Await.result(futureFind(appId = appId,
-                            channelId = channelId,
-                            startTime = startTime,
-                            untilTime = untilTime,
-                            entityType = entityType,
-                            entityId = entityId,
-                            eventNames = eventNames,
-                            targetEntityType = targetEntityType,
-                            targetEntityId = targetEntityId,
-                            limit = limit,
-                            reversed = reversed),
-                 timeout)
+    Await.result(
+      futureFind(
+        appId = appId,
+        channelId = channelId,
+        startTime = startTime,
+        untilTime = untilTime,
+        entityType = entityType,
+        entityId = entityId,
+        eventNames = eventNames,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId,
+        limit = limit,
+        reversed = reversed
+      ),
+      timeout
+    )
   }
 
   // NOTE: remove in next release
@@ -352,18 +356,22 @@ trait LEvents {
     try {
       // return Either for legacy usage
       Right(
-        Await.result(futureFind(appId = appId,
-                                channelId = channelId,
-                                startTime = startTime,
-                                untilTime = untilTime,
-                                entityType = entityType,
-                                entityId = entityId,
-                                eventNames = eventNames,
-                                targetEntityType = targetEntityType,
-                                targetEntityId = targetEntityId,
-                                limit = limit,
-                                reversed = reversed),
-                     timeout))
+        Await.result(
+          futureFind(
+            appId = appId,
+            channelId = channelId,
+            startTime = startTime,
+            untilTime = untilTime,
+            entityType = entityType,
+            entityId = entityId,
+            eventNames = eventNames,
+            targetEntityType = targetEntityType,
+            targetEntityId = targetEntityId,
+            limit = limit,
+            reversed = reversed
+          ),
+          timeout
+        ))
     } catch {
       case e: TimeoutException => Left(StorageError(s"${e}"))
       case e: Exception => Left(StorageError(s"${e}"))
@@ -408,18 +416,20 @@ trait LEvents {
                        timeout: Duration = defaultTimeout)(
       implicit ec: ExecutionContext): Either[StorageError, Iterator[Event]] = {
 
-    findLegacy(appId = appId,
-               channelId = channelId,
-               startTime = startTime,
-               untilTime = untilTime,
-               entityType = Some(entityType),
-               entityId = Some(entityId),
-               eventNames = eventNames,
-               targetEntityType = targetEntityType,
-               targetEntityId = targetEntityId,
-               limit = limit,
-               reversed = Some(latest),
-               timeout = timeout)
+    findLegacy(
+      appId = appId,
+      channelId = channelId,
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = Some(entityType),
+      entityId = Some(entityId),
+      eventNames = eventNames,
+      targetEntityType = targetEntityType,
+      targetEntityId = targetEntityId,
+      limit = limit,
+      reversed = Some(latest),
+      timeout = timeout
+    )
   }
 
   /** Aggregate properties of entities based on these special events:
@@ -481,12 +491,14 @@ trait LEvents {
       timeout: Duration = defaultTimeout)(
       implicit ec: ExecutionContext): Option[PropertyMap] = {
 
-    Await.result(futureAggregatePropertiesOfEntity(appId = appId,
-                                                   channelId = channelId,
-                                                   entityType = entityType,
-                                                   entityId = entityId,
-                                                   startTime = startTime,
-                                                   untilTime = untilTime),
-                 timeout)
+    Await.result(
+      futureAggregatePropertiesOfEntity(appId = appId,
+                                        channelId = channelId,
+                                        entityType = entityType,
+                                        entityId = entityId,
+                                        startTime = startTime,
+                                        untilTime = untilTime),
+      timeout
+    )
   }
 }

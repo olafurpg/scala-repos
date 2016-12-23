@@ -128,7 +128,8 @@ object ConsistentHash {
           nodeHash = hashFor(node.toString)
           vnode ← 1 to virtualNodesFactor
         } yield (concatenateNodeHash(nodeHash, vnode) -> node)),
-      virtualNodesFactor)
+      virtualNodesFactor
+    )
   }
 
   /**

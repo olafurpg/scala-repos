@@ -58,7 +58,8 @@ object DistributedPubSubSettings {
         config.getDuration("gossip-interval", MILLISECONDS).millis,
       removedTimeToLive =
         config.getDuration("removed-time-to-live", MILLISECONDS).millis,
-      maxDeltaElements = config.getInt("max-delta-elements"))
+      maxDeltaElements = config.getInt("max-delta-elements")
+    )
 
   /**
     * Java API: Create settings from the default configuration
@@ -730,12 +731,14 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
     case _: MemberEvent ⇒ // not of interest
 
     case Count ⇒
-      val count = registry.map {
-        case (owner, bucket) ⇒
-          bucket.content.count {
-            case (_, valueHolder) ⇒ valueHolder.ref.isDefined
-          }
-      }.sum
+      val count = registry
+        .map {
+          case (owner, bucket) ⇒
+            bucket.content.count {
+              case (_, valueHolder) ⇒ valueHolder.ref.isDefined
+            }
+        }
+        .sum
       sender() ! count
   }
 

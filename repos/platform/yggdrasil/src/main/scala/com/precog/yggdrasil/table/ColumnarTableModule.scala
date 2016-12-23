@@ -1553,23 +1553,25 @@ trait ColumnarTableModule[M[+ _]]
                 pairR <- strk(rightHead)
                 (rkstate, rkey) = pairR
               } yield {
-                Cogroup(stlr.initial,
-                        strr.initial,
-                        stbr.initial,
-                        SlicePosition(SliceId(0),
-                                      0,
-                                      lkstate,
-                                      lkey,
-                                      leftHead,
-                                      leftTail),
-                        SlicePosition(SliceId(0),
-                                      0,
-                                      rkstate,
-                                      rkey,
-                                      rightHead,
-                                      rightTail),
-                        None,
-                        None)
+                Cogroup(
+                  stlr.initial,
+                  strr.initial,
+                  stbr.initial,
+                  SlicePosition(SliceId(0),
+                                0,
+                                lkstate,
+                                lkey,
+                                leftHead,
+                                leftTail),
+                  SlicePosition(SliceId(0),
+                                0,
+                                rkstate,
+                                rkey,
+                                rightHead,
+                                rightTail),
+                  None,
+                  None
+                )
               }
             }
 
@@ -1598,11 +1600,13 @@ trait ColumnarTableModule[M[+ _]]
         }), UnknownSize)
       }
 
-      cogroup0(composeSliceTransform(leftKey),
-               composeSliceTransform(rightKey),
-               composeSliceTransform(leftResultTrans),
-               composeSliceTransform(rightResultTrans),
-               composeSliceTransform2(bothResultTrans))
+      cogroup0(
+        composeSliceTransform(leftKey),
+        composeSliceTransform(rightKey),
+        composeSliceTransform(leftResultTrans),
+        composeSliceTransform(rightResultTrans),
+        composeSliceTransform2(bothResultTrans)
+      )
     }
 
     /**

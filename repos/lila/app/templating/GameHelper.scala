@@ -23,7 +23,8 @@ trait GameHelper {
       title = titleGame(pov.game),
       url =
         s"$netBaseUrl${routes.Round.watcher(pov.game.id, pov.color.name).url}",
-      description = describePov(pov))
+      description = describePov(pov)
+    )
 
   def titleGame(g: Game) = {
     val speed = chess.Speed(g.clock).name
@@ -268,15 +269,17 @@ trait GameHelper {
       var isLive = pov.game.isBeingPlayed
       val variant = pov.game.variant.key
       s"""<a href="%s%s" title="%s" class="mini_board mini_board_${pov.game.id} parse_fen is2d %s $variant" data-live="%s" data-color="%s" data-fen="%s" data-lastmove="%s"%s>$miniBoardContent</a>"""
-        .format(blank ?? netBaseUrl,
-                tv.fold(routes.Tv.index,
-                        routes.Round.watcher(pov.game.id, pov.color.name)),
-                gameTitle(pov.game, pov.color),
-                isLive ?? ("live live_" + pov.game.id),
-                isLive ?? pov.game.id,
-                pov.color.name,
-                Forsyth exportBoard pov.game.toChess.board,
-                ~pov.game.castleLastMoveTime.lastMoveString,
-                blank ?? """ target="_blank"""")
+        .format(
+          blank ?? netBaseUrl,
+          tv.fold(routes.Tv.index,
+                  routes.Round.watcher(pov.game.id, pov.color.name)),
+          gameTitle(pov.game, pov.color),
+          isLive ?? ("live live_" + pov.game.id),
+          isLive ?? pov.game.id,
+          pov.color.name,
+          Forsyth exportBoard pov.game.toChess.board,
+          ~pov.game.castleLastMoveTime.lastMoveString,
+          blank ?? """ target="_blank""""
+        )
     }
 }

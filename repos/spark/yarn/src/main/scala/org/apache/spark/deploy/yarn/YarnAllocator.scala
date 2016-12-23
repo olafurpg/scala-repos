@@ -375,15 +375,17 @@ private[yarn] class YarnAllocator(driverUrl: String,
       resource: Resource,
       nodes: Array[String],
       racks: Array[String]): ContainerRequest = {
-    nodeLabelConstructor.map { constructor =>
-      constructor.newInstance(resource,
-                              nodes,
-                              racks,
-                              RM_REQUEST_PRIORITY,
-                              true: java.lang.Boolean,
-                              labelExpression.orNull)
-    }.getOrElse(
-      new ContainerRequest(resource, nodes, racks, RM_REQUEST_PRIORITY))
+    nodeLabelConstructor
+      .map { constructor =>
+        constructor.newInstance(resource,
+                                nodes,
+                                racks,
+                                RM_REQUEST_PRIORITY,
+                                true: java.lang.Boolean,
+                                labelExpression.orNull)
+      }
+      .getOrElse(
+        new ContainerRequest(resource, nodes, racks, RM_REQUEST_PRIORITY))
   }
 
   /**

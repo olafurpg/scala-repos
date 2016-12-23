@@ -157,7 +157,8 @@ trait EvaluatorModule[M[+ _]]
             megaReduce(g, findReductions(g, ctx))
           },
           memoize
-        ))
+        )
+      )
     }
 
     /**
@@ -373,8 +374,8 @@ trait EvaluatorModule[M[+ _]]
         def cross(graph: DepGraph,
                   left: DepGraph,
                   right: DepGraph,
-                  hint: Option[CrossOrder])(spec: (TransSpec2,
-                                                   TransSpec2) => TransSpec2)
+                  hint: Option[CrossOrder])(
+            spec: (TransSpec2, TransSpec2) => TransSpec2)
           : StateT[N, EvaluatorState, PendingTable] = {
           import CrossOrder._
           def valueSpec = DerefObjectStatic(Leaf(Source), paths.Value)
@@ -690,17 +691,20 @@ trait EvaluatorModule[M[+ _]]
                 loaded = pendingTable.table
                   .transform(trans2)
                   .load(ctx.apiKey, jtpe)
-                  .fold({
-                    case ResourceError.NotFound(message) =>
-                      report.warn(graph.loc, message) >> Table.empty.point[N]
-                    case ResourceError.PermissionsError(message) =>
-                      report.warn(graph.loc, message) >> Table.empty.point[N]
-                    case fatal =>
-                      report.error(
-                        graph.loc,
-                        "Fatal error while loading dataset") >> report
-                        .die() >> Table.empty.point[N]
-                  }, table => table.point[N])
+                  .fold(
+                    {
+                      case ResourceError.NotFound(message) =>
+                        report.warn(graph.loc, message) >> Table.empty.point[N]
+                      case ResourceError.PermissionsError(message) =>
+                        report.warn(graph.loc, message) >> Table.empty.point[N]
+                      case fatal =>
+                        report.error(
+                          graph.loc,
+                          "Fatal error while loading dataset") >> report
+                          .die() >> Table.empty.point[N]
+                    },
+                    table => table.point[N]
+                  )
                 back <- transState liftM mn(loaded).join
               } yield
                 PendingTable(back, graph, TransSpec1.Id, IdentityOrder(graph))
@@ -722,17 +726,20 @@ trait EvaluatorModule[M[+ _]]
                 loaded = pendingTable.table
                   .transform(trans2)
                   .load(ctx.apiKey, jtpe)
-                  .fold({
-                    case ResourceError.NotFound(message) =>
-                      report.warn(graph.loc, message) >> Table.empty.point[N]
-                    case ResourceError.PermissionsError(message) =>
-                      report.warn(graph.loc, message) >> Table.empty.point[N]
-                    case fatal =>
-                      report.error(
-                        graph.loc,
-                        "Fatal error while loading dataset") >> report
-                        .die() >> Table.empty.point[N]
-                  }, table => table.point[N])
+                  .fold(
+                    {
+                      case ResourceError.NotFound(message) =>
+                        report.warn(graph.loc, message) >> Table.empty.point[N]
+                      case ResourceError.PermissionsError(message) =>
+                        report.warn(graph.loc, message) >> Table.empty.point[N]
+                      case fatal =>
+                        report.error(
+                          graph.loc,
+                          "Fatal error while loading dataset") >> report
+                          .die() >> Table.empty.point[N]
+                    },
+                    table => table.point[N]
+                  )
                 back <- transState liftM mn(loaded).join
               } yield
                 PendingTable(back, graph, TransSpec1.Id, IdentityOrder(graph))

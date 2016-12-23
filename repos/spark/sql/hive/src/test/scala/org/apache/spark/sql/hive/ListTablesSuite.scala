@@ -69,17 +69,18 @@ class ListTablesSuite
   }
 
   test("getting all tables with a database name") {
-    Seq(tables("listtablessuiteDb"), sql("SHOW TABLes in listTablesSuitedb")).foreach {
-      case allTables =>
-        checkAnswer(allTables.filter("tableName = 'listtablessuitetable'"),
-                    Row("listtablessuitetable", true))
-        assert(
-          allTables
-            .filter("tableName = 'hivelisttablessuitetable'")
-            .count() === 0)
-        checkAnswer(
-          allTables.filter("tableName = 'hiveindblisttablessuitetable'"),
-          Row("hiveindblisttablessuitetable", false))
-    }
+    Seq(tables("listtablessuiteDb"), sql("SHOW TABLes in listTablesSuitedb"))
+      .foreach {
+        case allTables =>
+          checkAnswer(allTables.filter("tableName = 'listtablessuitetable'"),
+                      Row("listtablessuitetable", true))
+          assert(
+            allTables
+              .filter("tableName = 'hivelisttablessuitetable'")
+              .count() === 0)
+          checkAnswer(
+            allTables.filter("tableName = 'hiveindblisttablessuitetable'"),
+            Row("hiveindblisttablessuitetable", false))
+      }
   }
 }

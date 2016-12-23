@@ -237,11 +237,13 @@ private object PartitionAssignorTest extends Logging {
 
     // check for coverage (i.e., all given partitions are owned)
     val assignedPartitions = globalAssignment.keySet
-    val givenPartitions = scenario.topicPartitionCounts.flatMap {
-      case (topic, partitionCount) =>
-        (0 until partitionCount).map(partition =>
-          TopicAndPartition(topic, partition))
-    }.toSet
+    val givenPartitions = scenario.topicPartitionCounts
+      .flatMap {
+        case (topic, partitionCount) =>
+          (0 until partitionCount).map(partition =>
+            TopicAndPartition(topic, partition))
+      }
+      .toSet
     assertTrue(
       "Scenario %s: the list of given partitions and assigned partitions are different."
         .format(scenario),
@@ -256,7 +258,8 @@ private object PartitionAssignorTest extends Logging {
         assertTrue(
           "Scenario %s: assignment is not uniform (partition counts per stream are in the range [%d, %d])"
             .format(scenario, minCount, maxCount),
-          (maxCount - minCount) <= 1)
+          (maxCount - minCount) <= 1
+        )
       }
     }
   }

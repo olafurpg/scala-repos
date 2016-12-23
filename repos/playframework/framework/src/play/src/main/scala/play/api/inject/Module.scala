@@ -127,15 +127,17 @@ object Modules {
           case e: ClassNotFoundException => None
         }
 
-    moduleClassNames.map { className =>
-      constructModule(environment,
-                      configuration,
-                      className,
-                      () =>
-                        environment.classLoader
-                          .loadClass(className)
-                          .asInstanceOf[Class[Any]])
-    }.toSeq ++ defaultModule
+    moduleClassNames
+      .map { className =>
+        constructModule(environment,
+                        configuration,
+                        className,
+                        () =>
+                          environment.classLoader
+                            .loadClass(className)
+                            .asInstanceOf[Class[Any]])
+      }
+      .toSeq ++ defaultModule
   }
 
   private def constructModule[T](environment: Environment,

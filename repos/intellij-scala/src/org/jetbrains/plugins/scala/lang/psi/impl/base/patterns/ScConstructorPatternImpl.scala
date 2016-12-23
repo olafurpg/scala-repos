@@ -101,7 +101,8 @@ class ScConstructorPatternImpl(node: ASTNode)
                     case tp: ScTypeParam =>
                       new ScTypeParameterType(tp, r.substitutor)
                     case _ => new ScTypeParameterType(tp, r.substitutor)
-                  })))
+                  }))
+              )
               val emptySubst: ScSubstitutor =
                 new ScSubstitutor(
                   Map(td.typeParameters.map(tp =>

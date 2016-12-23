@@ -125,31 +125,35 @@ class ScSimpleTypeElementImpl(node: ASTNode)
           (fun.effectiveParameterClauses.map(_.effectiveParameters.map { p =>
             val paramType: ScType =
               subst.subst(p.getType(TypingContext.empty).getOrAny)
-            new Parameter(p.name,
-                          p.deprecatedName,
-                          paramType,
-                          paramType,
-                          p.isDefaultParam,
-                          p.isRepeatedParameter,
-                          p.isCallByNameParameter,
-                          p.index,
-                          Some(p),
-                          p.getDefaultExpression.flatMap(_.getType().toOption))
+            new Parameter(
+              p.name,
+              p.deprecatedName,
+              paramType,
+              paramType,
+              p.isDefaultParam,
+              p.isRepeatedParameter,
+              p.isCallByNameParameter,
+              p.index,
+              Some(p),
+              p.getDefaultExpression.flatMap(_.getType().toOption)
+            )
           }), fun.parameterList.clauses.lastOption.exists(_.isImplicit))
         case f: ScPrimaryConstructor =>
           (f.effectiveParameterClauses.map(_.effectiveParameters.map { p =>
             val paramType: ScType =
               subst.subst(p.getType(TypingContext.empty).getOrAny)
-            new Parameter(p.name,
-                          p.deprecatedName,
-                          paramType,
-                          paramType,
-                          p.isDefaultParam,
-                          p.isRepeatedParameter,
-                          p.isCallByNameParameter,
-                          p.index,
-                          Some(p),
-                          p.getDefaultExpression.flatMap(_.getType().toOption))
+            new Parameter(
+              p.name,
+              p.deprecatedName,
+              paramType,
+              paramType,
+              p.isDefaultParam,
+              p.isRepeatedParameter,
+              p.isCallByNameParameter,
+              p.index,
+              Some(p),
+              p.getDefaultExpression.flatMap(_.getType().toOption)
+            )
           }), f.parameterList.clauses.lastOption.exists(_.isImplicit))
         case m: PsiMethod =>
           (Seq(m.getParameterList.getParameters.map { p =>
@@ -215,7 +219,8 @@ class ScSimpleTypeElementImpl(node: ASTNode)
                     }
                     .toMap,
                   Map.empty,
-                  None)
+                  None
+                )
                 (params, subst)
               case _ => (Seq.empty, ScSubstitutor.empty)
             }
@@ -263,7 +268,8 @@ class ScSimpleTypeElementImpl(node: ASTNode)
                  arg.getType(TypingContext.empty).getOrAny)
             },
             Map.empty,
-            None)
+            None
+          )
           val newRes = appSubst.subst(res)
           updateImplicits(newRes,
                           withExpected = false,
@@ -313,7 +319,8 @@ class ScSimpleTypeElementImpl(node: ASTNode)
                           .subst(res.inferValueType))),
                     nonValueType.typeParameters,
                     shouldUndefineParameters = false,
-                    filterTypeParams = false) //here should work in different way:
+                    filterTypeParams = false
+                  ) //here should work in different way:
                 }
                 val fromUnderscore = c.newTemplate match {
                   case Some(n) =>
@@ -407,7 +414,8 @@ class ScSimpleTypeElementImpl(node: ASTNode)
                  arg.getType(TypingContext.empty).getOrAny)
             },
             Map.empty,
-            None)
+            None
+          )
           (appSubst.subst(res), appSubst)
         }
         val constrRef = ref.isConstructorReference && !noConstructor

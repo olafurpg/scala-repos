@@ -180,7 +180,8 @@ object WebSocketHandler {
                   ctx.push(Right(close))
               }
         }),
-      Merge(2, eagerComplete = true))
+      Merge(2, eagerComplete = true)
+    )
   }
 
   private case class Frame(header: FrameHeader, data: ByteString) {

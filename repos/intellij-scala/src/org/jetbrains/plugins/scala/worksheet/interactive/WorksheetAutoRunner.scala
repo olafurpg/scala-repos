@@ -100,13 +100,17 @@ class WorksheetAutoRunner(project: Project, woof: WolfTheProblemSolver)
       if (woof.hasSyntaxErrors(virtualFile) ||
           WorksheetProcessManager.running(virtualFile)) return
 
-      myAlarm.addRequest(new Runnable {
-        override def run() {
-          if (!woof.hasSyntaxErrors(virtualFile) &&
-              !WorksheetProcessManager.running(virtualFile))
-            RunWorksheetAction.runCompiler(project, auto = true)
-        }
-      }, getAutoRunDelay, true)
+      myAlarm.addRequest(
+        new Runnable {
+          override def run() {
+            if (!woof.hasSyntaxErrors(virtualFile) &&
+                !WorksheetProcessManager.running(virtualFile))
+              RunWorksheetAction.runCompiler(project, auto = true)
+          }
+        },
+        getAutoRunDelay,
+        true
+      )
     }
   }
 }

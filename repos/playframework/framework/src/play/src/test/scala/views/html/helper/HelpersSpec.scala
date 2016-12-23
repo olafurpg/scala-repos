@@ -237,12 +237,14 @@ object HelpersSpec extends Specification {
     "correctly lookup constraint, error and format messages" in {
 
       val field =
-        Field(Form(single("foo" -> Forms.text)),
-              "foo",
-              Seq(("constraint.custom", Seq("constraint.customarg"))),
-              Some("format.custom", Seq("format.customarg")),
-              Seq(FormError("foo", "error.custom", Seq("error.customarg"))),
-              None)
+        Field(
+          Form(single("foo" -> Forms.text)),
+          "foo",
+          Seq(("constraint.custom", Seq("constraint.customarg"))),
+          Some("format.custom", Seq("format.customarg")),
+          Seq(FormError("foo", "error.custom", Seq("error.customarg"))),
+          None
+        )
 
       val body = inputText.apply(field).body
 

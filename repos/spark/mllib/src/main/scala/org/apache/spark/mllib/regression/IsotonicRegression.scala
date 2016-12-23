@@ -216,9 +216,13 @@ object IsotonicRegressionModel extends Loader[IsotonicRegressionModel] {
 
       checkSchema[Data](dataRDD.schema)
       val dataArray = dataRDD.select("boundary", "prediction").collect()
-      val (boundaries, predictions) = dataArray.map { x =>
-        (x.getDouble(0), x.getDouble(1))
-      }.toList.sortBy(_._1).unzip
+      val (boundaries, predictions) = dataArray
+        .map { x =>
+          (x.getDouble(0), x.getDouble(1))
+        }
+        .toList
+        .sortBy(_._1)
+        .unzip
       (boundaries.toArray, predictions.toArray)
     }
   }

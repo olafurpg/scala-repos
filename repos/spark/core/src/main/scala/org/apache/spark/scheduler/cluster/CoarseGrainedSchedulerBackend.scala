@@ -222,12 +222,14 @@ private[spark] class CoarseGrainedSchedulerBackend(
     private def makeOffers() {
       // Filter out executors under killing
       val activeExecutors = executorDataMap.filterKeys(executorIsAlive)
-      val workOffers = activeExecutors.map {
-        case (id, executorData) =>
-          new WorkerOffer(id,
-                          executorData.executorHost,
-                          executorData.freeCores)
-      }.toSeq
+      val workOffers = activeExecutors
+        .map {
+          case (id, executorData) =>
+            new WorkerOffer(id,
+                            executorData.executorHost,
+                            executorData.freeCores)
+        }
+        .toSeq
       launchTasks(scheduler.resourceOffers(workOffers))
     }
 
@@ -239,7 +241,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
             _,
             SlaveLost("Remote RPC client disassociated. Likely due to " +
               "containers exceeding thresholds, or network issues. Check driver logs for WARN " +
-              "messages.")))
+              "messages.")
+          ))
     }
 
     // Make fake resource offers on just one executor
@@ -582,11 +585,13 @@ private[spark] class CoarseGrainedSchedulerBackend(
 
       // If an executor is already pending to be removed, do not kill it again (SPARK-9795)
       // If this executor is busy, do not kill it unless we are told to force kill it (SPARK-9552)
-      val executorsToKill = knownExecutors.filter { id =>
-        !executorsPendingToRemove.contains(id)
-      }.filter { id =>
-        force || !scheduler.isExecutorBusy(id)
-      }
+      val executorsToKill = knownExecutors
+        .filter { id =>
+          !executorsPendingToRemove.contains(id)
+        }
+        .filter { id =>
+          force || !scheduler.isExecutorBusy(id)
+        }
       executorsToKill.foreach { id =>
         executorsPendingToRemove(id) = !replace
       }

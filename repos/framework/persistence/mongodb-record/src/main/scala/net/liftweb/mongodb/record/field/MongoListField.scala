@@ -86,15 +86,20 @@ class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType: Manifest](
   def setFromJValue(jvalue: JValue): Box[MyType] = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)
     case JArray(array) =>
-      setBox(Full((array.map {
-        case JsonObjectId(objectId) => objectId
-        case JsonRegex(regex) => regex
-        case JsonUUID(uuid) => uuid
-        case JsonDateTime(dt) if (mf.toString == "org.joda.time.DateTime") =>
-          dt
-        case JsonDate(date) => date
-        case other => other.values
-      }).asInstanceOf[MyType]))
+      setBox(
+        Full(
+          (array
+            .map {
+              case JsonObjectId(objectId) => objectId
+              case JsonRegex(regex) => regex
+              case JsonUUID(uuid) => uuid
+              case JsonDateTime(dt)
+                  if (mf.toString == "org.joda.time.DateTime") =>
+                dt
+              case JsonDate(date) => date
+              case other => other.values
+            })
+            .asInstanceOf[MyType]))
     case other => setBox(FieldHelpers.expectedA("JArray", other))
   }
 

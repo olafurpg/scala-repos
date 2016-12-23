@@ -62,7 +62,8 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
         case e: Throwable =>
           logError(e.getMessage, e)
           System.exit(SparkExitCode.UNCAUGHT_EXCEPTION)
-    })
+    }
+  )
 
   private val lostMasters = new HashSet[RpcAddress]
   private var activeMasterEndpoint: RpcEndpointRef = null

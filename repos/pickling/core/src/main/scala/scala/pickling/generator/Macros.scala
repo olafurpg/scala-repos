@@ -31,13 +31,15 @@ private[pickling] trait PicklingMacros
             ScalaSingleton))
     } else {
       PicklingAlgorithm.aggregate(
-        Seq(new CaseClassPickling(allowReflection = true,
-                                  careAboutSubclasses =
-                                    handleCaseClassSubclasses),
-            AdtPickling,
-            ScalaSingleton,
-            new ExternalizablePickling,
-            WillRobinsonPickling))
+        Seq(
+          new CaseClassPickling(
+            allowReflection = true,
+            careAboutSubclasses = handleCaseClassSubclasses),
+          AdtPickling,
+          ScalaSingleton,
+          new ExternalizablePickling,
+          WillRobinsonPickling
+        ))
     }
 
   object logger extends AlgorithmLogger {

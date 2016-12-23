@@ -637,8 +637,8 @@ sealed abstract class IListInstances extends IListInstance0 {
         case INil() => None
       }
 
-    override def foldMapLeft1Opt[A, B](fa: IList[A])(z: A => B)(f: (B,
-                                                                    A) => B) =
+    override def foldMapLeft1Opt[A, B](fa: IList[A])(z: A => B)(
+        f: (B, A) => B) =
       fa match {
         case ICons(h, t) => Some(t.foldLeft(z(h))(f))
         case INil() => None

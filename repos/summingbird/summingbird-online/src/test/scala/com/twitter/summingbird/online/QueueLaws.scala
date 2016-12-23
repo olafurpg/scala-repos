@@ -100,17 +100,19 @@ object QueueLaws extends Properties("Queue") {
   property("Queue poll + size is correct") = forAll { (items: List[Int]) =>
     // Make sure we can fit everything
     val q = Queue[Int]()
-    items.map { i =>
-      q.put(i)
-      val size = q.size
-      if (i % 2 == 0) {
-        // do a poll test
-        q.poll match {
-          case None => q.size == 0
-          case Some(_) => q.size == (size - 1)
-        }
-      } else true
-    }.forall(identity)
+    items
+      .map { i =>
+        q.put(i)
+        val size = q.size
+        if (i % 2 == 0) {
+          // do a poll test
+          q.poll match {
+            case None => q.size == 0
+            case Some(_) => q.size == (size - 1)
+          }
+        } else true
+      }
+      .forall(identity)
   }
   property("Queue is fifo") = forAll { (items: List[Int]) =>
     val q = Queue[Int]()

@@ -42,10 +42,12 @@ object Scope {
 
   def replaceThis(thisScope: Scope): Scope => Scope =
     (scope: Scope) =>
-      Scope(subThis(thisScope.project, scope.project),
-            subThis(thisScope.config, scope.config),
-            subThis(thisScope.task, scope.task),
-            subThis(thisScope.extra, scope.extra))
+      Scope(
+        subThis(thisScope.project, scope.project),
+        subThis(thisScope.config, scope.config),
+        subThis(thisScope.task, scope.task),
+        subThis(thisScope.extra, scope.extra)
+    )
 
   def subThis[T](sub: ScopeAxis[T], into: ScopeAxis[T]): ScopeAxis[T] =
     if (into == This) sub else into
@@ -222,12 +224,12 @@ object Scope {
         scope)
   }
 
-  def indexedDelegates(resolve: Reference => ResolvedReference,
-                       index: DelegateIndex,
-                       rootProject: URI => String,
-                       taskInherit: AttributeKey[_] => Seq[AttributeKey[_]],
-                       extraInherit: (ResolvedReference,
-                                      AttributeMap) => Seq[AttributeMap])(
+  def indexedDelegates(
+      resolve: Reference => ResolvedReference,
+      index: DelegateIndex,
+      rootProject: URI => String,
+      taskInherit: AttributeKey[_] => Seq[AttributeKey[_]],
+      extraInherit: (ResolvedReference, AttributeMap) => Seq[AttributeMap])(
       rawScope: Scope): Seq[Scope] = {
     val scope = Scope.replaceThis(GlobalScope)(rawScope)
 
@@ -278,8 +280,8 @@ object Scope {
       refs: Seq[(ProjectRef, Proj)],
       configurations: Proj => Seq[ConfigKey],
       projectInherit: ProjectRef => Seq[ProjectRef],
-      configInherit: (ResolvedReference,
-                      ConfigKey) => Seq[ConfigKey]): DelegateIndex = {
+      configInherit: (ResolvedReference, ConfigKey) => Seq[ConfigKey])
+    : DelegateIndex = {
     val pDelegates = refs map {
       case (ref, project) =>
         (ref,
@@ -290,8 +292,8 @@ object Scope {
   }
   private[this] def delegateIndex(ref: ProjectRef, confs: Seq[ConfigKey])(
       projectInherit: ProjectRef => Seq[ProjectRef],
-      configInherit: (ResolvedReference,
-                      ConfigKey) => Seq[ConfigKey]): ProjectDelegates = {
+      configInherit: (ResolvedReference, ConfigKey) => Seq[ConfigKey])
+    : ProjectDelegates = {
     val refDelegates = withRawBuilds(
       linearize(Select(ref), false)(projectInherit))
     val configs =

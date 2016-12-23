@@ -63,5 +63,6 @@ object FileUtil {
     "image/gif",
     "image/jpeg",
     "image/png",
-    "text/plain")
+    "text/plain"
+  )
 }

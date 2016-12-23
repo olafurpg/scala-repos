@@ -48,11 +48,15 @@ class CaseClassPickling(val allowReflection: Boolean,
             m <- vars.find(_.methodName == name)
           } yield FieldInfo(name, m)
           if (fields.length == c.parameterNames.flatten.length) {
-            val pickle = PickleBehavior(Seq(PickleEntry(fields.map { field =>
-              GetField(field.name, field.sym)
-            }.toSeq ++ standAloneVars.map { field =>
-              GetField(field.methodName, field)
-            })))
+            val pickle = PickleBehavior(
+              Seq(
+                PickleEntry(fields
+                  .map { field =>
+                    GetField(field.name, field.sym)
+                  }
+                  .toSeq ++ standAloneVars.map { field =>
+                  GetField(field.methodName, field)
+                })))
             val unpickle = UnpickleBehavior(Seq(
               CallConstructor(fields.map(_.name), c)) ++ standAloneVars.map {
               field =>
@@ -131,9 +135,12 @@ class CaseClassPickling(val allowReflection: Boolean,
         m <- vars.find(_.methodName == name)
       } yield FieldInfo(name, m)
       if (fields.length == factoryMethod.parameterNames.flatten.length) {
-        val pickle = PickleBehavior(Seq(PickleEntry(fields.map { field =>
-          GetField(field.name, field.sym)
-        }.toSeq)))
+        val pickle = PickleBehavior(
+          Seq(PickleEntry(fields
+            .map { field =>
+              GetField(field.name, field.sym)
+            }
+            .toSeq)))
         val unpickle = UnpickleBehavior(
           Seq(CallModuleFactory(fieldNameList, companion, factoryMethod)))
         PickleUnpickleImplementation(pickle, unpickle)

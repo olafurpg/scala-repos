@@ -32,12 +32,14 @@ class PythonMLLibAPISuite extends SparkFunSuite {
   SerDe.initialize()
 
   test("pickle vector") {
-    val vectors = Seq(Vectors.dense(Array.empty[Double]),
-                      Vectors.dense(0.0),
-                      Vectors.dense(0.0, -2.0),
-                      Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
-                      Vectors.sparse(1, Array.empty[Int], Array.empty[Double]),
-                      Vectors.sparse(2, Array(1), Array(-2.0)))
+    val vectors = Seq(
+      Vectors.dense(Array.empty[Double]),
+      Vectors.dense(0.0),
+      Vectors.dense(0.0, -2.0),
+      Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
+      Vectors.sparse(1, Array.empty[Int], Array.empty[Double]),
+      Vectors.sparse(2, Array(1), Array(-2.0))
+    )
     vectors.foreach { v =>
       val u = SerDe.loads(SerDe.dumps(v))
       assert(u.getClass === v.getClass)
@@ -55,7 +57,8 @@ class PythonMLLibAPISuite extends SparkFunSuite {
                      Vectors.sparse(0, Array.empty[Int], Array.empty[Double])),
         LabeledPoint(1.0,
                      Vectors.sparse(1, Array.empty[Int], Array.empty[Double])),
-        LabeledPoint(-0.5, Vectors.sparse(2, Array(1), Array(-2.0))))
+        LabeledPoint(-0.5, Vectors.sparse(2, Array(1), Array(-2.0)))
+      )
     points.foreach { p =>
       val q = SerDe.loads(SerDe.dumps(p)).asInstanceOf[LabeledPoint]
       assert(q.label === p.label)

@@ -305,10 +305,12 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("Avoid aggregation on the last level") {
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(1.0, 0.0, 0.0)),
-                    LabeledPoint(1.0, Vectors.dense(0.0, 1.0, 1.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0, 0.0, 0.0)),
-                    LabeledPoint(1.0, Vectors.dense(0.0, 2.0, 1.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(1.0, 0.0, 0.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0, 1.0, 1.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0, 0.0, 0.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0, 2.0, 1.0))
+    )
     val input = sc.parallelize(arr)
 
     val strategy = new Strategy(algo = Classification,
@@ -358,10 +360,12 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("Avoid aggregation if impurity is 0.0") {
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(1.0, 0.0, 0.0)),
-                    LabeledPoint(1.0, Vectors.dense(0.0, 1.0, 1.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0, 0.0, 0.0)),
-                    LabeledPoint(1.0, Vectors.dense(0.0, 2.0, 1.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(1.0, 0.0, 0.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0, 1.0, 1.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0, 0.0, 0.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0, 2.0, 1.0))
+    )
     val input = sc.parallelize(arr)
 
     val strategy = new Strategy(algo = Classification,
@@ -414,18 +418,20 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
     "Use soft prediction for binary classification with ordered categorical features") {
     // The following dataset is set up such that the best split is {1} vs. {0, 2}.
     // If the hard prediction is used to order the categories, then {0} vs. {1, 2} is chosen.
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(1.0, Vectors.dense(0.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0)),
-                    LabeledPoint(1.0, Vectors.dense(2.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(1.0, Vectors.dense(2.0))
+    )
     val input = sc.parallelize(arr)
 
     // Must set maxBins s.t. the feature will be treated as an ordered categorical feature.
@@ -780,10 +786,12 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("Binary classification stump with 2 continuous features") {
-    val arr = Array(LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
-                    LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
-                    LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
-                    LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 2.0)))))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
+      LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
+      LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 2.0))))
+    )
 
     val rdd = sc.parallelize(arr)
     val strategy = new Strategy(algo = Classification,
@@ -960,10 +968,12 @@ class DecisionTreeSuite extends SparkFunSuite with MLlibTestSparkContext {
     "do not choose split that does not satisfy min instance per node requirements") {
     // if a split does not satisfy min instances per node requirements,
     // this split is invalid, even though the information gain of split is large.
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(0.0, 1.0)),
-                    LabeledPoint(1.0, Vectors.dense(1.0, 1.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0, 0.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(0.0, 1.0)),
+      LabeledPoint(1.0, Vectors.dense(1.0, 1.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0, 0.0))
+    )
 
     val rdd = sc.parallelize(arr)
     val strategy = new Strategy(algo = Classification,

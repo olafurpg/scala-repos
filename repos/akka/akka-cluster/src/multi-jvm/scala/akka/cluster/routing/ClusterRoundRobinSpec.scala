@@ -116,7 +116,8 @@ abstract class ClusterRoundRobinSpec
                                 maxInstancesPerNode = 1,
                                 allowLocalRoutees = true,
                                 useRole = None)).props(Props[SomeActor]),
-    "router2")
+    "router2"
+  )
   lazy val router3 =
     system.actorOf(FromConfig.props(Props[SomeActor]), "router3")
   lazy val router4 = system.actorOf(FromConfig.props(), "router4")
@@ -369,9 +370,11 @@ abstract class ClusterRoundRobinSpec
         val notUsedAddress =
           ((roles map address).toSet diff routeeAddresses).head
         val downAddress = routeeAddresses.find(_ != address(first)).get
-        val downRouteeRef = routees.collectFirst {
-          case ActorRefRoutee(ref) if ref.path.address == downAddress ⇒ ref
-        }.get
+        val downRouteeRef = routees
+          .collectFirst {
+            case ActorRefRoutee(ref) if ref.path.address == downAddress ⇒ ref
+          }
+          .get
 
         cluster.down(downAddress)
         expectMsgType[Terminated](15.seconds).actor should ===(downRouteeRef)

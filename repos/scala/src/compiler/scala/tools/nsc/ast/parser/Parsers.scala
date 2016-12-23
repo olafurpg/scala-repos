@@ -153,7 +153,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       *  if not, the AST will be supplemented.
       */
     def parseStartRule =
-      if (source.isSelfContained) () => compilationUnit()
+      if (source.isSelfContained)() => compilationUnit()
       else () => scriptBody()
 
     def newScanner(): Scanner = new SourceFileScanner(source)
@@ -1029,15 +1029,18 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       private def makeExistentialTypeTree(t: Tree) = {
         // EmptyTrees in the result of refinement() stand for parse errors
         // so it's okay for us to filter them out here
-        ExistentialTypeTree(t, refinement() flatMap {
-          case t @ TypeDef(_, _, _, TypeBoundsTree(_, _)) => Some(t)
-          case t @ ValDef(_, _, _, EmptyTree) => Some(t)
-          case EmptyTree => None
-          case _ =>
-            syntaxError(t.pos,
-                        "not a legal existential clause",
-                        skipIt = false); None
-        })
+        ExistentialTypeTree(
+          t,
+          refinement() flatMap {
+            case t @ TypeDef(_, _, _, TypeBoundsTree(_, _)) => Some(t)
+            case t @ ValDef(_, _, _, EmptyTree) => Some(t)
+            case EmptyTree => None
+            case _ =>
+              syntaxError(t.pos,
+                          "not a legal existential clause",
+                          skipIt = false); None
+          }
+        )
       }
 
       /** {{{
@@ -2414,7 +2417,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         syntaxError(
           in.lastOffset,
           "case classes without a parameter list are not allowed;\n" +
-            "use either case objects or case classes with an explicit `()' as a parameter list.")
+            "use either case objects or case classes with an explicit `()' as a parameter list."
+        )
       while (implicitmod == 0 && in.token == LPAREN) {
         in.nextToken()
         vds += paramClause()
@@ -3227,12 +3231,14 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       def anyvalConstructor() = (
         // Not a well-formed constructor, has to be finished later - see note
         // regarding AnyVal constructor in AddInterfaces.
-        DefDef(NoMods,
-               nme.CONSTRUCTOR,
-               Nil,
-               ListOfNil,
-               TypeTree(),
-               Block(Nil, literalUnit))
+        DefDef(
+          NoMods,
+          nme.CONSTRUCTOR,
+          Nil,
+          ListOfNil,
+          TypeTree(),
+          Block(Nil, literalUnit)
+        )
       )
       val parentPos = o2p(in.offset)
       val tstart1 =

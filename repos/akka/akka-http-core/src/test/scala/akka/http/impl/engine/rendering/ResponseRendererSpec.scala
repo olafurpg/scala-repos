@@ -21,9 +21,12 @@ import HttpEntity._
 import scala.util.control.NonFatal
 
 class ResponseRendererSpec
-    extends FreeSpec with Matchers with BeforeAndAfterAll {
+    extends FreeSpec
+    with Matchers
+    with BeforeAndAfterAll {
   val testConf: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = WARNING""")
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
@@ -96,11 +99,11 @@ class ResponseRendererSpec
 
       "to a transparent HEAD request (Strict response entity)" in new TestSetup() {
         ResponseRenderingContext(
-            requestMethod = HttpMethods.HEAD,
-            response = HttpResponse(
-                  headers = List(Age(30), Connection("Keep-Alive")),
-                  entity = "Small f*ck up overhere!")) should renderTo(
-            """HTTP/1.1 200 OK
+          requestMethod = HttpMethods.HEAD,
+          response =
+            HttpResponse(headers = List(Age(30), Connection("Keep-Alive")),
+                         entity = "Small f*ck up overhere!")) should renderTo(
+          """HTTP/1.1 200 OK
               |Age: 30
               |Server: akka-http/1.0.0
               |Date: Thu, 25 Aug 2011 09:10:29 GMT
@@ -108,37 +111,41 @@ class ResponseRendererSpec
               |Content-Length: 23
               |
               |""",
-            close = false)
+          close = false
+        )
       }
 
       "to a transparent HEAD request (CloseDelimited response entity)" in new TestSetup() {
         ResponseRenderingContext(
-            requestMethod = HttpMethods.HEAD,
-            response = HttpResponse(
-                  headers = List(Age(30), Connection("Keep-Alive")),
-                  entity = HttpEntity.CloseDelimited(
-                        ContentTypes.`text/plain(UTF-8)`,
-                        Source.single(ByteString("Foo"))))) should renderTo(
-            """HTTP/1.1 200 OK
+          requestMethod = HttpMethods.HEAD,
+          response = HttpResponse(
+            headers = List(Age(30), Connection("Keep-Alive")),
+            entity =
+              HttpEntity.CloseDelimited(ContentTypes.`text/plain(UTF-8)`,
+                                        Source.single(ByteString("Foo"))))
+        ) should renderTo(
+          """HTTP/1.1 200 OK
               |Age: 30
               |Server: akka-http/1.0.0
               |Date: Thu, 25 Aug 2011 09:10:29 GMT
               |Content-Type: text/plain; charset=UTF-8
               |
               |""",
-            close = false)
+          close = false
+        )
       }
 
       "to a transparent HEAD request (Chunked response entity)" in new TestSetup() {
         ResponseRenderingContext(
-            requestMethod = HttpMethods.HEAD,
-            response = HttpResponse(headers = List(Age(30),
-                                                   Connection("Keep-Alive")),
-                                    entity = HttpEntity.Chunked(
-                                          ContentTypes.`text/plain(UTF-8)`,
-                                          Source.single(HttpEntity.Chunk(
-                                                  ByteString("Foo")))))) should renderTo(
-            """HTTP/1.1 200 OK
+          requestMethod = HttpMethods.HEAD,
+          response = HttpResponse(
+            headers = List(Age(30), Connection("Keep-Alive")),
+            entity = HttpEntity.Chunked(
+              ContentTypes.`text/plain(UTF-8)`,
+              Source.single(HttpEntity.Chunk(ByteString("Foo"))))
+          )
+        ) should renderTo(
+          """HTTP/1.1 200 OK
               |Age: 30
               |Server: akka-http/1.0.0
               |Date: Thu, 25 Aug 2011 09:10:29 GMT
@@ -146,18 +153,21 @@ class ResponseRendererSpec
               |Content-Type: text/plain; charset=UTF-8
               |
               |""",
-            close = false)
+          close = false
+        )
       }
 
       "to a HEAD request setting a custom Content-Type and Content-Length (default response entity)" in new TestSetup() {
         ResponseRenderingContext(
-            requestMethod = HttpMethods.HEAD,
-            response = HttpResponse(
-                  headers = List(Age(30)),
-                  entity = HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
+          requestMethod = HttpMethods.HEAD,
+          response =
+            HttpResponse(headers = List(Age(30)),
+                         entity =
+                           HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
                                               100,
-                                              Source.empty))) should renderTo(
-            """HTTP/1.1 200 OK
+                                              Source.empty))
+        ) should renderTo(
+          """HTTP/1.1 200 OK
               |Age: 30
               |Server: akka-http/1.0.0
               |Date: Thu, 25 Aug 2011 09:10:29 GMT
@@ -165,7 +175,8 @@ class ResponseRendererSpec
               |Content-Length: 100
               |
               |""",
-            close = false)
+          close = false
+        )
       }
     }
 
@@ -187,11 +198,10 @@ class ResponseRendererSpec
 
       "status 400, a few headers and a body with an explicitly suppressed Content Type header" in new TestSetup() {
         HttpResponse(
-            400,
-            List(Age(30), Connection("Keep-Alive")),
-            HttpEntity(
-                ContentTypes.NoContentType,
-                ByteString("Small f*ck up overhere!"))) should renderTo {
+          400,
+          List(Age(30), Connection("Keep-Alive")),
+          HttpEntity(ContentTypes.NoContentType,
+                     ByteString("Small f*ck up overhere!"))) should renderTo {
           """HTTP/1.1 400 Bad Request
               |Age: 30
               |Server: akka-http/1.0.0
@@ -204,9 +214,9 @@ class ResponseRendererSpec
 
       "status 200 and a custom Transfer-Encoding header" in new TestSetup() {
         HttpResponse(
-            headers = List(
-                  `Transfer-Encoding`(TransferEncodings.Extension("fancy"))),
-            entity = "All good") should renderTo {
+          headers =
+            List(`Transfer-Encoding`(TransferEncodings.Extension("fancy"))),
+          entity = "All good") should renderTo {
           """HTTP/1.1 200 OK
               |Transfer-Encoding: fancy
               |Server: akka-http/1.0.0
@@ -221,12 +231,12 @@ class ResponseRendererSpec
     "a response with a Default (streamed with explicit content-length body," - {
       "status 400 and a few headers" in new TestSetup() {
         HttpResponse(
-            400,
-            List(Age(30), Connection("Keep-Alive")),
-            entity = Default(
-                  ContentTypes.`text/plain(UTF-8)`,
-                  23,
-                  source(ByteString("Small f*ck up overhere!")))) should renderTo {
+          400,
+          List(Age(30), Connection("Keep-Alive")),
+          entity = Default(
+            ContentTypes.`text/plain(UTF-8)`,
+            23,
+            source(ByteString("Small f*ck up overhere!")))) should renderTo {
           """HTTP/1.1 400 Bad Request
               |Age: 30
               |Server: akka-http/1.0.0
@@ -239,56 +249,57 @@ class ResponseRendererSpec
       }
       "one chunk and incorrect (too large) Content-Length" in new TestSetup() {
         the[RuntimeException] thrownBy {
-          HttpResponse(
-              200,
-              entity = Default(ContentTypes.`application/json`,
-                               10,
-                               source(ByteString("body123")))) should renderTo(
-              "")
+          HttpResponse(200,
+                       entity = Default(
+                         ContentTypes.`application/json`,
+                         10,
+                         source(ByteString("body123")))) should renderTo("")
         } should have message "HTTP message had declared Content-Length 10 but entity data stream amounts to 3 bytes less"
       }
 
       "one chunk and incorrect (too small) Content-Length" in new TestSetup() {
         the[RuntimeException] thrownBy {
-          HttpResponse(
-              200,
-              entity = Default(ContentTypes.`application/json`,
-                               5,
-                               source(ByteString("body123")))) should renderTo(
-              "")
+          HttpResponse(200,
+                       entity = Default(
+                         ContentTypes.`application/json`,
+                         5,
+                         source(ByteString("body123")))) should renderTo("")
         } should have message "HTTP message had declared Content-Length 5 but entity data stream amounts to more bytes"
       }
     }
     "a response with a CloseDelimited body" - {
       "without data" in new TestSetup() {
         ResponseRenderingContext(
-            HttpResponse(200,
-                         entity = CloseDelimited(
-                               ContentTypes.`application/json`,
-                               source(ByteString.empty)))) should renderTo(
-            """HTTP/1.1 200 OK
+          HttpResponse(200,
+                       entity = CloseDelimited(
+                         ContentTypes.`application/json`,
+                         source(ByteString.empty)))) should renderTo(
+          """HTTP/1.1 200 OK
               |Server: akka-http/1.0.0
               |Date: Thu, 25 Aug 2011 09:10:29 GMT
               |Connection: close
               |Content-Type: application/json
               |
               |""",
-            close = true)
+          close = true
+        )
       }
       "consisting of two parts" in new TestSetup() {
-        ResponseRenderingContext(HttpResponse(
-                200,
-                entity = CloseDelimited(ContentTypes.`application/json`,
-                                        source(ByteString("abc"),
-                                               ByteString("defg"))))) should renderTo(
-            """HTTP/1.1 200 OK
+        ResponseRenderingContext(
+          HttpResponse(
+            200,
+            entity = CloseDelimited(
+              ContentTypes.`application/json`,
+              source(ByteString("abc"), ByteString("defg"))))) should renderTo(
+          """HTTP/1.1 200 OK
               |Server: akka-http/1.0.0
               |Date: Thu, 25 Aug 2011 09:10:29 GMT
               |Connection: close
               |Content-Type: application/json
               |
               |abcdefg""",
-            close = true)
+          close = true
+        )
       }
     }
 
@@ -296,9 +307,9 @@ class ResponseRendererSpec
       "with empty entity" in new TestSetup() {
         pending // Disabled until #15981 is fixed
         HttpResponse(
-            200,
-            List(Age(30)),
-            Chunked(ContentTypes.NoContentType, source())) should renderTo {
+          200,
+          List(Age(30)),
+          Chunked(ContentTypes.NoContentType, source())) should renderTo {
           """HTTP/1.1 200 OK
               |Age: 30
               |Server: akka-http/1.0.0
@@ -311,9 +322,9 @@ class ResponseRendererSpec
       "with empty entity but non-default Content-Type" in new TestSetup() {
         pending // Disabled until #15981 is fixed
         HttpResponse(
-            200,
-            List(Age(30)),
-            Chunked(ContentTypes.`application/json`, source())) should renderTo {
+          200,
+          List(Age(30)),
+          Chunked(ContentTypes.`application/json`, source())) should renderTo {
           """HTTP/1.1 200 OK
               |Age: 30
               |Server: akka-http/1.0.0
@@ -343,14 +354,13 @@ class ResponseRendererSpec
 
       "with one chunk and an explicit LastChunk" in new TestSetup() {
         HttpResponse(
-            entity = Chunked(
-                  ContentTypes.`text/plain(UTF-8)`,
-                  source(Chunk(ByteString("body123"),
-                               """key=value;another="tl;dr""""),
-                         LastChunk("foo=bar",
-                                   List(Age(30),
-                                        RawHeader("Cache-Control",
-                                                  "public")))))) should renderTo {
+          entity = Chunked(
+            ContentTypes.`text/plain(UTF-8)`,
+            source(
+              Chunk(ByteString("body123"), """key=value;another="tl;dr""""),
+              LastChunk("foo=bar",
+                        List(Age(30), RawHeader("Cache-Control", "public"))))
+          )) should renderTo {
           """HTTP/1.1 200 OK
             |Server: akka-http/1.0.0
             |Date: Thu, 25 Aug 2011 09:10:29 GMT
@@ -369,14 +379,14 @@ class ResponseRendererSpec
 
       "with one chunk and and extra LastChunks at the end (which should be ignored)" in new TestSetup() {
         HttpResponse(
-            entity = Chunked(ContentTypes.`text/plain(UTF-8)`,
-                             source(Chunk(ByteString("body123"),
-                                          """key=value;another="tl;dr""""),
-                                    LastChunk("foo=bar",
-                                              List(Age(30),
-                                                   RawHeader("Cache-Control",
-                                                             "public"))),
-                                    LastChunk))) should renderTo {
+          entity = Chunked(
+            ContentTypes.`text/plain(UTF-8)`,
+            source(
+              Chunk(ByteString("body123"), """key=value;another="tl;dr""""),
+              LastChunk("foo=bar",
+                        List(Age(30), RawHeader("Cache-Control", "public"))),
+              LastChunk)
+          )) should renderTo {
           """HTTP/1.1 200 OK
             |Server: akka-http/1.0.0
             |Date: Thu, 25 Aug 2011 09:10:29 GMT
@@ -394,11 +404,11 @@ class ResponseRendererSpec
       }
 
       "with a custom Transfer-Encoding header" in new TestSetup() {
-        HttpResponse(
-            headers = List(
-                  `Transfer-Encoding`(TransferEncodings.Extension("fancy"))),
-            entity = Chunked(ContentTypes.`text/plain(UTF-8)`,
-                             source("Yahoooo"))) should renderTo {
+        HttpResponse(headers = List(
+                       `Transfer-Encoding`(
+                         TransferEncodings.Extension("fancy"))),
+                     entity = Chunked(ContentTypes.`text/plain(UTF-8)`,
+                                      source("Yahoooo"))) should renderTo {
           """HTTP/1.1 200 OK
               |Transfer-Encoding: fancy, chunked
               |Server: akka-http/1.0.0
@@ -417,46 +427,49 @@ class ResponseRendererSpec
     "chunked responses to a HTTP/1.0 request" - {
       "with two chunks" in new TestSetup() {
         ResponseRenderingContext(
-            requestProtocol = HttpProtocols.`HTTP/1.0`,
-            response = HttpResponse(entity = Chunked(
-                        ContentTypes.`application/json`,
-                        source(Chunk("abc"), Chunk("defg"))))) should renderTo(
-            """HTTP/1.1 200 OK
+          requestProtocol = HttpProtocols.`HTTP/1.0`,
+          response = HttpResponse(
+            entity =
+              Chunked(ContentTypes.`application/json`,
+                      source(Chunk("abc"), Chunk("defg"))))) should renderTo(
+          """HTTP/1.1 200 OK
               |Server: akka-http/1.0.0
               |Date: Thu, 25 Aug 2011 09:10:29 GMT
               |Connection: close
               |Content-Type: application/json
               |
               |abcdefg""",
-            close = true)
+          close = true
+        )
       }
 
       "with one chunk and an explicit LastChunk" in new TestSetup() {
         ResponseRenderingContext(
-            requestProtocol = HttpProtocols.`HTTP/1.0`,
-            response = HttpResponse(
-                  entity = Chunked(
-                        ContentTypes.`text/plain(UTF-8)`,
-                        source(Chunk(ByteString("body123"),
-                                     """key=value;another="tl;dr""""),
-                               LastChunk("foo=bar",
-                                         List(Age(30),
-                                              RawHeader("Cache-Control",
-                                                        "public"))))))) should renderTo(
-            """HTTP/1.1 200 OK
+          requestProtocol = HttpProtocols.`HTTP/1.0`,
+          response = HttpResponse(
+            entity = Chunked(
+              ContentTypes.`text/plain(UTF-8)`,
+              source(
+                Chunk(ByteString("body123"), """key=value;another="tl;dr""""),
+                LastChunk("foo=bar",
+                          List(Age(30), RawHeader("Cache-Control", "public"))))
+            ))
+        ) should renderTo(
+          """HTTP/1.1 200 OK
               |Server: akka-http/1.0.0
               |Date: Thu, 25 Aug 2011 09:10:29 GMT
               |Connection: close
               |Content-Type: text/plain; charset=UTF-8
               |
               |body123""",
-            close = true)
+          close = true
+        )
       }
     }
 
     "properly handle the Server header" - {
       "if no default is set and no explicit Server header given" in new TestSetup(
-          None) {
+        None) {
         HttpResponse(200) should renderTo {
           """HTTP/1.1 200 OK
             |Date: Thu, 25 Aug 2011 09:10:29 GMT
@@ -624,32 +637,38 @@ class ResponseRendererSpec
       // format: ON
 
       forAll(table)(
-          (reqProto, headReq, reqCH, resProto, resCH, resCD, renCH, close) ⇒
-            ResponseRenderingContext(response = HttpResponse(200,
-                                                             headers = resCH.toList,
-                                                             entity = if (resCD)
-                                                                 HttpEntity
-                                                                   .CloseDelimited(
-                                                                     ContentTypes.`text/plain(UTF-8)`,
-                                                                     Source
-                                                                       .single(ByteString(
-                                                                             "ENTITY")))
-                                                               else
-                                                                 HttpEntity(
-                                                                     "ENTITY"),
-                                                             protocol = resProto),
-                                     requestMethod = if (headReq)
-                                         HttpMethods.HEAD else HttpMethods.GET,
-                                     requestProtocol = reqProto,
-                                     closeRequested = HttpMessage
-                                         .connectionCloseExpected(
-                                           reqProto, reqCH)) should renderTo(
-                s"""${resProto.value} 200 OK
+        (reqProto, headReq, reqCH, resProto, resCH, resCD, renCH, close) ⇒
+          ResponseRenderingContext(
+            response = HttpResponse(
+              200,
+              headers = resCH.toList,
+              entity =
+                if (resCD)
+                  HttpEntity
+                    .CloseDelimited(ContentTypes.`text/plain(UTF-8)`,
+                                    Source
+                                      .single(ByteString("ENTITY")))
+                else
+                  HttpEntity("ENTITY"),
+              protocol = resProto
+            ),
+            requestMethod =
+              if (headReq)
+                HttpMethods.HEAD
+              else HttpMethods.GET,
+            requestProtocol = reqProto,
+            closeRequested = HttpMessage
+              .connectionCloseExpected(reqProto, reqCH)
+          ) should renderTo(
+            s"""${resProto.value} 200 OK
                  |Server: akka-http/1.0.0
                  |Date: Thu, 25 Aug 2011 09:10:29 GMT
-                 |${renCH.fold("")(_ + "\n")}Content-Type: text/plain; charset=UTF-8
+                 |${renCH
+              .fold("")(_ + "\n")}Content-Type: text/plain; charset=UTF-8
                  |${if (resCD) "" else "Content-Length: 6\n"}
-                 |${if (headReq) "" else "ENTITY"}""", close))
+                 |${if (headReq) "" else "ENTITY"}""",
+            close
+        ))
     }
   }
 
@@ -657,28 +676,29 @@ class ResponseRendererSpec
 
   class TestSetup(
       val serverHeader: Option[Server] = Some(Server("akka-http/1.0.0")))
-      extends HttpResponseRendererFactory(
-          serverHeader, responseHeaderSizeHint = 64, NoLogging) {
+      extends HttpResponseRendererFactory(serverHeader,
+                                          responseHeaderSizeHint = 64,
+                                          NoLogging) {
 
     def renderTo(expected: String): Matcher[HttpResponse] =
       renderTo(expected, close = false) compose (ResponseRenderingContext(_))
 
-    def renderTo(
-        expected: String, close: Boolean): Matcher[ResponseRenderingContext] =
+    def renderTo(expected: String,
+                 close: Boolean): Matcher[ResponseRenderingContext] =
       equal(expected.stripMarginWithNewline("\r\n") -> close)
         .matcher[(String, Boolean)] compose { ctx ⇒
         val (wasCompletedFuture, resultFuture) = (Source.single(ctx) ++ Source
-              .maybe[ResponseRenderingContext]) // never send upstream completion
+          .maybe[ResponseRenderingContext]) // never send upstream completion
           .via(renderer.named("renderer"))
           .map {
             case ResponseRenderingOutput.HttpData(bytes) ⇒ bytes
             case _: ResponseRenderingOutput.SwitchToWebSocket ⇒
               throw new IllegalStateException(
-                  "Didn't expect websocket response")
+                "Didn't expect websocket response")
           }
           .groupedWithin(1000, 100.millis)
           .viaMat(StreamUtils.identityFinishReporter[Seq[ByteString]])(
-              Keep.right)
+            Keep.right)
           .toMat(Sink.head)(Keep.both)
           .run()
 
@@ -689,11 +709,15 @@ class ResponseRendererSpec
         } catch {
           case NonFatal(_) ⇒ false
         }
-        Await.result(resultFuture, 250.millis).reduceLeft(_ ++ _).utf8String -> wasCompleted
+        Await
+          .result(resultFuture, 250.millis)
+          .reduceLeft(_ ++ _)
+          .utf8String -> wasCompleted
       }
 
     override def currentTimeMillis() =
-      DateTime(2011, 8, 25, 9, 10, 29).clicks // provide a stable date for testing
+      DateTime(2011, 8, 25, 9, 10,
+        29).clicks // provide a stable date for testing
   }
 
   def source[T](elems: T*) = Source(elems.toList)

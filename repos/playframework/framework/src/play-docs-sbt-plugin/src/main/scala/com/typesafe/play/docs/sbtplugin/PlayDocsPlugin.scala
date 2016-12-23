@@ -67,7 +67,8 @@ object Imports {
     val generateUpstreamCodeSamplesReport = TaskKey[CodeSamplesReport](
       "generateUpstreamCodeSamplesReport",
       "Parses all markdown files from the upstream translation and generates a report of code samples used",
-      KeyRanks.CTask)
+      KeyRanks.CTask
+    )
     val translationCodeSamplesReportFile = SettingKey[File](
       "translationCodeSamplesReportFilename",
       "The filename of the translation code samples report",
@@ -301,10 +302,12 @@ object PlayDocsPlugin extends AutoPlugin {
                                        classOf[Array[String]])
 
     val files = allResources.map(_.file).toArray[File]
-    val baseDirs = allResources.map {
-      case PlayDocsJarFileResource(_, base) => base.orNull
-      case PlayDocsDirectoryResource(_) => null
-    }.toArray[String]
+    val baseDirs = allResources
+      .map {
+        case PlayDocsJarFileResource(_, base) => base.orNull
+        case PlayDocsDirectoryResource(_) => null
+      }
+      .toArray[String]
 
     val buildDocHandler = fromResourcesMethod.invoke(null, files, baseDirs)
 

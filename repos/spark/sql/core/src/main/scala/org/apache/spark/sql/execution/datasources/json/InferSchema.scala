@@ -48,29 +48,30 @@ private[sql] object InferSchema {
       }
 
     // perform schema inference on each row and merge afterwards
-    val rootType = schemaData.mapPartitions { iter =>
-      val factory = new JsonFactory()
-      configOptions.setJacksonOptions(factory)
-      iter.flatMap { row =>
-        try {
-          Utils.tryWithResource(factory.createParser(row)) { parser =>
-            parser.nextToken()
-            Some(inferField(parser, configOptions))
-          }
-        } catch {
-          case _: JsonParseException if shouldHandleCorruptRecord =>
-            Some(
-              StructType(
+    val rootType = schemaData
+      .mapPartitions { iter =>
+        val factory = new JsonFactory()
+        configOptions.setJacksonOptions(factory)
+        iter.flatMap { row =>
+          try {
+            Utils.tryWithResource(factory.createParser(row)) { parser =>
+              parser.nextToken()
+              Some(inferField(parser, configOptions))
+            }
+          } catch {
+            case _: JsonParseException if shouldHandleCorruptRecord =>
+              Some(StructType(
                 Seq(StructField(columnNameOfCorruptRecords, StringType))))
-          case _: JsonParseException =>
-            None
+            case _: JsonParseException =>
+              None
+          }
         }
       }
-    }.treeAggregate[DataType](StructType(Seq()))(
-      compatibleRootType(columnNameOfCorruptRecords,
-                         shouldHandleCorruptRecord),
-      compatibleRootType(columnNameOfCorruptRecords,
-                         shouldHandleCorruptRecord))
+      .treeAggregate[DataType](StructType(Seq()))(
+        compatibleRootType(columnNameOfCorruptRecords,
+                           shouldHandleCorruptRecord),
+        compatibleRootType(columnNameOfCorruptRecords,
+                           shouldHandleCorruptRecord))
 
     canonicalizeType(rootType) match {
       case Some(st: StructType) => st

@@ -33,19 +33,20 @@ object TestOptions {
       else kdc,
       editConfigurationFilePut("etc/config.properties",
                                "karaf.framework",
-                               "equinox"))
+                               "equinox")
+    )
   }
 
   def testBundles(): PaxOption = {
-    new DefaultCompositeOption(mavenBundle(
-                                 "com.typesafe.akka",
-                                 "akka-testkit_%s"
-                                   .format(scalaDepVersion)).versionAsInProject,
-                               mavenBundle(
-                                 "org.scalatest",
-                                 "scalatest_%s"
-                                   .format(scalaDepVersion)).versionAsInProject,
-                               junitBundles)
+    new DefaultCompositeOption(
+      mavenBundle("com.typesafe.akka",
+                  "akka-testkit_%s"
+                    .format(scalaDepVersion)).versionAsInProject,
+      mavenBundle("org.scalatest",
+                  "scalatest_%s"
+                    .format(scalaDepVersion)).versionAsInProject,
+      junitBundles
+    )
   }
 
   def debugOptions(level: LogLevelOption.LogLevel =
@@ -79,6 +80,7 @@ object TestOptions {
         .`type`("xml")
         .classifier("features")
         .version(System.getProperty("project.version")),
-      feature)
+      feature
+    )
   }
 }

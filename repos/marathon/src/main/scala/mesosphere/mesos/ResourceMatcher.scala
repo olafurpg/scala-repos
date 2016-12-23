@@ -58,10 +58,11 @@ object ResourceMatcher {
             Map.empty
           else {
             import scala.collection.JavaConverters._
-            resource.getReservation.getLabels.getLabelsList.asScala.iterator.map {
-              label =>
+            resource.getReservation.getLabels.getLabelsList.asScala.iterator
+              .map { label =>
                 label.getKey -> label.getValue
-            }.toMap
+              }
+              .toMap
           }
         requiredLabels.labels.forall {
           case (k, v) => labelMap.get(k).contains(v)

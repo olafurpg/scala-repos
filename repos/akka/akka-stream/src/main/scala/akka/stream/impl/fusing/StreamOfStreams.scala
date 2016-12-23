@@ -46,15 +46,18 @@ final class FlattenMerge[T, M](breadth: Int)
       else removeSource(src)
     }
 
-    setHandler(in, new InHandler {
-      override def onPush(): Unit = {
-        val source = grab(in)
-        addSource(source)
-        if (activeSources < breadth) tryPull(in)
+    setHandler(
+      in,
+      new InHandler {
+        override def onPush(): Unit = {
+          val source = grab(in)
+          addSource(source)
+          if (activeSources < breadth) tryPull(in)
+        }
+        override def onUpstreamFinish(): Unit =
+          if (activeSources == 0) completeStage()
       }
-      override def onUpstreamFinish(): Unit =
-        if (activeSources == 0) completeStage()
-    })
+    )
 
     setHandler(out, new OutHandler {
       override def onPull(): Unit = {
@@ -283,40 +286,46 @@ final class Split[T](decision: Split.SplitDecision,
           .timeout
       }
 
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          if (substreamSource eq null) pull(in)
-          else if (!substreamPushed) {
-            push(out, Source.fromGraph(substreamSource.source))
-            scheduleOnce(SubscriptionTimer, timeout)
-            substreamPushed = true
+      setHandler(
+        out,
+        new OutHandler {
+          override def onPull(): Unit = {
+            if (substreamSource eq null) pull(in)
+            else if (!substreamPushed) {
+              push(out, Source.fromGraph(substreamSource.source))
+              scheduleOnce(SubscriptionTimer, timeout)
+              substreamPushed = true
+            }
+          }
+
+          override def onDownstreamFinish(): Unit = {
+            // If the substream is already cancelled or it has not been handed out, we can go away
+            if (!substreamPushed || substreamCancelled) completeStage()
           }
         }
-
-        override def onDownstreamFinish(): Unit = {
-          // If the substream is already cancelled or it has not been handed out, we can go away
-          if (!substreamPushed || substreamCancelled) completeStage()
-        }
-      })
+      )
 
       // initial input handler
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          val handler = new SubstreamHandler
-          val elem = grab(in)
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            val handler = new SubstreamHandler
+            val elem = grab(in)
 
-          decision match {
-            case SplitAfter if p(elem) ⇒
-              push(out, Source.single(elem))
-            // Next pull will come from the next substream that we will open
-            case _ ⇒
-              handler.firstElem = elem
+            decision match {
+              case SplitAfter if p(elem) ⇒
+                push(out, Source.single(elem))
+              // Next pull will come from the next substream that we will open
+              case _ ⇒
+                handler.firstElem = elem
+            }
+
+            handOver(handler)
           }
-
-          handOver(handler)
+          override def onUpstreamFinish(): Unit = completeStage()
         }
-        override def onUpstreamFinish(): Unit = completeStage()
-      })
+      )
 
       private def handOver(handler: SubstreamHandler): Unit = {
         if (isClosed(out)) completeStage()

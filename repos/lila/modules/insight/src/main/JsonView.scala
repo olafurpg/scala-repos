@@ -11,16 +11,18 @@ final class JsonView {
 
   def ui(ecos: Set[String]) = {
 
-    val openingJson = Json.obj("key" -> D.Opening.key,
-                               "name" -> D.Opening.name,
-                               "position" -> D.Opening.position,
-                               "description" -> D.Opening.description.body,
-                               "values" -> Dimension
-                                 .valuesOf(D.Opening)
-                                 .filter { o =>
-                                   ecos contains o.eco
-                                 }
-                                 .map(Dimension.valueToJson(D.Opening)))
+    val openingJson = Json.obj(
+      "key" -> D.Opening.key,
+      "name" -> D.Opening.name,
+      "position" -> D.Opening.position,
+      "description" -> D.Opening.description.body,
+      "values" -> Dimension
+        .valuesOf(D.Opening)
+        .filter { o =>
+          ecos contains o.eco
+        }
+        .map(Dimension.valueToJson(D.Opening))
+    )
 
     Json.obj(
       "dimensionCategs" -> List(

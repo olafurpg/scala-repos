@@ -69,7 +69,8 @@ object Trophy {
           icon = ",".some,
           url =
             "http://lichess.org/blog/VXF45yYAAPQgLH4d/chess-marathon-1".some,
-          "fire_trophy".some)
+          "fire_trophy".some
+        )
 
     object BongcloudWarrior
         extends Kind(
@@ -78,7 +79,8 @@ object Trophy {
           icon = "~".some,
           url =
             "http://lichess.org/forum/lichess-feedback/bongcloud-trophy".some,
-          "fire_trophy".some)
+          "fire_trophy".some
+        )
 
     object Developer
         extends Kind(
@@ -109,17 +111,19 @@ object Trophy {
                      url = "http://lichess.org/how-to-stream-on-lichess".some,
                      "icon3d".some)
 
-    val all = List(ZugMiracle,
-                   WayOfBerserk,
-                   MarathonSurvivor,
-                   MarathonWinner,
-                   MarathonTopTen,
-                   MarathonTopFifty,
-                   MarathonTopHundred,
-                   BongcloudWarrior,
-                   Developer,
-                   Moderator,
-                   Streamer)
+    val all = List(
+      ZugMiracle,
+      WayOfBerserk,
+      MarathonSurvivor,
+      MarathonWinner,
+      MarathonTopTen,
+      MarathonTopFifty,
+      MarathonTopHundred,
+      BongcloudWarrior,
+      Developer,
+      Moderator,
+      Streamer
+    )
     def byKey(key: String) = all find (_.key == key)
   }
 

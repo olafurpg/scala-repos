@@ -262,9 +262,11 @@ object Messages {
     : Either[PlayException.ExceptionSource, Map[String, String]] = {
     new Messages.MessagesParser(messageSource, "").parse.right.map {
       messages =>
-        messages.map { message =>
-          message.key -> message.pattern
-        }.toMap
+        messages
+          .map { message =>
+            message.key -> message.pattern
+          }
+          .toMap
     }
   }
 

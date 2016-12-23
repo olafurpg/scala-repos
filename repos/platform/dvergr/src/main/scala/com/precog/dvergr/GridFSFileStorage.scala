@@ -117,8 +117,9 @@ trait GridFSFileStorage[M[+ _]] extends FileStorage[M] {
         }
       val in0 = file.getInputStream()
 
-      FileData(mimeType, StreamT.unfoldM[M, Array[Byte], InputStream](in0) {
-        in =>
+      FileData(
+        mimeType,
+        StreamT.unfoldM[M, Array[Byte], InputStream](in0) { in =>
           M.point {
             val buffer = new Array[Byte](chunkSize)
             val len = in.read(buffer)
@@ -130,7 +131,8 @@ trait GridFSFileStorage[M[+ _]] extends FileStorage[M] {
               Some((buffer, in))
             }
           }
-      })
+        }
+      )
     }
   }
 

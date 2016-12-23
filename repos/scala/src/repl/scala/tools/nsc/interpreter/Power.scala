@@ -332,8 +332,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     def strings(s: Seq[Byte]): List[String] = {
       if (s.length == 0) Nil
       else
-        s dropWhile (_.toChar.isControl) span (x =>
-                                                 !x.toChar.isControl) match {
+        s dropWhile (_.toChar.isControl) span (x => !x.toChar.isControl) match {
           case (next, rest) => next.map(_.toChar).mkString :: strings(rest)
         }
     }

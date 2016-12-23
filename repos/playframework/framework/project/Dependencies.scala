@@ -44,12 +44,14 @@ object Dependencies {
   val acolyte = "org.eu.acolyte" % "jdbc-driver" % acolyteVersion
 
   val jdbcDeps =
-    Seq("com.jolbox" % "bonecp" % "0.8.0.RELEASE",
-        "com.zaxxer" % "HikariCP" % "2.4.3",
-        "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2",
-        h2database,
-        acolyte % Test,
-        "tyrex" % "tyrex" % "1.0.1") ++ specsBuild.map(_ % Test) ++ logback
+    Seq(
+      "com.jolbox" % "bonecp" % "0.8.0.RELEASE",
+      "com.zaxxer" % "HikariCP" % "2.4.3",
+      "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2",
+      h2database,
+      acolyte % Test,
+      "tyrex" % "tyrex" % "1.0.1"
+    ) ++ specsBuild.map(_ % Test) ++ logback
       .map(_ % Test)
 
   val javaJdbcDeps = Seq(acolyte % Test)

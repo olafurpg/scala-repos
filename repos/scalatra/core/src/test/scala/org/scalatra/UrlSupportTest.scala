@@ -5,21 +5,26 @@ import org.scalatra.test.scalatest._
 class UrlSupportTest extends ScalatraFunSuite {
   override def contextPath = "/context"
 
-  addServlet(new ScalatraServlet {
-    get("/") {
-      if (params.contains("session")) session // trigger a jsessionid
-      this.url(params("url"), params - "url", absolutize = false)
-    }
+  addServlet(
+    new ScalatraServlet {
+      get("/") {
+        if (params.contains("session")) session // trigger a jsessionid
+        this.url(params("url"), params - "url", absolutize = false)
+      }
 
-    get("/option") {
-      this
-        .url(params("url"), Seq("id" -> params.get("id")), absolutize = false)
-    }
+      get("/option") {
+        this
+          .url(params("url"),
+               Seq("id" -> params.get("id")),
+               absolutize = false)
+      }
 
-    get("/strip-context") {
-      this.url(params("url")) //, includeContextPath = false)
-    }
-  }, "/*")
+      get("/strip-context") {
+        this.url(params("url")) //, includeContextPath = false)
+      }
+    },
+    "/*"
+  )
 
   def url(url: String, params: Map[String, String] = Map.empty) =
     get("/context/", params + ("url" -> url)) { response.body }

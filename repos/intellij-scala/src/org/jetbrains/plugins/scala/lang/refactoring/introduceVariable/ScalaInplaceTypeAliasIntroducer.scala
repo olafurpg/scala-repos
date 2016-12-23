@@ -36,30 +36,37 @@ object ScalaInplaceTypeAliasIntroducer {
                   scopeItem: ScopeItem,
                   namedElement: ScNamedElement): Unit = {
     val myProject = myEditor.getProject
-    CommandProcessor.getInstance.executeCommand(myProject, new Runnable {
-      def run() {
-        val revertInfo =
-          myEditor.getUserData(ScalaIntroduceVariableHandler.REVERT_INFO)
-        val document = myEditor.getDocument
-        if (revertInfo != null) {
-          extensions.inWriteAction {
-            document.replaceString(0,
-                                   document.getTextLength,
-                                   revertInfo.fileText)
+    CommandProcessor.getInstance.executeCommand(
+      myProject,
+      new Runnable {
+        def run() {
+          val revertInfo =
+            myEditor.getUserData(ScalaIntroduceVariableHandler.REVERT_INFO)
+          val document = myEditor.getDocument
+          if (revertInfo != null) {
+            extensions.inWriteAction {
+              document.replaceString(0,
+                                     document.getTextLength,
+                                     revertInfo.fileText)
+              PsiDocumentManager
+                .getInstance(myProject)
+                .commitDocument(document)
+            }
+            val offset = revertInfo.caretOffset
+            myEditor.getCaretModel.moveToOffset(offset)
+            myEditor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
+            PsiDocumentManager
+              .getInstance(myEditor.getProject)
+              .commitDocument(document)
+          }
+          if (!myProject.isDisposed && myProject.isOpen) {
             PsiDocumentManager.getInstance(myProject).commitDocument(document)
           }
-          val offset = revertInfo.caretOffset
-          myEditor.getCaretModel.moveToOffset(offset)
-          myEditor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
-          PsiDocumentManager
-            .getInstance(myEditor.getProject)
-            .commitDocument(document)
         }
-        if (!myProject.isDisposed && myProject.isOpen) {
-          PsiDocumentManager.getInstance(myProject).commitDocument(document)
-        }
-      }
-    }, "Introduce Type Alias", null)
+      },
+      "Introduce Type Alias",
+      null
+    )
   }
 }
 

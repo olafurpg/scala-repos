@@ -114,12 +114,14 @@ class ReceivedBlockHandlerSuite
       testBlockStoring(handler) {
         case (data, blockIds, storeResults) =>
           // Verify the data in block manager is correct
-          val storedData = blockIds.flatMap { blockId =>
-            blockManager
-              .getLocalValues(blockId)
-              .map(_.data.map(_.toString).toList)
-              .getOrElse(List.empty)
-          }.toList
+          val storedData = blockIds
+            .flatMap { blockId =>
+              blockManager
+                .getLocalValues(blockId)
+                .map(_.data.map(_.toString).toList)
+                .getOrElse(List.empty)
+            }
+            .toList
           storedData shouldEqual data
 
           // Verify that the store results are instances of BlockManagerBasedStoreResult
@@ -144,12 +146,14 @@ class ReceivedBlockHandlerSuite
       testBlockStoring(handler) {
         case (data, blockIds, storeResults) =>
           // Verify the data in block manager is correct
-          val storedData = blockIds.flatMap { blockId =>
-            blockManager
-              .getLocalValues(blockId)
-              .map(_.data.map(_.toString).toList)
-              .getOrElse(List.empty)
-          }.toList
+          val storedData = blockIds
+            .flatMap { blockId =>
+              blockManager
+                .getLocalValues(blockId)
+                .map(_.data.map(_.toString).toList)
+                .getOrElse(List.empty)
+            }
+            .toList
           storedData shouldEqual data
 
           // Verify that the store results are instances of WriteAheadLogBasedStoreResult
@@ -368,7 +372,8 @@ class ReceivedBlockHandlerSuite
             "Message count not matches for a " +
               receivedBlock.getClass.getName +
               " being inserted using BlockManagerBasedBlockHandler with " +
-              sLevel)
+              sLevel
+          )
         }
       } else {
         // test received block with WAL based handler
@@ -381,7 +386,8 @@ class ReceivedBlockHandlerSuite
             "Message count not matches for a " +
               receivedBlock.getClass.getName +
               " being inserted using WriteAheadLogBasedBlockHandler with " +
-              sLevel)
+              sLevel
+          )
         }
       }
     } finally {

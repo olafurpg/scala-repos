@@ -167,7 +167,8 @@ class MigrationTo0_13Test
       newState = () =>
         MarathonTaskState(
           MarathonTask.newBuilder().setId(UUID.randomUUID().toString).build()),
-      prefix = TaskRepository.storePrefix)
+      prefix = TaskRepository.storePrefix
+    )
     lazy val taskRepo = {
       val metrics = new Metrics(new MetricRegistry)
       new TaskRepository(entityStore, metrics)

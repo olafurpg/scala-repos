@@ -32,7 +32,8 @@ trait FlatSpecStaticStringTest extends ScalaTestTestCase {
         | it should "not accept this: " + System.currentTimeMillis() in {
         | }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   def testFlatSpecSum() = {
@@ -66,10 +67,12 @@ trait FlatSpecStaticStringTest extends ScalaTestTestCase {
     addFlatSpec()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(15, 7, flatSpecFileName),
-                             flatSpecClassName,
-                             "Static strings should accept sums",
-                             "Static strings should work with consts",
-                             "Static strings should work with sums of consts"))
+      checkConfigAndSettings(
+        createTestFromLocation(15, 7, flatSpecFileName),
+        flatSpecClassName,
+        "Static strings should accept sums",
+        "Static strings should work with consts",
+        "Static strings should work with sums of consts"
+      ))
   }
 }

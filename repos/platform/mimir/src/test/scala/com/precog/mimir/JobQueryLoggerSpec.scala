@@ -54,8 +54,8 @@ class JobQueryLoggerSpec extends Specification {
     })
   }
 
-  def testChannel(channel: String)(f: (QueryLogger[Need, Unit],
-                                       String) => Need[Unit]) = {
+  def testChannel(channel: String)(
+      f: (QueryLogger[Need, Unit], String) => Need[Unit]) = {
     withReport { report =>
       val messages = (for {
         _ <- f(report, "Hi there!")

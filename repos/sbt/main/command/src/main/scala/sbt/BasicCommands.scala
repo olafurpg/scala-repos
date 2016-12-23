@@ -28,26 +28,28 @@ import scala.util.control.NonFatal
 
 object BasicCommands {
   lazy val allBasicCommands =
-    Seq(nop,
-        ignore,
-        help,
-        completionsCommand,
-        multi,
-        ifLast,
-        append,
-        setOnFailure,
-        clearOnFailure,
-        stashOnFailure,
-        popOnFailure,
-        reboot,
-        call,
-        early,
-        exit,
-        continuous,
-        history,
-        shell,
-        read,
-        alias) ++ compatCommands
+    Seq(
+      nop,
+      ignore,
+      help,
+      completionsCommand,
+      multi,
+      ifLast,
+      append,
+      setOnFailure,
+      clearOnFailure,
+      stashOnFailure,
+      popOnFailure,
+      reboot,
+      call,
+      early,
+      exit,
+      continuous,
+      history,
+      shell,
+      read,
+      alias
+    ) ++ compatCommands
 
   def nop = Command.custom(s => success(() => s))
   def ignore = Command.command(FailureWall)(idFun)

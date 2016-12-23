@@ -44,10 +44,12 @@ object SimpleParamsExample {
     // We use LabeledPoint, which is a case class.  Spark SQL can convert RDDs of case classes
     // into DataFrames, where it uses the case class metadata to infer the schema.
     val training = sc.parallelize(
-      Seq(LabeledPoint(1.0, Vectors.dense(0.0, 1.1, 0.1)),
-          LabeledPoint(0.0, Vectors.dense(2.0, 1.0, -1.0)),
-          LabeledPoint(0.0, Vectors.dense(2.0, 1.3, 1.0)),
-          LabeledPoint(1.0, Vectors.dense(0.0, 1.2, -0.5))))
+      Seq(
+        LabeledPoint(1.0, Vectors.dense(0.0, 1.1, 0.1)),
+        LabeledPoint(0.0, Vectors.dense(2.0, 1.0, -1.0)),
+        LabeledPoint(0.0, Vectors.dense(2.0, 1.3, 1.0)),
+        LabeledPoint(1.0, Vectors.dense(0.0, 1.2, -0.5))
+      ))
 
     // Create a LogisticRegression instance.  This instance is an Estimator.
     val lr = new LogisticRegression()

@@ -62,17 +62,20 @@ abstract class LeaderLeavingSpec
 
           val exitingLatch = TestLatch()
 
-          cluster.subscribe(system.actorOf(Props(new Actor {
-            def receive = {
-              case state: CurrentClusterState ⇒
-                if (state.members.exists(m ⇒
-                      m.address == oldLeaderAddress &&
-                        m.status == Exiting)) exitingLatch.countDown()
-              case MemberExited(m) if m.address == oldLeaderAddress ⇒
-                exitingLatch.countDown()
-              case _ ⇒ // ignore
-            }
-          }).withDeploy(Deploy.local)), classOf[MemberEvent])
+          cluster.subscribe(
+            system.actorOf(Props(new Actor {
+              def receive = {
+                case state: CurrentClusterState ⇒
+                  if (state.members.exists(m ⇒
+                        m.address == oldLeaderAddress &&
+                          m.status == Exiting)) exitingLatch.countDown()
+                case MemberExited(m) if m.address == oldLeaderAddress ⇒
+                  exitingLatch.countDown()
+                case _ ⇒ // ignore
+              }
+            }).withDeploy(Deploy.local)),
+            classOf[MemberEvent]
+          )
           enterBarrier("registered-listener")
 
           enterBarrier("leader-left")

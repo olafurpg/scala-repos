@@ -200,7 +200,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
         d
       },
       serialization = SerializationExtension(system),
-      transport = new Remoting(system, this))
+      transport = new Remoting(system, this)
+    )
 
     _internals = internals
     remotingTerminator ! internals
@@ -219,13 +220,14 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
     val failureDetector = createRemoteWatcherFailureDetector(system)
     system.systemActorOf(
       configureDispatcher(
-        RemoteWatcher.props(failureDetector,
-                            heartbeatInterval = WatchHeartBeatInterval,
-                            unreachableReaperInterval =
-                              WatchUnreachableReaperInterval,
-                            heartbeatExpectedResponseAfter =
-                              WatchHeartbeatExpectedResponseAfter)),
-      "remote-watcher")
+        RemoteWatcher.props(
+          failureDetector,
+          heartbeatInterval = WatchHeartBeatInterval,
+          unreachableReaperInterval = WatchUnreachableReaperInterval,
+          heartbeatExpectedResponseAfter = WatchHeartbeatExpectedResponseAfter
+        )),
+      "remote-watcher"
+    )
   }
 
   protected def createRemoteWatcherFailureDetector(

@@ -114,14 +114,16 @@ object Status {
   }
 
   def toMessage(status: Status): Message = {
-    Message(status.job,
-            status.id,
-            channels.Status,
-            JObject(
-              jfield("message", status.message) :: jfield(
-                "progress",
-                status.progress) :: jfield("unit", status.unit) ::
-                (status.info map (jfield("info", _) :: Nil) getOrElse Nil)
-            ))
+    Message(
+      status.job,
+      status.id,
+      channels.Status,
+      JObject(
+        jfield("message", status.message) :: jfield(
+          "progress",
+          status.progress) :: jfield("unit", status.unit) ::
+          (status.info map (jfield("info", _) :: Nil) getOrElse Nil)
+      )
+    )
   }
 }

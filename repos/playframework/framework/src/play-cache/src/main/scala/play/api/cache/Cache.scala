@@ -251,7 +251,8 @@ private[play] object NamedEhCacheProvider {
            |
            |This usually indicates that multiple instances of a dependent component (e.g. a Play application) have been started at the same time.
          """.stripMargin,
-          e)
+          e
+        )
     }
 }
 

@@ -53,35 +53,39 @@ class ScalaCopyPastePostProcessor
     try {
       ProgressManager
         .getInstance()
-        .runProcess(new Runnable {
-          override def run(): Unit = {
-            breakable {
-              for ((startOffset, endOffset) <- startOffsets.zip(endOffsets);
-                   element <- getElementsStrictlyInRange(file,
-                                                         startOffset,
-                                                         endOffset);
-                   reference <- element.asOptionOf[ScReferenceElement];
-                   dependency <- Dependency.dependencyFor(reference)
-                   if dependency.isExternal;
-                   range = dependency.source.getTextRange.shiftRight(
-                     -startOffset)) {
-                if (System.currentTimeMillis > timeBound) {
-                  Log.warn(
-                    "Time-out while collecting dependencies in %s:\n%s".format(
-                      file.getName,
-                      file.getText.substring(startOffset, endOffset)))
-                  break()
+        .runProcess(
+          new Runnable {
+            override def run(): Unit = {
+              breakable {
+                for ((startOffset, endOffset) <- startOffsets.zip(endOffsets);
+                     element <- getElementsStrictlyInRange(file,
+                                                           startOffset,
+                                                           endOffset);
+                     reference <- element.asOptionOf[ScReferenceElement];
+                     dependency <- Dependency.dependencyFor(reference)
+                     if dependency.isExternal;
+                     range = dependency.source.getTextRange.shiftRight(
+                       -startOffset)) {
+                  if (System.currentTimeMillis > timeBound) {
+                    Log.warn(
+                      "Time-out while collecting dependencies in %s:\n%s"
+                        .format(
+                          file.getName,
+                          file.getText.substring(startOffset, endOffset)))
+                    break()
+                  }
+                  associations ::=
+                    Association(dependency.kind, range, dependency.path)
                 }
-                associations ::=
-                  Association(dependency.kind, range, dependency.path)
               }
             }
+          },
+          new AbstractProgressIndicatorBase {
+            override def isCanceled: scala.Boolean = {
+              System.currentTimeMillis > timeBound || super.isCanceled
+            }
           }
-        }, new AbstractProgressIndicatorBase {
-          override def isCanceled: scala.Boolean = {
-            System.currentTimeMillis > timeBound || super.isCanceled
-          }
-        })
+        )
     } catch {
       case p: ProcessCanceledException =>
         Log.warn(

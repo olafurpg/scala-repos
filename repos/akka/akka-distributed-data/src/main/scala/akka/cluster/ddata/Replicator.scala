@@ -67,7 +67,8 @@ object ReplicatorSettings {
       pruningInterval =
         config.getDuration("pruning-interval", MILLISECONDS).millis,
       maxPruningDissemination =
-        config.getDuration("max-pruning-dissemination", MILLISECONDS).millis)
+        config.getDuration("max-pruning-dissemination", MILLISECONDS).millis
+    )
   }
 
   /**
@@ -646,10 +647,12 @@ object Replicator {
                             totChunks: Int)
         extends ReplicatorMessage {
       override def toString: String =
-        (digests.map {
-          case (key, bytes) ⇒
-            key + " -> " + bytes.map(byte ⇒ f"$byte%02x").mkString("")
-        }).mkString("Status(", ", ", ")")
+        (digests
+          .map {
+            case (key, bytes) ⇒
+              key + " -> " + bytes.map(byte ⇒ f"$byte%02x").mkString("")
+          })
+          .mkString("Status(", ", ", ")")
     }
     final case class Gossip(updatedData: Map[String, DataEnvelope],
                             sendBack: Boolean)

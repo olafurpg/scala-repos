@@ -132,11 +132,13 @@ trait NormalizationHelperModule[M[+ _]]
           }
 
           range.toList map { i =>
-            totalColumns.collect {
-              case (cpath, (meanCol, stdDevCol))
-                  if meanCol.isDefinedAt(i) && stdDevCol.isDefinedAt(i) =>
-                (cpath, Stats(meanCol(i), stdDevCol(i)))
-            }.toMap
+            totalColumns
+              .collect {
+                case (cpath, (meanCol, stdDevCol))
+                    if meanCol.isDefinedAt(i) && stdDevCol.isDefinedAt(i) =>
+                  (cpath, Stats(meanCol(i), stdDevCol(i)))
+              }
+              .toMap
           }
         }
       }

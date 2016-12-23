@@ -72,26 +72,29 @@ final class Merge[T] private (val inputPorts: Int, val eagerComplete: Boolean)
       }
 
       in.foreach { i ⇒
-        setHandler(i, new InHandler {
-          override def onPush(): Unit = {
-            if (isAvailable(out)) {
-              // isAvailable(out) implies !pending
-              // -> grab and push immediately
-              push(out, grab(i))
-              tryPull(i)
-            } else pendingQueue.enqueue(i)
-          }
-
-          override def onUpstreamFinish() =
-            if (eagerComplete) {
-              in.foreach(cancel)
-              runningUpstreams = 0
-              if (!pending) completeStage()
-            } else {
-              runningUpstreams -= 1
-              if (upstreamsClosed && !pending) completeStage()
+        setHandler(
+          i,
+          new InHandler {
+            override def onPush(): Unit = {
+              if (isAvailable(out)) {
+                // isAvailable(out) implies !pending
+                // -> grab and push immediately
+                push(out, grab(i))
+                tryPull(i)
+              } else pendingQueue.enqueue(i)
             }
-        })
+
+            override def onUpstreamFinish() =
+              if (eagerComplete) {
+                in.foreach(cancel)
+                runningUpstreams = 0
+                if (!pending) completeStage()
+              } else {
+                runningUpstreams -= 1
+                if (upstreamsClosed && !pending) completeStage()
+              }
+          }
+        )
       }
 
       setHandler(out, new OutHandler {
@@ -190,47 +193,53 @@ final class MergePreferred[T] private (val secondaryPorts: Int,
       val maxEmitting = 2
       var preferredEmitting = 0
 
-      setHandler(preferred, new InHandler {
-        override def onUpstreamFinish(): Unit = onComplete()
-        override def onPush(): Unit =
-          if (preferredEmitting == maxEmitting) () // blocked
-          else emitPreferred()
+      setHandler(
+        preferred,
+        new InHandler {
+          override def onUpstreamFinish(): Unit = onComplete()
+          override def onPush(): Unit =
+            if (preferredEmitting == maxEmitting) () // blocked
+            else emitPreferred()
 
-        def emitPreferred(): Unit = {
-          preferredEmitting += 1
-          emit(out, grab(preferred), emitted)
-          tryPull(preferred)
-        }
+          def emitPreferred(): Unit = {
+            preferredEmitting += 1
+            emit(out, grab(preferred), emitted)
+            tryPull(preferred)
+          }
 
-        val emitted = () ⇒ {
-          preferredEmitting -= 1
-          if (isAvailable(preferred)) emitPreferred()
-          else if (preferredEmitting == 0) emitSecondary()
-        }
+          val emitted = () ⇒ {
+            preferredEmitting -= 1
+            if (isAvailable(preferred)) emitPreferred()
+            else if (preferredEmitting == 0) emitSecondary()
+          }
 
-        def emitSecondary(): Unit = {
-          var i = 0
-          while (i < secondaryPorts) {
-            val port = in(i)
-            if (isAvailable(port)) emit(out, grab(port), pullMe(i))
-            i += 1
+          def emitSecondary(): Unit = {
+            var i = 0
+            while (i < secondaryPorts) {
+              val port = in(i)
+              if (isAvailable(port)) emit(out, grab(port), pullMe(i))
+              i += 1
+            }
           }
         }
-      })
+      )
 
       var i = 0
       while (i < secondaryPorts) {
         val port = in(i)
         val pullPort = pullMe(i)
-        setHandler(port, new InHandler {
-          override def onPush(): Unit = {
-            if (preferredEmitting > 0) () // blocked
-            else {
-              emit(out, grab(port), pullPort)
+        setHandler(
+          port,
+          new InHandler {
+            override def onPush(): Unit = {
+              if (preferredEmitting > 0) () // blocked
+              else {
+                emit(out, grab(port), pullPort)
+              }
             }
+            override def onUpstreamFinish(): Unit = onComplete()
           }
-          override def onUpstreamFinish(): Unit = onComplete()
-        })
+        )
         i += 1
       }
     }
@@ -308,25 +317,28 @@ final class Interleave[T] private (val inputPorts: Int,
       }
 
       in.foreach { i ⇒
-        setHandler(i, new InHandler {
-          override def onPush(): Unit = {
-            push(out, grab(i))
-            counter += 1
-            if (counter == segmentSize) switchToNextInput()
-          }
+        setHandler(
+          i,
+          new InHandler {
+            override def onPush(): Unit = {
+              push(out, grab(i))
+              counter += 1
+              if (counter == segmentSize) switchToNextInput()
+            }
 
-          override def onUpstreamFinish(): Unit = {
-            if (!eagerClose) {
-              runningUpstreams -= 1
-              if (!upstreamsClosed) {
-                if (i == currentUpstream) {
-                  switchToNextInput()
-                  if (isAvailable(out)) pull(currentUpstream)
-                }
+            override def onUpstreamFinish(): Unit = {
+              if (!eagerClose) {
+                runningUpstreams -= 1
+                if (!upstreamsClosed) {
+                  if (i == currentUpstream) {
+                    switchToNextInput()
+                    if (isAvailable(out)) pull(currentUpstream)
+                  }
+                } else completeStage()
               } else completeStage()
-            } else completeStage()
+            }
           }
-        })
+        )
       }
 
       setHandler(out, new OutHandler {
@@ -436,25 +448,28 @@ final class Broadcast[T](private val outputPorts: Int, eagerCancel: Boolean)
       private val pending = Array.fill[Boolean](outputPorts)(true)
       private var downstreamsRunning = outputPorts
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          pendingCount = downstreamsRunning
-          val elem = grab(in)
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            pendingCount = downstreamsRunning
+            val elem = grab(in)
 
-          var idx = 0
-          val itr = out.iterator
+            var idx = 0
+            val itr = out.iterator
 
-          while (itr.hasNext) {
-            val o = itr.next()
-            val i = idx
-            if (!isClosed(o)) {
-              push(o, elem)
-              pending(i) = true
+            while (itr.hasNext) {
+              val o = itr.next()
+              val i = idx
+              if (!isClosed(o)) {
+                push(o, elem)
+                pending(i) = true
+              }
+              idx += 1
             }
-            idx += 1
           }
         }
-      })
+      )
 
       private def tryPull(): Unit =
         if (pendingCount == 0 && !hasBeenPulled(in)) pull(in)
@@ -465,26 +480,29 @@ final class Broadcast[T](private val outputPorts: Int, eagerCancel: Boolean)
         while (itr.hasNext) {
           val out = itr.next()
           val i = idx
-          setHandler(out, new OutHandler {
-            override def onPull(): Unit = {
-              pending(i) = false
-              pendingCount -= 1
-              tryPull()
-            }
+          setHandler(
+            out,
+            new OutHandler {
+              override def onPull(): Unit = {
+                pending(i) = false
+                pendingCount -= 1
+                tryPull()
+              }
 
-            override def onDownstreamFinish() = {
-              if (eagerCancel) completeStage()
-              else {
-                downstreamsRunning -= 1
-                if (downstreamsRunning == 0) completeStage()
-                else if (pending(i)) {
-                  pending(i) = false
-                  pendingCount -= 1
-                  tryPull()
+              override def onDownstreamFinish() = {
+                if (eagerCancel) completeStage()
+                else {
+                  downstreamsRunning -= 1
+                  if (downstreamsRunning == 0) completeStage()
+                  else if (pending(i)) {
+                    pending(i) = false
+                    pendingCount -= 1
+                    tryPull()
+                  }
                 }
               }
             }
-          })
+          )
           idx += 1
         }
       }
@@ -537,60 +555,66 @@ final class Partition[T](outputPorts: Int, partitioner: T ⇒ Int)
       private var outPendingIdx: Int = _
       private var downstreamRunning = outputPorts
 
-      setHandler(in, new InHandler {
-        override def onPush() = {
-          val elem = grab(in)
-          val idx = partitioner(elem)
-          if (idx < 0 || idx >= outputPorts)
-            failStage(PartitionOutOfBoundsException(
-              s"partitioner must return an index in the range [0,${outputPorts -
-                1}]. returned: [$idx] for input [${elem.getClass.getName}]."))
-          else if (!isClosed(out(idx))) {
-            if (isAvailable(out(idx))) {
-              push(out(idx), elem)
-              if (out.exists(isAvailable(_))) pull(in)
-            } else {
-              outPendingElem = elem
-              outPendingIdx = idx
-            }
-          } else if (out.exists(isAvailable(_))) pull(in)
-        }
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush() = {
+            val elem = grab(in)
+            val idx = partitioner(elem)
+            if (idx < 0 || idx >= outputPorts)
+              failStage(PartitionOutOfBoundsException(
+                s"partitioner must return an index in the range [0,${outputPorts -
+                  1}]. returned: [$idx] for input [${elem.getClass.getName}]."))
+            else if (!isClosed(out(idx))) {
+              if (isAvailable(out(idx))) {
+                push(out(idx), elem)
+                if (out.exists(isAvailable(_))) pull(in)
+              } else {
+                outPendingElem = elem
+                outPendingIdx = idx
+              }
+            } else if (out.exists(isAvailable(_))) pull(in)
+          }
 
-        override def onUpstreamFinish(): Unit = {
-          if (outPendingElem == null) completeStage()
+          override def onUpstreamFinish(): Unit = {
+            if (outPendingElem == null) completeStage()
+          }
         }
-      })
+      )
 
       out.zipWithIndex.foreach {
         case (o, idx) ⇒
-          setHandler(o, new OutHandler {
-            override def onPull() = {
+          setHandler(
+            o,
+            new OutHandler {
+              override def onPull() = {
 
-              if (outPendingElem != null) {
-                val elem = outPendingElem.asInstanceOf[T]
-                if (idx == outPendingIdx) {
-                  push(o, elem)
-                  outPendingElem = null
-                  if (!isClosed(in)) {
-                    if (!hasBeenPulled(in)) {
-                      pull(in)
-                    }
-                  } else completeStage()
-                }
-              } else if (!hasBeenPulled(in)) pull(in)
-            }
+                if (outPendingElem != null) {
+                  val elem = outPendingElem.asInstanceOf[T]
+                  if (idx == outPendingIdx) {
+                    push(o, elem)
+                    outPendingElem = null
+                    if (!isClosed(in)) {
+                      if (!hasBeenPulled(in)) {
+                        pull(in)
+                      }
+                    } else completeStage()
+                  }
+                } else if (!hasBeenPulled(in)) pull(in)
+              }
 
-            override def onDownstreamFinish(): Unit = {
-              downstreamRunning -= 1
-              if (downstreamRunning == 0) completeStage()
-              else if (outPendingElem != null) {
-                if (idx == outPendingIdx) {
-                  outPendingElem = null
-                  if (!hasBeenPulled(in)) pull(in)
+              override def onDownstreamFinish(): Unit = {
+                downstreamRunning -= 1
+                if (downstreamRunning == 0) completeStage()
+                else if (outPendingElem != null) {
+                  if (idx == outPendingIdx) {
+                    outPendingElem = null
+                    if (!hasBeenPulled(in)) pull(in)
+                  }
                 }
               }
             }
-          })
+          )
       }
     }
 
@@ -658,36 +682,39 @@ final class Balance[T](val outputPorts: Int, waitForAllDownstreams: Boolean)
       })
 
       out.foreach { o ⇒
-        setHandler(o, new OutHandler {
-          private var hasPulled = false
+        setHandler(
+          o,
+          new OutHandler {
+            private var hasPulled = false
 
-          override def onPull(): Unit = {
-            if (!hasPulled) {
-              hasPulled = true
-              if (needDownstreamPulls > 0) needDownstreamPulls -= 1
-            }
-
-            if (needDownstreamPulls == 0) {
-              if (isAvailable(in)) {
-                if (noPending) {
-                  push(o, grab(in))
-                }
-              } else {
-                if (!hasBeenPulled(in)) pull(in)
-                pendingQueue.enqueue(o)
+            override def onPull(): Unit = {
+              if (!hasPulled) {
+                hasPulled = true
+                if (needDownstreamPulls > 0) needDownstreamPulls -= 1
               }
-            } else pendingQueue.enqueue(o)
-          }
 
-          override def onDownstreamFinish() = {
-            downstreamsRunning -= 1
-            if (downstreamsRunning == 0) completeStage()
-            else if (!hasPulled && needDownstreamPulls > 0) {
-              needDownstreamPulls -= 1
-              if (needDownstreamPulls == 0 && !hasBeenPulled(in)) pull(in)
+              if (needDownstreamPulls == 0) {
+                if (isAvailable(in)) {
+                  if (noPending) {
+                    push(o, grab(in))
+                  }
+                } else {
+                  if (!hasBeenPulled(in)) pull(in)
+                  pendingQueue.enqueue(o)
+                }
+              } else pendingQueue.enqueue(o)
+            }
+
+            override def onDownstreamFinish() = {
+              downstreamsRunning -= 1
+              if (downstreamsRunning == 0) completeStage()
+              else if (!hasPulled && needDownstreamPulls > 0) {
+                needDownstreamPulls -= 1
+                if (needDownstreamPulls == 0 && !hasBeenPulled(in)) pull(in)
+              }
             }
           }
-        })
+        )
       }
     }
 
@@ -817,22 +844,25 @@ final class Concat[T](inputPorts: Int)
         while (itr.hasNext) {
           val i = itr.next()
           val idx = idxx
-          setHandler(i, new InHandler {
-            override def onPush() = {
-              push(out, grab(i))
-            }
+          setHandler(
+            i,
+            new InHandler {
+              override def onPush() = {
+                push(out, grab(i))
+              }
 
-            override def onUpstreamFinish() = {
-              if (idx == activeStream) {
-                activeStream += 1
-                // Skip closed inputs
-                while (activeStream < inputPorts &&
-                       isClosed(in(activeStream))) activeStream += 1
-                if (activeStream == inputPorts) completeStage()
-                else if (isAvailable(out)) pull(in(activeStream))
+              override def onUpstreamFinish() = {
+                if (idx == activeStream) {
+                  activeStream += 1
+                  // Skip closed inputs
+                  while (activeStream < inputPorts &&
+                         isClosed(in(activeStream))) activeStream += 1
+                  if (activeStream == inputPorts) completeStage()
+                  else if (isAvailable(out)) pull(in(activeStream))
+                }
               }
             }
-          })
+          )
           idxx += 1
         }
       }

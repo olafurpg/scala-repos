@@ -156,13 +156,15 @@ abstract class ClusterShardingGracefulShutdownSpec(
     val allocationStrategy = new ShardCoordinator.LeastShardAllocationStrategy(
       rebalanceThreshold = 2,
       maxSimultaneousRebalance = 1)
-    ClusterSharding(system).start(typeName = "Entity",
-                                  entityProps = Props[Entity],
-                                  settings = ClusterShardingSettings(system),
-                                  extractEntityId = extractEntityId,
-                                  extractShardId = extractShardId,
-                                  allocationStrategy,
-                                  handOffStopMessage = StopEntity)
+    ClusterSharding(system).start(
+      typeName = "Entity",
+      entityProps = Props[Entity],
+      settings = ClusterShardingSettings(system),
+      extractEntityId = extractEntityId,
+      extractShardId = extractShardId,
+      allocationStrategy,
+      handOffStopMessage = StopEntity
+    )
   }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")
@@ -192,11 +194,13 @@ abstract class ClusterShardingGracefulShutdownSpec(
 
       awaitAssert {
         val p = TestProbe()
-        val regionAddresses = (1 to 100).map { n ⇒
-          region.tell(n, p.ref)
-          p.expectMsg(1.second, n)
-          p.lastSender.path.address
-        }.toSet
+        val regionAddresses = (1 to 100)
+          .map { n ⇒
+            region.tell(n, p.ref)
+            p.expectMsg(1.second, n)
+            p.lastSender.path.address
+          }
+          .toSet
         regionAddresses.size should be(2)
       }
       enterBarrier("after-2")
@@ -234,14 +238,15 @@ abstract class ClusterShardingGracefulShutdownSpec(
             rebalanceThreshold = 2,
             maxSimultaneousRebalance = 1)
         val regionEmpty =
-          ClusterSharding(system).start(typeName = "EntityEmpty",
-                                        entityProps = Props[Entity],
-                                        settings =
-                                          ClusterShardingSettings(system),
-                                        extractEntityId = extractEntityId,
-                                        extractShardId = extractShardId,
-                                        allocationStrategy,
-                                        handOffStopMessage = StopEntity)
+          ClusterSharding(system).start(
+            typeName = "EntityEmpty",
+            entityProps = Props[Entity],
+            settings = ClusterShardingSettings(system),
+            extractEntityId = extractEntityId,
+            extractShardId = extractShardId,
+            allocationStrategy,
+            handOffStopMessage = StopEntity
+          )
 
         watch(regionEmpty)
         regionEmpty ! GracefulShutdown

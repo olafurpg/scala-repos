@@ -320,7 +320,8 @@ trait ActorPublisher[T] extends Actor {
             if (subscriber == sub)
               ReactiveStreamsCompliance.canNotSubscribeTheSameSubscriberMultipleTimesException
             else
-              ReactiveStreamsCompliance.canNotSubscribeTheSameSubscriberMultipleTimesException)
+              ReactiveStreamsCompliance.canNotSubscribeTheSameSubscriberMultipleTimesException
+          )
       }
 
     case Cancel ⇒

@@ -73,24 +73,26 @@ trait NIHDBSnapshot {
 
   def getBlockAfter(id0: Option[Long],
                     cols: Option[Set[ColumnRef]]): Option[Block] =
-    findReaderAfter(id0).map { reader =>
-      val snapshot = reader.snapshotRef(cols)
-      if (logger.isTraceEnabled) {
-        logger.trace(
-          "Block after %s, %s (%s)\nSnapshot on %s:\n  %s".format(
-            id0,
-            reader,
-            reader.hashCode,
-            cols,
-            snapshot.segments.map(_.toString).mkString("\n  ")))
+    findReaderAfter(id0)
+      .map { reader =>
+        val snapshot = reader.snapshotRef(cols)
+        if (logger.isTraceEnabled) {
+          logger.trace(
+            "Block after %s, %s (%s)\nSnapshot on %s:\n  %s".format(
+              id0,
+              reader,
+              reader.hashCode,
+              cols,
+              snapshot.segments.map(_.toString).mkString("\n  ")))
+        }
+        snapshot
       }
-      snapshot
-    }.orElse {
-      if (logger.isTraceEnabled) {
-        logger.trace("No block after " + id0)
+      .orElse {
+        if (logger.isTraceEnabled) {
+          logger.trace("No block after " + id0)
+        }
+        None
       }
-      None
-    }
 
   def structure: Set[ColumnRef] =
     readers.flatMap(_.structure)(collection.breakOut)

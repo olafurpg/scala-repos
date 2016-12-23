@@ -519,7 +519,8 @@ protected[kestrel] class ConnectedClient(
       },
       open,
       (Unit) => closeAndOpen,
-      (Unit) => abort)
+      (Unit) => abort
+    )
   }
 }
 
@@ -639,5 +640,6 @@ protected[kestrel] class ThriftConnectedClient(
       },
       openRead(queueName),
       confirmAndOpenRead(queueName),
-      abortReadCommand(queueName))
+      abortReadCommand(queueName)
+    )
 }

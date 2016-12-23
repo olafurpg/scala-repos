@@ -35,25 +35,27 @@ object MFunctionColumn {
         case _: AbstractMethodError => null
       }
     } { r =>
-      MFunctionColumn(MQName.from(r),
-                      r.<<,
-                      r.<<,
-                      r.<<,
-                      r.<<,
-                      r.<<,
-                      r.<<,
-                      r.<<,
-                      r.<<,
-                      r.nextShort match {
-                        case DatabaseMetaData.functionNoNulls => Some(false)
-                        case DatabaseMetaData.functionNullable => Some(true)
-                        case _ => None
-                      },
-                      r.<<,
-                      r.<<,
-                      r.<<,
-                      DatabaseMeta.yesNoOpt(r),
-                      r.<<)
+      MFunctionColumn(
+        MQName.from(r),
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.nextShort match {
+          case DatabaseMetaData.functionNoNulls => Some(false)
+          case DatabaseMetaData.functionNullable => Some(true)
+          case _ => None
+        },
+        r.<<,
+        r.<<,
+        r.<<,
+        DatabaseMeta.yesNoOpt(r),
+        r.<<
+      )
     }
   }
 }

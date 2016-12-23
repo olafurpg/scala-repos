@@ -25,9 +25,11 @@ object LookupJoinedTest {
   // Not defined if there is a collision in K and T, so make those unique:
   def genList(maxTime: Int, maxKey: Int, sz: Int): List[(Int, Int, Int)] = {
     val rng = new java.util.Random
-    (0 until sz).view.map { _ =>
-      (rng.nextInt(maxTime), rng.nextInt(maxKey), rng.nextInt)
-    }.groupBy { case (t, k, v) => (t, k) }
+    (0 until sz).view
+      .map { _ =>
+        (rng.nextInt(maxTime), rng.nextInt(maxKey), rng.nextInt)
+      }
+      .groupBy { case (t, k, v) => (t, k) }
       .mapValues(_.headOption.toList)
       .values
       .flatten
@@ -43,10 +45,12 @@ class LookupJoinerJob(args: Args) extends Job(args) {
   val in1 = TypedTsv[(Int, Int, Int)]("input1")
 
   LookupJoin(TypedPipe.from(in0).map { case (t, k, v) => (t, (k, v)) },
-             TypedPipe.from(in1).map { case (t, k, v) => (t, (k, v)) }).map {
-    case (t, (k, (v, opt))) =>
-      (t.toString, k.toString, v.toString, opt.toString)
-  }.write(TypedTsv[(String, String, String, String)]("output"))
+             TypedPipe.from(in1).map { case (t, k, v) => (t, (k, v)) })
+    .map {
+      case (t, (k, (v, opt))) =>
+        (t.toString, k.toString, v.toString, opt.toString)
+    }
+    .write(TypedTsv[(String, String, String, String)]("output"))
 
   LookupJoin
     .rightSumming(TypedPipe.from(in0).map { case (t, k, v) => (t, (k, v)) },
@@ -71,7 +75,8 @@ class LookupJoinedTest extends WordSpec with Matchers {
         tkw._1
       }
       serv.get(k).flatMap { in1s =>
-        in1s.filter { case (t1, _, _) => Ordering[T].lt(t1, t) }
+        in1s
+          .filter { case (t1, _, _) => Ordering[T].lt(t1, t) }
           .reduceOption(ord.max(_, _))
           .map {
             _._3
@@ -95,10 +100,12 @@ class LookupJoinedTest extends WordSpec with Matchers {
       .mapValues {
         _.toList.sorted
           .scanLeft(None: Option[(T, K, W)]) { (old, newer) =>
-            old.map {
-              case (_, _, w) =>
-                (newer._1, newer._2, Semigroup.plus(w, newer._3))
-            }.orElse(Some(newer))
+            old
+              .map {
+                case (_, _, w) =>
+                  (newer._1, newer._2, Semigroup.plus(w, newer._3))
+              }
+              .orElse(Some(newer))
           }
           .filter {
             _.isDefined
@@ -114,7 +121,8 @@ class LookupJoinedTest extends WordSpec with Matchers {
         tkw._1
       }
       serv.get(k).flatMap { in1s =>
-        in1s.filter { case (t1, _, _) => Ordering[T].lt(t1, t) }
+        in1s
+          .filter { case (t1, _, _) => Ordering[T].lt(t1, t) }
           .reduceOption(ord.max(_, _))
           .map {
             _._3
@@ -190,12 +198,15 @@ class WindowLookupJoinedTest extends WordSpec with Matchers {
         tkw._1
       }
       serv.get(k).flatMap { in1s =>
-        in1s.filter {
-          case (t1, _, _) =>
-            (t1 < t) && ((t.toLong - t1.toLong) < win)
-        }.reduceOption(ord.max(_, _)).map {
-          _._3
-        }
+        in1s
+          .filter {
+            case (t1, _, _) =>
+              (t1 < t) && ((t.toLong - t1.toLong) < win)
+          }
+          .reduceOption(ord.max(_, _))
+          .map {
+            _._3
+          }
       }
     }
     in0.map {

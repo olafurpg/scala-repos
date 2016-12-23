@@ -45,16 +45,18 @@ object JdbcCapabilities {
   val other = Capability("jdbc.other")
 
   /** All JDBC capabilities */
-  val all = Set(other,
-                createModel,
-                forceInsert,
-                insertOrUpdate,
-                mutable,
-                returnInsertKey,
-                defaultValueMetaData,
-                booleanMetaData,
-                nullableNoDefault,
-                distinguishesIntTypes,
-                supportsByte,
-                returnInsertOther)
+  val all = Set(
+    other,
+    createModel,
+    forceInsert,
+    insertOrUpdate,
+    mutable,
+    returnInsertKey,
+    defaultValueMetaData,
+    booleanMetaData,
+    nullableNoDefault,
+    distinguishesIntTypes,
+    supportsByte,
+    returnInsertOther
+  )
 }

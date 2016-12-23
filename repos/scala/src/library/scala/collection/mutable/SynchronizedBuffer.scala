@@ -25,7 +25,8 @@ import script._
   */
 @deprecated(
   "Synchronization via traits is deprecated as it is inherently unreliable.  Consider java.util.concurrent.ConcurrentLinkedQueue as an alternative.",
-  "2.11.0")
+  "2.11.0"
+)
 trait SynchronizedBuffer[A] extends Buffer[A] {
 
   import scala.collection.Traversable

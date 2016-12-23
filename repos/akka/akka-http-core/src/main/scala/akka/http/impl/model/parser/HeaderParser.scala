@@ -179,7 +179,8 @@ private[http] object HeaderParser {
       "user-agent",
       "www-authenticate",
       "x-forwarded-for",
-      "x-real-ip")
+      "x-real-ip"
+    )
 
   abstract class Settings {
     def uriParsingMode: Uri.ParsingMode

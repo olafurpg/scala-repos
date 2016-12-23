@@ -210,13 +210,15 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
         EventFilter.warning(source = "akka://AkkaProtocolStressTest/user/$a",
                             start = "received dead letter"),
         EventFilter.warning(
-          pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+          pattern = "received dead letter.*(InboundPayload|Disassociate)")
+      ))
     systemB.eventStream.publish(
       TestEvent.Mute(
         EventFilter[EndpointException](),
         EventFilter.error(start = "AssociationError"),
         EventFilter.warning(
-          pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+          pattern = "received dead letter.*(InboundPayload|Disassociate)")
+      ))
   }
 
   override def afterTermination(): Unit = shutdown(systemB)

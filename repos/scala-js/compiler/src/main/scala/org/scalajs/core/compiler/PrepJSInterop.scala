@@ -259,15 +259,18 @@ abstract class PrepJSInterop
             tree.pos,
             """Couldn't transform call to Enumeration.Value.
               |The resulting program is unlikely to function properly as this
-              |operation requires reflection.""".stripMargin)
+              |operation requires reflection.""".stripMargin
+          )
           super.transform(tree)
 
         case ScalaEnumValue.NullName()
             if noEnclosingOwner is OwnerKind.EnumImpl =>
-          reporter.warning(tree.pos,
-                           """Passing null as name to Enumeration.Value
+          reporter.warning(
+            tree.pos,
+            """Passing null as name to Enumeration.Value
               |requires reflection at runtime. The resulting
-              |program is unlikely to function properly.""".stripMargin)
+              |program is unlikely to function properly.""".stripMargin
+          )
           super.transform(tree)
 
         case ScalaEnumVal.NoName(_)
@@ -276,7 +279,8 @@ abstract class PrepJSInterop
             tree.pos,
             """Calls to the non-string constructors of Enumeration.Val
               |require reflection at runtime. The resulting
-              |program is unlikely to function properly.""".stripMargin)
+              |program is unlikely to function properly.""".stripMargin
+          )
           super.transform(tree)
 
         case ScalaEnumVal.NullName()
@@ -285,7 +289,8 @@ abstract class PrepJSInterop
             tree.pos,
             """Passing null as name to a constructor of Enumeration.Val
               |requires reflection at runtime. The resulting
-              |program is unlikely to function properly.""".stripMargin)
+              |program is unlikely to function properly.""".stripMargin
+          )
           super.transform(tree)
 
         // Rewrite js.constructorOf[T] into runtime.constructorOf(classOf[T])
@@ -342,7 +347,8 @@ abstract class PrepJSInterop
               """This classOf resulted in an unresolved classOf in the jscode
                 |phase. This is most likely a bug in the Scala compiler. ScalaJS
                 |is probably able to work around this bug. Enable the workaround
-                |by passing the fixClassOf option to the plugin.""".stripMargin)
+                |by passing the fixClassOf option to the plugin.""".stripMargin
+            )
             EmptyTree
           }
 
@@ -490,7 +496,8 @@ abstract class PrepJSInterop
           "Classes, traits and objects inheriting from js.Any should be " +
             "annotated with @js.native, unless they have @ScalaJSDefined. " +
             "The default will switch to Scala.js-defined in the next major " +
-            "version of Scala.js.")
+            "version of Scala.js."
+        )
       } else if (!isJSNative && sym.hasAnnotation(JSNativeAnnotation)) {
         reporter.error(
           implDef.pos,
@@ -712,7 +719,8 @@ abstract class PrepJSInterop
             sym.pos,
             s"A member named apply represents function " +
               "application in JavaScript. A parameterless member should be " +
-              "exported as a property. You must add @JSName(\"apply\")")
+              "exported as a property. You must add @JSName(\"apply\")"
+          )
         } else if (enclosingOwner is OwnerKind.JSNonNative) {
           reporter.error(
             sym.pos,

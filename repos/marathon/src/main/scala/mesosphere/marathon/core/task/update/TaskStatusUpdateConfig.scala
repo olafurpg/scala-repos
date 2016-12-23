@@ -11,7 +11,8 @@ trait TaskStatusUpdateConfig extends ScallopConf {
       "INTERNAL TUNING PARAMETER: The maximum number of status updates that get processed in parallel.",
     noshort = true,
     hidden = true,
-    default = Some(20))
+    default = Some(20)
+  )
 
   lazy val internalMaxQueuedStatusUpdates = opt[Int](
     "max_queued_status_updates",
@@ -19,5 +20,6 @@ trait TaskStatusUpdateConfig extends ScallopConf {
         " Mesos will resent status updates which we do not acknowledge.",
     noshort = true,
     hidden = true,
-    default = Some(10000))
+    default = Some(10000)
+  )
 }

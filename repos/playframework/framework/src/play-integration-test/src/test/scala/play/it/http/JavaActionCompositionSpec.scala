@@ -103,9 +103,10 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       Map(
         "play.http.actionComposition.controllerAnnotationsFirst" -> "false",
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "true",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("actioncreatoractioncontroller")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator"
+      )
+    ) { response =>
+      response.body must beEqualTo("actioncreatoractioncontroller")
     }
 
     "execute request handler action first and controller composition before action composition" in makeRequest(
@@ -116,9 +117,10 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       Map(
         "play.http.actionComposition.controllerAnnotationsFirst" -> "true",
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "true",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("actioncreatorcontrolleraction")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator"
+      )
+    ) { response =>
+      response.body must beEqualTo("actioncreatorcontrolleraction")
     }
 
     "execute request handler action first with only controller composition" in makeRequest(
@@ -127,9 +129,9 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       },
       Map(
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "true",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("actioncreatorcontroller")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")
+    ) { response =>
+      response.body must beEqualTo("actioncreatorcontroller")
     }
 
     "execute request handler action first with only action composition" in makeRequest(
@@ -139,9 +141,9 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       },
       Map(
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "true",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("actioncreatoraction")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")
+    ) { response =>
+      response.body must beEqualTo("actioncreatoraction")
     }
   }
 
@@ -154,9 +156,10 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       Map(
         "play.http.actionComposition.controllerAnnotationsFirst" -> "false",
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "false",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("actioncontrolleractioncreator")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator"
+      )
+    ) { response =>
+      response.body must beEqualTo("actioncontrolleractioncreator")
     }
 
     "execute request handler action last and controller composition before action composition" in makeRequest(
@@ -167,9 +170,10 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       Map(
         "play.http.actionComposition.controllerAnnotationsFirst" -> "true",
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "false",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("controlleractionactioncreator")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator"
+      )
+    ) { response =>
+      response.body must beEqualTo("controlleractionactioncreator")
     }
 
     "execute request handler action last with only controller composition" in makeRequest(
@@ -178,9 +182,9 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       },
       Map(
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "false",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("controlleractioncreator")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")
+    ) { response =>
+      response.body must beEqualTo("controlleractioncreator")
     }
 
     "execute request handler action last with only action composition" in makeRequest(
@@ -190,9 +194,9 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       },
       Map(
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "false",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("actionactioncreator")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")
+    ) { response =>
+      response.body must beEqualTo("actionactioncreator")
     }
 
     "execute request handler action last is the default and controller composition before action composition" in makeRequest(
@@ -200,11 +204,10 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
         @ActionAnnotation
         override def action: Result = Results.ok()
       },
-      Map(
-        "play.http.actionComposition.controllerAnnotationsFirst" -> "true",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("controlleractionactioncreator")
+      Map("play.http.actionComposition.controllerAnnotationsFirst" -> "true",
+          "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")
+    ) { response =>
+      response.body must beEqualTo("controlleractionactioncreator")
     }
 
     "execute request handler action last is the default and action composition before controller composition" in makeRequest(
@@ -212,11 +215,10 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
         @ActionAnnotation
         override def action: Result = Results.ok()
       },
-      Map(
-        "play.http.actionComposition.controllerAnnotationsFirst" -> "false",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("actioncontrolleractioncreator")
+      Map("play.http.actionComposition.controllerAnnotationsFirst" -> "false",
+          "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")
+    ) { response =>
+      response.body must beEqualTo("actioncontrolleractioncreator")
     }
   }
 
@@ -227,9 +229,9 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       },
       Map(
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "false",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("actioncreator")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")
+    ) { response =>
+      response.body must beEqualTo("actioncreator")
     }
 
     "execute request handler action first without action composition" in makeRequest(
@@ -238,9 +240,9 @@ object JavaActionCompositionSpec extends PlaySpecification with WsTestClient {
       },
       Map(
         "play.http.actionComposition.executeActionCreatorActionFirst" -> "true",
-        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")) {
-      response =>
-        response.body must beEqualTo("actioncreator")
+        "play.http.actionCreator" -> "play.it.http.ActionCompositionActionCreator")
+    ) { response =>
+      response.body must beEqualTo("actioncreator")
     }
   }
 }

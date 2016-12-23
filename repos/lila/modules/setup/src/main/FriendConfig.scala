@@ -50,7 +50,8 @@ object FriendConfig extends BaseHumanConfig {
       days = d,
       mode = m.fold(Mode.default)(Mode.orDefault),
       color = Color(c) err "Invalid color " + c,
-      fen = fen)
+      fen = fen
+    )
 
   val default = FriendConfig(variant = variantDefault,
                              timeMode = TimeMode.Unlimited,
@@ -67,14 +68,16 @@ object FriendConfig extends BaseHumanConfig {
     new BSON[FriendConfig] {
 
       def reads(r: BSON.Reader): FriendConfig =
-        FriendConfig(variant = chess.variant.Variant orDefault (r int "v"),
-                     timeMode = TimeMode orDefault (r int "tm"),
-                     time = r double "t",
-                     increment = r int "i",
-                     days = r int "d",
-                     mode = Mode orDefault (r int "m"),
-                     color = Color.White,
-                     fen = r strO "f" filter (_.nonEmpty))
+        FriendConfig(
+          variant = chess.variant.Variant orDefault (r int "v"),
+          timeMode = TimeMode orDefault (r int "tm"),
+          time = r double "t",
+          increment = r int "i",
+          days = r int "d",
+          mode = Mode orDefault (r int "m"),
+          color = Color.White,
+          fen = r strO "f" filter (_.nonEmpty)
+        )
 
       def writes(w: BSON.Writer, o: FriendConfig) =
         BSONDocument("v" -> o.variant.id,

@@ -137,7 +137,8 @@ class ReflectionTest {
 
     assertEquals(
       "org.scalajs.testsuite.compiler.ReflectionTest$ParentClassWhoseDataIsNotAccessedDirectly",
-      classOf[ChildClassWhoseDataIsAccessedDirectly].getSuperclass.getName)
+      classOf[ChildClassWhoseDataIsAccessedDirectly].getSuperclass.getName
+    )
   }
 
   @Test def cast_positive(): Unit = {

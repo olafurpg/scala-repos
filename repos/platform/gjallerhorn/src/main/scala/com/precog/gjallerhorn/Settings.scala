@@ -109,13 +109,15 @@ object Settings {
 
     val lines = io.Source.fromFile(f).getLines
 
-    val defaults = PartialSettings(host = Some("localhost"),
-                                   accountsPath = Some("accounts"),
-                                   authPath = Some("apikeys"),
-                                   ingestPath = Some("ingest"),
-                                   shardPath = Some("meta"),
-                                   jobsPath = Some("jobs/v1"),
-                                   secure = Some(false))
+    val defaults = PartialSettings(
+      host = Some("localhost"),
+      accountsPath = Some("accounts"),
+      authPath = Some("apikeys"),
+      ingestPath = Some("ingest"),
+      shardPath = Some("meta"),
+      jobsPath = Some("jobs/v1"),
+      secure = Some(false)
+    )
 
     val ps = lines.foldLeft(defaults) { (ps, s) =>
       val ps2 = s match {

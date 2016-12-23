@@ -92,11 +92,13 @@ class CoordinateMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("toRowMatrix") {
     val rowMatrix = mat.toRowMatrix()
     val rows = rowMatrix.rows.collect().toSet
-    val expected = Set(Vectors.dense(1.0, 2.0, 0.0, 0.0),
-                       Vectors.dense(0.0, 3.0, 4.0, 0.0),
-                       Vectors.dense(0.0, 0.0, 5.0, 6.0),
-                       Vectors.dense(7.0, 0.0, 0.0, 8.0),
-                       Vectors.dense(0.0, 9.0, 0.0, 0.0))
+    val expected = Set(
+      Vectors.dense(1.0, 2.0, 0.0, 0.0),
+      Vectors.dense(0.0, 3.0, 4.0, 0.0),
+      Vectors.dense(0.0, 0.0, 5.0, 6.0),
+      Vectors.dense(7.0, 0.0, 0.0, 8.0),
+      Vectors.dense(0.0, 9.0, 0.0, 0.0)
+    )
     assert(rows === expected)
   }
 

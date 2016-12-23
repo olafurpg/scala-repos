@@ -166,7 +166,8 @@ class PersistentActorFailureSpec
         extraConfig = Some(
           """
   akka.persistence.journal.inmem.class = "akka.persistence.PersistentActorFailureSpec$FailingInmemJournal"
-  """)))
+  """)
+      ))
     with ImplicitSender {
 
   import PersistentActorFailureSpec._

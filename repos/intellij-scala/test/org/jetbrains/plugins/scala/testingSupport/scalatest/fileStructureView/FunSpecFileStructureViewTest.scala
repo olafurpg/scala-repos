@@ -11,8 +11,9 @@ trait FunSpecFileStructureViewTest extends ScalaTestTestCase {
   private val className = "FunSpecViewTest"
 
   def addFunSpecViewTest(): Unit = {
-    addFileToProject(className + ".scala",
-                     """
+    addFileToProject(
+      className + ".scala",
+      """
         |import org.scalatest._
         |
         |class FunSpecTest extends FunSpec {
@@ -27,7 +28,8 @@ trait FunSpecFileStructureViewTest extends ScalaTestTestCase {
         |  describe("pending") (pending)
         |  ignore("pending_and_ignore") (pending)
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testFunSpecNormal() {

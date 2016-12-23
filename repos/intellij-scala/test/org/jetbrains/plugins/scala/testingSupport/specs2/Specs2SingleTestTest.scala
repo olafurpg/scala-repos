@@ -10,8 +10,9 @@ abstract class Specs2SingleTestTest extends Specs2TestCase {
   protected val specsTestClassName = "SpecificationTest"
 
   def testSpecification() {
-    addFileToProject(specsTestFileName,
-                     """
+    addFileToProject(
+      specsTestFileName,
+      """
         |import org.specs2.mutable.Specification
         |
         |class SpecificationTest extends Specification {
@@ -31,7 +32,8 @@ abstract class Specs2SingleTestTest extends Specs2TestCase {
         |    }
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
 
     runTestByLocation(
       5,
@@ -48,7 +50,8 @@ abstract class Specs2SingleTestTest extends Specs2TestCase {
                                           "ignore other test",
                                           "run greater test",
                                           "run exclamation test"),
-      debug = true)
+      debug = true
+    )
 
     runTestByLocation(
       10,
@@ -64,7 +67,8 @@ abstract class Specs2SingleTestTest extends Specs2TestCase {
           checkResultTreeDoesNotHaveNodes(root,
                                           "ignore other test",
                                           "run single test",
-                                          "run greater test"))
+                                          "run greater test")
+    )
 
     runTestByLocation(
       12,
@@ -80,6 +84,7 @@ abstract class Specs2SingleTestTest extends Specs2TestCase {
           checkResultTreeDoesNotHaveNodes(root,
                                           "ignore other test",
                                           "run single test",
-                                          "run exclamation test"))
+                                          "run exclamation test")
+    )
   }
 }

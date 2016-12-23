@@ -198,11 +198,11 @@ class ActorContextSpec
       */
     def behavior(ctx: ActorContext[Event]): Behavior[Command]
 
-    def setup(name: String)(
-        proc: (ActorContext[Event],
-               StepWise.Steps[Event, ActorRef[Command]]) ⇒ StepWise.Steps[
-          Event,
-          _]): Future[TypedSpec.Status] =
+    def setup(
+        name: String)(proc: (ActorContext[Event], StepWise.Steps[
+                               Event,
+                               ActorRef[Command]]) ⇒ StepWise.Steps[Event, _])
+      : Future[TypedSpec.Status] =
       runTest(s"$suite-$name")(StepWise[Event] { (ctx, startWith) ⇒
         val steps = startWith
           .withKeepTraces(true)(ctx.spawn(Props(behavior(ctx)), "subject"))
@@ -226,26 +226,29 @@ class ActorContextSpec
                   self: ActorRef[Event],
                   inert: Boolean = false)
         : StepWise.Steps[Event, (ActorRef[Command], ActorRef[Command])] = {
-        val s = startWith.keep { subj ⇒
-          subj ! MkChild(name, monitor, self)
-        }.expectMultipleMessages(500.millis, 2) { (msgs, subj) ⇒
-          val child = msgs match {
-            case Created(child) :: ChildEvent(GotSignal(PreStart)) :: Nil ⇒
-              child
-            case ChildEvent(GotSignal(PreStart)) :: Created(child) :: Nil ⇒
-              child
+        val s = startWith
+          .keep { subj ⇒
+            subj ! MkChild(name, monitor, self)
           }
-          (subj, child)
-        }
+          .expectMultipleMessages(500.millis, 2) { (msgs, subj) ⇒
+            val child = msgs match {
+              case Created(child) :: ChildEvent(GotSignal(PreStart)) :: Nil ⇒
+                child
+              case ChildEvent(GotSignal(PreStart)) :: Created(child) :: Nil ⇒
+                child
+            }
+            (subj, child)
+          }
 
         if (!inert) s
         else
           s.keep {
-            case (subj, child) ⇒
-              child ! BecomeInert(self)
-          }.expectMessageKeep(500.millis) { (msg, _) ⇒
-            msg should ===(BecameInert)
-          }
+              case (subj, child) ⇒
+                child ! BecomeInert(self)
+            }
+            .expectMessageKeep(500.millis) { (msg, _) ⇒
+              msg should ===(BecameInert)
+            }
       }
     }
 
@@ -265,9 +268,11 @@ class ActorContextSpec
     def `00 must canonicalize behaviors`(): Unit =
       sync(setup("ctx00") { (ctx, startWith) ⇒
         val self = ctx.self
-        startWith.keep { subj ⇒
-          subj ! Ping(self)
-        }.expectMessageKeep(500.millis) { (msg, subj) ⇒
+        startWith
+          .keep { subj ⇒
+            subj ! Ping(self)
+          }
+          .expectMessageKeep(500.millis) { (msg, subj) ⇒
             msg should ===(Pong1)
             subj ! Miss(self)
           }
@@ -316,12 +321,14 @@ class ActorContextSpec
 
     def `02 must not signal PostStop after voluntary termination`(): Unit =
       sync(setup("ctx02") { (ctx, startWith) ⇒
-        startWith.keep { subj ⇒
-          ctx.watch(subj)
-          stop(subj)
-        }.expectTermination(500.millis) { (t, subj) ⇒
-          t.ref should ===(subj)
-        }
+        startWith
+          .keep { subj ⇒
+            ctx.watch(subj)
+            stop(subj)
+          }
+          .expectTermination(500.millis) { (t, subj) ⇒
+            t.ref should ===(subj)
+          }
       })
 
     def `03 must restart and stop a child actor`(): Unit =
@@ -620,9 +627,11 @@ class ActorContextSpec
 
     def `40 must create a working adapter`(): Unit =
       sync(setup("ctx40") { (ctx, startWith) ⇒
-        startWith.keep { subj ⇒
-          subj ! GetAdapter(ctx.self)
-        }.expectMessage(500.millis) { (msg, subj) ⇒
+        startWith
+          .keep { subj ⇒
+            subj ! GetAdapter(ctx.self)
+          }
+          .expectMessage(500.millis) { (msg, subj) ⇒
             val Adapter(adapter) = msg
             ctx.watch(adapter)
             adapter ! Ping(ctx.self)

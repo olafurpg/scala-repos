@@ -40,7 +40,8 @@ class SchemaSpec extends Specification {
         CPath(CPathField("foo")),
         CPath(CPathField("bar"), CPathIndex(0)),
         CPath(CPathField("bar"), CPathIndex(1), CPathField("baz"), CPathArray),
-        CPath(CPathField("bar"), CPathIndex(2))) sorted
+        CPath(CPathField("bar"), CPathIndex(2))
+      ) sorted
 
       result mustEqual expected
     }

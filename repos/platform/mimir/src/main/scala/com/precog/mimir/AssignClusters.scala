@@ -97,26 +97,32 @@ trait AssignClusterModule[M[+ _]]
               }
 
             { (i: Int) =>
-              val models0 = modelsByCluster.map {
-                case (modelId, clusters) =>
-                  val modelClusters0: Array[ModelCluster] = clusters.map {
-                    case (clusterId, colInfo) =>
-                      val featureValues = colInfo.collect {
-                        case (_, _, cpath, col) if col.isDefinedAt(i) =>
-                          cpath -> col(i)
-                      }.toMap
+              val models0 = modelsByCluster
+                .map {
+                  case (modelId, clusters) =>
+                    val modelClusters0: Array[ModelCluster] = clusters
+                      .map {
+                        case (clusterId, colInfo) =>
+                          val featureValues = colInfo
+                            .collect {
+                              case (_, _, cpath, col) if col.isDefinedAt(i) =>
+                                cpath -> col(i)
+                            }
+                            .toMap
 
-                      ModelCluster(clusterId, featureValues)
-                  }.toArray
+                          ModelCluster(clusterId, featureValues)
+                      }
+                      .toArray
 
-                  val modelClusters =
-                    modelClusters0 filter {
-                      case ModelCluster(_, featureValues) =>
-                        !featureValues.isEmpty
-                    }
+                    val modelClusters =
+                      modelClusters0 filter {
+                        case ModelCluster(_, featureValues) =>
+                          !featureValues.isEmpty
+                      }
 
-                  Model(modelId, modelClusters)
-              }.toSet
+                    Model(modelId, modelClusters)
+                }
+                .toSet
 
               models0 filter {
                 case Model(_, modelClusters) => !modelClusters.isEmpty
@@ -142,9 +148,11 @@ trait AssignClusterModule[M[+ _]]
                      cols: Map[ColumnRef, Column],
                      range: Range): (A, Map[ColumnRef, Column]) = {
               def included(model: Model): Map[ColumnRef, Column] = {
-                val featurePaths = (model.clusters).flatMap {
-                  _.featureValues.keys
-                }.toSet
+                val featurePaths = (model.clusters)
+                  .flatMap {
+                    _.featureValues.keys
+                  }
+                  .toSet
 
                 val res =
                   cols filter {
@@ -184,9 +192,12 @@ trait AssignClusterModule[M[+ _]]
                         model.clusters map { _.name }
                       val clusterCenters: Array[Array[Double]] =
                         (model.clusters).map {
-                          _.featureValues.toArray.sortBy {
-                            case (path, _) => path
-                          }.map { case (_, col) => col }.toArray
+                          _.featureValues.toArray
+                            .sortBy {
+                              case (path, _) => path
+                            }
+                            .map { case (_, col) => col }
+                            .toArray
                         }
 
                       val centerPaths: Array[CPath] =
@@ -196,9 +207,11 @@ trait AssignClusterModule[M[+ _]]
                         } getOrElse Array.empty[CPath]
 
                       val featureColumns0 =
-                        includedModel.collect {
-                          case (ref, col: DoubleColumn) => (ref, col)
-                        }.toArray sortBy {
+                        includedModel
+                          .collect {
+                            case (ref, col: DoubleColumn) => (ref, col)
+                          }
+                          .toArray sortBy {
                           case (ColumnRef(path, _), _) => path
                         }
                       val featureColumns =
@@ -281,13 +294,16 @@ trait AssignClusterModule[M[+ _]]
 
                       val pref = CPath(TableModule.paths.Value)
 
-                      val centers: Map[ColumnRef, Column] = zipped.collect {
-                        case (col, path) if path.hasPrefix(pref) =>
-                          val path0 = CPath(TableModule.paths.Value,
-                                            CPathField(model.name),
-                                            CPathField("clusterCenter"))
-                          ColumnRef(path0 \ path.dropPrefix(pref).get, CDouble) -> col
-                      }.toMap
+                      val centers: Map[ColumnRef, Column] = zipped
+                        .collect {
+                          case (col, path) if path.hasPrefix(pref) =>
+                            val path0 = CPath(TableModule.paths.Value,
+                                              CPathField(model.name),
+                                              CPathField("clusterCenter"))
+                            ColumnRef(path0 \ path.dropPrefix(pref).get,
+                                      CDouble) -> col
+                        }
+                        .toMap
 
                       val idPath = CPath(TableModule.paths.Value,
                                          CPathField(model.name),

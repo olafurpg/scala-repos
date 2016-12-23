@@ -1025,15 +1025,17 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
           // if class is not a trait add accessor definitions
           if (isConcreteAccessor(sym)) {
             // add accessor definitions
-            addDefDef(sym, {
-              if (sym.isSetter) {
-                // If this is a setter of a mixed-in field which is overridden by another mixin,
-                // the trait setter of the overridden one does not need to do anything - the
-                // trait setter of the overriding field will initialize the field.
-                if (isOverriddenSetter(sym)) UNIT
-                else setterBody(sym)
-              } else getterBody(sym)
-            })
+            addDefDef(
+              sym, {
+                if (sym.isSetter) {
+                  // If this is a setter of a mixed-in field which is overridden by another mixin,
+                  // the trait setter of the overridden one does not need to do anything - the
+                  // trait setter of the overriding field will initialize the field.
+                  if (isOverriddenSetter(sym)) UNIT
+                  else setterBody(sym)
+                } else getterBody(sym)
+              }
+            )
           } else if (sym.isModule && !(sym hasFlag LIFTED | BRIDGE)) {
             // Moved to Refchecks
           } else if (!sym.isMethod) {

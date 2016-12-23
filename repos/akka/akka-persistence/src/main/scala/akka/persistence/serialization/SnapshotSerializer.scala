@@ -181,35 +181,10 @@ object SnapshotSerializer {
    * This is the serialized form of Class[Option[_]] (as a superclass, hence
    * the leading 0x78) with Scala 2.10.
    */
-  val key: Array[Byte] = Array(0x78,
-                               0x72,
-                               0x00,
-                               0x0c,
-                               0x73,
-                               0x63,
-                               0x61,
-                               0x6c,
-                               0x61,
-                               0x2e,
-                               0x4f,
-                               0x70,
-                               0x74,
-                               0x69,
-                               0x6f,
-                               0x6e,
-                               0xe3,
-                               0x60,
-                               0x24,
-                               0xa8,
-                               0x32,
-                               0x8a,
-                               0x45,
-                               0xe9, // here is the UID
-                               0x02,
-                               0x00,
-                               0x00,
-                               0x78,
-                               0x70).map(_.toByte)
+  val key: Array[Byte] = Array(0x78, 0x72, 0x00, 0x0c, 0x73, 0x63, 0x61, 0x6c,
+    0x61, 0x2e, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0xe3, 0x60, 0x24, 0xa8,
+    0x32, 0x8a, 0x45, 0xe9, // here is the UID
+    0x02, 0x00, 0x00, 0x78, 0x70).map(_.toByte)
   // The offset of the serialVersionUID in the above.
   val offset = 16
   // This is the new serialVersionUID from Scala 2.11 onwards.

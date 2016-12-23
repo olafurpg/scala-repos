@@ -96,7 +96,8 @@ private[streaming] class ReceiverSupervisorImpl(
             bg.updateRate(eps)
           }
       }
-    })
+    }
+  )
 
   /** Unique block ids if one wants to add blocks directly */
   private val newBlockId = new AtomicLong(System.currentTimeMillis())

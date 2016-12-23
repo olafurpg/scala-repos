@@ -110,13 +110,12 @@ class DecoderTest extends FunSuite with MockitoSugar {
     decoder.decode(null, null, buffer)
     val lines = decoder.decode(null, null, buffer)
     assert(
-      lines == StatLines(
-        Seq(
-          Tokens(Seq("STAT", "items:1:number", "1") map { Buf.Utf8(_) }),
-          Tokens(Seq("STAT", "items:1:age", "1468") map { Buf.Utf8(_) }),
-          Tokens(Seq("ITEM", "foo", "[5", "b;", "1322514067", "s]") map {
-            Buf.Utf8(_)
-          })
-        )))
+      lines == StatLines(Seq(
+        Tokens(Seq("STAT", "items:1:number", "1") map { Buf.Utf8(_) }),
+        Tokens(Seq("STAT", "items:1:age", "1468") map { Buf.Utf8(_) }),
+        Tokens(Seq("ITEM", "foo", "[5", "b;", "1322514067", "s]") map {
+          Buf.Utf8(_)
+        })
+      )))
   }
 }

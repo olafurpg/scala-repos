@@ -108,8 +108,8 @@ private trait ProductFoldable[F[_], G[_]]
 
   implicit def G: Foldable[G]
 
-  override def foldRight[A, B](fa: (F[A], G[A]), z: => B)(f: (A,
-                                                              => B) => B): B =
+  override def foldRight[A, B](fa: (F[A], G[A]), z: => B)(
+      f: (A, => B) => B): B =
     F.foldRight(fa._1, G.foldRight(fa._2, z)(f))(f)
 
   override def foldMap[A, B](fa: (F[A], G[A]))(f: A => B)(

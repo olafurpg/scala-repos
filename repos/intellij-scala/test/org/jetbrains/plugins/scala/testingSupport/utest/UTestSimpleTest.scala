@@ -13,8 +13,9 @@ trait UTestSimpleTest extends UTestTestCase {
   protected def uTestFileName = uTestTestName + ".scala"
 
   protected def addUTestTest(): Unit = {
-    addFileToProject(uTestFileName,
-                     """
+    addFileToProject(
+      uTestFileName,
+      """
         |import utest._
         |import utest.framework.TestSuite
         |
@@ -45,7 +46,8 @@ trait UTestSimpleTest extends UTestTestCase {
         |    }
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   protected val inner2_1Path =
@@ -68,7 +70,8 @@ trait UTestSimpleTest extends UTestTestCase {
       checkConfigAndSettings(_, uTestTestName, "tests\\outer2\\inner2_1"),
       root =>
         checkResultTreeHasExactNamedPath(root, inner2_1Path) &&
-          checkResultTreeDoesNotHaveNodes(root, "outer1", "inner1_1"))
+          checkResultTreeDoesNotHaveNodes(root, "outer1", "inner1_1")
+    )
   }
 
   def testSameName(): Unit = {
@@ -94,7 +97,8 @@ trait UTestSimpleTest extends UTestTestCase {
       root =>
         checkResultTreeHasExactNamedPath(root, outer1_Path) &&
           checkResultTreeHasExactNamedPath(root, inner2_1Path) &&
-          checkResultTreeDoesNotHaveNodes(root, "inner1_1", "sameName"))
+          checkResultTreeDoesNotHaveNodes(root, "inner1_1", "sameName")
+    )
   }
 
   def testClassSuite(): Unit = {
@@ -110,7 +114,8 @@ trait UTestSimpleTest extends UTestTestCase {
           checkResultTreeHasExactNamedPath(root, sameNamePath) &&
           checkResultTreeHasExactNamedPath(root, outer1_Path) &&
           checkResultTreeHasExactNamedPath(root, inner1_1Path) &&
-          checkResultTreeHasExactNamedPath(root, failedPath))
+          checkResultTreeHasExactNamedPath(root, failedPath)
+    )
   }
 
   def testFileStructureView(): Unit = {

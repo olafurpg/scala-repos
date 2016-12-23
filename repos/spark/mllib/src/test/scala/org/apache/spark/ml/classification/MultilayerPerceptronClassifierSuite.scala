@@ -60,16 +60,8 @@ class MultilayerPerceptronClassifierSuite
 
     // The following coefficients are taken from OneVsRestSuite.scala
     // they represent 3-class iris dataset
-    val coefficients = Array(-0.57997,
-                             0.912083,
-                             -0.371077,
-                             -0.819866,
-                             2.688191,
-                             -0.16624,
-                             -0.84355,
-                             -0.048509,
-                             -0.301789,
-                             4.170682)
+    val coefficients = Array(-0.57997, 0.912083, -0.371077, -0.819866,
+      2.688191, -0.16624, -0.84355, -0.048509, -0.301789, 4.170682)
 
     val xMean = Array(5.843, 3.057, 3.758, 1.199)
     val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)

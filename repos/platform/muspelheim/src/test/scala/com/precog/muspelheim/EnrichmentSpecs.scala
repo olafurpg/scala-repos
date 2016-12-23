@@ -108,12 +108,14 @@ trait EnrichmentSpecs extends EvalStackSpecs {
       val (_, actual) = results.head
 
       val expected = SObject(
-        Map("email" -> SString("nobody@precog.com"),
-            "accountId" -> SString("dummyAccount"),
-            "name" -> SString("Tom"),
-            "age" -> SDecimal(27),
-            "mission" -> SString("Write tons of code."),
-            "status" -> SFalse))
+        Map(
+          "email" -> SString("nobody@precog.com"),
+          "accountId" -> SString("dummyAccount"),
+          "name" -> SString("Tom"),
+          "age" -> SDecimal(27),
+          "mission" -> SString("Write tons of code."),
+          "status" -> SFalse
+        ))
 
       actual must_== expected
     }

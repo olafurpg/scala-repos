@@ -42,7 +42,8 @@ class JoinOptimizationSuite extends PlanTest {
         PushPredicateThroughGenerate,
         PushPredicateThroughAggregate,
         ColumnPruning,
-        CollapseProject) :: Nil
+        CollapseProject
+      ) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)

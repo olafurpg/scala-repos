@@ -183,12 +183,14 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
     out.zipWithIndex.foreach {
       case ((k, v), i) =>
         if (prevK != null) {
-          assert(keyOrdering.compare(prevK, k) <= 0,
-                 s"""
+          assert(
+            keyOrdering.compare(prevK, k) <= 0,
+            s"""
              |key is not in sorted order:
              |previous key: $prevK
              |current key : $k
-             """.stripMargin)
+             """.stripMargin
+          )
         }
         prevK = k
     }

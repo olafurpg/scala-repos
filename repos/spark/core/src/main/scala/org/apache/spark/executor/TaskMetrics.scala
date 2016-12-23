@@ -363,19 +363,21 @@ class TaskMetrics private[spark] (initialAccums: Seq[Accumulator[_]])
   {
     var (hasShuffleRead, hasShuffleWrite, hasInput, hasOutput) =
       (false, false, false, false)
-    initialAccums.filter { a =>
-      a.localValue != a.zero
-    }.foreach { a =>
-      a.name.get match {
-        case sr if sr.startsWith(SHUFFLE_READ_METRICS_PREFIX) =>
-          hasShuffleRead = true
-        case sw if sw.startsWith(SHUFFLE_WRITE_METRICS_PREFIX) =>
-          hasShuffleWrite = true
-        case in if in.startsWith(INPUT_METRICS_PREFIX) => hasInput = true
-        case out if out.startsWith(OUTPUT_METRICS_PREFIX) => hasOutput = true
-        case _ =>
+    initialAccums
+      .filter { a =>
+        a.localValue != a.zero
       }
-    }
+      .foreach { a =>
+        a.name.get match {
+          case sr if sr.startsWith(SHUFFLE_READ_METRICS_PREFIX) =>
+            hasShuffleRead = true
+          case sw if sw.startsWith(SHUFFLE_WRITE_METRICS_PREFIX) =>
+            hasShuffleWrite = true
+          case in if in.startsWith(INPUT_METRICS_PREFIX) => hasInput = true
+          case out if out.startsWith(OUTPUT_METRICS_PREFIX) => hasOutput = true
+          case _ =>
+        }
+      }
     if (hasShuffleRead) {
       _shuffleReadMetrics = Some(new ShuffleReadMetrics(initialAccumsMap))
     }
@@ -448,13 +450,15 @@ private[spark] object TaskMetrics extends Logging {
     val definedAccumUpdates = accumUpdates.filter { info =>
       info.update.isDefined
     }
-    val initialAccums = definedAccumUpdates.filter { info =>
-      info.name.exists(_.startsWith(InternalAccumulator.METRICS_PREFIX))
-    }.map { info =>
-      val accum = InternalAccumulator.create(info.name.get)
-      accum.setValueAny(info.update.get)
-      accum
-    }
+    val initialAccums = definedAccumUpdates
+      .filter { info =>
+        info.name.exists(_.startsWith(InternalAccumulator.METRICS_PREFIX))
+      }
+      .map { info =>
+        val accum = InternalAccumulator.create(info.name.get)
+        accum.setValueAny(info.update.get)
+        accum
+      }
     new ListenerTaskMetrics(initialAccums, definedAccumUpdates)
   }
 }

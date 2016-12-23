@@ -91,14 +91,16 @@ private[finagle] object RegistryEntryLifecycle {
 
         CanStackFrom
           .fromFun[ServiceFactory[Req, Rep]]
-          .toStackable(role, { factory: ServiceFactory[Req, Rep] =>
-            new ServiceFactoryProxy[Req, Rep](factory) {
-              override def close(deadline: Time): Future[Unit] = {
-                ClientRegistry.unregister(shown, next, params)
-                self.close(deadline)
+          .toStackable(
+            role, { factory: ServiceFactory[Req, Rep] =>
+              new ServiceFactoryProxy[Req, Rep](factory) {
+                override def close(deadline: Time): Future[Unit] = {
+                  ClientRegistry.unregister(shown, next, params)
+                  self.close(deadline)
+                }
               }
             }
-          }) +: next
+          ) +: next
       }
     }
 }

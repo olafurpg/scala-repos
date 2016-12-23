@@ -43,10 +43,12 @@ class TaskStatusUpdateProcessorImpl @Inject()(
   private[this] val killUnknownTaskTimer: Timer = metrics.timer(
     metrics.name(MetricPrefixes.SERVICE, getClass, "killUnknownTask"))
 
-  private[this] val stepTimers: Map[String, Timer] = steps.map { step =>
-    step.name -> metrics.timer(
-      metrics.name(MetricPrefixes.SERVICE, getClass, s"step-${step.name}"))
-  }.toMap
+  private[this] val stepTimers: Map[String, Timer] = steps
+    .map { step =>
+      step.name -> metrics.timer(
+        metrics.name(MetricPrefixes.SERVICE, getClass, s"step-${step.name}"))
+    }
+    .toMap
 
   log.info("Started status update processor with steps:\n{}",
            steps.map(step => s"* ${step.name}").mkString("\n"))

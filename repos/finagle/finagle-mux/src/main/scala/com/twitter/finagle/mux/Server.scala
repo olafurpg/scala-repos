@@ -415,17 +415,18 @@ private[finagle] object Processor
 
     Contexts.broadcast.letUnmarshal(contextBufs) {
       if (tdispatch.dtab.nonEmpty) Dtab.local ++= tdispatch.dtab
-      service(Request(tdispatch.dst, ChannelBufferBuf.Owned(tdispatch.req))).transform {
-        case Return(rep) =>
-          Future.value(
-            RdispatchOk(tdispatch.tag, Nil, BufChannelBuffer(rep.body)))
+      service(Request(tdispatch.dst, ChannelBufferBuf.Owned(tdispatch.req)))
+        .transform {
+          case Return(rep) =>
+            Future.value(
+              RdispatchOk(tdispatch.tag, Nil, BufChannelBuffer(rep.body)))
 
-        case Throw(f: Failure) if f.isFlagged(Failure.Restartable) =>
-          Future.value(RdispatchNack(tdispatch.tag, Nil))
+          case Throw(f: Failure) if f.isFlagged(Failure.Restartable) =>
+            Future.value(RdispatchNack(tdispatch.tag, Nil))
 
-        case Throw(exc) =>
-          Future.value(RdispatchError(tdispatch.tag, Nil, exc.toString))
-      }
+          case Throw(exc) =>
+            Future.value(RdispatchError(tdispatch.tag, Nil, exc.toString))
+        }
     }
   }
 
@@ -434,16 +435,17 @@ private[finagle] object Processor
       service: Service[Request, Response]
   ): Future[Message] = {
     Trace.letIdOption(treq.traceId) {
-      service(Request(Path.empty, ChannelBufferBuf.Owned(treq.req))).transform {
-        case Return(rep) =>
-          Future.value(RreqOk(treq.tag, BufChannelBuffer(rep.body)))
+      service(Request(Path.empty, ChannelBufferBuf.Owned(treq.req)))
+        .transform {
+          case Return(rep) =>
+            Future.value(RreqOk(treq.tag, BufChannelBuffer(rep.body)))
 
-        case Throw(f: Failure) if f.isFlagged(Failure.Restartable) =>
-          Future.value(Message.RreqNack(treq.tag))
+          case Throw(f: Failure) if f.isFlagged(Failure.Restartable) =>
+            Future.value(Message.RreqNack(treq.tag))
 
-        case Throw(exc) =>
-          Future.value(Message.RreqError(treq.tag, exc.toString))
-      }
+          case Throw(exc) =>
+            Future.value(Message.RreqError(treq.tag, exc.toString))
+        }
     }
   }
 

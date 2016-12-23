@@ -56,7 +56,8 @@ trait TreeAndTypeAnalysis extends Debugging {
               pat.pos,
               sm"""The value matched by $pat is bound to ${binder.name}, which may be used under the
                   |unsound assumption that it has type ${pat.tpe}, whereas we can only safely
-                  |count on it having type $pt, as the pattern is matched using `==` (see SI-1503).""")
+                  |count on it having type $pt, as the pattern is matched using `==` (see SI-1503)."""
+            )
 
           pat.tpe
         }
@@ -599,15 +600,20 @@ trait MatchAnalysis extends MatchApproximation {
 
         val approx = new TreeMakersToPropsIgnoreNullChecks(prevBinder)
         val symbolicCases =
-          approx.approximateMatch(cases, approx.onUnknown { tm =>
-            approx.fullRewrite.applyOrElse[TreeMaker, Prop](tm, {
-              case BodyTreeMaker(_, _) =>
-                True // irrelevant -- will be discarded by symbolCase later
-              case _ => // debug.patmat("backing off due to "+ tm)
-                backoff = true
-                False
-            })
-          }) map caseWithoutBodyToProp
+          approx.approximateMatch(
+            cases,
+            approx.onUnknown { tm =>
+              approx.fullRewrite.applyOrElse[TreeMaker, Prop](
+                tm, {
+                  case BodyTreeMaker(_, _) =>
+                    True // irrelevant -- will be discarded by symbolCase later
+                  case _ => // debug.patmat("backing off due to "+ tm)
+                    backoff = true
+                    False
+                }
+              )
+            }
+          ) map caseWithoutBodyToProp
 
         if (backoff) Nil
         else {
@@ -716,9 +722,10 @@ trait MatchAnalysis extends MatchApproximation {
         other match {
           case other @ ListExample(_) =>
             this == other ||
-              ((elems.length == other.elems.length) && (elems zip other.elems).forall {
-                case (a, b) => a coveredBy b
-              })
+              ((elems.length == other.elems.length) && (elems zip other.elems)
+                .forall {
+                  case (a, b) => a coveredBy b
+                })
           case _ => super.coveredBy(other)
         }
 
@@ -732,9 +739,10 @@ trait MatchAnalysis extends MatchApproximation {
         other match {
           case TupleExample(otherArgs) =>
             this == other ||
-              ((ctorArgs.length == otherArgs.length) && (ctorArgs zip otherArgs).forall {
-                case (a, b) => a coveredBy b
-              })
+              ((ctorArgs.length == otherArgs.length) && (ctorArgs zip otherArgs)
+                .forall {
+                  case (a, b) => a coveredBy b
+                })
           case _ => super.coveredBy(other)
         }
     }
@@ -756,13 +764,15 @@ trait MatchAnalysis extends MatchApproximation {
     // equal and notEqual symbols
     def modelToVarAssignment(
         model: Model): Map[Var, (Seq[Const], Seq[Const])] =
-      model.toSeq.groupBy { f =>
-        f match { case (sym, value) => sym.variable }
-      }.mapValues { xs =>
-        val (trues, falses) = xs.partition(_._2)
-        (trues map (_._1.const), falses map (_._1.const))
-      // should never be more than one value in trues...
-      }
+      model.toSeq
+        .groupBy { f =>
+          f match { case (sym, value) => sym.variable }
+        }
+        .mapValues { xs =>
+          val (trues, falses) = xs.partition(_._2)
+          (trues map (_._1.const), falses map (_._1.const))
+        // should never be more than one value in trues...
+        }
 
     def varAssignmentString(
         varAssignment: Map[Var, (Seq[Const], Seq[Const])]) =
@@ -905,7 +915,8 @@ trait MatchAnalysis extends MatchApproximation {
         private def findVar(path: List[Symbol]) = path match {
           case List(root) if root == scrutVar.path.symbol => Some(scrutVar)
           case _ =>
-            varAssignment.find { case (v, a) => chop(v.path) == path }
+            varAssignment
+              .find { case (v, a) => chop(v.path) == path }
               .map(_._1)
         }
 
@@ -1025,14 +1036,16 @@ trait MatchAnalysis extends MatchApproximation {
 
                 cls match {
                   case ConsClass =>
-                    args().map {
-                      case List(NoExample, l: ListExample) =>
-                        // special case for neg/t7020.scala:
-                        // if we find a counter example `??::*` we report `*::*` instead
-                        // since the `??` originates from uniqueEqualTo containing several instanced of the same type
-                        List(WildcardExample, l)
-                      case args => args
-                    }.map(ListExample)
+                    args()
+                      .map {
+                        case List(NoExample, l: ListExample) =>
+                          // special case for neg/t7020.scala:
+                          // if we find a counter example `??::*` we report `*::*` instead
+                          // since the `??` originates from uniqueEqualTo containing several instanced of the same type
+                          List(WildcardExample, l)
+                        case args => args
+                      }
+                      .map(ListExample)
                   case _ if isTupleSymbol(cls) =>
                     args(brevity = true).map(TupleExample)
                   case _ if cls.isSealed && cls.isAbstractClass =>

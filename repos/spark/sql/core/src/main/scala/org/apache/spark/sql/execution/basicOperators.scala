@@ -129,27 +129,31 @@ case class Filter(condition: Expression, child: SparkPlan)
     val numOutput = metricTerm(ctx, "numOutputRows")
 
     // filter out the nulls
-    val filterOutNull = notNullAttributes.map { a =>
-      val idx = child.output.indexOf(a)
-      s"if (${input(idx).isNull}) continue;"
-    }.mkString("\n")
+    val filterOutNull = notNullAttributes
+      .map { a =>
+        val idx = child.output.indexOf(a)
+        s"if (${input(idx).isNull}) continue;"
+      }
+      .mkString("\n")
 
     ctx.currentVars = input
-    val predicates = otherPreds.map { e =>
-      val bound = ExpressionCanonicalizer.execute(
-        BindReferences.bindReference(e, output))
-      val ev = bound.gen(ctx)
-      val nullCheck =
-        if (bound.nullable) {
-          s"${ev.isNull} || "
-        } else {
-          s""
-        }
-      s"""
+    val predicates = otherPreds
+      .map { e =>
+        val bound = ExpressionCanonicalizer.execute(
+          BindReferences.bindReference(e, output))
+        val ev = bound.gen(ctx)
+        val nullCheck =
+          if (bound.nullable) {
+            s"${ev.isNull} || "
+          } else {
+            s""
+          }
+        s"""
          |${ev.code}
          |if (${nullCheck}!${ev.value}) continue;
        """.stripMargin
-    }.mkString("\n")
+      }
+      .mkString("\n")
 
     // Reset the isNull to false for the not-null columns, then the followed operators could
     // generate better code (remove dead branches).
@@ -261,8 +265,9 @@ case class Range(start: Long,
         s"$number > $partitionEnd"
       }
 
-    ctx.addNewFunction("initRange",
-                       s"""
+    ctx.addNewFunction(
+      "initRange",
+      s"""
         | private void initRange(int idx) {
         |   $BigInt index = $BigInt.valueOf(idx);
         |   $BigInt numSlice = $BigInt.valueOf(${numSlices}L);
@@ -291,7 +296,8 @@ case class Range(start: Long,
         |
         |   $numOutput.add(($partitionEnd - $number) / ${step}L);
         | }
-       """.stripMargin)
+       """.stripMargin
+    )
 
     val input = ctx.freshName("input")
     // Right now, Range is only used when there is one upstream.

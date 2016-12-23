@@ -202,5 +202,6 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
         // Get results from parent reference
         parentRef.getVariants() foreach applyVariant
       }
-    })
+    }
+  )
 }

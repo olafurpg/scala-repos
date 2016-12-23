@@ -44,9 +44,14 @@ case class Sketched[K, V](
   def reducers = Some(numReducers)
 
   private lazy implicit val cms = CMS.monoid[Bytes](eps, delta, seed)
-  lazy val sketch: TypedPipe[CMS[Bytes]] = pipe.map {
-    case (k, _) => cms.create(Bytes(serialization(k)))
-  }.groupAll.sum.values.forceToDisk
+  lazy val sketch: TypedPipe[CMS[Bytes]] = pipe
+    .map {
+      case (k, _) => cms.create(Bytes(serialization(k)))
+    }
+    .groupAll
+    .sum
+    .values
+    .forceToDisk
 
   /**
     * Like a hashJoin, this joiner does not see all the values V at one time, only one at a time.

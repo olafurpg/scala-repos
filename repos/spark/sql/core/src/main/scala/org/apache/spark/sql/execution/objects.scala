@@ -47,9 +47,11 @@ trait ObjectOperator extends SparkPlan {
       } else {
         GenerateUnsafeProjection.generate(serializer)
       }
-    val inputType = serializer.head.collect {
-      case b: BoundReference => b.dataType
-    }.head
+    val inputType = serializer.head
+      .collect {
+        case b: BoundReference => b.dataType
+      }
+      .head
     val outputRow = new SpecificMutableRow(inputType :: Nil)
     (o: Any) =>
       {
@@ -157,18 +159,18 @@ case class MapGroups(func: (Any, Iterator[Any]) => TraversableOnce[Any],
   * iterators containing all elements in the group from left and right side.
   * The result of this function is encoded and flattened before being output.
   */
-case class CoGroup(func: (Any, Iterator[Any],
-                          Iterator[Any]) => TraversableOnce[Any],
-                   keyDeserializer: Expression,
-                   leftDeserializer: Expression,
-                   rightDeserializer: Expression,
-                   serializer: Seq[NamedExpression],
-                   leftGroup: Seq[Attribute],
-                   rightGroup: Seq[Attribute],
-                   leftAttr: Seq[Attribute],
-                   rightAttr: Seq[Attribute],
-                   left: SparkPlan,
-                   right: SparkPlan)
+case class CoGroup(
+    func: (Any, Iterator[Any], Iterator[Any]) => TraversableOnce[Any],
+    keyDeserializer: Expression,
+    leftDeserializer: Expression,
+    rightDeserializer: Expression,
+    serializer: Seq[NamedExpression],
+    leftGroup: Seq[Attribute],
+    rightGroup: Seq[Attribute],
+    leftAttr: Seq[Attribute],
+    rightAttr: Seq[Attribute],
+    left: SparkPlan,
+    right: SparkPlan)
     extends BinaryNode
     with ObjectOperator {
 

@@ -226,7 +226,8 @@ class AsyncProducerTest {
       encoder = null.asInstanceOf[Encoder[String]],
       keyEncoder = new IntEncoder(),
       producerPool = producerPool,
-      topicPartitionInfos = topicPartitionInfos)
+      topicPartitionInfos = topicPartitionInfos
+    )
 
     val topic1Broker1Data = ArrayBuffer[KeyedMessage[Int, Message]](
       new KeyedMessage[Int, Message]("topic1",
@@ -286,7 +287,8 @@ class AsyncProducerTest {
       encoder = new StringEncoder,
       keyEncoder = new StringEncoder,
       producerPool = producerPool,
-      topicPartitionInfos = topicPartitionInfos)
+      topicPartitionInfos = topicPartitionInfos
+    )
 
     val serializedData = handler.serialize(produceData)
     val deserializedData = serializedData.map(
@@ -334,7 +336,8 @@ class AsyncProducerTest {
       encoder = null.asInstanceOf[Encoder[String]],
       keyEncoder = null.asInstanceOf[Encoder[String]],
       producerPool = producerPool,
-      topicPartitionInfos = topicPartitionInfos)
+      topicPartitionInfos = topicPartitionInfos
+    )
     try {
       handler.partitionAndCollate(producerDataList)
     } catch {
@@ -366,7 +369,8 @@ class AsyncProducerTest {
       encoder = new StringEncoder,
       keyEncoder = new StringEncoder,
       producerPool = producerPool,
-      topicPartitionInfos = topicPartitionInfos)
+      topicPartitionInfos = topicPartitionInfos
+    )
     try {
       handler.handle(producerDataList)
       fail("Should fail with FailedToSendMessageException")
@@ -418,7 +422,8 @@ class AsyncProducerTest {
       encoder = null.asInstanceOf[Encoder[String]],
       keyEncoder = null.asInstanceOf[Encoder[String]],
       producerPool = producerPool,
-      topicPartitionInfos = topicPartitionInfos)
+      topicPartitionInfos = topicPartitionInfos
+    )
     val producerDataList = new ArrayBuffer[KeyedMessage[String, Message]]
     producerDataList.append(
       new KeyedMessage[String, Message]("topic1",
@@ -486,10 +491,13 @@ class AsyncProducerTest {
                                                     clientId = DefaultClientId)
     val response1 = ProducerResponse(
       0,
-      Map((TopicAndPartition("topic1", 0),
-           ProducerResponseStatus(Errors.NOT_LEADER_FOR_PARTITION.code, 0L)),
-          (TopicAndPartition("topic1", 1),
-           ProducerResponseStatus(Errors.NONE.code, 0L))))
+      Map(
+        (TopicAndPartition("topic1", 0),
+         ProducerResponseStatus(Errors.NOT_LEADER_FOR_PARTITION.code, 0L)),
+        (TopicAndPartition("topic1", 1),
+         ProducerResponseStatus(Errors.NONE.code, 0L))
+      )
+    )
     val request3 = TestUtils.produceRequest(topic1,
                                             0,
                                             messagesToSet(msgs),
@@ -534,7 +542,8 @@ class AsyncProducerTest {
       keyEncoder = new NullEncoder[Int](),
       producerPool = producerPool,
       topicPartitionInfos = topicPartitionInfos,
-      time = time)
+      time = time
+    )
     val data =
       msgs.map(m => new KeyedMessage[Int, String](topic1, 0, m)) ++ msgs.map(
         m => new KeyedMessage[Int, String](topic1, 1, m))

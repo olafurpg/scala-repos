@@ -448,14 +448,12 @@ class SparkContext(config: SparkConf)
 
     _conf.set("spark.executor.id", SparkContext.DRIVER_IDENTIFIER)
 
-    _jars = _conf
-      .getOption("spark.jars")
+    _jars = _conf.getOption("spark.jars")
       .map(_.split(","))
       .map(_.filter(_.nonEmpty))
       .toSeq
       .flatten
-    _files = _conf
-      .getOption("spark.files")
+    _files = _conf.getOption("spark.files")
       .map(_.split(","))
       .map(_.filter(_.nonEmpty))
       .toSeq
@@ -537,8 +535,7 @@ class SparkContext(config: SparkConf)
       files.foreach(addFile)
     }
 
-    _executorMemory = _conf
-      .getOption("spark.executor.memory")
+    _executorMemory = _conf.getOption("spark.executor.memory")
       .orElse(Option(System.getenv("SPARK_EXECUTOR_MEMORY")))
       .orElse(Option(System.getenv("SPARK_MEM")).map(warnSparkMem))
       .map(Utils.memoryStringToMb)
@@ -1951,9 +1948,9 @@ class SparkContext(config: SparkConf)
   /**
     * Run a job on all partitions in an RDD and return the results in an array.
     */
-  def runJob[T, U: ClassTag](rdd: RDD[T],
-                             func: (TaskContext,
-                                    Iterator[T]) => U): Array[U] = {
+  def runJob[T, U: ClassTag](
+      rdd: RDD[T],
+      func: (TaskContext, Iterator[T]) => U): Array[U] = {
     runJob(rdd, func, 0 until rdd.partitions.length)
   }
 
@@ -2027,13 +2024,13 @@ class SparkContext(config: SparkConf)
     assertNotStopped()
     val cleanF = clean(processPartition)
     val callSite = getCallSite
-    val waiter = dagScheduler.submitJob(rdd,
-                                        (context: TaskContext,
-                                         iter: Iterator[T]) => cleanF(iter),
-                                        partitions,
-                                        callSite,
-                                        resultHandler,
-                                        localProperties.get)
+    val waiter = dagScheduler.submitJob(
+      rdd,
+      (context: TaskContext, iter: Iterator[T]) => cleanF(iter),
+      partitions,
+      callSite,
+      resultHandler,
+      localProperties.get)
     new SimpleFutureAction(waiter, resultFunc)
   }
 

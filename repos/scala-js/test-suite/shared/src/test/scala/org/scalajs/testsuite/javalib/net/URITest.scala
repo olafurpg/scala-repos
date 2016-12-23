@@ -72,14 +72,15 @@ class URITest {
 
   @Test def should_parse_absolute_URIs_with_IPv6(): Unit = {
     val uri = new URI("http://hans@[ffff::0:128.4.5.3]:345/~hans/")
-    expectURI(uri, true, false)(scheme = "http",
-                                host = "[ffff::0:128.4.5.3]",
-                                userInfo = "hans",
-                                port = 345,
-                                path = "/~hans/",
-                                authority = "hans@[ffff::0:128.4.5.3]:345",
-                                schemeSpecificPart =
-                                  "//hans@[ffff::0:128.4.5.3]:345/~hans/")()
+    expectURI(uri, true, false)(
+      scheme = "http",
+      host = "[ffff::0:128.4.5.3]",
+      userInfo = "hans",
+      port = 345,
+      path = "/~hans/",
+      authority = "hans@[ffff::0:128.4.5.3]:345",
+      schemeSpecificPart = "//hans@[ffff::0:128.4.5.3]:345/~hans/"
+    )()
   }
 
   @Test def should_parse_absolute_URIs_without_authority(): Unit = {
@@ -148,8 +149,8 @@ class URITest {
       host = "example.com",
       port = 8000,
       path = "/foo",
-      schemeSpecificPart = "//ma]x:secret@example.com:8000/foo")(
-      rawUserInfo = "ma%5dx:secret",
+      schemeSpecificPart = "//ma]x:secret@example.com:8000/foo"
+    )(rawUserInfo = "ma%5dx:secret",
       rawAuthority = "ma%5dx:secret@example.com:8000",
       rawSchemeSpecificPart = "//ma%5dx:secret@example.com:8000/foo")
   }

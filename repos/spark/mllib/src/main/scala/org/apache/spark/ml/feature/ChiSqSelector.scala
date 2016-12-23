@@ -52,7 +52,8 @@ private[feature] trait ChiSqSelectorParams
     "numTopFeatures",
     "Number of features that selector will select, ordered by statistics value descending. If the" +
       " number of features is < numTopFeatures, then this will select all features.",
-    ParamValidators.gtEq(1))
+    ParamValidators.gtEq(1)
+  )
   setDefault(numTopFeatures -> 50)
 
   /** @group getParam */

@@ -360,14 +360,16 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
                                 mode.getClass.getName)
       internalTarget.sendSystemMessage(Watch(internalTarget, ref))
       target.tell(mode, ref)
-      ref.result.future.transform({
-        case Terminated(t) if t.path == target.path ⇒ SetThrottleAck
-        case SetThrottleAck ⇒ {
-          internalTarget.sendSystemMessage(Unwatch(target, ref));
-          SetThrottleAck
-        }
-      }, t ⇒ { internalTarget.sendSystemMessage(Unwatch(target, ref)); t })(
-        ref.internalCallingThreadExecutionContext)
+      ref.result.future.transform(
+        {
+          case Terminated(t) if t.path == target.path ⇒ SetThrottleAck
+          case SetThrottleAck ⇒ {
+            internalTarget.sendSystemMessage(Unwatch(target, ref));
+            SetThrottleAck
+          }
+        },
+        t ⇒ { internalTarget.sendSystemMessage(Unwatch(target, ref)); t }
+      )(ref.internalCallingThreadExecutionContext)
     }
   }
 
@@ -375,16 +377,20 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
                          listener: AssociationEventListener,
                          inbound: Boolean): ThrottlerHandle = {
     val managerRef = self
-    ThrottlerHandle(originalHandle,
-                    context.actorOf(RARP(context.system)
-                                      .configureDispatcher(
-                                        Props(classOf[ThrottledAssociation],
-                                              managerRef,
-                                              listener,
-                                              originalHandle,
-                                              inbound))
-                                      .withDeploy(Deploy.local),
-                                    "throttler" + nextId()))
+    ThrottlerHandle(
+      originalHandle,
+      context.actorOf(
+        RARP(context.system)
+          .configureDispatcher(
+            Props(classOf[ThrottledAssociation],
+                  managerRef,
+                  listener,
+                  originalHandle,
+                  inbound))
+          .withDeploy(Deploy.local),
+        "throttler" + nextId()
+      )
+    )
   }
 }
 

@@ -51,10 +51,10 @@ private[netty] case class OneWayOutboxMessage(content: ByteBuffer)
   }
 }
 
-private[netty] case class RpcOutboxMessage(content: ByteBuffer,
-                                           _onFailure: (Throwable) => Unit,
-                                           _onSuccess: (TransportClient,
-                                                        ByteBuffer) => Unit)
+private[netty] case class RpcOutboxMessage(
+    content: ByteBuffer,
+    _onFailure: (Throwable) => Unit,
+    _onSuccess: (TransportClient, ByteBuffer) => Unit)
     extends OutboxMessage
     with RpcResponseCallback {
 

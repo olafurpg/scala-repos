@@ -232,7 +232,8 @@ class ClusterSingletonManagerSpec
         singletonProps = Props(classOf[Consumer], queue, testActor),
         terminationMessage = End,
         settings = ClusterSingletonManagerSettings(system).withRole("worker")),
-      name = "consumer")
+      name = "consumer"
+    )
     //#create-singleton-manager
   }
 
@@ -242,7 +243,8 @@ class ClusterSingletonManagerSpec
       ClusterSingletonProxy.props(
         singletonManagerPath = "/user/consumer",
         settings = ClusterSingletonProxySettings(system).withRole("worker")),
-      name = "consumerProxy")
+      name = "consumerProxy"
+    )
     //#create-singleton-proxy
   }
 

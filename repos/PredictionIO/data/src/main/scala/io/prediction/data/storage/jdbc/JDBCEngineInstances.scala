@@ -178,20 +178,22 @@ class JDBCEngineInstances(client: String,
 
   /** Convert JDBC results to [[EngineInstance]] */
   def resultToEngineInstance(rs: WrappedResultSet): EngineInstance = {
-    EngineInstance(id = rs.string("id"),
-                   status = rs.string("status"),
-                   startTime = rs.jodaDateTime("startTime"),
-                   endTime = rs.jodaDateTime("endTime"),
-                   engineId = rs.string("engineId"),
-                   engineVersion = rs.string("engineVersion"),
-                   engineVariant = rs.string("engineVariant"),
-                   engineFactory = rs.string("engineFactory"),
-                   batch = rs.string("batch"),
-                   env = JDBCUtils.stringToMap(rs.string("env")),
-                   sparkConf = JDBCUtils.stringToMap(rs.string("sparkConf")),
-                   dataSourceParams = rs.string("datasourceParams"),
-                   preparatorParams = rs.string("preparatorParams"),
-                   algorithmsParams = rs.string("algorithmsParams"),
-                   servingParams = rs.string("servingParams"))
+    EngineInstance(
+      id = rs.string("id"),
+      status = rs.string("status"),
+      startTime = rs.jodaDateTime("startTime"),
+      endTime = rs.jodaDateTime("endTime"),
+      engineId = rs.string("engineId"),
+      engineVersion = rs.string("engineVersion"),
+      engineVariant = rs.string("engineVariant"),
+      engineFactory = rs.string("engineFactory"),
+      batch = rs.string("batch"),
+      env = JDBCUtils.stringToMap(rs.string("env")),
+      sparkConf = JDBCUtils.stringToMap(rs.string("sparkConf")),
+      dataSourceParams = rs.string("datasourceParams"),
+      preparatorParams = rs.string("preparatorParams"),
+      algorithmsParams = rs.string("algorithmsParams"),
+      servingParams = rs.string("servingParams")
+    )
   }
 }

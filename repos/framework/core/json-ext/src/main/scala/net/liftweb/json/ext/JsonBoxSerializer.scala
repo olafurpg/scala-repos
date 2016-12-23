@@ -59,7 +59,8 @@ class JsonBoxSerializer extends Serializer[Box[_]] {
             deserializeException(exception),
             extract(chain, TypeInfo(BoxClass, Some(typeHoldingFailure)))
               .asInstanceOf[Box[Failure]],
-            extract(param, TypeInfo(clazz, None)))
+            extract(param, TypeInfo(clazz, None))
+          )
         case x =>
           val t = ptype.getOrElse(
             throw new MappingException("parameterized type not known for Box"))

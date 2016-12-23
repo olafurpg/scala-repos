@@ -44,11 +44,13 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
           }
           val processor = new CollectMethodsProcessor(ref, unapplyName)
           typeResult.foreach(t => processor.processType(t, ref))
-          val sigs = processor.candidatesS.flatMap {
-            case ScalaResolveResult(meth: PsiMethod, subst) =>
-              Some((meth, subst, Some(obj)))
-            case _ => None
-          }.toSeq
+          val sigs = processor.candidatesS
+            .flatMap {
+              case ScalaResolveResult(meth: PsiMethod, subst) =>
+                Some((meth, subst, Some(obj)))
+              case _ => None
+            }
+            .toSeq
           addResults(sigs.map {
             case (m, subst, parent) =>
               val resolveToMethod =

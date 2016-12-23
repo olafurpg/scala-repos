@@ -174,23 +174,27 @@ final class BuildLoader(val fail: URI => Nothing,
                         val full: MultiHandler[LoadInfo, () => BuildUnit],
                         val transformAll: TransformAll) {
   def addNonRoot(uri: URI, loaders: Components): BuildLoader =
-    new BuildLoader(fail,
-                    state,
-                    config,
-                    resolvers.addNonRoot(uri, loaders.resolver),
-                    builders.addNonRoot(uri, loaders.builder),
-                    seq(transformer, loaders.transformer),
-                    full.addNonRoot(uri, loaders.full),
-                    transformAll andThen loaders.transformAll)
+    new BuildLoader(
+      fail,
+      state,
+      config,
+      resolvers.addNonRoot(uri, loaders.resolver),
+      builders.addNonRoot(uri, loaders.builder),
+      seq(transformer, loaders.transformer),
+      full.addNonRoot(uri, loaders.full),
+      transformAll andThen loaders.transformAll
+    )
   def setRoot(loaders: Components): BuildLoader =
-    new BuildLoader(fail,
-                    state,
-                    config,
-                    resolvers.setRoot(loaders.resolver),
-                    builders.setRoot(loaders.builder),
-                    seq(loaders.transformer, transformer),
-                    full.setRoot(loaders.full),
-                    loaders.transformAll andThen transformAll)
+    new BuildLoader(
+      fail,
+      state,
+      config,
+      resolvers.setRoot(loaders.resolver),
+      builders.setRoot(loaders.builder),
+      seq(loaders.transformer, transformer),
+      full.setRoot(loaders.full),
+      loaders.transformAll andThen transformAll
+    )
   def resetPluginDepth: BuildLoader =
     copyWithNewPM(config.pluginManagement.resetDepth)
 

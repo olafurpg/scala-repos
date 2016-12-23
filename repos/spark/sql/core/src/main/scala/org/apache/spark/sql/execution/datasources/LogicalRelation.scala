@@ -46,16 +46,18 @@ case class LogicalRelation(
 
   override val output: Seq[AttributeReference] = {
     val attrs = relation.schema.toAttributes
-    expectedOutputAttributes.map { expectedAttrs =>
-      assert(expectedAttrs.length == attrs.length)
-      attrs.zip(expectedAttrs).map {
-        // We should respect the attribute names provided by base relation and only use the
-        // exprId in `expectedOutputAttributes`.
-        // The reason is that, some relations(like parquet) will reconcile attribute names to
-        // workaround case insensitivity issue.
-        case (attr, expected) => attr.withExprId(expected.exprId)
+    expectedOutputAttributes
+      .map { expectedAttrs =>
+        assert(expectedAttrs.length == attrs.length)
+        attrs.zip(expectedAttrs).map {
+          // We should respect the attribute names provided by base relation and only use the
+          // exprId in `expectedOutputAttributes`.
+          // The reason is that, some relations(like parquet) will reconcile attribute names to
+          // workaround case insensitivity issue.
+          case (attr, expected) => attr.withExprId(expected.exprId)
+        }
       }
-    }.getOrElse(attrs)
+      .getOrElse(attrs)
   }
 
   // Logical Relations are distinct if they have different output for the sake of transformations.

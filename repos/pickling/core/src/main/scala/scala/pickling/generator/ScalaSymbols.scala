@@ -96,17 +96,23 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
 
     // TODO - Should we iterate down ALL of the hierarchy here for members, or make the algorithms do it later...
     private val allMethods = {
-      val constructorArgs = tpe.members.collect {
-        case meth: MethodSymbol => meth
-      }.toList.filter { x =>
-        //System.err.println(s"$x - param: ${x.isParamAccessor}, var: ${x.isVar}, val: ${x.isVal}, owner: ${x.owner}, owner-constructor: ${x.owner.isConstructor}")
-        (x.owner == tpe.typeSymbol) && (x.isParamAccessor)
-      }.toList
+      val constructorArgs = tpe.members
+        .collect {
+          case meth: MethodSymbol => meth
+        }
+        .toList
+        .filter { x =>
+          //System.err.println(s"$x - param: ${x.isParamAccessor}, var: ${x.isVar}, val: ${x.isVal}, owner: ${x.owner}, owner-constructor: ${x.owner.isConstructor}")
+          (x.owner == tpe.typeSymbol) && (x.isParamAccessor)
+        }
+        .toList
       //System.err.println(s"$tpe has constructor args:\n - ${constructorArgs.mkString("\n - ")}")
       // NOTE - This will only collect memeber vals/vals.  It's possible some things come from the constructor.
-      val declaredVars = (tpe.declarations).collect {
-        case meth: MethodSymbol => meth
-      }.toList
+      val declaredVars = (tpe.declarations)
+        .collect {
+          case meth: MethodSymbol => meth
+        }
+        .toList
       // NOTE - There can be duplication between 'constructor args' and 'declared vars' we'd like to avoid.
       declaredVars
     }

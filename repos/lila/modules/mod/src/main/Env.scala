@@ -52,7 +52,8 @@ final class Env(config: Config,
     modApi = api,
     reporter = hub.actor.report,
     fishnet = hub.actor.fishnet,
-    userIdsSharingIp = securityApi.userIdsSharingIp)
+    userIdsSharingIp = securityApi.userIdsSharingIp
+  )
 
   lazy val gamify = new Gamify(logColl = logColl,
                                reportColl = reportColl,
@@ -62,36 +63,41 @@ final class Env(config: Config,
     new UserSearch(securityApi = securityApi, emailAddress = emailAddress)
 
   // api actor
-  private val actorApi = system.actorOf(Props(new Actor {
-    override def preStart {
-      context.system.lilaBus.subscribe(self, 'finishGame, 'analysisReady)
-    }
-    def receive = {
-      case lila.hub.actorApi.mod.MarkCheater(userId) => api autoAdjust userId
-      case lila.analyse.actorApi.AnalysisReady(game, analysis) =>
-        assessApi.onAnalysisReady(game, analysis)
-      case lila.game.actorApi
-            .FinishGame(game, whiteUserOption, blackUserOption) =>
-        (whiteUserOption |@| blackUserOption) apply {
-          case (whiteUser, blackUser) =>
-            boosting.check(game, whiteUser, blackUser) >> assessApi
-              .onGameReady(game, whiteUser, blackUser)
-        }
-    }
-  }), name = ActorName)
+  private val actorApi = system.actorOf(
+    Props(new Actor {
+      override def preStart {
+        context.system.lilaBus.subscribe(self, 'finishGame, 'analysisReady)
+      }
+      def receive = {
+        case lila.hub.actorApi.mod.MarkCheater(userId) => api autoAdjust userId
+        case lila.analyse.actorApi.AnalysisReady(game, analysis) =>
+          assessApi.onAnalysisReady(game, analysis)
+        case lila.game.actorApi
+              .FinishGame(game, whiteUserOption, blackUserOption) =>
+          (whiteUserOption |@| blackUserOption) apply {
+            case (whiteUser, blackUser) =>
+              boosting.check(game, whiteUser, blackUser) >> assessApi
+                .onGameReady(game, whiteUser, blackUser)
+          }
+      }
+    }),
+    name = ActorName
+  )
 }
 
 object Env {
 
   lazy val current =
-    "mod" boot new Env(config = lila.common.PlayApp loadConfig "mod",
-                       db = lila.db.Env.current,
-                       hub = lila.hub.Env.current,
-                       system = lila.common.PlayApp.system,
-                       firewall = lila.security.Env.current.firewall,
-                       reportColl = lila.report.Env.current.reportColl,
-                       userSpy = lila.security.Env.current.userSpy,
-                       lightUserApi = lila.user.Env.current.lightUserApi,
-                       securityApi = lila.security.Env.current.api,
-                       emailAddress = lila.security.Env.current.emailAddress)
+    "mod" boot new Env(
+      config = lila.common.PlayApp loadConfig "mod",
+      db = lila.db.Env.current,
+      hub = lila.hub.Env.current,
+      system = lila.common.PlayApp.system,
+      firewall = lila.security.Env.current.firewall,
+      reportColl = lila.report.Env.current.reportColl,
+      userSpy = lila.security.Env.current.userSpy,
+      lightUserApi = lila.user.Env.current.lightUserApi,
+      securityApi = lila.security.Env.current.api,
+      emailAddress = lila.security.Env.current.emailAddress
+    )
 }

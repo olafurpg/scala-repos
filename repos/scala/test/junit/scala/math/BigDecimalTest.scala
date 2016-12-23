@@ -187,18 +187,26 @@ class BigDecimalTest {
     val rn = new scala.util.Random(42)
     for (i <- 1 to 1000) {
       val d = rn.nextDouble
-      assert({
-        BigDecimal.decimal(d).isDecimalDouble &&
-        BigDecimal.binary(d).isBinaryDouble &&
-        BigDecimal.exact(d).isExactDouble
-      }, s"At least one wrong BigDecimal representation for $d")
+      assert(
+        {
+          BigDecimal.decimal(d).isDecimalDouble &&
+          BigDecimal.binary(d).isBinaryDouble &&
+          BigDecimal.exact(d).isExactDouble
+        },
+        s"At least one wrong BigDecimal representation for $d"
+      )
     }
     for (i <- 1 to 1000) {
       val f = rn.nextFloat
-      assert({
-        BigDecimal.decimal(f).isDecimalFloat &&
-        BigDecimal.binary(f).isBinaryFloat && BigDecimal.exact(f).isExactFloat
-      }, s"At least one wrong BigDecimal representation for $f")
+      assert(
+        {
+          BigDecimal.decimal(f).isDecimalFloat &&
+          BigDecimal.binary(f).isBinaryFloat && BigDecimal
+            .exact(f)
+            .isExactFloat
+        },
+        s"At least one wrong BigDecimal representation for $f"
+      )
     }
     for (i <- 1 to 1000) {
       val ndig = 15 + rn.nextInt(5)

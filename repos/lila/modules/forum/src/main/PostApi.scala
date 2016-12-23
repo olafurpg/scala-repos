@@ -27,16 +27,18 @@ final class PostApi(env: Env,
       implicit ctx: UserContext): Fu[Post] =
     lastNumberOf(topic) zip detectLanguage(data.text) zip userIds(topic) flatMap {
       case ((number, lang), topicUserIds) =>
-        val post = Post.make(topicId = topic.id,
-                             author = data.author,
-                             userId = ctx.me map (_.id),
-                             ip = ctx.req.remoteAddress.some,
-                             text = lila.security.Spam.replace(data.text),
-                             number = number + 1,
-                             lang = lang map (_.language),
-                             troll = ctx.troll,
-                             hidden = topic.hidden,
-                             categId = categ.id)
+        val post = Post.make(
+          topicId = topic.id,
+          author = data.author,
+          userId = ctx.me map (_.id),
+          ip = ctx.req.remoteAddress.some,
+          text = lila.security.Spam.replace(data.text),
+          number = number + 1,
+          lang = lang map (_.language),
+          troll = ctx.troll,
+          hidden = topic.hidden,
+          categId = categ.id
+        )
         PostRepo findDuplicate post flatMap {
           case Some(dup) => fuccess(dup)
           case _ =>
@@ -160,7 +162,8 @@ final class PostApi(env: Env,
           env.topicApi.delete(view.categ, view.topic),
           $remove[Post](view.post) >> (env.topicApi denormalize view.topic) >>
             (env.categApi denormalize view.categ) >> env.recent.invalidate >>-
-            (indexer ! RemovePost(post)))
+            (indexer ! RemovePost(post))
+        )
         _ ← MasterGranter(_.ModerateForum)(mod) ?? modLog.deletePost(
           mod,
           post.userId,

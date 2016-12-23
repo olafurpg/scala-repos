@@ -407,9 +407,8 @@ class PutJobStateHandler(jobs: JobManager[Future])(
     extends CustomHttpService[Future[JValue], Future[HttpResponse[JValue]]]
     with Logging {
 
-  def transition(obj: JValue)(
-      f: (DateTime,
-          Option[String]) => Future[Validation[String, JobState]]) = {
+  def transition(obj: JValue)(f: (DateTime, Option[String]) => Future[
+                                Validation[String, JobState]]) = {
     import scalaz.syntax.traverse._
     import scalaz.std.option._
 

@@ -92,7 +92,8 @@ class DslConsistencySpec extends WordSpec with Matchers {
     sFlowClass -> Set("of"),
     sSourceClass -> Set("adapt", "from"),
     sSinkClass -> Set("adapt"),
-    sRunnableGraphClass -> Set("builder"))
+    sRunnableGraphClass -> Set("builder")
+  )
 
   def materializing(m: Method): Boolean =
     m.getParameterTypes.contains(classOf[ActorMaterializer])

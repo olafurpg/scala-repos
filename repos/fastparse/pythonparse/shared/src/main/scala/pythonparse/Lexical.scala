@@ -19,8 +19,8 @@ object Lexical {
     (CharsWhile(" ".toSet, min = 1) | Lexical.comment | "\\\n").rep)
 
   val identifier: P[Ast.identifier] =
-    P((letter | "_") ~ (letter | digit | "_").rep).!
-      .filter(!keywordList.contains(_))
+    P((letter | "_") ~ (letter | digit | "_").rep).!.filter(
+      !keywordList.contains(_))
       .map(Ast.identifier)
   val letter = P(lowercase | uppercase)
   val lowercase = P(CharIn('a' to 'z'))

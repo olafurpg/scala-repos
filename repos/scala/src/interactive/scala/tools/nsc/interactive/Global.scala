@@ -545,7 +545,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
       initializing || anyThread || onCompilerThread,
       "Race condition detected: You are running a presentation compiler method outside the PC thread.[phase: %s]"
         .format(globalPhase) +
-        " Please file a ticket with the current stack trace at https://www.assembla.com/spaces/scala-ide/support/tickets")
+        " Please file a ticket with the current stack trace at https://www.assembla.com/spaces/scala-ide/support/tickets"
+    )
   }
 
   /** Create a new presentation compiler runner.

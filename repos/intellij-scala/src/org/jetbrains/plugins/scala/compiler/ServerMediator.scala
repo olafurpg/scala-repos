@@ -92,7 +92,8 @@ class ServerMediator(project: Project) extends ProjectComponent {
               "Shared compile output paths in Scala module(s)",
               "Split output path(s) automatically",
               "Cancel compilation",
-              Messages.getErrorIcon)
+              Messages.getErrorIcon
+            )
           } else Messages.YES
 
         val splitAutomatically = choice == Messages.YES
