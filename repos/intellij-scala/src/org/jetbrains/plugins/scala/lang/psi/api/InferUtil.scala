@@ -585,7 +585,7 @@ object InferUtil {
                       val substedLowerType = unSubst.subst(lower)
                       val addLower =
                         if (tp.typeParams.nonEmpty &&
-                            !_addLower.isInstanceOf[ScParameterizedType] &&
+                            ! _addLower.isInstanceOf[ScParameterizedType] &&
                             !tp.typeParams.exists(_.name == "_"))
                           ScParameterizedType(
                             _addLower,
@@ -604,7 +604,7 @@ object InferUtil {
                       val substedUpperType = unSubst.subst(upper)
                       val addUpper =
                         if (tp.typeParams.nonEmpty &&
-                            !_addUpper.isInstanceOf[ScParameterizedType] &&
+                            ! _addUpper.isInstanceOf[ScParameterizedType] &&
                             !tp.typeParams.exists(_.name == "_"))
                           ScParameterizedType(
                             _addUpper,

@@ -143,7 +143,7 @@ trait MappedForeignKey[
     * Load and cache the record that this field references
     */
   def obj: Box[Other] = synchronized {
-    if (!_calcedObj) {
+    if (! _calcedObj) {
       _calcedObj = true
       this._obj = if (defined_?) dbKeyToTable.find(i_is_!) else Empty
     }

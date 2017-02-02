@@ -136,7 +136,7 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](initialCapacity: Int,
     var pos = hashcode(hasher.hash(k)) & _mask
     var delta = 1
     while (true) {
-      if (!_bitset.get(pos)) {
+      if (! _bitset.get(pos)) {
         // This is a new key.
         _data(pos) = k
         _bitset.set(pos)
@@ -177,7 +177,7 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](initialCapacity: Int,
     var pos = hashcode(hasher.hash(k)) & _mask
     var delta = 1
     while (true) {
-      if (!_bitset.get(pos)) {
+      if (! _bitset.get(pos)) {
         return INVALID_POS
       } else if (k == _data(pos)) {
         return pos

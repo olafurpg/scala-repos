@@ -30,14 +30,14 @@ private[streaming] class WindowedDStream[T: ClassTag](
     _slideDuration: Duration)
     extends DStream[T](parent.ssc) {
 
-  if (!_windowDuration.isMultipleOf(parent.slideDuration)) {
+  if (! _windowDuration.isMultipleOf(parent.slideDuration)) {
     throw new Exception(
       "The window duration of windowed DStream (" + _windowDuration +
         ") " + "must be a multiple of the slide duration of parent DStream (" +
         parent.slideDuration + ")")
   }
 
-  if (!_slideDuration.isMultipleOf(parent.slideDuration)) {
+  if (! _slideDuration.isMultipleOf(parent.slideDuration)) {
     throw new Exception(
       "The slide duration of windowed DStream (" + _slideDuration +
         ") " + "must be a multiple of the slide duration of parent DStream (" +

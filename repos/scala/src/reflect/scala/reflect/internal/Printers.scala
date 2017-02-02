@@ -1306,7 +1306,7 @@ trait Printers extends api.Printers { self: SymbolTable =>
       classFootnotes[T].toList map
         (fi => (fi, classIndex[T].find { case (any, ii) => ii == fi }.get._1))
 
-    def print[T: ClassTag](printer: Printers. super.TreePrinter): Unit = {
+    def print[T: ClassTag](printer: Printers.super.TreePrinter): Unit = {
       val footnotes = get[T]
       if (footnotes.nonEmpty) {
         printer.print(EOL)

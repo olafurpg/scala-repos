@@ -66,7 +66,7 @@ trait Evaluation extends Deployment {
     */
   def engineEvaluator_=[EI, Q, P, A, R <: BaseEvaluatorResult](
       engineEvaluator: (BaseEngine[EI, Q, P, A], BaseEvaluator[EI, Q, P, A, R])) {
-    assert(!_evaluatorSet, "Evaluator can be set at most once")
+    assert(! _evaluatorSet, "Evaluator can be set at most once")
     engine = engineEvaluator._1
     _evaluator = engineEvaluator._2
     _evaluatorSet = true

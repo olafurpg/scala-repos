@@ -18,12 +18,12 @@ class C extends A with B {
   val f4 = () => this.m
 
   val g1 = new runtime.AbstractFunction0[String] {
-    def apply() = C. super[A].m
+    def apply() = C.super[A].m
   }
   val g2 = new runtime.AbstractFunction0[String] {
-    def apply() = C. super[B].m
+    def apply() = C.super[B].m
   }
-  val g3 = new runtime.AbstractFunction0[String] { def apply() = C. super.m }
+  val g3 = new runtime.AbstractFunction0[String] { def apply() = C.super.m }
   val g4 = new runtime.AbstractFunction0[String] { def apply() = C.this.m }
 
   val h1 = () => super[A].n
@@ -32,12 +32,12 @@ class C extends A with B {
   val h4 = () => this.n
 
   val i1 = new runtime.AbstractFunction0[String] {
-    def apply() = C. super[A].n
+    def apply() = C.super[A].n
   }
   val i2 = new runtime.AbstractFunction0[String] {
-    def apply() = C. super[B].n
+    def apply() = C.super[B].n
   }
-  val i3 = new runtime.AbstractFunction0[String] { def apply() = C. super.n }
+  val i3 = new runtime.AbstractFunction0[String] { def apply() = C.super.n }
   val i4 = new runtime.AbstractFunction0[String] { def apply() = C.this.n }
 }
 

@@ -568,9 +568,8 @@ private[persistence] trait Eventsourced
           case SelectedSnapshot(metadata, snapshot) ⇒
             setLastSequenceNr(metadata.sequenceNr)
             // Since we are recovering we can ignore the receive behavior from the stack
-            Eventsourced. super.aroundReceive(
-              recoveryBehavior,
-              SnapshotOffer(metadata, snapshot))
+            Eventsourced.super.aroundReceive(recoveryBehavior,
+                                             SnapshotOffer(metadata, snapshot))
         }
         changeState(recovering(recoveryBehavior))
         journal ! ReplayMessages(lastSequenceNr + 1L,
@@ -601,7 +600,7 @@ private[persistence] trait Eventsourced
       case ReplayedMessage(p) ⇒
         try {
           updateLastSequenceNr(p)
-          Eventsourced. super.aroundReceive(recoveryBehavior, p)
+          Eventsourced.super.aroundReceive(recoveryBehavior, p)
         } catch {
           case NonFatal(t) ⇒
             try onRecoveryFailure(t, Some(p.payload))
@@ -613,7 +612,7 @@ private[persistence] trait Eventsourced
         sequenceNr = highestSeqNr
         setLastSequenceNr(highestSeqNr)
         internalStash.unstashAll()
-        Eventsourced. super.aroundReceive(recoveryBehavior, RecoveryCompleted)
+        Eventsourced.super.aroundReceive(recoveryBehavior, RecoveryCompleted)
       case ReplayMessagesFailure(cause) ⇒
         try onRecoveryFailure(cause, event = None)
         finally context.stop(self)
@@ -704,7 +703,7 @@ private[persistence] trait Eventsourced
       if (common.isDefinedAt(message)) common(message)
       else
         try {
-          Eventsourced. super.aroundReceive(receive, message)
+          Eventsourced.super.aroundReceive(receive, message)
           aroundReceiveComplete(err = false)
         } catch {
           case NonFatal(e) ⇒ aroundReceiveComplete(err = true); throw e

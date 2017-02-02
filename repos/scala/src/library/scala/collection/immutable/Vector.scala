@@ -685,7 +685,7 @@ class VectorIterator[+A](_startIndex: Int, endIndex: Int)
   private var _hasNext = blockIndex + lo < endIndex
 
   def next(): A = {
-    if (!_hasNext) throw new NoSuchElementException("reached iterator end")
+    if (! _hasNext) throw new NoSuchElementException("reached iterator end")
 
     val res = display0(lo).asInstanceOf[A]
     lo += 1

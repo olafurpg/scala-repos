@@ -421,18 +421,18 @@ class SparkContext(config: SparkConf)
     _conf = config.clone()
     _conf.validateSettings()
 
-    if (!_conf.contains("spark.master")) {
+    if (! _conf.contains("spark.master")) {
       throw new SparkException(
         "A master URL must be set in your configuration")
     }
-    if (!_conf.contains("spark.app.name")) {
+    if (! _conf.contains("spark.app.name")) {
       throw new SparkException(
         "An application name must be set in your configuration")
     }
 
     // System property spark.yarn.app.id must be set if user code ran by AM on a YARN cluster
     if (master == "yarn" && deployMode == "cluster" &&
-        !_conf.contains("spark.yarn.app.id")) {
+        ! _conf.contains("spark.yarn.app.id")) {
       throw new SparkException(
         "Detected yarn cluster mode, but isn't running on a cluster. " +
           "Deployment to YARN is not supported directly by SparkContext. Please use spark-submit.")

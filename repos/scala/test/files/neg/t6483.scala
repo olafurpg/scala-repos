@@ -12,7 +12,7 @@ class C2(val a: Int) extends AnyVal with T {
 }
 
 class C3(val a: Int) extends AnyVal with T {
-  override def foo = C3. super.foo + a // okay
+  override def foo = C3.super.foo + a // okay
 }
 
 class C4(val a: Int) extends AnyVal with T {

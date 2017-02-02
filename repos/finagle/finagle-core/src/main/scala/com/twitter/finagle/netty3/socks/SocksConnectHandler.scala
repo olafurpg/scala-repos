@@ -256,7 +256,7 @@ class SocksConnectHandler(proxyAddr: SocketAddress,
     // proxy cancellations again.
     connectFuture.get.addListener(new ChannelFutureListener {
       def operationComplete(f: ChannelFuture) {
-        if (f.isSuccess) SocksConnectHandler. super.channelConnected(ctx, e)
+        if (f.isSuccess) SocksConnectHandler.super.channelConnected(ctx, e)
         else if (f.isCancelled)
           fail(ctx.getChannel, new ChannelClosedException(addr))
       }

@@ -36,7 +36,7 @@ private[netty3] class SslListenerConnectionHandler(sslHandler: SslHandler,
       .addListener(new ChannelFutureListener {
         override def operationComplete(f: ChannelFuture): Unit =
           if (f.isSuccess) {
-            SslListenerConnectionHandler. super.channelConnected(ctx, e)
+            SslListenerConnectionHandler.super.channelConnected(ctx, e)
           } else {
             Channels.close(ctx.getChannel)
           }
@@ -148,7 +148,7 @@ class SslConnectHandler(
                 fail(ctx.getChannel, t)
               case None =>
                 connectFuture.get.setSuccess()
-                SslConnectHandler. super.channelConnected(ctx, e)
+                SslConnectHandler.super.channelConnected(ctx, e)
             }
           } else if (f.isCancelled) {
             fail(ctx.getChannel, new InconsistentStateException(_))

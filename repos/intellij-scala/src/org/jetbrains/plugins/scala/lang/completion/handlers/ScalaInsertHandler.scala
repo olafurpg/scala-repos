@@ -63,7 +63,7 @@ object ScalaInsertHandler {
 class ScalaInsertHandler extends InsertHandler[LookupElement] {
   import org.jetbrains.plugins.scala.lang.completion.handlers.ScalaInsertHandler._
   override def handleInsert(context: InsertionContext, _item: LookupElement) {
-    if (!_item.isInstanceOf[ScalaLookupItem]) return
+    if (! _item.isInstanceOf[ScalaLookupItem]) return
     val item = _item.asInstanceOf[ScalaLookupItem]
 
     val editor = context.getEditor

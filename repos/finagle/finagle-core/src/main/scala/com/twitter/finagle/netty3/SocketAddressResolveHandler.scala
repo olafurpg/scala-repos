@@ -55,7 +55,7 @@ private[finagle] class SocketAddressResolveHandler(
                   de.getState,
                   resolvedSocketAddress
                 )
-                SocketAddressResolveHandler. super
+                SocketAddressResolveHandler.super
                   .connectRequested(ctx, resolvedEvent)
               case Left(t) =>
                 de.getFuture.setFailure(t)

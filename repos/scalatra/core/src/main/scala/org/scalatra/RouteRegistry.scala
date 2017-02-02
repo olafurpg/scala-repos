@@ -121,7 +121,7 @@ class RouteRegistry {
                                     f: (Seq[Route] => Seq[Route])): Unit = {
     if (_methodRoutes.putIfAbsent(method, f(Vector.empty)).isDefined) {
       val oldRoutes = _methodRoutes(method)
-      if (!_methodRoutes.replace(method, oldRoutes, f(oldRoutes)))
+      if (! _methodRoutes.replace(method, oldRoutes, f(oldRoutes)))
         modifyRoutes(method, f)
     }
   }

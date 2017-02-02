@@ -53,7 +53,7 @@ abstract class MongoRefListField[OwnerType <: BsonRecord[OwnerType],
    * get the referenced objects
    */
   def objs = synchronized {
-    if (!_calcedObjs) {
+    if (! _calcedObjs) {
       _calcedObjs = true
       this._objs = findAll
     }

@@ -41,7 +41,7 @@ class DBRefField[OwnerType <: BsonRecord[OwnerType],
    * get the referenced object
    */
   def obj = synchronized {
-    if (!_calcedObj) {
+    if (! _calcedObj) {
       _calcedObj = true
       this._obj = ref.meta.findAny(value.getId)
     }

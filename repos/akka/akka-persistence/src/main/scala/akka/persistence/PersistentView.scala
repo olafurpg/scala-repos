@@ -278,7 +278,7 @@ trait PersistentView
         sso.foreach {
           case SelectedSnapshot(metadata, snapshot) ⇒
             setLastSequenceNr(metadata.sequenceNr)
-            PersistentView. super
+            PersistentView.super
               .aroundReceive(receive, SnapshotOffer(metadata, snapshot))
         }
         changeState(replayStarted(await = true))
@@ -314,7 +314,7 @@ trait PersistentView
       case ReplayedMessage(p) ⇒
         try {
           updateLastSequenceNr(p)
-          PersistentView. super.aroundReceive(receive, p.payload)
+          PersistentView.super.aroundReceive(receive, p.payload)
         } catch {
           case NonFatal(t) ⇒
             changeState(ignoreRemainingReplay(t))
@@ -331,7 +331,7 @@ trait PersistentView
         if (await) internalStash.stash()
         else {
           try {
-            PersistentView. super.aroundReceive(receive, other)
+            PersistentView.super.aroundReceive(receive, other)
           } catch {
             case NonFatal(t) ⇒
               changeState(ignoreRemainingReplay(t))
@@ -390,12 +390,12 @@ trait PersistentView
         case ReplayedMessage(p) ⇒
           // we can get ReplayedMessage here if it was stashed by user during replay
           // unwrap the payload
-          PersistentView. super.aroundReceive(receive, p.payload)
+          PersistentView.super.aroundReceive(receive, p.payload)
         case ScheduledUpdate(replayMax) ⇒
           changeStateToReplayStarted(await = false, replayMax)
         case Update(awaitUpdate, replayMax) ⇒
           changeStateToReplayStarted(awaitUpdate, replayMax)
-        case other ⇒ PersistentView. super.aroundReceive(receive, other)
+        case other ⇒ PersistentView.super.aroundReceive(receive, other)
       }
 
     def changeStateToReplayStarted(await: Boolean, replayMax: Long): Unit = {

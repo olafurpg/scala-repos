@@ -9,8 +9,8 @@ class B extends S1 with S2 {
   override val q = new M3
   val q3: q.type = q
 
-  var x1: B. super[S1].q1.type = null
-  var x2: B. super[S2].q2.type = null
+  var x1: B.super[S1].q1.type = null
+  var x2: B.super[S2].q2.type = null
   var x3: B.this.q3.type = null
 
   x1 = x1
@@ -40,8 +40,8 @@ class C extends S1 with S2 {
 
   // x1's type and x2's type are incompatible
   // x3's is assignable to x1 or x2, but not vice versa
-  var x1: C. super[S1].q.type = null
-  var x2: C. super[S2].q.type = null
+  var x1: C.super[S1].q.type = null
+  var x2: C.super[S2].q.type = null
   var x3: C.this.q.type = null
 
   x1 = x1

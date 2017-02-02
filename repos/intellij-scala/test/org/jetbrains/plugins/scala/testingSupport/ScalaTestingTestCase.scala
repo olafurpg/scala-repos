@@ -68,14 +68,14 @@ abstract class ScalaTestingTestCase(
   override protected def addFileToProject(fileName: String, fileText: String) = {
     UsefulTestCase.edt(new Runnable() {
       override def run(): Unit = {
-        ScalaTestingTestCase. super.addFileToProject(fileName, fileText)
+        ScalaTestingTestCase.super.addFileToProject(fileName, fileText)
       }
     })
   }
 
   override protected def tearDown() = {
     UsefulTestCase.edt(new Runnable() {
-      override def run(): Unit = ScalaTestingTestCase. super.tearDown()
+      override def run(): Unit = ScalaTestingTestCase.super.tearDown()
     })
   }
 

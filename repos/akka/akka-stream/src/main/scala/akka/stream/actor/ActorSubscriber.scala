@@ -187,7 +187,7 @@ trait ActorSubscriber extends Actor {
                                              msg: Any): Unit = msg match {
     case _: OnNext ⇒
       requested -= 1
-      if (!_canceled) {
+      if (! _canceled) {
         super.aroundReceive(receive, msg)
         request(requestStrategy.requestDemand(remainingRequested))
       }
@@ -200,7 +200,7 @@ trait ActorSubscriber extends Actor {
         } else if (requested != 0) sub.request(remainingRequested)
       } else sub.cancel()
     case OnComplete | OnError(_) ⇒
-      if (!_canceled) {
+      if (! _canceled) {
         _canceled = true
         super.aroundReceive(receive, msg)
       }
@@ -248,7 +248,7 @@ trait ActorSubscriber extends Actor {
     */
   protected[akka] override def aroundPostStop(): Unit = {
     state.remove(self)
-    if (!_canceled) subscription.foreach(_.cancel())
+    if (! _canceled) subscription.foreach(_.cancel())
     super.aroundPostStop()
   }
 
@@ -256,7 +256,7 @@ trait ActorSubscriber extends Actor {
     * Request a number of elements from upstream.
     */
   protected def request(elements: Long): Unit =
-    if (elements > 0 && !_canceled) {
+    if (elements > 0 && ! _canceled) {
       // if we don't have a subscription yet, it will be requested when it arrives
       subscription.foreach(_.request(elements))
       requested += elements
@@ -271,7 +271,7 @@ trait ActorSubscriber extends Actor {
     * until a subscription arrives, cancel it and then stop itself.
     */
   protected def cancel(): Unit =
-    if (!_canceled) {
+    if (! _canceled) {
       subscription match {
         case Some(s) ⇒
           context.stop(self)

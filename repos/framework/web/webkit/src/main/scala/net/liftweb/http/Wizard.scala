@@ -564,7 +564,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     def postFinish() {}
 
     private[http] def enterScreen() {
-      if (!_touched) {
+      if (! _touched) {
         _touched.set(true)
         localSetup()
       }

@@ -160,7 +160,7 @@ case class Http(
                                                maxHeaderSizeInBytes,
                                                maxChunkSize))
 
-          if (!_streaming)
+          if (! _streaming)
             pipeline.addLast(
               "httpDechunker",
               new HttpChunkAggregator(_maxResponseSize.inBytes.toInt))
@@ -186,7 +186,7 @@ case class Http(
         // Waiting on CSL-915 for a proper fix.
         underlying.map { u =>
           val filters = new ClientContextFilter[Request, Response].andThenIf(
-            !_streaming -> new PayloadSizeFilter[Request, Response](
+            ! _streaming -> new PayloadSizeFilter[Request, Response](
               params[param.Stats].statsReceiver,
               _.content.length,
               _.content.length
@@ -248,7 +248,7 @@ case class Http(
           // Response to ``Expect: Continue'' requests.
           pipeline
             .addLast("respondToExpectContinue", new RespondToExpectContinue)
-          if (!_streaming)
+          if (! _streaming)
             pipeline.addLast("httpDechunker",
                              new HttpChunkAggregator(maxRequestSizeInBytes))
 
@@ -275,7 +275,7 @@ case class Http(
           .andThen(new DtabFilter.Finagle[Request])
           .andThen(new ServerContextFilter[Request, Response])
           .andThenIf(
-            !_streaming -> new PayloadSizeFilter[Request, Response](
+            ! _streaming -> new PayloadSizeFilter[Request, Response](
               stats,
               _.content.length,
               _.content.length))

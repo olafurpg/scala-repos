@@ -5,10 +5,10 @@ trait A {
 class B extends A {
   def b() = super[A].f()
   trait C {
-    def c() = B. super[A].f()
+    def c() = B.super[A].f()
   }
   def g() = for (i <- 0 until 1) super[A].f()
-  def h() = for (i <- 0 until 1) B. super[A].f()
+  def h() = for (i <- 0 until 1) B.super[A].f()
   override def f() = println("B")
 }
 

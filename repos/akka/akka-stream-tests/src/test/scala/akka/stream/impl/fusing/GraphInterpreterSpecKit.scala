@@ -313,7 +313,7 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
     // to make tests a bit more readable
     lazy val stage: GraphStageLogic = new GraphStageLogic(stageshape) {
       private def mayFail(task: ⇒ Unit): Unit = {
-        if (!_failOnNextEvent) task
+        if (! _failOnNextEvent) task
         else {
           _failOnNextEvent = false
           throw testException
@@ -337,7 +337,7 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
 
       override def preStart(): Unit = mayFail(lastEvent += PreStart(stage))
       override def postStop(): Unit =
-        if (!_failOnPostStop) lastEvent += PostStop(stage)
+        if (! _failOnPostStop) lastEvent += PostStop(stage)
         else throw testException
 
       override def toString = "stage"

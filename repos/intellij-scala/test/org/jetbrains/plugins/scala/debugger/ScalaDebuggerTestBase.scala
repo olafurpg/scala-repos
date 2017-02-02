@@ -52,7 +52,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
     UsefulTestCase.edt(new Runnable {
 
       def run() {
-        ScalaDebuggerTestBase. super.setUp()
+        ScalaDebuggerTestBase.super.setUp()
         checkOrAddAllSourceFiles()
         addScalaSdk()
         addOtherLibraries()

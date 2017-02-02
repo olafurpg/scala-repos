@@ -1245,7 +1245,7 @@ trait BaseCometActor
   private def composeFunction_i: PartialFunction[Any, Unit] = {
     // if we're no longer running don't pass messages to the other handlers
     // just pass them to our handlers
-    if (!_running && (millis - 20000L) > _shutDownAt)
+    if (! _running && (millis - 20000L) > _shutDownAt)
       _mediumPriority orElse _lowPriority
     else
       highPriority orElse mediumPriority orElse _mediumPriority orElse lowPriority orElse _lowPriority

@@ -85,7 +85,7 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
   }
 
   def execute(_element: PsiElement, state: ResolveState): Boolean = {
-    if (!_element.isInstanceOf[PsiElement]) return false
+    if (! _element.isInstanceOf[PsiElement]) return false
     val element = _element.asInstanceOf[PsiNamedElement]
     forName match {
       case Some(name) if element.name != name => return true
