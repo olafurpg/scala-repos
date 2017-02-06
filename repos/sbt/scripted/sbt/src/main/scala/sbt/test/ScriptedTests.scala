@@ -227,7 +227,7 @@ class ScriptedRunner {
                                    bootProperties,
                                    launchOpts)
     val allTests =
-      get(tests, resourceBaseDirectory, logger) flatMap {
+      get(tests, resourceBaseDirectory, logger).flatMap {
         case ScriptedTest(group, name) =>
           runner.scriptedTest(group, name, prescripted, logger)
       }
@@ -265,7 +265,7 @@ private[test] final class ListTests(baseDirectory: File,
     extends NotNull {
   def filter = DirectoryFilter -- HiddenFileFilter
   def listTests: Seq[ScriptedTest] = {
-    list(baseDirectory, filter) flatMap { group =>
+    list(baseDirectory, filter).flatMap { group =>
       val groupName = group.getName
       listTests(group).map(ScriptedTest(groupName, _))
     }

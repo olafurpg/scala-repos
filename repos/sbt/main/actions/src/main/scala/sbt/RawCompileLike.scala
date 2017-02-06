@@ -105,7 +105,7 @@ object RawCompileLike {
     }
   def filterSources(f: File => Boolean, doCompile: Gen): Gen =
     (sources, classpath, outputDirectory, options, maxErrors, log) =>
-      doCompile(sources filter f,
+      doCompile(sources.filter(f),
                 classpath,
                 outputDirectory,
                 options,

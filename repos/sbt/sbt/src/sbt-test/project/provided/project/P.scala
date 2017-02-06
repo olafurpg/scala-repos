@@ -3,7 +3,7 @@ import Import._
 import Keys._
 
 object P extends Build {
-  lazy val superRoot = Project("super-root", file("super")) dependsOn (root)
+  lazy val superRoot = Project("super-root", file("super")).dependsOn(root)
   lazy val root: Project = Project(
     "root",
     file("."),
@@ -18,7 +18,7 @@ object P extends Build {
      fullClasspath in (root, Runtime),
      fullClasspath in (root, Test),
      fullClasspath in (sub, Test),
-     fullClasspath in (superRoot, Compile)) map { (rc, rr, rt, st, pr) =>
+     fullClasspath in (superRoot, Compile)).map { (rc, rr, rt, st, pr) =>
       check0(st, "sub test", true)
       check0(pr, "super main", false)
       check0(rc, "root main", true)

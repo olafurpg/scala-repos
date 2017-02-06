@@ -11,13 +11,13 @@ object SelectMainClass {
       case Nil => None
       case head :: Nil => Some(head)
       case multiple =>
-        promptIfMultipleChoices flatMap { prompt =>
+        promptIfMultipleChoices.flatMap { prompt =>
           println("\nMultiple main classes detected, select one to run:\n")
           for ((className, index) <- multiple.zipWithIndex)
             println(" [" + (index + 1) + "] " + className)
           val line = trim(prompt("\nEnter number: "))
           println("")
-          toInt(line, multiple.length) map multiple.apply
+          toInt(line, multiple.length).map(multiple.apply)
         }
     }
   }

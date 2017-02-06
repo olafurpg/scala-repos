@@ -8,7 +8,7 @@ object MyBuild extends Build {
   lazy val root =
     Project("root", file(".")) settings (externalPom(): _*) settings
       (scalaVersion := "2.9.0-1", check <<= checkTask,
-      managedClasspath in Provided <<= (classpathTypes, update) map {
+      managedClasspath in Provided <<= (classpathTypes, update).map {
         (cpts, report) =>
           Classpaths.managedJars(Provided, cpts, report)
       })
@@ -18,7 +18,7 @@ object MyBuild extends Build {
      managedClasspath in Provided,
      fullClasspath in Compile,
      fullClasspath in Test,
-     fullClasspath in Runtime) map {
+     fullClasspath in Runtime).map {
       case ((conf, names), p, c, t, r) =>
         println("Checking: " + conf.name)
         checkClasspath(conf match {
@@ -36,10 +36,10 @@ object MyBuild extends Build {
       "<module-names>")
   def cp(c: Configuration): Parser[Configuration] = c.name ^^^ c
   def checkClasspath(cp: Seq[Attributed[File]], names: Set[String]) = {
-    val fs = cp.files filter { _.getName endsWith ".jar" }
+    val fs = cp.files.filter { _.getName.endsWith(".jar") }
     val intersect =
-      fs filter { f =>
-        names exists { f.getName startsWith _ }
+      fs.filter { f =>
+        names.exists { f.getName.startsWith(_) }
       }
     assert(intersect == fs,
            "Expected:" + seqStr(names.toSeq) + "Got: " + seqStr(fs))

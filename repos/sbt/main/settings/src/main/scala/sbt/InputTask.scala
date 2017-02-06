@@ -10,7 +10,7 @@ import sbt.internal.util.Types._
 /** Parses input and produces a task to run.  Constructed using the companion object. */
 final class InputTask[T] private (val parser: State => Parser[Task[T]]) {
   def mapTask[S](f: Task[T] => Task[S]): InputTask[S] =
-    new InputTask[S](s => parser(s) map f)
+    new InputTask[S](s => parser(s).map(f))
 
   def partialInput(in: String): InputTask[T] =
     new InputTask[T](s => Parser(parser(s))(in))
@@ -28,21 +28,19 @@ final class InputTask[T] private (val parser: State => Parser[Task[T]]) {
 object InputTask {
   implicit class InitializeInput[T](i: Initialize[InputTask[T]]) {
     def partialInput(in: String): Initialize[InputTask[T]] =
-      i(_ partialInput in)
-    def fullInput(in: String): Initialize[InputTask[T]] = i(_ fullInput in)
+      i(_.partialInput(in))
+    def fullInput(in: String): Initialize[InputTask[T]] = i(_.fullInput(in))
 
     import std.FullInstance._
     def toTask(in: String): Initialize[Task[T]] = flatten(
-      (Def.stateKey zipWith i)(
-        (sTask, it) =>
-          sTask map
-            (s =>
-               Parser.parse(in, it.parser(s)) match {
-                 case Right(t) => Def.value(t)
-                 case Left(msg) =>
-                   val indented = msg.lines.map("   " + _).mkString("\n")
-                   sys.error(s"Invalid programmatic input:\n$indented")
-               }))
+      (Def.stateKey.zipWith(i))((sTask, it) =>
+        sTask.map(s =>
+          Parser.parse(in, it.parser(s)) match {
+            case Right(t) => Def.value(t)
+            case Left(msg) =>
+              val indented = msg.lines.map("   " + _).mkString("\n")
+              sys.error(s"Invalid programmatic input:\n$indented")
+        }))
     )
   }
 
@@ -56,16 +54,16 @@ object InputTask {
   def static[T](p: Parser[Task[T]]): InputTask[T] = free(_ => p)
 
   def static[I, T](p: Parser[I])(c: I => Task[T]): InputTask[T] =
-    static(p map c)
+    static(p.map(c))
 
   def free[T](p: State => Parser[Task[T]]): InputTask[T] = make(p)
 
   def free[I, T](p: State => Parser[I])(c: I => Task[T]): InputTask[T] =
-    free(s => p(s) map c)
+    free(s => p(s).map(c))
 
   def separate[I, T](p: State => Parser[I])(
       action: Initialize[I => Task[T]]): Initialize[InputTask[T]] =
-    separate(Def value p)(action)
+    separate(Def.value(p))(action)
 
   def separate[I, T](p: Initialize[State => Parser[I]])(
       action: Initialize[I => Task[T]]): Initialize[InputTask[T]] =
@@ -108,7 +106,7 @@ object InputTask {
     val dummyKey = localKey[Task[I]]
     val (marker, dummy) = dummyTask[I]
     val it =
-      action(TaskKey(dummyKey)) mapConstant subResultForDummy(dummyKey, dummy)
+      action(TaskKey(dummyKey)).mapConstant(subResultForDummy(dummyKey, dummy))
     val act = it { tsk => (value: I) =>
       subForDummy(marker, value, tsk)
     }

@@ -40,9 +40,9 @@ object Output {
                patternString: String,
                printLines: Seq[String] => Unit)(
       implicit display: Show[ScopedKey[_]]): Unit = {
-    val pattern = Pattern compile patternString
+    val pattern = Pattern.compile(patternString)
     val lines =
-      flatLines(lastLines(keys, streams))(_ flatMap showMatches(pattern))
+      flatLines(lastLines(keys, streams))(_.flatMap(showMatches(pattern)))
     printLines(lines)
   }
   def lastGrep(file: File,
@@ -51,12 +51,12 @@ object Output {
                tailDelim: String = DefaultTail): Unit =
     printLines(grep(tailLines(file, tailDelim), patternString))
   def grep(lines: Seq[String], patternString: String): Seq[String] =
-    lines flatMap showMatches(Pattern compile patternString)
+    lines.flatMap(showMatches(Pattern.compile(patternString)))
 
   def flatLines(outputs: Values[Seq[String]])(f: Seq[String] => Seq[String])(
       implicit display: Show[ScopedKey[_]]): Seq[String] = {
     val single = outputs.size == 1
-    outputs flatMap {
+    outputs.flatMap {
       case KeyValue(key, lines) =>
         val flines = f(lines)
         if (!single) bold(display(key)) +: flines else flines
@@ -67,7 +67,7 @@ object Output {
                 streams: Streams,
                 sid: Option[String] = None): Values[Seq[String]] = {
     val outputs =
-      keys map { (kv: KeyValue[_]) =>
+      keys.map { (kv: KeyValue[_]) =>
         KeyValue(kv.key, lastLines(kv.key, streams, sid))
       }
     outputs.filterNot(_.value.isEmpty)
@@ -99,8 +99,8 @@ object Output {
     if (lines.isEmpty) lines
     else {
       val (first, tail) = lines.span { line =>
-        !(line startsWith tailDelim)
+        !(line.startsWith(tailDelim))
       }
-      if (first.isEmpty) headLines(tail drop 1, tailDelim) else first
+      if (first.isEmpty) headLines(tail.drop(1), tailDelim) else first
     }
 }

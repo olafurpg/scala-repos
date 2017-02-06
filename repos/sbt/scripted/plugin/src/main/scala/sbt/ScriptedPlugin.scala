@@ -35,12 +35,12 @@ object ScriptedPlugin extends Plugin {
   val scripted = InputKey[Unit]("scripted")
 
   def scriptedTestsTask: Initialize[Task[AnyRef]] =
-    (scriptedClasspath, scalaInstance) map { (classpath, scala) =>
+    (scriptedClasspath, scalaInstance).map { (classpath, scala) =>
       val loader = ClasspathUtilities.toLoader(classpath, scala.loader)
       ModuleUtilities.getObject("sbt.test.ScriptedTests", loader)
     }
 
-  def scriptedRunTask: Initialize[Task[Method]] = (scriptedTests) map { (m) =>
+  def scriptedRunTask: Initialize[Task[Method]] = (scriptedTests).map { (m) =>
     m.getClass.getMethod("run",
                          classOf[File],
                          classOf[Boolean],
@@ -52,7 +52,7 @@ object ScriptedPlugin extends Plugin {
   private def scriptedParser(scriptedBase: File): Parser[Seq[String]] = {
     import DefaultParsers._
     val pairs =
-      (scriptedBase * AllPassFilter * AllPassFilter * "test").get map {
+      (scriptedBase * AllPassFilter * AllPassFilter * "test").get.map {
         (f: File) =>
           val p = f.getParentFile
           (p.getParentFile.getName, p.getName)
@@ -96,7 +96,7 @@ object ScriptedPlugin extends Plugin {
     scriptedTests <<= scriptedTestsTask,
     scriptedRun <<= scriptedRunTask,
     scriptedDependencies <<=
-      (compile in Test, publishLocal) map { (analysis, pub) =>
+      (compile in Test, publishLocal).map { (analysis, pub) =>
         Unit
       },
     scriptedLaunchOpts := Seq(),

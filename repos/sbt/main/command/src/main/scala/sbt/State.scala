@@ -237,14 +237,14 @@ object State {
     def keepLastLog = setNext(KeepLastLog)
     def exit(ok: Boolean) =
       runExitHooks().setNext(new Return(Exit(if (ok) 0 else 1)))
-    def get[T](key: AttributeKey[T]) = s.attributes get key
+    def get[T](key: AttributeKey[T]) = s.attributes.get(key)
     def put[T](key: AttributeKey[T], value: T) =
       s.copy(attributes = s.attributes.put(key, value))
     def update[T](key: AttributeKey[T])(f: Option[T] => T): State =
       put(key, f(get(key)))
     def has(key: AttributeKey[_]) = s.attributes contains key
     def remove(key: AttributeKey[_]) =
-      s.copy(attributes = s.attributes remove key)
+      s.copy(attributes = s.attributes.remove(key))
     def log = s.globalLogging.full
     def handleError(t: Throwable): State = handleException(t, s, log)
     def fail = {
@@ -277,7 +277,7 @@ object State {
     def setInteractive(i: Boolean) = s.put(BasicKeys.interactive, i)
 
     def classLoaderCache: ClassLoaderCache =
-      s get BasicKeys.classLoaderCache getOrElse newClassLoaderCache
+      s.get(BasicKeys.classLoaderCache).getOrElse(newClassLoaderCache)
     def initializeClassLoaderCache =
       s.put(BasicKeys.classLoaderCache, newClassLoaderCache)
     private[this] def newClassLoaderCache =
@@ -305,5 +305,5 @@ object State {
   private[sbt] def getBoolean(s: State,
                               key: AttributeKey[Boolean],
                               default: Boolean): Boolean =
-    s.get(key) getOrElse default
+    s.get(key).getOrElse(default)
 }

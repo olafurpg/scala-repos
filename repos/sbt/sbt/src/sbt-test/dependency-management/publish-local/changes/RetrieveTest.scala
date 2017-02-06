@@ -9,7 +9,7 @@ object MultiPublishTest extends Build {
       version := "1.0",
       ivyPaths <<=
         baseDirectory(dir => new IvyPaths(dir, Some(dir / "ivy" / "cache"))),
-      externalResolvers <<= baseDirectory map { base =>
+      externalResolvers <<= baseDirectory.map { base =>
         Resolver.file("local", base / "ivy" / "local" asFile)(
           Resolver.ivyStylePatterns) :: Nil
       }

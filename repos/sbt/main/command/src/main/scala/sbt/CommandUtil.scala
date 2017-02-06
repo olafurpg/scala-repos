@@ -11,15 +11,15 @@ import sbt.io.IO
 
 object CommandUtil {
   def readLines(files: Seq[File]): Seq[String] =
-    files flatMap (line => IO.readLines(line)) flatMap processLine
+    files.flatMap(line => IO.readLines(line)).flatMap(processLine)
   def processLine(s: String) = {
     val trimmed = s.trim; if (ignoreLine(trimmed)) None else Some(trimmed)
   }
   def ignoreLine(s: String) = s.isEmpty || s.startsWith("#")
 
   private def canRead = (_: File).canRead
-  def notReadable(files: Seq[File]): Seq[File] = files filterNot canRead
-  def readable(files: Seq[File]): Seq[File] = files filter canRead
+  def notReadable(files: Seq[File]): Seq[File] = files.filterNot(canRead)
+  def readable(files: Seq[File]): Seq[File] = files.filter(canRead)
 
   // slightly better fallback in case of older launcher
   def bootDirectory(state: State): File =
@@ -39,7 +39,7 @@ object CommandUtil {
 
   def withAttribute[T](s: State, key: AttributeKey[T], ifMissing: String)(
       f: T => State): State =
-    (s get key) match {
+    (s.get(key)) match {
       case None =>
         s.log.error(ifMissing); s.fail
       case Some(nav) => f(nav)
@@ -47,8 +47,8 @@ object CommandUtil {
 
   def singleArgument(exampleStrings: Set[String]): Parser[String] = {
     val arg =
-      (NotSpaceClass ~ any.*) map { case (ns, s) => (ns +: s).mkString }
-    token(Space) ~> token(arg examples exampleStrings)
+      (NotSpaceClass ~ any.*).map { case (ns, s) => (ns +: s).mkString }
+    token(Space) ~> token(arg.examples(exampleStrings))
   }
   def detail(selected: String, detailMap: Map[String, String]): String =
     detailMap.get(selected) match {
@@ -69,12 +69,12 @@ object CommandUtil {
   def searchHelp(selected: String,
                  detailMap: Map[String, String]): Map[String, String] = {
     val pattern = Pattern.compile(selected, HelpPatternFlags)
-    detailMap flatMap {
+    detailMap.flatMap {
       case (k, v) =>
         val contentMatches = Highlight.showMatches(pattern)(v)
         val keyMatches = Highlight.showMatches(pattern)(k)
-        val keyString = Highlight.bold(keyMatches getOrElse k)
-        val contentString = contentMatches getOrElse v
+        val keyString = Highlight.bold(keyMatches.getOrElse(k))
+        val contentString = contentMatches.getOrElse(v)
         if (keyMatches.isDefined || contentMatches.isDefined)
           (keyString, contentString) :: Nil
         else Nil

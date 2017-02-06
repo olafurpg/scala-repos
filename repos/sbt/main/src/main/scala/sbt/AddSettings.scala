@@ -74,7 +74,7 @@ object AddSettings {
     tx(a) {
       case _: DefaultSbtFiles | _: SbtFiles => None
       case x => Some(x)
-    } getOrElse seq()
+    }.getOrElse(seq())
 
   private[sbt] def tx(a: AddSettings)(
       f: AddSettings => Option[AddSettings]): Option[AddSettings] = a match {

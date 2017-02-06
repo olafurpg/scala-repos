@@ -26,7 +26,7 @@ object Util {
         Seq(javaSource in Compile).join)
   lazy val baseScalacOptions = Seq(
     scalacOptions ++= Seq("-Xelide-below", "0"),
-    scalacOptions <++= scalaVersion map CrossVersion.partialVersion map {
+    scalacOptions <++= scalaVersion.map(CrossVersion.partialVersion).map {
       case Some((2, 9)) | Some((2, 8)) =>
         Nil // support 2.9 for some subprojects for the Scala Eclipse IDE
       case _ =>
@@ -36,7 +36,7 @@ object Util {
             "-language:higherKinds",
             "-language:existentials")
     },
-    scalacOptions <++= scalaVersion map CrossVersion.partialVersion map {
+    scalacOptions <++= scalaVersion.map(CrossVersion.partialVersion).map {
       case Some((2, 10)) => Seq("-deprecation", "-Xlint")
       case _ => Seq()
     }
@@ -44,7 +44,7 @@ object Util {
 
   def projectComponent = projectID <<= (projectID, componentID) { (pid, cid) =>
     cid match {
-      case Some(id) => pid extra ("e:component" -> id); case None => pid
+      case Some(id) => pid.extra("e:component" -> id); case None => pid
     }
   }
 
@@ -74,13 +74,13 @@ object Util {
     val args =
       "xsbti.api" :: out.getAbsolutePath :: defs.map(_.getAbsolutePath).toList
     val mainClass =
-      main getOrElse "No main class defined for datatype generator"
+      main.getOrElse("No main class defined for datatype generator")
     toError(run.run(mainClass, cp.files, args, s.log))
     (out ** "*.java").get
   }
   def lastCompilationTime(analysis: sbt.inc.Analysis): Long = {
     val lastCompilation = analysis.compilations.allCompilations.lastOption
-    lastCompilation.map(_.startTime) getOrElse 0L
+    lastCompilation.map(_.startTime).getOrElse(0L)
   }
   def generateVersionFile(version: String,
                           dir: File,
@@ -113,7 +113,7 @@ object Util {
 
   def cleanPom(pomNode: scala.xml.Node) = {
     import scala.xml._
-    def cleanNodes(nodes: Seq[Node]): Seq[Node] = nodes flatMap {
+    def cleanNodes(nodes: Seq[Node]): Seq[Node] = nodes.flatMap {
       case elem @ Elem(prefix, "dependency", attributes, scope, children @ _ *)
           if excludePomDependency(elem) =>
         NodeSeq.Empty
@@ -132,14 +132,14 @@ object Util {
     cleanNodes(pomNode.theSeq)(0)
   }
 
-  def excludePomDependency(node: scala.xml.Node) = node \ "artifactId" exists {
+  def excludePomDependency(node: scala.xml.Node) = node \ "artifactId".exists {
     n =>
       excludePomArtifact(n.text)
   }
 
   def excludePomArtifact(artifactId: String) =
     (artifactId == "compiler-interface") ||
-      (artifactId startsWith "precompiled")
+      (artifactId.startsWith("precompiled"))
 
   val testExclusive = tags in test += ((ExclusiveTest, 1))
 
@@ -172,8 +172,8 @@ object %s {
       Seq(
         scalaKeywords := getScalaKeywords,
         generateKeywords <<=
-          (sourceManaged, scalaKeywords) map writeScalaKeywords,
-        sourceGenerators <+= generateKeywords map (x => Seq(x))
+          (sourceManaged, scalaKeywords).map(writeScalaKeywords),
+        sourceGenerators <+= generateKeywords.map(x => Seq(x))
       ))
 }
 
@@ -196,11 +196,11 @@ object Licensed {
 
   def settings: Seq[Setting[_]] = Seq(
     notice <<= baseDirectory(_ / "NOTICE"),
-    unmanagedResources in Compile <++= (notice, extractLicenses) map {
+    unmanagedResources in Compile <++= (notice, extractLicenses).map {
       _ +: _
     },
     extractLicenses <<=
-      (baseDirectory in ThisBuild, notice, streams) map extractLicenses0
+      (baseDirectory in ThisBuild, notice, streams).map(extractLicenses0)
   )
   def extractLicenses0(base: File, note: File, s: TaskStreams): Seq[File] =
     if (!note.exists) Nil

@@ -12,7 +12,7 @@ final case class Extracted(
     session: SessionSettings,
     currentRef: ProjectRef)(implicit val showKey: Show[ScopedKey[_]]) {
   def rootProject = structure.rootProject
-  lazy val currentUnit = structure units currentRef.build
+  lazy val currentUnit = structure.units(currentRef.build)
   lazy val currentProject = currentUnit defined currentRef.project
   lazy val currentLoader: ClassLoader = currentUnit.loader
   def get[T](key: TaskKey[T]): Task[T] = get(key.task)
@@ -112,12 +112,13 @@ final case class Extracted(
       scope: Scope,
       key: AttributeKey[_],
       value: Option[T])(implicit display: Show[ScopedKey[_]]): T =
-    value getOrElse sys.error(
-      display(ScopedKey(scope, key)) + " is undefined.")
+    value.getOrElse(
+      sys.error(display(ScopedKey(scope, key)) + " is undefined."))
   private def getOrError[T](scope: Scope, key: AttributeKey[T])(
       implicit display: Show[ScopedKey[_]]): T =
-    structure.data.get(scope, key) getOrElse sys.error(
-      display(ScopedKey(scope, key)) + " is undefined.")
+    structure.data
+      .get(scope, key)
+      .getOrElse(sys.error(display(ScopedKey(scope, key)) + " is undefined."))
 
   def append(settings: Seq[Setting[_]], state: State): State = {
     val appendSettings = Load.transformSettings(Load.projectScope(currentRef),

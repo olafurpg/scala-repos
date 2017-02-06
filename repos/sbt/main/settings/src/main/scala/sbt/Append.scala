@@ -29,7 +29,7 @@ object Append {
     new Sequence[Seq[T], Seq[V], V] {
       def appendValues(a: Seq[T], b: Seq[V]): Seq[T] =
         a ++
-          (b map { x =>
+          (b.map { x =>
             (x: T)
           })
       def appendValue(a: Seq[T], b: V): Seq[T] = a :+ (b: T)
@@ -43,7 +43,7 @@ object Append {
     new Sequence[List[T], List[V], V] {
       def appendValues(a: List[T], b: List[V]): List[T] =
         a :::
-          (b map { x =>
+          (b.map { x =>
             (x: T)
           })
       def appendValue(a: List[T], b: V): List[T] = a :+ (b: T)

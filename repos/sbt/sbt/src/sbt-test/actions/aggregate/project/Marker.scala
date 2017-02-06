@@ -9,7 +9,7 @@ trait Marker {
   final def mark(project: Reference): Initialize[Task[Unit]] =
     mark(baseDirectory in project)
   final def mark(baseKey: SettingKey[File]): Initialize[Task[Unit]] =
-    baseKey map { base =>
+    baseKey.map { base =>
       val toMark = base / "ran"
       if (toMark.exists) error("Already ran (" + toMark + " exists)")
       else IO touch toMark

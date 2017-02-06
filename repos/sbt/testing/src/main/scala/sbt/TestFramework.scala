@@ -213,7 +213,7 @@ object TestFramework {
                               ordered: Seq[TestDefinition],
                               log: Logger,
                               listeners: Seq[TestReportListener]) = {
-    val testsListeners = listeners collect { case tl: TestsListener => tl }
+    val testsListeners = listeners.collect { case tl: TestsListener => tl }
 
     def foreachListenerSafe(f: TestsListener => Unit): () => Unit =
       () => safeForeach(testsListeners, log)(f)
@@ -222,7 +222,7 @@ object TestFramework {
 
     val startTask = foreachListenerSafe(_.doInit)
     val testTasks =
-      tests flatMap {
+      tests.flatMap {
         case (framework, testDefinitions) =>
           val runner = runners(framework)
           val testTasks = withContextLoader(loader) {

@@ -37,10 +37,10 @@ object Sync {
 
       def outofdate(source: File, target: File): Boolean =
         !previousRelation.contains(source, target) ||
-          (previousInfo get source) != (currentInfo get source) ||
+          (previousInfo.get(source)) != (currentInfo.get(source)) ||
           !target.exists || target.isDirectory != source.isDirectory
 
-      val updates = relation filter outofdate
+      val updates = relation.filter(outofdate)
 
       val (cleanDirs, cleanFiles) =
         (updates._2s ++ removeTargets).partition(_.isDirectory)
@@ -63,13 +63,15 @@ object Sync {
 
   def noDuplicateTargets(relation: Relation[File, File]) {
     val dups =
-      relation.reverseMap.filter {
-        case (target, srcs) =>
-          srcs.size >= 2 && srcs.exists(!_.isDirectory)
-      } map {
-        case (target, srcs) =>
-          "\n\t" + target + "\nfrom\n\t" + srcs.mkString("\n\t\t")
-      }
+      relation.reverseMap
+        .filter {
+          case (target, srcs) =>
+            srcs.size >= 2 && srcs.exists(!_.isDirectory)
+        }
+        .map {
+          case (target, srcs) =>
+            "\n\t" + target + "\nfrom\n\t" + srcs.mkString("\n\t\t")
+        }
     if (dups.nonEmpty) sys.error("Duplicate mappings:" + dups.mkString)
   }
 

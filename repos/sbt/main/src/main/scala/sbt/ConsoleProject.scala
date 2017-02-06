@@ -18,7 +18,7 @@ object ConsoleProject {
             extra: String,
             cleanupCommands: String = "",
             options: Seq[String] = Nil)(implicit log: Logger): Unit = {
-    val extracted = Project extract state
+    val extracted = Project.extract(state)
     val cpImports = new Imports(extracted, state)
     val bindings =
       ("currentState" -> state) :: ("extracted" -> extracted) ::

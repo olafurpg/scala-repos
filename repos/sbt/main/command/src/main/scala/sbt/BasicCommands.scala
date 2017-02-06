@@ -91,28 +91,34 @@ object BasicCommands {
       completionsParser)
   def completionsParser(state: State) = {
     val notQuoted =
-      (NotQuoted ~ any.*) map { case (nq, s) => (nq +: s).mkString }
+      (NotQuoted ~ any.*).map { case (nq, s) => (nq +: s).mkString }
     val quotedOrUnquotedSingleArgument =
       Space ~> (StringVerbatim | StringEscapable | notQuoted)
 
-    applyEffect(
-      token(quotedOrUnquotedSingleArgument ?? "" examples ("", " ")))(
+    applyEffect(token(quotedOrUnquotedSingleArgument ?? "".examples("", " ")))(
       runCompletions(state))
   }
   def runCompletions(state: State)(input: String): State = {
-    Parser.completions(state.combinedParser, input, 9).get map { c =>
-      if (c.isEmpty) input else input + c.append
-    } foreach { c =>
-      System.out.println("[completions] " + c.replaceAll("\n", " "))
-    }
+    Parser
+      .completions(state.combinedParser, input, 9)
+      .get
+      .map { c =>
+        if (c.isEmpty) input else input + c.append
+      }
+      .foreach { c =>
+        System.out.println("[completions] " + c.replaceAll("\n", " "))
+      }
     state
   }
 
   def multiParser(s: State): Parser[Seq[String]] = {
     val nonSemi = token(charClass(_ != ';').+, hide = const(true))
-    (token(';' ~> OptSpace) flatMap { _ =>
-      matched((s.combinedParser & nonSemi) | nonSemi) <~ token(OptSpace)
-    } map (_.trim)).+
+    (token(';' ~> OptSpace)
+      .flatMap { _ =>
+        matched((s.combinedParser & nonSemi) | nonSemi) <~ token(OptSpace)
+      }
+      .map(_.trim))
+      .+
   }
 
   def multiApplied(s: State) =
@@ -216,7 +222,7 @@ object BasicCommands {
     token(StringBasic.map(s => IO.pathSplit(s).toSeq), "<classpath>")
 
   def exit =
-    Command.command(TerminateAction, exitBrief, exitBrief)(_ exit true)
+    Command.command(TerminateAction, exitBrief, exitBrief)(_.exit(true))
 
   def continuous =
     Command(ContinuousExecutePrefix, continuousBriefHelp, continuousDetail)(
@@ -235,11 +241,11 @@ object BasicCommands {
   def historyParser(s: State): Parser[() => State] =
     Command.applyEffect(HistoryCommands.actionParser) { histFun =>
       val logError = (msg: String) => s.log.error(msg)
-      val hp = s get historyPath getOrElse None
+      val hp = s.get(historyPath).getOrElse(None)
       val lines = hp.toList.flatMap(p => IO.readLines(p)).toIndexedSeq
       histFun(CHistory(lines, hp, logError)) match {
         case Some(commands) =>
-          commands foreach println //printing is more appropriate than logging
+          commands.foreach(println) //printing is more appropriate than logging
           (commands ::: s).continue
         case None => s.fail
       }
@@ -247,8 +253,8 @@ object BasicCommands {
 
   def shell = Command.command(Shell, Help.more(Shell, ShellDetailed)) { s =>
     val history =
-      (s get historyPath) getOrElse Some(new File(s.baseDir, ".history"))
-    val prompt = (s get shellPrompt) match {
+      (s.get(historyPath)).getOrElse(Some(new File(s.baseDir, ".history")))
+    val prompt = (s.get(shellPrompt)) match {
       case Some(pf) => pf(s); case None => "> "
     }
     val reader = new FullReader(history, s.combinedParser)
@@ -328,7 +334,7 @@ object BasicCommands {
       case Some(name ~ Some(Some(value))) => addAlias(s, name.trim, value.trim)
     }
   def addAlias(s: State, name: String, value: String): State =
-    if (Command validID name) {
+    if (Command.validID(name)) {
       val removed = removeAlias(s, name)
       if (value.isEmpty) removed else addAlias0(removed, name, value)
     } else {
@@ -354,7 +360,7 @@ object BasicCommands {
     alias match { case None => false; case Some((n, _)) => name == n }
 
   def getAlias(c: Command): Option[(String, String)] =
-    c.tags get CommandAliasKey
+    c.tags.get(CommandAliasKey)
   def printAlias(s: State, name: String): Unit =
     printAliases(aliases(s, (n, v) => n == name))
   def printAliases(s: State): Unit = printAliases(allAliases(s))

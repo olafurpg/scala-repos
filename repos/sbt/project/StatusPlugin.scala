@@ -38,9 +38,8 @@ object StatusPlugin extends AutoPlugin {
   }
   def stamp(v: String): String = {
     val Snapshot = "-SNAPSHOT"
-    if (v endsWith Snapshot)
-      (v stripSuffix Snapshot) + "-" + timestampString(
-        System.currentTimeMillis)
+    if (v.endsWith(Snapshot))(v.stripSuffix(Snapshot)) + "-" + timestampString(
+      System.currentTimeMillis)
     else sys.error("Release version '" + v + "' cannot be stamped")
   }
   def timestampString(time: Long): String = {

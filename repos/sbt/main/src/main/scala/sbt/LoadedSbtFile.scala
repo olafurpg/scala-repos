@@ -22,7 +22,7 @@ private[sbt] final class LoadedSbtFile(
                       projects ++ o.projects,
                       importedDefs ++ o.importedDefs,
                       manipulations,
-                      definitions zip o.definitions,
+                      definitions.zip(o.definitions),
                       generatedFiles ++ o.generatedFiles)
 
   def clearProjects =
@@ -42,7 +42,7 @@ private[sbt] final class DefinedSbtValues(
     val sbtFiles: Seq[compiler.EvalDefinitions]) {
 
   def values(parent: ClassLoader): Seq[Any] =
-    sbtFiles flatMap (_ values parent)
+    sbtFiles.flatMap(_.values(parent))
 
   def classloader(parent: ClassLoader): ClassLoader =
     sbtFiles.foldLeft(parent) { (cl, e) =>
@@ -59,7 +59,7 @@ private[sbt] final class DefinedSbtValues(
     } yield s"import ${m}.${v}"
   }
   def generated: Seq[File] =
-    sbtFiles flatMap (_.generated)
+    sbtFiles.flatMap(_.generated)
 
   // Returns a classpath for the generated .sbt files.
   def classpath: Seq[File] =

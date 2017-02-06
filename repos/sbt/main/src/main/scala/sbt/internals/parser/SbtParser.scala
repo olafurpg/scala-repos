@@ -125,7 +125,7 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     }
 
     val (imports, statements) =
-      parsedTrees partition {
+      parsedTrees.partition {
         case _: Import => true
         case _ => false
       }
@@ -162,7 +162,7 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
              t,
              LineRange(position.line - 1, position.line + numberLines)))
       }
-    val stmtTreeLineRange = statements flatMap convertStatement
+    val stmtTreeLineRange = statements.flatMap(convertStatement)
     val importsLineRange = importsToLineRanges(content, imports)
     (importsLineRange, stmtTreeLineRange.map {
       case (stmt, _, lr) => (stmt, lr)
@@ -177,7 +177,7 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     */
   private def importsToLineRanges(modifiedContent: String,
                                   imports: Seq[Tree]): Seq[(String, Int)] = {
-    val toLineRange = imports map convertImport(modifiedContent)
+    val toLineRange = imports.map(convertImport(modifiedContent))
     val groupedByLineNumber = toLineRange.groupBy {
       case (_, lineNumber) => lineNumber
     }

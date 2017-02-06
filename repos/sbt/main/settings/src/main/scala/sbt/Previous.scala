@@ -86,7 +86,7 @@ object Previous {
 
     for {
       results.TPair(Task(info, _), Value(result)) <- results.toTypedSeq
-      key <- info.attributes get Def.taskDefinitionKey
+      key <- info.attributes.get(Def.taskDefinitionKey)
     } impl(key, result)
   }
 
@@ -104,17 +104,18 @@ object Previous {
   def runtime[T](skey: TaskKey[T])(
       implicit format: Format[T]): Initialize[Task[Option[T]]] = {
     val inputs =
-      (cache in Global) zip Def.validated(skey, selfRefOk = true) zip
-        (references in Global)
+      (cache in Global)
+        .zip(Def.validated(skey, selfRefOk = true))
+        .zip(references in Global)
     inputs {
       case ((prevTask, resolved), refs) =>
         refs.recordReference(resolved, format) // always evaluated on project load
         import std.TaskExtra._
-        prevTask.map(_ get resolved) // evaluated if this task is evaluated
+        prevTask.map(_.get(resolved)) // evaluated if this task is evaluated
     }
   }
 
-  private[sbt] def cacheSetting = (streamsManagerKey, references) map {
+  private[sbt] def cacheSetting = (streamsManagerKey, references).map {
     (s, refs) =>
       new Previous(s, refs.getReferences)
   }

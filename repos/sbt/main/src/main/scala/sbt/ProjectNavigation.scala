@@ -14,11 +14,11 @@ import java.net.URI
 
 object ProjectNavigation {
   def command(s: State): Parser[() => State] =
-    if (s get sessionSettings isEmpty) failure("No project loaded")
+    if (s.get(sessionSettings) isEmpty) failure("No project loaded")
     else (new ProjectNavigation(s)).command
 }
 final class ProjectNavigation(s: State) {
-  val extracted = Project extract s
+  val extracted = Project.extract(s)
   import extracted.{currentRef, structure, session}
 
   def setProject(nuri: URI, nid: String) = {

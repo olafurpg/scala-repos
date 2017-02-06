@@ -343,7 +343,7 @@ private final class TrapExit(delegateManager: SecurityManager)
 
     // registers Threads from the tracked ThreadGroups
     private[this] def addUntrackedThreads(): Unit =
-      groupThreadsSnapshot foreach register
+      groupThreadsSnapshot.foreach(register)
 
     private[this] def groupThreadsSnapshot: Seq[Thread] = {
       val snap = groups.readOnlySnapshot.values.map(_.get).filter(_ != null)
@@ -391,14 +391,14 @@ private final class TrapExit(delegateManager: SecurityManager)
   }
 
   private[this] def interruptAllThreads(app: App): Unit =
-    app processThreads { t =>
+    app.processThreads { t =>
       if (!isSystemThread(t)) safeInterrupt(t, app.log)
       else app.log.debug(s"Not interrupting system thread $t")
     }
 
   /** Gets the managed application associated with Thread `t` */
   private[this] def getApp(t: Thread): Option[App] =
-    Option(threadToApp.get(computeID(t))) orElse getApp(t.getThreadGroup)
+    Option(threadToApp.get(computeID(t))).orElse(getApp(t.getThreadGroup))
 
   /** Gets the managed application associated with ThreadGroup `group` */
   private[this] def getApp(group: ThreadGroup): Option[App] =
@@ -481,7 +481,7 @@ private final class TrapExit(delegateManager: SecurityManager)
   }
 
   private[this] def noteAccess(group: ThreadGroup)(f: App => Unit): Unit =
-    getApp(currentThread) orElse getApp(group) foreach f
+    getApp(currentThread).orElse(getApp(group)).foreach(f)
 
   private[this] def isSystemGroup(group: ThreadGroup): Boolean =
     (group != null) && (group.getName == "system")
@@ -516,7 +516,7 @@ private final class TrapExit(delegateManager: SecurityManager)
 /** A thread-safe, write-once, optional cell for tracking an application's exit code.*/
 private final class ExitCode {
   private var code: Option[Int] = None
-  def set(c: Int): Unit = synchronized { code = code orElse Some(c) }
+  def set(c: Int): Unit = synchronized { code = code.orElse(Some(c)) }
   def value: Option[Int] = synchronized { code }
 }
 

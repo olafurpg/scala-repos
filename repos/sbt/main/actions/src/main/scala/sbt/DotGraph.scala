@@ -29,7 +29,7 @@ object DotGraph {
       if (packagePath.isEmpty) ""
       else packagePath.replace(File.separatorChar, '.')
     }
-    val toString = packageOnly compose fToString(sourceRoots)
+    val toString = packageOnly.compose(fToString(sourceRoots))
     apply(relations, outputDirectory, toString, toString)
   }
   def apply(relations: Relations,

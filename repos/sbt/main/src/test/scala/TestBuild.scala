@@ -30,7 +30,7 @@ object TestBuild {
   val MaxDepsGen = chooseShrinkable(0, MaxDeps)
 
   def chooseShrinkable(min: Int, max: Int): Gen[Int] =
-    sized(sz => choose(min, (max min sz) max 1))
+    sized(sz => choose(min, (max min sz).max(1)))
 
   implicit val cGen = Arbitrary {
     genConfigs(idGen, MaxDepsGen, MaxConfigsGen)
@@ -40,7 +40,7 @@ object TestBuild {
   final class Keys(val env: Env, val scopes: Seq[Scope]) {
     override def toString =
       env + "\n" + scopes.mkString("Scopes:\n\t", "\n\t", "")
-    lazy val delegated = scopes map env.delegates
+    lazy val delegated = scopes.map(env.delegates)
   }
 
   final case class Structure(env: Env,
@@ -96,7 +96,7 @@ object TestBuild {
         val hasGlobal = tasks(Global)
         if (hasGlobal) global += skey
         else {
-          val keys = tasks map makeKey
+          val keys = tasks.map(makeKey)
           if (keys.size == 1) single ++= keys
           else if (keys.size > 1) multi ++= keys
         }
@@ -120,9 +120,9 @@ object TestBuild {
     lazy val allProjects = builds.flatMap(_.allProjects)
     def rootProject(uri: URI): String = buildMap(uri).root.id
     def inheritConfig(ref: ResolvedReference, config: ConfigKey) =
-      projectFor(ref).confMap(config.name).extended map toConfigKey
+      projectFor(ref).confMap(config.name).extended.map(toConfigKey)
     def inheritTask(task: AttributeKey[_]) = taskMap.get(task) match {
-      case None => Nil; case Some(t) => t.delegates map getKey
+      case None => Nil; case Some(t) => t.delegates.map(getKey)
     }
     def inheritProject(ref: ProjectRef) = project(ref).delegates
     def resolve(ref: Reference) =
@@ -151,7 +151,7 @@ object TestBuild {
     override def toString =
       "Build " + uri.toString + " :\n    " + projects.mkString("\n    ")
     val allProjects =
-      projects map { p =>
+      projects.map { p =>
         (ProjectRef(uri, p.id), p)
       }
     val root = projects.head
@@ -178,7 +178,7 @@ object TestBuild {
   }
 
   def mapBy[K, T](s: Seq[T])(f: T => K): Map[K, T] =
-    s map { t =>
+    s.map { t =>
       (f(t), t)
     } toMap;
 
@@ -193,15 +193,15 @@ object TestBuild {
     for {
       build <- oneOf(env.builds)
       project <- oneOf(build.projects)
-      cAxis <- oneOrGlobal(project.configurations map toConfigKey)
-      tAxis <- oneOrGlobal(env.tasks map getKey)
+      cAxis <- oneOrGlobal(project.configurations.map(toConfigKey))
+      tAxis <- oneOrGlobal(env.tasks.map(getKey))
       pAxis <- orGlobal(
         frequency((1, BuildRef(build.uri)),
                   (3, ProjectRef(build.uri, project.id))))
     } yield Scope(pAxis, cAxis, tAxis, Global)
 
   def orGlobal[T](gen: Gen[T]): Gen[ScopeAxis[T]] =
-    frequency((1, gen map Select.apply), (1, Global))
+    frequency((1, gen.map(Select.apply)), (1, Global))
   def oneOrGlobal[T](gen: Seq[T]): Gen[ScopeAxis[T]] = orGlobal(oneOf(gen))
 
   def makeParser(structure: Structure): Parser[ScopedKey[_]] = {
@@ -250,7 +250,7 @@ object TestBuild {
     for (size <- chooseShrinkable(1, MaxIDSize); cs <- listOfN(size, alphaChar))
       yield cs.mkString
   implicit lazy val optIDGen: Gen[Option[String]] =
-    frequency((1, idGen map some.fn), (1, None))
+    frequency((1, idGen.map(some.fn)), (1, None))
   implicit lazy val uriGen: Gen[URI] = for (sch <- idGen; ssp <- idGen;
                                             frag <- optIDGen)
     yield new URI(sch, ssp, frag.orNull)
@@ -264,7 +264,7 @@ object TestBuild {
     for (u <- uGen; ps <- pGen(u)) yield new Build(u, ps)
 
   def nGen[T](igen: Gen[Int])(implicit g: Gen[T]): Gen[List[T]] =
-    igen flatMap { ig =>
+    igen.flatMap { ig =>
       listOfN(ig, g)
     }
 
@@ -301,26 +301,26 @@ object TestBuild {
 
   def genAcyclic[A, T](maxDeps: Gen[Int], keyGen: Gen[T], max: Gen[Int])(
       make: T => Gen[Seq[A] => A]): Gen[Seq[A]] =
-    max flatMap { count =>
-      listOfN(count, keyGen) flatMap { keys =>
+    max.flatMap { count =>
+      listOfN(count, keyGen).flatMap { keys =>
         genAcyclic(maxDeps, keys.distinct)(make)
       }
     }
   def genAcyclic[A, T](maxDeps: Gen[Int], keys: List[T])(
       make: T => Gen[Seq[A] => A]): Gen[Seq[A]] =
-    genAcyclic(maxDeps, keys, Nil) flatMap { pairs =>
-      sequence(pairs.map { case (key, deps) => mapMake(key, deps, make) }) flatMap {
-        inputs =>
+    genAcyclic(maxDeps, keys, Nil).flatMap { pairs =>
+      sequence(pairs.map { case (key, deps) => mapMake(key, deps, make) })
+        .flatMap { inputs =>
           val made = new collection.mutable.HashMap[T, A]
-          for ((key, deps, mk) <- inputs) made(key) = mk(deps map made)
-          keys map made
-      }
+          for ((key, deps, mk) <- inputs) made(key) = mk(deps.map(made))
+          keys.map(made)
+        }
     }
 
   def mapMake[A, T](key: T,
                     deps: Seq[T],
                     make: T => Gen[Seq[A] => A]): Gen[Inputs[A, T]] =
-    make(key) map { (mk: Seq[A] => A) =>
+    make(key).map { (mk: Seq[A] => A) =>
       (key, deps, mk)
     }
 
@@ -336,8 +336,8 @@ object TestBuild {
         genAcyclic(maxDeps, xs, next :: acc)
     }
   def sequence[T](gs: Seq[Gen[T]]): Gen[Seq[T]] = Gen.parameterized { prms =>
-    wrap(gs map { g =>
-      g(prms) getOrElse sys.error("failed generator")
+    wrap(gs.map { g =>
+      g(prms).getOrElse(sys.error("failed generator"))
     })
   }
   type Inputs[A, T] = (T, Seq[T], Seq[A] => A)

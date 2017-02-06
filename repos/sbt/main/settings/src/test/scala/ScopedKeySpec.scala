@@ -63,6 +63,6 @@ class ScopedKeySpec extends Specification {
 
   def beParsedAs(cmd: String, scope0: Scope, key0: String) = {
     val (scope, key) = parseScopedKey(cmd)
-    (scope must_== scope0) and (key must_== key0)
+    (scope must_== scope0).and(key must_== key0)
   }
 }

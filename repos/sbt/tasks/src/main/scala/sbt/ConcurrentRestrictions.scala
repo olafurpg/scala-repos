@@ -105,7 +105,7 @@ object ConcurrentRestrictions {
 
   private[this] def update[A, B](m: Map[A, B], a: A, b: B)(
       f: (B, B) => B): Map[A, B] = {
-    val newb = (m get a) match {
+    val newb = (m.get(a)) match {
       case Some(bv) => f(bv, b)
       case None => b
     }
@@ -159,7 +159,7 @@ object ConcurrentRestrictions {
         val newState = tags.add(tagState, node)
         // if the new task is allowed to run concurrently with the currently running tasks,
         //   submit it to be run by the backing j.u.c.CompletionService
-        if (tags valid newState) {
+        if (tags.valid(newState)) {
           tagState = newState
           submitValid(node, work)
         } else {

@@ -144,7 +144,7 @@ private[sbt] object PluginsDebug {
   }
   private[this] def availableAutoPlugins(
       build: LoadedBuildUnit): Seq[AutoPlugin] =
-    build.unit.plugins.detected.autoPlugins map { _.value }
+    build.unit.plugins.detected.autoPlugins.map { _.value }
 
   def help(plugin: AutoPlugin, s: State): String = {
     val extracted = Project.extract(s)
@@ -353,7 +353,7 @@ private[sbt] object PluginsDebug {
   private[this] def includeAll[T <: Basic](basic: Set[T]): Plugins =
     And(basic.toList)
   private[this] def excludeAll(plugins: Set[AutoPlugin]): Plugins =
-    And(plugins map (p => Exclude(p)) toList)
+    And(plugins.map(p => Exclude(p)) toList)
 
   private[this] def excludes(bs: Seq[Basic]): Set[AutoPlugin] =
     bs.collect { case Exclude(b) => b }.toSet

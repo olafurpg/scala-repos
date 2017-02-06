@@ -8,7 +8,7 @@ final class BuildDependencies private (
     val classpath: DependencyMap[ClasspathDep[ProjectRef]],
     val aggregate: DependencyMap[ProjectRef]) {
   def classpathRefs(ref: ProjectRef): Seq[ProjectRef] =
-    classpath(ref) map getID
+    classpath(ref).map(getID)
   def classpathTransitiveRefs(ref: ProjectRef): Seq[ProjectRef] =
     classpathTransitive(ref)
 
@@ -36,8 +36,8 @@ object BuildDependencies {
   def transitive[D](deps: DependencyMap[D],
                     extract: D => ProjectRef): DependencyMap[ProjectRef] =
     for ((ref, _) <- deps) yield {
-      val sorted = Dag.topologicalSort(ref)(d => deps(d) map extract)
-      (ref, sorted dropRight 1)
+      val sorted = Dag.topologicalSort(ref)(d => deps(d).map(extract))
+      (ref, sorted.dropRight(1))
     }
   val getID: ClasspathDep[ProjectRef] => ProjectRef = _.project
 }
