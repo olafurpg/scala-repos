@@ -17,18 +17,18 @@ object PluginsTest extends Specification {
     }
     "order enable plugins after required plugins" in {
       val ns = deducePlugin(A && B, log)
-      ((ns indexOf Q) must beGreaterThan(ns indexOf A)) and
-        ((ns indexOf Q) must beGreaterThan(ns indexOf B)) and
-        ((ns indexOf R) must beGreaterThan(ns indexOf A)) and
-        ((ns indexOf R) must beGreaterThan(ns indexOf B)) and
-        ((ns indexOf R) must beGreaterThan(ns indexOf Q))
+      ((ns indexOf Q) must beGreaterThan(ns indexOf A))
+        .and((ns indexOf Q) must beGreaterThan(ns indexOf B))
+        .and((ns indexOf R) must beGreaterThan(ns indexOf A))
+        .and((ns indexOf R) must beGreaterThan(ns indexOf B))
+        .and((ns indexOf R) must beGreaterThan(ns indexOf Q))
     }
     "not enable plugins with trigger=allRequirements but conflicting requirements" in {
       deducePlugin(A && B, log) must not contain (S)
     }
     "enable plugins that are required by the requested plugins" in {
       val ns = deducePlugin(Q, log)
-      (ns must contain(A)) and (ns must contain(B))
+      (ns must contain(A)).and(ns must contain(B))
     }
     "throw an AutoPluginException on conflicting requirements" in {
       deducePlugin(S, log) must throwAn[AutoPluginException](message =

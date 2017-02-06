@@ -6,11 +6,11 @@ import Import._
 object B extends Build {
   lazy val root =
     Project("root", file(".")) settings
-      (a <<= baseDirectory map
-        (b => if ((b / "succeed").exists) () else sys.error("fail")), b <<=
-        a.task(at => nop dependsOn (at)), c <<= a map { _ =>
+      (a <<= baseDirectory.map(b =>
+        if ((b / "succeed").exists) () else sys.error("fail")), b <<=
+        a.task(at => nop.dependsOn(at)), c <<= a.map { _ =>
         ()
-      }, d <<= a flatMap { _ =>
+      }, d <<= a.flatMap { _ =>
         task { () }
       })
   lazy val a = TaskKey[Unit]("a")
@@ -21,10 +21,10 @@ object B extends Build {
   lazy val input =
     Project("input", file("input")) settings
       (f <<= inputTask {
-        _ map { args =>
+        _.map { args =>
           if (args(0) == "succeed") () else sys.error("fail")
         }
-      }, j := sys.error("j"), g <<= f dependsOn (j), h <<= f map { _ =>
+      }, j := sys.error("j"), g <<= f.dependsOn(j), h <<= f.map { _ =>
         IO.touch(file("h"))
       })
   lazy val f = InputKey[Unit]("f")

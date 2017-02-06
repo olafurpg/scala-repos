@@ -15,7 +15,7 @@ object TaskRunnerCircularTest extends Properties("TaskRunner Circular") {
   final def allowedReference(intermediate: Int, workers: Int) = {
     val top = task(intermediate).named("top")
     def iterate(tk: Task[Int]): Task[Int] =
-      tk flatMap { t =>
+      tk.flatMap { t =>
         if (t <= 0) top
         else iterate(task(t - 1).named((t - 1).toString))
       }
@@ -27,7 +27,7 @@ object TaskRunnerCircularTest extends Properties("TaskRunner Circular") {
   final def checkCircularReferences(intermediate: Int, workers: Int) = {
     lazy val top = iterate(task(intermediate).named("bottom"), intermediate)
     def iterate(tk: Task[Int], i: Int): Task[Int] =
-      tk flatMap { t =>
+      tk.flatMap { t =>
         if (t <= 0) top
         else iterate(task(t - 1).named((t - 1).toString), i - 1)
       }

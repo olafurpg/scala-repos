@@ -80,7 +80,7 @@ private[sbt] object SettingCompletions {
                                         rootProject,
                                         settings)
     val newSession =
-      session.appendSettings(append map (a => (a, arg.split('\n').toList)))
+      session.appendSettings(append.map(a => (a, arg.split('\n').toList)))
     val struct = extracted.structure
     val r = relation(newSession.mergeSettings, true)(structure.delegates,
                                                      structure.scopeLocal,
@@ -218,7 +218,7 @@ private[sbt] object SettingCompletions {
     val data = settings.data
     val allScopes = data.keys.toSeq
     val definedScopes =
-      data.toSeq flatMap {
+      data.toSeq.flatMap {
         case (scope, attrs) => if (attrs contains key) scope :: Nil else Nil
       }
     scope(key, allScopes, definedScopes, context)
@@ -261,7 +261,7 @@ private[sbt] object SettingCompletions {
                                                  _.description,
                                                  "task")
     val nonGlobal =
-      (configParser ~ taskParser) map {
+      (configParser ~ taskParser).map {
         case (c, t) => Scope(This, c, t, Global)
       }
     val global = inParser ~> token((Space ~ GlobalID) ^^^ GlobalScope)
@@ -275,7 +275,8 @@ private[sbt] object SettingCompletions {
     }
     val identifier =
       Act
-        .filterStrings(Op, Assign.values.map(_.toString), "assignment method") map Assign.withName
+        .filterStrings(Op, Assign.values.map(_.toString), "assignment method")
+        .map(Assign.withName)
     token(Space) ~> token(optionallyQuoted(identifier), completions)
   }
 
@@ -286,13 +287,13 @@ private[sbt] object SettingCompletions {
   private[this] def scalaID[T](keyMap: Map[String, T],
                                label: String): Parser[T] = {
     val identifier =
-      Act.filterStrings(ScalaID, keyMap.keySet, label) map keyMap
+      Act.filterStrings(ScalaID, keyMap.keySet, label).map(keyMap)
     optionallyQuoted(identifier)
   }
 
   /** Produce a new parser that allows the input accepted by `p` to be quoted in backticks. */
   def optionallyQuoted[T](p: Parser[T]): Parser[T] =
-    (Backtick.? ~ p) flatMap {
+    (Backtick.? ~ p).flatMap {
       case (quote, id) =>
         if (quote.isDefined) Backtick.? ^^^ id else success(id)
     }
@@ -309,7 +310,7 @@ private[sbt] object SettingCompletions {
       else assignNoAppend
     val applicable = allowed.toSeq.flatMap { a =>
       val s = a.toString
-      if (s startsWith seen) (s, a) :: Nil else Nil
+      if (s.startsWith(seen)) (s, a) :: Nil else Nil
     }
     completeDescribed(seen, true, applicable)(assignDescription)
   }
@@ -338,8 +339,8 @@ private[sbt] object SettingCompletions {
       all: Map[String, T],
       detailLimit: Int)(description: T => Option[String])(
       prominent: (String, T) => Boolean): Seq[Completion] = {
-    val applicable = all.toSeq.filter { case (k, v) => k startsWith seen }
-    val prominentOnly = applicable filter { case (k, v) => prominent(k, v) }
+    val applicable = all.toSeq.filter { case (k, v) => k.startsWith(seen) }
+    val prominentOnly = applicable.filter { case (k, v) => prominent(k, v) }
 
     val showAll =
       (level >= 3) || (level == 2 && prominentOnly.size <= detailLimit) ||
@@ -357,7 +358,7 @@ private[sbt] object SettingCompletions {
     if (in.isEmpty) Nil
     else if (showDescriptions) {
       val withDescriptions =
-        in map { case (id, key) => (id, description(key)) }
+        in.map { case (id, key) => (id, description(key)) }
       val padded = CommandUtil.aligned("", "   ", withDescriptions)
       (padded, in).zipped.map {
         case (line, (id, key)) =>
@@ -365,7 +366,7 @@ private[sbt] object SettingCompletions {
                                   display = line + "\n")
       }
     } else
-      in map {
+      in.map {
         case (id, key) =>
           Completion.tokenDisplay(display = id, append = appendString(id))
       }
@@ -426,7 +427,7 @@ private[sbt] object SettingCompletions {
   /** True if the `key` represents a setting or task that may be appended using an assignment method such as `+=`. */
   def appendable(key: AttributeKey[_]): Boolean = {
     val underlying = keyUnderlyingType(key).runtimeClass
-    appendableClasses.exists(_ isAssignableFrom underlying)
+    appendableClasses.exists(_.isAssignableFrom(underlying))
   }
 
   /** The simple name of the global scope axis, which can be used to reference it in the default setting context. */

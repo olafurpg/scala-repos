@@ -135,9 +135,9 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
                autoPlugins)
 
   def resolve(resolveRef: ProjectReference => ProjectRef): ResolvedProject = {
-    def resolveRefs(prs: Seq[ProjectReference]) = prs map resolveRef
+    def resolveRefs(prs: Seq[ProjectReference]) = prs.map(resolveRef)
     def resolveDeps(ds: Seq[ClasspathDep[ProjectReference]]) =
-      ds map resolveDep
+      ds.map(resolveDep)
     def resolveDep(d: ClasspathDep[ProjectReference]) =
       ResolvedClasspathDependency(resolveRef(d.project), d.configuration)
     resolved(
@@ -154,9 +154,9 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
     )
   }
   def resolveBuild(resolveRef: ProjectReference => ProjectReference): Project = {
-    def resolveRefs(prs: Seq[ProjectReference]) = prs map resolveRef
+    def resolveRefs(prs: Seq[ProjectReference]) = prs.map(resolveRef)
     def resolveDeps(ds: Seq[ClasspathDep[ProjectReference]]) =
-      ds map resolveDep
+      ds.map(resolveDep)
     def resolveDep(d: ClasspathDep[ProjectReference]) =
       ClasspathDependency(resolveRef(d.project), d.configuration)
     unresolved(
@@ -501,13 +501,13 @@ object Project extends ProjectExtra {
   }
 
   def getOrError[T](state: State, key: AttributeKey[T], msg: String): T =
-    state get key getOrElse sys.error(msg)
+    state.get(key).getOrElse(sys.error(msg))
   def structure(state: State): BuildStructure =
     getOrError(state, stateBuildStructure, "No build loaded.")
   def session(state: State): SessionSettings =
     getOrError(state, sessionSettings, "Session not initialized.")
   def isProjectLoaded(state: State): Boolean =
-    (state has sessionSettings) && (state has stateBuildStructure)
+    (state.has(sessionSettings)) && (state.has(stateBuildStructure))
 
   def extract(state: State): Extracted =
     extract(session(state), structure(state))
@@ -528,10 +528,10 @@ object Project extends ProjectExtra {
     getProject(ref, structure.units)
   def getProject(ref: ProjectRef,
                  units: Map[URI, LoadedBuildUnit]): Option[ResolvedProject] =
-    (units get ref.build).flatMap(_.defined get ref.project)
+    (units.get(ref.build)).flatMap(_.defined.get(ref.project))
 
   def runUnloadHooks(s: State): State = {
-    val previousOnUnload = orIdentity(s get Keys.onUnload.key)
+    val previousOnUnload = orIdentity(s.get(Keys.onUnload.key))
     previousOnUnload(s.runExitHooks())
   }
   def setProject(session: SessionSettings,
@@ -548,9 +548,9 @@ object Project extends ProjectExtra {
       LogManager.setGlobalLogLevels(updateCurrent(newState), structure.data))
   }
 
-  def orIdentity[T](opt: Option[T => T]): T => T = opt getOrElse idFun
+  def orIdentity[T](opt: Option[T => T]): T => T = opt.getOrElse(idFun)
   def getHook[T](key: SettingKey[T => T], data: Settings[Scope]): T => T =
-    orIdentity(key in GlobalScope get data)
+    orIdentity(key in GlobalScope.get(data))
   def getHooks(data: Settings[Scope]): (State => State, State => State) =
     (getHook(Keys.onLoad, data), getHook(Keys.onUnload, data))
 
@@ -559,20 +559,20 @@ object Project extends ProjectExtra {
     val structure = Project.structure(s)
     val ref = Project.current(s)
     val project = Load.getProject(structure.units, ref.build, ref.project)
-    val msg = Keys.onLoadMessage in ref get structure.data getOrElse ""
+    val msg = Keys.onLoadMessage in ref.get(structure.data).getOrElse("")
     if (!msg.isEmpty) s.log.info(msg)
-    def get[T](k: SettingKey[T]): Option[T] = k in ref get structure.data
+    def get[T](k: SettingKey[T]): Option[T] = k in ref.get(structure.data)
     def commandsIn(axis: ResolvedReference) =
-      commands in axis get structure.data toList;
+      commands in axis.get(structure.data) toList;
 
     val allCommands =
       commandsIn(ref) ++ commandsIn(BuildRef(ref.build)) ++
-        (commands in Global get structure.data toList)
-    val history = get(historyPath) flatMap idFun
+        (commands in Global.get(structure.data) toList)
+    val history = get(historyPath).flatMap(idFun)
     val prompt = get(shellPrompt)
     val watched = get(watch)
     val commandDefs =
-      allCommands.distinct.flatten[Command].map(_ tag (projectCommand, true))
+      allCommands.distinct.flatten[Command].map(_.tag(projectCommand, true))
     val newDefinedCommands =
       commandDefs ++ BasicCommands.removeTagged(s.definedCommands,
                                                 projectCommand)
@@ -600,7 +600,7 @@ object Project extends ProjectExtra {
     if (dups.isEmpty) None
     else {
       val dupStrs =
-        dups map {
+        dups.map {
           case (dir, scopes) =>
             s"${dir.getAbsolutePath}:\n\t${scopes.mkString("\n\t")}"
         }
@@ -638,12 +638,12 @@ object Project extends ProjectExtra {
   def transform(g: Scope => Scope,
                 ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] = {
     val f = mapScope(g)
-    ss.map(_ mapKey f mapReferenced f)
+    ss.map(_.mapKey(f).mapReferenced(f))
   }
   def transformRef(g: Scope => Scope,
                    ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] = {
     val f = mapScope(g)
-    ss.map(_ mapReferenced f)
+    ss.map(_.mapReferenced(f))
   }
 
   def delegates(structure: BuildStructure,
@@ -654,7 +654,7 @@ object Project extends ProjectExtra {
   def scopedKeyData(structure: BuildStructure,
                     scope: Scope,
                     key: AttributeKey[_]): Option[ScopedKeyData[_]] =
-    structure.data.get(scope, key) map { v =>
+    structure.data.get(scope, key).map { v =>
       ScopedKeyData(ScopedKey(scope, key), v)
     }
 
@@ -666,7 +666,7 @@ object Project extends ProjectExtra {
     val scoped = ScopedKey(scope, key)
 
     val data =
-      scopedKeyData(structure, scope, key) map { _.description } getOrElse {
+      scopedKeyData(structure, scope, key).map { _.description }.getOrElse {
         "No entry for key."
       }
     val description = key.description match {
@@ -685,9 +685,12 @@ object Project extends ProjectExtra {
                                                         structure.scopeLocal,
                                                         display)
     val definedAt =
-      comp get definingScoped map { c =>
-        Def.definedAtString(c.settings).capitalize
-      } getOrElse ""
+      comp
+        .get(definingScoped)
+        .map { c =>
+          Def.definedAtString(c.settings).capitalize
+        }
+        .getOrElse("")
 
     val cMap = Def.flattenLocals(comp)
     val related = cMap.keys.filter(k => k.key == key && k.scope != scope)
@@ -799,12 +802,12 @@ object Project extends ProjectExtra {
       structure: BuildStructure,
       actual: Boolean,
       key: AttributeKey[_])(implicit display: Show[ScopedKey[_]]): Seq[Scope] =
-    relation(structure, actual)(display)._1s.toSeq flatMap { sk =>
+    relation(structure, actual)(display)._1s.toSeq.flatMap { sk =>
       if (sk.key == key) sk.scope :: Nil else Nil
     }
   def usedBy(structure: BuildStructure, actual: Boolean, key: AttributeKey[_])(
       implicit display: Show[ScopedKey[_]]): Seq[ScopedKey[_]] =
-    relation(structure, actual)(display).all.toSeq flatMap {
+    relation(structure, actual)(display).all.toSeq.flatMap {
       case (a, b) => if (b.key == key) List[ScopedKey[_]](a) else Nil
     }
   def reverseDependencies(cMap: Map[ScopedKey[_], Flattened],
@@ -822,7 +825,7 @@ object Project extends ProjectExtra {
     "Extra build URIs to load in addition to the ones defined by the project.")
   def extraBuilds(s: State): List[URI] = getOrNil(s, ExtraBuilds)
   def getOrNil[T](s: State, key: AttributeKey[List[T]]): List[T] =
-    s get key getOrElse Nil
+    s.get(key).getOrElse(Nil)
   def setExtraBuilds(s: State, extra: List[URI]): State =
     s.put(ExtraBuilds, extra)
   def addExtraBuilds(s: State, extra: List[URI]): State =
@@ -996,7 +999,7 @@ trait ProjectExtra {
   private[sbt] def inTask[T](t: Scoped, i: Initialize[T]): Initialize[T] =
     inScope(ThisScope.copy(task = Select(t.key)), i)
   private[sbt] def inScope[T](scope: Scope, i: Initialize[T]): Initialize[T] =
-    i mapReferenced Project.mapScope(Scope.replaceThis(scope))
+    i.mapReferenced(Project.mapScope(Scope.replaceThis(scope)))
 
   /**
     * Creates a new Project.  This is a macro that expects to be assigned directly to a val.

@@ -54,7 +54,7 @@ object TaskSerial extends Properties("task serial") {
                      restrictions: ConcurrentRestrictions[Task[_]],
                      shouldSucceed: Boolean) = {
     val latch = task { new CountDownLatch(size) }
-    def mktask = latch map { l =>
+    def mktask = latch.map { l =>
       l.countDown()
       l.await(Timeout, TimeUnit.MILLISECONDS)
     }

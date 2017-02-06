@@ -65,7 +65,7 @@ object Dependencies {
   private def scala211Module(name: String, moduleVersion: String) =
     Def.setting {
       scalaVersion.value match {
-        case sv if (sv startsWith "2.9.") || (sv startsWith "2.10.") => Nil
+        case sv if (sv.startsWith("2.9.")) || (sv.startsWith("2.10.")) => Nil
         case _ => ("org.scala-lang.modules" %% name % moduleVersion) :: Nil
       }
     }

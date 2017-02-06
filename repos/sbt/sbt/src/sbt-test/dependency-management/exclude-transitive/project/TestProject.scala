@@ -16,7 +16,7 @@ object TestProject extends Build {
     if ((base / "transitive").exists) dep else dep.intransitive()
 
   private def check(transitive: Boolean) =
-    (dependencyClasspath in Compile) map { downloaded =>
+    (dependencyClasspath in Compile).map { downloaded =>
       val jars = downloaded.size
       if (transitive) {
         if (jars <= 2)

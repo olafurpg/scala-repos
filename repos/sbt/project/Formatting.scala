@@ -3,8 +3,8 @@ import Keys._
 import com.typesafe.sbt.SbtScalariform.{ScalariformKeys => sr, _}
 
 object Formatting {
-  lazy val BuildConfig = config("build") extend Compile
-  lazy val BuildSbtConfig = config("buildsbt") extend Compile
+  lazy val BuildConfig = config("build").extend(Compile)
+  lazy val BuildSbtConfig = config("buildsbt").extend(Compile)
 
   lazy val settings: Seq[Setting[_]] = Seq() ++ scalariformSettings ++ prefs
   lazy val prefs: Seq[Setting[_]] = {

@@ -12,7 +12,7 @@ final case class ScopedKeyData[A](scoped: ScopedKey[A], value: Any) {
   def description: String =
     fold(fmtMf("Task: %s"),
          fmtMf("Input task: %s"),
-         "Setting: %s = %s" format (key.manifest.toString, value.toString))
+         "Setting: %s = %s".format(key.manifest.toString, value.toString))
   def fold[A](targ: OptManifest[_] => A,
               itarg: OptManifest[_] => A,
               s: => A): A =
@@ -21,5 +21,5 @@ final case class ScopedKeyData[A](scoped: ScopedKey[A], value: Any) {
     else if (key.manifest.runtimeClass == classOf[InputTask[_]])
       itarg(key.manifest.typeArguments.head)
     else s
-  def fmtMf(s: String): OptManifest[_] => String = s format _
+  def fmtMf(s: String): OptManifest[_] => String = s.format(_)
 }

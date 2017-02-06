@@ -183,7 +183,7 @@ object ScopeFilter {
       classpath: Boolean,
       aggregate: Boolean): ProjectRef => Seq[ProjectRef] =
     ref =>
-      Project.getProject(ref, structure).toList flatMap { p =>
+      Project.getProject(ref, structure).toList.flatMap { p =>
         (if (classpath) p.dependencies.map(_.project) else Nil) ++
           (if (aggregate) p.aggregate else Nil)
     }
@@ -200,7 +200,7 @@ object ScopeFilter {
                                    aggregate = aggregate)
       if (transitive) {
         val full = Dag.topologicalSort(resolvedRef)(direct)
-        if (includeRoot) full else full dropRight 1
+        if (includeRoot) full else full.dropRight(1)
       } else {
         val directDeps = direct(resolvedRef)
         if (includeRoot) resolvedRef +: directDeps else directDeps

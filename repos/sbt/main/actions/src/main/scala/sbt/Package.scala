@@ -57,7 +57,7 @@ object Package {
     for ((key, value) <- mergeManifest.getEntries) {
       entryMap.get(key) match {
         case Some(attributes) => mergeAttributes(attributes, value)
-        case None => entryMap put (key, value)
+        case None => entryMap.put(key, value)
       }
     }
   }
@@ -107,7 +107,7 @@ object Package {
     val attribKeys =
       Seq(SPECIFICATION_TITLE, SPECIFICATION_VERSION, SPECIFICATION_VENDOR)
     val attribVals = Seq(name, version, orgName)
-    ManifestAttributes(attribKeys zip attribVals: _*)
+    ManifestAttributes(attribKeys.zip(attribVals): _*)
   }
   def addImplManifestAttributes(name: String,
                                 version: String,
@@ -120,8 +120,8 @@ object Package {
                          IMPLEMENTATION_VENDOR,
                          IMPLEMENTATION_VENDOR_ID)
     val attribVals = Seq(name, version, orgName, org)
-    ManifestAttributes((attribKeys zip attribVals) ++ {
-      homepage map (h => (IMPLEMENTATION_URL, h.toString))
+    ManifestAttributes((attribKeys.zip(attribVals)) ++ {
+      homepage.map(h => (IMPLEMENTATION_URL, h.toString))
     }: _*)
   }
   def makeJar(sources: Seq[(File, String)],
@@ -136,11 +136,11 @@ object Package {
   }
   def sourcesDebugString(sources: Seq[(File, String)]): String =
     "Input file mappings:\n\t" +
-      (sources map { case (f, s) => s + "\n\t  " + f } mkString ("\n\t"))
+      (sources.map { case (f, s) => s + "\n\t  " + f } mkString ("\n\t"))
 
   implicit def manifestEquiv: Equiv[Manifest] = defaultEquiv
   implicit def manifestFormat: Format[Manifest] =
-    streamFormat(_ write _, in => new Manifest(in))
+    streamFormat(_.write(_), in => new Manifest(in))
 
   implicit def stringMapEquiv: Equiv[Map[File, String]] = defaultEquiv
 }

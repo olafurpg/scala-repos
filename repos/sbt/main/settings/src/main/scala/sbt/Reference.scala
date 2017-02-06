@@ -68,14 +68,14 @@ object Reference {
         }
     }
   implicit val buildRefOrdering: Ordering[BuildRef] = new Ordering[BuildRef] {
-    def compare(a: BuildRef, b: BuildRef): Int = a.build compareTo b.build
+    def compare(a: BuildRef, b: BuildRef): Int = a.build.compareTo(b.build)
   }
 
   implicit val projectRefOrdering: Ordering[ProjectRef] =
     new Ordering[ProjectRef] {
       def compare(a: ProjectRef, b: ProjectRef): Int = {
-        val bc = a.build compareTo b.build
-        if (bc == 0) a.project compareTo b.project else bc
+        val bc = a.build.compareTo(b.build)
+        if (bc == 0) a.project.compareTo(b.project) else bc
       }
     }
 

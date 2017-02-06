@@ -35,7 +35,7 @@ final object Aggregation {
     xs match {
       case KeyValue(_, x) :: Nil => print(x.toString)
       case _ =>
-        xs foreach {
+        xs.foreach {
           case KeyValue(key, value) =>
             print(display(key) + "\n\t" + value.toString)
         }
@@ -71,7 +71,7 @@ final object Aggregation {
       implicit display: Show[ScopedKey[_]]): Unit = {
     import complete._
     val log = state.log
-    val extracted = Project extract state
+    val extracted = Project.extract(state)
     val success = results match { case Value(_) => true; case Inc(_) => false }
     results.toEither.right.foreach { r =>
       if (show.taskValues) printSettings(r, show.print)
@@ -84,10 +84,10 @@ final object Aggregation {
     import EvaluateTask._
     import std.TaskExtra._
 
-    val extracted = Project extract s
+    val extracted = Project.extract(s)
     import extracted.structure
-    val toRun = ts map { case KeyValue(k, t) => t.map(v => KeyValue(k, v)) } join;
-    val roots = ts map { case KeyValue(k, _) => k }
+    val toRun = ts.map { case KeyValue(k, t) => t.map(v => KeyValue(k, v)) } join;
+    val roots = ts.map { case KeyValue(k, _) => k }
     val config = extractedTaskConfig(extracted, structure, s)
 
     val start = System.currentTimeMillis
@@ -120,7 +120,7 @@ final object Aggregation {
                    log: Logger): Unit = {
     import extracted._
     def get(key: SettingKey[Boolean]): Boolean =
-      key in currentRef get structure.data getOrElse true
+      key in currentRef.get(structure.data).getOrElse(true)
     if (get(showSuccess)) {
       if (get(showTiming)) {
         val msg =
@@ -135,7 +135,7 @@ final object Aggregation {
                            data: Settings[Scope],
                            currentRef: ProjectRef,
                            log: Logger): String = {
-    val format = timingFormat in currentRef get data getOrElse defaultFormat
+    val format = timingFormat in currentRef.get(data).getOrElse(defaultFormat)
     timing(format, startTime, endTime, "", log)
   }
   def timing(format: java.text.DateFormat,
@@ -224,7 +224,7 @@ final object Aggregation {
   private[this] def castToAny[T[_]](t: T[_]): T[Any] = t.asInstanceOf[T[Any]]
 
   private[this] def maps[T, S](vs: Values[T])(f: T => S): Values[S] =
-    vs map { case KeyValue(k, v) => KeyValue(k, f(v)) }
+    vs.map { case KeyValue(k, v) => KeyValue(k, f(v)) }
 
   def projectAggregates[Proj](proj: Option[Reference],
                               extra: BuildUtil[Proj],
@@ -251,18 +251,18 @@ final object Aggregation {
   def reverseAggregatedKeys[T](key: ScopedKey[T],
                                extra: BuildUtil[_],
                                mask: ScopeMask): Seq[ScopedKey[T]] =
-    projectAggregates(key.scope.project.toOption, extra, reverse = true) flatMap {
-      ref =>
+    projectAggregates(key.scope.project.toOption, extra, reverse = true)
+      .flatMap { ref =>
         val toResolve = key.scope.copy(project = Select(ref))
         val resolved = Resolve(extra, Global, key.key, mask)(toResolve)
         val skey = ScopedKey(resolved, key.key)
         if (aggregationEnabled(skey, extra.data)) skey :: Nil else Nil
-    }
+      }
 
   def aggregatedKeys[T](key: ScopedKey[T],
                         extra: BuildUtil[_],
                         mask: ScopeMask): Seq[ScopedKey[T]] =
-    projectAggregates(key.scope.project.toOption, extra, reverse = false) map {
+    projectAggregates(key.scope.project.toOption, extra, reverse = false).map {
       ref =>
         val toResolve = key.scope.copy(project = Select(ref))
         val resolved = Resolve(extra, Global, key.key, mask)(toResolve)
@@ -271,7 +271,9 @@ final object Aggregation {
 
   def aggregationEnabled(key: ScopedKey[_], data: Settings[Scope]): Boolean =
     Keys.aggregate in Scope
-      .fillTaskAxis(key.scope, key.key) get data getOrElse true
+      .fillTaskAxis(key.scope, key.key)
+      .get(data)
+      .getOrElse(true)
 
   @deprecated("Use BuildUtil.aggregationRelation", "0.13.0")
   def relation(

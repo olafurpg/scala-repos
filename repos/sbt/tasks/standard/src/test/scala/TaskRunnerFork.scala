@@ -18,7 +18,7 @@ object TaskRunnerForkTest extends Properties("TaskRunner Fork") {
   property("Fork and reduce 2") = forAll(MaxTasksGen, MaxWorkersGen) {
     (m: Int, workers: Int) =>
       (m > 1) ==> {
-        val task = (0 to m) fork { _ * 10 } reduced { _ + _ }
+        val task = (0 to m).fork { _ * 10 }.reduced { _ + _ }
         checkResult(tryRun(task, false, workers), 5 * (m + 1) * m)
       }
   }

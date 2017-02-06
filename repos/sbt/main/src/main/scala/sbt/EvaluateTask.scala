@@ -315,7 +315,7 @@ object EvaluateTask {
                     default: T,
                     extracted: Extracted,
                     structure: BuildStructure): T =
-    key in extracted.currentRef get structure.data getOrElse default
+    key in extracted.currentRef.get(structure.data).getOrElse(default)
 
   def injectSettings: Seq[Setting[_]] = Seq(
     (state in GlobalScope) ::= dummyState,
@@ -335,9 +335,9 @@ object EvaluateTask {
                           root,
                           config)
     val (newS, result) =
-      evaluated getOrElse sys.error(
-        "Plugin data does not exist for plugin definition at " +
-          pluginDef.root)
+      evaluated.getOrElse(
+        sys.error("Plugin data does not exist for plugin definition at " +
+          pluginDef.root))
     Project.runUnloadHooks(newS) // discard states
     processResult(result, log)
   }
@@ -490,7 +490,7 @@ object EvaluateTask {
     val log = state.log
     log.debug(
       s"Running task... Cancel: ${config.cancelStrategy}, check cycles: ${config.checkCycles}, forcegc: ${config.forceGarbageCollection}")
-    val tags = tagged[Task[_]](_.info get tagsKey getOrElse Map.empty,
+    val tags = tagged[Task[_]](_.info.get(tagsKey).getOrElse(Map.empty),
                                Tags.predicate(config.restrictions))
     val (service, shutdownThreads) =
       completionService[Task[_], Completed](tags, (s: String) => log.warn(s))
@@ -540,9 +540,10 @@ object EvaluateTask {
   private[this] def storeValuesForPrevious(results: RMap[Task, Result],
                                            state: State,
                                            streams: Streams): Unit =
-    for (referenced <- Previous.references in Global get Project
-           .structure(state)
-           .data) Previous.complete(referenced, results, streams)
+    for (referenced <- Previous.references in Global.get(
+           Project
+             .structure(state)
+             .data)) Previous.complete(referenced, results, streams)
 
   def applyResults[T](results: RMap[Task, Result],
                       state: State,
@@ -550,9 +551,9 @@ object EvaluateTask {
     (stateTransform(results)(state), results(root))
   def stateTransform(results: RMap[Task, Result]): State => State =
     Function.chain(
-      results.toTypedSeq flatMap {
+      results.toTypedSeq.flatMap {
         case results.TPair(Task(info, _), Value(v)) =>
-          info.post(v) get transformState
+          info.post(v).get(transformState)
         case _ => Nil
       }
     )
@@ -561,7 +562,7 @@ object EvaluateTask {
     // taskToKey needs to be before liftAnonymous.  liftA only lifts non-keyed (anonymous) Incompletes.
     result.toEither.left.map { i =>
       Incomplete.transformBU(i)(
-        convertCyclicInc andThen taskToKey andThen liftAnonymous)
+        convertCyclicInc.andThen(taskToKey).andThen(liftAnonymous))
     }
   def taskToKey: Incomplete => Incomplete = {
     case in @ Incomplete(Some(node: Task[_]), _, _, _, _) =>
@@ -611,7 +612,7 @@ object EvaluateTask {
   // if the return type Seq[Setting[_]] is not explicitly given, scalac hangs
   val injectStreams: ScopedKey[_] => Seq[Setting[_]] = scoped =>
     if (scoped.key == streams.key)
-      Seq(streams in scoped.scope <<= streamsManager map { mgr =>
+      Seq(streams in scoped.scope <<= streamsManager.map { mgr =>
         val stream = mgr(scoped)
         stream.open()
         stream

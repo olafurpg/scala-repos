@@ -33,7 +33,7 @@ object Sxr {
      classpathOptions,
      scalaInstance,
      fullClasspath,
-     streams) map { (srcs, out, opts, cpOpts, si, cp, s) =>
+     streams).map { (srcs, out, opts, cpOpts, si, cp, s) =>
       val cache = s.cacheDirectory
       val outputDir = out.getParentFile / (out.getName + ".sxr")
       val f = FileFunction.cached(cache / "sxr", FilesInfo.hash) { in =>

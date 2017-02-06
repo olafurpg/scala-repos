@@ -77,10 +77,10 @@ object BuildPaths {
   def getFileSetting(stateKey: AttributeKey[File],
                      property: String,
                      default: => File)(state: State): File =
-    state get stateKey orElse getFileProperty(property) getOrElse default
+    state.get(stateKey).orElse(getFileProperty(property)).getOrElse(default)
 
   def getFileProperty(name: String): Option[File] =
-    Option(System.getProperty(name)) flatMap { path =>
+    Option(System.getProperty(name)).flatMap { path =>
       if (path.isEmpty) None else Some(new File(path))
     }
 

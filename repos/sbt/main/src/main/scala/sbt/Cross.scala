@@ -31,7 +31,7 @@ object Cross {
       val optionalCommand = token(Space ~> matched(state.combinedParser)) ?? ""
       spacedVersion ~ optionalCommand
     }
-    token(SwitchCommand ~> OptSpace) flatMap { sp =>
+    token(SwitchCommand ~> OptSpace).flatMap { sp =>
       versionAndCommand(sp.nonEmpty)
     }
   }
@@ -85,7 +85,8 @@ object Cross {
           }
 
         val isForceGc =
-          getOpt(Keys.forcegc in Global) getOrElse GCUtil.defaultForceGarbageCollection
+          getOpt(Keys.forcegc in Global)
+            .getOrElse(GCUtil.defaultForceGarbageCollection)
         // This is how to get the interval, but ignore it, and just forcegc
         // val gcInterval = getOpt(Keys.minForcegcInterval in Global) getOrElse GCUtil.defaultMinForcegcInterval
         if (isForceGc) {
@@ -94,7 +95,7 @@ object Cross {
 
         // TODO - Track delegates and avoid regenerating.
         val delegates: Seq[Setting[_]] =
-          session.mergeSettings collect {
+          session.mergeSettings.collect {
             case x if exclude(x) => delegateToGlobal(x.key)
           }
         val fixedSession = session.appendRaw(add ++ delegates)
@@ -122,7 +123,7 @@ object Cross {
     }
 
   def crossParser(state: State): Parser[String] =
-    token(CrossCommand <~ OptSpace) flatMap { _ =>
+    token(CrossCommand <~ OptSpace).flatMap { _ =>
       token(matched(state.combinedParser & spacedFirst(CrossCommand)))
     }
 
@@ -131,8 +132,9 @@ object Cross {
       val x = Project.extract(state)
       import x._
       val versions = crossVersions(state)
-      val current = scalaVersion in currentRef get structure.data map
-        (SwitchCommand + " " + _) toList;
+      val current = scalaVersion in currentRef
+        .get(structure.data)
+        .map(SwitchCommand + " " + _) toList;
       if (versions.isEmpty) command :: state
       else {
         versions.map(v => s"$SwitchCommand $v $command") ::: current ::: state
@@ -141,10 +143,11 @@ object Cross {
   def crossVersions(state: State): Seq[String] = {
     val x = Project.extract(state)
     import x._
-    crossScalaVersions in currentRef get structure.data getOrElse Nil
+    crossScalaVersions in currentRef.get(structure.data).getOrElse(Nil)
   }
 
   def requireSession[T](p: State => Parser[T]): State => Parser[T] =
     s =>
-      if (s get sessionSettings isEmpty) failure("No project loaded") else p(s)
+      if (s.get(sessionSettings) isEmpty) failure("No project loaded")
+      else p(s)
 }

@@ -30,7 +30,7 @@ final class BuildUtil[Proj](val keyIndex: KeyIndex,
     case None => rootProject(root)
   }
   def exactProject(refOpt: Option[Reference]): Option[Proj] =
-    refOpt map resolveRef flatMap {
+    refOpt.map(resolveRef).flatMap {
       case ProjectRef(uri, id) => Some(project(uri, id))
       case _ => None
     }
@@ -51,7 +51,7 @@ object BuildUtil {
     new BuildUtil(keyIndex,
                   data,
                   root,
-                  Load getRootProject units,
+                  Load.getRootProject(units),
                   getp,
                   configs,
                   aggregates)
@@ -73,7 +73,7 @@ object BuildUtil {
     def getRef(pref: ProjectRef) = units(pref.build).defined(pref.project)
     def deps(proj: ResolvedProject)(
         base: ResolvedProject => Seq[ProjectRef]): Seq[ResolvedProject] =
-      Dag.topologicalSort(proj)(p => base(p) map getRef)
+      Dag.topologicalSort(proj)(p => base(p).map(getRef))
     // check for cycles
     for ((_, lbu) <- units; proj <- lbu.defined.values) {
       deps(proj)(_.dependencies.map(_.project))
@@ -102,13 +102,13 @@ object BuildUtil {
 
   /** Prepend `_root_` and import just the names. */
   def importNamesRoot(names: Seq[String]): Seq[String] =
-    importNames(names map rootedName)
+    importNames(names.map(rootedName))
 
   /** Wildcard import `._` for all values. */
   def importAll(values: Seq[String]): Seq[String] =
-    importNames(values map { _ + "._" })
+    importNames(values.map { _ + "._" })
   def importAllRoot(values: Seq[String]): Seq[String] =
-    importAll(values map rootedName)
+    importAll(values.map(rootedName))
   def rootedName(s: String): String = if (s contains '.') "_root_." + s else s
 
   def aggregationRelation(

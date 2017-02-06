@@ -78,7 +78,7 @@ sealed trait TaskStreams[Key] {
   /** Creates a Logger that logs to stream with ID `sid`.*/
   def log(sid: String): Logger
 
-  private[this] def getID(s: Option[String]) = s getOrElse default
+  private[this] def getID(s: Option[String]) = s.getOrElse(default)
 }
 sealed trait ManagedStreams[Key] extends TaskStreams[Key] {
   def open()
@@ -175,7 +175,7 @@ object Streams {
         def close(): Unit = synchronized {
           if (!closed) {
             closed = true
-            opened foreach closeQuietly
+            opened.foreach(closeQuietly)
           }
         }
         def checkOpen(): Unit = synchronized {

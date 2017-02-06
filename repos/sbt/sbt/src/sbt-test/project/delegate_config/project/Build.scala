@@ -22,8 +22,8 @@ object B extends Build {
   override lazy val settings =
     (sample in newConfig := 3) :: checkTask(3) :: Nil
 
-  def incSample = sample <<= sample in newConfig apply (_ + 1)
+  def incSample = sample <<= sample in newConfig.apply(_ + 1)
   def checkTask(expected: Int) =
-    check <<= sample in newConfig map
-      (i => assert(i == expected, "Expected " + expected + ", got " + i))
+    check <<= sample in newConfig.map(i =>
+      assert(i == expected, "Expected " + expected + ", got " + i))
 }

@@ -37,7 +37,7 @@ object Docs {
     ) ++ site.addMappingsToSiteDir(mappings in sxr, prefix)
 
   def synchLocalImpl =
-    (ghkeys.privateMappings, ghkeys.updatedRepository, version, streams) map {
+    (ghkeys.privateMappings, ghkeys.updatedRepository, version, streams).map {
       (mappings, repo, v, s) =>
         val versioned = repo / v
         IO.delete(versioned / "sxr")

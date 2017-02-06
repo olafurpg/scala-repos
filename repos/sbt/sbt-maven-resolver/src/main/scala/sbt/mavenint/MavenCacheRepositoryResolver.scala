@@ -46,7 +46,7 @@ class MavenCacheRepositoryResolver(val repo: MavenCache, settings: IvySettings)
       request: AetherVersionRangeRequest): AetherVersionRangeRequest = request
   protected def publishArtifacts(artifacts: Seq[AetherArtifact]): Unit = {
     val request = new AetherInstallRequest()
-    artifacts foreach request.addArtifact
+    artifacts.foreach(request.addArtifact)
     system.install(session, request)
   }
   // TODO - Share this with non-local repository code, since it's MOSTLY the same.
@@ -86,7 +86,7 @@ class MavenCacheRepositoryResolver(val repo: MavenCache, settings: IvySettings)
           d <- MavenRepositoryResolver.parseTimeString(lu)
         } yield d
         // TODO - Only look at timestamp *IF* the version is for a snapshot.
-        timestampOpt orElse lastUpdatedOpt
+        timestampOpt.orElse(lastUpdatedOpt)
       case _ => None
     }
   }
