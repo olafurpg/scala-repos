@@ -198,16 +198,16 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
     fold(f, g, (a, b) => M.append(f(a), g(b)))
 
   def exists(p: B => Boolean): Boolean =
-    b exists p
+    b.exists(p)
 
   def forall(p: B => Boolean): Boolean =
-    b forall p
+    b.forall(p)
 
   def toList: List[B] =
     b.toList
 
   def getOrElse[BB >: B](bb: => BB): BB =
-    b getOrElse bb
+    b.getOrElse(bb)
 
   def |[BB >: B](bb: => BB): BB =
     getOrElse(bb)
@@ -358,10 +358,10 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
         \&/.tailrecM(f)(a)
 
       override def map[A, B](x: L \&/ A)(f: A => B) =
-        x map f
+        x.map(f)
 
       def bind[A, B](fa: L \&/ A)(f: A => L \&/ B) =
-        fa flatMap f
+        fa.flatMap(f)
 
       def point[A](a: => A) =
         \&/.That(a)
@@ -425,11 +425,11 @@ sealed abstract class TheseInstances1 {
   implicit def TheseInstance1[L]: Traverse[L \&/ ?] with Cobind[L \&/ ?] =
     new Traverse[L \&/ ?] with Cobind[L \&/ ?] {
       def traverseImpl[G[_]: Applicative, A, B](fa: L \&/ A)(f: A => G[B]) =
-        fa traverse f
+        fa.traverse(f)
 
       override def foldMap[A, B](fa: L \&/ A)(f: A => B)(
           implicit F: Monoid[B]) =
-        fa foldMap f
+        fa.foldMap(f)
 
       override def foldRight[A, B](fa: L \&/ A, z: => B)(f: (A, => B) => B) =
         fa.foldRight(z)(f)

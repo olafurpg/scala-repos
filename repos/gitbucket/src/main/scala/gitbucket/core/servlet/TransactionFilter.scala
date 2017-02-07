@@ -30,7 +30,7 @@ class TransactionFilter extends Filter {
       // assets don't need transaction
       chain.doFilter(req, res)
     } else {
-      Database() withTransaction { session =>
+      Database().withTransaction { session =>
         // Register Scalatra error callback to rollback transaction
         ScalatraBase.onFailure { _ =>
           logger.debug("Rolled back transaction")

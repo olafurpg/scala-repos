@@ -17,9 +17,9 @@ trait CommandHandler {
   @transient private[this] val commandLogger: Logger = Logger[this.type]
   def execute[S: Manifest](cmd: ModelCommand[S]): ModelValidation[S] = {
     commandLogger.debug(
-      "Executing [%s].\n%s" format (cmd.getClass.getName, cmd))
+      "Executing [%s].\n%s".format(cmd.getClass.getName, cmd))
     if (cmd.isValid) {
-      val res = (allCatch withApply (serverError(cmd.getClass.getName, _))) {
+      val res = (allCatch.withApply(serverError(cmd.getClass.getName, _))) {
         handle.lift(cmd).map(_.map(_.asInstanceOf[S])) | ValidationError(
           "Don't know how to handle: " + cmd.getClass.getName,
           UnknownError).failureNel
@@ -31,16 +31,16 @@ trait CommandHandler {
         "successfully"
       })
       commandLogger.debug(
-        "Command [%s] executed %s." format (cmd.getClass.getName, resultLog))
+        "Command [%s] executed %s.".format(cmd.getClass.getName, resultLog))
       res
     } else {
       val f =
-        cmd.errors.map(_.validation) collect {
+        cmd.errors.map(_.validation).collect {
           case Failure(e) ⇒ e
         }
       commandLogger.debug(
-        "Command [%s] executed with %d failures.\n%s" format
-          (cmd.getClass.getName, f.size, f.toList))
+        "Command [%s] executed with %d failures.\n%s"
+          .format(cmd.getClass.getName, f.size, f.toList))
       NonEmptyList(f.head, f.tail: _*).failure
     }
   }

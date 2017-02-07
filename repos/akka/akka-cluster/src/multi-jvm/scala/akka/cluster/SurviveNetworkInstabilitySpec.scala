@@ -101,7 +101,7 @@ abstract class SurviveNetworkInstabilitySpec
   override def expectedTestDuration = 3.minutes
 
   def assertUnreachable(subjects: RoleName*): Unit = {
-    val expected = subjects.toSet map address
+    val expected = subjects.toSet.map(address)
     awaitAssert(
       clusterView.unreachableMembers.map(_.address) should ===(expected))
   }
@@ -353,7 +353,7 @@ abstract class SurviveNetworkInstabilitySpec
 
       runOn(side1AfterJoin: _*) {
         // side2 removed
-        val expected = (side1AfterJoin map address).toSet
+        val expected = (side1AfterJoin.map(address)).toSet
         awaitAssert(clusterView.members.map(_.address) should ===(expected))
         awaitAssert(clusterView.members.collectFirst {
           case m if m.address == address(eighth) ⇒ m.status
@@ -373,12 +373,12 @@ abstract class SurviveNetworkInstabilitySpec
       Thread.sleep(10000)
 
       runOn(side1AfterJoin: _*) {
-        val expected = (side1AfterJoin map address).toSet
+        val expected = (side1AfterJoin.map(address)).toSet
         clusterView.members.map(_.address) should ===(expected)
       }
 
       runOn(side2: _*) {
-        val expected = ((side2 ++ side1) map address).toSet
+        val expected = (((side2 ++ side1)).map(address)).toSet
         clusterView.members.map(_.address) should ===(expected)
         assertUnreachable(side1: _*)
       }

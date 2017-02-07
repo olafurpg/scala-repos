@@ -9,13 +9,13 @@ object Test extends Properties("Division of Duration by Long") {
 
   val weightedLong = frequency(
     1 -> choose(-128L, 127L),
-    1 -> (arbitrary[Byte] map (_.toLong << 8)),
-    1 -> (arbitrary[Byte] map (_.toLong << 16)),
-    1 -> (arbitrary[Byte] map (_.toLong << 24)),
-    1 -> (arbitrary[Byte] map (_.toLong << 32)),
-    1 -> (arbitrary[Byte] map (_.toLong << 40)),
-    1 -> (arbitrary[Byte] map (_.toLong << 48)),
-    1 -> (choose(-127L, 127L) map (_ << 56))
+    1 -> (arbitrary[Byte].map(_.toLong << 8)),
+    1 -> (arbitrary[Byte].map(_.toLong << 16)),
+    1 -> (arbitrary[Byte].map(_.toLong << 24)),
+    1 -> (arbitrary[Byte].map(_.toLong << 32)),
+    1 -> (arbitrary[Byte].map(_.toLong << 40)),
+    1 -> (arbitrary[Byte].map(_.toLong << 48)),
+    1 -> (choose(-127L, 127L).map(_ << 56))
   )
 
   val genTwoSmall = for {
@@ -26,8 +26,8 @@ object Test extends Properties("Division of Duration by Long") {
 
   val genTwoLarge = for {
     a <- weightedLong
-    b <- arbitrary[Long] suchThat
-      (b => (abs(b) > Long.MaxValue / max(1, abs(a))))
+    b <- arbitrary[Long].suchThat(b =>
+      (abs(b) > Long.MaxValue / max(1, abs(a))))
   } yield (a, b)
 
   val genClose = for {

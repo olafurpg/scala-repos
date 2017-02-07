@@ -7,7 +7,7 @@ trait JsonHelper {
 
   def toJson[A: Writes](map: Map[Int, A]): String = Json stringify {
     Json toJson {
-      map mapKeys (_.toString)
+      map.mapKeys(_.toString)
     }
   }
 

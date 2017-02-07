@@ -239,16 +239,20 @@ package object templates {
     * Calculate the parameters for the javascript reverse route call for the given routes.
     */
   def reverseParametersJavascript(routes: Seq[Route]) =
-    routes.head.call.parameters.getOrElse(Nil).zipWithIndex.map {
-      case (p, i) =>
-        val re: Regex = """[^\p{javaJavaIdentifierPart}]""".r
-        val paramEscapedName: String = re.replaceAllIn(p.name, "_")
-        (p.copy(name = paramEscapedName + i), i)
-    } filterNot {
-      case (p, i) =>
-        val fixeds = routes.map(_.call.parameters.get(i).fixed).distinct
-        fixeds.size == 1 && fixeds(0) != None
-    }
+    routes.head.call.parameters
+      .getOrElse(Nil)
+      .zipWithIndex
+      .map {
+        case (p, i) =>
+          val re: Regex = """[^\p{javaJavaIdentifierPart}]""".r
+          val paramEscapedName: String = re.replaceAllIn(p.name, "_")
+          (p.copy(name = paramEscapedName + i), i)
+      }
+      .filterNot {
+        case (p, i) =>
+          val fixeds = routes.map(_.call.parameters.get(i).fixed).distinct
+          fixeds.size == 1 && fixeds(0) != None
+      }
 
   /**
     * Reverse parameters for matching

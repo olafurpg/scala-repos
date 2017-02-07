@@ -40,7 +40,7 @@ class ImmediateStatsReceiverTest extends FunSuite with BeforeAndAfter {
 
     assert(metrics("stat") == None)
     val stat = receiver.stat("stat")
-    (1 to 100) foreach { stat.add(_) }
+    ((1 to 100)).foreach { stat.add(_) }
     assert(metrics("stat.count") == Some(100))
     assert(metrics("stat.p99") == Some(99))
     assert(metrics("stat.min") == Some(1))

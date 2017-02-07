@@ -118,8 +118,9 @@ trait Implicits { self: Analyzer =>
     //         `implicitSearchContext.undetparams`, *not* in `context.undetparams`
     //         Here, we copy them up to parent context (analogously to the way the errors are copied above),
     //         and then filter out any which *were* inferred and are part of the substitutor in the implicit search result.
-    context.undetparams =
-      ((context.undetparams ++ result.undetparams) filterNot result.subst.from.contains).distinct
+    context.undetparams = (((context.undetparams ++ result.undetparams))
+      .filterNot(result.subst.from.contains))
+      .distinct
 
     if (Statistics.canEnable) Statistics.stopTimer(implicitNanos, start)
     if (Statistics.canEnable) Statistics.stopCounter(rawTypeImpl, rawTypeStart)
@@ -180,7 +181,7 @@ trait Implicits { self: Analyzer =>
       context: Context,
       tpars: List[Symbol]): List[(SearchResult, List[TypeConstraint])] = {
     // my untouchable typevars are better than yours (they can't be constrained by them)
-    val tvars = tpars map (TypeVar untouchable _)
+    val tvars = tpars.map(TypeVar untouchable _)
     val tpSubsted = tp.subst(tpars, tvars)
 
     val search = new ImplicitSearch(
@@ -303,7 +304,7 @@ trait Implicits { self: Analyzer =>
         containsError(restpe)
       case mt @ MethodType(_, restpe) =>
         // OPT avoiding calling `mt.paramTypes` which creates a new list.
-        (mt.params exists symTypeIsError) || containsError(restpe)
+        (mt.params.exists(symTypeIsError)) || containsError(restpe)
       case _ =>
         tp.isError
     }
@@ -342,9 +343,9 @@ trait Implicits { self: Analyzer =>
   def memberWildcardType(name: Name, tp: Type) = {
     val result = refinedType(List(WildcardType), NoSymbol)
     name match {
-      case x: TermName => result.typeSymbol.newMethod(x) setInfoAndEnter tp
+      case x: TermName => result.typeSymbol.newMethod(x).setInfoAndEnter(tp)
       case x: TypeName =>
-        result.typeSymbol.newAbstractType(x) setInfoAndEnter tp
+        result.typeSymbol.newAbstractType(x).setInfoAndEnter(tp)
     }
     result
   }
@@ -362,15 +363,16 @@ trait Implicits { self: Analyzer =>
     */
   object HasMethodMatching {
     val dummyMethod =
-      NoSymbol.newTermSymbol(TermName("typer$dummy")) setInfo NullaryMethodType(
-        AnyTpe)
+      NoSymbol
+        .newTermSymbol(TermName("typer$dummy"))
+        .setInfo(NullaryMethodType(AnyTpe))
 
     def templateArgType(argtpe: Type) =
       new BoundedWildcardType(TypeBounds.lower(argtpe))
 
     def apply(name: Name, argtpes: List[Type], restpe: Type): Type = {
       val mtpe = MethodType(
-        dummyMethod.newSyntheticValueParams(argtpes map templateArgType),
+        dummyMethod.newSyntheticValueParams(argtpes.map(templateArgType)),
         restpe)
       memberWildcardType(name, mtpe)
     }
@@ -380,9 +382,9 @@ trait Implicits { self: Analyzer =>
           case List(sym) =>
             sym.tpe match {
               case MethodType(params, restpe)
-                  if (params forall (_.tpe
+                  if (params.forall(_.tpe
                     .isInstanceOf[BoundedWildcardType])) =>
-                Some((sym.name, params map (_.tpe.bounds.lo), restpe))
+                Some((sym.name, params.map(_.tpe.bounds.lo), restpe))
               case _ => None
             }
           case _ => None
@@ -439,7 +441,7 @@ trait Implicits { self: Analyzer =>
     def undet_s =
       if (undetParams.isEmpty) ""
       else undetParams.mkString(" inferring ", ", ", "")
-    def tree_s = typeDebug ptTree tree
+    def tree_s = typeDebug.ptTree(tree)
     def ctx_s = fullSiteString(context)
     typingLog("start",
               s"`$tree_s`$undet_s, searching for adaptation to pt=$pt $ctx_s")
@@ -462,7 +464,7 @@ trait Implicits { self: Analyzer =>
       if (Statistics.canEnable) Statistics.incCounter(improvesCount)
       (info2 == NoImplicitInfo) || (info1 != NoImplicitInfo) && {
         if (info1.sym.isStatic && info2.sym.isStatic) {
-          improvesCache get ((info1, info2)) match {
+          improvesCache.get((info1, info2)) match {
             case Some(b) =>
               if (Statistics.canEnable)
                 Statistics.incCounter(improvesCachedCount); b
@@ -500,14 +502,14 @@ trait Implicits { self: Analyzer =>
     private def dominates(dtor: Type, dted: Type): Boolean = {
       def core(tp: Type): Type = tp.dealiasWiden match {
         case RefinedType(parents, defs) =>
-          intersectionType(parents map core, tp.typeSymbol.owner)
+          intersectionType(parents.map(core), tp.typeSymbol.owner)
         case AnnotatedType(annots, tp) => core(tp)
         case ExistentialType(tparams, result) =>
           core(result)
-            .subst(tparams, tparams map (t => core(t.info.bounds.hi)))
+            .subst(tparams, tparams.map(t => core(t.info.bounds.hi)))
         case PolyType(tparams, result) =>
           core(result)
-            .subst(tparams, tparams map (t => core(t.info.bounds.hi)))
+            .subst(tparams, tparams.map(t => core(t.info.bounds.hi)))
         case _ => tp
       }
       def stripped(tp: Type): Type = {
@@ -524,13 +526,13 @@ trait Implicits { self: Analyzer =>
           if (sym.hasPackageFlag) 0 else complexity(tp.dealiasWiden)
         case ThisType(sym) => if (sym.hasPackageFlag) 0 else 1
         case TypeRef(pre, sym, args) =>
-          complexity(pre) + (args map complexity).sum + 1
-        case RefinedType(parents, _) => (parents map complexity).sum + 1
+          complexity(pre) + (args.map(complexity)).sum + 1
+        case RefinedType(parents, _) => (parents.map(complexity)).sum + 1
         case _ => 1
       }
       def overlaps(tp1: Type, tp2: Type): Boolean = (tp1, tp2) match {
-        case (RefinedType(parents, _), _) => parents exists (overlaps(_, tp2))
-        case (_, RefinedType(parents, _)) => parents exists (overlaps(tp1, _))
+        case (RefinedType(parents, _), _) => parents.exists(overlaps(_, tp2))
+        case (_, RefinedType(parents, _)) => parents.exists(overlaps(tp1, _))
         case _ => tp1.typeSymbol == tp2.typeSymbol
       }
       val dtor1 = stripped(core(dtor))
@@ -636,11 +638,12 @@ trait Implicits { self: Analyzer =>
                               ptarg: Type,
                               ptres: Type,
                               undet: List[Symbol]): Boolean =
-      (ptarg weak_<:< tparg) && {
+      (ptarg.weak_<:<(tparg)) && {
         ptres match {
           case HasMethodMatching(name, argtpes, restpe) =>
-            (tpres.member(name) filter
-              (m => isApplicableSafe(undet, m.tpe, argtpes, restpe))) != NoSymbol
+            (tpres
+              .member(name)
+              .filter(m => isApplicableSafe(undet, m.tpe, argtpes, restpe))) != NoSymbol
           case _ =>
             tpres <:< ptres
         }
@@ -715,7 +718,7 @@ trait Implicits { self: Analyzer =>
           tp2.dealiasWiden match {
             case TypeRef(_, sym2, _) =>
               ((sym1 eq ByNameParamClass) != (sym2 eq ByNameParamClass)) ||
-                (sym2.isClass && !(sym1 isWeakSubClass sym2))
+                (sym2.isClass && !(sym1.isWeakSubClass(sym2)))
             case RefinedType(parents, decls) =>
               decls.nonEmpty && tr1.member(decls.head.name) == NoSymbol
             case _ => false
@@ -772,7 +775,7 @@ trait Implicits { self: Analyzer =>
                   atPos(itree0.pos)(
                     Apply(
                       itree1,
-                      List(Ident(nme.argument) setType approximate(arg1)))),
+                      List(Ident(nme.argument).setType(approximate(arg1))))),
                   EXPRmode,
                   approximate(arg2)
                 ) match {
@@ -833,7 +836,7 @@ trait Implicits { self: Analyzer =>
               info.sym.fullLocationString,
               itree2.symbol.fullLocationString))
         else {
-          val tvars = undetParams map freshVar
+          val tvars = undetParams.map(freshVar)
           def ptInstantiated = pt.instantiateTypeParams(undetParams, tvars)
 
           if (matchesPt(itree3.tpe, ptInstantiated, undetParams)) {
@@ -844,7 +847,7 @@ trait Implicits { self: Analyzer =>
 
             val targs = solvedTypes(tvars,
                                     undetParams,
-                                    undetParams map varianceInType(pt),
+                                    undetParams.map(varianceInType(pt)),
                                     upper = false,
                                     lubDepth(itree3.tpe :: pt :: Nil))
 
@@ -873,7 +876,7 @@ trait Implicits { self: Analyzer =>
               if (okParams.isEmpty) EmptyTreeTypeSubstituter
               else {
                 val subst = new TreeTypeSubstituter(okParams, okArgs)
-                subst traverse itree3
+                subst.traverse(itree3)
                 notifyUndetparamsInferred(okParams, okArgs)
                 subst
               }
@@ -952,8 +955,8 @@ trait Implicits { self: Analyzer =>
         sym.pos.pointOrElse(0) < ownerPos &&
         (if (sym.hasAccessorFlag) {
            val symAcc = sym.accessed // #3373
-           symAcc.pos.pointOrElse(0) < ownerPos && !(owner.ownerChain exists
-             (o => (o eq sym) || (o eq symAcc))) // probably faster to iterate only once, don't feel like duplicating hasTransOwner for this case
+           symAcc.pos.pointOrElse(0) < ownerPos && !(owner.ownerChain.exists(
+             o => (o eq sym) || (o eq symAcc))) // probably faster to iterate only once, don't feel like duplicating hasTransOwner for this case
          } else
            !(owner hasTransOwner sym)) // faster than owner.ownerChain contains sym
       }
@@ -1033,7 +1036,7 @@ trait Implicits { self: Analyzer =>
         }
 
         def issueSavedDivergentError() {
-          divergentError foreach (err => context.issue(err))
+          divergentError.foreach(err => context.issue(err))
         }
 
         def apply(search: SearchResult,
@@ -1041,7 +1044,9 @@ trait Implicits { self: Analyzer =>
                   errors: Seq[AbsTypeError]): SearchResult = {
           // A divergent error from a nested implicit search will be found in `errors`. Stash that
           // aside to be re-issued if this implicit search fails.
-          errors.collectFirst { case err: DivergentImplicitTypeError => err } foreach saveDivergent
+          errors
+            .collectFirst { case err: DivergentImplicitTypeError => err }
+            .foreach(saveDivergent)
 
           if (search.isDivergent && divergentError.isEmpty) {
             // Divergence triggered by `i` at this level of the implicit search. We haven't
@@ -1069,15 +1074,15 @@ trait Implicits { self: Analyzer =>
         */
       val eligible = {
         val matches =
-          iss flatMap { is =>
+          iss.flatMap { is =>
             val result =
-              is filter (info => checkValid(info.sym) && survives(info))
-            shadower addInfos is
+              is.filter(info => checkValid(info.sym) && survives(info))
+            shadower.addInfos(is)
             result
           }
 
         // most frequent one first
-        matches sortBy (x => if (isView) -x.useCountView else -x.useCountArg)
+        matches.sortBy(x => if (isView) -x.useCountView else -x.useCountArg)
       }
       if (eligible.nonEmpty)
         printTyping(tree,
@@ -1120,8 +1125,8 @@ trait Implicits { self: Analyzer =>
             case newBest =>
               best = newBest // firstPending is our new best, since we already pruned last time around:
               val pendingImprovingBest =
-                undoLog undo {
-                  otherPending filterNot firstPendingImproves
+                undoLog.undo {
+                  otherPending.filterNot(firstPendingImproves)
                 }
               rankImplicits(pendingImprovingBest,
                             (newBest, firstPending) :: acc)
@@ -1235,7 +1240,7 @@ trait Implicits { self: Analyzer =>
                                   seen: mutable.Set[Type],
                                   pending: Set[Symbol]) = tp match {
         case TypeRef(pre, sym, args) =>
-          infoMap get sym match {
+          infoMap.get(sym) match {
             case Some(infos1) =>
               if (infos1.nonEmpty && !(pre =:= infos1.head.pre.prefix)) {
                 log(
@@ -1281,7 +1286,7 @@ trait Implicits { self: Analyzer =>
               if (!sym.isAnonOrRefinementClass && !sym.isRoot) {
                 if (sym.isStatic && !(pending contains sym))
                   infoMap ++= {
-                    infoMapCache get sym match {
+                    infoMapCache.get(sym) match {
                       case Some(imap) => imap
                       case None =>
                         val result = new InfoMap
@@ -1292,7 +1297,7 @@ trait Implicits { self: Analyzer =>
                         result
                     }
                   } else getClassParts(tp)
-                args foreach getParts
+                args.foreach(getParts)
               }
             } else if (sym.isAliasType) {
               getParts(tp.normalize) // SI-7180 Normalize needed to expand HK type refs
@@ -1332,7 +1337,7 @@ trait Implicits { self: Analyzer =>
       */
     private def implicitsOfExpectedType: Infoss = {
       if (Statistics.canEnable) Statistics.incCounter(implicitCacheAccs)
-      implicitsCache get pt match {
+      implicitsCache.get(pt) match {
         case Some(implicitInfoss) =>
           if (Statistics.canEnable) Statistics.incCounter(implicitCacheHits)
           implicitInfoss
@@ -1396,7 +1401,7 @@ trait Implicits { self: Analyzer =>
         else
           pre match {
             case SingleType(prePre, preSym) =>
-              gen.mkAttributedRef(prePre, preSym) setType pre
+              gen.mkAttributedRef(prePre, preSym).setType(pre)
             // necessary only to compile typetags used inside the Universe cake
             case ThisType(thisSym) =>
               gen.mkAttributedThis(thisSym)
@@ -1505,7 +1510,7 @@ trait Implicits { self: Analyzer =>
                 case _: ExistentialType => gen.mkCast(classarg0, ClassType(tp))
                 case _ => classarg0
               }
-              val suffix = classarg :: (args map findSubManifest)
+              val suffix = classarg :: (args.map(findSubManifest))
               manifestFactoryCall("classType",
                                   tp,
                                   (if ((pre eq NoPrefix) ||
@@ -1533,7 +1538,7 @@ trait Implicits { self: Analyzer =>
             else if (full)
               manifestFactoryCall("intersectionType",
                                   tp,
-                                  parents map findSubManifest: _*)
+                                  parents.map(findSubManifest): _*)
             else mot(erasure.intersectionDominator(parents), from, to)
           case ExistentialType(tparams, result) =>
             mot(tp1.skolemizeExistential, from, to)
@@ -1728,7 +1733,7 @@ trait Implicits { self: Analyzer =>
     // collect the constraints that result from typing each implicit
     def allImplicitsPoly(
         tvars: List[TypeVar]): List[(SearchResult, List[TypeConstraint])] = {
-      def resetTVars() = tvars foreach { _.constr = new TypeConstraint }
+      def resetTVars() = tvars.foreach { _.constr = new TypeConstraint }
 
       def eligibleInfos(iss: Infoss, isLocalToCallsite: Boolean) = {
         val eligible = new ImplicitComputation(iss, isLocalToCallsite).eligible
@@ -1739,7 +1744,7 @@ trait Implicits { self: Analyzer =>
           // any previous errors should not affect us now
           context.reporter.clearAllErrors()
           val res = typedImplicit(ii, ptChecked = false, isLocalToCallsite)
-          if (res.tree ne EmptyTree) List((res, tvars map (_.constr)))
+          if (res.tree ne EmptyTree) List((res, tvars.map(_.constr)))
           else Nil
         }
       }
@@ -1792,7 +1797,7 @@ trait Implicits { self: Analyzer =>
       Intersobralator.replaceAllIn(
         text,
         (_: Regex.Match) match {
-          case Regex.Groups(v) => Regex quoteReplacement vars.getOrElse(v, "")
+          case Regex.Groups(v) => Regex.quoteReplacement(vars.getOrElse(v, ""))
           // #3915: need to quote replacement string since it may include $'s (such as the interpreter's $iw)
         }
       )
@@ -1802,13 +1807,13 @@ trait Implicits { self: Analyzer =>
     private def typeArgsAtSym(paramTp: Type) = paramTp.baseType(sym).typeArgs
 
     def format(paramName: Name, paramTp: Type): String =
-      format(typeArgsAtSym(paramTp) map (_.toString))
+      format(typeArgsAtSym(paramTp).map(_.toString))
 
     def format(typeArgs: List[String]): String =
-      interpolate(msg, Map((typeParamNames zip typeArgs): _*)) // TODO: give access to the name and type of the implicit argument, etc?
+      interpolate(msg, Map((typeParamNames.zip(typeArgs)): _*)) // TODO: give access to the name and type of the implicit argument, etc?
 
     def validate: Option[String] = {
-      val refs = Intersobralator.findAllMatchIn(msg).map(_ group 1).toSet
+      val refs = Intersobralator.findAllMatchIn(msg).map(_.group(1)).toSet
       val decls = typeParamNames.toSet
 
       (refs &~ decls) match {

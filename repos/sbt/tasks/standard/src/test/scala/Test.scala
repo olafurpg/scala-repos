@@ -31,19 +31,19 @@ object Test extends std.TaskExtra {
       val cs = x.productIterator.toList.collect { case Inc(x) => x } // workaround for double definition bug
       throw Incomplete(None, causes = cs)
   }
-  val d2 = t3(a, b2, c) mapR f
+  val d2 = t3(a, b2, c).mapR(f)
   val f2: Values => Task[Any] = {
     case (Value(aa), Value(bb), Value(cc)) => task(aa + " " + bb + " " + cc)
     case x => d3
   }
-  lazy val d = t3(a, b, c) flatMapR f2
+  lazy val d = t3(a, b, c).flatMapR(f2)
   val f3: Values => Task[Any] = {
     case (Value(aa), Value(bb), Value(cc)) => task(aa + " " + bb + " " + cc)
     case x => d2
   }
-  lazy val d3 = t3(a, b, c) flatMapR f3
+  lazy val d3 = t3(a, b, c).flatMapR(f3)
 
-  def d4(i: Int): Task[Int] = nop flatMap { _ =>
+  def d4(i: Int): Task[Int] = nop.flatMap { _ =>
     val x = math.random; if (x < 0.01) task(i); else d4(i + 1)
   }
 

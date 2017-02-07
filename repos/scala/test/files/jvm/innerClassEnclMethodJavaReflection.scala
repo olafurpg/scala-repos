@@ -3,7 +3,7 @@ import java.net.URLClassLoader
 
 object Test extends App {
   val jarsOrDirectories =
-    Set("partest.lib", "partest.reflect", "partest.comp") map sys.props
+    Set("partest.lib", "partest.reflect", "partest.comp").map(sys.props)
 
   object AllowedMissingClass {
     // Some classes in scala-compiler.jar have references to jline / ant classes, which seem to be
@@ -26,7 +26,7 @@ object Test extends App {
     }
   }
 
-  jarsOrDirectories foreach testClasses
+  jarsOrDirectories.foreach(testClasses)
 
   def testClasses(jarOrDirectory: String): Unit = {
     val classPath = AbstractFile.getDirectory(new java.io.File(jarOrDirectory))

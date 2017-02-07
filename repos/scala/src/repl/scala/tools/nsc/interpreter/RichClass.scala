@@ -22,17 +22,17 @@ class RichClass[T](val clazz: Class[T]) {
     } // good ol' "Malformed class name"
     )
 
-  def supertags: List[ClassTag[_]] = supers map (_.toTag)
-  def superNames: List[String] = supers map (_.getName)
-  def interfaces: List[JClass] = supers filter (_.isInterface)
+  def supertags: List[ClassTag[_]] = supers.map(_.toTag)
+  def superNames: List[String] = supers.map(_.getName)
+  def interfaces: List[JClass] = supers.filter(_.isInterface)
 
-  def hasAncestorName(f: String => Boolean) = superNames exists f
-  def hasAncestor(f: JClass => Boolean) = supers exists f
+  def hasAncestorName(f: String => Boolean) = superNames.exists(f)
+  def hasAncestor(f: JClass => Boolean) = supers.exists(f)
 
   def supers: List[JClass] = {
     def loop(x: JClass): List[JClass] = x.getSuperclass match {
       case null => List(x)
-      case sc => x :: (x.getInterfaces.toList flatMap loop) ++ loop(sc)
+      case sc => x :: (x.getInterfaces.toList.flatMap(loop)) ++ loop(sc)
     }
     loop(clazz).distinct
   }

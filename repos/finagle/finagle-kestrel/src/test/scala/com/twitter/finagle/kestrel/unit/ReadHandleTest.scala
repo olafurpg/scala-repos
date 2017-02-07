@@ -43,7 +43,7 @@ class ReadHandleTest extends FunSuite {
 
   test("ReadHandle.buffered should acknowledge howmany messages") {
     new BufferedReadHandle {
-      0 until N foreach { i =>
+      (0 until N).foreach { i =>
         val (ack, m) = msg_(i)
         messages ! m
         assert((ack ?).isDefined == true)
@@ -56,7 +56,7 @@ class ReadHandleTest extends FunSuite {
   test(
     "ReadHandle.buffered should not synchronize on send when buffer is full") {
     new BufferedReadHandle {
-      0 until N foreach { _ =>
+      (0 until N).foreach { _ =>
         assert((messages ! msg(0)).isDefined == true)
       }
       assert((messages ! msg(0)).isDefined == false)
@@ -65,7 +65,7 @@ class ReadHandleTest extends FunSuite {
 
   test("ReadHandle.buffered should keep the buffer full") {
     new BufferedReadHandle {
-      0 until N foreach { _ =>
+      (0 until N).foreach { _ =>
         messages ! msg(0)
       }
       val sent = messages ! msg(0)
@@ -79,11 +79,11 @@ class ReadHandleTest extends FunSuite {
 
   test("ReadHandle.buffered should preserve FIFO order") {
     new BufferedReadHandle {
-      0 until N foreach { i =>
+      (0 until N).foreach { i =>
         messages ! msg(i)
       }
 
-      0 until N foreach { i =>
+      (0 until N).foreach { i =>
         val recvd = (buffered.messages ?)
         assert(recvd.isDefined == true)
         val Buf.Utf8(res) = Await.result(recvd).bytes

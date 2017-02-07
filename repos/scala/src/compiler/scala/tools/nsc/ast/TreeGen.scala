@@ -35,10 +35,11 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
     assert(qualSym ne null, this)
     val qual = gen.mkAttributedStableRef(qualSym)
     val importSym =
-      (NoSymbol newImport NoPosition setFlag SYNTHETIC setInfo ImportType(
-        qual))
+      ((NoSymbol newImport NoPosition)
+        .setFlag(SYNTHETIC)
+        .setInfo(ImportType(qual)))
     val importTree =
-      (Import(qual, selector) setSymbol importSym setType NoType)
+      (Import(qual, selector).setSymbol(importSym).setType(NoType))
     importTree
   }
 
@@ -101,13 +102,13 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
     else
       AppliedTypeTree(
         Ident(clazz),
-        1 to numParams map (_ => Bind(tpnme.WILDCARD, EmptyTree)) toList)
+        (1 to numParams).map(_ => Bind(tpnme.WILDCARD, EmptyTree)) toList)
   }
   def mkBindForCase(patVar: Symbol, clazz: Symbol, targs: List[Type]): Tree = {
     Bind(patVar,
          Typed(Ident(nme.WILDCARD),
                if (targs.isEmpty) mkAppliedTypeForCase(clazz)
-               else AppliedTypeTree(Ident(clazz), targs map TypeTree)))
+               else AppliedTypeTree(Ident(clazz), targs.map(TypeTree))))
   }
 
   def wildcardStar(tree: Tree) =
@@ -124,7 +125,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
 
   /** Make forwarder to method `target`, passing all parameters in `params` */
   def mkForwarder(target: Tree, vparamss: List[List[Symbol]]) =
-    (target /: vparamss)((fn, vparams) => Apply(fn, vparams map paramToArg))
+    (target /: vparamss)((fn, vparams) => Apply(fn, vparams.map(paramToArg)))
 
   /** Applies a wrapArray call to an array, making it a WrappedArray.
     *  Don't let a reference type parameter be inferred, in case it's a singleton:
@@ -189,7 +190,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
   def convertToSelectFromType(qual: Tree, origName: Name) =
     convertToTypeName(qual) match {
       case Some(qual1) =>
-        SelectFromTypeTree(qual1 setPos qual.pos, origName.toTypeName)
+        SelectFromTypeTree(qual1.setPos(qual.pos), origName.toTypeName)
       case _ => EmptyTree
     }
 
@@ -203,9 +204,11 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
     val packedType = typer.packedType(expr, owner)
     val sym =
       owner
-        .newValue(name.toTermName, expr.pos.makeTransparent, SYNTHETIC) setInfo packedType
+        .newValue(name.toTermName, expr.pos.makeTransparent, SYNTHETIC)
+        .setInfo(packedType)
 
-    (ValDef(sym, expr), () => Ident(sym) setPos sym.pos.focus setType expr.tpe)
+    (ValDef(sym, expr),
+     () => Ident(sym).setPos(sym.pos.focus).setType(expr.tpe))
   }
 
   /** Used in situations where you need to access value of an expression several times
@@ -220,7 +223,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
         mkPackedValDef(expr, owner, unit.freshTermName("ev$"))
       val containing = within(identFn)
       ensureNonOverlapping(containing, List(expr))
-      Block(List(valDef), containing) setPos (containing.pos union expr.pos)
+      Block(List(valDef), containing).setPos(containing.pos.union(expr.pos))
     }
   }
 
@@ -250,7 +253,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
     ensureNonOverlapping(containing, exprs)
     if (prefix.isEmpty) containing
     else
-      Block(prefix, containing) setPos (prefix.head.pos union containing.pos)
+      Block(prefix, containing).setPos(prefix.head.pos.union(containing.pos))
   }
 
   /** Return the synchronized part of the double-checked locking idiom around the syncBody tree. It guards with `cond` and
@@ -309,7 +312,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
       owner: Symbol,
       name: TermName,
       additionalFlags: FlagSet = NoFlags) = {
-    val funParams = fun.vparams map (_.symbol)
+    val funParams = fun.vparams.map(_.symbol)
     val formals :+ restpe = fun.tpe.typeArgs
 
     val methSym = owner.newMethod(name, fun.pos, FINAL | additionalFlags)
@@ -318,7 +321,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
       methSym.newSyntheticValueParam(tp, vparam.name)
     }
 
-    methSym setInfo MethodType(paramSyms, restpe.deconst)
+    methSym.setInfo(MethodType(paramSyms, restpe.deconst))
 
     fun.body.substituteSymbols(funParams, paramSyms)
     fun.body changeOwner (fun.symbol -> methSym)
@@ -327,7 +330,7 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
 
     // Have to repack the type to avoid mismatches when existentials
     // appear in the result - see SI-4869.
-    methDef.tpt setType localTyper.packedType(fun.body, methSym).deconst
+    methDef.tpt.setType(localTyper.packedType(fun.body, methSym).deconst)
     methDef
   }
 }

@@ -32,7 +32,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
       private[ConjugateGradient] val direction: T,
       iter: Int,
       converged: Boolean) {
-    lazy val rtr = residual dot residual
+    lazy val rtr = residual.dot(residual)
   }
 
   /**
@@ -56,9 +56,9 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
         var d = direction
         var rtr = state.rtr
         val Bd = mult(B, d)
-        val dtd = d dot d
+        val dtd = d.dot(d)
         val alpha =
-          math.pow(norm(r), 2.0) / ((d dot Bd) + normSquaredPenalty * dtd)
+          math.pow(norm(r), 2.0) / ((d.dot(Bd)) + normSquaredPenalty * dtd)
         val nextX = x + d * alpha
 
         val xnorm: Double = norm(nextX)
@@ -66,8 +66,8 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
           // reached the edge. We're done.
           logger.info(
             f"$iter boundary reached! norm(x): $xnorm%.3f >= maxNormValue $maxNormValue")
-          val xtd = x dot d
-          val xtx = x dot x
+          val xtd = x.dot(d)
+          val xtx = x.dot(x)
 
           val normSquare = maxNormValue * maxNormValue
 
@@ -89,7 +89,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
         } else {
           x := nextX
           r -= (Bd + (d :* normSquaredPenalty)) :* alpha
-          val newrtr = r dot r
+          val newrtr = r.dot(r)
           val beta = newrtr / rtr
           d :*= beta
           d += r

@@ -209,7 +209,7 @@ class SetMapConsistencyTest {
       n match {
         case 0 => m += a
         case 1 => m(a) = true
-        case 2 => m add a
+        case 2 => m.add(a)
         case 3 => m = (m + a).asInstanceOf[M]
         case 4 => m = (m ++ List(a)).asInstanceOf[M]
         case _ => oor("add", n)
@@ -302,7 +302,7 @@ class SetMapConsistencyTest {
                n: Int = 1000,
                seed: Int = 42,
                valuer: Int => Int = identity) = {
-    def check = map1.keys.forall(map2 has _) && map2.keys.forall(map1 has _)
+    def check = map1.keys.forall(map2.has(_)) && map2.keys.forall(map1.has(_))
     val rn = new scala.util.Random(seed)
     var what = new StringBuilder
     what ++= "creation"
@@ -320,8 +320,10 @@ class SetMapConsistencyTest {
         }
         throw new Exception(
           s"Disagreement after ${what.result} between ${map1.title} and ${map2.title} because ${map1.keys
-            .map(map2 has _)
-            .mkString(",")} ${map2.keys.map(map1 has _).mkString(",")} at step $i:\n$map1\n$map2\n$temp")
+            .map(map2.has(_))
+            .mkString(",")} ${map2.keys
+            .map(map1.has(_))
+            .mkString(",")} at step $i:\n$map1\n$map2\n$temp")
       }
       what ++= " (%d) ".format(i)
       if (rn.nextInt(10) == 0) {
@@ -678,8 +680,8 @@ class SetMapConsistencyTest {
     type NSEE = NoSuchElementException
     val map = Map(0 -> "zero", 1 -> "one")
     val m = map.filterKeys(i => if (map contains i) true else throw new NSEE)
-    assert { (m contains 0) && (m get 0).nonEmpty }
+    assert { (m contains 0) && (m.get(0)).nonEmpty }
     assertThrows[NSEE] { m contains 2 }
-    assertThrows[NSEE] { m get 2 }
+    assertThrows[NSEE] { m.get(2) }
   }
 }

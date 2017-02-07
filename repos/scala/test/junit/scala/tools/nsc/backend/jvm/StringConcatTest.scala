@@ -63,7 +63,7 @@ class StringConcatTest extends ClearAfterClass {
     val List(c) = compileClasses(compiler)(code)
 
     def invokeNameDesc(m: String): List[String] =
-      getSingleMethod(c, m).instructions collect {
+      getSingleMethod(c, m).instructions.collect {
         case Invoke(_, _, name, desc, _) => name + desc
       }
     assertEquals(

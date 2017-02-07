@@ -171,7 +171,7 @@ class SizedTests {
     val (pr7, sf7) = cl.get.splitAt(7)
     """)
 
-    val ml = cl.get map (_.toString)
+    val ml = cl.get.map(_.toString)
     typed[Sized[List[String], _6]](ml)
     assertEquals(List("1", "2", "3", "4", "5", "6"), ml.unsized)
 

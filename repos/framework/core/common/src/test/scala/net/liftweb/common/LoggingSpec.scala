@@ -25,7 +25,7 @@ import org.specs2.mutable.Specification
   * Tests rely on logback being in the classpath, so no configuration should be necessary.
   */
 object LoggingSpec extends Specification {
-  "Logging" can {
+  "Logging".can {
     "be mixed directly into object" in {
       object MyObj extends Logger {
         info("direct Hello")

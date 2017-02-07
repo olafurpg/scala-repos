@@ -94,7 +94,8 @@ trait FileAndResourceDirectives {
                       classLoader: ClassLoader = defaultClassLoader): Route =
     if (!resourceName.endsWith("/"))
       get {
-        Option(classLoader.getResource(resourceName)) flatMap ResourceFile.apply match {
+        Option(classLoader.getResource(resourceName))
+          .flatMap(ResourceFile.apply) match {
           case Some(ResourceFile(url, length, lastModified)) ⇒
             conditionalFor(length, lastModified) {
               if (length > 0) {
@@ -149,7 +150,7 @@ trait FileAndResourceDirectives {
         val pathString =
           withTrailingSlash(fileSystemPath("/", path, ctx.log, '/'))
         val dirs =
-          directories flatMap { dir ⇒
+          directories.flatMap { dir ⇒
             fileSystemPath(withTrailingSlash(dir), path, ctx.log) match {
               case "" ⇒ None
               case fileName ⇒
@@ -220,7 +221,7 @@ object FileAndResourceDirectives extends FileAndResourceDirectives {
     RangeDirectives.withRangeSupport & CodingDirectives.withPrecompressedMediaTypeSupport & BasicDirectives.extractSettings
 
   private def withTrailingSlash(path: String): String =
-    if (path endsWith "/") path else path + '/'
+    if (path.endsWith("/")) path else path + '/'
   private def fileSystemPath(base: String,
                              path: Uri.Path,
                              log: LoggingAdapter,
@@ -260,7 +261,7 @@ object FileAndResourceDirectives extends FileAndResourceDirectives {
         val jar = new java.util.zip.ZipFile(filePath)
         try {
           val entry = jar.getEntry(resourcePath)
-          Option(jar.getInputStream(entry)) map { is ⇒
+          Option(jar.getInputStream(entry)).map { is ⇒
             is.close()
             ResourceFile(url, entry.getSize, entry.getTime)
           }
@@ -359,7 +360,7 @@ object DirectoryListing {
       |</div>$
       |</body>
       |</html>
-      |""".stripMarginWithNewline("\n") split '$'
+      |""".stripMarginWithNewline("\n").split('$')
 
   def directoryMarshaller(
       renderVanityFooter: Boolean): ToEntityMarshaller[DirectoryListing] =
@@ -388,8 +389,8 @@ object DirectoryListing {
           val secondToLastSlash =
             path.lastIndexOf('/', path.lastIndexOf('/', path.length - 1) - 1)
           sb.append(
-            "<a href=\"%s/\">../</a>\n" format path
-              .substring(0, secondToLastSlash))
+            "<a href=\"%s/\">../</a>\n".format(path
+              .substring(0, secondToLastSlash)))
         }
         def lastModified(file: File) =
           DateTime(file.lastModified).toIsoLikeDateTimeString

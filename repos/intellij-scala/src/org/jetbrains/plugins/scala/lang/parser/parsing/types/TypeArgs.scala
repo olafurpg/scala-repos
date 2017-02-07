@@ -57,14 +57,14 @@ object TypeArgs {
                    parsedType) {
               builder.advanceLexer()
               parsedType = checkTypeVariable || Type.parse(builder)
-              if (!parsedType) builder error ScalaBundle.message("wrong.type")
+              if (!parsedType) builder.error(ScalaBundle.message("wrong.type"))
             }
-          } else builder error ScalaBundle.message("wrong.type")
+          } else builder.error(ScalaBundle.message("wrong.type"))
 
           builder.getTokenType match {
             case ScalaTokenTypes.tRSQBRACKET =>
               builder.advanceLexer() //Ate ]
-            case _ => builder error ScalaBundle.message("rsqbracket.expected")
+            case _ => builder.error(ScalaBundle.message("rsqbracket.expected"))
           }
           builder.restoreNewlinesState
           true

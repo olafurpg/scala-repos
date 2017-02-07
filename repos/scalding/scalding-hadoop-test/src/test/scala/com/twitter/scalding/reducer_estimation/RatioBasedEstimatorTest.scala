@@ -138,7 +138,7 @@ class RatioBasedReducerEstimatorTest
       HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
                             cluster).inspectCompletedFlow { flow =>
         val steps = flow.getFlowSteps.asScala
-        steps should have size 1
+        (steps should have).size(1)
 
         val conf = steps.head.getConfig
         conf.getNumReduceTasks should equal(1) // default
@@ -154,7 +154,7 @@ class RatioBasedReducerEstimatorTest
       HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
                             cluster).inspectCompletedFlow { flow =>
         val steps = flow.getFlowSteps.asScala
-        steps should have size 1
+        (steps should have).size(1)
 
         val conf = steps.head.getConfig
         conf.getNumReduceTasks should equal(1) // default
@@ -170,7 +170,7 @@ class RatioBasedReducerEstimatorTest
       HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
                             cluster).inspectCompletedFlow { flow =>
         val steps = flow.getFlowSteps.asScala
-        steps should have size 1
+        (steps should have).size(1)
 
         // base estimate from input size reducer = 3
         // reducer ratio from history = 0.5
@@ -189,7 +189,7 @@ class RatioBasedReducerEstimatorTest
       HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
                             cluster).inspectCompletedFlow { flow =>
         val steps = flow.getFlowSteps.asScala
-        steps should have size 1
+        (steps should have).size(1)
 
         val conf = steps.head.getConfig
         conf.getNumReduceTasks should equal(1) // default

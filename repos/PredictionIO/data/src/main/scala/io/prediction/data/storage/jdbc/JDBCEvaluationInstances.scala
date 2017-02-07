@@ -46,7 +46,7 @@ class JDBCEvaluationInstances(client: String,
       evaluatorResultsJSON text)""".execute().apply()
   }
 
-  def insert(i: EvaluationInstance): String = DB localTx { implicit session =>
+  def insert(i: EvaluationInstance): String = DB.localTx { implicit session =>
     val id = java.util.UUID.randomUUID().toString
     sql"""
     INSERT INTO $tableName VALUES(
@@ -65,7 +65,7 @@ class JDBCEvaluationInstances(client: String,
     id
   }
 
-  def get(id: String): Option[EvaluationInstance] = DB localTx {
+  def get(id: String): Option[EvaluationInstance] = DB.localTx {
     implicit session =>
       sql"""
     SELECT
@@ -85,7 +85,7 @@ class JDBCEvaluationInstances(client: String,
     """.map(resultToEvaluationInstance).single().apply()
   }
 
-  def getAll(): Seq[EvaluationInstance] = DB localTx { implicit session =>
+  def getAll(): Seq[EvaluationInstance] = DB.localTx { implicit session =>
     sql"""
     SELECT
       id,
@@ -104,7 +104,7 @@ class JDBCEvaluationInstances(client: String,
     """.map(resultToEvaluationInstance).list().apply()
   }
 
-  def getCompleted(): Seq[EvaluationInstance] = DB localTx { implicit s =>
+  def getCompleted(): Seq[EvaluationInstance] = DB.localTx { implicit s =>
     sql"""
     SELECT
       id,
@@ -126,7 +126,7 @@ class JDBCEvaluationInstances(client: String,
     """.map(resultToEvaluationInstance).list().apply()
   }
 
-  def update(i: EvaluationInstance): Unit = DB localTx { implicit session =>
+  def update(i: EvaluationInstance): Unit = DB.localTx { implicit session =>
     sql"""
     update $tableName set
       status = ${i.status},
@@ -143,7 +143,7 @@ class JDBCEvaluationInstances(client: String,
     where id = ${i.id}""".update().apply()
   }
 
-  def delete(id: String): Unit = DB localTx { implicit session =>
+  def delete(id: String): Unit = DB.localTx { implicit session =>
     sql"DELETE FROM $tableName WHERE id = $id".update().apply()
   }
 

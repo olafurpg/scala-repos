@@ -59,7 +59,7 @@ object SharedLeveldbJournalSpec {
     def receive = {
       case ActorIdentity(1, Some(store)) ⇒
         SharedLeveldbJournal.setStore(store, context.system)
-      case m ⇒ p forward m
+      case m ⇒ p.forward(m)
     }
 
     override def preStart(): Unit =
@@ -81,7 +81,7 @@ class SharedLeveldbJournalSpec
     super.afterTermination()
   }
 
-  "A LevelDB store" can {
+  "A LevelDB store".can {
     "be shared by multiple actor systems" in {
 
       val probeA = new TestProbe(systemA)

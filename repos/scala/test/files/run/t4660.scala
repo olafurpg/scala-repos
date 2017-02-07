@@ -1,6 +1,6 @@
 object Test {
   def main(args: Array[String]): Unit = {
-    val traversable = 1 to 20 map (_.toString)
+    val traversable = (1 to 20).map(_.toString)
     def normalize(m: Map[Char, Traversable[String]]) = m.map {
       case (k, v) => (k, v.toList)
     }

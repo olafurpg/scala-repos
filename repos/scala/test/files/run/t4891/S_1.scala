@@ -21,6 +21,6 @@ object Bug4891 extends SigTest {
     show[C2[_]]("m1")
 
     println(classOf[T1[_]].getGenericSuperclass)
-    classOf[T1[_]].getGenericInterfaces foreach println
+    classOf[T1[_]].getGenericInterfaces.foreach(println)
   }
 }

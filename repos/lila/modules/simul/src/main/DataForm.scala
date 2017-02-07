@@ -48,13 +48,13 @@ final class DataForm {
           ) contains _)
         }.verifying("At least one variant", _.nonEmpty),
         "color" -> stringIn(colorChoices)
-      )(SimulSetup.apply)(SimulSetup.unapply)) fill SimulSetup(
+      )(SimulSetup.apply)(SimulSetup.unapply)).fill(SimulSetup(
       clockTime = clockTimeDefault,
       clockIncrement = clockIncrementDefault,
       clockExtra = clockExtraDefault,
       variants = List(chess.variant.Standard.id),
       color = colorDefault
-    )
+    ))
 }
 
 case class SimulSetup(clockTime: Int,

@@ -93,10 +93,10 @@ trait BuildFileModifier {
       case (original, copy) =>
         val originalRevision =
           new SimpleContentRevision(VfsUtilCore.loadText(original),
-                                    VcsUtil getFilePath original,
+                                    VcsUtil.getFilePath(original),
                                     "original")
         val copyRevision =
-          new CurrentContentRevision(VcsUtil getFilePath copy) {
+          new CurrentContentRevision(VcsUtil.getFilePath(copy)) {
             override def getVirtualFile = copy
           }
         val isModified = changes.contains(copy)
@@ -109,7 +109,7 @@ trait BuildFileModifier {
         fileStatusMap.put(copy, (buildFileStatus, buildFileModificationStamp))
         new BuildFileChange(originalRevision, copyRevision, buildFileStatus)
     }
-    val changesToWorkingCopies = (vcsChanges zip changes).toMap
+    val changesToWorkingCopies = (vcsChanges.zip(changes)).toMap
     val dialog =
       ChangesConfirmationDialog(project, vcsChanges.toList, fileStatusMap)
     dialog.setModal(true)

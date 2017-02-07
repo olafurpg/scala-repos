@@ -82,7 +82,7 @@ class ResponseRendererSpec
       "a custom status code and no headers and different dates" in new TestSetup() {
         val initial = DateTime(2011, 8, 25, 9, 10, 0).clicks
         var extraMillis = 0L
-        (0 until 10000 by 500) foreach { millis ⇒
+        ((0 until 10000 by 500)).foreach { millis ⇒
           extraMillis = millis
           HttpResponse(200) should renderTo {
             s"""HTTP/1.1 200 OK
@@ -248,23 +248,25 @@ class ResponseRendererSpec
         }
       }
       "one chunk and incorrect (too large) Content-Length" in new TestSetup() {
-        the[RuntimeException] thrownBy {
+        (the[RuntimeException] thrownBy {
           HttpResponse(200,
                        entity = Default(
                          ContentTypes.`application/json`,
                          10,
                          source(ByteString("body123")))) should renderTo("")
-        } should have message "HTTP message had declared Content-Length 10 but entity data stream amounts to 3 bytes less"
+        } should have).message(
+          "HTTP message had declared Content-Length 10 but entity data stream amounts to 3 bytes less")
       }
 
       "one chunk and incorrect (too small) Content-Length" in new TestSetup() {
-        the[RuntimeException] thrownBy {
+        (the[RuntimeException] thrownBy {
           HttpResponse(200,
                        entity = Default(
                          ContentTypes.`application/json`,
                          5,
                          source(ByteString("body123")))) should renderTo("")
-        } should have message "HTTP message had declared Content-Length 5 but entity data stream amounts to more bytes"
+        } should have).message(
+          "HTTP message had declared Content-Length 5 but entity data stream amounts to more bytes")
       }
     }
     "a response with a CloseDelimited body" - {
@@ -681,39 +683,40 @@ class ResponseRendererSpec
                                           NoLogging) {
 
     def renderTo(expected: String): Matcher[HttpResponse] =
-      renderTo(expected, close = false) compose (ResponseRenderingContext(_))
+      renderTo(expected, close = false).compose(ResponseRenderingContext(_))
 
     def renderTo(expected: String,
                  close: Boolean): Matcher[ResponseRenderingContext] =
       equal(expected.stripMarginWithNewline("\r\n") -> close)
-        .matcher[(String, Boolean)] compose { ctx ⇒
-        val (wasCompletedFuture, resultFuture) = (Source.single(ctx) ++ Source
-          .maybe[ResponseRenderingContext]) // never send upstream completion
-          .via(renderer.named("renderer"))
-          .map {
-            case ResponseRenderingOutput.HttpData(bytes) ⇒ bytes
-            case _: ResponseRenderingOutput.SwitchToWebSocket ⇒
-              throw new IllegalStateException(
-                "Didn't expect websocket response")
-          }
-          .groupedWithin(1000, 100.millis)
-          .viaMat(StreamUtils.identityFinishReporter[Seq[ByteString]])(
-            Keep.right)
-          .toMat(Sink.head)(Keep.both)
-          .run()
+        .matcher[(String, Boolean)]
+        .compose { ctx ⇒
+          val (wasCompletedFuture, resultFuture) = (Source.single(ctx) ++ Source
+            .maybe[ResponseRenderingContext]) // never send upstream completion
+            .via(renderer.named("renderer"))
+            .map {
+              case ResponseRenderingOutput.HttpData(bytes) ⇒ bytes
+              case _: ResponseRenderingOutput.SwitchToWebSocket ⇒
+                throw new IllegalStateException(
+                  "Didn't expect websocket response")
+            }
+            .groupedWithin(1000, 100.millis)
+            .viaMat(StreamUtils.identityFinishReporter[Seq[ByteString]])(
+              Keep.right)
+            .toMat(Sink.head)(Keep.both)
+            .run()
 
-        // we try to find out if the renderer has already flagged completion even without the upstream being completed
-        val wasCompleted = try {
-          Await.ready(wasCompletedFuture, 100.millis)
-          true
-        } catch {
-          case NonFatal(_) ⇒ false
+          // we try to find out if the renderer has already flagged completion even without the upstream being completed
+          val wasCompleted = try {
+            Await.ready(wasCompletedFuture, 100.millis)
+            true
+          } catch {
+            case NonFatal(_) ⇒ false
+          }
+          Await
+            .result(resultFuture, 250.millis)
+            .reduceLeft(_ ++ _)
+            .utf8String -> wasCompleted
         }
-        Await
-          .result(resultFuture, 250.millis)
-          .reduceLeft(_ ++ _)
-          .utf8String -> wasCompleted
-      }
 
     override def currentTimeMillis() =
       DateTime(2011, 8, 25, 9, 10,

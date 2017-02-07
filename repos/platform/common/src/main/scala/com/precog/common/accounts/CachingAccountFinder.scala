@@ -68,8 +68,8 @@ class CachingAccountFinder[M[+ _]: Monad](
 
   def findAccountByAPIKey(apiKey: APIKey) = byKeyCache.get(apiKey) match {
     case None =>
-      delegate.findAccountByAPIKey(apiKey) map {
-        _ map { _ tap (add(apiKey, _)) unsafePerformIO }
+      delegate.findAccountByAPIKey(apiKey).map {
+        _.map { _.tap(add(apiKey, _)) unsafePerformIO }
       }
 
     case idOpt =>
@@ -79,8 +79,8 @@ class CachingAccountFinder[M[+ _]: Monad](
   def findAccountDetailsById(accountId: AccountId) =
     byAccountIdCache.get(accountId) match {
       case None =>
-        delegate.findAccountDetailsById(accountId) map {
-          _ map { _ tap add unsafePerformIO }
+        delegate.findAccountDetailsById(accountId).map {
+          _.map { _.tap(add) unsafePerformIO }
         }
 
       case detailsOpt =>

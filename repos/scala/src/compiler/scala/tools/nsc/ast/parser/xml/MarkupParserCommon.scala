@@ -59,7 +59,7 @@ private[scala] trait MarkupParserCommon {
       if (ch == '<')
         return errorAndResult("'<' not allowed in attrib value", "")
       else if (ch == SU) truncatedError("")
-      else buf append ch_returning_nextch
+      else buf.append(ch_returning_nextch)
     }
     ch_returning_nextch
     // @todo: normalize attribute value
@@ -88,16 +88,16 @@ private[scala] trait MarkupParserCommon {
     if (ch == SU) truncatedError("")
     else if (!isNameStart(ch))
       return errorAndResult(
-        "name expected, but char '%s' cannot start a name" format ch,
+        "name expected, but char '%s' cannot start a name".format(ch),
         "")
 
     val buf = new StringBuilder
 
-    do buf append ch_returning_nextch while (isNameChar(ch))
+    do buf.append(ch_returning_nextch) while (isNameChar(ch))
 
     if (buf.last == ':') {
       reportSyntaxError("name cannot end in ':'")
-      buf.toString dropRight 1
+      buf.toString.dropRight(1)
     } else buf.toString
   }
 
@@ -153,7 +153,7 @@ private[scala] trait MarkupParserCommon {
     if (ch == that) nextch()
     else xHandleError(that, "'%s' expected instead of '%s'".format(that, ch))
   }
-  def xToken(that: Seq[Char]) { that foreach xToken }
+  def xToken(that: Seq[Char]) { that.foreach(xToken) }
 
   /** scan [S] '=' [S]*/
   def xEQ() = { xSpaceOpt(); xToken('='); xSpaceOpt() }
@@ -192,7 +192,7 @@ private[scala] trait MarkupParserCommon {
       else if (ch == SU)
         truncatedError("") // throws TruncatedXMLControl in compiler
 
-      sb append ch
+      sb.append(ch)
       nextch()
     }
     unreachable
@@ -204,9 +204,11 @@ private[scala] trait MarkupParserCommon {
     *  and leave input unchanged.
     */
   private def peek(lookingFor: String): Boolean =
-    (lookahead() take lookingFor.length sameElements lookingFor.iterator) && {
+    (lookahead()
+      .take(lookingFor.length)
+      .sameElements(lookingFor.iterator)) && {
       // drop the chars from the real reader (all lookahead + orig)
-      (0 to lookingFor.length) foreach (_ => nextch())
+      ((0 to lookingFor.length)).foreach(_ => nextch())
       true
     }
 }

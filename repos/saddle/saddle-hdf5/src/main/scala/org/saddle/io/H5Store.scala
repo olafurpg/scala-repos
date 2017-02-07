@@ -430,7 +430,7 @@ object H5Store {
                            lcpl_id,
                            HDF5Constants.H5P_DEFAULT,
                            HDF5Constants.H5P_DEFAULT)
-    assertException(gid >= 0, "Failed to great group %s" format path)
+    assertException(gid >= 0, "Failed to great group %s".format(path))
 
     H5Reg.close(lcpl_id, H5P)
 
@@ -1479,7 +1479,8 @@ object H5Store {
 
     def toGeneric(s: IndexedSeq[Vec[_]]) = s.asInstanceOf[IndexedSeq[Vec[Any]]]
 
-    val cx = didx concat iidx concat sidx concat lidx concat fidx concat tidx
+    val cx =
+      didx.concat(iidx).concat(sidx).concat(lidx).concat(fidx).concat(tidx)
 
     val cols =
       toGeneric(mxDouble.cols) ++ toGeneric(mxInt.cols) ++ toGeneric(

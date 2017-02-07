@@ -61,11 +61,13 @@ object Scalajsp {
       fileName <- options.fileNames
     } {
       val vfile =
-        options.jar map { jar =>
-          readFromJar(jar, fileName)
-        } getOrElse {
-          readFromFile(fileName)
-        }
+        options.jar
+          .map { jar =>
+            readFromJar(jar, fileName)
+          }
+          .getOrElse {
+            readFromFile(fileName)
+          }
 
       displayFileContent(vfile, options)
     }

@@ -31,9 +31,9 @@ class AsyncSemaphoreTest extends FunSpec {
   describe("AsyncSemaphore") {
     def acquire(s: AsyncSemaphoreHelper) = {
       val fPermit = s.sem.acquire()
-      fPermit onSuccess { permit =>
+      fPermit.onSuccess { permit =>
         s.count += 1
-        s.permits add permit
+        s.permits.add(permit)
       }
       fPermit
     }

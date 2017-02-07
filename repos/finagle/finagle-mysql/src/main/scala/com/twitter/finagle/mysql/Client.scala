@@ -110,22 +110,23 @@ private[mysql] class StdClient(factory: ServiceFactory[Request, Result])
   def ping(): Future[Result] = service(PingRequest)
 
   def select[T](sql: String)(f: Row => T): Future[Seq[T]] =
-    query(sql) map {
+    query(sql).map {
       case rs: ResultSet => rs.rows.map(f)
       case _ => Nil
     }
 
   def prepare(sql: String): PreparedStatement = new PreparedStatement {
-    def apply(ps: Parameter*): Future[Result] = factory() flatMap { svc =>
-      svc(PrepareRequest(sql)).flatMap {
-        case ok: PrepareOK => svc(ExecuteRequest(ok.id, ps.toIndexedSeq))
-        case r =>
-          Future.exception(
-            new Exception(
+    def apply(ps: Parameter*): Future[Result] = factory().flatMap { svc =>
+      svc(PrepareRequest(sql))
+        .flatMap {
+          case ok: PrepareOK => svc(ExecuteRequest(ok.id, ps.toIndexedSeq))
+          case r =>
+            Future.exception(new Exception(
               "Unexpected result %s when preparing %s".format(r, sql)))
-      } ensure {
-        svc.close()
-      }
+        }
+        .ensure {
+          svc.close()
+        }
     }
   }
 
@@ -135,7 +136,7 @@ private[mysql] class StdClient(factory: ServiceFactory[Request, Result])
       // Because the `singleton` is used in the context of a `FactoryToService` we override
       // `Service#close` to ensure that we can control the checkout lifetime of the `Service`.
       val proxiedService =
-        svc map { service =>
+        svc.map { service =>
           new ServiceProxy(service) {
             override def close(deadline: Time) = Future.Done
           }
@@ -154,12 +155,12 @@ private[mysql] class StdClient(factory: ServiceFactory[Request, Result])
 
     // handle failures and put connection back in the pool
 
-    transaction transform {
+    transaction.transform {
       case Return(r) =>
         singleton.close()
         Future.value(r)
       case Throw(e) =>
-        client.query("ROLLBACK") transform { _ =>
+        client.query("ROLLBACK").transform { _ =>
           singleton.close()
           Future.exception(e)
         }

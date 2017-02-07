@@ -14,8 +14,8 @@ class ExampleMockitoSpec extends Specification with Mockito {
   "MyService#isDailyData" should {
     "return true if the data is from today" in {
       val mockDataService = mock[DataService]
-      mockDataService.findData returns Data(
-        retrievalDate = new java.util.Date())
+      mockDataService.findData.returns(
+        Data(retrievalDate = new java.util.Date()))
 
       val myService = new MyService() {
         override def dataService = mockDataService

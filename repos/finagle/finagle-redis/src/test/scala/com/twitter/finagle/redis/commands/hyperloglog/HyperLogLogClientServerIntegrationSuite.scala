@@ -36,7 +36,7 @@ final class HyperLogLogClientServerIntegrationSuite
   test("PFMERGE should work correctly", ClientServerTest, RedisTest) {
     withRedisClient { client =>
       val setup =
-        List(PFAdd("foo", List("bar")), PFAdd("bar", List("baz"))) map client
+        List(PFAdd("foo", List("bar")), PFAdd("bar", List("baz"))).map(client)
       val pfMergeResult = Future
         .collect(setup)
         .flatMap(_ => client(PFMerge("baz", List("foo", "bar"))))

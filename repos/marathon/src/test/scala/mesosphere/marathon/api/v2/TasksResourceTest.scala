@@ -42,13 +42,18 @@ class TasksResourceTest
     val task1 = MarathonTestHelper.stagedTask(taskId1)
     val task2 = MarathonTestHelper.runningTask(taskId2)
 
-    config.zkTimeoutDuration returns 5.seconds
-    taskTracker.tasksByAppSync returns TaskTracker.TasksByApp.forTasks(task1,
-                                                                       task2)
-    taskKiller.kill(any, any)(any) returns Future.successful(
-      Iterable.empty[Task])
-    groupManager.app(app1) returns Future.successful(Some(AppDefinition(app1)))
-    groupManager.app(app2) returns Future.successful(Some(AppDefinition(app2)))
+    config.zkTimeoutDuration.returns(5.seconds)
+    taskTracker.tasksByAppSync.returns(
+      TaskTracker.TasksByApp.forTasks(task1, task2))
+    taskKiller
+      .kill(any, any)(any)
+      .returns(Future.successful(Iterable.empty[Task]))
+    groupManager
+      .app(app1)
+      .returns(Future.successful(Some(AppDefinition(app1))))
+    groupManager
+      .app(app2)
+      .returns(Future.successful(Some(AppDefinition(app2))))
 
     When("we ask to kill both tasks")
     val response = taskResource
@@ -85,13 +90,18 @@ class TasksResourceTest
     val task1 = MarathonTestHelper.runningTask(taskId1)
     val task2 = MarathonTestHelper.stagedTask(taskId2)
 
-    config.zkTimeoutDuration returns 5.seconds
-    taskTracker.tasksByAppSync returns TaskTracker.TasksByApp.forTasks(task1,
-                                                                       task2)
-    taskKiller.killAndScale(any, any)(any) returns Future.successful(
-      deploymentPlan)
-    groupManager.app(app1) returns Future.successful(Some(AppDefinition(app1)))
-    groupManager.app(app2) returns Future.successful(Some(AppDefinition(app2)))
+    config.zkTimeoutDuration.returns(5.seconds)
+    taskTracker.tasksByAppSync.returns(
+      TaskTracker.TasksByApp.forTasks(task1, task2))
+    taskKiller
+      .killAndScale(any, any)(any)
+      .returns(Future.successful(deploymentPlan))
+    groupManager
+      .app(app1)
+      .returns(Future.successful(Some(AppDefinition(app1))))
+    groupManager
+      .app(app2)
+      .returns(Future.successful(Some(AppDefinition(app2))))
 
     When("we ask to kill both tasks")
     val response = taskResource
@@ -124,8 +134,9 @@ class TasksResourceTest
     val body = s"""{"ids": ["$taskId1", "$taskId2", "$taskId3"]}""".getBytes
 
     Given("the app exists")
-    groupManager.app(appId) returns Future.successful(
-      Some(AppDefinition(appId)))
+    groupManager
+      .app(appId)
+      .returns(Future.successful(Some(AppDefinition(appId))))
 
     When(s"kill task is called")
     val killTasks =
@@ -146,7 +157,7 @@ class TasksResourceTest
     val body = s"""{"ids": ["$taskId1", "$taskId2", "$taskId3"]}""".getBytes
 
     Given("the app does not exist")
-    groupManager.app(appId) returns Future.successful(None)
+    groupManager.app(appId).returns(Future.successful(None))
 
     When(s"kill task is called")
     val killTasks =
@@ -201,9 +212,10 @@ class TasksResourceTest
     )
 
     Given("the app exists")
-    groupManager.app(appId) returns Future.successful(
-      Some(AppDefinition(appId)))
-    taskTracker.tasksByAppSync returns TaskTracker.TasksByApp.empty
+    groupManager
+      .app(appId)
+      .returns(Future.successful(Some(AppDefinition(appId))))
+    taskTracker.tasksByAppSync.returns(TaskTracker.TasksByApp.empty)
 
     When(s"kill task is called")
     val killTasks =

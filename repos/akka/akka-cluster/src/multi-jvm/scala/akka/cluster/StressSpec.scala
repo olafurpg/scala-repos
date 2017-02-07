@@ -329,7 +329,7 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
           if (infolog)
             log.info(
               s"[${title}] completed in [${aggregated.duration.toMillis}] ms\n${aggregated.clusterStats}\n${formatMetrics}\n\n${formatPhi}\n\n${formatStats}")
-          reportTo foreach { _ ! aggregated }
+          reportTo.foreach { _ ! aggregated }
           context stop self
         }
       case _: CurrentClusterState ⇒
@@ -345,7 +345,7 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
     def formatMetrics: String = {
       import akka.cluster.Member.addressOrdering
       (formatMetricsHeader +:
-        (nodeMetrics.toSeq.sortBy(_.address) map formatMetricsLine))
+        (nodeMetrics.toSeq.sortBy(_.address).map(formatMetricsLine)))
         .mkString("\n")
     }
 
@@ -397,12 +397,14 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
         import stats.vclockStats._
         s"ClusterStats($receivedGossipCount, $mergeCount, $sameCount, $newerCount, $olderCount, $versionSize, $seenLatest)"
       }
-      (clusterStatsObservedByNode map {
-        case (monitor, stats) ⇒ s"${monitor}\t${f(stats)}"
-      }).mkString(
-        "ClusterStats(gossip, merge, same, newer, older, vclockSize, seenLatest)\n",
-        "\n",
-        "")
+      (clusterStatsObservedByNode
+        .map {
+          case (monitor, stats) ⇒ s"${monitor}\t${f(stats)}"
+        })
+        .mkString(
+          "ClusterStats(gossip, merge, same, newer, older, vclockSize, seenLatest)\n",
+          "\n",
+          "")
     }
   }
 
@@ -421,7 +423,7 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
     }
 
     def formatHistory: String =
-      (formatHistoryHeader +: (history map formatHistoryLine)).mkString("\n")
+      (formatHistoryHeader +: (history.map(formatHistoryLine))).mkString("\n")
 
     def formatHistoryHeader: String =
       "[Title]\t[Duration (ms)]\t[GossipStats(gossip, merge, same, newer, older)]"
@@ -467,7 +469,7 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
 
     def receive = {
       case PhiTick ⇒
-        nodes foreach { node ⇒
+        nodes.foreach { node ⇒
           val previous = phiByNode(node)
           val φ = phi(node)
           if (φ > 0 || cluster.failureDetector.isMonitoring(node)) {
@@ -479,13 +481,13 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
           }
         }
         val phiSet = immutable.SortedSet.empty[PhiValue] ++ phiByNode.values
-        reportTo foreach { _ ! PhiResult(cluster.selfAddress, phiSet) }
+        reportTo.foreach { _ ! PhiResult(cluster.selfAddress, phiSet) }
       case state: CurrentClusterState ⇒ nodes = state.members.map(_.address)
       case memberEvent: MemberEvent ⇒ nodes += memberEvent.member.address
       case ReportTo(ref) ⇒
-        reportTo foreach context.unwatch
+        reportTo.foreach(context.unwatch)
         reportTo = ref
-        reportTo foreach context.watch
+        reportTo.foreach(context.watch)
       case Terminated(ref) ⇒
         reportTo match {
           case Some(`ref`) ⇒ reportTo = None
@@ -516,11 +518,11 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
         }
         val res = StatsResult(cluster.selfAddress,
                               CurrentInternalStats(diff, vclockStats))
-        reportTo foreach { _ ! res }
+        reportTo.foreach { _ ! res }
       case ReportTo(ref) ⇒
-        reportTo foreach context.unwatch
+        reportTo.foreach(context.unwatch)
         reportTo = ref
-        reportTo foreach context.watch
+        reportTo.foreach(context.watch)
       case Terminated(ref) ⇒
         reportTo match {
           case Some(`ref`) ⇒ reportTo = None
@@ -556,7 +558,7 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
     val payload = Array.fill(settings.payloadSize)(
       ThreadLocalRandom.current.nextInt(127).toByte)
     val retryTimeout = 5.seconds.dilated(context.system)
-    val idCounter = Iterator from 0
+    val idCounter = Iterator.from(0)
     var sendCounter = 0L
     var ackCounter = 0L
     var outstanding = Map.empty[JobId, JobState]
@@ -612,7 +614,7 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
       }
 
     def sendJobs(): Unit = {
-      0 until settings.workBatchSize foreach { _ ⇒
+      (0 until settings.workBatchSize).foreach { _ ⇒
         send(createJob())
       }
     }
@@ -628,7 +630,7 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
     }
 
     def resend(): Unit = {
-      outstanding.values foreach { jobState ⇒
+      outstanding.values.foreach { jobState ⇒
         if (jobState.deadline.isOverdue) send(jobState.job)
       }
     }
@@ -657,14 +659,14 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
           width)
         val tree =
           context.actorOf(Props(classOf[TreeNode], levels, width), "tree")
-        tree forward ((idx, SimpleJob(id, payload)))
+        tree.forward((idx, SimpleJob(id, payload)))
         context.become(treeWorker(tree))
     }
 
     def treeWorker(tree: ActorRef): Receive = {
       case SimpleJob(id, payload) ⇒ sender() ! Ack(id)
       case TreeJob(id, payload, idx, _, _) ⇒
-        tree forward ((idx, SimpleJob(id, payload)))
+        tree.forward((idx, SimpleJob(id, payload)))
     }
   }
 
@@ -672,14 +674,14 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
     require(level >= 1)
     def createChild(): Actor =
       if (level == 1) new Leaf else new TreeNode(level - 1, width)
-    val indexedChildren = 0 until width map { i ⇒
+    val indexedChildren = (0 until width).map { i ⇒
       context.actorOf(Props(createChild()).withDeploy(Deploy.local),
                       name = i.toString)
     } toVector
 
     def receive = {
       case (idx: Int, job: SimpleJob) if idx < width ⇒
-        indexedChildren(idx) forward ((idx, job))
+        indexedChildren(idx).forward((idx, job))
     }
   }
 
@@ -712,7 +714,7 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
 
     def receive = {
       case props: Props ⇒ context.actorOf(props)
-      case e: Exception ⇒ context.children foreach { _ ! e }
+      case e: Exception ⇒ context.children.foreach { _ ! e }
       case GetChildrenCount ⇒
         sender() ! ChildrenCount(context.children.size, restartCount)
       case Reset ⇒
@@ -942,7 +944,7 @@ abstract class StressSpec
   }
 
   def joinOneByOne(numberOfNodes: Int): Unit = {
-    0 until numberOfNodes foreach { _ ⇒
+    (0 until numberOfNodes).foreach { _ ⇒
       joinOne()
       nbrUsedRoles += 1
       step += 1
@@ -985,7 +987,7 @@ abstract class StressSpec
         reportResult {
           runOn(joiningRoles: _*) {
             if (toSeedNodes)
-              cluster.joinSeedNodes(seedNodes.toIndexedSeq map address)
+              cluster.joinSeedNodes(seedNodes.toIndexedSeq.map(address))
             else cluster.join(roles.head)
           }
           awaitMembersUp(currentRoles.size, timeout = remainingOrDefault)
@@ -996,7 +998,7 @@ abstract class StressSpec
     }
 
   def removeOneByOne(numberOfNodes: Int, shutdown: Boolean): Unit = {
-    0 until numberOfNodes foreach { _ ⇒
+    (0 until numberOfNodes).foreach { _ ⇒
       removeOne(shutdown)
       nbrUsedRoles -= 1
       step += 1
@@ -1088,7 +1090,7 @@ abstract class StressSpec
 
     val returnValue = thunk
 
-    clusterResultAggregator foreach {
+    clusterResultAggregator.foreach {
       _ ! ClusterResult(cluster.selfAddress,
                         (System.nanoTime - startTime).nanos,
                         latestGossipStats :- startStats)
@@ -1125,12 +1127,12 @@ abstract class StressSpec
           reportResult {
             val nextAS =
               if (activeRoles contains myself) {
-                previousAS foreach { as ⇒
+                previousAS.foreach { as ⇒
                   TestKit.shutdownActorSystem(as)
                 }
                 val sys = ActorSystem(system.name, system.settings.config)
                 muteLog(sys)
-                Cluster(sys).joinSeedNodes(seedNodes.toIndexedSeq map address)
+                Cluster(sys).joinSeedNodes(seedNodes.toIndexedSeq.map(address))
                 Some(sys)
               } else previousAS
             runOn(usedRoles: _*) {
@@ -1140,7 +1142,7 @@ abstract class StressSpec
               awaitAllReachable()
             }
             val nextAddresses =
-              clusterView.members.map(_.address) diff usedAddresses
+              clusterView.members.map(_.address).diff(usedAddresses)
             runOn(usedRoles: _*) {
               nextAddresses.size should ===(numberOfNodesJoinRemove)
             }
@@ -1156,7 +1158,7 @@ abstract class StressSpec
       }
     }
 
-    loop(1, None, Set.empty) foreach { as ⇒
+    loop(1, None, Set.empty).foreach { as ⇒
       TestKit.shutdownActorSystem(as)
     }
     within(loopDuration) {
@@ -1247,7 +1249,7 @@ abstract class StressSpec
         val (masterRoles, otherRoles) = roles.take(nbrUsedRoles).splitAt(3)
         runOn(masterRoles: _*) {
           reportResult {
-            roles.take(nbrUsedRoles) foreach { r ⇒
+            roles.take(nbrUsedRoles).foreach { r ⇒
               supervisor ! Props[RemoteChild].withDeploy(
                 Deploy(scope = RemoteScope(address(r))))
             }
@@ -1255,7 +1257,7 @@ abstract class StressSpec
             expectMsgType[ChildrenCount] should ===(
               ChildrenCount(nbrUsedRoles, 0))
 
-            1 to 5 foreach { _ ⇒
+            (1 to 5).foreach { _ ⇒
               supervisor ! new RuntimeException("Simulated exception")
             }
             awaitAssert {
@@ -1326,7 +1328,7 @@ abstract class StressSpec
 
       runOn((seedNodes ++ otherNodesJoiningSeedNodes): _*) {
         reportResult {
-          cluster.joinSeedNodes(seedNodes.toIndexedSeq map address)
+          cluster.joinSeedNodes(seedNodes.toIndexedSeq.map(address))
           awaitMembersUp(size, timeout = remainingOrDefault)
         }
       }

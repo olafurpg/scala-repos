@@ -188,7 +188,7 @@ private[niflheim] object RawLoader {
       if (header == null) sys.error("missing header")
       else if (header == ("##rawlog " + id.toString + " 1"))
         load1(id, f, reader)
-      else sys.error("unsupported header: %s" format header)
+      else sys.error("unsupported header: %s".format(header))
     } finally {
       reader.close()
     }

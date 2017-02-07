@@ -22,18 +22,18 @@ trait TreeDSL {
   object CODE {
     // Add a null check to a Tree => Tree function
     def nullSafe[T](f: Tree => Tree, ifNull: Tree): Tree => Tree =
-      tree => IF(tree MEMBER_== NULL) THEN ifNull ELSE f(tree)
+      tree => IF(tree.MEMBER_==(NULL)).THEN(ifNull).ELSE(f(tree))
 
     def returning[T](x: T)(f: T => Unit): T = util.returning(x)(f)
 
     object LIT extends (Any => Literal) {
-      def typed(x: Any) = apply(x) setType ConstantType(Constant(x))
+      def typed(x: Any) = apply(x).setType(ConstantType(Constant(x)))
       def apply(x: Any) = Literal(Constant(x))
     }
 
     // Boring, predictable trees.
-    def TRUE = LIT typed true
-    def FALSE = LIT typed false
+    def TRUE = LIT.typed(true)
+    def FALSE = LIT.typed(false)
     def ZERO = LIT(0)
     def NULL = LIT(null)
     def UNIT = LIT(())
@@ -68,7 +68,7 @@ trait TreeDSL {
         if (opSym == NoSymbol) ANY_==(other)
         else fn(target, opSym, other)
       }
-      def ANY_EQ(other: Tree) = OBJ_EQ(other AS ObjectTpe)
+      def ANY_EQ(other: Tree) = OBJ_EQ(other.AS(ObjectTpe))
       def ANY_==(other: Tree) = fn(target, Any_==, other)
       def ANY_!=(other: Tree) = fn(target, Any_!=, other)
       def OBJ_EQ(other: Tree) = fn(target, Object_eq, other)
@@ -141,7 +141,7 @@ trait TreeDSL {
 
     def NOT(tree: Tree) = Select(tree, Boolean_not)
     def AND(guards: Tree*) =
-      if (guards.isEmpty) EmptyTree else guards reduceLeft gen.mkAnd
+      if (guards.isEmpty) EmptyTree else guards.reduceLeft(gen.mkAnd)
 
     def IF(tree: Tree) = new IfStart(tree, EmptyTree)
     def TRY(tree: Tree) = new TryStart(tree, Nil, EmptyTree)

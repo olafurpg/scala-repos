@@ -20,13 +20,13 @@ package object cmd {
     sys.exit(0)
   }
 
-  def toOpt(s: String): String = if (s startsWith "--") s else "--" + s
-  def fromOpt(s: String): String = s stripPrefix "--"
+  def toOpt(s: String): String = if (s.startsWith("--")) s else "--" + s
+  def fromOpt(s: String): String = s.stripPrefix("--")
   def toArgs(line: String): List[String] = CommandLineParser tokenize line
   def fromArgs(args: List[String]): String = args mkString " "
 
   def stripQuotes(s: String): String = {
     def isQuotedBy(c: Char) = s.length > 0 && s.head == c && s.last == c
-    if (List('"', '\'') exists isQuotedBy) s.tail.init else s
+    if (List('"', '\'').exists(isQuotedBy)) s.tail.init else s
   }
 }

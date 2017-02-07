@@ -13,16 +13,16 @@ object Tv extends LilaController {
   def index = onChannel(lila.tv.Tv.Channel.Best.key)
 
   def onChannel(chanKey: String) = Open { implicit ctx =>
-    (lila.tv.Tv.Channel.byKey get chanKey).fold(notFound)(lichessTv)
+    (lila.tv.Tv.Channel.byKey.get(chanKey)).fold(notFound)(lichessTv)
   }
 
   def sides(chanKey: String, gameId: String, color: String) = Open {
     implicit ctx =>
-      lila.tv.Tv.Channel.byKey get chanKey match {
+      lila.tv.Tv.Channel.byKey.get(chanKey) match {
         case None => notFound
         case Some(channel) =>
           OptionFuResult(GameRepo.pov(gameId, color)) { pov =>
-            Env.tv.tv.getChampions zip Env.game.crosstableApi(pov.game) map {
+            Env.tv.tv.getChampions.zip(Env.game.crosstableApi(pov.game)).map {
               case (champions, crosstable) =>
                 Ok(
                   html.tv
@@ -33,51 +33,54 @@ object Tv extends LilaController {
   }
 
   private def lichessTv(channel: lila.tv.Tv.Channel)(implicit ctx: Context) =
-    OptionFuResult(Env.tv.tv getGame channel) { game =>
+    OptionFuResult(Env.tv.tv.getGame(channel)) { game =>
       val flip = getBool("flip")
-      val pov = flip.fold(Pov second game, Pov first game)
+      val pov = flip.fold(Pov.second(game), Pov.first(game))
       val onTv = lila.round.OnTv(channel.key, flip)
       negotiate(
         html = {
-          Env.api.roundApi.watcher(pov,
-                                   lila.api.Mobile.Api.currentVersion,
-                                   tv = onTv.some,
-                                   withOpening = false) zip Env.game
-            .crosstableApi(game) zip Env.tv.tv.getChampions map {
-            case ((data, cross), champions) =>
-              NoCache {
-                Ok(html.tv.index(channel, champions, pov, data, cross, flip))
-              }
-          }
+          Env.api.roundApi
+            .watcher(pov,
+                     lila.api.Mobile.Api.currentVersion,
+                     tv = onTv.some,
+                     withOpening = false)
+            .zip(Env.game
+              .crosstableApi(game))
+            .zip(Env.tv.tv.getChampions)
+            .map {
+              case ((data, cross), champions) =>
+                NoCache {
+                  Ok(html.tv.index(channel, champions, pov, data, cross, flip))
+                }
+            }
         },
         api = apiVersion =>
-          Env.api.roundApi.watcher(pov,
-                                   apiVersion,
-                                   tv = onTv.some,
-                                   withOpening = false) map {
-            Ok(_)
-        }
+          Env.api.roundApi
+            .watcher(pov, apiVersion, tv = onTv.some, withOpening = false)
+            .map {
+              Ok(_)
+          }
       )
     }
 
   def games = gamesChannel(lila.tv.Tv.Channel.Best.key)
 
   def gamesChannel(chanKey: String) = Open { implicit ctx =>
-    (lila.tv.Tv.Channel.byKey get chanKey).fold(notFound)(lichessGames)
+    (lila.tv.Tv.Channel.byKey.get(chanKey)).fold(notFound)(lichessGames)
   }
 
   private def lichessGames(channel: lila.tv.Tv.Channel)(
       implicit ctx: Context) =
-    Env.tv.tv.getChampions zip Env.tv.tv.getGames(channel, 9) map {
+    Env.tv.tv.getChampions.zip(Env.tv.tv.getGames(channel, 9)).map {
       case (champs, games) =>
         NoCache {
-          Ok(html.tv.games(channel, games map lila.game.Pov.first, champs))
+          Ok(html.tv.games(channel, games.map(lila.game.Pov.first), champs))
         }
     }
 
   def streamIn(id: String) = Open { implicit ctx =>
     OptionFuResult(Env.tv.streamerList find id) { streamer =>
-      Env.tv.streamsOnAir.all flatMap { streams =>
+      Env.tv.streamsOnAir.all.flatMap { streams =>
         val others = streams.filter(_.id != id)
         streams find (_.id == id) match {
           case None => fuccess(Ok(html.tv.notStreaming(streamer, others)))
@@ -93,10 +96,11 @@ object Tv extends LilaController {
     import lila.round.TvBroadcast
     import play.api.libs.EventSource
     implicit val encoder = play.api.libs.Comet.CometMessage.jsonMessages
-    Env.round.tvBroadcast ? TvBroadcast.GetEnumerator mapTo manifest[
-      TvBroadcast.EnumeratorType] map { enum =>
-      Ok.chunked(enum &> EventSource()).as("text/event-stream")
-    }
+    (Env.round.tvBroadcast ? TvBroadcast.GetEnumerator)
+      .mapTo(manifest[TvBroadcast.EnumeratorType])
+      .map { enum =>
+        Ok.chunked(enum &> EventSource()).as("text/event-stream")
+      }
   }
 
   def streamConfig = Auth { implicit ctx => me =>
@@ -121,16 +125,16 @@ object Tv extends LilaController {
       val theme = get("theme", req) | "brown"
       val url = s"""${req.domain + routes.Tv.frame}?bg=$bg&theme=$theme"""
       s"""document.write("<iframe src='http://$url&embed=" + document.domain + "' class='lichess-tv-iframe' allowtransparency='true' frameBorder='0' style='width: 224px; height: 264px;' title='Lichess free online chess'></iframe>");"""
-    } as JAVASCRIPT withHeaders (CACHE_CONTROL -> "max-age=86400")
+    }.as(JAVASCRIPT).withHeaders(CACHE_CONTROL -> "max-age=86400")
   }
 
   def frame = Action.async { req =>
-    Env.tv.tv.getBest map {
+    Env.tv.tv.getBest.map {
       case None => NotFound
       case Some(game) =>
         Ok(
           views.html.tv.embed(
-            Pov first game,
+            Pov.first(game),
             get("bg", req) | "light",
             lila.pref.Theme(~get("theme", req)).cssClass
           ))

@@ -148,7 +148,7 @@ abstract class OperationOnCollectionInspectionBase
       patternList.foreach(JListCompatibility.add(listModel, listModel.size, _))
       val patternJBList = JListCompatibility.createJBListFromModel(listModel)
       def resetValues() {
-        val newArray = listModel.toArray collect { case s: String => s }
+        val newArray = listModel.toArray.collect { case s: String => s }
         setPatternLists(patternListKey)(newArray)
       }
       val panel = ToolbarDecorator

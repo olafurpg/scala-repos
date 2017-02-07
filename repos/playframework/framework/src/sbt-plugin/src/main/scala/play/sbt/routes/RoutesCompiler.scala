@@ -193,7 +193,7 @@ object RoutesCompiler extends AutoPlugin {
       Option(error.sourceName).getOrElse("") +
         Option(error.line).map(":" + _).getOrElse("") + ": " +
         error.getMessage)
-    Option(error.interestingLines(0)).map(_.focus).flatMap(_.headOption) map {
+    Option(error.interestingLines(0)).map(_.focus).flatMap(_.headOption).map {
       line =>
         // log the line
         log.error(line)
@@ -210,7 +210,7 @@ object RoutesCompiler extends AutoPlugin {
   }
 
   val routesPositionMapper: Position => Option[Position] = position => {
-    position.sourceFile collect {
+    position.sourceFile.collect {
       case GeneratedSource(generatedSource) => {
         new xsbti.Position {
           lazy val line = {
@@ -220,11 +220,13 @@ object RoutesCompiler extends AutoPlugin {
               .getOrElse(xsbti.Maybe.nothing[java.lang.Integer])
           }
           lazy val lineContent = {
-            line flatMap { lineNo =>
-              sourceFile.flatMap { file =>
-                IO.read(file).split('\n').lift(lineNo - 1)
+            line
+              .flatMap { lineNo =>
+                sourceFile.flatMap { file =>
+                  IO.read(file).split('\n').lift(lineNo - 1)
+                }
               }
-            } getOrElse ""
+              .getOrElse("")
           }
           val offset = xsbti.Maybe.nothing[java.lang.Integer]
           val pointer = xsbti.Maybe.nothing[java.lang.Integer]

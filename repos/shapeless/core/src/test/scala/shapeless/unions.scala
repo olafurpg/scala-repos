@@ -350,9 +350,9 @@ class UnionTests {
       val u2 = Coproduct[U]("bar" ->> true)
       val u3 = Coproduct[U]("baz" ->> 2.0)
 
-      val r1 = u1 mapValues toUpper
-      val r2 = u2 mapValues toUpper
-      val r3 = u3 mapValues toUpper
+      val r1 = u1.mapValues(toUpper)
+      val r2 = u2.mapValues(toUpper)
+      val r3 = u3.mapValues(toUpper)
 
       assertTypedEquals[U](Coproduct[U]("foo" ->> "JOE"), r1)
       assertTypedEquals[U](Coproduct[U]("bar" ->> true), r2)

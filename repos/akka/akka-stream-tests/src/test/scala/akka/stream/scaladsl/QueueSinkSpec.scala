@@ -28,8 +28,8 @@ class QueueSinkSpec extends AkkaSpec {
     "send the elements as result of future" in assertAllStagesStopped {
       val expected = List(Some(1), Some(2), Some(3), None)
       val queue = Source(expected.flatten).runWith(Sink.queue())
-      expected foreach { v ⇒
-        queue.pull() pipeTo testActor
+      expected.foreach { v ⇒
+        queue.pull().pipeTo(testActor)
         expectMsg(v)
       }
     }
@@ -134,10 +134,10 @@ class QueueSinkSpec extends AkkaSpec {
         .run()
       probe.futureValue should ===(akka.Done)
       for (i ← 1 to streamElementCount) {
-        queue.pull() pipeTo testActor
+        queue.pull().pipeTo(testActor)
         expectMsg(Some(i))
       }
-      queue.pull() pipeTo testActor
+      queue.pull().pipeTo(testActor)
       expectMsg(None)
     }
 

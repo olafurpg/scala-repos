@@ -17,20 +17,20 @@ final class GameSearchApi(client: ESClient)
   private var writeable = true
 
   def search(query: Query, from: From, size: Size) =
-    client.search(query, from, size) flatMap { res =>
+    client.search(query, from, size).flatMap { res =>
       import lila.db.api.$find
       import lila.game.tube.gameTube
       $find.byOrderedIds[lila.game.Game](res.ids)
     }
 
   def count(query: Query) =
-    client.count(query) map (_.count)
+    client.count(query).map(_.count)
 
   def ids(query: Query, max: Int): Fu[List[String]] =
     client.search(query, From(0), Size(max)).map(_.ids)
 
   def store(game: Game) = (writeable && storable(game)) ?? {
-    GameRepo isAnalysed game.id flatMap { analysed =>
+    GameRepo.isAnalysed(game.id).flatMap { analysed =>
       client.store(Id(game.id), toDoc(game, analysed))
     }
   }
@@ -49,7 +49,7 @@ final class GameSearchApi(client: ESClient)
         Fields.rated -> game.rated,
         Fields.perf -> game.perfType.map(_.id),
         Fields.uids -> game.userIds.toArray.some.filterNot(_.isEmpty),
-        Fields.winner -> (game.winner flatMap (_.userId)),
+        Fields.winner -> (game.winner.flatMap(_.userId)),
         Fields.winnerColor -> game.winner.fold(3)(_.color.fold(1, 2)),
         Fields.averageRating -> game.averageUsersRating,
         Fields.ai -> game.aiLevel,
@@ -67,12 +67,12 @@ final class GameSearchApi(client: ESClient)
 
   def indexAll: Funit = {
     writeable = false
-    Thread sleep 3000
+    Thread.sleep(3000)
     client match {
       case c: ESClientHttp =>
         logger.info(s"Drop ${c.index.name}")
         writeable = false
-        Thread sleep 3000
+        Thread.sleep(3000)
         c.putMapping >> indexSince("2011-01-01")
       case _ => funit
     }
@@ -85,10 +85,10 @@ final class GameSearchApi(client: ESClient)
           case c: ESClientHttp =>
             logger.info(s"Index to ${c.index.name} since $since")
             writeable = false
-            Thread sleep 3000
+            Thread.sleep(3000)
             doIndex(c, since) >>- {
               logger.info("[game search] Completed indexation.")
-              Thread sleep 3000
+              Thread.sleep(3000)
               writeable = true
             }
           case _ => funit
@@ -96,12 +96,12 @@ final class GameSearchApi(client: ESClient)
     }
 
   private val datePattern = "yyyy-MM-dd"
-  private val dateFormatter = DateTimeFormat forPattern datePattern
+  private val dateFormatter = DateTimeFormat.forPattern(datePattern)
   private val dateTimeFormatter =
-    DateTimeFormat forPattern s"$datePattern HH:mm"
+    DateTimeFormat.forPattern(s"$datePattern HH:mm")
 
   private def parseDate(str: String): Option[DateTime] =
-    Try(dateFormatter parseDateTime str).toOption
+    Try(dateFormatter.parseDateTime(str)).toOption
 
   private def doIndex(client: ESClientHttp, since: DateTime): Funit = {
     import lila.game.BSONHandlers._
@@ -120,13 +120,13 @@ final class GameSearchApi(client: ESClient)
       .sort(BSONDocument("ca" -> 1))
       .cursor[Game](ReadPreference.secondaryPreferred)
       .enumerate(maxGames, stopOnError = true) &> Enumeratee.grouped(
-      Iteratee takeUpTo batchSize) |>>> Enumeratee
+      Iteratee.takeUpTo(batchSize)) |>>> Enumeratee
       .mapM[Seq[Game]]
       .apply[(Seq[Game], Set[String])] { games =>
-        GameRepo filterAnalysed games.map(_.id) map games.->
+        GameRepo.filterAnalysed(games.map(_.id)).map(games.->)
       } &> Iteratee.foldM[(Seq[Game], Set[String]), Long](nowMillis) {
       case (millis, (games, analysedIds)) =>
-        client.storeBulk(games map { g =>
+        client.storeBulk(games.map { g =>
           Id(g.id) -> toDoc(g, analysedIds(g.id))
         }) inject {
           val date =

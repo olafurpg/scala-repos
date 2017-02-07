@@ -951,7 +951,7 @@ object DenseMatrix
                                                  DenseMatrix[Complex]] = {
     new CanTranspose[DenseMatrix[Complex], DenseMatrix[Complex]] {
       def apply(from: DenseMatrix[Complex]) = {
-        new DenseMatrix(data = from.data map { _.conjugate },
+        new DenseMatrix(data = from.data.map { _.conjugate },
                         offset = from.offset,
                         cols = from.rows,
                         rows = from.cols,
@@ -1095,7 +1095,7 @@ object DenseMatrix
             val data = new Array[Res](rows * row.length)
             result = DenseMatrix.create(rows, row.length, data)
           }
-          result.t apply (::, r) := row
+          result.t.apply(::, r) := row
         }
 
         if (result ne null) {
@@ -1135,7 +1135,7 @@ object DenseMatrix
             val data = new Array[Boolean](rows * row.length)
             result = DenseMatrix.create(rows, row.length, data)
           }
-          result.t apply (::, r) := row
+          result.t.apply(::, r) := row
         }
 
         if (result ne null) {

@@ -10,7 +10,7 @@ object ImplicitTest {
   object ImplicitTest extends Application {
 
     implicit object StringMonoid extends Monoid[String] {
-      def add(x: String, y: String): String = x concat y
+      def add(x: String, y: String): String = x.concat(y)
 
       def unit: String = ""
     }

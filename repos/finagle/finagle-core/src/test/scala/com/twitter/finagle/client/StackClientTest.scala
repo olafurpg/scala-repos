@@ -233,7 +233,7 @@ class StackClientTest
       .remove(DefaultPool.Role)
       .replace(
         StackClient.Role.prepFactory, { next: ServiceFactory[Unit, Unit] =>
-          next map { service: Service[Unit, Unit] =>
+          next.map { service: Service[Unit, Unit] =>
             new ServiceProxy[Unit, Unit](service) {
               override def close(deadline: Time) = Future.never
             }

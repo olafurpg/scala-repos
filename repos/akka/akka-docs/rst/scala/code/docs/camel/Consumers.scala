@@ -15,7 +15,7 @@ object Consumers {
 
       def receive = {
         case msg: CamelMessage =>
-          println("received %s" format msg.bodyAs[String])
+          println("received %s".format(msg.bodyAs[String]))
       }
     }
     //#Consumer1
@@ -29,7 +29,7 @@ object Consumers {
 
       def receive = {
         case msg: CamelMessage =>
-          sender() ! ("Hello %s" format msg.bodyAs[String])
+          sender() ! ("Hello %s".format(msg.bodyAs[String]))
       }
     }
     //#Consumer2
@@ -67,7 +67,7 @@ object Consumers {
       override def replyTimeout = 500 millis
       def receive = {
         case msg: CamelMessage =>
-          sender() ! ("Hello %s" format msg.bodyAs[String])
+          sender() ! ("Hello %s".format(msg.bodyAs[String]))
       }
     }
     //#Consumer4

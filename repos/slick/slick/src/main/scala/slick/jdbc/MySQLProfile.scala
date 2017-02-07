@@ -257,11 +257,11 @@ trait MySQLProfile extends JdbcProfile { profile =>
   class ColumnDDLBuilder(column: FieldSymbol)
       extends super.ColumnDDLBuilder(column) {
     override protected def appendOptions(sb: StringBuilder) {
-      if (defaultLiteral ne null) sb append " DEFAULT " append defaultLiteral
-      if (notNull) sb append " NOT NULL"
-      else if (sqlType.toUpperCase == "TIMESTAMP") sb append " NULL"
-      if (autoIncrement) sb append " AUTO_INCREMENT"
-      if (primaryKey) sb append " PRIMARY KEY"
+      if (defaultLiteral ne null) sb.append(" DEFAULT ").append(defaultLiteral)
+      if (notNull) sb.append(" NOT NULL")
+      else if (sqlType.toUpperCase == "TIMESTAMP") sb.append(" NULL")
+      if (autoIncrement) sb.append(" AUTO_INCREMENT")
+      if (primaryKey) sb.append(" PRIMARY KEY")
     }
   }
 
@@ -274,11 +274,11 @@ trait MySQLProfile extends JdbcProfile { profile =>
       val increment = seq._increment.getOrElse(one)
       val desc = increment < zero
       val minValue =
-        seq._minValue getOrElse
-          (if (desc) fromInt(java.lang.Integer.MIN_VALUE) else one)
+        seq._minValue.getOrElse(
+          if (desc) fromInt(java.lang.Integer.MIN_VALUE) else one)
       val maxValue =
-        seq._maxValue getOrElse
-          (if (desc) fromInt(-1) else fromInt(java.lang.Integer.MAX_VALUE))
+        seq._maxValue.getOrElse(
+          if (desc) fromInt(-1) else fromInt(java.lang.Integer.MAX_VALUE))
       val start = seq._start.getOrElse(if (desc) maxValue else minValue)
       val beforeStart = start - increment
       if (!seq._cycle &&
@@ -327,20 +327,20 @@ trait MySQLProfile extends JdbcProfile { profile =>
         if (value eq null) "NULL"
         else {
           val sb = new StringBuilder
-          sb append '\''
+          sb.append('\'')
           for (c <- value) c match {
-            case '\'' => sb append "\\'"
-            case '"' => sb append "\\\""
-            case 0 => sb append "\\0"
-            case 26 => sb append "\\Z"
-            case '\b' => sb append "\\b"
-            case '\n' => sb append "\\n"
-            case '\r' => sb append "\\r"
-            case '\t' => sb append "\\t"
-            case '\\' => sb append "\\\\"
-            case _ => sb append c
+            case '\'' => sb.append("\\'")
+            case '"' => sb.append("\\\"")
+            case 0 => sb.append("\\0")
+            case 26 => sb.append("\\Z")
+            case '\b' => sb.append("\\b")
+            case '\n' => sb.append("\\n")
+            case '\r' => sb.append("\\r")
+            case '\t' => sb.append("\\t")
+            case '\\' => sb.append("\\\\")
+            case _ => sb.append(c)
           }
-          sb append '\''
+          sb.append('\'')
           sb.toString
         }
     }

@@ -65,10 +65,12 @@ trait HTTPProvider {
                        System.nanoTime)
 
       CurrentReq.doWith(newReq) {
-        URLRewriter.doWith(url =>
-          NamedPF
-            .applyBox(resp.encodeUrl(url), LiftRules.urlDecorate.toList) openOr resp
-            .encodeUrl(url)) {
+        URLRewriter.doWith(
+          url =>
+            NamedPF
+              .applyBox(resp.encodeUrl(url), LiftRules.urlDecorate.toList)
+              .openOr(resp
+                .encodeUrl(url))) {
           if (!(isLiftRequest_?(newReq) &&
                 actualServlet.service(newReq, resp))) {
             chain
@@ -84,7 +86,9 @@ trait HTTPProvider {
   protected def bootLift(loader: Box[String]): Unit = {
     try {
       val b: Bootable =
-        loader.map(b => Class.forName(b).newInstance.asInstanceOf[Bootable]) openOr DefaultBootstrap
+        loader
+          .map(b => Class.forName(b).newInstance.asInstanceOf[Bootable])
+          .openOr(DefaultBootstrap)
       preBoot
       b.boot
     } catch {
@@ -129,7 +133,7 @@ trait HTTPProvider {
 
   private def postBoot {
     try {
-      ResourceBundle getBundle (LiftRules.liftCoreResourceName)
+      ResourceBundle.getBundle(LiftRules.liftCoreResourceName)
 
       if (Props.productionMode && LiftRules.templateCache.isEmpty) {
         // Since we're in productin mode and user did not explicitely set any template caching, we're setting it

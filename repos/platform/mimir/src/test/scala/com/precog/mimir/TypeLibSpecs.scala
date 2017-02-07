@@ -57,11 +57,11 @@ trait TypeLibSpecs[M[+ _]]
       result must haveSize(24)
 
       val result2 =
-        result.toSeq collect {
+        result.toSeq.collect {
           case (ids, SBoolean(b)) if ids.length == 1 => b
         }
 
-      val (trues, falses) = result2 partition identity
+      val (trues, falses) = result2.partition(identity)
 
       trues.length mustEqual 9
       falses.length mustEqual 15
@@ -81,11 +81,11 @@ trait TypeLibSpecs[M[+ _]]
       result must haveSize(24)
 
       val result2 =
-        result.toSeq collect {
+        result.toSeq.collect {
           case (ids, SBoolean(b)) if ids.length == 1 => b
         }
 
-      val (trues, falses) = result2 partition identity
+      val (trues, falses) = result2.partition(identity)
 
       trues.length mustEqual 4
       falses.length mustEqual 20
@@ -105,11 +105,11 @@ trait TypeLibSpecs[M[+ _]]
       result must haveSize(24)
 
       val result2 =
-        result.toSeq collect {
+        result.toSeq.collect {
           case (ids, SBoolean(b)) if ids.length == 1 => b
         }
 
-      val (trues, falses) = result2 partition identity
+      val (trues, falses) = result2.partition(identity)
 
       trues.length mustEqual 2
       falses.length mustEqual 22
@@ -129,11 +129,11 @@ trait TypeLibSpecs[M[+ _]]
       result must haveSize(24)
 
       val result2 =
-        result.toSeq collect {
+        result.toSeq.collect {
           case (ids, SBoolean(b)) if ids.length == 1 => b
         }
 
-      val (trues, falses) = result2 partition identity
+      val (trues, falses) = result2.partition(identity)
 
       trues.length mustEqual 1
       falses.length mustEqual 23
@@ -153,11 +153,11 @@ trait TypeLibSpecs[M[+ _]]
       result must haveSize(24)
 
       val result2 =
-        result.toSeq collect {
+        result.toSeq.collect {
           case (ids, SBoolean(b)) if ids.length == 1 => b
         }
 
-      val (trues, falses) = result2 partition identity
+      val (trues, falses) = result2.partition(identity)
 
       trues.length mustEqual 3
       falses.length mustEqual 21
@@ -177,11 +177,11 @@ trait TypeLibSpecs[M[+ _]]
       result must haveSize(24)
 
       val result2 =
-        result.toSeq collect {
+        result.toSeq.collect {
           case (ids, SBoolean(b)) if ids.length == 1 => b
         }
 
-      val (trues, falses) = result2 partition identity
+      val (trues, falses) = result2.partition(identity)
 
       trues.length mustEqual 5
       falses.length mustEqual 19

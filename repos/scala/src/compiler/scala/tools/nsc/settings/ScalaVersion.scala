@@ -50,7 +50,7 @@ case class SpecificScalaVersion(major: Int,
       else if (minor > thatMinor) 1
       else if (rev < thatRev) -1
       else if (rev > thatRev) 1
-      else build compare thatBuild
+      else build.compare(thatBuild)
     case AnyScalaVersion => 1
     case NoScalaVersion => -1
   }
@@ -147,7 +147,7 @@ case class Development(id: String) extends ScalaBuild {
     // sorting two development builds based on id is reasonably valid for two versions created with the same schema
     // otherwise it's not correct, but since it's impossible to put a total ordering on development build versions
     // this is a pragmatic compromise
-    case Development(thatId) => id compare thatId
+    case Development(thatId) => id.compare(thatId)
     // assume a development build is newer than anything else, that's not really true, but good luck
     // mapping development build versions to other build types
     case _ => 1

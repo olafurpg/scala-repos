@@ -90,7 +90,7 @@ object BodyParserSpec
         run {
           constant(x).map(inc).map(dbl)
         } must_== run {
-          constant(x).map(inc andThen dbl)
+          constant(x).map(inc.andThen(dbl))
         }
       }
     }

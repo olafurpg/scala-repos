@@ -70,7 +70,7 @@ private[reflect] object ScalaSigReader {
           .orElse {
             sig.topLevelObjects.map { obj =>
               val t = obj.infoType.asInstanceOf[TypeRefType]
-              t.symbol.children collect { case c: ClassSymbol => c } find
+              t.symbol.children.collect { case c: ClassSymbol => c } find
                 (_.symbolInfo.name == clazz.getSimpleName)
             }.head
           }
@@ -80,14 +80,14 @@ private[reflect] object ScalaSigReader {
   def findConstructor(c: ClassSymbol,
                       argNames: List[String]): Option[MethodSymbol] = {
     val ms =
-      c.children collect {
+      c.children.collect {
         case m: MethodSymbol if m.name == "<init>" => m
       }
     ms.find(m => m.children.map(_.name) == argNames)
   }
 
   private def findField(c: ClassSymbol, name: String): Option[MethodSymbol] =
-    (c.children collect { case m: MethodSymbol if m.name == name => m }).headOption
+    (c.children.collect { case m: MethodSymbol if m.name == name => m }).headOption
 
   def findArgType(s: MethodSymbol, argIdx: Int, typeArgIndex: Int): Class[_] = {
     def findPrimitive(t: Type): Symbol = {
@@ -123,7 +123,7 @@ private[reflect] object ScalaSigReader {
           symbol
         case TypeRefType(_, symbol, Nil) => symbol
         case TypeRefType(_, _, args) if typeArgIndexes(ii) >= args.length =>
-          findPrimitive(args(0 max args.length - 1), curr + 1)
+          findPrimitive(args(0.max(args.length - 1)), curr + 1)
         case TypeRefType(_, _, args) =>
           val ta = args(typeArgIndexes(ii))
           ta match {
@@ -173,7 +173,7 @@ private[reflect] object ScalaSigReader {
     try {
       // taken from ScalaSigParser parse method with the explicit purpose of walking away from NPE
       val byteCode = ByteCode.forClass(clazz)
-      Option(ClassFileParser.parse(byteCode)) flatMap ScalaSigParser.parse
+      Option(ClassFileParser.parse(byteCode)).flatMap(ScalaSigParser.parse)
     } catch {
       case e: NullPointerException =>
         None // yes, this is the exception, but it is totally unhelpful to the end user

@@ -106,7 +106,7 @@ sealed abstract class InputInstances {
         eof = b
       )
       def bind[A, B](fa: Input[A])(f: A => Input[B]): Input[B] =
-        fa flatMap (a => f(a))
+        fa.flatMap(a => f(a))
     }
 
   implicit def inputSemigroup[A](

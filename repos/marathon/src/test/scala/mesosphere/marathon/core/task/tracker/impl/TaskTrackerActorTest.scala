@@ -27,8 +27,10 @@ class TaskTrackerActorTest
     val f = new Fixture
 
     Given("a failing task loader")
-    f.taskLoader.loadTasks() returns Future.failed(
-      new RuntimeException("severe simulated loading failure"))
+    f.taskLoader
+      .loadTasks()
+      .returns(Future.failed(
+        new RuntimeException("severe simulated loading failure")))
 
     When("the task tracker starts")
     f.taskTrackerActor
@@ -47,8 +49,9 @@ class TaskTrackerActorTest
       override def updaterProps(trackerRef: ActorRef): Props = failProps
     }
     And("an empty task loader result")
-    f.taskLoader.loadTasks() returns Future.successful(
-      TaskTracker.TasksByApp.empty)
+    f.taskLoader
+      .loadTasks()
+      .returns(Future.successful(TaskTracker.TasksByApp.empty))
 
     When("the task tracker actor gets a ForwardTaskOp")
     val deadline = Timestamp.zero // ignored
@@ -67,7 +70,7 @@ class TaskTrackerActorTest
     val f = new Fixture
     Given("an empty task loader result")
     val appDataMap = TaskTracker.TasksByApp.empty
-    f.taskLoader.loadTasks() returns Future.successful(appDataMap)
+    f.taskLoader.loadTasks().returns(Future.successful(appDataMap))
 
     When("the task tracker actor gets a List query")
     val probe = TestProbe()
@@ -84,7 +87,7 @@ class TaskTrackerActorTest
     val task = MarathonTestHelper.dummyTaskProto(appId)
     val appDataMap =
       TaskTracker.TasksByApp.of(TaskTracker.AppTasks(appId, Iterable(task)))
-    f.taskLoader.loadTasks() returns Future.successful(appDataMap)
+    f.taskLoader.loadTasks().returns(Future.successful(appDataMap))
 
     When("the task tracker actor gets a List query")
     val probe = TestProbe()
@@ -105,7 +108,7 @@ class TaskTrackerActorTest
       TaskTracker.AppTasks(appId,
                            Iterable(stagedTask, runningTask1, runningTask2))
     )
-    f.taskLoader.loadTasks() returns Future.successful(appDataMap)
+    f.taskLoader.loadTasks().returns(Future.successful(appDataMap))
 
     When("the task tracker has started up")
     val probe = TestProbe()
@@ -128,7 +131,7 @@ class TaskTrackerActorTest
       TaskTracker.AppTasks(appId,
                            Iterable(stagedTask, runningTask1, runningTask2))
     )
-    f.taskLoader.loadTasks() returns Future.successful(appDataMap)
+    f.taskLoader.loadTasks().returns(Future.successful(appDataMap))
 
     When("staged task gets deleted")
     val probe = TestProbe()
@@ -165,7 +168,7 @@ class TaskTrackerActorTest
       TaskTracker.AppTasks(appId,
                            Iterable(stagedTask, runningTask1, runningTask2))
     )
-    f.taskLoader.loadTasks() returns Future.successful(appDataMap)
+    f.taskLoader.loadTasks().returns(Future.successful(appDataMap))
 
     When("staged task transitions to running")
     val probe = TestProbe()
@@ -193,7 +196,7 @@ class TaskTrackerActorTest
       TaskTracker.AppTasks(appId,
                            Iterable(stagedTask, runningTask1, runningTask2))
     )
-    f.taskLoader.loadTasks() returns Future.successful(appDataMap)
+    f.taskLoader.loadTasks().returns(Future.successful(appDataMap))
 
     When("a new staged task gets added")
     val probe = TestProbe()

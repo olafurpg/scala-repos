@@ -85,13 +85,15 @@ class TestActor(queue: BlockingDeque[TestActor.Message]) extends Actor {
         case other ⇒ other
       }
       val observe =
-        ignore map (ignoreFunc ⇒ !ignoreFunc.applyOrElse(x, FALSE)) getOrElse true
+        ignore
+          .map(ignoreFunc ⇒ !ignoreFunc.applyOrElse(x, FALSE))
+          .getOrElse(true)
       if (observe) queue.offerLast(RealMessage(x, sender()))
   }
 
   override def postStop() = {
     import scala.collection.JavaConverters._
-    queue.asScala foreach { m ⇒
+    queue.asScala.foreach { m ⇒
       context.system.deadLetters
         .tell(DeadLetter(m.msg, m.sender, self), m.sender)
     }
@@ -480,7 +482,8 @@ trait TestKitBase {
   private def expectMsgClass_internal[C](max: FiniteDuration, c: Class[C]): C = {
     val o = receiveOne(max)
     assert(o ne null, s"timeout ($max) during expectMsgClass waiting for $c")
-    assert(BoxedType(c) isInstance o, s"expected $c, found ${o.getClass} ($o)")
+    assert(BoxedType(c).isInstance(o),
+           s"expected $c, found ${o.getClass} ($o)")
     o.asInstanceOf[C]
   }
 
@@ -505,7 +508,7 @@ trait TestKitBase {
     assert(
       o ne null,
       s"timeout ($max) during expectMsgAnyOf waiting for ${obj.mkString("(", ", ", ")")}")
-    assert(obj exists (_ == o), s"found unexpected $o")
+    assert(obj.exists(_ == o), s"found unexpected $o")
     o.asInstanceOf[T]
   }
 
@@ -531,7 +534,7 @@ trait TestKitBase {
     assert(o ne null,
            s"timeout ($max) during expectMsgAnyClassOf waiting for ${obj
              .mkString("(", ", ", ")")}")
-    assert(obj exists (c ⇒ BoxedType(c) isInstance o), s"found unexpected $o")
+    assert(obj.exists(c ⇒ BoxedType(c).isInstance(o)), s"found unexpected $o")
     o.asInstanceOf[C]
   }
 
@@ -574,8 +577,8 @@ trait TestKitBase {
   private def expectMsgAllOf_internal[T](max: FiniteDuration,
                                          obj: T*): immutable.Seq[T] = {
     val recv = receiveN_internal(obj.size, max)
-    val missing = obj filterNot (x ⇒ recv exists (x == _))
-    val unexpected = recv filterNot (x ⇒ obj exists (x == _))
+    val missing = obj.filterNot(x ⇒ recv.exists(x == _))
+    val unexpected = recv.filterNot(x ⇒ obj.exists(x == _))
     checkMissingAndUnexpected(missing,
                               unexpected,
                               "not found",
@@ -605,9 +608,9 @@ trait TestKitBase {
       max: FiniteDuration,
       obj: Class[_ <: T]*): immutable.Seq[T] = {
     val recv = receiveN_internal(obj.size, max)
-    val missing = obj filterNot (x ⇒ recv exists (_.getClass eq BoxedType(x)))
+    val missing = obj.filterNot(x ⇒ recv.exists(_.getClass eq BoxedType(x)))
     val unexpected =
-      recv filterNot (x ⇒ obj exists (c ⇒ BoxedType(c) eq x.getClass))
+      recv.filterNot(x ⇒ obj.exists(c ⇒ BoxedType(c) eq x.getClass))
     checkMissingAndUnexpected(missing,
                               unexpected,
                               "not found",
@@ -640,9 +643,9 @@ trait TestKitBase {
       max: FiniteDuration,
       obj: Class[_ <: T]*): immutable.Seq[T] = {
     val recv = receiveN_internal(obj.size, max)
-    val missing = obj filterNot (x ⇒ recv exists (BoxedType(x) isInstance _))
+    val missing = obj.filterNot(x ⇒ recv.exists(BoxedType(x).isInstance(_)))
     val unexpected =
-      recv filterNot (x ⇒ obj exists (c ⇒ BoxedType(c) isInstance x))
+      recv.filterNot(x ⇒ obj.exists(c ⇒ BoxedType(c).isInstance(x)))
     checkMissingAndUnexpected(missing,
                               unexpected,
                               "not found",

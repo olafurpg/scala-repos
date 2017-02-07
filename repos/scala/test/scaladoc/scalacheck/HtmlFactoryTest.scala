@@ -105,7 +105,7 @@ object Test extends Properties("HtmlFactory") {
       // resolve the file to be checked
       val fileName = fileHint match {
         case Some(file) =>
-          if (file endsWith ".html") file
+          if (file.endsWith(".html")) file
           else file + ".html"
         case None =>
           htmlFile
@@ -766,7 +766,7 @@ object Test extends Properties("HtmlFactory") {
         node \ ("@" + attrName) text
 
       def \@(attrName: String, attrValue: String): NodeSeq =
-        node filter { _ \ ("@" + attrName) exists (_.text == attrValue) }
+        node.filter { (_ \ ("@" + attrName)).exists(_.text == attrValue) }
     }
 
     implicit class AssertionAwareNode(node: scala.xml.NodeSeq) {

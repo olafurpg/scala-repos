@@ -119,7 +119,7 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
 
     // Here we only return "accessor" methods.
     override val methods: Seq[IrMethod] = {
-      (allMethods map { mth =>
+      (allMethods.map { mth =>
         new ScalaIrMethod(mth, this)
       })(collection.breakOut)
     }
@@ -191,7 +191,7 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
       // TODO - We may need, additionally,  run some existentialAbstractoin fun on these signatures so the
       //        symbol/types are fully realized from what we had.
       // We always drop the first class, becasue it is ourself.
-      classSymbol.baseClasses.drop(1) filter (_.isClass) map { x =>
+      classSymbol.baseClasses.drop(1).filter(_.isClass).map { x =>
         //new ScalaIrClass(fillParameters(x), quantified, rawType)
         new ScalaIrClass(tpe.baseType(x), quantified, rawType)
       }
@@ -243,7 +243,7 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
     private def removeTrailingSpace(orig: String): String =
       orig match {
         // TODO - Why do we need this random fix, is this a bug?
-        case x if x endsWith " " =>
+        case x if x.endsWith(" ") =>
           //System.err.println(s"Caugh funny symbol: $field, name: ${field.name}, fullName: ${field.fullName}")
           x.dropRight(1).toString
         case x => x
@@ -302,7 +302,7 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
     override def methodName: String = {
       mthd.name.toString match {
         // TODO - Why do we need this random fix, is this a bug?
-        case x if x endsWith " " => x.dropRight(1).toString
+        case x if x.endsWith(" ") => x.dropRight(1).toString
         case x => x
       }
     }

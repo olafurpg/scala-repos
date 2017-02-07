@@ -94,7 +94,7 @@ trait Formats { self: Formats =>
 
     val ord =
       Ordering[Int].on[(Class[_], FieldSerializer[_])](x => delta(x._1, clazz))
-    fieldSerializers filter (_._1.isAssignableFrom(clazz)) match {
+    fieldSerializers.filter(_._1.isAssignableFrom(clazz)) match {
       case Nil => None
       case xs => Some((xs min ord)._2)
     }
@@ -158,7 +158,7 @@ trait TypeHints {
     */
   def classFor(hint: String): Option[Class[_]]
 
-  def containsHint_?(clazz: Class[_]) = hints exists (_ isAssignableFrom clazz)
+  def containsHint_?(clazz: Class[_]) = hints.exists(_.isAssignableFrom(clazz))
   def deserialize: PartialFunction[(String, JObject), Any] = Map()
   def serialize: PartialFunction[Any, JObject] = Map()
 
@@ -193,10 +193,12 @@ trait TypeHints {
 
     def classFor(hint: String): Option[Class[_]] = {
       def hasClass(h: TypeHints) =
-        scala.util.control.Exception.allCatch opt (h.classFor(hint)) map
-          (_.isDefined) getOrElse (false)
+        scala.util.control.Exception.allCatch
+          .opt(h.classFor(hint))
+          .map(_.isDefined)
+          .getOrElse(false)
 
-      components find (hasClass) flatMap (_.classFor(hint))
+      (components find (hasClass)).flatMap(_.classFor(hint))
     }
 
     override def deserialize: PartialFunction[(String, JObject), Any] =

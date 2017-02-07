@@ -40,8 +40,8 @@ sealed abstract class STRef[S, A] {
     for {
       v1 <- this.read
       v2 <- that.read
-      _ <- this write v2
-      _ <- that write v1
+      _ <- this.write(v2)
+      _ <- that.write(v1)
     } yield ()
 }
 
@@ -213,6 +213,6 @@ sealed abstract class STInstances extends STInstance0 {
   implicit def stMonad[S]: Monad[ST[S, ?]] =
     new Monad[ST[S, ?]] {
       def point[A](a: => A): ST[S, A] = returnST(a)
-      def bind[A, B](fa: ST[S, A])(f: A => ST[S, B]): ST[S, B] = fa flatMap f
+      def bind[A, B](fa: ST[S, A])(f: A => ST[S, B]): ST[S, B] = fa.flatMap(f)
     }
 }

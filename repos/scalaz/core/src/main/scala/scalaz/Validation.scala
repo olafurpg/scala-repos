@@ -449,7 +449,7 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] =
     new Order[Validation[E, A]] {
       def order(f1: Validation[E, A], f2: Validation[E, A]) =
-        f1 compare f2
+        f1.compare(f2)
       override def equal(f1: Validation[E, A], f2: Validation[E, A]) =
         f1 === f2
     }
@@ -526,7 +526,7 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
     with Plus[Validation[L, ?]] with Optional[Validation[L, ?]] {
 
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
-        fa map f
+        fa.map(f)
 
       def traverseImpl[G[_]: Applicative, A, B](fa: Validation[L, A])(
           f: A => G[B]) =
@@ -547,7 +547,7 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
         }
 
       def plus[A](a: Validation[L, A], b: => Validation[L, A]) =
-        a orElse b
+        a.orElse(b)
 
       def pextract[B, A](fa: Validation[L, A]): Validation[L, B] \/ A =
         fa.fold(l => -\/(Failure(l)), \/.right)
@@ -558,7 +558,7 @@ sealed abstract class ValidationInstances3 {
   implicit val ValidationInstances0: Bitraverse[Validation] =
     new Bitraverse[Validation] {
       override def bimap[A, B, C, D](
-          fab: Validation[A, B])(f: A => C, g: B => D) = fab bimap (f, g)
+          fab: Validation[A, B])(f: A => C, g: B => D) = fab.bimap(f, g)
 
       def bitraverseImpl[G[_]: Applicative, A, B, C, D](
           fab: Validation[A, B])(f: A => G[C], g: B => G[D]) =
@@ -569,12 +569,12 @@ sealed abstract class ValidationInstances3 {
     : Applicative[Validation[L, ?]] =
     new Applicative[Validation[L, ?]] {
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
-        fa map f
+        fa.map(f)
 
       def point[A](a: => A) =
         Success(a)
 
       def ap[A, B](fa: => Validation[L, A])(f: => Validation[L, A => B]) =
-        fa ap f
+        fa.ap(f)
     }
 }

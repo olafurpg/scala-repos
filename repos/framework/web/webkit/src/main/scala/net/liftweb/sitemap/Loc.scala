@@ -87,7 +87,7 @@ trait Loc[T] {
   /**
     * The value of the Loc based on params (either Loc.Value or Loc.CalcValue)
     */
-  def paramValue: Box[T] = calcValue.flatMap(f => f()) or staticValue
+  def paramValue: Box[T] = calcValue.flatMap(f => f()).or(staticValue)
 
   private lazy val staticValue: Box[T] = {
     allParams.collectFirst {
@@ -125,7 +125,7 @@ trait Loc[T] {
     * The current value of the cell: overrideValue or requestValue.is or defaultValue oe paramValue
     */
   def currentValue: Box[T] =
-    overrideValue or requestValue.is or defaultValue or paramValue
+    overrideValue.or(requestValue.is).or(defaultValue).or(paramValue)
 
   def childValues: List[T] = Nil
 
@@ -261,7 +261,7 @@ trait Loc[T] {
     */
   protected def reqCalcStateless(): Boolean = {
     val (np, param) = foundStatelessCalc
-    (np.map(_.f()) or param.map(_.f(currentValue))) openOr false
+    (np.map(_.f()).or(param.map(_.f(currentValue)))).openOr(false)
   }
 
   /**
@@ -271,7 +271,7 @@ trait Loc[T] {
     .collect {
       case v: Loc.ValueSnippets[T] => v.snippets
     }
-    .reduceLeftOption(_ orElse _)
+    .reduceLeftOption(_.orElse(_))
     .getOrElse(Map.empty)
 
   /**
@@ -279,7 +279,7 @@ trait Loc[T] {
     * `Loc` value.
     */
   def snippet(name: String): Box[NodeSeq => NodeSeq] = {
-    snippets orElse calcSnippets lift (name, currentValue)
+    snippets.orElse(calcSnippets).lift(name, currentValue)
   }
 
   protected object accessTestRes
@@ -363,7 +363,7 @@ trait Loc[T] {
     * or Loc.ValueTemplate parameter will take precedence over a value returned
     * by the calcTemplate method.
     */
-  def template: Box[NodeSeq] = paramTemplate or calcTemplate
+  def template: Box[NodeSeq] = paramTemplate.or(calcTemplate)
 
   /**
     * The first Loc.Title in the param list.
@@ -378,14 +378,14 @@ trait Loc[T] {
     * Any Loc.Title parameter will take precedence over the
     * value returned by the linkText method.
     */
-  def title(in: T): NodeSeq = paramTitle.map(_.apply(in)) openOr linkText(in)
+  def title(in: T): NodeSeq = paramTitle.map(_.apply(in)).openOr(linkText(in))
 
   /**
     * The title of the location given the current value associated with this Loc.
     * If no current value is available, this will use the name of this Loc
     * as the title.
     */
-  def title: NodeSeq = currentValue.map(title _) openOr Text(name)
+  def title: NodeSeq = currentValue.map(title _).openOr(Text(name))
 
   /**
     * The link text to be displayed for a value of type T
@@ -488,7 +488,7 @@ trait Loc[T] {
   def inGroup_?(group: String): Boolean = groupSet.contains(group)
 
   def init() {
-    params.foreach(_ onCreate (this))
+    params.foreach(_.onCreate(this))
   }
 }
 

@@ -29,8 +29,8 @@ object XmlPattern {
       builder.restoreNewlinesState
       return false
     }
-    ContentP parse builder
-    if (!ETagP.parse(builder)) builder error ErrMsg("xml.end.tag.expected")
+    ContentP.parse(builder)
+    if (!ETagP.parse(builder)) builder.error(ErrMsg("xml.end.tag.expected"))
     builder.restoreNewlinesState
     patternMarker.done(ScalaElementTypes.XML_PATTERN)
     return true

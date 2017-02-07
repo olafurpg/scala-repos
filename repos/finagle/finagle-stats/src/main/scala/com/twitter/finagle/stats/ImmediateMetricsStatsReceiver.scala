@@ -21,7 +21,7 @@ object ImmediateMetricsStatsReceiver {
 
           override def percentiles(): Array[Percentile] = {
             val quantiles = Histogram.DEFAULT_QUANTILES
-            (hist.getQuantiles(quantiles) zip quantiles.toSeq) map {
+            (hist.getQuantiles(quantiles).zip(quantiles.toSeq)).map {
               case (q, p) => new Percentile(p, q)
             }
           }

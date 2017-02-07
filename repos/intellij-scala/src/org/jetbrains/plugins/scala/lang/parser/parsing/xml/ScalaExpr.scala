@@ -28,7 +28,7 @@ object ScalaExpr {
       case _ => return false
     }
     if (!Block.parse(builder, hasBrace = false, needNode = true)) {
-      builder error ErrMsg("xml.scala.expression.exected")
+      builder.error(ErrMsg("xml.scala.expression.exected"))
     }
     while (builder.getTokenType == ScalaTokenTypes.tSEMICOLON) {
       builder.advanceLexer()
@@ -36,7 +36,7 @@ object ScalaExpr {
     builder.getTokenType match {
       case ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_END =>
         builder.advanceLexer()
-      case _ => builder error ErrMsg("xml.scala.injection.end.expected")
+      case _ => builder.error(ErrMsg("xml.scala.injection.end.expected"))
     }
     builder.restoreNewlinesState
     true

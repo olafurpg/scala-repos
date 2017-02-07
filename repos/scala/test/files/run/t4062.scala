@@ -10,7 +10,7 @@ class B(f: String) extends A(f) {
 object Test {
   def main(args: Array[String]): Unit = {
     val b = new B("abc")
-    println(b foo "bippy")
-    println(b foo "abc")
+    println(b.foo("bippy"))
+    println(b.foo("abc"))
   }
 }

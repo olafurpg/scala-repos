@@ -110,7 +110,7 @@ class StringHandler(formatter: Formatter = new Formatter(),
   private val buffer = new StringBuffer()
 
   def publish(record: javalog.LogRecord) = {
-    buffer append getFormatter().format(record)
+    buffer.append(getFormatter().format(record))
   }
 
   def close() = {}

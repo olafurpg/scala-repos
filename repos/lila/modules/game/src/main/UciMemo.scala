@@ -11,7 +11,7 @@ final class UciMemo(ttl: Duration) {
   private val hardLimit = 300
 
   def add(game: Game, uciMove: String) {
-    val current = Option(memo getIfPresent game.id) | Vector.empty
+    val current = Option(memo.getIfPresent(game.id)) | Vector.empty
     memo.put(game.id, current :+ uciMove)
   }
   def add(game: Game, move: chess.MoveOrDrop) {
@@ -23,15 +23,15 @@ final class UciMemo(ttl: Duration) {
   }
 
   def get(game: Game, max: Int = hardLimit): Fu[Vector[String]] =
-    Option(memo getIfPresent game.id) filter { moves =>
+    Option(memo.getIfPresent(game.id)).filter { moves =>
       moves.size.min(max) == game.pgnMoves.size.min(max)
     } match {
       case Some(moves) => fuccess(moves)
-      case _ => compute(game, max) addEffect { set(game, _) }
+      case _ => compute(game, max).addEffect { set(game, _) }
     }
 
   def drop(game: Game, nb: Int) {
-    val current = Option(memo getIfPresent game.id) | Vector.empty
+    val current = Option(memo.getIfPresent(game.id)) | Vector.empty
     memo.put(game.id, current.take(current.size - nb))
   }
 

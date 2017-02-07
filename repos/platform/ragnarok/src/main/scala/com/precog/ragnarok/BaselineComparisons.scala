@@ -88,17 +88,17 @@ trait BaselineComparisons {
       results match {
         case Tree.Node((RunQuery(query), stats), _) =>
           Tree.leaf(
-            RunQuery(query) -> PerfDelta(baseline get ((path, Some(query))),
+            RunQuery(query) -> PerfDelta(baseline.get((path, Some(query))),
                                          stats))
 
         case Tree.Node((Group(name), stats), kids) =>
           val newPath = path :+ name
           Tree.node(
-            Group(name) -> PerfDelta(baseline get ((newPath, None)), stats),
-            kids map (rec(_, newPath)))
+            Group(name) -> PerfDelta(baseline.get((newPath, None)), stats),
+            kids.map(rec(_, newPath)))
 
         case Tree.Node((test, stats), kids) =>
-          Tree.node(test -> PerfDelta(None, stats), kids map (rec(_, path)))
+          Tree.node(test -> PerfDelta(None, stats), kids.map(rec(_, path)))
       }
 
     rec(results, Nil)
@@ -121,21 +121,23 @@ trait BaselineComparisons {
             (obj \? "stats") match {
               case Some(stats) =>
                 (for {
-                  JArray(jpath) <- obj \? "path" flatMap
-                    (_ -->? classOf[JArray])
-                  JNum(mean) <- stats \? "mean" flatMap (_ -->? classOf[JNum])
-                  JNum(variance) <- stats \? "variance" flatMap
-                    (_ -->? classOf[JNum])
-                  JNum(stdDev) <- stats \? "stdDev" flatMap
-                    (_ -->? classOf[JNum])
-                  JNum(min) <- stats \? "min" flatMap (_ -->? classOf[JNum])
-                  JNum(max) <- stats \? "max" flatMap (_ -->? classOf[JNum])
-                  JNum(count) <- stats \? "count" flatMap
-                    (_ -->? classOf[JNum])
+                  JArray(jpath) <- (obj \? "path").flatMap(
+                    _ -->? classOf[JArray])
+                  JNum(mean) <- (stats \? "mean").flatMap(_ -->? classOf[JNum])
+                  JNum(variance) <- (stats \? "variance").flatMap(
+                    _ -->? classOf[JNum])
+                  JNum(stdDev) <- (stats \? "stdDev").flatMap(
+                    _ -->? classOf[JNum])
+                  JNum(min) <- (stats \? "min").flatMap(_ -->? classOf[JNum])
+                  JNum(max) <- (stats \? "max").flatMap(_ -->? classOf[JNum])
+                  JNum(count) <- (stats \? "count").flatMap(
+                    _ -->? classOf[JNum])
                 } yield {
                   val path =
-                    (jpath collect { case JString(p) => p },
-                     (obj \? "query") collect { case JString(query) => query })
+                    (jpath.collect { case JString(p) => p },
+                     ((obj \? "query")).collect {
+                       case JString(query) => query
+                     })
                   val n = count.toInt
                   path -> Statistics(0,
                                      List(min.toDouble),
@@ -143,9 +145,9 @@ trait BaselineComparisons {
                                      mean.toDouble,
                                      (n - 1) * variance.toDouble,
                                      n)
-                }) map (acc + _) getOrElse {
+                }).map(acc + _).getOrElse {
                   // TODO: Replace these errors with something more useful.
-                  sys.error("Error parsing: %s" format obj.toString)
+                  sys.error("Error parsing: %s".format(obj.toString))
                 }
 
               // Stats will be misssing when the Option[Statistics] is None.

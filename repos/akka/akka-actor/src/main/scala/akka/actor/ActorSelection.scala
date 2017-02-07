@@ -62,7 +62,7 @@ abstract class ActorSelection extends Serializable {
   def resolveOne()(implicit timeout: Timeout): Future[ActorRef] = {
     implicit val ec = ExecutionContexts.sameThreadExecutionContext
     val p = Promise[ActorRef]()
-    this.ask(Identify(None)) onComplete {
+    this.ask(Identify(None)).onComplete {
       case Success(ActorIdentity(_, Some(ref))) ⇒ p.success(ref)
       case _ ⇒ p.failure(ActorNotFound(this))
     }

@@ -22,7 +22,7 @@ final class RateLimit(nb: Int, duration: Duration, name: String) {
 
   def apply[A](key: String, msg: => String = "")(op: => A)(
       implicit default: Zero[A]): A =
-    Option(storage getIfPresent key) match {
+    Option(storage.getIfPresent(key)) match {
       case None =>
         storage.put(key, 1 -> makeClearAt)
         op

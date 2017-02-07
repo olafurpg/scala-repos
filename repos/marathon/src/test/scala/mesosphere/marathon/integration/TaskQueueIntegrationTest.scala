@@ -14,14 +14,14 @@ class TaskQueueIntegrationTest
     with Matchers {
   test("GET /v2/queue with an empty queue") {
     Given("no pending deployments")
-    marathon.listDeploymentsForBaseGroup().value should have size 0
+    (marathon.listDeploymentsForBaseGroup().value should have).size(0)
 
     Then("the task queue should be empty")
     val response = marathon.taskQueue()
     response.code should be(200)
 
     val queue = response.value.queue
-    queue should have size 0
+    (queue should have).size(0)
   }
 
   test("GET /v2/queue with pending app") {
@@ -50,7 +50,7 @@ class TaskQueueIntegrationTest
     response.code should be(200)
 
     val queue = response.value.queue
-    queue should have size 1
+    (queue should have).size(1)
     queue.head.app.id should be(appId)
     queue.head.count should be(5)
   }

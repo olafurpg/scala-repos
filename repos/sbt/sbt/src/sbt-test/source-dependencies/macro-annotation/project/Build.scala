@@ -12,7 +12,8 @@ object BuildSettings {
       resolvers += Resolver.sonatypeRepo("snapshots"),
       resolvers += Resolver.sonatypeRepo("releases"),
       addCompilerPlugin(
-        "org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full),
+        ("org.scalamacros" % "paradise" % paradiseVersion)
+          .cross(CrossVersion.full)),
       incOptions := incOptions.value.withNameHashing(true)
     )
 }
@@ -27,7 +28,7 @@ object MyBuild extends Build {
       settings = buildSettings ++ Seq(
           run <<= run in Compile in core
         )
-    ) aggregate (macros, core)
+    ).aggregate(macros, core)
 
   lazy val macros: Project = Project(
     "macros",
@@ -47,5 +48,5 @@ object MyBuild extends Build {
       "core",
       file("core"),
       settings = buildSettings
-    ) dependsOn (macros)
+    ).dependsOn(macros)
 }

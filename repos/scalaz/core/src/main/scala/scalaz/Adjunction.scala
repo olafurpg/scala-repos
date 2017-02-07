@@ -66,8 +66,8 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F],
       implicit A: P -| Q): λ[α => P[F[α]]] -| λ[α => G[Q[α]]] = {
     implicit val P = A.F
     implicit val Q = A.G
-    implicit val PF = P compose F
-    implicit val GQ = G compose Q
+    implicit val PF = P.compose(F)
+    implicit val GQ = G.compose(Q)
     new (λ[α => P[F[α]]] -| λ[α => G[Q[α]]]) {
       override def unit[A](a: => A): G[Q[P[F[A]]]] =
         self.G.map(self.unit(a))(x => A.unit(x))
@@ -91,7 +91,7 @@ sealed abstract class AdjunctionInstances {
   implicit def compositeAdjunction[F[_], P[_], G[_], Q[_]](
       implicit A1: F -| G,
       A2: P -| Q): λ[α => P[F[α]]] -| λ[α => G[Q[α]]] =
-    A1 compose A2
+    A1.compose(A2)
 
   import Id._
   import std.tuple._

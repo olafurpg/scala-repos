@@ -12,7 +12,7 @@ object Test1 {
     !(d == WeekDays.Sat || d == WeekDays.Sun);
 
   def run: Int = {
-    val it = WeekDays.values filter (isWorkingDay);
+    val it = WeekDays.values.filter(isWorkingDay);
     it.toList.length
   }
 }
@@ -44,7 +44,7 @@ object Test3 {
   }
 
   def run: Int = {
-    val it = for (d <- Direction.values; if d.toString() startsWith "N")
+    val it = for (d <- Direction.values; if d.toString().startsWith("N"))
       yield d;
     it.toList.length
   }

@@ -194,7 +194,7 @@ private class SelectorMap(binds: List[CssBind])
           applyRule(xs, realE, onlySelThis, depth)
 
         case bind :: xs => {
-          applyRule(bind, realE, depth) flatMap {
+          applyRule(bind, realE, depth).flatMap {
             case e: Elem => applyRule(xs, e, onlySelThis, depth + 1)
             case x => x
           }
@@ -488,15 +488,20 @@ private class SelectorMap(binds: List[CssBind])
                       case Group(g) => (ids, g :: result)
                       case e: Elem => {
                         val targetId =
-                          e.attribute("id").map(_.toString) orElse
-                            (attrs.get("id"))
+                          e.attribute("id")
+                            .map(_.toString)
+                            .orElse(attrs.get("id"))
                         val keepId =
-                          targetId map { id =>
-                            ids.contains(id)
-                          } getOrElse (false)
+                          targetId
+                            .map { id =>
+                              ids.contains(id)
+                            }
+                            .getOrElse(false)
                         val newIds =
-                          targetId filter (_ => keepId) map (i => ids - i) getOrElse
-                            (ids)
+                          targetId
+                            .filter(_ => keepId)
+                            .map(i => ids - i)
+                            .getOrElse(ids)
                         val newElem =
                           new Elem(e.prefix,
                                    e.label,
@@ -692,7 +697,7 @@ private class SelectorMap(binds: List[CssBind])
   final private def run(in: NodeSeq,
                         onlyRunSel: Boolean,
                         depth: Int): NodeSeq =
-    in flatMap {
+    in.flatMap {
       case Group(g) => run(g, onlyRunSel, depth)
       case e: Elem => treatElem(e, onlyRunSel, depth)
       case x => x
@@ -715,17 +720,20 @@ trait CssBindImplicits {
       * @return the function that will transform an incoming DOM based on the transform rules
       */
     def #>[T](replacement: => T)(implicit converter: CanBind[T]): CssSel = {
-      cssSelector.collect {
-        case EnclosedSelector(a, b) =>
-          new CssBindPromoter(stringSelector, Full(a)) #> nsFunc({ ns =>
-            new CssBindPromoter(stringSelector, Full(b))
-              .#>(replacement)(converter)(ns)
-          }) // (CanBind.nodeSeqFuncTransform)
-      } openOr {
-        new CssBindImpl(stringSelector, cssSelector) {
-          def calculate(in: NodeSeq): Seq[NodeSeq] = converter(replacement)(in)
+      cssSelector
+        .collect {
+          case EnclosedSelector(a, b) =>
+            new CssBindPromoter(stringSelector, Full(a)) #> nsFunc({ ns =>
+              new CssBindPromoter(stringSelector, Full(b))
+                .#>(replacement)(converter)(ns)
+            }) // (CanBind.nodeSeqFuncTransform)
         }
-      }
+        .openOr {
+          new CssBindImpl(stringSelector, cssSelector) {
+            def calculate(in: NodeSeq): Seq[NodeSeq] =
+              converter(replacement)(in)
+          }
+        }
     }
 
     /**
@@ -766,7 +774,7 @@ trait CssBind extends CssSel {
         {stringSelector openOr "N/A"}
         .
         The selector will not be applied.
-      </div>) openOr NodeSeq.Empty
+      </div>).openOr(NodeSeq.Empty)
   }
 
   /**

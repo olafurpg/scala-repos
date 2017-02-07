@@ -101,7 +101,7 @@ private[lease] object Coordinator {
   def create(): Option[Coordinator] = {
     val ms = ManagementFactory.getMemoryPoolMXBeans().asScala
     val cs = ManagementFactory.getGarbageCollectorMXBeans().asScala
-    parallelGc(ms, cs) orElse parNewCMS(ms, cs) map {
+    parallelGc(ms, cs).orElse(parNewCMS(ms, cs)).map {
       case (memory, collector) =>
         val info = new JvmInfo(new BeanMemoryPool(memory), collector)
         val counter = new WindowedByteCounter(info)

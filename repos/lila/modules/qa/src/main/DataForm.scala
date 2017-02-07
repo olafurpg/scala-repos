@@ -21,11 +21,12 @@ private[qa] final class DataForm(val captcher: akka.actor.ActorSelection,
       .verifying(captchaFailMessage, validateCaptcha _))
 
   def editQuestion(q: Question) =
-    question fill QuestionData(title = q.title,
-                               body = q.body,
-                               `hidden-tags` = q.tags mkString ",",
-                               gameId = "",
-                               move = "")
+    question.fill(
+      QuestionData(title = q.title,
+                   body = q.body,
+                   `hidden-tags` = q.tags mkString ",",
+                   gameId = "",
+                   move = ""))
 
   lazy val answer = Form(
     mapping(

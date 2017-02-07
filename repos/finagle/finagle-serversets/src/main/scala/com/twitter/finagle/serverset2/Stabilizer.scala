@@ -123,7 +123,7 @@ private[serverset2] object Stabilizer {
       // triggered at most once per batchEpoch.
 
       val states: Event[State] =
-        (va.changes select removalEpoch.event).foldLeft(initState) {
+        (va.changes.select(removalEpoch.event)).foldLeft(initState) {
           // Addr update
           case (st @ State(limbo, active, last), Left(addr)) =>
             addr match {
@@ -183,7 +183,8 @@ private[serverset2] object Stabilizer {
 
       // Trigger at most one change to state per batchEpoch
       val init = States(Some(Addr.Pending), Addr.Pending, None, Time.Zero)
-      val batchedUpdates = (addrs select batchEpoch.event)
+      val batchedUpdates = (addrs
+        .select(batchEpoch.event))
         .foldLeft(init) {
           case (st, ev) =>
             val now = Time.now

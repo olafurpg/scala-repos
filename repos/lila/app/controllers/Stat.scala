@@ -11,7 +11,7 @@ object Stat extends LilaController {
     implicit ctx =>
       lila.rating.PerfType(perfKey).filter(lila.rating.PerfType.isGame) match {
         case Some(perfType) =>
-          Env.user.cached.ratingDistribution(perfType) map { data =>
+          Env.user.cached.ratingDistribution(perfType).map { data =>
             Ok(html.stat.ratingDistribution(perfType, data))
           }
         case _ => notFound

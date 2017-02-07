@@ -59,7 +59,7 @@ object DiffFunction {
     }
 
     private def myValueAt(v: Double, x: T) = {
-      v + weight * (x dot x) / 2
+      v + weight * (x.dot(x)) / 2
     }
 
     private def myGrad(g: T, x: T): T = {
@@ -87,7 +87,7 @@ object DiffFunction {
       }
 
       private def myValueAt(x: T) = {
-        weight * (x dot x)
+        weight * (x.dot(x))
       }
 
       private def myGrad(g: T, x: T) = {

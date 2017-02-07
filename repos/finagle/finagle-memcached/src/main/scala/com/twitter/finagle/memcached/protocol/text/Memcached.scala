@@ -90,28 +90,30 @@ private class MemcachedTracingFilter extends SimpleFilter[Command, Response] {
 
     val response = service(command)
     if (Trace.isActivelyTracing) {
-      response onSuccess {
-        case Values(values) =>
-          command match {
-            case cmd: RetrievalCommand =>
-              val keys: immutable.Set[String] =
-                immutable.Set(cmd.keys map { case Buf.Utf8(s) => s }: _*)
-              val hits = values.map {
-                case value =>
-                  val Buf.Utf8(keyStr) = value.key
-                  Trace.recordBinary(keyStr, "Hit")
-                  keyStr
-              }
-              val misses: immutable.Set[String] = keys -- hits
-              misses foreach { k: String =>
-                Trace.recordBinary(k, "Miss")
-              }
-            case _ =>
-          }
-        case _ =>
-      } ensure {
-        Trace.record(Annotation.ClientRecv())
-      }
+      response
+        .onSuccess {
+          case Values(values) =>
+            command match {
+              case cmd: RetrievalCommand =>
+                val keys: immutable.Set[String] =
+                  immutable.Set(cmd.keys.map { case Buf.Utf8(s) => s }: _*)
+                val hits = values.map {
+                  case value =>
+                    val Buf.Utf8(keyStr) = value.key
+                    Trace.recordBinary(keyStr, "Hit")
+                    keyStr
+                }
+                val misses: immutable.Set[String] = keys -- hits
+                misses.foreach { k: String =>
+                  Trace.recordBinary(k, "Miss")
+                }
+              case _ =>
+            }
+          case _ =>
+        }
+        .ensure {
+          Trace.record(Annotation.ClientRecv())
+        }
     }
     response
   }
@@ -126,7 +128,7 @@ private class MemcachedLoggingFilter(stats: StatsReceiver)
   private[this] val succ = stats.scope("success")
 
   override def apply(command: Command, service: Service[Command, Response]) = {
-    service(command) map { response =>
+    service(command).map { response =>
       response match {
         case NotFound() | Stored() | NotStored() | Exists() | Deleted() |
             NoOp() | Info(_, _) | InfoLines(_) | Values(_) | Number(_) =>

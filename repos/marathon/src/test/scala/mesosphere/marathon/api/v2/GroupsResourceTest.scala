@@ -29,8 +29,10 @@ class GroupsResourceTest
   test("dry run update") {
     Given("A real Group Manager with no groups")
     useRealGroupManager()
-    groupRepository.group(GroupRepository.zkRootName) returns Future
-      .successful(Some(Group.empty))
+    groupRepository
+      .group(GroupRepository.zkRootName)
+      .returns(Future
+        .successful(Some(Group.empty)))
 
     val app =
       AppDefinition(id = "/test/app".toRootPath, cmd = Some("test cmd"))
@@ -62,7 +64,7 @@ class GroupsResourceTest
     val req = auth.request
     val body = """{"id":"/a/b/c","cmd":"foo","ports":[]}"""
 
-    groupManager.rootGroup() returns Future.successful(Group(PathId.empty))
+    groupManager.rootGroup().returns(Future.successful(Group(PathId.empty)))
 
     When(s"the root is fetched from index")
     val root = groupsResource.root(req, embed)
@@ -112,9 +114,11 @@ class GroupsResourceTest
     Given("A real group manager with one app")
     useRealGroupManager()
     val group = Group(PathId.empty, apps = Set(AppDefinition("/a".toRootPath)))
-    groupRepository.group(GroupRepository.zkRootName) returns Future
-      .successful(Some(group))
-    groupRepository.rootGroup returns Future.successful(Some(group))
+    groupRepository
+      .group(GroupRepository.zkRootName)
+      .returns(Future
+        .successful(Some(group)))
+    groupRepository.rootGroup.returns(Future.successful(Some(group)))
 
     Given("An unauthorized request")
     auth.authenticated = true
@@ -160,10 +164,12 @@ class GroupsResourceTest
     "authenticated delete without authorization leads to a 404 if the resource doesn't exist") {
     Given("A real group manager with no apps")
     useRealGroupManager()
-    groupRepository.group("/") returns Future.successful(None)
-    groupRepository.group(GroupRepository.zkRootName) returns Future
-      .successful(Some(Group.empty))
-    groupRepository.rootGroup returns Future.successful(Some(Group.empty))
+    groupRepository.group("/").returns(Future.successful(None))
+    groupRepository
+      .group(GroupRepository.zkRootName)
+      .returns(Future
+        .successful(Some(Group.empty)))
+    groupRepository.rootGroup.returns(Future.successful(Some(Group.empty)))
 
     Given("An unauthorized request")
     auth.authenticated = true
@@ -182,10 +188,12 @@ class GroupsResourceTest
     "Group Versions for root are transferred as simple json string array (Fix #2329)") {
     Given("Specific Group versions")
     val groupVersions = Seq(Timestamp.now(), Timestamp.now())
-    groupManager.versions(PathId.empty) returns Future.successful(
-      groupVersions.toIterable)
-    groupManager.group(PathId.empty) returns Future.successful(
-      Some(Group(PathId.empty)))
+    groupManager
+      .versions(PathId.empty)
+      .returns(Future.successful(groupVersions.toIterable))
+    groupManager
+      .group(PathId.empty)
+      .returns(Future.successful(Some(Group(PathId.empty))))
 
     When("The versions are queried")
     val rootVersionsResponse =
@@ -201,12 +209,16 @@ class GroupsResourceTest
     "Group Versions for path are transferred as simple json string array (Fix #2329)") {
     Given("Specific group versions")
     val groupVersions = Seq(Timestamp.now(), Timestamp.now())
-    groupManager.versions(any) returns Future.successful(
-      groupVersions.toIterable)
-    groupManager.versions("/foo/bla/blub".toRootPath) returns Future
-      .successful(groupVersions.toIterable)
-    groupManager.group("/foo/bla/blub".toRootPath) returns Future.successful(
-      Some(Group("/foo/bla/blub".toRootPath)))
+    groupManager
+      .versions(any)
+      .returns(Future.successful(groupVersions.toIterable))
+    groupManager
+      .versions("/foo/bla/blub".toRootPath)
+      .returns(Future
+        .successful(groupVersions.toIterable))
+    groupManager
+      .group("/foo/bla/blub".toRootPath)
+      .returns(Future.successful(Some(Group("/foo/bla/blub".toRootPath))))
 
     When("The versions are queried")
     val rootVersionsResponse =
@@ -224,9 +236,11 @@ class GroupsResourceTest
     useRealGroupManager()
     val group = Group("/group".toRootPath,
                       apps = Set(AppDefinition("/group/app".toRootPath)))
-    groupRepository.group(GroupRepository.zkRootName) returns Future
-      .successful(Some(group))
-    groupRepository.rootGroup returns Future.successful(Some(group))
+    groupRepository
+      .group(GroupRepository.zkRootName)
+      .returns(Future
+        .successful(Some(group)))
+    groupRepository.rootGroup.returns(Future.successful(Some(group)))
 
     When("creating a group with the same path existing app")
     val body = Json.stringify(
@@ -243,9 +257,11 @@ class GroupsResourceTest
     Given("A real group manager with one app")
     useRealGroupManager()
     val group = Group("/group".toRootPath)
-    groupRepository.group(GroupRepository.zkRootName) returns Future
-      .successful(Some(group))
-    groupRepository.rootGroup returns Future.successful(Some(group))
+    groupRepository
+      .group(GroupRepository.zkRootName)
+      .returns(Future
+        .successful(Some(group)))
+    groupRepository.rootGroup.returns(Future.successful(Some(group)))
 
     When("creating a group with the same path existing app")
     val body =
@@ -272,7 +288,7 @@ class GroupsResourceTest
     groupsResource =
       new GroupsResource(groupManager, groupInfo, auth.auth, auth.auth, config)
 
-    config.zkTimeoutDuration returns 1.second
+    config.zkTimeoutDuration.returns(1.second)
   }
 
   private[this] def useRealGroupManager(): Unit = {
@@ -281,7 +297,7 @@ class GroupsResourceTest
     groupRepository = f.groupRepository
     groupManager = f.groupManager
 
-    config.zkTimeoutDuration returns 1.second
+    config.zkTimeoutDuration.returns(1.second)
 
     groupsResource =
       new GroupsResource(groupManager, groupInfo, auth.auth, auth.auth, config)

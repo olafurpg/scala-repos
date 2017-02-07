@@ -76,27 +76,27 @@ class WebJarServletTest
 
   def req(servletPath: String, path: String): HttpServletRequest = {
     val request = mock[HttpServletRequest]
-    request.getServletPath returns servletPath
-    request.getPathInfo returns path
-    request.getRequestURI returns s"$servletPath$path"
-    request.getServletContext returns context
+    request.getServletPath.returns(servletPath)
+    request.getPathInfo.returns(path)
+    request.getRequestURI.returns(s"$servletPath$path")
+    request.getServletContext.returns(context)
     request
   }
 
   def resp(): (HttpServletResponse, ByteArrayOutputStream) = {
     val response = mock[HttpServletResponse]
     val outStream = new ByteArrayOutputStream()
-    response.getOutputStream returns new ServletOutputStream {
+    response.getOutputStream.returns(new ServletOutputStream {
       override def isReady: Boolean = ???
       override def setWriteListener(writeListener: WriteListener): Unit = ???
       override def write(b: Int): Unit = outStream.write(b)
-    }
+    })
     response -> outStream
   }
 
   val context = {
     val context = mock[ServletContext]
-    context.getMimeType("index.html") returns "text/html"
+    context.getMimeType("index.html").returns("text/html")
     context
   }
 

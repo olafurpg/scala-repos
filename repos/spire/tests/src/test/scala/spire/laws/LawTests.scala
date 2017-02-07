@@ -32,7 +32,7 @@ class LawTests extends FunSuite with Discipline {
     new Eq[A] {
       def eqv(x: A, y: A): Boolean = {
         val delta = Order[A].max(x.abs, y.abs) * eps
-        println("d = %f, (x - y).abs = %f" format (delta, (x - y).abs))
+        println("d = %f, (x - y).abs = %f".format(delta, (x - y).abs))
         (x - y).abs < delta
       }
     }

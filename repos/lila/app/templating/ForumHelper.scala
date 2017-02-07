@@ -18,10 +18,10 @@ trait ForumHelper { self: UserHelper with StringHelper =>
   }
 
   def isGrantedRead(categSlug: String)(implicit ctx: Context) =
-    Granter isGrantedRead categSlug
+    Granter.isGrantedRead(categSlug)
 
   def isGrantedWrite(categSlug: String)(implicit ctx: Context) =
-    Granter isGrantedWrite categSlug
+    Granter.isGrantedWrite(categSlug)
 
   def isGrantedMod(categSlug: String)(implicit ctx: Context) =
     Granter.isGrantedMod(categSlug).await

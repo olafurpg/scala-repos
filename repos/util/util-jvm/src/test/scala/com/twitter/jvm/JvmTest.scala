@@ -29,7 +29,7 @@ class JvmTest extends WordSpec with TestLogging {
         def snap = currentSnap
 
         def pushGc(gc: Gc) {
-          val gcs = snap.lastGcs filter (_.name != gc.name)
+          val gcs = snap.lastGcs.filter(_.name != gc.name)
           setSnap(snap.copy(lastGcs = gc +: gcs))
         }
 
@@ -59,7 +59,7 @@ class JvmTest extends WordSpec with TestLogging {
         import h._
         val b = mutable.Buffer[Gc]()
         assert(jvm.executor.schedules == List())
-        jvm foreachGc { b += _ }
+        jvm.foreachGc { b += _ }
         assert(jvm.executor.schedules.size == 1)
         val Seq((r, _, _, _)) = jvm.executor.schedules
         r.run()
@@ -95,7 +95,7 @@ class JvmTest extends WordSpec with TestLogging {
 
           traceLogger(Level.DEBUG)
 
-          jvm foreachGc { _ => /*ignore*/
+          jvm.foreachGc { _ => /*ignore*/
           }
           assert(jvm.executor.schedules.size == 1)
           val Seq((r, _, _, _)) = jvm.executor.schedules

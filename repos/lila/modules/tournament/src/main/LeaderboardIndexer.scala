@@ -24,7 +24,7 @@ private final class LeaderboardIndexer(tournamentColl: Coll,
         .mapM[Tournament]
         .apply[Seq[Entry]](generateTour) &> Enumeratee
         .mapConcat[Seq[Entry]]
-        .apply[Entry](identity) &> Enumeratee.grouped(Iteratee takeUpTo 500) |>>> Iteratee
+        .apply[Entry](identity) &> Enumeratee.grouped(Iteratee.takeUpTo(500)) |>>> Iteratee
         .foldM[Seq[Entry], Int](0) {
           case (number, entries) =>
             if (number % 10000 == 0)
@@ -34,7 +34,8 @@ private final class LeaderboardIndexer(tournamentColl: Coll,
     }.void
 
   def indexOne(tour: Tournament): Funit =
-    leaderboardColl.remove(BSONDocument("t" -> tour.id)) >> generateTour(tour) flatMap saveEntries
+    (leaderboardColl.remove(BSONDocument("t" -> tour.id)) >> generateTour(
+      tour)).flatMap(saveEntries)
 
   private def saveEntries(entries: Seq[Entry]) =
     entries.nonEmpty ?? leaderboardColl
@@ -54,7 +55,7 @@ private final class LeaderboardIndexer(tournamentColl: Coll,
         case RankedPlayer(rank, player) =>
           for {
             perfType <- tour.perfType
-            nb <- nbGames get player.userId
+            nb <- nbGames.get(player.userId)
           } yield
             Entry(
               id = player._id,

@@ -31,7 +31,7 @@ trait ScalaDocWithSyntaxSurrounder extends Surrounder {
         expr.substring(endOffset - offset)
 
     val surroundedText = new StringBuilder()
-    elements.foreach(surroundedText append _.getText)
+    elements.foreach(surroundedText.append(_.getText))
 
     var newExpr = ScalaPsiElementFactory.createDocSimpleData(
       getNewExprText(surroundedText.toString()),

@@ -177,23 +177,26 @@ private[remote] class Remoting(_system: ExtendedActorSystem,
         }
 
         import system.dispatcher
-        (manager ? ShutdownAndFlush).mapTo[Boolean].andThen {
-          case Success(flushSuccessful) ⇒
-            if (!flushSuccessful)
-              log.warning(
-                "Shutdown finished, but flushing might not have been successful and some messages might have been dropped. " +
-                  "Increase akka.remote.flush-wait-on-shutdown to a larger value to avoid this.")
-            finalize()
+        (manager ? ShutdownAndFlush)
+          .mapTo[Boolean]
+          .andThen {
+            case Success(flushSuccessful) ⇒
+              if (!flushSuccessful)
+                log.warning(
+                  "Shutdown finished, but flushing might not have been successful and some messages might have been dropped. " +
+                    "Increase akka.remote.flush-wait-on-shutdown to a larger value to avoid this.")
+              finalize()
 
-          case Failure(e) ⇒
-            notifyError("Failure during shutdown of remoting.", e)
-            finalize()
-        } map { _ ⇒
-          Done
-        } // RARP needs only akka.Done, not a boolean
+            case Failure(e) ⇒
+              notifyError("Failure during shutdown of remoting.", e)
+              finalize()
+          }
+          .map { _ ⇒
+            Done
+          } // RARP needs only akka.Done, not a boolean
       case None ⇒
         log.warning("Remoting is not running. Ignoring shutdown attempt.")
-        Future successful Done
+        Future.successful(Done)
     }
   }
 
@@ -222,9 +225,11 @@ private[remote] class Remoting(_system: ExtendedActorSystem,
               "No transport drivers were loaded.",
               null)
 
-          transportMapping = transports.groupBy {
-            case (transport, _) ⇒ transport.schemeIdentifier
-          } map { case (k, v) ⇒ k -> v.toSet }
+          transportMapping = transports
+            .groupBy {
+              case (transport, _) ⇒ transport.schemeIdentifier
+            }
+            .map { case (k, v) ⇒ k -> v.toSet }
 
           defaultAddress = transports.head._2
           addresses = transports.map { _._2 }.toSet
@@ -256,7 +261,7 @@ private[remote] class Remoting(_system: ExtendedActorSystem,
                     recipient: RemoteActorRef): Unit = endpointManager match {
     case Some(manager) ⇒
       manager.tell(Send(message, senderOption, recipient),
-                   sender = senderOption getOrElse Actor.noSender)
+                   sender = senderOption.getOrElse(Actor.noSender))
     case None ⇒
       throw new RemoteTransportExceptionNoStackTrace(
         "Attempted to send remote message but Remoting is not running.",
@@ -268,7 +273,7 @@ private[remote] class Remoting(_system: ExtendedActorSystem,
       case Some(manager) ⇒
         import system.dispatcher
         implicit val timeout = CommandAckTimeout
-        manager ? ManagementCommand(cmd) map {
+        (manager ? ManagementCommand(cmd)).map {
           case ManagementCommandAck(status) ⇒ status
         }
       case None ⇒
@@ -505,7 +510,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
 
   val settings = new RemoteSettings(conf)
   val extendedSystem = context.system.asInstanceOf[ExtendedActorSystem]
-  val endpointId: Iterator[Int] = Iterator from 0
+  val endpointId: Iterator[Int] = Iterator.from(0)
 
   val eventPublisher = new EventPublisher(
     context.system,
@@ -530,7 +535,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
   def handleStashedInbound(endpoint: ActorRef, writerIsIdle: Boolean) {
     val stashed = stashedInbound.getOrElse(endpoint, Vector.empty)
     stashedInbound -= endpoint
-    stashed foreach (handleInboundAssociation(_, writerIsIdle))
+    stashed.foreach(handleInboundAssociation(_, writerIsIdle))
   }
 
   def keepQuarantinedOr(remoteAddress: Address)(body: ⇒ Unit): Unit =
@@ -631,22 +636,27 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
 
   def receive = {
     case Listen(addressesPromise) ⇒
-      listens map { ListensResult(addressesPromise, _) } recover {
-        case NonFatal(e) ⇒ ListensFailure(addressesPromise, e)
-      } pipeTo self
+      listens
+        .map { ListensResult(addressesPromise, _) }
+        .recover {
+          case NonFatal(e) ⇒ ListensFailure(addressesPromise, e)
+        }
+        .pipeTo(self)
     case ListensResult(addressesPromise, results) ⇒
-      transportMapping = results.groupBy {
-        case (_, transportAddress, _) ⇒ transportAddress
-      } map {
-        case (a, t) if t.size > 1 ⇒
-          throw new RemoteTransportException(
-            s"There are more than one transports listening on local address [$a]",
-            null)
-        case (a, t) ⇒ a -> t.head._1
-      }
+      transportMapping = results
+        .groupBy {
+          case (_, transportAddress, _) ⇒ transportAddress
+        }
+        .map {
+          case (a, t) if t.size > 1 ⇒
+            throw new RemoteTransportException(
+              s"There are more than one transports listening on local address [$a]",
+              null)
+          case (a, t) ⇒ a -> t.head._1
+        }
       // Register to each transport as listener and collect mapping to addresses
       val transportsAndAddresses =
-        results map {
+        results.map {
           case (transport, address, promise) ⇒
             promise.success(ActorAssociationEventListener(self))
             transport -> address
@@ -668,10 +678,13 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
   val accepting: Receive = {
     case ManagementCommand(cmd) ⇒
       val allStatuses =
-        transportMapping.values map { transport ⇒
+        transportMapping.values.map { transport ⇒
           transport.managementCommand(cmd)
         }
-      Future.fold(allStatuses)(true)(_ && _) map ManagementCommandAck pipeTo sender()
+      Future
+        .fold(allStatuses)(true)(_ && _)
+        .map(ManagementCommandAck)
+        .pipeTo(sender())
 
     case Quarantine(address, uidToQuarantineOption) ⇒
       // Stop writers
@@ -732,7 +745,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
           }
       }
 
-      uidToQuarantineOption foreach { uid ⇒
+      uidToQuarantineOption.foreach { uid ⇒
         endpoints.markAsQuarantined(address,
                                     uid,
                                     Deadline.now + settings.QuarantineDuration)
@@ -793,9 +806,11 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
 
       def shutdownAll[T](resources: TraversableOnce[T])(
           shutdown: T ⇒ Future[Boolean]): Future[Boolean] = {
-        (Future sequence resources.map(shutdown)) map { _.forall(identity) } recover {
-          case NonFatal(_) ⇒ false
-        }
+        ((Future sequence resources.map(shutdown)))
+          .map { _.forall(identity) }
+          .recover {
+            case NonFatal(_) ⇒ false
+          }
       }
 
       (for {
@@ -804,10 +819,10 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
         flushStatus ← shutdownAll(endpoints.allEndpoints)(
           gracefulStop(_, settings.FlushWait, EndpointWriter.FlushAndStop))
         shutdownStatus ← shutdownAll(transportMapping.values)(_.shutdown())
-      } yield flushStatus && shutdownStatus) pipeTo sender()
+      } yield flushStatus && shutdownStatus).pipeTo(sender())
 
-      pendingReadHandoffs.valuesIterator foreach
-        (_.disassociate(AssociationHandle.Shutdown))
+      pendingReadHandoffs.valuesIterator.foreach(
+        _.disassociate(AssociationHandle.Shutdown))
 
       // Ignore all other writes
       normalShutdown = true
@@ -826,7 +841,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
     case ia @ InboundAssociation(handle: AkkaProtocolHandle) ⇒
       endpoints.readOnlyEndpointFor(handle.remoteAddress) match {
         case Some((endpoint, _)) ⇒
-          pendingReadHandoffs.get(endpoint) foreach (_.disassociate())
+          pendingReadHandoffs.get(endpoint).foreach(_.disassociate())
           pendingReadHandoffs += endpoint -> handle
           endpoint ! EndpointWriter.TakeOver(handle, self)
           endpoints.writableEndpointWithPolicyFor(handle.remoteAddress) match {
@@ -853,7 +868,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
                     refuseUid = endpoints.refuseUid(handle.remoteAddress))
               case Some(Pass(ep, Some(uid), _)) ⇒
                 if (handle.handshakeInfo.uid == uid) {
-                  pendingReadHandoffs.get(ep) foreach (_.disassociate())
+                  pendingReadHandoffs.get(ep).foreach(_.disassociate())
                   pendingReadHandoffs += ep -> handle
                   ep ! EndpointWriter.StopReading(ep, self)
                   ep ! ReliableDeliverySupervisor.Ungate
@@ -959,7 +974,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
 
     // Collect all transports, listen addresses and listener promises in one future
     Future.sequence(transports.map { transport ⇒
-      transport.listen map {
+      transport.listen.map {
         case (address, listenerPromise) ⇒ (transport, address, listenerPromise)
       }
     })
@@ -1047,8 +1062,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
 
   override def postStop(): Unit = {
     pruneTimerCancellable.cancel()
-    pendingReadHandoffs.valuesIterator foreach
-      (_.disassociate(AssociationHandle.Shutdown))
+    pendingReadHandoffs.valuesIterator.foreach(
+      _.disassociate(AssociationHandle.Shutdown))
 
     if (!normalShutdown) {
       // Remaining running endpoints are children, so they will clean up themselves.
@@ -1058,7 +1073,7 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
       log.error(
         "Remoting system has been terminated abrubtly. Attempting to shut down transports")
       // The result of this shutdown is async, should we try to Await for a short duration?
-      transportMapping.values map (_.shutdown())
+      transportMapping.values.map(_.shutdown())
     }
   }
 }

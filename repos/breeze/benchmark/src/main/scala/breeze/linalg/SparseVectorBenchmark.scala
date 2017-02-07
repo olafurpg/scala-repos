@@ -40,7 +40,7 @@ class SparseVectorBenchmark extends BreezeBenchmark with BuildsRandomVectors {
        randomSparseVector(size, sparsity2))
     }) {
       case (a, b) =>
-        a dot b
+        a.dot(b)
     }
   }
 

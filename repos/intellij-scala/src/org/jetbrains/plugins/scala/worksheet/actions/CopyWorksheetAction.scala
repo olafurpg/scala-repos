@@ -49,23 +49,23 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
     val result = new StringBuilder
     val fullShift = StringUtil.repeat(" ", CopyWorksheetAction.COPY_BORDER)
     val lineSeparator =
-      Option(System.getProperty("line.separator")) getOrElse "\n"
+      Option(System.getProperty("line.separator")).getOrElse("\n")
 
     val leftDocument = editor.getDocument
     val rightDocument = viewer.getDocument
 
     def append2Result(textLeft: String, textRight: String, sym: String) {
-      result append
-        (if (textLeft.length < CopyWorksheetAction.COPY_BORDER) textLeft
-         else textLeft.substring(0, CopyWorksheetAction.COPY_BORDER))
+      result.append(
+        if (textLeft.length < CopyWorksheetAction.COPY_BORDER) textLeft
+        else textLeft.substring(0, CopyWorksheetAction.COPY_BORDER))
       for (_ <- 1 to (CopyWorksheetAction.COPY_BORDER - textLeft.length))
-        result append sym
-      result append "//"
-      result append textRight
-      result append lineSeparator
+        result.append(sym)
+      result.append("//")
+      result.append(textRight)
+      result.append(lineSeparator)
     }
 
-    def getFromDoc(lineNumber: Int, document: Document) = document getText {
+    def getFromDoc(lineNumber: Int, document: Document) = document.getText {
       new TextRange(document getLineStartOffset lineNumber,
                     document getLineEndOffset lineNumber)
     }
@@ -85,7 +85,7 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
     var lastLeftEnd = 0
     var lastRightEnd = 0
 
-    marker map {
+    marker.map {
       case m: WorksheetFoldRegionDelegate =>
         (0 /: m.getWorksheetGroup.getCorrespondInfo) {
           case (lastEnd,
@@ -122,16 +122,16 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
 
             if (spaces > 0)
               for (j <- (spaces - 1).to(0, -1)) {
-                result append fullShift
-                result append "//"
-                result append {
-                  rightDocument getText {
+                result.append(fullShift)
+                result.append("//")
+                result.append {
+                  rightDocument.getText {
                     new TextRange(
                       rightDocument getLineStartOffset (rightEnd - j),
                       rightDocument getLineEndOffset (rightEnd - j))
                   }
                 }
-                result append lineSeparator
+                result.append(lineSeparator)
               }
 
             lastLeftEnd = leftEnd + 1

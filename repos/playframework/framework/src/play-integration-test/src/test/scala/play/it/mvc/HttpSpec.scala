@@ -26,11 +26,11 @@ object HttpSpec extends org.specs2.mutable.Specification {
     }
 
     "have HTTPS scheme" in {
-      (Call("GET", "/playframework")
+      ((Call("GET", "/playframework")
         .absoluteURL()(req.copy(secure = true))
         .aka("absolute URL 1") must_==
-        ("https://playframework.com/playframework")) and
-        (Call("GET", "/playframework")
+        ("https://playframework.com/playframework"))).and(
+        Call("GET", "/playframework")
           .absoluteURL(secure = true)(req)
           .aka("absolute URL 2") must_==
           ("https://playframework.com/playframework"))
@@ -53,11 +53,11 @@ object HttpSpec extends org.specs2.mutable.Specification {
     }
 
     "have WSS scheme" in {
-      (Call("GET", "/playframework")
+      ((Call("GET", "/playframework")
         .webSocketURL()(req.copy(secure = true))
         .aka("absolute URL 1") must_==
-        ("wss://playframework.com/playframework")) and
-        (Call("GET", "/playframework")
+        ("wss://playframework.com/playframework"))).and(
+        Call("GET", "/playframework")
           .webSocketURL(secure = true)(req)
           .aka("absolute URL 2") must_==
           ("wss://playframework.com/playframework"))
@@ -69,13 +69,15 @@ object HttpSpec extends org.specs2.mutable.Specification {
       FakeRequest()
         .withHeaders(
           HeaderNames.CONTENT_TYPE -> """text/xml; charset="utf-8"""")
-        .charset aka "request charset" must beSome("utf-8")
+        .charset
+        .aka("request charset") must beSome("utf-8")
     }
 
     "parse quoted and unquoted charset" in {
       FakeRequest()
         .withHeaders(HeaderNames.CONTENT_TYPE -> "text/xml; charset=utf-8")
-        .charset aka "request charset" must beSome("utf-8")
+        .charset
+        .aka("request charset") must beSome("utf-8")
     }
   }
 }

@@ -30,7 +30,7 @@ class StreamTcpDocSpec extends AkkaSpec {
         Tcp().bind("127.0.0.1", 8888).to(Sink.ignore).run()
 
       binding.map { b =>
-        b.unbind() onComplete {
+        b.unbind().onComplete {
           case _ => // ...
         }
       }
@@ -43,7 +43,7 @@ class StreamTcpDocSpec extends AkkaSpec {
 
       val connections: Source[IncomingConnection, Future[ServerBinding]] =
         Tcp().bind(host, port)
-      connections runForeach { connection =>
+      connections.runForeach { connection =>
         println(s"New connection from: ${connection.remoteAddress}")
 
         val echo = Flow[ByteString]

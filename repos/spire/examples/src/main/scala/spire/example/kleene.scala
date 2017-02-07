@@ -49,7 +49,7 @@ object KleeneDemo {
   }
   implicit def streamHasShow[A](implicit ev: Show[A]) = new Show[Stream[A]] {
     def show(s: Stream[A]) =
-      if (s.isEmpty) "[]" else "[%s,...]" format ev.show(s.head)
+      if (s.isEmpty) "[]" else "[%s,...]".format(ev.show(s.head))
   }
 
   /**
@@ -200,7 +200,7 @@ object KleeneDemo {
       val lines = Array.fill(n)("")
       cfor(0)(_ < n, _ + 1) { x =>
         cfor(0)(_ < n, _ + 1)(y => lines(y) += s.show(m(x, y)) + " ")
-        val len = lines.foldLeft(0)(_ max _.length)
+        val len = lines.foldLeft(0)(_.max(_.length))
         cfor(0)(_ < n, _ + 1)(y => lines(y) += " " * (len - lines(y).length))
       }
       lines.mkString("\n") + "\n"
@@ -238,7 +238,7 @@ object KleeneDemo {
 
   // type class instance for Show[Edge]
   implicit object EdgeHasShow extends Show[Edge] {
-    def show(e: Edge) = "(%c%c)" format ('A' + e.from, 'A' + e.to)
+    def show(e: Edge) = "(%c%c)".format('A' + e.from, 'A' + e.to)
   }
 
   /**
@@ -378,7 +378,7 @@ object KleeneDemo {
 
   // type class instance for Show[ShortestPath[A, B]]
   implicit def spHasShow[A: Show, B: Show] = new Show[ShortestPath[A, B]] {
-    def show(p: ShortestPath[A, B]) = "%s[%s]" format (p.b.show, p.a.show)
+    def show(p: ShortestPath[A, B]) = "%s[%s]".format(p.b.show, p.a.show)
   }
 
   // type class instance for Kleene[ShortestPath[A, B]]
@@ -391,7 +391,7 @@ object KleeneDemo {
       def one = ShortestPath(rig.one, kb.one)
 
       def plus(x: ShortestPath[A, B], y: ShortestPath[A, B]) =
-        (x.a compare y.a) match {
+        (x.a.compare(y.a)) match {
           case -1 => x
           case 0 => ShortestPath(x.a + y.a, x.b + y.b)
           case 1 => y
@@ -508,16 +508,16 @@ object KleeneDemo {
     val example: Matrix[Boolean] = Graph(edges: _*)
 
     // examine the graph
-    println("adjacency matrix:\n%s" format example.show)
-    println("reflexive-transitive closure:\n%s" format example.kstar.show)
-    println("transitive closure:\n%s" format example.kplus.show)
+    println("adjacency matrix:\n%s".format(example.show))
+    println("reflexive-transitive closure:\n%s".format(example.kstar.show))
+    println("transitive closure:\n%s".format(example.kplus.show))
 
     val labeled = LabeledGraph(example)
-    println("labels:\n%s" format labeled.show)
+    println("labels:\n%s".format(labeled.show))
 
     val expred = labeled.map(_.map(Expr.apply).getOrElse(Nul))
-    println("exprs:\n%s" format expred.show)
-    println("path exprs:\n%s" format expred.kstar.show)
+    println("exprs:\n%s".format(expred.show))
+    println("path exprs:\n%s".format(expred.kstar.show))
   }
 
   def pathExample(): Unit = {
@@ -546,8 +546,8 @@ object KleeneDemo {
       m
     }
 
-    println("weights:\n%s" format weighted.show)
-    println("least-cost:\n%s" format weighted.kstar.show)
+    println("weights:\n%s".format(weighted.show))
+    println("least-cost:\n%s".format(weighted.kstar.show))
 
     val annotated = Matrix[ShortestPath[Int, Expr[Edge]]] { (x, y) =>
       weighted(x, y) match {

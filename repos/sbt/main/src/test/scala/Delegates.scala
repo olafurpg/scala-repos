@@ -41,7 +41,7 @@ object Delegates extends Properties("delegates") {
       val global = nonProject.dropWhile {
         case Select(_: BuildRef) => true; case _ => false
       }
-      global forall { _ == Global }
+      global.forall { _ == Global }
     }
   }
   property("Initial scope present with all combinations of Global axes") =
@@ -68,7 +68,7 @@ object Delegates extends Properties("delegates") {
       }
     }
   def allDelegates(keys: Keys)(f: (Scope, Seq[Scope]) => Prop): Prop =
-    all(keys.scopes map { scope =>
+    all(keys.scopes.map { scope =>
       val delegates = keys.env.delegates(scope)
       ("Scope: " + Scope.display(scope, "_")) |:
         ("Delegates:\n\t" + delegates
@@ -78,7 +78,7 @@ object Delegates extends Properties("delegates") {
   def alwaysGlobal(s: Scope,
                    ds: Seq[Scope],
                    axis: Scope => ScopeAxis[_]): Prop =
-    (axis(s) != Global) || all(ds map { d =>
+    (axis(s) != Global) || all(ds.map { d =>
       (axis(d) == Global): Prop
     }: _*)
   def globalCombinations(s: Scope,
@@ -97,7 +97,7 @@ object Delegates extends Properties("delegates") {
       rem match {
         case Nil => acc
         case x :: xs =>
-          x flatMap { mod =>
+          x.flatMap { mod =>
             val s = mod(cur)
             loop(s, s :: acc, xs)
           }

@@ -9,7 +9,7 @@ object Test {
       ) :+ Int.MinValue
 
   // reducing output a little
-  val endpoints = numbers filterNot Set(-3, -2, 2, 17, 127)
+  val endpoints = numbers.filterNot(Set(-3, -2, 2, 17, 127))
 
   def num(n: Int) = {
     val frommax = Int.MaxValue - n

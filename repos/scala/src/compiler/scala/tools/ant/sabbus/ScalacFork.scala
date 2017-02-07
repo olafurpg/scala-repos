@@ -41,7 +41,10 @@ import scala.reflect.internal.util.ScalaClassLoader
 class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
 
   private def originOfThis: String =
-    ScalaClassLoader.originOfClass(classOf[ScalacFork]) map (_.toString) getOrElse "<unknown>"
+    ScalaClassLoader
+      .originOfClass(classOf[ScalacFork])
+      .map(_.toString)
+      .getOrElse("<unknown>")
 
   /** Sets the `srcdir` attribute. Used by [[http://ant.apache.org Ant]].
     *  @param input The value of `sourceDir`. */
@@ -82,8 +85,8 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
   private def createMapper() = {
     val mapper = new GlobPatternMapper()
     val extension = "*.class"
-    mapper setTo extension
-    mapper setFrom "*.scala"
+    mapper.setTo(extension)
+    mapper.setFrom("*.scala")
 
     mapper
   }
@@ -95,32 +98,34 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
         Project.MSG_VERBOSE)
 
     val compilerPath =
-      this.compilerPath getOrElse sys.error(
-        "Mandatory attribute 'compilerpath' is not set.")
+      this.compilerPath
+        .getOrElse(sys.error("Mandatory attribute 'compilerpath' is not set."))
     val sourceDir =
-      this.sourceDir getOrElse sys.error(
-        "Mandatory attribute 'srcdir' is not set.")
+      this.sourceDir
+        .getOrElse(sys.error("Mandatory attribute 'srcdir' is not set."))
     val destinationDir =
-      this.destinationDir getOrElse sys.error(
-        "Mandatory attribute 'destdir' is not set.")
+      this.destinationDir
+        .getOrElse(sys.error("Mandatory attribute 'destdir' is not set."))
 
     val settings = new Settings
     settings.d = destinationDir
 
-    compTarget foreach (settings.target = _)
-    compilationPath foreach (settings.classpath = _)
-    sourcePath foreach (settings.sourcepath = _)
+    compTarget.foreach(settings.target = _)
+    compilationPath.foreach(settings.classpath = _)
+    sourcePath.foreach(settings.sourcepath = _)
     settings.extraParams = extraArgsFlat
 
     val mapper = createMapper()
 
     val includedFiles: Array[File] =
-      new SourceFileScanner(this).restrict(
-        getDirectoryScanner(sourceDir).getIncludedFiles,
-        sourceDir,
-        destinationDir,
-        mapper
-      ) map (x => new File(sourceDir, x))
+      new SourceFileScanner(this)
+        .restrict(
+          getDirectoryScanner(sourceDir).getIncludedFiles,
+          sourceDir,
+          destinationDir,
+          mapper
+        )
+        .map(x => new File(sourceDir, x))
 
     /* Nothing to do. */
     if (includedFiles.isEmpty && argfile.isEmpty) return
@@ -131,20 +136,20 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
                                            plural(includedFiles.length),
                                            destinationDir))
 
-    argfile foreach (x => log("Using argfile file: @" + x))
+    argfile.foreach(x => log("Using argfile file: @" + x))
 
     val java = new Java(this) // set this as owner
-    java setFork true
+    java.setFork(true)
     // using 'setLine' creates multiple arguments out of a space-separated string
-    jvmArgs foreach (java.createJvmarg() setLine _)
-    timeout foreach (java setTimeout _)
+    jvmArgs.foreach(java.createJvmarg() setLine _)
+    timeout.foreach(java.setTimeout(_))
 
-    java setClasspath compilerPath
-    java setClassname MainClass
+    java.setClasspath(compilerPath)
+    java.setClassname(MainClass)
 
     // Encode scalac/javac args for use in a file to be read back via "@file.txt"
     def encodeScalacArgsFile(t: Traversable[String]) =
-      t map { s =>
+      t.map { s =>
         if (s.find(c => c <= ' ' || "\"'\\".contains(c)).isDefined)
           "\"" +
             s.flatMap(c => (if (c == '"' || c == '\\') "\\" else "") + c) + "\""
@@ -153,11 +158,11 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
 
     // dump the arguments to a file and do "java @file"
     val tempArgFile = io.File.makeTemp("scalacfork")
-    val tokens = settings.toArgs ++ (includedFiles map (_.getPath))
-    tempArgFile writeAll encodeScalacArgsFile(tokens)
+    val tokens = settings.toArgs ++ (includedFiles.map(_.getPath))
+    tempArgFile.writeAll(encodeScalacArgsFile(tokens))
 
     val paths =
-      List(Some(tempArgFile.toAbsolute.path), argfile).flatten map (_.toString)
+      List(Some(tempArgFile.toAbsolute.path), argfile).flatten.map(_.toString)
     val res = execWithArgFiles(java, paths)
 
     if (failOnError && res != 0)

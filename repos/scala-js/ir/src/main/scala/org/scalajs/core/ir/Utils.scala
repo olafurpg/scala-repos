@@ -30,7 +30,8 @@ object Utils {
       val trgtCmps = trgt.getRawPath.split('/')
       val baseCmps = base.getRawPath.split('/')
 
-      val prefixLen = (trgtCmps zip baseCmps).takeWhile(t => t._1 == t._2).size
+      val prefixLen =
+        (trgtCmps.zip(baseCmps)).takeWhile(t => t._1 == t._2).size
 
       val newPathCmps =
         List.fill(baseCmps.size - prefixLen)("..") ++ trgtCmps.drop(prefixLen)

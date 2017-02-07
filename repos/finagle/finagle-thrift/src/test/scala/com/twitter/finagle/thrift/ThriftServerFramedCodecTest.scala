@@ -56,7 +56,7 @@ class ThriftServerFramedCodecTest extends FunSuite with MockitoSugar {
                           ignoreMsg.toArray),
         service)
 
-      bufferingTracer.iterator foreach { record =>
+      bufferingTracer.iterator.foreach { record =>
         assert(record.traceId == traceId)
         assert(record.traceId.flags == traceId.flags)
       }

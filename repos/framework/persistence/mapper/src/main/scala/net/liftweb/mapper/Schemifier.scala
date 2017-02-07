@@ -237,7 +237,9 @@ object Schemifier extends Loggable {
     * Retrieves schema name where the unqualified db objects are searched.
     */
   def getDefaultSchemaName(connection: SuperConnection): String =
-    (connection.schemaName or connection.driverType.defaultSchemaName or DB.globalDefaultSchemaName)
+    (connection.schemaName
+      .or(connection.driverType.defaultSchemaName)
+      .or(DB.globalDefaultSchemaName))
       .openOr(connection.getMetaData.getUserName)
 
   private def hasTable_?(
@@ -309,13 +311,13 @@ object Schemifier extends Loggable {
             f.dbPrimaryKey_?
           }
           .foreach { pkField =>
-            connection.driverType.primaryKeySetup(
-              table._dbTableNameLC,
-              pkField._dbColumnNameLC) foreach { command =>
-              cmds += maybeWrite(performWrite, logFunc, connection) { () =>
-                command
+            connection.driverType
+              .primaryKeySetup(table._dbTableNameLC, pkField._dbColumnNameLC)
+              .foreach { command =>
+                cmds += maybeWrite(performWrite, logFunc, connection) { () =>
+                  command
+                }
               }
-            }
           }
       }
       hasTable_?(table, connection, actualTableNames)

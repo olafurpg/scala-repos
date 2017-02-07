@@ -20,9 +20,9 @@ trait MemberLookup extends base.MemberLookupBase { thisFactory: ModelFactory =>
     findTemplateMaybe(sym) match {
       case Some(tpl) => Some(LinkToTpl(tpl))
       case None =>
-        findTemplateMaybe(site) flatMap { inTpl =>
-          inTpl.members find (_.asInstanceOf[EntityImpl].sym == sym) map
-            (LinkToMember(_, inTpl))
+        findTemplateMaybe(site).flatMap { inTpl =>
+          (inTpl.members find (_.asInstanceOf[EntityImpl].sym == sym))
+            .map(LinkToMember(_, inTpl))
         }
     }
 
@@ -50,9 +50,9 @@ trait MemberLookup extends base.MemberLookupBase { thisFactory: ModelFactory =>
         /* Get package object which has associatedFile ne null */
         sym.info.member(newTermName("package"))
       else sym
-    Option(sym1.associatedFile) flatMap (_.underlyingSource) flatMap { src =>
+    Option(sym1.associatedFile).flatMap(_.underlyingSource).flatMap { src =>
       val path = src.canonicalPath
-      settings.extUrlMapping get path map { url =>
+      settings.extUrlMapping.get(path).map { url =>
         LinkToExternal(name, url + "#" + name)
       }
     }

@@ -57,11 +57,11 @@ trait ClusteringTestSupport {
   }
 
   def pointToJson(p: Array[Double]): RValue = {
-    RArray(p.toSeq map (CNum(_)): _*)
+    RArray(p.toSeq.map(CNum(_)): _*)
   }
 
   def pointsToJson(points: Array[Array[Double]]): List[RValue] =
-    points.toList map (pointToJson(_))
+    points.toList.map(pointToJson(_))
 
   def writePointsToDataset[A](points: Array[Array[Double]])(
       f: String => A): A = {
@@ -69,7 +69,7 @@ trait ClusteringTestSupport {
   }
 
   def writeRValuesToDataset[A](jvals: List[RValue])(f: String => A): A = {
-    val lines = jvals map { _.toJValue.renderCompact }
+    val lines = jvals.map { _.toJValue.renderCompact }
     val tmpFile = File.createTempFile("values", ".json")
     IOUtils.writeSeqToFile(lines, tmpFile).unsafePerformIO
     val pointsString0 = "filesystem" + tmpFile.toString

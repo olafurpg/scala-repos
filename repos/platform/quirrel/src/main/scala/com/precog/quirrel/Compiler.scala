@@ -39,6 +39,6 @@ trait Compiler
   private val cache = new ParseCache(quirrelCacheSize)
 
   def compile(str: LineStream): Set[Expr] =
-    cache.getOrElseUpdate(str)(parse(_)) map shakeTree
+    cache.getOrElseUpdate(str)(parse(_)).map(shakeTree)
   def compile(str: String): Set[Expr] = compile(LineStream(str))
 }

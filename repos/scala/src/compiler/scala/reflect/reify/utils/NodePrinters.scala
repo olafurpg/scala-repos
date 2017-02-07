@@ -22,7 +22,7 @@ trait NodePrinters { self: Utils =>
       // Rolling a full-fledged, robust TreePrinter would be several times more code.
       // Also as of late we have tests that ensure that UX won't be broken by random changes to the reifier.
       val lines =
-        (tree.toString.split(EOL) drop 1 dropRight 1).toList splitAt 2
+        (tree.toString.split(EOL).drop(1).dropRight(1)).toList.splitAt(2)
       val (List(universe, mirror), reification0) = lines
       val reification = (for (line <- reification0) yield {
         var s = line substring 2
@@ -69,18 +69,17 @@ trait NodePrinters { self: Utils =>
       val isExpr =
         reification.length > 0 && reification(0).trim.startsWith("Expr[")
       var rtree =
-        reification dropWhile
-          (!_.trim.startsWith(
+        reification.dropWhile(
+          !_.trim.startsWith(
             s"val ${nme.UNIVERSE_SHORT}: U = ${nme.MIRROR_UNTYPED}.universe;"))
-      rtree = rtree drop 2
-      rtree = rtree takeWhile (_ != "    }")
-      rtree = rtree map
-          (s0 => {
-           var s = s0
-           mirrorIsUsed |= s contains nme.MIRROR_PREFIX.toString
-           s = s.replace(nme.MIRROR_PREFIX.toString, "")
-           s.trim
-         })
+      rtree = rtree.drop(2)
+      rtree = rtree.takeWhile(_ != "    }")
+      rtree = rtree.map(s0 => {
+        var s = s0
+        mirrorIsUsed |= s contains nme.MIRROR_PREFIX.toString
+        s = s.replace(nme.MIRROR_PREFIX.toString, "")
+        s.trim
+      })
 
       val printout = scala.collection.mutable.ListBuffer[String]()
       printout += universe.trim
@@ -90,12 +89,12 @@ trait NodePrinters { self: Utils =>
       imports += nme.UNIVERSE_SHORT.toString
       if (mirrorIsUsed) imports += nme.MIRROR_SHORT.toString
       if (flagsAreUsed) imports += nme.Flag.toString
-      printout += s"""import ${imports map (_ + "._") mkString ", "}"""
+      printout += s"""import ${imports.map(_ + "._") mkString ", "}"""
 
       val name = if (isExpr) "tree" else "tpe"
-      if (rtree(0) startsWith "val") {
+      if (rtree(0).startsWith("val")) {
         printout += s"val $name = {"
-        printout ++= (rtree map ("  " + _))
+        printout ++= (rtree.map("  " + _))
         printout += "}"
       } else {
         printout += s"val $name = " + rtree(0)
@@ -113,7 +112,8 @@ trait NodePrinters { self: Utils =>
 
       // printout mkString EOL
       val prefix = "// produced from " + reifier.defaultErrorPosition
-      (prefix +: "object Test extends App {" +: (printout map ("  " + _)) :+ "}") mkString EOL
+      (prefix +: "object Test extends App {" +: (printout
+        .map("  " + _)) :+ "}") mkString EOL
     }
   }
 }

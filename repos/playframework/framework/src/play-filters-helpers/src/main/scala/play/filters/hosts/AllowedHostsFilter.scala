@@ -26,7 +26,7 @@ case class AllowedHostsFilter @Inject()(config: AllowedHostsConfig,
   }
 
   private val hostMatchers: Seq[HostMatcher] =
-    config.allowed map HostMatcher.apply
+    config.allowed.map(HostMatcher.apply)
 
   override def apply(next: EssentialAction) = EssentialAction { req =>
     if (hostMatchers.exists(_(req.host))) {
@@ -44,13 +44,13 @@ case class AllowedHostsFilter @Inject()(config: AllowedHostsConfig,
   * A utility class for matching a host header with a pattern
   */
 private[hosts] case class HostMatcher(pattern: String) {
-  val isSuffix = pattern startsWith "."
+  val isSuffix = pattern.startsWith(".")
   val (hostPattern, port) = getHostAndPort(pattern)
 
   def apply(hostHeader: String): Boolean = {
     val (headerHost, headerPort) = getHostAndPort(hostHeader)
     val hostMatches =
-      if (isSuffix) s".$headerHost" endsWith hostPattern
+      if (isSuffix) s".$headerHost".endsWith(hostPattern)
       else headerHost == hostPattern
     val portMatches =
       headerPort.forall(_ > 0) && (port.isEmpty || port == headerPort)

@@ -50,7 +50,7 @@ class A {
       f2(CaseClass2(1, 2, 3)),
       f2(CaseClass3(4)),
       f2(CaseClass4(5, 6, 7))
-    ) foreach println
+    ).foreach(println)
   }
 }
 

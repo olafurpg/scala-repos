@@ -206,7 +206,7 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
       awaitCond(!registry.existsAssociation(addressATest, addressBTest))
 
       awaitCond {
-        registry.logSnapshot exists {
+        registry.logSnapshot.exists {
           case DisassociateAttempt(`addressATest`, `addressBTest`) ⇒ true
           case _ ⇒ false
         }

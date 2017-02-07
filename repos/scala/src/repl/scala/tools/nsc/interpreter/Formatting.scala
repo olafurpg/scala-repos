@@ -16,7 +16,7 @@ class Formatting(indent: Int) {
 
     /** Heuristic to avoid indenting and thereby corrupting """-strings and XML literals. */
     val tokens = List("\"\"\"", "</", "/>")
-    val noIndent = (code contains "\n") && (tokens exists code.contains)
+    val noIndent = (code contains "\n") && (tokens.exists(code.contains))
 
     !noIndent
   }

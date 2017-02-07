@@ -26,7 +26,7 @@ class BoyerMooreSpec extends WordSpec with Matchers {
         random.shuffle(0 to 255).take(8).map(_.toByte)
 
       val haystackLen = 1000
-      (0 to 9) foreach { run ⇒
+      ((0 to 9)).foreach { run ⇒
         val alphabet =
           alphabetBase.take(4 + random.nextInt(5)) // 4 to 8 distinct alphanumeric chars
         val randomAlphabetChars =

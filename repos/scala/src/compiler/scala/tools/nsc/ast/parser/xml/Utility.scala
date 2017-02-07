@@ -34,7 +34,7 @@ object Utility {
     * @return    `'''null'''` if `ref` was not a predefined entity.
     */
   private final def unescape(ref: String, s: StringBuilder): StringBuilder =
-    ((unescMap get ref) map (s append _)).orNull
+    ((unescMap.get(ref)).map(s.append(_))).orNull
 
   def parseAttributeValue[T](value: String,
                              text: String => T,
@@ -63,7 +63,7 @@ object Utility {
           sb.append(theChar)
         } else {
           if (rfb eq null) rfb = new StringBuilder()
-          rfb append c
+          rfb.append(c)
           c = it.next()
           while (c != ';') {
             rfb.append(c)
@@ -82,7 +82,7 @@ object Utility {
             case _ =>
           }
         }
-      } else sb append c
+      } else sb.append(c)
     }
 
     if (!sb.isEmpty) // flush buffer

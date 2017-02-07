@@ -24,9 +24,9 @@ private[collection] object BitOperations {
     def unsignedCompare(i: Int, j: Int) = (i < j) ^ (i < 0) ^ (j < 0)
     def shorter(m1: Int, m2: Int) = unsignedCompare(m2, m1)
     def complement(i: Int) = (-1) ^ i
-    def bits(num: Int) = 31 to 0 by -1 map (i => (num >>> i & 1) != 0)
+    def bits(num: Int) = (31 to 0 by -1).map(i => (num >>> i & 1) != 0)
     def bitString(num: Int, sep: String = "") =
-      bits(num) map (b => if (b) "1" else "0") mkString sep
+      bits(num).map(b => if (b) "1" else "0") mkString sep
 
     def highestOneBit(j: Int) = {
       var i = j
@@ -48,9 +48,9 @@ private[collection] object BitOperations {
     def unsignedCompare(i: Long, j: Long) = (i < j) ^ (i < 0L) ^ (j < 0L)
     def shorter(m1: Long, m2: Long) = unsignedCompare(m2, m1)
     def complement(i: Long) = (-1L) ^ i
-    def bits(num: Long) = 63L to 0L by -1L map (i => (num >>> i & 1L) != 0L)
+    def bits(num: Long) = (63L to 0L by -1L).map(i => (num >>> i & 1L) != 0L)
     def bitString(num: Long, sep: String = "") =
-      bits(num) map (b => if (b) "1" else "0") mkString sep
+      bits(num).map(b => if (b) "1" else "0") mkString sep
 
     def highestOneBit(j: Long) = {
       var i = j

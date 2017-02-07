@@ -82,7 +82,7 @@ object IO {
 
 class ProcessSpecification extends Properties("Process I/O") {
   implicit val exitCodeArb: Arbitrary[Array[Byte]] = Arbitrary(
-    Gen.choose(0, 10) flatMap { size =>
+    Gen.choose(0, 10).flatMap { size =>
       Gen.resize(size, Arbitrary.arbArray[Byte].arbitrary)
     })
 
@@ -138,7 +138,7 @@ class ProcessSpecification extends Properties("Process I/O") {
     val temporaryFile1 = temp()
     val temporaryFile2 = temp()
     try {
-      temporaryFile1 writeBytes data
+      temporaryFile1.writeBytes(data)
       val process = f(temporaryFile1.jfile, temporaryFile2.jfile)
       (process !) == 0 && {
         val b1 = temporaryFile1.slurp()

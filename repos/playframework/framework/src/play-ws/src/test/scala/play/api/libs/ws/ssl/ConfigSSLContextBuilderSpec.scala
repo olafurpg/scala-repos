@@ -96,7 +96,7 @@ class ConfigSSLContextBuilderSpec extends Specification with Mockito {
                                           password = Some(password))
 
       val keyManager = mock[X509KeyManager]
-      keyManagerFactory.getKeyManagers returns Array(keyManager)
+      keyManagerFactory.getKeyManagers.returns(Array(keyManager))
 
       val disabledKeyAlgorithms =
         Set(AlgorithmConstraint("RSA", Some(LessThan(1024))))
@@ -115,7 +115,7 @@ class ConfigSSLContextBuilderSpec extends Specification with Mockito {
                                                 trustManagerFactory)
 
       val trustManager = mock[X509TrustManager]
-      trustManagerFactory.getTrustManagers returns Array(trustManager)
+      trustManagerFactory.getTrustManagers.returns(Array(trustManager))
       val disabledSignatureAlgorithms = Set(AlgorithmConstraint("md5"))
       val disabledKeyAlgorithms =
         Set(AlgorithmConstraint("RSA", Some(LessThan(1024))))

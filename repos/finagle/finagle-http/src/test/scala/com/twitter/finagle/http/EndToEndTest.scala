@@ -61,8 +61,8 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
   def readNBytes(n: Int, r: Reader): Future[Buf] = {
     def loop(left: Buf): Future[Buf] = (n - left.length) match {
       case x if x > 0 =>
-        r.read(x) flatMap {
-          case Some(right) => loop(left concat right)
+        r.read(x).flatMap {
+          case Some(right) => loop(left.concat(right))
           case None => Future.value(left)
         }
       case _ => Future.value(left)
@@ -445,7 +445,7 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
             _ <- res.close()
           } yield ()
         // discard the reader, which should terminate the drip.
-        go ensure req.reader.discard()
+        go.ensure(req.reader.discard())
 
         Future.value(res)
       }
@@ -458,7 +458,7 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
       Await.result(req.writer.write(buf("hello")))
 
       val contentf =
-        resf flatMap { res =>
+        resf.flatMap { res =>
           Reader.readAll(res.reader)
         }
       assert(Await.result(contentf) == Buf.Utf8("hello"))

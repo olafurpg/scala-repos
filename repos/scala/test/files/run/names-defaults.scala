@@ -280,7 +280,7 @@ object Test extends App {
   // #2784
   class Test2784 {
     object t { def f(x: Int) = x }
-    val one = t f (x = 1)
+    val one = t.f(x = 1)
   }
 
   // #2820
@@ -375,8 +375,8 @@ object Test extends App {
 
   // #4041
   object t4041 {
-    def _1 = (0, 0) copy (_1 = 1)
-    def _2 = (1, 1) copy (_2 = 2)
+    def _1 = (0, 0).copy(_1 = 1)
+    def _2 = (1, 1).copy(_2 = 2)
   }
   println("" + t4041._1 + ", " + t4041._2)
 

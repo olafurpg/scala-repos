@@ -10,5 +10,5 @@ object Test extends App {
       <c/>
       println("hello, world.")"""
   )
-  trees foreach println
+  trees.foreach(println)
 }

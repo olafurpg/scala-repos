@@ -261,38 +261,38 @@ class Mediator(winSz: Int) {
   }
 
   private def printMaxHeap() {
-    if (maxCt > 0) print("%6.2f" format data(heap(-1 + hMid)))
+    if (maxCt > 0) print("%6.2f".format(data(heap(-1 + hMid))))
     var i = 2
     while (i <= maxCt) {
-      print(" |%6.2f " format data(heap(-i + hMid)))
+      print(" |%6.2f ".format(data(heap(-i + hMid))))
       i += 1
-      if (i <= maxCt) print("%6.2f" format data(heap(-i + hMid)))
+      if (i <= maxCt) print("%6.2f".format(data(heap(-i + hMid))))
       i += 1
     }
     println("")
   }
 
   private def printMinHeap() {
-    if (minCt > 0) print("%6.2f" format data(heap(1 + hMid)))
+    if (minCt > 0) print("%6.2f".format(data(heap(1 + hMid))))
     var i = 2
     while (i <= minCt) {
-      print(" |%6.2f " format data(heap(i + hMid)))
+      print(" |%6.2f ".format(data(heap(i + hMid))))
       i += 1
-      if (i <= minCt) print("%6.2f" format data(heap(i + hMid)))
+      if (i <= minCt) print("%6.2f".format(data(heap(i + hMid))))
       i += 1
     }
     println("")
   }
 
   def debug() {
-    println("Med: %6.2f" format median)
-    println("Obs: %6d" format totCt)
-    println("NAs: %6d" format nanCt)
-    println("+H:  %6d" format maxCt)
-    println("-H:  %6d" format minCt)
+    println("Med: %6.2f".format(median))
+    println("Obs: %6d".format(totCt))
+    println("NAs: %6d".format(nanCt))
+    println("+H:  %6d".format(maxCt))
+    println("-H:  %6d".format(minCt))
     println("-------------------- DATA LAYOUT --------------------")
     print("Max: "); printMaxHeap()
-    println("Mid: %6.2f" format data(heap(hMid)))
+    println("Mid: %6.2f".format(data(heap(hMid))))
     print("Min: "); printMinHeap()
     println("---------------------- ARRAYS -----------------------")
     println("  i |       DATA |       HEAP |         LOC | sawNA |")
@@ -301,8 +301,8 @@ class Mediator(winSz: Int) {
       val star1 = if (i == idx) "*" else " "
       val star2 = if (i == naIdx) " *" else "  "
       println(
-        "%s%3d|%12.6f|%12d|%12d |%5s%s|" format
-          (star1, i, data(i), heap(i), loc(i), sawNa(i), star2))
+        "%s%3d|%12.6f|%12d|%12d |%5s%s|"
+          .format(star1, i, data(i), heap(i), loc(i), sawNa(i), star2))
     }
     println("-----------------------------------------------------")
   }

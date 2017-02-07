@@ -92,10 +92,10 @@ trait AttrHelper[+Holder[X]] {
     convert(findAttr(prefix, key))
 
   def apply(key: String, default: => Info): Info =
-    findAttr(key) getOrElse default
+    findAttr(key).getOrElse(default)
 
   def apply(prefix: String, key: String, default: => Info): Info =
-    findAttr(prefix, key) getOrElse default
+    findAttr(prefix, key).getOrElse(default)
 
   def apply[T](key: String, f: Info => T): Holder[T] =
     convert(findAttr(key).map(f))
@@ -104,10 +104,10 @@ trait AttrHelper[+Holder[X]] {
     convert(findAttr(prefix, key).map(f))
 
   def apply[T](key: String, f: Info => T, default: => T): T =
-    findAttr(key).map(f) getOrElse default
+    findAttr(key).map(f).getOrElse(default)
 
   def apply[T](prefix: String, key: String, f: Info => T, default: => T): T =
-    findAttr(prefix, key).map(f) getOrElse default
+    findAttr(prefix, key).map(f).getOrElse(default)
 
   protected def findAttr(key: String): Option[Info]
   protected def findAttr(prefix: String, key: String): Option[Info]
@@ -125,7 +125,7 @@ trait HtmlHelpers extends CssBindImplicits {
   def findBox[T](nodes: Seq[Node])(f: Elem => Box[T]): Box[T] = {
     nodes.view.flatMap {
       case Group(g) => findBox(g)(f)
-      case e: Elem => f(e) or findBox(e.child)(f)
+      case e: Elem => f(e).or(findBox(e.child)(f))
       case _ => Empty
     }.headOption
   }
@@ -138,7 +138,7 @@ trait HtmlHelpers extends CssBindImplicits {
   def findOption[T](nodes: Seq[Node])(f: Elem => Option[T]): Option[T] = {
     nodes.view.flatMap {
       case Group(g) => findOption(g)(f)
-      case e: Elem => f(e) orElse findOption(e.child)(f)
+      case e: Elem => f(e).orElse(findOption(e.child)(f))
       case _ => None
     }.headOption
   }

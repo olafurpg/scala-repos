@@ -85,14 +85,14 @@ class EnsembleAdvancedBarChart extends EnsembleExample {
       name = "Data Series 3"
       // Assign data by mapping x and y values to XYChart.Data
       val prices = Seq(800, 1000, 2000)
-      data = years zip prices map {
+      data = years.zip(prices).map {
         case (x, y) => XYChart.Data[String, Number](x, y)
       }
     }
 
     // Assign data using a helper function
     def xyData(ys: Seq[Number]) =
-      ObservableBuffer(years zip ys map (xy => XYChart.Data(xy._1, xy._2)))
+      ObservableBuffer(years.zip(ys).map(xy => XYChart.Data(xy._1, xy._2)))
     val series4 = XYChart.Series("Data Series 4", xyData(Seq(786, 2100, 450)))
 
     // Setup chart

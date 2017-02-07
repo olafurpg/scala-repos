@@ -19,12 +19,12 @@ object System {
 
   val all = List(Arena)
 
-  val byId = all map { s =>
+  val byId = all.map { s =>
     (s.id -> s)
   } toMap
 
-  def apply(id: Int): Option[System] = byId get id
-  def orDefault(id: Int): System = apply(id) getOrElse default
+  def apply(id: Int): Option[System] = byId.get(id)
+  def orDefault(id: Int): System = apply(id).getOrElse(default)
 }
 
 trait PairingSystem {

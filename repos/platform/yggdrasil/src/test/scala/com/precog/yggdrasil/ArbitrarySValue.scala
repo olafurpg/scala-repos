@@ -45,9 +45,9 @@ object CValueGenerators {
       Seq.empty
     } else {
       val current =
-        data.head.flattenWithPath flatMap {
+        data.head.flattenWithPath.flatMap {
           case (path, jv) =>
-            CType.forJValue(jv) map { ct =>
+            CType.forJValue(jv).map { ct =>
               (path, ct)
             }
         }
@@ -63,7 +63,7 @@ trait CValueGenerators extends ArbitraryBigDecimal {
   def schema(depth: Int): Gen[JSchema] = {
     if (depth <= 0) leafSchema
     else
-      oneOf(1, 2, 3) flatMap {
+      oneOf(1, 2, 3).flatMap {
         case 1 => objectSchema(depth, choose(1, 3))
         case 2 => arraySchema(depth, choose(1, 5))
         case 3 => leafSchema
@@ -77,7 +77,7 @@ trait CValueGenerators extends ArbitraryBigDecimal {
       subschemas <- listOfN(size, schema(depth - 1))
     } yield {
       for {
-        (name, subschema) <- names.toList zip subschemas
+        (name, subschema) <- names.toList.zip(subschemas)
         (jpath, ctype) <- subschema
       } yield {
         (JPathField(name) \ jpath, ctype)
@@ -91,7 +91,7 @@ trait CValueGenerators extends ArbitraryBigDecimal {
       subschemas <- listOfN(size, schema(depth - 1))
     } yield {
       for {
-        (idx, subschema) <- (0 until size) zip subschemas
+        (idx, subschema) <- ((0 until size)).zip(subschemas)
         (jpath, ctype) <- subschema
       } yield {
         (JPathIndex(idx) \ jpath, ctype)
@@ -99,7 +99,7 @@ trait CValueGenerators extends ArbitraryBigDecimal {
     }
   }
 
-  def leafSchema: Gen[JSchema] = ctype map { t =>
+  def leafSchema: Gen[JSchema] = ctype.map { t =>
     (JPath.Identity -> t) :: Nil
   }
 
@@ -116,18 +116,18 @@ trait CValueGenerators extends ArbitraryBigDecimal {
 
   // FIXME: TODO Should this provide some form for CDate?
   def jvalue(ctype: CType): Gen[JValue] = ctype match {
-    case CString => alphaStr map (JString(_))
-    case CBoolean => arbitrary[Boolean] map (JBool(_))
+    case CString => alphaStr.map(JString(_))
+    case CBoolean => arbitrary[Boolean].map(JBool(_))
     case CLong =>
-      arbitrary[Long] map { ln =>
+      arbitrary[Long].map { ln =>
         JNum(BigDecimal(ln, MathContext.UNLIMITED))
       }
     case CDouble =>
-      arbitrary[Double] map { d =>
+      arbitrary[Double].map { d =>
         JNum(BigDecimal(d, MathContext.UNLIMITED))
       }
     case CNum =>
-      arbitrary[BigDecimal] map { bd =>
+      arbitrary[BigDecimal].map { bd =>
         JNum(bd)
       }
     case CNull => JNull
@@ -158,7 +158,7 @@ trait CValueGenerators extends ArbitraryBigDecimal {
         containerOfN[List, Long](idCount, posNum[Long]))
       values <- containerOfN[List, Seq[(JPath, JValue)]](
         dataSize,
-        Gen.sequence[List, (JPath, JValue)](jschema map {
+        Gen.sequence[List, (JPath, JValue)](jschema.map {
           case (jpath, ctype) => jvalue(ctype).map(jpath ->)
         }))
 
@@ -170,15 +170,15 @@ trait CValueGenerators extends ArbitraryBigDecimal {
         containerOfN[List, Long](idCount, posNum[Long]))
       falseValues <- containerOfN[List, Seq[(JPath, JValue)]](
         falseSize,
-        Gen.sequence[List, (JPath, JValue)](falseSchema map {
+        Gen.sequence[List, (JPath, JValue)](falseSchema.map {
           case (jpath, ctype) => jvalue(ctype).map(jpath ->)
         }))
 
       falseIds2 = falseIds -- ids // distinct ids
     } yield {
       (idCount,
-       (ids.map(_.toArray) zip values).toStream ++
-         (falseIds2.map(_.toArray) zip falseValues).toStream)
+       (ids.map(_.toArray).zip(values)).toStream ++
+         (falseIds2.map(_.toArray).zip(falseValues)).toStream)
     }
 
   def assemble(parts: Seq[(JPath, JValue)]): JValue = {
@@ -195,7 +195,7 @@ trait SValueGenerators extends ArbitraryBigDecimal {
   def svalue(depth: Int): Gen[SValue] = {
     if (depth <= 0) sleaf
     else
-      oneOf(1, 2, 3) flatMap {
+      oneOf(1, 2, 3).flatMap {
         //it's much faster to lazily compute the subtrees
         case 1 => sobject(depth)
         case 2 => sarray(depth)
@@ -209,7 +209,7 @@ trait SValueGenerators extends ArbitraryBigDecimal {
       names <- containerOfN[Set, String](size, identifier)
       values <- listOfN(size, svalue(depth - 1))
     } yield {
-      SObject((names zip values).toMap)
+      SObject((names.zip(values)).toMap)
     }
   }
 
@@ -221,11 +221,11 @@ trait SValueGenerators extends ArbitraryBigDecimal {
   }
 
   def sleaf: Gen[SValue] = oneOf(
-    alphaStr map (SString(_: String)),
-    arbitrary[Boolean] map (SBoolean(_: Boolean)),
-    arbitrary[Long] map (l => SDecimal(BigDecimal(l))),
-    arbitrary[Double] map (d => SDecimal(BigDecimal(d))),
-    arbitrary[BigDecimal] map { bd =>
+    alphaStr.map(SString(_: String)),
+    arbitrary[Boolean].map(SBoolean(_: Boolean)),
+    arbitrary[Long].map(l => SDecimal(BigDecimal(l))),
+    arbitrary[Double].map(d => SDecimal(BigDecimal(d))),
+    arbitrary[BigDecimal].map { bd =>
       SDecimal(bd)
     }, //scalacheck's BigDecimal gen will overflow at random
     value(SNull)
@@ -239,7 +239,7 @@ trait SValueGenerators extends ArbitraryBigDecimal {
   }
 
   def chunk(size: Int, idCount: Int, vdepth: Int): Gen[Vector[SEvent]] =
-    listOfN(size, sevent(idCount, vdepth)) map { l =>
+    listOfN(size, sevent(idCount, vdepth)).map { l =>
       Vector(l: _*)
     }
 }

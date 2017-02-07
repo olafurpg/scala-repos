@@ -27,12 +27,12 @@ object TypeDef {
       case ScalaTokenTypes.tIDENTIFIER =>
         builder.advanceLexer //Ate identifier
       case _ =>
-        builder error ScalaBundle.message("identifier.expected")
+        builder.error(ScalaBundle.message("identifier.expected"))
         faultMarker.rollbackTo
         return false
     }
     val isTypeParamClause =
-      if (TypeParamClause parse builder) {
+      if (TypeParamClause.parse(builder)) {
         true
       } else false
     builder.getTokenType match {
@@ -43,7 +43,7 @@ object TypeDef {
           return true
         } else {
           faultMarker.drop
-          builder error ScalaBundle.message("wrong.type")
+          builder.error(ScalaBundle.message("wrong.type"))
           return false
         }
       case _ =>

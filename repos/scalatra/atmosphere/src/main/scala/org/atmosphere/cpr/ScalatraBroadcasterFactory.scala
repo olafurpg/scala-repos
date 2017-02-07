@@ -54,7 +54,7 @@ class ScalatraBroadcasterFactory(var cfg: AtmosphereConfig,
       }
 
       b.setBroadcasterLifeCyclePolicy(BroadcasterLifeCyclePolicy.NEVER)
-      broadcasterListeners.asScala foreach { l =>
+      broadcasterListeners.asScala.foreach { l =>
         b.addBroadcasterListener(l)
         l.onPostCreate(b)
       }
@@ -76,7 +76,7 @@ class ScalatraBroadcasterFactory(var cfg: AtmosphereConfig,
     }
 
     var bc: BroadcasterConfig = null
-    store foreach {
+    store.foreach {
       case (k, b) =>
         b.resumeAll()
         b.destroy()
@@ -100,7 +100,7 @@ class ScalatraBroadcasterFactory(var cfg: AtmosphereConfig,
   def lookup[T <: Broadcaster](c: Class[T],
                                id: scala.Any,
                                createIfNull: Boolean): T = {
-    val bOpt = store get id
+    val bOpt = store.get(id)
     if (bOpt.isDefined && !c.isAssignableFrom(bOpt.get.getClass)) {
       val msg =
         "Invalid lookup class " + c.getName + ". Cached class is: " +
@@ -113,7 +113,7 @@ class ScalatraBroadcasterFactory(var cfg: AtmosphereConfig,
         (bOpt.isDefined && bOpt.get.isDestroyed)) {
       if (bOpt.isDefined) {
         val b = bOpt.get
-        logger.debug("Removing destroyed Broadcaster %s" format b.getID)
+        logger.debug("Removing destroyed Broadcaster %s".format(b.getID))
         store.remove(b.getID, b)
       }
       if (store.putIfAbsent(id, createBroadcaster(c, id)) == null) {
@@ -154,7 +154,7 @@ class ScalatraBroadcasterFactory(var cfg: AtmosphereConfig,
     try {
       if (store.nonEmpty) {
         try {
-          store.valuesIterator foreach { b =>
+          store.valuesIterator.foreach { b =>
             if (b.getAtmosphereResources.contains(r))
               b.removeAtmosphereResource(r)
           }

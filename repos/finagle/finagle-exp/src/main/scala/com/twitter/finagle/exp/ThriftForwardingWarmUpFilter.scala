@@ -23,7 +23,7 @@ class ThriftForwardingWarmUpFilter(
     isBypassClient: ClientId => Boolean = _ => true
 ) extends ForwardingWarmUpFilter[Array[Byte], Array[Byte]](
       warmupPeriod,
-      thriftForwardingWarmupFilter andThen forwardTo,
+      thriftForwardingWarmupFilter.andThen(forwardTo),
       statsReceiver
     ) {
 

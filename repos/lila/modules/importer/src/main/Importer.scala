@@ -22,7 +22,7 @@ final class Importer(roundMap: ActorRef,
             forceId: Option[String] = None): Fu[Game] = {
 
     def gameExists(processing: => Fu[Game]): Fu[Game] =
-      GameRepo.findPgnImport(data.pgn) flatMap { _.fold(processing)(fuccess) }
+      GameRepo.findPgnImport(data.pgn).flatMap { _.fold(processing)(fuccess) }
 
     def applyResult(game: Game,
                     result: Option[Result],
@@ -44,7 +44,7 @@ final class Importer(roundMap: ActorRef,
         }
 
     gameExists {
-      (data preprocess user).future flatMap {
+      (data.preprocess(user)).future.flatMap {
         case Preprocessed(g, replay, result) =>
           val started = forceId.fold(g)(g.withId).start
           val game = applyResult(started, result, replay.state.situation)
@@ -63,6 +63,6 @@ final class Importer(roundMap: ActorRef,
 
   def inMemory(data: ImportData): Valid[Game] =
     data.preprocess(user = none).map {
-      case Preprocessed(game, replay, _) => game withId "synthetic"
+      case Preprocessed(game, replay, _) => game.withId("synthetic")
     }
 }

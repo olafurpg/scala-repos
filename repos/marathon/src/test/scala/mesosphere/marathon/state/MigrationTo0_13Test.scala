@@ -28,7 +28,7 @@ class MigrationTo0_13Test
     f.legacyTaskStore.store(appId, task1).futureValue
     f.legacyTaskStore.store(appId, task2).futureValue
     val names = f.entityStore.names().futureValue
-    names should have size 2
+    (names should have).size(2)
     names should contain(appId.safePath + ":" + task1.getId)
     names should contain(appId.safePath + ":" + task2.getId)
 
@@ -38,7 +38,7 @@ class MigrationTo0_13Test
     Then("the tasks are stored in paths without duplicated appId")
     val taskKeys = f.taskRepo.tasksKeys(appId).futureValue
 
-    taskKeys should have size 2
+    (taskKeys should have).size(2)
     taskKeys should contain(task1.getId)
     taskKeys should not contain f.legacyStoreKey(appId, task1.getId)
     taskKeys should contain(task2.getId)
@@ -69,7 +69,7 @@ class MigrationTo0_13Test
     val task1 = MarathonTestHelper.dummyTaskProto(appId)
     f.legacyTaskStore.store(appId, task1).futureValue
     val names = f.entityStore.names().futureValue
-    names should have size 1
+    (names should have).size(1)
     names should contain(appId.safePath + ":" + task1.getId)
 
     When("we run the migration")
@@ -78,7 +78,7 @@ class MigrationTo0_13Test
     Then("the tasks are stored in paths without duplicated appId")
     val taskKeys1 = f.taskRepo.tasksKeys(appId).futureValue
 
-    taskKeys1 should have size 1
+    (taskKeys1 should have).size(1)
 
     When("we add another task in old format")
     val task2 = MarathonTestHelper.dummyTaskProto(appId)
@@ -92,7 +92,7 @@ class MigrationTo0_13Test
     Then(
       "Only the second task is considered and the first one does not crash the migration")
     val taskKeys2 = f.taskRepo.tasksKeys(appId).futureValue
-    taskKeys2 should have size 2
+    (taskKeys2 should have).size(2)
     taskKeys2 should contain(task1.getId)
     taskKeys2 should not contain f.legacyStoreKey(appId, task1.getId)
     taskKeys2 should contain(task2.getId)

@@ -26,10 +26,10 @@ class MetricValuesSpec
 
   val nodes: Seq[NodeMetrics] = {
     (1 to 100).foldLeft(List(node1, node2)) { (nodes, _) ⇒
-      nodes map { n ⇒
+      nodes.map { n ⇒
         n.copy(metrics = collector.sample.metrics.flatMap(latest ⇒
           n.metrics.collect {
-            case streaming if latest sameAs streaming ⇒ streaming :+ latest
+            case streaming if latest.sameAs(streaming) ⇒ streaming :+ latest
         }))
       }
     }
@@ -43,7 +43,7 @@ class MetricValuesSpec
     }
 
     "extract expected MetricValue types for load balancing" in {
-      nodes foreach { node ⇒
+      nodes.foreach { node ⇒
         node match {
           case HeapMemory(address, _, used, committed, _) ⇒
             used should be > (0L)

@@ -141,32 +141,37 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                                storageTimeout,
                                txLogScheduler)(actorSystem)
       } yield {
-        nihdbV.disjunction leftMap {
-          ResourceError.fromExtractorError(
-            "Failed to create NIHDB in %s as %s".format(versionDir.toString,
-                                                        authorities))
-        } map {
-          NIHDBResource(_)
-        }
+        nihdbV.disjunction
+          .leftMap {
+            ResourceError.fromExtractorError(
+              "Failed to create NIHDB in %s as %s".format(versionDir.toString,
+                                                          authorities))
+          }
+          .map {
+            NIHDBResource(_)
+          }
       }
     }
 
     def openNIHDB(descriptorDir: File): IO[ResourceError \/ NIHDBResource] = {
-      NIHDB.open(chef,
-                 descriptorDir,
-                 cookThreshold,
-                 storageTimeout,
-                 txLogScheduler)(actorSystem) map {
-        _ map {
-          _.disjunction map { NIHDBResource(_) } leftMap {
-            ResourceError.fromExtractorError(
-              "Failed to open NIHDB from %s".format(descriptorDir.toString))
+      NIHDB
+        .open(chef,
+              descriptorDir,
+              cookThreshold,
+              storageTimeout,
+              txLogScheduler)(actorSystem)
+        .map {
+          _.map {
+            _.disjunction.map { NIHDBResource(_) }.leftMap {
+              ResourceError.fromExtractorError(
+                "Failed to open NIHDB from %s".format(descriptorDir.toString))
+            }
+          }.getOrElse {
+            \/.left(
+              NotFound(
+                "No NIHDB projection found in %s".format(descriptorDir)))
           }
-        } getOrElse {
-          \/.left(
-            NotFound("No NIHDB projection found in %s".format(descriptorDir)))
         }
-      }
     }
 
     final val blobMetadataFilename = "blob_metadata"
@@ -188,11 +193,12 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
           .disjunction
           .map { metadata =>
             FileBlobResource(new File(versionDir, "data"), metadata) //(actorSystem.dispatcher)
-          } leftMap {
-          ResourceError.fromExtractorError(
-            "Error reading metadata from versionDir %s".format(
-              versionDir.toString))
-        }
+          }
+          .leftMap {
+            ResourceError.fromExtractorError(
+              "Error reading metadata from versionDir %s".format(
+                versionDir.toString))
+          }
       }
 
     /**
@@ -230,17 +236,18 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         _ = logger.debug("Creating new blob at " + file)
         writeResult <- write(new FileOutputStream(file), 0L, data)
         blobResult <- IOT {
-          writeResult traverse { size =>
+          writeResult.traverse { size =>
             logger.debug("Write complete on " + file)
             val metadata =
               BlobMetadata(mimeType, size, clock.now(), authorities)
             //val metadataStore = PersistentJValue(versionDir, blobMetadataFilename)
             //metadataStore.json = metadata.serialize
-            IOUtils.writeToFile(
-              metadata.serialize.renderCompact,
-              new File(versionDir, blobMetadataFilename)) map { _ =>
-              FileBlobResource(file, metadata)
-            }
+            IOUtils
+              .writeToFile(metadata.serialize.renderCompact,
+                           new File(versionDir, blobMetadataFilename))
+              .map { _ =>
+                FileBlobResource(file, metadata)
+              }
           }
         }
       } yield blobResult
@@ -261,8 +268,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
     def recordCount(implicit M: Monad[Future]) = projection.map(_.length)
 
     def asByteStream(mimeType: MimeType)(implicit M: Monad[Future]) = OptionT {
-      projection map { p =>
-        val slices = p.getBlockStream(None) map VFS.derefValue
+      projection.map { p =>
+        val slices = p.getBlockStream(None).map(VFS.derefValue)
         ColumnarTableModule.byteStream(slices, Some(mimeType))
       }
     }
@@ -318,7 +325,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
 
       StreamT.unfoldM[IO, Array[Byte], Long](0L) { offset =>
         IO(new FileInputStream(dataFile)).bracket(f => IO(f.close())) { in =>
-          IO(readChunk(in, offset) map { bytes =>
+          IO(readChunk(in, offset).map { bytes =>
             (bytes, offset + bytes.length)
           })
         }
@@ -368,13 +375,16 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       for {
         // it's necessary to group by path then traverse since each path will respond to ingest independently.
         // -- a bit of a leak of implementation detail, but that's the actor model for you.
-        allResults <- (data groupBy { case (offset, msg) => msg.path }).toStream traverse {
-          case (path, subset) =>
-            (projectionsActor ? IngestData(subset)).mapTo[WriteResult]
-        }
+        allResults <- (data
+          .groupBy { case (offset, msg) => msg.path })
+          .toStream
+          .traverse {
+            case (path, subset) =>
+              (projectionsActor ? IngestData(subset)).mapTo[WriteResult]
+          }
       } yield {
         val errors: List[ResourceError] =
-          allResults.toList collect { case PathOpFailure(_, error) => error }
+          allResults.toList.collect { case PathOpFailure(_, error) => error }
         errors.toNel.map(ResourceError.all).toLeftDisjunction(PrecogUnit)
       }
     }
@@ -384,7 +394,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         version: Version): EitherT[Future, ResourceError, Resource] = {
       implicit val t = projectionReadTimeout
       EitherT {
-        (projectionsActor ? Read(path, version)).mapTo[ReadResult] map {
+        (projectionsActor ? Read(path, version)).mapTo[ReadResult].map {
           case ReadSuccess(_, resource) => \/.right(resource)
           case PathOpFailure(_, error) => \/.left(error)
         }
@@ -395,7 +405,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         path: Path): EitherT[Future, ResourceError, Set[PathMetadata]] = {
       implicit val t = projectionReadTimeout
       EitherT {
-        (projectionsActor ? FindChildren(path)).mapTo[MetadataResult] map {
+        (projectionsActor ? FindChildren(path)).mapTo[MetadataResult].map {
           case PathChildren(_, children) =>
             \/.right(for (pm <- children; p0 <- (pm.path - path)) yield {
               pm.copy(path = p0)
@@ -409,10 +419,10 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         path: Path): EitherT[Future, ResourceError, PathMetadata] = {
       implicit val t = projectionReadTimeout
       EitherT {
-        (projectionsActor ? FindPathMetadata(path)).mapTo[MetadataResult] map {
+        (projectionsActor ? FindPathMetadata(path)).mapTo[MetadataResult].map {
           case PathChildren(_, children) =>
-            children.headOption flatMap { pm =>
-              (pm.path - path) map { p0 =>
+            children.headOption.flatMap { pm =>
+              ((pm.path - path)).map { p0 =>
                 pm.copy(path = p0)
               }
             } toRightDisjunction {
@@ -461,7 +471,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
     }
 
     private[this] def targetActor(path: Path): IO[ActorRef] = {
-      pathActors.get(path).map(IO(_)) getOrElse {
+      pathActors.get(path).map(IO(_)).getOrElse {
         val pathDir = VFSPathUtils.pathDir(baseDir, path)
 
         for {
@@ -469,25 +479,27 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
           _ = logger.debug(
             "Created new path dir for %s : %s".format(path, pathDir))
           vlog <- VersionLog.open(pathDir)
-          actorV <- vlog traverse { versionLog =>
+          actorV <- vlog.traverse { versionLog =>
             logger.debug("Creating new PathManagerActor for " + path)
-            context.actorOf(
-              Props(
-                new PathManagerActor(path,
-                                     VFSPathUtils.versionsSubdir(pathDir),
-                                     versionLog,
-                                     shutdownTimeout,
-                                     quiescenceTimeout,
-                                     clock,
-                                     self))) tap { newActor =>
-              IO {
-                pathActors += (path -> newActor);
-                pathLRU += (path -> ())
+            context
+              .actorOf(
+                Props(
+                  new PathManagerActor(path,
+                                       VFSPathUtils.versionsSubdir(pathDir),
+                                       versionLog,
+                                       shutdownTimeout,
+                                       quiescenceTimeout,
+                                       clock,
+                                       self)))
+              .tap { newActor =>
+                IO {
+                  pathActors += (path -> newActor);
+                  pathLRU += (path -> ())
+                }
               }
-            }
           }
         } yield {
-          actorV valueOr {
+          actorV.valueOr {
             case Extractor.Thrown(t) => throw t
             case error => throw new Exception(error.message)
           }
@@ -499,11 +511,14 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       case FindChildren(path) =>
         logger.debug(
           "Received request to find children of %s".format(path.path))
-        VFSPathUtils.findChildren(baseDir, path) map { children =>
-          sender ! PathChildren(path, children)
-        } except {
-          case t: Throwable =>
-            logger.error("Error obtaining path children for " + path, t)
+        VFSPathUtils
+          .findChildren(baseDir, path)
+          .map { children =>
+            sender ! PathChildren(path, children)
+          }
+          .except {
+            case t: Throwable =>
+              logger.error("Error obtaining path children for " + path, t)
             IO { sender ! PathOpFailure(path, IOError(t)) }
         } unsafePerformIO
 
@@ -512,18 +527,21 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
           "Received request to find metadata for path %s".format(path.path))
         val requestor = sender
         val eio =
-          VFSPathUtils.currentPathMetadata(baseDir, path) map { pathMetadata =>
-            requestor ! PathChildren(path, Set(pathMetadata))
-          } leftMap { error =>
-            requestor ! PathOpFailure(path, error)
-          }
+          VFSPathUtils
+            .currentPathMetadata(baseDir, path)
+            .map { pathMetadata =>
+              requestor ! PathChildren(path, Set(pathMetadata))
+            }
+            .leftMap { error =>
+              requestor ! PathOpFailure(path, error)
+            }
 
         eio.run.unsafePerformIO
 
       case op: PathOp =>
         val requestor = sender
         val io =
-          targetActor(op.path) map { _.tell(op, requestor) } except {
+          targetActor(op.path).map { _.tell(op, requestor) }.except {
             case t: Throwable =>
               logger.error("Error obtaining path actor for " + op.path, t)
               IO { requestor ! PathOpFailure(op.path, IOError(t)) }
@@ -537,47 +555,56 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         val groupedAndPermissioned =
           messages
             .groupBy({ case (_, event) => event.path })
-            .toStream traverse {
-            case (path, pathMessages) =>
-              targetActor(path) map { pathActor =>
-                pathMessages.map(_._2.apiKey).distinct.toStream traverse {
-                  apiKey =>
-                    permissionsFinder.writePermissions(apiKey,
-                                                       path,
-                                                       clock.instant()) map {
-                      apiKey -> _
-                    }
-                } map { perms =>
-                  val allPerms: Map[APIKey, Set[WritePermission]] =
-                    perms.map(Map(_)).suml
-                  val (totalArchives, totalEvents, totalStoreFiles) =
-                    pathMessages.foldLeft((0, 0, 0)) {
-                      case ((archived, events, storeFiles),
-                            (_, IngestMessage(_, _, _, data, _, _, _))) =>
-                        (archived, events + data.size, storeFiles)
-                      case ((archived, events, storeFiles),
-                            (_, am: ArchiveMessage)) =>
-                        (archived + 1, events, storeFiles)
-                      case ((archived, events, storeFiles),
-                            (_, sf: StoreFileMessage)) =>
-                        (archived, events, storeFiles + 1)
-                    }
-                  logger.debug(
-                    "Sending %d archives, %d storeFiles, and %d events to %s"
-                      .format(totalArchives,
-                              totalStoreFiles,
-                              totalEvents,
-                              path))
-                  pathActor.tell(IngestBundle(pathMessages, allPerms),
-                                 requestor)
-                }
-              } except {
-                case t: Throwable =>
-                  IO(
-                    logger.error("Failure during version log open on " + path,
-                                 t))
-              }
-          }
+            .toStream
+            .traverse {
+              case (path, pathMessages) =>
+                targetActor(path)
+                  .map { pathActor =>
+                    pathMessages
+                      .map(_._2.apiKey)
+                      .distinct
+                      .toStream
+                      .traverse { apiKey =>
+                        permissionsFinder
+                          .writePermissions(apiKey, path, clock.instant())
+                          .map {
+                            apiKey -> _
+                          }
+                      }
+                      .map { perms =>
+                        val allPerms: Map[APIKey, Set[WritePermission]] =
+                          perms.map(Map(_)).suml
+                        val (totalArchives, totalEvents, totalStoreFiles) =
+                          pathMessages.foldLeft((0, 0, 0)) {
+                            case ((archived, events, storeFiles),
+                                  (_,
+                                   IngestMessage(_, _, _, data, _, _, _))) =>
+                              (archived, events + data.size, storeFiles)
+                            case ((archived, events, storeFiles),
+                                  (_, am: ArchiveMessage)) =>
+                              (archived + 1, events, storeFiles)
+                            case ((archived, events, storeFiles),
+                                  (_, sf: StoreFileMessage)) =>
+                              (archived, events, storeFiles + 1)
+                          }
+                        logger.debug(
+                          "Sending %d archives, %d storeFiles, and %d events to %s"
+                            .format(totalArchives,
+                                    totalStoreFiles,
+                                    totalEvents,
+                                    path))
+                        pathActor.tell(IngestBundle(pathMessages, allPerms),
+                                       requestor)
+                      }
+                  }
+                  .except {
+                    case t: Throwable =>
+                      IO(
+                        logger.error(
+                          "Failure during version log open on " + path,
+                          t))
+                  }
+            }
 
         groupedAndPermissioned.unsafePerformIO
     }
@@ -607,9 +634,9 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
 
     override def postStop = {
       val closeAll =
-        versions.values.toStream traverse {
+        versions.values.toStream.traverse {
           case NIHDBResource(db) => db.close(context.system)
-          case _ => Promise successful PrecogUnit
+          case _ => Promise.successful(PrecogUnit)
         }
 
       Await.result(closeAll, shutdownTimeout)
@@ -625,7 +652,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       logger.trace(
         "Checking write permission for " + path + " as " +
           authorities + " among " + permissions)
-      PermissionsFinder.canWriteAs(permissions filter {
+      PermissionsFinder.canWriteAs(permissions.filter {
         _.path.isEqualOrParentOf(path)
       }, authorities)
     }
@@ -641,36 +668,41 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
 
     private def openResource(
         version: UUID): EitherT[IO, ResourceError, Resource] = {
-      versions.get(version) map { r =>
-        logger.debug("Located existing resource for " + version)
-        right(IO(r))
-      } getOrElse {
-        logger.debug("Opening new resource for " + version)
-        versionLog.find(version) map {
-          case VersionEntry(v, _, _) =>
-            val dir = versionDir(v)
-            val openf =
-              if (NIHDB.hasProjection(dir)) { resourceBuilder.openNIHDB _ } else {
-                resourceBuilder.openBlob _
-              }
-
-            for {
-              resource <- EitherT {
-                openf(dir) flatMap {
-                  _ tap { resourceV =>
-                    IO(resourceV foreach { r =>
-                      versions += (version -> r)
-                    })
-                  }
-                }
-              }
-            } yield resource
-        } getOrElse {
-          left(
-            IO(Corrupt("No version %s found to exist for resource %s."
-              .format(version, path.path))))
+      versions
+        .get(version)
+        .map { r =>
+          logger.debug("Located existing resource for " + version)
+          right(IO(r))
         }
-      }
+        .getOrElse {
+          logger.debug("Opening new resource for " + version)
+          versionLog
+            .find(version)
+            .map {
+              case VersionEntry(v, _, _) =>
+                val dir = versionDir(v)
+                val openf =
+                  if (NIHDB.hasProjection(dir)) { resourceBuilder.openNIHDB _ } else {
+                    resourceBuilder.openBlob _
+                  }
+
+                for {
+                  resource <- EitherT {
+                    openf(dir).flatMap {
+                      _.tap { resourceV =>
+                        IO(resourceV.foreach { r =>
+                          versions += (version -> r)
+                        })
+                      }
+                    }
+                  }
+                } yield resource
+            }
+            .getOrElse {
+              left(IO(Corrupt("No version %s found to exist for resource %s."
+                .format(version, path.path))))
+            }
+        }
     }
 
     private def performCreate(apiKey: APIKey,
@@ -691,13 +723,13 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
               bytes :: StreamT.empty[IO, Array[Byte]])
 
           case NIHDBData(data) =>
-            resourceBuilder.createNIHDB(versionDir(version), writeAs) flatMap {
-              _ traverse { nihdbr =>
-                nihdbr tap { _.db.insert(data) }
+            resourceBuilder.createNIHDB(versionDir(version), writeAs).flatMap {
+              _.traverse { nihdbr =>
+                nihdbr.tap { _.db.insert(data) }
               }
             }
         }
-        _ <- created traverse { resource =>
+        _ <- created.traverse { resource =>
           for {
             _ <- IO { versions += (version -> resource) }
             _ <- complete.whenM(
@@ -739,11 +771,15 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                                  response: PathActionResponse) = {
       //TODO: Add job progress updates
       (response == UpdateSuccess(msg.path) &&
-        terminal).option(msg.jobId).join traverse {
-        jobManager.finish(_, clock.now())
-      } map { _ =>
-        response
-      }
+        terminal)
+        .option(msg.jobId)
+        .join
+        .traverse {
+          jobManager.finish(_, clock.now())
+        }
+        .map { _ =>
+          response
+        }
     }
 
     def processEventMessages(msgs: Stream[(Long, EventMessage)],
@@ -755,11 +791,13 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
 
       def openNIHDB(
           version: UUID): EitherT[IO, ResourceError, ProjectionResource] = {
-        openResource(version) flatMap {
+        openResource(version).flatMap {
           _.fold(
             blob =>
-              left(IO(NotFound(
-                "Located resource on %s is a BLOB, not a projection" format path.path))),
+              left(
+                IO(
+                  NotFound("Located resource on %s is a BLOB, not a projection"
+                    .format(path.path)))),
             db => right(IO(db))
           )
         }
@@ -787,7 +825,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                 } yield {
                   logger.trace("Sent insert message for " + msg + " to nihdb")
                   // FIXME: We aren't actually guaranteed success here because NIHDB might do something screwy.
-                  maybeCompleteJob(msg, terminal, UpdateSuccess(msg.path)) pipeTo requestor
+                  maybeCompleteJob(msg, terminal, UpdateSuccess(msg.path))
+                    .pipeTo(requestor)
                   PrecogUnit
               }
             )
@@ -798,8 +837,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                         NIHDBData(List(batch(msg))),
                         streamId,
                         msg.writeAs,
-                        terminal) map { response =>
-            maybeCompleteJob(msg, terminal, response) pipeTo requestor
+                        terminal).map { response =>
+            maybeCompleteJob(msg, terminal, response).pipeTo(requestor)
             PrecogUnit
           }
         } else {
@@ -829,8 +868,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                         BlobData(msg.content.data, msg.content.mimeType),
                         streamId,
                         msg.writeAs,
-                        terminal) map { response =>
-            maybeCompleteJob(msg, terminal, response) pipeTo requestor
+                        terminal).map { response =>
+            maybeCompleteJob(msg, terminal, response).pipeTo(requestor)
             PrecogUnit
           }
         } else {
@@ -844,90 +883,95 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         }
       }
 
-      msgs traverse {
-        case (offset,
-              msg @ IngestMessage(apiKey, path, _, _, _, _, streamRef)) =>
-          streamRef match {
-            case StreamRef.Create(streamId, terminal) =>
-              logger.trace(
-                "Received create for %s stream %s: current: %b, complete: %b"
-                  .format(path.path,
-                          streamId,
-                          versionLog.current.isEmpty,
-                          versionLog.isCompleted(streamId)))
-              persistNIHDB(versionLog.current.isEmpty &&
-                             !versionLog.isCompleted(streamId),
-                           offset,
-                           msg,
-                           streamId,
-                           terminal)
+      msgs
+        .traverse {
+          case (offset,
+                msg @ IngestMessage(apiKey, path, _, _, _, _, streamRef)) =>
+            streamRef match {
+              case StreamRef.Create(streamId, terminal) =>
+                logger.trace(
+                  "Received create for %s stream %s: current: %b, complete: %b"
+                    .format(path.path,
+                            streamId,
+                            versionLog.current.isEmpty,
+                            versionLog.isCompleted(streamId)))
+                persistNIHDB(versionLog.current.isEmpty &&
+                               !versionLog.isCompleted(streamId),
+                             offset,
+                             msg,
+                             streamId,
+                             terminal)
 
-            case StreamRef.Replace(streamId, terminal) =>
-              logger.trace("Received replace for %s stream %s: complete: %b"
-                .format(path.path, streamId, versionLog.isCompleted(streamId)))
-              persistNIHDB(!versionLog.isCompleted(streamId),
-                           offset,
-                           msg,
-                           streamId,
-                           terminal)
+              case StreamRef.Replace(streamId, terminal) =>
+                logger.trace(
+                  "Received replace for %s stream %s: complete: %b"
+                    .format(path.path,
+                            streamId,
+                            versionLog.isCompleted(streamId)))
+                persistNIHDB(!versionLog.isCompleted(streamId),
+                             offset,
+                             msg,
+                             streamId,
+                             terminal)
 
-            case StreamRef.Append =>
-              logger.trace("Received append for %s".format(path.path))
-              val streamId =
-                versionLog.current.map(_.id).getOrElse(UUID.randomUUID())
-              for {
-                _ <- persistNIHDB(
-                  canCreate(msg.path, permissions(apiKey), msg.writeAs),
-                  offset,
-                  msg,
-                  streamId,
-                  false)
-                _ <- versionLog.completeVersion(streamId) >> versionLog
-                  .setHead(streamId)
-              } yield PrecogUnit
-          }
+              case StreamRef.Append =>
+                logger.trace("Received append for %s".format(path.path))
+                val streamId =
+                  versionLog.current.map(_.id).getOrElse(UUID.randomUUID())
+                for {
+                  _ <- persistNIHDB(
+                    canCreate(msg.path, permissions(apiKey), msg.writeAs),
+                    offset,
+                    msg,
+                    streamId,
+                    false)
+                  _ <- versionLog.completeVersion(streamId) >> versionLog
+                    .setHead(streamId)
+                } yield PrecogUnit
+            }
 
-        case (offset,
-              msg @ StoreFileMessage(_, path, _, _, _, _, _, streamRef)) =>
-          streamRef match {
-            case StreamRef.Create(streamId, terminal) =>
-              if (!terminal) {
-                logger.warn(
-                  "Non-terminal BLOB for %s will not currently behave correctly!"
-                    .format(path))
-              }
-              persistFile(versionLog.current.isEmpty &&
-                            !versionLog.isCompleted(streamId),
-                          offset,
-                          msg,
-                          streamId,
-                          terminal)
+          case (offset,
+                msg @ StoreFileMessage(_, path, _, _, _, _, _, streamRef)) =>
+            streamRef match {
+              case StreamRef.Create(streamId, terminal) =>
+                if (!terminal) {
+                  logger.warn(
+                    "Non-terminal BLOB for %s will not currently behave correctly!"
+                      .format(path))
+                }
+                persistFile(versionLog.current.isEmpty &&
+                              !versionLog.isCompleted(streamId),
+                            offset,
+                            msg,
+                            streamId,
+                            terminal)
 
-            case StreamRef.Replace(streamId, terminal) =>
-              if (!terminal) {
-                logger.warn(
-                  "Non-terminal BLOB for %s will not currently behave correctly!"
-                    .format(path))
-              }
-              persistFile(!versionLog.isCompleted(streamId),
-                          offset,
-                          msg,
-                          streamId,
-                          terminal)
+              case StreamRef.Replace(streamId, terminal) =>
+                if (!terminal) {
+                  logger.warn(
+                    "Non-terminal BLOB for %s will not currently behave correctly!"
+                      .format(path))
+                }
+                persistFile(!versionLog.isCompleted(streamId),
+                            offset,
+                            msg,
+                            streamId,
+                            terminal)
 
-            case StreamRef.Append =>
-              IO(
-                requestor ! PathOpFailure(
-                  path,
-                  IllegalWriteRequestError(
-                    "Append is not yet supported for binary files.")))
-          }
+              case StreamRef.Append =>
+                IO(
+                  requestor ! PathOpFailure(
+                    path,
+                    IllegalWriteRequestError(
+                      "Append is not yet supported for binary files.")))
+            }
 
-        case (offset, ArchiveMessage(apiKey, path, jobId, _, timestamp)) =>
-          versionLog.clearHead >> IO(requestor ! UpdateSuccess(path))
-      } map { _ =>
-        PrecogUnit
-      }
+          case (offset, ArchiveMessage(apiKey, path, jobId, _, timestamp)) =>
+            versionLog.clearHead >> IO(requestor ! UpdateSuccess(path))
+        }
+        .map { _ =>
+          PrecogUnit
+        }
     }
 
     def versionOpt(version: Version) = version match {
@@ -940,8 +984,9 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         logger.info(
           "Resource entering state of quiescence after receive timeout.")
         val quiesce =
-          versions.values.toStream collect { case NIHDBResource(db) => db } traverse
-            (_.quiesce)
+          versions.values.toStream
+            .collect { case NIHDBResource(db) => db }
+            .traverse(_.quiesce)
         quiesce.unsafePerformIO
 
       case IngestBundle(messages, permissions) =>
@@ -955,16 +1000,17 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         val requestor = sender
         val io: IO[ReadResult] = version match {
           case Version.Current =>
-            versionLog.current map { v =>
-              openResource(v.id)
-                .fold(PathOpFailure(path, _), ReadSuccess(path, _))
-            } getOrElse {
-              IO(
-                PathOpFailure(
-                  path,
-                  NotFound(
-                    "No current version found for path %s".format(path.path))))
-            }
+            versionLog.current
+              .map { v =>
+                openResource(v.id)
+                  .fold(PathOpFailure(path, _), ReadSuccess(path, _))
+              }
+              .getOrElse {
+                IO(
+                  PathOpFailure(path,
+                                NotFound("No current version found for path %s"
+                                  .format(path.path))))
+              }
 
           case Version.Archived(id) =>
             openResource(id).fold(PathOpFailure(path, _), ReadSuccess(path, _))

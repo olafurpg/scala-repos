@@ -20,10 +20,10 @@ final class Env(config: Config,
 
   private val settings = new {
     val CollectionChallenge = config getString "collection.challenge"
-    val MaxPerUser = config getInt "max_per_user"
-    val HistoryMessageTtl = config duration "history.message.ttl"
-    val UidTimeout = config duration "uid.timeout"
-    val SocketTimeout = config duration "socket.timeout"
+    val MaxPerUser = config.getInt("max_per_user")
+    val HistoryMessageTtl = config.duration("history.message.ttl")
+    val UidTimeout = config.duration("uid.timeout")
+    val SocketTimeout = config.duration("socket.timeout")
     val SocketName = config getString "socket.name"
   }
   import settings._
@@ -44,7 +44,7 @@ final class Env(config: Config,
     )
 
   def version(challengeId: Challenge.ID): Fu[Int] =
-    socketHub ? Ask(challengeId, GetVersion) mapTo manifest[Int]
+    (socketHub ? Ask(challengeId, GetVersion)).mapTo(manifest[Int])
 
   lazy val socketHandler = new SocketHandler(hub = hub,
                                              socketHub = socketHub,
@@ -70,13 +70,14 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "challenge" boot new Env(
-      config = lila.common.PlayApp loadConfig "challenge",
-      system = lila.common.PlayApp.system,
-      onStart = lila.game.Env.current.onStart,
-      hub = lila.hub.Env.current,
-      lightUser = lila.user.Env.current.lightUser,
-      db = lila.db.Env.current,
-      scheduler = lila.common.PlayApp.scheduler
-    )
+    "challenge".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("challenge"),
+        system = lila.common.PlayApp.system,
+        onStart = lila.game.Env.current.onStart,
+        hub = lila.hub.Env.current,
+        lightUser = lila.user.Env.current.lightUser,
+        db = lila.db.Env.current,
+        scheduler = lila.common.PlayApp.scheduler
+      ))
 }

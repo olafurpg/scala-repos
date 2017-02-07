@@ -16,8 +16,8 @@ final class Env(config: Config,
 
   private val CollectionAnalysis = config getString "collection.analysis"
   private val NetDomain = config getString "net.domain"
-  private val CachedNbTtl = config duration "cached.nb.ttl"
-  private val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
+  private val CachedNbTtl = config.duration("cached.nb.ttl")
+  private val PaginatorMaxPerPage = config.getInt("paginator.max_per_page")
   private val ActorName = config getString "actor.name"
 
   private[analyse] lazy val analysisColl = db(CollectionAnalysis)
@@ -32,11 +32,12 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "analyse" boot new Env(
-      config = lila.common.PlayApp loadConfig "analyse",
-      db = lila.db.Env.current,
-      system = lila.common.PlayApp.system,
-      roundSocket = lila.hub.Env.current.socket.round,
-      indexer = lila.hub.Env.current.actor.gameSearch
-    )
+    "analyse".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("analyse"),
+        db = lila.db.Env.current,
+        system = lila.common.PlayApp.system,
+        roundSocket = lila.hub.Env.current.socket.round,
+        indexer = lila.hub.Env.current.actor.gameSearch
+      ))
 }

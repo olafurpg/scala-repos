@@ -176,10 +176,10 @@ object PartialFunction {
     }
 
     override def orElse[A1 <: A, B1 >: B](that: PartialFunction[A1, B1]) =
-      new OrElse[A1, B1](f1, f2 orElse that)
+      new OrElse[A1, B1](f1, f2.orElse(that))
 
     override def andThen[C](k: B => C) =
-      new OrElse[A, C](f1 andThen k, f2 andThen k)
+      new OrElse[A, C](f1.andThen(k), f2.andThen(k))
   }
 
   /** Composite function produced by `PartialFunction#andThen` method

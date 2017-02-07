@@ -92,7 +92,7 @@ abstract class JournalPerfSpec(config: Config) extends JournalSpec(config) {
   def feedAndExpectLast(actor: ActorRef,
                         mode: String,
                         cmnds: immutable.Seq[Int]): Unit = {
-    cmnds foreach { c ⇒
+    cmnds.foreach { c ⇒
       actor ! Cmd(mode, c)
     }
     testProbe.expectMsg(awaitDuration, cmnds.last)

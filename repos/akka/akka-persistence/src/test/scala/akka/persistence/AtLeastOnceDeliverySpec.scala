@@ -171,7 +171,7 @@ object AtLeastOnceDeliverySpec {
         count += 1
         if (count % dropMod != 0) {
           log.debug("Pass msg {} count {}", msg, count)
-          target forward msg
+          target.forward(msg)
         } else {
           log.debug("Drop msg {} count {}", msg, count)
         }

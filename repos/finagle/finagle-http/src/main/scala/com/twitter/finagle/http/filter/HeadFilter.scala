@@ -16,15 +16,17 @@ class HeadFilter[Req <: Request] extends SimpleFilter[Req, Response] {
 
       // Convert to GET and forward
       request.method = Method.Get
-      service(request) map { response =>
-        // Set Content-Length on success
-        response.contentLength = response.length
-        response
-      } ensure {
-        // Ensure method is HEAD and has no content
-        request.method = Method.Head
-        request.response.clearContent()
-      }
+      service(request)
+        .map { response =>
+          // Set Content-Length on success
+          response.contentLength = response.length
+          response
+        }
+        .ensure {
+          // Ensure method is HEAD and has no content
+          request.method = Method.Head
+          request.response.clearContent()
+        }
     } else {
       service(request)
     }

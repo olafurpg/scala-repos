@@ -118,13 +118,14 @@ trait BaseBlockStoreTestModule[M[+ _]]
       }
 
       val slice =
-        id map { key =>
-          findBlockAfter(key, slices)
-        } getOrElse {
-          slices.headOption
-        }
+        id.map { key =>
+            findBlockAfter(key, slices)
+          }
+          .getOrElse {
+            slices.headOption
+          }
 
-      slice map { s =>
+      slice.map { s =>
         val s0 = new Slice {
           val size = s.size
           val columns = colSelection

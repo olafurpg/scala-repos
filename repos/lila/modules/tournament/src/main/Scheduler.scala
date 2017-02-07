@@ -39,12 +39,15 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
   def receive = {
 
     case ScheduleNow =>
-      TournamentRepo.scheduledUnfinished.map(_.flatMap(_.schedule)) map ScheduleNowWith.apply pipeTo self
+      TournamentRepo.scheduledUnfinished
+        .map(_.flatMap(_.schedule))
+        .map(ScheduleNowWith.apply)
+        .pipeTo(self)
 
     case ScheduleNowWith(dbScheds) =>
       val rightNow = DateTime.now
       val today = rightNow.withTimeAtStartOfDay
-      val tomorrow = rightNow plusDays 1
+      val tomorrow = rightNow.plusDays(1)
       val lastDayOfMonth = today.dayOfMonth.withMaximumValue
       val firstDayOfMonth = today.dayOfMonth.withMinimumValue
       val lastSundayOfCurrentMonth =
@@ -54,9 +57,9 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
       val nextSaturday = today.plusDays((13 - today.getDayOfWeek) % 7)
 
       def orTomorrow(date: DateTime) =
-        if (date isBefore rightNow) date plusDays 1 else date
+        if (date.isBefore(rightNow)) date.plusDays(1) else date
       def orNextWeek(date: DateTime) =
-        if (date isBefore rightNow) date plusWeeks 1 else date
+        if (date.isBefore(rightNow)) date.plusWeeks(1) else date
 
       val isHalloween = today.getMonthOfYear == 10 && today.getDayOfMonth == 31
 
@@ -206,7 +209,7 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
         },
         // hourly standard tournaments!
         (0 to 6).toList.flatMap { hourDelta =>
-          val date = rightNow plusHours hourDelta
+          val date = rightNow.plusHours(hourDelta)
           val hour = date.getHourOfDay
           val bulletType = Set(1, 7, 13, 19)(hour)
             .fold[Schedule.Speed](HyperBullet, Bullet)
@@ -215,16 +218,13 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
             Schedule(Hourly, bulletType, Standard, std, at(date, hour, 30)).some,
             Schedule(Hourly, SuperBlitz, Standard, std, at(date, hour)).some,
             Schedule(Hourly, Blitz, Standard, std, at(date, hour)).some,
-            (hour % 2 == 0) option Schedule(Hourly,
-                                            Classical,
-                                            Standard,
-                                            std,
-                                            at(date, hour))
+            ((hour % 2 == 0)).option(
+              Schedule(Hourly, Classical, Standard, std, at(date, hour)))
           ).flatten
         },
         // hourly crazyhouse tournaments!
         (0 to 6).toList.flatMap { hourDelta =>
-          val date = rightNow plusHours hourDelta
+          val date = rightNow.plusHours(hourDelta)
           val hour = date.getHourOfDay
           val speed = hour % 3 match {
             case 0 => Bullet
@@ -233,34 +233,33 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
           }
           List(
             Schedule(Hourly, speed, Crazyhouse, std, at(date, hour)).some,
-            (speed == Bullet) option Schedule(Hourly,
-                                              speed,
-                                              Crazyhouse,
-                                              std,
-                                              at(date, hour, 30))
+            ((speed == Bullet)).option(
+              Schedule(Hourly, speed, Crazyhouse, std, at(date, hour, 30)))
           ).flatten
         }
       ).flatten
 
-      nextSchedules.foldLeft(List[Schedule]()) {
-        case (scheds, sched) if sched.at.isBeforeNow => scheds
-        case (scheds, sched) if overlaps(sched, dbScheds) => scheds
-        case (scheds, sched) if overlaps(sched, scheds) => scheds
-        case (scheds, sched) => sched :: scheds
-      } foreach api.createScheduled
+      nextSchedules
+        .foldLeft(List[Schedule]()) {
+          case (scheds, sched) if sched.at.isBeforeNow => scheds
+          case (scheds, sched) if overlaps(sched, dbScheds) => scheds
+          case (scheds, sched) if overlaps(sched, scheds) => scheds
+          case (scheds, sched) => sched :: scheds
+        }
+        .foreach(api.createScheduled)
   }
 
   private case class ScheduleNowWith(dbScheds: List[Schedule])
 
   private def endsAt(s: Schedule) =
-    s.at plus ((~Schedule.durationFor(s)).toLong * 60 * 1000)
+    s.at.plus((~Schedule.durationFor(s)).toLong * 60 * 1000)
   private def interval(s: Schedule) =
     new org.joda.time.Interval(s.at, endsAt(s))
-  private def overlaps(s: Schedule, ss: Seq[Schedule]) = ss exists {
+  private def overlaps(s: Schedule, ss: Seq[Schedule]) = ss.exists {
     case s2 if s.variant.exotic && s.sameVariant(s2) =>
-      interval(s) overlaps interval(s2)
+      interval(s).overlaps(interval(s2))
     case s2 if s.similarSpeed(s2) && s.sameVariant(s2) =>
-      interval(s) overlaps interval(s2)
+      interval(s).overlaps(interval(s2))
     case _ => false
   }
 
@@ -268,5 +267,6 @@ private[tournament] final class Scheduler(api: TournamentApi) extends Actor {
     new DateTime(year, month, day, 0, 0)
 
   private def at(day: DateTime, hour: Int, minute: Int = 0) =
-    day withHourOfDay hour withMinuteOfHour minute withSecondOfMinute 0 withMillisOfSecond 0
+    (day.withHourOfDay(hour) withMinuteOfHour minute withSecondOfMinute 0)
+      .withMillisOfSecond(0)
 }

@@ -159,8 +159,8 @@ class ScForStatementImpl(node: ASTNode)
           exprText.append("\n} ")
           if (isYield) exprText.append("yield ")
           body match {
-            case Some(x) => exprText append bodyToText(x)
-            case _ => exprText append "{}"
+            case Some(x) => exprText.append(bodyToText(x))
+            case _ => exprText.append("{}")
           }
         case gen2: ScGenerator =>
           exprText
@@ -187,8 +187,8 @@ class ScForStatementImpl(node: ASTNode)
           exprText.append("\n} ")
           if (isYield) exprText.append("yield ")
           body match {
-            case Some(x) => exprText append bodyToText(x)
-            case _ => exprText append "{}"
+            case Some(x) => exprText.append(bodyToText(x))
+            case _ => exprText.append("{}")
           }
           exprText.append("\n}")
         case enum: ScEnumerator =>
@@ -236,8 +236,8 @@ class ScForStatementImpl(node: ASTNode)
           exprText.append("\n} ")
           if (isYield) exprText.append("yield ")
           body match {
-            case Some(x) => exprText append bodyToText(x)
-            case _ => exprText append "{}"
+            case Some(x) => exprText.append(bodyToText(x))
+            case _ => exprText.append("{}")
           }
         case _ =>
       }

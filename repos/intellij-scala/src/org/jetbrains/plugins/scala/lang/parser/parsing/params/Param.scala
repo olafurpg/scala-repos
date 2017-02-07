@@ -43,13 +43,13 @@ object Param {
     builder.getTokenType match {
       case ScalaTokenTypes.tCOLON =>
         builder.advanceLexer() //Ate :
-        if (!ParamType.parse(builder)) builder error ErrMsg("wrong.type")
+        if (!ParamType.parse(builder)) builder.error(ErrMsg("wrong.type"))
       case _ =>
     }
     builder.getTokenType match {
       case ScalaTokenTypes.tASSIGN =>
         builder.advanceLexer() //Ate =
-        if (!Expr.parse(builder)) builder error ErrMsg("wrong.expression")
+        if (!Expr.parse(builder)) builder.error(ErrMsg("wrong.expression"))
       case _ =>
     }
     paramMarker.done(ScalaElementTypes.PARAM)

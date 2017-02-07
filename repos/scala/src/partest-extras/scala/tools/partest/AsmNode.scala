@@ -35,7 +35,7 @@ object AsmNode {
         (node.methods.asScala.toList
           .map(x => (x: AsmMethod)) ++ node.fields.asScala.toList.map(x =>
           (x: AsmField)))
-      xs sortBy (_.characteristics)
+      xs.sortBy(_.characteristics)
     }
   }
   implicit class AsmMethodNode(val node: MethodNode)

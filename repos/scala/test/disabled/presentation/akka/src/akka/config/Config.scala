@@ -29,7 +29,7 @@ object Config {
       case value => Some(value)
     }
 
-    envHome orElse systemHome
+    envHome.orElse(systemHome)
   }
 
   val config: Configuration = try {
@@ -44,7 +44,8 @@ object Config {
         case value => Some(value)
       }
 
-      (envConf orElse systemConf)
+      (envConf
+        .orElse(systemConf))
         .map("akka." + _ + ".conf")
         .getOrElse("akka.conf")
     }

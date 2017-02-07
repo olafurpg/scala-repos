@@ -25,7 +25,7 @@ object ImportSelectors extends ParserNode {
         builder.advanceLexer() //Ate {
         builder.enableNewlines
       case _ =>
-        builder error ErrMsg("lbrace.expected")
+        builder.error(ErrMsg("lbrace.expected"))
         importSelectorMarker.drop()
         return false
     }
@@ -33,7 +33,7 @@ object ImportSelectors extends ParserNode {
     while (true) {
       builder.getTokenType match {
         case ScalaTokenTypes.tRBRACE =>
-          builder error ErrMsg("import.selector.expected")
+          builder.error(ErrMsg("import.selector.expected"))
           builder.advanceLexer() //Ate }
           builder.restoreNewlinesState
           importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
@@ -56,7 +56,7 @@ object ImportSelectors extends ParserNode {
             }
           }
         case ScalaTokenTypes.tIDENTIFIER =>
-          ImportSelector parse builder
+          ImportSelector.parse(builder)
           builder.getTokenType match {
             case ScalaTokenTypes.tCOMMA => {
               builder.advanceLexer() //Ate ,
@@ -73,7 +73,7 @@ object ImportSelectors extends ParserNode {
               return true
             }
             case _ => {
-              builder error ErrMsg("rbrace.expected")
+              builder.error(ErrMsg("rbrace.expected"))
               builder.advanceLexer()
             }
           }
@@ -82,7 +82,7 @@ object ImportSelectors extends ParserNode {
           importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTORS)
           return true
         case _ =>
-          builder error ErrMsg("rbrace.expected")
+          builder.error(ErrMsg("rbrace.expected"))
           builder.advanceLexer()
       }
     }

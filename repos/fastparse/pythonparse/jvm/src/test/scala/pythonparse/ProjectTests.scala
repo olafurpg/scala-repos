@@ -49,7 +49,7 @@ object ProjectTests extends TestSuite {
       .groupBy(_._1)
       .mapValues(_.map(_._2))
     val selfParsed =
-      grouped(0) groupBy { x =>
+      grouped(0).groupBy { x =>
         print(".")
         pythonparse.Statements.file_input
           .parse(new String(Files.readAllBytes(Paths.get(x))))

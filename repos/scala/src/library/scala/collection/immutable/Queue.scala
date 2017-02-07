@@ -120,7 +120,7 @@ class Queue[+A] protected (protected val in: List[A],
     *  @param  iter        an iterable object
     */
   def enqueue[B >: A](iter: Iterable[B]) =
-    new Queue(iter.toList reverse_::: in, out)
+    new Queue(iter.toList.reverse_:::(in), out)
 
   /** Returns a tuple with the first element in the queue,
     *  and a new queue with this element removed.
@@ -166,7 +166,7 @@ object Queue extends SeqFactory[Queue] {
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Queue[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, Queue[A]] =
-    new ListBuffer[A] mapResult (x => new Queue[A](Nil, x.toList))
+    new ListBuffer[A].mapResult(x => new Queue[A](Nil, x.toList))
   override def empty[A]: Queue[A] = EmptyQueue.asInstanceOf[Queue[A]]
   override def apply[A](xs: A*): Queue[A] = new Queue[A](Nil, xs.toList)
 

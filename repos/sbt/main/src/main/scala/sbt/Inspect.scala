@@ -18,7 +18,7 @@ object Inspect {
 
   def parser: State => Parser[(Inspect.Mode, ScopedKey[_])] =
     (s: State) =>
-      spacedModeParser(s) flatMap {
+      spacedModeParser(s).flatMap {
         case opt @ (Uses | Definitions) =>
           allKeyParser(s).map(key => (opt, Def.ScopedKey(Global, key)))
         case opt @ (DependencyTree | Details(_)) =>
@@ -34,7 +34,7 @@ object Inspect {
 
   def allKeyParser(s: State): Parser[AttributeKey[_]] = {
     val keyMap = Project.structure(s).index.keyMap
-    token(Space ~> (ID !!! "Expected key" examples keyMap.keySet)) flatMap {
+    token(Space ~> ((ID !!! "Expected key").examples(keyMap.keySet))).flatMap {
       key =>
         Act.getKey(keyMap, key, idFun)
     }

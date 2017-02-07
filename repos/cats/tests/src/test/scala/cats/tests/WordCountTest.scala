@@ -37,9 +37,9 @@ class WordCountTest extends CatsSuite {
           y = !isSpace(c)
           _ <- set(y)
         } yield testIf(y && !x)
-      } andThen appFunc(liftInt)
+      }.andThen(appFunc(liftInt))
 
-    val countAll = countWord product countLine product countChar
+    val countAll = countWord.product(countLine).product(countChar)
     // Run all applicative functions at once
     val allResults = countAll.traverse(text)
     val wordCountState = allResults.first.first

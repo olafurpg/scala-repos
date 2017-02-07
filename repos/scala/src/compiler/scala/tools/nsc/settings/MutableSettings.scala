@@ -30,10 +30,10 @@ class MutableSettings(val errorFn: String => Unit)
   }
 
   def copyInto(settings: MutableSettings) {
-    allSettings foreach { thisSetting =>
+    allSettings.foreach { thisSetting =>
       val otherSetting =
         settings.allSettings find { _.name == thisSetting.name }
-      otherSetting foreach { otherSetting =>
+      otherSetting.foreach { otherSetting =>
         if (thisSetting.isSetByUser || otherSetting.isSetByUser) {
           otherSetting.value = thisSetting.value.asInstanceOf[otherSetting.T]
         }
@@ -74,7 +74,7 @@ class MutableSettings(val errorFn: String => Unit)
         case "" :: xs =>
           loop(xs, residualArgs)
         case x :: xs =>
-          if (x startsWith "-") {
+          if (x.startsWith("-")) {
             parseParams(args) match {
               case newArgs if newArgs eq args =>
                 errorFn(s"bad option: '$x'"); (false, args)
@@ -107,7 +107,7 @@ class MutableSettings(val errorFn: String => Unit)
   /** A list of settings which act based on prefix rather than an exact
     *  match.  This is basically -D and -J.
     */
-  lazy val prefixSettings = allSettings collect { case x: PrefixSetting => x }
+  lazy val prefixSettings = allSettings.collect { case x: PrefixSetting => x }
 
   /** Split the given line into parameters.
     */
@@ -140,13 +140,13 @@ class MutableSettings(val errorFn: String => Unit)
     // the entire arg is consumed, so return None for failure
     // any non-Nil return value means failure and we return s unmodified
     def parseColonArg(s: String): Option[List[String]] =
-      if (s endsWith ":") {
+      if (s.endsWith(":")) {
         clearIfExists(s.init)
       } else {
         for {
           (p, args) <- StringOps.splitWhere(s, _ == ':', doDropIndex = true)
           rest <- tryToSetIfExists(p,
-                                   (args split ",").toList,
+                                   (args.split(",")).toList,
                                    (s: Setting) => s.tryToSetColon _)
         } yield rest
       }
@@ -172,9 +172,9 @@ class MutableSettings(val errorFn: String => Unit)
           //
           // Internally we use Option[List[String]] to discover error,
           // but the outside expects our arguments back unchanged on failure
-          val prefix = prefixSettings find (_ respondsTo arg)
+          val prefix = prefixSettings find (_.respondsTo(arg))
           if (prefix.isDefined) {
-            prefix.get tryToSet args
+            prefix.get.tryToSet(args)
             rest
           } else if (arg contains ":")
             parseColonArg(arg) match {
@@ -203,8 +203,8 @@ class MutableSettings(val errorFn: String => Unit)
     * and boot classpaths in the same form as would be passed on the command line.*/
   def embeddedDefaults(loader: ClassLoader) {
     explicitParentLoader = Option(loader) // for the Interpreter parentClassLoader
-    getClasspath("app", loader) foreach { classpath.value = _ }
-    getClasspath("boot", loader) foreach { bootclasspath append _ }
+    getClasspath("app", loader).foreach { classpath.value = _ }
+    getClasspath("boot", loader).foreach { bootclasspath.append(_) }
   }
 
   /** The parent loader to use for the interpreter.*/
@@ -394,7 +394,7 @@ class MutableSettings(val errorFn: String => Unit)
             case _ => List(d.lookupPathUnchecked(srcPath, directory = false))
           }
         case None =>
-          (outputs filter (isBelow _).tupled) match {
+          (outputs.filter(isBelow _).tupled) match {
             case Nil => Nil
             case matches =>
               matches.map(_._1.lookupPathUnchecked(srcPath, directory = false))
@@ -458,8 +458,8 @@ class MutableSettings(val errorFn: String => Unit)
     // not stable values!
     val IntMin = Int.MinValue
     val IntMax = Int.MaxValue
-    def min = range map (_._1) getOrElse IntMin
-    def max = range map (_._2) getOrElse IntMax
+    def min = range.map(_._1).getOrElse(IntMin)
+    def max = range.map(_._2).getOrElse(IntMax)
 
     override def value_=(s: Int) =
       if (isInputValid(s)) super.value_=(s) else errorMsg()
@@ -482,7 +482,7 @@ class MutableSettings(val errorFn: String => Unit)
     assert(isInputValid(default))
 
     def parseArgument(x: String): Option[Int] = {
-      parser(x) orElse {
+      parser(x).orElse {
         try { Some(x.toInt) } catch { case _: NumberFormatException => None }
       }
     }
@@ -541,13 +541,13 @@ class MutableSettings(val errorFn: String => Unit)
     protected var v: T = Nil
 
     def tryToSet(args: List[String]) = args match {
-      case x :: xs if x startsWith prefix =>
+      case x :: xs if x.startsWith(prefix) =>
         v = v :+ x
         Some(xs)
       case _ =>
         None
     }
-    override def respondsTo(token: String) = token startsWith prefix
+    override def respondsTo(token: String) = token.startsWith(prefix)
     def unparse: List[String] = value
   }
 
@@ -721,15 +721,15 @@ class MutableSettings(val errorFn: String => Unit)
       errorFn(s"'$s' is not a valid choice for '$name'")
     private def isChoice(s: String) = (s == "_") || (choices contains pos(s))
 
-    private def pos(s: String) = s stripPrefix "-"
-    private def isPos(s: String) = !(s startsWith "-")
+    private def pos(s: String) = s.stripPrefix("-")
+    private def isPos(s: String) = !(s.startsWith("-"))
 
     override val choices: List[String] =
-      domain.values.toList map {
+      domain.values.toList.map {
         case ChoiceOrVal(name, _, _) => name
       }
 
-    def descriptions: List[String] = domain.values.toList map {
+    def descriptions: List[String] = domain.values.toList.map {
       case ChoiceOrVal(_, "", x :: xs) =>
         "Enables the options " + (x :: xs).map(_.name).mkString(", ")
       case ChoiceOrVal(_, descr, _) => descr
@@ -749,16 +749,16 @@ class MutableSettings(val errorFn: String => Unit)
         *
         * Note: by precondition, options in nays are not expanding, they can only be leaves.
         */
-      def expand(vs: domain.ValueSet): domain.ValueSet = vs flatMap {
+      def expand(vs: domain.ValueSet): domain.ValueSet = vs.flatMap {
         case c @ ChoiceOrVal(_, _, Nil) => domain.ValueSet(c)
         case ChoiceOrVal(_, _, others) => expand(domain.ValueSet(others: _*))
       }
 
       // yeas from _ or expansions are weak: an explicit nay will disable them
       val weakYeas =
-        if (sawAll) domain.values filter simple
-        else expand(yeas filterNot simple)
-      value = (yeas filter simple) | (weakYeas &~ nays)
+        if (sawAll) domain.values.filter(simple)
+        else expand(yeas.filterNot(simple))
+      value = (yeas.filter(simple)) | (weakYeas &~ nays)
     }
 
     /** Add a named choice to the multichoice value. */
@@ -769,10 +769,10 @@ class MutableSettings(val errorFn: String => Unit)
         sawAll = true
         compute()
       case _ if isPos(arg) =>
-        yeas += domain withName arg
+        yeas += domain.withName(arg)
         compute()
       case _ =>
-        val choice = domain withName pos(arg)
+        val choice = domain.withName(pos(arg))
         choice match {
           case ChoiceOrVal(_, _, _ :: _) =>
             errorFn(
@@ -814,11 +814,11 @@ class MutableSettings(val errorFn: String => Unit)
       // if no arg consumed, use defaults or error; otherwise, add what they added
       if (rest.size == args.size)
         default match {
-          case Some(defaults) => defaults foreach add
+          case Some(defaults) => defaults.foreach(add)
           case None =>
             errorFn(s"'$name' requires an option. See '$name:help'.")
         } else {
-        added foreach add
+        added.foreach(add)
       }
 
       Some(rest)
@@ -843,7 +843,7 @@ class MutableSettings(val errorFn: String => Unit)
       sawAll = false
       sawHelp = false
     }
-    def unparse: List[String] = value.toList map (s => s"$name:$s")
+    def unparse: List[String] = value.toList.map(s => s"$name:$s")
     def contains(s: String) =
       domain.values.find(_.toString == s).exists(value.contains)
   }
@@ -864,7 +864,7 @@ class MutableSettings(val errorFn: String => Unit)
     protected def tryToSetArgs(args: List[String], halting: Boolean) = {
       def loop(args: List[String]): List[String] = args match {
         case arg :: rest =>
-          if (halting && (arg startsWith "-")) args
+          if (halting && (arg.startsWith("-"))) args
           else { appendToValue(arg); loop(rest) }
         case Nil => Nil
       }
@@ -877,7 +877,7 @@ class MutableSettings(val errorFn: String => Unit)
       tryToSet(s.trim.split(',').toList) // used from ide
 
     def clear(): Unit = (v = Nil)
-    def unparse: List[String] = value map (name + ":" + _)
+    def unparse: List[String] = value.map(name + ":" + _)
     def contains(s: String) = value contains s
 
     withHelpSyntax(name + ":<" + arg + ">")
@@ -954,9 +954,8 @@ class MutableSettings(val errorFn: String => Unit)
         case i => (s.take(i).toInt, s.drop(i + 1).toInt)
       }
       val numsAndStrs =
-        t filter (_.nonEmpty) partition
-          (_ forall (ch => ch.isDigit || ch == '-'))
-      _numbs = numsAndStrs._1 map asRange
+        t.filter(_.nonEmpty).partition(_.forall(ch => ch.isDigit || ch == '-'))
+      _numbs = numsAndStrs._1.map(asRange)
       _names = numsAndStrs._2
       _v = t
     }
@@ -965,14 +964,13 @@ class MutableSettings(val errorFn: String => Unit)
     private def numericValues = _numbs
     private def stringValues = _names
     private def phaseIdTest(i: Int): Boolean =
-      numericValues exists
-        (_ match {
-          case (min, max) => min <= i && i <= max
-        })
+      numericValues.exists(_ match {
+        case (min, max) => min <= i && i <= max
+      })
 
     def tryToSet(args: List[String]) =
       if (default == "") errorAndValue("missing phase", None)
-      else tryToSetColon(List(default)) map (_ => args)
+      else tryToSetColon(List(default)).map(_ => args)
 
     override def tryToSetColon(args: List[String]) =
       try {
@@ -990,12 +988,12 @@ class MutableSettings(val errorFn: String => Unit)
     // true if our phase list contains "all", regardless of the incoming argument
     def contains(phName: String) = doAllPhases || containsName(phName)
     def containsName(phName: String) =
-      stringValues exists (phName startsWith _)
+      stringValues.exists(phName.startsWith(_))
     def containsId(phaseId: Int) = phaseIdTest(phaseId)
     def containsPhase(ph: Phase) = contains(ph.name) || containsId(ph.id)
 
     def doAllPhases = stringValues contains "all"
-    def unparse: List[String] = value map (name + ":" + _)
+    def unparse: List[String] = value.map(name + ":" + _)
 
     withHelpSyntax(
       if (default == "") name + ":<phases>"
@@ -1006,16 +1004,14 @@ class MutableSettings(val errorFn: String => Unit)
   /** Internal use - syntax enhancements. */
   protected class EnableSettings[T <: BooleanSetting](val s: T) {
     def enablingIfNotSetByUser(toEnable: List[BooleanSetting]): s.type =
-      s withPostSetHook
-        (_ =>
-           toEnable foreach
-             (sett => if (!sett.isSetByUser) sett.value = s.value))
+      s.withPostSetHook(_ =>
+        toEnable.foreach(sett => if (!sett.isSetByUser) sett.value = s.value))
     def enabling(toEnable: List[BooleanSetting]): s.type =
-      s withPostSetHook (_ => toEnable foreach (_.value = s.value))
+      s.withPostSetHook(_ => toEnable.foreach(_.value = s.value))
     def disabling(toDisable: List[BooleanSetting]): s.type =
-      s withPostSetHook (_ => toDisable foreach (_.value = !s.value))
+      s.withPostSetHook(_ => toDisable.foreach(_.value = !s.value))
     def andThen(f: s.T => Unit): s.type =
-      s withPostSetHook (setting => f(setting.value))
+      s.withPostSetHook(setting => f(setting.value))
   }
   import scala.language.implicitConversions
   protected implicit def installEnableSettings[T <: BooleanSetting](

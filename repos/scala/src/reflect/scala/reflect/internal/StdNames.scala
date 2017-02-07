@@ -71,13 +71,13 @@ trait StdNames { self: SymbolTable =>
           2 * marker.length - 32)
     )
     def toMD5(s: String, edge: Int): String = {
-      val prefix = s take edge
-      val suffix = s takeRight edge
+      val prefix = s.take(edge)
+      val suffix = s.takeRight(edge)
 
       val cs = s.toArray
       val bytes = Codec toUTF8 cs
-      md5 update bytes
-      val md5chars = (md5.digest() map (b => (b & 0xFF).toHexString)).mkString
+      md5.update(bytes)
+      val md5chars = (md5.digest().map(b => (b & 0xFF).toHexString)).mkString
 
       prefix + marker + md5chars + marker + suffix
     }
@@ -310,9 +310,9 @@ trait StdNames { self: SymbolTable =>
     final val scala_ : NameType = "scala"
 
     def dropSingletonName(name: Name): TypeName =
-      (name dropRight SINGLETON_SUFFIX.length).toTypeName
+      (name.dropRight(SINGLETON_SUFFIX.length)).toTypeName
     def singletonName(name: Name): TypeName =
-      (name append SINGLETON_SUFFIX).toTypeName
+      (name.append(SINGLETON_SUFFIX)).toTypeName
   }
 
   abstract class TermNames extends Keywords with TermNamesApi {
@@ -392,19 +392,19 @@ trait StdNames { self: SymbolTable =>
     def isConstructorName(name: Name) =
       name == CONSTRUCTOR || name == MIXIN_CONSTRUCTOR
     def isExceptionResultName(name: Name) =
-      name startsWith EXCEPTION_RESULT_PREFIX
-    def isLocalDummyName(name: Name) = name startsWith LOCALDUMMY_PREFIX
-    def isLocalName(name: Name) = name endsWith LOCAL_SUFFIX_STRING
+      name.startsWith(EXCEPTION_RESULT_PREFIX)
+    def isLocalDummyName(name: Name) = name.startsWith(LOCALDUMMY_PREFIX)
+    def isLocalName(name: Name) = name.endsWith(LOCAL_SUFFIX_STRING)
     def isLoopHeaderLabel(name: Name) =
-      (name startsWith WHILE_PREFIX) || (name startsWith DO_WHILE_PREFIX)
-    def isProtectedAccessorName(name: Name) = name startsWith PROTECTED_PREFIX
+      (name.startsWith(WHILE_PREFIX)) || (name.startsWith(DO_WHILE_PREFIX))
+    def isProtectedAccessorName(name: Name) = name.startsWith(PROTECTED_PREFIX)
     def isReplWrapperName(name: Name) =
       name containsName INTERPRETER_IMPORT_WRAPPER
-    def isSetterName(name: Name) = name endsWith SETTER_SUFFIX
+    def isSetterName(name: Name) = name.endsWith(SETTER_SUFFIX)
     def isTraitSetterName(name: Name) =
       isSetterName(name) && (name containsName TRAIT_SETTER_SEPARATOR_STRING)
-    def isSingletonName(name: Name) = name endsWith SINGLETON_SUFFIX
-    def isModuleName(name: Name) = name endsWith MODULE_SUFFIX_NAME
+    def isSingletonName(name: Name) = name.endsWith(SINGLETON_SUFFIX)
+    def isModuleName(name: Name) = name.endsWith(MODULE_SUFFIX_NAME)
 
     /** Is name a variable name? */
     def isVariableName(name: Name): Boolean = {
@@ -441,7 +441,7 @@ trait StdNames { self: SymbolTable =>
       *  part of the string after that; but if the string is "$$$" or longer,
       *  be sure to retain the extra dollars.
       */
-    def unexpandedName(name: Name): Name = name lastIndexOf "$$" match {
+    def unexpandedName(name: Name): Name = name.lastIndexOf("$$") match {
       case 0 | -1 => name
       case idx0 =>
         // Sketchville - We've found $$ but if it's part of $$$ or $$$$
@@ -449,7 +449,7 @@ trait StdNames { self: SymbolTable =>
         // has an original name of $outer.
         var idx = idx0
         while (idx > 0 && name.charAt(idx - 1) == '$') idx -= 1
-        name drop idx + 2
+        name.drop(idx + 2)
     }
 
     @deprecated("Use unexpandedName", "2.11.0")
@@ -474,7 +474,7 @@ trait StdNames { self: SymbolTable =>
       */
     def unspecializedName(name: Name): Name =
       (// DUPLICATED LOGIC WITH `splitSpecializedName`
-      if (name endsWith SPECIALIZED_SUFFIX)
+      if (name.endsWith(SPECIALIZED_SUFFIX))
         name.subName(0, name.lastIndexOf('m') - 1)
       else name)
 
@@ -491,10 +491,10 @@ trait StdNames { self: SymbolTable =>
       */
     def splitSpecializedName(name: Name): (Name, String, String) =
       // DUPLICATED LOGIC WITH `unspecializedName`
-      if (name endsWith SPECIALIZED_SUFFIX) {
-        val name1 = name dropRight SPECIALIZED_SUFFIX.length
-        val idxC = name1 lastIndexOf 'c'
-        val idxM = name1 lastIndexOf 'm'
+      if (name.endsWith(SPECIALIZED_SUFFIX)) {
+        val name1 = name.dropRight(SPECIALIZED_SUFFIX.length)
+        val idxC = name1.lastIndexOf('c')
+        val idxM = name1.lastIndexOf('m')
 
         (name1.subName(0, idxM - 1),
          name1.subName(idxC + 1, name1.length).toString,
@@ -507,11 +507,11 @@ trait StdNames { self: SymbolTable =>
        else name + DEFAULT_GETTER_STRING + pos)
     // Nominally, name from name$default$N, CONSTRUCTOR for <init>
     def defaultGetterToMethod(name: Name): TermName =
-      (if (name startsWith DEFAULT_GETTER_INIT_STRING) nme.CONSTRUCTOR
+      (if (name.startsWith(DEFAULT_GETTER_INIT_STRING)) nme.CONSTRUCTOR
        else
          name indexOf DEFAULT_GETTER_STRING match {
            case -1 => name.toTermName
-           case idx => name.toTermName take idx
+           case idx => name.toTermName.take(idx)
          })
 
     def localDummyName(clazz: Symbol): TermName =
@@ -904,7 +904,10 @@ trait StdNames { self: SymbolTable =>
     val toInteger: NameType = "toInteger"
 
     def newLazyValSlowComputeName(lzyValName: Name) =
-      (lzyValName stripSuffix MODULE_VAR_SUFFIX append LAZY_SLOW_SUFFIX).toTermName
+      (lzyValName
+        .stripSuffix(MODULE_VAR_SUFFIX)
+        .append(LAZY_SLOW_SUFFIX))
+        .toTermName
 
     // ASCII names for operators
     val ADD = encode("+")
@@ -1059,13 +1062,13 @@ trait StdNames { self: SymbolTable =>
         // otherwise, we can tell based on whether '#' or '.' is the following char.
         case idx =>
           val (simple, div, rest) =
-            (name take idx, name charAt idx, name drop idx + 1)
+            (name.take(idx), name.charAt(idx), name.drop(idx + 1))
           mkName(simple, div == '.') :: segments(rest, assumeTerm)
       }
     }
 
     def newBitmapName(bitmapPrefix: Name, n: Int) =
-      bitmapPrefix append ("" + n)
+      bitmapPrefix.append("" + n)
 
     val BITMAP_NORMAL: NameType =
       BITMAP_PREFIX +
@@ -1093,7 +1096,7 @@ trait StdNames { self: SymbolTable =>
   /** Java binary names, like scala/runtime/Nothing$.
     */
   object binarynme {
-    def toBinary(name: Name) = name mapName (_.replace('.', '/'))
+    def toBinary(name: Name) = name.mapName(_.replace('.', '/'))
 
     val RuntimeNothing = toBinary(fulltpnme.RuntimeNothing).toTypeName
     val RuntimeNull = toBinary(fulltpnme.RuntimeNull).toTypeName

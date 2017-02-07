@@ -31,12 +31,12 @@ object UserRepo {
     SumValue
   }
 
-  val normalize = User normalize _
+  val normalize = User.normalize(_)
 
   def all: Fu[List[User]] = $find.all
 
   def topNbGame(nb: Int): Fu[List[User]] =
-    $find($query(enabledSelect) sort ($sort desc "count.game"), nb)
+    $find($query(enabledSelect).sort($sort.desc("count.game")), nb)
 
   def byId(id: ID): Fu[Option[User]] = $find byId id
 
@@ -49,10 +49,10 @@ object UserRepo {
     $primitive.one(Json.obj(F.email -> email), "_id")(_.asOpt[String])
 
   def enabledByEmail(email: String): Fu[Option[User]] =
-    byEmail(email) map (_ filter (_.enabled))
+    byEmail(email).map(_.filter(_.enabled))
 
   def pair(x: Option[ID], y: Option[ID]): Fu[(Option[User], Option[User])] =
-    $find byIds List(x, y).flatten map { users =>
+    ($find byIds List(x, y).flatten).map { users =>
       x.??(xx => users.find(_.id == xx)) -> y.??(yy => users.find(_.id == yy))
     }
 
@@ -92,15 +92,16 @@ object UserRepo {
         _.flatMap { _.getAs[String]("_id") }
       }
 
-  def allSortToints(nb: Int) = $find($query.all sort ($sort desc F.toints), nb)
+  def allSortToints(nb: Int) = $find($query.all.sort($sort.desc(F.toints)), nb)
 
   def usernameById(id: ID) =
     $primitive.one($select(id), F.username)(_.asOpt[String])
 
   def usernamesByIds(ids: List[ID]) =
-    coll.distinct(
-      F.username,
-      BSONDocument("_id" -> BSONDocument("$in" -> ids)).some) map lila.db.BSON.asStrings
+    coll
+      .distinct(F.username,
+                BSONDocument("_id" -> BSONDocument("$in" -> ids)).some)
+      .map(lila.db.BSON.asStrings)
 
   def orderByGameCount(u1: String, u2: String): Fu[Option[(String, String)]] = {
     coll
@@ -109,19 +110,20 @@ object UserRepo {
         BSONDocument(s"${F.count}.game" -> true)
       )
       .cursor[BSONDocument]()
-      .collect[List]() map { docs =>
-      docs
-        .sortBy {
-          _.getAs[BSONDocument](F.count)
-            .flatMap(_.getAs[BSONNumberLike]("game"))
-            .??(_.toInt)
+      .collect[List]()
+      .map { docs =>
+        docs
+          .sortBy {
+            _.getAs[BSONDocument](F.count)
+              .flatMap(_.getAs[BSONNumberLike]("game"))
+              .??(_.toInt)
+          }
+          .map(_.getAs[String]("_id"))
+          .flatten match {
+          case List(u1, u2) => (u1, u2).some
+          case _ => none
         }
-        .map(_.getAs[String]("_id"))
-        .flatten match {
-        case List(u1, u2) => (u1, u2).some
-        case _ => none
       }
-    }
   }
 
   def firstGetsWhite(u1O: Option[String], u2O: Option[String]): Fu[Boolean] =
@@ -152,8 +154,8 @@ object UserRepo {
 
   def setPerfs(user: User, perfs: Perfs, prev: Perfs) = {
     val diff =
-      PerfType.all flatMap { pt =>
-        perfs(pt).nb != prev(pt).nb option {
+      PerfType.all.flatMap { pt =>
+        (perfs(pt).nb != prev(pt).nb).option {
           s"perfs.${pt.key}" -> Perf.perfBSONHandler.write(perfs(pt))
         }
       }
@@ -202,8 +204,8 @@ object UserRepo {
 
   val goodLadQuery = $query(goodLadSelect)
 
-  def sortPerfDesc(perf: String) = $sort desc s"perfs.$perf.gl.r"
-  val sortCreatedAtDesc = $sort desc F.createdAt
+  def sortPerfDesc(perf: String) = $sort.desc(s"perfs.$perf.gl.r")
+  val sortCreatedAtDesc = $sort.desc(F.createdAt)
 
   def incNbGames(id: ID,
                  rated: Boolean,
@@ -214,8 +216,8 @@ object UserRepo {
     val incs =
       List(
         "count.game".some,
-        rated option "count.rated",
-        ai option "count.ai",
+        rated.option("count.rated"),
+        ai.option("count.ai"),
         (result match {
           case -1 => "count.loss".some
           case 1 => "count.win".some
@@ -227,10 +229,10 @@ object UserRepo {
           case 1 => "count.winH".some
           case 0 => "count.drawH".some
           case _ => none
-        }) ifFalse ai
+        }).ifFalse(ai)
       ).flatten.map(_ -> 1) ::: List(
-        totalTime map (s"${F.playTime}.total" -> _),
-        tvTime map (s"${F.playTime}.tv" -> _)
+        totalTime.map(s"${F.playTime}.total" -> _),
+        tvTime.map(s"${F.playTime}.tv" -> _)
       ).flatten
 
     $update($select(id), $incBson(incs: _*))
@@ -241,10 +243,10 @@ object UserRepo {
   def removeAllToints = $update($select.all, $unset("toints"), multi = true)
 
   def authenticateById(id: ID, password: String): Fu[Option[User]] =
-    checkPasswordById(id, password) flatMap { _ ?? ($find byId id) }
+    checkPasswordById(id, password).flatMap { _ ?? ($find byId id) }
 
   def authenticateByEmail(email: String, password: String): Fu[Option[User]] =
-    checkPasswordByEmail(email, password) flatMap { _ ?? byEmail(email) }
+    checkPasswordByEmail(email, password).flatMap { _ ?? byEmail(email) }
 
   private case class AuthData(password: String,
                               salt: String,
@@ -262,7 +264,7 @@ object UserRepo {
     private def defaults = Json.obj("sha512" -> false)
 
     lazy val reader =
-      (__.json update merge(defaults)) andThen Json.reads[AuthData]
+      (__.json.update(merge(defaults))).andThen(Json.reads[AuthData])
   }
 
   def checkPasswordById(id: ID, password: String): Fu[Boolean] =
@@ -275,8 +277,8 @@ object UserRepo {
     $projection.one(select,
                     Seq("password", "salt", "enabled", "sha512", "email")) {
       obj =>
-        (AuthData.reader reads obj).asOpt
-    } map {
+        (AuthData.reader.reads(obj)).asOpt
+    }.map {
       _ ?? (data => data.enabled && data.compare(password))
     }
 
@@ -288,7 +290,7 @@ object UserRepo {
              email: Option[String],
              blind: Boolean,
              mobileApiVersion: Option[Int]): Fu[Option[User]] =
-    !nameExists(username) flatMap {
+    !nameExists(username).flatMap {
       _ ?? {
         $insert.bson(newUser(username,
                              password,
@@ -299,20 +301,22 @@ object UserRepo {
     }
 
   def nameExists(username: String): Fu[Boolean] = idExists(normalize(username))
-  def idExists(id: String): Fu[Boolean] = $count exists id
+  def idExists(id: String): Fu[Boolean] = $count.exists(id)
 
   def engineIds: Fu[Set[String]] =
-    coll.distinct("_id", BSONDocument("engine" -> true).some) map lila.db.BSON.asStringSet
+    coll
+      .distinct("_id", BSONDocument("engine" -> true).some)
+      .map(lila.db.BSON.asStringSet)
 
   def usernamesLike(username: String, max: Int = 10): Fu[List[String]] = {
     import java.util.regex.Matcher.quoteReplacement
     val escaped = """^([\w-]*).*$""".r
-      .replaceAllIn(normalize(username), m => quoteReplacement(m group 1))
+      .replaceAllIn(normalize(username), m => quoteReplacement(m.group(1)))
     val regex = "^" + escaped + ".*$"
     $primitive(
       $select.byId($regex(regex)) ++ enabledSelect,
       F.username,
-      _ sort $sort.desc("_id"),
+      _.sort($sort.desc("_id")),
       max.some
     )(_.asOpt[String])
   }
@@ -353,7 +357,7 @@ object UserRepo {
   )
 
   def passwd(id: ID, password: String): Funit =
-    $primitive.one($select(id), "salt")(_.asOpt[String]) flatMap {
+    $primitive.one($select(id), "salt")(_.asOpt[String]).flatMap {
       saltOption =>
         saltOption ?? { salt =>
           $update(
@@ -387,13 +391,15 @@ object UserRepo {
   }
 
   def recentlySeenNotKidIds(since: DateTime) =
-    coll.distinct("_id",
-                  BSONDocument(
-                    F.enabled -> true,
-                    "seenAt" -> BSONDocument("$gt" -> since),
-                    "count.game" -> BSONDocument("$gt" -> 9),
-                    "kid" -> BSONDocument("$ne" -> true)
-                  ).some) map lila.db.BSON.asStrings
+    coll
+      .distinct("_id",
+                BSONDocument(
+                  F.enabled -> true,
+                  "seenAt" -> BSONDocument("$gt" -> since),
+                  "count.game" -> BSONDocument("$gt" -> 9),
+                  "kid" -> BSONDocument("$ne" -> true)
+                ).some)
+      .map(lila.db.BSON.asStrings)
 
   def setLang(id: ID, lang: String) = $update.field(id, "lang", lang)
 
@@ -402,7 +408,7 @@ object UserRepo {
       .aggregate(Match(BSONDocument("_id" -> BSONDocument("$in" -> ids))),
                  List(Group(BSONNull)(F.toints -> SumField(F.toints))))
       .map(
-        _.documents.headOption flatMap { _.getAs[Int](F.toints) }
+        _.documents.headOption.flatMap { _.getAs[Int](F.toints) }
       )
       .map(~_)
 

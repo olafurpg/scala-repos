@@ -25,7 +25,7 @@ class PartialFunctionSerializationTest {
 
   @Test def canSerializeLifted = assertSerializable(pf1.lift)
 
-  @Test def canSerializeOrElse = assertSerializable(pf1 orElse pf2)
+  @Test def canSerializeOrElse = assertSerializable(pf1.orElse(pf2))
 
   @Test def canSerializeUnlifted =
     assertSerializable(Function.unlift((x: Int) => Some(x)))

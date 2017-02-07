@@ -167,7 +167,7 @@ class ScParameterizedType private (val designator: ScType,
         //res = res bindT ((p1.name, p1.getId), p2)
       }
       val subst = new ScSubstitutor(builder.result(), Map.empty, None)
-      initial followed subst
+      initial.followed(subst)
     }
     designator match {
       case ScTypeParameterType(_, args, _, _, _) =>
@@ -331,7 +331,7 @@ class ScParameterizedType private (val designator: ScType,
         val result = clazz.getType(TypingContext.empty)
         result match {
           case Success(t, _) =>
-            val substituted = (sub followed substitutor).subst(t)
+            val substituted = (sub.followed(substitutor)).subst(t)
             substituted match {
               case pt: ScParameterizedType =>
                 Some((clazz, pt.typeArgs))
@@ -363,7 +363,7 @@ class ScParameterizedType private (val designator: ScType,
 
   override def equals(other: Any): Boolean = other match {
     case that: ScParameterizedType =>
-      (that canEqual this) && designator == that.designator &&
+      (that.canEqual(this)) && designator == that.designator &&
         typeArgs == that.typeArgs
     case _ => false
   }

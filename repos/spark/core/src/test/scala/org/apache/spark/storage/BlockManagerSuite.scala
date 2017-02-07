@@ -304,15 +304,15 @@ class BlockManagerSuite
 
     eventually(timeout(1000 milliseconds), interval(10 milliseconds)) {
       assert(!store.hasLocalBlock("a1-to-remove"))
-      master.getLocations("a1-to-remove") should have size 0
+      (master.getLocations("a1-to-remove") should have).size(0)
     }
     eventually(timeout(1000 milliseconds), interval(10 milliseconds)) {
       assert(!store.hasLocalBlock("a2-to-remove"))
-      master.getLocations("a2-to-remove") should have size 0
+      (master.getLocations("a2-to-remove") should have).size(0)
     }
     eventually(timeout(1000 milliseconds), interval(10 milliseconds)) {
       assert(store.hasLocalBlock("a3-to-remove"))
-      master.getLocations("a3-to-remove") should have size 0
+      (master.getLocations("a3-to-remove") should have).size(0)
     }
     eventually(timeout(1000 milliseconds), interval(10 milliseconds)) {
       val memStatus = master.getMemoryStatus.head._2
@@ -334,24 +334,24 @@ class BlockManagerSuite
 
     eventually(timeout(1000 milliseconds), interval(10 milliseconds)) {
       store.getSingleAndReleaseLock(rdd(0, 0)) should be(None)
-      master.getLocations(rdd(0, 0)) should have size 0
+      (master.getLocations(rdd(0, 0)) should have).size(0)
     }
     eventually(timeout(1000 milliseconds), interval(10 milliseconds)) {
       store.getSingleAndReleaseLock(rdd(0, 1)) should be(None)
-      master.getLocations(rdd(0, 1)) should have size 0
+      (master.getLocations(rdd(0, 1)) should have).size(0)
     }
     eventually(timeout(1000 milliseconds), interval(10 milliseconds)) {
       store.getSingleAndReleaseLock("nonrddblock") should not be (None)
-      master.getLocations("nonrddblock") should have size (1)
+      (master.getLocations("nonrddblock") should have).size(1)
     }
 
     store.putSingle(rdd(0, 0), a1, StorageLevel.MEMORY_ONLY)
     store.putSingle(rdd(0, 1), a2, StorageLevel.MEMORY_ONLY)
     master.removeRdd(0, blocking = true)
     store.getSingleAndReleaseLock(rdd(0, 0)) should be(None)
-    master.getLocations(rdd(0, 0)) should have size 0
+    (master.getLocations(rdd(0, 0)) should have).size(0)
     store.getSingleAndReleaseLock(rdd(0, 1)) should be(None)
-    master.getLocations(rdd(0, 1)) should have size 0
+    (master.getLocations(rdd(0, 1)) should have).size(0)
   }
 
   test("removing broadcast") {

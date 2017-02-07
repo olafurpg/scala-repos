@@ -29,7 +29,9 @@ trait FlatMapLaws[F[_]] extends ApplyLaws[F] {
                                        h: C => F[D],
                                        a: A): IsEq[F[D]] = {
     val (kf, kg, kh) = (Kleisli(f), Kleisli(g), Kleisli(h))
-    ((kf andThen kg) andThen kh).run(a) <-> (kf andThen (kg andThen kh)).run(a)
+    ((kf.andThen(kg)).andThen(kh)).run(a) <-> (kf
+      .andThen(kg.andThen(kh)))
+      .run(a)
   }
 }
 

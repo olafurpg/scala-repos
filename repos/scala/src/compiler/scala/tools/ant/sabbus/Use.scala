@@ -47,12 +47,14 @@ class Use extends ScalaMatchingTask {
     mapper.setTo("*.class")
     mapper.setFrom("*.scala")
     val includedFiles: Array[File] =
-      new SourceFileScanner(this).restrict(
-        getDirectoryScanner(sourceDir.get).getIncludedFiles,
-        sourceDir.get,
-        compiler.settings.d,
-        mapper
-      ) map (new File(sourceDir.get, _))
+      new SourceFileScanner(this)
+        .restrict(
+          getDirectoryScanner(sourceDir.get).getIncludedFiles,
+          sourceDir.get,
+          compiler.settings.d,
+          mapper
+        )
+        .map(new File(sourceDir.get, _))
     if (includedFiles.length > 0)
       try {
         log(

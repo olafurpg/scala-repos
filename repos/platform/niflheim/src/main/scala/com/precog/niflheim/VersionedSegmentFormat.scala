@@ -57,29 +57,35 @@ case class VersionedSegmentFormat(formats: Map[Int, SegmentFormat])
   object reader extends SegmentReader {
     def readSegmentId(
         channel: ReadableByteChannel): Validation[IOException, SegmentId] = {
-      readVersion(channel) flatMap { version =>
-        formats get version map { format =>
-          format.reader.readSegmentId(channel)
-        } getOrElse {
-          Failure(
-            new IOException(
-              "Invalid version found. Expected one of %s, found %d." format
-                (formats.keys mkString ",", version)))
-        }
+      readVersion(channel).flatMap { version =>
+        formats
+          .get(version)
+          .map { format =>
+            format.reader.readSegmentId(channel)
+          }
+          .getOrElse {
+            Failure(
+              new IOException(
+                "Invalid version found. Expected one of %s, found %d."
+                  .format(formats.keys mkString ",", version)))
+          }
       }
     }
 
     def readSegment(
         channel: ReadableByteChannel): Validation[IOException, Segment] = {
-      readVersion(channel) flatMap { version =>
-        formats get version map { format =>
-          format.reader.readSegment(channel)
-        } getOrElse {
-          Failure(
-            new IOException(
-              "Invalid version found. Expected one of %s, found %d." format
-                (formats.keys mkString ",", version)))
-        }
+      readVersion(channel).flatMap { version =>
+        formats
+          .get(version)
+          .map { format =>
+            format.reader.readSegment(channel)
+          }
+          .getOrElse {
+            Failure(
+              new IOException(
+                "Invalid version found. Expected one of %s, found %d."
+                  .format(formats.keys mkString ",", version)))
+          }
       }
     }
   }

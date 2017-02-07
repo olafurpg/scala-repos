@@ -89,7 +89,7 @@ object XmlApiSpec extends Specification {
     // canNodeToResponse conversion
     def doSum(r: Req): LiftResponse = reduceOp(_ + _)(r)
     def doProduct(r: Req): LiftResponse = (reduceOp(_ * _)(r): Box[Node])
-    def doMax(r: Req): LiftResponse = (reduceOp(_ max _)(r): Box[NodeSeq])
+    def doMax(r: Req): LiftResponse = (reduceOp(_.max(_))(r): Box[NodeSeq])
     def doMin(r: Req): LiftResponse = (reduceOp(_ min _)(r): Box[Node])
     //def doMin (r : Req) : LiftResponse = (reduceOp(_ min _)(r) : Box[Seq[Node]])
   }

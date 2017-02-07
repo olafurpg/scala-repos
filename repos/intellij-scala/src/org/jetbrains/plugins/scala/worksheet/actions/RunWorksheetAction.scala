@@ -101,7 +101,7 @@ object RunWorksheetAction {
 
     psiFile match {
       case file: ScalaFile if file.isWorksheetFile =>
-        val viewer = WorksheetViewerInfo getViewer editor
+        val viewer = WorksheetViewerInfo.getViewer(editor)
 
         if (viewer != null) {
           ApplicationManager.getApplication.invokeAndWait(
@@ -139,7 +139,7 @@ object RunWorksheetAction {
           )
         }
 
-        if (WorksheetCompiler isMakeBeforeRun psiFile) {
+        if (WorksheetCompiler.isMakeBeforeRun(psiFile)) {
           CompilerManager
             .getInstance(project)
             .make(
@@ -167,7 +167,7 @@ object RunWorksheetAction {
     val params = createParameters(
       getModuleFor(file),
       mainClassName,
-      Option(project.getBaseDir) map (_.getPath) getOrElse "",
+      Option(project.getBaseDir).map(_.getPath).getOrElse(""),
       addToCp,
       "",
       virtualFile.getCanonicalPath) //todo extract default java options??
@@ -213,7 +213,7 @@ object RunWorksheetAction {
     params.getProgramParametersList addParametersString worksheetField
     if (!consoleArgs.isEmpty)
       params.getProgramParametersList addParametersString consoleArgs
-    params.getProgramParametersList prepend mainClassName //IMPORTANT! this must be first program argument
+    params.getProgramParametersList.prepend(mainClassName) //IMPORTANT! this must be first program argument
 
     params
   }
@@ -265,19 +265,25 @@ object RunWorksheetAction {
     vFile match {
       case _: VirtualFileWithId =>
         Option(
-          ProjectFileIndex.SERVICE getInstance project getModuleForFile vFile) getOrElse project.anyScalaModule
-          .map(_.module)
-          .orNull
+          ProjectFileIndex.SERVICE
+            .getInstance(project)
+            .getModuleForFile(vFile)).getOrElse(
+          project.anyScalaModule
+            .map(_.module)
+            .orNull)
       case _ => project.anyScalaModule.map(_.module).orNull
     }
   }
 
   def getModuleFor(file: PsiFile): Module =
-    WorksheetCompiler.getModuleForCpName(file) flatMap {
-      case name =>
-        scala.extensions.inReadAction {
-          Option(
-            ModuleManager getInstance file.getProject findModuleByName name)
-        }
-    } getOrElse getModuleFor(file.getVirtualFile, file.getProject)
+    WorksheetCompiler
+      .getModuleForCpName(file)
+      .flatMap {
+        case name =>
+          scala.extensions.inReadAction {
+            Option(
+              ModuleManager.getInstance(file.getProject) findModuleByName name)
+          }
+      }
+      .getOrElse(getModuleFor(file.getVirtualFile, file.getProject))
 }

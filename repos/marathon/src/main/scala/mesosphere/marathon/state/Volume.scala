@@ -102,9 +102,9 @@ case class DockerVolume(containerPath: String,
 object DockerVolume {
 
   implicit val validDockerVolume = validator[DockerVolume] { vol =>
-    vol.containerPath is notEmpty
-    vol.hostPath is notEmpty
-    vol.mode is oneOf(Mode.RW, Mode.RO)
+    vol.containerPath.is(notEmpty)
+    vol.hostPath.is(notEmpty)
+    vol.mode.is(oneOf(Mode.RW, Mode.RO))
   }
 }
 
@@ -125,12 +125,13 @@ case class PersistentVolume(containerPath: String,
 object PersistentVolume {
   import org.apache.mesos.Protos.Volume.Mode
   implicit val validPersistentVolume = validator[PersistentVolume] { vol =>
-    vol.containerPath is notEmpty
-    vol.persistent is valid
-    vol.mode is equalTo(Mode.RW)
+    vol.containerPath.is(notEmpty)
+    vol.persistent.is(valid)
+    vol.mode.is(equalTo(Mode.RW))
     //persistent volumes require those CLI parameters provided
-    vol is configValueSet("mesos_authentication_principal",
-                          "mesos_role",
-                          "mesos_authentication_secret_file")
+    vol.is(
+      configValueSet("mesos_authentication_principal",
+                     "mesos_role",
+                     "mesos_authentication_secret_file"))
   }
 }

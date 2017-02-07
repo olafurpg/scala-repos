@@ -47,7 +47,7 @@ trait DirectoryFileLookup[FileEntryType <: ClassRepClassPathEntry]
     }
     val prefix = PackageNameUtils.packagePrefix(inPackage)
     val entries =
-      nestedDirs map { file =>
+      nestedDirs.map { file =>
         PackageEntryImpl(prefix + file.getName)
       }
     entries
@@ -60,7 +60,7 @@ trait DirectoryFileLookup[FileEntryType <: ClassRepClassPathEntry]
       case Some(directory) => directory.listFiles(fileFilter)
     }
     val entries =
-      files map { file =>
+      files.map { file =>
         val wrappedFile = new scala.reflect.io.File(file)
         createFileEntry(new PlainFile(wrappedFile))
       }
@@ -106,7 +106,7 @@ case class DirectoryFlatClassPath(dir: File)
 
   override def findClass(
       className: String): Option[ClassRepresentation[AbstractFile]] =
-    findClassFile(className) map ClassFileEntryImpl
+    findClassFile(className).map(ClassFileEntryImpl)
 
   override def findClassFile(className: String): Option[AbstractFile] = {
     val relativePath = FileUtils.dirPath(className)
@@ -147,7 +147,7 @@ case class DirectoryFlatSourcePath(dir: File)
 
   override def findClass(
       className: String): Option[ClassRepresentation[AbstractFile]] = {
-    findSourceFile(className) map SourceFileEntryImpl
+    findSourceFile(className).map(SourceFileEntryImpl)
   }
 
   private def findSourceFile(className: String): Option[AbstractFile] = {

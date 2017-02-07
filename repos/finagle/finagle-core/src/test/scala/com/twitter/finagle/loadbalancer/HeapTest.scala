@@ -26,7 +26,7 @@ class HeapTest extends FunSuite {
     import h._
     import h.ops._
 
-    N to 1 by -1 foreach { i =>
+    (N to 1 by -1).foreach { i =>
       heap(N + 1 - i) = input(N - i)
       fixUp(heap, N + 1 - i)
       assert(isValid(heap, 1, N + 1 - i))
@@ -38,12 +38,12 @@ class HeapTest extends FunSuite {
     import h._
     import h.ops._
 
-    N to 1 by -1 foreach { i =>
+    (N to 1 by -1).foreach { i =>
       heap(N + 1 - i) = input(N - i)
       fixUp(heap, N + 1 - i)
       val copy = heap.clone()
       val ordered = new Array[Int](N + 1 - i)
-      0 until (N + 1 - i) foreach { j =>
+      (0 until (N + 1 - i)).foreach { j =>
         ordered(j) = copy(1)
         copy(1) = copy(N + 1 - i - j)
         fixDown(copy, 1, N + 1 - i - j)
@@ -58,20 +58,20 @@ class HeapTest extends FunSuite {
     import h._
     import h.ops._
 
-    N to 1 by -1 foreach { i =>
+    (N to 1 by -1).foreach { i =>
       heap(N + 1 - i) = input(N - i)
       indices(input(N - i)) = N + 1 - i
       val fixed = fixUp(heap, N + 1 - i)
-      1 to N + 1 - i foreach { j =>
+      (1 to N + 1 - i).foreach { j =>
         assert(indices(heap(j)) == j)
       }
     }
 
-    1 until N foreach { i =>
+    (1 until N).foreach { i =>
       heap(1) = heap(N - i + 1)
       indices(heap(1)) = 1
       fixDown(heap, 1, N - i)
-      1 to N - i foreach { j =>
+      (1 to N - i).foreach { j =>
         assert(indices(heap(j)) == j)
       }
     }

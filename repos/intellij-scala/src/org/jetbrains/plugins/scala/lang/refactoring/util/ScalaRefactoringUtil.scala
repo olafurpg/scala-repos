@@ -331,7 +331,7 @@ object ScalaRefactoringUtil {
                                                         classOf[ScExpression])
 
     if (element == null || element.getTextRange.getEndOffset != endOffset) {
-      return selectedInfixExpr() orElse partOfStringLiteral()
+      return selectedInfixExpr().orElse(partOfStringLiteral())
     }
 
     val cachedType = element.getType(TypingContext.empty).getOrAny
@@ -1254,8 +1254,9 @@ object ScalaRefactoringUtil {
       PsiTreeUtil
         .getParentOfType(elem, classOf[ScInterpolatedStringLiteral], false))
     val expr =
-      interpolated getOrElse PsiTreeUtil
-        .getParentOfType(elem, classOf[ScExpression], false)
+      interpolated.getOrElse(
+        PsiTreeUtil
+          .getParentOfType(elem, classOf[ScExpression], false))
     val nextPar = nextParent(expr, elem.getContainingFile)
     nextPar match {
       case prevExpr: ScExpression if !checkEnd(nextPar, expr) =>

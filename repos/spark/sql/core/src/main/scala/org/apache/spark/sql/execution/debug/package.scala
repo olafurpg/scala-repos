@@ -61,7 +61,7 @@ package object debug {
       val plan = query.queryExecution.executedPlan
       val visited = new collection.mutable.HashSet[TreeNodeRef]()
       val debugPlan =
-        plan transform {
+        plan.transform {
           case s: SparkPlan if !visited.contains(new TreeNodeRef(s)) =>
             visited += new TreeNodeRef(s)
             DebugNode(s)

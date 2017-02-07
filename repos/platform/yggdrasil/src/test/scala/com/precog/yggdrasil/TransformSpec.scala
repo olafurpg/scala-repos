@@ -185,12 +185,14 @@ trait TransformSpec[M[+ _]]
 
       val results = toJson(table.transform {
         Map1(DerefObjectStatic(Leaf(Source), CPathField("value")),
-             lookupF2(Nil, "mod").applyr(CLong(2)) andThen lookupF2(Nil, "eq")
-               .applyr(CLong(0)))
+             lookupF2(Nil, "mod")
+               .applyr(CLong(2))
+               .andThen(lookupF2(Nil, "eq")
+                 .applyr(CLong(0))))
       })
 
       val expected =
-        sample.data flatMap { jv =>
+        sample.data.flatMap { jv =>
           (jv \ "value") match {
             case JNum(x) if x % 2 == 0 => Some(JBool(true))
             case JNum(_) => Some(JBool(false))
@@ -243,14 +245,16 @@ trait TransformSpec[M[+ _]]
           Leaf(Source),
           Map1(
             DerefObjectStatic(Leaf(Source), CPathField("value")),
-            lookupF2(Nil, "mod").applyr(CLong(2)) andThen lookupF2(Nil, "eq")
-              .applyr(CLong(0))
+            lookupF2(Nil, "mod")
+              .applyr(CLong(2))
+              .andThen(lookupF2(Nil, "eq")
+                .applyr(CLong(0)))
           )
         )
       })
 
       val expected =
-        sample.data flatMap { jv =>
+        sample.data.flatMap { jv =>
           (jv \ "value") match {
             case JNum(x) if x % 2 == 0 => Some(jv)
             case _ => None
@@ -281,15 +285,17 @@ trait TransformSpec[M[+ _]]
     val table = fromSample(sample)
 
     val results = toJson(table.transform {
-      Filter(Leaf(Source),
-             Map1(DerefObjectStatic(Leaf(Source), CPathField("value")),
-                  lookupF2(Nil, "mod").applyr(CLong(2)) andThen lookupF2(
-                    Nil,
-                    "eq").applyr(CLong(0))))
+      Filter(
+        Leaf(Source),
+        Map1(DerefObjectStatic(Leaf(Source), CPathField("value")),
+             lookupF2(Nil, "mod")
+               .applyr(CLong(2))
+               .andThen(lookupF2(Nil, "eq").applyr(CLong(0))))
+      )
     })
 
     val expected =
-      data flatMap { jv =>
+      data.flatMap { jv =>
         (jv \ "value") match {
           case JNum(x) if x % 2 == 0 => Some(jv)
           case _ => None
@@ -325,12 +331,14 @@ trait TransformSpec[M[+ _]]
       })
 
       val expected =
-        sample.data.map { jv =>
-          jv(JPath(fieldHead))
-        } flatMap {
-          case JUndefined => None
-          case jv => Some(jv)
-        }
+        sample.data
+          .map { jv =>
+            jv(JPath(fieldHead))
+          }
+          .flatMap {
+            case JUndefined => None
+            case jv => Some(jv)
+          }
 
       results.copoint must_== expected
     }
@@ -350,12 +358,14 @@ trait TransformSpec[M[+ _]]
       })
 
       val expected =
-        sample.data.map { jv =>
-          jv(JPath(fieldHead))
-        } flatMap {
-          case JUndefined => None
-          case jv => Some(jv)
-        }
+        sample.data
+          .map { jv =>
+            jv(JPath(fieldHead))
+          }
+          .flatMap {
+            case JUndefined => None
+            case jv => Some(jv)
+          }
 
       results.copoint must_== expected
     }
@@ -379,7 +389,7 @@ trait TransformSpec[M[+ _]]
       })
 
       val expected =
-        sample.data flatMap { jv =>
+        sample.data.flatMap { jv =>
           ((jv \ "value" \ "value1"), (jv \ "value" \ "value2")) match {
             case (JNum(x), JNum(y)) if x == y => Some(JBool(true))
             case (JNum(x), JNum(y)) => Some(JBool(false))
@@ -409,7 +419,7 @@ trait TransformSpec[M[+ _]]
       })
 
       val expected =
-        sample.data flatMap { jv =>
+        sample.data.flatMap { jv =>
           ((jv \ "value" \ "value1"), (jv \ "value" \ "value2")) match {
             case (JNum(x), JNum(y)) => Some(JNum(x + y))
             case _ => None
@@ -512,7 +522,7 @@ trait TransformSpec[M[+ _]]
     val results = toJson(
       table.cross(table2)(
         InnerObjectConcat(wrappedIdentitySpec, wrappedValueSpec)))
-    val expected = (data map {
+    val expected = (data.map {
       case jo @ JObject(fields) if fields.contains("value") => {
         if (fields("value") == JArray(List(JNum(9), JNum(10), JNum(11))))
           JObject(fields - "value" + JField("value", JBool(true)))
@@ -558,7 +568,7 @@ trait TransformSpec[M[+ _]]
     })
 
     val expected =
-      data flatMap { jv =>
+      data.flatMap { jv =>
         ((jv \ "value" \ "value1"), (jv \ "value" \ "value2")) match {
           case (_, JUndefined) => None
           case (JUndefined, _) => None
@@ -600,7 +610,7 @@ trait TransformSpec[M[+ _]]
     })
 
     val expected =
-      data flatMap { jv =>
+      data.flatMap { jv =>
         ((jv \ "value" \ "value1"), (jv \ "value" \ "value2")) match {
           case (_, JUndefined) => None
           case (JUndefined, _) => None
@@ -645,7 +655,7 @@ trait TransformSpec[M[+ _]]
     })
 
     val expected =
-      data flatMap { jv =>
+      data.flatMap { jv =>
         ((jv \ "value" \ "value1"), (jv \ "value" \ "value2")) match {
           case (_, JUndefined) => None
           case (JUndefined, _) => None
@@ -684,7 +694,7 @@ trait TransformSpec[M[+ _]]
     })
 
     val expected =
-      data flatMap { jv =>
+      data.flatMap { jv =>
         ((jv \ "value" \ "value1"), (jv \ "value" \ "value2")) match {
           case (_, JUndefined) => None
           case (JUndefined, _) => None
@@ -707,7 +717,7 @@ trait TransformSpec[M[+ _]]
     })
 
     val expected =
-      sample.data flatMap { jv =>
+      sample.data.flatMap { jv =>
         ((jv \ "value" \ "value1"), (jv \ "value" \ "value2")) match {
           case (JUndefined, JUndefined) =>
             None
@@ -726,9 +736,9 @@ trait TransformSpec[M[+ _]]
     val genBase: Gen[SampleData] = sample(
       _ => Seq(JPath("value1") -> CLong, JPath("value2") -> CLong)).arbitrary
     implicit val gen: Arbitrary[SampleData] = Arbitrary {
-      genBase map { sd =>
+      genBase.map { sd =>
         SampleData(
-          sd.data.zipWithIndex map {
+          sd.data.zipWithIndex.map {
             case (jv, i) if i % 2 == 0 =>
               if (hasVal1Val2(jv)) {
                 jv.set(JPath(JPathField("value"), JPathField("value1")),
@@ -792,9 +802,9 @@ trait TransformSpec[M[+ _]]
     val genBase: Gen[SampleData] =
       sample(_ => Seq(JPath("value1") -> CLong)).arbitrary
     implicit val gen: Arbitrary[SampleData] = Arbitrary {
-      genBase map { sd =>
+      genBase.map { sd =>
         SampleData(
-          sd.data.zipWithIndex map {
+          sd.data.zipWithIndex.map {
             case (jv, i) if i % 2 == 0 =>
               if ((jv \? ".value.value1").nonEmpty) {
                 jv.set(JPath(JPathField("value"), JPathField("value1")),
@@ -828,7 +838,7 @@ trait TransformSpec[M[+ _]]
       })
 
       val expected =
-        sample.data flatMap { jv =>
+        sample.data.flatMap { jv =>
           jv \ "value" \ "value1" match {
             case JUndefined => None
             case x => Some(JBool(x == JNum(0)))
@@ -842,9 +852,9 @@ trait TransformSpec[M[+ _]]
     val genBase: Gen[SampleData] =
       sample(_ => Seq(JPath("value1") -> CLong)).arbitrary
     implicit val gen: Arbitrary[SampleData] = Arbitrary {
-      genBase map { sd =>
+      genBase.map { sd =>
         SampleData(
-          sd.data.zipWithIndex map {
+          sd.data.zipWithIndex.map {
             case (jv, i) if i % 2 == 0 =>
               if ((jv \? ".value.value1").nonEmpty) {
                 jv.set(JPath(JPathField("value"), JPathField("value1")),
@@ -878,7 +888,7 @@ trait TransformSpec[M[+ _]]
       })
 
       val expected =
-        sample.data flatMap { jv =>
+        sample.data.flatMap { jv =>
           jv \ "value" \ "value1" match {
             case JUndefined => None
             case x => Some(JBool(x != JNum(0)))
@@ -898,7 +908,7 @@ trait TransformSpec[M[+ _]]
       })
 
       val expected =
-        sample.data map { jv =>
+        sample.data.map { jv =>
           JObject(JField("foo", jv) :: Nil)
         }
 
@@ -1206,9 +1216,9 @@ trait TransformSpec[M[+ _]]
 
       def isOk(results: M[Stream[JValue]]) =
         results.copoint must_==
-          (sample.data flatMap {
+          (sample.data.flatMap {
             case JObject(fields) => {
-              val back = JObject(fields filter {
+              val back = JObject(fields.filter {
                 case (name, value) =>
                   name == "value" && value.isInstanceOf[JObject]
               })
@@ -1258,7 +1268,7 @@ trait TransformSpec[M[+ _]]
 
       def isOk(results: M[Stream[JValue]]) =
         results.copoint must_==
-          (sample.data map { _ \ "value" } collect {
+          (sample.data.map { _ \ "value" }.collect {
             case v
                 if (v \ "value1") != JUndefined && (v \ "value2") != JUndefined =>
               JObject(JField("value1", v \ "value2") :: Nil)
@@ -1281,7 +1291,7 @@ trait TransformSpec[M[+ _]]
                ConstLiteral(CBoolean(false), Leaf(Source))), // undefined
         "b"))
 
-    val results = toJson(table transform spec)
+    val results = toJson(table.transform(spec))
 
     results.copoint mustEqual Stream()
   }
@@ -1297,7 +1307,7 @@ trait TransformSpec[M[+ _]]
       array.concat(undefined) = array
       which is incorrect but is what the code currently does
         */
-      val sample = SampleData(sample0.data flatMap { jv =>
+      val sample = SampleData(sample0.data.flatMap { jv =>
         (jv \ "value") match {
           case JArray(x :: Nil) => None
           case z => Some(z)
@@ -1339,11 +1349,11 @@ trait TransformSpec[M[+ _]]
 
       def isOk(results: M[Stream[JValue]]) =
         results.copoint must_==
-          (sample.data flatMap {
+          (sample.data.flatMap {
             case obj @ JObject(fields) => {
               (obj \ "value") match {
                 case JArray(inner) if inner.length >= 2 =>
-                  Some(JObject(JField("value", JArray(inner take 2)) :: Nil))
+                  Some(JObject(JField("value", JArray(inner.take(2))) :: Nil))
 
                 case _ => None
               }
@@ -2039,7 +2049,7 @@ trait TransformSpec[M[+ _]]
   def testIsType(sample: SampleData) = {
     val (_, schema) = sample.schema.getOrElse(0 -> List())
     val cschema =
-      schema map { case (jpath, ctype) => ColumnRef(CPath(jpath), ctype) }
+      schema.map { case (jpath, ctype) => ColumnRef(CPath(jpath), ctype) }
 
     // using a generator with heterogeneous data, we're just going to produce
     // the jtype that chooses all of the elements of the non-random data.
@@ -2056,16 +2066,16 @@ trait TransformSpec[M[+ _]]
     val results = toJson(table.transform(IsType(Leaf(Source), jtpe)))
 
     val schemasSeq: Stream[Seq[JValue]] = toJson(table).copoint.map(Seq(_))
-    val schemas0 = schemasSeq map { inferSchema(_) }
+    val schemas0 = schemasSeq.map { inferSchema(_) }
     val schemas =
-      schemas0 map { _ map { case (jpath, ctype) => (CPath(jpath), ctype) } }
+      schemas0.map { _.map { case (jpath, ctype) => (CPath(jpath), ctype) } }
 
     val expected0 =
-      schemas map { schema =>
+      schemas.map { schema =>
         Schema.subsumes(schema, jtpe)
       }
     val expected =
-      expected0 map {
+      expected0.map {
         case true => JTrue
         case false => JFalse
         case _ => sys.error("impossible result")
@@ -2096,7 +2106,7 @@ trait TransformSpec[M[+ _]]
       })
 
       val expected =
-        sample.data flatMap { jv =>
+        sample.data.flatMap { jv =>
           val value1 = jv \ "value" \ "value1"
           val value3 = jv \ "value" \ "value3"
 
@@ -2120,7 +2130,7 @@ trait TransformSpec[M[+ _]]
   def testTyped(sample: SampleData) = {
     val (_, schema) = sample.schema.getOrElse(0 -> List())
     val cschema =
-      schema map { case (jpath, ctype) => ColumnRef(CPath(jpath), ctype) }
+      schema.map { case (jpath, ctype) => ColumnRef(CPath(jpath), ctype) }
 
     // using a generator with heterogeneous data, we're just going to produce
     // the jtype that chooses all of the elements of the non-random data.
@@ -2139,7 +2149,7 @@ trait TransformSpec[M[+ _]]
     val included = schema.groupBy(_._1).mapValues(_.map(_._2).toSet)
 
     val sampleSchema =
-      inferSchema(sample.data.toSeq) map {
+      inferSchema(sample.data.toSeq).map {
         case (jpath, ctype) => (CPath(jpath), ctype)
       }
     val subsumes: Boolean = Schema.subsumes(sampleSchema, jtpe)
@@ -2342,7 +2352,7 @@ trait TransformSpec[M[+ _]]
       JPath(List(JPathIndex(2))) -> Set(CNull))
 
     val sampleSchema =
-      inferSchema(data.toSeq) map {
+      inferSchema(data.toSeq).map {
         case (jpath, ctype) => (CPath(jpath), ctype)
       }
     val subsumes: Boolean = Schema.subsumes(sampleSchema, jtpe)
@@ -2385,7 +2395,7 @@ trait TransformSpec[M[+ _]]
     )
 
     val sampleSchema =
-      inferSchema(data.toSeq) map {
+      inferSchema(data.toSeq).map {
         case (jpath, ctype) => (CPath(jpath), ctype)
       }
     val subsumes: Boolean = Schema.subsumes(sampleSchema, jtpe)
@@ -2574,7 +2584,7 @@ trait TransformSpec[M[+ _]]
       this will never happen in the real system
       so the test ignores this case
         */
-      val sample = SampleData(sample0.data flatMap { jv =>
+      val sample = SampleData(sample0.data.flatMap { jv =>
         (jv \ "value") match {
           case JArray(x :: Nil) => None
           case JArray(x :: y :: Nil) => None
@@ -2587,7 +2597,7 @@ trait TransformSpec[M[+ _]]
       })
 
       val expected =
-        sample.data flatMap { jv =>
+        sample.data.flatMap { jv =>
           (jv \ "value") match {
             case JArray(x :: y :: z :: xs) => Some(JArray(z :: y :: x :: xs))
             case _ => None
@@ -2614,7 +2624,7 @@ trait TransformSpec[M[+ _]]
                          CPathField("field")))))
 
       val expected =
-        sample.data flatMap {
+        sample.data.flatMap {
           case jv if jv \ "value" \ "field" == JUndefined => None
           case _ => Some(JString("foo"))
         }
@@ -2627,19 +2637,19 @@ trait TransformSpec[M[+ _]]
     implicit val gen = sample(_ => Gen.value(Seq(JPath.Identity -> CLong)))
     check { (sample: SampleData) =>
       val table = fromSample(sample)
-      val results = toJson(table transform {
+      val results = toJson(table.transform {
         Cond(
           Map1(DerefObjectStatic(Leaf(Source), CPathField("value")),
-               lookupF2(Nil, "mod").applyr(CLong(2)) andThen lookupF2(
-                 Nil,
-                 "eq").applyr(CLong(0))),
+               lookupF2(Nil, "mod")
+                 .applyr(CLong(2))
+                 .andThen(lookupF2(Nil, "eq").applyr(CLong(0)))),
           DerefObjectStatic(Leaf(Source), CPathField("value")),
           ConstLiteral(CBoolean(false), Leaf(Source))
         )
       })
 
       val expected =
-        sample.data flatMap { jv =>
+        sample.data.flatMap { jv =>
           (jv \ "value") match {
             case jv @ JNum(x) => Some(if (x % 2 == 0) jv else JBool(false))
             case _ => None
@@ -2653,11 +2663,11 @@ trait TransformSpec[M[+ _]]
   def expectedResult(data: Stream[JValue],
                      included: Map[JPath, Set[CType]],
                      subsumes: Boolean): Stream[JValue] = {
-    data map { jv =>
+    data.map { jv =>
       val paths = jv.flattenWithPath.toMap.keys.toList
 
       val filtered =
-        jv.flattenWithPath filter {
+        jv.flattenWithPath.filter {
           case (JPath(JPathField("value"), tail @ _ *), leaf) =>
             included.get(JPath(tail: _*)).exists { ctpes =>
               leaf match {

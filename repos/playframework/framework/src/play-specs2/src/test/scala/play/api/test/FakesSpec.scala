@@ -48,7 +48,7 @@ object FakesSpec extends PlaySpecification {
         .routes {
           case (PUT, "/process") =>
             Action { req =>
-              Results.Ok(req.headers.get(CONTENT_TYPE) getOrElse "")
+              Results.Ok(req.headers.get(CONTENT_TYPE).getOrElse(""))
             }
         }
         .build()
@@ -61,8 +61,8 @@ object FakesSpec extends PlaySpecification {
         </foo>
       val bytes = ByteString(xml.toString, "utf-16le")
       val req = FakeRequest(PUT, "/process").withRawBody(bytes)
-      route(req) aka "response" must beSome.which { resp =>
-        contentAsString(resp) aka "content" must_== "application/octet-stream"
+      route(req).aka("response") must beSome.which { resp =>
+        contentAsString(resp).aka("content") must_== "application/octet-stream"
       }
     }
 
@@ -78,8 +78,8 @@ object FakesSpec extends PlaySpecification {
         .withHeaders(
           CONTENT_TYPE -> "text/xml;charset=utf-16le"
         )
-      route(req) aka "response" must beSome.which { resp =>
-        contentAsString(resp) aka "content" must_== "text/xml;charset=utf-16le"
+      route(req).aka("response") must beSome.which { resp =>
+        contentAsString(resp).aka("content") must_== "text/xml;charset=utf-16le"
       }
     }
 

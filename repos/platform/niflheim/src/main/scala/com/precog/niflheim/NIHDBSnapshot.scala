@@ -50,7 +50,7 @@ trait NIHDBSnapshot {
     if (readers.isEmpty) {
       None
     } else {
-      val i = id0.map(Arrays.binarySearch(blockIds, _)) getOrElse 0
+      val i = id0.map(Arrays.binarySearch(blockIds, _)).getOrElse(0)
       if (i >= 0) Some(readers(i)) else None
     }
   }
@@ -58,7 +58,7 @@ trait NIHDBSnapshot {
   protected[this] def findReaderAfter(
       id0: Option[Long]): Option[StorageReader] = {
     // be careful! the semantics of findReaderAfter are somewhat subtle
-    val i = id0.map(Arrays.binarySearch(blockIds, _)) getOrElse -1
+    val i = id0.map(Arrays.binarySearch(blockIds, _)).getOrElse(-1)
     val j = if (i < 0) -i - 1 else i + 1
     if (logger.isTraceEnabled) {
       logger.trace(
@@ -119,13 +119,15 @@ trait NIHDBSnapshot {
         .cardinality
 
     findReader(id).map { reader =>
-      paths0 map { paths =>
-        val constraints = getConstraints(reader.structure, paths)
-        val Block(_, cols, _) = reader.snapshot(Some(constraints.toSet))
-        countSegments(cols)
-      } getOrElse {
-        reader.length
-      }
+      paths0
+        .map { paths =>
+          val constraints = getConstraints(reader.structure, paths)
+          val Block(_, cols, _) = reader.snapshot(Some(constraints.toSet))
+          countSegments(cols)
+        }
+        .getOrElse {
+          reader.length
+        }
     }
   }
 
@@ -137,17 +139,25 @@ trait NIHDBSnapshot {
 
   def reduce[A](reduction: Reduction[A], path: CPath): Map[CType, A] = {
     blockIds.foldLeft(Map.empty[CType, A]) { (acc, id) =>
-      getBlock(Some(id), Some(Set(path))) map {
-        case Block(_, segments, _) =>
-          segments.foldLeft(acc) { (acc, segment) =>
-            reduction.reduce(segment, None) map { a =>
-              val key = segment.ctype
-              val value =
-                acc.get(key).map(reduction.semigroup.append(_, a)).getOrElse(a)
-              acc + (key -> value)
-            } getOrElse acc
-          }
-      } getOrElse acc
+      getBlock(Some(id), Some(Set(path)))
+        .map {
+          case Block(_, segments, _) =>
+            segments.foldLeft(acc) { (acc, segment) =>
+              reduction
+                .reduce(segment, None)
+                .map { a =>
+                  val key = segment.ctype
+                  val value =
+                    acc
+                      .get(key)
+                      .map(reduction.semigroup.append(_, a))
+                      .getOrElse(a)
+                  acc + (key -> value)
+                }
+                .getOrElse(acc)
+            }
+        }
+        .getOrElse(acc)
     }
   }
 }

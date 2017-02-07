@@ -68,10 +68,10 @@ trait Paginator[T] extends Loggable {
     * as the page numbers get further from the current page, they are more sparse.
     */
   def zoomedPages =
-    (List(curPage - 1020, curPage - 120, curPage - 20) ++
+    ((List(curPage - 1020, curPage - 120, curPage - 20) ++
       (curPage - 10 to curPage + 10) ++ List(curPage + 20,
                                              curPage + 120,
-                                             curPage + 1020)) filter { n =>
+                                             curPage + 1020))).filter { n =>
       n >= 0 && n < numPages
     }
 }
@@ -202,12 +202,12 @@ trait PaginatorSnippet[T] extends Paginator[T] {
   /**
     * Overrides the super's implementation so the first record can be overridden by a URL query parameter.
     */
-  override def first = S.param(offsetParam).map(toLong) openOr _first max 0
+  override def first = S.param(offsetParam).map(toLong).openOr(_first).max(0)
 
   /**
     * Sets the default starting record of the page (URL query parameters take precedence over this)
     */
-  def first_=(f: Long) = _first = f max 0 min (count - 1)
+  def first_=(f: Long) = _first = f.max(0) min (count - 1)
 
   /**
     * Returns a URL used to link to a page starting at the given record offset.
@@ -230,7 +230,7 @@ trait PaginatorSnippet[T] extends Paginator[T] {
     * Generates links to multiple pages with arbitrary XML delimiting them.
     */
   def pagesXml(pages: Seq[Int])(sep: NodeSeq): NodeSeq = {
-    pages.toList map { n =>
+    pages.toList.map { n =>
       pageXml(n * itemsPerPage, Text((n + 1).toString))
     } match {
       case one :: Nil => one
@@ -320,8 +320,8 @@ trait SortedPaginatorSnippet[T, C]
   override def sort = super.sort match {
     case (col, ascending) =>
       (
-        S.param("sort").map(toInt) openOr col,
-        S.param("asc").map(toBoolean) openOr ascending
+        S.param("sort").map(toInt).openOr(col),
+        S.param("asc").map(toBoolean).openOr(ascending)
       )
   }
 

@@ -100,7 +100,7 @@ class SymbolNamer(treeSymbolPrefix: String,
   }
 
   def get(s: Symbol): Option[String] =
-    map.get(s) orElse parent.flatMap(_.get(s))
+    map.get(s).orElse(parent.flatMap(_.get(s)))
 
   def apply(s: Symbol): String =
     get(s).getOrElse(s match {

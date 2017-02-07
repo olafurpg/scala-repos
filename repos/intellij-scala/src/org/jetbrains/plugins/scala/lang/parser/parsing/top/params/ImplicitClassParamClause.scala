@@ -34,18 +34,18 @@ object ImplicitClassParamClause {
             builder.advanceLexer //Ate implicit
           }
           case _ => {
-            builder error ErrMsg("wrong.parameter")
+            builder.error(ErrMsg("wrong.parameter"))
           }
         }
         //ok, let's parse parameters
-        if (!(ClassParam parse builder)) {
+        if (!(ClassParam.parse(builder))) {
           classParamMarker.rollbackTo
           builder.restoreNewlinesState
           return false
         }
         while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
           builder.advanceLexer //Ate ,
-          if (!(ClassParam parse builder)) {
+          if (!(ClassParam.parse(builder))) {
             classParamMarker.rollbackTo
             builder.restoreNewlinesState
             return false

@@ -30,10 +30,10 @@ final class Env(config: Config,
       system.lilaBus.subscribe(self, 'donation, 'deploy, 'slack)
     }
     def receive = {
-      case d: DonationEvent => api donation d
+      case d: DonationEvent => api.donation(d)
       case Deploy(RemindDeployPre, _) => api.deployPre
       case Deploy(RemindDeployPost, _) => api.deployPost
-      case e: Event => api publishEvent e
+      case e: Event => api.publishEvent(e)
     }
   }))
 }
@@ -41,7 +41,8 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "slack" boot new Env(system = lila.common.PlayApp.system,
-                         getLightUser = lila.user.Env.current.lightUser,
-                         config = lila.common.PlayApp loadConfig "slack")
+    "slack".boot(
+      new Env(system = lila.common.PlayApp.system,
+              getLightUser = lila.user.Env.current.lightUser,
+              config = lila.common.PlayApp.loadConfig("slack")))
 }

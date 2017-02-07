@@ -22,7 +22,7 @@ object TailChoppingSpec {
           case "times" ⇒ sender() ! times
           case x ⇒
             times += 1
-            Thread sleep sleepTime.toMillis
+            Thread.sleep(sleepTime.toMillis)
             sender ! "ack"
         }
       }),

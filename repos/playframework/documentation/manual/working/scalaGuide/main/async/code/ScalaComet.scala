@@ -25,7 +25,7 @@ object ScalaCometSpec extends PlaySpecification {
     def cometString = Action {
       implicit val m = materializer
       def stringSource: Source[String, _] = Source(List("kiki", "foo", "bar"))
-      Ok.chunked(stringSource via Comet.string("parent.cometMessage"))
+      Ok.chunked(stringSource.via(Comet.string("parent.cometMessage")))
         .as(ContentTypes.HTML)
     }
     //#comet-string
@@ -34,7 +34,7 @@ object ScalaCometSpec extends PlaySpecification {
     def cometJson = Action {
       implicit val m = materializer
       def jsonSource: Source[JsValue, _] = Source(List(JsString("jsonString")))
-      Ok.chunked(jsonSource via Comet.json("parent.cometMessage"))
+      Ok.chunked(jsonSource.via(Comet.json("parent.cometMessage")))
         .as(ContentTypes.HTML)
     }
     //#comet-json
@@ -45,7 +45,7 @@ object ScalaCometSpec extends PlaySpecification {
       val enum = Enumerator("one", "two", "three")
       val publisher = Streams.enumeratorToPublisher(enum)
       def stringSource: Source[String, _] = Source.fromPublisher(publisher)
-      Ok.chunked(stringSource via Comet.string("parent.cometMessage"))
+      Ok.chunked(stringSource.via(Comet.string("parent.cometMessage")))
         .as(ContentTypes.HTML)
     }
     //#comet-enumerator

@@ -232,9 +232,12 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
       ) {
         case _ =>
           Action { implicit req =>
-            CSRF.getToken(req).map { token =>
-              Results.Ok(token.value)
-            } getOrElse Results.NotFound
+            CSRF
+              .getToken(req)
+              .map { token =>
+                Results.Ok(token.value)
+              }
+              .getOrElse(Results.NotFound)
           }
       } {
         import play.api.Play.current

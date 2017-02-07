@@ -41,14 +41,14 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
   private[process] class OStreamBuilder(
       stream: => OutputStream,
       label: String
-  ) extends ThreadBuilder(label, _ writeInput protect(stream)) {
+  ) extends ThreadBuilder(label, _.writeInput(protect(stream))) {
     override def hasExitValue = false
   }
 
   private[process] class IStreamBuilder(
       stream: => InputStream,
       label: String
-  ) extends ThreadBuilder(label, _ processOutput protect(stream)) {
+  ) extends ThreadBuilder(label, _.processOutput(protect(stream))) {
     override def hasExitValue = false
   }
 
@@ -59,10 +59,10 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
 
     override def run(io: ProcessIO): Process = {
       val success = new SyncVar[Boolean]
-      success put false
+      success.put(false)
       val t = Spawn({
         runImpl(io)
-        success set true
+        success.set(true)
       }, io.daemonizeThreads)
 
       new ThreadProcess(t, success)
@@ -166,7 +166,7 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
     }
 
     private[this] def runBuffered(log: ProcessLogger, connectInput: Boolean) =
-      log buffer run(log, connectInput).exitValue()
+      log.buffer(run(log, connectInput).exitValue())
 
     def canPipeTo = false
     def hasExitValue = true

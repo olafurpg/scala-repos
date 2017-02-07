@@ -86,11 +86,11 @@ trait AST extends Phases {
   }
 
   def prettyPrint(e: Expr, level: Int = 0): String = {
-    val indent = 0 until level map Function.const(' ') mkString
+    val indent = (0 until level).map(Function.const(' ')) mkString
 
     val back = e match {
       case e @ Let(loc, id, params, left, right) => {
-        val paramStr = params map { indent + "  - " + _ } mkString "\n"
+        val paramStr = params.map { indent + "  - " + _ } mkString "\n"
 
         indent + "type: let\n" + indent + "id: " + id + "\n" + indent +
           "params:\n" + paramStr + "\n" + indent + "left:\n" +
@@ -100,7 +100,7 @@ trait AST extends Phases {
 
       case Solve(loc, constraints, child) => {
         val constraintsStr =
-          constraints map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
+          constraints.map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
 
         indent + "type: solve\n" + indent + "constraints:\n" +
           constraintsStr + "\n" + indent + "child:\n" + prettyPrint(child,
@@ -171,7 +171,7 @@ trait AST extends Phases {
 
       case ObjectDef(loc, props) => {
         val propStr =
-          props map {
+          props.map {
             case (name, value) => {
               indent + "  - \n" + indent + "    name: " + name + "\n" +
                 indent + "    value:\n" + prettyPrint(value, level + 6)
@@ -183,7 +183,7 @@ trait AST extends Phases {
 
       case ArrayDef(loc, values) => {
         val valStr =
-          values map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
+          values.map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
 
         indent + "type: array\n" + indent + "values:\n" + valStr
       }
@@ -209,7 +209,7 @@ trait AST extends Phases {
 
       case d @ Dispatch(loc, name, actuals) => {
         val actualsStr =
-          actuals map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
+          actuals.map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
 
         indent + "type: dispatch\n" + indent + "name: " + name + "\n" +
           indent + "actuals:\n" + actualsStr + "\n" + indent + "binding: " +
@@ -353,9 +353,11 @@ trait AST extends Phases {
     }
 
     val constraintStr =
-      e.constrainingExpr map { e =>
-        "\n" + indent + "constraining-expr: @" + e.nodeId
-      } getOrElse ""
+      e.constrainingExpr
+        .map { e =>
+          "\n" + indent + "constraining-expr: @" + e.nodeId
+        }
+        .getOrElse("")
 
     indent + "nodeId: " + e.nodeId + "\n" + indent + "line: " + e.loc.lineNum +
       "\n" + indent + "col: " + e.loc.colNum + "\n" + back + "\n" + indent +
@@ -381,9 +383,9 @@ trait AST extends Phases {
 
     e.root = root
 
-    e.productIterator foreach {
+    e.productIterator.foreach {
       case e: Expr => bindRoot(root, e)
-      case v: Vector[_] => v foreach bindElements
+      case v: Vector[_] => v.foreach(bindElements)
       case _ =>
     }
   }
@@ -465,7 +467,7 @@ trait AST extends Phases {
 
     override def toString: String = {
       val result =
-        productIterator map {
+        productIterator.map {
           case ls: LineStream => "<%d:%d>".format(ls.lineNum, ls.colNum)
           case x => x.toString
         }
@@ -484,7 +486,7 @@ trait AST extends Phases {
       case (Solve(_, constraints1, child1), Solve(_, constraints2, child2)) => {
         val sizing = constraints1.length == constraints2.length
         val contents =
-          constraints1 zip constraints2 forall {
+          constraints1.zip(constraints2).forall {
             case (e1, e2) => e1 equalsIgnoreLoc e2
           }
 
@@ -529,7 +531,7 @@ trait AST extends Phases {
         // TODO ordering
         val sizing = props1.length == props2.length
         val contents =
-          props1 zip props2 forall {
+          props1.zip(props2).forall {
             case ((key1, value1), (key2, value2)) =>
               (key1 == key2) && (value1 equalsIgnoreLoc value2)
           }
@@ -540,7 +542,7 @@ trait AST extends Phases {
       case (ArrayDef(_, values1), ArrayDef(_, values2)) => {
         val sizing = values1.length == values2.length
         val contents =
-          values1 zip values2 forall {
+          values1.zip(values2).forall {
             case (e1, e2) => e1 equalsIgnoreLoc e2
           }
 
@@ -563,7 +565,7 @@ trait AST extends Phases {
         val sizing = actuals1.length == actuals2.length
         val binding = d1.binding == d2.binding
         val contents =
-          actuals1 zip actuals2 forall {
+          actuals1.zip(actuals2).forall {
             case (e1, e2) => e1 equalsIgnoreLoc e2
           }
 
@@ -644,7 +646,7 @@ trait AST extends Phases {
           right.hashCodeIgnoreLoc
 
       case Solve(_, constraints, child) =>
-        (constraints map { _.hashCodeIgnoreLoc } sum) + child.hashCodeIgnoreLoc
+        (constraints.map { _.hashCodeIgnoreLoc } sum) + child.hashCodeIgnoreLoc
 
       case Import(_, spec, child) =>
         spec.hashCode + child.hashCodeIgnoreLoc
@@ -673,13 +675,13 @@ trait AST extends Phases {
       case NullLit(_) => "null".hashCode
 
       case ObjectDef(_, props) => {
-        props map {
+        props.map {
           case (key, value) => key.hashCode + value.hashCodeIgnoreLoc
         } sum
       }
 
       case ArrayDef(_, values) =>
-        values map { _.hashCodeIgnoreLoc } sum
+        values.map { _.hashCodeIgnoreLoc } sum
 
       case Descent(_, child, property) =>
         child.hashCodeIgnoreLoc + property.hashCode
@@ -692,7 +694,7 @@ trait AST extends Phases {
 
       case d @ Dispatch(_, name, actuals) =>
         name.hashCode + d.binding.hashCode +
-          (actuals map { _.hashCodeIgnoreLoc } sum)
+          (actuals.map { _.hashCodeIgnoreLoc } sum)
 
       case Cond(_, pred, left, right) =>
         "if".hashCode + pred.hashCodeIgnoreLoc + "then".hashCode +
@@ -874,7 +876,7 @@ trait AST extends Phases {
 
       lazy val substitutions: Map[Dispatch, Map[String, Expr]] = {
         dispatches.map({ dispatch =>
-          dispatch -> Map(params zip dispatch.actuals: _*)
+          dispatch -> Map(params.zip(dispatch.actuals): _*)
         })(collection.breakOut)
       }
 
@@ -899,9 +901,13 @@ trait AST extends Phases {
 
       def form =
         'solve ~
-          (constraints.init map { _ ~ 'comma } reduceOption { _ ~ _ } map {
-            _ ~ constraints.last ~ child
-          } getOrElse (constraints.last ~ child))
+          (constraints.init
+            .map { _ ~ 'comma }
+            .reduceOption { _ ~ _ }
+            .map {
+              _ ~ constraints.last ~ child
+            }
+            .getOrElse(constraints.last ~ child))
 
       def children = child +: constraints toList
 
@@ -909,7 +915,7 @@ trait AST extends Phases {
       def vars: Set[TicId] = _vars()
       private[quirrel] def vars_=(vars: Set[TicId]) = _vars() = vars
 
-      lazy val criticalConstraints = constraints filter {
+      lazy val criticalConstraints = constraints.filter {
         case TicVar(_, _) => false
         case _ => true
       } toSet
@@ -1004,13 +1010,13 @@ trait AST extends Phases {
         with NaryOp {
       val sym = 'object
 
-      def values = props map { _._2 }
+      def values = props.map { _._2 }
 
       def form = {
         val opt =
-          (props map { case (_, e) => 'name ~ e } reduceOption { _ ~ _ })
+          (props.map { case (_, e) => 'name ~ e }.reduceOption { _ ~ _ })
 
-        opt map { 'leftCurl ~ _ ~ 'rightCurl } getOrElse sym
+        opt.map { 'leftCurl ~ _ ~ 'rightCurl }.getOrElse(sym)
       }
 
       def children = values.toList
@@ -1022,9 +1028,9 @@ trait AST extends Phases {
       val sym = 'array
 
       def form = {
-        val opt = (values map { _ ~ 'comma } reduceOption { _ ~ _ })
+        val opt = (values.map { _ ~ 'comma }.reduceOption { _ ~ _ })
 
-        opt map { 'leftBracket ~ _ ~ 'rightBracket } getOrElse sym
+        opt.map { 'leftBracket ~ _ ~ 'rightBracket }.getOrElse(sym)
       }
 
       def children = values.toList
@@ -1074,9 +1080,9 @@ trait AST extends Phases {
       private[quirrel] def binding_=(b: NameBinding) = _binding() = b
 
       def form = {
-        val opt = (actuals map { _ ~ 'comma } reduceOption { _ ~ _ })
+        val opt = (actuals.map { _ ~ 'comma }.reduceOption { _ ~ _ })
 
-        opt map { sym ~ 'leftParen ~ _ ~ 'rightParen } getOrElse sym
+        opt.map { sym ~ 'leftParen ~ _ ~ 'rightParen }.getOrElse(sym)
       }
 
       def children = actuals.toList

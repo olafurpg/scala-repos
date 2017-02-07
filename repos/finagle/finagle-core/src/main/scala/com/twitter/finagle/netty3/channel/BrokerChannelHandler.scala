@@ -86,14 +86,14 @@ class BrokerChannelHandler extends SimpleChannelHandler {
     * Proxy further downstream events.
     */
   protected def proxyDownstream() {
-    downstreamEvent foreach { _.sendDownstream() }
+    downstreamEvent.foreach { _.sendDownstream() }
   }
 
   /**
     * Proxy further upstream events.
     */
   protected def proxyUpstream() {
-    upstreamEvent foreach { _.sendUpstream() }
+    upstreamEvent.foreach { _.sendUpstream() }
   }
 
   /**
@@ -124,9 +124,11 @@ class BrokerChannelHandler extends SimpleChannelHandler {
     // the channel handler process has died (eg. it threw an unhandled
     // exception).
     val of =
-      upstreamBroker.send(Exception(e, ctx)) orElse Offer.const {
-        super.exceptionCaught(ctx, e)
-      }
+      upstreamBroker
+        .send(Exception(e, ctx))
+        .orElse(Offer.const {
+          super.exceptionCaught(ctx, e)
+        })
     of.sync()
   }
 

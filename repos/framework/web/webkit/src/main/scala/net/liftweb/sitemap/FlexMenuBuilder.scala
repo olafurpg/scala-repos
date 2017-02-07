@@ -51,11 +51,13 @@ trait FlexMenuBuilder {
                                  currLoc: Box[Loc[_]],
                                  expandAll: Boolean): List[MenuItem] = {
     val isInPath =
-      currLoc.map { cur =>
-        def isInPath(loc: Loc[_]): Boolean =
-          (cur == loc) || loc.menu.kids.exists(k => isInPath(k.loc))
-        isInPath(loc)
-      } openOr false
+      currLoc
+        .map { cur =>
+          def isInPath(loc: Loc[_]): Boolean =
+            (cur == loc) || loc.menu.kids.exists(k => isInPath(k.loc))
+          isInPath(loc)
+        }
+        .openOr(false)
 
     val kids: List[MenuItem] =
       if (expandAll) loc.buildKidMenuItems(loc.menu.kids) else Nil
@@ -204,7 +206,7 @@ trait FlexMenuBuilder {
          sm <- LiftRules.siteMap;
          req <- S.request
        } yield sm.buildMenu(req.location).lines
-     else S.request.map(_.buildMenu.lines)) openOr Nil
+     else S.request.map(_.buildMenu.lines)).openOr(Nil)
 
   def render: NodeSeq = {
 

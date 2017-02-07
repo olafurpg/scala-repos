@@ -62,7 +62,7 @@ class LoggingReceive(source: Option[AnyRef],
     val handled = r.isDefinedAt(o)
     if (context.system.eventStream.logLevel >= Logging.DebugLevel) {
       val (str, clazz) = LogSource.fromAnyRef(
-        source getOrElse context.asInstanceOf[ActorCell].actor)
+        source.getOrElse(context.asInstanceOf[ActorCell].actor))
       context.system.eventStream.publish(
         Debug(str,
               clazz,

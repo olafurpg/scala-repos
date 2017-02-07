@@ -47,7 +47,7 @@ private[util] trait StackTracing extends Any {
 
     val seen = new ArrayBuffer[Throwable](16)
     def unseen(t: Throwable) = {
-      def inSeen = seen exists (_ eq t)
+      def inSeen = seen.exists(_ eq t)
       val interesting = (t != null) && !inSeen
       if (interesting) seen += t
       interesting
@@ -62,18 +62,18 @@ private[util] trait StackTracing extends Any {
         (if (share.nonEmpty) {
            val spare = share.reverseIterator
            val trimmed =
-             trace.reverse dropWhile (spare.hasNext && spare.next == _)
+             trace.reverse.dropWhile(spare.hasNext && spare.next == _)
            trimmed.reverse
          } else trace)
-      val prefix = frames takeWhile p
+      val prefix = frames.takeWhile(p)
       val margin = indent * indents
       val indented = margin + indent
-      sb append s"${margin}${r}${header(e)}"
-      prefix foreach (f => sb append s"${indented}at $f")
+      sb.append(s"${margin}${r}${header(e)}")
+      prefix.foreach(f => sb.append(s"${indented}at $f"))
       if (frames.size < trace.size)
-        sb append s"$indented... ${trace.size - frames.size} more"
+        sb.append(s"$indented... ${trace.size - frames.size} more")
       if (r == Self && prefix.size < frames.size)
-        sb append s"$indented... ${frames.size - prefix.size} elided"
+        sb.append(s"$indented... ${frames.size - prefix.size} elided")
       print(e.getCause, CausedBy, trace, indents)
       if (suppressable) {
         import scala.language.reflectiveCalls

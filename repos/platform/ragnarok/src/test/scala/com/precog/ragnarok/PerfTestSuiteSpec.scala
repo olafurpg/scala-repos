@@ -32,7 +32,7 @@ class PerfTestSuiteSpec extends Specification {
     def equal(a: Tree[A], b: Tree[A]): Boolean =
       Equal[A].equal(a.rootLabel, b.rootLabel) &&
         a.subForest.size == b.subForest.size &&
-        ((a.subForest zip b.subForest) forall (equal _).tupled)
+        ((a.subForest.zip(b.subForest)).forall(equal _).tupled)
   }
 
   object ex extends PerfTestSuite {
@@ -84,7 +84,7 @@ class PerfTestSuiteSpec extends Specification {
     }
 
     "faithfully reprsent the test suite" in {
-      ex.test.subForest must have size (1)
+      (ex.test.subForest must have).size(1)
 
       treeEq[PerfTest].equal(ex.test.subForest.head, exInnerTest) must beTrue
     }
@@ -104,7 +104,7 @@ class PerfTestSuiteSpec extends Specification {
 
   "the test selector" should {
     "select whole tree if root is true" in {
-      val t = ex select ((_, _) => true)
+      val t = ex.select((_, _) => true)
       t must beLike {
         case Some(t) =>
           treeEq[PerfTest].equal(t, ex.test) must beTrue
@@ -113,7 +113,7 @@ class PerfTestSuiteSpec extends Specification {
 
     "selecting multiple disjoint tests gives list" in {
       val ts =
-        ex select {
+        ex.select {
           case (_, _: RunQuery) => true
           case (_, _) => false
         }

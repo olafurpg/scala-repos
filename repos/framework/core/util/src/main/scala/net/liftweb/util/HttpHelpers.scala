@@ -605,7 +605,7 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
       case s => Some(Text(s.toString))
     }
 
-    value.map(v => new UnprefixedAttribute(in._1, v, Null)) getOrElse Null
+    value.map(v => new UnprefixedAttribute(in._1, v, Null)).getOrElse(Null)
   }
 
   /**

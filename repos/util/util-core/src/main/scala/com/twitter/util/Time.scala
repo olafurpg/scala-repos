@@ -229,10 +229,10 @@ trait TimeLike[This <: TimeLike[This]] extends Ordered[This] { self: This =>
   }
 
   def max(that: This): This =
-    if ((this compare that) < 0) that else this
+    if ((this.compare(that)) < 0) that else this
 
   def min(that: This): This =
-    if ((this compare that) < 0) this else that
+    if ((this.compare(that)) < 0) this else that
 
   def compare(that: This): Int =
     if ((that eq Top) || (that eq Undefined)) -1
@@ -244,7 +244,7 @@ trait TimeLike[This <: TimeLike[This]] extends Ordered[This] { self: This =>
   /** Equality within `maxDelta` */
   def moreOrLessEquals(other: This, maxDelta: Duration): Boolean =
     (other ne Undefined) &&
-      ((this == other) || (this diff other).abs <= maxDelta)
+      ((this == other) || (this.diff(other)).abs <= maxDelta)
 }
 
 /**

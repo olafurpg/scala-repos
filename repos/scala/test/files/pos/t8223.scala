@@ -24,10 +24,10 @@ package object p {
   def f2[R](xs: R)(implicit tc: Indexable[R]): SubAlias[tc.type] =
     new ViewEnv[tc.A]() get
 
-  def g0 = f0(Array(1)) has 2 // ok
-  def g1 = f1(Array(1)) has 2 // ok
-  def g2 = f2(Array(1)) has 2 // "found: Int(2), required: tc.A"
+  def g0 = f0(Array(1)).has(2) // ok
+  def g1 = f1(Array(1)).has(2) // ok
+  def g2 = f2(Array(1)).has(2) // "found: Int(2), required: tc.A"
   def g3 =
-    f2(Array(1))(new ArrayTC[Int]) has 2 // "found: Int(2), required: tc.A"
-  def g4 = f2(Array(1))(intArrayTC) has 2 // ok
+    f2(Array(1))(new ArrayTC[Int]).has(2) // "found: Int(2), required: tc.A"
+  def g4 = f2(Array(1))(intArrayTC).has(2) // ok
 }

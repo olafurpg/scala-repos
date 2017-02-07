@@ -63,7 +63,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -83,7 +83,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -103,7 +103,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -123,7 +123,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -139,7 +139,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -159,7 +159,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -179,7 +179,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -199,7 +199,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -219,7 +219,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -239,7 +239,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -259,7 +259,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -275,7 +275,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -298,7 +298,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -318,7 +318,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -338,7 +338,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -358,7 +358,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -374,7 +374,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -394,7 +394,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -414,7 +414,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -434,7 +434,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -454,7 +454,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -474,7 +474,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -494,7 +494,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -510,7 +510,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -534,7 +534,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -574,7 +574,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -611,7 +611,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -651,7 +651,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -690,7 +690,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -730,7 +730,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -770,7 +770,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -810,7 +810,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -850,7 +850,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -890,7 +890,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -930,7 +930,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -970,7 +970,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1013,7 +1013,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1039,7 +1039,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1065,7 +1065,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1091,7 +1091,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1117,7 +1117,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1145,7 +1145,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1173,7 +1173,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1201,7 +1201,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1229,7 +1229,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1257,7 +1257,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1283,7 +1283,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
@@ -1309,7 +1309,7 @@ trait TimeTruncationSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d
         }
 

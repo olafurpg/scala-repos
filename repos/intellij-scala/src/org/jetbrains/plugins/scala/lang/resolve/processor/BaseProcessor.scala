@@ -339,7 +339,8 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
       case proj @ ScProjectionType(des, elem, _) =>
         val s: ScSubstitutor =
           if (updateWithProjectionSubst)
-            new ScSubstitutor(Map.empty, Map.empty, Some(proj)) followed proj.actualSubst
+            new ScSubstitutor(Map.empty, Map.empty, Some(proj))
+              .followed(proj.actualSubst)
           else proj.actualSubst
         processElement(proj.actualElement,
                        s,
@@ -410,7 +411,7 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
       state.get(BaseProcessor.COMPOUND_TYPE_THIS_TYPE_KEY) //todo: looks like ugly workaround
     val newSubst = compound match {
       case Some(_) => subst
-      case _ => if (subst != null) subst followed s else s
+      case _ => if (subst != null) subst.followed(s) else s
     }
     e match {
       case ta: ScTypeAlias =>
@@ -438,7 +439,7 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         typeResult match {
           case Success(tp, _) =>
             processType(
-              newSubst subst tp,
+              newSubst.subst(tp),
               place,
               state.put(ScSubstitutor.key, ScSubstitutor.empty),
               updateWithProjectionSubst = false,

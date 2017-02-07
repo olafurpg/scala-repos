@@ -97,10 +97,12 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
                          abbreviate: Boolean,
                          untype: Boolean) = {
       def preprocess(tpe: Type) = if (untype) untypeMetalevel(tpe) else tpe
-      var pssPart = (pss map
-        (ps =>
-           ps map (p => p.defStringSeenAs(preprocess(p.info))) mkString
-             ("(", ", ", ")"))).mkString
+      var pssPart = (pss
+        .map(
+          ps =>
+            ps.map(p => p.defStringSeenAs(preprocess(p.info))) mkString
+              ("(", ", ", ")")))
+        .mkString
       if (abbreviate) pssPart = abbreviateCoreAliases(pssPart)
       var retPart = preprocess(restpe).toString
       if (abbreviate || macroDdef.tpt.tpe == null)
@@ -137,7 +139,7 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
       if (!ok) {
         if (!verbose) explainTypes(rtpe, atpe)
         val msg = {
-          val ss = Seq(rtpe, atpe) map (this abbreviateCoreAliases _.toString)
+          val ss = Seq(rtpe, atpe).map(this.abbreviateCoreAliases(_.toString))
           s"type mismatch for $slot: ${ss(0)} does not conform to ${ss(1)}"
         }
         compatibilityError(msg)
@@ -198,7 +200,7 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
 
     def MacroImplTparamInstantiationError(atparams: List[Symbol],
                                           e: NoInstance) = {
-      val badps = atparams map (_.defString) mkString ", "
+      val badps = atparams.map(_.defString) mkString ", "
       compatibilityError(
         f"type parameters $badps cannot be instantiated%n${e.getMessage}")
     }

@@ -177,7 +177,7 @@ trait OracleProfile extends JdbcProfile {
       case Library.Repeat(s, n) => b"RPAD($s, LENGTH($s)*$n, $s)"
       case Library.==(left: ProductNode, right: ProductNode) => //TODO
         b"\("
-        val cols = (left.children zip right.children).force
+        val cols = (left.children.zip(right.children)).force
         b.sep(cols, " and ") {
           case (l, r) => expr(Library.==.typed[Boolean](l, r))
         }
@@ -205,21 +205,24 @@ trait OracleProfile extends JdbcProfile {
     }
 
     override protected def addForeignKey(fk: ForeignKey, sb: StringBuilder) {
-      sb append "constraint " append quoteIdentifier(fk.name) append " foreign key("
+      sb.append("constraint ")
+        .append(quoteIdentifier(fk.name))
+        .append(" foreign key(")
       addForeignKeyColumnList(fk.linearizedSourceColumns, sb, table.tableName)
-      sb append ") references " append quoteIdentifier(
-        fk.targetTable.tableName) append "("
+      sb.append(") references ")
+        .append(quoteIdentifier(fk.targetTable.tableName))
+        .append("(")
       addForeignKeyColumnList(fk.linearizedTargetColumnsForOriginalTargetTable,
                               sb,
                               fk.targetTable.tableName)
-      sb append ')'
+      sb.append(')')
       fk.onDelete match {
-        case ForeignKeyAction.Cascade => sb append " on delete cascade"
-        case ForeignKeyAction.SetNull => sb append " on delete set null"
+        case ForeignKeyAction.Cascade => sb.append(" on delete cascade")
+        case ForeignKeyAction.SetNull => sb.append(" on delete set null")
         case _ => // do nothing
       }
       if (fk.onUpdate == ForeignKeyAction.Cascade)
-        sb append " initially deferred"
+        sb.append(" initially deferred")
     }
 
     override protected def createIndex(idx: Index) = {
@@ -229,11 +232,14 @@ trait OracleProfile extends JdbcProfile {
          * reference columns which have a UNIQUE INDEX but not a nominal UNIQUE
          * CONSTRAINT. */
         val sb =
-          new StringBuilder append "ALTER TABLE " append quoteIdentifier(
-            table.tableName) append " ADD "
-        sb append "CONSTRAINT " append quoteIdentifier(idx.name) append " UNIQUE("
+          new StringBuilder.append("ALTER TABLE ")
+            .append(quoteIdentifier(table.tableName))
+            .append(" ADD ")
+        sb.append("CONSTRAINT ")
+          .append(quoteIdentifier(idx.name))
+          .append(" UNIQUE(")
         addIndexColumnList(idx.on, sb, idx.table.tableName)
-        sb append ")"
+        sb.append(")")
         sb.toString
       } else super.createIndex(idx)
     }
@@ -246,18 +252,18 @@ trait OracleProfile extends JdbcProfile {
 
     override def appendColumn(sb: StringBuilder) {
       val qname = quoteIdentifier(column.name)
-      sb append qname append ' '
+      sb.append(qname).append(' ')
       appendType(sb)
       appendOptions(sb)
       if (jdbcType.isInstanceOf[JdbcTypes#BooleanJdbcType]) {
-        sb append " check (" append qname append " in (0, 1))"
+        sb.append(" check (").append(qname).append(" in (0, 1))")
       }
     }
 
     override protected def appendOptions(sb: StringBuilder) {
-      if (defaultLiteral ne null) sb append " DEFAULT " append defaultLiteral
-      if (notNull) sb append " NOT NULL"
-      if (primaryKey) sb append " PRIMARY KEY"
+      if (defaultLiteral ne null) sb.append(" DEFAULT ").append(defaultLiteral)
+      if (notNull) sb.append(" NOT NULL")
+      if (primaryKey) sb.append(" PRIMARY KEY")
     }
 
     override protected def handleColumnOption(o: ColumnOption[_]): Unit =
@@ -307,13 +313,13 @@ trait OracleProfile extends JdbcProfile {
       extends super.SequenceDDLBuilder(seq) {
     override def buildDDL: DDL = {
       val b =
-        new StringBuilder append "create sequence " append quoteIdentifier(
-          seq.name)
-      seq._increment.foreach { b append " increment by " append _ }
-      seq._minValue.foreach { b append " minvalue " append _ }
-      seq._maxValue.foreach { b append " maxvalue " append _ }
-      seq._start.foreach { b append " start with " append _ }
-      if (seq._cycle) b append " cycle nocache"
+        new StringBuilder.append("create sequence ")
+          .append(quoteIdentifier(seq.name))
+      seq._increment.foreach { b.append(" increment by ").append(_) }
+      seq._minValue.foreach { b.append(" minvalue ").append(_) }
+      seq._maxValue.foreach { b.append(" maxvalue ").append(_) }
+      seq._start.foreach { b.append(" start with ").append(_) }
+      if (seq._cycle) b.append(" cycle nocache")
       DDL(b.toString, "drop sequence " + quoteIdentifier(seq.name))
     }
   }

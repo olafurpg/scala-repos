@@ -15,7 +15,7 @@ private[finagle] class RefcountedService[Req, Rep](
 
   override def apply(request: Req) = {
     replyLatch.incr()
-    underlying(request) ensure { replyLatch.decr() }
+    underlying(request).ensure { replyLatch.decr() }
   }
 
   override final def close(deadline: Time): Future[Unit] = {

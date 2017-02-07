@@ -597,9 +597,8 @@ class ServerBuilder[Req, Rep, HasCodec, HasBindTo, HasName] private[builder] (
     val MonitorFactory(newMonitor) = params[MonitorFactory]
 
     val monitor =
-      newMonitor(lbl, InetSocketAddressUtil.toPublic(addr)) andThen new SourceTrackingMonitor(
-        logger,
-        label)
+      newMonitor(lbl, InetSocketAddressUtil.toPublic(addr))
+        .andThen(new SourceTrackingMonitor(logger, label))
 
     val serverParams =
       params + Monitor(monitor) + Reporter(NullReporterFactory)
@@ -613,7 +612,7 @@ class ServerBuilder[Req, Rep, HasCodec, HasBindTo, HasName] private[builder] (
 
       override protected def closeServer(deadline: Time): Future[Unit] =
         closeAwaitably {
-          listeningServer.close(deadline) ensure {
+          listeningServer.close(deadline).ensure {
             exitGuard.foreach(_.unguard())
           }
         }

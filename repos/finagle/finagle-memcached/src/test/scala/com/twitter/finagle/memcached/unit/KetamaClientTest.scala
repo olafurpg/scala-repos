@@ -50,7 +50,7 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
     // Build Ketama client
     def newMock() = {
       val s = mock[Service[Command, Response]]
-      when(s.close(any())) thenReturn Future.Done
+      when(s.close(any())).thenReturn(Future.Done)
       s
     }
     val clients = Map(
@@ -78,15 +78,15 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
       val expectedService = ipToService(testcase(3))
       val randomResponse = Number(rng.nextLong)
 
-      when(expectedService.apply(any[Incr])) thenReturn Future.value(
-        randomResponse)
+      when(expectedService.apply(any[Incr]))
+        .thenReturn(Future.value(randomResponse))
 
       assert(Await.result(mockClient.incr("foo")).get == randomResponse.value)
     }
 
     info("release")
     ketamaClient.release()
-    clients.values foreach { client =>
+    clients.values.foreach { client =>
       verify(client, times(1)).close(any())
     }
   }
@@ -116,7 +116,7 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
 
     // resolve the group: request proceeds
     verifyZeroInteractions(mockService)
-    when(mockService.apply(any[Incr])) thenReturn Future.value(Number(42))
+    when(mockService.apply(any[Incr])).thenReturn(Future.value(Number(42)))
     backends.update(scala.collection.immutable.Set(client1))
     assert(Await.result(r2).get == 42)
   }
@@ -137,8 +137,8 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
 
       val key = Buf.Utf8("foo")
       val value = mock[Value](RETURNS_SMART_NULLS)
-      when(value.key) thenReturn key
-      when(serviceA(any())) thenReturn Future.value(Values(Seq(value)))
+      when(value.key).thenReturn(key)
+      when(serviceA(any())).thenReturn(Future.value(Values(Seq(value))))
 
       val broker = new Broker[NodeHealth]
       def newService(node: CacheNode) = services.get(node).get
@@ -153,7 +153,8 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
 
     info("goes to secondary if primary is down")
     new KetamaClientBuilder {
-      when(serviceB(Get(Seq(key)))) thenReturn Future.value(Values(Seq(value)))
+      when(serviceB(Get(Seq(key))))
+        .thenReturn(Future.value(Values(Seq(value))))
       Await.result(ketamaClient.get("foo"))
       verify(serviceB, times(1)).apply(any())
     }
@@ -168,7 +169,7 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
 
     info("brings back the dead node")
     new KetamaClientBuilder {
-      when(serviceA(any())) thenReturn Future.value(Values(Seq(value)))
+      when(serviceA(any())).thenReturn(Future.value(Values(Seq(value))))
       broker !! NodeRevived(nodeKeyA)
       Await.result(ketamaClient.get("foo"))
       verify(serviceA, times(2)).apply(any())
@@ -178,12 +179,14 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
     info("primary leaves and rejoins")
     new KetamaClientBuilder {
       mutableGroup.update(immutable.Set(nodeB)) // nodeA leaves
-      when(serviceB(Get(Seq(key)))) thenReturn Future.value(Values(Seq(value)))
+      when(serviceB(Get(Seq(key))))
+        .thenReturn(Future.value(Values(Seq(value))))
       Await.result(ketamaClient.get("foo"))
       verify(serviceB, times(1)).apply(any())
 
       mutableGroup.update(immutable.Set(nodeA, nodeB)) // nodeA joins
-      when(serviceA(Get(Seq(key)))) thenReturn Future.value(Values(Seq(value)))
+      when(serviceA(Get(Seq(key))))
+        .thenReturn(Future.value(Values(Seq(value))))
       Await.result(ketamaClient.get("foo"))
       verify(serviceA, times(2)).apply(any())
     }

@@ -130,7 +130,7 @@ trait StateRules {
   def none = unit(None)
 
   /** Create a rule that identities if f(in) is true. */
-  def cond(f: S => Boolean) = get filter f
+  def cond(f: S => Boolean) = get.filter(f)
 
   /** Create a rule that succeeds if all of the given rules succeed.
       @param rules the rules to apply in sequence.

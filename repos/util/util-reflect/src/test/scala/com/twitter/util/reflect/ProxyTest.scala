@@ -195,7 +195,7 @@ class ProxyTest extends WordSpec {
       t2 should beLessThan(200L)
     }
      */
-    "maintains invocation speed" ignore {
+    "maintains invocation speed".ignore {
       val repTimes = 1500000
 
       val obj = new TestImpl

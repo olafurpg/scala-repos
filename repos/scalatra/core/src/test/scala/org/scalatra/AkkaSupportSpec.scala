@@ -56,7 +56,7 @@ class AkkaSupportServlet extends ScalatraServlet with FutureSupport {
   }
 
   asyncGet("/timeout") {
-    Thread.sleep((asyncTimeout plus 1.second).toMillis)
+    Thread.sleep((asyncTimeout.plus(1.second)).toMillis)
   }
 
   class FailException extends RuntimeException
@@ -82,7 +82,7 @@ class AkkaSupportServlet extends ScalatraServlet with FutureSupport {
   override protected def contentTypeInferrer =
     ({
       case "jpeg" => "image/jpeg"
-    }: ContentTypeInferrer) orElse super.contentTypeInferrer
+    }: ContentTypeInferrer).orElse(super.contentTypeInferrer)
 
   error {
     case e: FailException => "caught"

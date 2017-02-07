@@ -97,7 +97,7 @@ class MongoPasswordField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType,
   override def defaultValue = Password("")
 
   override def asJs =
-    valueBox.map(vb => Str(vb.pwd)) openOr Str(defaultValue.pwd)
+    valueBox.map(vb => Str(vb.pwd)).openOr(Str(defaultValue.pwd))
 
   def isMatch(toMatch: String): Boolean =
     MongoPasswordField.encrypt(toMatch, value.salt) == value.pwd

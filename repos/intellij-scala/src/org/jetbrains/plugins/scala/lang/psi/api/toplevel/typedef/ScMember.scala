@@ -204,10 +204,12 @@ trait ScMember
     def fromQualifiedPrivate(): Option[SearchScope] = {
       accessModifier
         .filter(am => am.isPrivate && am.getReference != null)
-        .map(_.scope) collect {
-        case p: PsiPackage => new PackageScope(p, true, true)
-        case td: ScTypeDefinition => ScalaPsiUtil.withCompanionSearchScope(td)
-      }
+        .map(_.scope)
+        .collect {
+          case p: PsiPackage => new PackageScope(p, true, true)
+          case td: ScTypeDefinition =>
+            ScalaPsiUtil.withCompanionSearchScope(td)
+        }
     }
 
     val fromModifierOrContext = this match {

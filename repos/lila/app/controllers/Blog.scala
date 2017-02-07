@@ -14,8 +14,8 @@ object Blog extends LilaController {
   import Prismic._
 
   def index(ref: Option[String]) = Open { implicit ctx =>
-    blogApi context ref flatMap { implicit prismic =>
-      blogApi.recent(prismic.api, ref, 50) flatMap {
+    blogApi.context(ref).flatMap { implicit prismic =>
+      blogApi.recent(prismic.api, ref, 50).flatMap {
         case Some(response) => fuccess(Ok(views.html.blog.index(response)))
         case _ => notFound
       }
@@ -24,27 +24,33 @@ object Blog extends LilaController {
 
   def show(id: String, slug: String, ref: Option[String]) = Open {
     implicit ctx =>
-      blogApi context ref flatMap { implicit prismic =>
-        blogApi.one(prismic.api, ref, id) flatMap { maybeDocument =>
-          checkSlug(maybeDocument, slug) {
-            case Left(newSlug) =>
-              MovedPermanently(routes.Blog.show(id, newSlug, ref).url)
-            case Right(doc) => Ok(views.html.blog.show(doc))
+      blogApi.context(ref).flatMap { implicit prismic =>
+        blogApi
+          .one(prismic.api, ref, id)
+          .flatMap { maybeDocument =>
+            checkSlug(maybeDocument, slug) {
+              case Left(newSlug) =>
+                MovedPermanently(routes.Blog.show(id, newSlug, ref).url)
+              case Right(doc) => Ok(views.html.blog.show(doc))
+            }
           }
-        } recoverWith {
-          case e: RuntimeException if e.getMessage contains "Not Found" =>
-            notFound
-        }
+          .recoverWith {
+            case e: RuntimeException if e.getMessage contains "Not Found" =>
+              notFound
+          }
       }
   }
 
   def atom(ref: Option[String]) = Action.async { implicit req =>
-    blogApi context ref flatMap { implicit prismic =>
-      blogApi.recent(prismic.api, ref, 50) map {
-        _ ?? (_.results)
-      } map { docs =>
-        Ok(views.xml.blog.atom(docs)) as XML
-      }
+    blogApi.context(ref).flatMap { implicit prismic =>
+      blogApi
+        .recent(prismic.api, ref, 50)
+        .map {
+          _ ?? (_.results)
+        }
+        .map { docs =>
+          Ok(views.xml.blog.atom(docs)).as(XML)
+        }
     }
   }
 
@@ -52,10 +58,12 @@ object Blog extends LilaController {
   private def checkSlug(document: Option[Document], slug: String)(
       callback: Either[String, Document] => Result)(
       implicit ctx: lila.api.Context) =
-    document.collect {
-      case document if document.slug == slug =>
-        fuccess(callback(Right(document)))
-      case document if document.slugs.contains(slug) =>
-        fuccess(callback(Left(document.slug)))
-    } getOrElse notFound
+    document
+      .collect {
+        case document if document.slug == slug =>
+          fuccess(callback(Right(document)))
+        case document if document.slugs.contains(slug) =>
+          fuccess(callback(Left(document.slug)))
+      }
+      .getOrElse(notFound)
 }

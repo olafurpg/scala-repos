@@ -25,7 +25,7 @@ class ComposeTests extends CatsSuite {
 
     implicit val alternativeListVector: Alternative[
       Lambda[A => List[Vector[A]]]] =
-      Alternative[List] compose Alternative[Vector]
+      Alternative[List].compose(Alternative[Vector])
     implicit val iso =
       CartesianTests.Isomorphisms.invariant[Lambda[A => List[Vector[A]]]]
 
@@ -39,7 +39,7 @@ class ComposeTests extends CatsSuite {
 
     implicit val applicativeListVector: Applicative[
       Lambda[A => List[Vector[A]]]] =
-      Applicative[List] compose Applicative[Vector]
+      Applicative[List].compose(Applicative[Vector])
     implicit val iso =
       CartesianTests.Isomorphisms.invariant[Lambda[A => List[Vector[A]]]]
 
@@ -52,7 +52,7 @@ class ComposeTests extends CatsSuite {
     // Foldable composition
 
     implicit val foldableListVector: Foldable[Lambda[A => List[Vector[A]]]] =
-      Foldable[List] compose Foldable[Vector]
+      Foldable[List].compose(Foldable[Vector])
 
     checkAll("Foldable[Lambda[A => List[Vector[A]]]]",
              FoldableTests[Lambda[A => List[Vector[A]]]].foldable[Int, Int])
@@ -73,7 +73,7 @@ class ComposeTests extends CatsSuite {
 
     implicit val reducibleListVector: Reducible[
       Lambda[A => NonEmptyList[NonEmptyVector[A]]]] =
-      Reducible[NonEmptyList] compose Reducible[NonEmptyVector]
+      Reducible[NonEmptyList].compose(Reducible[NonEmptyVector])
 
     // No Reducible-specific laws, so check the Foldable laws are satisfied
     checkAll("Reducible[Lambda[A => List[Vector[A]]]]",

@@ -38,7 +38,7 @@ sealed abstract class SettingKey[T]
     with Scoped.ScopingSetting[SettingKey[T]]
     with Scoped.DefinableSetting[T] {
   val key: AttributeKey[T]
-  final def toTask: Initialize[Task[T]] = this apply inlineTask
+  final def toTask: Initialize[Task[T]] = this.apply(inlineTask)
   final def scopedKey: ScopedKey[T] = ScopedKey(scope, key)
   final def in(scope: Scope): SettingKey[T] =
     Scoped.scopedSetting(Scope.replaceThis(this.scope)(scope), this.key)
@@ -133,7 +133,7 @@ sealed abstract class TaskKey[T]
       other: Initialize[Task[S]],
       source: SourcePosition)(f: (T, S) => T): Setting[Task[T]] =
     set((this, other) { (a, b) =>
-      (a, b) map f.tupled
+      (a, b).map(f.tupled)
     }, source)
 }
 
@@ -160,7 +160,7 @@ sealed trait InputKey[T]
     macro std.TaskMacro.itaskTransformPosition[T]
   final def transform(f: T => T,
                       source: SourcePosition): Setting[InputTask[T]] =
-    set(scopedKey(_ mapTask { _ map f }), source)
+    set(scopedKey(_.mapTask { _.map(f) }), source)
 }
 
 /** Methods and types related to constructing settings, including keys, scopes, and initializations. */
@@ -249,7 +249,7 @@ object Scoped {
       * @return currently bound setting value, or `i` if unbound.
       */
     final def or[T >: S](i: Initialize[T]): Initialize[T] =
-      (this.?, i)(_ getOrElse _)
+      (this.?, i)(_.getOrElse(_))
 
     /**
       * Like [[?]], but with a call-by-name parameter rather than an existing [[Def.Initialize]].
@@ -258,7 +258,7 @@ object Scoped {
       * @return currently bound setting value, or the result of `or` if unbound.
       */
     final def ??[T >: S](or: => T): Initialize[T] =
-      Def.optional(scopedKey)(_ getOrElse or)
+      Def.optional(scopedKey)(_.getOrElse(or))
   }
 
   /**
@@ -284,7 +284,7 @@ object Scoped {
             source: SourcePosition): Setting[Task[S]] =
       Def.setting(scopedKey, app, source)
     def transform(f: S => S, source: SourcePosition): Setting[Task[S]] =
-      set(scopedKey(_ map f), source)
+      set(scopedKey(_.map(f)), source)
 
     @deprecated(
       "No longer needed with new task syntax and SettingKey inheriting from Initialize.",
@@ -294,17 +294,18 @@ object Scoped {
       settings.get(scope, key)
 
     def ? : Initialize[Task[Option[S]]] = Def.optional(scopedKey) {
-      case None => mktask { None }; case Some(t) => t map some.fn
+      case None => mktask { None }; case Some(t) => t.map(some.fn)
     }
     def ??[T >: S](or: => T): Initialize[Task[T]] =
-      Def.optional(scopedKey)(_ getOrElse mktask(or))
+      Def.optional(scopedKey)(_.getOrElse(mktask(or)))
     def or[T >: S](i: Initialize[Task[T]]): Initialize[Task[T]] =
-      (this.? zipWith i)((x, y) => (x, y) map { case (a, b) => a getOrElse b })
+      (this.?.zipWith(i))((x, y) =>
+        (x, y).map { case (a, b) => a.getOrElse(b) })
   }
   final class RichInitializeTask[S](i: Initialize[Task[S]])
       extends RichInitTaskBase[S, Task] {
     protected def onTask[T](f: Task[S] => Task[T]): Initialize[Task[T]] =
-      i apply f
+      i.apply(f)
 
     def dependsOn(tasks: AnyInitTask*): Initialize[Task[S]] =
       (i, Initialize.joinAny[Task](tasks)) { (thisTask, deps) =>
@@ -330,7 +331,7 @@ object Scoped {
   final class RichInitializeInputTask[S](i: Initialize[InputTask[S]])
       extends RichInitTaskBase[S, InputTask] {
     protected def onTask[T](f: Task[S] => Task[T]): Initialize[InputTask[T]] =
-      i(_ mapTask f)
+      i(_.mapTask(f))
     def dependsOn(tasks: AnyInitTask*): Initialize[InputTask[S]] =
       (i, Initialize.joinAny[Task](tasks)) { (thisTask, deps) =>
         thisTask.mapTask(_.dependsOn(deps: _*))
@@ -341,8 +342,8 @@ object Scoped {
     protected def onTask[T](f: Task[S] => Task[T]): Initialize[R[T]]
 
     def flatMap[T](f: S => Task[T]): Initialize[R[T]] =
-      flatMapR(f compose successM)
-    def map[T](f: S => T): Initialize[R[T]] = mapR(f compose successM)
+      flatMapR(f.compose(successM))
+    def map[T](f: S => T): Initialize[R[T]] = mapR(f.compose(successM))
     def andFinally(fin: => Unit): Initialize[R[S]] = onTask(_ andFinally fin)
     def doFinally(t: Task[Unit]): Initialize[R[S]] = onTask(_ doFinally t)
 
@@ -356,24 +357,24 @@ object Scoped {
       "Use the `result` method to create a task that returns the full Result of this task.  Then, call `flatMap` on the new task.",
       "0.13.0")
     def flatMapR[T](f: Result[S] => Task[T]): Initialize[R[T]] =
-      onTask(_ flatMapR f)
+      onTask(_.flatMapR(f))
 
     @deprecated(
       "Use the `result` method to create a task that returns the full Result of this task.  Then, call `map` on the new task.",
       "0.13.0")
-    def mapR[T](f: Result[S] => T): Initialize[R[T]] = onTask(_ mapR f)
+    def mapR[T](f: Result[S] => T): Initialize[R[T]] = onTask(_.mapR(f))
 
     @deprecated(
       "Use the `failure` method to create a task that returns Incomplete when this task fails and then call `flatMap` on the new task.",
       "0.13.0")
     def flatFailure[T](f: Incomplete => Task[T]): Initialize[R[T]] =
-      flatMapR(f compose failM)
+      flatMapR(f.compose(failM))
 
     @deprecated(
       "Use the `failure` method to create a task that returns Incomplete when this task fails and then call `map` on the new task.",
       "0.13.0")
     def mapFailure[T](f: Incomplete => T): Initialize[R[T]] =
-      mapR(f compose failM)
+      mapR(f.compose(failM))
   }
 
   type AnyInitTask = Initialize[Task[T]] forSome { type T }
@@ -526,12 +527,12 @@ object Scoped {
     def flatMapR[T](f: Fun[Result, Task[T]]): App[T] =
       onTasks(_.flatMapR(convert(f)))
     def map[T](f: Fun[Id, T]): App[T] =
-      onTasks(_.mapR(convert(f) compose allM))
+      onTasks(_.mapR(convert(f).compose(allM)))
     def mapR[T](f: Fun[Result, T]): App[T] = onTasks(_.mapR(convert(f)))
     def flatFailure[T](f: Seq[Incomplete] => Task[T]): App[T] =
-      onTasks(_ flatFailure f)
+      onTasks(_.flatFailure(f))
     def mapFailure[T](f: Seq[Incomplete] => T): App[T] =
-      onTasks(_ mapFailure f)
+      onTasks(_.mapFailure(f))
   }
   type ST[X] = ScopedTaskable[X]
   final class RichTaskable2[A, B](t2: (ST[A], ST[B]))

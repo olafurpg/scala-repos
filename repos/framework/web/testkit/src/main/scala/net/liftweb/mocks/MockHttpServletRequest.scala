@@ -417,7 +417,7 @@ class MockHttpServletRequest(val url: String = null,
   def getLocalPort(): Int = localPort
 
   def getParameter(key: String): String =
-    parameters.find(_._1 == key).map(_._2) getOrElse null
+    parameters.find(_._1 == key).map(_._2).getOrElse(null)
 
   def getParameterMap(): java.util.Map[String, Array[String]] = {
     // Build a new map based on the parameters List
@@ -496,7 +496,8 @@ class MockHttpServletRequest(val url: String = null,
             .map(Helpers.internetDateFormatter.parse(_).getTime)
         }
       )
-      .flatMap(x => x) openOr -1L
+      .flatMap(x => x)
+      .openOr(-1L)
   }
 
   def getHeader(h: String): String = headers.get(h) match {
@@ -510,7 +511,7 @@ class MockHttpServletRequest(val url: String = null,
     headers.getOrElse(s, Nil).iterator
 
   def getIntHeader(h: String): Int = {
-    Box.!!(getHeader(h)).map(_.toInt) openOr -1
+    Box.!!(getHeader(h)).map(_.toInt).openOr(-1)
   }
 
   def getMethod(): String = method

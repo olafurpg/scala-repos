@@ -40,7 +40,7 @@ trait SeqLike[A, +This <: SeqLike[A, This] with Seq[A]]
     */
   def transform(f: A => A): this.type = {
     var i = 0
-    this foreach { el =>
+    this.foreach { el =>
       this(i) = f(el)
       i += 1
     }

@@ -213,7 +213,7 @@ class XorTTests extends CatsSuite {
   test("orElse evaluates effect only once") {
     forAll { (xor: String Xor Int, fallback: XorT[Eval, String, Int]) =>
       var evals = 0
-      val xort = (XorT(Eval.always { evals += 1; xor }) orElse fallback)
+      val xort = (XorT(Eval.always { evals += 1; xor }).orElse(fallback))
       xort.value.value
       evals should ===(1)
     }
@@ -295,7 +295,7 @@ class XorTTests extends CatsSuite {
 
   test("ensure on right is identity if predicate satisfied") {
     forAll { (x: XorT[Id, String, Int], s: String, p: Int => Boolean) =>
-      if (x.isRight && p(x getOrElse 0)) {
+      if (x.isRight && p(x.getOrElse(0))) {
         x.ensure(s)(p) should ===(x)
       }
     }
@@ -303,7 +303,7 @@ class XorTTests extends CatsSuite {
 
   test("ensure should fail if predicate not satisfied") {
     forAll { (x: XorT[Id, String, Int], s: String, p: Int => Boolean) =>
-      if (x.isRight && !p(x getOrElse 0)) {
+      if (x.isRight && !p(x.getOrElse(0))) {
         x.ensure(s)(p) should ===(XorT.left[Id, String, Int](s))
       }
     }

@@ -278,8 +278,8 @@ class HistoryServerSuite
                        Option(proxyBaseBeforeTest).getOrElse(""))
 
     // then
-    val urls = response \\ "@href" map (_.toString)
-    val siteRelativeLinks = urls filter (_.startsWith("/"))
+    val urls = (response \\ "@href").map(_.toString)
+    val siteRelativeLinks = urls.filter(_.startsWith("/"))
     all(siteRelativeLinks) should startWith(uiRoot)
   }
 
@@ -364,7 +364,7 @@ class HistoryServerSuite
     val appId = eventually(timeout(20 seconds), stdInterval) {
       val json = getContentAndCode("applications", port)._2.get
       val apps = parse(json).asInstanceOf[JArray].arr
-      apps should have size 1
+      (apps should have).size(1)
       (apps.head \ "id").extract[String]
     }
 
@@ -428,8 +428,8 @@ class HistoryServerSuite
       getAppUI.jobProgressListener.activeJobs.values.toSeq
     }
 
-    activeJobs() should have size 0
-    completedJobs() should have size 1
+    (activeJobs() should have).size(0)
+    (completedJobs() should have).size(1)
     getNumJobs("") should be(1)
     getNumJobs("/jobs") should be(1)
     getNumJobsRestful() should be(1)

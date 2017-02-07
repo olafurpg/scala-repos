@@ -49,7 +49,7 @@ object ResourceError {
 
   def all(errors: NonEmptyList[ResourceError])
     : ResourceError with FatalError with UserError = new ResourceErrors(
-    errors flatMap {
+    errors.flatMap {
       case ResourceErrors(e0) => e0
       case other => NonEmptyList(other)
     }
@@ -57,7 +57,7 @@ object ResourceError {
 
   def fromExtractorError(msg: String): Extractor.Error => ResourceError = {
     error =>
-      Corrupt("%s:\n%s" format (msg, error.message))
+      Corrupt("%s:\n%s".format(msg, error.message))
   }
 
   sealed trait FatalError { self: ResourceError =>

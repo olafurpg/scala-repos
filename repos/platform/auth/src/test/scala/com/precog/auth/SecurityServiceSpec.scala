@@ -282,7 +282,7 @@ class SecurityServiceSpec
       ))
   }
 
-  val rootGrantRequests = rootGrants map mkNewGrantRequest
+  val rootGrantRequests = rootGrants.map(mkNewGrantRequest)
 
   "Security service" should {
     "get existing API key" in {
@@ -621,7 +621,7 @@ class SecurityServiceSpec
         beLike {
           case HttpResponse(HttpStatus(OK, _), _, Some(jperms), _) =>
             val perms =
-              jperms.deserialize[Set[Permission]] map Permission.accessType
+              jperms.deserialize[Set[Permission]].map(Permission.accessType)
             val types = Set("read", "write", "delete")
             perms must_== types
         }

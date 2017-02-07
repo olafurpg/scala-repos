@@ -35,7 +35,7 @@ object Ids {
           builder.advanceLexer //Ate identifier
           m.done(ScalaElementTypes.FIELD_ID)
         case _ =>
-          builder error ErrMsg("identifier.expected")
+          builder.error(ErrMsg("identifier.expected"))
           idListMarker.done(ScalaElementTypes.IDENTIFIER_LIST)
           return true
       }

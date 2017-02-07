@@ -12,7 +12,7 @@ class TrigTest extends FunSuite {
   final class RelativeOps(lhs: Double) {
     def within(rhs: Double) = {
       val ok = abs(lhs - rhs) < epsilon
-      if (!ok) println("failed: abs(%s - %s) < %s" format (lhs, rhs, epsilon))
+      if (!ok) println("failed: abs(%s - %s) < %s".format(lhs, rhs, epsilon))
       assert(ok)
     }
   }

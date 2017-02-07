@@ -40,47 +40,49 @@ object JavaWebSocket extends JavaHelpers {
 
       javaWebSocket.map { jws =>
         val reject = Option(jws.rejectWith())
-        reject.map { result =>
-          Left(createResult(javaContext, result))
-        } getOrElse {
-          val current = play.api.Play.privateMaybeApplication.get
-          implicit val system = current.actorSystem
-          implicit val mat = current.materializer
+        reject
+          .map { result =>
+            Left(createResult(javaContext, result))
+          }
+          .getOrElse {
+            val current = play.api.Play.privateMaybeApplication.get
+            implicit val system = current.actorSystem
+            implicit val mat = current.materializer
 
-          Right(
-            if (jws.isActor) {
-              transformer.transform(ActorFlow.actorRef(jws.actorProps))
-            } else {
+            Right(
+              if (jws.isActor) {
+                transformer.transform(ActorFlow.actorRef(jws.actorProps))
+              } else {
 
-              val socketIn = new JWebSocket.In[A]
+                val socketIn = new JWebSocket.In[A]
 
-              val sink = Flow[A]
-                .map { msg =>
-                  socketIn.callbacks.asScala.foreach(_.accept(msg))
-                }
-                .to(Sink.onComplete { _ =>
-                  socketIn.closeCallbacks.asScala.foreach(_.run())
-                })
+                val sink = Flow[A]
+                  .map { msg =>
+                    socketIn.callbacks.asScala.foreach(_.accept(msg))
+                  }
+                  .to(Sink.onComplete { _ =>
+                    socketIn.closeCallbacks.asScala.foreach(_.run())
+                  })
 
-              val source = Source
-                .actorRef[A](256, OverflowStrategy.dropNew)
-                .mapMaterializedValue { actor =>
-                  val socketOut = new JWebSocket.Out[A] {
-                    def write(frame: A) = {
-                      actor ! frame
+                val source = Source
+                  .actorRef[A](256, OverflowStrategy.dropNew)
+                  .mapMaterializedValue { actor =>
+                    val socketOut = new JWebSocket.Out[A] {
+                      def write(frame: A) = {
+                        actor ! frame
+                      }
+                      def close() = {
+                        actor ! Status.Success(())
+                      }
                     }
-                    def close() = {
-                      actor ! Status.Success(())
-                    }
+
+                    jws.onReady(socketIn, socketOut)
                   }
 
-                  jws.onReady(socketIn, socketOut)
-                }
-
-              transformer.transform(Flow.fromSinkAndSource(sink, source))
-            }
-          )
-        }
+                transformer.transform(Flow.fromSinkAndSource(sink, source))
+              }
+            )
+          }
       }
     }
 

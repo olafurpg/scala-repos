@@ -20,7 +20,7 @@ object GenerateTupleW {
           val alpha2: String = alpha + alpha
           val element: String = "_" + n
         }
-        val ns = (1 to arity) map N.apply
+        val ns = ((1 to arity)).map(N.apply)
         def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
         val tparams = mapMkString { n =>

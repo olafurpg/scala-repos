@@ -481,22 +481,23 @@ object AppDefinition {
     AppDefinition().mergeFromProto(proto)
 
   private val validBasicAppDefinition = validator[AppDefinition] { appDef =>
-    appDef.upgradeStrategy is valid
-    appDef.container.each is valid
-    appDef.storeUrls is every(urlCanBeResolvedValidator)
-    appDef.portDefinitions is PortDefinitions.portDefinitionsValidator
+    appDef.upgradeStrategy.is(valid)
+    appDef.container.each.is(valid)
+    appDef.storeUrls.is(every(urlCanBeResolvedValidator))
+    appDef.portDefinitions.is(PortDefinitions.portDefinitionsValidator)
     appDef.executor should matchRegexFully("^(//cmd)|(/?[^/]+(/[^/]+)*)|$")
-    appDef is containsCmdArgsOrContainer
-    appDef.healthChecks is every(portIndexIsValid(appDef.hostPorts.indices))
+    appDef.is(containsCmdArgsOrContainer)
+    appDef.healthChecks.is(every(portIndexIsValid(appDef.hostPorts.indices)))
     appDef.instances should be >= 0
-    appDef.fetch is every(fetchUriIsValid)
+    appDef.fetch.is(every(fetchUriIsValid))
     appDef.mem should be >= 0.0
     appDef.cpus should be >= 0.0
     appDef.instances should be >= 0
     appDef.disk should be >= 0.0
     appDef must definesCorrectResidencyCombination
-    (appDef.isResident is false) or
-      (appDef.upgradeStrategy is UpgradeStrategy.validForResidentTasks)
+    (appDef.isResident
+      .is(false))
+      .or(appDef.upgradeStrategy.is(UpgradeStrategy.validForResidentTasks))
   }
 
   /**
@@ -508,10 +509,10 @@ object AppDefinition {
     */
   implicit val validAppDefinition: Validator[AppDefinition] =
     validator[AppDefinition] { app =>
-      app.id is valid
-      app.id is PathId.absolutePathValidator
-      app.dependencies is every(PathId.validPathWithBase(app.id.parent))
-    } and validBasicAppDefinition
+      app.id.is(valid)
+      app.id.is(PathId.absolutePathValidator)
+      app.dependencies.is(every(PathId.validPathWithBase(app.id.parent)))
+    }.and(validBasicAppDefinition)
 
   /**
     * Validator for apps, which are being part of a group.
@@ -520,9 +521,9 @@ object AppDefinition {
     */
   def validNestedAppDefinition(base: PathId): Validator[AppDefinition] =
     validator[AppDefinition] { app =>
-      app.id is PathId.validPathWithBase(base)
-      app.dependencies is every(PathId.validPathWithBase(base))
-    } and validBasicAppDefinition
+      app.id.is(PathId.validPathWithBase(base))
+      app.dependencies.is(every(PathId.validPathWithBase(base)))
+    }.and(validBasicAppDefinition)
 
   private val definesCorrectResidencyCombination: Validator[AppDefinition] =
     isTrue(
@@ -576,7 +577,7 @@ object AppDefinition {
     validator[AppDefinition] { app =>
       app should changeNoVolumes
       app should changeNoResources
-      app.upgradeStrategy is UpgradeStrategy.validForResidentTasks
+      app.upgradeStrategy.is(UpgradeStrategy.validForResidentTasks)
     }
   }
 

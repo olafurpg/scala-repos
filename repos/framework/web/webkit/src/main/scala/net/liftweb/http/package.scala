@@ -45,25 +45,27 @@ package object http {
 
         val concreteResolvable: ResolvableType = resolvable
 
-        S.session.map { session =>
-          // Capture context now.
-          val deferredRender =
-            session.buildDeferredFunction((resolved: ResolvedType) => {
-              AsyncRenderComet.completeAsyncRender(
-                Replace(placeholderId, innerTransform(resolved)(ns).flatten)
-              )
-            })
+        S.session
+          .map { session =>
+            // Capture context now.
+            val deferredRender =
+              session.buildDeferredFunction((resolved: ResolvedType) => {
+                AsyncRenderComet.completeAsyncRender(
+                  Replace(placeholderId, innerTransform(resolved)(ns).flatten)
+                )
+              })
 
-          // Actually complete the render once the future is fulfilled.
-          asyncResolveProvider.resolveAsync(
-            concreteResolvable,
-            resolvedResult => deferredRender(resolvedResult))
+            // Actually complete the render once the future is fulfilled.
+            asyncResolveProvider.resolveAsync(
+              concreteResolvable,
+              resolvedResult => deferredRender(resolvedResult))
 
-          <div id={placeholderId}><img src="/images/ajax-loader.gif" alt="Loading..." /></div>
-        } openOr {
-          Comment(
-            "FIX" + "ME: Asynchronous rendering failed for unknown reason.")
-        }
+            <div id={placeholderId}><img src="/images/ajax-loader.gif" alt="Loading..." /></div>
+          }
+          .openOr {
+            Comment(
+              "FIX" + "ME: Asynchronous rendering failed for unknown reason.")
+          }
       }
     }
   }

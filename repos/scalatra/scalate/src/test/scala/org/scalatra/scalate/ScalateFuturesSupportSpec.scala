@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class DaemonThreadFactory extends ThreadFactory {
   def newThread(r: Runnable): Thread = {
     val thread = new Thread(r)
-    thread setDaemon true
+    thread.setDaemon(true)
     thread
   }
 }

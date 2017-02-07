@@ -137,7 +137,7 @@ trait DAGTransform extends DAG {
           f(SplitParam(s.id, s.parentId)(s.loc))
       }
 
-      memotable.get(new DepGraphWrapper(graph)) getOrElse {
+      memotable.get(new DepGraphWrapper(graph)).getOrElse {
         val result = inner(graph)
         memotable += (new DepGraphWrapper(graph) -> result)
         result

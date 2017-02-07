@@ -66,7 +66,7 @@ object GaussMixtureTransform {
                       centers: DenseVector[Double],
                       gamma: Double): Double = {
     val diff: DenseVector[Double] = sample - centers
-    exp(-gamma * (diff dot diff))
+    exp(-gamma * (diff.dot(diff)))
   }
 
   def samplesTransform(samples: Iterable[DenseVector[Double]],

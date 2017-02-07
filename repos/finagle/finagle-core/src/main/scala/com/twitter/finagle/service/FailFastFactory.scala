@@ -37,7 +37,7 @@ object FailFastFactory {
   }
 
   private val defaultBackoffs =
-    (Backoff.exponential(1.second, 2) take 5) ++ Backoff.const(32.seconds)
+    (Backoff.exponential(1.second, 2).take(5)) ++ Backoff.const(32.seconds)
   private val rng = new Random
 
   val role = Stack.Role("FailFast")
@@ -153,7 +153,7 @@ private[finagle] class FailFastFactory[Req, Rep](
       }
     }
 
-  private[this] def getBackoffs(): Stream[Duration] = backoffs map {
+  private[this] def getBackoffs(): Stream[Duration] = backoffs.map {
     duration =>
       // Add a 10% jitter to reduce correlation.
       val ms = duration.inMilliseconds

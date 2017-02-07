@@ -14,7 +14,7 @@ class ArraySortingTest {
   }
 
   object CanOrder extends Ordering[CantSortMe] {
-    def compare(a: CantSortMe, b: CantSortMe) = a.i compare b.i
+    def compare(a: CantSortMe, b: CantSortMe) = a.i.compare(b.i)
   }
 
   // Tests SI-7837

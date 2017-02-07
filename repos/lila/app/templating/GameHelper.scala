@@ -145,10 +145,10 @@ trait GameHelper {
         s"""<span class="user_link$klass">$content$statusIcon</span>"""
       case Some(user) =>
         val klass = userClass(user.id, cssClass, withOnline)
-        val href = s"${routes.User show user.name}${if (mod) "?mod" else ""}"
+        val href = s"${routes.User.show(user.name)}${if (mod) "?mod" else ""}"
         val content = playerUsername(player, withRating)
         val diff =
-          (player.ratingDiff ifTrue withDiff).fold(Html(""))(showRatingDiff)
+          (player.ratingDiff.ifTrue(withDiff)).fold(Html(""))(showRatingDiff)
         val mark =
           engine ?? s"""<span class="engine_mark" title="${trans
             .thisPlayerUsesChessComputerAssistance()}"></span>"""
@@ -195,7 +195,7 @@ trait GameHelper {
     }
 
   private def gameTitle(game: Game, color: Color): String = {
-    val u1 = playerText(game player color, withRating = true)
+    val u1 = playerText(game.player(color), withRating = true)
     val u2 = playerText(game opponent color, withRating = true)
     val clock =
       game.clock ?? { c =>
@@ -235,11 +235,11 @@ trait GameHelper {
                color: Color,
                ownerLink: Boolean = false,
                tv: Boolean = false)(implicit ctx: UserContext): String = {
-    val owner = ownerLink.fold(ctx.me flatMap game.player, none)
+    val owner = ownerLink.fold(ctx.me.flatMap(game.player), none)
     val url = tv.fold(routes.Tv.index,
                       owner.fold(routes.Round.watcher(game.id, color.name)) {
                         o =>
-                          routes.Round.player(game fullIdOf o.color)
+                          routes.Round.player(game.fullIdOf(o.color))
                       })
     url.toString
   }
@@ -257,7 +257,7 @@ trait GameHelper {
     val title = withTitle ?? s"""title="${gameTitle(game, pov.color)}""""
     val cssClass = isLive ?? ("live live_" + game.id)
     val live = isLive ?? game.id
-    val fen = Forsyth exportBoard game.toChess.board
+    val fen = Forsyth.exportBoard(game.toChess.board)
     val lastMove = ~game.castleLastMoveTime.lastMoveString
     val variant = game.variant.key
     val tag = if (withLink) "a" else "span"
@@ -277,7 +277,7 @@ trait GameHelper {
           isLive ?? ("live live_" + pov.game.id),
           isLive ?? pov.game.id,
           pov.color.name,
-          Forsyth exportBoard pov.game.toChess.board,
+          Forsyth.exportBoard(pov.game.toChess.board),
           ~pov.game.castleLastMoveTime.lastMoveString,
           blank ?? """ target="_blank""""
         )

@@ -57,7 +57,7 @@ object ExpiringService {
         (idle, life) match {
           case (None, None) => next
           case _ =>
-            next map { service =>
+            next.map { service =>
               val closeOnRelease = new CloseOnReleaseService(service)
               new ExpiringService(closeOnRelease,
                                   idle,
@@ -99,9 +99,11 @@ abstract class ExpiringService[Req, Rep](
   private[this] val didExpire = new Promise[Unit]
 
   private[this] def startTimer(duration: Option[Duration], counter: Counter) =
-    duration map { t: Duration =>
-      timer.schedule(t.fromNow) { expire(counter) }
-    } getOrElse { NullTimerTask }
+    duration
+      .map { t: Duration =>
+        timer.schedule(t.fromNow) { expire(counter) }
+      }
+      .getOrElse { NullTimerTask }
 
   private[this] def expire(counter: Counter) {
     if (deactivate()) {
@@ -145,7 +147,7 @@ abstract class ExpiringService[Req, Rep](
       }
     }
 
-    super.apply(req) ensure {
+    super.apply(req).ensure {
       if (decrLatch) {
         val n = latch.decr()
         synchronized {

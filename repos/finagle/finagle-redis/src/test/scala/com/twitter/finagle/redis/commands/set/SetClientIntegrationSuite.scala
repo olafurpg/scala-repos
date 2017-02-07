@@ -181,7 +181,7 @@ final class SetClientIntegrationSuite extends RedisClientTest {
 
       val fooInter = Await.result(client.sInter(Seq(foo)))
       // Only one key will give itself as intersection
-      assert(fooMembers forall (m => fooInter.contains(m)))
+      assert(fooMembers.forall(m => fooInter.contains(m)))
 
       // At least one non-empty key is required
       intercept[ClientError] {

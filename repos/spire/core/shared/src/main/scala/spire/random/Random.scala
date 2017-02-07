@@ -129,7 +129,7 @@ trait RandomCompanion[G <: Generator] { self =>
   }
 
   def tuple2[A, B](r1: R[A], r2: R[B]): R[(A, B)] =
-    r1 and r2
+    r1.and(r2)
   def tuple3[A, B, C](r1: R[A], r2: R[B], r3: R[C]): R[(A, B, C)] =
     for { a <- r1; b <- r2; c <- r3 } yield (a, b, c)
   def tuple4[A, B, C, D](r1: R[A],

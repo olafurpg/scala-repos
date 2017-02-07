@@ -14,7 +14,7 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
 
   def filterFilled(
       implicit ctx: UserContext): Fu[(Form[FilterConfig], FilterConfig)] =
-    filterConfig map { f =>
+    filterConfig.map { f =>
       filter(ctx).fill(f) -> f
     }
 
@@ -28,14 +28,14 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
   )
 
   def filterConfig(implicit ctx: UserContext): Fu[FilterConfig] =
-    savedConfig map (_.filter)
+    savedConfig.map(_.filter)
 
   def aiFilled(fen: Option[String])(
       implicit ctx: UserContext): Fu[Form[AiConfig]] =
-    aiConfig map { config =>
-      ai(ctx) fill fen.fold(config) { f =>
+    aiConfig.map { config =>
+      ai(ctx).fill(fen.fold(config) { f =>
         config.copy(fen = f.some, variant = chess.variant.FromPosition)
-      }
+      })
     }
 
   def ai(ctx: UserContext) = Form(
@@ -52,14 +52,14 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
   )
 
   def aiConfig(implicit ctx: UserContext): Fu[AiConfig] =
-    savedConfig map (_.ai)
+    savedConfig.map(_.ai)
 
   def friendFilled(fen: Option[String])(
       implicit ctx: UserContext): Fu[Form[FriendConfig]] =
-    friendConfig map { config =>
-      friend(ctx) fill fen.fold(config) { f =>
+    friendConfig.map { config =>
+      friend(ctx).fill(fen.fold(config) { f =>
         config.copy(fen = f.some, variant = chess.variant.FromPosition)
-      }
+      })
     }
 
   def friend(ctx: UserContext) = Form(
@@ -78,11 +78,11 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
   )
 
   def friendConfig(implicit ctx: UserContext): Fu[FriendConfig] =
-    savedConfig map (_.friend)
+    savedConfig.map(_.friend)
 
   def hookFilled(timeModeString: Option[String])(
       implicit ctx: UserContext): Fu[Form[HookConfig]] =
-    hookConfig map (_ withTimeModeString timeModeString) map hook(ctx).fill
+    hookConfig.map(_ withTimeModeString timeModeString).map(hook(ctx).fill)
 
   def hook(ctx: UserContext) = Form(
     mapping(
@@ -101,8 +101,8 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
   )
 
   def hookConfig(implicit ctx: UserContext): Fu[HookConfig] =
-    savedConfig map (_.hook)
+    savedConfig.map(_.hook)
 
   def savedConfig(implicit ctx: UserContext): Fu[UserConfig] =
-    ctx.me.fold(AnonConfigRepo config ctx.req)(UserConfigRepo.config)
+    ctx.me.fold(AnonConfigRepo.config(ctx.req))(UserConfigRepo.config)
 }

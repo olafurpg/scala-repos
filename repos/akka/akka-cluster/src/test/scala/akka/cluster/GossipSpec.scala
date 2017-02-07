@@ -92,11 +92,11 @@ class GossipSpec extends WordSpec with Matchers {
       val g1 = Gossip(members = SortedSet(a1, c1, e1))
       val g2 = Gossip(members = SortedSet(a2, c2, e2))
 
-      val merged1 = g1 merge g2
+      val merged1 = g1.merge(g2)
       merged1.members should ===(SortedSet(a2, c1, e1))
       merged1.members.toSeq.map(_.status) should ===(Seq(Up, Leaving, Up))
 
-      val merged2 = g2 merge g1
+      val merged2 = g2.merge(g1)
       merged2.members should ===(SortedSet(a2, c1, e1))
       merged2.members.toSeq.map(_.status) should ===(Seq(Up, Leaving, Up))
     }
@@ -112,11 +112,11 @@ class GossipSpec extends WordSpec with Matchers {
       val g2 = Gossip(members = SortedSet(a1, b1, c1, d1),
                       overview = GossipOverview(reachability = r2))
 
-      val merged1 = g1 merge g2
+      val merged1 = g1.merge(g2)
       merged1.overview.reachability.allUnreachable should ===(
         Set(a1.uniqueAddress, c1.uniqueAddress, d1.uniqueAddress))
 
-      val merged2 = g2 merge g1
+      val merged2 = g2.merge(g1)
       merged2.overview.reachability.allUnreachable should ===(
         merged1.overview.reachability.allUnreachable)
     }
@@ -131,12 +131,12 @@ class GossipSpec extends WordSpec with Matchers {
       val g2 = Gossip(members = SortedSet(a1, b1, c3),
                       overview = GossipOverview(reachability = r2))
 
-      val merged1 = g1 merge g2
+      val merged1 = g1.merge(g2)
       merged1.members should ===(SortedSet(a1, b1))
       merged1.overview.reachability.allUnreachable should ===(
         Set(a1.uniqueAddress))
 
-      val merged2 = g2 merge g1
+      val merged2 = g2.merge(g1)
       merged2.overview.reachability.allUnreachable should ===(
         merged1.overview.reachability.allUnreachable)
       merged2.members should ===(merged1.members)
@@ -169,21 +169,21 @@ class GossipSpec extends WordSpec with Matchers {
       val g2 = (Gossip(members = SortedSet(a1, b1, c1, d1)) :+ vclockNode)
         .seen(a1.uniqueAddress)
         .seen(c1.uniqueAddress)
-      val g3 = (g1 copy (version = g2.version)).seen(d1.uniqueAddress)
+      val g3 = (g1.copy(version = g2.version)).seen(d1.uniqueAddress)
 
       def checkMerged(merged: Gossip) {
         val seen = merged.overview.seen.toSeq
         seen.length should ===(0)
 
-        merged seenByNode (a1.uniqueAddress) should ===(false)
-        merged seenByNode (b1.uniqueAddress) should ===(false)
-        merged seenByNode (c1.uniqueAddress) should ===(false)
-        merged seenByNode (d1.uniqueAddress) should ===(false)
-        merged seenByNode (e1.uniqueAddress) should ===(false)
+        merged.seenByNode(a1.uniqueAddress) should ===(false)
+        merged.seenByNode(b1.uniqueAddress) should ===(false)
+        merged.seenByNode(c1.uniqueAddress) should ===(false)
+        merged.seenByNode(d1.uniqueAddress) should ===(false)
+        merged.seenByNode(e1.uniqueAddress) should ===(false)
       }
 
-      checkMerged(g3 merge g2)
-      checkMerged(g2 merge g3)
+      checkMerged(g3.merge(g2))
+      checkMerged(g2.merge(g3))
     }
 
     "know who is youngest" in {

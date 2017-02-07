@@ -36,7 +36,7 @@ object FunDef {
     }
     builder.getTokenType match {
       case ScalaTokenTypes.tIDENTIFIER =>
-        FunSig parse builder
+        FunSig.parse(builder)
         builder.getTokenType match {
           case ScalaTokenTypes.tCOLON =>
             builder.advanceLexer() //Ate :
@@ -48,7 +48,7 @@ object FunDef {
                     faultMarker.drop()
                     true
                   } else {
-                    builder error ScalaBundle.message("wrong.expression")
+                    builder.error(ScalaBundle.message("wrong.expression"))
                     faultMarker.drop()
                     true
                   }
@@ -62,12 +62,12 @@ object FunDef {
             }
           case ScalaTokenTypes.tASSIGN =>
             builder.advanceLexer() //Ate =
-            ParserPatcher getSuitablePatcher builder parse builder
-            if (Expr parse builder) {
+            ParserPatcher.getSuitablePatcher(builder).parse(builder)
+            if (Expr.parse(builder)) {
               faultMarker.drop()
               true
             } else {
-              builder error ScalaBundle.message("wrong.expression")
+              builder.error(ScalaBundle.message("wrong.expression"))
               faultMarker.drop()
               true
             }
@@ -85,23 +85,23 @@ object FunDef {
         }
       case ScalaTokenTypes.kTHIS =>
         builder.advanceLexer() //Ate this
-        ParamClauses parse (builder, true)
+        ParamClauses.parse(builder, true)
         builder.getTokenType match {
           case ScalaTokenTypes.tASSIGN =>
             builder.advanceLexer() //Ate =
             if (!ConstrExpr.parse(builder)) {
-              builder error ScalaBundle.message("wrong.constr.expression")
+              builder.error(ScalaBundle.message("wrong.constr.expression"))
             }
             faultMarker.drop()
             true
           case _ =>
             if (builder.twoNewlinesBeforeCurrentToken) {
-              builder error ScalaBundle.message("constr.block.expected")
+              builder.error(ScalaBundle.message("constr.block.expected"))
               faultMarker.drop()
               return true
             }
             if (!ConstrBlock.parse(builder)) {
-              builder error ScalaBundle.message("constr.block.expected")
+              builder.error(ScalaBundle.message("constr.block.expected"))
             }
             faultMarker.drop()
             true

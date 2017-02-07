@@ -59,7 +59,7 @@ object InfixType {
           assoc match {
             case 0 => assoc = -1
             case 1 =>
-              builder error ScalaBundle.message("wrong.type.associativity")
+              builder.error(ScalaBundle.message("wrong.type.associativity"))
             case -1 =>
           }
         case _ =>
@@ -67,7 +67,7 @@ object InfixType {
             case 0 => assoc = 1
             case 1 =>
             case -1 =>
-              builder error ScalaBundle.message("wrong.type.associativity")
+              builder.error(ScalaBundle.message("wrong.type.associativity"))
           }
       }
       val idMarker = builder.mark
@@ -88,7 +88,7 @@ object InfixType {
           typeMarker.done(ScalaElementTypes.WILDCARD_TYPE)
         case _ =>
           if (!CompoundType.parse(builder, isPattern))
-            builder error ScalaBundle.message("compound.type.expected")
+            builder.error(ScalaBundle.message("compound.type.expected"))
       }
       if (assoc == 1) {
         val newMarker = infixTypeMarker.precede

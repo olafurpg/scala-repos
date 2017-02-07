@@ -21,7 +21,7 @@ class KetamaDistributor[A](
     val nodeCount = _nodes.size
     val totalWeight = _nodes.foldLeft(0) { _ + _.weight }
 
-    _nodes foreach { node =>
+    _nodes.foreach { node =>
       val pointsOnRing =
         if (oldLibMemcachedVersionComplianceMode) {
           val percent = node.weight.toFloat / totalWeight.toFloat

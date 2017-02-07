@@ -200,7 +200,7 @@ trait PersistentFSMBase[S, D, E]
 
   final class TransformHelper(func: StateFunction) {
     def using(andThen: PartialFunction[State, State]): StateFunction =
-      func andThen (andThen orElse { case x ⇒ x })
+      func.andThen(andThen.orElse { case x ⇒ x })
   }
 
   final def transform(func: StateFunction): TransformHelper =
@@ -316,7 +316,7 @@ trait PersistentFSMBase[S, D, E]
     * The current state may be queried using ``stateName``.
     */
   final def whenUnhandled(stateFunction: StateFunction): Unit =
-    handleEvent = stateFunction orElse handleEventDefault
+    handleEvent = stateFunction.orElse(handleEventDefault)
 
   /**
     * Verify existence of initial state and setup timers. This should be the
@@ -374,7 +374,7 @@ trait PersistentFSMBase[S, D, E]
    * Timer handling
    */
   private val timers = mutable.Map[String, Timer]()
-  private val timerGen = Iterator from 0
+  private val timerGen = Iterator.from(0)
 
   /*
    * State definitions
@@ -386,8 +386,8 @@ trait PersistentFSMBase[S, D, E]
                        function: StateFunction,
                        timeout: Timeout): Unit = {
     if (stateFunctions contains name) {
-      stateFunctions(name) = stateFunctions(name) orElse function
-      stateTimeouts(name) = timeout orElse stateTimeouts(name)
+      stateFunctions(name) = stateFunctions(name).orElse(function)
+      stateTimeouts(name) = timeout.orElse(stateTimeouts(name))
     } else {
       stateFunctions(name) = function
       stateTimeouts(name) = timeout
@@ -488,7 +488,7 @@ trait PersistentFSMBase[S, D, E]
     nextState.stopReason match {
       case None ⇒ makeTransition(nextState)
       case _ ⇒
-        nextState.replies.reverse foreach { r ⇒
+        nextState.replies.reverse.foreach { r ⇒
           sender() ! r
         }
         terminate(nextState)
@@ -502,7 +502,7 @@ trait PersistentFSMBase[S, D, E]
         stay withStopReason Failure(
           "Next state %s does not exist".format(nextState.stateName)))
     } else {
-      nextState.replies.reverse foreach { r ⇒
+      nextState.replies.reverse.foreach { r ⇒
         sender() ! r
       }
       if (currentState.stateName != nextState.stateName ||
@@ -637,8 +637,10 @@ trait LoggingPersistentFSM[S, D, E] extends PersistentFSMBase[S, D, E] {
     */
   protected def getLog: IndexedSeq[LogEntry[S, D]] = {
     val log =
-      events zip states filter (_._1 ne null) map
-        (x ⇒ LogEntry(x._2.asInstanceOf[S], x._1.stateData, x._1.event))
+      events
+        .zip(states)
+        .filter(_._1 ne null)
+        .map(x ⇒ LogEntry(x._2.asInstanceOf[S], x._1.stateData, x._1.event))
     if (full) {
       IndexedSeq() ++ log.drop(pos) ++ log.take(pos)
     } else {

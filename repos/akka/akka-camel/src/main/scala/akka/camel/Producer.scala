@@ -78,7 +78,7 @@ trait ProducerSupport extends Actor with CamelSupport {
 
     case msg ⇒
       producerChild match {
-        case Some(child) ⇒ child forward transformOutgoingMessage(msg)
+        case Some(child) ⇒ child.forward(transformOutgoingMessage(msg))
         case None ⇒ messages :+= ((sender(), msg))
       }
   }
@@ -111,7 +111,7 @@ trait ProducerSupport extends Actor with CamelSupport {
       extends Actor {
     def receive = {
       case msg @ (_: FailureResult | _: MessageResult) ⇒
-        context.parent forward msg
+        context.parent.forward(msg)
       case msg ⇒
         produce(endpoint,
                 processor,

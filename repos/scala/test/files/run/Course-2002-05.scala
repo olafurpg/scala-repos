@@ -145,7 +145,7 @@ object M3 {
       if (row == 0) List(List())
       else {
         def isSafe(column: Int, placement: Placement): Boolean =
-          placement forall { pos =>
+          placement.forall { pos =>
             (pos._2 != column && abs(pos._2 - column) != row - pos._1)
           }
 
@@ -154,7 +154,7 @@ object M3 {
             .filter(column => isSafe(column, placement))
             .map(column => (row, column) :: placement);
 
-        placeQueens(row - 1) flatMap adjoinRow
+        placeQueens(row - 1).flatMap(adjoinRow)
       }
     }
     placeQueens(n)

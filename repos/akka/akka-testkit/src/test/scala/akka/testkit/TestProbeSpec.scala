@@ -125,7 +125,7 @@ class TestProbeSpec extends AkkaSpec with DefaultTimeout {
       }))
       system.stop(target)
       probe.ref ! "hello"
-      probe watch target
+      probe.watch(target)
       probe.expectMsg(1.seconds, "hello")
       probe.expectMsg(1.seconds, Terminated(target)(false, false))
     }

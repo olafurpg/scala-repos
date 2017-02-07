@@ -60,7 +60,7 @@ class OpTransport[In, Out](_ops: List[OpTransport.Op[In, Out]])
     case Close(res) :: rest =>
       ops = rest
       status = Status.Closed
-      res respond {
+      res.respond {
         case Return(()) =>
           onClose.setValue(new Exception("closed"))
         case Throw(exc) =>
@@ -110,7 +110,7 @@ class HttpClientDispatcherTest extends FunSuite {
     val c = res.reader.read(Int.MaxValue)
     assert(!c.isDefined)
     req.writer.write(Buf.Utf8("a"))
-    out.read() flatMap { c =>
+    out.read().flatMap { c =>
       out.write(c)
     }
     assert(Await.result(c, timeout) === Some(Buf.Utf8("a")))
@@ -118,7 +118,7 @@ class HttpClientDispatcherTest extends FunSuite {
     val cc = res.reader.read(Int.MaxValue)
     assert(!cc.isDefined)
     req.writer.write(Buf.Utf8("some other thing"))
-    out.read() flatMap { c =>
+    out.read().flatMap { c =>
       out.write(c)
     }
     assert(Await.result(cc, timeout) === Some(Buf.Utf8("some other thing")))
@@ -126,7 +126,7 @@ class HttpClientDispatcherTest extends FunSuite {
     val last = res.reader.read(Int.MaxValue)
     assert(!last.isDefined)
     req.close()
-    out.read() flatMap { c =>
+    out.read().flatMap { c =>
       out.write(c)
     }
     assert(Await.result(last, timeout).isEmpty)

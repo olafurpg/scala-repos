@@ -107,7 +107,7 @@ object ProdServerStart {
 
     val httpPort = parsePort("http")
     val httpsPort = parsePort("https")
-    if (!(httpPort orElse httpsPort).isDefined)
+    if (!(httpPort.orElse(httpsPort)).isDefined)
       throw ServerStartException("Must provide either an HTTP or HTTPS port")
 
     val address =
@@ -142,8 +142,8 @@ object ProdServerStart {
       }
 
       val pid =
-        process.pid getOrElse
-          (throw ServerStartException(
+        process.pid.getOrElse(
+          throw ServerStartException(
             "Couldn't determine current process's pid"))
       val out = new FileOutputStream(pidFile)
       try out.write(pid.getBytes)

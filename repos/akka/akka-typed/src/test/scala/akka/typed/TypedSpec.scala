@@ -39,7 +39,7 @@ class TypedSpec(config: Config)
   implicit val system = ActorSystem(
     AkkaSpec.getCallerName(classOf[TypedSpec]),
     Props(guardian()),
-    Some(config withFallback AkkaSpec.testConf))
+    Some(config.withFallback(AkkaSpec.testConf)))
 
   implicit val timeout = Timeout(1.minute)
   implicit val patience = PatienceConfig(3.seconds)
@@ -94,8 +94,8 @@ class TypedSpec(config: Config)
     * Group assertion that ensures that the given inboxes are empty.
     */
   def assertEmpty(inboxes: Inbox.SyncInbox[_]*): Unit = {
-    inboxes foreach
-      (i ⇒ withClue(s"inbox $i had messages")(i.hasMessages should be(false)))
+    inboxes.foreach(i ⇒
+      withClue(s"inbox $i had messages")(i.hasMessages should be(false)))
   }
 
   // for ScalaTest === compare of Class objects
@@ -138,7 +138,7 @@ object TypedSpec {
     : Behavior[Command] =
     FullTotal {
       case Sig(ctx, f @ t.Failed(ex, test)) ⇒
-        outstanding get test match {
+        outstanding.get(test) match {
           case Some(reply) ⇒
             reply ! Failed(ex)
             f.decide(t.Failed.Stop)
@@ -148,7 +148,7 @@ object TypedSpec {
             Same
         }
       case Sig(ctx, Terminated(test)) ⇒
-        outstanding get test match {
+        outstanding.get(test) match {
           case Some(reply) ⇒
             reply ! Success
             guardian(outstanding - test)

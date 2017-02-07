@@ -7,7 +7,7 @@ object Test1 {
   }
   def run {
     val method = classOf[Foo].getMethod("foo")
-    method.getExceptionTypes foreach println
+    method.getExceptionTypes.foreach(println)
   }
 }
 
@@ -21,7 +21,7 @@ object Test2 {
   }
   def run {
     val method = classOf[Reader].getMethod("read")
-    method.getExceptionTypes foreach println
+    method.getExceptionTypes.foreach(println)
   }
 }
 
@@ -138,7 +138,7 @@ object Test4 {
       //print SourceAnnotation in a predefined way to insure
       // against difference in the JVMs (e.g. Sun's vs IBM's)
       val anns = target.getAnnotations()
-      anns foreach printSourceAnnotation
+      anns.foreach(printSourceAnnotation)
       if (anns.length > 0) {
         println(target)
         println
@@ -148,7 +148,7 @@ object Test4 {
       def getParameterAnnotations(): Array[Array[Annotation]]
     }) {
       val anns = target.getParameterAnnotations().flatten
-      anns foreach printSourceAnnotation
+      anns.foreach(printSourceAnnotation)
       if (anns.length > 0) {
         println(target)
         println
@@ -157,33 +157,41 @@ object Test4 {
     printSourceAnnotations(classOf[Foo1])
     printSourceAnnotations(classOf[Foo2])
     printSourceAnnotations(classOf[Foo3])
-    classOf[Foo4].getDeclaredFields foreach printSourceAnnotations
-    classOf[Foo4].getDeclaredMethods foreach printSourceAnnotations
-    classOf[Foo5].getDeclaredMethods foreach printSourceAnnotations
-    classOf[Foo6].getDeclaredConstructors foreach printSourceAnnotations
-    classOf[Foo7].getDeclaredConstructors foreach printSourceAnnotations
-    classOf[Foo8].getDeclaredFields foreach printSourceAnnotations
-    classOf[Foo8].getDeclaredMethods foreach printSourceAnnotations
-    classOf[Foo8].getDeclaredConstructors foreach printParamSourceAnnotations
+    classOf[Foo4].getDeclaredFields.foreach(printSourceAnnotations)
+    classOf[Foo4].getDeclaredMethods.foreach(printSourceAnnotations)
+    classOf[Foo5].getDeclaredMethods.foreach(printSourceAnnotations)
+    classOf[Foo6].getDeclaredConstructors.foreach(printSourceAnnotations)
+    classOf[Foo7].getDeclaredConstructors.foreach(printSourceAnnotations)
+    classOf[Foo8].getDeclaredFields.foreach(printSourceAnnotations)
+    classOf[Foo8].getDeclaredMethods.foreach(printSourceAnnotations)
+    classOf[Foo8].getDeclaredConstructors.foreach(printParamSourceAnnotations)
     classOf[Foo9].getDeclaredFields
-      .sortWith((x, y) => x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo9].getDeclaredMethods.sortWith((x, y) =>
-      x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo10].getDeclaredFields.sortWith((x, y) =>
-      x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo10].getDeclaredMethods.sortWith((x, y) =>
-      x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo10].getDeclaredConstructors foreach printParamSourceAnnotations
-    classOf[Foo11].getDeclaredFields.sortWith((x, y) =>
-      x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo11].getDeclaredMethods.sortWith((x, y) =>
-      x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo11].getDeclaredConstructors foreach printParamSourceAnnotations
-    classOf[Foo12].getDeclaredFields.sortWith((x, y) =>
-      x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo12].getDeclaredMethods.sortWith((x, y) =>
-      x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo12].getDeclaredConstructors foreach printParamSourceAnnotations
+      .sortWith((x, y) => x.toString < y.toString)
+      .foreach(printSourceAnnotations)
+    classOf[Foo9].getDeclaredMethods
+      .sortWith((x, y) => x.toString < y.toString)
+      .foreach(printSourceAnnotations)
+    classOf[Foo10].getDeclaredFields
+      .sortWith((x, y) => x.toString < y.toString)
+      .foreach(printSourceAnnotations)
+    classOf[Foo10].getDeclaredMethods
+      .sortWith((x, y) => x.toString < y.toString)
+      .foreach(printSourceAnnotations)
+    classOf[Foo10].getDeclaredConstructors.foreach(printParamSourceAnnotations)
+    classOf[Foo11].getDeclaredFields
+      .sortWith((x, y) => x.toString < y.toString)
+      .foreach(printSourceAnnotations)
+    classOf[Foo11].getDeclaredMethods
+      .sortWith((x, y) => x.toString < y.toString)
+      .foreach(printSourceAnnotations)
+    classOf[Foo11].getDeclaredConstructors.foreach(printParamSourceAnnotations)
+    classOf[Foo12].getDeclaredFields
+      .sortWith((x, y) => x.toString < y.toString)
+      .foreach(printSourceAnnotations)
+    classOf[Foo12].getDeclaredMethods
+      .sortWith((x, y) => x.toString < y.toString)
+      .foreach(printSourceAnnotations)
+    classOf[Foo12].getDeclaredConstructors.foreach(printParamSourceAnnotations)
   }
 }
 

@@ -98,7 +98,7 @@ abstract class TreeBrowsers {
     def isLeaf(node: AnyRef): Boolean = packChildren(node).isEmpty
 
     def removeTreeModelListener(l: TreeModelListener): Unit =
-      listeners = listeners filterNot (_ == l)
+      listeners = listeners.filterNot(_ == l)
 
     /** we ignore this message for now */
     def valueForPathChanged(path: TreePath, newValue: AnyRef) = ()
@@ -150,7 +150,9 @@ abstract class TreeBrowsers {
           val childPath = path pathByAddingChild child
           _setExpansionState(root, childPath)
         }
-        if (expand) { jTree expandPath path } else { jTree collapsePath path }
+        if (expand) { jTree.expandPath(path) } else {
+          jTree.collapsePath(path)
+        }
       }
       _setExpansionState(root, new TreePath(root.getModel.getRoot))
     }
@@ -253,7 +255,7 @@ abstract class TreeBrowsers {
           }
         }
       )
-      jmFile add jmiCancel
+      jmFile.add(jmiCancel)
 
       val jmiExit = new JMenuItem(
         new AbstractAction("Exit") {
@@ -262,7 +264,7 @@ abstract class TreeBrowsers {
           override def actionPerformed(e: ActionEvent) = closeWindow()
         }
       )
-      jmFile add jmiExit
+      jmFile.add(jmiExit)
       add(jmFile)
 
       val jmView = new JMenu("View")
@@ -275,7 +277,7 @@ abstract class TreeBrowsers {
           }
         }
       )
-      jmView add jmiExpand
+      jmView.add(jmiExpand)
       val jmiCollapse = new JMenuItem(
         new AbstractAction("Collapse All Nodes") {
           putValue(Action.ACCELERATOR_KEY,
@@ -285,7 +287,7 @@ abstract class TreeBrowsers {
           }
         }
       )
-      jmView add jmiCollapse
+      jmView.add(jmiCollapse)
       add(jmView)
     }
 

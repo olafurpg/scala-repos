@@ -13,7 +13,7 @@ import org.scalatest.mock.MockitoSugar
 class ClientIdRequiredFilterTest extends FunSuite with MockitoSugar {
 
   case class ClientIdRequiredFilterContext(underlying: Service[String, String]) {
-    lazy val service = new ClientIdRequiredFilter andThen underlying
+    lazy val service = new ClientIdRequiredFilter.andThen(underlying)
   }
 
   val request = "request"

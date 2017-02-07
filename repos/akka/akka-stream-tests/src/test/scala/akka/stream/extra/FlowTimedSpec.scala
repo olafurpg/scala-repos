@@ -39,21 +39,20 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
       val testRuns = 1 to 2
 
       def script =
-        Script((1 to n) map { x ⇒
+        Script(((1 to n)).map { x ⇒
           Seq(x) -> Seq(x)
         }: _*)
-      testRuns foreach
-        (_ ⇒
-           runScript(script, settings) { flow ⇒
-             flow
-               .map(identity)
-               .timedIntervalBetween(_ % measureBetweenEvery == 0,
-                                     onInterval = printInfo)
-           })
+      testRuns.foreach(_ ⇒
+        runScript(script, settings) { flow ⇒
+          flow
+            .map(identity)
+            .timedIntervalBetween(_ % measureBetweenEvery == 0,
+                                  onInterval = printInfo)
+      })
 
       val expectedNrOfOnIntervalCalls =
         testRuns.size * ((n / measureBetweenEvery) - 1) // first time has no value to compare to, so skips calling onInterval
-      1 to expectedNrOfOnIntervalCalls foreach { _ ⇒
+      (1 to expectedNrOfOnIntervalCalls).foreach { _ ⇒
         testActor.expectMsgType[Duration]
       }
     }
@@ -70,16 +69,15 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
       val testRuns = 1 to 3
 
       def script =
-        Script((1 to n) map { x ⇒
+        Script(((1 to n)).map { x ⇒
           Seq(x) -> Seq(x)
         }: _*)
-      testRuns foreach
-        (_ ⇒
-           runScript(script, settings) { flow ⇒
-             flow.timed(_.map(identity), onComplete = printInfo)
-           })
+      testRuns.foreach(_ ⇒
+        runScript(script, settings) { flow ⇒
+          flow.timed(_.map(identity), onComplete = printInfo)
+      })
 
-      testRuns foreach { _ ⇒
+      testRuns.foreach { _ ⇒
         testActor.expectMsgType[Duration]
       }
       testActor.expectNoMsg(1.second)
@@ -134,7 +132,7 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
 
       val s = c1.expectSubscription()
       s.request(200)
-      0 to 100 foreach { i ⇒
+      (0 to 100).foreach { i ⇒
         c1.expectNext(i.toString + "!")
       }
       c1.expectComplete()

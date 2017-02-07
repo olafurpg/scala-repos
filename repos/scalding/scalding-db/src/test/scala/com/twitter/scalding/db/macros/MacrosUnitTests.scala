@@ -175,23 +175,23 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     assert(typeDesc.fields.equalsFields(expectedFields))
 
     val rsmd = mock[ResultSetMetaData]
-    when(rsmd.getColumnTypeName(1)) thenReturn ("INT")
-    when(rsmd.isNullable(1)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(2)) thenReturn ("VARCHAR")
-    when(rsmd.isNullable(2)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(3)) thenReturn ("INT")
-    when(rsmd.isNullable(3)) thenReturn (ResultSetMetaData.columnNullable)
-    when(rsmd.getColumnTypeName(4)) thenReturn ("VARCHAR")
-    when(rsmd.isNullable(4)) thenReturn
-      (ResultSetMetaData.columnNullableUnknown)
+    when(rsmd.getColumnTypeName(1)).thenReturn("INT")
+    when(rsmd.isNullable(1)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(2)).thenReturn("VARCHAR")
+    when(rsmd.isNullable(2)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(3)).thenReturn("INT")
+    when(rsmd.isNullable(3)).thenReturn(ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(4)).thenReturn("VARCHAR")
+    when(rsmd.isNullable(4))
+      .thenReturn(ResultSetMetaData.columnNullableUnknown)
 
     assert(columnDef.resultSetExtractor.validate(rsmd).isSuccess)
 
     val rs = mock[ResultSet]
-    when(rs.getInt("date_id")) thenReturn (123)
-    when(rs.getString("user_name")) thenReturn ("alice")
-    when(rs.getInt("age")) thenReturn (26)
-    when(rs.getString("gender")) thenReturn ("F")
+    when(rs.getInt("date_id")).thenReturn(123)
+    when(rs.getString("user_name")).thenReturn("alice")
+    when(rs.getInt("age")).thenReturn(26)
+    when(rs.getString("gender")).thenReturn("F")
 
     assert(
       columnDef.resultSetExtractor.toCaseClass(rs, typeDesc.converter) == User(
@@ -228,10 +228,10 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     assert(typeDesc.fields.equalsFields(expectedFields))
 
     val rs = mock[ResultSet]
-    when(rs.getInt("date_id")) thenReturn (123)
-    when(rs.getString("user_name")) thenReturn ("alice")
-    when(rs.getInt("age")) thenReturn (26)
-    when(rs.getString("gender")) thenReturn ("F")
+    when(rs.getInt("date_id")).thenReturn(123)
+    when(rs.getString("user_name")).thenReturn("alice")
+    when(rs.getInt("age")).thenReturn(26)
+    when(rs.getString("gender")).thenReturn("F")
 
     assert(
       columnDef.resultSetExtractor
@@ -349,54 +349,54 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     assert(columnDef.columns.toList === expectedColumns)
 
     val rsmd = mock[ResultSetMetaData]
-    when(rsmd.getColumnTypeName(1)) thenReturn ("BIGINT")
-    when(rsmd.isNullable(1)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(2)) thenReturn ("INT")
-    when(rsmd.isNullable(2)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(3)) thenReturn ("INTEGER") // synonym of INT
-    when(rsmd.isNullable(3)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(4)) thenReturn ("SMALLINT")
-    when(rsmd.isNullable(4)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(5)) thenReturn ("DOUBLE")
-    when(rsmd.isNullable(5)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(6)) thenReturn ("TINYINT")
-    when(rsmd.isNullable(6)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(7)) thenReturn ("VARCHAR")
-    when(rsmd.isNullable(7)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(8)) thenReturn ("CHAR") // synonym of VARCHAR
-    when(rsmd.isNullable(8)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(9)) thenReturn ("TEXT")
-    when(rsmd.isNullable(9)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(10)) thenReturn ("TEXT")
-    when(rsmd.isNullable(10)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(11)) thenReturn ("VARCHAR")
-    when(rsmd.isNullable(11)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(12)) thenReturn ("DATETIME")
-    when(rsmd.isNullable(12)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(13)) thenReturn ("DATE")
-    when(rsmd.isNullable(13)) thenReturn (ResultSetMetaData.columnNoNulls)
-    when(rsmd.getColumnTypeName(14)) thenReturn ("BIGINT")
-    when(rsmd.isNullable(14)) thenReturn (ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(1)).thenReturn("BIGINT")
+    when(rsmd.isNullable(1)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(2)).thenReturn("INT")
+    when(rsmd.isNullable(2)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(3)).thenReturn("INTEGER") // synonym of INT
+    when(rsmd.isNullable(3)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(4)).thenReturn("SMALLINT")
+    when(rsmd.isNullable(4)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(5)).thenReturn("DOUBLE")
+    when(rsmd.isNullable(5)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(6)).thenReturn("TINYINT")
+    when(rsmd.isNullable(6)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(7)).thenReturn("VARCHAR")
+    when(rsmd.isNullable(7)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(8)).thenReturn("CHAR") // synonym of VARCHAR
+    when(rsmd.isNullable(8)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(9)).thenReturn("TEXT")
+    when(rsmd.isNullable(9)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(10)).thenReturn("TEXT")
+    when(rsmd.isNullable(10)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(11)).thenReturn("VARCHAR")
+    when(rsmd.isNullable(11)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(12)).thenReturn("DATETIME")
+    when(rsmd.isNullable(12)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(13)).thenReturn("DATE")
+    when(rsmd.isNullable(13)).thenReturn(ResultSetMetaData.columnNoNulls)
+    when(rsmd.getColumnTypeName(14)).thenReturn("BIGINT")
+    when(rsmd.isNullable(14)).thenReturn(ResultSetMetaData.columnNullable)
 
     assert(columnDef.resultSetExtractor.validate(rsmd).isSuccess)
 
     val rs = mock[ResultSet]
-    when(rs.getLong("bigInt")) thenReturn (12345678L)
-    when(rs.getInt("smallerAgainInt")) thenReturn (123)
-    when(rs.getInt("normalIntWithSize")) thenReturn (12)
-    when(rs.getInt("evenSmallerInt")) thenReturn (1)
-    when(rs.getDouble("numberFun")) thenReturn (1.1)
-    when(rs.getBoolean("booleanFlag")) thenReturn (true)
-    when(rs.getString("smallString")) thenReturn ("small_string")
-    when(rs.getString("smallishString")) thenReturn ("smallish_string")
-    when(rs.getString("largeString")) thenReturn ("large_string")
-    when(rs.getString("forceTextString")) thenReturn ("force_text_string")
-    when(rs.getString("forcedVarChar")) thenReturn ("forced_var_char")
-    when(rs.getTimestamp("myDateWithTime")) thenReturn
-      (new java.sql.Timestamp(1111L))
-    when(rs.getTimestamp("myDateWithoutTime")) thenReturn
-      (new java.sql.Timestamp(1112L))
-    when(rs.getLong("optiLong")) thenReturn (1113L)
+    when(rs.getLong("bigInt")).thenReturn(12345678L)
+    when(rs.getInt("smallerAgainInt")).thenReturn(123)
+    when(rs.getInt("normalIntWithSize")).thenReturn(12)
+    when(rs.getInt("evenSmallerInt")).thenReturn(1)
+    when(rs.getDouble("numberFun")).thenReturn(1.1)
+    when(rs.getBoolean("booleanFlag")).thenReturn(true)
+    when(rs.getString("smallString")).thenReturn("small_string")
+    when(rs.getString("smallishString")).thenReturn("smallish_string")
+    when(rs.getString("largeString")).thenReturn("large_string")
+    when(rs.getString("forceTextString")).thenReturn("force_text_string")
+    when(rs.getString("forcedVarChar")).thenReturn("forced_var_char")
+    when(rs.getTimestamp("myDateWithTime"))
+      .thenReturn(new java.sql.Timestamp(1111L))
+    when(rs.getTimestamp("myDateWithoutTime"))
+      .thenReturn(new java.sql.Timestamp(1112L))
+    when(rs.getLong("optiLong")).thenReturn(1113L)
 
     assert(
       columnDef.resultSetExtractor
@@ -437,19 +437,19 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     val columnDef = typeDesc.columnDefn
 
     val rsmd = mock[ResultSetMetaData]
-    when(rsmd.getColumnTypeName(1)) thenReturn ("INT")
-    when(rsmd.isNullable(1)) thenReturn (ResultSetMetaData.columnNullable)
-    when(rsmd.getColumnTypeName(2)) thenReturn ("VARCHAR")
-    when(rsmd.isNullable(2)) thenReturn (ResultSetMetaData.columnNullable)
-    when(rsmd.getColumnTypeName(3)) thenReturn ("DATETIME")
-    when(rsmd.isNullable(3)) thenReturn (ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(1)).thenReturn("INT")
+    when(rsmd.isNullable(1)).thenReturn(ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(2)).thenReturn("VARCHAR")
+    when(rsmd.isNullable(2)).thenReturn(ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(3)).thenReturn("DATETIME")
+    when(rsmd.isNullable(3)).thenReturn(ResultSetMetaData.columnNullable)
 
     assert(columnDef.resultSetExtractor.validate(rsmd).isSuccess)
 
     val rs = mock[ResultSet]
-    when(rs.getInt("id")) thenReturn (26)
-    when(rs.getString("name")) thenReturn ("alice")
-    when(rs.getTimestamp("date_id")) thenReturn (new java.sql.Timestamp(1111L))
+    when(rs.getInt("id")).thenReturn(26)
+    when(rs.getString("name")).thenReturn("alice")
+    when(rs.getTimestamp("date_id")).thenReturn(new java.sql.Timestamp(1111L))
     assert(
       columnDef.resultSetExtractor
         .toCaseClass(rs, typeDesc.converter) == CaseClassWithOptions(
@@ -458,9 +458,10 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         Some(new Date(1111L))))
 
     reset(rs)
-    when(rs.getInt("id")) thenReturn (0) // jdbc returns 0 for null numeric values
-    when(rs.getString("name")) thenReturn (null)
-    when(rs.getString("date_id")) thenReturn (null)
+    when(rs.getInt("id"))
+      .thenReturn(0) // jdbc returns 0 for null numeric values
+    when(rs.getString("name")).thenReturn(null)
+    when(rs.getString("date_id")).thenReturn(null)
     assert(
       columnDef.resultSetExtractor
         .toCaseClass(rs, typeDesc.converter) == CaseClassWithOptions(Some(0),
@@ -473,12 +474,12 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     val columnDef = typeDesc.columnDefn
 
     val rsmd = mock[ResultSetMetaData]
-    when(rsmd.getColumnTypeName(1)) thenReturn ("INT")
-    when(rsmd.isNullable(1)) thenReturn (ResultSetMetaData.columnNullable)
-    when(rsmd.getColumnTypeName(2)) thenReturn ("TINYINT") // mismatch
-    when(rsmd.isNullable(2)) thenReturn (ResultSetMetaData.columnNullable)
-    when(rsmd.getColumnTypeName(3)) thenReturn ("DATETIME")
-    when(rsmd.isNullable(3)) thenReturn (ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(1)).thenReturn("INT")
+    when(rsmd.isNullable(1)).thenReturn(ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(2)).thenReturn("TINYINT") // mismatch
+    when(rsmd.isNullable(2)).thenReturn(ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(3)).thenReturn("DATETIME")
+    when(rsmd.isNullable(3)).thenReturn(ResultSetMetaData.columnNullable)
 
     assert(columnDef.resultSetExtractor.validate(rsmd).isFailure)
   }
@@ -488,12 +489,13 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     val columnDef = typeDesc.columnDefn
 
     val rsmd = mock[ResultSetMetaData]
-    when(rsmd.getColumnTypeName(1)) thenReturn ("INT")
-    when(rsmd.isNullable(1)) thenReturn (ResultSetMetaData.columnNullable)
-    when(rsmd.getColumnTypeName(2)) thenReturn ("VARCHAR")
-    when(rsmd.isNullable(2)) thenReturn (ResultSetMetaData.columnNullable)
-    when(rsmd.getColumnTypeName(3)) thenReturn ("DATETIME")
-    when(rsmd.isNullable(3)) thenReturn (ResultSetMetaData.columnNoNulls) // mismatch
+    when(rsmd.getColumnTypeName(1)).thenReturn("INT")
+    when(rsmd.isNullable(1)).thenReturn(ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(2)).thenReturn("VARCHAR")
+    when(rsmd.isNullable(2)).thenReturn(ResultSetMetaData.columnNullable)
+    when(rsmd.getColumnTypeName(3)).thenReturn("DATETIME")
+    when(rsmd.isNullable(3))
+      .thenReturn(ResultSetMetaData.columnNoNulls) // mismatch
 
     assert(columnDef.resultSetExtractor.validate(rsmd).isFailure)
   }

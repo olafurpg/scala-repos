@@ -24,12 +24,12 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
   class SocksConnectHandlerHelper {
     val ctx = mock[ChannelHandlerContext]
     val channel = mock[Channel]
-    when(ctx.getChannel) thenReturn channel
+    when(ctx.getChannel).thenReturn(channel)
     val pipeline = mock[ChannelPipeline]
-    when(ctx.getPipeline) thenReturn pipeline
-    when(channel.getPipeline) thenReturn pipeline
+    when(ctx.getPipeline).thenReturn(pipeline)
+    when(channel.getPipeline).thenReturn(pipeline)
     val closeFuture = Channels.future(channel)
-    when(channel.getCloseFuture) thenReturn closeFuture
+    when(channel.getCloseFuture).thenReturn(closeFuture)
     val port = 80 // never bound
     val portByte1 = (port >> 8).toByte
     val portByte2 = (port & 0xFF).toByte
@@ -37,7 +37,7 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     val remoteAddress = new InetSocketAddress(
       InetAddress.getByAddress(null, Array[Byte](0x7F, 0x0, 0x0, 0x1)),
       port)
-    when(channel.getRemoteAddress) thenReturn remoteAddress
+    when(channel.getRemoteAddress).thenReturn(remoteAddress)
     val proxyAddress = mock[SocketAddress]
 
     val connectFuture = Channels.future(channel, true)

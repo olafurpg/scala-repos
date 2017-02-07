@@ -46,7 +46,7 @@ trait ListeningServer
   final def close(deadline: Time): Future[Unit] = synchronized {
     isClosed = true
     val collected = Future.collect(announcements)
-    collected flatMap { list =>
+    collected.flatMap { list =>
       Closable.all(list: _*).close(deadline) before closeServer(deadline)
     }
   }

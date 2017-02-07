@@ -111,7 +111,7 @@ class NingAsyncHttpClientConfigBuilder(
     : NingAsyncHttpClientConfigBuilder = {
     new NingAsyncHttpClientConfigBuilder(ningConfig) {
       override val addCustomSettings =
-        modify compose NingAsyncHttpClientConfigBuilder.this.addCustomSettings
+        modify.compose(NingAsyncHttpClientConfigBuilder.this.addCustomSettings)
       override val builder = NingAsyncHttpClientConfigBuilder.this.builder
     }
   }
@@ -135,7 +135,7 @@ class NingAsyncHttpClientConfigBuilder(
       .setUseProxyProperties(config.useProxyProperties)
       .setCompressionEnforced(config.compressionEnabled)
 
-    config.userAgent foreach builder.setUserAgent
+    config.userAgent.foreach(builder.setUserAgent)
 
     // setAllowPoolingConnections and setAllowPoolingSslConnections were merged into isKeepAlive
     val keepAlive = ningConfig.keepAlive

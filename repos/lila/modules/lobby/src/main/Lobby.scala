@@ -34,8 +34,8 @@ private[lobby] final class Lobby(
 
     case HooksFor(userOption) =>
       val replyTo = sender
-      (userOption.map(_.id) ?? blocking) foreach { blocks =>
-        val lobbyUser = userOption map { LobbyUser.make(_, blocks) }
+      ((userOption.map(_.id) ?? blocking)).foreach { blocks =>
+        val lobbyUser = userOption.map { LobbyUser.make(_, blocks) }
         replyTo ! HookRepo.vector.filter { hook =>
           ~(hook.userId |@| lobbyUser.map(_.id)).apply(_ == _) ||
           Biter.canJoin(hook, lobbyUser)
@@ -44,11 +44,11 @@ private[lobby] final class Lobby(
 
     case msg @ AddHook(hook) => {
       lila.mon.lobby.hook.create()
-      HookRepo byUid hook.uid foreach remove
+      (HookRepo byUid hook.uid).foreach(remove)
       hook.sid ?? { sid =>
-        HookRepo bySid sid foreach remove
+        (HookRepo bySid sid).foreach(remove)
       }
-      findCompatible(hook) foreach {
+      findCompatible(hook).foreach {
         case Some(h) => self ! BiteHook(h.id, hook.uid, hook.user)
         case None => self ! SaveHook(msg)
       }
@@ -56,13 +56,13 @@ private[lobby] final class Lobby(
 
     case msg @ AddSeek(seek) =>
       lila.mon.lobby.seek.create()
-      findCompatible(seek) foreach {
+      findCompatible(seek).foreach {
         case Some(s) => self ! BiteSeek(s.id, seek.user)
         case None => self ! SaveSeek(msg)
       }
 
     case SaveHook(msg) =>
-      HookRepo save msg.hook
+      HookRepo.save(msg.hook)
       socket ! msg
 
     case SaveSeek(msg) =>
@@ -71,7 +71,7 @@ private[lobby] final class Lobby(
       }
 
     case CancelHook(uid) => {
-      HookRepo byUid uid foreach remove
+      (HookRepo byUid uid).foreach(remove)
     }
 
     case CancelSeek(seekId, user) =>
@@ -82,18 +82,18 @@ private[lobby] final class Lobby(
     case BiteHook(hookId, uid, user) =>
       NoPlayban(user) {
         lila.mon.lobby.hook.join()
-        HookRepo byId hookId foreach { hook =>
-          HookRepo byUid uid foreach remove
-          Biter(hook, uid, user) pipeTo self
+        (HookRepo byId hookId).foreach { hook =>
+          (HookRepo byUid uid).foreach(remove)
+          Biter(hook, uid, user).pipeTo(self)
         }
       }
 
     case BiteSeek(seekId, user) =>
       NoPlayban(user.some) {
         lila.mon.lobby.seek.join()
-        seekApi find seekId foreach {
-          _ foreach { seek =>
-            Biter(seek, user) pipeTo self
+        (seekApi find seekId).foreach {
+          _.foreach { seek =>
+            Biter(seek, user).pipeTo(self)
           }
         }
       }
@@ -112,8 +112,10 @@ private[lobby] final class Lobby(
 
     case Broom =>
       HookRepo.truncateIfNeeded
-      implicit val timeout = makeTimeout seconds 1
-      (socket ? GetUids mapTo manifest[SocketUids]).chronometer
+      implicit val timeout = makeTimeout.seconds(1)
+      ((socket ? GetUids)
+        .mapTo(manifest[SocketUids]))
+        .chronometer
         .logIfSlow(100, logger) { r =>
           s"GetUids size=${r.uids.size}"
         }
@@ -125,8 +127,8 @@ private[lobby] final class Lobby(
     case SocketUids(uids) =>
       val createdBefore = DateTime.now minusSeconds 5
       val hooks = {
-        (HookRepo notInUids uids).filter {
-          _.createdAt isBefore createdBefore
+        (HookRepo.notInUids(uids)).filter {
+          _.createdAt.isBefore(createdBefore)
         } ++ HookRepo.cleanupOld
       }.toSet
       // logger.debug(
@@ -138,19 +140,21 @@ private[lobby] final class Lobby(
       lila.mon.lobby.socket.member(uids.size)
       lila.mon.lobby.hook.size(HookRepo.size)
 
-    case RemoveHooks(hooks) => hooks foreach remove
+    case RemoveHooks(hooks) => hooks.foreach(remove)
 
     case Resync =>
       socket ! HookIds(HookRepo.vector.map(_.id))
   }
 
   private def NoPlayban(user: Option[LobbyUser])(f: => Unit) {
-    user.?? { u =>
-      playban(u.id)
-    } foreach {
-      case None => f
-      case _ =>
-    }
+    user
+      .?? { u =>
+        playban(u.id)
+      }
+      .foreach {
+        case None => f
+        case _ =>
+      }
   }
 
   private def findCompatible(hook: Hook): Fu[Option[Hook]] =
@@ -160,27 +164,28 @@ private[lobby] final class Lobby(
                                in: Vector[Hook]): Fu[Option[Hook]] = in match {
     case Vector() => fuccess(none)
     case h +: rest =>
-      Biter.canJoin(h, hook.user) ?? ! {
+      (Biter.canJoin(h, hook.user) ?? ! {
         (h.user |@| hook.user).tupled ?? {
           case (u1, u2) =>
             GameRepo
-              .lastGameBetween(u1.id, u2.id, DateTime.now minusHours 1) map {
-              _ ?? (_.aborted)
-            }
+              .lastGameBetween(u1.id, u2.id, DateTime.now minusHours 1)
+              .map {
+                _ ?? (_.aborted)
+              }
         }
-      } flatMap {
+      }).flatMap {
         case true => fuccess(h.some)
         case false => findCompatibleIn(hook, rest)
       }
   }
 
   private def findCompatible(seek: Seek): Fu[Option[Seek]] =
-    seekApi forUser seek.user map {
-      _ find (_ compatibleWith seek)
+    seekApi.forUser(seek.user).map {
+      _ find (_.compatibleWith(seek))
     }
 
   private def remove(hook: Hook) = {
-    HookRepo remove hook
+    HookRepo.remove(hook)
     socket ! RemoveHook(hook.id)
   }
 }

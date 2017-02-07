@@ -163,7 +163,7 @@ class Reversi(jQuery: JQueryStatic, playground: JQuery) {
   @JSExport
   def startGame() {
     // Set up the board
-    allSquares foreach (_.owner = NoPlayer)
+    allSquares.foreach(_.owner = NoPlayer)
     board(3)(3).owner = White
     board(3)(4).owner = Black
     board(4)(3).owner = Black
@@ -208,7 +208,7 @@ class Reversi(jQuery: JQueryStatic, playground: JQuery) {
   def clickSquare(square: Square) {
     val toFlip = computeFlips(square)
     if (!toFlip.isEmpty) {
-      (square :: toFlip) foreach (_.owner = currentPlayer)
+      ((square :: toFlip)).foreach(_.owner = currentPlayer)
       nextTurn()
     }
   }

@@ -108,7 +108,7 @@ object DebuggerTestUtil {
       priorityPaths.flatten.headOption
     } else {
       val fullSearchPaths =
-        paths flatMap { p =>
+        paths.flatMap { p =>
           versionStrings.map((p, _))
         }
       for ((path, ver) <- fullSearchPaths) {

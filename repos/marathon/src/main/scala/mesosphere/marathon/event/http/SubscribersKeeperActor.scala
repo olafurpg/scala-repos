@@ -29,7 +29,7 @@ class SubscribersKeeperActor(val store: EntityStore[EventSubscribers])
       }(context.dispatcher)
 
       import context.dispatcher
-      subscription pipeTo sender()
+      subscription.pipeTo(sender())
 
     case event @ Unsubscribe(_, callbackUrl, _, _) =>
       val removeResult: Future[EventSubscribers] = remove(callbackUrl)
@@ -42,7 +42,7 @@ class SubscribersKeeperActor(val store: EntityStore[EventSubscribers])
       }(context.dispatcher)
 
       import context.dispatcher
-      subscription pipeTo sender()
+      subscription.pipeTo(sender())
 
     case GetSubscribers =>
       val subscription = store
@@ -50,7 +50,7 @@ class SubscribersKeeperActor(val store: EntityStore[EventSubscribers])
         .map(_.getOrElse(EventSubscribers()))(context.dispatcher)
 
       import context.dispatcher
-      subscription pipeTo sender()
+      subscription.pipeTo(sender())
   }
 
   protected[this] def add(callbackUrl: String): Future[EventSubscribers] =

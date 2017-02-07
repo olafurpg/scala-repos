@@ -39,7 +39,7 @@ trait CommandSupport
         .map(_())
         .getOrElse(mf.erasure.newInstance())
         .asInstanceOf[T]
-    commandOption[T] getOrElse bindCommand(createCommand)
+    commandOption[T].getOrElse(bindCommand(createCommand))
   }
 
   /**
@@ -51,7 +51,7 @@ trait CommandSupport
   def commandOrElse[T <: CommandType](factory: ⇒ T)(
       implicit request: HttpServletRequest,
       mf: Manifest[T]): T = {
-    commandOption[T] getOrElse bindCommand(factory)
+    commandOption[T].getOrElse(bindCommand(factory))
   }
 
   protected def bindCommand[T <: CommandType](newCommand: T)(

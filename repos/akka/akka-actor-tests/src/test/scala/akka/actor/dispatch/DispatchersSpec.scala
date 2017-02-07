@@ -84,8 +84,8 @@ object DispatchersSpec {
       extends UnboundedQueueBasedMessageQueue {
     final val queue = new ConcurrentLinkedQueue[Envelope]()
     override def enqueue(receiver: ActorRef, handle: Envelope): Unit = {
-      queue add handle
-      queue add handle
+      queue.add(handle)
+      queue.add(handle)
     }
   }
 }

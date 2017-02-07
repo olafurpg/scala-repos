@@ -32,13 +32,13 @@ object Test extends Properties("==") {
                          x.toDouble,
                          BigInt(x),
                          BigDecimal(x))
-      val shortAndLarger = anyvals drop 2
+      val shortAndLarger = anyvals.drop(2)
 
       val result =
-        (((anyvals, anyvals).zipped forall equalObjectsEqualHashcodes) &&
-          ((shortAndLarger, shortAndLarger).zipped forall (_ == _)) &&
-          ((shortAndLarger, shortAndLarger).zipped forall
-            ((x, y) => (x: Any) == (y: Any))))
+        (((anyvals, anyvals).zipped.forall(equalObjectsEqualHashcodes)) &&
+          ((shortAndLarger, shortAndLarger).zipped.forall(_ == _)) &&
+          ((shortAndLarger, shortAndLarger).zipped.forall((x, y) =>
+            (x: Any) == (y: Any))))
       result
     }
   }

@@ -33,7 +33,7 @@ class JsonValueReader(val data: JValue)(implicit formats: Formats)
     if (realRest.isEmpty) {
       get(part, subj)
     } else {
-      get(part, subj) flatMap (readPath(realRest, _))
+      get(part, subj).flatMap(readPath(realRest, _))
     }
   }
 

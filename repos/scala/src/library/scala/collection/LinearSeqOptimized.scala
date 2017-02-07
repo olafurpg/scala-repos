@@ -192,7 +192,7 @@ trait LinearSeqOptimized[+A, +Repr <: LinearSeqOptimized[A, Repr]]
   def dropRight(n: Int): Repr = {
     val b = newBuilder
     var these = this
-    var lead = this drop n
+    var lead = this.drop(n)
     while (!lead.isEmpty) {
       b += these.head
       these = these.tail
@@ -204,7 +204,7 @@ trait LinearSeqOptimized[+A, +Repr <: LinearSeqOptimized[A, Repr]]
   override /*IterableLike*/
   def slice(from: Int, until: Int): Repr = {
     var these: Repr = repr
-    var count = from max 0
+    var count = from.max(0)
     if (until <= count) return newBuilder.result()
 
     val b = newBuilder
@@ -277,7 +277,7 @@ trait LinearSeqOptimized[+A, +Repr <: LinearSeqOptimized[A, Repr]]
   override /*SeqLike*/
   def segmentLength(p: A => Boolean, from: Int): Int = {
     var i = 0
-    var these = this drop from
+    var these = this.drop(from)
     while (!these.isEmpty && p(these.head)) {
       i += 1
       these = these.tail
@@ -288,7 +288,7 @@ trait LinearSeqOptimized[+A, +Repr <: LinearSeqOptimized[A, Repr]]
   override /*SeqLike*/
   def indexWhere(p: A => Boolean, from: Int): Int = {
     var i = from
-    var these = this drop from
+    var these = this.drop(from)
     while (these.nonEmpty) {
       if (p(these.head)) return i
 

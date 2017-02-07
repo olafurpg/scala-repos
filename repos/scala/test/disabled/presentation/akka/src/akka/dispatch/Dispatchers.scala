@@ -226,7 +226,7 @@ object Dispatchers {
   def fromConfig(key: String,
                  default: => MessageDispatcher = defaultGlobalDispatcher)
     : MessageDispatcher =
-    config getSection key flatMap from getOrElse default
+    config.getSection(key).flatMap(from).getOrElse(default)
 
   /*
    * Creates of obtains a dispatcher from a ConfigMap according to the format below
@@ -252,34 +252,38 @@ object Dispatchers {
    *         IllegalArgumentException if it cannot
    */
   def from(cfg: Configuration): Option[MessageDispatcher] = {
-    cfg.getString("type") map {
-      case "ExecutorBasedEventDriven" =>
-        new ExecutorBasedEventDrivenDispatcherConfigurator()
-      case "ExecutorBasedEventDrivenWorkStealing" =>
-        new ExecutorBasedEventDrivenWorkStealingDispatcherConfigurator()
-      case "GlobalExecutorBasedEventDriven" =>
-        GlobalExecutorBasedEventDrivenDispatcherConfigurator
-      case fqn =>
-        ReflectiveAccess.getClassFor[MessageDispatcherConfigurator](fqn) match {
-          case r: Right[_, Class[MessageDispatcherConfigurator]] =>
-            ReflectiveAccess.createInstance[MessageDispatcherConfigurator](
-              r.b,
-              Array[Class[_]](),
-              Array[AnyRef]()) match {
-              case r: Right[Exception, MessageDispatcherConfigurator] => r.b
-              case l: Left[Exception, MessageDispatcherConfigurator] =>
-                throw new IllegalArgumentException(
-                  "Cannot instantiate MessageDispatcherConfigurator type [%s], make sure it has a default no-args constructor" format fqn,
-                  l.a)
-            }
-          case l: Left[Exception, _] =>
-            throw new IllegalArgumentException(
-              "Unknown MessageDispatcherConfigurator type [%s]" format fqn,
-              l.a)
-        }
-    } map {
-      _ configure cfg
-    }
+    cfg
+      .getString("type")
+      .map {
+        case "ExecutorBasedEventDriven" =>
+          new ExecutorBasedEventDrivenDispatcherConfigurator()
+        case "ExecutorBasedEventDrivenWorkStealing" =>
+          new ExecutorBasedEventDrivenWorkStealingDispatcherConfigurator()
+        case "GlobalExecutorBasedEventDriven" =>
+          GlobalExecutorBasedEventDrivenDispatcherConfigurator
+        case fqn =>
+          ReflectiveAccess.getClassFor[MessageDispatcherConfigurator](fqn) match {
+            case r: Right[_, Class[MessageDispatcherConfigurator]] =>
+              ReflectiveAccess.createInstance[MessageDispatcherConfigurator](
+                r.b,
+                Array[Class[_]](),
+                Array[AnyRef]()) match {
+                case r: Right[Exception, MessageDispatcherConfigurator] => r.b
+                case l: Left[Exception, MessageDispatcherConfigurator] =>
+                  throw new IllegalArgumentException(
+                    "Cannot instantiate MessageDispatcherConfigurator type [%s], make sure it has a default no-args constructor"
+                      .format(fqn),
+                    l.a)
+              }
+            case l: Left[Exception, _] =>
+              throw new IllegalArgumentException(
+                "Unknown MessageDispatcherConfigurator type [%s]".format(fqn),
+                l.a)
+          }
+      }
+      .map {
+        _.configure(cfg)
+      }
   }
 }
 

@@ -103,7 +103,7 @@ class ParHashSet[T] private[immutable] (private[this] val trie: HashSet[T])
             // iterator of the collision map case
             val buff = triter.toBuffer
             val (fp, sp) = buff.splitAt(buff.length / 2)
-            Seq(fp, sp) map { b =>
+            Seq(fp, sp).map { b =>
               new ParHashSetIterator(b.iterator, b.length)
             }
         }

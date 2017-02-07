@@ -101,9 +101,9 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     extends NumericOps[Series[X, T]]
     with Serializable {
 
-  require(values.length == index.length,
-          "Values length %d != index length %d" format
-            (values.length, index.length))
+  require(
+    values.length == index.length,
+    "Values length %d != index length %d".format(values.length, index.length))
 
   /**
     * The length shared by both the index and the values array
@@ -241,7 +241,7 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     */
   def reindex(newIx: Index[X]): Series[X, T] = {
     val ixer = index.getIndexer(newIx)
-    ixer.map(a => Series(values.take(a), newIx)) getOrElse this
+    ixer.map(a => Series(values.take(a), newIx)).getOrElse(this)
   }
 
   /**
@@ -292,7 +292,7 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     */
   def concat[U, V](other: Series[X, U])(implicit pro: Promoter[T, U, V],
                                         md: ST[V]): Series[X, V] =
-    Series(values concat other.values, index concat other.index)
+    Series(values.concat(other.values), index.concat(other.index))
 
   /**
     * Additive inverse of Series with numeric elements
@@ -760,8 +760,8 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     */
   def join(other: Series[X, T], how: JoinType = LeftJoin): Frame[X, Int, T] = {
     val indexer = this.index.join(other.index, how)
-    val lseq = indexer.lTake.map(this.values.take(_)) getOrElse this.values
-    val rseq = indexer.rTake.map(other.values.take(_)) getOrElse other.values
+    val lseq = indexer.lTake.map(this.values.take(_)).getOrElse(this.values)
+    val rseq = indexer.rTake.map(other.values.take(_)).getOrElse(other.values)
     Frame(MatCols(lseq, rseq), indexer.index, Array(0, 1))
   }
 
@@ -777,8 +777,8 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
   def hjoin(other: Series[X, _],
             how: JoinType = LeftJoin): Frame[X, Int, Any] = {
     val indexer = this.index.join(other.index, how)
-    val lft = indexer.lTake.map(this.values.take(_)) getOrElse this.values
-    val rgt = indexer.rTake.map(other.values.take(_)) getOrElse other.values
+    val lft = indexer.lTake.map(this.values.take(_)).getOrElse(this.values)
+    val rgt = indexer.rTake.map(other.values.take(_)).getOrElse(other.values)
     Panel(Seq(lft, rgt), indexer.index, IndexIntRange(2))
   }
 
@@ -830,8 +830,8 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
   def align[U: ST](other: Series[X, U],
                    how: JoinType = LeftJoin): (Series[X, T], Series[X, U]) = {
     val indexer = this.index.join(other.index, how)
-    val lseq = indexer.lTake.map(this.values.take(_)) getOrElse this.values
-    val rseq = indexer.rTake.map(other.values.take(_)) getOrElse other.values
+    val lseq = indexer.lTake.map(this.values.take(_)).getOrElse(this.values)
+    val rseq = indexer.rTake.map(other.values.take(_)).getOrElse(other.values)
     (Series(lseq, indexer.index), Series(rseq, indexer.index))
   }
 
@@ -865,34 +865,34 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
   /**
     * Convert Series to an indexed sequence of (key, value) pairs.
     */
-  def toSeq: IndexedSeq[(X, T)] = index.toSeq zip values.toSeq
+  def toSeq: IndexedSeq[(X, T)] = index.toSeq.zip(values.toSeq)
 
   def stringify(len: Int = 10): String = {
     val half = len / 2
 
     val buf = new StringBuilder()
 
-    if (length == 0) buf append "Empty Series"
+    if (length == 0) buf.append("Empty Series")
     else {
-      buf.append("[%d x 1]\n" format length)
+      buf.append("[%d x 1]\n".format(length))
 
       val maxf = (a: List[Int], b: List[String]) =>
-        (a zip b).map(v => v._1.max(v._2.length))
+        (a.zip(b)).map(v => v._1.max(v._2.length))
 
       val isca = index.scalarTag
       val vidx = index.toVec
-      val idxHf = { vidx.head(half) concat vidx.tail(half) }
+      val idxHf = { vidx.head(half).concat(vidx.tail(half)) }
       val ilens = idxHf
         .map(isca.strList(_))
         .foldLeft(isca.strList(vidx(0)).map(_.length))(maxf)
 
       val vsca = values.scalarTag
-      val vlHf = { values.head(half) concat values.tail(half) }
+      val vlHf = { values.head(half).concat(values.tail(half)) }
       val vlen =
         vlHf.map(vsca.show(_)).foldLeft(2)((a, b) => math.max(a, b.length))
 
       def enumZip[A, B](a: List[A], b: List[B]): List[(Int, A, B)] =
-        for (v <- (a.zipWithIndex zip b)) yield (v._1._2, v._1._1, v._2)
+        for (v <- (a.zipWithIndex.zip(b))) yield (v._1._2, v._1._1, v._2)
 
       val sz = isca.strList(index.raw(0)).size
 

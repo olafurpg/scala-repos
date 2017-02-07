@@ -34,7 +34,7 @@ trait ApplicativeError[F[_], E] extends Applicative[F] {
     * @see [[recover]] to only recover from certain errors.
     */
   def handleError[A](fa: F[A])(f: E => A): F[A] =
-    handleErrorWith(fa)(f andThen pure)
+    handleErrorWith(fa)(f.andThen(pure))
 
   /**
     * Handle errors by turning them into [[cats.data.Xor.Left]] values.
@@ -63,7 +63,7 @@ trait ApplicativeError[F[_], E] extends Applicative[F] {
     * `F[A]` values.
     */
   def recover[A](fa: F[A])(pf: PartialFunction[E, A]): F[A] =
-    handleErrorWith(fa)(e => (pf andThen pure) applyOrElse (e, raiseError))
+    handleErrorWith(fa)(e => (pf.andThen(pure)).applyOrElse(e, raiseError))
 
   /**
     * Recover from certain errors by mapping them to an `F[A]` value.
@@ -74,7 +74,7 @@ trait ApplicativeError[F[_], E] extends Applicative[F] {
     * values.
     */
   def recoverWith[A](fa: F[A])(pf: PartialFunction[E, F[A]]): F[A] =
-    handleErrorWith(fa)(e => pf applyOrElse (e, raiseError))
+    handleErrorWith(fa)(e => pf.applyOrElse(e, raiseError))
 }
 
 object ApplicativeError {

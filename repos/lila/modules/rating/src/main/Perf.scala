@@ -15,7 +15,7 @@ case class Perf(glicko: Glicko,
   def intDeviation = glicko.deviation.toInt
 
   def progress: Int = ~recent.headOption.flatMap { head =>
-    recent.lastOption map (head -)
+    recent.lastOption.map(head -)
   }
 
   def add(g: Glicko, date: DateTime): Perf =
@@ -23,12 +23,12 @@ case class Perf(glicko: Glicko,
          nb = nb + 1,
          recent =
            if (nb < 10) recent
-           else (g.intRating :: recent) take Perf.recentMaxSize,
+           else ((g.intRating :: recent)).take(Perf.recentMaxSize),
          latest = date.some)
 
   def add(r: Rating, date: DateTime): Option[Perf] = {
     val glicko = Glicko(r.getRating, r.getRatingDeviation, r.getVolatility)
-    glicko.sanityCheck option add(glicko, date)
+    glicko.sanityCheck.option(add(glicko, date))
   }
 
   def addOrReset(monitor: lila.mon.IncPath,
@@ -70,7 +70,7 @@ case object Perf {
     def reads(r: BSON.Reader): Perf =
       Perf(glicko = r.getO[Glicko]("gl") | Glicko.default,
            nb = r intD "nb",
-           latest = r dateO "la",
+           latest = r.dateO("la"),
            recent = r intsD "re")
 
     def writes(w: BSON.Writer, o: Perf) =

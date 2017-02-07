@@ -365,7 +365,7 @@ class CleanerTest extends JUnitSuite {
     val cleaner = makeCleaner(Int.MaxValue)
     val start = 0
     val end = 500
-    val offsets = writeToLog(log, (start until end) zip (start until end))
+    val offsets = writeToLog(log, ((start until end)).zip(start until end))
     def checkRange(map: FakeOffsetMap, start: Int, end: Int) {
       val endOffset = cleaner.buildOffsetMap(log, start, end, map) + 1
       assertEquals("Last offset should be the end offset.", end, endOffset)

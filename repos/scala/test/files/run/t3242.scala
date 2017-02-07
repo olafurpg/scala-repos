@@ -22,7 +22,7 @@ object Test {
     // this will crash, Vector bug!
     def vectorRemove(vec: Vector[A]): Vector[A] =
       updateM[Vector](vec, (as, a) => {
-        val v = (as filterNot { _ == a })
+        val v = (as.filterNot { _ == a })
         //val v = (is filter{ _ != i})
         //println("==>remove:    i: "+a)
         v

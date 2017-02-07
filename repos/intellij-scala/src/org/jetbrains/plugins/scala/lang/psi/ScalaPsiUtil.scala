@@ -121,16 +121,16 @@ object ScalaPsiUtil {
       paramText +=
         param.typeParameters.map(typeParamString).mkString("[", ", ", "]")
     }
-    param.lowerTypeElement foreach {
+    param.lowerTypeElement.foreach {
       case tp => paramText = paramText + " >: " + tp.getText
     }
-    param.upperTypeElement foreach {
+    param.upperTypeElement.foreach {
       case tp => paramText = paramText + " <: " + tp.getText
     }
-    param.viewTypeElement foreach {
+    param.viewTypeElement.foreach {
       case tp => paramText = paramText + " <% " + tp.getText
     }
-    param.contextBoundTypeElement foreach {
+    param.contextBoundTypeElement.foreach {
       case tp => paramText = paramText + " : " + tp.getText
     }
     paramText
@@ -314,7 +314,7 @@ object ScalaPsiUtil {
           case Success(t, _) =>
             (processor, place) match {
               case (b: BaseProcessor, p: ScalaPsiElement) =>
-                b.processType(subst subst t, p, state)
+                b.processType(subst.subst(t), p, state)
               case _ => true
             }
           case _ => true
@@ -363,19 +363,20 @@ object ScalaPsiUtil {
             e.getResolveScope,
             ScalaPsiManager.ClassCategory.TYPE
           )
-      ) collect {
-        case cl: ScTrait =>
-          ScParameterizedType(
-            ScType.designator(cl),
-            cl.typeParameters.map(
-              tp =>
-                new ScUndefinedType(
-                  new ScTypeParameterType(tp, ScSubstitutor.empty),
-                  1)))
-      } flatMap {
-        case p: ScParameterizedType => Some(p)
-        case _ => None
-      }
+      ).collect {
+          case cl: ScTrait =>
+            ScParameterizedType(
+              ScType.designator(cl),
+              cl.typeParameters.map(
+                tp =>
+                  new ScUndefinedType(
+                    new ScTypeParameterType(tp, ScSubstitutor.empty),
+                    1)))
+        }
+        .flatMap {
+          case p: ScParameterizedType => Some(p)
+          case _ => None
+        }
 
     def specialExtractParameterType(
         rr: ScalaResolveResult): (Option[ScType], Seq[TypeParameter]) = {

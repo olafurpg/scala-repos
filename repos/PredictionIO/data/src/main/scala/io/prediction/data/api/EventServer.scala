@@ -202,11 +202,11 @@ class EventServiceActor(val eventClient: LEvents,
                                   authData.channelId,
                                   pluginArgs)
                   case EventServerPlugin.inputSniffer =>
-                    pluginsActorRef ? PluginsActor.HandleREST(
+                    (pluginsActorRef ? PluginsActor.HandleREST(
                       appId = authData.appId,
                       channelId = authData.channelId,
                       pluginName = pluginName,
-                      pluginArgs = pluginArgs) map {
+                      pluginArgs = pluginArgs)).map {
                       _.asInstanceOf[String]
                     }
                 }
@@ -480,7 +480,7 @@ class EventServiceActor(val eventClient: LEvents,
               respondWithMediaType(MediaTypes.`application/json`) {
                 if (config.stats) {
                   complete {
-                    statsActorRef ? GetStats(appId) map {
+                    (statsActorRef ? GetStats(appId)).map {
                       _.asInstanceOf[Map[String, StatsSnapshot]]
                     }
                   }

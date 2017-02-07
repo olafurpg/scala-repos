@@ -42,7 +42,7 @@ object SimpleExpr extends ParserNode with ScalaTokenTypes {
       case ScalaTokenTypes.kNEW =>
         builder.advanceLexer() //Ate new
         if (!ClassTemplate.parse(builder, nonEmpty = true)) {
-          builder error ErrMsg("identifier.expected")
+          builder.error(ErrMsg("identifier.expected"))
           simpleMarker.drop()
           return false
         }
@@ -72,7 +72,7 @@ object SimpleExpr extends ParserNode with ScalaTokenTypes {
             simpleMarker.done(ScalaElementTypes.UNIT_EXPR)
           case _ =>
             if (!Expr.parse(builder)) {
-              builder error ErrMsg("rparenthesis.expected")
+              builder.error(ErrMsg("rparenthesis.expected"))
               builder.restoreNewlinesState
               newMarker = simpleMarker.precede
               simpleMarker.done(ScalaElementTypes.UNIT_EXPR)
@@ -85,7 +85,7 @@ object SimpleExpr extends ParserNode with ScalaTokenTypes {
                 isTuple = true
                 builder.advanceLexer()
                 if (!Expr.parse(builder)) {
-                  builder error ErrMsg("wrong.expression")
+                  builder.error(ErrMsg("wrong.expression"))
                 }
               }
               if (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
@@ -93,7 +93,7 @@ object SimpleExpr extends ParserNode with ScalaTokenTypes {
                 isTuple = true
               }
               if (builder.getTokenType != ScalaTokenTypes.tRPARENTHESIS) {
-                builder error ErrMsg("rparenthesis.expected")
+                builder.error(ErrMsg("rparenthesis.expected"))
               } else {
                 builder.advanceLexer()
               }
@@ -139,7 +139,7 @@ object SimpleExpr extends ParserNode with ScalaTokenTypes {
               marker.done(ScalaElementTypes.REFERENCE_EXPRESSION)
               subparse(tMarker)
             case _ =>
-              builder error ScalaBundle.message("identifier.expected")
+              builder.error(ScalaBundle.message("identifier.expected"))
               marker.drop()
           }
         case ScalaTokenTypes.tLPARENTHESIS | ScalaTokenTypes.tLBRACE

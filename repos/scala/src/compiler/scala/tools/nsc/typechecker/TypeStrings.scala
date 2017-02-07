@@ -42,7 +42,7 @@ trait StructuredTypeStrings extends DestructureTypes {
       name: String,
       nodes: List[TypeNode]): String = {
     val l1 = str(level)(name + grouping.ldelim)
-    val l2 = nodes.map(_ show level + 1)
+    val l2 = nodes.map(_.show(level + 1))
     val l3 = str(level)(grouping.rdelim)
 
     l1 +: l2 :+ l3 mkString "\n"
@@ -53,16 +53,16 @@ trait StructuredTypeStrings extends DestructureTypes {
     val threshold = 70
 
     val try1 = str(level)(
-      name + grouping.join(nodes map (_.show(0, grouping.labels)): _*))
+      name + grouping.join(nodes.map(_.show(0, grouping.labels)): _*))
     if (try1.length < threshold) try1
     else block(level, grouping)(name, nodes)
   }
   private def shortClass(x: Any) = {
     if (settings.debug) {
-      val name = (x.getClass.getName split '.').last
+      val name = (x.getClass.getName.split('.')).last
       val str =
         if (TypeStrings.isAnonClass(x.getClass)) name
-        else (name split '$').last
+        else (name.split('$')).last
 
       " // " + str
     } else ""
@@ -138,7 +138,7 @@ trait StructuredTypeStrings extends DestructureTypes {
     def withLabel(node: TypeNode, label: String): TypeNode =
       node withLabel label
     def withType(node: TypeNode, typeName: String): TypeNode =
-      node withType typeName
+      node.withType(typeName)
 
     def wrapEmpty = TypeEmpty
     def wrapSequence(nodes: List[TypeNode]) = new TypeList(nodes)
@@ -172,7 +172,7 @@ trait TypeStrings {
                                        "double",
                                        "boolean",
                                        "void")
-  private val primitiveMap = (primitives.toList map { x =>
+  private val primitiveMap = (primitives.toList.map { x =>
     val key = x match {
       case "int" => "Integer"
       case "char" => "Character"
@@ -187,12 +187,12 @@ trait TypeStrings {
   }).toMap
 
   def isAnonClass(cl: Class[_]) = {
-    val xs = cl.getName.reverse takeWhile (_ != '$')
+    val xs = cl.getName.reverse.takeWhile(_ != '$')
     xs.nonEmpty && xs.forall(_.isDigit)
   }
 
   def scalaName(s: String): String = {
-    if (s endsWith MODULE_SUFFIX_STRING) s.init + ".type"
+    if (s.endsWith(MODULE_SUFFIX_STRING)) s.init + ".type"
     else if (s == "void") "scala.Unit"
     else if (primitives(s)) "scala." + s.capitalize
     else primitiveMap.getOrElse(s, NameTransformer.decode(s))
@@ -202,11 +202,11 @@ trait TypeStrings {
     val name = clazz.getName
     val enclClass = clazz.getEnclosingClass
     def enclPre = enclClass.getName + MODULE_SUFFIX_STRING
-    def enclMatch = name startsWith enclPre
+    def enclMatch = name.startsWith(enclPre)
 
     scalaName(
       if (enclClass == null || isAnonClass(clazz) || !enclMatch) name
-      else enclClass.getName + "." + (name stripPrefix enclPre)
+      else enclClass.getName + "." + (name.stripPrefix(enclPre))
     )
   }
   def anyClass(x: Any): JClass = if (x == null) null else x.getClass
@@ -219,12 +219,12 @@ trait TypeStrings {
     tvarString(tvar.getBounds.toList)
   private def tvarString(bounds: List[AnyRef]): String = {
     val xs =
-      bounds filterNot (_ == ObjectClass) collect { case x: JClass => x }
+      bounds.filterNot(_ == ObjectClass).collect { case x: JClass => x }
     if (xs.isEmpty) "_"
     else scalaName(xs.head)
   }
   private def tparamString(clazz: JClass): String = {
-    brackets(clazz.getTypeParameters map tvarString: _*)
+    brackets(clazz.getTypeParameters.map(tvarString): _*)
   }
 
   private def tparamString[T: ru.TypeTag]: String = {
@@ -232,7 +232,7 @@ trait TypeStrings {
     def typeArguments: List[ru.Type] = ru.typeOf[T] match {
       case ru.TypeRef(_, _, args) => args; case _ => Nil
     }
-    brackets(typeArguments map (jc => tvarString(List(jc))): _*)
+    brackets(typeArguments.map(jc => tvarString(List(jc))): _*)
   }
 
   /** Going for an overabundance of caution right now.  Later these types
@@ -259,7 +259,7 @@ trait TypeStrings {
         "scala.collection.generic." -> "generic.",
         "java.lang." -> "jl.",
         "scala.runtime." -> "runtime."
-      ) ++ (alsoStrip map (_ -> ""))
+      ) ++ (alsoStrip.map(_ -> ""))
 
     transforms.foldLeft(tpe) {
       case (res, (k, v)) => res.replaceAll(k, v)

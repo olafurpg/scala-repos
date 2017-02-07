@@ -174,7 +174,7 @@ object HiveTypeCoercion {
 
       case q: LogicalPlan =>
         val inputMap = q.inputSet.toSeq.map(a => (a.exprId, a)).toMap
-        q transformExpressions {
+        q.transformExpressions {
           case a: AttributeReference =>
             inputMap.get(a.exprId) match {
               // This can happen when a Attribute reference is born in a non-leaf node, for example
@@ -292,7 +292,7 @@ object HiveTypeCoercion {
     * Promotes strings that appear in arithmetic expressions.
     */
   object PromoteStrings extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
@@ -379,7 +379,7 @@ object HiveTypeCoercion {
     * be raised at type checking phase.
     */
   object InConversion extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
@@ -399,7 +399,7 @@ object HiveTypeCoercion {
     private val trueValues = Seq(1.toByte, 1.toShort, 1, 1L, Decimal.ONE)
     private val falseValues = Seq(0.toByte, 0.toShort, 0, 0L, Decimal.ZERO)
 
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
@@ -450,7 +450,7 @@ object HiveTypeCoercion {
     * truncated version of this number.
     */
   object StringToIntegralCasts extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
@@ -463,7 +463,7 @@ object HiveTypeCoercion {
     * This ensure that the types for various functions are as expected.
     */
   object FunctionArgumentConversion extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
@@ -535,7 +535,7 @@ object HiveTypeCoercion {
     * converted to fractional types.
     */
   object Division extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       // Skip nodes who has not been resolved yet,
       // as this is an extra rule which should be applied at last.
       case e if !e.resolved => e
@@ -553,7 +553,7 @@ object HiveTypeCoercion {
     * Coerces the type of different branches of a CASE WHEN statement to a common type.
     */
   object CaseWhenCoercion extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       case c: CaseWhen if c.childrenResolved && !c.valueTypesEqual =>
         val maybeCommonType = findWiderCommonType(c.valueTypes)
         maybeCommonType
@@ -586,7 +586,7 @@ object HiveTypeCoercion {
     * Coerces the type of different branches of If statement to a common type.
     */
   object IfCoercion extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       case e if !e.childrenResolved => e
       // Find tightest common type for If, if the true value and false value have different types.
       case i @ If(pred, left, right) if left.dataType != right.dataType =>
@@ -615,7 +615,7 @@ object HiveTypeCoercion {
 
     private val acceptedTypes = Seq(DateType, TimestampType, StringType)
 
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
@@ -635,7 +635,7 @@ object HiveTypeCoercion {
     * Casts types according to the expected input types for [[Expression]]s.
     */
   object ImplicitTypeCasts extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 

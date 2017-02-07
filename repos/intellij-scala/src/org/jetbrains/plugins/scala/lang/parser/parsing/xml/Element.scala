@@ -26,8 +26,8 @@ object Element {
       elemMarker.drop()
       return false
     }
-    Content parse builder
-    if (!ETag.parse(builder)) builder error ErrMsg("xml.end.tag.expected")
+    Content.parse(builder)
+    if (!ETag.parse(builder)) builder.error(ErrMsg("xml.end.tag.expected"))
     elemMarker.done(ScalaElementTypes.XML_ELEMENT)
     return true
   }

@@ -70,7 +70,7 @@ final class AutoPairing(roundMap: ActorRef,
     } yield game2
 
   private def getUser(username: String): Fu[User] =
-    UserRepo named username flatMap {
+    UserRepo.named(username).flatMap {
       _.fold(fufail[User]("No user named " + username))(fuccess)
     }
 
@@ -84,8 +84,8 @@ final class AutoPairing(roundMap: ActorRef,
   private def idleCheck(povRef: PovRef,
                         secondsToMove: Int,
                         thenAgain: Boolean) {
-    GameRepo pov povRef foreach {
-      _.filter(_.game.playable) foreach { pov =>
+    GameRepo.pov(povRef).foreach {
+      _.filter(_.game.playable).foreach { pov =>
         if (pov.game.playerHasMoved(pov.color)) {
           if (thenAgain && !pov.game.playerHasMoved(pov.opponent.color))
             scheduleIdleCheck(

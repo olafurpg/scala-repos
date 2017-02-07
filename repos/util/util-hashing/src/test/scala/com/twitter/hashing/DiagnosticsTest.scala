@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 class DiagnosticsTest extends WordSpec {
   "Diagnostics" should {
     "print distribution" in {
-      val hosts = 1 until 500 map { "10.1.1." + _ + ":11211:4" }
+      val hosts = (1 until 500).map { "10.1.1." + _ + ":11211:4" }
 
       val nodes = hosts.map { s =>
         val Array(host, port, weight) = s.split(":")

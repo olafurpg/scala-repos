@@ -60,7 +60,7 @@ class StackTraceTest extends Expecting {
     case e: Throwable =>
       val t = new RuntimeException("My problem")
       if (suppressable) {
-        t.asInstanceOf[Suppressing] addSuppressed e
+        t.asInstanceOf[Suppressing].addSuppressed(e)
       }
       throw t
   }
@@ -69,7 +69,7 @@ class StackTraceTest extends Expecting {
   // evaluating s should throw, p trims stack trace, t is the test of resulting trace string
   def probe(s: => String)(p: StackTraceElement => Boolean)(
       t: String => Unit): Unit = {
-    Try(s) recover { case e => e stackTracePrefixString p } match {
+    Try(s).recover { case e => e stackTracePrefixString p } match {
       case Success(s) => t(s)
       case Failure(e) => throw e
     }
@@ -110,7 +110,7 @@ class StackTraceTest extends Expecting {
     }
        */
       assert(res.length == 6)
-      assert(res exists (_ startsWith CausedBy.toString))
+      assert(res.exists(_.startsWith(CausedBy.toString)))
   }
   @Test def showsWrappedExceptions() =
     probe(rewrapperer)(_.getMethodName != "rewrapperer") { s =>
@@ -125,9 +125,9 @@ class StackTraceTest extends Expecting {
     }
        */
       assert(res.length == 9)
-      assert(res exists (_ startsWith CausedBy.toString))
-      assert((res collect {
-        case s if s startsWith CausedBy.toString => s
+      assert(res.exists(_.startsWith(CausedBy.toString)))
+      assert((res.collect {
+        case s if s.startsWith(CausedBy.toString) => s
       }).size == 2)
     }
   @Test def dontBlowOnCycle() = probe(insaner)(_.getMethodName != "insaner") {
@@ -140,7 +140,7 @@ class StackTraceTest extends Expecting {
     }
        */
       assert(res.length == 7)
-      assert(res exists (_ startsWith CausedBy.toString))
+      assert(res.exists(_.startsWith(CausedBy.toString)))
   }
 
   /** Java 7, but shouldn't bomb on Java 6.
@@ -158,7 +158,7 @@ java.lang.RuntimeException: My problem
       val res = s.lines.toList
       if (suppressable) {
         assert(res.length == 7)
-        assert(res exists (_.trim startsWith Suppressed.toString))
+        assert(res.exists(_.trim.startsWith(Suppressed.toString)))
       }
     /*
     expect {

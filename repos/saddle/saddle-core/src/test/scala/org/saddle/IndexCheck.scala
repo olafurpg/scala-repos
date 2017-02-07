@@ -66,18 +66,18 @@ class IndexCheck extends Specification with ScalaCheck {
           Seq(index.LeftJoin,
               index.RightJoin,
               index.OuterJoin,
-              index.InnerJoin) map { jointype =>
+              index.InnerJoin).map { jointype =>
             val res = ix1.join(ix2, how = jointype)
 
             val exp = res.index.toVec
             val lix = ix1.toVec
             val rix = ix2.toVec
             val lft =
-              res.lTake.map(x => lix.take(x)) getOrElse lix fillNA {
+              res.lTake.map(x => lix.take(x)).getOrElse(lix).fillNA {
                 exp.raw(_)
               }
             val rgt =
-              res.rTake.map(x => rix.take(x)) getOrElse rix fillNA {
+              res.rTake.map(x => rix.take(x)).getOrElse(rix).fillNA {
                 exp.raw(_)
               }
 
@@ -203,18 +203,18 @@ class IndexCheck extends Specification with ScalaCheck {
           Seq(index.LeftJoin,
               index.RightJoin,
               index.OuterJoin,
-              index.InnerJoin) map { jointype =>
+              index.InnerJoin).map { jointype =>
             val res = ix1.join(ix2, how = jointype)
 
             val exp = res.index.toVec
             val lix = ix1.toVec
             val rix = ix2.toVec
             val lft =
-              res.lTake.map(x => lix.take(x)) getOrElse lix fillNA {
+              res.lTake.map(x => lix.take(x)).getOrElse(lix).fillNA {
                 exp.raw(_)
               }
             val rgt =
-              res.rTake.map(x => rix.take(x)) getOrElse rix fillNA {
+              res.rTake.map(x => rix.take(x)).getOrElse(rix).fillNA {
                 exp.raw(_)
               }
 

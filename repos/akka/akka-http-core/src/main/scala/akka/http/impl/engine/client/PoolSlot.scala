@@ -132,8 +132,9 @@ private object PoolSlot {
 
     def waitingForSubscribePending: Receive = {
       case SubscribePending ⇒
-        exposedPublisher.takePendingSubscribers() foreach
-          (s ⇒ self ! ActorPublisher.Internal.Subscribe(s))
+        exposedPublisher
+          .takePendingSubscribers()
+          .foreach(s ⇒ self ! ActorPublisher.Internal.Subscribe(s))
         log.debug("become unconnected, from subscriber pending")
         context.become(unconnected)
     }
@@ -200,7 +201,8 @@ private object PoolSlot {
         val (entity, whenCompleted) =
           HttpEntity.captureTermination(response.entity)
         val delivery = ResponseDelivery(
-          ResponseContext(requestContext, Success(response withEntity entity)))
+          ResponseContext(requestContext,
+                          Success(response.withEntity(entity))))
         import fm.executionContext
         val requestCompleted = SlotEvent.RequestCompletedFuture(
           whenCompleted.map(_ ⇒ SlotEvent.RequestCompleted(slotIx)))
@@ -215,7 +217,7 @@ private object PoolSlot {
                          firstContext: Option[RequestContext] = None): Unit = {
       log.debug("Slot {} disconnected after {}",
                 slotIx,
-                error getOrElse "regular connection close")
+                error.getOrElse("regular connection close"))
 
       val results: List[ProcessorOut] = {
         if (inflightRequests.isEmpty && firstContext.isDefined) {

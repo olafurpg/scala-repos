@@ -16,8 +16,8 @@ final class Env(config: Config,
                 scheduler: lila.common.Scheduler,
                 isProd: Boolean) {
 
-  private val FeaturedSelect = config duration "featured.select"
-  private val StreamingSearch = config duration "streaming.search"
+  private val FeaturedSelect = config.duration("featured.select")
+  private val StreamingSearch = config.duration("streaming.search")
   private val GoogleApiKey = config getString "streaming.google.api_key"
   private val Keyword = config getString "streaming.keyword"
 
@@ -54,7 +54,7 @@ final class Env(config: Config,
       timeToLive = 10 seconds,
       default = Set.empty,
       logger = logger)
-    def apply(id: String) = cache get true contains id
+    def apply(id: String) = cache.get(true) contains id
   }
 
   object streamsOnAir {
@@ -82,13 +82,14 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "tv" boot new Env(
-      config = lila.common.PlayApp loadConfig "tv",
-      db = lila.db.Env.current,
-      hub = lila.hub.Env.current,
-      lightUser = lila.user.Env.current.lightUser,
-      system = lila.common.PlayApp.system,
-      scheduler = lila.common.PlayApp.scheduler,
-      isProd = lila.common.PlayApp.isProd
-    )
+    "tv".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("tv"),
+        db = lila.db.Env.current,
+        hub = lila.hub.Env.current,
+        lightUser = lila.user.Env.current.lightUser,
+        system = lila.common.PlayApp.system,
+        scheduler = lila.common.PlayApp.scheduler,
+        isProd = lila.common.PlayApp.isProd
+      ))
 }

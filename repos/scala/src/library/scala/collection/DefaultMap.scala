@@ -38,7 +38,7 @@ trait DefaultMap[A, +B] extends Map[A, B] { self =>
     */
   override def -(key: A): Map[A, B] = {
     val b = newBuilder
-    b ++= this filter (key != _._1)
+    b ++= this.filter(key != _._1)
     b.result()
   }
 }

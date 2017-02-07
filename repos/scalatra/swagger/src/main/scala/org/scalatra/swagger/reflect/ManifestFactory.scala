@@ -15,7 +15,7 @@ private[swagger] object ManifestFactory {
 
     case pt: ParameterizedType =>
       val clazz = manifestOf(pt.getRawType).runtimeClass
-      val typeArgs = pt.getActualTypeArguments map manifestOf
+      val typeArgs = pt.getActualTypeArguments.map(manifestOf)
 
       if (pt.getOwnerType == null) {
         manifestOf(clazz, typeArgs)
@@ -58,7 +58,7 @@ private[swagger] object ManifestFactory {
   def manifestOf(st: ScalaType): Manifest[_] = st match {
     case t: ManifestScalaType => t.manifest
     case _ =>
-      val typeArgs = st.typeArgs map manifestOf
+      val typeArgs = st.typeArgs.map(manifestOf)
       manifestOf(st.erasure, typeArgs)
   }
 

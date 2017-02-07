@@ -73,7 +73,7 @@ object Test extends InteractiveTest {
           fragments: List[(Symbol, SourceFile)]): Option[Comment] = {
         val docResponse = new Response[(String, String, Position)]
         askDocComment(sym, source, sym.owner, fragments, docResponse)
-        docResponse.get.left.toOption flatMap {
+        docResponse.get.left.toOption.flatMap {
           case (expanded, raw, pos) =>
             if (expanded.isEmpty) None
             else
@@ -147,8 +147,8 @@ object Test extends InteractiveTest {
     val derivedSource = findSource("Derived.scala")
     def existsText(where: Any, text: String): Boolean = where match {
       case s: String => s contains text
-      case s: Seq[_] => s exists (existsText(_, text))
-      case p: Product => p.productIterator exists (existsText(_, text))
+      case s: Seq[_] => s.exists(existsText(_, text))
+      case p: Product => p.productIterator.exists(existsText(_, text))
       case c: Comment => existsText(c.body, text)
     }
     val (derived, base) = compiler.ask { () =>

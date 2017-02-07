@@ -69,7 +69,7 @@ object Test extends App {
 
       /** Return the sum of pairwise product of the two lists. */
       def scalProd(xs: List[Double], ys: List[Double]) =
-        sum(for ((x, y) <- xs zip ys) yield x * y);
+        sum(for ((x, y) <- xs.zip(ys)) yield x * y);
 
       /** Remove duplicate elements in 'xs'. */
       def removeDuplicates[A](xs: List[A]): List[A] =
@@ -83,7 +83,7 @@ object Test extends App {
     import Persons._
 
     print("Persons over 20:")
-    olderThan20(persons) foreach { x =>
+    olderThan20(persons).foreach { x =>
       print(" " + x)
     }
     println
@@ -93,7 +93,7 @@ object Test extends App {
     println("divisors(34) = " + divisors(34))
 
     print("findNums(15) =")
-    findNums(15) foreach { x =>
+    findNums(15).foreach { x =>
       print(" " + x)
     }
     println

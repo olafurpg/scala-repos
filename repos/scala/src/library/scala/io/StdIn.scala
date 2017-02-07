@@ -89,7 +89,7 @@ private[scala] trait StdIn {
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
-    else s charAt 0
+    else s.charAt(0)
   }
 
   /** Reads an int value from an entire line of the default input.

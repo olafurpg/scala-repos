@@ -23,14 +23,14 @@ class KetamaFailureAccrualFactoryTest extends FunSuite with MockitoSugar {
                serviceRep: Future[Int] = Future.exception(new Exception),
                underlyingStatus: Status = Status.Open) {
     val underlyingService = mock[Service[Int, Int]]
-    when(underlyingService.close(any[Time])) thenReturn Future.Done
-    when(underlyingService.status) thenReturn underlyingStatus
-    when(underlyingService(Matchers.anyInt)) thenReturn serviceRep
+    when(underlyingService.close(any[Time])).thenReturn(Future.Done)
+    when(underlyingService.status).thenReturn(underlyingStatus)
+    when(underlyingService(Matchers.anyInt)).thenReturn(serviceRep)
 
     val underlying = mock[ServiceFactory[Int, Int]]
-    when(underlying.close(any[Time])) thenReturn Future.Done
-    when(underlying.status) thenReturn underlyingStatus
-    when(underlying()) thenReturn Future.value(underlyingService)
+    when(underlying.close(any[Time])).thenReturn(Future.Done)
+    when(underlying.status).thenReturn(underlyingStatus)
+    when(underlying()).thenReturn(Future.value(underlyingService))
 
     val key = mock[KetamaClientKey]
     val broker = new Broker[NodeHealth]
@@ -89,7 +89,7 @@ class KetamaFailureAccrualFactoryTest extends FunSuite with MockitoSugar {
       assert(service.isAvailable)
       assert(broker.recv.sync().isDefined == false)
 
-      when(underlyingService(123)) thenReturn Future.value(123)
+      when(underlyingService(123)).thenReturn(Future.value(123))
 
       assert(Await.result(service(123)) == 123)
 
@@ -169,7 +169,7 @@ class KetamaFailureAccrualFactoryTest extends FunSuite with MockitoSugar {
       assert(factory.isAvailable)
       assert(service.isAvailable)
 
-      when(underlyingService(123)) thenReturn Future.value(321)
+      when(underlyingService(123)).thenReturn(Future.value(321))
       Await.result(service(123))
 
       // A good dispatch; revived

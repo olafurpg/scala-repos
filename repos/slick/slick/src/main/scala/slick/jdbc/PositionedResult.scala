@@ -33,107 +33,107 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
     if (hasMoreColumns) this.<< else None
 
   final def nextBoolean() = {
-    val npos = pos + 1; val r = rs getBoolean npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getBoolean(npos); pos = npos; r
   }
   final def nextBigDecimal() = {
-    val npos = pos + 1; val r = rs getBigDecimal npos; pos = npos;
+    val npos = pos + 1; val r = rs.getBigDecimal(npos); pos = npos;
     if (r eq null) null else BigDecimal(r)
   }
   final def nextBlob() = {
-    val npos = pos + 1; val r = rs getBlob npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getBlob(npos); pos = npos; r
   }
   final def nextByte() = {
-    val npos = pos + 1; val r = rs getByte npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getByte(npos); pos = npos; r
   }
   final def nextBytes() = {
-    val npos = pos + 1; val r = rs getBytes npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getBytes(npos); pos = npos; r
   }
   final def nextClob() = {
-    val npos = pos + 1; val r = rs getClob npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getClob(npos); pos = npos; r
   }
   final def nextDate() = {
-    val npos = pos + 1; val r = rs getDate npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getDate(npos); pos = npos; r
   }
   final def nextDouble() = {
-    val npos = pos + 1; val r = rs getDouble npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getDouble(npos); pos = npos; r
   }
   final def nextFloat() = {
-    val npos = pos + 1; val r = rs getFloat npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getFloat(npos); pos = npos; r
   }
   final def nextInt() = {
-    val npos = pos + 1; val r = rs getInt npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getInt(npos); pos = npos; r
   }
   final def nextLong() = {
-    val npos = pos + 1; val r = rs getLong npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getLong(npos); pos = npos; r
   }
   final def nextObject() = {
-    val npos = pos + 1; val r = rs getObject npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getObject(npos); pos = npos; r
   }
   final def nextShort() = {
-    val npos = pos + 1; val r = rs getShort npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getShort(npos); pos = npos; r
   }
   final def nextString() = {
     val npos = pos + 1; val r = rs getString npos; pos = npos; r
   }
   final def nextTime() = {
-    val npos = pos + 1; val r = rs getTime npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getTime(npos); pos = npos; r
   }
   final def nextTimestamp() = {
-    val npos = pos + 1; val r = rs getTimestamp npos; pos = npos; r
+    val npos = pos + 1; val r = rs.getTimestamp(npos); pos = npos; r
   }
 
   final def wasNull() = rs.wasNull
 
   final def nextBooleanOption() = {
-    val npos = pos + 1; val r = rs getBoolean npos;
+    val npos = pos + 1; val r = rs.getBoolean(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextBigDecimalOption() = {
-    val npos = pos + 1; val r = rs getBigDecimal npos;
+    val npos = pos + 1; val r = rs.getBigDecimal(npos);
     val rr = (if (rs.wasNull) None else Some(BigDecimal(r))); pos = npos; rr
   }
   final def nextBlobOption() = {
-    val npos = pos + 1; val r = rs getBlob npos;
+    val npos = pos + 1; val r = rs.getBlob(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextByteOption() = {
-    val npos = pos + 1; val r = rs getByte npos;
+    val npos = pos + 1; val r = rs.getByte(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextBytesOption() = {
-    val npos = pos + 1; val r = rs getBytes npos;
+    val npos = pos + 1; val r = rs.getBytes(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextClobOption() = {
-    val npos = pos + 1; val r = rs getClob npos;
+    val npos = pos + 1; val r = rs.getClob(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextDateOption() = {
-    val npos = pos + 1; val r = rs getDate npos;
+    val npos = pos + 1; val r = rs.getDate(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextDoubleOption() = {
-    val npos = pos + 1; val r = rs getDouble npos;
+    val npos = pos + 1; val r = rs.getDouble(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextFloatOption() = {
-    val npos = pos + 1; val r = rs getFloat npos;
+    val npos = pos + 1; val r = rs.getFloat(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextIntOption() = {
-    val npos = pos + 1; val r = rs getInt npos;
+    val npos = pos + 1; val r = rs.getInt(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextLongOption() = {
-    val npos = pos + 1; val r = rs getLong npos;
+    val npos = pos + 1; val r = rs.getLong(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextObjectOption() = {
-    val npos = pos + 1; val r = rs getObject npos;
+    val npos = pos + 1; val r = rs.getObject(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextShortOption() = {
-    val npos = pos + 1; val r = rs getShort npos;
+    val npos = pos + 1; val r = rs.getShort(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextStringOption() = {
@@ -141,11 +141,11 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextTimeOption() = {
-    val npos = pos + 1; val r = rs getTime npos;
+    val npos = pos + 1; val r = rs.getTime(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
   final def nextTimestampOption() = {
-    val npos = pos + 1; val r = rs getTimestamp npos;
+    val npos = pos + 1; val r = rs.getTimestamp(npos);
     val rr = (if (rs.wasNull) None else Some(r)); pos = npos; rr
   }
 

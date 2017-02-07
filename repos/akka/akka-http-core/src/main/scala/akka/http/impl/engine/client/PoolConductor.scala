@@ -251,7 +251,7 @@ private object PoolConductor {
 
     override def createLogic(effectiveAttributes: Attributes) =
       new GraphStageLogic(shape) {
-        shape.outArray foreach { setHandler(_, ignoreTerminateOutput) }
+        shape.outArray.foreach { setHandler(_, ignoreTerminateOutput) }
 
         val in = shape.in
         setHandler(in, new InHandler {

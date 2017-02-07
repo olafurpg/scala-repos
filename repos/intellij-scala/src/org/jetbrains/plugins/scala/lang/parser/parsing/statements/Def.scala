@@ -62,7 +62,7 @@ object Def {
     builder.getTokenType match {
       case ScalaTokenTypes.kVAL =>
         builder.advanceLexer() //Ate val
-        if (PatDef parse builder) {
+        if (PatDef.parse(builder)) {
           defMarker.done(ScalaElementTypes.PATTERN_DEFINITION)
           true
         } else {
@@ -71,7 +71,7 @@ object Def {
         }
       case ScalaTokenTypes.kVAR =>
         builder.advanceLexer() //Ate var
-        if (VarDef parse builder) {
+        if (VarDef.parse(builder)) {
           defMarker.done(ScalaElementTypes.VARIABLE_DEFINITION)
           true
         } else {
@@ -79,10 +79,10 @@ object Def {
           false
         }
       case ScalaTokenTypes.kDEF =>
-        if (MacroDef parse builder) {
+        if (MacroDef.parse(builder)) {
           defMarker.done(ScalaElementTypes.MACRO_DEFINITION)
           true
-        } else if (FunDef parse builder) {
+        } else if (FunDef.parse(builder)) {
           defMarker.done(ScalaElementTypes.FUNCTION_DEFINITION)
           true
         } else {
@@ -90,7 +90,7 @@ object Def {
           false
         }
       case ScalaTokenTypes.kTYPE =>
-        if (TypeDef parse builder) {
+        if (TypeDef.parse(builder)) {
           defMarker.done(ScalaElementTypes.TYPE_DEFINITION)
           true
         } else {
@@ -100,7 +100,7 @@ object Def {
       case ScalaTokenTypes.kCASE | ScalaTokenTypes.kCLASS |
           ScalaTokenTypes.kOBJECT | ScalaTokenTypes.kTRAIT =>
         defMarker.rollbackTo()
-        TmplDef parse builder
+        TmplDef.parse(builder)
       case _ =>
         defMarker.rollbackTo()
         false

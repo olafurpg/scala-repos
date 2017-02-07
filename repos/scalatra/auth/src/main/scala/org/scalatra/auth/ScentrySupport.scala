@@ -37,17 +37,20 @@ trait ScentrySupport[UserType <: AnyRef] extends Initializable {
 
   private def readStrategiesFromConfig(config: ConfigT) =
     _strategiesFromConfig = {
-      config.context.getInitParameter("scentry.strategies").blankOption map
-        (s ⇒ (s split ";").toList) getOrElse Nil
+      config.context
+        .getInitParameter("scentry.strategies")
+        .blankOption
+        .map(s ⇒ (s.split(";")).toList)
+        .getOrElse(Nil)
     }
 
-  private def registerStrategiesFromConfig = _strategiesFromConfig foreach {
+  private def registerStrategiesFromConfig = _strategiesFromConfig.foreach {
     strategyClassName ⇒
       val strategy = Class
         .forName(strategyClassName)
         .newInstance
         .asInstanceOf[ScentryStrategy[UserType]]
-      strategy registerWith scentry
+      strategy.registerWith(scentry)
   }
 
   private[this] def createScentry() = {

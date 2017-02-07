@@ -40,7 +40,7 @@ class ReflectiveDynamicAccess(val classLoader: ClassLoader)
       else
         throw new ClassCastException(
           clazz.getName + " is not a subtype of " + t)
-    } recover {
+    }.recover {
       case i: InvocationTargetException if i.getTargetException ne null ⇒
         throw i.getTargetException
     }
@@ -48,15 +48,15 @@ class ReflectiveDynamicAccess(val classLoader: ClassLoader)
   override def createInstanceFor[T: ClassTag](
       fqcn: String,
       args: immutable.Seq[(Class[_], AnyRef)]): Try[T] =
-    getClassFor(fqcn) flatMap { c ⇒
+    getClassFor(fqcn).flatMap { c ⇒
       createInstanceFor(c, args)
     }
 
   override def getObjectFor[T: ClassTag](fqcn: String): Try[T] = {
     val classTry =
       if (fqcn.endsWith("$")) getClassFor(fqcn)
-      else getClassFor(fqcn + "$") recoverWith { case _ ⇒ getClassFor(fqcn) }
-    classTry flatMap { c ⇒
+      else getClassFor(fqcn + "$").recoverWith { case _ ⇒ getClassFor(fqcn) }
+    classTry.flatMap { c ⇒
       Try {
         val module = c.getDeclaredField("MODULE$")
         module.setAccessible(true)
@@ -67,7 +67,7 @@ class ReflectiveDynamicAccess(val classLoader: ClassLoader)
             throw new ClassCastException(fqcn + " is not a subtype of " + t)
           case x: T ⇒ x
         }
-      } recover {
+      }.recover {
         case i: InvocationTargetException if i.getTargetException ne null ⇒
           throw i.getTargetException
       }

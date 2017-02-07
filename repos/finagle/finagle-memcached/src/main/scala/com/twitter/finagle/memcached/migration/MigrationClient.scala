@@ -147,9 +147,9 @@ trait ReadWarmup { self: DarkRead =>
       frontResult: Future[GetResult],
       backResult: Future[GetResult]): Future[GetResult] = {
     // when readRepairDark, hit on front should repair miss on back in the background
-    Future.join(frontResult, backResult) onSuccess {
+    Future.join(frontResult, backResult).onSuccess {
       case (frontR, backR) =>
-        backR.misses foreach {
+        backR.misses.foreach {
           case key if frontR.hits.contains(key) =>
             backendClient.set(key, frontR.hits.get(key).get.value)
           case _ =>
@@ -162,9 +162,9 @@ trait ReadWarmup { self: DarkRead =>
   override protected def chooseGetsResult(
       frontResult: Future[GetsResult],
       backResult: Future[GetsResult]): Future[GetsResult] = {
-    Future.join(frontResult, backResult) onSuccess {
+    Future.join(frontResult, backResult).onSuccess {
       case (frontR, backR) =>
-        backR.misses foreach {
+        backR.misses.foreach {
           case key if frontR.hits.contains(key) =>
             backendClient.set(key, frontR.hits.get(key).get.value)
           case _ =>
@@ -273,9 +273,9 @@ trait FallbackRead extends Client {
   abstract override def getResult(keys: Iterable[String]) = {
     val frontResult = super.getResult(keys)
 
-    frontResult flatMap {
+    frontResult.flatMap {
       case frontR if (frontR.misses.nonEmpty || frontR.failures.nonEmpty) =>
-        backendClient.getResult(frontR.misses ++ frontR.failures.keySet) map {
+        backendClient.getResult(frontR.misses ++ frontR.failures.keySet).map {
           backR =>
             combineGetResult(frontR, backR)
         }
@@ -310,7 +310,7 @@ trait ReadRepair { self: FallbackRead =>
   override def combineGetResult(frontR: GetResult,
                                 backR: GetResult): GetResult = {
     // when readrepair, use back hit to repair front miss
-    backR.hits foreach {
+    backR.hits.foreach {
       case (k, v) => set(k, v.value)
     }
     GetResult.merged(Seq(GetResult(frontR.hits), backR))

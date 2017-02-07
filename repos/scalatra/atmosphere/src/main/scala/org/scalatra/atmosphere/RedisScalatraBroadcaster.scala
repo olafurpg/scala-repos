@@ -52,7 +52,7 @@ final class RedisScalatraBroadcaster(
       val newMsg = filter(embeddedMsg)
 
       if (newMsg != null) {
-        val selectedResources = _resources.asScala filter clientFilter
+        val selectedResources = _resources.asScala.filter(clientFilter)
         val selectedSet = selectedResources.toSet.asJava
         push(
           new Deliver(newMsg,

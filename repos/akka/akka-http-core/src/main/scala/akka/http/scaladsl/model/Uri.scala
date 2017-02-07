@@ -900,7 +900,7 @@ object Uri {
       case -1 ⇒ scheme
       case ix ⇒
         fail(
-          s"Invalid URI scheme, unexpected character at pos $ix ('${scheme charAt ix}')")
+          s"Invalid URI scheme, unexpected character at pos $ix ('${scheme.charAt(ix)}')")
     }
   }
 

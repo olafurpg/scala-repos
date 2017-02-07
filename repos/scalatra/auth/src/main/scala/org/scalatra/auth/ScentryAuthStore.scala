@@ -22,7 +22,7 @@ object ScentryAuthStore {
 
     def get(implicit request: HttpServletRequest,
             response: HttpServletResponse) =
-      app.cookies.get(Scentry.scentryAuthKey) getOrElse ""
+      app.cookies.get(Scentry.scentryAuthKey).getOrElse("")
 
     def set(value: String)(implicit request: HttpServletRequest,
                            response: HttpServletResponse) {

@@ -165,7 +165,7 @@ class CaseClassPickling(val allowReflection: Boolean,
         tpe.closedSubclasses match {
           case scala.util.Success(subs) =>
             assert(subs.exists(_.className == tpe.className))
-            behavior map { b =>
+            behavior.map { b =>
               IrAst
                 .transform(b) {
                   case x: PickleEntry =>

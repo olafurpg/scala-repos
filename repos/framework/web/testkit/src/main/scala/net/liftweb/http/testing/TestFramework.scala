@@ -915,7 +915,8 @@ abstract class BaseResponse(override val baseUrl: String,
       }
       .toList
       .headOption
-      .map(_._2.head) getOrElse ""
+      .map(_._2.head)
+      .getOrElse("")
 
   /**
     * The response body as a UTF-8 encoded String
@@ -936,8 +937,9 @@ abstract class BaseResponse(override val baseUrl: String,
 
   def xmlMatch(findFunc: Elem => NodeSeq,
                filterFunc: Node => Boolean): Boolean =
-    xml.toList flatMap (theXml => findFunc(theXml)) exists
-      (n => filterFunc(trim(n)))
+    xml.toList
+      .flatMap(theXml => findFunc(theXml))
+      .exists(n => filterFunc(trim(n)))
 
   def getOrFail(success: Boolean, msg: String, errorFunc: ReportFailure) =
     if (success) this.asInstanceOf[SelfType]
@@ -989,13 +991,13 @@ abstract class BaseResponse(override val baseUrl: String,
 class CompleteFailure(val serverName: String, val exception: Box[Throwable])
     extends TestResponse {
   override def toString =
-    serverName + (exception.map(e => " Exception: " + e.getMessage) openOr "")
+    serverName + (exception.map(e => " Exception: " + e.getMessage).openOr(""))
 
   def headers: Map[String, List[String]] =
-    throw (exception openOr new java.io.IOException("HTTP Failure"))
+    throw (exception.openOr(new java.io.IOException("HTTP Failure")))
 
   def xml: Box[Elem] =
-    throw (exception openOr new java.io.IOException("HTTP Failure"))
+    throw (exception.openOr(new java.io.IOException("HTTP Failure")))
 
   def !@(msg: => String)(implicit errorFunc: ReportFailure): SelfType =
     errorFunc.fail(msg)
@@ -1031,8 +1033,8 @@ class CompleteFailure(val serverName: String, val exception: Box[Throwable])
       implicit errorFunc: ReportFailure): SelfType = errorFunc.fail(msg)
 
   def foreach(f: HttpResponse => Unit): Unit =
-    throw (exception openOr new java.io.IOException("HTTP Failure"))
+    throw (exception.openOr(new java.io.IOException("HTTP Failure")))
 
   def filter(f: HttpResponse => Unit): HttpResponse =
-    throw (exception openOr new java.io.IOException("HTTP Failure"))
+    throw (exception.openOr(new java.io.IOException("HTTP Failure")))
 }

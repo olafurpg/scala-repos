@@ -62,7 +62,7 @@ class ObservableMapSpec[K, V]
                                originalMap: ObservableMap[Int, String],
                                shouldBeTheSame: Boolean) {
     if (shouldBeTheSame) {
-      generatedMap should be theSameInstanceAs (originalMap)
+      (generatedMap should be).theSameInstanceAs(originalMap)
     } else {
       generatedMap should not be theSameInstanceAs(originalMap)
       generatedMap.getClass.getInterfaces
@@ -97,7 +97,7 @@ class ObservableMapSpec[K, V]
     // Preparation
     val map = ObservableMap(List((1, "one"), (2, "two")))
     var invalidateCount = 0
-    map onInvalidate {
+    map.onInvalidate {
       invalidateCount += 1
     }
 
@@ -113,7 +113,7 @@ class ObservableMapSpec[K, V]
     // Preparation
     val map = ObservableMap((1, "one"), (2, "two"))
     var changeCount = 0
-    map onChange {
+    map.onChange {
       changeCount += 1
     }
 
@@ -128,7 +128,7 @@ class ObservableMapSpec[K, V]
   it should "return changed map" in {
     // Preparation
     val map = ObservableMap((1, "one"), (2, "two"))
-    map onChange { (sourceMap, change) =>
+    map.onChange { (sourceMap, change) =>
       sourceMap should be(map)
     }
 
@@ -140,7 +140,7 @@ class ObservableMapSpec[K, V]
     // Preparation
     val map = ObservableMap.empty[Int, String]
     val addedEntries = Buffer.empty[(Int, String)]
-    map onChange { (sourceMap, change) =>
+    map.onChange { (sourceMap, change) =>
       change match {
         case Add(key, valueAdded) => {
           addedEntries += ((key, valueAdded))
@@ -162,8 +162,8 @@ class ObservableMapSpec[K, V]
     compareInstances((map ++= List((10, 10.toString), (11, 11.toString))),
                      map,
                      true)
-    (map put (12, 12.toString)) should be(None)
-    (map getOrElseUpdate (13, 13.toString)) should equal(13.toString)
+    (map.put(12, 12.toString)) should be(None)
+    (map.getOrElseUpdate(13, 13.toString)) should equal(13.toString)
     // Next operations must not affect original map, so they must not call onchange function
     compareInstances((map + (100 -> 100.toString)), map, false)
     compareInstances((map + (101 -> 101.toString) + (102 -> 102.toString)),
@@ -191,7 +191,7 @@ class ObservableMapSpec[K, V]
     // Preparation
     val map = ObservableMap((0 to 20).map(i => (i, i.toString)))
     val removedEntries = Buffer.empty[(Int, String)]
-    map onChange { (sourceMap, change) =>
+    map.onChange { (sourceMap, change) =>
       change match {
         case Remove(key, valueRemoved) => {
           removedEntries += ((key, valueRemoved))
@@ -207,10 +207,10 @@ class ObservableMapSpec[K, V]
     compareInstances((map -= (4, 5)), map, true)
     compareInstances((map --= List(6)), map, true)
     compareInstances((map --= List(7, 8)), map, true)
-    (map remove (9)) should equal(Option(9.toString))
+    (map.remove(9)) should equal(Option(9.toString))
     // Trying remove not registered key. Should not activate onchange
     map -= -1
-    (map remove 1) should be(None)
+    (map.remove(1)) should be(None)
     // Next operations must not affect original map, so they must not call onchange function
     compareInstances((map - 10), map, false)
     compareInstances((map - 11 - 12), map, false)
@@ -248,7 +248,7 @@ class ObservableMapSpec[K, V]
     // Preparation
     val map = ObservableMap((0 to 20).map(i => (i, i.toString)))
     val replacedEntries = Buffer.empty[(Int, String, String)]
-    map onChange { (sourceMap, change) =>
+    map.onChange { (sourceMap, change) =>
       change match {
         case Replace(key, valueAdded, valueRemoved) => {
           replacedEntries += ((key, valueAdded, valueRemoved))
@@ -276,10 +276,10 @@ class ObservableMapSpec[K, V]
     expectedEntries += ((9, "nine", 9.toString))
     map ++= List((10, "ten"), (11, "eleven"))
     expectedEntries += ((10, "ten", 10.toString), (11, "eleven", 11.toString))
-    map put (12, 12.toString) // repeating a value. It will not be change the map
-    map put (12, "twelve")
+    map.put(12, 12.toString) // repeating a value. It will not be change the map
+    map.put(12, "twelve")
     expectedEntries += ((12, "twelve", 12.toString))
-    map getOrElseUpdate (13, "thirteen") // Map will not be updated
+    map.getOrElseUpdate(13, "thirteen") // Map will not be updated
     // Operations that not change this set
     map + (14 -> "fourteen")
     map + (15 -> "fifteen") + (16 -> "sixteen")
@@ -299,7 +299,7 @@ class ObservableMapSpec[K, V]
     val map = ObservableMap(new LinkedHashMap[Int, String])
     val addedValues = Buffer.empty[(Int, String)]
     val removedValues = Buffer.empty[(Int, String)]
-    map onChange { (sourceSet, change) =>
+    map.onChange { (sourceSet, change) =>
       change match {
         case Add(key, value) => addedValues += ((key, value))
         case Remove(key, value) => removedValues += ((key, value))

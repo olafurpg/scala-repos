@@ -27,19 +27,19 @@ object TypeParamClause {
         return false
     }
     if (!TypeParam.parse(builder, mayHaveVariance = true)) {
-      builder error ScalaBundle.message("wrong.parameter")
+      builder.error(ScalaBundle.message("wrong.parameter"))
     }
     while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
       builder.advanceLexer() //Ate
       if (!TypeParam.parse(builder, mayHaveVariance = true)) {
-        builder error ScalaBundle.message("wrong.parameter")
+        builder.error(ScalaBundle.message("wrong.parameter"))
       }
     }
     builder.getTokenType match {
       case ScalaTokenTypes.tRSQBRACKET =>
         builder.advanceLexer //Ate ]
       case _ =>
-        builder error ScalaBundle.message("rsqbracket.expected")
+        builder.error(ScalaBundle.message("rsqbracket.expected"))
     }
     builder.restoreNewlinesState
     typeMarker.done(ScalaElementTypes.TYPE_PARAM_CLAUSE)

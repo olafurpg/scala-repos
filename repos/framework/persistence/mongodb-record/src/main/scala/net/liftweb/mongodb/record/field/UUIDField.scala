@@ -82,5 +82,5 @@ class UUIDField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
   }
 
   def asJValue: JValue =
-    valueBox.map(v => JsonUUID(v)) openOr (JNothing: JValue)
+    valueBox.map(v => JsonUUID(v)).openOr(JNothing: JValue)
 }

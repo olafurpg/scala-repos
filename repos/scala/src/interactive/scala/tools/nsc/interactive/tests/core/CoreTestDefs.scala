@@ -25,7 +25,7 @@ private[tests] trait CoreTestDefs
           // we skip getClass because it changed signature between 1.5 and 1.6, so there is no
           // universal check file that we can provide for this to work
           reporter.println("retrieved %d members".format(members.size))
-          compiler ask { () =>
+          compiler.ask { () =>
             val filtered = members.filterNot(
               member =>
                 (member.sym.name string_== "getClass") ||
@@ -56,7 +56,7 @@ private[tests] trait CoreTestDefs
             val filtered = members.filter(member => eligible(member.sym))
 
             reporter.println("retrieved %d members".format(filtered.size))
-            compiler ask { () =>
+            compiler.ask { () =>
               reporter.println(
                 filtered.map(_.forceInfoString).sorted mkString "\n")
             }

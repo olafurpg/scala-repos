@@ -384,7 +384,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
                     sf.foldMap(f)))
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B = {
-    foldMap((a: A) => (Endo.endo(f(a, _: B)))) apply z
+    foldMap((a: A) => (Endo.endo(f(a, _: B)))).apply(z)
   }
 
   def foldLeft[B](b: B)(f: (B, A) => B): B = {
@@ -975,7 +975,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     implicit val nm = nodeMeasure[B, V2]
     fold(v => empty,
          (v, x) => single(f(x)),
-         (v, pr, mt, sf) => deep(pr map f, mt.map(x => x.map(f)), sf map f))
+         (v, pr, mt, sf) => deep(pr.map(f), mt.map(x => x.map(f)), sf.map(f)))
   }
 
   /**
@@ -1098,10 +1098,7 @@ sealed abstract class FingerTreeInstances {
   implicit def nodeMeasure[A, V](
       implicit m: Reducer[A, V]): Reducer[Node[V, A], V] = {
     implicit val vm = m.monoid
-    UnitReducer(
-      (a: Node[V, A]) =>
-        a fold ((v, _, _) => v,
-        (v, _, _, _) => v))
+    UnitReducer((a: Node[V, A]) => a.fold((v, _, _) => v, (v, _, _, _) => v))
   }
 
   implicit def fingerTreeMeasure[A, V](
@@ -1113,9 +1110,9 @@ sealed abstract class FingerTreeInstances {
 
   implicit def nodeFoldable[V] =
     new Foldable[Node[V, ?]] {
-      def foldMap[A, M: Monoid](t: Node[V, A])(f: A => M): M = t foldMap f
+      def foldMap[A, M: Monoid](t: Node[V, A])(f: A => M): M = t.foldMap(f)
       def foldRight[A, B](v: Node[V, A], z: => B)(f: (A, => B) => B): B =
-        foldMap(v)((a: A) => (Endo.endo(f.curried(a)(_: B)))) apply z
+        foldMap(v)((a: A) => (Endo.endo(f.curried(a)(_: B)))).apply(z)
     }
 
   implicit def fingerTreeFoldable[V]: Foldable[FingerTree[V, ?]] =
@@ -1124,7 +1121,7 @@ sealed abstract class FingerTreeInstances {
         t.foldLeft(b)(f)
 
       def foldMap[A, M: Monoid](t: FingerTree[V, A])(f: A => M): M =
-        t foldMap (f)
+        t.foldMap(f)
 
       override def foldRight[A, B](t: FingerTree[V, A], z: => B)(
           f: (A, => B) => B) = t.foldRight(z)(f)
@@ -1340,7 +1337,7 @@ final class IndSeq[A](val self: FingerTree[Int, A]) {
   def init: IndSeq[A] = indSeq(self.init)
   def drop(n: Int): IndSeq[A] = split(n)._2
   def take(n: Int): IndSeq[A] = split(n)._1
-  def map[B](f: A => B): IndSeq[B] = indSeq(self map f)
+  def map[B](f: A => B): IndSeq[B] = indSeq(self.map(f))
 
   import FingerTree.fingerTreeFoldable
 
@@ -1390,9 +1387,9 @@ sealed abstract class IndSeqInstances {
       def point[A](a: => A) =
         IndSeq(a)
       def bind[A, B](fa: IndSeq[A])(f: A => IndSeq[B]) =
-        fa flatMap f
+        fa.flatMap(f)
       override def map[A, B](fa: IndSeq[A])(f: A => B) =
-        fa map f
+        fa.map(f)
       def plus[A](a: IndSeq[A], b: => IndSeq[A]) =
         a ++ b
       def empty[A] =

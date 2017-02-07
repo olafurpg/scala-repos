@@ -21,8 +21,9 @@ abstract class CachingMessageConsumer(var delegate: MessageConsumer)
   def flush() {
     synchronized {
       val bs = StringBuilder.newBuilder
-      for (i <- 0 until messages.size()) bs append messages.poll() append "\n"
-      delegate consume bs.delete(bs.size - 1, bs.size).result()
+      for (i <- 0 until messages.size())
+        bs.append(messages.poll()).append("\n")
+      delegate.consume(bs.delete(bs.size - 1, bs.size).result())
     }
 
     messages.clear()

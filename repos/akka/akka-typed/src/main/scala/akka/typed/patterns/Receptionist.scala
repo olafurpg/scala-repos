@@ -87,11 +87,11 @@ object Receptionist {
       r.replyTo ! Registered(r.key, r.address)
       behavior(map.inserted(r.key)(r.address))
     case Msg(ctx, f: Find[t]) ⇒
-      val set = map get f.key
+      val set = map.get(f.key)
       f.replyTo ! Listing(f.key, set)
       Same
     case Sig(ctx, Terminated(ref)) ⇒
-      behavior(map valueRemoved ref)
+      behavior(map.valueRemoved(ref))
   }
 }
 

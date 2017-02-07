@@ -1,5 +1,5 @@
 object Test {
-  Some(Some(1)) collect {
+  Some(Some(1)).collect {
     case Some(a) => 2
     case Some(b) => 3 // no warning was emitted
   }

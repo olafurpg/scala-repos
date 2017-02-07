@@ -21,7 +21,7 @@ case class PerfStat(_id: String, // userId/perfId
   def agg(pov: Pov) =
     if (!pov.game.finished) this
     else {
-      val thisYear = pov.game.createdAt isAfter DateTime.now.minusYears(1)
+      val thisYear = pov.game.createdAt.isAfter(DateTime.now.minusYears(1))
       copy(
         highest = RatingAt.agg(highest, pov, 1),
         lowest = thisYear.fold(RatingAt.agg(lowest, pov, -1), lowest),
@@ -29,8 +29,8 @@ case class PerfStat(_id: String, // userId/perfId
         worstLosses = (thisYear &&
           ~pov.loss).fold(worstLosses.agg(pov, 1), worstLosses),
         count = count(pov),
-        resultStreak = resultStreak agg pov,
-        playStreak = playStreak agg pov
+        resultStreak = resultStreak.agg(pov),
+        playStreak = playStreak.agg(pov)
       )
     }
 }
@@ -95,9 +95,9 @@ case class Streak(v: Int, from: Option[RatingAt], to: Option[RatingAt]) {
   private def inc(pov: Pov, by: Int) =
     copy(
       v = v + by,
-      from = from orElse pov.player.rating.map {
+      from = from.orElse(pov.player.rating.map {
         RatingAt(_, pov.game.createdAt, pov.gameId)
-      },
+      }),
       to = pov.player.ratingAfter.map {
         RatingAt(_, pov.game.updatedAtOrCreatedAt, pov.gameId)
       }
@@ -167,7 +167,8 @@ object RatingAt {
       }
       .map {
         RatingAt(_, pov.game.updatedAtOrCreatedAt, pov.game.id)
-      } orElse cur
+      }
+      .orElse(cur)
 }
 
 case class Result(opInt: Int, opId: UserId, at: DateTime, gameId: String)
@@ -177,11 +178,11 @@ case class Results(results: List[Result]) {
     pov.opponent.rating.ifTrue(pov.game.rated).fold(this) { opInt =>
       copy(
         results = (Result(
-            opInt,
-            UserId(~pov.opponent.userId),
-            pov.game.updatedAtOrCreatedAt,
-            pov.game.id
-          ) :: results).sortBy(_.opInt * comp) take Results.nb)
+          opInt,
+          UserId(~pov.opponent.userId),
+          pov.game.updatedAtOrCreatedAt,
+          pov.game.id
+        ) :: results).sortBy(_.opInt * comp).take(Results.nb))
     }
 }
 object Results {

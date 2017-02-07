@@ -34,7 +34,7 @@ private[io] class AtomicFileOutputStream private (
     super.close()
 
     synchronized {
-      if (! _closed) {
+      if (!_closed) {
         _closed = true
         atomicReplace()
       }

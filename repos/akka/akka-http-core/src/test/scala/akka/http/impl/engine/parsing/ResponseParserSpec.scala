@@ -323,7 +323,7 @@ class ResponseParserSpec
       multiParseTo(GET, expected: _*)
     def multiParseTo(requestMethod: HttpMethod,
                      expected: HttpResponse*): Matcher[Seq[String]] =
-      rawMultiParseTo(requestMethod, expected: _*).compose(_ map prep)
+      rawMultiParseTo(requestMethod, expected: _*).compose(_.map(prep))
 
     def rawMultiParseTo(expected: HttpResponse*): Matcher[Seq[String]] =
       rawMultiParseTo(GET, expected: _*)
@@ -336,7 +336,7 @@ class ResponseParserSpec
 
     def generalMultiParseTo(expected: Either[ResponseOutput, HttpResponse]*)
       : Matcher[Seq[String]] =
-      generalRawMultiParseTo(expected: _*).compose(_ map prep)
+      generalRawMultiParseTo(expected: _*).compose(_.map(prep))
 
     def generalRawMultiParseTo(expected: Either[ResponseOutput, HttpResponse]*)
       : Matcher[Seq[String]] =
@@ -344,9 +344,9 @@ class ResponseParserSpec
     def generalRawMultiParseTo(requestMethod: HttpMethod,
                                expected: Either[ResponseOutput, HttpResponse]*)
       : Matcher[Seq[String]] =
-      equal(expected.map(strictEqualify)).matcher[Seq[
-        Either[ResponseOutput, StrictEqualHttpResponse]]] compose {
-        input: Seq[String] ⇒
+      equal(expected.map(strictEqualify))
+        .matcher[Seq[Either[ResponseOutput, StrictEqualHttpResponse]]]
+        .compose { input: Seq[String] ⇒
           collectBlocking {
             rawParse(requestMethod, input: _*).mapAsync(1) {
               case Right(response) ⇒
@@ -355,7 +355,7 @@ class ResponseParserSpec
               case Left(error) ⇒ FastFuture.successful(Left(error))
             }
           }.map(strictEqualify)
-      }
+        }
 
     def rawParse(requestMethod: HttpMethod, input: String*)
       : Source[Either[ResponseOutput, HttpResponse], NotUsed] =

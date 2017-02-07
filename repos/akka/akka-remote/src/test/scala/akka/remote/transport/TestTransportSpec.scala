@@ -164,7 +164,7 @@ class TestTransportSpec
 
       awaitCond(!registry.existsAssociation(addressA, addressB))
 
-      registry.logSnapshot exists {
+      registry.logSnapshot.exists {
         case DisassociateAttempt(requester, remote)
             if requester == addressA && remote == addressB ⇒
           true

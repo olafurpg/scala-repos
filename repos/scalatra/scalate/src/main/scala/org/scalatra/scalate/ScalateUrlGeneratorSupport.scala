@@ -18,7 +18,7 @@ trait ScalateUrlGeneratorSupport extends ScalateSupport {
     val engine = super.createTemplateEngine(config)
     //    val generatorBinding = Binding("urlGenerator", classOf[UrlGeneratorSupport].getName, true)
     val routeBindings =
-      this.reflectRoutes.keys map (Binding(_, classOf[Route].getName))
+      this.reflectRoutes.keys.map(Binding(_, classOf[Route].getName))
     engine.bindings = engine.bindings ::: routeBindings.toList
     engine
   }

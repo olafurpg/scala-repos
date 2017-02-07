@@ -28,7 +28,7 @@ class WorksheetFoldGroup(
   private val unfolded = new util.TreeMap[Int, Int]()
 
   def left2rightOffset(left: Int) = {
-    val key: Int = unfolded floorKey left
+    val key: Int = unfolded.floorKey(left)
 
     if (key == 0) left
     else {
@@ -56,7 +56,7 @@ class WorksheetFoldGroup(
     traverseAndChange(collapsedRegion, expand = false)
   }
 
-  def getCorrespondInfo = regions map {
+  def getCorrespondInfo = regions.map {
     case FoldRegionInfo(region: WorksheetFoldRegionDelegate,
                         _,
                         leftStart,
@@ -85,7 +85,7 @@ class WorksheetFoldGroup(
   }
 
   protected def serialize() =
-    regions map {
+    regions.map {
       case FoldRegionInfo(region, expanded, trueStart, spaces, lsLength) =>
         s"${region.getStartOffset},${region.getEndOffset},$expanded,$trueStart,$spaces,$lsLength"
     } mkString "|"
@@ -95,9 +95,9 @@ class WorksheetFoldGroup(
 
     folding runBatchFoldingOperation new Runnable {
       override def run() {
-        elem split '|' foreach {
+        elem.split('|').foreach {
           case regionElem =>
-            regionElem split ',' match {
+            regionElem.split(',') match {
               case Array(start, end, expanded, trueStart, spaces, lsLength) =>
                 try {
                   val region = new WorksheetFoldRegionDelegate(
@@ -112,7 +112,7 @@ class WorksheetFoldGroup(
 
                   region.setExpanded(expanded.length == 4)
 
-                  folding addFoldRegion region
+                  folding.addFoldRegion(region)
                 } catch {
                   case _: NumberFormatException =>
                 }
@@ -137,10 +137,10 @@ class WorksheetFoldGroup(
       case ((res, _, ff), reg) if reg.expanded && reg.region == target =>
         (res, reg, ff)
       case ((res, _, ff), reg) if !reg.expanded && reg.region == target =>
-        res append numbers(reg, ff)
+        res.append(numbers(reg, ff))
         (res, reg, ff + reg.spaces)
       case ((res, a, ff), reg) if reg.expanded && reg.region != target =>
-        res append numbers(reg, ff)
+        res.append(numbers(reg, ff))
         (res, a, ff + reg.spaces)
       case (res, _) => res
     }
@@ -148,11 +148,11 @@ class WorksheetFoldGroup(
 
   private def updateChangeFolded(target: FoldRegionInfo, expand: Boolean) {
     val line = offset2Line(target.trueStart)
-    val key = unfolded floorKey line
+    val key = unfolded.floorKey(line)
 
     val spaces = target.spaces
     if (unfolded.get(key) == 0) {
-      if (expand) unfolded.put(line, spaces) else unfolded remove line
+      if (expand) unfolded.put(line, spaces) else unfolded.remove(line)
       return
     }
 
@@ -203,8 +203,8 @@ object WorksheetFoldGroup {
 
     lazy val group =
       new WorksheetFoldGroup(viewerEditor, originalEditor, project, splitter)
-    bytes foreach {
-      case nonEmpty if nonEmpty.length > 0 => group deserialize nonEmpty
+    bytes.foreach {
+      case nonEmpty if nonEmpty.length > 0 => group.deserialize(nonEmpty)
       case _ =>
     }
   }

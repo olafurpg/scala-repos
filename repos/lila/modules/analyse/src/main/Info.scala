@@ -18,7 +18,7 @@ case class Info(ply: Int,
   def encode: String =
     List(
       best ?? (_.keysPiotr),
-      variation take Info.LineMaxPlies mkString " ",
+      variation.take(Info.LineMaxPlies) mkString " ",
       mate ?? (_.toString),
       score ?? (_.centipawns.toString)
     ).dropWhile(_.isEmpty).reverse mkString Info.separator
@@ -28,11 +28,11 @@ case class Info(ply: Int,
 
   def invert = copy(score = score.map(_.invert), mate = mate.map(-_))
 
-  def scoreComment: Option[String] = score map (_.showPawns)
-  def mateComment: Option[String] = mate map { m =>
+  def scoreComment: Option[String] = score.map(_.showPawns)
+  def mateComment: Option[String] = mate.map { m =>
     s"Mate in ${math.abs(m)}"
   }
-  def evalComment: Option[String] = scoreComment orElse mateComment
+  def evalComment: Option[String] = scoreComment.orElse(mateComment)
 
   def isEmpty = score.isEmpty && mate.isEmpty
 
@@ -67,21 +67,21 @@ object Info {
              Score(cp),
              parseIntOption(ma),
              va.split(' ').toList,
-             Uci.Move piotr be).some
+             Uci.Move.piotr(be)).some
       case _ => none
     }
 
   def decodeList(str: String, fromPly: Int): Option[List[Info]] = {
-    str.split(listSeparator).toList.zipWithIndex map {
+    str.split(listSeparator).toList.zipWithIndex.map {
       case (infoStr, index) => decode(index + 1 + fromPly, infoStr)
     }
   }.sequence
 
   def encodeList(infos: List[Info]): String =
-    infos map (_.encode) mkString listSeparator
+    infos.map(_.encode) mkString listSeparator
 
   def apply(score: Option[Int],
             mate: Option[Int],
             variation: List[String]): Int => Info =
-    ply => Info(ply, score map Score.apply, mate, variation)
+    ply => Info(ply, score.map(Score.apply), mate, variation)
 }

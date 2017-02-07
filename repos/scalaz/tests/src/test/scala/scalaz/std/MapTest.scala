@@ -28,11 +28,11 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]],
   "satisfy equals laws when not natural" ! equal.laws[Map[NotNatural, String]]
 
   implicit def mapArb[A: Arbitrary: BKC, B: Arbitrary]: Arbitrary[Map[A, B]] =
-    Arbitrary(arbitrary[SMap[A, B]] map (m => fromSeq(m.toSeq: _*)))
+    Arbitrary(arbitrary[SMap[A, B]].map(m => fromSeq(m.toSeq: _*)))
 
   class NotNatural(val id: Int)
   implicit def NotNaturalArbitrary: Arbitrary[NotNatural] =
-    Arbitrary(arbitrary[Int] map (new NotNatural(_)))
+    Arbitrary(arbitrary[Int].map(new NotNatural(_)))
 
   implicit def NotNaturalOrder: Order[NotNatural] =
     Order.orderBy[NotNatural, Int](_.id)

@@ -112,29 +112,32 @@ trait PerfTestSuite extends Logging {
 
       runner.startup()
 
-      config.ingest foreach {
+      config.ingest.foreach {
         case (db, file) =>
           runner.ingest(db, file).unsafePerformIO
       }
 
-      select(config.select getOrElse ((_, _) => true)) foreach { test =>
+      select(config.select.getOrElse((_, _) => true)).foreach { test =>
         if (config.dryRuns > 0)
           run(test, runner, runs = config.dryRuns, outliers = config.outliers)
         val result =
-          run(test, runner, runs = config.runs, outliers = config.outliers) map {
-            case (t, stats) =>
-              (t, stats map (_ * (1 / 1000000.0))) // Convert to ms.
-          }
+          run(test, runner, runs = config.runs, outliers = config.outliers)
+            .map {
+              case (t, stats) =>
+                (t, stats.map(_ * (1 / 1000000.0))) // Convert to ms.
+            }
 
         def withPrinter[A](f: PrintStream => A): A = {
-          config.output map { file =>
-            val out = new PrintStream(file)
-            val result = f(out)
-            out.close()
-            result
-          } getOrElse {
-            f(System.out)
-          }
+          config.output
+            .map { file =>
+              val out = new PrintStream(file)
+              val result = f(out)
+              out.close()
+              result
+            }
+            .getOrElse {
+              f(System.out)
+            }
         }
 
         config.baseline match {
@@ -175,7 +178,7 @@ trait PerfTestSuite extends Logging {
     RunConfig.fromCommandLine(args.toList) match {
       case Failure(errors) =>
         System.err.println("Error parsing command lines:")
-        errors.list foreach { msg =>
+        errors.list.foreach { msg =>
           System.err.println("\t" + msg)
         }
         System.err.println()
@@ -240,7 +243,7 @@ trait PerfTestSuite extends Logging {
       }
     }
 
-    test.subForest.headOption flatMap { root =>
+    test.subForest.headOption.flatMap { root =>
       find(root.loc, Nil, Nil) match {
         case Nil => None
         case tests => Some(Tree.node(Group(suiteName), tests.toStream))

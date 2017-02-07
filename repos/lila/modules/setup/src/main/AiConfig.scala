@@ -26,9 +26,9 @@ case class AiConfig(variant: chess.variant.Variant,
       Game.make(
         game = chessGame,
         whitePlayer = Player.make(color = ChessColor.White,
-                                  aiLevel = creatorColor.black option level),
+                                  aiLevel = creatorColor.black.option(level)),
         blackPlayer = Player.make(color = ChessColor.Black,
-                                  aiLevel = creatorColor.white option level),
+                                  aiLevel = creatorColor.white.option(level)),
         mode = Mode.Casual,
         variant = realVariant,
         source = (realVariant == chess.variant.FromPosition)
@@ -52,13 +52,13 @@ object AiConfig extends BaseConfig {
          c: String,
          fen: Option[String]) =
     new AiConfig(
-      variant = chess.variant.Variant(v) err "Invalid game variant " + v,
-      timeMode = TimeMode(tm) err s"Invalid time mode $tm",
+      variant = chess.variant.Variant(v).err("Invalid game variant " + v),
+      timeMode = TimeMode(tm).err(s"Invalid time mode $tm"),
       time = t,
       increment = i,
       days = d,
       level = level,
-      color = Color(c) err "Invalid color " + c,
+      color = Color(c).err("Invalid color " + c),
       fen = fen
     )
 
@@ -73,7 +73,7 @@ object AiConfig extends BaseConfig {
   val levels = (1 to 8).toList
 
   val levelChoices =
-    levels map { l =>
+    levels.map { l =>
       (l.toString, l.toString, none)
     }
 
@@ -84,14 +84,14 @@ object AiConfig extends BaseConfig {
 
     def reads(r: BSON.Reader): AiConfig =
       AiConfig(
-        variant = chess.variant.Variant orDefault (r int "v"),
-        timeMode = TimeMode orDefault (r int "tm"),
-        time = r double "t",
+        variant = chess.variant.Variant.orDefault(r int "v"),
+        timeMode = TimeMode.orDefault(r int "tm"),
+        time = r.double("t"),
         increment = r int "i",
         days = r int "d",
         level = r int "l",
         color = Color.White,
-        fen = r strO "f" filter (_.nonEmpty)
+        fen = r.strO("f").filter(_.nonEmpty)
       )
 
     def writes(w: BSON.Writer, o: AiConfig) =

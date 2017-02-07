@@ -21,7 +21,7 @@ object ImportExpr {
     if (!StableId.parse(builder,
                         forImport = true,
                         ScalaElementTypes.REFERENCE)) {
-      builder error ErrMsg("identifier.expected")
+      builder.error(ErrMsg("identifier.expected"))
       importExprMarker.drop()
       return true
     }
@@ -33,8 +33,8 @@ object ImportExpr {
     builder.advanceLexer()
     builder.getTokenType match {
       case ScalaTokenTypes.tUNDER => builder.advanceLexer() //Ate _
-      case ScalaTokenTypes.tLBRACE => ImportSelectors parse builder
-      case _ => builder error ErrMsg("wrong.import.statment.end")
+      case ScalaTokenTypes.tLBRACE => ImportSelectors.parse(builder)
+      case _ => builder.error(ErrMsg("wrong.import.statment.end"))
     }
     importExprMarker.done(ScalaElementTypes.IMPORT_EXPR)
     true

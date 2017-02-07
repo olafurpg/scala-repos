@@ -619,7 +619,7 @@ trait Symbols { self: Universe =>
 
     /** Used to provide a better error message for `asMethod` */
     override protected def isOverloadedMethod =
-      alternatives exists (_.isMethod)
+      alternatives.exists(_.isMethod)
 
     /** Backing field for an accessor method, NoSymbol for all other term symbols.
       *

@@ -22,7 +22,7 @@ class DateTest extends Specification {
         Json.obj(
           "ca" -> $gt($date(date))
         ))
-      doc.getAsTry[BSONDocument]("ca") flatMap { gt =>
+      doc.getAsTry[BSONDocument]("ca").flatMap { gt =>
         gt.getAsTry[BSONDateTime]("$gt")
       } must_== scala.util.Success(BSONDateTime(date.getMillis))
     }

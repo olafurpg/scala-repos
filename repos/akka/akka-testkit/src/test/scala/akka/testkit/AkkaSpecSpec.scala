@@ -46,9 +46,9 @@ class AkkaSpecSpec extends WordSpec with Matchers {
       val spec = new AkkaSpec(system) {
         refs = Seq(testActor, system.actorOf(Props.empty, "name"))
       }
-      refs foreach (_.isTerminated should not be true)
+      refs.foreach(_.isTerminated should not be true)
       TestKit.shutdownActorSystem(system)
-      spec.awaitCond(refs forall (_.isTerminated), 2 seconds)
+      spec.awaitCond(refs.forall(_.isTerminated), 2 seconds)
     }
 
     "stop correctly when sending PoisonPill to rootGuardian" in {

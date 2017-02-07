@@ -27,18 +27,18 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
   }
 
   def update(game: Game, userId: String, previous: Entry): Funit =
-    PovToEntry(game, userId, previous.provisional) flatMap {
-      case Right(e) => storage update e.copy(number = previous.number)
+    PovToEntry(game, userId, previous.provisional).flatMap {
+      case Right(e) => storage.update(e.copy(number = previous.number))
       case _ => funit
     }
 
-  private def compute(user: User): Funit = storage.fetchLast(user.id) flatMap {
+  private def compute(user: User): Funit = storage.fetchLast(user.id).flatMap {
     case None => fromScratch(user)
-    case Some(e) => computeFrom(user, e.date plusSeconds 1, e.number + 1)
+    case Some(e) => computeFrom(user, e.date.plusSeconds(1), e.number + 1)
   }
 
   private def fromScratch(user: User): Funit =
-    fetchFirstGame(user) flatMap {
+    fetchFirstGame(user).flatMap {
       _.?? { g =>
         computeFrom(user, g.createdAt, 1)
       }
@@ -58,43 +58,48 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
         .sort(Query.sortCreated)
         .skip(maxGames - 1)
         .one[Game]
-    } orElse pimpQB($query(gameQuery(user)))
+    }.orElse(pimpQB($query(gameQuery(user)))
       .sort(Query.sortChronological)
-      .one[Game]
+      .one[Game])
 
   private def computeFrom(user: User, from: DateTime, fromNumber: Int): Funit = {
-    storage nbByPerf user.id flatMap { nbs =>
-      var nbByPerf = nbs
-      def toEntry(game: Game): Fu[Option[Entry]] = game.perfType ?? { pt =>
-        val nb = nbByPerf.getOrElse(pt, 0) + 1
-        nbByPerf = nbByPerf.updated(pt, nb)
-        PovToEntry(game, user.id, provisional = nb < 10).addFailureEffect {
-          e =>
-            println(e)
-            e.printStackTrace
-        } map (_.toOption)
-      }
-      val query = $query(
-        gameQuery(user) ++ Json.obj(
-          Game.BSONFields.createdAt -> $gte($date(from))))
-      pimpQB(query)
-        .sort(Query.sortChronological)
-        .cursor[Game]()
-        .enumerate(maxGames, stopOnError = true) &> Enumeratee.grouped(
-        Iteratee takeUpTo 4) &> Enumeratee.mapM[Seq[Game]].apply[Seq[Entry]] {
-        games =>
-          games.map(toEntry).sequenceFu.map(_.flatten).addFailureEffect { e =>
-            println(e)
-            e.printStackTrace
-          }
-      } &> Enumeratee.grouped(Iteratee takeUpTo 50) |>>> Iteratee
-        .foldM[Seq[Seq[Entry]], Int](fromNumber) {
-          case (number, xs) =>
-            val entries = xs.flatten.sortBy(_.date).zipWithIndex.map {
-              case (e, i) => e.copy(number = number + i)
+    storage
+      .nbByPerf(user.id)
+      .flatMap { nbs =>
+        var nbByPerf = nbs
+        def toEntry(game: Game): Fu[Option[Entry]] = game.perfType ?? { pt =>
+          val nb = nbByPerf.getOrElse(pt, 0) + 1
+          nbByPerf = nbByPerf.updated(pt, nb)
+          PovToEntry(game, user.id, provisional = nb < 10)
+            .addFailureEffect { e =>
+              println(e)
+              e.printStackTrace
             }
-            val nextNumber = number + entries.size
-            storage bulkInsert entries inject nextNumber
+            .map(_.toOption)
+        }
+        val query = $query(
+          gameQuery(user) ++ Json.obj(
+            Game.BSONFields.createdAt -> $gte($date(from))))
+        pimpQB(query)
+          .sort(Query.sortChronological)
+          .cursor[Game]()
+          .enumerate(maxGames, stopOnError = true) &> Enumeratee.grouped(
+          Iteratee.takeUpTo(4)) &> Enumeratee
+          .mapM[Seq[Game]]
+          .apply[Seq[Entry]] { games =>
+            games.map(toEntry).sequenceFu.map(_.flatten).addFailureEffect {
+              e =>
+                println(e)
+                e.printStackTrace
+            }
+          } &> Enumeratee.grouped(Iteratee.takeUpTo(50)) |>>> Iteratee
+          .foldM[Seq[Seq[Entry]], Int](fromNumber) {
+            case (number, xs) =>
+              val entries = xs.flatten.sortBy(_.date).zipWithIndex.map {
+                case (e, i) => e.copy(number = number + i)
+              }
+              val nextNumber = number + entries.size
+              storage.bulkInsert(entries) inject nextNumber
         }
     } void
   }

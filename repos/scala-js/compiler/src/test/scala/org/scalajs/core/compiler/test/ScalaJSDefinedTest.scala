@@ -25,11 +25,11 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       s"""
       @ScalaJSDefined
       $obj A
-      """ hasErrors s"""
+      """.hasErrors(s"""
         |newSource1.scala:6: error: @ScalaJSDefined is only allowed on classes extending js.Any
         |      $obj A
         |       ${" " * obj.length}^
-      """
+      """)
     }
   }
 
@@ -38,20 +38,22 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     """
     @ScalaJSDefined
     class A extends js.Any
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:6: error: A Scala.js-defined JS class cannot directly extend AnyRef. It must extend a JS class (native or not).
       |    class A extends js.Any
       |          ^
-    """
+    """)
 
     """
     @ScalaJSDefined
     object A extends js.Any
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:6: error: A Scala.js-defined JS object cannot directly extend AnyRef. It must extend a JS class (native or not).
       |    object A extends js.Any
       |           ^
-    """
+    """)
   }
 
   @Test
@@ -72,7 +74,8 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     object Container {
       val x = new NativeTrait {}
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:9: error: A Scala.js-defined JS class cannot directly extend a native JS trait.
       |    class A extends NativeTrait
       |          ^
@@ -85,7 +88,7 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       |newSource1.scala:18: error: A Scala.js-defined JS class cannot directly extend a native JS trait.
       |      val x = new NativeTrait {}
       |                  ^
-    """
+    """)
   }
 
   @Test
@@ -95,11 +98,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     class A extends js.Object {
       def apply(arg: Int): Int = arg
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: A Scala.js-defined JavaScript class cannot declare a method named `apply` without `@JSName`
       |      def apply(arg: Int): Int = arg
       |          ^
-    """
+    """)
   }
 
   @Test
@@ -110,11 +114,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       @JSBracketAccess
       def foo(index: Int, arg: Int): Int = arg
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: @JSBracketAccess is not allowed in Scala.js-defined JS classes
       |      def foo(index: Int, arg: Int): Int = arg
       |          ^
-    """
+    """)
   }
 
   @Test
@@ -125,11 +130,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       @JSBracketCall
       def foo(m: String, arg: Int): Int = arg
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: @JSBracketCall is not allowed in Scala.js-defined JS classes
       |      def foo(m: String, arg: Int): Int = arg
       |          ^
-    """
+    """)
   }
 
   @Test
@@ -140,14 +146,15 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       private def foo(i: Int): Int = i
       private def foo(s: String): String = s
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: Private methods in Scala.js-defined JS classes cannot be overloaded. Use different names instead.
       |      private def foo(i: Int): Int = i
       |                  ^
       |newSource1.scala:8: error: Private methods in Scala.js-defined JS classes cannot be overloaded. Use different names instead.
       |      private def foo(s: String): String = s
       |                  ^
-    """
+    """)
 
     """
     @ScalaJSDefined
@@ -155,14 +162,15 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       private def foo(i: Int): Int = i
       private def foo(s: String): String = s
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: Private methods in Scala.js-defined JS classes cannot be overloaded. Use different names instead.
       |      private def foo(i: Int): Int = i
       |                  ^
       |newSource1.scala:8: error: Private methods in Scala.js-defined JS classes cannot be overloaded. Use different names instead.
       |      private def foo(s: String): String = s
       |                  ^
-    """
+    """)
 
     """
     object Enclosing {
@@ -172,14 +180,15 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
         private def foo(s: String): String = s
       }
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: Private methods in Scala.js-defined JS classes cannot be overloaded. Use different names instead.
       |        private[Enclosing] def foo(i: Int): Int = i
       |                               ^
       |newSource1.scala:9: error: Private methods in Scala.js-defined JS classes cannot be overloaded. Use different names instead.
       |        private def foo(s: String): String = s
       |                    ^
-    """
+    """)
 
     """
     @ScalaJSDefined
@@ -187,11 +196,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       private def foo(i: Int): Int = i
       def foo(s: String): String = s
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: Private methods in Scala.js-defined JS classes cannot be overloaded. Use different names instead.
       |      private def foo(i: Int): Int = i
       |                  ^
-    """
+    """)
 
     """
     object Enclosing {
@@ -201,11 +211,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
         def foo(s: String): String = s
       }
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: Private methods in Scala.js-defined JS classes cannot be overloaded. Use different names instead.
       |        private[Enclosing] def foo(i: Int): Int = i
       |                               ^
-    """
+    """)
   }
 
   @Test
@@ -224,7 +235,8 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
         override private[Enclosing] final def foo(i: Int): Int = i + 1
       }
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: Qualified private members in Scala.js-defined JS classes must be final
       |        private[Enclosing] def foo(i: Int): Int = i
       |                               ^
@@ -234,7 +246,7 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       |newSource1.scala:10: error: Qualified private members in Scala.js-defined JS classes must be final
       |        private[Enclosing] var y: Int = 5
       |                               ^
-    """
+    """)
 
     """
     object Enclosing {
@@ -245,7 +257,8 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
         private[Enclosing] var y: Int = 5
       }
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: Qualified private members in Scala.js-defined JS classes must be final
       |        private[Enclosing] def foo(i: Int): Int = i
       |                               ^
@@ -255,7 +268,7 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       |newSource1.scala:10: error: Qualified private members in Scala.js-defined JS classes must be final
       |        private[Enclosing] var y: Int = 5
       |                               ^
-    """
+    """)
 
     """
     object Enclosing {
@@ -271,7 +284,8 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
         override private[Enclosing] final def foo(i: Int): Int = i + 1
       }
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: Qualified private members in Scala.js-defined JS classes must be final
       |        private[Enclosing] def foo(i: Int): Int
       |                               ^
@@ -281,7 +295,7 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       |newSource1.scala:10: error: Qualified private members in Scala.js-defined JS classes must be final
       |        private[Enclosing] var y: Int
       |                               ^
-    """
+    """)
 
     """
     object Enclosing {
@@ -292,7 +306,8 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
         private[Enclosing] var y: Int
       }
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: Qualified private members in Scala.js-defined JS classes must be final
       |        private[Enclosing] def foo(i: Int): Int
       |                               ^
@@ -302,7 +317,7 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       |newSource1.scala:10: error: Qualified private members in Scala.js-defined JS classes must be final
       |        private[Enclosing] var y: Int
       |                               ^
-    """
+    """)
 
     """
     object Enclosing {
@@ -362,11 +377,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
         final private[Enclosing] def foo(i: Int): Int
       }
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: abstract member may not have final modifier
       |        final private[Enclosing] def foo(i: Int): Int
       |                                     ^
-    """
+    """)
 
     """
     object Enclosing {
@@ -375,11 +391,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
         final private[Enclosing] def foo(i: Int): Int
       }
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: abstract member may not have final modifier
       |        final private[Enclosing] def foo(i: Int): Int
       |                                     ^
-    """
+    """)
   }
 
   @Test
@@ -389,22 +406,24 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     class A extends js.Object {
       def foo = js.native
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: js.native may only be used as stub implementation in facade types
       |      def foo = js.native
       |                   ^
-    """
+    """)
 
     """
     @ScalaJSDefined
     object A extends js.Object {
       def foo = js.native
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: js.native may only be used as stub implementation in facade types
       |      def foo = js.native
       |                   ^
-    """
+    """)
 
     """
     class A {
@@ -412,11 +431,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
         def a: Int = js.native
       }
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: js.native may only be used as stub implementation in facade types
       |        def a: Int = js.native
       |                        ^
-    """
+    """)
   }
 
   @Test
@@ -434,11 +454,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       @JSName(A.b)
       def bar: Int = 5
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:12: error: The argument to JSName must be a literal string
       |      @JSName(A.a)
       |       ^
-    """
+    """)
 
     """
     object A {
@@ -453,11 +474,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
       @JSName(A.b)
       def bar: Int = 5
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:12: error: The argument to JSName must be a literal string
       |      @JSName(A.a)
       |       ^
-    """
+    """)
   }
 
   @Test
@@ -469,11 +491,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     class A extends js.Object {
       def apply: Int = 42
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: A member named apply represents function application in JavaScript. A parameterless member should be exported as a property. You must add @JSName("apply")
       |      def apply: Int = 42
       |          ^
-    """
+    """)
 
     """
     @ScalaJSDefined
@@ -490,11 +513,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     class A extends js.Object {
       val apply: Int = 42
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: A member named apply represents function application in JavaScript. A parameterless member should be exported as a property. You must add @JSName("apply")
       |      val apply: Int = 42
       |          ^
-    """
+    """)
 
     """
     @ScalaJSDefined
@@ -511,11 +535,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     class A extends js.Object {
       var apply: Int = 42
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: A member named apply represents function application in JavaScript. A parameterless member should be exported as a property. You must add @JSName("apply")
       |      var apply: Int = 42
       |          ^
-    """
+    """)
 
     """
     @ScalaJSDefined
@@ -532,21 +557,23 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     @ScalaJSDefined
     @JSExport
     class A private () extends js.Object
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:6: error: You may not export a class that has only private constructors
       |    @JSExport
       |     ^
-    """
+    """)
 
     """
     @ScalaJSDefined
     @JSExport
     class A private[this] () extends js.Object
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:6: error: You may not export a class that has only private constructors
       |    @JSExport
       |     ^
-    """
+    """)
 
     """
     @ScalaJSDefined
@@ -554,11 +581,12 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     class A private[A] () extends js.Object
 
     object A
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:6: error: You may not export a class that has only private constructors
       |    @JSExport
       |     ^
-    """
+    """)
   }
 
   @Test
@@ -568,10 +596,11 @@ class ScalaJSDefinedTest extends DirectTest with TestHelpers {
     trait A extends js.Object {
       def foo(x: Int): Int = x + 1
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:7: error: A Scala.js-defined JS trait can only contain abstract members
       |      def foo(x: Int): Int = x + 1
       |          ^
-    """
+    """)
   }
 }

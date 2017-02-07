@@ -41,7 +41,7 @@ class ScalaEditorFoldingTest extends ScalaLightCodeInsightFixtureTestAdapter {
 
     assert(i1 > -1 && i2 > -2, s"Bad fold markers: $i1 and $i2")
 
-    myFileText append fileText.substring(0, i1)
+    myFileText.append(fileText.substring(0, i1))
 
     while (i1 > -1 || i2 > -1) {
       if (i2 < i1 && i2 > -1) {
@@ -49,9 +49,10 @@ class ScalaEditorFoldingTest extends ScalaLightCodeInsightFixtureTestAdapter {
 
         val i2Old = i2
         i2 = fileText.indexOf(FOLD_END_MARKER, i2Old + 1)
-        myFileText append fileText.substring(i2Old + FOLD_MARKER_LENGTH,
-                                             if (i2 > 0) Math.min(i2, i1)
-                                             else i1)
+        myFileText.append(
+          fileText.substring(i2Old + FOLD_MARKER_LENGTH,
+                             if (i2 > 0) Math.min(i2, i1)
+                             else i1))
 
         increaseOverall()
       } else if (i1 < i2 && i1 > -1) {
@@ -62,9 +63,10 @@ class ScalaEditorFoldingTest extends ScalaLightCodeInsightFixtureTestAdapter {
         val i1Old = i1
         i1 = fileText.indexOf(FOLD_START_MARKER, i1Old + 1)
 
-        myFileText append fileText.substring(i1Old + FOLD_MARKER_LENGTH,
-                                             if (i1 > -1) Math.min(i2, i1)
-                                             else i2)
+        myFileText.append(
+          fileText.substring(i1Old + FOLD_MARKER_LENGTH,
+                             if (i1 > -1) Math.min(i2, i1)
+                             else i2))
       } else if (i1 < i2) {
         //i1 == -1
         appendPair("#1.5")
@@ -92,13 +94,13 @@ class ScalaEditorFoldingTest extends ScalaLightCodeInsightFixtureTestAdapter {
     val myBuilder = new ScalaFoldingBuilder
     val regions = myBuilder.buildFoldRegions(
       myFixture.getFile.getNode,
-      myFixture getDocument myFixture.getFile)
+      myFixture.getDocument(myFixture.getFile))
 
     assert(
       regions.length == assumedRegionRanges.size,
       s"Different region count, expected: ${assumedRegionRanges.size}, but got: ${regions.length}")
 
-    (regions zip assumedRegionRanges).zipWithIndex foreach {
+    (regions.zip(assumedRegionRanges)).zipWithIndex.foreach {
       case ((region, assumedRange), idx) =>
         assert(
           region.getRange.getStartOffset == assumedRange.getStartOffset,

@@ -92,24 +92,24 @@ trait PrettyPrinters {
     def lines(test: Tree[(PerfTest, A)]): List[String] = {
       test match {
         case Tree.Node((Group(name), _), kids) =>
-          name :: (kids.toList flatMap (lines(_)))
+          name :: (kids.toList.flatMap(lines(_)))
 
         case Tree.Node((RunSequential, result), kids) =>
-          (kids.toList map (lines(_)) flatMap {
+          (kids.toList.map(lines(_)).flatMap {
             case head :: tail =>
-              (" + " + head) :: (tail map (" | " + _))
+              (" + " + head) :: (tail.map(" | " + _))
             case Nil => Nil
           }) ++ List(" ' " + prettyResult(result), "")
 
         case Tree.Node((RunConcurrent, result), kids) =>
-          (kids.toList map (lines(_)) flatMap {
+          (kids.toList.map(lines(_)).flatMap {
             case head :: tail =>
-              (" * " + head) :: (tail map (" | " + _))
+              (" * " + head) :: (tail.map(" | " + _))
             case Nil => Nil
           }) ++ List(" ' " + prettyResult(result), "")
 
         case Tree.Node((RunQuery(q), result), kids) =>
-          (q split "\n").toList match {
+          (q.split("\n")).toList match {
             case Nil => Nil
             case head :: tail =>
               ("-> " + head) ::
@@ -128,15 +128,15 @@ trait PrettyPrinters {
 
     prettyPerfTest(test) {
       case NoChange(baseline, stats) =>
-        "NO CHANGE  %.1f ms (s = %.1f ms)" format (stats.mean, stats.stdDev)
+        "NO CHANGE  %.1f ms (s = %.1f ms)".format(stats.mean, stats.stdDev)
       case Faster(baseline, stats) =>
-        "FASTER     %.1f ms (%.1 ms faster)" format
-          (stats.mean, baseline.mean - stats.mean)
+        "FASTER     %.1f ms (%.1 ms faster)".format(stats.mean,
+                                                    baseline.mean - stats.mean)
       case Slower(baseline, stats) =>
-        "SLOWER     %.1f ms (%.1 ms slower)" format
-          (stats.mean, stats.mean - baseline.mean)
+        "SLOWER     %.1f ms (%.1 ms slower)".format(stats.mean,
+                                                    stats.mean - baseline.mean)
       case MissingBaseline(stats) =>
-        "TOTAL      %.1f ms" format stats.mean
+        "TOTAL      %.1f ms".format(stats.mean)
       case MissingStats(_) | Missing =>
         ""
     }
@@ -144,9 +144,9 @@ trait PrettyPrinters {
 
   def prettyPerfTestResult(
       result: Tree[(PerfTest, Option[Statistics])]): String =
-    prettyPerfTest(result)(_ map { s =>
-      "%.1f ms  (s = %.1f ms)" format (s.mean, s.stdDev)
-    } getOrElse "")
+    prettyPerfTest(result)(_.map { s =>
+      "%.1f ms  (s = %.1f ms)".format(s.mean, s.stdDev)
+    }.getOrElse(""))
 }
 
 object PerfTestPrettyPrinters extends PrettyPrinters with JsonConverters {

@@ -125,7 +125,7 @@ trait ShardService
       service: HttpService[ByteChunk, F[Future[HttpResponse[QueryResult]]]])(
       implicit F: Functor[F])
     : HttpService[ByteChunk, F[Future[HttpResponse[ByteChunk]]]] = {
-    service map { _ map { _ map { _ map queryResultToByteChunk } } }
+    service.map { _.map { _.map { _.map(queryResultToByteChunk) } } }
   }
 
   private def asyncHandler(state: ShardState) = {
@@ -177,8 +177,8 @@ trait ShardService
           dataPath("/metadata/fs") {
             get {
               produce(application / json)(
-                new BrowseServiceHandler[ByteChunk](state.platform.vfs) map {
-                  _ map { _ map { _ map { jvalueToChunk } } }
+                new BrowseServiceHandler[ByteChunk](state.platform.vfs).map {
+                  _.map { _.map { _.map { jvalueToChunk } } }
                 }
               )(ResponseModifier.responseFG[({
                                               type λ[α] = (APIKey, Path) => α
@@ -195,8 +195,8 @@ trait ShardService
             get {
               produce(application / json)(
                 new BrowseServiceHandler[ByteChunk](state.platform.vfs,
-                                                    legacy = true) map {
-                  _ map { _ map { _ map { jvalueToChunk } } }
+                                                    legacy = true).map {
+                  _.map { _.map { _.map { jvalueToChunk } } }
                 }
               )(ResponseModifier.responseFG[({
                                               type λ[α] = (APIKey, Path) => α

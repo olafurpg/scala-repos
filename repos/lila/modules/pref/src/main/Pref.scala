@@ -69,29 +69,29 @@ case class Pref(_id: String, // user id
     case "bg" =>
       if (value == "transp") copy(dark = true, transp = true).some
       else
-        Pref.bgs get value map { b =>
+        Pref.bgs.get(value).map { b =>
           copy(dark = b, transp = false)
         }
     case "bgImg" => copy(bgImg = value.some).some
     case "theme" =>
-      Theme.allByName get value map { t =>
+      Theme.allByName.get(value).map { t =>
         copy(theme = t.name)
       }
     case "pieceSet" =>
-      PieceSet.allByName get value map { p =>
+      PieceSet.allByName.get(value).map { p =>
         copy(pieceSet = p.name)
       }
     case "theme3d" =>
-      Theme3d.allByName get value map { t =>
+      Theme3d.allByName.get(value).map { t =>
         copy(theme3d = t.name)
       }
     case "pieceSet3d" =>
-      PieceSet3d.allByName get value map { p =>
+      PieceSet3d.allByName.get(value).map { p =>
         copy(pieceSet3d = p.name)
       }
     case "is3d" => copy(is3d = value == "true").some
     case "soundSet" =>
-      SoundSet.allByKey get value map { s =>
+      SoundSet.allByKey.get(value).map { s =>
         copy(soundSet = s.name)
       }
     case _ => none

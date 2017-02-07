@@ -373,27 +373,28 @@ class Engine[TD, EI, PD, Q, P, A](
     logger.info(s"Preparator params: $preparatorParams")
 
     val algorithmsParams: Seq[(String, Params)] =
-      variantJson findField {
+      (variantJson findField {
         case JField("algorithms", _) => true
         case _ => false
-      } map { jv =>
-        val algorithmsParamsJson = jv._2
-        algorithmsParamsJson match {
-          case JArray(s) =>
-            s.map { algorithmParamsJValue =>
-              val eap =
-                algorithmParamsJValue.extract[CreateWorkflow.AlgorithmParams]
-              (
-                eap.name,
-                WorkflowUtils.extractParams(engineLanguage,
-                                            compact(render(eap.params)),
-                                            algorithmClassMap(eap.name),
-                                            jsonExtractor)
-              )
-            }
-          case _ => Nil
+      }).map { jv =>
+          val algorithmsParamsJson = jv._2
+          algorithmsParamsJson match {
+            case JArray(s) =>
+              s.map { algorithmParamsJValue =>
+                val eap =
+                  algorithmParamsJValue.extract[CreateWorkflow.AlgorithmParams]
+                (
+                  eap.name,
+                  WorkflowUtils.extractParams(engineLanguage,
+                                              compact(render(eap.params)),
+                                              algorithmClassMap(eap.name),
+                                              jsonExtractor)
+                )
+              }
+            case _ => Nil
+          }
         }
-      } getOrElse Seq(("", EmptyParams()))
+        .getOrElse(Seq(("", EmptyParams())))
 
     logger.info(s"Extracting serving params...")
     val servingParams: (String, Params) =

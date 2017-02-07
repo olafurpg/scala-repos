@@ -137,7 +137,7 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
         }
       } else None
 
-    maybeLaunchOnReservation orElse maybeReserveAndCreateVolumes
+    maybeLaunchOnReservation.orElse(maybeReserveAndCreateVolumes)
   }
 
   private[this] def launchOnReservation(
@@ -150,24 +150,25 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
 
     // create a TaskBuilder that used the id of the existing task as id for the created TaskInfo
     new TaskBuilder(app, (_) => task.taskId, config)
-      .build(offer, resourceMatch, volumeMatch) map {
-      case (taskInfo, ports) =>
-        val launch = TaskStateOp.Launch(appVersion = app.version,
-                                        status = Task.Status(
-                                          stagedAt = clock.now()
-                                        ),
-                                        networking = Task.HostPorts(ports))
+      .build(offer, resourceMatch, volumeMatch)
+      .map {
+        case (taskInfo, ports) =>
+          val launch = TaskStateOp.Launch(appVersion = app.version,
+                                          status = Task.Status(
+                                            stagedAt = clock.now()
+                                          ),
+                                          networking = Task.HostPorts(ports))
 
-        // FIXME (3221): something like reserved.launch(...): LaunchedOnReservation so we don't need to match?
-        task.update(launch) match {
-          case TaskStateChange.Update(updatedTask) =>
-            taskOperationFactory.launch(taskInfo, updatedTask)
+          // FIXME (3221): something like reserved.launch(...): LaunchedOnReservation so we don't need to match?
+          task.update(launch) match {
+            case TaskStateChange.Update(updatedTask) =>
+              taskOperationFactory.launch(taskInfo, updatedTask)
 
-          case unexpected: TaskStateChange =>
-            throw new scala.RuntimeException(
-              s"Expected TaskStateChange.Update but got $unexpected")
-        }
-    }
+            case unexpected: TaskStateChange =>
+              throw new scala.RuntimeException(
+                s"Expected TaskStateChange.Update but got $unexpected")
+          }
+      }
   }
 
   private[this] def reserveAndCreateVolumes(

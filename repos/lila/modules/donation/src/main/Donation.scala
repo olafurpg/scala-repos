@@ -16,7 +16,7 @@ case class Donation(_id: String, // random ID
                     public: Boolean,
                     publicAmount: Boolean) {
 
-  def nonEmptyMessage = Some(message.trim) filter (_.nonEmpty)
+  def nonEmptyMessage = Some(message.trim).filter(_.nonEmpty)
 }
 
 object Donation {

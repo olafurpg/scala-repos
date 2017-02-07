@@ -178,7 +178,7 @@ trait TestShardService
          authorities)
 
       val stubData =
-        ownerMap mapValues { accounts =>
+        ownerMap.mapValues { accounts =>
           stubValue(Authorities.ifPresent(accounts).get)
         }
 
@@ -210,20 +210,20 @@ trait TestShardService
   implicit val queryResultByteChunkTranscoder =
     new AsyncHttpTranscoder[QueryResult, ByteChunk] {
       def apply(req: HttpRequest[QueryResult]): HttpRequest[ByteChunk] =
-        req map {
+        req.map {
           case Left(jv) => Left(jv.renderCompact.getBytes(utf8))
           case Right(stream) => Right(stream.map(charBufferToBytes))
         }
 
       def unapply(fres: Future[HttpResponse[ByteChunk]])
         : Future[HttpResponse[QueryResult]] =
-        fres map { response =>
+        fres.map { response =>
           val contentType = response.headers
             .header[`Content-Type`]
             .flatMap(_.mimeTypes.headOption)
           response.status.code match {
             case OK | Accepted => //assume application/json
-              response map {
+              response.map {
                 case Left(bytes) =>
                   Left(
                     JParser
@@ -236,7 +236,7 @@ trait TestShardService
 
             case error =>
               if (contentType.exists(_ == MimeTypes.application / json)) {
-                response map {
+                response.map {
                   case Left(bytes) =>
                     Left(
                       JParser
@@ -247,7 +247,7 @@ trait TestShardService
                       stream.map(bytes => utf8.decode(ByteBuffer.wrap(bytes))))
                 }
               } else {
-                response map {
+                response.map {
                   case Left(bb) => Left(JString(new String(bb.array, "UTF-8")))
                   case chunk =>
                     Right(
@@ -296,7 +296,7 @@ class ShardServiceSpec extends TestShardService {
             format: Option[String] = None,
             path: String = ""): Future[HttpResponse[QueryResult]] = {
     val client = syncClient(query, apiKey)
-    (format map (client.query("format", _)) getOrElse client).get(path)
+    (format.map(client.query("format", _)).getOrElse(client)).get(path)
   }
 
   def asyncQuery(query: String,
@@ -327,7 +327,7 @@ class ShardServiceSpec extends TestShardService {
   val inaccessibleAbsoluteQuery = "//inaccessible/foo"
 
   def extractResult(data: StreamT[Future, CharBuffer]): Future[JValue] = {
-    data.foldLeft("") { _ + _.toString } map (JParser.parseUnsafe(_))
+    data.foldLeft("") { _ + _.toString }.map(JParser.parseUnsafe(_))
   }
 
   def extractJobId(jv: JValue): JobId = {
@@ -341,7 +341,7 @@ class ShardServiceSpec extends TestShardService {
     Either[String, (Option[MimeType], StreamT[Future, Array[Byte]])]] = {
     import JobState._
 
-    jobManager.findJob(jobId) flatMap {
+    jobManager.findJob(jobId).flatMap {
       case Some(Job(_, _, _, _, _, NotStarted | Started(_, _))) =>
         waitForJobCompletion(jobId)
       case Some(_) =>
@@ -613,7 +613,7 @@ trait TestPlatform extends ManagedPlatform { self =>
       def execute(query: String, ctx: EvaluationContext, opts: QueryOptions) = {
         if (query == "bad query") {
           val mu =
-            shardQueryMonad.jobId traverse { jobId =>
+            shardQueryMonad.jobId.traverse { jobId =>
               jobManager.addMessage(jobId,
                                     JobManager.channels.Error,
                                     JString("ERROR!"))
@@ -622,7 +622,7 @@ trait TestPlatform extends ManagedPlatform { self =>
           EitherT[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {
             shardQueryMonad
               .liftM[Future, EvaluationError \/ StreamT[JobQueryTF, Slice]] {
-                mu map { _ =>
+                mu.map { _ =>
                   \/.right(toSlice(JObject("value" -> JNum(2))))
                 }
               }

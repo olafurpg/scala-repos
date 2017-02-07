@@ -84,14 +84,14 @@ class ScalaGoToDeclarationHandler extends GotoDeclarationHandler {
                   val clazz = c.containingClass
                   if (clazz == x.getActualElement)
                     Seq(x.element).flatMap(goToTargets)
-                  else all.distinct flatMap goToTargets
+                  else all.distinct.flatMap(goToTargets)
                 case _ =>
-                  all.distinct flatMap goToTargets
+                  all.distinct.flatMap(goToTargets)
               }
             case None => return null
           }
         case r =>
-          Set(r.resolve()) flatMap goToTargets
+          Set(r.resolve()).flatMap(goToTargets)
       }
       return targets.toArray
     }

@@ -112,7 +112,7 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
     val IntRewriter = new Rewriter[Int](q"Int.MinValue", fallback)
 
     new Transformer {
-      val f = IntRewriter(transform _) orElse LongRewriter(transform _)
+      val f = IntRewriter(transform _).orElse(LongRewriter(transform _))
 
       override def transform(tree: Tree): Tree =
         if (f.isDefinedAt(tree)) f(tree) else super.transform(tree)
@@ -137,8 +137,8 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
       case Apply(Select(lhs, method), rhs :: Nil) =>
         val lt = lhs.tpe.widen
         val rt = rhs.tpe.widen
-        ((lt weak_<:< tpe) && (rt <:< tpe)) ||
-        ((lt <:< tpe) && (rt weak_<:< tpe))
+        ((lt.weak_<:<(tpe)) && (rt <:< tpe)) ||
+        ((lt <:< tpe) && (rt.weak_<:<(tpe)))
       case _ =>
         false
     }

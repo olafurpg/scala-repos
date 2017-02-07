@@ -47,7 +47,7 @@ class MemoizeTest extends FunSuite {
     }
 
     val ConcurrencyLevel = 5
-    val computations = Future.collect(1 to ConcurrencyLevel map { _ =>
+    val computations = Future.collect((1 to ConcurrencyLevel).map { _ =>
       FuturePool.unboundedPool(memoizer(5))
     })
 
@@ -55,7 +55,7 @@ class MemoizeTest extends FunSuite {
     val results = Await.result(computations)
 
     // All of the items are equal, up to reference equality
-    results foreach { item =>
+    results.foreach { item =>
       assert(item == results(0))
       assert(item eq results(0))
     }
@@ -81,13 +81,13 @@ class MemoizeTest extends FunSuite {
     }
 
     val ConcurrencyLevel = 5
-    val computation = Future.collect(1 to ConcurrencyLevel map { _ =>
-      FuturePool.unboundedPool(memo(5)) transform { Future.value _ }
+    val computation = Future.collect((1 to ConcurrencyLevel).map { _ =>
+      FuturePool.unboundedPool(memo(5)).transform { Future.value _ }
     })
 
     startUpLatch.countDown()
     val (successes, failures) =
-      Await.result(computation, 200.milliseconds).toList partition {
+      Await.result(computation, 200.milliseconds).toList.partition {
         _.isReturn
       }
 

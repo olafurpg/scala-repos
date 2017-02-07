@@ -154,7 +154,7 @@ final class Source[+Out, +Mat](private[stream] override val module: Module)
     * only to the contained processing stages).
     */
   override def addAttributes(attr: Attributes): Repr[Out] =
-    withAttributes(module.attributes and attr)
+    withAttributes(module.attributes.and(attr))
 
   /**
     * Add a ``name`` attribute to this Flow.

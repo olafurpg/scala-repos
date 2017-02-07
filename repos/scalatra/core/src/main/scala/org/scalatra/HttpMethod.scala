@@ -52,7 +52,7 @@ case class ExtensionMethod(name: String) extends HttpMethod {
 
 object HttpMethod {
   private[this] val methodMap = Map(
-    List(Options, Get, Head, Post, Put, Delete, Trace, Connect, Patch) map {
+    List(Options, Get, Head, Post, Put, Delete, Trace, Connect, Patch).map {
       method =>
         (method.toString, method)
     }: _*)

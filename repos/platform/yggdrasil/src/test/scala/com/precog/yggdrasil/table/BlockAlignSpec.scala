@@ -62,12 +62,12 @@ trait BlockAlignSpec[M[+ _]]
     import module.trans.constants._
 
     val lstream =
-      sample.data.zipWithIndex collect { case (v, i) if i % 2 == 0 => v }
+      sample.data.zipWithIndex.collect { case (v, i) if i % 2 == 0 => v }
     val rstream =
-      sample.data.zipWithIndex collect { case (v, i) if i % 3 == 0 => v }
+      sample.data.zipWithIndex.collect { case (v, i) if i % 3 == 0 => v }
 
     val expected =
-      sample.data.zipWithIndex collect {
+      sample.data.zipWithIndex.collect {
         case (v, i) if i % 2 == 0 && i % 3 == 0 => v
       }
 
@@ -361,8 +361,8 @@ trait BlockAlignSpec[M[+ _]]
         (ljson, rjson)
       }).copoint
 
-      (ljsonreversed.toList must_== rjsondirect.toList) and
-        (rjsonreversed.toList must_== ljsondirect.toList)
+      ((ljsonreversed.toList must_== rjsondirect.toList))
+        .and(rjsonreversed.toList must_== ljsondirect.toList)
     }
 
     def test0 = {

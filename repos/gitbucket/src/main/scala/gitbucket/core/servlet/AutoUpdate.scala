@@ -103,7 +103,7 @@ object AutoUpdate {
             val curInfo = rs.getString("ADDITIONAL_INFO")
             val newInfo = curInfo
               .split("\n")
-              .filter(_ matches "^[0-9a-z]{40}:.*")
+              .filter(_.matches("^[0-9a-z]{40}:.*"))
               .mkString("\n")
             if (curInfo != newInfo) {
               conn.update(

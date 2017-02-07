@@ -61,14 +61,14 @@ class ScalaUnusedImportPass(val file: PsiFile,
       case scalaFile: ScalaFile
           if HighlightingLevelManager.getInstance(file.getProject) shouldInspect file =>
         val unusedImports: Array[ImportUsed] =
-          ImportTracker getInstance file.getProject getUnusedImport scalaFile
+          ImportTracker.getInstance(file.getProject).getUnusedImport(scalaFile)
         val annotations = collectAnnotations(
           unusedImports,
           new AnnotationHolderImpl(new AnnotationSession(file)))
 
         val list = new util.ArrayList[HighlightInfo](annotations.length)
-        annotations foreach
-          (annotation => list add (HighlightInfo fromAnnotation annotation))
+        annotations.foreach(annotation =>
+          list.add(HighlightInfo.fromAnnotation(annotation)))
 
         if (ScalaApplicationSettings
               .getInstance()

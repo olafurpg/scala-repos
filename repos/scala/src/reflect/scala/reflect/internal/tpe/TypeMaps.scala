@@ -32,7 +32,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         case TypeRef(_, SingletonClass, _) =>
           AnyTpe
         case tp1 @ RefinedType(parents, decls) =>
-          parents filter (_.typeSymbol != SingletonClass) match {
+          parents.filter(_.typeSymbol != SingletonClass) match {
             case Nil => AnyTpe
             case p :: Nil if decls.isEmpty => mapOver(p)
             case ps => mapOver(copyRefinedType(tp1, ps, decls))
@@ -49,7 +49,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       case TypeRef(_, sym, _) if sym.isAliasType => apply(tp.dealias)
       case TypeRef(_, sym, _) if sym.isAbstractType => apply(tp.bounds.hi)
       case rtp @ RefinedType(parents, decls) =>
-        copyRefinedType(rtp, parents mapConserve this, decls)
+        copyRefinedType(rtp, parents.mapConserve(this), decls)
       case AnnotatedType(_, _) => mapOver(tp)
       case _ => tp // no recursion - top level only
     }
@@ -91,7 +91,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
   trait KeepOnlyTypeConstraints extends AnnotationFilter {
     // filter keeps only type constraint annotations
     def keepAnnotation(annot: AnnotationInfo) =
-      annot matches TypeConstraintClass
+      annot.matches(TypeConstraintClass)
   }
 
   // todo. move these into scala.reflect.api
@@ -117,7 +117,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         val args1 =
           (if (trackVariance && args.nonEmpty && !variance.isInvariant &&
                sym.typeParams.nonEmpty) mapOverArgs(args, sym.typeParams)
-           else args mapConserve this)
+           else args.mapConserve(this))
         if ((pre1 eq pre) && (args1 eq args)) tp
         else copyTypeRef(tp, pre1, tr.coevolveSym(pre1), args1)
       case ThisType(_) => tp
@@ -158,7 +158,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         if (bounds1 eq bounds) tp
         else BoundedWildcardType(bounds1.asInstanceOf[TypeBounds])
       case rtp @ RefinedType(parents, decls) =>
-        val parents1 = parents mapConserve this
+        val parents1 = parents.mapConserve(this)
         val decls1 = mapOver(decls)
         copyRefinedType(rtp, parents1, decls1)
       case ExistentialType(tparams, result) =>
@@ -172,7 +172,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         else OverloadedType(pre1, alts)
       case AntiPolyType(pre, args) =>
         val pre1 = this(pre)
-        val args1 = args mapConserve this
+        val args1 = args.mapConserve(this)
         if ((pre1 eq pre) && (args1 eq args)) tp
         else AntiPolyType(pre1, args1)
       case tv @ TypeVar(_, constr) =>
@@ -213,7 +213,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       (if (trackVariance)
          map2Conserve(args, tparams)((arg, tparam) =>
            withVariance(variance * tparam.variance)(this(arg)))
-       else args mapConserve this)
+       else args.mapConserve(this))
 
     /** Applies this map to the symbol's info, setting variance = Invariant
       *  if necessary when the symbol is an alias.
@@ -260,20 +260,20 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       if ((args eq args1) && (atp eq atp1)) annot
       else if (args1.isEmpty && args.nonEmpty)
         UnmappableAnnotation // some annotation arg was unmappable
-      else AnnotationInfo(atp1, args1, assocs) setPos annot.pos
+      else AnnotationInfo(atp1, args1, assocs).setPos(annot.pos)
     }
 
     def mapOverAnnotations(
         annots: List[AnnotationInfo]): List[AnnotationInfo] = {
-      val annots1 = annots mapConserve mapOver
+      val annots1 = annots.mapConserve(mapOver)
       if (annots1 eq annots) annots
-      else annots1 filterNot (_ eq UnmappableAnnotation)
+      else annots1.filterNot(_ eq UnmappableAnnotation)
     }
 
     /** Map over a set of annotation arguments.  If any
       *  of the arguments cannot be mapped, then return Nil.  */
     def mapOverAnnotArgs(args: List[Tree]): List[Tree] = {
-      val args1 = args mapConserve mapOver
+      val args1 = args.mapConserve(mapOver)
       if (args1 contains UnmappableTree) Nil
       else args1
     }
@@ -339,7 +339,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
             val eparams = mapOver(typeParamsToExistentials(sym))
             existentialAbstraction(
               eparams,
-              typeRef(apply(pre), sym, eparams map (_.tpe)))
+              typeRef(apply(pre), sym, eparams.map(_.tpe)))
           } finally {
             expanded -= sym
           }
@@ -368,14 +368,14 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       extends TypeMap(trackVariance = true) {
     private val occurCount = mutable.HashMap[Symbol, Int]()
     private def countOccs(tp: Type) = {
-      tp foreach {
+      tp.foreach {
         case TypeRef(_, sym, _) =>
           if (tparams contains sym) occurCount(sym) += 1
         case _ => ()
       }
     }
     def extrapolate(tpe: Type): Type = {
-      tparams foreach (t => occurCount(t) = 0)
+      tparams.foreach(t => occurCount(t) = 0)
       countOccs(tpe)
       for (tparam <- tparams) countOccs(tparam.info)
 
@@ -399,7 +399,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
               if (variance.isPositive) dropSingletonType(tp1.bounds.hi)
               else tp1.bounds.lo
             val count = occurCount(sym)
-            val containsTypeParam = tparams exists (repl contains _)
+            val containsTypeParam = tparams.exists(repl contains _)
             def msg = {
               val word = if (variance.isPositive) "upper" else "lower"
               s"Widened lone occurrence of $tp1 inside existential to $word bound"
@@ -516,7 +516,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     private def isBaseClassOfEnclosingClass(base: Symbol) = {
       def loop(encl: Symbol): Boolean =
         (isPossiblePrefix(encl) &&
-          ((encl isSubClass base) || loop(encl.owner.enclClass)))
+          ((encl.isSubClass(base)) || loop(encl.owner.enclClass)))
       // The hasCompleteInfo guard is necessary to avoid cycles during the typing
       // of certain classes, notably ones defined inside package objects.
       !base.hasCompleteInfo || loop(seenFromClass)
@@ -537,8 +537,9 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         case Some(p) => p.tpe
         case _ =>
           val qvar =
-            clazz freshExistential nme.SINGLETON_SUFFIX setInfo singletonBounds(
-              pre)
+            clazz
+              .freshExistential(nme.SINGLETON_SUFFIX)
+              .setInfo(singletonBounds(pre))
           _capturedParams ::= qvar
           debuglog(
             s"Captured This(${clazz.fullNameString}) seen from $seenFromPrefix: ${qvar.defString}")
@@ -581,7 +582,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         def explain =
           sm"""|   sought  ${own_s(lhsSym)}
                | classSym  ${own_s(rhsSym)}
-               |  tparams  ${rhsSym.typeParams map own_s mkString ", "}
+               |  tparams  ${rhsSym.typeParams.map(own_s) mkString ", "}
                |"""
 
         if (!rhsArgs.isDefinedAt(argIndex))
@@ -591,7 +592,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         else {
           val targ = rhsArgs(argIndex)
           // @M! don't just replace the whole thing, might be followed by type application
-          val result = appliedType(targ, lhsArgs mapConserve this)
+          val result = appliedType(targ, lhsArgs.mapConserve(this))
           def msg =
             s"Created $result, though could not find ${own_s(lhsSym)} among tparams of ${own_s(rhsSym)}"
           if (!rhsSym.typeParams.contains(lhsSym))
@@ -617,7 +618,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
 
       def loop(pre: Type, clazz: Symbol): Type = {
         // have to deconst because it may be a Class[T]
-        def nextBase = (pre baseType clazz).deconst
+        def nextBase = (pre.baseType(clazz)).deconst
         //@M! see test pos/tcpoly_return_overriding.scala why mapOver is necessary
         if (skipPrefixOf(pre, clazz)) mapOver(classParam)
         else if (!matchesPrefixAndClass(pre, clazz)(tparam.owner))
@@ -644,7 +645,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     // B will not be considered.
     private def matchesPrefixAndClass(pre: Type, clazz: Symbol)(
         candidate: Symbol) =
-      (clazz == candidate) && (pre.widen.typeSymbol isSubClass clazz)
+      (clazz == candidate) && (pre.widen.typeSymbol.isSubClass(clazz))
 
     // Whether the annotation tree currently being mapped over has had a This(_) node rewritten.
     private[this] var wroteAnnotation = false
@@ -658,7 +659,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         val presym = seenFromPrefix.widen.typeSymbol
         val thisSym =
           presym.owner
-            .newValue(presym.name.toTermName, presym.pos) setInfo seenFromPrefix
+            .newValue(presym.name.toTermName, presym.pos)
+            .setInfo(seenFromPrefix)
         gen.mkAttributedQualifier(seenFromPrefix, thisSym)
       }
 
@@ -677,11 +679,11 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     // than an allocation on every call to mapOver, and no extra work when the
     // tree only has its types remapped.
     override def mapOver(tree: Tree, giveup: () => Nothing): Tree = {
-      if (isStablePrefix) annotationArgRewriter transform tree
+      if (isStablePrefix) annotationArgRewriter.transform(tree)
       else {
         val saved = wroteAnnotation
         wroteAnnotation = false
-        try annotationArgRewriter transform tree
+        try annotationArgRewriter.transform(tree)
         finally if (wroteAnnotation)
           giveup()
         else wroteAnnotation = saved
@@ -697,7 +699,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         if (skipPrefixOf(pre, clazz))
           mapOver(tp) // TODO - is mapOver necessary here?
         else if (!matchesPrefixAndClass(pre, clazz)(tp.sym))
-          loop((pre baseType clazz).prefix, clazz.owner)
+          loop((pre.baseType(clazz)).prefix, clazz.owner)
         else if (pre1.isStable) pre1
         else captureThis(pre1, clazz)
       }
@@ -759,7 +761,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       else {
         val boundSyms = tp0.boundSyms
         val tp1 =
-          if (boundSyms.nonEmpty && (boundSyms exists from.contains))
+          if (boundSyms.nonEmpty && (boundSyms.exists(from.contains)))
             renameBoundSyms(tp0)
           else tp0
         val tp = mapOver(tp1)
@@ -784,7 +786,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
           case SingleType(NoPrefix, sym) =>
             substFor(sym)
           case ClassInfoType(parents, decls, sym) =>
-            val parents1 = parents mapConserve this
+            val parents1 = parents.mapConserve(this)
             // We don't touch decls here; they will be touched when an enclosing TreeSubstituter
             // transforms the tree that defines them.
             if (parents1 eq parents) tp
@@ -848,7 +850,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       // constructor `trans` and sets the symbol and the type on the resulting tree.
       def transformIfMapped(tree: Tree)(trans: Symbol => Tree) =
         termMapsTo(tree.symbol) match {
-          case Some(toSym) => trans(toSym) setSymbol toSym setType tree.tpe
+          case Some(toSym) => trans(toSym).setSymbol(toSym).setType(tree.tpe)
           case None => tree
         }
 
@@ -885,7 +887,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
               case -1 => super.transform(tree)
               case idx =>
                 val totpe = to(idx)
-                if (totpe.isStable) tree.duplicate setType totpe
+                if (totpe.isStable) tree.duplicate.setType(totpe)
                 else giveup()
             }
           case _ =>
@@ -965,11 +967,11 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     private def existentialFor(pid: Int) = {
       if (existentials(pid) eq null) {
         val param = params(pid)
-        existentials(pid) =
-          (param.owner.newExistential(
-            param.name.toTypeName append nme.SINGLETON_SUFFIX,
-            param.pos,
-            param.flags) setInfo singletonBounds(actuals(pid)))
+        existentials(pid) = (param.owner
+          .newExistential(param.name.toTypeName.append(nme.SINGLETON_SUFFIX),
+                          param.pos,
+                          param.flags)
+          .setInfo(singletonBounds(actuals(pid))))
       }
       existentials(pid)
     }
@@ -1031,11 +1033,11 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         override def transform(tree: Tree): Tree = tree.symbol match {
           case StableArgTp(tp) => gen.mkAttributedQualifier(tp, tree.symbol)
           case UnstableArgTp(quant, tp) =>
-            Ident(quant) copyAttrs tree setType tp
+            Ident(quant).copyAttrs(tree).setType(tp)
           case _ => super.transform(tree)
         }
       }
-      treeTrans transform arg
+      treeTrans.transform(arg)
     }
   }
 
@@ -1149,20 +1151,22 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       else if (sym.isModuleClass) {
         val sourceModule1 = adaptToNewRun(pre, sym.sourceModule)
 
-        sourceModule1.moduleClass orElse sourceModule1.initialize.moduleClass orElse {
-          val msg =
-            "Cannot adapt module class; sym = %s, sourceModule = %s, sourceModule.moduleClass = %s => sourceModule1 = %s, sourceModule1.moduleClass = %s"
-          debuglog(
-            msg.format(sym,
-                       sym.sourceModule,
-                       sym.sourceModule.moduleClass,
-                       sourceModule1,
-                       sourceModule1.moduleClass))
-          sym
-        }
+        sourceModule1.moduleClass
+          .orElse(sourceModule1.initialize.moduleClass)
+          .orElse {
+            val msg =
+              "Cannot adapt module class; sym = %s, sourceModule = %s, sourceModule.moduleClass = %s => sourceModule1 = %s, sourceModule1.moduleClass = %s"
+            debuglog(
+              msg.format(sym,
+                         sym.sourceModule,
+                         sym.sourceModule.moduleClass,
+                         sourceModule1,
+                         sourceModule1.moduleClass))
+            sym
+          }
       } else {
         var rebind0 =
-          pre.findMember(sym.name, BRIDGE, 0, stableOnly = true) orElse {
+          pre.findMember(sym.name, BRIDGE, 0, stableOnly = true).orElse {
             if (sym.isAliasType) throw missingAliasException
             devWarning(s"$pre.$sym no longer exist at phase $phase")
             throw new MissingTypeControl // For build manager and presentation compiler purposes
@@ -1186,7 +1190,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
               rebind0.fullLocationString
           )
         }
-        rebind0.suchThat(sym => sym.isType || sym.isStable) orElse {
+        rebind0.suchThat(sym => sym.isType || sym.isStable).orElse {
           debuglog(
             "" + phase + " " + phase.flatClasses + sym.owner +
               sym.name + " " + sym.isType)
@@ -1220,7 +1224,7 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         if (sym.isPackageClass) tp
         else {
           val pre1 = this(pre)
-          val args1 = args mapConserve (this)
+          val args1 = args.mapConserve(this)
           try {
             val sym1 = adaptToNewRun(pre1, sym)
             if ((pre1 eq pre) && (sym1 eq sym) && (args1 eq args) /* && sym.isExternal*/ ) {
@@ -1258,12 +1262,12 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       case ClassInfoType(parents, decls, clazz) =>
         if (clazz.isPackageClass) tp
         else {
-          val parents1 = parents mapConserve (this)
+          val parents1 = parents.mapConserve(this)
           if (parents1 eq parents) tp
           else ClassInfoType(parents1, decls, clazz)
         }
       case RefinedType(parents, decls) =>
-        val parents1 = parents mapConserve (this)
+        val parents1 = parents.mapConserve(this)
         if (parents1 eq parents) tp
         else
           refinedType(parents1,

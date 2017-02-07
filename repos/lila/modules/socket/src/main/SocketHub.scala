@@ -27,7 +27,7 @@ final class SocketHub extends Actor {
 
     case Close(socket) => sockets -= socket
 
-    case msg => sockets foreach (_ ! msg)
+    case msg => sockets.foreach(_ ! msg)
   }
 }
 

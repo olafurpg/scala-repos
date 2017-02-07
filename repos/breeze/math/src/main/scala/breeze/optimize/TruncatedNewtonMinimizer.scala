@@ -47,7 +47,7 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
     val (v, grad, h) = f.calculate2(initial)
     val adjgrad = grad + initial * l2Regularization
     val initDelta = norm(adjgrad)
-    val adjfval = v + 0.5 * l2Regularization * (initial dot initial)
+    val adjfval = v + 0.5 * l2Regularization * (initial.dot(initial))
     val f_too_small = if (adjfval < -1.0e+32) true else false
     State(0,
           initDelta,
@@ -88,13 +88,13 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
         cg.minimizeAndReturnResidual(-adjGrad, h, initStep)
       val x_new = x + step
 
-      val gs = adjGrad dot step
-      val predictedReduction = -0.5 * (gs - (step dot residual))
+      val gs = adjGrad.dot(step)
+      val predictedReduction = -0.5 * (gs - (step.dot(residual)))
 
       val (newv, newg, newh) = f.calculate2(x_new)
 
       val adjNewG = newg + x_new * l2Regularization
-      val adjNewV = newv + 0.5 * l2Regularization * (x_new dot x_new)
+      val adjNewV = newv + 0.5 * l2Regularization * (x_new.dot(x_new))
 
       val actualReduction = adjFval - adjNewV
 
@@ -103,7 +103,7 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
 
       val alpha =
         if (-actualReduction <= gs) sigma3
-        else sigma1 max (-0.5 * (gs / (-actualReduction - gs)))
+        else sigma1.max(-0.5 * (gs / (-actualReduction - gs)))
 
       newDelta = {
         if (actualReduction < eta0 * predictedReduction)
@@ -191,8 +191,8 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
     val rho = new Array[Double](m)
 
     for (i <- (memStep.length - 1) to 0 by -1) {
-      rho(i) = (memStep(i) dot memGradDelta(i))
-      as(i) = (memStep(i) dot dir) / rho(i)
+      rho(i) = (memStep(i).dot(memGradDelta(i)))
+      as(i) = (memStep(i).dot(dir)) / rho(i)
       if (as(i).isNaN) {
         throw new NaNHistory
       }
@@ -202,7 +202,7 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
     dir *= diag
 
     for (i <- 0 until memStep.length) {
-      val beta = (memGradDelta(i) dot dir) / rho(i)
+      val beta = (memGradDelta(i).dot(dir)) / rho(i)
       dir += memStep(i) * (as(i) - beta)
     }
 
@@ -211,8 +211,8 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
   }
 
   private def computeDiagScale(prevStep: T, prevGradStep: T): Double = {
-    val sy = prevStep dot prevGradStep
-    val yy = prevGradStep dot prevGradStep
+    val sy = prevStep.dot(prevGradStep)
+    val yy = prevGradStep.dot(prevGradStep)
     if (sy < 0 || sy.isNaN) throw new NaNHistory
     sy / yy
   }
@@ -224,8 +224,8 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
     val gradDelta: T = (newGrad :- oldState.adjGrad)
     val step: T = (newX - oldState.x)
 
-    val memStep = (step +: oldState.history.memStep) take m
-    val memGradDelta = (gradDelta +: oldState.history.memGradDelta) take m
+    val memStep = ((step +: oldState.history.memStep)).take(m)
+    val memGradDelta = ((gradDelta +: oldState.history.memGradDelta)).take(m)
 
     new History(memStep, memGradDelta)
   }

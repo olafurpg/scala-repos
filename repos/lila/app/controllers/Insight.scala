@@ -30,13 +30,13 @@ object Insight extends LilaController {
     Open { implicit ctx =>
       Accessible(username) { user =>
         import lila.insight.InsightApi.UserStatus._
-        env.api userStatus user flatMap {
+        env.api.userStatus(user).flatMap {
           case NoGame => Ok(html.insight.noGame(user)).fuccess
           case Empty => Ok(html.insight.empty(user)).fuccess
           case s =>
             for {
-              cache <- env.api userCache user
-              prefId <- env.share getPrefId user
+              cache <- env.api.userCache(user)
+              prefId <- env.share.getPrefId(user)
             } yield
               Ok(
                 html.insight.index(
@@ -60,10 +60,13 @@ object Insight extends LilaController {
             err => BadRequest(jsonError(err.toString)).fuccess,
             qJson =>
               qJson.question.fold(BadRequest.fuccess) { q =>
-                env.api.ask(q, user) map lila.insight.Chart.fromAnswer(
-                  Env.user.lightUser) map env.jsonView.chart.apply map {
-                  Ok(_)
-                }
+                env.api
+                  .ask(q, user)
+                  .map(lila.insight.Chart.fromAnswer(Env.user.lightUser))
+                  .map(env.jsonView.chart.apply)
+                  .map {
+                    Ok(_)
+                  }
             }
           )
       }
@@ -71,9 +74,9 @@ object Insight extends LilaController {
 
   private def Accessible(username: String)(f: lila.user.User => Fu[Result])(
       implicit ctx: Context) =
-    lila.user.UserRepo named username flatMap {
+    lila.user.UserRepo.named(username).flatMap {
       _.fold(notFound) { u =>
-        env.share.grant(u, ctx.me) flatMap {
+        env.share.grant(u, ctx.me).flatMap {
           _.fold(f(u), fuccess(Forbidden(html.insight.forbidden(u))))
         }
       }
@@ -81,13 +84,17 @@ object Insight extends LilaController {
 
   private def AccessibleJson(username: String)(
       f: lila.user.User => Fu[Result])(implicit ctx: Context) =
-    lila.user.UserRepo named username flatMap {
-      _.fold(notFoundJson(s"No such user: $username")) { u =>
-        env.share.grant(u, ctx.me) flatMap {
-          _.fold(
-            f(u),
-            fuccess(Forbidden(jsonError(s"User $username data is protected"))))
+    lila.user.UserRepo
+      .named(username)
+      .flatMap {
+        _.fold(notFoundJson(s"No such user: $username")) { u =>
+          env.share.grant(u, ctx.me).flatMap {
+            _.fold(
+              f(u),
+              fuccess(
+                Forbidden(jsonError(s"User $username data is protected"))))
+          }
         }
       }
-    } map (_ as JSON)
+      .map(_.as(JSON))
 }

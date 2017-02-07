@@ -5,6 +5,6 @@ final class Phantom[A](val s: String) extends AnyVal {
 object Test extends App {
   val x = new Phantom[Int]("foo")
   val y = new Phantom[Int]("bar")
-  val z = x compose y
+  val z = x.compose(y)
   println(z.s)
 }

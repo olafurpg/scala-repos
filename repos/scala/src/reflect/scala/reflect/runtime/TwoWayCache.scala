@@ -31,7 +31,7 @@ private[runtime] class TwoWayCache[J, S] {
   }
 
   def toScala(key: J)(body: => S): S = synchronized {
-    toScalaMap get key match {
+    toScalaMap.get(key) match {
       case SomeRef(v) =>
         v
       case _ =>
@@ -42,7 +42,7 @@ private[runtime] class TwoWayCache[J, S] {
   }
 
   def toJava(key: S)(body: => J): J = synchronized {
-    toJavaMap get key match {
+    toJavaMap.get(key) match {
       case SomeRef(v) =>
         v
       case _ =>

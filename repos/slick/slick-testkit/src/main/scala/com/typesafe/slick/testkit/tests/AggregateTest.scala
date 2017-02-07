@@ -124,7 +124,7 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
       }
       .flatMap { _ =>
         val q6 = ((for {
-          (u, t) <- us joinLeft ts on (_.id === _.a)
+          (u, t) <- (us joinLeft ts).on(_.id === _.a)
         } yield (u, t))
           .groupBy(_._1.id)
           .map {
@@ -210,10 +210,13 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
       .flatMap { _ =>
         val q10 = ((for {
           m <- ts
-        } yield m) groupBy (_.a) map {
-          case (id, data) =>
-            (id, data.map(_.b.asColumnOf[Option[Double]]).max)
-        }).to[Set]
+        } yield m)
+          .groupBy(_.a)
+          .map {
+            case (id, data) =>
+              (id, data.map(_.b.asColumnOf[Option[Double]]).max)
+          })
+          .to[Set]
         db.run(mark("q10", q10.result))
           .map(_ shouldBe Set((2, Some(5.0)), (1, Some(3.0)), (3, Some(9.0))))
       }
@@ -343,7 +346,8 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
       _ <- (as.schema ++ bs.schema).create
       q1 = as.groupBy(_.id).map(_._2.map(x => x).map(x => x.a).min)
       _ <- q1.result.map(v => v.toList shouldBe Nil)
-      q2 = (as joinLeft bs on (_.id === _.id))
+      q2 = ((as joinLeft bs)
+        .on(_.id === _.id))
         .map {
           case (c, so) =>
             val nameo = so.map(_.b)
@@ -436,9 +440,13 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
     val q1b = as.distinct.map(_.a)
     val q2 = as.distinct.map(a => (a.a, 5))
     val q3a =
-      as.distinct.map(_.id).filter(_ === 1) unionAll as.distinct
+      as.distinct
         .map(_.id)
-        .filter(_ === 2)
+        .filter(_ === 1)
+        .unionAll(
+          as.distinct
+            .map(_.id)
+            .filter(_ === 2))
     val q4 = as.map(a => (a.a, a.b)).distinct.map(_._1)
     val q5a = as.groupBy(_.a).map(_._2.map(_.id).min.get)
     val q5b = as.distinct.map(_.id)

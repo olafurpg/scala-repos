@@ -253,7 +253,7 @@ private[akka] final case class HeartbeatHistory private (
   private def dropOldest: HeartbeatHistory =
     HeartbeatHistory(
       maxSampleSize,
-      intervals = intervals drop 1,
+      intervals = intervals.drop(1),
       intervalSum = intervalSum - intervals.head,
       squaredIntervalSum = squaredIntervalSum - pow2(intervals.head))
 

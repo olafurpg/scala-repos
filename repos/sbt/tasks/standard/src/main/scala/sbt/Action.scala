@@ -41,7 +41,7 @@ final case class FlatMapped[T, K[L[x]]](in: K[Task],
                                         alist: AList[K])
     extends Action[T] {
   private[sbt] def mapTask(g: Task ~> Task) =
-    FlatMapped[T, K](alist.transform(in, g), g.fn[T] compose f, alist)
+    FlatMapped[T, K](alist.transform(in, g), g.fn[T].compose(f), alist)
 }
 
 /** A computation `in` that requires other tasks `deps` to be evaluated first.*/
@@ -64,7 +64,7 @@ final case class Join[T, U](in: Seq[Task[U]],
 
 /** Combines metadata `info` and a computation `work` to define a task. */
 final case class Task[T](info: Info[T], work: Action[T]) {
-  override def toString = info.name getOrElse ("Task(" + info + ")")
+  override def toString = info.name.getOrElse("Task(" + info + ")")
   override def hashCode = info.hashCode
 
   private[sbt] def mapTask(g: Task ~> Task): Task[T] =
@@ -73,7 +73,7 @@ final case class Task[T](info: Info[T], work: Action[T]) {
   def tagw(tags: (Tag, Int)*): Task[T] =
     copy(
       info = info.set(tagsKey, info.get(tagsKey).getOrElse(Map.empty) ++ tags))
-  def tags: TagMap = info get tagsKey getOrElse Map.empty
+  def tags: TagMap = info.get(tagsKey).getOrElse(Map.empty)
 }
 
 /**

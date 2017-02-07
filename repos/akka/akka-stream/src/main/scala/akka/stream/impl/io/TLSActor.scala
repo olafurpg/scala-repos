@@ -188,17 +188,17 @@ private[akka] class TLSActor(settings: ActorMaterializerSettings,
   applySessionParameters(firstSession)
 
   def applySessionParameters(params: NegotiateNewSession): Unit = {
-    params.enabledCipherSuites foreach
-      (cs ⇒ engine.setEnabledCipherSuites(cs.toArray))
-    params.enabledProtocols foreach (p ⇒ engine.setEnabledProtocols(p.toArray))
+    params.enabledCipherSuites.foreach(cs ⇒
+      engine.setEnabledCipherSuites(cs.toArray))
+    params.enabledProtocols.foreach(p ⇒ engine.setEnabledProtocols(p.toArray))
     params.clientAuth match {
       case Some(TLSClientAuth.None) ⇒ engine.setNeedClientAuth(false)
       case Some(TLSClientAuth.Want) ⇒ engine.setWantClientAuth(true)
       case Some(TLSClientAuth.Need) ⇒ engine.setNeedClientAuth(true)
       case _ ⇒ // do nothing
     }
-    params.sslParameters foreach { p ⇒
-      hostInfo foreach { case (host, _) ⇒ applySNI(host, p) }
+    params.sslParameters.foreach { p ⇒
+      hostInfo.foreach { case (host, _) ⇒ applySNI(host, p) }
       engine.setSSLParameters(p)
     }
 

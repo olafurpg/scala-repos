@@ -105,7 +105,7 @@ trait Analyzer
             global.validatePositions(unit.body)
           for (workItem <- unit.toCheck) workItem()
           if (settings.warnUnusedImport) warnUnusedImports(unit)
-          if (settings.warnUnused) typer checkUnused unit
+          if (settings.warnUnused) typer.checkUnused(unit)
         } finally {
           unit.toCheck.clear()
         }

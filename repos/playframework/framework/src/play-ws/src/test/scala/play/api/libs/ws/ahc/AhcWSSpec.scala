@@ -450,7 +450,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
                                                maxAge,
                                                secure,
                                                httpOnly)
-      ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
+      ahcResponse.getCookies.returns(util.Arrays.asList(ahcCookie))
 
       val response = AhcWSResponse(ahcResponse)
 
@@ -485,7 +485,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
                                                maxAge,
                                                secure,
                                                httpOnly)
-      ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
+      ahcResponse.getCookies.returns(util.Arrays.asList(ahcCookie))
 
       val response = AhcWSResponse(ahcResponse)
 
@@ -511,7 +511,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
                                                -1L,
                                                false,
                                                false)
-      ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
+      ahcResponse.getCookies.returns(util.Arrays.asList(ahcCookie))
 
       val response = AhcWSResponse(ahcResponse)
 
@@ -525,7 +525,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
       val ahcResponse: AHCResponse = mock[AHCResponse]
       val bytes = ByteString(-87, -72, 96, -63, -32, 46, -117, -40, -128, -7,
         61, 109, 80, 45, 44, 30)
-      ahcResponse.getResponseBodyAsBytes returns bytes.toArray
+      ahcResponse.getResponseBodyAsBytes.returns(bytes.toArray)
       val response = AhcWSResponse(ahcResponse)
       response.bodyAsBytes must_== bytes
     }
@@ -536,7 +536,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
       ahcHeaders.add("Foo", "bar")
       ahcHeaders.add("Foo", "baz")
       ahcHeaders.add("Bar", "baz")
-      ahcResponse.getHeaders returns ahcHeaders
+      ahcResponse.getHeaders.returns(ahcHeaders)
       val response = AhcWSResponse(ahcResponse)
       val headers = response.allHeaders
       headers must beEqualTo(

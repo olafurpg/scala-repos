@@ -7,11 +7,11 @@ trait Positions extends scala.reflect.internal.Positions { self: Global =>
     var pos: Position = _
     override def traverse(t: Tree) {
       if (t eq EmptyTree) ()
-      else if (t.pos == NoPosition) super.traverse(t setPos pos)
+      else if (t.pos == NoPosition) super.traverse(t.setPos(pos))
       else if (globalPhase.id <= currentRun.picklerPhase.id) {
         // When we prune due to encountering a position, traverse the
         // pruned children so we can warn about those lacking positions.
-        t.children foreach { c =>
+        t.children.foreach { c =>
           if (!c.canHaveAttrs) ()
           else if (c.pos == NoPosition) {
             reporter.warning(

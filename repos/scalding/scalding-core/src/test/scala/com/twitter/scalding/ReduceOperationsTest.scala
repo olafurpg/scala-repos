@@ -185,7 +185,7 @@ class ReduceOperationsTest extends WordSpec with Matchers {
         "grouped OS count" in {
           val whatWeWant: Map[String, Long] = Map("laptop" -> 1, "mobile" -> 2)
           val whatWeGet: Map[String, Long] = buf.toMap
-          whatWeGet should have size 2
+          (whatWeGet should have).size(2)
           whatWeGet.get("laptop").getOrElse("apples") shouldBe
             (whatWeWant.get("laptop").getOrElse("oranges"))
           whatWeGet.get("mobile").getOrElse("apples") shouldBe

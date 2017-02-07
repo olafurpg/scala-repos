@@ -462,7 +462,7 @@ class Scaladoc extends ScalaMatchingTask {
     */
   private def getClasspath: List[File] =
     if (classpath.isEmpty) buildError("Member 'classpath' is empty.")
-    else classpath.get.list().toList map nameToFile
+    else classpath.get.list().toList.map(nameToFile)
 
   /** Gets the value of the `origin` attribute in a Scala-friendly
     *  form.
@@ -471,7 +471,7 @@ class Scaladoc extends ScalaMatchingTask {
     */
   private def getOrigin: List[File] =
     if (origin.isEmpty) buildError("Member 'origin' is empty.")
-    else origin.get.list().toList map nameToFile
+    else origin.get.list().toList.map(nameToFile)
 
   /** Gets the value of the `destination` attribute in a
     *  Scala-friendly form.
@@ -480,7 +480,7 @@ class Scaladoc extends ScalaMatchingTask {
     */
   private def getDestination: File =
     if (destination.isEmpty) buildError("Member 'destination' is empty.")
-    else existing(getProject resolveFile destination.get.toString)
+    else existing(getProject.resolveFile(destination.get.toString))
 
   /** Gets the value of the `sourcepath` attribute in a
     *  Scala-friendly form.
@@ -489,7 +489,7 @@ class Scaladoc extends ScalaMatchingTask {
     */
   private def getSourcepath: List[File] =
     if (sourcepath.isEmpty) buildError("Member 'sourcepath' is empty.")
-    else sourcepath.get.list().toList map nameToFile
+    else sourcepath.get.list().toList.map(nameToFile)
 
   /** Gets the value of the `bootclasspath` attribute in a
     *  Scala-friendly form.
@@ -498,7 +498,7 @@ class Scaladoc extends ScalaMatchingTask {
     */
   private def getBootclasspath: List[File] =
     if (bootclasspath.isEmpty) buildError("Member 'bootclasspath' is empty.")
-    else bootclasspath.get.list().toList map nameToFile
+    else bootclasspath.get.list().toList.map(nameToFile)
 
   /** Gets the value of the `extdirs` attribute in a
     *  Scala-friendly form.
@@ -507,7 +507,7 @@ class Scaladoc extends ScalaMatchingTask {
     */
   private def getExtdirs: List[File] =
     if (extdirs.isEmpty) buildError("Member 'extdirs' is empty.")
-    else extdirs.get.list().toList map nameToFile
+    else extdirs.get.list().toList.map(nameToFile)
 
   /*============================================================================*\
    **                       Compilation and support methods                      **
@@ -537,7 +537,7 @@ class Scaladoc extends ScalaMatchingTask {
     *  @return     A file created from the name.
     */
   private def nameToFile(name: String): File =
-    existing(getProject resolveFile name)
+    existing(getProject.resolveFile(name))
 
   /** Tests if a file exists and prints a warning in case it doesn't. Always
     *  returns the file, even if it doesn't exist.
@@ -582,8 +582,8 @@ class Scaladoc extends ScalaMatchingTask {
     if (destination.isEmpty) destination = Some(getOrigin.head)
 
     val mapper = new GlobPatternMapper()
-    mapper setTo "*.html"
-    mapper setFrom "*.scala"
+    mapper.setTo("*.html")
+    mapper.setFrom("*.scala")
 
     // Scans source directories to build up a compile lists.
     // If force is false, only files were the .class file in destination is
@@ -697,7 +697,7 @@ class Scaladoc extends ScalaMatchingTask {
       case exception: Throwable =>
         exception.printStackTrace()
         val msg =
-          Option(exception.getMessage) getOrElse "no error message provided"
+          Option(exception.getMessage).getOrElse("no error message provided")
         safeBuildError(
           s"Document failed because of an internal documenter error ($msg); see the error output for details.")
     }

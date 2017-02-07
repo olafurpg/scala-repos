@@ -38,7 +38,7 @@ trait Reference extends Spec {
       extends CommandLine(Reference.this, args) {}
   protected def creator(args: List[String]): ThisCommandLine
   final def apply(args: String*): ThisCommandLine =
-    creator(propertyArgs ++ args flatMap expandArg)
+    creator((propertyArgs ++ args).flatMap(expandArg))
 
   type OptionMagic = Opt.Reference
   protected implicit def optionMagicAdditions(name: String) =
@@ -72,21 +72,21 @@ object Reference {
 
     def addHelp(f: () => String): Unit = _help += f
     def addHelpAlias(f: () => String) = mapHelp { s =>
-      val str = "alias for '%s'" format f()
+      val str = "alias for '%s'".format(f())
       def noHelp = (helpFormatStr.format("", "")).length == s.length
       val str2 = if (noHelp) str else " (" + str + ")"
 
       s + str2
     }
     def addHelpDefault(f: () => String): Unit = mapHelp { s =>
-      val str = "(default: %s)" format f()
+      val str = "(default: %s)".format(f())
 
       if (s.length + str.length < MaxLine) s + " " + str
       else defaultFormatStr.format(s, str)
     }
     def addHelpEnvDefault(name: String): Unit = mapHelp { s =>
       val line1 = "%s (default: %s)".format(s, name)
-      val envNow = envOrNone(name) map ("'" + _ + "'") getOrElse "unset"
+      val envNow = envOrNone(name).map("'" + _ + "'").getOrElse("unset")
       val line2 = defaultFormatStr.format("Currently " + envNow)
 
       line1 + "\n" + line2
@@ -96,7 +96,7 @@ object Reference {
     lazy val binary = _binary.distinct
     lazy val all = unary ++ binary
     lazy val expansionMap = _expand
-    lazy val helpMsg = _help map (f => f() + "\n") mkString
-    lazy val longestArg = all map (_.length) max
+    lazy val helpMsg = _help.map(f => f() + "\n") mkString
+    lazy val longestArg = all.map(_.length) max
   }
 }

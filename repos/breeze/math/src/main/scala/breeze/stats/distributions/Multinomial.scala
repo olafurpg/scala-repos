@@ -180,7 +180,7 @@ object Multinomial {
     def likelihoodFunction(stats: SufficientStatistic) = new DiffFunction[T] {
       def calculate(x: T) = {
         val nn: T = logNormalize(x)
-        val lp = nn dot stats.counts
+        val lp = nn.dot(stats.counts)
 
         val mysum = sum(stats.counts)
 

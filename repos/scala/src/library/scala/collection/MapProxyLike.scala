@@ -50,7 +50,7 @@ trait MapProxyLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     self.+(kv1, kv2, kvs: _*)
   override def ++[B1 >: B](xs: GenTraversableOnce[(A, B1)]): Map[A, B1] =
     self.++(xs)
-  override def filterNot(p: ((A, B)) => Boolean) = self filterNot p
+  override def filterNot(p: ((A, B)) => Boolean) = self.filterNot(p)
 
   override def addString(b: StringBuilder,
                          start: String,

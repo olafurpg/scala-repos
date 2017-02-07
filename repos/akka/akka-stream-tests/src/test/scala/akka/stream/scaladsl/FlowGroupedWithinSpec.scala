@@ -33,16 +33,16 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
       val cSub = c.expectSubscription
       cSub.request(100)
       val demand1 = pSub.expectRequest.toInt
-      (1 to demand1) foreach { _ ⇒
+      ((1 to demand1)).foreach { _ ⇒
         pSub.sendNext(input.next())
       }
       val demand2 = pSub.expectRequest.toInt
-      (1 to demand2) foreach { _ ⇒
+      ((1 to demand2)).foreach { _ ⇒
         pSub.sendNext(input.next())
       }
       val demand3 = pSub.expectRequest.toInt
       c.expectNext((1 to (demand1 + demand2).toInt).toVector)
-      (1 to demand3) foreach { _ ⇒
+      ((1 to demand3)).foreach { _ ⇒
         pSub.sendNext(input.next())
       }
       c.expectNoMsg(300.millis)
@@ -85,12 +85,12 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
       val cSub = c.expectSubscription
       cSub.request(1)
       val demand1 = pSub.expectRequest.toInt
-      (1 to demand1) foreach { _ ⇒
+      ((1 to demand1)).foreach { _ ⇒
         pSub.sendNext(input.next())
       }
       c.expectNext((1 to demand1).toVector)
       val demand2 = pSub.expectRequest.toInt
-      (1 to demand2) foreach { _ ⇒
+      ((1 to demand2)).foreach { _ ⇒
         pSub.sendNext(input.next())
       }
       c.expectNoMsg(300.millis)
@@ -139,7 +139,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
       downstream.request(2)
       downstream.expectNoMsg(1000.millis)
 
-      (1 to 4) foreach { _ ⇒
+      ((1 to 4)).foreach { _ ⇒
         upstream.sendNext(inputs.next())
       }
       downstream.within(1000.millis) {
@@ -159,12 +159,12 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
 
     "group evenly" in {
       def script =
-        Script(TestConfig.RandomTestRange map { _ ⇒
+        Script(TestConfig.RandomTestRange.map { _ ⇒
           val x, y, z = random.nextInt();
           Seq(x, y, z) -> Seq(immutable.Seq(x, y, z))
         }: _*)
-      TestConfig.RandomTestRange foreach
-        (_ ⇒ runScript(script, settings)(_.groupedWithin(3, 10.minutes)))
+      TestConfig.RandomTestRange.foreach(_ ⇒
+        runScript(script, settings)(_.groupedWithin(3, 10.minutes)))
     }
 
     "group with rest" in {
@@ -173,8 +173,8 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
           val x, y, z = random.nextInt();
           Seq(x, y, z) -> Seq(immutable.Seq(x, y, z))
         } :+ { val x = random.nextInt(); Seq(x) -> Seq(immutable.Seq(x)) }): _*)
-      TestConfig.RandomTestRange foreach
-        (_ ⇒ runScript(script, settings)(_.groupedWithin(3, 10.minutes)))
+      TestConfig.RandomTestRange.foreach(_ ⇒
+        runScript(script, settings)(_.groupedWithin(3, 10.minutes)))
     }
   }
 }

@@ -21,6 +21,6 @@ trait ManagedSeq[+A, +Coll]
   trait Transformed[+B] extends ManagedSeq[B, Coll] with super.Transformed[B]
 
   trait Sliced extends Transformed[A] with super.Sliced {
-    override def managedIterator = self.managedIterator slice (from, until)
+    override def managedIterator = self.managedIterator.slice(from, until)
   }
 }

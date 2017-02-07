@@ -15,7 +15,7 @@ trait EmbeddedJettyContainer extends JettyContainer {
     *
     * @return Some port if Jetty is currently listening, or None if it is not.
     */
-  def localPort: Option[Int] = server.getConnectors collectFirst {
+  def localPort: Option[Int] = server.getConnectors.collectFirst {
     case x: ServerConnector => x.getLocalPort
   }
 
@@ -38,11 +38,14 @@ trait EmbeddedJettyContainer extends JettyContainer {
   def stop(): Unit = server.stop()
 
   def baseUrl: String =
-    server.getConnectors collectFirst {
-      case conn: ServerConnector =>
-        val host = Option(conn.getHost) getOrElse "localhost"
-        val port = conn.getLocalPort
-        require(port > 0, "The detected local port is < 1, that's not allowed")
-        "http://%s:%d".format(host, port)
-    } getOrElse sys.error("can't calculate base URL: no connector")
+    server.getConnectors
+      .collectFirst {
+        case conn: ServerConnector =>
+          val host = Option(conn.getHost).getOrElse("localhost")
+          val port = conn.getLocalPort
+          require(port > 0,
+                  "The detected local port is < 1, that's not allowed")
+          "http://%s:%d".format(host, port)
+      }
+      .getOrElse(sys.error("can't calculate base URL: no connector"))
 }

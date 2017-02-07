@@ -95,5 +95,5 @@ object Prop {
   implicit object DoubleProp extends CreatorImpl[Double](_.toDouble)
 
   def apply[T: Creator](key: String): Prop[T] =
-    implicitly[Creator[T]] apply key
+    implicitly[Creator[T]].apply(key)
 }

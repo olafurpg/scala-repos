@@ -12,7 +12,7 @@ object Test extends Properties("UnrolledBuffer") {
     val u2 = new UnrolledBuffer[Int]
     u2 ++= l2
     val totalsz = u1.size + u2.size
-    u1 concat u2
+    u1.concat(u2)
     totalsz == u1.size
   }
 

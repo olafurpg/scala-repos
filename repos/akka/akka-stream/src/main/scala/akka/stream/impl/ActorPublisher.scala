@@ -74,7 +74,7 @@ private[akka] class ActorPublisher[T](val impl: ActorRef)
     shutdownReason = reason
     pendingSubscribers.getAndSet(null) match {
       case null ⇒ // already called earlier
-      case pending ⇒ pending foreach reportSubscribeFailure
+      case pending ⇒ pending.foreach(reportSubscribeFailure)
     }
   }
 
@@ -124,7 +124,7 @@ private[akka] trait SoftShutdown { this: Actor ⇒
     if (children.isEmpty) {
       context.stop(self)
     } else {
-      context.children foreach context.watch
+      context.children.foreach(context.watch)
       context.become {
         case Terminated(_) ⇒ if (context.children.isEmpty) context.stop(self)
         case _ ⇒ // ignore all the rest, we’re practically dead

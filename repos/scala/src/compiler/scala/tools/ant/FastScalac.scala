@@ -107,15 +107,15 @@ class FastScalac extends Scalac {
         s.sourcepath,
         /*fsc*/
         s.server
-      ) filter (_.value != "") flatMap (x => List(x.name, x.value))
+      ).filter(_.value != "").flatMap(x => List(x.name, x.value))
 
     val choiceSettings =
       List(
         /*scalac*/
         s.debuginfo,
         s.target
-      ) filter (x => x.value != x.default) map
-        (x => "%s:%s".format(x.name, x.value))
+      ).filter(x => x.value != x.default)
+        .map(x => "%s:%s".format(x.name, x.value))
 
     val booleanSettings =
       List(
@@ -133,14 +133,14 @@ class FastScalac extends Scalac {
         s.preferIPv4,
         s.reset,
         s.shutdown
-      ) filter (_.value) map (_.name)
+      ).filter(_.value).map(_.name)
 
     val intSettings =
       List(
         /*fsc*/
         s.idleMins
-      ) filter (x => x.value != x.default) flatMap
-        (x => List(x.name, x.value.toString))
+      ).filter(x => x.value != x.default)
+        .flatMap(x => List(x.name, x.value.toString))
 
     val phaseSetting = {
       val s = settings.log
@@ -152,17 +152,17 @@ class FastScalac extends Scalac {
       stringSettings ::: choiceSettings ::: booleanSettings ::: intSettings ::: phaseSetting
 
     val java = new Java(this)
-    java setFork true
+    java.setFork(true)
     // use same default memory options as in fsc script
-    java.createJvmarg() setValue "-Xmx256M"
-    java.createJvmarg() setValue "-Xms32M"
+    java.createJvmarg().setValue("-Xmx256M")
+    java.createJvmarg().setValue("-Xms32M")
     val scalacPath: Path = {
       val path = new Path(getProject)
-      if (compilerPath.isDefined) path add compilerPath.get
+      if (compilerPath.isDefined) path.add(compilerPath.get)
       else
         getClass.getClassLoader match {
           case cl: AntClassLoader =>
-            path add new Path(getProject, cl.getClasspath)
+            path.add(new Path(getProject, cl.getClasspath))
           case _ =>
             buildError(
               "Compilation failed because of an internal compiler error;" +
@@ -170,8 +170,8 @@ class FastScalac extends Scalac {
         }
       path
     }
-    java.createJvmarg() setValue ("-Xbootclasspath/a:" + scalacPath)
-    s.jvmargs.value foreach (java.createJvmarg() setValue _)
+    java.createJvmarg().setValue("-Xbootclasspath/a:" + scalacPath)
+    s.jvmargs.value.foreach(java.createJvmarg().setValue(_))
 
     val scalaHome: String = try {
       val url = ScalaClassLoader.originOfClass(classOf[FastScalac]).get
@@ -182,16 +182,16 @@ class FastScalac extends Scalac {
           "Compilation failed because of an internal compiler error;" +
             " couldn't determine value for -Dscala.home=<value>")
     }
-    java.createJvmarg() setValue "-Dscala.usejavacp=true"
-    java.createJvmarg() setValue ("-Dscala.home=" + scalaHome)
-    s.defines.value foreach (java.createJvmarg() setValue _)
+    java.createJvmarg().setValue("-Dscala.usejavacp=true")
+    java.createJvmarg().setValue("-Dscala.home=" + scalaHome)
+    s.defines.value.foreach(java.createJvmarg().setValue(_))
 
-    java setClassname "scala.tools.nsc.MainGenericRunner"
-    java.createArg() setValue "scala.tools.nsc.CompileClient"
+    java.setClassname("scala.tools.nsc.MainGenericRunner")
+    java.createArg().setValue("scala.tools.nsc.CompileClient")
 
     // Encode scalac/javac args for use in a file to be read back via "@file.txt"
     def encodeScalacArgsFile(t: Traversable[String]) =
-      t map { s =>
+      t.map { s =>
         if (s.find(c => c <= ' ' || "\"'\\".contains(c)).isDefined)
           "\"" +
             s.flatMap(c => (if (c == '"' || c == '\\') "\\" else "") + c) + "\""
@@ -200,11 +200,11 @@ class FastScalac extends Scalac {
 
     // dump the arguments to a file and do "java @file"
     val tempArgFile = File.makeTemp("fastscalac")
-    val tokens = fscOptions ++ (sourceFiles map (_.getPath))
-    tempArgFile writeAll encodeScalacArgsFile(tokens)
+    val tokens = fscOptions ++ (sourceFiles.map(_.getPath))
+    tempArgFile.writeAll(encodeScalacArgsFile(tokens))
 
     val paths =
-      List(Some(tempArgFile.toAbsolute.path), argfile).flatten map (_.toString)
+      List(Some(tempArgFile.toAbsolute.path), argfile).flatten.map(_.toString)
     val res = execWithArgFiles(java, paths)
 
     if (failonerror && res != 0)

@@ -102,9 +102,9 @@ class ModelValidationTest
       case Success => fail()
       case f: Failure =>
         val errors = (Json.toJson(f) \ "details").as[Seq[JsObject]]
-        errors should have size 1
+        (errors should have).size(1)
         (errors.head \ "path").as[String] should be("/name")
-        (errors.head \ "errors").as[Seq[String]] should have size 2
+        ((errors.head \ "errors").as[Seq[String]] should have).size(2)
     }
   }
 
@@ -126,7 +126,7 @@ class ModelValidationTest
       case Success => fail()
       case f: Failure =>
         val errors = (Json.toJson(f) \ "details").as[Seq[JsObject]]
-        errors should have size 1
+        (errors should have).size(1)
         (errors.head \ "path").as[String] should be("/groups(0)/apps(1)")
     }
   }
@@ -149,7 +149,7 @@ class ModelValidationTest
   case class ImportantTitle(name: String)
 
   implicit val mrImportantValidator = validator[ImportantTitle] { m =>
-    m.name is equalTo("Dr.")
-    m.name is notEmpty
+    m.name.is(equalTo("Dr."))
+    m.name.is(notEmpty)
   }
 }

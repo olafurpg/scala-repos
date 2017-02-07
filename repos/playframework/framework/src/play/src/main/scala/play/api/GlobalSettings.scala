@@ -90,29 +90,31 @@ trait GlobalSettings {
         configuredErrorHandler.onClientError(req, NOT_FOUND))
 
     val (routedRequest, handler) =
-      onRouteRequest(request) map {
-        case handler: RequestTaggingHandler =>
-          (handler.tagRequest(request), handler)
-        case otherHandler => (request, otherHandler)
-      } getOrElse {
-
-        // We automatically permit HEAD requests against any GETs without the need to
-        // add an explicit mapping in Routes
-        request.method match {
-          case HttpVerbs.HEAD =>
-            onRouteRequest(request.copy(method = HttpVerbs.GET)) match {
-              case Some(action: EssentialAction) =>
-                action match {
-                  case handler: RequestTaggingHandler =>
-                    (handler.tagRequest(request), action)
-                  case _ => (request, action)
-                }
-              case None => (request, notFoundHandler)
-            }
-          case _ =>
-            (request, notFoundHandler)
+      onRouteRequest(request)
+        .map {
+          case handler: RequestTaggingHandler =>
+            (handler.tagRequest(request), handler)
+          case otherHandler => (request, otherHandler)
         }
-      }
+        .getOrElse {
+
+          // We automatically permit HEAD requests against any GETs without the need to
+          // add an explicit mapping in Routes
+          request.method match {
+            case HttpVerbs.HEAD =>
+              onRouteRequest(request.copy(method = HttpVerbs.GET)) match {
+                case Some(action: EssentialAction) =>
+                  action match {
+                    case handler: RequestTaggingHandler =>
+                      (handler.tagRequest(request), action)
+                    case _ => (request, action)
+                  }
+                case None => (request, notFoundHandler)
+              }
+            case _ =>
+              (request, notFoundHandler)
+          }
+        }
 
     (routedRequest, doFilter(rh => handler)(routedRequest))
   }
@@ -140,7 +142,7 @@ trait GlobalSettings {
     * Filters for EssentialAction.
     */
   def doFilter(next: EssentialAction): EssentialAction = {
-    filters.filters.foldRight(next)(_ apply _)
+    filters.filters.foldRight(next)(_.apply(_))
   }
 
   /**

@@ -104,7 +104,7 @@ object Lexer {
     */
   def quoted(str: String): String = {
     val buf = new StringBuilder += '\"'
-    str foreach (addToStr(buf, _))
+    str.foreach(addToStr(buf, _))
     buf += '\"'
     buf.toString
   }
@@ -173,7 +173,7 @@ class Lexer(rd: Reader) {
   }
 
   private def putAcceptString(str: String) {
-    str foreach acceptChar
+    str.foreach(acceptChar)
     sb ++= str
   }
 

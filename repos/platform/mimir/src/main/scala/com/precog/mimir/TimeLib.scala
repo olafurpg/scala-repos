@@ -183,7 +183,7 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
     //ok to `get` because CoerceToDate is defined for StrColumn
     def createDateCol(c: StrColumn) =
-      cf.util.CoerceToDate(c) collect { case (dc: DateColumn) => dc } get
+      cf.util.CoerceToDate(c).collect { case (dc: DateColumn) => dc } get
 
     object ChangeTimeZone extends Op2F2(TimeNamespace, "changeTimeZone") {
       val tpe = BinaryOperationType(StrAndDateT, JTextT, JDateT)
@@ -227,16 +227,16 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
                  cols: Map[ColumnRef, Column],
                  range: Range): (A, Map[ColumnRef, Column]) = {
           val startCol =
-            cols collectFirst {
+            cols.collectFirst {
               case (ref, col: DateColumn) if ref.selector == CPath(start) =>
                 col
             }
           val endCol =
-            cols collectFirst {
+            cols.collectFirst {
               case (ref, col: DateColumn) if ref.selector == CPath(end) => col
             }
           val stepCol =
-            cols collectFirst {
+            cols.collectFirst {
               case (ref, col: PeriodColumn) if ref.selector == CPath(step) =>
                 col
             }
@@ -257,7 +257,7 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
           val dateTimeArrays = Array.fill(range.length)(Array.empty[DateTime])
 
           val dateTimes: Array[Array[DateTime]] = {
-            definedRange.toArray map { i =>
+            definedRange.toArray.map { i =>
               val startTime = startCol.get(i)
               val endTime = endCol.get(i)
               val stepPeriod = stepCol.get(i)
@@ -279,23 +279,23 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
           // creates a BitSet for each array-column with index `idx`
           def defined(idx: Int): BitSet = {
-            val bools = dateTimes map { _.length > idx }
+            val bools = dateTimes.map { _.length > idx }
             val indices =
-              bools.zipWithIndex collect { case (true, idx) => idx }
+              bools.zipWithIndex.collect { case (true, idx) => idx }
 
             BitSetUtil.create(indices)
           }
 
           // creates the DateTime values for each array-column with index `idx`
-          def dateCol(idx: Int): Array[DateTime] = dateTimes map { arr =>
+          def dateCol(idx: Int): Array[DateTime] = dateTimes.map { arr =>
             if (arr.length > idx) arr(idx)
             else new DateTime()
           }
 
           val result = {
-            val lengths = dateTimes map { _.length }
+            val lengths = dateTimes.map { _.length }
 
-            (0 until lengths.max) map { idx =>
+            ((0 until lengths.max)).map { idx =>
               val colRef = ColumnRef(CPathIndex(idx), CDate)
               val col = ArrayDateColumn(defined(idx), dateCol(idx))
               (colRef, col)

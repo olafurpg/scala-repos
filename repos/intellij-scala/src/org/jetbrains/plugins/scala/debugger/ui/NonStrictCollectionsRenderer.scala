@@ -76,7 +76,7 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
       objectRef.referenceType().methodsByName(methodName, "()" + signature)
     if (suitableMethods.size() > 0) {
       companionObject
-        .invokeEmptyArgsMethod(objectRef, suitableMethods get 0, context)
+        .invokeEmptyArgsMethod(objectRef, suitableMethods.get(0), context)
     } else {
       MethodNotFound()
     }
@@ -107,14 +107,14 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
     def invokeEmptyArgsMethod(obj: ObjectReference,
                               actualRefType: ReferenceType,
                               methodName: String): Value = {
-      val suitableMethods = actualRefType methodsByName methodName
+      val suitableMethods = actualRefType.methodsByName(methodName)
       if (suitableMethods.size() == 0) return null
 
       try {
         evaluationContext.getDebugProcess.invokeMethod(
           evaluationContext,
           obj,
-          suitableMethods get 0,
+          suitableMethods.get(0),
           companionObject.EMPTY_ARGS)
       } catch {
         case (_: EvaluateException | _: InvocationException |
@@ -160,7 +160,7 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
                   evaluationContext.getProject,
                   newHead),
                 evaluationContext)
-              myChildren add newNode
+              myChildren.add(newNode)
               currentTail = newTail
               indexCount += 1
             case _ => returnChildren(); return
@@ -225,11 +225,11 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
               case _ => "?"
             })
 
-        stringBuilder append
-          (if (tpe != null)
-             ScalaCollectionRenderer.transformName(tpe.name) + sizeString
-           else "{...}")
-      case _ => stringBuilder append "{...}"
+        stringBuilder.append(
+          if (tpe != null)
+            ScalaCollectionRenderer.transformName(tpe.name) + sizeString
+          else "{...}")
+      case _ => stringBuilder.append("{...}")
     }
 
     val label = stringBuilder.toString
@@ -292,7 +292,7 @@ object NonStrictCollectionsRenderer {
           .getInstance(project)
           .getElementFactory
           .createExpressionFromText(name,
-                                    PositionUtil getContextElement context)
+                                    PositionUtil.getContextElement(context))
       } catch {
         case e: IncorrectOperationException => null
       }

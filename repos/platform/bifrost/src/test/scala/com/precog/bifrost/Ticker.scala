@@ -61,14 +61,17 @@ class Ticker(ticks: AtomicLong) extends Actor {
   def receive = {
     case Tick =>
       val t = ticks.get()
-      schedule get t map { thunks =>
-        schedule = schedule - t
-        thunks.reverse foreach { t =>
-          t()
+      schedule
+        .get(t)
+        .map { thunks =>
+          schedule = schedule - t
+          thunks.reverse.foreach { t =>
+            t()
+          }
         }
-      } getOrElse {
-        ticks.getAndIncrement()
-      }
+        .getOrElse {
+          ticks.getAndIncrement()
+        }
 
     case Schedule(n, thunk) =>
       val t = ticks.get() + n

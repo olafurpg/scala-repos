@@ -41,13 +41,15 @@ class ScDocResolvableCodeReferenceImpl(node: ASTNode)
 
   override def multiResolve(incomplete: Boolean): Array[ResolveResult] = {
     val s = super.multiResolve(incomplete)
-    s.zipWithIndex.collect {
-      case (ScalaResolveResult(cstr: ScPrimaryConstructor, _), ind)
-          if cstr.containingClass != null =>
-        (new ScalaResolveResult(cstr.containingClass), ind)
-    } foreach {
-      case (rr, idx) => s(idx) = rr
-    }
+    s.zipWithIndex
+      .collect {
+        case (ScalaResolveResult(cstr: ScPrimaryConstructor, _), ind)
+            if cstr.containingClass != null =>
+          (new ScalaResolveResult(cstr.containingClass), ind)
+      }
+      .foreach {
+        case (rr, idx) => s(idx) = rr
+      }
 
     s
   }

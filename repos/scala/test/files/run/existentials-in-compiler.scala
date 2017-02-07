@@ -79,12 +79,13 @@ package extest {
     getPackage(TermName("extest")).moduleClass.info.decls.toList
       .filter(_.isType)
       .map(_.initialize)
-      .sortBy(_.name.toString) foreach { clazz =>
-      exitingTyper {
-        clazz.info
-        println(clazz.defString)
-        println("    " + classExistentialType(clazz) + "\n")
+      .sortBy(_.name.toString)
+      .foreach { clazz =>
+        exitingTyper {
+          clazz.info
+          println(clazz.defString)
+          println("    " + classExistentialType(clazz) + "\n")
+        }
       }
-    }
   }
 }

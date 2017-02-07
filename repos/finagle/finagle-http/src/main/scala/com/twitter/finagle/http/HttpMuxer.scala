@@ -31,7 +31,7 @@ class HttpMuxer(
   private[this] val sorted: Seq[(String, Service[Request, Response])] =
     handlers.sortBy { case (pattern, _) => pattern.length }.reverse
 
-  def patterns: Seq[String] = sorted map { case (p, _) => p }
+  def patterns: Seq[String] = sorted.map { case (p, _) => p }
 
   /**
     * Create a new Mux service with the specified pattern added. If the pattern already exists, overwrite existing value.

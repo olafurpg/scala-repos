@@ -18,21 +18,21 @@ trait SigTest {
   def fstr(f: JField) = "  (f) %s".format(f.toGenericString)
 
   def isObjectMethodName(name: String) =
-    classOf[Object].getMethods exists (_.getName == name)
+    classOf[Object].getMethods.exists(_.getName == name)
 
   def fields[T: ClassTag](p: JField => Boolean) = {
     val cl = classTag[T].runtimeClass
-    val fs = (cl.getFields ++ cl.getDeclaredFields).distinct sortBy (_.getName)
+    val fs = (cl.getFields ++ cl.getDeclaredFields).distinct.sortBy(_.getName)
 
-    fs filter p
+    fs.filter(p)
   }
   def methods[T: ClassTag](p: JMethod => Boolean) = {
     val cl = classTag[T].runtimeClass
     val ms =
-      (cl.getMethods ++ cl.getDeclaredMethods).distinct sortBy
-        (x => (x.getName, x.isBridge))
+      (cl.getMethods ++ cl.getDeclaredMethods).distinct.sortBy(x =>
+        (x.getName, x.isBridge))
 
-    ms filter p
+    ms.filter(p)
   }
   def allFields[T: ClassTag]() = fields[T](_ => true)
   def allMethods[T: ClassTag]() =
@@ -41,14 +41,14 @@ trait SigTest {
   def methodsNamed[T: ClassTag](name: String) = methods[T](_.getName == name)
 
   def allGenericStrings[T: ClassTag]() =
-    (allMethods[T]() map mstr) ++ (allFields[T]() map fstr)
+    (allMethods[T]().map(mstr)) ++ (allFields[T]().map(fstr))
 
   def genericStrings[T: ClassTag](name: String) =
-    (methodsNamed[T](name) map mstr) ++ (fieldsNamed[T](name) map fstr)
+    (methodsNamed[T](name).map(mstr)) ++ (fieldsNamed[T](name).map(fstr))
 
   def show[T: ClassTag](name: String = "") = {
     println(classTag[T].runtimeClass.getName)
-    if (name == "") allGenericStrings[T]() foreach println
-    else genericStrings[T](name) foreach println
+    if (name == "") allGenericStrings[T]().foreach(println)
+    else genericStrings[T](name).foreach(println)
   }
 }

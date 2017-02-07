@@ -97,7 +97,7 @@ object BigDecimalRootRefinement {
       with Order[JBigDecimal] {
     def signum(a: JBigDecimal): Int = a.signum
     def abs(a: JBigDecimal): JBigDecimal = a.abs
-    def compare(x: JBigDecimal, y: JBigDecimal): Int = x compareTo y
+    def compare(x: JBigDecimal, y: JBigDecimal): Int = x.compareTo(y)
   }
 
   private val bits2dec: Double = log(2, 10)

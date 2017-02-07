@@ -192,10 +192,10 @@ class ObjectPropertySpec
     var invalidateCount = 0
     var changeCount = 0
     val binding = objectProperty === objectProperty2
-    binding onInvalidate {
+    binding.onInvalidate {
       invalidateCount += 1
     }
-    binding onChange {
+    binding.onChange {
       changeCount += 1
     }
     objectProperty() = "new value"
@@ -206,7 +206,7 @@ class ObjectPropertySpec
     changeCount should equal(2)
   }
 
-  it should "support implicit conversion to a String Binding" is (pending)
+  (it should "support implicit conversion to a String Binding").is(pending)
 
   it should "support implicit conversion from a ScalaFX ObjectProperty with a SFXDelegate of a type T to a JavaFX ObjectProperty of type T" in {
     val scalaObjProperty: ObjectProperty[Button] =

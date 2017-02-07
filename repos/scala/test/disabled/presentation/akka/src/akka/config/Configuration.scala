@@ -15,7 +15,7 @@ object Configuration {
 
   def load(data: String, importer: Importer = DefaultImporter): Configuration = {
     val parser = new ConfigParser(importer = importer)
-    new Configuration(parser parse data)
+    new Configuration(parser.parse(data))
   }
 
   def fromFile(filename: String, importer: Importer): Configuration = {
@@ -139,7 +139,7 @@ class Configuration(val map: Map[String, Any]) {
     getDouble(key).getOrElse(defaultValue)
 
   def getBoolean(key: String): Option[Boolean] = {
-    getString(key) flatMap { s =>
+    getString(key).flatMap { s =>
       val isTrue = trueValues.contains(s)
       if (!isTrue && !falseValues.contains(s)) None
       else Some(isTrue)

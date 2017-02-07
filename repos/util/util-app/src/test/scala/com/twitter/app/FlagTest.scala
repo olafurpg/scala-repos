@@ -415,7 +415,7 @@ class FlagTest extends FunSuite {
       )
 
       // make sure every line in localAndGlobal exists in the flagString
-      localAndGlobal map { flagString.contains } reduce { _ && _ }
+      localAndGlobal.map { flagString.contains }.reduce { _ && _ }
     }
 
     assert(matchesGlobal(flagWithGlobal.formattedFlagValuesString(WithGlobal)))

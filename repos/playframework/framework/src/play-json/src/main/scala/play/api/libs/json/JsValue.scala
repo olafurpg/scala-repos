@@ -144,7 +144,7 @@ case class JsObject(private val underlying: Map[String, JsValue])
   }
 
   override def equals(other: Any): Boolean = other match {
-    case that: JsObject => (that canEqual this) && fieldSet == that.fieldSet
+    case that: JsObject => (that.canEqual(this)) && fieldSet == that.fieldSet
     case _ => false
   }
 

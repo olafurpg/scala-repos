@@ -164,19 +164,19 @@ class StubbedActorContext[T](val name: String, override val props: Props[T])(
   override val self = inbox.ref
 
   private var _children = TreeMap.empty[String, Inbox.SyncInbox[_]]
-  private val childName = Iterator from 1 map (Helpers.base64(_))
+  private val childName = Iterator.from(1).map(Helpers.base64(_))
 
   override def children: Iterable[ActorRef[Nothing]] =
-    _children.values map (_.ref)
+    _children.values.map(_.ref)
   override def child(name: String): Option[ActorRef[Nothing]] =
-    _children get name map (_.ref)
+    _children.get(name).map(_.ref)
   override def spawnAnonymous[U](props: Props[U]): ActorRef[U] = {
     val i = Inbox.sync[U](childName.next())
     _children += i.ref.untypedRef.path.name -> i
     i.ref
   }
   override def spawn[U](props: Props[U], name: String): ActorRef[U] =
-    _children get name match {
+    _children.get(name) match {
       case Some(_) ⇒
         throw new untyped.InvalidActorNameException(
           s"actor name $name is already taken")
@@ -191,7 +191,7 @@ class StubbedActorContext[T](val name: String, override val props: Props[T])(
     i.ref.untypedRef
   }
   override def actorOf(props: untyped.Props, name: String): untyped.ActorRef =
-    _children get name match {
+    _children.get(name) match {
       case Some(_) ⇒
         throw new untyped.InvalidActorNameException(
           s"actor name $name is already taken")

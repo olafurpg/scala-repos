@@ -77,7 +77,7 @@ class TimeoutFilterTest extends FunSuite with MockitoSugar {
     val exception = new IndividualRequestTimeoutException(timeout)
     val timeoutFilter =
       new TimeoutFilter[Unit, Option[Deadline]](timeout, exception, timer)
-    val timeoutService = timeoutFilter andThen service
+    val timeoutService = timeoutFilter.andThen(service)
   }
 
   test("deadlines, finite timeout") {

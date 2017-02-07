@@ -13,7 +13,7 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
 
   def map[B](f: A => B)(implicit W: Functor[W]): IndexedContsT[W, M, R, O, B] =
     IndexedContsT { wbmo =>
-      run(W.map(wbmo)(f andThen _))
+      run(W.map(wbmo)(f.andThen(_)))
     }
 
   def flatten[E, B](implicit ev: A =:= IndexedContsT[W, M, O, E, B],
@@ -49,7 +49,7 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
       implicit M: Functor[M],
       W: Functor[W]): IndexedContsT[W, M, E, O, B] =
     IndexedContsT { wbmo =>
-      M.map(run(W.map(wbmo)(g andThen _)))(f)
+      M.map(run(W.map(wbmo)(g.andThen(_))))(f)
     }
 
   def xmap[E, I](f: R => E, g: I => O)(
@@ -71,7 +71,7 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
     IndexedContsT { wami =>
       M.map(run(W.map(wami) { ami =>
         { a =>
-          M.map(ami(a))(f from _)
+          M.map(ami(a))(f.from(_))
         }
       }))(f to _)
     }

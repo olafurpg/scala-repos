@@ -44,7 +44,7 @@ object TestDetector {
       if (isBlacklisted(fullName)) {
         Nil
       } else if (js.typeOf(item) == "object") {
-        js.Object.properties(item).toList flatMap { prop =>
+        js.Object.properties(item).toList.flatMap { prop =>
           rec(item.selectDynamic(prop), s"$fullName.$prop")
         }
       } else if (isExportedModule(item)) {

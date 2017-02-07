@@ -10,12 +10,12 @@ class DistributionTester[A](distributor: Distributor[A]) {
     */
   def distributionDeviation(keys: Seq[Long]): Double = {
     val keysPerNode = mutable.Map[A, Int]()
-    keys map { distributor.nodeForHash(_) } foreach { key =>
+    keys.map { distributor.nodeForHash(_) }.foreach { key =>
       if (!keysPerNode.contains(key)) keysPerNode(key) = 0
       keysPerNode(key) += 1
     }
     var frequencies = keysPerNode.values.toList
-    frequencies ++= 0 until (distributor.nodeCount - frequencies.size) map {
+    frequencies ++= (0 until (distributor.nodeCount - frequencies.size)).map {
       _ =>
         0
     }

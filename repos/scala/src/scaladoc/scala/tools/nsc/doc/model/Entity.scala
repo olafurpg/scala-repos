@@ -71,8 +71,8 @@ object Entity {
 
   /** Ordering deprecated things last. */
   implicit lazy val EntityOrdering: Ordering[Entity] =
-    Ordering[(Boolean, String, Boolean)] on
-      (x => (isDeprecated(x), x.qualifiedName, isObject(x)))
+    Ordering[(Boolean, String, Boolean)].on(x =>
+      (isDeprecated(x), x.qualifiedName, isObject(x)))
 }
 
 /** A template, which is either a class, trait, object or package. Depending on whether documentation is available
@@ -205,7 +205,7 @@ object MemberEntity {
   // Oh contravariance, contravariance, wherefore art thou contravariance?
   // Note: the above works for both the commonly misunderstood meaning of the line and the real one.
   implicit lazy val MemberEntityOrdering: Ordering[MemberEntity] =
-    Entity.EntityOrdering on (x => x)
+    Entity.EntityOrdering.on(x => x)
 }
 
 /** An entity that is parameterized by types */

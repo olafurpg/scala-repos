@@ -57,15 +57,18 @@ trait FSLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
           if (m.find) {
             m.group(1).trim match {
               case "*" =>
-                prefixes traverse { prefix =>
-                  vfs
-                    .findDirectChildren(apiKey, prefix)
-                    .fold(_ => Set(), a => a) map { child =>
-                    child map { prefix / _.path }
+                prefixes
+                  .traverse { prefix =>
+                    vfs
+                      .findDirectChildren(apiKey, prefix)
+                      .fold(_ => Set(), a => a)
+                      .map { child =>
+                        child.map { prefix / _.path }
+                      }
                   }
-                } flatMap { paths =>
-                  walk(m, paths.flatten)
-                }
+                  .flatMap { paths =>
+                    walk(m, paths.flatten)
+                  }
 
               case token =>
                 walk(m, prefixes.map(_ / Path(token)))
@@ -80,30 +83,33 @@ trait FSLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
       def apply(input: Table, ctx: MorphContext): M[Table] = M.point {
         val result = Table(
-          input.transform(SourceValue.Single).slices flatMap { slice =>
-            slice.columns.get(ColumnRef.identity(CString)) collect {
-              case col: StrColumn =>
-                val expanded: Stream[M[Stream[Path]]] =
-                  Stream.tabulate(slice.size) { i =>
-                    expand_*(ctx.evalContext.apiKey,
-                             col(i),
-                             ctx.evalContext.basePath)
-                  }
+          input.transform(SourceValue.Single).slices.flatMap { slice =>
+            slice.columns
+              .get(ColumnRef.identity(CString))
+              .collect {
+                case col: StrColumn =>
+                  val expanded: Stream[M[Stream[Path]]] =
+                    Stream.tabulate(slice.size) { i =>
+                      expand_*(ctx.evalContext.apiKey,
+                               col(i),
+                               ctx.evalContext.basePath)
+                    }
 
-                StreamT wrapEffect {
-                  expanded.sequence map { pathSets =>
-                    val unprefixed: Stream[String] = for {
-                      paths <- pathSets
-                      path <- paths
-                      suffix <- (path - ctx.evalContext.basePath)
-                    } yield suffix.toString
+                  StreamT.wrapEffect {
+                    expanded.sequence.map { pathSets =>
+                      val unprefixed: Stream[String] = for {
+                        paths <- pathSets
+                        path <- paths
+                        suffix <- (path - ctx.evalContext.basePath)
+                      } yield suffix.toString
 
-                    Table.constString(unprefixed.toSet).slices
+                      Table.constString(unprefixed.toSet).slices
+                    }
                   }
-                }
-            } getOrElse {
-              StreamT.empty[M, Slice]
-            }
+              }
+              .getOrElse {
+                StreamT.empty[M, Slice]
+              }
           },
           UnknownSize
         )

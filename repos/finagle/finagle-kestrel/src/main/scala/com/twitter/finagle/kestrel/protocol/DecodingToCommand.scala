@@ -61,7 +61,7 @@ private[kestrel] class DecodingToCommand
     val splitAll = tokens.head.split('/')
 
     val (splitTimeout, split) =
-      splitAll partition { (value: Buf) =>
+      splitAll.partition { (value: Buf) =>
         value.startsWith(TimestampPrefix)
       }
 

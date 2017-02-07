@@ -74,32 +74,34 @@ trait NIHDBIngestSupport
     */
   private def readRows(data: File): Seq[JValue] = {
     // TODO Resource leak; need to close zippedData.
-    openZipFile(data).map { zippedData =>
-      new Iterator[ZipEntry] {
-        val enum = zippedData.entries
-        def next() = enum.nextElement()
-        def hasNext = enum.hasMoreElements()
-      }.map { zipEntry =>
-          new InputStreamReader(zippedData.getInputStream(zipEntry))
-        }
-        .flatMap { reader =>
-          val sb = new StringBuilder
-          val buf = new BufferedReader(reader)
-          var line = buf.readLine
-          while (line != null) {
-            sb.append(line)
-            line = buf.readLine
+    openZipFile(data)
+      .map { zippedData =>
+        new Iterator[ZipEntry] {
+          val enum = zippedData.entries
+          def next() = enum.nextElement()
+          def hasNext = enum.hasMoreElements()
+        }.map { zipEntry =>
+            new InputStreamReader(zippedData.getInputStream(zipEntry))
           }
-          val str = sb.toString
-          val rows =
-            JParser.parseManyFromString(str).valueOr(throw _).toIterator
-          reader.close()
-          rows
-        }
-        .toList
-    } getOrElse {
-      JParser.parseManyFromFile(data).valueOr(throw _)
-    }
+          .flatMap { reader =>
+            val sb = new StringBuilder
+            val buf = new BufferedReader(reader)
+            var line = buf.readLine
+            while (line != null) {
+              sb.append(line)
+              line = buf.readLine
+            }
+            val str = sb.toString
+            val rows =
+              JParser.parseManyFromString(str).valueOr(throw _).toIterator
+            reader.close()
+            rows
+          }
+          .toList
+      }
+      .getOrElse {
+        JParser.parseManyFromFile(data).valueOr(throw _)
+      }
   }
 
   /**
@@ -111,13 +113,13 @@ trait NIHDBIngestSupport
              apiKey: String = "root",
              accountId: String = "root",
              clock: Clock = Clock.System): IO[PrecogUnit] = IO {
-    logger.debug("Ingesting %s to '//%s'." format (data, db))
+    logger.debug("Ingesting %s to '//%s'.".format(data, db))
 
     implicit val to = Timeout(300 * 1000)
 
     val path = Path(db)
     val eventId = EventId(pid, sid.getAndIncrement)
-    val records = readRows(data) map (IngestRecord(eventId, _))
+    val records = readRows(data).map(IngestRecord(eventId, _))
 
     val projection = {
       for {
@@ -141,11 +143,13 @@ trait NIHDBIngestSupport
           .readProjection(apiKey, path, Version.Current, AccessMode.Read)
           .run
       } yield {
-        (projection valueOr { err =>
-          sys.error(
-            "An error was encountered attempting to read projection at path %s: %s"
-              .format(path, err.toString))
-        }).asInstanceOf[NIHDBResource]
+        (projection
+          .valueOr { err =>
+            sys.error(
+              "An error was encountered attempting to read projection at path %s: %s"
+                .format(path, err.toString))
+          })
+          .asInstanceOf[NIHDBResource]
       }
     }.copoint
 
@@ -155,7 +159,7 @@ trait NIHDBIngestSupport
 
     projection.db.close(actorSystem).copoint
 
-    logger.debug("Ingested %s." format data)
+    logger.debug("Ingested %s.".format(data))
 
     PrecogUnit
   }

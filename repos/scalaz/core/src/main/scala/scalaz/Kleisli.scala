@@ -48,7 +48,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
     kleisli(a => M.map(run(a))(f))
 
   def mapK[N[_], C](f: M[B] => N[C]): Kleisli[N, A, C] =
-    kleisli(run andThen f)
+    kleisli(run.andThen(f))
 
   def flatMapK[C](f: B => M[C])(implicit M: Bind[M]): Kleisli[M, A, C] =
     kleisli(a => M.bind(run(a))(f))
@@ -71,7 +71,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
       implicit M: Comonad[N],
       ev: this.type <~< Kleisli[λ[α => N[FF[α]]], A, B]): Kleisli[FF, A, B] =
     kleisli[FF, A, B] { a =>
-      Comonad[N].copoint(ev(self) run a)
+      Comonad[N].copoint(ev(self).run(a))
     }
 
   def unliftId[N[_]](implicit M: Comonad[N],
@@ -95,7 +95,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
     mapK[T[M, ?], B](ma => T.liftM(ma))
 
   def local[AA](f: AA => A): Kleisli[M, AA, B] =
-    kleisli(f andThen run)
+    kleisli(f.andThen(run))
 
   def endo(implicit M: Functor[M],
            ev: A >~> B): Endomorphic[Kleisli[M, ?, ?], A] =
@@ -302,7 +302,7 @@ object Kleisli extends KleisliInstances {
     kleisli(a => Applicative[M].point(a))
 
   def local[M[_], A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] =
-    fa local f
+    fa.local(f)
 }
 
 //
@@ -318,7 +318,7 @@ import Kleisli.kleisli
 private trait KleisliFunctor[F[_], R] extends Functor[Kleisli[F, R, ?]] {
   implicit def F: Functor[F]
   override def map[A, B](fa: Kleisli[F, R, A])(f: A => B): Kleisli[F, R, B] =
-    fa map f
+    fa.map(f)
 }
 
 private trait KleisliApply[F[_], R]
@@ -337,7 +337,7 @@ private trait KleisliDistributive[F[_], R]
 
   override def distributeImpl[G[_]: Functor, A, B](a: G[A])(
       f: A => Kleisli[F, R, B]): Kleisli[F, R, G[B]] =
-    Kleisli(r => F.distribute(a)(f(_) run r))
+    Kleisli(r => F.distribute(a)(f(_).run(r)))
 }
 
 private trait KleisliBind[F[_], R]
@@ -346,7 +346,7 @@ private trait KleisliBind[F[_], R]
   implicit def F: Bind[F]
   override final def bind[A, B](fa: Kleisli[F, R, A])(
       f: A => Kleisli[F, R, B]) =
-    fa flatMap f
+    fa.flatMap(f)
 }
 
 private trait KleisliApplicative[F[_], R]
@@ -423,7 +423,7 @@ private trait KleisliMonadError[F[_], E, R]
 
 private trait KleisliContravariant[F[_], X]
     extends Contravariant[Kleisli[F, ?, X]] {
-  def contramap[A, B](fa: Kleisli[F, A, X])(f: B => A) = fa local f
+  def contramap[A, B](fa: Kleisli[F, A, X])(f: B => A) = fa.local(f)
 }
 
 //
@@ -443,9 +443,9 @@ private trait KleisliStrong[F[_]] extends Strong[Kleisli[F, ?, ?]] {
       case (c, a) => F.map(f.run(a))((b: B) => (c, b))
     }
 
-  override def mapfst[A, B, C](fa: Kleisli[F, A, B])(f: C => A) = fa local f
+  override def mapfst[A, B, C](fa: Kleisli[F, A, B])(f: C => A) = fa.local(f)
 
-  override def mapsnd[A, B, C](fa: Kleisli[F, A, B])(f: B => C) = fa map f
+  override def mapsnd[A, B, C](fa: Kleisli[F, A, B])(f: B => C) = fa.map(f)
 }
 
 private trait KleisliProChoice[F[_]]
@@ -456,14 +456,14 @@ private trait KleisliProChoice[F[_]]
 
   def left[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, A \/ C, B \/ C] =
     Kleisli {
-      case -\/(a) => F.map(fa run a)(\/.left)
+      case -\/(a) => F.map(fa.run(a))(\/.left)
       case b @ \/-(_) => F.point(b)
     }
 
   def right[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, C \/ A, C \/ B] =
     Kleisli {
       case b @ -\/(_) => F.point(b)
-      case \/-(a) => F.map(fa run a)(\/.right)
+      case \/-(a) => F.map(fa.run(a))(\/.right)
     }
 }
 
@@ -496,8 +496,8 @@ private trait KleisliArrow[F[_]]
   def choice[A, B, C](f: => Kleisli[F, A, C],
                       g: => Kleisli[F, B, C]): Kleisli[F, A \/ B, C] =
     Kleisli {
-      case -\/(a) => f run a
-      case \/-(b) => g run b
+      case -\/(a) => f.run(a)
+      case \/-(b) => g.run(b)
     }
 
   override def split[A, B, C, D](
@@ -505,7 +505,7 @@ private trait KleisliArrow[F[_]]
       g: Kleisli[F, C, D]): Kleisli[F, (A, C), (B, D)] =
     Kleisli {
       case (a, c) =>
-        F.bind(f run a)(b => F.map(g run c)(d => (b, d)))
+        F.bind(f.run(a))(b => F.map(g.run(c))(d => (b, d)))
     }
 }
 

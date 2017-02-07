@@ -223,7 +223,7 @@ private[akka] trait Children { this: ActorCell ⇒
   }
 
   protected def suspendChildren(exceptFor: Set[ActorRef] = Set.empty): Unit =
-    childrenRefs.stats foreach {
+    childrenRefs.stats.foreach {
       case ChildRestartStats(child, _, _) if !(exceptFor contains child) ⇒
         child.asInstanceOf[InternalActorRef].suspend()
       case _ ⇒
@@ -231,7 +231,7 @@ private[akka] trait Children { this: ActorCell ⇒
 
   protected def resumeChildren(causedByFailure: Throwable,
                                perp: ActorRef): Unit =
-    childrenRefs.stats foreach {
+    childrenRefs.stats.foreach {
       case ChildRestartStats(child: InternalActorRef, _, _) ⇒
         child.resume(if (perp == child) causedByFailure else null)
     }
@@ -309,23 +309,23 @@ private[akka] trait Children { this: ActorCell ⇒
         props.deploy.scope != LocalScope)
       try {
         val ser = SerializationExtension(cell.system)
-        props.args forall
-          (arg ⇒
-             arg == null ||
-               arg.isInstanceOf[NoSerializationVerificationNeeded] || {
-               val o = arg.asInstanceOf[AnyRef]
-               val serializer = ser.findSerializerFor(o)
-               val bytes = serializer.toBinary(o)
-               serializer match {
-                 case ser2: SerializerWithStringManifest ⇒
-                   val manifest = ser2.manifest(o)
-                   ser
-                     .deserialize(bytes, serializer.identifier, manifest)
-                     .get != null
-                 case _ ⇒
-                   ser.deserialize(bytes, arg.getClass).get != null
-               }
-             })
+        props.args.forall(
+          arg ⇒
+            arg == null ||
+              arg.isInstanceOf[NoSerializationVerificationNeeded] || {
+              val o = arg.asInstanceOf[AnyRef]
+              val serializer = ser.findSerializerFor(o)
+              val bytes = serializer.toBinary(o)
+              serializer match {
+                case ser2: SerializerWithStringManifest ⇒
+                  val manifest = ser2.manifest(o)
+                  ser
+                    .deserialize(bytes, serializer.identifier, manifest)
+                    .get != null
+                case _ ⇒
+                  ser.deserialize(bytes, arg.getClass).get != null
+              }
+          })
       } catch {
         case NonFatal(e) ⇒
           throw new IllegalArgumentException(

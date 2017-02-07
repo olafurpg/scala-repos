@@ -58,7 +58,7 @@ class WebServerSpec extends HttpFlatSpec with WebServer {
     }
   }
 
-  it should "respond to WebSocket queries" ignore {
+  (it should "respond to WebSocket queries").ignore {
     // https://github.com/akka/akka/issues/17914
     fail("no test framework yet")
   }

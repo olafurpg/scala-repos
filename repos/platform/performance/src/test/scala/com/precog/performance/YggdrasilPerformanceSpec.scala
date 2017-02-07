@@ -121,7 +121,7 @@ histogram
 
       def test(i: Int) = {
         val threads =
-          (0.until(threadCount)) map { i =>
+          (0.until(threadCount)).map { i =>
             if (i == 0) {
               new Thread {
                 override def run() {
@@ -224,7 +224,7 @@ histogram
 
       def test(i: Int) = {
         val threads =
-          (0.until(threadCount)) map { _ =>
+          (0.until(threadCount)).map { _ =>
             new Thread {
               override def run() {
                 var cnt = 0

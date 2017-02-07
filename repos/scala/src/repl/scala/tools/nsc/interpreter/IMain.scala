@@ -150,7 +150,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
       // if this crashes, REPL will hang its head in shame
       val run = new _compiler.Run()
       assert(run.typerPhase != NoPhase, "REPL requires a typer phase.")
-      run compileSources _initSources
+      run.compileSources(_initSources)
       _initializeComplete = true
       true
     } catch AbstractOrMissingHandler()
@@ -193,11 +193,11 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     }
 
   def getClassIfDefined(path: String) =
-    (noFatal(runtimeMirror staticClass path) orElse noFatal(
-      rootMirror staticClass path))
+    (noFatal(runtimeMirror.staticClass(path))
+      .orElse(noFatal(rootMirror.staticClass(path))))
   def getModuleIfDefined(path: String) =
-    (noFatal(runtimeMirror staticModule path) orElse noFatal(
-      rootMirror staticModule path))
+    (noFatal(runtimeMirror.staticModule(path))
+      .orElse(noFatal(rootMirror.staticModule(path))))
 
   implicit class ReplTypeOps(tp: Type) {
     def andAlso(fn: Type => Type): Type = if (tp eq NoType) tp else fn(tp)
@@ -314,7 +314,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   }
 
   def backticked(s: String): String =
-    ((s split '.').toList map {
+    ((s.split('.')).toList.map {
       case "_" => "_"
       case s if nme.keywords(newTermName(s)) => s"`$s`"
       case s => s
@@ -337,9 +337,9 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
   def originalPath(name: String): String = originalPath(TermName(name))
   def originalPath(name: Name): String =
-    translateOriginalPath(typerOp path name)
+    translateOriginalPath(typerOp.path(name))
   def originalPath(sym: Symbol): String =
-    translateOriginalPath(typerOp path sym)
+    translateOriginalPath(typerOp.path(sym))
 
   /** For class based repl mode we use an .INSTANCE accessor. */
   val readInstanceName = if (isClassBased) ".INSTANCE" else ""
@@ -347,12 +347,12 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     val readName = java.util.regex.Matcher.quoteReplacement(sessionNames.read)
     p.replaceFirst(readName, readName + readInstanceName)
   }
-  def flatPath(sym: Symbol): String = flatOp shift sym.javaClassName
+  def flatPath(sym: Symbol): String = flatOp.shift(sym.javaClassName)
 
   def translatePath(path: String) = {
     val sym =
-      if (path endsWith "$") symbolOfTerm(path.init) else symbolOfIdent(path)
-    sym.toOption map flatPath
+      if (path.endsWith("$")) symbolOfTerm(path.init) else symbolOfIdent(path)
+    sym.toOption.map(flatPath)
   }
 
   /** If path represents a class resource in the default package,
@@ -360,18 +360,19 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     *  residing at a different resource path. Translate X.class to $line3/$read$$iw$$iw$X.class.
     */
   def translateSimpleResource(path: String): Option[String] = {
-    if (!(path contains '/') && (path endsWith ".class")) {
-      val name = path stripSuffix ".class"
+    if (!(path contains '/') && (path.endsWith(".class"))) {
+      val name = path.stripSuffix(".class")
       val sym =
-        if (name endsWith "$") symbolOfTerm(name.init) else symbolOfIdent(name)
+        if (name.endsWith("$")) symbolOfTerm(name.init)
+        else symbolOfIdent(name)
       def pathOf(s: String) = s"${s.replace('.', '/')}.class"
-      sym.toOption map (s => pathOf(flatPath(s)))
+      sym.toOption.map(s => pathOf(flatPath(s)))
     } else {
       None
     }
   }
   def translateEnclosingClass(n: String) =
-    symbolOfTerm(n).enclClass.toOption map flatPath
+    symbolOfTerm(n).enclClass.toOption.map(flatPath)
 
   /** If unable to find a resource foo.class, try taking foo as a symbol in scope
     *  and use its java class name as a resource to load.
@@ -383,7 +384,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     override protected def findAbstractFile(name: String): AbstractFile =
       super.findAbstractFile(name) match {
         case null if _initializeComplete =>
-          translateSimpleResource(name) map super.findAbstractFile orNull
+          translateSimpleResource(name).map(super.findAbstractFile) orNull
         case file => file
       }
   }
@@ -399,12 +400,12 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
   def allDefinedNames: List[Name] =
     exitingTyper(replScope.toList.map(_.name).sorted)
-  def unqualifiedIds: List[String] = allDefinedNames map (_.decode) sorted
+  def unqualifiedIds: List[String] = allDefinedNames.map(_.decode) sorted
 
   /** Most recent tree handled which wasn't wholly synthetic. */
   private def mostRecentlyHandledTree: Option[Tree] = {
-    prevRequests.reverse foreach { req =>
-      req.handlers.reverse foreach {
+    prevRequests.reverse.foreach { req =>
+      req.handlers.reverse.foreach {
         case x: MemberDefHandler
             if x.definesValue && !isInternalTermName(x.name) =>
           return Some(x.member)
@@ -423,15 +424,15 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
       scopelog(f"[$mark$what%6s] $name%-25s $defn%s")
     }
-    if (ObjectClass isSubClass sym.owner) return
+    if (ObjectClass.isSubClass(sym.owner)) return
     // unlink previous
-    replScope lookupAll sym.name foreach { sym =>
+    replScope.lookupAll(sym.name).foreach { sym =>
       log("unlink")
       replScope unlink sym
     }
     val what = if (isDefined) "define" else "import"
     log(what)
-    replScope enter sym
+    replScope.enter(sym)
   }
 
   def recordRequest(req: Request) {
@@ -443,10 +444,11 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     // enough to just redefine them together but that may not always
     // be what people want so I'm waiting until I can do it better.
     exitingTyper {
-      req.defines filterNot (s => req.defines contains s.companionSymbol) foreach {
-        newSym =>
-          val oldSym = replScope lookup newSym.name.companionName
-          if (Seq(oldSym, newSym).permutations exists {
+      req.defines
+        .filterNot(s => req.defines contains s.companionSymbol)
+        .foreach { newSym =>
+          val oldSym = replScope.lookup(newSym.name.companionName)
+          if (Seq(oldSym, newSym).permutations.exists {
                 case Seq(s1, s2) => s1.isClass && s2.isModule
               }) {
             replwarn(
@@ -454,11 +456,11 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
             replwarn(
               "Companions must be defined together; you may wish to use :paste mode for this.")
           }
-      }
+        }
     }
     exitingTyper {
-      req.imports foreach (sym => updateReplScope(sym, isDefined = false))
-      req.defines foreach (sym => updateReplScope(sym, isDefined = true))
+      req.imports.foreach(sym => updateReplScope(sym, isDefined = false))
+      req.defines.foreach(sym => updateReplScope(sym, isDefined = true))
     }
   }
 
@@ -470,7 +472,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     val run = new Run()
     assert(run.typerPhase != NoPhase, "REPL requires a typer phase.")
     reporter.reset()
-    run compileSources sources.toList
+    run.compileSources(sources.toList)
     (!reporter.hasErrors, run)
   }
 
@@ -502,7 +504,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   // at a '*'.  So look at each subtree and find the earliest of all positions.
   private def earliestPosition(tree: Tree): Int = {
     var pos = Int.MaxValue
-    tree foreach { t =>
+    tree.foreach { t =>
       pos = math.min(pos, safePos(t, Int.MaxValue))
     }
     pos
@@ -519,19 +521,18 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
       case parse.Success(trees) => trees
     }
     repltrace(
-      trees map
-        (t => {
-           // [Eugene to Paul] previously it just said `t map ...`
-           // because there was an implicit conversion from Tree to a list of Trees
-           // however Martin and I have removed the conversion
-           // (it was conflicting with the new reflection API),
-           // so I had to rewrite this a bit
-           val subs = t collect { case sub => sub }
-           subs map
-             (t0 =>
-                "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                  "\n") mkString ""
-         }) mkString "\n"
+      trees.map(t => {
+        // [Eugene to Paul] previously it just said `t map ...`
+        // because there was an implicit conversion from Tree to a list of Trees
+        // however Martin and I have removed the conversion
+        // (it was conflicting with the new reflection API),
+        // so I had to rewrite this a bit
+        val subs = t.collect { case sub => sub }
+        subs.map(
+          t0 =>
+            "  " + safePos(t0, -1) + ": " + t0.shortClass +
+            "\n") mkString ""
+      }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
     // AST node position and snap the line off there.  Rewrite the code embodied
@@ -556,15 +557,15 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
             // with increasingly hard to decipher positions as we move on to "() => 5",
             // (x: Int) => x + 1, and more.  So I abandon attempts to finesse and just
             // look for semicolons and newlines, which I'm sure is also buggy.
-            val (raw1, raw2) = content splitAt lastpos0
+            val (raw1, raw2) = content.splitAt(lastpos0)
             repldbg("[raw] " + raw1 + "   <--->   " + raw2)
 
-            val adjustment = (raw1.reverse takeWhile
-              (ch => (ch != ';') && (ch != '\n'))).size
+            val adjustment =
+              (raw1.reverse.takeWhile(ch => (ch != ';') && (ch != '\n'))).size
             val lastpos = lastpos0 - adjustment
 
             // the source code split at the laboriously determined position.
-            val (l1, l2) = content splitAt lastpos
+            val (l1, l2) = content.splitAt(lastpos)
             repldbg("[adj] " + l1 + "   <--->   " + l2)
 
             val prefix = if (l1.trim == "") "" else l1 + ";\n"
@@ -576,7 +577,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
               List("    line" -> line,
                    " content" -> content,
                    "     was" -> l2,
-                   "combined" -> combined) map {
+                   "combined" -> combined).map {
                 case (label, s) => label + ": '" + s + "'"
               } mkString "\n")
             combined
@@ -691,9 +692,10 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
         *  output checking, we have to take one off to balance.
         */
       if (succeeded) {
-        if (printResults && result != "") printMessage(result stripSuffix "\n")
+        if (printResults && result != "")
+          printMessage(result.stripSuffix("\n"))
         else if (isReplDebug) // show quiet-mode activity
-          printMessage(result.trim.lines map ("[quiet] " + _) mkString "\n")
+          printMessage(result.trim.lines.map("[quiet] " + _) mkString "\n")
 
         // Book-keeping.  Have to record synthetic requests too,
         // as they may have been issued for information, e.g. :type
@@ -737,7 +739,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
       case Right(_) =>
         val line = "%sval %s = %s.value"
-          .format(modifiers map (_ + " ") mkString, name, bindRep.evalPath)
+          .format(modifiers.map(_ + " ") mkString, name, bindRep.evalPath)
         repldbg("Interpreting: " + line)
         interpret(line)
     }
@@ -880,7 +882,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     def resolvePathToSymbol(fullAccessPath: String): Symbol = {
       val accessPath = fullAccessPath.stripPrefix(readPath)
       val readRoot = readRootPath(readPath) // the outermost wrapper
-      (accessPath split '.').foldLeft(readRoot: Symbol) {
+      (accessPath.split('.')).foldLeft(readRoot: Symbol) {
         case (sym, "") => sym
         case (sym, name) => exitingTyper(termMember(sym, name))
       }
@@ -895,7 +897,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
           case Nil => Nil
           case ((pos, msg)) :: rest =>
             val filtered =
-              rest filter {
+              rest.filter {
                 case (pos0, msg0) =>
                   (msg != msg0) ||
                     (pos.lineContent.trim != pos0.lineContent.trim) || {
@@ -912,7 +914,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
       if (warnings.nonEmpty) mostRecentWarnings = warnings
     }
     private def evalMethod(name: String) =
-      evalClass.getMethods filter (_.getName == name) match {
+      evalClass.getMethods.filter(_.getName == name) match {
         case Array() => null
         case Array(method) => method
         case xs =>
@@ -933,11 +935,13 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   class Request(val line: String,
                 val trees: List[Tree],
                 generousImports: Boolean = false) {
-    def defines = defHandlers flatMap (_.definedSymbols)
+    def defines = defHandlers.flatMap(_.definedSymbols)
     def imports = importedSymbols
     def value =
-      Some(handlers.last) filter (h => h.definesValue) map
-        (h => definedSymbols(h.definesTerm.get)) getOrElse NoSymbol
+      Some(handlers.last)
+        .filter(h => h.definesValue)
+        .map(h => definedSymbols(h.definesTerm.get))
+        .getOrElse(NoSymbol)
     val lineRep = new ReadEvalPrint()
 
     private var _originalLine: String = null
@@ -946,21 +950,21 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
     /** handlers for each tree in this request */
     val handlers: List[MemberHandler] =
-      trees map (memberHandlers chooseHandler _)
+      trees.map(memberHandlers.chooseHandler(_))
     val definesClass = handlers.exists {
       case _: ClassHandler => true
       case _ => false
     }
 
-    def defHandlers = handlers collect { case x: MemberDefHandler => x }
+    def defHandlers = handlers.collect { case x: MemberDefHandler => x }
 
     /** list of names used by this expression */
-    val referencedNames: List[Name] = handlers flatMap (_.referencedNames)
+    val referencedNames: List[Name] = handlers.flatMap(_.referencedNames)
 
     /** def and val names */
-    def termNames = handlers flatMap (_.definesTerm)
-    def typeNames = handlers flatMap (_.definesType)
-    def importedSymbols = handlers flatMap {
+    def termNames = handlers.flatMap(_.definesTerm)
+    def typeNames = handlers.flatMap(_.definesType)
+    def importedSymbols = handlers.flatMap {
       case x: ImportHandler => x.importedSymbols
       case _ => Nil
     }
@@ -1000,13 +1004,13 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
       }
       def preamble = s"""
         |$headerPreamble
-        |${preambleHeader format lineRep.readName}
+        |${preambleHeader.format(lineRep.readName)}
         |${envLines mkString ("  ", ";\n  ", ";\n")}
         |$importsPreamble
         |${indentCode(toCompute)}""".stripMargin
       def preambleLength = preamble.length - toCompute.length - 1
 
-      val generate = (m: MemberHandler) => m extraCodeToEvaluate Request.this
+      val generate = (m: MemberHandler) => m.extraCodeToEvaluate(Request.this)
 
       /** A format string with %s for $read, specifying the wrapper definition. */
       def preambleHeader: String
@@ -1079,7 +1083,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
       |  }
       |}
       """.stripMargin
-      val generate = (m: MemberHandler) => m resultExtractionCode Request.this
+      val generate = (m: MemberHandler) => m.resultExtractionCode(Request.this)
     }
 
     /** Compile the object file.  Returns whether the compilation succeeded.
@@ -1096,17 +1100,17 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
 
         // Assign symbols to the original trees
         // TODO - just use the new trees.
-        defHandlers foreach { dh =>
+        defHandlers.foreach { dh =>
           val name = dh.member.name
-          definedSymbols get name foreach { sym =>
-            dh.member setSymbol sym
+          definedSymbols.get(name).foreach { sym =>
+            dh.member.setSymbol(sym)
             repldbg("Set symbol of " + name + " to " + symbolDefString(sym))
           }
         }
 
         // compile the result-extraction object
         val handls = if (printResults) handlers else Nil
-        withoutWarnings(lineRep compile ResultObjectSourceCode(handls))
+        withoutWarnings(lineRep.compile(ResultObjectSourceCode(handls)))
       }
     }
 
@@ -1124,7 +1128,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
         f(cleanMemberDecl(resultSymbol, x)))
 
     /** Types of variables defined by this request. */
-    lazy val compilerTypeOf = typeMap[Type](x => x) withDefaultValue NoType
+    lazy val compilerTypeOf = typeMap[Type](x => x).withDefaultValue(NoType)
 
     /** String representations of same. */
     lazy val typeOf = typeMap[String](tp => exitingTyper(tp.toString))
@@ -1132,14 +1136,15 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     lazy val definedSymbols =
       (termNames.map(x => x -> applyToResultMember(x, x => x)) ++ typeNames
         .map(x => x -> compilerTypeOf(x).typeSymbolDirect))
-        .toMap[Name, Symbol] withDefaultValue NoSymbol
+        .toMap[Name, Symbol]
+        .withDefaultValue(NoSymbol)
 
     lazy val typesOfDefinedTerms =
       mapFrom[Name, Name, Type](termNames)(x => applyToResultMember(x, _.tpe))
 
     /** load and run the code using reflection */
     def loadAndRun: (String, Boolean) = {
-      try { ("" + (lineRep call sessionNames.print), true) } catch {
+      try { ("" + (lineRep.call(sessionNames.print)), true) } catch {
         case ex: Throwable => (lineRep.bindError(ex), false)
       }
     }
@@ -1203,20 +1208,20 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   private var mostRecentWarnings: List[(global.Position, String)] = Nil
   def lastWarnings = mostRecentWarnings
 
-  private lazy val importToGlobal = global mkImporter ru
-  private lazy val importToRuntime = ru.internal createImporter global
+  private lazy val importToGlobal = global.mkImporter(ru)
+  private lazy val importToRuntime = ru.internal.createImporter(global)
   private lazy val javaMirror = ru.rootMirror match {
     case x: ru.JavaMirror => x
     case _ => null
   }
   private implicit def importFromRu(sym: ru.Symbol): Symbol =
-    importToGlobal importSymbol sym
+    importToGlobal.importSymbol(sym)
   private implicit def importToRu(sym: Symbol): ru.Symbol =
-    importToRuntime importSymbol sym
+    importToRuntime.importSymbol(sym)
 
   def classOfTerm(id: String): Option[JClass] = symbolOfTerm(id) match {
     case NoSymbol => None
-    case sym => Some(javaMirror runtimeClass importToRu(sym).asClass)
+    case sym => Some(javaMirror.runtimeClass(importToRu(sym).asClass))
   }
 
   def typeOfTerm(id: String): Type = symbolOfTerm(id).tpe
@@ -1224,7 +1229,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   def valueOfTerm(id: String): Option[Any] = exitingTyper {
     def value() = {
       val sym0 = symbolOfTerm(id)
-      val sym = (importToRuntime importSymbol sym0).asTerm
+      val sym = (importToRuntime.importSymbol(sym0)).asTerm
       val module = runtimeMirror
         .reflectModule(sym.owner.companionSymbol.asModule)
         .instance
@@ -1245,32 +1250,32 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     *  exactly where a flat name is sneaking in when calculating imports.
     */
   def tryTwice(op: => Symbol): Symbol =
-    exitingTyper(op) orElse exitingFlatten(op)
+    exitingTyper(op).orElse(exitingFlatten(op))
 
   def symbolOfIdent(id: String): Symbol =
-    symbolOfType(id) orElse symbolOfTerm(id)
+    symbolOfType(id).orElse(symbolOfTerm(id))
   def symbolOfType(id: String): Symbol =
-    tryTwice(replScope lookup TypeName(id))
+    tryTwice(replScope.lookup(TypeName(id)))
   def symbolOfTerm(id: String): Symbol =
-    tryTwice(replScope lookup TermName(id))
-  def symbolOfName(id: Name): Symbol = replScope lookup id
+    tryTwice(replScope.lookup(TermName(id)))
+  def symbolOfName(id: Name): Symbol = replScope.lookup(id)
 
   def runtimeClassAndTypeOfTerm(id: String): Option[(JClass, Type)] = {
-    classOfTerm(id) flatMap { clazz =>
-      clazz.supers find (!_.isScalaAnonymous) map { nonAnon =>
+    classOfTerm(id).flatMap { clazz =>
+      (clazz.supers find (!_.isScalaAnonymous)).map { nonAnon =>
         (nonAnon, runtimeTypeOfTerm(id))
       }
     }
   }
 
   def runtimeTypeOfTerm(id: String): Type = {
-    typeOfTerm(id) andAlso { tpe =>
-      val clazz = classOfTerm(id) getOrElse { return NoType }
+    typeOfTerm(id).andAlso { tpe =>
+      val clazz = classOfTerm(id).getOrElse { return NoType }
       val staticSym = tpe.typeSymbol
       val runtimeSym = getClassIfDefined(clazz.getName)
 
       if ((runtimeSym != NoSymbol) && (runtimeSym != staticSym) &&
-          (runtimeSym isSubClass staticSym)) runtimeSym.info
+          (runtimeSym.isSubClass(staticSym))) runtimeSym.info
       else NoType
     }
   }
@@ -1285,7 +1290,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     )
   }
   def cleanMemberDecl(owner: Symbol, member: Name): Type =
-    cleanTypeAfterTyper(owner.info nonPrivateDecl member)
+    cleanTypeAfterTyper(owner.info.nonPrivateDecl(member))
 
   object exprTyper extends {
     val repl: IMain.this.type = imain
@@ -1319,23 +1324,23 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   def typeOfExpression(expr: String, silent: Boolean = true): Type =
     exprTyper.typeOfExpression(expr, silent)
 
-  protected def onlyTerms(xs: List[Name]): List[TermName] = xs collect {
+  protected def onlyTerms(xs: List[Name]): List[TermName] = xs.collect {
     case x: TermName => x
   }
-  protected def onlyTypes(xs: List[Name]): List[TypeName] = xs collect {
+  protected def onlyTypes(xs: List[Name]): List[TypeName] = xs.collect {
     case x: TypeName => x
   }
 
-  def definedTerms = onlyTerms(allDefinedNames) filterNot isInternalTermName
+  def definedTerms = onlyTerms(allDefinedNames).filterNot(isInternalTermName)
   def definedTypes = onlyTypes(allDefinedNames)
   def definedSymbolList =
-    prevRequestList flatMap (_.defines) filterNot
-      (s => isInternalTermName(s.name))
+    prevRequestList
+      .flatMap(_.defines)
+      .filterNot(s => isInternalTermName(s.name))
 
   // Terms with user-given names (i.e. not res0 and not synthetic)
   def namedDefinedTerms =
-    definedTerms filterNot
-      (x => isUserVarName("" + x) || directlyBoundNames(x))
+    definedTerms.filterNot(x => isUserVarName("" + x) || directlyBoundNames(x))
 
   private var _replScope: Scope = _
   private def resetReplScope() {
@@ -1351,10 +1356,10 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   private val prevRequests = mutable.ListBuffer[Request]()
   private val directlyBoundNames = mutable.Set[Name]()
 
-  def allHandlers = prevRequestList flatMap (_.handlers)
+  def allHandlers = prevRequestList.flatMap(_.handlers)
   def lastRequest = if (prevRequests.isEmpty) null else prevRequests.last
   def prevRequestList = prevRequests.toList
-  def importHandlers = allHandlers collect { case x: ImportHandler => x }
+  def importHandlers = allHandlers.collect { case x: ImportHandler => x }
 
   def withoutUnwrapping(op: => Unit): Unit = {
     val saved = isettings.unwrapStrings
@@ -1378,11 +1383,11 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     /** Secret bookcase entrance for repl debuggers: end the line
       *  with "// show" and see what's going on.
       */
-    def isShow = code.lines exists (_.trim endsWith "// show")
+    def isShow = code.lines.exists(_.trim.endsWith("// show"))
     if (isReplDebug || isShow) {
       beSilentDuring(parse(code)) match {
         case parse.Success(ts) =>
-          ts foreach { t =>
+          ts.foreach { t =>
             withoutUnwrapping(echo(asCompactString(t)))
           }
         case _ =>
@@ -1466,7 +1471,7 @@ object IMain {
 
     def apply(contributors: List[T]): String = stringFromWriter { code =>
       code println preamble
-      contributors map generate foreach (code println _)
+      contributors.map(generate).foreach(code println _)
       code println postamble
     }
   }
@@ -1481,8 +1486,8 @@ object IMain {
     def isTruncating: Boolean
     def truncate(str: String): String = {
       if (isTruncating &&
-          (maxStringLength != 0 && str.length > maxStringLength))
-        (str take maxStringLength - 3) + "..."
+          (maxStringLength != 0 && str.length > maxStringLength))(str.take(
+        maxStringLength - 3)) + "..."
       else str
     }
   }

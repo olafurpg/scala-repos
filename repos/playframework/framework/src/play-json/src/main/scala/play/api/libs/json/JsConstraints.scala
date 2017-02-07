@@ -183,8 +183,9 @@ trait ConstraintReads {
       implicit rds: Reads[A]) =
     Reads[A] { js =>
       rds.reads(js).flatMap { t =>
-        (scala.util.control.Exception.catching(classOf[MatchError]) opt cond(
-          t))
+        (scala.util.control.Exception
+          .catching(classOf[MatchError])
+          .opt(cond(t)))
           .flatMap { b =>
             if (b) Some(subreads.reads(js).map(_ => t))
             else None

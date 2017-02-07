@@ -38,17 +38,17 @@ abstract class ReplTest extends DirectTest {
        //val welcome = Regex.quote(header.lines.next).r
        //val version = "(.*version).*".r   // version on separate line?
        //var inHead  = false
-       lines map {
+       lines.map {
          //case s @ welcome()        => inHead = true  ; s
          //case version(s) if inHead => inHead = false ; s
          case welcome(s) => s
          case s => s
        }
      } else {
-       lines drop header.lines.size
-     }) map normalize
+       lines.drop(header.lines.size)
+     }).map(normalize)
   }
-  def show() = eval() foreach println
+  def show() = eval().foreach(println)
 }
 
 /** Retain and normalize the welcome message. */
@@ -82,7 +82,7 @@ abstract class SessionTest extends ReplTest {
   import SessionTest._
   lazy val pasted = input(prompt)
   override final def code =
-    pasted findAllMatchIn (expected mkString ("", "\n", "\n")) map {
+    (pasted findAllMatchIn (expected mkString ("", "\n", "\n"))).map {
       case pasted(null, null, prompted) =>
         def continued(m: Match): Option[String] = m match {
           case margin(text) => Some(text)

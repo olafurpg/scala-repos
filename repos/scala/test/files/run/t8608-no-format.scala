@@ -9,6 +9,6 @@ object Test extends JavapTest {
   // no format
   override def yah(res: Seq[String]) = {
     // note: avoid the word "information"
-    res forall (!_.contains("StringOps.format"))
+    res.forall(!_.contains("StringOps.format"))
   }
 }

@@ -104,7 +104,7 @@ class MDNSResolver extends Resolver {
     */
   def bind(arg: String): Var[Addr] = {
     val (name, regType, domain) = parse(arg)
-    resolver.resolve(regType, domain) map {
+    resolver.resolve(regType, domain).map {
       case Addr.Bound(addrs, attrs) =>
         val filtered = addrs.filter {
           case Address.Inet(ia, MdnsAddrMetadata(n, _, _)) =>

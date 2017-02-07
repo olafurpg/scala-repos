@@ -42,7 +42,7 @@ object ScalaErrorHandling extends PlaySpecification with WsTestClient {
                                            new RuntimeException("foo")))
 
       errorContent(Mode.Prod) must startWith("A server error occurred: ")
-      errorContent(Mode.Dev) must not startWith ("A server error occurred: ")
+      (errorContent(Mode.Dev) must not).startWith("A server error occurred: ")
     }
   }
 }

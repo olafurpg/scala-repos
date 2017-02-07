@@ -33,7 +33,7 @@ object Path extends ParserNode with ScalaTokenTypes {
       thisMarker.done(THIS_REFERENCE)
       if (lookAhead(builder, tDOT, tIDENTIFIER)) {
         builder.advanceLexer()
-        StableId parseQualId (builder, nm, element, false)
+        StableId.parseQualId(builder, nm, element, false)
       } else {
         nm.drop()
       }
@@ -46,7 +46,7 @@ object Path extends ParserNode with ScalaTokenTypes {
       thisMarker.done(THIS_REFERENCE)
       true
     } else {
-      StableId parse (builder, element)
+      StableId.parse(builder, element)
     }
   }
 }

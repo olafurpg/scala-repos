@@ -94,13 +94,12 @@ class ByteCodeRepository[BT <: BTypes](
     */
   def classNodeAndSource(internalName: InternalName)
     : Either[ClassNotFound, (ClassNode, Source)] = {
-    classNode(internalName) map
-      (n => {
-         val source =
-           if (compilingClasses contains internalName) CompilationUnit
-           else Classfile
-         (n, source)
-       })
+    classNode(internalName).map(n => {
+      val source =
+        if (compilingClasses contains internalName) CompilationUnit
+        else Classfile
+      (n, source)
+    })
   }
 
   /**
@@ -108,7 +107,7 @@ class ByteCodeRepository[BT <: BTypes](
     * the classfile on the compile classpath.
     */
   def classNode(internalName: InternalName): Either[ClassNotFound, ClassNode] = {
-    compilingClasses.get(internalName).map(Right(_)) getOrElse {
+    compilingClasses.get(internalName).map(Right(_)).getOrElse {
       val r = parsedClasses.get(internalName) match {
         case Some(l @ Left(_)) => l
         case Some(r @ Right((classNode, _))) =>
@@ -218,7 +217,7 @@ class ByteCodeRepository[BT <: BTypes](
   private def parseClass(
       internalName: InternalName): Either[ClassNotFound, ClassNode] = {
     val fullName = internalName.replace('/', '.')
-    classPath.findClassFile(fullName) map { classFile =>
+    classPath.findClassFile(fullName).map { classFile =>
       val classNode = new asm.tree.ClassNode()
       val classReader = new asm.ClassReader(classFile.toByteArray)
 

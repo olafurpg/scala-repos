@@ -25,10 +25,10 @@ object genprod extends App {
     def fileName(i: Int) = className(i) + ".scala"
   }
 
-  def productFiles = arities map Product.make
-  def tupleFiles = arities map Tuple.make
-  def functionFiles = (0 :: arities) map Function.make
-  def absFunctionFiles = (0 :: arities) map AbstractFunction.make
+  def productFiles = arities.map(Product.make)
+  def tupleFiles = arities.map(Tuple.make)
+  def functionFiles = ((0 :: arities)).map(Function.make)
+  def absFunctionFiles = ((0 :: arities)).map(AbstractFunction.make)
   def allfiles =
     productFiles ::: tupleFiles ::: functionFiles ::: absFunctionFiles
 
@@ -42,17 +42,17 @@ object genprod extends App {
     def className = name + i
     def classAnnotation = ""
     def fileName = className + ".scala"
-    def targs = to map ("T" + _)
-    def vdefs = to map ("v" + _)
-    def xdefs = to map ("x" + _)
-    def mdefs = to map ("_" + _)
+    def targs = to.map("T" + _)
+    def vdefs = to.map("v" + _)
+    def xdefs = to.map("x" + _)
+    def mdefs = to.map("_" + _)
     def invariantArgs = typeArgsString(targs)
-    def covariantArgs = typeArgsString(targs map (covariantSpecs + "+" + _))
+    def covariantArgs = typeArgsString(targs.map(covariantSpecs + "+" + _))
     def covariantSpecs = ""
     def contravariantSpecs = ""
     def contraCoArgs =
       typeArgsString(
-        (targs map (contravariantSpecs + "-" + _)) ::: List(
+        (targs.map(contravariantSpecs + "-" + _)) ::: List(
           covariantSpecs + "+R"))
     def constructorArgs = (targs).map(_.toLowerCase) mkString ", "
     def fields = (mdefs, targs).zipped.map(_ + ": " + _) mkString ", "
@@ -88,10 +88,10 @@ package %s
     import scala.tools.nsc.io._
     val f = Path(out) / node.attributes("name").toString
     f.parent.createDirectory(force = true)
-    f.toFile writeAll node.text
+    f.toFile.writeAll(node.text)
   }
 
-  allfiles foreach writeFile
+  allfiles.foreach(writeFile)
 }
 import genprod._
 
@@ -206,7 +206,7 @@ class Function(val i: Int) extends Group("Function") with Arity {
  *  object Main extends App {%s}
  *  }}}"""
 
-  def toStr() = "\"" + ("<function%d>" format i) + "\""
+  def toStr() = "\"" + ("<function%d>".format(i)) + "\""
   def apply() = {
     <file name={fileName}>{header}
 
@@ -235,18 +235,22 @@ class Function(val i: Int) extends Group("Function") with Arity {
   }
 
   // (x1: T1) => ((x2: T2, x3: T3, x4: T4, x5: T5, x6: T6, x7: T7) => self.apply(x1,x2,x3,x4,x5,x6,x7)).curried
-  def longCurry = ((xdefs, targs).zipped.map(_ + ": " + _) drop 1).mkString(
-    "(x1: T1) => ((",
-    ", ",
-    ") => self.apply%s).curried".format(commaXs)
-  )
+  def longCurry =
+    ((xdefs, targs).zipped
+      .map(_ + ": " + _)
+      .drop(1))
+      .mkString(
+        "(x1: T1) => ((",
+        ", ",
+        ") => self.apply%s).curried".format(commaXs)
+      )
 
   // f(x1,x2,x3,x4,x5,x6)  == (f.curried)(x1)(x2)(x3)(x4)(x5)(x6)
   def curryComment = {
     """  /** Creates a curried version of this function.
    *
    *  @return   a function `f` such that `f%s == apply%s`
-   */""".format(xdefs map ("(" + _ + ")") mkString, commaXs)
+   */""".format(xdefs.map("(" + _ + ")") mkString, commaXs)
   }
 
   def tupleMethod = {
@@ -324,10 +328,8 @@ class Tuple(val i: Int) extends Group("Tuple") with Arity {
 
   private def params =
     (
-      1 to i map (x =>
-                    " *  @param  _%d   Element %d of this Tuple%d".format(x,
-                                                                          x,
-                                                                          i))
+      (1 to i).map(x =>
+        " *  @param  _%d   Element %d of this Tuple%d".format(x, x, i))
     ) mkString "\n"
 
   // prettifies it a little if it's overlong
@@ -335,8 +337,8 @@ class Tuple(val i: Int) extends Group("Tuple") with Arity {
     def str(xs: List[String]) = xs.mkString(""" + "," + """)
     if (i <= MAX_ARITY / 2) str(mdefs)
     else {
-      val s1 = str(mdefs take (i / 2))
-      val s2 = str(mdefs drop (i / 2))
+      val s1 = str(mdefs.take(i / 2))
+      val s2 = str(mdefs.drop(i / 2))
       s1 + " +\n    \",\" + " + s2
     }
   }
@@ -397,7 +399,7 @@ class Product(val i: Int) extends Group("Product") with Arity {
     val xs = for ((x, i) <- mdefs.zipWithIndex)
       yield "case %d => %s".format(i, x)
     val default = "case _ => throw new IndexOutOfBoundsException(n.toString())"
-    "\n" + ((xs ::: List(default)) map ("    " + _ + "\n") mkString)
+    "\n" + (((xs ::: List(default))).map("    " + _ + "\n") mkString)
   }
   def proj = {
     (mdefs, targs).zipped

@@ -32,8 +32,8 @@ private[scala] trait PropertiesTrait {
   /** The loaded properties */
   protected lazy val scalaProps: java.util.Properties = {
     val props = new java.util.Properties
-    val stream = pickJarBasedOn getResourceAsStream propFilename
-    if (stream ne null) quietlyDispose(props load stream, stream.close)
+    val stream = pickJarBasedOn.getResourceAsStream(propFilename)
+    if (stream ne null) quietlyDispose(props.load(stream), stream.close)
 
     props
   }
@@ -50,16 +50,17 @@ private[scala] trait PropertiesTrait {
   def propOrNull(name: String) = propOrElse(name, null)
   def propOrNone(name: String) = Option(propOrNull(name))
   def propOrFalse(name: String) =
-    propOrNone(name) exists
-      (x => List("yes", "on", "true") contains x.toLowerCase)
+    propOrNone(name).exists(x =>
+      List("yes", "on", "true") contains x.toLowerCase)
   def setProp(name: String, value: String) = System.setProperty(name, value)
   def clearProp(name: String) = System.clearProperty(name)
 
   def envOrElse(name: String, alt: String) =
-    Option(System getenv name) getOrElse alt
-  def envOrNone(name: String) = Option(System getenv name)
+    Option(System.getenv(name)).getOrElse(alt)
+  def envOrNone(name: String) = Option(System.getenv(name))
 
-  def envOrSome(name: String, alt: Option[String]) = envOrNone(name) orElse alt
+  def envOrSome(name: String, alt: Option[String]) =
+    envOrNone(name).orElse(alt)
 
   // for values based on propFilename, falling back to System properties
   def scalaPropOrElse(name: String, alt: String): String =
@@ -77,7 +78,7 @@ private[scala] trait PropertiesTrait {
     *  cannot be read.
     */
   val releaseVersion = for {
-    v <- scalaPropOrNone("maven.version.number") if !(v endsWith "-SNAPSHOT")
+    v <- scalaPropOrNone("maven.version.number") if !(v.endsWith("-SNAPSHOT"))
   } yield v
 
   /** The development Scala version, if this is not a final release.
@@ -89,7 +90,7 @@ private[scala] trait PropertiesTrait {
     *  is a final release or the version cannot be read.
     */
   val developmentVersion = for {
-    v <- scalaPropOrNone("maven.version.number") if v endsWith "-SNAPSHOT"
+    v <- scalaPropOrNone("maven.version.number") if v.endsWith("-SNAPSHOT")
     ov <- scalaPropOrNone("version.number")
   } yield ov
 
@@ -143,14 +144,14 @@ private[scala] trait PropertiesTrait {
 
   /* Some derived values. */
   /** Returns `true` iff the underlying operating system is a version of Microsoft Windows. */
-  def isWin = osName startsWith "Windows"
+  def isWin = osName.startsWith("Windows")
   // See http://mail.openjdk.java.net/pipermail/macosx-port-dev/2012-November/005148.html for
   // the reason why we don't follow developer.apple.com/library/mac/#technotes/tn2002/tn2110.
   /** Returns `true` iff the underlying operating system is a version of Apple Mac OSX.  */
-  def isMac = osName startsWith "Mac OS X"
+  def isMac = osName.startsWith("Mac OS X")
 
   /** Returns `true` iff the underlying operating system is a Linux distribution. */
-  def isLinux = osName startsWith "Linux"
+  def isLinux = osName.startsWith("Linux")
 
   /* Some runtime values. */
   private[scala] def isAvian = javaVmName contains "Avian"

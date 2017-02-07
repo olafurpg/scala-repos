@@ -11,7 +11,7 @@ class ActivityTest extends FunSuite {
     val v = Var(Activity.Pending: Activity.State[Int])
     val ref = new AtomicReference[Seq[Activity.State[Int]]]
     val act =
-      Activity(v) flatMap {
+      Activity(v).flatMap {
         case i if i % 2 == 0 => Activity.value(-i)
         case i => Activity.value(i)
       }
@@ -48,7 +48,7 @@ class ActivityTest extends FunSuite {
     val v = Var(Activity.Pending: Activity.State[Int])
     val ref = new AtomicReference(Seq.empty: Seq[Try[String]])
     val act =
-      Activity(v) collect {
+      Activity(v).collect {
         case i if i % 2 == 0 => "EVEN%d".format(i)
       }
     act.values.build.register(Witness(ref))
@@ -131,16 +131,18 @@ class ActivityTest extends FunSuite {
 
     val ref = new AtomicReference(Seq.empty: Seq[Try[Int]])
     val b =
-      a map {
-        case 111 => throw exc1
-        case i => i
-      } flatMap {
-        case 222 => throw exc2
-        case i => Activity.value(i)
-      } transform {
-        case Activity.Ok(333) => throw exc3
-        case other => Activity(Var.value(other))
-      }
+      a.map {
+          case 111 => throw exc1
+          case i => i
+        }
+        .flatMap {
+          case 222 => throw exc2
+          case i => Activity.value(i)
+        }
+        .transform {
+          case Activity.Ok(333) => throw exc3
+          case other => Activity(Var.value(other))
+        }
 
     b.values.build.register(Witness(ref))
 

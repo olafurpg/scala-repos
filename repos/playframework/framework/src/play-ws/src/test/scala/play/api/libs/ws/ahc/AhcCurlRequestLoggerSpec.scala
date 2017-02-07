@@ -47,7 +47,7 @@ class AhcCurlRequestLoggerSpec
                               |  --header 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' \\
                               |  --header 'user-agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36' \\
                               |  'http://localhost:$testServerPort/'""".stripMargin
-        there was one(logger).info(curlStatement)
+        there.was(one(logger).info(curlStatement))
       }
 
       "log a request with POST" in new WithServer() {
@@ -65,7 +65,7 @@ class AhcCurlRequestLoggerSpec
                               |  --header 'Content-Type: application/x-www-form-urlencoded' \\
                               |  --data 'key=value' \\
                               |  'http://localhost:$testServerPort/'""".stripMargin
-        there was one(logger).info(curlStatement)
+        there.was(one(logger).info(curlStatement))
       }
 
       "log a request with POST with an explicit content type" in new WithServer() {
@@ -85,7 +85,7 @@ class AhcCurlRequestLoggerSpec
                               |  --header 'Content-Type: text/plain; charset=utf-8' \\
                               |  --data 'this is plain text' \\
                               |  'http://localhost:$testServerPort/'""".stripMargin
-        there was one(logger).info(curlStatement)
+        there.was(one(logger).info(curlStatement))
       }
 
       "log a query string" in new WithServer() {
@@ -103,7 +103,7 @@ class AhcCurlRequestLoggerSpec
                               |  --verbose \\
                               |  --request GET \\
                               |  'http://localhost:$testServerPort/?search=%26%3F%24HOME%27'""".stripMargin
-        there was one(logger).info(curlStatement)
+        there.was(one(logger).info(curlStatement))
       }
 
       "log a request with POST with a hanging quote" in new WithServer() {
@@ -127,7 +127,7 @@ class AhcCurlRequestLoggerSpec
                               |  --data 'this is '\\'' text with a hanging quote' \\
                               |  'http://localhost:$testServerPort/'""".stripMargin
 
-        there was one(logger).info(curlStatement)
+        there.was(one(logger).info(curlStatement))
       }
 
       "log a request with PUT" in new WithServer {
@@ -147,7 +147,7 @@ class AhcCurlRequestLoggerSpec
                               |  --data 'key=value' \\
                               |  'http://localhost:$testServerPort/'""".stripMargin
 
-        there was one(logger).info(curlStatement)
+        there.was(one(logger).info(curlStatement))
       }
       //
       //      "log a request with a proxy" in new WithServer {

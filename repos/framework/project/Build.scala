@@ -148,8 +148,8 @@ object BuildDef extends Build {
         System.setProperty("net.liftweb.webapptest.src.test.webapp",
                            (src / "webapp").absString)
       },
-      (compile in Compile) <<= (compile in Compile) dependsOn
-        (WebKeys.assets),
+      (compile in Compile) <<= ((compile in Compile)).dependsOn(
+        WebKeys.assets),
       /**
         * This is to ensure that the tests in net.liftweb.webapptest run last
         * so that other tests (MenuSpec in particular) run before the SiteMap

@@ -8,7 +8,7 @@ import std.option.{optionInstance, none, some}
 final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
 
   def map[B](f: A => B)(implicit F: Functor[F]): OptionT[F, B] =
-    new OptionT[F, B](mapO(_ map f))
+    new OptionT[F, B](mapO(_.map(f)))
 
   def flatMap[B](f: A => OptionT[F, B])(implicit F: Monad[F]): OptionT[F, B] =
     new OptionT[F, B](
@@ -41,7 +41,7 @@ final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
   def ap[B](f: => OptionT[F, A => B])(implicit F: Monad[F]): OptionT[F, B] =
     OptionT(F.bind(f.run) {
       case None => F.point(None)
-      case Some(ff) => F.map(run)(_ map ff)
+      case Some(ff) => F.map(run)(_.map(ff))
     })
 
   /** Apply a function in the environment of both options, containing
@@ -57,7 +57,7 @@ final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
   def isEmpty(implicit F: Functor[F]): F[Boolean] = mapO(_.isEmpty)
 
   def filter(f: A => Boolean)(implicit F: Functor[F]): OptionT[F, A] =
-    OptionT(F.map(self.run) { _ filter f })
+    OptionT(F.map(self.run) { _.filter(f) })
 
   def fold[X](some: A => X, none: => X)(implicit F: Functor[F]): F[X] =
     mapO {
@@ -205,7 +205,7 @@ private trait OptionTFunctor[F[_]] extends Functor[OptionT[F, ?]] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] =
-    fa map f
+    fa.map(f)
 }
 
 private trait OptionTApply[F[_]]
@@ -214,7 +214,7 @@ private trait OptionTApply[F[_]]
   implicit def F: Monad[F]
 
   override final def ap[A, B](fa: => OptionT[F, A])(
-      f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
+      f: => OptionT[F, A => B]): OptionT[F, B] = fa.ap(f)
 }
 
 private trait OptionTBind[F[_]]
@@ -223,7 +223,7 @@ private trait OptionTBind[F[_]]
   implicit def F: Monad[F]
 
   final def bind[A, B](fa: OptionT[F, A])(
-      f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f
+      f: A => OptionT[F, B]): OptionT[F, B] = fa.flatMap(f)
 }
 
 private trait OptionTBindRec[F[_]]
@@ -275,7 +275,7 @@ private trait OptionTTraverse[F[_]]
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: OptionT[F, A])(
-      f: A => G[B]): G[OptionT[F, B]] = fa traverse f
+      f: A => G[B]): G[OptionT[F, B]] = fa.traverse(f)
 }
 
 private trait OptionTHoist extends Hoist[OptionT] {
@@ -298,7 +298,7 @@ private trait OptionTMonadPlus[F[_]]
 
   def empty[A]: OptionT[F, A] = OptionT(F point none[A])
   def plus[A](a: OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] =
-    a orElse b
+    a.orElse(b)
 }
 
 private trait OptionTMonadTell[F[_], W]

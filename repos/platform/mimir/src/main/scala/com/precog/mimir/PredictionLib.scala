@@ -70,7 +70,7 @@ trait PredictionLibModule[M[+ _]]
                      range: Range): (A, Map[ColumnRef, Column]) = {
               val result: Set[Map[ColumnRef, Column]] = {
                 val modelsResult: Set[Map[ColumnRef, Column]] =
-                  modelSet.models map {
+                  modelSet.models.map {
                     case model =>
                       val scannerPrelims =
                         Model.makePrelims(model, cols, range, trans)
@@ -93,7 +93,7 @@ trait PredictionLibModule[M[+ _]]
                           case (Intervals(arrConf, arrPred), i) =>
                             val includedDoubles =
                               1.0 +:
-                                (scannerPrelims.cpaths map {
+                                (scannerPrelims.cpaths.map {
                                   scannerPrelims.includedCols(_).apply(i)
                                 })
                             val includedMatrix =
@@ -123,12 +123,12 @@ trait PredictionLibModule[M[+ _]]
                       val confidenceUpper =
                         arraySum(resultArray, res.confidence)
                       val confidenceLower =
-                        arraySum(resultArray, res.confidence map { -_ })
+                        arraySum(resultArray, res.confidence.map { -_ })
 
                       val predictionUpper =
                         arraySum(resultArray, res.prediction)
                       val predictionLower =
-                        arraySum(resultArray, res.prediction map { -_ })
+                        arraySum(resultArray, res.prediction.map { -_ })
 
                       def makeCPath(field: String, index: Int) = {
                         CPath(TableModule.paths.Value,
@@ -180,23 +180,25 @@ trait PredictionLibModule[M[+ _]]
 
           def apply(table: Table, ctx: MorphContext): M[Table] = {
             val scanners: Seq[TransSpec1] =
-              models map { model =>
+              models.map { model =>
                 WrapArray(Scan(TransSpec1.Id, scanner(model)))
               }
             val spec: TransSpec1 =
-              scanners reduceOption { (s1, s2) =>
-                InnerArrayConcat(s1, s2)
-              } getOrElse TransSpec1.Id
+              scanners
+                .reduceOption { (s1, s2) =>
+                  InnerArrayConcat(s1, s2)
+                }
+                .getOrElse(TransSpec1.Id)
 
             val forcedTable = table.transform(spec).force
             val tables0 =
-              Range(0, scanners.size) map { i =>
+              Range(0, scanners.size).map { i =>
                 forcedTable.map(
                   _.transform(DerefArrayStatic(TransSpec1.Id, CPathIndex(i))))
               }
             val tables: M[Seq[Table]] = (tables0.toList).sequence
 
-            tables.map(_.reduceOption { _ concat _ } getOrElse Table.empty)
+            tables.map(_.reduceOption { _.concat(_) }.getOrElse(Table.empty))
           }
         }
     }
@@ -214,7 +216,7 @@ trait PredictionLibModule[M[+ _]]
                      range: Range): (A, Map[ColumnRef, Column]) = {
               val result: Set[Map[ColumnRef, Column]] = {
                 val modelsResult: Set[Map[ColumnRef, Column]] =
-                  modelSet.models map {
+                  modelSet.models.map {
                     case model =>
                       val scannerPrelims =
                         Model.makePrelims(model, cols, range, trans)
@@ -246,23 +248,25 @@ trait PredictionLibModule[M[+ _]]
 
           def apply(table: Table, ctx: MorphContext): M[Table] = {
             val scanners: Seq[TransSpec1] =
-              models map { model =>
+              models.map { model =>
                 WrapArray(Scan(TransSpec1.Id, scanner(model)))
               }
             val spec: TransSpec1 =
-              scanners reduceOption { (s1, s2) =>
-                InnerArrayConcat(s1, s2)
-              } getOrElse TransSpec1.Id
+              scanners
+                .reduceOption { (s1, s2) =>
+                  InnerArrayConcat(s1, s2)
+                }
+                .getOrElse(TransSpec1.Id)
 
             val forcedTable = table.transform(spec).force
             val tables0 =
-              Range(0, scanners.size) map { i =>
+              Range(0, scanners.size).map { i =>
                 forcedTable.map(
                   _.transform(DerefArrayStatic(TransSpec1.Id, CPathIndex(i))))
               }
             val tables: M[Seq[Table]] = (tables0.toList).sequence
 
-            tables.map(_.reduceOption { _ concat _ } getOrElse Table.empty)
+            tables.map(_.reduceOption { _.concat(_) }.getOrElse(Table.empty))
           }
         }
     }

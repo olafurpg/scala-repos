@@ -17,8 +17,8 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     val members = typeOf[A].decls.toList
-    val tpes = members flatMap (_.annotations) map (_.tree.tpe)
+    val tpes = members.flatMap(_.annotations).map(_.tree.tpe)
 
-    tpes.map(_.toString).sorted foreach println
+    tpes.map(_.toString).sorted.foreach(println)
   }
 }

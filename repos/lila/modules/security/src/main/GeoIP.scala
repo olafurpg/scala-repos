@@ -10,9 +10,9 @@ final class GeoIP(file: String, cacheTtl: Duration) {
   private val cache = lila.memo.Builder.cache(cacheTtl, compute)
 
   private def compute(ip: String): Option[Location] =
-    geoIp getLocation ip map Location.apply
+    geoIp.getLocation(ip).map(Location.apply)
 
-  def apply(ip: String): Option[Location] = cache get ip
+  def apply(ip: String): Option[Location] = cache.get(ip)
 
   def orUnknown(ip: String): Location = apply(ip) | Location.unknown
 }

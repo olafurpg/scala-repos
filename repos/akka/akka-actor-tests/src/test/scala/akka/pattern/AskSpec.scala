@@ -65,7 +65,8 @@ class AskSpec extends AkkaSpec {
       }))
       val f = echo ? "foo"
       val expectedMsg =
-        "Timeout length must not be negative, question not sent to [%s]. Sender[null] sent the message of type \"java.lang.String\"." format echo
+        "Timeout length must not be negative, question not sent to [%s]. Sender[null] sent the message of type \"java.lang.String\"."
+          .format(echo)
       intercept[IllegalArgumentException] {
         Await.result(f, timeout.duration)
       }.getMessage should ===(expectedMsg)
@@ -78,7 +79,8 @@ class AskSpec extends AkkaSpec {
       }))
       val f = echo ? "foo"
       val expectedMsg =
-        "Timeout length must not be negative, question not sent to [%s]. Sender[null] sent the message of type \"java.lang.String\"." format echo
+        "Timeout length must not be negative, question not sent to [%s]. Sender[null] sent the message of type \"java.lang.String\"."
+          .format(echo)
       intercept[IllegalArgumentException] {
         Await.result(f, timeout.duration)
       }.getMessage should ===(expectedMsg)

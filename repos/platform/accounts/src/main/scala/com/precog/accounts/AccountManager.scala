@@ -125,21 +125,23 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
     if (child == ancestor) {
       true.point[M]
     } else {
-      child.parentId map { id =>
-        findAccountById(id) flatMap {
-          case None => false.point[M]
-          case Some(`child`) => false.point[M] // avoid infinite loops
-          case Some(parent) => hasAncestor(parent, ancestor)
+      child.parentId
+        .map { id =>
+          findAccountById(id).flatMap {
+            case None => false.point[M]
+            case Some(`child`) => false.point[M] // avoid infinite loops
+            case Some(parent) => hasAncestor(parent, ancestor)
+          }
         }
-      } getOrElse {
-        false.point[M]
-      }
+        .getOrElse {
+          false.point[M]
+        }
     }
   }
 
   def authAccount(email: String, password: String)(
       implicit M: Monad[M]): M[Validation[String, Account]] = {
-    findAccountByEmail(email) map {
+    findAccountByEmail(email).map {
       case Some(account)
           if account.passwordHash == saltAndHashSHA1(password,
                                                      account.passwordSalt) ||

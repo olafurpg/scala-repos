@@ -29,7 +29,7 @@ class InitializeListener
     }
     org.h2.Driver.load()
 
-    Database() withTransaction { session =>
+    Database().withTransaction { session =>
       val conn = session.conn
 
       // Migration
@@ -92,7 +92,7 @@ class DeleteOldActivityActor
     case s: String => {
       loadSystemSettings().activityLogLimit.foreach { limit =>
         if (limit > 0) {
-          Database() withTransaction { implicit session =>
+          Database().withTransaction { implicit session =>
             val rows = deleteOldActivities(limit)
             logger.info(s"Deleted ${rows} activity logs")
           }

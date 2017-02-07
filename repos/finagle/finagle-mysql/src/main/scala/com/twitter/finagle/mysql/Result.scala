@@ -251,7 +251,7 @@ object ResultSet {
       * a prepared statement, respectively.
       */
     val rows =
-      rowPackets map { p: Packet =>
+      rowPackets.map { p: Packet =>
         if (!isBinaryEncoded) new StringEncodedRow(p.body, fields, indexMap)
         else new BinaryEncodedRow(p.body, fields, indexMap)
       }

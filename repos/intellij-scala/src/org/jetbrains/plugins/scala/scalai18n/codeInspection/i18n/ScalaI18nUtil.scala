@@ -465,20 +465,22 @@ object ScalaI18nUtil {
     annotationAttributeValues
       .put(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
     if (mustBePropertyKey(project, expression, annotationAttributeValues)) {
-      annotationAttributeValues get AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER exists {
-        case bundleName: PsiElement =>
-          val result = JavaPsiFacade
-            .getInstance(bundleName.getProject)
-            .getConstantEvaluationHelper
-            .computeConstantExpression(bundleName)
-          if (result == null) false
-          else {
-            val bundleName = result.toString
-            outResourceBundle.set(bundleName)
-            isPropertyRef(expression, key, bundleName)
-          }
-        case _ => false
-      }
+      annotationAttributeValues
+        .get(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER)
+        .exists {
+          case bundleName: PsiElement =>
+            val result = JavaPsiFacade
+              .getInstance(bundleName.getProject)
+              .getConstantEvaluationHelper
+              .computeConstantExpression(bundleName)
+            if (result == null) false
+            else {
+              val bundleName = result.toString
+              outResourceBundle.set(bundleName)
+              isPropertyRef(expression, key, bundleName)
+            }
+          case _ => false
+        }
     } else true
   }
 

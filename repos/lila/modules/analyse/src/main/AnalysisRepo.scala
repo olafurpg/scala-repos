@@ -20,16 +20,16 @@ object AnalysisRepo {
   def byId(id: ID): Fu[Option[Analysis]] = $find byId id
 
   def byIds(ids: Seq[ID]): Fu[Seq[Option[Analysis]]] =
-    $find optionsByOrderedIds ids
+    $find.optionsByOrderedIds(ids)
 
   def associateToGames(games: List[Game]): Fu[List[(Game, Analysis)]] =
-    byIds(games.map(_.id)) map { as =>
-      games zip as collect {
+    byIds(games.map(_.id)).map { as =>
+      games.zip(as).collect {
         case (game, Some(analysis)) => game -> analysis
       }
     }
 
   def remove(id: String) = $remove byId id
 
-  def exists(id: String) = $count exists id
+  def exists(id: String) = $count.exists(id)
 }

@@ -64,7 +64,7 @@ trait ZkClient {
 
   /** Use the current retry policy to perform an operation with a ZooKeeper handle. */
   def retrying[T](op: ZooKeeper => Future[T]): Future[T] = retryPolicy {
-    apply() flatMap (op)
+    apply().flatMap(op)
   }
 
   /** Create a new ZkClient, possibly overriding configuration. */

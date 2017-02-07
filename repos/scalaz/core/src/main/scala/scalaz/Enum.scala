@@ -25,13 +25,13 @@ trait Enum[F] extends Order[F] { self =>
     * Moves to the successor, unless at the maximum.
     */
   def succx: Kleisli[Option, F, F] =
-    Kleisli(a => if (max forall (equal(a, _))) None else Some(succ(a)))
+    Kleisli(a => if (max.forall(equal(a, _))) None else Some(succ(a)))
 
   /**
     * Moves to the predecessor, unless at the minimum.
     */
   def predx: Kleisli[Option, F, F] =
-    Kleisli(a => if (min forall (equal(a, _))) None else Some(pred(a)))
+    Kleisli(a => if (min.forall(equal(a, _))) None else Some(pred(a)))
 
   /**
     * Produce a state value that executes the successor (`succ`) on each spin and executing the given function on the current value. This is useful to implement incremental looping. Evaluating the state value requires a beginning to increment from.
@@ -50,7 +50,7 @@ trait Enum[F] extends Order[F] { self =>
     */
   def succStateZeroM[X, Y](f: F => X, k: X => State[F, Y])(
       implicit m: Monoid[F]): Y =
-    (succState(f) flatMap k) eval m.zero
+    (succState(f).flatMap(k)).eval(m.zero)
 
   /**
     * Produce a value that starts at zero (`Monoid.zero`) and increments through a state value with the given mapping function. This is useful to implement incremental looping.
@@ -69,7 +69,7 @@ trait Enum[F] extends Order[F] { self =>
     * @param k The binding function.
     */
   def succStateMinM[X, Y](f: F => X, k: X => State[F, Y]): Option[Y] =
-    min map ((succState(f) flatMap k) eval _)
+    min.map((succState(f).flatMap(k)).eval(_))
 
   /**
     * Produce a value that starts at the minimum (if it exists) and increments through a state value with the given mapping function. This is useful to implement incremental looping.
@@ -97,7 +97,7 @@ trait Enum[F] extends Order[F] { self =>
     */
   def predStateZeroM[X, Y](f: F => X, k: X => State[F, Y])(
       implicit m: Monoid[F]): Y =
-    (predState(f) flatMap k) eval m.zero
+    (predState(f).flatMap(k)).eval(m.zero)
 
   /**
     * Produce a value that starts at zero (`Monoid.zero`) and decrements through a state value with the given mapping function. This is useful to implement decremental looping.
@@ -116,7 +116,7 @@ trait Enum[F] extends Order[F] { self =>
     * @param k The binding function.
     */
   def predStateMaxM[X, Y](f: F => X, k: X => State[F, Y]): Option[Y] =
-    max map ((predState(f) flatMap k) eval _)
+    max.map((predState(f).flatMap(k)).eval(_))
 
   /**
     * Produce a value that starts at the maximum (if it exists) and decrements through a state value with the given mapping function. This is useful to implement decremental looping.
@@ -147,7 +147,7 @@ trait Enum[F] extends Order[F] { self =>
       if (equal(a, z)) return_(a :: Nil)
       else
         suspend(
-          fromToLT(if (lessThan(a, z)) succ(a) else pred(a), z) map (a :: _))
+          fromToLT(if (lessThan(a, z)) succ(a) else pred(a), z).map(a :: _))
     fromToLT(a, z).run
   }
 
@@ -171,7 +171,7 @@ trait Enum[F] extends Order[F] { self =>
         else (_: F, _: F) => false
       val k = succn(n, a)
       if (cmp(k, z)) return_(a :: Nil)
-      else suspend(fromStepToLT(n, k, z) map (a :: _))
+      else suspend(fromStepToLT(n, k, z).map(a :: _))
     }
     fromStepToLT(n, a, z).run
   }
@@ -184,10 +184,10 @@ trait Enum[F] extends Order[F] { self =>
       equal(pred(succ(x)), x)
 
     def minmaxpred: Boolean =
-      min forall (x => max forall (y => equal(pred(x), y)))
+      min.forall(x => max.forall(y => equal(pred(x), y)))
 
     def minmaxsucc: Boolean =
-      min forall (x => max forall (y => equal(succ(y), x)))
+      min.forall(x => max.forall(y => equal(succ(y), x)))
 
     def succn(x: F, n: Int): Boolean =
       equal(self.succn(n, x), Enum.succn(n, x)(self))
@@ -196,10 +196,10 @@ trait Enum[F] extends Order[F] { self =>
       equal(self.predn(n, x), Enum.predn(n, x)(self))
 
     def succorder(x: F): Boolean =
-      (max exists (equal(_, x))) || greaterThanOrEqual(succ(x), x)
+      (max.exists(equal(_, x))) || greaterThanOrEqual(succ(x), x)
 
     def predorder(x: F): Boolean =
-      (min exists (equal(_, x))) || lessThanOrEqual(pred(x), x)
+      (min.exists(equal(_, x))) || lessThanOrEqual(pred(x), x)
   }
 
   def enumLaw = new EnumLaw {}

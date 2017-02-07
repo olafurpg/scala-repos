@@ -17,13 +17,13 @@ trait HasCompileSocket {
 
   // This is kind of a suboptimal way to identify error situations.
   val errorMarkers = Set("error:", "error found", "errors found", "bad option")
-  def isErrorMessage(msg: String) = errorMarkers exists (msg contains _)
+  def isErrorMessage(msg: String) = errorMarkers.exists(msg contains _)
 
   def compileOnServer(sock: Socket, args: Seq[String]): Boolean = {
     var noErrors = true
 
     sock.applyReaderAndWriter { (in, out) =>
-      out println (compileSocket getPassword sock.getPort())
+      out println (compileSocket.getPassword(sock.getPort()))
       out println (args mkString "\u0000")
 
       def loop(): Boolean = in.readLine() match {
@@ -72,7 +72,7 @@ class CompileSocket extends CompileOutputCommon {
 
   /** A temporary directory to use */
   val tmpDir = {
-    val udir = Option(Properties.userName) getOrElse "shared"
+    val udir = Option(Properties.userName).getOrElse("shared")
     val f =
       (Path(Properties.tmpDir) / ("scala-devel" + udir)).createDirectory()
 
@@ -90,13 +90,13 @@ class CompileSocket extends CompileOutputCommon {
     *  @param vmArgs  the argument string to be passed to the java or scala command
     */
   private def serverCommand(vmArgs: Seq[String]): Seq[String] =
-    Seq(vmCommand) ++ vmArgs ++ Seq(serverClass) ++ serverClassArgs filterNot
-      (_ == "")
+    (Seq(vmCommand) ++ vmArgs ++ Seq(serverClass) ++ serverClassArgs)
+      .filterNot(_ == "")
 
   /** Start a new server. */
   private def startNewServer(vmArgs: String) = {
-    val cmd = serverCommand((vmArgs split " ").toSeq)
-    info("[Executing command: %s]" format cmd.mkString(" "))
+    val cmd = serverCommand((vmArgs.split(" ")).toSeq)
+    info("[Executing command: %s]".format(cmd.mkString(" ")))
 
     // Hiding inadequate daemonized implementation from public API for now
     Process(cmd) match {
@@ -158,7 +158,7 @@ class CompileSocket extends CompileOutputCommon {
     val file = portFile(port)
     val secret = new SecureRandom().nextInt.toString
 
-    try file writeAll secret
+    try file.writeAll(secret)
     catch {
       case e @ (_: FileNotFoundException | _: SecurityException) =>
         fatal("Cannot create file: %s".format(file.path))
@@ -189,17 +189,18 @@ class CompileSocket extends CompileOutputCommon {
 
         Socket.localhost(port).either match {
           case Right(socket) =>
-            info("[Connected to compilation daemon at port %d]" format port)
+            info("[Connected to compilation daemon at port %d]".format(port))
             Some(socket)
           case Left(err) =>
             info(err.toString)
             info(
-              "[Connecting to compilation daemon at port %d failed; re-trying...]" format port)
+              "[Connecting to compilation daemon at port %d failed; re-trying...]"
+                .format(port))
 
             if (attempts % 2 == 0)
               deletePort(port) // 50% chance to stop trying on this port
 
-            Thread sleep retryDelay // delay before retrying
+            Thread.sleep(retryDelay) // delay before retrying
             getsock(attempts - 1)
         }
     }
@@ -215,8 +216,8 @@ class CompileSocket extends CompileOutputCommon {
                                         _ == ':',
                                         doDropIndex = true);
           port <- parseInt(portStr))
-      yield getSocket(name, port)) getOrElse fatal(
-      "Malformed server address: %s; exiting" format serverAdr)
+      yield getSocket(name, port)).getOrElse(
+      fatal("Malformed server address: %s; exiting".format(serverAdr)))
 
   def getSocket(hostName: String, port: Int): Option[Socket] = {
     val sock = Socket(hostName, port).opt
@@ -233,10 +234,10 @@ class CompileSocket extends CompileOutputCommon {
 
     // allow some time for the server to start up
     def check = {
-      Thread sleep 100
+      Thread.sleep(100)
       ff.length
     }
-    if ((Iterator continually check take 50 find (_ > 0)).isEmpty) {
+    if (((Iterator continually check).take(50) find (_ > 0)).isEmpty) {
       ff.delete()
       fatal("Unable to establish connection to server.")
     }

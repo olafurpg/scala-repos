@@ -92,7 +92,7 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     ValueTypeable[Unit, runtime.BoxedUnit](classOf[runtime.BoxedUnit], "Unit")
 
   def isValClass[T](clazz: Class[T]) =
-    (classOf[jl.Number] isAssignableFrom clazz) ||
+    (classOf[jl.Number].isAssignableFrom(clazz)) ||
       clazz == classOf[jl.Boolean] || clazz == classOf[jl.Character] ||
       clazz == classOf[runtime.BoxedUnit]
 
@@ -164,7 +164,7 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
           Some(t.asInstanceOf[T])
         else None
       }
-      def describe = parents map (_.describe) mkString " with "
+      def describe = parents.map(_.describe) mkString " with "
     }
 
   /** Typeable instance for `Option`. */
@@ -188,7 +188,7 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
       castB: Typeable[B]): Typeable[Either[A, B]] =
     new Typeable[Either[A, B]] {
       def cast(t: Any): Option[Either[A, B]] = {
-        t.cast[Left[A, B]] orElse t.cast[Right[A, B]]
+        t.cast[Left[A, B]].orElse(t.cast[Right[A, B]])
       }
       def describe = s"Either[${castA.describe}, ${castB.describe}]"
     }
@@ -231,7 +231,7 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     new Typeable[CC[T]] {
       def cast(t: Any): Option[CC[T]] =
         if (t == null) None
-        else if (mCC.runtimeClass isAssignableFrom t.getClass) {
+        else if (mCC.runtimeClass.isAssignableFrom(t.getClass)) {
           val cc = t.asInstanceOf[CC[Any]]
           if (cc.forall(_.cast[T].isDefined)) Some(t.asInstanceOf[CC[T]])
           else None
@@ -248,7 +248,7 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     new Typeable[M[K, V]] {
       def cast(t: Any): Option[M[K, V]] =
         if (t == null) None
-        else if (mM.runtimeClass isAssignableFrom t.getClass) {
+        else if (mM.runtimeClass.isAssignableFrom(t.getClass)) {
           val m = t.asInstanceOf[GenMap[Any, Any]]
           if (m.forall(_.cast[(K, V)].isDefined)) Some(t.asInstanceOf[M[K, V]])
           else None
@@ -266,13 +266,13 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
             erased.isAssignableFrom(t.getClass)) {
           val c = t.asInstanceOf[Product with T]
           val f = c.productIterator.toList
-          if ((f zip fields).forall {
+          if ((f.zip(fields)).forall {
                 case (f, castF) => castF.cast(f).isDefined
               }) Some(c)
           else None
         } else None
       def describe = {
-        val typeParams = fields map (_.describe) mkString (",")
+        val typeParams = fields.map(_.describe) mkString (",")
         // Workaround for https://issues.scala-lang.org/browse/SI-5425
         val name = try {
           erased.getSimpleName
@@ -323,7 +323,7 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
       castT: Typeable[T]): Typeable[H :+: T] =
     new Typeable[H :+: T] {
       def cast(t: Any): Option[H :+: T] = {
-        t.cast[Inl[H, T]] orElse t.cast[Inr[H, T]]
+        t.cast[Inl[H, T]].orElse(t.cast[Inr[H, T]])
       }
       def describe = s"${castH.describe} :+: ${castT.describe}"
     }
@@ -445,7 +445,7 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
           c.abort(c.enclosingPosition,
                   s"No default Typeable for parametrized type $tpe")
         val fields =
-          tpe.decls.toList collect {
+          tpe.decls.toList.collect {
             case sym: TermSymbol if sym.isVal && sym.isCaseAccessor =>
               sym.typeSignatureIn(tpe)
           }

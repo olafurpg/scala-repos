@@ -40,7 +40,7 @@ object Test extends App {
       final def filterMap[B, That](f: A => Option[B])(
           implicit cbf: CanBuildFrom[Repr, B, That]): That = {
         val b = cbf()
-        for (e <- r.seq) f(e) foreach (b +=)
+        for (e <- r.seq) f(e).foreach(b +=)
 
         b.result
       }

@@ -89,7 +89,7 @@ final class Cached(nbTtl: FiniteDuration,
 
   val topNbGame = mongoCache[Int, List[User.LightCount]](
     prefix = "user:top:nbGame",
-    f = nb => UserRepo topNbGame nb map { _ map (_.lightCount) },
+    f = nb => (UserRepo topNbGame nb).map { _.map(_.lightCount) },
     timeToLive = 34 minutes)
 
   val top50Online = lila.memo.AsyncCache.single[List[User]](
@@ -99,7 +99,7 @@ final class Cached(nbTtl: FiniteDuration,
   object ranking {
 
     def getAll(userId: User.ID): Fu[Map[Perf.Key, Int]] =
-      rankingApi.weeklyStableRanking of userId
+      rankingApi.weeklyStableRanking.of(userId)
   }
 
   object ratingDistribution {

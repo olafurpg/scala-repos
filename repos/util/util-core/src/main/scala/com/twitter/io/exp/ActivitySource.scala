@@ -56,7 +56,7 @@ object ActivitySource {
                                                   failover: ActivitySource[U])
       extends ActivitySource[U] {
     def get(name: String): Activity[U] = {
-      primary.get(name) transform {
+      primary.get(name).transform {
         case Activity.Failed(_) => failover.get(name)
         case state => Activity(Var.value(state))
       }
@@ -82,7 +82,7 @@ class CachingActivitySource[T](underlying: ActivitySource[T])
     */
   def get(name: String): Activity[T] = synchronized {
     gc()
-    Option(forward.get(name)) flatMap { wr =>
+    Option(forward.get(name)).flatMap { wr =>
       Option(wr.get())
     } match {
       case Some(v) => v
@@ -134,15 +134,18 @@ class FilePollingActivitySource private[exp] (
               new InputStreamReader(new FileInputStream(file),
                                     InputStreamReader.DefaultMaxBufferSize,
                                     pool)
-            Reader.readAll(reader) respond {
-              case Return(buf) =>
-                value() = Activity.Ok(buf)
-              case Throw(cause) =>
-                value() = Activity.Failed(cause)
-            } ensure {
-              // InputStreamReader ignores the deadline in close
-              reader.close(Time.Undefined)
-            }
+            Reader
+              .readAll(reader)
+              .respond {
+                case Return(buf) =>
+                  value() = Activity.Ok(buf)
+                case Throw(cause) =>
+                  value() = Activity.Failed(cause)
+              }
+              .ensure {
+                // InputStreamReader ignores the deadline in close
+                reader.close(Time.Undefined)
+              }
           }
         } else {
           value() = Activity.Failed(NotFound)
@@ -187,15 +190,18 @@ class ClassLoaderActivitySource private[exp] (classLoader: ClassLoader,
                 new InputStreamReader(stream,
                                       InputStreamReader.DefaultMaxBufferSize,
                                       pool)
-              Reader.readAll(reader) respond {
-                case Return(buf) =>
-                  p.setValue(Activity.Ok(buf))
-                case Throw(cause) =>
-                  p.setValue(Activity.Failed(cause))
-              } ensure {
-                // InputStreamReader ignores the deadline in close
-                reader.close(Time.Undefined)
-              }
+              Reader
+                .readAll(reader)
+                .respond {
+                  case Return(buf) =>
+                    p.setValue(Activity.Ok(buf))
+                  case Throw(cause) =>
+                    p.setValue(Activity.Failed(cause))
+                }
+                .ensure {
+                  // InputStreamReader ignores the deadline in close
+                  reader.close(Time.Undefined)
+                }
           }
         }
       }

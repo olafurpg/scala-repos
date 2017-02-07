@@ -115,9 +115,9 @@ trait GenMapLike[A, +B, +Repr]
     */
   override def equals(that: Any): Boolean = that match {
     case that: GenMap[b, _] =>
-      (this eq that) || (that canEqual this) && (this.size == that.size) && {
+      (this eq that) || (that.canEqual(this)) && (this.size == that.size) && {
         try {
-          this forall {
+          this.forall {
             case (k, v) =>
               that.get(k.asInstanceOf[b]) match {
                 case Some(`v`) =>

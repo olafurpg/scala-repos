@@ -159,8 +159,8 @@ object SerializationExamples extends Specification {
 
   "Option serialization example" in {
     val ser = swrite(Some(List(1, 2)))
-    (read[Option[List[Int]]](ser) mustEqual Some(List(1, 2))) and
-      (read[Option[List[Int]]]("") mustEqual None)
+    ((read[Option[List[Int]]](ser) mustEqual Some(List(1, 2))))
+      .and(read[Option[List[Int]]]("") mustEqual None)
   }
 
   "None Option of tuple serialization example" in {
@@ -173,7 +173,7 @@ object SerializationExamples extends Specification {
   "Case class with internal state example" in {
     val m = Members("s", 1)
     val ser = swrite(m)
-    (ser mustEqual """{"x":"s","y":1}""") and (read[Members](ser) mustEqual m)
+    ((ser mustEqual """{"x":"s","y":1}""")).and(read[Members](ser) mustEqual m)
   }
 
   "Case class from type constructors example" in {

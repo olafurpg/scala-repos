@@ -310,7 +310,7 @@ class OrcQuerySuite extends QueryTest with BeforeAndAfterAll with OrcTest {
 
       sqlContext
         .range(0, 10)
-        .select('id as "Acol")
+        .select('id.as("Acol"))
         .write
         .format("orc")
         .save(path)

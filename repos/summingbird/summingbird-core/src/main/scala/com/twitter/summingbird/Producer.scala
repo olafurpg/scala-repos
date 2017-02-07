@@ -74,7 +74,7 @@ object Producer {
 
   /** a semigroup on producers where + means merge */
   implicit def semigroup[P <: Platform[P], T]: Semigroup[Producer[P, T]] =
-    Semigroup.from(_ merge _)
+    Semigroup.from(_.merge(_))
 
   /** the list of the Producers, this producer directly depends on */
   def dependenciesOf[P <: Platform[P]](

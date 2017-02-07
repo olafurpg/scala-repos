@@ -25,7 +25,7 @@ object MacroDef {
     }
     builder.getTokenType match {
       case ScalaTokenTypes.tIDENTIFIER =>
-        FunSig parse builder
+        FunSig.parse(builder)
         builder.getTokenType match {
           case ScalaTokenTypes.tCOLON =>
             builder.advanceLexer() //Ate :

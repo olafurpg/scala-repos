@@ -50,8 +50,8 @@ object IndicesHelper {
     var i = 1
     while (i < len) {
       val z = buf.get(i)
-      if (last > z) sys.error("buffer is out-of-order: %s" format buf)
-      if (last == z) sys.error("buffer has duplicates: %s" format buf)
+      if (last > z) sys.error("buffer is out-of-order: %s".format(buf))
+      if (last == z) sys.error("buffer has duplicates: %s".format(buf))
       last = z
       i += 1
     }
@@ -147,7 +147,7 @@ trait IndicesModule[M[+ _]]
 
       def accumulate(buf: mutable.ListBuffer[SliceIndex],
                      stream: StreamT[M, SliceIndex]): M[TableIndex] =
-        stream.uncons flatMap {
+        stream.uncons.flatMap {
           case None => M.point(new TableIndex(buf.toList))
           case Some((si, tail)) => { buf += si; accumulate(buf, tail) }
         }
@@ -158,13 +158,13 @@ trait IndicesModule[M[+ _]]
       val vt = composeSliceTransform(valueSpec)
 
       val indices =
-        table.slices flatMap { slice =>
+        table.slices.flatMap { slice =>
           val streamTM =
-            SliceIndex.createFromSlice(slice, sts, vt) map { si =>
+            SliceIndex.createFromSlice(slice, sts, vt).map { si =>
               si :: StreamT.empty[M, SliceIndex]
             }
 
-          StreamT wrapEffect streamTM
+          StreamT.wrapEffect(streamTM)
         }
 
       accumulate(mutable.ListBuffer.empty[SliceIndex], indices)
@@ -347,7 +347,7 @@ trait IndicesModule[M[+ _]]
       val sts = groupKeys.map(composeSliceTransform).toArray
       val vt = composeSliceTransform(valueSpec)
 
-      table.slices.uncons flatMap {
+      table.slices.uncons.flatMap {
         case Some((slice, _)) => createFromSlice(slice, sts, vt)
         case None => M.point(SliceIndex.empty)
       }
@@ -372,7 +372,7 @@ trait IndicesModule[M[+ _]]
       val dict = mutable.Map.empty[(Int, RValue), ArrayIntList]
       val keyset = mutable.Set.empty[Seq[RValue]]
 
-      readKeys(slice, sts) flatMap { keys =>
+      readKeys(slice, sts).flatMap { keys =>
         // build empty initial jvalue sets for our group keys
         Loop.range(0, numKeys)(vals(_) = mutable.Set.empty[RValue])
 
@@ -413,7 +413,7 @@ trait IndicesModule[M[+ _]]
           i += 1
         }
 
-        vt(slice) map {
+        vt(slice).map {
           case (_, slice2) =>
             new SliceIndex(vals, dict, keyset, slice2.materialized)
         }
@@ -436,7 +436,7 @@ trait IndicesModule[M[+ _]]
       val keys: mutable.ArrayBuffer[M[Array[RValue]]] =
         new mutable.ArrayBuffer[M[Array[RValue]]](numKeys)
 
-      (0 until numKeys) foreach { _ =>
+      ((0 until numKeys)).foreach { _ =>
         keys += null.asInstanceOf[M[Array[RValue]]]
       }
 
@@ -444,7 +444,7 @@ trait IndicesModule[M[+ _]]
       while (k < numKeys) {
         val st: SliceTransform1[_] = sts(k)
 
-        keys(k) = st(slice) map {
+        keys(k) = st(slice).map {
           case (_, keySlice) => {
             val arr = new Array[RValue](n)
 
@@ -476,7 +476,7 @@ trait IndicesModule[M[+ _]]
           }
         }
 
-      back map { _.toArray }
+      back.map { _.toArray }
     }
 
     private def unionBuffers(as: ArrayIntList,
@@ -487,7 +487,7 @@ trait IndicesModule[M[+ _]]
       var j = 0
       val alen = as.size
       val blen = bs.size
-      val out = new ArrayIntList(alen max blen)
+      val out = new ArrayIntList(alen.max(blen))
       while (i < alen && j < blen) {
         val a = as.get(i)
         val b = bs.get(j)

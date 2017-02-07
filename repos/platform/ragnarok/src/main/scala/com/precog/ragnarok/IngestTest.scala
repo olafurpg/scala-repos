@@ -43,23 +43,24 @@ object IngestTest {
          runner.yggConfig.scratchDir)
 
   private def ensureDataDirsAreEmpty(runner: NIHDBPerfTestRunner[_]) {
-    dataDirs(runner) foreach { dir =>
+    dataDirs(runner).foreach { dir =>
       if (!dir.exists()) {
         dir.mkdirs()
       } else if (!dir.list().isEmpty) {
         sys.error(
-          "Cannot run ingest performance tests on non-empty directory '%s'." format dir)
+          "Cannot run ingest performance tests on non-empty directory '%s'."
+            .format(dir))
       }
     }
   }
 
   private def rm(f: File, exclusive: Boolean = false) {
-    if (f.isDirectory()) f.listFiles() foreach (rm(_))
+    if (f.isDirectory()) f.listFiles().foreach(rm(_))
     if (!exclusive) f.delete()
   }
 
   private def deleteDataDirs(runner: NIHDBPerfTestRunner[_]) {
-    dataDirs(runner) foreach (rm(_, true))
+    dataDirs(runner).foreach(rm(_, true))
   }
 
   def run(config: RunConfig) {
@@ -104,7 +105,7 @@ object IngestTest {
 
         run(config.dryRuns)
         val stats = run(config.runs)
-        println(JObject(stats.toList collect {
+        println(JObject(stats.toList.collect {
           case (path, Some(s)) =>
             JField(path, s.toJson)
         }))
@@ -118,7 +119,7 @@ object IngestTest {
     RunConfig.fromCommandLine(args.toList) match {
       case Failure(errors) =>
         System.err.println("Error parsing command lines:")
-        errors.list foreach { msg =>
+        errors.list.foreach { msg =>
           System.err.println("\t" + msg)
         }
         System.err.println()

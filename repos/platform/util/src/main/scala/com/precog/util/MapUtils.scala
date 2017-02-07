@@ -43,24 +43,27 @@ class MapPimp[A, B, CC[B] <: GenTraversable[B]](left: GenMap[A, CC[B]]) {
       cbfRight: CanBuildFrom[CC2[C], C, CC2[C]]): Result = {
     val resultBuilder = cbf()
 
-    left foreach {
+    left.foreach {
       case (key, leftValues) => {
-        right get key map { rightValues =>
-          resultBuilder +=
-            (key -> Either3
-              .middle3[B, (CC[B], CC2[C]), C]((leftValues, rightValues)))
-        } getOrElse {
-          leftValues foreach { b =>
-            resultBuilder += (key -> Either3.left3[B, (CC[B], CC2[C]), C](b))
+        right
+          .get(key)
+          .map { rightValues =>
+            resultBuilder +=
+              (key -> Either3
+                .middle3[B, (CC[B], CC2[C]), C]((leftValues, rightValues)))
           }
-        }
+          .getOrElse {
+            leftValues.foreach { b =>
+              resultBuilder += (key -> Either3.left3[B, (CC[B], CC2[C]), C](b))
+            }
+          }
       }
     }
 
-    right foreach {
+    right.foreach {
       case (key, rightValues) => {
-        if (!(left get key isDefined)) {
-          rightValues foreach { c =>
+        if (!(left.get(key) isDefined)) {
+          rightValues.foreach { c =>
             resultBuilder +=
               (key -> Either3.right3[B, (CC[B], CC2[C]), C](c))
           }

@@ -39,11 +39,11 @@ object M1 {
   def test0 = {
     val account = new BankAccount();
     Console.print("account deposit  50 -> ");
-    Console.println((account deposit 50).toString()); // !!! .toString
+    Console.println((account.deposit(50)).toString()); // !!! .toString
     Console.print("account withdraw 20 -> ");
-    Console.println(account withdraw 20);
+    Console.println(account.withdraw(20));
     Console.print("account withdraw 20 -> ");
-    Console.println(account withdraw 20);
+    Console.println(account.withdraw(20));
     Console.print("account withdraw 15 -> ");
     Console.println;
   }
@@ -52,7 +52,7 @@ object M1 {
     val x = new BankAccount();
     val y = new BankAccount();
     Console.print("x deposit  30 -> ");
-    Console.println((x deposit 30).toString()); // !!! .toString
+    Console.println((x.deposit(30)).toString()); // !!! .toString
     Console.print("y withdraw 20 -> ");
     Console.println;
   }
@@ -61,18 +61,18 @@ object M1 {
     val x = new BankAccount();
     val y = new BankAccount();
     Console.print("x deposit  30 -> ");
-    Console.println((x deposit 30).toString()); // !!! .toString
+    Console.println((x.deposit(30)).toString()); // !!! .toString
     Console.print("x withdraw 20 -> ");
-    Console.println(x withdraw 20);
+    Console.println(x.withdraw(20));
   }
 
   def test3 = {
     val x = new BankAccount();
     val y = x;
     Console.print("x deposit  30 -> ");
-    Console.println((x deposit 30).toString()); // !!! .toString
+    Console.println((x.deposit(30)).toString()); // !!! .toString
     Console.print("y withdraw 20 -> ");
-    Console.println(y withdraw 20);
+    Console.println(y.withdraw(20));
   }
 
   def test = {
@@ -207,7 +207,7 @@ object M5 {
           output.setSignal(!inputSig)
         };
       }
-      input addAction invertAction
+      input.addAction(invertAction)
     }
 
     def andGate(a1: Wire, a2: Wire, output: Wire): Unit = {
@@ -218,8 +218,8 @@ object M5 {
           output.setSignal(a1Sig & a2Sig)
         };
       }
-      a1 addAction andAction;
-      a2 addAction andAction;
+      a1.addAction(andAction);
+      a2.addAction(andAction);
     }
 
     def orGate(o1: Wire, o2: Wire, output: Wire): Unit = {
@@ -230,12 +230,12 @@ object M5 {
           output.setSignal(o1Sig | o2Sig)
         };
       }
-      o1 addAction orAction;
-      o2 addAction orAction;
+      o1.addAction(orAction);
+      o2.addAction(orAction);
     }
 
     def probe(name: String, wire: Wire): Unit = {
-      wire addAction { () =>
+      wire.addAction { () =>
         Console.println(
           name + " " + currentTime + " new-value = " + wire.getSignal);
       }
@@ -277,7 +277,7 @@ object M5 {
       def result = if (cout.getSignal) 1 else 0;
 
       def test(a: Int) = {
-        ain setSignal (if (a == 0) false else true);
+        ain.setSignal(if (a == 0) false else true);
         run;
         Console.println("!" + a + " = " + result);
         Console.println;
@@ -298,8 +298,8 @@ object M5 {
       def result = if (cout.getSignal) 1 else 0;
 
       def test(a: Int, b: Int) = {
-        ain setSignal (if (a == 0) false else true);
-        bin setSignal (if (b == 0) false else true);
+        ain.setSignal(if (a == 0) false else true);
+        bin.setSignal(if (b == 0) false else true);
         run;
         Console.println(a + " & " + b + " = " + result);
         Console.println;
@@ -323,8 +323,8 @@ object M5 {
       def result = if (cout.getSignal) 1 else 0;
 
       def test(a: Int, b: Int) = {
-        ain setSignal (if (a == 0) false else true);
-        bin setSignal (if (b == 0) false else true);
+        ain.setSignal(if (a == 0) false else true);
+        bin.setSignal(if (b == 0) false else true);
         run;
         Console.println(a + " | " + b + " = " + result);
         Console.println;
@@ -350,8 +350,8 @@ object M5 {
         ((if (sout.getSignal) 1 else 0) + (if (cout.getSignal) 2 else 0));
 
       def test(a: Int, b: Int) = {
-        ain setSignal (if (a == 0) false else true);
-        bin setSignal (if (b == 0) false else true);
+        ain.setSignal(if (a == 0) false else true);
+        bin.setSignal(if (b == 0) false else true);
         run;
         Console.println(a + " + " + b + " = " + result);
         Console.println;
@@ -379,9 +379,9 @@ object M5 {
         ((if (sout.getSignal) 1 else 0) + (if (cout.getSignal) 2 else 0));
 
       def test(a: Int, b: Int, c: Int) = {
-        ain setSignal (if (a == 0) false else true);
-        bin setSignal (if (b == 0) false else true);
-        cin setSignal (if (c == 0) false else true);
+        ain.setSignal(if (a == 0) false else true);
+        bin.setSignal(if (b == 0) false else true);
+        cin.setSignal(if (c == 0) false else true);
         run;
         Console.println(a + " + " + b + " + " + c + " = " + result);
         Console.println;
@@ -470,7 +470,7 @@ class Wire() {
 abstract class BasicCircuitSimulator() extends Simulator() {
 
   def probe(name: String, wire: Wire): Unit = {
-    wire addAction { () =>
+    wire.addAction { () =>
       Console.println(
         name + " " + currentTime + " new-value = " + wire.getSignal);
     }
@@ -487,7 +487,7 @@ abstract class BasicCircuitSimulator() extends Simulator() {
         output.setSignal(!inputSig)
       };
     }
-    input addAction invertAction
+    input.addAction(invertAction)
   }
 
   def andGate(a1: Wire, a2: Wire, output: Wire) = {
@@ -498,8 +498,8 @@ abstract class BasicCircuitSimulator() extends Simulator() {
         output.setSignal(a1Sig & a2Sig)
       };
     }
-    a1 addAction andAction;
-    a2 addAction andAction
+    a1.addAction(andAction);
+    a2.addAction(andAction)
   }
 
   def orGate(a1: Wire, a2: Wire, output: Wire) = {
@@ -510,8 +510,8 @@ abstract class BasicCircuitSimulator() extends Simulator() {
         output.setSignal(a1Sig | a2Sig)
       };
     }
-    a1 addAction orAction;
-    a2 addAction orAction
+    a1.addAction(orAction);
+    a2.addAction(orAction)
   }
 
   def orGate2(a1: Wire, a2: Wire, output: Wire) = {
@@ -545,7 +545,7 @@ abstract class CircuitSimulator() extends BasicCircuitSimulator() {
   }
 
   def connect(in: Wire, out: Wire) = {
-    in addAction { () =>
+    in.addAction { () =>
       out.setSignal(in.getSignal);
     }
   }
@@ -581,8 +581,8 @@ class Main() extends CircuitSimulator() {
     demux(in, ctrl.reverse, out.reverse);
 
     probe("in", in);
-    for ((x, c) <- range(0, n) zip ctrl) { probe("ctrl" + x, c) }
-    for ((x, o) <- range(0, outNum) zip out) { probe("out" + x, o) }
+    for ((x, c) <- range(0, n).zip(ctrl)) { probe("ctrl" + x, c) }
+    for ((x, o) <- range(0, outNum).zip(out)) { probe("out" + x, o) }
 
     in.setSignal(true);
     run;

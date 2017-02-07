@@ -16,20 +16,20 @@ import akka.http.scaladsl.unmarshalling.FromEntityUnmarshaller
 trait ScalatestUtils extends MarshallingTestUtils {
   import org.scalatest.Matchers._
   def evaluateTo[T](value: T): Matcher[Future[T]] =
-    equal(value).matcher[T] compose (x ⇒ Await.result(x, 1.second))
+    equal(value).matcher[T].compose(x ⇒ Await.result(x, 1.second))
 
   def haveFailedWith(t: Throwable): Matcher[Future[_]] =
-    equal(t).matcher[Throwable] compose (x ⇒ Await.result(x.failed, 1.second))
+    equal(t).matcher[Throwable].compose(x ⇒ Await.result(x.failed, 1.second))
 
   def unmarshalToValue[T: FromEntityUnmarshaller](value: T)(
       implicit ec: ExecutionContext,
       mat: Materializer): Matcher[HttpEntity] =
-    equal(value).matcher[T] compose (unmarshalValue(_))
+    equal(value).matcher[T].compose(unmarshalValue(_))
 
   def unmarshalTo[T: FromEntityUnmarshaller](value: Try[T])(
       implicit ec: ExecutionContext,
       mat: Materializer): Matcher[HttpEntity] =
-    equal(value).matcher[Try[T]] compose (unmarshal(_))
+    equal(value).matcher[Try[T]].compose(unmarshal(_))
 }
 
 trait ScalatestRouteTest

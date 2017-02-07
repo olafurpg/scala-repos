@@ -154,7 +154,7 @@ object ScalaDSL {
     override def management(ctx: ActorContext[T], msg: Signal): Behavior[T] = {
       lazy val fallback: (MessageOrSignal[T]) ⇒ Behavior[T] = {
         case Sig(context, PreRestart(_)) ⇒
-          context.children foreach { child ⇒
+          context.children.foreach { child ⇒
             context.unwatch(child.untypedRef)
             context.stop(child)
           }

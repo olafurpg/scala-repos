@@ -45,7 +45,7 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
       .router(Router.from {
         case GET(p"/Bob") =>
           Action {
-            Ok("Hello Bob") as "text/html; charset=utf-8"
+            Ok("Hello Bob").as("text/html; charset=utf-8")
           }
       })
       .build()
@@ -95,7 +95,7 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
               |  <a href="/login">click me</a>
               |</body>
               |</html>
-            """.stripMargin) as "text/html"
+            """.stripMargin).as("text/html")
             }
           case GET(p"/login") =>
             Action {
@@ -105,7 +105,7 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
               |  <div id="title">Hello Coco</div>
               |</body>
               |</html>
-            """.stripMargin) as "text/html"
+            """.stripMargin).as("text/html")
             }
         })
         .build()

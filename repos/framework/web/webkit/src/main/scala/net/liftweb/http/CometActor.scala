@@ -107,7 +107,7 @@ trait StatefulComet extends CometActor {
         }
     }
 
-    pf orElse super._lowPriority
+    pf.orElse(super._lowPriority)
   }
 
   /**
@@ -208,7 +208,10 @@ trait ListenerManager { self: SimpleActor[Any] =>
   private var listeners: List[ActorTest] = Nil
 
   protected def messageHandler: PartialFunction[Any, Unit] =
-    highPriority orElse mediumPriority orElse listenerService orElse lowPriority
+    highPriority
+      .orElse(mediumPriority)
+      .orElse(listenerService)
+      .orElse(lowPriority)
 
   protected def listenerService: PartialFunction[Any, Unit] = {
     case AddAListener(who, wantsMessage) =>
@@ -236,7 +239,7 @@ trait ListenerManager { self: SimpleActor[Any] =>
   protected def updateListeners(listeners: List[ActorTest] = listeners) {
     val update = createUpdate
 
-    listeners foreach {
+    listeners.foreach {
       case (who, wantsMessage)
           if wantsMessage.isDefinedAt(update) && wantsMessage(update) =>
         who ! update
@@ -248,7 +251,7 @@ trait ListenerManager { self: SimpleActor[Any] =>
     * invocation the createUpdate method is not used.
     */
   protected def sendListenersMessage(msg: Any) {
-    listeners foreach (_._1 ! msg)
+    listeners.foreach(_._1 ! msg)
   }
 
   /**
@@ -289,7 +292,11 @@ abstract class LiftActorJWithListenerManager
     extends LiftActorJ
     with ListenerManager {
   protected override def messageHandler: PartialFunction[Any, Unit] =
-    highPriority orElse mediumPriority orElse listenerService orElse lowPriority orElse _messageHandler
+    highPriority
+      .orElse(mediumPriority)
+      .orElse(listenerService)
+      .orElse(lowPriority)
+      .orElse(_messageHandler)
 }
 
 /**
@@ -628,7 +635,7 @@ trait BaseCometActor
   def defaultPrefix: Box[String] = Empty
 
   private lazy val _defaultPrefix: String =
-    (defaultPrefix or _name) openOr "comet"
+    (defaultPrefix.or(_name)).openOr("comet")
 
   /**
     * Set to 'true' if we should run "render" on every page load
@@ -663,7 +670,7 @@ trait BaseCometActor
     * @param h -- the PartialFunction that can handle a JSON request
     */
   def appendJsonHandler(h: PartialFunction[Any, JsCmd]) {
-    jsonHandlerChain = h orElse jsonHandlerChain
+    jsonHandlerChain = h.orElse(jsonHandlerChain)
   }
 
   /**
@@ -868,7 +875,7 @@ trait BaseCometActor
                                           lastRendering,
                                           buildSpan _,
                                           notices.toList),
-                           whosAsking openOr this,
+                           whosAsking.openOr(this),
                            lastRenderTime,
                            wasLastFullRender))
             clearNotices
@@ -888,7 +895,7 @@ trait BaseCometActor
                                    buildSpan,
                                    false,
                                    notices.toList),
-                    whosAsking openOr this,
+                    whosAsking.openOr(this),
                     hd.when,
                     false))
                 clearNotices
@@ -947,7 +954,7 @@ trait BaseCometActor
                                         out.openOr(lastRendering),
                                         buildSpan _,
                                         notices.toList),
-                         whosAsking openOr this,
+                         whosAsking.openOr(this),
                          lastRenderTime,
                          true))
           clearNotices
@@ -1041,7 +1048,7 @@ trait BaseCometActor
                                                    buildSpan,
                                                    false,
                                                    notices.toList),
-                                    whosAsking openOr this,
+                                    whosAsking.openOr(this),
                                     time,
                                     false)
         clearNotices
@@ -1245,10 +1252,14 @@ trait BaseCometActor
   private def composeFunction_i: PartialFunction[Any, Unit] = {
     // if we're no longer running don't pass messages to the other handlers
     // just pass them to our handlers
-    if (! _running && (millis - 20000L) > _shutDownAt)
-      _mediumPriority orElse _lowPriority
+    if (!_running && (millis - 20000L) > _shutDownAt)
+      _mediumPriority.orElse(_lowPriority)
     else
-      highPriority orElse mediumPriority orElse _mediumPriority orElse lowPriority orElse _lowPriority
+      highPriority
+        .orElse(mediumPriority)
+        .orElse(_mediumPriority)
+        .orElse(lowPriority)
+        .orElse(_lowPriority)
   }
 
   /**
@@ -1635,7 +1646,7 @@ case class RenderOut(xhtml: Box[NodeSeq],
   def ++(cmd: JsCmd) =
     RenderOut(xhtml,
               fixedXhtml,
-              script.map(_ & cmd) or Full(cmd),
+              script.map(_ & cmd).or(Full(cmd)),
               destroyScript,
               ignoreHtmlOnJs)
 }

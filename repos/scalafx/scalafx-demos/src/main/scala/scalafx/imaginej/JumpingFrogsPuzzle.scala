@@ -227,13 +227,13 @@ class Model(var optionalFrogMap: Map[Int, Option[Frog]]) {
 
   val position = (frog: Frog) => positionSingleton(frog).head
 
-  val canJumpOneRight = canMoveOneRightAt compose position
+  val canJumpOneRight = canMoveOneRightAt.compose(position)
 
-  val canJumpTwoRight = canMoveTwoRightAt compose position
+  val canJumpTwoRight = canMoveTwoRightAt.compose(position)
 
-  val canJumpOneLeft = canMoveOneLeftAt compose position
+  val canJumpOneLeft = canMoveOneLeftAt.compose(position)
 
-  val canJumpTwoLeft = canMoveTwoLeftAt compose position
+  val canJumpTwoLeft = canMoveTwoLeftAt.compose(position)
 
   val jumpOneRight = update(_ + 1)
 
@@ -393,7 +393,7 @@ class Control {
 object theModel extends Model(theModelValues.optionalFrogMap)
 
 object theView
-    extends View(theModel.position compose (_.getFrog),
+    extends View(theModel.position.compose(_.getFrog),
                  theViewValues.frogShapes) {
   theControl.update(theModel, this)
 }

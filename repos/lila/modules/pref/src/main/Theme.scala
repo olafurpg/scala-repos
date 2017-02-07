@@ -19,11 +19,11 @@ sealed trait ThemeObject {
 
   lazy val listString = list mkString " "
 
-  lazy val allByName = list map { c =>
+  lazy val allByName = list.map { c =>
     c.name -> c
   } toMap
 
-  def apply(name: String) = (allByName get name) | default
+  def apply(name: String) = (allByName.get(name)) | default
 
   def contains(name: String) = allByName contains name
 }
@@ -48,11 +48,11 @@ object Theme extends ThemeObject {
       "metal",
       "olive",
       "purple"
-    ) map { name =>
+    ).map { name =>
       new Theme(name)
     }
 
-  lazy val default = allByName get "brown" err "Can't find default theme D:"
+  lazy val default = allByName.get("brown").err("Can't find default theme D:")
 }
 
 object Theme3d extends ThemeObject {
@@ -74,9 +74,9 @@ object Theme3d extends ThemeObject {
       "Wax",
       "Jade",
       "Woodi"
-    ) map { name =>
+    ).map { name =>
       new Theme(name)
     }
 
-  lazy val default = allByName get "Woodi" err "Can't find default theme D:"
+  lazy val default = allByName.get("Woodi").err("Can't find default theme D:")
 }

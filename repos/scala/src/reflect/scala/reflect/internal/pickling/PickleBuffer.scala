@@ -132,7 +132,7 @@ class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
     readNat(); readNat() // discarding version
     val result = new Array[(Int, Array[Byte])](readNat())
 
-    result.indices foreach { index =>
+    result.indices.foreach { index =>
       val tag = readNat()
       val len = readNat()
       val bytes = data.slice(readIndex, len + readIndex)

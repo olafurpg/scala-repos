@@ -21,6 +21,6 @@ object Test {
     val (x, y) = 0
     """
     val exprs = tests.split("\\n").map(_.trim).filterNot(_.isEmpty)
-    exprs foreach test
+    exprs.foreach(test)
   }
 }

@@ -101,7 +101,7 @@ object ClassFileParser extends ByteCodeReader {
   def parseAnnotations(byteCode: ByteCode) = expect(annotations)(byteCode)
 
   val magicNumber =
-    (u4 filter (_ == 0xCAFEBABE)) | error("Not a valid class file")
+    (u4.filter(_ == 0xCAFEBABE)) | error("Not a valid class file")
   val version = u2 ~ u2 ^^ { case minor ~ major => (major, minor) }
   val constantPool =
     (u2 ^^ ConstantPool) >> repeatUntil(constantPoolEntry)(_ isFull)
@@ -235,9 +235,9 @@ object ClassFileParser extends ByteCodeReader {
   }
 
   def add1[T](f: T => ConstantPool => Any)(raw: T)(pool: ConstantPool) =
-    pool add f(raw)
+    pool.add(f(raw))
   def add2[T](f: T => ConstantPool => Any)(raw: T)(pool: ConstantPool) =
-    pool add f(raw) add { pool =>
+    pool.add(f(raw)).add { pool =>
       "<empty>"
     }
 }
@@ -309,7 +309,7 @@ case class ConstantPool(len: Int) {
   def apply(index: Int) = {
     // Note constant pool indices are 1-based
     val i = index - 1
-    values(i) getOrElse {
+    values(i).getOrElse {
       val value = buffer(i)(this)
       buffer(i) = null
       values(i) = Some(value)

@@ -456,7 +456,7 @@ object Printers {
         case RecordValue(tpe, elems) =>
           print('(')
           var first = true
-          for ((field, value) <- tpe.fields zip elems) {
+          for ((field, value) <- tpe.fields.zip(elems)) {
             if (first) first = false
             else print(", ")
             print(field.name)

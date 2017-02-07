@@ -150,7 +150,7 @@ object AtomSpecs extends Specification with ScalaCheck {
     "self-populate once on access using +=" in check { xs: Set[Int] =>
       lazy val a: Atom[Set[Int]] = atom[Set[Int]] {
         a ++= Set[Int]()
-        xs foreach { x =>
+        xs.foreach { x =>
           a += x
         }
       }
@@ -168,7 +168,7 @@ object AtomSpecs extends Specification with ScalaCheck {
 
     "never self-populate on access when pre-populated by =" in check {
       xs: Set[Int] =>
-        val marker = Stream from 0 dropWhile xs head
+        val marker = Stream.from(0).dropWhile(xs) head
 
         lazy val a: Atom[Set[Int]] = atom[Set[Int]] {
           a += marker
@@ -180,13 +180,13 @@ object AtomSpecs extends Specification with ScalaCheck {
 
     "self-populate once on access when pre-populated by +=" in check {
       xs: Set[Int] =>
-        val marker = Stream from 0 dropWhile xs head
+        val marker = Stream.from(0).dropWhile(xs) head
 
         lazy val a: Atom[Set[Int]] = atom[Set[Int]] {
           a += marker
         }
 
-        xs foreach { x =>
+        xs.foreach { x =>
           a += x
         }
         a() mustEqual (xs + marker)
@@ -194,7 +194,7 @@ object AtomSpecs extends Specification with ScalaCheck {
 
     "self-populate once on access when pre-populated by ++=" in check {
       xs: Set[Int] =>
-        val marker = Stream from 0 dropWhile xs head
+        val marker = Stream.from(0).dropWhile(xs) head
 
         lazy val a: Atom[Set[Int]] = atom[Set[Int]] {
           a += marker
@@ -209,7 +209,7 @@ object AtomSpecs extends Specification with ScalaCheck {
         a ++= Set[Int]()
       }
 
-      xs foreach { x =>
+      xs.foreach { x =>
         a += x
       }
 

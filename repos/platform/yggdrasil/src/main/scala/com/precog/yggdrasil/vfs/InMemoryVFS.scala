@@ -76,11 +76,11 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
       M point {
         id match {
           case Some(i) =>
-            slices.lift(i + 1) map { s =>
+            slices.lift(i + 1).map { s =>
               BlockProjectionData(i + 1, i + 1, s)
             }
           case None =>
-            slices.headOption map { s =>
+            slices.headOption.map { s =>
               BlockProjectionData(0, 0, s)
             }
         }
@@ -197,7 +197,7 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
     import VFS._
 
     private var data: Map[(Path, Version), Record] =
-      data0 map {
+      data0.map {
         case (p, (r, auth)) =>
           (p, Version.Current) -> r.fold(
             BinaryRecord(_, auth, newVersion),
@@ -234,7 +234,7 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
 
       IO {
         data =
-          (events groupBy { case (offset, msg) => msg.path }).foldLeft(data) {
+          (events.groupBy { case (offset, msg) => msg.path }).foldLeft(data) {
             case (acc, (path, messages)) =>
               val currentKey = (path, Version.Current)
               // We can discard the event IDs for the purposes of this class
@@ -282,33 +282,37 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
                                     _,
                                     StreamRef.Replace(id, _))) =>
                   val archiveKey = (path, Version.Archived(id))
-                  acc.get(archiveKey).orElse(acc.get(currentKey)) map {
-                    case rec @ JsonRecord(resource, `id`) =>
-                      // append when it is the same id
-                      rec.resource
-                        .append(NIHDB.Batch(0, records.map(_.value)))
-                        .unsafePerformIO
-                      acc +
-                        ((if (acc.contains(currentKey))
-                            currentKey
-                          else archiveKey) -> rec)
+                  acc
+                    .get(archiveKey)
+                    .orElse(acc.get(currentKey))
+                    .map {
+                      case rec @ JsonRecord(resource, `id`) =>
+                        // append when it is the same id
+                        rec.resource
+                          .append(NIHDB.Batch(0, records.map(_.value)))
+                          .unsafePerformIO
+                        acc +
+                          ((if (acc.contains(currentKey))
+                              currentKey
+                            else archiveKey) -> rec)
 
-                    case record =>
-                      // replace when id is not recognized, or when record is binary
+                      case record =>
+                        // replace when id is not recognized, or when record is binary
+                        acc +
+                          ((path, Version.Archived(record.versionId)) -> record) +
+                          (currentKey -> JsonRecord(
+                            Vector(records.map(_.value): _*),
+                            writeAs,
+                            id))
+                    }
+                    .getOrElse {
+                      // start a new current version
                       acc +
-                        ((path, Version.Archived(record.versionId)) -> record) +
                         (currentKey -> JsonRecord(
                           Vector(records.map(_.value): _*),
                           writeAs,
                           id))
-                  } getOrElse {
-                    // start a new current version
-                    acc +
-                      (currentKey -> JsonRecord(
-                        Vector(records.map(_.value): _*),
-                        writeAs,
-                        id))
-                  }
+                    }
 
                 case (acc,
                       StoreFileMessage(_,
@@ -353,24 +357,28 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
         data
           .get((path, version))
           .toRightDisjunction(NotFound("No data found for path %s version %s"
-            .format(path.path, version))) traverse { toResource }
+            .format(path.path, version)))
+          .traverse { toResource }
       }
     }
 
     private def childMetadata(path: Path): Set[PathMetadata] = {
-      data.keySet.map(_._1) flatMap { _ - path } flatMap { p0 =>
+      data.keySet.map(_._1).flatMap { _ - path }.flatMap { p0 =>
         val childPath = path / Path(p0.elements.headOption.toList)
         val isDir = p0.length > 1
-        data.get((childPath, Version.Current)) map { record =>
-          Set(
-            PathMetadata(p0,
-                         if (isDir) DataDir(record.resource.mimeType)
-                         else DataOnly(record.resource.mimeType)))
-        } getOrElse {
-          // no current version
-          if (isDir) Set(PathMetadata(p0, PathOnly))
-          else Set.empty[PathMetadata]
-        }
+        data
+          .get((childPath, Version.Current))
+          .map { record =>
+            Set(
+              PathMetadata(p0,
+                           if (isDir) DataDir(record.resource.mimeType)
+                           else DataOnly(record.resource.mimeType)))
+          }
+          .getOrElse {
+            // no current version
+            if (isDir) Set(PathMetadata(p0, PathOnly))
+            else Set.empty[PathMetadata]
+          }
       }
     }
 
@@ -385,21 +393,24 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
       EitherT {
         M point {
           val isDir = childMetadata(path).nonEmpty
-          data.get((path, Version.Current)) map { record =>
-            \/.right(
-              PathMetadata(path,
-                           if (isDir) DataDir(record.resource.mimeType)
-                           else DataOnly(record.resource.mimeType)))
-          } getOrElse {
-            if (isDir) \/.right(PathMetadata(path, PathOnly))
-            else \/.left(NotFound("Path not fournd: %s".format(path.path)))
-          }
+          data
+            .get((path, Version.Current))
+            .map { record =>
+              \/.right(
+                PathMetadata(path,
+                             if (isDir) DataDir(record.resource.mimeType)
+                             else DataOnly(record.resource.mimeType)))
+            }
+            .getOrElse {
+              if (isDir) \/.right(PathMetadata(path, PathOnly))
+              else \/.left(NotFound("Path not fournd: %s".format(path.path)))
+            }
         }
       }
     }
 
     def currentVersion(path: Path): M[Option[VersionEntry]] = M point {
-      data.get((path, Version.Current)) map {
+      data.get((path, Version.Current)).map {
         case BinaryRecord(resource, id) =>
           VersionEntry(id, PathData.BLOB(resource.mimeType), clock.instant)
         case JsonRecord(_, id) =>

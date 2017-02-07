@@ -34,8 +34,9 @@ private object ClassPath {
     */
   case class Info(path: String, loader: ClassLoader) {
     val name: String =
-      if (path.endsWith(".class"))
-        (path take (path.length - 6)).replace('/', '.')
+      if (path.endsWith(".class"))(path
+        .take(path.length - 6))
+        .replace('/', '.')
       else path.replace('/', '.')
 
     /**
@@ -62,8 +63,8 @@ private object ClassPath {
   }
 
   private def isClass(name: String) =
-    (name endsWith ".class") &&
-      ((name endsWith "$.class") || !(name contains "$"))
+    (name.endsWith(".class")) &&
+      ((name.endsWith("$.class")) || !(name contains "$"))
 
   private def getEntries(loader: ClassLoader): Seq[(URI, ClassLoader)] = {
     val ents = mutable.Buffer[(URI, ClassLoader)]()
@@ -133,7 +134,7 @@ private object ClassPath {
 
       for {
         e <- jarFile.entries.asScala if !e.isDirectory
-        n = e.getName if !(ignoredPackages exists (n startsWith _))
+        n = e.getName if !(ignoredPackages.exists(n.startsWith(_)))
         if isClass(n)
       } buf += Info(n, loader)
     } finally {

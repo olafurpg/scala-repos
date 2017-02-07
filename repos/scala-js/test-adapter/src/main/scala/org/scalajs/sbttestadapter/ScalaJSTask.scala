@@ -51,8 +51,11 @@ final class ScalaJSTask private (
     }
 
     val handlerChain =
-      (eventHandler(handler) orElse loggerHandler(logBuffer) orElse runner
-        .msgHandler(slave) orElse doneHandler)
+      (eventHandler(handler)
+        .orElse(loggerHandler(logBuffer))
+        .orElse(runner
+          .msgHandler(slave))
+        .orElse(doneHandler))
 
     // Wait for result
     val taskInfos = ComUtils.receiveLoop(slave)(handlerChain)

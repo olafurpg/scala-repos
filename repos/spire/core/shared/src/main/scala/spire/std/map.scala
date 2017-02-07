@@ -17,7 +17,7 @@ class MapMonoid[K, V](implicit val scalar: Semigroup[V])
       xx = y; yy = x; f = (x: V, y: V) => scalar.op(y, x)
     }
     yy.foldLeft(xx) { (z, kv) =>
-      z.updated(kv._1, (xx get kv._1).map(u => f(u, kv._2)).getOrElse(kv._2))
+      z.updated(kv._1, (xx.get(kv._1)).map(u => f(u, kv._2)).getOrElse(kv._2))
     }
   }
 }
@@ -44,7 +44,7 @@ class MapSemiring[K, V](implicit val scalar: Semiring[V])
     yy.foldLeft(xx) { (z, kv) =>
       z.updated(
         kv._1,
-        (xx get kv._1).map(u => scalar.plus(u, kv._2)).getOrElse(kv._2))
+        (xx.get(kv._1)).map(u => scalar.plus(u, kv._2)).getOrElse(kv._2))
     }
   }
 
@@ -56,7 +56,7 @@ class MapSemiring[K, V](implicit val scalar: Semiring[V])
       xx = y; yy = x; f = (x: V, y: V) => scalar.times(y, x)
     }
     yy.foldLeft(zero) { (z, kv) =>
-      (xx get kv._1).map(u => z.updated(kv._1, f(u, kv._2))).getOrElse(z)
+      (xx.get(kv._1)).map(u => z.updated(kv._1, f(u, kv._2))).getOrElse(z)
     }
   }
 }
@@ -66,9 +66,9 @@ class MapRng[K, V](override implicit val scalar: Rng[V])
     extends MapSemiring[K, V]
     with RingAlgebra[Map[K, V], V]
     with Serializable { self =>
-  def negate(x: Map[K, V]): Map[K, V] = x mapValues (scalar.negate(_))
+  def negate(x: Map[K, V]): Map[K, V] = x.mapValues(scalar.negate(_))
 
-  def timesl(r: V, v: Map[K, V]): Map[K, V] = v mapValues (scalar.times(r, _))
+  def timesl(r: V, v: Map[K, V]): Map[K, V] = v.mapValues(scalar.times(r, _))
 }
 
 @SerialVersionUID(0L)
@@ -82,7 +82,8 @@ class MapVectorSpace[K, V](override implicit val scalar: Field[V])
     var f = scalar.times _
     if (x.size < y.size) { xx = y; yy = x }
     yy.foldLeft(zero) { (z, kv) =>
-      (xx get kv._1)
+      (xx
+        .get(kv._1))
         .map(u => z.updated(kv._1, scalar.times(u, kv._2)))
         .getOrElse(z)
     }
@@ -105,9 +106,9 @@ class MapEq[K, V](implicit V: Eq[V]) extends Eq[Map[K, V]] with Serializable {
   def eqv(x: Map[K, V], y: Map[K, V]): Boolean = {
     if (x.size != y.size) false
     else {
-      x forall {
+      x.forall {
         case (k, v) =>
-          (y get k) match {
+          (y.get(k)) match {
             case Some(e) if V.eqv(e, v) => true
             case _ => false
           }
@@ -125,7 +126,7 @@ class MapVectorEq[K, V](implicit V: Eq[V], scalar: AdditiveMonoid[V])
     def loop(acc: Map[K, V], it: Iterator[(K, V)]): Boolean = {
       if (it.hasNext) {
         val (k, v0) = it.next()
-        (acc get k) match {
+        (acc.get(k)) match {
           case Some(v1) if V.eqv(v0, v1) =>
             loop(acc - k, it)
           case None if V.eqv(v0, scalar.zero) =>
@@ -134,7 +135,7 @@ class MapVectorEq[K, V](implicit V: Eq[V], scalar: AdditiveMonoid[V])
             false
         }
       } else {
-        acc forall { case (_, v) => V.eqv(v, scalar.zero) }
+        acc.forall { case (_, v) => V.eqv(v, scalar.zero) }
       }
     }
 

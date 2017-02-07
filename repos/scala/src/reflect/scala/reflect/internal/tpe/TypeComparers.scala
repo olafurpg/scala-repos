@@ -69,7 +69,7 @@ trait TypeComparers { self: SymbolTable =>
   def isDifferentType(tp1: Type, tp2: Type): Boolean =
     try {
       subsametypeRecursions += 1
-      undoLog undo {
+      undoLog.undo {
         // undo type constraints that arise from operations in this block
         !isSameType1(tp1, tp2)
       }
@@ -167,7 +167,7 @@ trait TypeComparers { self: SymbolTable =>
     def subst(info: Type) = info.substSym(tparams2, tparams1)
     // corresponds does not check length of two sequences before checking the predicate,
     // but SubstMap assumes it has been checked (SI-2956)
-    (sameLength(tparams1, tparams2) && (tparams1 corresponds tparams2)(
+    (sameLength(tparams1, tparams2) && (tparams1.corresponds(tparams2))(
       (p1, p2) =>
         methodHigherOrderTypeParamsSameVariance(p1, p2) &&
           p1.info =:= subst(p2.info)) && (res1 =:= subst(res2)))
@@ -241,7 +241,7 @@ trait TypeComparers { self: SymbolTable =>
       case RefinedType(ps1, decls1) =>
         tp2 match {
           case RefinedType(ps2, decls2) =>
-            isSameTypes(ps1, ps2) && (decls1 isSameScope decls2);
+            isSameTypes(ps1, ps2) && (decls1.isSameScope(decls2));
           case _ => false
         }
       case SingleType(pre1, sym1) =>
@@ -385,7 +385,7 @@ trait TypeComparers { self: SymbolTable =>
         (methodHigherOrderTypeParamsSubVariance(p2, p1) &&
           sub2(p2.info) <:< sub1(p1.info))
 
-      (tparams1 corresponds tparams2)(cmp) && (sub1(res1) <:< sub2(res2))
+      (tparams1.corresponds(tparams2))(cmp) && (sub1(res1) <:< sub2(res2))
     }
   }
   // This is looking for situations such as B.this.x.type <:< B.super.x.type.
@@ -409,8 +409,7 @@ trait TypeComparers { self: SymbolTable =>
         case (_, TypeRef(_, NothingClass, _)) => false
         case (pt1: PolyType, pt2: PolyType) =>
           isPolySubType(pt1, pt2) // @assume both .isHigherKinded (both normalized to PolyType)
-        case (_: PolyType, MethodType(ps, _))
-            if ps exists (_.tpe.isWildcard) =>
+        case (_: PolyType, MethodType(ps, _)) if ps.exists(_.tpe.isWildcard) =>
           false // don't warn on HasMethodMatching on right hand side
         case _ => // @assume !(both .isHigherKinded) thus cannot be subtypes
           def tp_s(tp: Type): String =
@@ -470,7 +469,7 @@ trait TypeComparers { self: SymbolTable =>
                  isSubPre(pre1, pre2, sym2)))) &&
             isSubArgs(tr1.args, tr2.args, sym1.typeParams, depth)) ||
             sym2.isClass && {
-              val base = tr1 baseType sym2
+              val base = tr1.baseType(sym2)
               // During bootstrap, `base eq NoType` occurs about 2.5 times as often as `base ne NoType`.
               // The extra check seems like a worthwhile optimization (about 2.5M useless calls to isSubtype saved during that run).
               (base ne tr1) && (base ne NoType) &&
@@ -548,8 +547,8 @@ trait TypeComparers { self: SymbolTable =>
       case tr2: TypeRef =>
         thirdTryRef(tp1, tr2)
       case rt2: RefinedType =>
-        (rt2.parents forall (isSubType(tp1, _, depth))) &&
-          (rt2.decls forall (specializesSym(tp1, _, depth)))
+        (rt2.parents.forall(isSubType(tp1, _, depth))) &&
+          (rt2.decls.forall(specializesSym(tp1, _, depth)))
       case et2: ExistentialType =>
         et2.withTypeVars(isSubType(tp1, _, depth), depth) || fourthTry
       case mt2: MethodType =>
@@ -614,7 +613,7 @@ trait TypeComparers { self: SymbolTable =>
             case _: TypeSymbol => retry(normalizePlus(tp1), normalizePlus(tp2))
             case _ => false
           }
-        case RefinedType(parents, _) => parents exists (retry(_, tp2))
+        case RefinedType(parents, _) => parents.exists(retry(_, tp2))
         case _: SingletonType => retry(tp1.underlying, tp2)
         case _ => false
       }

@@ -24,7 +24,7 @@ trait StdAttachments { self: Analyzer =>
   /** Loads underlying MacroExpanderAttachment from a macro expandee or returns a default value for that attachment.
     */
   def macroExpanderAttachment(tree: Tree): MacroExpanderAttachment =
-    tree.attachments.get[MacroExpanderAttachment] getOrElse {
+    tree.attachments.get[MacroExpanderAttachment].getOrElse {
       tree match {
         case Apply(fn, _) if tree.isInstanceOf[ApplyToImplicitArgs] =>
           macroExpanderAttachment(fn)
@@ -37,8 +37,8 @@ trait StdAttachments { self: Analyzer =>
     */
   def linkExpandeeAndDesugared(expandee: Tree, desugared: Tree): Unit = {
     val metadata = MacroExpanderAttachment(expandee, desugared)
-    expandee updateAttachment metadata
-    desugared updateAttachment metadata
+    expandee.updateAttachment(metadata)
+    desugared.updateAttachment(metadata)
   }
 
   /** Is added by the macro engine to originals and results of macro expansions.
@@ -67,10 +67,10 @@ trait StdAttachments { self: Analyzer =>
     */
   def linkExpandeeAndExpanded(expandee: Tree, expanded: Any): Unit = {
     val metadata = MacroExpansionAttachment(expandee, expanded)
-    expandee updateAttachment metadata
+    expandee.updateAttachment(metadata)
     expanded match {
       case expanded: Tree if !expanded.isEmpty =>
-        expanded updateAttachment metadata
+        expanded.updateAttachment(metadata)
       case _ => // do nothing
     }
   }
@@ -128,7 +128,7 @@ trait StdAttachments { self: Analyzer =>
     *  so it really benefits from a dedicated extractor.
     */
   def superArgs(tree: Tree): Option[List[List[Tree]]] =
-    tree.attachments.get[SuperArgsAttachment] collect {
+    tree.attachments.get[SuperArgsAttachment].collect {
       case SuperArgsAttachment(argss) => argss
     }
 

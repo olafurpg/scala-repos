@@ -56,42 +56,46 @@ trait WikiControllerBase extends ControllerBase {
     "id" -> trim(label("Latest commit id", text(required)))
   )(WikiPageEditForm.apply)
 
-  get("/:owner/:repository/wiki")(referrersOnly { repository =>
-    getWikiPage(repository.owner, repository.name, "Home").map {
-      page =>
-        html.page(
-          "Home",
-          page,
-          getWikiPageList(repository.owner, repository.name),
-          repository,
-          hasWritePermission(repository.owner,
-                             repository.name,
-                             context.loginAccount),
-          getWikiPage(repository.owner, repository.name, "_Sidebar"),
-          getWikiPage(repository.owner, repository.name, "_Footer")
-        )
-    } getOrElse redirect(
-      s"/${repository.owner}/${repository.name}/wiki/Home/_edit")
+  get("/:owner/:repository/wiki")(referrersOnly {
+    repository =>
+      getWikiPage(repository.owner, repository.name, "Home")
+        .map { page =>
+          html.page(
+            "Home",
+            page,
+            getWikiPageList(repository.owner, repository.name),
+            repository,
+            hasWritePermission(repository.owner,
+                               repository.name,
+                               context.loginAccount),
+            getWikiPage(repository.owner, repository.name, "_Sidebar"),
+            getWikiPage(repository.owner, repository.name, "_Footer")
+          )
+        }
+        .getOrElse(
+          redirect(s"/${repository.owner}/${repository.name}/wiki/Home/_edit"))
   })
 
   get("/:owner/:repository/wiki/:page")(referrersOnly { repository =>
     val pageName = StringUtil.urlDecode(params("page"))
 
-    getWikiPage(repository.owner, repository.name, pageName).map {
-      page =>
-        html.page(
-          pageName,
-          page,
-          getWikiPageList(repository.owner, repository.name),
-          repository,
-          hasWritePermission(repository.owner,
-                             repository.name,
-                             context.loginAccount),
-          getWikiPage(repository.owner, repository.name, "_Sidebar"),
-          getWikiPage(repository.owner, repository.name, "_Footer")
-        )
-    } getOrElse redirect(
-      s"/${repository.owner}/${repository.name}/wiki/${StringUtil.urlEncode(pageName)}/_edit")
+    getWikiPage(repository.owner, repository.name, pageName)
+      .map {
+        page =>
+          html.page(
+            pageName,
+            page,
+            getWikiPageList(repository.owner, repository.name),
+            repository,
+            hasWritePermission(repository.owner,
+                               repository.name,
+                               context.loginAccount),
+            getWikiPage(repository.owner, repository.name, "_Sidebar"),
+            getWikiPage(repository.owner, repository.name, "_Footer")
+          )
+      }
+      .getOrElse(redirect(
+        s"/${repository.owner}/${repository.name}/wiki/${StringUtil.urlEncode(pageName)}/_edit"))
   })
 
   get("/:owner/:repository/wiki/:page/_history")(referrersOnly { repository =>
@@ -296,9 +300,11 @@ trait WikiControllerBase extends ControllerBase {
   get("/:owner/:repository/wiki/_blob/*")(referrersOnly { repository =>
     val path = multiParams("splat").head
 
-    getFileContent(repository.owner, repository.name, path).map { bytes =>
-      RawData(FileUtil.getContentType(path, bytes), bytes)
-    } getOrElse NotFound
+    getFileContent(repository.owner, repository.name, path)
+      .map { bytes =>
+        RawData(FileUtil.getContentType(path, bytes), bytes)
+      }
+      .getOrElse(NotFound)
   })
 
   private def unique: Constraint = new Constraint() {

@@ -291,7 +291,7 @@ trait BaseClient[T] {
     * @return a Map[String, T] of all of the keys that the server had.
     */
   def get(keys: Iterable[String]): Future[Map[String, T]] = {
-    getResult(keys) flatMap { result =>
+    getResult(keys).flatMap { result =>
       if (result.failures.nonEmpty) {
         Future.exception(result.failures.values.head)
       } else {
@@ -309,7 +309,7 @@ trait BaseClient[T] {
     * keys the server had, together with their "cas unique" token
     */
   def gets(keys: Iterable[String]): Future[Map[String, (T, Buf)]] = {
-    getsResult(keys) flatMap { result =>
+    getsResult(keys).flatMap { result =>
       if (result.failures.nonEmpty) {
         Future.exception(result.failures.values.head)
       } else {
@@ -506,29 +506,31 @@ protected class ConnectedClient(
       case Buf.Utf8(s) => s
     }(breakOut)
 
-    service(command).map {
-      case Values(values) =>
-        val hits: Map[String, Value] = values.map {
-          case value =>
-            val Buf.Utf8(keyStr) = value.key
-            (keyStr, value)
-        }(breakOut)
-        val misses = util.NotFound(keys, hits.keySet)
-        GetResult(hits, misses)
-      case Error(e) => throw e
-      case other =>
-        throw new IllegalStateException(
-          "Invalid response type from get: %s".format(
-            other.getClass.getSimpleName)
-        )
-    } handle {
-      case t: RequestException =>
-        GetResult(failures = (keys.map { (_, t) }).toMap)
-      case t: ChannelException =>
-        GetResult(failures = (keys.map { (_, t) }).toMap)
-      case t: ServiceException =>
-        GetResult(failures = (keys.map { (_, t) }).toMap)
-    }
+    service(command)
+      .map {
+        case Values(values) =>
+          val hits: Map[String, Value] = values.map {
+            case value =>
+              val Buf.Utf8(keyStr) = value.key
+              (keyStr, value)
+          }(breakOut)
+          val misses = util.NotFound(keys, hits.keySet)
+          GetResult(hits, misses)
+        case Error(e) => throw e
+        case other =>
+          throw new IllegalStateException(
+            "Invalid response type from get: %s".format(
+              other.getClass.getSimpleName)
+          )
+      }
+      .handle {
+        case t: RequestException =>
+          GetResult(failures = (keys.map { (_, t) }).toMap)
+        case t: ChannelException =>
+          GetResult(failures = (keys.map { (_, t) }).toMap)
+        case t: ServiceException =>
+          GetResult(failures = (keys.map { (_, t) }).toMap)
+      }
   }
 
   def getResult(keys: Iterable[String]): Future[GetResult] = {
@@ -876,7 +878,7 @@ private[finagle] object KetamaFailureAccrualFactory {
 
         case Param.Replaced(f) =>
           val param.Timer(timer) = _timer
-          f(timer) andThen next
+          f(timer).andThen(next)
 
         case Param.Disabled => next
       }
@@ -1026,7 +1028,7 @@ private[finagle] class KetamaPartitionedClient(
       }
     }
 
-  nodeHealthBroker.recv foreach {
+  nodeHealthBroker.recv.foreach {
     case NodeMarkedDead(key) => ejectNode(key)
     case NodeRevived(key) => reviveNode(key)
   }
@@ -1038,12 +1040,12 @@ private[finagle] class KetamaPartitionedClient(
 
   private[this] val liveNodeGauge = statsReceiver.addGauge("live_nodes") {
     synchronized {
-      nodes count { case (_, Node(_, state)) => state == NodeState.Live }
+      nodes.count { case (_, Node(_, state)) => state == NodeState.Live }
     }
   }
   private[this] val deadNodeGauge = statsReceiver.addGauge("dead_nodes") {
     synchronized {
-      nodes count { case (_, Node(_, state)) => state == NodeState.Ejected }
+      nodes.count { case (_, Node(_, state)) => state == NodeState.Ejected }
     }
   }
   private[this] val ejectionCount = statsReceiver.counter("ejections")
@@ -1082,7 +1084,7 @@ private[finagle] class KetamaPartitionedClient(
       ketamaNodeSnap = ketamaNodeGrp()
 
       // remove old nodes and release clients
-      nodes --= (old &~ ketamaNodeSnap) collect {
+      nodes --= ((old &~ ketamaNodeSnap)).collect {
         case (key, node) =>
           node.handle.release()
           nodeLeaveCount.incr()
@@ -1090,7 +1092,7 @@ private[finagle] class KetamaPartitionedClient(
       }
 
       // new joined node appears as Live state
-      nodes ++= (ketamaNodeSnap &~ old) collect {
+      nodes ++= ((ketamaNodeSnap &~ old)).collect {
         case (key, node) =>
           nodeJoinCount.incr()
           key -> Node(node, NodeState.Live)
@@ -1277,9 +1279,13 @@ case class KetamaClientBuilder private[memcached] (
     copy(_ejectFailedHost = eject)
 
   def build(): Client = {
-    val stackBasedClient = (_clientBuilder getOrElse ClientBuilder()
-      .hostConnectionLimit(1)
-      .daemon(true)).codec(text.Memcached()).underlying
+    val stackBasedClient = (_clientBuilder
+      .getOrElse(
+        ClientBuilder()
+          .hostConnectionLimit(1)
+          .daemon(true)))
+      .codec(text.Memcached())
+      .underlying
 
     val keyHasher = KeyHasher.byName(_hashName.getOrElse("ketama"))
 
@@ -1339,7 +1345,7 @@ class RubyMemCacheClient(clients: Seq[Client]) extends PartitionedClient {
   }
 
   def release() {
-    clients foreach { _.release() }
+    clients.foreach { _.release() }
   }
 }
 
@@ -1370,9 +1376,10 @@ case class RubyMemCacheClientBuilder(
 
   def build(): PartitionedClient = {
     val builder =
-      _clientBuilder getOrElse ClientBuilder()
-        .hostConnectionLimit(1)
-        .daemon(true)
+      _clientBuilder.getOrElse(
+        ClientBuilder()
+          .hostConnectionLimit(1)
+          .daemon(true))
     val clients = _nodes.map {
       case (hostname, port, weight) =>
         require(weight == 1, "Ruby memcache node weight must be 1")
@@ -1396,7 +1403,7 @@ class PHPMemCacheClient(clients: Array[Client], keyHasher: KeyHasher)
   }
 
   def release() {
-    clients foreach { _.release() }
+    clients.foreach { _.release() }
   }
 }
 
@@ -1426,16 +1433,23 @@ case class PHPMemCacheClientBuilder(
 
   def build(): PartitionedClient = {
     val builder =
-      _clientBuilder getOrElse ClientBuilder()
-        .hostConnectionLimit(1)
-        .daemon(true)
+      _clientBuilder.getOrElse(
+        ClientBuilder()
+          .hostConnectionLimit(1)
+          .daemon(true))
     val keyHasher = KeyHasher.byName(_hashName.getOrElse("crc32-itu"))
-    val clients = _nodes.map {
-      case (hostname, port, weight) =>
-        val client = Client(
-          builder.hosts(hostname + ":" + port).codec(text.Memcached()).build())
-        for (i <- (1 to weight)) yield client
-    }.flatten.toArray
+    val clients = _nodes
+      .map {
+        case (hostname, port, weight) =>
+          val client = Client(
+            builder
+              .hosts(hostname + ":" + port)
+              .codec(text.Memcached())
+              .build())
+          for (i <- (1 to weight)) yield client
+      }
+      .flatten
+      .toArray
     new PHPMemCacheClient(clients, keyHasher)
   }
 }

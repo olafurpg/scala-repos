@@ -67,7 +67,7 @@ private[akka] object MessageDispatcher {
   // since this is a compile-time constant, scalac will elide code behind if (MessageDispatcher.debug) (RK checked with 2.9.1)
   final val debug =
     false // Deliberately without type ascription to make it a compile-time constant
-  lazy val actors = new Index[MessageDispatcher, ActorRef](16, _ compareTo _)
+  lazy val actors = new Index[MessageDispatcher, ActorRef](16, _.compareTo(_))
   def printActors(): Unit =
     if (debug) {
       for {
@@ -415,31 +415,34 @@ class ThreadPoolExecutorConfigurator(config: Config,
     import akka.util.Helpers.ConfigOps
     val builder = ThreadPoolConfigBuilder(ThreadPoolConfig())
       .setKeepAliveTime(config.getMillisDuration("keep-alive-time"))
-      .setAllowCoreThreadTimeout(config getBoolean "allow-core-timeout")
-      .configure(Some(config getInt "task-queue-size") flatMap {
+      .setAllowCoreThreadTimeout(config.getBoolean("allow-core-timeout"))
+      .configure(Some(config.getInt("task-queue-size")).flatMap {
         case size if size > 0 ⇒
-          Some(config getString "task-queue-type") map {
-            case "array" ⇒
-              ThreadPoolConfig
-                .arrayBlockingQueue(size, false) //TODO config fairness?
-            case "" | "linked" ⇒ ThreadPoolConfig.linkedBlockingQueue(size)
-            case x ⇒
-              throw new IllegalArgumentException(
-                "[%s] is not a valid task-queue-type [array|linked]!" format x)
-          } map { qf ⇒ (q: ThreadPoolConfigBuilder) ⇒
-            q.setQueueFactory(qf)
-          }
+          Some(config getString "task-queue-type")
+            .map {
+              case "array" ⇒
+                ThreadPoolConfig
+                  .arrayBlockingQueue(size, false) //TODO config fairness?
+              case "" | "linked" ⇒ ThreadPoolConfig.linkedBlockingQueue(size)
+              case x ⇒
+                throw new IllegalArgumentException(
+                  "[%s] is not a valid task-queue-type [array|linked]!".format(
+                    x))
+            }
+            .map { qf ⇒ (q: ThreadPoolConfigBuilder) ⇒
+              q.setQueueFactory(qf)
+            }
         case _ ⇒ None
       })
 
     if (config.getString("fixed-pool-size") == "off")
       builder
-        .setCorePoolSizeFromFactor(config getInt "core-pool-size-min",
-                                   config getDouble "core-pool-size-factor",
-                                   config getInt "core-pool-size-max")
-        .setMaxPoolSizeFromFactor(config getInt "max-pool-size-min",
-                                  config getDouble "max-pool-size-factor",
-                                  config getInt "max-pool-size-max")
+        .setCorePoolSizeFromFactor(config.getInt("core-pool-size-min"),
+                                   config.getDouble("core-pool-size-factor"),
+                                   config.getInt("core-pool-size-max"))
+        .setMaxPoolSizeFromFactor(config.getInt("max-pool-size-min"),
+                                  config.getDouble("max-pool-size-factor"),
+                                  config.getInt("max-pool-size-max"))
     else builder.setFixedPoolSize(config.getInt("fixed-pool-size"))
   }
 

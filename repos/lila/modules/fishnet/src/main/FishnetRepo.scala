@@ -21,7 +21,7 @@ private final class FishnetRepo(analysisColl: Coll, clientColl: Coll) {
     _.filter(_.enabled)
   }
   def getOfflineClient: Fu[Client] =
-    getEnabledClient(Client.offline.key) getOrElse fuccess(Client.offline)
+    getEnabledClient(Client.offline.key).getOrElse(fuccess(Client.offline))
   def updateClient(client: Client): Funit =
     clientColl
       .update(selectClient(client.key), client, upsert = true)

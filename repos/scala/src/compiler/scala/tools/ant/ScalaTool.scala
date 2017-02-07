@@ -182,11 +182,12 @@ class ScalaTool extends ScalaMatchingTask {
   // XXX encoding and generalize
   private def getResourceAsCharStream(clazz: Class[_],
                                       resource: String): Stream[Char] = {
-    val stream = clazz.getClassLoader() getResourceAsStream resource
+    val stream = clazz.getClassLoader().getResourceAsStream(resource)
     if (stream == null) Stream.empty
     else
-      Stream continually stream.read() takeWhile (_ != -1) map
-        (_.asInstanceOf[Char])
+      (Stream continually stream.read())
+        .takeWhile(_ != -1)
+        .map(_.asInstanceOf[Char])
   }
 
   // Converts a variable like @SCALA_HOME@ to ${SCALA_HOME} when pre = "${" and post = "}"
@@ -240,7 +241,7 @@ class ScalaTool extends ScalaMatchingTask {
       buildError("File " + file + " is not writable")
     else {
       val writer = new FileWriter(file, false)
-      writer write content
+      writer.write(content)
       writer.close()
     }
 

@@ -142,7 +142,7 @@ object IListTest extends SpecLite {
   }
 
   "concat" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
-    (ns concat ms).toList must_=== ns.toList ++ ms.toList
+    (ns.concat(ms)).toList must_=== ns.toList ++ ms.toList
   }
 
   "collect" ! forAll { (ns: IList[Int]) =>
@@ -336,7 +336,7 @@ object IListTest extends SpecLite {
   }
 
   "reverse_:::" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
-    (ns reverse_::: ms).toList must_=== (ns.toList reverse_::: ms.toList)
+    (ns.reverse_:::(ms)).toList must_=== (ns.toList.reverse_:::(ms.toList))
   }
 
   "scanLeft" ! forAll { (ss: IList[String], f: (Int, String) => Int) =>

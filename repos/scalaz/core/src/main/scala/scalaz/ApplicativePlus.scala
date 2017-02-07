@@ -26,8 +26,8 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
 
   /** `empty` or a non-empty list of results acquired by repeating `a`. */
   def some[A](a: F[A]): F[List[A]] = {
-    lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
-    lazy val z: Free.Trampoline[F[List[A]]] = y map (apply2(a, _)(_ :: _))
+    lazy val y: Free.Trampoline[F[List[A]]] = z.map(plus(_, point(Nil)))
+    lazy val z: Free.Trampoline[F[List[A]]] = y.map(apply2(a, _)(_ :: _))
     z.run
   }
 
@@ -35,8 +35,8 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
     * initial failure is an empty list instead.
     */
   def many[A](a: F[A]): F[List[A]] = {
-    lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
-    lazy val z: Free.Trampoline[F[List[A]]] = y map (apply2(a, _)(_ :: _))
+    lazy val y: Free.Trampoline[F[List[A]]] = z.map(plus(_, point(Nil)))
+    lazy val z: Free.Trampoline[F[List[A]]] = y.map(apply2(a, _)(_ :: _))
     y.run
   }
 

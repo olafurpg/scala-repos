@@ -64,7 +64,7 @@ final case class GSet[A](elements: Set[A])
     else if (this.isAncestorOf(that)) that.clearAncestor()
     else {
       clearAncestor()
-      copy(elements union that.elements)
+      copy(elements.union(that.elements))
     }
 }
 

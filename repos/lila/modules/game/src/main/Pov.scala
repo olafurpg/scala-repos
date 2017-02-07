@@ -4,15 +4,15 @@ import chess.Color
 
 case class Pov(game: Game, color: Color) {
 
-  def player = game player color
+  def player = game.player(color)
 
   def playerId = player.id
 
-  def fullId = game fullIdOf color
+  def fullId = game.fullIdOf(color)
 
   def gameId = game.id
 
-  def opponent = game player !color
+  def opponent = game.player(!color)
 
   def isFirstPlayer = game.firstPlayer.color == color
 
@@ -30,11 +30,11 @@ case class Pov(game: Game, color: Color) {
       game.playableCorrespondenceClock.map(_.remainingTime(color).toInt)
     }
 
-  def hasMoved = game playerHasMoved color
+  def hasMoved = game.playerHasMoved(color)
 
-  def win = game wonBy color
+  def win = game.wonBy(color)
 
-  def loss = game lostBy color
+  def loss = game.lostBy(color)
 
   def forecastable = game.forecastable && game.turnColor != color
 
@@ -60,18 +60,18 @@ object Pov {
   def apply(game: Game, player: Player) = new Pov(game, player.color)
 
   def apply(game: Game, playerId: String): Option[Pov] =
-    game player playerId map { apply(game, _) }
+    game.player(playerId).map { apply(game, _) }
 
   def apply(game: Game, user: lila.user.User): Option[Pov] =
-    game player user map { apply(game, _) }
+    game.player(user).map { apply(game, _) }
 
   def ofUserId(game: Game, userId: String): Option[Pov] =
-    game playerByUserId userId map { apply(game, _) }
+    game.playerByUserId(userId).map { apply(game, _) }
 
   def opponentOfUserId(game: Game, userId: String): Option[Player] =
-    ofUserId(game, userId) map (_.opponent)
+    ofUserId(game, userId).map(_.opponent)
 
-  private def orInf(i: Option[Int]) = i getOrElse Int.MaxValue
+  private def orInf(i: Option[Int]) = i.getOrElse(Int.MaxValue)
   private def isFresher(a: Pov, b: Pov) = {
     val aDate = a.game.updatedAtOrCreatedAt.getSeconds
     val bDate = b.game.updatedAtOrCreatedAt.getSeconds
@@ -103,5 +103,5 @@ case class PlayerRef(gameId: String, playerId: String)
 object PlayerRef {
 
   def apply(fullId: String): PlayerRef =
-    PlayerRef(Game takeGameId fullId, Game takePlayerId fullId)
+    PlayerRef(Game.takeGameId(fullId), Game.takePlayerId(fullId))
 }

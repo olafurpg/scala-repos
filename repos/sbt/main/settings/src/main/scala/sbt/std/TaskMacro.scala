@@ -28,9 +28,9 @@ object TaskInstance extends MonadInstance {
   final type M[x] = Task[x]
   def app[K[L[x]], Z](in: K[Task], f: K[Id] => Z)(
       implicit a: AList[K]): Task[Z] =
-    Task(Info(), new Mapped[Z, K](in, f compose allM, a))
-  def map[S, T](in: Task[S], f: S => T): Task[T] = in map f
-  def flatten[T](in: Task[Task[T]]): Task[T] = in flatMap idFun[Task[T]]
+    Task(Info(), new Mapped[Z, K](in, f.compose(allM), a))
+  def map[S, T](in: Task[S], f: S => T): Task[T] = in.map(f)
+  def flatten[T](in: Task[Task[T]]): Task[T] = in.flatMap(idFun[Task[T]])
   def pure[T](t: () => T): Task[T] = toTask(t)
 }
 object ParserInstance extends Instance {
@@ -38,7 +38,7 @@ object ParserInstance extends Instance {
   private[this] implicit val parserApplicative: Applicative[M] =
     new Applicative[M] {
       def apply[S, T](f: M[S => T], v: M[S]): M[T] =
-        s => (f(s) ~ v(s)) map { case (a, b) => a(b) }
+        s => ((f(s) ~ v(s))).map { case (a, b) => a(b) }
       def pure[S](s: => S) = const(Parser.success(s))
       def map[S, T](f: S => T, v: M[S]) = s => v(s).map(f)
     }
@@ -46,7 +46,7 @@ object ParserInstance extends Instance {
   final type M[x] = State => Parser[x]
   def app[K[L[x]], Z](in: K[M], f: K[Id] => Z)(implicit a: AList[K]): M[Z] =
     a.apply(in, f)
-  def map[S, T](in: M[S], f: S => T): M[T] = s => in(s) map f
+  def map[S, T](in: M[S], f: S => T): M[T] = s => in(s).map(f)
   def pure[T](t: () => T): State => Parser[T] =
     const(DefaultParsers.success(t()))
 }
@@ -65,19 +65,19 @@ object FullInstance
   def flatten[T](
       in: Initialize[Task[Initialize[Task[T]]]]): Initialize[Task[T]] = {
     import Scoped._
-    (in, settingsData, Def.capturedTransformations) apply {
+    (in, settingsData, Def.capturedTransformations).apply {
       (a: Task[Initialize[Task[T]]], data: Task[SS], f) =>
         import TaskExtra.multT2Task
-        (a, data) flatMap { case (a, d) => f(a) evaluate d }
+        (a, data).flatMap { case (a, d) => f(a).evaluate(d) }
     }
   }
   def flattenFun[S, T](in: Initialize[Task[S => Initialize[Task[T]]]])
     : Initialize[S => Task[T]] = {
     import Scoped._
-    (in, settingsData, Def.capturedTransformations) apply {
+    (in, settingsData, Def.capturedTransformations).apply {
       (a: Task[S => Initialize[Task[T]]], data: Task[SS], f) => (s: S) =>
         import TaskExtra.multT2Task
-        (a, data) flatMap { case (af, d) => f(af(s)) evaluate d }
+        (a, data).flatMap { case (af, d) => f(af(s)).evaluate(d) }
     }
   }
 }
@@ -486,7 +486,7 @@ object TaskMacro {
             qual: Tree,
             selection: Tree): Converted[c.type] = {
       val tag = c.WeakTypeTag[T](tpe)
-      InitParserConvert(c)(name, qual)(tag) transform { tree =>
+      InitParserConvert(c)(name, qual)(tag).transform { tree =>
         subWrapper(tpe, tree, selection)
       }
     }

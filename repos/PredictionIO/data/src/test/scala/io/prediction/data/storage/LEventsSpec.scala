@@ -138,9 +138,9 @@ class LEventsSpec extends Specification with TestEvents {
 
     val resultAfter = eventClient.get(eventId, appId)
 
-    (resultBefore must beEqualTo(Some(expectedBefore))) and
-      (deleteStatus must beEqualTo(true)) and (resultAfter must beEqualTo(
-      None))
+    ((resultBefore must beEqualTo(Some(expectedBefore))))
+      .and(deleteStatus must beEqualTo(true))
+      .and(resultAfter must beEqualTo(None))
   }
 
   def insertTestUserEvents(eventClient: LEvents) = {
@@ -226,9 +226,9 @@ class LEventsSpec extends Specification with TestEvents {
 
     val resultAfter = eventClient.get(eventId, appId, Some(channelId))
 
-    (resultBefore must beEqualTo(Some(expectedBefore))) and
-      (deleteStatus must beEqualTo(true)) and (resultAfter must beEqualTo(
-      None))
+    ((resultBefore must beEqualTo(Some(expectedBefore))))
+      .and(deleteStatus must beEqualTo(true))
+      .and(resultAfter must beEqualTo(None))
   }
 
   def findChannel(eventClient: LEvents) = {

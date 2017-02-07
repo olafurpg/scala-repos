@@ -105,21 +105,21 @@ private[csv] object CSVInferSchema {
   }
 
   private def tryParseInteger(field: String): DataType =
-    if ((allCatch opt field.toInt).isDefined) {
+    if ((allCatch.opt(field.toInt)).isDefined) {
       IntegerType
     } else {
       tryParseLong(field)
     }
 
   private def tryParseLong(field: String): DataType =
-    if ((allCatch opt field.toLong).isDefined) {
+    if ((allCatch.opt(field.toLong)).isDefined) {
       LongType
     } else {
       tryParseDouble(field)
     }
 
   private def tryParseDouble(field: String): DataType = {
-    if ((allCatch opt field.toDouble).isDefined) {
+    if ((allCatch.opt(field.toDouble)).isDefined) {
       DoubleType
     } else {
       tryParseTimestamp(field)
@@ -127,7 +127,7 @@ private[csv] object CSVInferSchema {
   }
 
   def tryParseTimestamp(field: String): DataType = {
-    if ((allCatch opt DateTimeUtils.stringToTime(field)).isDefined) {
+    if ((allCatch.opt(DateTimeUtils.stringToTime(field))).isDefined) {
       TimestampType
     } else {
       tryParseBoolean(field)
@@ -135,7 +135,7 @@ private[csv] object CSVInferSchema {
   }
 
   def tryParseBoolean(field: String): DataType = {
-    if ((allCatch opt field.toBoolean).isDefined) {
+    if ((allCatch.opt(field.toBoolean)).isDefined) {
       BooleanType
     } else {
       stringType()

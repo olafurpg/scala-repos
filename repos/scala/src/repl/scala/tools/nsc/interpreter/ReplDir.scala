@@ -42,7 +42,7 @@ class ReplOutput(val dirSetting: MutableSettings#StringSetting) {
       val spaces = "    " * indentLevel
       out.println(spaces + label)
       if (root.isDirectory)
-        root.toList sortBy (_.name) foreach (x => pp(x, indentLevel + 1))
+        root.toList.sortBy(_.name).foreach(x => pp(x, indentLevel + 1))
     }
     pp(dir, 0)
   }

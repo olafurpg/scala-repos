@@ -178,7 +178,7 @@ class SizedOps[A0, Repr: AdditiveCollection, L <: Nat](
     */
   def map[B, That](f: A0 => B)(implicit cbf: CanBuildFrom[Repr, B, That],
                                ev: AdditiveCollection[That]) =
-    wrap[That, L](s.unsized map f)
+    wrap[That, L](s.unsized.map(f))
 
   /**
     * Converts this `Sized` to an `HList` whose elements have the same type as in `Repr`.

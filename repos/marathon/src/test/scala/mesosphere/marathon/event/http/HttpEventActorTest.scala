@@ -121,11 +121,11 @@ class HttpEventActorTest
                     """akka.loggers = ["akka.testkit.TestEventListener"]"""))
     clock = ConstantClock()
     conf = mock[HttpEventConfiguration]
-    conf.slowConsumerTimeout returns 10.seconds
+    conf.slowConsumerTimeout.returns(10.seconds)
     statusCode = mock[StatusCode]
-    statusCode.isSuccess returns true
+    statusCode.isSuccess.returns(true)
     response = mock[HttpResponse]
-    response.status returns statusCode
+    response.status.returns(statusCode)
     responseAction = () => response
   }
 

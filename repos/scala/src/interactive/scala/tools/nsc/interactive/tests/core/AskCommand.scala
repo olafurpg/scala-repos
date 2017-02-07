@@ -46,7 +46,7 @@ trait AskParse extends AskCommand {
     *  the source's AST is not yet loaded).
     */
   def askParse(sources: Seq[SourceFile]) {
-    val responses = sources map (askParse(_))
+    val responses = sources.map(askParse(_))
     responses.foreach(_.get) // force source files parsing
   }
 
@@ -64,7 +64,7 @@ trait AskReload extends AskCommand {
   /** Reload the given source files and wait for them to be reloaded. */
   protected def askReload(sources: Seq[SourceFile])(
       implicit reporter: Reporter): Response[Unit] = {
-    val sortedSources = (sources map (_.file.name)).sorted
+    val sortedSources = (sources.map(_.file.name)).sorted
     reporter.println("reload: " + sortedSources.mkString(", "))
 
     ask {

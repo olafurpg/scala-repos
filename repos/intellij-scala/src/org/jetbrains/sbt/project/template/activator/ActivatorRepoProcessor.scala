@@ -51,14 +51,16 @@ object ActivatorRepoProcessor {
     val DESCRIPTION = new Key("description")
 
     def from(doc: Document) =
-      (NAME getValue doc,
-       DocData(TEMPLATE_ID getValue doc,
-               TITLE getValue doc,
-               AUTHOR_NAME getValue doc,
-               SOURCE_LINK getValue doc,
-               CATEGORY getValue doc,
-               DESCRIPTION getValue doc,
-               TAGS getValue doc))
+      (NAME.getValue(doc),
+       DocData(
+         TEMPLATE_ID.getValue(doc),
+         TITLE.getValue(doc),
+         AUTHOR_NAME.getValue(doc),
+         SOURCE_LINK.getValue(doc),
+         CATEGORY.getValue(doc),
+         DESCRIPTION.getValue(doc),
+         TAGS.getValue(doc)
+       ))
   }
 
   def downloadStringFromRepo(url: String): Option[String] = {

@@ -177,14 +177,14 @@ object Flaggable {
     assert(!flag.default.isDefined)
     override def parse(v: String): Set[T] =
       v.split(",").map(flag.parse(_)).toSet
-    override def show(set: Set[T]) = set map flag.show mkString ","
+    override def show(set: Set[T]) = set.map(flag.show) mkString ","
   }
 
   private[app] class SeqFlaggable[T: Flaggable] extends Flaggable[Seq[T]] {
     private val flag = implicitly[Flaggable[T]]
     assert(!flag.default.isDefined)
-    def parse(v: String): Seq[T] = v.split(",") map flag.parse
-    override def show(seq: Seq[T]) = seq map flag.show mkString ","
+    def parse(v: String): Seq[T] = v.split(",").map(flag.parse)
+    override def show(seq: Seq[T]) = seq.map(flag.show) mkString ","
   }
 
   private[app] class MapFlaggable[K: Flaggable, V: Flaggable]
@@ -213,7 +213,7 @@ object Flaggable {
     }
 
     override def show(out: Map[K, V]) = {
-      out.toSeq map { case (k, v) => k.toString + "=" + v.toString } mkString
+      out.toSeq.map { case (k, v) => k.toString + "=" + v.toString } mkString
         (",")
     }
   }
@@ -430,7 +430,7 @@ class Flag[T: Flaggable] private[app] (val name: String,
   /** String representation of this flag's default value */
   def defaultString(): String = {
     try {
-      flaggable.show(default getOrElse { throw flagNotFound })
+      flaggable.show(default.getOrElse { throw flagNotFound })
     } catch {
       case e: Throwable =>
         log.log(Level.SEVERE, s"Flag $name default cannot be read", e)
@@ -559,7 +559,7 @@ class Flags(argv0: String,
   private[this] val helpFlag = this("help", false, "Show this help")
 
   def reset() = synchronized {
-    flags foreach { case (_, f) => f.reset() }
+    flags.foreach { case (_, f) => f.reset() }
   }
 
   private[app] def finishParsing(): Unit = {
@@ -570,7 +570,7 @@ class Flags(argv0: String,
     if (includeGlobal) GlobalFlag.get(f) else None
 
   private[this] def resolveFlag(f: String): Option[Flag[_]] =
-    synchronized { flags.get(f) orElse resolveGlobalFlag(f) }
+    synchronized { flags.get(f).orElse(resolveGlobalFlag(f)) }
 
   private[this] def hasFlag(f: String) = resolveFlag(f).isDefined
   private[this] def flag(f: String) = resolveFlag(f).get
@@ -598,8 +598,8 @@ class Flags(argv0: String,
       if (a == "--") {
         remaining ++= args.slice(i, args.size)
         i = args.size
-      } else if (a startsWith "-") {
-        a drop 1 split ("=", 2) match {
+      } else if (a.startsWith("-")) {
+        a.drop(1).split("=", 2) match {
           // There seems to be a bug Scala's pattern matching
           // optimizer that leaves `v' dangling in the last case if
           // we make this a wildcard (Array(k, _@_*))
@@ -913,7 +913,7 @@ class GlobalFlag[T] private[app] (
 
   override protected[this] def parsingDone: Boolean = true
   private[this] lazy val propertyValue =
-    Option(System.getProperty(name)) flatMap { p =>
+    Option(System.getProperty(name)).flatMap { p =>
       try Some(flaggable.parse(p))
       catch {
         case NonFatal(exc) =>
@@ -976,7 +976,7 @@ private object GlobalFlag {
     // Search for Scala objects annotated with GlobalFlagVisible:
     // Since Scala object classnames end with $, filter by name first
     // before attempting to load the class.
-    for (info <- ClassPath.browse(loader) if (info.name endsWith "$")) try {
+    for (info <- ClassPath.browse(loader) if (info.name.endsWith("$"))) try {
       val cls = info.load()
       if (cls.isAnnotationPresent(markerClass)) {
         get(info.name.dropRight(1)) match {

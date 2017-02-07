@@ -75,7 +75,7 @@ private[akka] class ActorRefBackpressureSinkStage[In](
         in,
         new InHandler {
           override def onPush(): Unit = {
-            buffer offer grab(in)
+            buffer.offer(grab(in))
             if (acknowledgementReceived) {
               dequeueAndSend()
               acknowledgementReceived = false

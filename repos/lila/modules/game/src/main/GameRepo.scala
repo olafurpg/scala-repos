@@ -30,36 +30,36 @@ object GameRepo {
   def games(gameIds: Seq[ID]): Fu[List[Game]] = $find byOrderedIds gameIds
 
   def gameOptions(gameIds: Seq[ID]): Fu[Seq[Option[Game]]] =
-    $find optionsByOrderedIds gameIds
+    $find.optionsByOrderedIds(gameIds)
 
   def finished(gameId: ID): Fu[Option[Game]] =
     $find.one($select(gameId) ++ Query.finished)
 
   def player(gameId: ID, color: Color): Fu[Option[Player]] =
-    $find byId gameId map2 { (game: Game) =>
-      game player color
+    ($find byId gameId).map2 { (game: Game) =>
+      game.player(color)
     }
 
   def player(gameId: ID, playerId: ID): Fu[Option[Player]] =
-    $find byId gameId map { gameOption =>
-      gameOption flatMap { _ player playerId }
+    ($find byId gameId).map { gameOption =>
+      gameOption.flatMap { _.player(playerId) }
     }
 
   def player(playerRef: PlayerRef): Fu[Option[Player]] =
     player(playerRef.gameId, playerRef.playerId)
 
   def pov(gameId: ID, color: Color): Fu[Option[Pov]] =
-    $find byId gameId map2 { (game: Game) =>
-      Pov(game, game player color)
+    ($find byId gameId).map2 { (game: Game) =>
+      Pov(game, game.player(color))
     }
 
   def pov(gameId: ID, color: String): Fu[Option[Pov]] =
     Color(color) ?? (pov(gameId, _))
 
   def pov(playerRef: PlayerRef): Fu[Option[Pov]] =
-    $find byId playerRef.gameId map { gameOption =>
-      gameOption flatMap { game =>
-        game player playerRef.playerId map { Pov(game, _) }
+    ($find byId playerRef.gameId).map { gameOption =>
+      gameOption.flatMap { game =>
+        game.player(playerRef.playerId).map { Pov(game, _) }
       }
     }
 
@@ -70,23 +70,23 @@ object GameRepo {
   def remove(id: ID) = $remove($select(id))
 
   def recentByUser(userId: String): Fu[List[Game]] = $find(
-    $query(Query user userId) sort Query.sortCreated
+    $query(Query.user(userId)).sort(Query.sortCreated)
   )
 
   def userPovsByGameIds(gameIds: List[String], user: User): Fu[List[Pov]] =
-    $find.byOrderedIds(gameIds) map { _.flatMap(g => Pov(g, user)) }
+    $find.byOrderedIds(gameIds).map { _.flatMap(g => Pov(g, user)) }
 
   def recentPovsByUser(user: User, nb: Int): Fu[List[Pov]] =
     $find(
-      $query(Query user user) sort Query.sortCreated,
+      $query(Query.user(user)).sort(Query.sortCreated),
       nb
-    ) map { _.flatMap(g => Pov(g, user)) }
+    ).map { _.flatMap(g => Pov(g, user)) }
 
   def gamesForAssessment(userId: String, nb: Int): Fu[List[Game]] = $find(
     $query(
       Query.finished ++ Query.rated ++ Query.user(userId) ++ Query.analysed(
-        true) ++ Query.turnsMoreThan(20) ++ Query.clock(true)) sort
-      ($sort asc F.createdAt),
+        true) ++ Query.turnsMoreThan(20) ++ Query.clock(true))
+      .sort($sort.asc(F.createdAt)),
     nb
   )
 
@@ -154,30 +154,31 @@ object GameRepo {
     )
 
   def urgentGames(user: User): Fu[List[Pov]] =
-    $find(Query nowPlaying user.id, 100) map { games =>
-      val povs = games flatMap { Pov(_, user) }
+    $find(Query nowPlaying user.id, 100).map { games =>
+      val povs = games.flatMap { Pov(_, user) }
       try {
-        povs sortWith Pov.priority
+        povs.sortWith(Pov.priority)
       } catch {
         case e: IllegalArgumentException =>
-          povs sortBy (-_.game.updatedAtOrCreatedAt.getSeconds)
+          povs.sortBy(-_.game.updatedAtOrCreatedAt.getSeconds)
       }
     }
 
   // gets most urgent game to play
   def mostUrgentGame(user: User): Fu[Option[Pov]] =
-    urgentGames(user) map (_.headOption)
+    urgentGames(user).map(_.headOption)
 
   // gets last recently played move game in progress
   def lastPlayedPlaying(user: User): Fu[Option[Pov]] =
     $find.one(
-      $query(Query recentlyPlaying user.id) sort Query.sortUpdatedNoIndex) map {
-      _ flatMap { Pov(_, user) }
-    }
+      $query(Query recentlyPlaying user.id).sort(Query.sortUpdatedNoIndex))
+      .map {
+        _.flatMap { Pov(_, user) }
+      }
 
   def lastPlayed(user: User): Fu[Option[Pov]] =
-    $find($query(Query user user.id) sort ($sort desc F.createdAt), 20) map {
-      _.sortBy(_.updatedAt).lastOption flatMap { Pov(_, user) }
+    $find($query(Query.user(user.id)).sort($sort.desc(F.createdAt)), 20).map {
+      _.sortBy(_.updatedAt).lastOption.flatMap { Pov(_, user) }
     }
 
   def lastFinishedRatedNotFromPosition(user: User): Fu[Option[Game]] =
@@ -185,7 +186,7 @@ object GameRepo {
       $query {
         Query.user(user.id) ++ Query.rated ++ Query.finished ++ Query
           .turnsMoreThan(2) ++ Query.notFromPosition
-      } sort Query.sortAntiChronological
+      }.sort(Query.sortAntiChronological)
     }
 
   def setTv(id: ID) {
@@ -193,7 +194,7 @@ object GameRepo {
   }
 
   def onTv(nb: Int): Fu[List[Game]] =
-    $find($query(Json.obj(F.tvAt -> $exists(true))) sort $sort.desc(F.tvAt),
+    $find($query(Json.obj(F.tvAt -> $exists(true))).sort($sort.desc(F.tvAt)),
           nb)
 
   def setAnalysed(id: ID) {
@@ -207,11 +208,13 @@ object GameRepo {
     $count.exists($select(id) ++ Query.analysed(true))
 
   def filterAnalysed(ids: Seq[String]): Fu[Set[String]] =
-    gameTube.coll.distinct("_id",
-                           BSONDocument(
-                             "_id" -> BSONDocument("$in" -> ids),
-                             F.analysed -> true
-                           ).some) map lila.db.BSON.asStringSet
+    gameTube.coll
+      .distinct("_id",
+                BSONDocument(
+                  "_id" -> BSONDocument("$in" -> ids),
+                  F.analysed -> true
+                ).some)
+      .map(lila.db.BSON.asStringSet)
 
   def exists(id: String) =
     gameTube.coll.count(BSONDocument("_id" -> id).some).map(0 <)
@@ -266,7 +269,7 @@ object GameRepo {
   def findRandomStandardCheckmate(distribution: Int): Fu[Option[Game]] =
     $find.one(
       Query.mate ++ Json.obj("v" -> $exists(false)),
-      _ sort Query.sortCreated skip (Random nextInt distribution)
+      _.sort(Query.sortCreated).skip(Random nextInt distribution)
     )
 
   def insertDenormalized(g: Game, ratedCheck: Boolean = true): Funit = {
@@ -279,13 +282,13 @@ object GameRepo {
       .option(Forsyth >> g2.toChess)
       .filter(Forsyth.initial !=)
     val bson =
-      (gameTube.handler write g2) ++ BSONDocument(
+      (gameTube.handler.write(g2)) ++ BSONDocument(
         F.initialFen -> fen,
         F.checkAt -> (!g2.isPgnImport)
-          .option(DateTime.now plusHours g2.hasClock.fold(1, 10 * 24)),
+          .option(DateTime.now.plusHours(g2.hasClock.fold(1, 10 * 24))),
         F.playingUids -> (g2.started && userIds.nonEmpty).option(userIds)
       )
-    $insert bson bson
+    $insert.bson(bson)
   } >>- {
     lila.mon.game.create.variant(g.variant.key)()
     lila.mon.game.create.source(g.source.fold("unknown")(_.name))()
@@ -330,7 +333,7 @@ object GameRepo {
 
   def initialFen(game: Game): Fu[Option[String]] =
     if (game.imported || !game.variant.standardInitialPosition)
-      initialFen(game.id) map {
+      initialFen(game.id).map {
         case None if game.variant == chess.variant.Chess960 =>
           Forsyth.initial.some
         case fen => fen
@@ -350,9 +353,9 @@ object GameRepo {
   def count(query: Query.type => JsObject): Fu[Int] = $count(query(Query))
 
   def nbPerDay(days: Int): Fu[List[Int]] =
-    ((days to 1 by -1).toList map { day =>
+    ((days to 1 by -1).toList.map { day =>
       val from = DateTime.now.withTimeAtStartOfDay minusDays day
-      val to = from plusDays 1
+      val to = from.plusDays(1)
       $count(Json.obj(F.createdAt -> ($gte($date(from)) ++ $lt($date(to)))))
     }).sequenceFu
 
@@ -376,17 +379,17 @@ object GameRepo {
         )
       )
       .map(_.documents.flatMap { obj =>
-        obj.getAs[String]("_id") flatMap { id =>
-          obj.getAs[Int]("gs") map { id -> _ }
+        obj.getAs[String]("_id").flatMap { id =>
+          obj.getAs[Int]("gs").map { id -> _ }
         }
       })
   }
 
   def random: Fu[Option[Game]] =
-    $find.one($query.all sort Query.sortCreated skip (Random nextInt 1000))
+    $find.one($query.all.sort(Query.sortCreated).skip(Random nextInt 1000))
 
   def random(nb: Int): Fu[List[Game]] =
-    $find($query.all sort Query.sortCreated skip (Random nextInt 1000), nb)
+    $find($query.all.sort(Query.sortCreated).skip(Random nextInt 1000), nb)
 
   def findMirror(game: Game): Fu[Option[Game]] =
     $find.one(
@@ -414,10 +417,10 @@ object GameRepo {
       )
       .one[Game]
 
-  def getPgn(id: ID): Fu[PgnMoves] = getOptionPgn(id) map (~_)
+  def getPgn(id: ID): Fu[PgnMoves] = getOptionPgn(id).map(~_)
 
   def getNonEmptyPgn(id: ID): Fu[Option[PgnMoves]] =
-    getOptionPgn(id) map (_ filter (_.nonEmpty))
+    getOptionPgn(id).map(_.filter(_.nonEmpty))
 
   def getOptionPgn(id: ID): Fu[Option[PgnMoves]] =
     gameTube.coll
@@ -428,7 +431,8 @@ object GameRepo {
           F.binaryPgn -> true
         )
       )
-      .one[BSONDocument] map { _ flatMap extractPgnMoves }
+      .one[BSONDocument]
+      .map { _.flatMap(extractPgnMoves) }
 
   def lastGameBetween(u1: String,
                       u2: String,
@@ -449,9 +453,10 @@ object GameRepo {
           F.playerUids -> true
         )
       )
-      .one[BSONDocument] map {
-      ~_.flatMap(_.getAs[List[String]](F.playerUids))
-    }
+      .one[BSONDocument]
+      .map {
+        ~_.flatMap(_.getAs[List[String]](F.playerUids))
+      }
 
   // #TODO this breaks it all since reactivemongo > 0.11.9
   def activePlayersSinceNOPENOPENOPE(since: DateTime,
@@ -487,14 +492,14 @@ object GameRepo {
         )
       )
       .map(_.documents.flatMap { obj =>
-        obj.getAs[Int]("nb") map { nb =>
+        obj.getAs[Int]("nb").map { nb =>
           UidNb(~obj.getAs[String]("_id"), nb)
         }
       })
   }
 
   private def extractPgnMoves(doc: BSONDocument) =
-    doc.getAs[BSONBinary](F.binaryPgn) map { bin =>
-      BinaryFormat.pgn read { ByteArray.ByteArrayBSONHandler read bin }
+    doc.getAs[BSONBinary](F.binaryPgn).map { bin =>
+      BinaryFormat.pgn.read { ByteArray.ByteArrayBSONHandler.read(bin) }
     }
 }

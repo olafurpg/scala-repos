@@ -28,14 +28,14 @@ object Test {
 
     def showsCovariance = (elements == containers)
     def showsContravariance = (elements == containers.reverse)
-    def showsInvariance = containers forall (_ == isSame)
+    def showsInvariance = containers.forall(_ == isSame)
 
     def allContainerVariances =
       List(showsCovariance, showsInvariance, showsContravariance)
 
     def showsExpectedVariance =
-      if (isUnrelated) allContainerVariances forall (_ == false)
-      else if (isSame) allContainerVariances forall (_ == true)
+      if (isUnrelated) allContainerVariances.forall(_ == false)
+      else if (isSame) allContainerVariances.forall(_ == true)
       else
         expected match {
           case CO =>
@@ -78,14 +78,14 @@ object Test {
       typeOf[T] <:< typeOf[Any],
       typeOf[T] <:< typeOf[AnyRef],
       !(typeOf[T] <:< typeOf[AnyVal])
-    ) foreach (assert(_, "assertAnyRef"))
+    ).foreach(assert(_, "assertAnyRef"))
 
   def assertAnyVal[T: TypeTag] =
     List(
       typeOf[T] <:< typeOf[Any],
       !(typeOf[T] <:< typeOf[AnyRef]),
       typeOf[T] <:< typeOf[AnyVal]
-    ) foreach (assert(_, "assertAnyVal"))
+    ).foreach(assert(_, "assertAnyVal"))
 
   def assertSameType[T: TypeTag, U: TypeTag] =
     assert(typeCompare[T, U] == SAME, "assertSameType")

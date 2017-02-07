@@ -63,14 +63,14 @@ class MetricsGossipSpec
       val beforeMergeNodes = g1.nodes
 
       val m2Updated =
-        m2 copy
-          (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
+        m2.copy(metrics = newSample(m2.metrics),
+                timestamp = m2.timestamp + 1000)
       val g2 = g1 :+ m2Updated // merge peers
       g2.nodes.size should ===(2)
       g2.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(
         Some(m2Updated.metrics))
-      g2.nodes collect {
+      g2.nodes.collect {
         case peer if peer.address == m2.address ⇒
           peer.timestamp should ===(m2Updated.timestamp)
       }
@@ -87,8 +87,8 @@ class MetricsGossipSpec
                            newTimestamp,
                            collector.sample.metrics)
       val m2Updated =
-        m2 copy
-          (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
+        m2.copy(metrics = newSample(m2.metrics),
+                timestamp = m2.timestamp + 1000)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       val g2 = MetricsGossip.empty :+ m3 :+ m2Updated
@@ -96,7 +96,7 @@ class MetricsGossipSpec
       g1.nodes.map(_.address) should ===(Set(m1.address, m2.address))
 
       // should contain nodes 1,3, and the most recent version of 2
-      val mergedGossip = g1 merge g2
+      val mergedGossip = g1.merge(g2)
       mergedGossip.nodes.map(_.address) should ===(
         Set(m1.address, m2.address, m3.address))
       mergedGossip.nodeMetricsFor(m1.address).map(_.metrics) should ===(
@@ -128,7 +128,7 @@ class MetricsGossipSpec
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
-      val g2 = g1 remove m1.address
+      val g2 = g1.remove(m1.address)
       g2.nodes.size should ===(1)
       g2.nodes.exists(_.address == m1.address) should ===(false)
       g2.nodeMetricsFor(m1.address) should ===(None)
@@ -145,7 +145,7 @@ class MetricsGossipSpec
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
-      val g2 = g1 filter Set(m2.address)
+      val g2 = g1.filter(Set(m2.address))
       g2.nodes.size should ===(1)
       g2.nodes.exists(_.address == m1.address) should ===(false)
       g2.nodeMetricsFor(m1.address) should ===(None)

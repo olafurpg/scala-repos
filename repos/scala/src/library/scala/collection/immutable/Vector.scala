@@ -685,7 +685,7 @@ class VectorIterator[+A](_startIndex: Int, endIndex: Int)
   private var _hasNext = blockIndex + lo < endIndex
 
   def next(): A = {
-    if (! _hasNext) throw new NoSuchElementException("reached iterator end")
+    if (!_hasNext) throw new NoSuchElementException("reached iterator end")
 
     val res = display0(lo).asInstanceOf[A]
     lo += 1
@@ -707,7 +707,7 @@ class VectorIterator[+A](_startIndex: Int, endIndex: Int)
   }
 
   private[collection] def remainingElementCount: Int =
-    (endIndex - (blockIndex + lo)) max 0
+    ((endIndex - (blockIndex + lo))).max(0)
 
   /** Creates a new vector which consists of elements remaining in this iterator.
     *  Such a vector can then be split into several vectors using methods like `take` and `drop`.

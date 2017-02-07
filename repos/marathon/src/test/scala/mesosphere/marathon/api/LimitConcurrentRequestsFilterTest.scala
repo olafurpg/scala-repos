@@ -23,7 +23,7 @@ class LimitConcurrentRequestsFilterTest
     val request = mock[HttpServletRequest]
     val response = mock[HttpServletResponse]
     val chain = mock[FilterChain]
-    chain.doFilter(request, response) answers { args =>
+    chain.doFilter(request, response).answers { args =>
       latch.countDown()
     }
     val rf = new LimitConcurrentRequestsFilter(Some(2))
@@ -44,7 +44,7 @@ class LimitConcurrentRequestsFilterTest
     val request = mock[HttpServletRequest]
     val response = mock[HttpServletResponse]
     val chain = mock[FilterChain]
-    chain.doFilter(request, response) answers { args =>
+    chain.doFilter(request, response).answers { args =>
       latch.countDown(); semaphore.acquire() /* blocks*/
     }
     val rf = new LimitConcurrentRequestsFilter(Some(1))
@@ -67,7 +67,7 @@ class LimitConcurrentRequestsFilterTest
     val request = mock[HttpServletRequest]
     val response = mock[HttpServletResponse]
     val chain = mock[FilterChain]
-    chain.doFilter(request, response) answers { args =>
+    chain.doFilter(request, response).answers { args =>
       latch.countDown()
     }
     val rf = new LimitConcurrentRequestsFilter(None)

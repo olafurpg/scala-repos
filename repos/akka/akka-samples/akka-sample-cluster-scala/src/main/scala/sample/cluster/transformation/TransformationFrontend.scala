@@ -24,10 +24,10 @@ class TransformationFrontend extends Actor {
 
     case job: TransformationJob =>
       jobCounter += 1
-      backends(jobCounter % backends.size) forward job
+      backends(jobCounter % backends.size).forward(job)
 
     case BackendRegistration if !backends.contains(sender()) =>
-      context watch sender()
+      context.watch(sender())
       backends = backends :+ sender()
 
     case Terminated(a) =>
@@ -54,9 +54,10 @@ object TransformationFrontend {
     import system.dispatcher
     system.scheduler.schedule(2.seconds, 2.seconds) {
       implicit val timeout = Timeout(5 seconds)
-      (frontend ? TransformationJob("hello-" + counter.incrementAndGet())) onSuccess {
-        case result => println(result)
-      }
+      ((frontend ? TransformationJob("hello-" + counter.incrementAndGet())))
+        .onSuccess {
+          case result => println(result)
+        }
     }
   }
 }

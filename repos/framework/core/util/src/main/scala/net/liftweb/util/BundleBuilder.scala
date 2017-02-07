@@ -68,7 +68,8 @@ object BundleBuilder {
                   e.attribute("country").map(_.text),
                   e.attribute("default")
                     .map(_.text)
-                    .flatMap(Helpers.asBoolean) getOrElse false
+                    .flatMap(Helpers.asBoolean)
+                    .getOrElse(false)
                 ) ->
                   (e.child: NodeSeq))
           }

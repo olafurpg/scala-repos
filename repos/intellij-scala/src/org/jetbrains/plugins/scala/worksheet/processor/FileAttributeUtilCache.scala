@@ -18,8 +18,8 @@ object FileAttributeUtilCache {
   def readAttribute(attribute: FileAttribute, file: PsiFile): Option[String] = {
     file.getVirtualFile match {
       case normalFile: VirtualFileWithId =>
-        Option(attribute readAttributeBytes normalFile) map (new String(_))
-      case other => lightKeys get other flatMap (map => map get attribute)
+        Option(attribute.readAttributeBytes(normalFile)).map(new String(_))
+      case other => lightKeys.get(other).flatMap(map => map.get(attribute))
     }
   }
 
@@ -28,7 +28,7 @@ object FileAttributeUtilCache {
       case normalFile: VirtualFileWithId =>
         attribute.writeAttributeBytes(normalFile, data.getBytes)
       case other =>
-        lightKeys get other match {
+        lightKeys.get(other) match {
           case Some(e) => e.put(attribute, data)
           case _ => lightKeys.put(other, mutable.HashMap(attribute -> data))
         }

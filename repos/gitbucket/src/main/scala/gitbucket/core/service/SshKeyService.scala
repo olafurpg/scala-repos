@@ -17,5 +17,5 @@ trait SshKeyService {
 
   def deletePublicKey(userName: String, sshKeyId: Int)(
       implicit s: Session): Unit =
-    SshKeys filter (_.byPrimaryKey(userName, sshKeyId)) delete
+    SshKeys.filter(_.byPrimaryKey(userName, sshKeyId)) delete
 }

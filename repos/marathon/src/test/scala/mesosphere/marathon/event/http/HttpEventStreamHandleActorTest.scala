@@ -30,7 +30,7 @@ class HttpEventStreamHandleActorTest
     "A message send to the handle actor will be transferred to the stream handle") {
     Given("A handler that will postpone sending until latch is hit")
     val latch = new CountDownLatch(1)
-    handle.sendEvent(any[String], any[String]) answers (_ => latch.countDown())
+    handle.sendEvent(any[String], any[String]).answers(_ => latch.countDown())
 
     When("The event is send to the actor, the outstanding messages is 1")
     handleActor ! EventStreamAttached("remote")
@@ -44,7 +44,7 @@ class HttpEventStreamHandleActorTest
     "If the consumer is slow and maxOutstanding limit is reached, messages get dropped") {
     Given("A handler that will postpone the sending")
     val latch = new CountDownLatch(1)
-    handle.sendEvent(any[String], any[String]) answers (_ => latch.await())
+    handle.sendEvent(any[String], any[String]).answers(_ => latch.await())
     val filter = EventFilter(pattern = "Ignore event.*", occurrences = 1)
 
     When("More than the max size of outstanding events is send to the actor")
@@ -59,7 +59,7 @@ class HttpEventStreamHandleActorTest
 
   test("If the handler throws an EOF exception, the actor stops acting") {
     Given("A handler that will postpone the sending")
-    handle.sendEvent(any[String], any[String]) answers { _ =>
+    handle.sendEvent(any[String], any[String]).answers { _ =>
       throw new EOFException()
     }
     val filter = EventFilter(pattern = "Received EOF.*", occurrences = 1)
@@ -75,7 +75,7 @@ class HttpEventStreamHandleActorTest
     Given("A handler that will postpone the sending")
     val latch = new CountDownLatch(1)
     var events = List.empty[String]
-    handle.sendEvent(any[String], any[String]) answers { args =>
+    handle.sendEvent(any[String], any[String]).answers { args =>
       events ::= args(0).asInstanceOf[String]; latch.await()
     }
     handleActor = TestActorRef(

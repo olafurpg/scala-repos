@@ -36,7 +36,7 @@ abstract class PlanTest extends SparkFunSuite with PredicateHelper {
     * we must normalize them to check if two different queries are identical.
     */
   protected def normalizeExprIds(plan: LogicalPlan) = {
-    plan transformAllExpressions {
+    plan.transformAllExpressions {
       case a: AttributeReference =>
         AttributeReference(a.name, a.dataType, a.nullable)(exprId = ExprId(0))
       case a: Alias =>
@@ -50,7 +50,7 @@ abstract class PlanTest extends SparkFunSuite with PredicateHelper {
     * etc., will all now be equivalent.
     */
   private def normalizeFilters(plan: LogicalPlan) = {
-    plan transform {
+    plan.transform {
       case filter @ Filter(condition: Expression, child: LogicalPlan) =>
         Filter(splitConjunctivePredicates(condition)
                  .sortBy(_.hashCode())

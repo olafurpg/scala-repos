@@ -94,9 +94,9 @@ object Memo extends MemoInstances {
 
     memo[K, V](f =>
       k => {
-        a get k getOrElse {
+        a.get(k).getOrElse {
           val v = f(k)
-          a = a updated (k, v)
+          a = a.updated(k, v)
           v
         }
     })

@@ -26,7 +26,7 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
         val next = left.head
         val supers = next.getInterfaces.toSet ++ Option(next.getSuperclass)
         supers(sup) || {
-          val xs = left ++ supers filterNot seen
+          val xs = (left ++ supers).filterNot(seen)
           loop(xs - next, seen + next)
         }
       }
@@ -36,7 +36,7 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
 
   private def subargs(args1: List[OptManifest[_]],
                       args2: List[OptManifest[_]]) =
-    (args1 corresponds args2) {
+    (args1.corresponds(args2)) {
       // !!! [Martin] this is wrong, need to take variance into account
       case (x: ClassManifest[_], y: ClassManifest[_]) => x <:< y
       case (x, y) => (x eq NoManifest) && (y eq NoManifest)

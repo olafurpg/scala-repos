@@ -44,7 +44,7 @@ class AppDeployIntegrationTest
 
     Then("The app is created")
     result.code should be(201) //Created
-    extractDeploymentIds(result) should have size 1
+    (extractDeploymentIds(result) should have).size(1)
     waitForEvent("deployment_success")
     waitForTasks(app.id, 1) //make sure, the app has really started
   }
@@ -55,7 +55,7 @@ class AppDeployIntegrationTest
       appProxy(testBasePath / "app", "v1", instances = 1, withHealth = false)
     val result = marathon.createAppV2(app)
     result.code should be(201) //Created
-    extractDeploymentIds(result) should have size 1
+    (extractDeploymentIds(result) should have).size(1)
     waitForEvent("deployment_success")
     val taskBeforeRedeployment =
       waitForTasks(app.id, 1) //make sure, the app has really started
@@ -99,7 +99,7 @@ class AppDeployIntegrationTest
 
     And("BUT our app still has a backoff delay")
     val queueAfterScaling: List[ITQueueItem] = marathon.taskQueue().value.queue
-    queueAfterScaling should have size 1
+    (queueAfterScaling should have).size(1)
     queueAfterScaling.map(_.delay.overdue) should contain(false)
   }
 
@@ -146,7 +146,7 @@ class AppDeployIntegrationTest
     WaitTestSupport.waitUntil("queue item", 10.seconds) {
       try {
         val queue: List[ITQueueItem] = marathon.taskQueue().value.queue
-        queue should have size 1
+        (queue should have).size(1)
         queue.map(_.delay.overdue) should contain(false)
         true
       } catch {
@@ -193,7 +193,7 @@ class AppDeployIntegrationTest
 
       Then("The app is created")
       result.code should be(201) //Created
-      extractDeploymentIds(result) should have size 1
+      (extractDeploymentIds(result) should have).size(1)
       waitForEvent("deployment_success")
       waitForTasks(app.id, 1) //make sure, the app has really started
     }
@@ -213,7 +213,7 @@ class AppDeployIntegrationTest
 
     Then("The app is created")
     result.code should be(201) //Created
-    extractDeploymentIds(result) should have size 1
+    (extractDeploymentIds(result) should have).size(1)
     waitForEvent("deployment_success")
     check.pingSince(5.seconds) should be(true) //make sure, the app has really started
   }
@@ -236,7 +236,7 @@ class AppDeployIntegrationTest
 
     Then("The app is created")
     result.code should be(201) //Created
-    extractDeploymentIds(result) should have size 1
+    (extractDeploymentIds(result) should have).size(1)
     waitForEvent("deployment_success")
     check.pingSince(5.seconds) should be(true) //make sure, the app has really started
   }
@@ -254,7 +254,7 @@ class AppDeployIntegrationTest
 
     Then("The app is created")
     result.code should be(201) //Created
-    extractDeploymentIds(result) should have size 1
+    (extractDeploymentIds(result) should have).size(1)
     waitForEvent("deployment_success")
   }
 
@@ -272,7 +272,7 @@ class AppDeployIntegrationTest
 
     Then("The app is created")
     result.code should be(201) //Created
-    extractDeploymentIds(result) should have size 1
+    (extractDeploymentIds(result) should have).size(1)
     waitForEvent("deployment_success")
   }
 
@@ -288,11 +288,11 @@ class AppDeployIntegrationTest
     Then("the list of running app tasks can be fetched")
     val apps = marathon.listAppsInBaseGroup
     apps.code should be(200)
-    apps.value should have size 1
+    (apps.value should have).size(1)
 
     val tasks = marathon.tasks(appId)
     tasks.code should be(200)
-    tasks.value should have size 2
+    (tasks.value should have).size(2)
   }
 
   test("an unhealthy app fails to deploy") {
@@ -306,7 +306,7 @@ class AppDeployIntegrationTest
 
     Then("We receive a deployment created confirmation")
     create.code should be(201) //Created
-    extractDeploymentIds(create) should have size 1
+    (extractDeploymentIds(create) should have).size(1)
 
     And("a number of failed health events but the deployment does not succeed")
     def interestingEvent() =
@@ -323,7 +323,7 @@ class AppDeployIntegrationTest
     val delete = marathon.deleteApp(appId, force = true)
     delete.code should be(200)
     waitForChange(delete)
-    marathon.listAppsInBaseGroup.value should have size 0
+    (marathon.listAppsInBaseGroup.value should have).size(0)
   }
 
   test("update an app") {
@@ -403,7 +403,7 @@ class AppDeployIntegrationTest
 
     Then("The response should contain all the versions")
     list.code should be(200)
-    list.value.versions should have size 1
+    (list.value.versions should have).size(1)
     list.value.versions.head should be(createResponse.value.version)
   }
 
@@ -523,7 +523,7 @@ class AppDeployIntegrationTest
     waitForChange(delete)
 
     Then("All instances of the app get restarted")
-    marathon.listAppsInBaseGroup.value should have size 0
+    (marathon.listAppsInBaseGroup.value should have).size(0)
   }
 
   test("create and deploy an app with two tasks") {
@@ -617,7 +617,7 @@ class AppDeployIntegrationTest
 
     Then("the deployment should be gone")
     waitForEvent("deployment_failed")
-    marathon.listDeploymentsForBaseGroup().value should have size 0
+    (marathon.listDeploymentsForBaseGroup().value should have).size(0)
 
     Then("the app should still be there")
     marathon.app(appId).code should be(200)
@@ -684,7 +684,7 @@ class AppDeployIntegrationTest
     Then("The app is created")
     result.code should be(201) //Created
 
-    extractDeploymentIds(result) should have size 1
+    (extractDeploymentIds(result) should have).size(1)
     waitForEvent("deployment_success")
 
     When("We fetch the app definition")

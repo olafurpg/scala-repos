@@ -42,7 +42,7 @@ trait Row {
   protected def apply(columnIndex: Option[Int]): Option[Value] =
     for (idx <- columnIndex) yield values(idx)
 
-  override def toString = (fields zip values).toString
+  override def toString = (fields.zip(values)).toString
 }
 
 /**

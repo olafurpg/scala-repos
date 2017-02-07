@@ -25,12 +25,12 @@ trait RejectionHandler extends (immutable.Seq[Rejection] ⇒ Option[Route]) {
         this // the default handler already handles everything
       case (a: BuiltRejectionHandler, b: BuiltRejectionHandler) ⇒
         new BuiltRejectionHandler(a.cases ++ b.cases,
-                                  a.notFound orElse b.notFound,
+                                  a.notFound.orElse(b.notFound),
                                   b.isDefault)
       case _ ⇒
         new RejectionHandler {
           def apply(rejections: immutable.Seq[Rejection]): Option[Route] =
-            self(rejections) orElse that(rejections)
+            self(rejections).orElse(that(rejections))
         }
     }
 
@@ -94,7 +94,7 @@ object RejectionHandler {
       f: immutable.Seq[T] ⇒ Route)
       extends Handler
       with PartialFunction[Rejection, T] {
-    def isDefinedAt(rejection: Rejection) = runtimeClass isInstance rejection
+    def isDefinedAt(rejection: Rejection) = runtimeClass.isInstance(rejection)
     def apply(rejection: Rejection) = rejection.asInstanceOf[T]
   }
 
@@ -108,10 +108,10 @@ object RejectionHandler {
           if (ix < cases.length) {
             cases(ix) match {
               case CaseHandler(pf) ⇒
-                val route = rejections collectFirst pf
+                val route = rejections.collectFirst(pf)
                 if (route.isEmpty) rec(ix + 1) else route
               case x @ TypeHandler(_, f) ⇒
-                val rejs = rejections collect x
+                val rejs = rejections.collect(x)
                 if (rejs.isEmpty) rec(ix + 1) else Some(f(rejs))
             }
           } else None

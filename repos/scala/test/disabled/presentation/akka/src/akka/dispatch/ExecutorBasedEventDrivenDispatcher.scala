@@ -122,13 +122,13 @@ class ExecutorBasedEventDrivenDispatcher(
 
   private[akka] def dispatch(invocation: MessageInvocation) = {
     val mbox = getMailbox(invocation.receiver)
-    mbox enqueue invocation
+    mbox.enqueue(invocation)
     registerForExecution(mbox)
   }
 
   private[akka] def executeFuture(invocation: FutureInvocation[_]): Unit =
     if (active.isOn) {
-      try executorService.get() execute invocation
+      try executorService.get().execute(invocation)
       catch {
         case e: RejectedExecutionException =>
           EventHandler.warning(this, e.toString)
@@ -179,7 +179,7 @@ class ExecutorBasedEventDrivenDispatcher(
       if (active.isOn && !mbox.suspended.locked) {
         //If the dispatcher is active and the actor not suspended
         try {
-          executorService.get() execute mbox
+          executorService.get().execute(mbox)
         } catch {
           case e: RejectedExecutionException =>
             EventHandler.warning(this, e.toString)

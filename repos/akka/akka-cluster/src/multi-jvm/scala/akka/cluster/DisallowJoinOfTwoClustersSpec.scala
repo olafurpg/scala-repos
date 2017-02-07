@@ -72,7 +72,7 @@ abstract class DisallowJoinOfTwoClustersSpec
       }
 
       // no change expected
-      1 to 5 foreach { _ ⇒
+      (1 to 5).foreach { _ ⇒
         clusterView.members.size should ===(expectedSize)
         Thread.sleep(1000)
       }

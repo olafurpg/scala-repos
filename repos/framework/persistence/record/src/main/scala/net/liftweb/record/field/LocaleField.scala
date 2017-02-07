@@ -40,7 +40,7 @@ trait LocaleTypedField extends TypedField[String] {
 
   private def elem =
     SHtml.select(buildDisplayList,
-                 Full(valueBox.map(_.toString) openOr ""),
+                 Full(valueBox.map(_.toString).openOr("")),
                  locale => setBox(Full(locale))) %
       ("tabindex" -> tabIndex.toString)
 

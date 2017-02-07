@@ -24,23 +24,23 @@ class CacheConditionDirectivesSpec extends RoutingSpec {
     "return OK for new resources" in {
       Get() ~> taggedAndTimestamped ~> check {
         status shouldEqual OK
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
     }
 
     "return OK for non-matching resources" in {
       Get() ~> `If-None-Match`(EntityTag("old")) ~> taggedAndTimestamped ~> check {
         status shouldEqual OK
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Get() ~> `If-Modified-Since`(timestamp - 1000) ~> taggedAndTimestamped ~> check {
         status shouldEqual OK
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Get() ~> `If-None-Match`(EntityTag("old")) ~> `If-Modified-Since`(
         timestamp - 1000) ~> taggedAndTimestamped ~> check {
         status shouldEqual OK
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
     }
 
@@ -63,38 +63,38 @@ class CacheConditionDirectivesSpec extends RoutingSpec {
     "return NotModified for matching resources" in {
       Get() ~> `If-None-Match`.`*` ~> ifModifiedSince ~> taggedAndTimestamped ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Get() ~> `If-None-Match`(tag) ~> ifModifiedSince ~> taggedAndTimestamped ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Get() ~> `If-None-Match`(tag) ~> `If-Modified-Since`(timestamp + 1000) ~> taggedAndTimestamped ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Get() ~> `If-None-Match`(tag.copy(weak = true)) ~> ifModifiedSince ~> taggedAndTimestamped ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Get() ~> `If-None-Match`(tag, EntityTag("some"), EntityTag("other")) ~> ifModifiedSince ~> taggedAndTimestamped ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
     }
 
     "return NotModified when only one matching header is set" in {
       Get() ~> `If-None-Match`.`*` ~> taggedAndTimestamped ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Get() ~> `If-None-Match`(tag) ~> taggedAndTimestamped ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Get() ~> ifModifiedSince ~> taggedAndTimestamped ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
     }
 
@@ -102,28 +102,28 @@ class CacheConditionDirectivesSpec extends RoutingSpec {
       val weakTag = tag.copy(weak = true)
       Get() ~> `If-None-Match`(tag) ~> weak ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs
-          (List(ETag(weakTag), `Last-Modified`(timestamp)))
+        (headers should contain).theSameElementsAs(
+          List(ETag(weakTag), `Last-Modified`(timestamp)))
       }
       Get() ~> `If-None-Match`(weakTag) ~> weak ~> check {
         status shouldEqual NotModified
-        headers should contain theSameElementsAs
-          (List(ETag(weakTag), `Last-Modified`(timestamp)))
+        (headers should contain).theSameElementsAs(
+          List(ETag(weakTag), `Last-Modified`(timestamp)))
       }
     }
 
     "return normally for matching If-Match/If-Unmodified" in {
       Put() ~> `If-Match`.`*` ~> taggedAndTimestamped ~> check {
         status shouldEqual OK
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Put() ~> `If-Match`(tag) ~> taggedAndTimestamped ~> check {
         status shouldEqual OK
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
       Put() ~> ifUnmodifiedSince ~> taggedAndTimestamped ~> check {
         status shouldEqual OK
-        headers should contain theSameElementsAs (responseHeaders)
+        (headers should contain).theSameElementsAs(responseHeaders)
       }
     }
 

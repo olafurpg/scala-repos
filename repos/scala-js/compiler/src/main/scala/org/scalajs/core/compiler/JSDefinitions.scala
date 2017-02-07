@@ -58,10 +58,10 @@ trait JSDefinitions { self: JSGlobalAddons =>
       getMemberMethod(JSArrayClass, newTermName("update"))
 
     lazy val JSFunctionClasses =
-      (0 to 22) map (n => getRequiredClass("scala.scalajs.js.Function" + n))
+      ((0 to 22)).map(n => getRequiredClass("scala.scalajs.js.Function" + n))
     lazy val JSThisFunctionClasses =
-      (0 to 21) map
-        (n => getRequiredClass("scala.scalajs.js.ThisFunction" + n))
+      ((0 to 21)).map(n =>
+        getRequiredClass("scala.scalajs.js.ThisFunction" + n))
     lazy val AllJSFunctionClasses = JSFunctionClasses ++ JSThisFunctionClasses
 
     lazy val RuntimeExceptionClass = requiredClass[RuntimeException]

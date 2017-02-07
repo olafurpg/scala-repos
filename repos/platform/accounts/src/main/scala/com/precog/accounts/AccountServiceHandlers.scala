@@ -103,9 +103,9 @@ class AccountServiceHandlers(
       request: HttpRequest[_])(f: Account => Future[HttpResponse[JValue]])(
       implicit executor: ExecutionContext): Future[HttpResponse[JValue]] = {
     implicit val M = new FutureMonad(executor)
-    accountManager.findAccountById(accountId) flatMap {
+    accountManager.findAccountById(accountId).flatMap {
       case Some(account) =>
-        accountManager.hasAncestor(account, auth) flatMap {
+        accountManager.hasAncestor(account, auth).flatMap {
           case true => f(account)
           case false => {
             logger.warn(
@@ -130,14 +130,17 @@ class AccountServiceHandlers(
   def withAccountAdmin[A](request: HttpRequest[_], auth: Account)(
       f: Account => Future[HttpResponse[JValue]])(
       implicit executor: ExecutionContext): Future[HttpResponse[JValue]] = {
-    request.parameters.get('accountId).map { accountId =>
-      withAccountAdmin(accountId, auth, request) { f }
-    } getOrElse {
-      Future(
-        HttpResponse[JValue](
-          HttpStatus(BadRequest, "Missing accountId in request URI."),
-          content = Some(JString("Missing accountId in request URI."))))
-    }
+    request.parameters
+      .get('accountId)
+      .map { accountId =>
+        withAccountAdmin(accountId, auth, request) { f }
+      }
+      .getOrElse {
+        Future(
+          HttpResponse[JValue](
+            HttpStatus(BadRequest, "Missing accountId in request URI."),
+            content = Some(JString("Missing accountId in request URI."))))
+      }
   }
 
   object SearchAccountsHandler
@@ -279,69 +282,76 @@ class AccountServiceHandlers(
       Future[HttpResponse[JValue]]] =
       (request: HttpRequest[Future[JValue]]) => {
         logger.trace("Got request in PostAccountHandler: " + request)
-        request.content map { futureContent =>
-          Success(
-            futureContent flatMap { jv =>
-              (jv \ "email", jv \ "password", jv \ "profile") match {
-                case (JString(email), JString(password), profile) =>
-                  logger.debug("About to create account for email " + email)
-                  for {
-                    existingAccountOpt <- accountManager.findAccountByEmail(
-                      email)
-                    accountResponse <- existingAccountOpt map {
-                      account =>
-                        logger.warn(
-                          "Creation attempted on existing account %s by %s"
-                            .format(account.accountId, remoteIpFrom(request)))
-                        Promise.successful(
-                          Responses.failure(
-                            Conflict,
-                            "An account already exists with the email address %s. If you feel this is in error, please contact support@precog.com"
-                              .format(email)))
-                    } getOrElse {
-                      accountManager.createAccount(email,
-                                                   password,
-                                                   clock.now(),
-                                                   AccountPlan.Free,
-                                                   Some(rootAccountId),
-                                                   profile.minimize) {
-                        accountId =>
-                          logger.info(
-                            "Created new account for " + email +
-                              " with id " + accountId + " by " +
-                              remoteIpFrom(request))
-                          apiKeyFinder.createAPIKey(
-                            accountId,
-                            Some("Root key for account " + accountId),
-                            Some(
-                              "This is your master API key. Keep it secure!")) map {
-                            details =>
-                              details.apiKey
-                          }
-                      } map { account =>
-                        logger.debug("Account successfully created: " +
-                          account.accountId)
-                        HttpResponse[JValue](
-                          OK,
-                          content = Some(
-                            jobject(jfield("accountId", account.accountId))))
-                      }
-                    }
-                  } yield accountResponse
+        request.content
+          .map { futureContent =>
+            Success(
+              futureContent.flatMap { jv =>
+                (jv \ "email", jv \ "password", jv \ "profile") match {
+                  case (JString(email), JString(password), profile) =>
+                    logger.debug("About to create account for email " + email)
+                    for {
+                      existingAccountOpt <- accountManager.findAccountByEmail(
+                        email)
+                      accountResponse <- existingAccountOpt
+                        .map {
+                          account =>
+                            logger.warn(
+                              "Creation attempted on existing account %s by %s"
+                                .format(account.accountId,
+                                        remoteIpFrom(request)))
+                            Promise.successful(
+                              Responses.failure(
+                                Conflict,
+                                "An account already exists with the email address %s. If you feel this is in error, please contact support@precog.com"
+                                  .format(email)))
+                        }
+                        .getOrElse {
+                          accountManager
+                            .createAccount(email,
+                                           password,
+                                           clock.now(),
+                                           AccountPlan.Free,
+                                           Some(rootAccountId),
+                                           profile.minimize) {
+                              accountId =>
+                                logger.info(
+                                  "Created new account for " + email +
+                                    " with id " + accountId + " by " +
+                                    remoteIpFrom(request))
+                                apiKeyFinder
+                                  .createAPIKey(
+                                    accountId,
+                                    Some("Root key for account " + accountId),
+                                    Some("This is your master API key. Keep it secure!"))
+                                  .map { details =>
+                                    details.apiKey
+                                  }
+                            }
+                            .map { account =>
+                              logger.debug("Account successfully created: " +
+                                account.accountId)
+                              HttpResponse[JValue](
+                                OK,
+                                content = Some(jobject(
+                                  jfield("accountId", account.accountId))))
+                            }
+                        }
+                    } yield accountResponse
 
-                case _ =>
-                  val errmsg =
-                    "Missing email and/or password fields from request body."
-                  logger.warn(errmsg + ": " + jv)
-                  Future(
-                    HttpResponse[JValue](HttpStatus(BadRequest, errmsg),
-                                         content = Some(JString(errmsg))))
+                  case _ =>
+                    val errmsg =
+                      "Missing email and/or password fields from request body."
+                    logger.warn(errmsg + ": " + jv)
+                    Future(
+                      HttpResponse[JValue](HttpStatus(BadRequest, errmsg),
+                                           content = Some(JString(errmsg))))
+                }
               }
-            }
-          )
-        } getOrElse {
-          Failure(DispatchError(BadRequest, "Missing request body content."))
-        }
+            )
+          }
+          .getOrElse {
+            Failure(DispatchError(BadRequest, "Missing request body content."))
+          }
       }
 
     val metadata = DescriptionMetadata(
@@ -356,53 +366,60 @@ class AccountServiceHandlers(
       (request: HttpRequest[Future[JValue]]) =>
         Success {
           // cannot use withAccountAdmin here because of the ability to add grants to others' accounts.
-          request.parameters.get('accountId) map { accountId =>
-            accountManager.findAccountById(accountId) flatMap {
-              case Some(account) =>
-                request.content map { futureContent =>
-                  futureContent flatMap { jvalue =>
-                    jvalue.validated[GrantId]("grantId") match {
-                      case Success(grantId) =>
-                        apiKeyFinder.addGrant(account.apiKey, grantId) map {
-                          case true =>
-                            logger.info(
-                              "Grant added to %s (from %s): %s".format(
-                                accountId,
-                                remoteIpFrom(request),
-                                grantId))
-                            HttpResponse(Created)
+          request.parameters
+            .get('accountId)
+            .map { accountId =>
+              accountManager.findAccountById(accountId).flatMap {
+                case Some(account) =>
+                  request.content
+                    .map { futureContent =>
+                      futureContent.flatMap { jvalue =>
+                        jvalue.validated[GrantId]("grantId") match {
+                          case Success(grantId) =>
+                            apiKeyFinder
+                              .addGrant(account.apiKey, grantId)
+                              .map {
+                                case true =>
+                                  logger.info(
+                                    "Grant added to %s (from %s): %s".format(
+                                      accountId,
+                                      remoteIpFrom(request),
+                                      grantId))
+                                  HttpResponse(Created)
 
-                          case false =>
-                            logger.error(
-                              "Grant added to %s (from %s) failed for %s"
-                                .format(accountId,
-                                        remoteIpFrom(request),
-                                        grantId))
-                            HttpResponse(
-                              InternalServerError,
-                              content = Some(JString(
-                                "Grant creation failed; please contact support.")))
+                                case false =>
+                                  logger.error(
+                                    "Grant added to %s (from %s) failed for %s"
+                                      .format(accountId,
+                                              remoteIpFrom(request),
+                                              grantId))
+                                  HttpResponse(
+                                    InternalServerError,
+                                    content = Some(JString(
+                                      "Grant creation failed; please contact support.")))
+                              }
+
+                          case Failure(error) =>
+                            Promise.successful(badRequest(
+                              "Could not determine a valid grant ID from request body."))
                         }
-
-                      case Failure(error) =>
-                        Promise successful badRequest(
-                          "Could not determine a valid grant ID from request body.")
+                      }
                     }
-                  }
-                } getOrElse {
-                  Promise successful badRequest("Missing request body.")
-                }
+                    .getOrElse {
+                      Promise.successful(badRequest("Missing request body."))
+                    }
 
-              case _ =>
-                Promise.successful(
-                  HttpResponse[JValue](
-                    HttpStatus(NotFound),
-                    content =
-                      Some(JString("Unable to find account " + accountId))))
+                case _ =>
+                  Promise.successful(
+                    HttpResponse[JValue](
+                      HttpStatus(NotFound),
+                      content =
+                        Some(JString("Unable to find account " + accountId))))
+              }
             }
-          } getOrElse {
-            Future(badRequest("Missing account Id"))
-          }
+            .getOrElse {
+              Future(badRequest("Missing account Id"))
+            }
       }
 
     val metadata = DescriptionMetadata(
@@ -581,9 +598,10 @@ class AccountServiceHandlers(
                         "Missing/invalid password in request body"))
                 }
               }
-            } valueOr { errors =>
-            Future(Responses.failure(BadRequest, errors.list.mkString("\n")))
-          }
+            }
+            .valueOr { errors =>
+              Future(Responses.failure(BadRequest, errors.list.mkString("\n")))
+            }
         }
       }
 
@@ -610,49 +628,55 @@ class AccountServiceHandlers(
       (request: HttpRequest[Future[JValue]]) => {
         Success { (auth: Account) =>
           withAccountAdmin(request, auth) { account =>
-            request.content map { futureContent =>
-              futureContent flatMap { jvalue =>
-                (jvalue \ "password").validated[String] match {
-                  case Success(newPassword) =>
-                    accountManager
-                      .updateAccountPassword(account, newPassword) map {
-                      case true =>
-                        logger.info(
-                          "Password for account %s successfully updated by %s"
-                            .format(account.accountId, remoteIpFrom(request)))
-                        HttpResponse[JValue](OK, content = None)
-                      case _ =>
-                        logger.error(
-                          "Password update for account %s from %s failed"
-                            .format(account.accountId, remoteIpFrom(request)))
-                        Responses.failure(
-                          InternalServerError,
-                          "Account update failed, please contact support.")
-                    }
+            request.content
+              .map { futureContent =>
+                futureContent.flatMap { jvalue =>
+                  (jvalue \ "password").validated[String] match {
+                    case Success(newPassword) =>
+                      accountManager
+                        .updateAccountPassword(account, newPassword)
+                        .map {
+                          case true =>
+                            logger.info(
+                              "Password for account %s successfully updated by %s"
+                                .format(account.accountId,
+                                        remoteIpFrom(request)))
+                            HttpResponse[JValue](OK, content = None)
+                          case _ =>
+                            logger.error(
+                              "Password update for account %s from %s failed"
+                                .format(account.accountId,
+                                        remoteIpFrom(request)))
+                            Responses.failure(
+                              InternalServerError,
+                              "Account update failed, please contact support.")
+                        }
 
-                  case Failure(error) =>
-                    logger.warn(
-                      "Invalid password update body \"%s\" for account %s from %s: %s"
-                        .format(jvalue.renderCompact,
-                                account.accountId,
-                                remoteIpFrom(request),
-                                error))
-                    Future(
-                      HttpResponse[JValue](
-                        HttpStatus(BadRequest, "Invalid request body."),
-                        content = Some(JString(
-                          "Could not determine replacement password from request body."))))
+                    case Failure(error) =>
+                      logger.warn(
+                        "Invalid password update body \"%s\" for account %s from %s: %s"
+                          .format(jvalue.renderCompact,
+                                  account.accountId,
+                                  remoteIpFrom(request),
+                                  error))
+                      Future(
+                        HttpResponse[JValue](
+                          HttpStatus(BadRequest, "Invalid request body."),
+                          content = Some(JString(
+                            "Could not determine replacement password from request body."))))
+                  }
                 }
               }
-            } getOrElse {
-              logger.warn(
-                "Missing password update body for account %s from %s"
-                  .format(account.accountId, remoteIpFrom(request)))
-              Future(HttpResponse[JValue](
-                HttpStatus(BadRequest, "Request body missing."),
-                content = Some(JString(
-                  "You must provide a JSON object containing a password field."))))
-            }
+              .getOrElse {
+                logger.warn(
+                  "Missing password update body for account %s from %s"
+                    .format(account.accountId, remoteIpFrom(request)))
+                Future(
+                  HttpResponse[JValue](
+                    HttpStatus(BadRequest, "Request body missing."),
+                    content = Some(JString(
+                      "You must provide a JSON object containing a password field."))))
+              }
           }
         }
       }
@@ -671,44 +695,49 @@ class AccountServiceHandlers(
       (request: HttpRequest[Future[JValue]]) => {
         Success { (auth: Account) =>
           withAccountAdmin(request, auth) { account =>
-            request.content.map { futureContent =>
-              futureContent flatMap { jvalue =>
-                (jvalue \ "type").validated[String] match {
-                  case Success(planType) =>
-                    accountManager.updateAccount(
-                      account.copy(plan = new AccountPlan(planType))) map {
-                      case true =>
-                        logger.info(
-                          "Plan changed for %s to %s from %s".format(
-                            account.accountId,
-                            planType,
-                            remoteIpFrom(request)))
-                        HttpResponse[JValue](OK, content = None)
-                      case _ =>
-                        logger.error(
-                          "Plan change to %s for account %s by %s failed"
-                            .format(planType,
-                                    account.accountId,
-                                    remoteIpFrom(request)))
-                        Responses.failure(
-                          InternalServerError,
-                          "Account update failed, please contact support.")
-                    }
+            request.content
+              .map { futureContent =>
+                futureContent.flatMap { jvalue =>
+                  (jvalue \ "type").validated[String] match {
+                    case Success(planType) =>
+                      accountManager
+                        .updateAccount(
+                          account.copy(plan = new AccountPlan(planType)))
+                        .map {
+                          case true =>
+                            logger.info(
+                              "Plan changed for %s to %s from %s".format(
+                                account.accountId,
+                                planType,
+                                remoteIpFrom(request)))
+                            HttpResponse[JValue](OK, content = None)
+                          case _ =>
+                            logger.error(
+                              "Plan change to %s for account %s by %s failed"
+                                .format(planType,
+                                        account.accountId,
+                                        remoteIpFrom(request)))
+                            Responses.failure(
+                              InternalServerError,
+                              "Account update failed, please contact support.")
+                        }
 
-                  case Failure(error) =>
-                    Future(
-                      HttpResponse[JValue](
-                        HttpStatus(BadRequest, "Invalid request body."),
-                        content = Some(JString(
-                          "Could not determine new account type from request body."))))
+                    case Failure(error) =>
+                      Future(
+                        HttpResponse[JValue](
+                          HttpStatus(BadRequest, "Invalid request body."),
+                          content = Some(JString(
+                            "Could not determine new account type from request body."))))
+                  }
                 }
               }
-            } getOrElse {
-              Future(HttpResponse[JValue](
-                HttpStatus(BadRequest, "Request body missing."),
-                content = Some(JString(
-                  "You must provide a JSON object containing a \"type\" field."))))
-            }
+              .getOrElse {
+                Future(
+                  HttpResponse[JValue](
+                    HttpStatus(BadRequest, "Request body missing."),
+                    content = Some(JString(
+                      "You must provide a JSON object containing a \"type\" field."))))
+              }
           }
         }
       }
@@ -727,23 +756,24 @@ class AccountServiceHandlers(
       (request: HttpRequest[Future[JValue]]) => {
         Success { (auth: Account) =>
           withAccountAdmin(request, auth) { account =>
-            accountManager.updateAccount(account.copy(plan = AccountPlan.Free)) map {
-              case true =>
-                logger.info(
-                  "Account plan for %s deleted (converted to free plan) by %s"
+            accountManager
+              .updateAccount(account.copy(plan = AccountPlan.Free))
+              .map {
+                case true =>
+                  logger.info(
+                    "Account plan for %s deleted (converted to free plan) by %s"
+                      .format(account.accountId, remoteIpFrom(request)))
+                  HttpResponse[JValue](
+                    OK,
+                    content =
+                      Some(jobject(jfield("type", account.plan.planType))))
+                case _ =>
+                  logger.error("Account plan for %s deletion by %s failed"
                     .format(account.accountId, remoteIpFrom(request)))
-                HttpResponse[JValue](
-                  OK,
-                  content =
-                    Some(jobject(jfield("type", account.plan.planType))))
-              case _ =>
-                logger.error(
-                  "Account plan for %s deletion by %s failed"
-                    .format(account.accountId, remoteIpFrom(request)))
-                Responses.failure(
-                  InternalServerError,
-                  "Account update failed, please contact support.")
-            }
+                  Responses.failure(
+                    InternalServerError,
+                    "Account update failed, please contact support.")
+              }
           }
         }
       }

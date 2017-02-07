@@ -63,7 +63,7 @@ trait SetupHelper { self: I18nHelper =>
     translatedVariantChoicesWithVariants :+ variantTuple(
       chess.variant.FromPosition)
 
-  def translatedSpeedChoices(implicit ctx: Context) = Speed.limited map { s =>
+  def translatedSpeedChoices(implicit ctx: Context) = Speed.limited.map { s =>
     (s.id.toString, {
       (s.range.min, s.range.max) match {
         case (0, y) => s.toString + " - " + trans.lessThanNbMinutes(y / 60 + 1)

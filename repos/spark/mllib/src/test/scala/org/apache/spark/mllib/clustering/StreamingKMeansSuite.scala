@@ -64,7 +64,7 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     runStreams(ssc, numBatches, numBatches)
 
     // estimated center should be close to true center
-    assert(centers(0) ~== model.latestModel().clusterCenters(0) absTol 1E-1)
+    assert(centers(0) ~== model.latestModel().clusterCenters(0).absTol(1E-1))
 
     // estimated center from streaming should exactly match the arithmetic mean of all data points
     // because the decay factor is set to 1.0
@@ -73,7 +73,7 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
         (numBatches * numPoints).toDouble
     assert(
       model.latestModel().clusterCenters(0) ~==
-        Vectors.dense(grandMean.toArray) absTol 1E-5)
+        Vectors.dense(grandMean.toArray).absTol(1E-5))
   }
 
   test("accuracy for two centers") {
@@ -112,8 +112,8 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
       } else {
         (centers(1), centers(0))
       }
-    assert(c0 ~== kMeans.latestModel().clusterCenters(0) absTol 1E-1)
-    assert(c1 ~== kMeans.latestModel().clusterCenters(1) absTol 1E-1)
+    assert(c0 ~== kMeans.latestModel().clusterCenters(0).absTol(1E-1))
+    assert(c1 ~== kMeans.latestModel().clusterCenters(1).absTol(1E-1))
   }
 
   test("detecting dying clusters") {
@@ -155,8 +155,8 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     assert(c0 * c1 < 0.0,
            "should have one positive center and one negative center")
     // 0.8 is the mean of half-normal distribution
-    assert(math.abs(c0) ~== 0.8 absTol 0.6)
-    assert(math.abs(c1) ~== 0.8 absTol 0.6)
+    assert(math.abs(c0) ~== 0.8.absTol(0.6))
+    assert(math.abs(c1) ~== 0.8.absTol(0.6))
   }
 
   test("SPARK-7946 setDecayFactor") {

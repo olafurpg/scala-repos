@@ -273,10 +273,10 @@ object TestNodeProvider {
 
   private def checkClauses(clauses: Seq[ScParameterClause],
                            paramNames: List[String]*): Boolean = {
-    clauses.length == paramNames.length && (clauses zip paramNames).forall {
+    clauses.length == paramNames.length && (clauses.zip(paramNames)).forall {
       case (clause, names) =>
         clause.parameters.length == names.length &&
-          (clause.parameters zip names).forall {
+          (clause.parameters.zip(names)).forall {
             case (param, name) => param.getType.getCanonicalText == name
           }
     }

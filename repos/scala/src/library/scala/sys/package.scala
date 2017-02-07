@@ -85,6 +85,6 @@ package object sys {
     val tarray = new Array[Thread](num)
     val got = Thread.enumerate(tarray)
 
-    tarray take got
+    tarray.take(got)
   }
 }

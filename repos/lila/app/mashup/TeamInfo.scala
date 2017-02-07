@@ -36,7 +36,7 @@ object TeamInfo {
   private val cache = lila.memo.AsyncCache[String, Cachable](
     teamId =>
       for {
-        userIds ← MemberRepo userIdsByTeam teamId
+        userIds ← MemberRepo.userIdsByTeam(teamId)
         bestUserIds ← UserRepo.idsByIdsSortRating(userIds, 10)
         toints ← UserRepo.idsSumToints(userIds)
       } yield Cachable(bestUserIds, toints),

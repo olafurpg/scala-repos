@@ -32,7 +32,7 @@ object Refinement {
         return false
     }
     def foo() {
-      RefineStatSeq parse builder
+      RefineStatSeq.parse(builder)
     }
     ParserUtils.parseLoopUntilRBrace(builder, foo)
     builder.restoreNewlinesState

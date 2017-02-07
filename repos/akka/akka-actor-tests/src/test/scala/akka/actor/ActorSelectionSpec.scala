@@ -71,7 +71,7 @@ class ActorSelectionSpec
 
     implicit val ec = system.dispatcher
     val resolved = Await
-      .result(selection.resolveOne(timeout.duration).mapTo[ActorRef] recover {
+      .result(selection.resolveOne(timeout.duration).mapTo[ActorRef].recover {
         case _ ⇒ null
       }, timeout.duration)
     Option(resolved) should ===(result)
@@ -100,11 +100,11 @@ class ActorSelectionSpec
       identify(system / "c1") should ===(Some(c1))
       identify(system / "c2") should ===(Some(c2))
       identify(system / "c2" / "c21") should ===(Some(c21))
-      identify(system child "c2" child "c21") should ===(Some(c21)) // test Java API
+      identify(system.child("c2").child("c21")) should ===(Some(c21)) // test Java API
       identify(system / Seq("c2", "c21")) should ===(Some(c21))
 
       import scala.collection.JavaConverters._
-      identify(system descendant Seq("c2", "c21").asJava) // test Java API
+      identify(system.descendant(Seq("c2", "c21").asJava)) // test Java API
     }
 
     "select actors by their string path representation" in {
@@ -271,8 +271,8 @@ class ActorSelectionSpec
                SelectString("a/b/c") -> None,
                SelectString("akka://all-systems/Nobody") -> None,
                SelectPath(system / "hallo") -> None,
-               SelectPath(looker.path child "hallo") -> None, // test Java API
-               SelectPath(looker.path descendant Seq("a", "b").asJava) -> None
+               SelectPath(looker.path.child("hallo")) -> None, // test Java API
+               SelectPath(looker.path.descendant(Seq("a", "b").asJava)) -> None
              ) // test Java API
              ) checkOne(looker, l, r)
       }

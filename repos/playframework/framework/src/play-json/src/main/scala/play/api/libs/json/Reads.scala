@@ -152,7 +152,7 @@ object Reads extends ConstraintReads with PathReads with DefaultReads {
     }
 
   implicit object JsObjectMonoid extends Monoid[JsObject] {
-    def append(o1: JsObject, o2: JsObject) = o1 deepMerge o2
+    def append(o1: JsObject, o2: JsObject) = o1.deepMerge(o2)
     def identity = JsObject(Seq())
   }
 
@@ -677,7 +677,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
       implicit p: T => TemporalParser[Instant]): Reads[Instant] =
     new Reads[Instant] {
       def reads(json: JsValue): JsResult[Instant] = json match {
-        case JsNumber(d) => JsSuccess(Instant ofEpochMilli d.toLong)
+        case JsNumber(d) => JsSuccess(Instant.ofEpochMilli(d.toLong))
         case JsString(s) =>
           p(parsing).parse(corrector(s)) match {
             case Some(d) => JsSuccess(d)
@@ -769,8 +769,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
       }
 
       private def parseDate(input: String): Option[DateTime] =
-        scala.util.control.Exception.allCatch[DateTime] opt
-          (DateTime.parse(input, df))
+        scala.util.control.Exception
+          .allCatch[DateTime]
+          .opt(DateTime.parse(input, df))
     }
 
   /**
@@ -810,8 +811,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
       }
 
       private def parseDate(input: String): Option[LocalDate] =
-        scala.util.control.Exception.allCatch[LocalDate] opt
-          (LocalDate.parse(input, df))
+        scala.util.control.Exception
+          .allCatch[LocalDate]
+          .opt(LocalDate.parse(input, df))
     }
 
   /**
@@ -852,8 +854,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
       }
 
       private def parseTime(input: String): Option[LocalTime] =
-        scala.util.control.Exception.allCatch[LocalTime] opt
-          (LocalTime.parse(input, df))
+        scala.util.control.Exception
+          .allCatch[LocalTime]
+          .opt(LocalTime.parse(input, df))
     }
 
   /**
@@ -1001,8 +1004,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     */
   implicit object ObjectNodeReads extends Reads[ObjectNode] {
     def reads(json: JsValue): JsResult[ObjectNode] = {
-      json.validate[JsObject] map
-        (jo => JacksonJson.jsValueToJsonNode(jo).asInstanceOf[ObjectNode])
+      json
+        .validate[JsObject]
+        .map(jo => JacksonJson.jsValueToJsonNode(jo).asInstanceOf[ObjectNode])
     }
   }
 
@@ -1011,8 +1015,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     */
   implicit object ArrayNodeReads extends Reads[ArrayNode] {
     def reads(json: JsValue): JsResult[ArrayNode] = {
-      json.validate[JsArray] map
-        (ja => JacksonJson.jsValueToJsonNode(ja).asInstanceOf[ArrayNode])
+      json
+        .validate[JsArray]
+        .map(ja => JacksonJson.jsValueToJsonNode(ja).asInstanceOf[ArrayNode])
     }
   }
 
@@ -1067,7 +1072,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
       val uncheckedUuid = Try(UUID.fromString(s)).toOption
 
       if (checkUuuidValidity) {
-        uncheckedUuid filter check(s)
+        uncheckedUuid.filter(check(s))
       } else {
         uncheckedUuid
       }

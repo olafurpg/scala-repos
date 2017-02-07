@@ -89,7 +89,7 @@ class DatabaseService(dir: File) extends SLF4JLogging {
   def persist(check: FileCheck, symbols: Seq[FqnSymbol])(
       implicit ec: ExecutionContext): Future[Option[Int]] =
     db.run(
-      (fileChecksCompiled += check) andThen (fqnSymbolsCompiled ++= symbols)
+      ((fileChecksCompiled += check)).andThen(fqnSymbolsCompiled ++= symbols)
     )
 
   private val findCompiled = Compiled { fqn: Rep[String] =>

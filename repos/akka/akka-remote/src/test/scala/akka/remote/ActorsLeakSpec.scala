@@ -181,7 +181,7 @@ class ActorsLeakSpec
 
       val finalActors = targets.flatMap(collectLiveActors).toSet
 
-      (finalActors diff initialActors) should be(Set.empty)
+      (finalActors.diff(initialActors)) should be(Set.empty)
     }
   }
 }

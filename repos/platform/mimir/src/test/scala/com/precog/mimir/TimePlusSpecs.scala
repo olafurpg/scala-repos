@@ -65,7 +65,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -89,7 +89,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -113,7 +113,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -138,7 +138,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -163,7 +163,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -187,7 +187,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -211,7 +211,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -235,7 +235,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -259,7 +259,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -283,7 +283,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -310,7 +310,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -335,7 +335,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -360,7 +360,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -384,7 +384,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -408,7 +408,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -432,7 +432,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -456,7 +456,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -480,7 +480,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -508,7 +508,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -550,7 +550,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -592,7 +592,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -635,7 +635,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -678,7 +678,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -720,7 +720,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -762,7 +762,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -804,7 +804,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -846,7 +846,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -888,7 +888,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -933,7 +933,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -964,7 +964,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -995,7 +995,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -1025,7 +1025,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -1055,7 +1055,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -1085,7 +1085,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -1115,7 +1115,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
@@ -1145,7 +1145,7 @@ trait TimePlusSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(s)) if ids.length == 1 => s
         }
 

@@ -94,7 +94,7 @@ final class Eval(optionsNoncp: Seq[String],
   import definitions._
 
   private[sbt] def unlinkDeferred(): Unit = {
-    toUnlinkLater foreach unlink
+    toUnlinkLater.foreach(unlink)
     toUnlinkLater = Nil
   }
 
@@ -141,7 +141,7 @@ final class Eval(optionsNoncp: Seq[String],
                    importTrees: Seq[Tree],
                    moduleName: String): Tree = {
         val fullParser = new syntaxAnalyzer.UnitParser(unit)
-        val trees = defUnits flatMap parseDefinitions
+        val trees = defUnits.flatMap(parseDefinitions)
         syntheticModule(fullParser, importTrees, trees.toList, moduleName)
       }
       def extra(run: Run, unit: CompilationUnit) = {
@@ -338,13 +338,13 @@ final class Eval(optionsNoncp: Seq[String],
                                       moduleName: String): Seq[File] =
     backing match {
       case None => Nil
-      case Some(dir) => dir listFiles moduleFileFilter(moduleName)
+      case Some(dir) => dir.listFiles(moduleFileFilter(moduleName))
     }
   private[this] def getClassFiles(backing: Option[File],
                                   moduleName: String): Seq[File] =
     backing match {
       case None => Nil
-      case Some(dir) => dir listFiles moduleClassFilter(moduleName)
+      case Some(dir) => dir.listFiles(moduleClassFilter(moduleName))
     }
   private[this] def moduleFileFilter(moduleName: String) =
     new java.io.FilenameFilter {
@@ -354,7 +354,7 @@ final class Eval(optionsNoncp: Seq[String],
   private[this] def moduleClassFilter(moduleName: String) =
     new java.io.FilenameFilter {
       def accept(dir: File, s: String) =
-        (s contains moduleName) && (s endsWith ".class")
+        (s contains moduleName) && (s.endsWith(".class"))
     }
 
   private[this] class ParseErrorStrings(val base: String,
@@ -412,7 +412,7 @@ final class Eval(optionsNoncp: Seq[String],
     tpt0
   }
   private[this] def parseImports(imports: EvalImports): Seq[Tree] =
-    imports.strings flatMap {
+    imports.strings.flatMap {
       case (s, line) => parseImport(mkUnit(imports.srcName, line, s))
     }
   private[this] def parseImport(importUnit: CompilationUnit): Seq[Tree] = {
@@ -486,7 +486,7 @@ final class Eval(optionsNoncp: Seq[String],
                                            contents: String)
       extends BatchSourceFile(name, contents) {
     override def lineToOffset(line: Int): Int =
-      super.lineToOffset((line - startLine) max 0)
+      super.lineToOffset(((line - startLine)).max(0))
     override def offsetToLine(offset: Int): Int =
       super.offsetToLine(offset) + startLine
   }
@@ -525,7 +525,7 @@ final class Eval(optionsNoncp: Seq[String],
                                        lineMap: Array[Int]) =
     new BatchSourceFile(srcName, content) {
       override def lineToOffset(line: Int): Int =
-        super.lineToOffset(lineMap.indexWhere(_ == line) max 0)
+        super.lineToOffset(lineMap.indexWhere(_ == line).max(0))
       override def offsetToLine(offset: Int): Int =
         index(lineMap, super.offsetToLine(offset))
       // the SourceFile attribute is populated from this method, so we are required to only return the name
@@ -538,7 +538,8 @@ private[sbt] object Eval {
   def optBytes[T](o: Option[T])(f: T => Array[Byte]): Array[Byte] =
     seqBytes(o.toSeq)(f)
   def stringSeqBytes(s: Seq[String]): Array[Byte] = seqBytes(s)(bytes)
-  def seqBytes[T](s: Seq[T])(f: T => Array[Byte]): Array[Byte] = bytes(s map f)
+  def seqBytes[T](s: Seq[T])(f: T => Array[Byte]): Array[Byte] =
+    bytes(s.map(f))
   def bytes(b: Seq[Array[Byte]]): Array[Byte] =
     bytes(b.length) ++ b.flatten.toArray[Byte]
   def bytes(b: Boolean): Array[Byte] = Array[Byte](if (b) 1 else 0)
@@ -546,12 +547,12 @@ private[sbt] object Eval {
     if (fs eq null) filesModifiedBytes(Array[File]())
     else seqBytes(fs)(fileModifiedBytes)
   def fileModifiedBytes(f: File): Array[Byte] =
-    (if (f.isDirectory) filesModifiedBytes(f listFiles classDirFilter)
+    (if (f.isDirectory) filesModifiedBytes(f.listFiles(classDirFilter))
      else bytes(f.lastModified)) ++ bytes(f.getAbsolutePath)
   def fileExistsBytes(f: File): Array[Byte] =
     bytes(f.exists) ++ bytes(f.getAbsolutePath)
 
-  def bytes(s: String): Array[Byte] = s getBytes "UTF-8"
+  def bytes(s: String): Array[Byte] = s.getBytes("UTF-8")
   def bytes(l: Long): Array[Byte] = {
     val buffer = ByteBuffer.allocate(8)
     buffer.putLong(l)

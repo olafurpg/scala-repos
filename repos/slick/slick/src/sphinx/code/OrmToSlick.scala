@@ -111,7 +111,7 @@ object OrmToSlick extends App {
       val q = session
         .createCriteria(classOf[Person])
         .add(
-          Restrictions.disjunction.add(age lt 5).add(age gt 65)
+          Restrictions.disjunction.add(age.lt(5)).add(age.gt(65))
         )
       //#criteriaComposition
     };
@@ -237,7 +237,7 @@ object OrmToSlick extends App {
         import scala.concurrent.ExecutionContext.Implicits.global
         //#associationTuple
         val tupledJoin: Query[(People, Addresses), (Person, Address), Seq] =
-          people join addresses on (_.addressId === _.id)
+          (people join addresses).on(_.addressId === _.id)
 
         case class PersonWithAddress(person: Person, address: Address)
         val caseClassJoinResults =

@@ -58,8 +58,8 @@ object Entry {
   def parseJson(path: String, json: String): Seq[Entry] = {
     val basename = path.split("/").last
 
-    if (basename startsWith EndpointPrefix)
-      Endpoint.parseJson(json) map (_.copy(memberId = basename))
+    if (basename.startsWith(EndpointPrefix))
+      Endpoint.parseJson(json).map(_.copy(memberId = basename))
     else Nil
   }
 }
@@ -90,12 +90,12 @@ object Endpoint {
     m match {
       case ep: java.util.Map[_, _] =>
         val p =
-          Option(ep.get("port")) collect {
+          Option(ep.get("port")).collect {
             case port: java.lang.Integer => port
           }
 
         val h =
-          Option(ep.get("host")) collect {
+          Option(ep.get("host")).collect {
             case host: String => host
           }
 
@@ -113,7 +113,7 @@ object Endpoint {
         StringObj(s) <- d("status")
         status <- Status.ofString(s)
       } yield status
-    } getOrElse Endpoint.Status.Unknown
+    }.getOrElse(Endpoint.Status.Unknown)
     val tmpl = Endpoint.Empty
       .copy(shard = shard.getOrElse(Int.MinValue), status = status)
 
@@ -125,10 +125,10 @@ object Endpoint {
     for (map <- d("serviceEndpoint"); hostport <- parseEndpoint(map))
       namesByHostPort(hostport) += null
     for {
-      map <- d("additionalEndpoints") collect {
+      map <- d("additionalEndpoints").collect {
         case m: java.util.Map[_, _] => m
       }
-      key <- map.keySet().asScala collect { case k: String => k }
+      key <- map.keySet().asScala.collect { case k: String => k }
       if key.isInstanceOf[String]
       hostport <- parseEndpoint(map.get(key))
     } namesByHostPort(hostport) += key

@@ -68,7 +68,7 @@ private[finagle] class Cache[A](cacheSize: Int,
   }
 
   private[this] def cancelTimer() = synchronized {
-    timerTask foreach { _.cancel() }
+    timerTask.foreach { _.cancel() }
     timerTask = None
   }
 
@@ -79,10 +79,10 @@ private[finagle] class Cache[A](cacheSize: Int,
       if (!deque.isEmpty) scheduleTimer()
       es
     }
-    evicted foreach { evict(_) }
+    evicted.foreach { evict(_) }
   }
 
-  private[this] def evict(item: A) = evictor foreach { _(item) }
+  private[this] def evict(item: A) = evictor.foreach { _(item) }
 
   /**
     * Retrieve an item from the cache.  Items are retrieved in LIFO
@@ -114,7 +114,7 @@ private[finagle] class Cache[A](cacheSize: Int,
         None
       }
     }
-    evicted foreach { evict(_) }
+    evicted.foreach { evict(_) }
   }
 
   /**
@@ -128,7 +128,7 @@ private[finagle] class Cache[A](cacheSize: Int,
       oldDeque
     }
 
-    evicted.asScala foreach { case (_, item) => evict(item) }
+    evicted.asScala.foreach { case (_, item) => evict(item) }
   }
 
   /**

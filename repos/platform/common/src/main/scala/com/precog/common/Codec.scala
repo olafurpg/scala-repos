@@ -87,12 +87,12 @@ trait Codec[@spec(Boolean, Long, Double) A] { self =>
     def loop(s: S): M[Unit] =
       for {
         buf <- M.getBuffer(min)
-        _ <- writeMore(s, buf) map (loop(_)) getOrElse ().point[M]
+        _ <- writeMore(s, buf).map(loop(_)).getOrElse().point[M]
       } yield ()
 
     for {
       buf <- M.getBuffer(min)
-      _ <- writeInit(a, buf) map (loop(_)) getOrElse ().point[M]
+      _ <- writeInit(a, buf).map(loop(_)).getOrElse().point[M]
     } yield ()
   }
 
@@ -220,7 +220,7 @@ object Codec {
     }
 
     override def minSize(c: C) =
-      codecA.minSize(from(c)._1) max codecB.minSize(from(c)._2)
+      codecA.minSize(from(c)._1).max(codecB.minSize(from(c)._2))
     override def maxSize(c: C) = {
       val (a, b) = from(c)
       codecA.maxSize(a) + codecB.maxSize(b)
@@ -234,15 +234,19 @@ object Codec {
 
     def writeInit(c: C, buf: ByteBuffer): Option[S] = {
       val (a, b) = from(c)
-      (codecA.writeInit(a, buf) map (s => Left((s, b)))) orElse
-        (codecB.writeInit(b, buf) map (Right(_)))
+      (codecA
+        .writeInit(a, buf)
+        .map(s => Left((s, b))))
+        .orElse(codecB.writeInit(b, buf).map(Right(_)))
     }
 
     def writeMore(more: S, buf: ByteBuffer) = more match {
       case Left((s, b)) =>
-        (codecA.writeMore(s, buf) map (s => Left((s, b)))) orElse
-          (codecB.writeInit(b, buf) map (Right(_)))
-      case Right(s) => codecB.writeMore(s, buf) map (Right(_))
+        (codecA
+          .writeMore(s, buf)
+          .map(s => Left((s, b))))
+          .orElse(codecB.writeInit(b, buf).map(Right(_)))
+      case Right(s) => codecB.writeMore(s, buf).map(Right(_))
     }
 
     def read(buf: ByteBuffer): C = to(codecA.read(buf), codecB.read(buf))
@@ -298,8 +302,8 @@ object Codec {
       case FALSE_VALUE => false
       case invalid =>
         sys.error(
-          "Error reading boolean: expecting %d or %d, found %d" format
-            (TRUE_VALUE, FALSE_VALUE, invalid))
+          "Error reading boolean: expecting %d or %d, found %d"
+            .format(TRUE_VALUE, FALSE_VALUE, invalid))
     }
   }
 
@@ -524,7 +528,7 @@ object Codec {
 
     def writeUnsafe(as: IndexedSeq[A], sink: ByteBuffer) {
       writePackedInt(as.length, sink)
-      as foreach { elemCodec.writeUnsafe(_, sink) }
+      as.foreach { elemCodec.writeUnsafe(_, sink) }
     }
 
     @tailrec
@@ -549,16 +553,19 @@ object Codec {
     def writeMore(more: S, sink: ByteBuffer): Option[S] = more match {
       case Left(as) => writeInit(as, sink)
       case Right((s, as)) =>
-        elemCodec.writeMore(s, sink) map (Right(_, as)) orElse writeArray(
-          as.toList,
-          sink)
+        elemCodec
+          .writeMore(s, sink)
+          .map(Right(_, as))
+          .orElse(writeArray(as.toList, sink))
     }
 
     def read(src: ByteBuffer): IndexedSeq[A] =
-      ((0 until readPackedInt(src)) map (_ => elemCodec.read(src))).toIndexedSeq
+      (((0 until readPackedInt(src)))
+        .map(_ => elemCodec.read(src)))
+        .toIndexedSeq
 
     override def skip(buf: ByteBuffer) {
-      (0 until readPackedInt(buf)) foreach { _ =>
+      ((0 until readPackedInt(buf))).foreach { _ =>
         elemCodec.skip(buf)
       }
     }
@@ -629,10 +636,9 @@ object Codec {
       case Left(as) => writeInit(as, sink)
       case Right((s, as, row)) =>
         elemCodec
-          .writeMore(s, sink) map (s => Right((s, as, row))) orElse writeArray(
-          as,
-          row,
-          sink)
+          .writeMore(s, sink)
+          .map(s => Right((s, as, row)))
+          .orElse(writeArray(as, row, sink))
     }
 
     def read(src: ByteBuffer): Array[A] = {
@@ -672,11 +678,11 @@ object Codec {
     val codec: Codec[A]
 
     def init(a: A, sink: ByteBuffer): Option[State] =
-      codec.writeInit(a, sink) map (State(_))
+      codec.writeInit(a, sink).map(State(_))
 
     case class State(s: codec.S) {
       def more(sink: ByteBuffer): Option[State] =
-        codec.writeMore(s, sink) map (State(_))
+        codec.writeMore(s, sink).map(State(_))
     }
   }
 
@@ -693,7 +699,7 @@ object Codec {
   case class SparseBitSetCodec(size: Int) extends Codec[BitSet] {
 
     // The maxBytes is max. bits / 8 = (highestOneBit(size) << 3) / 8
-    private val maxBytes = java.lang.Integer.highestOneBit(size) max 1
+    private val maxBytes = java.lang.Integer.highestOneBit(size).max(1)
 
     type S = (Array[Byte], Int)
 
@@ -760,7 +766,7 @@ object Codec {
           set(offset + 1)
           offset + 2
         } else {
-          bs partition (_ < c) match {
+          bs.partition(_ < c) match {
             case (Nil, Nil) =>
               offset
             case (Nil, hi) =>
@@ -816,7 +822,7 @@ object Codec {
   case class SparseRawBitSetCodec(size: Int) extends Codec[RawBitSet] {
 
     // The maxBytes is max. bits / 8 = (highestOneBit(size) << 3) / 8
-    private val maxBytes = java.lang.Integer.highestOneBit(size) max 1
+    private val maxBytes = java.lang.Integer.highestOneBit(size).max(1)
 
     type S = (Array[Byte], Int)
 
@@ -917,7 +923,7 @@ object Codec {
           set(offset + 1)
           offset + 2
         } else {
-          bs partition (_ < c) match {
+          bs.partition(_ < c) match {
             case (Nil, Nil) =>
               offset
             case (Nil, hi) =>

@@ -260,7 +260,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       else
         in.healBraces() match {
           case Nil => showSyntaxErrors(); firstTry
-          case patches => (this withPatches patches).parse()
+          case patches => (this.withPatches(patches)).parse()
         }
     }
   }
@@ -294,10 +294,10 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       *  Backs up scanner data before evaluating a block and restores it after.
       */
     @inline final def lookingAhead[T](body: => T): T = {
-      val saved = new ScannerData {} copyFrom in
+      val saved = new ScannerData {}.copyFrom(in)
       in.nextToken()
       try body
-      finally in copyFrom saved
+      finally in.copyFrom(saved)
     }
 
     /** Perform an operation while peeking ahead.
@@ -305,12 +305,12 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       */
     @inline def peekingAhead(tree: => Tree): Tree = {
       @inline def peekahead() = {
-        in.prev copyFrom in
+        in.prev.copyFrom(in)
         in.nextToken()
       }
       @inline def pushback() = {
-        in.next copyFrom in
-        in copyFrom in.prev
+        in.next.copyFrom(in)
+        in.copyFrom(in.prev)
       }
       peekahead()
       // try it, in case it is recoverable
@@ -334,7 +334,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     def r2p(start: Offset, mid: Offset, end: Offset): Position =
       rangePos(source, start, mid, end)
     def r2p(start: Offset, mid: Offset): Position =
-      r2p(start, mid, in.lastOffset max start)
+      r2p(start, mid, in.lastOffset.max(start))
     def r2p(offset: Offset): Position = r2p(offset, offset)
 
     /** whether a non-continuable syntax error has been seen */
@@ -405,10 +405,10 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         /* For now we require there only be one top level object. */
         var seenModule = false
         val newStmts =
-          stmts collect {
+          stmts.collect {
             case t @ Import(_, _) => t
             case md @ ModuleDef(mods, name, template)
-                if !seenModule && (md exists isMainMethod) =>
+                if !seenModule && (md.exists(isMainMethod)) =>
               seenModule = true
               /* This slightly hacky situation arises because we have no way to communicate
                * back to the scriptrunner what the name of the program is.  Even if we were
@@ -427,7 +427,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       }
 
       if (mainModuleName == newTermName(ScriptRunner.defaultScriptMain))
-        searchForMain() foreach { return _ }
+        searchForMain().foreach { return _ }
 
       /*  Here we are building an AST representing the following source fiction,
        *  where `moduleName` is from -Xscript (defaults to "Main") and <stmts> are
@@ -641,17 +641,17 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     def acceptStatSepOpt() =
       if (!isStatSeqEnd) acceptStatSep()
 
-    def errorTypeTree = setInPos(TypeTree() setType ErrorType)
+    def errorTypeTree = setInPos(TypeTree().setType(ErrorType))
     def errorTermTree = setInPos(newLiteral(null))
     def errorPatternTree = setInPos(Ident(nme.WILDCARD))
 
     /** Check that type parameter is not by name or repeated. */
     def checkNotByNameOrVarargs(tpt: Tree) = {
-      if (treeInfo isByNameParamType tpt)
+      if (treeInfo.isByNameParamType(tpt))
         syntaxError(tpt.pos,
                     "no by-name parameter type allowed here",
                     skipIt = false)
-      else if (treeInfo isRepeatedParamType tpt)
+      else if (treeInfo.isRepeatedParamType(tpt))
         syntaxError(tpt.pos,
                     "no * parameter type allowed here",
                     skipIt = false)
@@ -765,31 +765,31 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     def atPos[T <: Tree](pos: Position)(t: T): T = global.atPos(pos)(t)
 
     def atInPos[T <: Tree](t: T): T = atPos(o2p(in.offset))(t)
-    def setInPos[T <: Tree](t: T): T = t setPos o2p(in.offset)
+    def setInPos[T <: Tree](t: T): T = t.setPos(o2p(in.offset))
 
     /** Convert tree to formal parameter list. */
     def convertToParams(tree: Tree): List[ValDef] = tree match {
-      case Parens(ts) => ts map convertToParam
+      case Parens(ts) => ts.map(convertToParam)
       case _ => List(convertToParam(tree))
     }
 
     /** Convert tree to formal parameter. */
     def convertToParam(tree: Tree): ValDef = atPos(tree.pos) {
       def removeAsPlaceholder(name: Name): Unit = {
-        placeholderParams = placeholderParams filter (_.name != name)
+        placeholderParams = placeholderParams.filter(_.name != name)
       }
       def errorParam =
-        makeParam(nme.ERROR, errorTypeTree setPos o2p(tree.pos.end))
+        makeParam(nme.ERROR, errorTypeTree.setPos(o2p(tree.pos.end)))
       tree match {
         case Ident(name) =>
           removeAsPlaceholder(name)
-          makeParam(name.toTermName, TypeTree() setPos o2p(tree.pos.end))
+          makeParam(name.toTermName, TypeTree().setPos(o2p(tree.pos.end)))
         case Typed(Ident(name), tpe) if tpe.isType => // get the ident!
           removeAsPlaceholder(name)
           makeParam(name.toTermName, tpe)
         case build.SyntacticTuple(as) =>
           val arity = as.length
-          val example = analyzer.exampleTuplePattern(as map {
+          val example = analyzer.exampleTuplePattern(as.map {
             case Ident(name) => name; case _ => nme.EMPTY
           })
           val msg = sm"""|not a legal formal parameter.
@@ -806,7 +806,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
 
     /** Convert (qual)ident to type identifier. */
     def convertToTypeId(tree: Tree): Tree = atPos(tree.pos) {
-      convertToTypeName(tree) getOrElse {
+      convertToTypeName(tree).getOrElse {
         syntaxError(tree.pos, "identifier expected", skipIt = false)
         errorTypeTree
       }
@@ -872,11 +872,11 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
               s"Incompatible args to makeBinop: !isExpr but targs=$targs")
 
       def mkSelection(t: Tree) = {
-        def sel = atPos(opPos union t.pos)(Select(stripParens(t), op.encode))
+        def sel = atPos(opPos.union(t.pos))(Select(stripParens(t), op.encode))
         if (targs.isEmpty) sel else atPos(left.pos)(TypeApply(sel, targs))
       }
       def mkNamed(args: List[Tree]) =
-        if (isExpr) args map treeInfo.assignmentToMaybeNamedArg else args
+        if (isExpr) args.map(treeInfo.assignmentToMaybeNamedArg) else args
       val arguments = right match {
         case Parens(args) => mkNamed(args)
         case _ => List(right)
@@ -947,7 +947,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       import opinfo._
       val operatorPos: Position = Position
         .range(rhs.pos.source, offset, offset, offset + operator.length)
-      val pos = lhs.pos union rhs.pos union operatorPos withPoint offset
+      val pos = lhs.pos.union(rhs.pos).union(operatorPos) withPoint offset
 
       atPos(pos)(
         makeBinop(isExpr, lhs, operator, rhs, operatorPos, opinfo.targs))
@@ -961,7 +961,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     def reduceStack(isExpr: Boolean, base: List[OpInfo], top: Tree): Tree = {
       val opPrecedence =
         if (isIdent) Precedence(in.name.toString) else Precedence(0)
-      val leftAssoc = !isIdent || (treeInfo isLeftAssoc in.name)
+      val leftAssoc = !isIdent || (treeInfo.isLeftAssoc(in.name))
 
       reduceStack(isExpr, base, top, opPrecedence, leftAssoc)
     }
@@ -1017,7 +1017,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
           accept(RPAREN)
           if (in.token == ARROW)
             atPos(start, in.skipToken()) { makeFunctionTypeTree(ts, typ()) } else {
-            ts foreach checkNotByNameOrVarargs
+            ts.foreach(checkNotByNameOrVarargs)
             val tuple = atPos(start) { makeSafeTupleType(ts, start) }
             infixTypeRest(
               compoundTypeRest(annotTypeRest(simpleTypeRest(tuple))),
@@ -1031,7 +1031,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         // so it's okay for us to filter them out here
         ExistentialTypeTree(
           t,
-          refinement() flatMap {
+          refinement().flatMap {
             case t @ TypeDef(_, _, _, TypeBoundsTree(_, _)) => Some(t)
             case t @ ValDef(_, _, _, EmptyTree) => Some(t)
             case EmptyTree => None
@@ -1147,7 +1147,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         // refinement from no refinement at all.  See bug #284.
         if (hasRefinement)
           types match {
-            case Ident(name) :: Nil if name endsWith "Unit" =>
+            case Ident(name) :: Nil if name.endsWith("Unit") =>
               warning(
                 braceOffset,
                 "Detected apparent refinement of Unit; are you missing an '=' sign?")
@@ -1188,7 +1188,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
           if (leftAssoc) infixTypeRest(mkOp(compoundType()), InfixMode.LeftOp)
           else mkOp(infixType(InfixMode.RightOp))
         }
-        if (isIdent) checkRepeatedParam orElse asInfix
+        if (isIdent) checkRepeatedParam.orElse(asInfix)
         else t
       }
 
@@ -1232,9 +1232,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       val point = if (isIdent) in.offset else in.lastOffset //SI-8459
       //assert(t.pos.isDefined, t)
       if (t != EmptyTree)
-        Select(t, ident(skipIt = false)) setPos r2p(t.pos.start,
-                                                    point,
-                                                    in.lastOffset)
+        Select(t, ident(skipIt = false))
+          .setPos(r2p(t.pos.start, point, in.lastOffset))
       else errorTermTree // has already been reported
     }
 
@@ -1264,7 +1263,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         val name = ident()
         t = atPos(start) {
           if (tok == BACKQUOTED_IDENT)
-            Ident(name) updateAttachment BackquotedIdentifierAttachment
+            Ident(name).updateAttachment(BackquotedIdentifierAttachment)
           else Ident(name)
         }
         if (in.token == DOT) {
@@ -1383,11 +1382,10 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       if (placeholderParams.nonEmpty && !isWildcard(res)) {
         res = atPos(res.pos)(Function(placeholderParams.reverse, res))
         if (isAny)
-          placeholderParams foreach
-            (_.tpt match {
-              case tpt @ TypeTree() => tpt setType definitions.AnyTpe
-              case _ => // some ascription
-            })
+          placeholderParams.foreach(_.tpt match {
+            case tpt @ TypeTree() => tpt.setType(definitions.AnyTpe)
+            case _ => // some ascription
+          })
         placeholderParams = List()
       }
       placeholderParams = placeholderParams ::: savedPlaceholderParams
@@ -1438,8 +1436,8 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         //val t1 = atPos(o2p(start)) { Select(Select (Ident(nme.ROOTPKG), nme.scala_), nme.StringContext) }
         val t1 = atPos(o2p(start)) { Ident(nme.StringContext) }
         val t2 = atPos(start) { Apply(t1, partsBuf.toList) }
-        t2 setPos t2.pos.makeTransparent
-        val t3 = Select(t2, interpolator) setPos t2.pos
+        t2.setPos(t2.pos.makeTransparent)
+        val t3 = Select(t2, interpolator).setPos(t2.pos)
         atPos(start) { Apply(t3, exprsBuf.toList) }
       }
       if (inPattern) stringCheese
@@ -1491,7 +1489,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       val pname = freshTypeName("_$")
       val t = atPos(start)(Ident(pname))
       val bounds = typeBounds()
-      val param = atPos(t.pos union bounds.pos) {
+      val param = atPos(t.pos.union(bounds.pos)) {
         makeSyntheticTypeParam(pname, bounds)
       }
       placeholderTypes = param :: placeholderTypes
@@ -1623,7 +1621,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
           }
           def adjustStart(tree: Tree) =
             if (tree.pos.isRange && start < tree.pos.start)
-              tree setPos tree.pos.withStart(start)
+              tree.setPos(tree.pos.withStart(start))
             else tree
           adjustStart(parseFor)
         case RETURN =>
@@ -1810,7 +1808,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
               val npos = r2p(nstart, nstart, in.lastOffset)
               val tstart = in.offset
               val (parents, self, stats) = template()
-              val cpos = r2p(tstart, tstart, in.lastOffset max tstart)
+              val cpos = r2p(tstart, tstart, in.lastOffset.max(tstart))
               gen.mkNew(parents, self, stats, npos, cpos)
             case _ =>
               syntaxErrorOrIncompleteAnd("illegal start of simple expression",
@@ -1986,7 +1984,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
 
       // why max? IDE stress tests have shown that lastOffset could be less than start,
       // I guess this happens if instead if a for-expression we sit on a closing paren.
-      val genPos = r2p(start, point, in.lastOffset max start)
+      val genPos = r2p(start, point, in.lastOffset.max(start))
       gen.mkGenerator(genPos, pat, hasEq, rhs) :: tail
     }
 
@@ -2120,7 +2118,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
             pushOpInfo(next); loop(simplePattern(badPattern3))
           case next => next
         }
-        checkWildStar orElse stripParens(loop(top))
+        checkWildStar.orElse(stripParens(loop(top)))
       }
 
       def badPattern3(): Tree = {
@@ -2270,16 +2268,16 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     private def normalizeModifiers(mods: Modifiers): Modifiers =
       if (mods.isPrivate && mods.hasAccessBoundary)
         normalizeModifiers(mods &~ Flags.PRIVATE)
-      else if (mods hasAllFlags (Flags.ABSTRACT | Flags.OVERRIDE))
+      else if (mods.hasAllFlags(Flags.ABSTRACT | Flags.OVERRIDE))
         normalizeModifiers(
           mods &~ (Flags.ABSTRACT | Flags.OVERRIDE) | Flags.ABSOVERRIDE)
       else mods
 
     private def addMod(mods: Modifiers, mod: Long, pos: Position): Modifiers = {
-      if (mods hasFlag mod)
+      if (mods.hasFlag(mod))
         syntaxError(in.offset, "repeated modifier", skipIt = false)
       in.nextToken()
-      (mods | mod) withPosition (mod, pos)
+      ((mods | mod)).withPosition(mod, pos)
     }
 
     private def tokenRange(token: TokenData) =
@@ -2428,7 +2426,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       }
       val result = vds.toList
       if (owner == nme.CONSTRUCTOR &&
-          (result.isEmpty || (result.head take 1 exists (_.mods.isImplicit)))) {
+          (result.isEmpty || (result.head
+            .take(1)
+            .exists(_.mods.isImplicit)))) {
         in.token match {
           case LBRACKET =>
             syntaxError(in.offset,
@@ -2480,7 +2480,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
             skipIt = false)
         in.token match {
           case v @ (VAL | VAR) =>
-            mods = mods withPosition (in.token.toLong, tokenRange(in))
+            mods = mods.withPosition(in.token.toLong, tokenRange(in))
             if (v == VAR) mods |= Flags.MUTABLE
             in.nextToken()
           case _ =>
@@ -2520,10 +2520,11 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
           expr()
         } else EmptyTree
       atPos(start, if (name == nme.ERROR) start else nameOffset) {
-        ValDef((mods | implicitmod.toLong | bynamemod) withAnnotations annots,
-               name.toTermName,
-               tpt,
-               default)
+        ValDef(
+          ((mods | implicitmod.toLong | bynamemod)).withAnnotations(annots),
+          name.toTermName,
+          tpt,
+          default)
       }
     }
 
@@ -2580,7 +2581,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       newLineOptWhenFollowedBy(LBRACKET)
       if (in.token == LBRACKET)
         inBrackets(commaSeparated(
-          typeParam(NoMods withAnnotations annotations(skipNewLines = true))))
+          typeParam(NoMods.withAnnotations(annotations(skipNewLines = true)))))
       else Nil
     }
 
@@ -2592,10 +2593,10 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       val lo = bound(SUPERTYPE)
       val hi = bound(SUBTYPE)
       val t = TypeBoundsTree(lo, hi)
-      val defined = List(t.hi, t.lo) filter (_.pos.isDefined)
+      val defined = List(t.hi, t.lo).filter(_.pos.isDefined)
 
-      if (defined.nonEmpty) t setPos wrappingPos(defined)
-      else t setPos o2p(in.offset)
+      if (defined.nonEmpty) t.setPos(wrappingPos(defined))
+      else t.setPos(o2p(in.offset))
     }
 
     def bound(tok: Token): Tree =
@@ -2636,7 +2637,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
        * an underscore, a left brace, or an undotted identifier.
        */
       def loop(expr: Tree): Tree = {
-        expr setPos expr.pos.makeTransparent
+        expr.setPos(expr.pos.makeTransparent)
         val selectors: List[ImportSelector] = in.token match {
           case USCORE => List(importSelector()) // import foo.bar._;
           case LBRACE => importSelectors() // import foo.bar.{ x, y, z }
@@ -2675,7 +2676,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       */
     def importSelectors(): List[ImportSelector] = {
       val selectors = inBracesOrNil(commaSeparated(importSelector()))
-      selectors.init foreach {
+      selectors.init.foreach {
         case ImportSelector(nme.WILDCARD, pos, _, _) =>
           syntaxError(pos, "Wildcard import must be in last position")
         case _ => ()
@@ -2726,15 +2727,15 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
                     skipIt = false)
       in.token match {
         case VAL =>
-          patDefOrDcl(pos, mods withPosition (VAL, tokenRange(in)))
+          patDefOrDcl(pos, mods.withPosition(VAL, tokenRange(in)))
         case VAR =>
           patDefOrDcl(
             pos,
-            (mods | Flags.MUTABLE) withPosition (VAR, tokenRange(in)))
+            ((mods | Flags.MUTABLE)).withPosition(VAR, tokenRange(in)))
         case DEF =>
-          List(funDefOrDcl(pos, mods withPosition (DEF, tokenRange(in))))
+          List(funDefOrDcl(pos, mods.withPosition(DEF, tokenRange(in))))
         case TYPE =>
-          List(typeDefOrDcl(pos, mods withPosition (TYPE, tokenRange(in))))
+          List(typeDefOrDcl(pos, mods.withPosition(TYPE, tokenRange(in))))
         case _ =>
           List(tmplDef(pos, mods))
       }
@@ -2746,7 +2747,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
 
     def nonLocalDefOrDcl: List[Tree] = {
       val annots = annotations(skipNewLines = true)
-      defOrDcl(caseAwareTokenOffset, modifiers() withAnnotations annots)
+      defOrDcl(caseAwareTokenOffset, modifiers().withAnnotations(annots))
     }
 
     /** {{{
@@ -2764,7 +2765,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         if (tp.isEmpty || in.token == EQUALS) {
           accept(EQUALS)
           if (!tp.isEmpty && newmods.isMutable &&
-              (lhs.toList forall (_.isInstanceOf[Ident])) &&
+              (lhs.toList.forall(_.isInstanceOf[Ident])) &&
               in.token == USCORE) {
             in.nextToken()
             newmods = newmods | Flags.DEFAULTINIT
@@ -2779,7 +2780,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       def mkDefs(p: Tree, tp: Tree, rhs: Tree): List[Tree] = {
         val trees = {
           val pat =
-            if (tp.isEmpty) p else Typed(p, tp) setPos (p.pos union tp.pos)
+            if (tp.isEmpty) p else Typed(p, tp).setPos(p.pos.union(tp.pos))
           makePatDef(newmods, pat, rhs)
         }
         if (newmods.isDeferred) {
@@ -2798,12 +2799,13 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         trees
       }
       val trees =
-        (lhs.toList.init flatMap (mkDefs(_, tp.duplicate, rhs.duplicate))) ::: mkDefs(
+        (lhs.toList.init
+          .flatMap(mkDefs(_, tp.duplicate, rhs.duplicate))) ::: mkDefs(
           lhs.last,
           tp,
           rhs)
       val hd = trees.head
-      hd setPos hd.pos.withStart(pos)
+      hd.setPos(hd.pos.withStart(pos))
       ensureNonOverlapping(hd, trees.tail)
       trees
     }
@@ -2849,7 +2851,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       if (in.token == THIS) {
         atPos(start, in.skipToken()) {
           val vparamss = paramClauses(nme.CONSTRUCTOR,
-                                      classContextBounds map (_.duplicate),
+                                      classContextBounds.map(_.duplicate),
                                       ofCaseClass = false)
           newLineOptWhenFollowedBy(LBRACE)
           val rhs = in.token match {
@@ -2992,7 +2994,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     def topLevelTmplDef: Tree = {
       val annots = annotations(skipNewLines = true)
       val pos = caseAwareTokenOffset
-      val mods = modifiers() withAnnotations annots
+      val mods = modifiers().withAnnotations(annots)
       tmplDef(pos, mods)
     }
 
@@ -3007,23 +3009,25 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       in.token match {
         case TRAIT =>
           classDef(pos,
-                   (mods | Flags.TRAIT | Flags.ABSTRACT) withPosition
-                     (Flags.TRAIT, tokenRange(in)))
+                   ((mods | Flags.TRAIT | Flags.ABSTRACT))
+                     .withPosition(Flags.TRAIT, tokenRange(in)))
         case CLASS =>
           classDef(pos, mods)
         case CASECLASS =>
           classDef(
             pos,
-            (mods | Flags.CASE) withPosition
-              (Flags.CASE, tokenRange(
+            ((mods | Flags.CASE)).withPosition(
+              Flags.CASE,
+              tokenRange(
                 in.prev /*scanner skips on 'case' to 'class', thus take prev*/ )))
         case OBJECT =>
           objectDef(pos, mods)
         case CASEOBJECT =>
           objectDef(
             pos,
-            (mods | Flags.CASE) withPosition
-              (Flags.CASE, tokenRange(
+            ((mods | Flags.CASE)).withPosition(
+              Flags.CASE,
+              tokenRange(
                 in.prev /*scanner skips on 'case' to 'object', thus take prev*/ )))
         case _ =>
           syntaxErrorOrIncompleteAnd("expected start of definition",
@@ -3074,7 +3078,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
           var mods1 = mods
           val template = templateOpt(mods1,
                                      name,
-                                     constrMods withAnnotations constrAnnots,
+                                     constrMods.withAnnotations(constrAnnots),
                                      vparamss,
                                      tstart)
           val result = gen.mkClassDef(mods1, name, tparams, template)
@@ -3357,14 +3361,14 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
           if (in.token == ARROW) {
             first match {
               case Typed(tree @ This(tpnme.EMPTY), tpt) =>
-                self = atPos(tree.pos union tpt.pos) {
+                self = atPos(tree.pos.union(tpt.pos)) {
                   makeSelfDef(nme.WILDCARD, tpt)
                 }
               case _ =>
                 convertToParam(first) match {
                   case tree @ ValDef(_, name, tpt, EmptyTree)
                       if (name != nme.ERROR) =>
-                    self = atPos(tree.pos union tpt.pos) {
+                    self = atPos(tree.pos.union(tpt.pos)) {
                       makeSelfDef(name, tpt)
                     }
                   case _ =>
@@ -3450,9 +3454,11 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     def localDef(implicitMod: Int): List[Tree] = {
       val annots = annotations(skipNewLines = true)
       val pos = in.offset
-      val mods = (localModifiers() | implicitMod.toLong) withAnnotations annots
+      val mods =
+        ((localModifiers() | implicitMod.toLong)).withAnnotations(annots)
       val defs =
-        if (!(mods hasFlag ~(Flags.IMPLICIT | Flags.LAZY))) defOrDcl(pos, mods)
+        if (!(mods.hasFlag(~(Flags.IMPLICIT | Flags.LAZY))))
+          defOrDcl(pos, mods)
         else List(tmplDef(pos, mods))
 
       in.token match {
@@ -3546,7 +3552,7 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         case (stat @ PackageDef(_, _)) :: Nil => stat
         case stats =>
           val start =
-            if (stats forall (_ == EmptyTree)) 0
+            if (stats.forall(_ == EmptyTree)) 0
             else {
               val wpos = wrappingPos(stats)
               if (wpos.isDefined) wpos.start

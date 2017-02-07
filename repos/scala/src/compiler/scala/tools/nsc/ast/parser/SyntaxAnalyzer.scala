@@ -62,11 +62,11 @@ abstract class SyntaxAnalyzer
       if (start == end) "" + start else s"$start,$end"
     }
     def outputForSed(md: MemberDef): String = {
-      val pos_s = "%-12s" format outputPos(md) + "p"
+      val pos_s = "%-12s".format(outputPos(md) + "p")
       s"$pos_s $path    # ${md.keyword} ${md.name}"
     }
     def outputForScreen(md: MemberDef): String = {
-      val pos_s = "%-20s" format " " * currentDepth + outputPos(md)
+      val pos_s = "%-20s".format(" " * currentDepth + outputPos(md))
       s"$pos_s ${md.keyword} ${md.name}"
     }
 
@@ -105,7 +105,7 @@ abstract class SyntaxAnalyzer
         validatePositions(unit.body)
 
       if (settings.Ymemberpos.isSetByUser)
-        new MemberPosReporter(unit) show (style = settings.Ymemberpos.value)
+        new MemberPosReporter(unit).show(style = settings.Ymemberpos.value)
     }
   }
 }

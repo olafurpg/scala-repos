@@ -26,27 +26,28 @@ final class FishnetApi(
 
   def authenticateClient(req: JsonApi.Request,
                          ip: Client.IpAddress): Fu[Try[Client]] = {
-    if (offlineMode) repo.getOfflineClient map some
+    if (offlineMode) repo.getOfflineClient.map(some)
     else repo.getEnabledClient(req.fishnet.apikey)
-  } map {
-    case None =>
-      Failure(
-        new Exception("Can't authenticate: invalid key or disabled client"))
-    case Some(client) =>
-      ClientVersion accept req.fishnet.version map (_ => client)
-  } flatMap {
-    case Success(client) =>
-      repo.updateClientInstance(client, req instance ip) map Success.apply
-    case failure => fuccess(failure)
-  }
+  }.map {
+      case None =>
+        Failure(
+          new Exception("Can't authenticate: invalid key or disabled client"))
+      case Some(client) =>
+        ClientVersion.accept(req.fishnet.version).map(_ => client)
+    }
+    .flatMap {
+      case Success(client) =>
+        repo.updateClientInstance(client, req instance ip).map(Success.apply)
+      case failure => fuccess(failure)
+    }
 
   def acquire(client: Client): Fu[Option[JsonApi.Work]] =
     (client.skill match {
       case Skill.Move => acquireMove(client)
       case Skill.Analysis => acquireAnalysis(client)
-      case Skill.All => acquireMove(client) orElse acquireAnalysis(client)
+      case Skill.All => acquireMove(client).orElse(acquireAnalysis(client))
     }).chronometer
-      .mon(_.fishnet.acquire time client.skill.key)
+      .mon(_.fishnet.acquire.time(client.skill.key))
       .logIfSlow(100, logger)(_ => s"acquire ${client.skill}")
       .result
       .withTimeout(1 second, AcquireTimeout)
@@ -60,9 +61,9 @@ final class FishnetApi(
       } >>- monitor.acquire(client)
 
   private def acquireMove(client: Client): Fu[Option[JsonApi.Work]] = fuccess {
-    moveDb.oldestNonAcquired.map(_ assignTo client) map { found =>
-      moveDb update found
-      JsonApi fromWork found
+    moveDb.oldestNonAcquired.map(_.assignTo(client)).map { found =>
+      moveDb.update(found)
+      JsonApi.fromWork(found)
     }
   }
 
@@ -81,27 +82,27 @@ final class FishnetApi(
         .one[Work.Analysis]
         .flatMap {
           _ ?? { work =>
-            repo.updateAnalysis(work assignTo client) inject work.some
+            repo.updateAnalysis(work.assignTo(client)) inject work.some
           }
         }
-    }.map { _ map JsonApi.fromWork }
+    }.map { _.map(JsonApi.fromWork) }
 
   def postMove(workId: Work.Id,
                client: Client,
                data: JsonApi.Request.PostMove): Funit =
     fuccess {
-      moveDb.get(workId).filter(_ isAcquiredBy client) match {
+      moveDb.get(workId).filter(_.isAcquiredBy(client)) match {
         case None => monitor.notFound(Client.Skill.Move, client)
-        case Some(work) if work isAcquiredBy client =>
+        case Some(work) if work.isAcquiredBy(client) =>
           data.move.uci match {
             case Some(uci) =>
-              moveDb delete work
+              moveDb.delete(work)
               monitor.move(work, client)
               hub.actor.roundMap ! hubApi.map.Tell(
                 work.game.id,
                 hubApi.round.FishnetPlay(uci, work.currentFen))
             case _ =>
-              moveDb updateOrGiveUp work.invalid
+              moveDb.updateOrGiveUp(work.invalid)
               monitor.failure(work, client)
           }
         case Some(work) => monitor.notAcquired(work, client)
@@ -115,24 +116,26 @@ final class FishnetApi(
                    client: Client,
                    data: JsonApi.Request.PostAnalysis): Funit =
     sequencer {
-      repo.getAnalysis(workId) flatMap {
+      repo.getAnalysis(workId).flatMap {
         case None =>
           monitor.notFound(Client.Skill.Analysis, client)
           fuccess(none)
-        case Some(work) if work isAcquiredBy client =>
-          AnalysisBuilder(client, work, data) flatMap { analysis =>
-            monitor.analysis(work, client, data)
-            repo.deleteAnalysis(work) inject analysis.some
-          } recoverWith {
-            case e: AnalysisBuilder.GameIsGone =>
-              logger.warn(
-                s"Game ${work.game.id} was deleted by ${work.sender} before analysis completes")
+        case Some(work) if work.isAcquiredBy(client) =>
+          AnalysisBuilder(client, work, data)
+            .flatMap { analysis =>
               monitor.analysis(work, client, data)
-              repo.deleteAnalysis(work) inject none
-            case e: Exception =>
-              monitor.failure(work, client)
-              repo.updateOrGiveUpAnalysis(work.invalid) inject none
-          }
+              repo.deleteAnalysis(work) inject analysis.some
+            }
+            .recoverWith {
+              case e: AnalysisBuilder.GameIsGone =>
+                logger.warn(
+                  s"Game ${work.game.id} was deleted by ${work.sender} before analysis completes")
+                monitor.analysis(work, client, data)
+                repo.deleteAnalysis(work) inject none
+              case e: Exception =>
+                monitor.failure(work, client)
+                repo.updateOrGiveUpAnalysis(work.invalid) inject none
+            }
         case Some(work) =>
           monitor.notAcquired(work, client)
           fuccess(none)
@@ -146,7 +149,7 @@ final class FishnetApi(
       .flatMap { _ ?? saveAnalysis }
 
   def abort(workId: Work.Id, client: Client): Funit = sequencer {
-    repo.getAnalysis(workId).map(_.filter(_ isAcquiredBy client)) flatMap {
+    repo.getAnalysis(workId).map(_.filter(_.isAcquiredBy(client))).flatMap {
       _ ?? { work =>
         monitor.abort(work, client)
         repo.updateAnalysis(work.abort)
@@ -173,15 +176,15 @@ final class FishnetApi(
                             instance = None,
                             enabled = true,
                             createdAt = DateTime.now)
-        repo addClient client inject client
+        repo.addClient(client) inject client
     }
 
   private[fishnet] def setClientSkill(key: Client.Key, skill: String) =
     Client.Skill.byKey(skill).fold(fufail[Unit](s"Invalid skill $skill")) {
       sk =>
-        repo getClient key flatten s"No client with key $key" flatMap {
+        repo.getClient(key).flatten(s"No client with key $key").flatMap {
           client =>
-            repo updateClient client.copy(skill = sk)
+            repo.updateClient(client.copy(skill = sk))
         }
     }
 }

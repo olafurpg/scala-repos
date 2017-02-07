@@ -50,7 +50,7 @@ abstract class SnapshotStoreSpec(config: Config)
     extension.snapshotStoreFor(null)
 
   def writeSnapshots(): Seq[SnapshotMetadata] = {
-    1 to 5 map { i ⇒
+    (1 to 5).map { i ⇒
       val metadata = SnapshotMetadata(pid, i + 10)
       snapshotStore.tell(SaveSnapshot(metadata, s"s-${i}"), senderProbe.ref)
       senderProbe.expectMsgPF() { case SaveSnapshotSuccess(md) ⇒ md }

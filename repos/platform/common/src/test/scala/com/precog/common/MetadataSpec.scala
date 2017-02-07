@@ -47,8 +47,8 @@ class MetadataSpec
     "merge with like metadata" in check {
       (sample1: List[Metadata], sample2: List[Metadata]) =>
         val prepared =
-          sample1 zip sample2 map {
-            case (e1, e2) => (e1, e2, e1 merge e2)
+          sample1.zip(sample2).map {
+            case (e1, e2) => (e1, e2, e1.merge(e2))
           }
 
         forall(prepared) {
@@ -63,21 +63,21 @@ class MetadataSpec
                 Some(LongValueStats(c3, mn3, mx3))) => {
             c3 must_== c1 + c2
             mn3 must_== (mn1 min mn2)
-            mx3 must_== (mx1 max mx2)
+            mx3 must_== (mx1.max(mx2))
           }
           case (DoubleValueStats(c1, mn1, mx1),
                 DoubleValueStats(c2, mn2, mx2),
                 Some(DoubleValueStats(c3, mn3, mx3))) => {
             c3 must_== c1 + c2
             mn3 must_== (mn1 min mn2)
-            mx3 must_== (mx1 max mx2)
+            mx3 must_== (mx1.max(mx2))
           }
           case (BigDecimalValueStats(c1, mn1, mx1),
                 BigDecimalValueStats(c2, mn2, mx2),
                 Some(BigDecimalValueStats(c3, mn3, mx3))) => {
             c3 must_== c1 + c2
             mn3 must_== (mn1 min mn2)
-            mx3 must_== (mx1 max mx2)
+            mx3 must_== (mx1.max(mx2))
           }
           case (StringValueStats(c1, mn1, mx1),
                 StringValueStats(c2, mn2, mx2),
@@ -106,7 +106,7 @@ class MetadataSpec
       (sample1: List[Map[MetadataType, Metadata]],
        sample2: List[Map[MetadataType, Metadata]]) =>
         val prepared =
-          sample1 zip sample2 map {
+          sample1.zip(sample2).map {
             case (s1, s2) => (s1, s2, s1 |+| s2)
           }
 
@@ -144,7 +144,7 @@ trait MetadataGenerators extends util.ArbitraryJValue {
   def genMetadataList: Gen[List[Metadata]] =
     for (cnt <- choose(0, 10); l <- listOfN(cnt, genMetadata)) yield { l }
 
-  def genMetadataMap: Gen[Map[MetadataType, Metadata]] = genMetadataList map {
+  def genMetadataMap: Gen[Map[MetadataType, Metadata]] = genMetadataList.map {
     l =>
       Map(l.map(m => (m.metadataType, m)): _*)
   }
@@ -157,15 +157,15 @@ trait MetadataGenerators extends util.ArbitraryJValue {
       yield BooleanValueStats(count, trueCount)
   def genLongMetadata: Gen[LongValueStats] =
     for (count <- choose(0, 1000); a <- arbLong.arbitrary;
-         b <- arbLong.arbitrary) yield LongValueStats(count, a min b, a max b)
+         b <- arbLong.arbitrary) yield LongValueStats(count, a min b, a.max(b))
   def genDoubleMetadata: Gen[DoubleValueStats] =
     for (count <- choose(0, 1000); a <- arbDouble.arbitrary;
          b <- arbDouble.arbitrary)
-      yield DoubleValueStats(count, a min b, a max b)
+      yield DoubleValueStats(count, a min b, a.max(b))
   def genBigDecimalMetadata: Gen[BigDecimalValueStats] =
     for (count <- choose(0, 1000); a <- arbBigDecimal.arbitrary;
          b <- arbBigDecimal.arbitrary)
-      yield BigDecimalValueStats(count, a min b, a max b)
+      yield BigDecimalValueStats(count, a min b, a.max(b))
   def genStringMetadata: Gen[StringValueStats] =
     for (count <- choose(0, 1000); a <- arbString.arbitrary;
          b <- arbString.arbitrary)

@@ -67,7 +67,7 @@ object MailerSpec extends Specification {
     eventually {
       lastMessage.isEmpty must_== false
     }
-    lastMessage openOrThrowException ("Checked")
+    lastMessage.openOrThrowException("Checked")
   }
 
   "A Mailer" should {

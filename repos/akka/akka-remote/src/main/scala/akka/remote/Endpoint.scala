@@ -308,7 +308,7 @@ private[remote] class ReliableDeliverySupervisor(
   }
 
   var writer: ActorRef = createWriter()
-  var uid: Option[Int] = handleOrActive map { _.handshakeInfo.uid }
+  var uid: Option[Int] = handleOrActive.map { _.handshakeInfo.uid }
   var bailoutAt: Option[Deadline] = None
   var maxSilenceTimer: Option[Cancellable] = None
   // Processing of Acks has to be delayed until the UID after a reconnect is discovered. Depending whether the
@@ -326,7 +326,7 @@ private[remote] class ReliableDeliverySupervisor(
     // Such a situation may arise when the EndpointWriter is shut down, and all of its mailbox contents are delivered
     // to dead letters. These messages should be ignored, as they still live in resendBuffer and might be delivered to
     // the remote system later.
-    (resendBuffer.nacked ++ resendBuffer.nonAcked) foreach { s ⇒
+    ((resendBuffer.nacked ++ resendBuffer.nonAcked)).foreach { s ⇒
       context.system.deadLetters ! s.copy(seqOpt = None)
     }
     receiveBuffers.remove(Link(localAddress, remoteAddress))
@@ -387,7 +387,7 @@ private[remote] class ReliableDeliverySupervisor(
       resendAll()
 
     case s: EndpointWriter.StopReading ⇒
-      writer forward s
+      writer.forward(s)
   }
 
   def gated(writerTerminated: Boolean,
@@ -497,16 +497,16 @@ private[remote] class ReliableDeliverySupervisor(
         writer ! sequencedSend
     } else writer ! send
 
-  private def resendNacked(): Unit = resendBuffer.nacked foreach { writer ! _ }
+  private def resendNacked(): Unit = resendBuffer.nacked.foreach { writer ! _ }
 
   private def resendAll(): Unit = {
     resendNacked()
-    resendBuffer.nonAcked.take(settings.SysResendLimit) foreach { writer ! _ }
+    resendBuffer.nonAcked.take(settings.SysResendLimit).foreach { writer ! _ }
   }
 
   private def tryBuffer(s: Send): Unit =
     try {
-      resendBuffer = resendBuffer buffer s
+      resendBuffer = resendBuffer.buffer(s)
       bufferWasInUse = true
     } catch {
       case NonFatal(e) ⇒
@@ -657,7 +657,7 @@ private[remote] class EndpointWriter(
 
   var reader: Option[ActorRef] = None
   var handle: Option[AkkaProtocolHandle] = handleOrActive
-  val readerId = Iterator from 0
+  val readerId = Iterator.from(0)
 
   def newAckDeadline: Deadline = Deadline.now + settings.SysMsgAckTimeout
   var ackDeadline: Deadline = newAckDeadline
@@ -703,7 +703,8 @@ private[remote] class EndpointWriter(
       case None ⇒
         transport
           .associate(remoteAddress, refuseUid)
-          .map(Handle(_)) pipeTo self
+          .map(Handle(_))
+          .pipeTo(self)
     }
   }
 
@@ -714,7 +715,7 @@ private[remote] class EndpointWriter(
     ackIdleTimer.cancel()
     while (!prioBuffer.isEmpty) extendedSystem.deadLetters ! prioBuffer.poll
     while (!buffer.isEmpty) extendedSystem.deadLetters ! buffer.poll
-    handle foreach { _.disassociate(stopReason) }
+    handle.foreach { _.disassociate(stopReason) }
     eventPublisher.notifyListeners(
       DisassociatedEvent(localAddress, remoteAddress, inbound))
   }
@@ -744,10 +745,10 @@ private[remote] class EndpointWriter(
   }
 
   def enqueueInBuffer(msg: AnyRef): Unit = msg match {
-    case s @ Send(_: PriorityMessage, _, _, _) ⇒ prioBuffer offer s
+    case s @ Send(_: PriorityMessage, _, _, _) ⇒ prioBuffer.offer(s)
     case s @ Send(ActorSelectionMessage(_: PriorityMessage, _, _), _, _, _) ⇒
-      prioBuffer offer s
-    case _ ⇒ buffer offer msg
+      prioBuffer.offer(s)
+    case _ ⇒ buffer.offer(msg)
   }
 
   val buffering: Receive = {
@@ -755,7 +756,7 @@ private[remote] class EndpointWriter(
     case BackoffTimer ⇒ sendBufferedMessages()
     case FlushAndStop ⇒
       // Flushing is postponed after the pending writes
-      buffer offer FlushAndStop
+      buffer.offer(FlushAndStop)
       context.system.scheduler
         .scheduleOnce(settings.FlushWait, self, FlushAndStopTimeout)
     case FlushAndStopTimeout ⇒
@@ -981,7 +982,7 @@ private[remote] class EndpointWriter(
       }
     case TakeOver(newHandle, replyTo) ⇒
       // Shutdown old reader
-      handle foreach { _.disassociate() }
+      handle.foreach { _.disassociate() }
       handle = Some(newHandle)
       replyTo ! TookOver(self, newHandle)
       context.become(handoff)
@@ -1211,7 +1212,7 @@ private[remote] class EndpointReader(
 
     // Notify writer that some messages can be acked
     context.parent ! OutboundAck(ack)
-    deliver foreach { m ⇒
+    deliver.foreach { m ⇒
       msgDispatch.dispatch(m.recipient,
                            m.recipientAddress,
                            m.serializedMessage,

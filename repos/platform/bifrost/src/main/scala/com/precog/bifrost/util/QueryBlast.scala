@@ -101,7 +101,7 @@ object QueryBlast extends AkkaDefaults {
       count += 1
       if ((count + errors) % interval == 0) {
         val now = System.currentTimeMillis()
-        stats foreach {
+        stats.foreach {
           case (key, stats) =>
             println(
               "%-20d\t%12d\t%f\t%f\t%f\t%f\t(%d)".format(

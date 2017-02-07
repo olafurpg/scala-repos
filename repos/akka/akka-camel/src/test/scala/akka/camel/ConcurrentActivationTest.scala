@@ -58,7 +58,7 @@ class ConcurrentActivationTest
         // map over all futures, put all futures in one list of activated and deactivated actor refs.
         futureRegistrarLists.map {
           case (futureActivations, futureDeactivations) ⇒
-            futureActivations zip futureDeactivations map {
+            futureActivations.zip(futureDeactivations).map {
               case (activations, deactivations) ⇒
                 promiseAllRefs.success(
                   (activations.flatten, deactivations.flatten))
@@ -162,7 +162,7 @@ class Registrar(val start: Int,
           "concurrent-test-producer-" + start + "-" + i)
       index = index + 1
       if (activations.size == number * 2) {
-        Future.sequence(activations.toList) map activationsPromise.success
+        Future.sequence(activations.toList).map(activationsPromise.success)
       }
     case reg: DeRegisterConsumersAndProducers ⇒
       actorRefs.foreach { aref ⇒
@@ -176,7 +176,9 @@ class Registrar(val start: Int,
         }
         deActivations += result
         if (deActivations.size == number * 2) {
-          Future.sequence(deActivations.toList) map deActivationsPromise.success
+          Future
+            .sequence(deActivations.toList)
+            .map(deActivationsPromise.success)
         }
       }
   }

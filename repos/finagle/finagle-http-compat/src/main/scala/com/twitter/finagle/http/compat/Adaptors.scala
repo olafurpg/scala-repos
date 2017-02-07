@@ -16,7 +16,7 @@ abstract class Adaptor[Req, Rep]
   private[compat] def out(rep: Rep): Future[http.Response]
   def apply(req: http.Request,
             next: Service[Req, Rep]): Future[http.Response] =
-    in(req) flatMap (next) flatMap (out)
+    in(req).flatMap(next).flatMap(out)
 }
 
 /**
@@ -44,7 +44,7 @@ abstract class ClientAdaptor[Req, Rep]
   private[compat] def out(rep: http.Response): Future[Rep]
   def apply(req: Req,
             next: Service[http.Request, http.Response]): Future[Rep] =
-    in(req) flatMap (next) flatMap (out)
+    in(req).flatMap(next).flatMap(out)
 }
 
 /**

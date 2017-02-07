@@ -6,7 +6,7 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     val m = SortedMap(Array[Byte](1) -> 0)
-    println(m.to(Array[Byte](1)) flatMap (_._1.mkString))
-    println(m.from(Array[Byte](1)) flatMap (_._1.mkString))
+    println(m.to(Array[Byte](1)).flatMap(_._1.mkString))
+    println(m.from(Array[Byte](1)).flatMap(_._1.mkString))
   }
 }

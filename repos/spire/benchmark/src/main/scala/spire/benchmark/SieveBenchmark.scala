@@ -10,7 +10,7 @@ object SieveBenchmark {
     val t0 = System.nanoTime
     val a = f
     val t = System.nanoTime - t0
-    println("%s generated %s in %.1f ms" format (s, a, t / 1000000.0))
+    println("%s generated %s in %.1f ms".format(s, a, t / 1000000.0))
     a
   }
 
@@ -35,6 +35,6 @@ object SieveBenchmark {
     Thread.sleep(1000)
 
     println("timing the sieve...")
-    ns.foreach(n => timer("  sieve.nth (%s)" format n)(nth(n)))
+    ns.foreach(n => timer("  sieve.nth (%s)".format(n))(nth(n)))
   }
 }

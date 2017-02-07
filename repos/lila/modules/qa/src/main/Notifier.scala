@@ -18,7 +18,7 @@ private[qa] final class Notifier(sender: String,
 
   private[qa] def createAnswer(q: Question, a: Answer, u: User) {
     val msg = Propagate(QaAnswer(u.id, q.id, q.title, a.id))
-    timeline ! (msg toFollowersOf u.id toUser q.userId exceptUser u.id)
+    timeline ! ((msg toFollowersOf u.id toUser q.userId).exceptUser(u.id))
     if (u.id != q.userId)
       messenger ! LichessThread(
         from = sender,
@@ -33,7 +33,7 @@ Check it out on ${questionUrl(q)}#answer-${a.id}"""
 
   private[qa] def createQuestionComment(q: Question, c: Comment, u: User) {
     val msg = Propagate(QaComment(u.id, q.id, q.title, c.id))
-    timeline ! (msg toFollowersOf u.id toUser q.userId exceptUser u.id)
+    timeline ! ((msg toFollowersOf u.id toUser q.userId).exceptUser(u.id))
   }
 
   private[qa] def createAnswerComment(q: Question,
@@ -41,7 +41,7 @@ Check it out on ${questionUrl(q)}#answer-${a.id}"""
                                       c: Comment,
                                       u: User) {
     val msg = Propagate(QaComment(u.id, q.id, q.title, c.id))
-    timeline ! (msg toFollowersOf u.id toUser a.userId exceptUser u.id)
+    timeline ! ((msg toFollowersOf u.id toUser a.userId).exceptUser(u.id))
   }
 
   private def questionUrl(q: Question) =

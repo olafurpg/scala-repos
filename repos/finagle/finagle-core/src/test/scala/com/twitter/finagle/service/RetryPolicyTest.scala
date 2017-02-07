@@ -38,7 +38,7 @@ class RetryPolicyTest extends FunSpec {
     }
 
     it("should WriteExceptionsOnly") {
-      val weo = WriteExceptionsOnly orElse NoExceptions
+      val weo = WriteExceptionsOnly.orElse(NoExceptions)
 
       assert(weo(Throw(new Exception)) == false)
       assert(weo(Throw(WriteException(new Exception))) == true)
@@ -54,7 +54,7 @@ class RetryPolicyTest extends FunSpec {
     }
 
     it("should TimeoutAndWriteExceptionsOnly") {
-      val taweo = TimeoutAndWriteExceptionsOnly orElse NoExceptions
+      val taweo = TimeoutAndWriteExceptionsOnly.orElse(NoExceptions)
 
       assert(taweo(Throw(new Exception)) == false)
       assert(taweo(Throw(WriteException(new Exception))) == true)

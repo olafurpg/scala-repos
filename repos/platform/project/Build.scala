@@ -54,11 +54,13 @@ object PlatformBuild extends Build {
 
   val nexusSettings: Seq[Project.Setting[_]] = Seq(
     resolvers ++= Seq(
-      "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-      "Maven Repo 1" at "http://repo1.maven.org/maven2/",
-      "Guiceyfruit" at "http://guiceyfruit.googlecode.com/svn/repo/releases/",
-      "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases/",
-      "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
+      "Typesafe Repository".at("http://repo.typesafe.com/typesafe/releases/"),
+      "Maven Repo 1".at("http://repo1.maven.org/maven2/"),
+      "Guiceyfruit".at("http://guiceyfruit.googlecode.com/svn/repo/releases/"),
+      "Sonatype Releases".at(
+        "http://oss.sonatype.org/content/repositories/releases/"),
+      "Sonatype Snapshots".at(
+        "http://oss.sonatype.org/content/repositories/snapshots/")
     ),
     credentials += Credentials(Path.userHome / ".ivy2" / ".rgcredentials")
   )
@@ -70,7 +72,7 @@ object PlatformBuild extends Build {
     organization := "com.precog",
     version := "2.6.0-SNAPSHOT",
     addCompilerPlugin("org.scala-tools.sxr" % "sxr_2.9.0" % "0.2.7"),
-    scalacOptions <+= scalaSource in Compile map {
+    scalacOptions <+= (scalaSource in Compile).map {
       "-P:sxr:base-directory:" + _.getAbsolutePath
     },
     scalacOptions ++= {
@@ -84,7 +86,7 @@ object PlatformBuild extends Build {
     },
     javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
     scalaVersion := "2.9.2",
-    jarName in assembly <<= (name) map { name =>
+    jarName in assembly <<= (name).map { name =>
       name + "-assembly-" + ("git describe".!!.trim) + ".jar"
     },
     target in assembly <<= target,
@@ -140,13 +142,13 @@ object PlatformBuild extends Build {
                                     jprofilerLib,
                                     jprofilerConf,
                                     jprofilerId,
-                                    baseDirectory) map {
+                                    baseDirectory).map {
       (opts, lib, conf, id, d) =>
         // download jnilib if necessary. a bit sketchy, but convenient
         Process("./jprofiler/setup-jnilib.py").!!
         opts ++ Seq(
-          "-agentpath:%s/jprofiler.jnilib=offline,config=%s/%s,id=%s" format
-            (d, d, conf, id))
+          "-agentpath:%s/jprofiler.jnilib=offline,config=%s/%s,id=%s"
+            .format(d, d, conf, id))
     }
   )
 
@@ -162,11 +164,19 @@ object PlatformBuild extends Build {
 
   lazy val standalone =
     Project(id = "standalone", base = file("standalone"))
-      .settings((commonAssemblySettings ++ jettySettings): _*) dependsOn
-      (common % "compile->compile;test->test",
-      yggdrasil % "compile->compile;test->test", util, bifrost,
-      muspelheim % "compile->compile;test->test", logging % "test->test",
-      auth, accounts, ingest, dvergr)
+      .settings((commonAssemblySettings ++ jettySettings): _*)
+      .dependsOn(
+        common % "compile->compile;test->test",
+        yggdrasil % "compile->compile;test->test",
+        util,
+        bifrost,
+        muspelheim % "compile->compile;test->test",
+        logging % "test->test",
+        auth,
+        accounts,
+        ingest,
+        dvergr
+      )
 
   lazy val platform = Project(id = "platform", base = file("."))
     .settings(
@@ -189,26 +199,30 @@ object PlatformBuild extends Build {
 
   lazy val util =
     Project(id = "util", base = file("util"))
-      .settings(commonNexusSettings: _*) dependsOn
-      (logging % "test->test")
+      .settings(commonNexusSettings: _*)
+      .dependsOn(logging % "test->test")
 
   lazy val common =
     Project(id = "common", base = file("common"))
-      .settings(commonNexusSettings: _*) dependsOn
-      (util, logging % "test->test")
+      .settings(commonNexusSettings: _*)
+      .dependsOn(util, logging % "test->test")
 
   lazy val bytecode =
     Project(id = "bytecode", base = file("bytecode"))
-      .settings(commonNexusSettings: _*) dependsOn (logging % "test->test")
+      .settings(commonNexusSettings: _*)
+      .dependsOn(logging % "test->test")
 
   lazy val quirrel =
     Project(id = "quirrel", base = file("quirrel"))
-      .settings(commonNexusSettings: _*) dependsOn
-      (bytecode % "compile->compile;test->test", util, logging % "test->test")
+      .settings(commonNexusSettings: _*)
+      .dependsOn(bytecode % "compile->compile;test->test",
+                 util,
+                 logging % "test->test")
 
   lazy val mirror =
     Project(id = "mirror", base = file("mirror"))
-      .settings(commonNexusSettings: _*) dependsOn (quirrel)
+      .settings(commonNexusSettings: _*)
+      .dependsOn(quirrel)
 
   lazy val niflheim = Project(id = "niflheim", base = file("niflheim"))
     .settings(commonAssemblySettings: _*)
@@ -258,15 +272,23 @@ object PlatformBuild extends Build {
 
   lazy val muspelheim =
     Project(id = "muspelheim", base = file("muspelheim"))
-      .settings(commonNexusSettings: _*) dependsOn
-      (util % "compile->compile;test->test", common, quirrel, mimir,
-      yggdrasil % "compile->compile;test->test", logging % "test->test")
+      .settings(commonNexusSettings: _*)
+      .dependsOn(util % "compile->compile;test->test",
+                 common,
+                 quirrel,
+                 mimir,
+                 yggdrasil % "compile->compile;test->test",
+                 logging % "test->test")
 
   lazy val surtr =
     Project(id = "surtr", base = file("surtr"))
-      .settings(commonAssemblySettings: _*) dependsOn
-      (quirrel, mimir, yggdrasil, ingest,
-      muspelheim % "compile->compile;test->test", logging % "test->test")
+      .settings(commonAssemblySettings: _*)
+      .dependsOn(quirrel,
+                 mimir,
+                 yggdrasil,
+                 ingest,
+                 muspelheim % "compile->compile;test->test",
+                 logging % "test->test")
 
   lazy val ragnarok = Project(id = "ragnarok", base = file("ragnarok"))
     .settings(commonAssemblySettings: _*)
@@ -311,8 +333,10 @@ object PlatformBuild extends Build {
 
   lazy val accounts =
     Project(id = "accounts", base = file("accounts"))
-      .settings(commonAssemblySettings: _*) dependsOn
-      (common % "compile->compile;test->test", auth, logging % "test->test")
+      .settings(commonAssemblySettings: _*)
+      .dependsOn(common % "compile->compile;test->test",
+                 auth,
+                 logging % "test->test")
 
   lazy val ingest = Project(id = "ingest", base = file("ingest"))
     .settings(commonAssemblySettings: _*)

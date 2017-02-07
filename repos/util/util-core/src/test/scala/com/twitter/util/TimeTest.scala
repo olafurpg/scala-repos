@@ -35,11 +35,11 @@ trait TimeLikeSpec[T <: TimeLike[T]]
                     fromNanoseconds(Long.MinValue + 1))
 
     "behave like boxed doubles" in {
-      assert((Top compare Undefined) < 0)
-      assert((Bottom compare Top) < 0)
-      assert((Undefined compare Undefined) == 0)
-      assert((Top compare Top) == 0)
-      assert((Bottom compare Bottom) == 0)
+      assert((Top.compare(Undefined)) < 0)
+      assert((Bottom.compare(Top)) < 0)
+      assert((Undefined.compare(Undefined)) == 0)
+      assert((Top.compare(Top)) == 0)
+      assert((Bottom.compare(Bottom)) == 0)
 
       assert(Top + Duration.Top == Top)
       assert(Bottom - Duration.Bottom == Undefined)
@@ -50,19 +50,19 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     "complementary diff" in {
       // Note that this doesn't always hold because of two's
       // complement arithmetic.
-      for (a <- easyVs; b <- easyVs) assert((a diff b) == -(b diff a))
+      for (a <- easyVs; b <- easyVs) assert((a.diff(b)) == -(b.diff(a)))
     }
 
     "complementary compare" in {
       for (a <- vs; b <- vs) {
-        val x = a compare b
-        val y = b compare a
+        val x = a.compare(b)
+        val y = b.compare(a)
         assert(((x == 0 && y == 0) || (x < 0 != y < 0)) == true)
       }
     }
 
     "commutative max" in {
-      for (a <- vs; b <- vs) assert((a max b) == (b max a))
+      for (a <- vs; b <- vs) assert((a.max(b)) == (b.max(a)))
     }
 
     "commutative min" in {
@@ -134,10 +134,10 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     }
 
     "always be max" in {
-      assert((Top max fromSeconds(1)) == Top)
-      assert((Top max fromFractionalSeconds(1.0)) == Top)
-      assert((Top max fromNanoseconds(Long.MaxValue)) == Top)
-      assert((Top max Bottom) == Top)
+      assert((Top.max(fromSeconds(1))) == Top)
+      assert((Top.max(fromFractionalSeconds(1.0))) == Top)
+      assert((Top.max(fromNanoseconds(Long.MaxValue))) == Top)
+      assert((Top.max(Bottom)) == Top)
     }
 
     "greater than everything else" in {
@@ -160,7 +160,7 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     }
 
     "Undefined diff to Top" in {
-      assert((Top diff Top) == Duration.Undefined)
+      assert((Top.diff(Top)) == Duration.Undefined)
     }
   }
 
@@ -205,7 +205,7 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     }
 
     "Undefined diff to Bottom" in {
-      assert((Bottom diff Bottom) == Duration.Undefined)
+      assert((Bottom.diff(Bottom)) == Duration.Undefined)
     }
   }
 
@@ -222,8 +222,8 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     }
 
     "always be max" in {
-      assert((Undefined max Top) == Undefined)
-      assert((Undefined max fromNanoseconds(0)) == Undefined)
+      assert((Undefined.max(Top)) == Undefined)
+      assert((Undefined.max(fromNanoseconds(0))) == Undefined)
     }
 
     "greater than everything else" in {
@@ -247,9 +247,9 @@ trait TimeLikeSpec[T <: TimeLike[T]]
     }
 
     "Undefined on diff" in {
-      assert((Undefined diff Top) == Duration.Undefined)
-      assert((Undefined diff Bottom) == Duration.Undefined)
-      assert((Undefined diff fromNanoseconds(123)) == Duration.Undefined)
+      assert((Undefined.diff(Top)) == Duration.Undefined)
+      assert((Undefined.diff(Bottom)) == Duration.Undefined)
+      assert((Undefined.diff(fromNanoseconds(123))) == Duration.Undefined)
     }
   }
 
@@ -551,9 +551,11 @@ with Eventually with IntegrationPatience {
 
     "max" in {
       assert(
-        (10.seconds.afterEpoch max 5.seconds.afterEpoch) == 10.seconds.afterEpoch)
+        (10.seconds.afterEpoch
+          .max(5.seconds.afterEpoch)) == 10.seconds.afterEpoch)
       assert(
-        (5.seconds.afterEpoch max 10.seconds.afterEpoch) == 10.seconds.afterEpoch)
+        (5.seconds.afterEpoch
+          .max(10.seconds.afterEpoch)) == 10.seconds.afterEpoch)
     }
 
     "min" in {

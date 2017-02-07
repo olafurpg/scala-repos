@@ -55,14 +55,14 @@ class ReplProps {
 
   // Handy system prop for shell prompt, or else pick it up from compiler.properties
   val promptString =
-    Prop[String]("scala.repl.prompt").option getOrElse
-      (if (info) "%nscala %#s> " else shellPromptString)
+    Prop[String]("scala.repl.prompt").option
+      .getOrElse(if (info) "%nscala %#s> " else shellPromptString)
   val promptText = enversion(promptString)
   val prompt = encolor(promptText)
 
   // Prompt for continued input, will be right-adjusted to width of the primary prompt
   val continueString =
-    Prop[String]("scala.repl.continue").option getOrElse "| "
+    Prop[String]("scala.repl.continue").option.getOrElse("| ")
   val continueText = {
     val text = enversion(continueString)
     val margin = promptText.lines.toList.last.length - text.length

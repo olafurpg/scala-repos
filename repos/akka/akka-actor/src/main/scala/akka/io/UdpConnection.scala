@@ -60,7 +60,7 @@ private[io] class UdpConnection(udpConn: UdpConnectedExt,
       channel.configureBlocking(false)
       val socket = channel.socket
       options.foreach(_.beforeDatagramBind(socket))
-      localAddress foreach socket.bind
+      localAddress.foreach(socket.bind)
       channel.connect(remoteAddress)
       channelRegistry.register(channel, OP_READ)
     }

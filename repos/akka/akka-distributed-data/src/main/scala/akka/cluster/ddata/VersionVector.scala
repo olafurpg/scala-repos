@@ -202,7 +202,7 @@ sealed abstract class VersionVector
           if (currentOrder eq Before) Concurrent else After
         } else {
           // compare the nodes
-          val nc = nt1._1 compareTo nt2._1
+          val nc = nt1._1.compareTo(nt2._1)
           if (nc == 0) {
             // both nodes exist compare the timestamps
             // same timestamp so just continue with the next nodes

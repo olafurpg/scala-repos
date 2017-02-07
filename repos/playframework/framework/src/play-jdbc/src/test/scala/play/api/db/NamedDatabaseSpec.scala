@@ -17,7 +17,7 @@ class NamedDatabaseSpec extends PlaySpecification {
         "db.other.driver" -> "org.h2.Driver",
         "db.other.url" -> "jdbc:h2:mem:other"
       )) {
-      app.injector.instanceOf[DBApi].databases must have size (2)
+      (app.injector.instanceOf[DBApi].databases must have).size(2)
       app.injector
         .instanceOf[DefaultComponent]
         .db
@@ -37,7 +37,7 @@ class NamedDatabaseSpec extends PlaySpecification {
         "db.other.driver" -> "org.h2.Driver",
         "db.other.url" -> "jdbc:h2:mem:other"
       )) {
-      app.injector.instanceOf[DBApi].databases must have size (1)
+      (app.injector.instanceOf[DBApi].databases must have).size(1)
       app.injector.instanceOf[DefaultComponent] must throwA[
         com.google.inject.ConfigurationException]
       app.injector.instanceOf[NamedDefaultComponent] must throwA[
@@ -64,7 +64,7 @@ class NamedDatabaseSpec extends PlaySpecification {
         "db.other.driver" -> "org.h2.Driver",
         "db.other.url" -> "jdbc:h2:mem:other"
       )) {
-      app.injector.instanceOf[DBApi].databases must have size 1
+      (app.injector.instanceOf[DBApi].databases must have).size(1)
       app.injector
         .instanceOf[DefaultComponent]
         .db
@@ -83,7 +83,7 @@ class NamedDatabaseSpec extends PlaySpecification {
         "databases.default.driver" -> "org.h2.Driver",
         "databases.default.url" -> "jdbc:h2:mem:default"
       )) {
-      app.injector.instanceOf[DBApi].databases must have size 1
+      (app.injector.instanceOf[DBApi].databases must have).size(1)
       app.injector
         .instanceOf[DefaultComponent]
         .db

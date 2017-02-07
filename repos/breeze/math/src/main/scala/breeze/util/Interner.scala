@@ -41,10 +41,10 @@ class Interner[T] extends (T => T) with Serializable {
   def size = inner.size;
 
   def internAll[C <: TraversableLike[T, C] with Traversable[T], That](c: C)(
-      implicit bf: CanBuildFrom[T, That, C]) = c map apply
-  def internAll(c: List[T]) = c map apply
-  def internAll(c: Array[T]) = c map apply
-  def internAll(c: Set[T]) = c map apply
+      implicit bf: CanBuildFrom[T, That, C]) = c.map(apply)
+  def internAll(c: List[T]) = c.map(apply)
+  def internAll(c: Array[T]) = c.map(apply)
+  def internAll(c: Set[T]) = c.map(apply)
 
   def internKeys[V](c: scala.collection.Map[T, V]) = {
     Map[T, V]() ++ c.map { case (k, v) => (intern(k), v) }

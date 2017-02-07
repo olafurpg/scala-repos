@@ -126,19 +126,22 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
       request: HttpRequest[ByteChunk]): Future[Option[IngestProcessing]] = {
     val selectors = processingSelectors.selectors(apiKey, path, authorities)
 
-    request.content traverse {
-      case Left(bytes) =>
-        Promise successful IngestProcessing.select(selectors, bytes, request)
+    request.content
+      .traverse {
+        case Left(bytes) =>
+          Promise.successful(
+            IngestProcessing.select(selectors, bytes, request))
 
-      case Right(stream) =>
-        stream.headOption map {
-          _ flatMap { bytes =>
-            IngestProcessing.select(selectors, bytes, request)
+        case Right(stream) =>
+          stream.headOption.map {
+            _.flatMap { bytes =>
+              IngestProcessing.select(selectors, bytes, request)
+            }
           }
-        }
-    } map {
-      _.join
-    }
+      }
+      .map {
+        _.join
+      }
   }
 
   def ingestBatch(apiKey: APIKey,
@@ -149,21 +152,25 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                   errorHandling: ErrorHandling,
                   storeMode: WriteMode)
     : EitherT[Future, NonEmptyList[String], IngestResult] =
-    right(chooseProcessing(apiKey, path, authorities, request)) flatMap {
+    right(chooseProcessing(apiKey, path, authorities, request)).flatMap {
       case Some(processing) =>
         EitherT {
-          (processing.forRequest(request) tuple request.content.toSuccess(
-            nels("Ingest request missing body content."))) traverse {
-            case (processor, data) =>
-              processor.ingest(durability, errorHandling, storeMode, data)
-          } map {
-            _.disjunction
-          }
+          (processing
+            .forRequest(request)
+            .tuple(request.content.toSuccess(
+              nels("Ingest request missing body content."))))
+            .traverse {
+              case (processor, data) =>
+                processor.ingest(durability, errorHandling, storeMode, data)
+            }
+            .map {
+              _.disjunction
+            }
         }
 
       case None =>
-        right(Promise successful NotIngested(
-          "Could not determine a data type for your batch ingest. Please set the Content-Type header."))
+        right(Promise.successful(NotIngested(
+          "Could not determine a data type for your batch ingest. Please set the Content-Type header.")))
     }
 
   def notifyJob(durability: Durability,
@@ -175,7 +182,7 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
           .addMessage(jobId, channel, JString(message))
           .map(_ => PrecogUnit)
       case LocalDurability =>
-        right(Promise successful PrecogUnit)
+        right(Promise.successful(PrecogUnit))
     }
 
   private def jobErrorResponse(message: String) = {
@@ -212,135 +219,143 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
               logger.debug(
                 "Write permission granted for " + authorities +
                   " to " + path)
-              request.content map { content =>
-                import MimeTypes._
-                import Validation._
+              request.content
+                .map { content =>
+                  import MimeTypes._
+                  import Validation._
 
-                val errorHandling =
-                  if (request.parameters
-                        .get('mode)
-                        .exists(_ equalsIgnoreCase "batch"))
-                    IngestAllPossible
-                  else StopOnFirstError
+                  val errorHandling =
+                    if (request.parameters
+                          .get('mode)
+                          .exists(_ equalsIgnoreCase "batch"))
+                      IngestAllPossible
+                    else StopOnFirstError
 
-                val durabilityM = request.method match {
-                  case HttpMethods.POST =>
-                    createJob map { jobId =>
-                      (GlobalDurability(jobId), postMode)
+                  val durabilityM = request.method match {
+                    case HttpMethods.POST =>
+                      createJob.map { jobId =>
+                        (GlobalDurability(jobId), postMode)
+                      }
+                    case HttpMethods.PUT =>
+                      createJob.map { jobId =>
+                        (GlobalDurability(jobId), AccessMode.Replace)
+                      }
+                    case HttpMethods.PATCH =>
+                      right[Future, String, (Durability, WriteMode)](Promise
+                        .successful((LocalDurability, AccessMode.Append)))
+                    case _ =>
+                      left[Future, String, (Durability, WriteMode)](
+                        Promise.successful("HTTP method " + request.method +
+                          " not supported for data ingest."))
+                  }
+
+                  durabilityM
+                    .flatMap {
+                      case (durability, storeMode) =>
+                        ingestBatch(apiKey,
+                                    path,
+                                    authorities,
+                                    request,
+                                    durability,
+                                    errorHandling,
+                                    storeMode).flatMap {
+                          case NotIngested(reason) =>
+                            val message =
+                              "Ingest to %s by %s failed with reason: %s "
+                                .format(path, apiKey, reason)
+                            logger.warn(message)
+                            notifyJob(durability,
+                                      JobManager.channels.Warning,
+                                      message).map { _ =>
+                              HttpResponse[JValue](
+                                BadRequest,
+                                content = Some(JObject(
+                                  "errors" -> JArray(JString(reason)))))
+                            }
+
+                          case StreamingResult(ingested, None) =>
+                            val message =
+                              "Ingest to %s by %s succeeded (%d records)"
+                                .format(path, apiKey, ingested)
+                            logger.info(message)
+                            notifyJob(durability,
+                                      JobManager.channels.Info,
+                                      message).map { _ =>
+                              val responseContent =
+                                JObject("ingested" -> JNum(ingested),
+                                        "errors" -> JArray())
+                              HttpResponse[JValue](OK,
+                                                   content =
+                                                     Some(responseContent))
+                            }
+
+                          case StreamingResult(ingested, Some(error)) =>
+                            val message =
+                              "Ingest to %s by %s failed after %d records with error %s"
+                                .format(path, apiKey, ingested, error)
+                            logger.error(message)
+                            notifyJob(durability,
+                                      JobManager.channels.Error,
+                                      message).map { _ =>
+                              val responseContent =
+                                JObject("ingested" -> JNum(ingested),
+                                        "errors" -> JArray(JString(error)))
+                              HttpResponse[JValue](UnprocessableEntity,
+                                                   content =
+                                                     Some(responseContent))
+                            }
+
+                          case BatchResult(total, ingested, errs) =>
+                            val failed = errs.size
+                            val responseContent = JObject(
+                              "total" -> JNum(total),
+                              "ingested" -> JNum(ingested),
+                              "failed" -> JNum(failed),
+                              "skipped" -> JNum(total - ingested - failed),
+                              "errors" -> JArray(errs.map {
+                                case (line, msg) =>
+                                  JObject("line" -> JNum(line),
+                                          "reason" -> JString(msg))
+                              }: _*),
+                              "ingestId" -> durability.jobId
+                                .map(JString(_))
+                                .getOrElse(JUndefined)
+                            )
+
+                            val message =
+                              "Ingest to %s with %s succeeded. Result: %s"
+                                .format(path,
+                                        apiKey,
+                                        responseContent.renderPretty)
+                            logger.info(message)
+                            notifyJob(durability,
+                                      JobManager.channels.Info,
+                                      message).map { _ =>
+                              HttpResponse[JValue](
+                                if (ingested == 0 && total > 0)
+                                  BadRequest
+                                else OK,
+                                content = Some(responseContent))
+                            }
+                        }
                     }
-                  case HttpMethods.PUT =>
-                    createJob map { jobId =>
-                      (GlobalDurability(jobId), AccessMode.Replace)
+                    .valueOr { errors =>
+                      HttpResponse(
+                        BadRequest,
+                        content = Some(JString(
+                          "Errors were encountered processing your ingest request: " +
+                            errors)))
                     }
-                  case HttpMethods.PATCH =>
-                    right[Future, String, (Durability, WriteMode)](
-                      Promise.successful((LocalDurability, AccessMode.Append)))
-                  case _ =>
-                    left[Future, String, (Durability, WriteMode)](
-                      Promise.successful("HTTP method " + request.method +
-                        " not supported for data ingest."))
                 }
-
-                durabilityM flatMap {
-                  case (durability, storeMode) =>
-                    ingestBatch(apiKey,
-                                path,
-                                authorities,
-                                request,
-                                durability,
-                                errorHandling,
-                                storeMode) flatMap {
-                      case NotIngested(reason) =>
-                        val message =
-                          "Ingest to %s by %s failed with reason: %s "
-                            .format(path, apiKey, reason)
-                        logger.warn(message)
-                        notifyJob(durability,
-                                  JobManager.channels.Warning,
-                                  message) map { _ =>
-                          HttpResponse[JValue](
-                            BadRequest,
-                            content = Some(
-                              JObject("errors" -> JArray(JString(reason)))))
-                        }
-
-                      case StreamingResult(ingested, None) =>
-                        val message =
-                          "Ingest to %s by %s succeeded (%d records)"
-                            .format(path, apiKey, ingested)
-                        logger.info(message)
-                        notifyJob(durability,
-                                  JobManager.channels.Info,
-                                  message) map { _ =>
-                          val responseContent =
-                            JObject("ingested" -> JNum(ingested),
-                                    "errors" -> JArray())
-                          HttpResponse[JValue](OK,
-                                               content = Some(responseContent))
-                        }
-
-                      case StreamingResult(ingested, Some(error)) =>
-                        val message =
-                          "Ingest to %s by %s failed after %d records with error %s"
-                            .format(path, apiKey, ingested, error)
-                        logger.error(message)
-                        notifyJob(durability,
-                                  JobManager.channels.Error,
-                                  message) map { _ =>
-                          val responseContent =
-                            JObject("ingested" -> JNum(ingested),
-                                    "errors" -> JArray(JString(error)))
-                          HttpResponse[JValue](UnprocessableEntity,
-                                               content = Some(responseContent))
-                        }
-
-                      case BatchResult(total, ingested, errs) =>
-                        val failed = errs.size
-                        val responseContent = JObject(
-                          "total" -> JNum(total),
-                          "ingested" -> JNum(ingested),
-                          "failed" -> JNum(failed),
-                          "skipped" -> JNum(total - ingested - failed),
-                          "errors" -> JArray(errs map {
-                            case (line, msg) =>
-                              JObject("line" -> JNum(line),
-                                      "reason" -> JString(msg))
-                          }: _*),
-                          "ingestId" -> durability.jobId
-                            .map(JString(_))
-                            .getOrElse(JUndefined)
-                        )
-
-                        val message =
-                          "Ingest to %s with %s succeeded. Result: %s"
-                            .format(path, apiKey, responseContent.renderPretty)
-                        logger.info(message)
-                        notifyJob(durability,
-                                  JobManager.channels.Info,
-                                  message) map { _ =>
-                          HttpResponse[JValue](if (ingested == 0 && total > 0)
-                                                 BadRequest
-                                               else OK,
-                                               content = Some(responseContent))
-                        }
-                    }
-                } valueOr { errors =>
-                  HttpResponse(
-                    BadRequest,
-                    content = Some(
-                      JString(
-                        "Errors were encountered processing your ingest request: " +
-                          errors)))
+                .getOrElse {
+                  logger.warn(
+                    "No event data found for ingest request from %s owner %s at path %s"
+                      .format(apiKey, authorities, path))
+                  M.point(
+                    HttpResponse[JValue](
+                      BadRequest,
+                      content = Some(JString("Missing event data."))))
                 }
-              } getOrElse {
-                logger.warn(
-                  "No event data found for ingest request from %s owner %s at path %s"
-                    .format(apiKey, authorities, path))
-                M.point(
-                  HttpResponse[JValue](BadRequest,
-                                       content =
-                                         Some(JString("Missing event data."))))
-              }
           }
         }
       }

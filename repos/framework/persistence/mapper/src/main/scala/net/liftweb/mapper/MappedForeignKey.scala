@@ -125,8 +125,10 @@ trait MappedForeignKey[
     // issue 165
     // invalidate if the primary key has changed Issue 370
     if (_obj.isEmpty ||
-        (_calcedObj && _obj.isDefined && _obj.openOrThrowException(
-          "_obj was just checked as full.").primaryKeyField.get != this.i_is_!)) {
+        (_calcedObj && _obj.isDefined && _obj
+          .openOrThrowException("_obj was just checked as full.")
+          .primaryKeyField
+          .get != this.i_is_!)) {
       _obj = Empty
       _calcedObj = false
     }
@@ -143,7 +145,7 @@ trait MappedForeignKey[
     * Load and cache the record that this field references
     */
   def obj: Box[Other] = synchronized {
-    if (! _calcedObj) {
+    if (!_calcedObj) {
       _calcedObj = true
       this._obj = if (defined_?) dbKeyToTable.find(i_is_!) else Empty
     }

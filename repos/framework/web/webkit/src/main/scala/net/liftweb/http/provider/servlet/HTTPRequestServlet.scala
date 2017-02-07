@@ -37,16 +37,18 @@ class HTTPRequestServlet(val req: HttpServletRequest,
 
   lazy val cookies: List[HTTPCookie] = {
     req.getSession(false) // do this to make sure we capture the JSESSIONID cookie
-    (Box !! req.getCookies).map(
-      _.toList.map(
-        c =>
-          HTTPCookie(c.getName,
-                     Box !! (c.getValue),
-                     Box !! (c.getDomain),
-                     Box !! (c.getPath),
-                     Box !! (c.getMaxAge),
-                     Box !! (c.getVersion),
-                     Box !! (c.getSecure)))) openOr Nil
+    (Box !! req.getCookies)
+      .map(
+        _.toList.map(
+          c =>
+            HTTPCookie(c.getName,
+                       Box !! (c.getValue),
+                       Box !! (c.getDomain),
+                       Box !! (c.getPath),
+                       Box !! (c.getMaxAge),
+                       Box !! (c.getVersion),
+                       Box !! (c.getSecure))))
+      .openOr(Nil)
   }
 
   lazy val authType: Box[String] = Box !! req.getAuthType
@@ -92,7 +94,7 @@ class HTTPRequestServlet(val req: HttpServletRequest,
     req.getParameterNames.asInstanceOf[java.util.Enumeration[String]]).map(n =>
     HTTPParam(n, param(n)))
 
-  lazy val paramNames: List[String] = params map (_.name)
+  lazy val paramNames: List[String] = params.map(_.name)
 
   def remoteAddress: String = req.getRemoteAddr
 
@@ -100,8 +102,8 @@ class HTTPRequestServlet(val req: HttpServletRequest,
     * The User-Agent of the request
     */
   lazy val userAgent: Box[String] =
-    headers find (_.name equalsIgnoreCase "user-agent") flatMap
-      (_.values.headOption)
+    (headers find (_.name equalsIgnoreCase "user-agent"))
+      .flatMap(_.values.headOption)
 
   def remotePort: Int = req.getRemotePort
 
@@ -146,7 +148,8 @@ class HTTPRequestServlet(val req: HttpServletRequest,
       mimeUpload.setProgressListener(new ProgressListener {
         lazy val progList: (Long, Long, Int) => Unit =
           S.session
-            .flatMap(_.progressListener) openOr LiftRules.progressListener
+            .flatMap(_.progressListener)
+            .openOr(LiftRules.progressListener)
 
         def update(a: Long, b: Long, c: Int) { progList(a, b, c) }
       })
@@ -213,8 +216,11 @@ class HTTPRequestServlet(val req: HttpServletRequest,
       .resume(what)
 
   lazy val suspendResumeSupport_? = {
-    LiftRules.asyncProviderMeta.map(_.suspendResumeSupport_? &&
-      (asyncProvider.map(_.suspendResumeSupport_?) openOr false)) openOr false
+    LiftRules.asyncProviderMeta
+      .map(
+        _.suspendResumeSupport_? &&
+          (asyncProvider.map(_.suspendResumeSupport_?).openOr(false)))
+      .openOr(false)
   }
 }
 
@@ -283,7 +289,8 @@ private class OfflineRequestSnapshot(req: HTTPRequest,
         .flatMap(Helpers.asBoolean _)
         .filter(a => a)
         .map(a => 443)
-        .headOption getOrElse 80
+        .headOption
+        .getOrElse(80)
     case x => x
   }
 
@@ -319,6 +326,6 @@ private class OfflineRequestSnapshot(req: HTTPRequest,
     * The User-Agent of the request
     */
   lazy val userAgent: Box[String] =
-    headers find (_.name equalsIgnoreCase "user-agent") flatMap
-      (_.values.headOption)
+    (headers find (_.name equalsIgnoreCase "user-agent"))
+      .flatMap(_.values.headOption)
 }

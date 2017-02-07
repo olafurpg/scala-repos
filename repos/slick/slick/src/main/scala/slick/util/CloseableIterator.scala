@@ -85,7 +85,7 @@ object CloseableIterator {
           try c.close()
           catch ignoreFollowOnError
           throw e
-      }) thenClose c
+      }).thenClose(c)
     }
   }
 }

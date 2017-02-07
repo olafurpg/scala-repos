@@ -30,13 +30,13 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
   private object closureInitOrdering extends Ordering[ClosureInstantiation] {
     override def compare(x: ClosureInstantiation,
                          y: ClosureInstantiation): Int = {
-      val cls = x.ownerClass.internalName compareTo y.ownerClass.internalName
+      val cls = x.ownerClass.internalName.compareTo(y.ownerClass.internalName)
       if (cls != 0) return cls
 
-      val mName = x.ownerMethod.name compareTo y.ownerMethod.name
+      val mName = x.ownerMethod.name.compareTo(y.ownerMethod.name)
       if (mName != 0) return mName
 
-      val mDesc = x.ownerMethod.desc compareTo y.ownerMethod.desc
+      val mDesc = x.ownerMethod.desc.compareTo(y.ownerMethod.desc)
       if (mDesc != 0) return mDesc
 
       def pos(inst: ClosureInstantiation) =
@@ -112,7 +112,7 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
                 lazy val prodCons = new ProdConsAnalyzer(method, ownerClass)
 
                 for (init <- closureInits.valuesIterator)
-                  closureCallsites(init, prodCons) foreach {
+                  closureCallsites(init, prodCons).foreach {
                     case Left(warning) =>
                       backendReporting.inlinerWarning(warning.pos,
                                                       warning.toString)
@@ -464,7 +464,7 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
     val argInfos =
       closureInit.capturedArgInfos ++ originalCallsite
         .map(cs =>
-          cs.argInfos map {
+          cs.argInfos.map {
             case (index, info) => (index + numCapturedValues, info)
         })
         .getOrElse(IntMap.empty)
@@ -539,7 +539,7 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
       methodNode.instructions.insert(previous, op)
     for ((l, i) <- localsList.locals.zipWithIndex) {
       ins(new VarInsnNode(l.storeOpcode, l.local))
-      beforeStore(i) foreach ins
+      beforeStore(i).foreach(ins)
     }
   }
 

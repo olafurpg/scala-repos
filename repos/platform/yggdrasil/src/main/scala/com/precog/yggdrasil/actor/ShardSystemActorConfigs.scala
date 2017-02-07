@@ -110,7 +110,7 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
       checkpoint: YggCheckpoint,
       checkpointCoordination: CheckpointCoordination,
       permissionsFinder: PermissionsFinder[Future]) = {
-    yggConfig.ingestConfig map { conf =>
+    yggConfig.ingestConfig.map { conf =>
       val consumer =
         new SimpleConsumer(yggConfig.kafkaHost,
                            yggConfig.kafkaPort,

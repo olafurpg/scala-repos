@@ -157,7 +157,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
             entries = ee :: entries
             ee = ee.next
           }
-          entries foreach enterInHash
+          entries.foreach(enterInHash)
         }
       }
     }
@@ -246,7 +246,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
         // than a non-deterministic bizarre one (see any bug involving overloads
         // in package objects.)
         val alts = lookupAll(name).toList
-        def alts_s = alts map (s => s.defString) mkString " <and> "
+        def alts_s = alts.map(s => s.defString) mkString " <and> "
         devWarning(s"scope lookup of $name found multiple symbols: $alts_s")
         // FIXME - how is one supposed to create an overloaded symbol without
         // knowing the correct owner? Using the symbol owner is not correct;
@@ -288,8 +288,8 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       lookupEntry(name) match {
         case null => Iterator.empty
         case e =>
-          lookupAllEntries(name) filter
-            (e1 => (e eq e1) || (e.depth == e1.depth && e.sym != e1.sym))
+          lookupAllEntries(name).filter(e1 =>
+            (e eq e1) || (e.depth == e1.depth && e.sym != e1.sym))
       }
     }
 
@@ -334,7 +334,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       */
     def isSameScope(other: Scope) =
       ((size == other.size) // optimization - size is cached
-        && (this isSubScope other) && (other isSubScope this))
+        && (this.isSubScope(other)) && (other.isSubScope(this)))
 
     def isSubScope(other: Scope) = {
       def scopeContainsSym(sym: Symbol): Boolean = {
@@ -345,9 +345,9 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
             (e.sym.info =:= comparableInfo) ||
             entryContainsSym(lookupNextEntry(e))
         }
-        entryContainsSym(this lookupEntry sym.name)
+        entryContainsSym(this.lookupEntry(sym.name))
       }
-      other.toList forall scopeContainsSym
+      other.toList.forall(scopeContainsSym)
     }
 
     /** Return all symbols as a list in the order they were entered in this scope.
@@ -380,14 +380,14 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       */
     def iterator: Iterator[Symbol] = toList.iterator
 
-    override def foreach[U](p: Symbol => U): Unit = toList foreach p
+    override def foreach[U](p: Symbol => U): Unit = toList.foreach(p)
 
     override def filterNot(p: Symbol => Boolean): Scope =
-      (if (toList exists p) newScopeWith(toList filterNot p: _*)
+      (if (toList.exists(p)) newScopeWith(toList.filterNot(p): _*)
        else this)
     override def filter(p: Symbol => Boolean): Scope =
-      (if (toList forall p) this
-       else newScopeWith(toList filter p: _*))
+      (if (toList.forall(p)) this
+       else newScopeWith(toList.filter(p): _*))
     @deprecated("Use `toList.reverse` instead", "2.10.0") // Used in SBT 0.12.4
     def reverse: List[Symbol] = toList.reverse
 
@@ -430,7 +430,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     override def sorted = {
       val members = toList
       val owners = members.map(_.owner).distinct
-      val grouped = members groupBy (_.owner)
+      val grouped = members.groupBy(_.owner)
       owners.flatMap(owner => grouped(owner).reverse)
     }
   }
@@ -450,7 +450,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
   /** Create a new scope with given initial elements */
   def newScopeWith(elems: Symbol*): Scope = {
     val scope = newScope
-    elems foreach scope.enter
+    elems.foreach(scope.enter)
     scope
   }
 

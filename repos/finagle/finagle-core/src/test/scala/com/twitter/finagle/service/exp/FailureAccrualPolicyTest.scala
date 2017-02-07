@@ -16,7 +16,7 @@ class FailureAccrualPolicyTest extends FunSuite with MockitoSugar {
 
   val constantBackoff = Backoff.const(5.seconds)
   val expBackoff = Backoff.equalJittered(5.seconds, 60.seconds)
-  val expBackoffList = expBackoff take 6
+  val expBackoffList = expBackoff.take(6)
 
   test("Consective failures policy: fail on nth attempt") {
     val policy = FailureAccrualPolicy.consecutiveFailures(3, constantBackoff)

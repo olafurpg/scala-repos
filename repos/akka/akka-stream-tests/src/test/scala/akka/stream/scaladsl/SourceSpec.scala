@@ -268,7 +268,7 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
           }
           .runFold(List.empty[Int]) { case (xs, x) ⇒ x :: xs }
           .failed) {
-        _ should be theSameInstanceAs (t)
+        (_ should be).theSameInstanceAs(t)
       }
     }
 

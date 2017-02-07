@@ -6,7 +6,7 @@ object Test extends JavapTest {
   """.stripMargin
 
   override def yah(res: Seq[String]) = {
-    def filtered = res filter (_ contains "public class disktest.Foo")
+    def filtered = res.filter(_ contains "public class disktest.Foo")
     1 == filtered.size
   }
 }

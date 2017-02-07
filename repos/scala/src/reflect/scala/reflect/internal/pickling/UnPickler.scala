@@ -255,11 +255,13 @@ abstract class UnPickler {
               Some(("org.scala-lang.modules", "scala-swing"))
             else None
 
-          (module map {
-            case (group, art) =>
-              s"""\n(NOTE: It looks like the $art module is missing; try adding a dependency on "$group" : "$art".
+          (module
+            .map {
+              case (group, art) =>
+                s"""\n(NOTE: It looks like the $art module is missing; try adding a dependency on "$group" : "$art".
                |       See http://docs.scala-lang.org/overviews/ for more information.)""".stripMargin
-          } getOrElse "")
+            }
+            .getOrElse(""))
         }
 
         def localDummy = {
@@ -268,15 +270,15 @@ abstract class UnPickler {
         }
 
         // (1) Try name.
-        localDummy orElse fromName(name) orElse {
+        localDummy.orElse(fromName(name)).orElse {
           // (2) Try with expanded name.  Can happen if references to private
           // symbols are read from outside: for instance when checking the children
           // of a class.  See #1722.
-          fromName(nme.expandedName(name.toTermName, owner)) orElse {
+          fromName(nme.expandedName(name.toTermName, owner)).orElse {
             // (3) Try as a nested object symbol.
-            nestedObjectSymbol orElse {
+            nestedObjectSymbol.orElse {
               // (4) Call the mirror's "missing" hook.
-              adjust(mirrorThatLoaded(owner).missingHook(owner, name)) orElse {
+              adjust(mirrorThatLoaded(owner).missingHook(owner, name)).orElse {
                 // (5) Create a stub symbol to defer hard failure a little longer.
                 val advice = moduleAdvice(s"${owner.fullName}.$name")
                 val missingMessage =
@@ -343,7 +345,7 @@ abstract class UnPickler {
                       assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
                       newLazyTypeRefAndAlias(inforef, readNat())
                     })
-        if (shouldEnterInOwnerScope) symScope(sym.owner) enter sym
+        if (shouldEnterInOwnerScope) symScope(sym.owner).enter(sym)
 
         sym
       }
@@ -354,8 +356,8 @@ abstract class UnPickler {
         case CLASSsym =>
           val sym =
             (if (isClassRoot) {
-               if (isModuleFlag) moduleRoot.moduleClass setFlag pflags
-               else classRoot setFlag pflags
+               if (isModuleFlag) moduleRoot.moduleClass.setFlag(pflags)
+               else classRoot.setFlag(pflags)
              } else owner.newClassSymbol(name.toTypeName, NoPosition, pflags))
           if (!atEnd) sym.typeOfThis = newLazyTypeRef(readNat())
 
@@ -363,7 +365,7 @@ abstract class UnPickler {
         case MODULEsym =>
           val clazz =
             at(inforef, () => readType()).typeSymbol // after NMT_TRANSITION, we can leave off the () => ... ()
-          if (isModuleRoot) moduleRoot setFlag pflags
+          if (isModuleRoot) moduleRoot.setFlag(pflags)
           else owner.newLinkedModule(clazz, pflags)
         case VALsym =>
           if (isModuleRoot) {
@@ -472,7 +474,7 @@ abstract class UnPickler {
       assert(tag == CHILDREN)
       val end = readEnd()
       val target = readSymbolRef()
-      while (readIndex != end) target addChild readSymbolRef()
+      while (readIndex != end) target.addChild(readSymbolRef())
     }
 
     /** Read an annotation argument, which is pickled either
@@ -482,7 +484,7 @@ abstract class UnPickler {
       case TREE => at(i, readTree)
       case _ =>
         val const = at(i, readConstant)
-        Literal(const) setType const.tpe
+        Literal(const).setType(const.tpe)
     }
 
     /** Read a ClassfileAnnotArg (argument to a classfile annotation)
@@ -546,8 +548,8 @@ abstract class UnPickler {
       def fixApply(tree: Apply, tpe: Type): Apply = {
         val Apply(fun, args) = tree
         if (fun.symbol.isOverloaded) {
-          fun setType fun.symbol.info
-          inferMethodAlternative(fun, args map (_.tpe), tpe)
+          fun.setType(fun.symbol.info)
+          inferMethodAlternative(fun, args.map(_.tpe), tpe)
         }
         tree
       }
@@ -629,8 +631,8 @@ abstract class UnPickler {
       val sym = if (isTreeSymbolPickled(tag)) readSymbolRef() else null
       val result = readTree(tpe)
 
-      if (sym ne null) result setSymbol sym
-      result setType tpe
+      if (sym ne null) result.setSymbol(sym)
+      result.setType(tpe)
     }
 
     /* Read an abstract syntax tree */
@@ -773,7 +775,7 @@ abstract class UnPickler {
               } else tp
 
           if (p ne null) {
-            slowButSafeEnteringPhase(p)(sym setInfo fixLocalChildTp)
+            slowButSafeEnteringPhase(p)(sym.setInfo(fixLocalChildTp))
           }
           if (currentRunId != definedAtRunId)
             sym.setInfo(adaptToNewRunMap(fixLocalChildTp))
@@ -797,9 +799,9 @@ abstract class UnPickler {
 
           var alias = at(j, readSymbol)
           if (alias.isOverloaded)
-            alias = slowButSafeEnteringPhase(picklerPhase)(
-              (alias suchThat
-                (alt => sym.tpe =:= sym.owner.thisType.memberType(alt))))
+            alias =
+              slowButSafeEnteringPhase(picklerPhase)((alias.suchThat(alt =>
+                sym.tpe =:= sym.owner.thisType.memberType(alt))))
 
           sym.asInstanceOf[TermSymbol].setAlias(alias)
         } catch {

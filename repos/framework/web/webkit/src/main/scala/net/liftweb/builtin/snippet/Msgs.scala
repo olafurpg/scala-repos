@@ -67,7 +67,7 @@ object Msgs extends DispatchSnippet {
     */
   def render(styles: NodeSeq): NodeSeq = {
     // Capture the value for later AJAX updates
-    ShowAll(toBoolean(S.attr("showAll") or S.attr("showall")))
+    ShowAll(toBoolean(S.attr("showAll").or(S.attr("showall"))))
 
     // Extract user-specified titles and CSS classes for later use
     List((NoticeType.Error, MsgsErrorMeta),
@@ -121,7 +121,7 @@ object Msgs extends DispatchSnippet {
                SessionVar[Box[AjaxMessageMeta]])): NodeSeq = args match {
       case (messages, noticeType, ajaxStorage) =>
         // get current settings
-        val title = ajaxStorage.get.map(_.title) openOr Text("")
+        val title = ajaxStorage.get.map(_.title).openOr(Text(""))
         val styles = ajaxStorage.get.flatMap(_.cssClasses)
 
         // Compute the resulting div
@@ -162,11 +162,15 @@ object Msgs extends DispatchSnippet {
   def noticesFadeOut[T](noticeType: NoticeType.Value,
                         default: T,
                         wrap: JsCmd => T): T =
-    LiftRules.noticesAutoFadeOut()(noticeType) map {
-      case (duration, fadeTime) => {
-        wrap(LiftRules.jsArtifacts.fadeOut(noticeType.id, duration, fadeTime))
+    LiftRules
+      .noticesAutoFadeOut()(noticeType)
+      .map {
+        case (duration, fadeTime) => {
+          wrap(
+            LiftRules.jsArtifacts.fadeOut(noticeType.id, duration, fadeTime))
+        }
       }
-    } openOr default
+      .openOr(default)
 
   /**
     * This method produces and appends a script element to lift's page script

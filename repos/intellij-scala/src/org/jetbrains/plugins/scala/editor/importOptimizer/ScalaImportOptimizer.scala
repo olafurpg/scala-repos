@@ -356,7 +356,7 @@ object ScalaImportOptimizer {
     val i = optimizers.iterator()
     while (i.hasNext) {
       val opt = i.next()
-      if (opt supports topLevelFile) {
+      if (opt.supports(topLevelFile)) {
         return Some(opt)
       }
     }
@@ -759,7 +759,7 @@ object ScalaImportOptimizer {
     element match {
       case ref: ScReferenceElement
           if PsiTreeUtil.getParentOfType(ref, classOf[ScImportStmt]) == null =>
-        ref.multiResolve(false) foreach {
+        ref.multiResolve(false).foreach {
           case scalaResult: ScalaResolveResult
               if scalaResult.importsUsed.nonEmpty =>
             result ++= scalaResult.importsUsed
@@ -832,7 +832,7 @@ object ScalaImportOptimizer {
     val namesWithOffset = ArrayBuffer[(String, Int)]()
     holder.depthFirst.foreach {
       case ref: ScReferenceElement if ref.qualifier.isEmpty =>
-        ref.multiResolve(false) foreach {
+        ref.multiResolve(false).foreach {
           case srr: ScalaResolveResult if srr.importsUsed.nonEmpty =>
             namesWithOffset += (srr.name -> ref.getTextRange.getStartOffset)
           case srr: ScalaResolveResult if implicitlyImported(srr) =>

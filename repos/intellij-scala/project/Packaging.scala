@@ -20,17 +20,17 @@ object Packaging {
   def packagePlugin(mappings: Seq[(File, String)], destination: File): Unit = {
     IO.delete(destination)
     val (dirs, files) = mappings.partition(_._1.isDirectory)
-    dirs foreach {
+    dirs.foreach {
       case (from, to) =>
         IO.copyDirectory(from, destination / to, overwrite = true)
     }
-    files foreach { case (from, to) => IO.copyFile(from, destination / to) }
+    files.foreach { case (from, to) => IO.copyFile(from, destination / to) }
   }
 
   def compressPackagedPlugin(source: File, destination: File): Unit =
-    IO.zip((source.getParentFile ***) pair
-             (relativeTo(source.getParentFile), false),
-           destination)
+    IO.zip(
+      (source.getParentFile ***).pair(relativeTo(source.getParentFile), false),
+      destination)
 
   import PackageEntry._
 
@@ -49,7 +49,7 @@ object Packaging {
 
   def replaceInFile(f: File, source: String, target: String) = {
     if (!(source == null) && !(target == null)) {
-      IO.writeLines(f, IO.readLines(f) map { _.replace(source, target) })
+      IO.writeLines(f, IO.readLines(f).map { _.replace(source, target) })
     }
   }
 
@@ -82,7 +82,7 @@ object Packaging {
       filesToMerge.foreach(IO.unzip(_, tmp))
       val zipFile = IO.temporaryDirectory / "sbt-merge-result.jar"
       zipFile.delete()
-      IO.zip((tmp ***) pair (relativeTo(tmp), false), zipFile)
+      IO.zip((tmp ***).pair(relativeTo(tmp), false), zipFile)
       zipFile
     }
 }

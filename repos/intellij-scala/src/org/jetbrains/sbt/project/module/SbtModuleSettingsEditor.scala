@@ -48,7 +48,7 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
     myForm.updateButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         val resolversToUpdate: Seq[SbtResolver] =
-          myForm.resolversTable.getSelectedRows map (resolvers(_))
+          myForm.resolversTable.getSelectedRows.map(resolvers(_))
         SbtResolverIndexesManager().update(resolversToUpdate)
       }
     })

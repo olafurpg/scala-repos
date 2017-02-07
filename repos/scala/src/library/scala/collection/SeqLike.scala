@@ -200,8 +200,10 @@ trait SeqLike[+A, +Repr]
 
     private[this] def init() = {
       val m = mutable.HashMap[A, Int]()
-      val (es, is) = (thisCollection map
-        (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
+      val (es, is) = (thisCollection
+        .map(e => (e, m.getOrElseUpdate(e, m.size)))
+        .sortBy(_._2))
+        .unzip
 
       (es.toBuffer, is.toArray)
     }
@@ -254,14 +256,16 @@ trait SeqLike[+A, +Repr]
       val m = mutable.HashMap[A, Int]()
 
       // e => (e, weight(e))
-      val (es, is) = (thisCollection map
-        (e => (e, m.getOrElseUpdate(e, m.size))) sortBy (_._2)).unzip
+      val (es, is) = (thisCollection
+        .map(e => (e, m.getOrElseUpdate(e, m.size)))
+        .sortBy(_._2))
+        .unzip
       val cs = new Array[Int](m.size)
-      is foreach (i => cs(i) += 1)
+      is.foreach(i => cs(i) += 1)
       val ns = new Array[Int](cs.length)
 
       var r = n
-      0 until ns.length foreach { k =>
+      (0 until ns.length).foreach { k =>
         ns(k) = r min cs(k)
         r -= ns(k)
       }
@@ -299,7 +303,7 @@ trait SeqLike[+A, +Repr]
   def reverseIterator: Iterator[A] = toCollection(reverse).iterator
 
   def startsWith[B](that: GenSeq[B], offset: Int): Boolean = {
-    val i = this.iterator drop offset
+    val i = this.iterator.drop(offset)
     val j = that.iterator
     while (j.hasNext && i.hasNext) if (i.next != j.next) return false
 
@@ -347,9 +351,9 @@ trait SeqLike[+A, +Repr]
                           forward = true)
     } else {
       var i = from
-      var s: Seq[A] = thisCollection drop i
+      var s: Seq[A] = thisCollection.drop(i)
       while (!s.isEmpty) {
-        if (s startsWith that) return i
+        if (s.startsWith(that)) return i
 
         i += 1
         s = s.tail
@@ -609,7 +613,7 @@ trait SeqLike[+A, +Repr]
     *    List("Bob", "John", "Steve", "Tom")
     *  }}}
     */
-  def sortWith(lt: (A, A) => Boolean): Repr = sorted(Ordering fromLessThan lt)
+  def sortWith(lt: (A, A) => Boolean): Repr = sorted(Ordering.fromLessThan(lt))
 
   /** Sorts this $Coll according to the Ordering which results from transforming
     *  an implicitly given Ordering with a transformation function.
@@ -631,7 +635,7 @@ trait SeqLike[+A, +Repr]
     *    res0: Array[String] = Array(The, dog, fox, the, lazy, over, brown, quick, jumped)
     *  }}}
     */
-  def sortBy[B](f: A => B)(implicit ord: Ordering[B]): Repr = sorted(ord on f)
+  def sortBy[B](f: A => B)(implicit ord: Ordering[B]): Repr = sorted(ord.on(f))
 
   /** Sorts this $coll according to an Ordering.
     *

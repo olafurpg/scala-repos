@@ -61,7 +61,7 @@ object EchoTestClientApp extends App {
 
   val (upgrade, res) =
     Http().singleWebSocketRequest("wss://echo.websocket.org", echoClient)
-  res onComplete {
+  res.onComplete {
     case Success(res) ⇒
       println("Run successful. Got these elements:")
       res.foreach(println)

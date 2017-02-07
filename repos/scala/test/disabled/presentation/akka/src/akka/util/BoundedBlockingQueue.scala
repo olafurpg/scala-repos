@@ -143,7 +143,7 @@ class BoundedBlockingQueue[E <: AnyRef](val maxCapacity: Int,
     if (e eq null) throw new NullPointerException
     lock.lock()
     try {
-      if (backing remove e) {
+      if (backing.remove(e)) {
         notFull.signal()
         true
       } else false
@@ -213,7 +213,7 @@ class BoundedBlockingQueue[E <: AnyRef](val maxCapacity: Int,
           backing.poll() match {
             case null => return n
             case e =>
-              c add e
+              c.add(e)
               n += 1
           }
         }

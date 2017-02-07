@@ -355,7 +355,7 @@ trait ProtoUser {
   /**
     * Is there a user logged in and are they a superUser?
     */
-  def superUser_? : Boolean = currentUser.map(_.superUser_?) openOr false
+  def superUser_? : Boolean = currentUser.map(_.superUser_?).openOr(false)
 
   /**
     * The menu item for login (make this "Empty" to disable)
@@ -422,7 +422,7 @@ trait ProtoUser {
     * Overwrite in order to add custom LocParams. Attention: Not calling super will change the default behavior!
     */
   protected def createUserMenuLocParams: List[LocParam[Unit]] =
-    Template(() => wrapIt(signupFunc.map(_()) openOr signup)) :: If(
+    Template(() => wrapIt(signupFunc.map(_()).openOr(signup))) :: If(
       notLoggedIn_? _,
       S.?("logout.first")) :: Nil
 
@@ -483,7 +483,7 @@ trait ProtoUser {
     * Overwrite in order to add custom LocParams. Attention: Not calling super will change the default behavior!
     */
   protected def editUserMenuLocParams: List[LocParam[Unit]] =
-    Template(() => wrapIt(editFunc.map(_()) openOr edit)) :: testLogginIn :: Nil
+    Template(() => wrapIt(editFunc.map(_()).openOr(edit))) :: testLogginIn :: Nil
 
   /**
     * The menu item for changing password (make this "Empty" to disable)
@@ -583,7 +583,7 @@ trait ProtoUser {
   }
 
   protected def snarfLastItem: String =
-    (for (r <- S.request) yield r.path.wholePath.last) openOr ""
+    (for (r <- S.request) yield r.path.wholePath.last).openOr("")
 
   lazy val ItemList: List[MenuItem] = List(
     MenuItem(S.?("sign.up"), signUpPath, false),
@@ -797,8 +797,8 @@ trait ProtoUser {
     }
 
     def innerSignup = {
-      ("type=submit" #> signupSubmitButton(S ? "sign.up", testSignup _)) apply signupXhtml(
-        theUser)
+      (("type=submit" #> signupSubmitButton(S ? "sign.up", testSignup _)))
+        .apply(signupXhtml(theUser))
     }
 
     innerSignup
@@ -1150,8 +1150,8 @@ trait ProtoUser {
     }
 
     def innerEdit = {
-      ("type=submit" #> editSubmitButton(S.?("save"), testEdit _)) apply editXhtml(
-        theUser)
+      (("type=submit" #> editSubmitButton(S.?("save"), testEdit _)))
+        .apply(editXhtml(theUser))
     }
 
     innerEdit
@@ -1186,10 +1186,12 @@ trait ProtoUser {
   }
 
   protected def wrapIt(in: NodeSeq): NodeSeq =
-    screenWrap.map(new RuleTransformer(new RewriteRule {
-      override def transform(n: Node) = n match {
-        case e: Elem if "bind" == e.label && "lift" == e.prefix => in
-        case _ => n
-      }
-    })) openOr in
+    screenWrap
+      .map(new RuleTransformer(new RewriteRule {
+        override def transform(n: Node) = n match {
+          case e: Elem if "bind" == e.label && "lift" == e.prefix => in
+          case _ => n
+        }
+      }))
+      .openOr(in)
 }

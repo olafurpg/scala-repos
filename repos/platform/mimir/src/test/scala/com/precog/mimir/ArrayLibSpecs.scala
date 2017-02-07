@@ -59,7 +59,7 @@ trait ArrayLibSpecs[M[+ _]]
       result must haveSize(25)
 
       val values =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 2 => d
         }
 
@@ -78,7 +78,7 @@ trait ArrayLibSpecs[M[+ _]]
       result must haveSize(26)
 
       val values =
-        result collect {
+        result.collect {
           case (ids, jv) if ids.length == 2 => jv
         }
 
@@ -142,7 +142,7 @@ trait ArrayLibSpecs[M[+ _]]
       result must haveSize(26)
 
       val values =
-        result collect {
+        result.collect {
           case (ids, jv) if ids.length == 2 => jv
         }
       values must haveAllElementsLike {

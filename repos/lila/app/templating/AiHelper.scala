@@ -26,5 +26,5 @@ trait AiHelper { self: I18nHelper =>
     Html(aiName(level, withRating).replace(" ", "&nbsp;"))
 
   def aiRating(level: Int): Option[Int] =
-    Env.fishnet.aiPerfApi.intRatings get level
+    Env.fishnet.aiPerfApi.intRatings.get(level)
 }

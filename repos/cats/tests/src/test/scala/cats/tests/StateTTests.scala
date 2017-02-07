@@ -46,7 +46,7 @@ class StateTTests extends CatsSuite {
 
   test("runEmpty, runEmptyS, and runEmptyA consistent") {
     forAll { (f: StateT[List, Long, Int]) =>
-      (f.runEmptyS zip f.runEmptyA) should ===(f.runEmpty)
+      (f.runEmptyS.zip(f.runEmptyA)) should ===(f.runEmpty)
     }
   }
 

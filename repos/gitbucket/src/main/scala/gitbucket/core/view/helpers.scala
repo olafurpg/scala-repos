@@ -305,10 +305,12 @@ object helpers
        getAccountByUserName(userName)
      } else {
        getAccountByMailAddress(mailAddress)
-     }).map { account =>
-      Html(
-        s"""<a href="${url(account.userName)}" class="${styleClass}">${content}</a>""")
-    } getOrElse content
+     })
+      .map { account =>
+        Html(
+          s"""<a href="${url(account.userName)}" class="${styleClass}">${content}</a>""")
+      }
+      .getOrElse(content)
 
   /**
     * Test whether the given Date is past date.

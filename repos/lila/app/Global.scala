@@ -18,7 +18,7 @@ object Global extends GlobalSettings {
 
   override def onRouteRequest(req: RequestHeader): Option[Handler] = {
     lila.mon.http.request.all()
-    Env.i18n.requestHandler(req) orElse super.onRouteRequest(req)
+    Env.i18n.requestHandler(req).orElse(super.onRouteRequest(req))
   }
 
   private def niceError(req: RequestHeader): Boolean =
@@ -30,8 +30,8 @@ object Global extends GlobalSettings {
     else fuccess(NotFound("404 - Resource not found"))
 
   override def onBadRequest(req: RequestHeader, error: String) =
-    if (error startsWith "Illegal character in path") fuccess(Redirect("/"))
-    else if (error startsWith "Cannot parse parameter") onHandlerNotFound(req)
+    if (error.startsWith("Illegal character in path")) fuccess(Redirect("/"))
+    else if (error.startsWith("Cannot parse parameter")) onHandlerNotFound(req)
     else if (niceError(req)) {
       lila.mon.http.response.code400()
       controllers.Lobby.handleStatus(req, Results.BadRequest)

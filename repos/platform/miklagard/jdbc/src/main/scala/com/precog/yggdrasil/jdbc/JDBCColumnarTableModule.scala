@@ -396,35 +396,38 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                   case dbName :: tableName :: Nil =>
                     M.point {
                       try {
-                        databaseMap.get(dbName).map {
-                          url =>
-                            // Extra split/take at the end is because we can only map to column level. While hstore and json column types
-                            // will end up with deepeer paths, they cannot be queried against in PostgreSQL
-                            val columns = jTypeToProperties(tpe, Set()).map {
-                              c =>
-                                c.split('.').head
-                            }
-                            val query = Query("SELECT %s FROM %s".format(
-                                                if (columns.isEmpty) "*"
-                                                else columns.mkString(","),
-                                                tableName),
-                                              yggConfig.maxSliceSize)
+                        databaseMap
+                          .get(dbName)
+                          .map {
+                            url =>
+                              // Extra split/take at the end is because we can only map to column level. While hstore and json column types
+                              // will end up with deepeer paths, they cannot be queried against in PostgreSQL
+                              val columns = jTypeToProperties(tpe, Set()).map {
+                                c =>
+                                  c.split('.').head
+                              }
+                              val query = Query("SELECT %s FROM %s".format(
+                                                  if (columns.isEmpty) "*"
+                                                  else columns.mkString(","),
+                                                  tableName),
+                                                yggConfig.maxSliceSize)
 
-                            logger.debug("Running query: " + query)
+                              logger.debug("Running query: " + query)
 
-                            val connGen =
-                              () => DriverManager.getConnection(url)
+                              val connGen =
+                                () => DriverManager.getConnection(url)
 
-                            val (slice, nextSkip) =
-                              makeSlice(connGen, query, 0)
-                            Some(slice,
-                                 nextSkip
-                                   .map(InLoad(connGen, query, _, xs))
-                                   .getOrElse(InitialLoad(xs)))
-                        } getOrElse {
-                          throw new Exception(
-                            "Database %s is not configured" format dbName)
-                        }
+                              val (slice, nextSkip) =
+                                makeSlice(connGen, query, 0)
+                              Some(slice,
+                                   nextSkip
+                                     .map(InLoad(connGen, query, _, xs))
+                                     .getOrElse(InitialLoad(xs)))
+                          }
+                          .getOrElse {
+                            throw new Exception(
+                              "Database %s is not configured".format(dbName))
+                          }
                       } catch {
                         case t =>
                           logger.error(

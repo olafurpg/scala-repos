@@ -99,11 +99,11 @@ class SafeLongCheck
     forAll { (x: BigInt, k: Byte) =>
       val sx = SafeLong(x)
       if (k < 0) {
-        intercept[IllegalArgumentException] { sx pow k }
+        intercept[IllegalArgumentException] { sx.pow(k) }
         true shouldBe true
       } else {
-        invariant(sx ** k) shouldBe (x pow k)
-        invariant(sx pow k) shouldBe (x pow k)
+        invariant(sx ** k) shouldBe (x.pow(k))
+        invariant(sx.pow(k)) shouldBe (x.pow(k))
       }
     }
   }
@@ -116,7 +116,7 @@ class SafeLongCheck
         if (k < 0) {
           intercept[IllegalArgumentException] { sx.modPow(k, sm) }
         } else {
-          invariant(sx.modPow(k, sm)) shouldBe (sx pow k) % m
+          invariant(sx.modPow(k, sm)) shouldBe (sx.pow(k)) % m
         }
       }
       true shouldBe true
@@ -128,9 +128,9 @@ class SafeLongCheck
       val sx = SafeLong(x)
       val sy = SafeLong(y)
       invariant(sx min sy) shouldBe (x min y)
-      invariant(sx max sy) shouldBe (x max y)
-      sx compare sy shouldBe (x compare y)
-      sx.signum shouldBe (sx compare zero)
+      invariant(sx.max(sy)) shouldBe (x.max(y))
+      sx.compare(sy) shouldBe (x.compare(y))
+      sx.signum shouldBe (sx.compare(zero))
       sx.isZero shouldBe (sx == zero)
     }
   }
@@ -174,7 +174,7 @@ class SafeLongCheck
     forAll { (x: Long) =>
       val sx = SafeLong(x)
 
-      intercept[IllegalArgumentException] { sx pow -1 }
+      intercept[IllegalArgumentException] { sx.pow(-1) }
 
       sx.toLong shouldBe x
       sx.getLong shouldBe Opt(x)
@@ -231,21 +231,21 @@ class SafeLongCheck
     smin /% (-smin) shouldBe ((SafeLong.minusOne, zero))
 
     // gcd
-    smin gcd smin shouldBe firstBig
-    smin gcd zero shouldBe firstBig
-    zero gcd smin shouldBe firstBig
-    SafeLong(2) gcd smin shouldBe SafeLong(2)
-    smin gcd smin shouldBe firstBig
-    SafeLong(13) gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe SafeLong(13)
-    smin gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe firstBig
-    SafeLong.minusOne gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe SafeLong
+    smin.gcd(smin) shouldBe firstBig
+    smin.gcd(zero) shouldBe firstBig
+    zero.gcd(smin) shouldBe firstBig
+    SafeLong(2).gcd(smin) shouldBe SafeLong(2)
+    smin.gcd(smin) shouldBe firstBig
+    SafeLong(13).gcd(SafeLongBigInteger(BigInteger.ZERO)) shouldBe SafeLong(13)
+    smin.gcd(SafeLongBigInteger(BigInteger.ZERO)) shouldBe firstBig
+    SafeLong.minusOne.gcd(SafeLongBigInteger(BigInteger.ZERO)) shouldBe SafeLong
       .one
 
-    (SafeLong(0) gcd SafeLong(-13)) shouldBe SafeLong(13)
-    (SafeLong(0) gcd smin) shouldBe firstBig
+    (SafeLong(0).gcd(SafeLong(-13))) shouldBe SafeLong(13)
+    (SafeLong(0).gcd(smin)) shouldBe firstBig
 
-    (SafeLong(-13) gcd SafeLong(0)) shouldBe SafeLong(13)
-    (smin gcd SafeLong(0)) shouldBe firstBig
+    (SafeLong(-13).gcd(SafeLong(0))) shouldBe SafeLong(13)
+    (smin.gcd(SafeLong(0))) shouldBe firstBig
   }
 
   property("regressions") {

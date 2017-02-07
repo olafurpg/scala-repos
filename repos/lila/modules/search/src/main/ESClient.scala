@@ -48,14 +48,14 @@ final class ESClientHttp(endpoint: String,
     HTTP(s"mapping/${index.name}/${index.name}", Json.obj())
 
   def storeBulk(docs: Seq[(Id, JsObject)]) =
-    HTTP(s"store/bulk/${index.name}/${index.name}", JsObject(docs map {
+    HTTP(s"store/bulk/${index.name}/${index.name}", JsObject(docs.map {
       case (Id(id), doc) => id -> JsString(Json.stringify(doc))
     }))
 
   private[search] def HTTP[D: Writes, R](url: String,
                                          data: D,
                                          read: String => R): Fu[R] =
-    WS.url(s"$endpoint/$url").post(Json toJson data) flatMap {
+    WS.url(s"$endpoint/$url").post(Json toJson data).flatMap {
       case res if res.status == 200 => fuccess(read(res.body))
       case res => fufail(s"$url ${res.status}")
     }

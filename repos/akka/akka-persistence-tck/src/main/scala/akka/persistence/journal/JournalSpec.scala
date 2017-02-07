@@ -113,7 +113,7 @@ abstract class JournalSpec(config: Config)
     journal ! WriteMessages(msgs, probe.ref, actorInstanceId)
 
     probe.expectMsg(WriteMessagesSuccessful)
-    fromSnr to toSnr foreach { i ⇒
+    (fromSnr to toSnr).foreach { i ⇒
       probe.expectMsgPF() {
         case WriteMessageSuccess(
             PersistentImpl(payload, `i`, `pid`, _, _, `sender`, `writerUuid`),
@@ -130,7 +130,7 @@ abstract class JournalSpec(config: Config)
                                Long.MaxValue,
                                pid,
                                receiverProbe.ref)
-      1 to 5 foreach { i ⇒
+      (1 to 5).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
@@ -141,49 +141,49 @@ abstract class JournalSpec(config: Config)
                                Long.MaxValue,
                                pid,
                                receiverProbe.ref)
-      3 to 5 foreach { i ⇒
+      (3 to 5).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
     }
     "replay messages using an upper sequence number bound" in {
       journal ! ReplayMessages(1, 3, Long.MaxValue, pid, receiverProbe.ref)
-      1 to 3 foreach { i ⇒
+      (1 to 3).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
     }
     "replay messages using a count limit" in {
       journal ! ReplayMessages(1, Long.MaxValue, 3, pid, receiverProbe.ref)
-      1 to 3 foreach { i ⇒
+      (1 to 3).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
     }
     "replay messages using a lower and upper sequence number bound" in {
       journal ! ReplayMessages(2, 3, Long.MaxValue, pid, receiverProbe.ref)
-      2 to 3 foreach { i ⇒
+      (2 to 3).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
     }
     "replay messages using a lower and upper sequence number bound and a count limit" in {
       journal ! ReplayMessages(2, 5, 2, pid, receiverProbe.ref)
-      2 to 3 foreach { i ⇒
+      (2 to 3).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
     }
     "replay a single if lower sequence number bound equals upper sequence number bound" in {
       journal ! ReplayMessages(2, 2, Long.MaxValue, pid, receiverProbe.ref)
-      2 to 2 foreach { i ⇒
+      (2 to 2).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
     }
     "replay a single message if count limit equals 1" in {
       journal ! ReplayMessages(2, 4, 1, pid, receiverProbe.ref)
-      2 to 2 foreach { i ⇒
+      (2 to 2).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
@@ -219,7 +219,7 @@ abstract class JournalSpec(config: Config)
                                Long.MaxValue,
                                pid,
                                receiverProbe.ref)
-      List(4, 5) foreach { i ⇒
+      List(4, 5).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
 
@@ -232,7 +232,7 @@ abstract class JournalSpec(config: Config)
                                Long.MaxValue,
                                pid,
                                receiverProbe.ref)
-      1 to 5 foreach { i ⇒
+      (1 to 5).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
@@ -245,7 +245,7 @@ abstract class JournalSpec(config: Config)
                                Long.MaxValue,
                                pid,
                                receiverProbe.ref)
-      4 to 5 foreach { i ⇒
+      (4 to 5).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
@@ -257,7 +257,7 @@ abstract class JournalSpec(config: Config)
                                Long.MaxValue,
                                pid,
                                receiverProbe.ref)
-      1 to 5 foreach { i ⇒
+      (1 to 5).foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
@@ -274,7 +274,7 @@ abstract class JournalSpec(config: Config)
     }
   }
 
-  "A Journal optionally" may {
+  "A Journal optionally".may {
 
     optional(flag = supportsRejectingNonSerializableObjects) {
       "reject non-serializable events" in EventFilter[

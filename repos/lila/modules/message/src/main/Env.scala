@@ -15,7 +15,7 @@ final class Env(config: Config,
                 system: ActorSystem) {
 
   private val CollectionThread = config getString "collection.thread"
-  private val ThreadMaxPerPage = config getInt "thread.max_per_page"
+  private val ThreadMaxPerPage = config.getInt("thread.max_per_page")
   private val ActorName = config getString "actor.name"
 
   import scala.collection.JavaConversions._
@@ -46,14 +46,15 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "message" boot new Env(
-      config = lila.common.PlayApp loadConfig "message",
-      db = lila.db.Env.current,
-      shutup = lila.hub.Env.current.actor.shutup,
-      mongoCache = lila.memo.Env.current.mongoCache,
-      blocks = lila.relation.Env.current.api.fetchBlocks,
-      follows = lila.relation.Env.current.api.fetchFollows,
-      getPref = lila.pref.Env.current.api.getPref,
-      system = lila.common.PlayApp.system
-    )
+    "message".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("message"),
+        db = lila.db.Env.current,
+        shutup = lila.hub.Env.current.actor.shutup,
+        mongoCache = lila.memo.Env.current.mongoCache,
+        blocks = lila.relation.Env.current.api.fetchBlocks,
+        follows = lila.relation.Env.current.api.fetchFollows,
+        getPref = lila.pref.Env.current.api.getPref,
+        system = lila.common.PlayApp.system
+      ))
 }

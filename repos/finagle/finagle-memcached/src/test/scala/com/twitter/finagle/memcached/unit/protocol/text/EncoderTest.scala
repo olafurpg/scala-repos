@@ -18,8 +18,8 @@ class EncoderTest extends FunSuite with MockitoSugar {
     val channel = mock[Channel]
     val context = mock[ChannelHandlerContext]
     val addr = mock[java.net.SocketAddress]
-    when(context.getChannel) thenReturn channel
-    when(channel.getLocalAddress) thenReturn addr
+    when(context.getChannel).thenReturn(channel)
+    when(channel.getLocalAddress).thenReturn(addr)
     val encoder = new Encoder
 
     def encode(x: AnyRef) = {

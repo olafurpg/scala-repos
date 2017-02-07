@@ -98,7 +98,7 @@ class RoutingSpec
       router ! GetRoutees
       val routees = expectMsgType[Routees].routees
       routees.size should ===(2)
-      routees foreach { _.send(PoisonPill, testActor) }
+      routees.foreach { _.send(PoisonPill, testActor) }
       // expect no Terminated
       expectNoMsg(2.seconds)
     }
@@ -213,10 +213,10 @@ class RoutingSpec
       system.actorOf(Props(new Actor {
         def receive = {
           case "start" ⇒
-            context.actorOf(
+            (context.actorOf(
               RoundRobinPool(2).props(routeeProps = Props(new Actor {
                 def receive = { case x ⇒ sender() ! x }
-              }))) ? "hello" pipeTo sender()
+              }))) ? "hello").pipeTo(sender())
         }
       })) ! "start"
       expectMsg("hello")
@@ -228,7 +228,7 @@ class RoutingSpec
     "send message to connection" in {
       class Actor1 extends Actor {
         def receive = {
-          case msg ⇒ testActor forward msg
+          case msg ⇒ testActor.forward(msg)
         }
       }
 

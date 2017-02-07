@@ -42,7 +42,7 @@ object ScalarTagInt extends ScalarTag[Int] {
   def inf(implicit ev: NUM[Int]) = Int.MaxValue
   def negInf(implicit ev: NUM[Int]) = Int.MinValue
 
-  def show(v: Int) = if (isMissing(v)) "%s" format "NA" else "%d" format v
+  def show(v: Int) = if (isMissing(v)) "%s".format("NA") else "%d".format(v)
 
   override def runtimeClass = classOf[Int]
 

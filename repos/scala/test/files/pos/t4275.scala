@@ -8,6 +8,6 @@ object Test {
   object B {
     implicit def b2seq(x: B): Seq[Int] = Nil
 
-    def f = (new B) count (_ > 0)
+    def f = (new B).count(_ > 0)
   }
 }

@@ -102,7 +102,7 @@ trait PrecogLibModule[M[+ _]]
         private def concatenate(stream0: StreamT[M, CharBuffer]): M[String] = {
           val sb = new StringBuffer
           def build(stream: StreamT[M, CharBuffer]): M[String] =
-            stream.uncons flatMap {
+            stream.uncons.flatMap {
               case Some((head, tail)) =>
                 sb.append(head.toString)
                 build(tail)
@@ -128,9 +128,11 @@ trait PrecogLibModule[M[+ _]]
           val chunks0: List[(Int, BitSet)] =
             range.foldLeft(List.empty[(Int, BitSet)]) {
               case (acc, row) if urls.isDefinedAt(row) =>
-                addOrCreate(row, acc, paramsOrder) map { pair =>
-                  pair :: acc
-                } getOrElse acc
+                addOrCreate(row, acc, paramsOrder)
+                  .map { pair =>
+                    pair :: acc
+                  }
+                  .getOrElse(acc)
               case (acc, _) => acc
             }
 
@@ -140,7 +142,7 @@ trait PrecogLibModule[M[+ _]]
           val baseOpts = Map(jfield("accountId", account.accountId),
                              jfield("email", account.email))
           val chunks: List[((String, Map[String, JValue]), BitSet)] =
-            chunks0 map {
+            chunks0.map {
               case (row, members) =>
                 val url = urls(row)
                 val opts = options.toJValue(row) match {
@@ -151,16 +153,16 @@ trait PrecogLibModule[M[+ _]]
             }
 
           val resultsM: M[List[Result[Slice]]] =
-            chunks traverse {
+            chunks.traverse {
               case ((url, opts), members) =>
                 val chunkValues = values.redefineWith(members)
                 val (stream, _) = chunkValues.renderJson[M](",")
 
-                concatenate(stream) map ("[" + _ + "]") flatMap { data =>
+                concatenate(stream).map("[" + _ + "]").flatMap { data =>
                   val fields =
                     opts.mapValues(_.renderCompact) + ("data" -> data)
                   val requestBody =
-                    fields map {
+                    fields.map {
                       case (field, value) =>
                         JString(field).renderCompact + ":" + value
                     } mkString ("{", ",", "}")
@@ -181,7 +183,7 @@ trait PrecogLibModule[M[+ _]]
                         } else Stream.empty
 
                       val sparseData =
-                        sparseStream(0, data map (RValue.fromJValue(_)))
+                        sparseStream(0, data.map(RValue.fromJValue(_)))
                       Success(Slice.fromRValues(sparseData))
                     }
                   }
@@ -191,7 +193,7 @@ trait PrecogLibModule[M[+ _]]
                     HttpMethod.POST,
                     body = Some(Request.Body("application/json", requestBody)))
 
-                  client.execute(request).run map { responseE =>
+                  client.execute(request).run.map { responseE =>
                     val validation = for {
                       response <- httpError <-: responseE.validation
                       body <- httpError <-: response.ok.validation
@@ -201,29 +203,28 @@ trait PrecogLibModule[M[+ _]]
                         .validated[List[JValue]]
                       result <- jsonError <-: populate(data)
                     } yield result
-                    validation leftMap (NonEmptyList(_))
+                    validation.leftMap(NonEmptyList(_))
                   }
                 }
             }
 
-          resultsM map (_.sequence: Result[List[Slice]]) flatMap {
+          resultsM.map(_.sequence: Result[List[Slice]]).flatMap {
             case Success(slices) =>
               val resultSlice =
-                slices.foldLeft(Slice(Map.empty, slice.size))(_ zip _).columns
+                slices.foldLeft(Slice(Map.empty, slice.size))(_.zip(_)).columns
               M point resultSlice
 
             case Failure(errors) =>
               val messages =
-                errors.toList map
-                  (_.fold({ httpError =>
-                    "Error making HTTP request: " + httpError.userMessage
-                  }, { jsonError =>
-                    "Error parsing JSON: " + jsonError.message
-                  }))
+                errors.toList.map(_.fold({ httpError =>
+                  "Error making HTTP request: " + httpError.userMessage
+                }, { jsonError =>
+                  "Error parsing JSON: " + jsonError.message
+                }))
               val units: M[List[Unit]] =
-                messages traverse (ctx.logger.error(_))
-              units flatMap { _ =>
-                ctx.logger.die() map { _ =>
+                messages.traverse(ctx.logger.error(_))
+              units.flatMap { _ =>
+                ctx.logger.die().map { _ =>
                   Map.empty
                 }
               }

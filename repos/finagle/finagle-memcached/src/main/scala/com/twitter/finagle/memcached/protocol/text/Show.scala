@@ -35,7 +35,7 @@ class ResponseToEncoding extends OneToOneEncoder {
         Tokens(formatted.map { Buf.ByteArray.Owned(_) })
       case InfoLines(lines) =>
         val statLines =
-          lines map { line =>
+          lines.map { line =>
             val key = line.key
             val values = line.values
             Tokens(Seq(key) ++ values)
@@ -43,7 +43,7 @@ class ResponseToEncoding extends OneToOneEncoder {
         StatLines(statLines)
       case Values(values) =>
         val tokensWithData =
-          values map {
+          values.map {
             case Value(key, value, casUnique, Some(flags)) =>
               TokensWithData(Seq(VALUE, key, flags), value, casUnique)
             case Value(key, value, casUnique, None) =>

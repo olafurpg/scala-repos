@@ -43,7 +43,7 @@ class NumberJoinTest extends WordSpec with Matchers {
         .source(Tsv("input1"), List(("0", "1"), ("1", "3"), ("2", "9")))
         .sink[(Int, Int, Long, Long)](Tsv("output")) { outBuf =>
           val unordered = outBuf.toSet
-          unordered should have size 3
+          (unordered should have).size(3)
           unordered should contain(0, 1, 0L, 1L)
           unordered should contain(1, 2, 1L, 3L)
           unordered should contain(2, 4, 2L, 9L)
@@ -799,7 +799,7 @@ class GroupUniqueSpec extends WordSpec with Matchers {
                    "6" -> "just one"))
       .sink[(Long)](Tsv("fakeOut")) { outBuf =>
         "correctly count unique sizes" in {
-          outBuf.toSet should have size 3
+          (outBuf.toSet should have).size(3)
         }
       }
       .run
@@ -836,7 +836,7 @@ class DiscardTest extends WordSpec with Matchers {
               List("0" -> "hello world", "1" -> "foo", "2" -> "bar"))
       .sink[Boolean](Tsv("fakeOut")) { outBuf =>
         "must reduce down to one line" in {
-          outBuf should have size 1
+          (outBuf should have).size(1)
         }
         "must correctly discard word column" in {
           outBuf(0) shouldBe true
@@ -862,7 +862,7 @@ class HistogramTest extends WordSpec with Matchers {
       .source(TextLine("fakeIn"), List("0" -> "single", "1" -> "single"))
       .sink[(Long, Long)](Tsv("fakeOut")) { outBuf =>
         "must reduce down to a single line for a trivial input" in {
-          outBuf should have size 1
+          (outBuf should have).size(1)
         }
         "must get the result right" in {
           outBuf(0) shouldBe (2L, 1L)
@@ -940,7 +940,7 @@ class ToListTest extends WordSpec with Matchers {
               List("0" -> "single test", "1" -> "single result"))
       .sink[(Int, String)](Tsv("fakeOut")) { outBuf =>
         "must have the right number of lines" in {
-          outBuf should have size 2
+          (outBuf should have).size(2)
         }
         "must get the result right" in {
           //need to convert to sets because order
@@ -960,7 +960,7 @@ class ToListTest extends WordSpec with Matchers {
               List("0" -> null, "0" -> "a", "0" -> null, "0" -> "b"))
       .sink[(Int, String)](Tsv("fakeOut")) { outBuf =>
         "must have the right number of lines" in {
-          outBuf should have size 1
+          (outBuf should have).size(1)
         }
         "must return an empty list for null key" in {
           val sSet = outBuf(0)._2.split(" ").toSet
@@ -993,7 +993,7 @@ class CrossTest extends WordSpec with Matchers {
       .source(Tsv("fakeIn2"), List("4", "5").map { Tuple1(_) })
       .sink[(Int, Int, Int)](Tsv("fakeOut")) { outBuf =>
         (idx + ": must look exactly right") in {
-          outBuf should have size 6
+          (outBuf should have).size(6)
           outBuf.toSet shouldBe
             (Set((0, 1, 4),
                  (0, 1, 5),
@@ -1042,7 +1042,7 @@ class GroupAllCrossTest extends WordSpec with Matchers {
       .source(Tsv("fakeIn2"), List("4", "5").map { Tuple1(_) })
       .sink[(Int, Int)](Tsv("fakeOut")) { outBuf =>
         (idx + ": must look exactly right") in {
-          outBuf should have size 2
+          (outBuf should have).size(2)
           outBuf.toSet shouldBe Set((1, 4), (1, 5))
         }
         idx += 1
@@ -1074,7 +1074,7 @@ class SmallCrossTest extends WordSpec with Matchers {
       .source(Tsv("fakeIn2"), List("4", "5").map { Tuple1(_) })
       .sink[(Int, Int, Int)](Tsv("fakeOut")) { outBuf =>
         (idx + ": must look exactly right") in {
-          outBuf should have size 6
+          (outBuf should have).size(6)
           outBuf.toSet shouldBe Set((0, 1, 4),
                                     (0, 1, 5),
                                     (1, 2, 4),
@@ -1108,7 +1108,7 @@ class TopKTest extends WordSpec with Matchers {
       .source(Tsv("fakeIn"), List(3, 24, 1, 4, 5).map { Tuple1(_) })
       .sink[List[Int]](Tsv("fakeOut")) { outBuf =>
         "must look exactly right" in {
-          outBuf should have size 1
+          (outBuf should have).size(1)
           outBuf(0) shouldBe List(1, 3, 4)
         }
       }
@@ -1168,13 +1168,13 @@ class TakeTest extends WordSpec with Matchers {
       .source(Tsv("in"), List((3, 0, 1), (3, 1, 10), (3, 5, 100)))
       .sink[(Int, Int, Int)](Tsv("outall")) { outBuf =>
         "groupAll must see everything in same order" in {
-          outBuf should have size 3
+          (outBuf should have).size(3)
           outBuf.toList shouldBe List((3, 0, 1), (3, 1, 10), (3, 5, 100))
         }
       }
       .sink[(Int, Int, Int)](Tsv("out2")) { outBuf =>
         "take(2) must only get 2" in {
-          outBuf should have size 2
+          (outBuf should have).size(2)
           outBuf.toList shouldBe List((3, 0, 1), (3, 1, 10))
         }
       }
@@ -1199,7 +1199,7 @@ class DropTest extends WordSpec with Matchers {
       .source(Tsv("in"), List((3, 0, 1), (3, 1, 10), (3, 5, 100)))
       .sink[(Int, Int, Int)](Tsv("outall")) { outBuf =>
         "groupAll must see everything in same order" in {
-          outBuf should have size 3
+          (outBuf should have).size(3)
           outBuf.toList shouldBe List((3, 0, 1), (3, 1, 10), (3, 5, 100))
         }
       }
@@ -1235,7 +1235,7 @@ class PivotTest extends WordSpec with Matchers with FieldConversions {
       .source(Tsv("in", ('k, 'w, 'y, 'z)), input)
       .sink[(String, String, String)](Tsv("unpivot")) { outBuf =>
         "unpivot columns correctly" in {
-          outBuf should have size 6
+          (outBuf should have).size(6)
           outBuf.toList.sorted shouldBe
             (List(("1", "w", "a"),
                   ("1", "y", "b"),
@@ -1247,14 +1247,14 @@ class PivotTest extends WordSpec with Matchers with FieldConversions {
       }
       .sink[(String, String, String, String)](Tsv("pivot")) { outBuf =>
         "pivot back to the original" in {
-          outBuf should have size 2
+          (outBuf should have).size(2)
           outBuf.toList.sorted shouldBe (input.sorted)
         }
       }
       .sink[(String, String, String, String, Double)](Tsv(
         "pivot_with_default")) { outBuf =>
         "pivot back to the original with the missing column replace by the specified default" in {
-          outBuf should have size 2
+          (outBuf should have).size(2)
           outBuf.toList.sorted shouldBe
             (List(("1", "a", "b", "c", 2.0), ("2", "d", "e", "f", 2.0)).sorted)
         }
@@ -1481,7 +1481,7 @@ class NormalizeTest extends WordSpec with Matchers {
               List(("0.3", "1"), ("0.3", "1"), ("0.3", "1"), ("0.3", "1")))
       .sink[(Double, Int)](Tsv("out")) { outBuf =>
         "must be normalized" in {
-          outBuf should have size 4
+          (outBuf should have).size(4)
           outBuf.toSet shouldBe Set((0.25, 1), (0.25, 1), (0.25, 1), (0.25, 1))
         }
       }
@@ -1514,7 +1514,7 @@ class ForceToDiskTest extends WordSpec with Matchers {
       .source(Tsv("in", ('x, 'y)), input)
       .sink[(Int, Int, Int)](Tsv("out")) { outBuf =>
         (idx + ": run correctly when combined with joinWithTiny") in {
-          outBuf should have size 2000
+          (outBuf should have).size(2000)
           val correct = (1 to 1000).flatMap { y =>
             List((1, 1, y), (-1, 1, y))
           }.sorted
@@ -1708,7 +1708,7 @@ class GroupAllToListTest extends WordSpec with Matchers {
       .source(TypedTsv[(Long, String, Double)]("input"), input)
       .sink[String](Tsv("output")) { outBuf =>
         "must properly aggregate stuff into a single map" in {
-          outBuf should have size 1
+          (outBuf should have).size(1)
           outBuf(0) shouldBe output.toString
         }
       }
@@ -1739,7 +1739,7 @@ class ToListGroupAllToListSpec extends WordSpec with Matchers {
               List((1L, "us"), (1L, "gb"), (2L, "jp"), (3L, "jp"), (3L, "gb")))
       .sink[String](Tsv("output")) { outBuf =>
         "must properly aggregate stuff in hadoop mode" in {
-          outBuf should have size 1
+          (outBuf should have).size(1)
           outBuf.head shouldBe (expected.toString)
           println(outBuf.head)
         }
@@ -1752,7 +1752,7 @@ class ToListGroupAllToListSpec extends WordSpec with Matchers {
               List((1L, "us"), (1L, "gb"), (2L, "jp"), (3L, "jp"), (3L, "gb")))
       .sink[List[(String, List[Long])]](Tsv("output")) { outBuf =>
         "must properly aggregate stuff in local model" in {
-          outBuf should have size 1
+          (outBuf should have).size(1)
           outBuf.head shouldBe expected
           println(outBuf.head)
         }
@@ -1887,10 +1887,10 @@ class VerifyTypesJobTest extends WordSpec with Matchers {
       JobTest(new VerifyTypesJob(_))
         .source(Tsv("input", new Fields("age", "weight")), input)
         .sink[(Int, Int)](Tsv("output")) { outBuf =>
-          outBuf.toList should have size (input.size - 2)
+          (outBuf.toList should have).size(input.size - 2)
         }
         .sink[(Any, Any)](Tsv("trap")) { outBuf =>
-          outBuf.toList should have size 2
+          (outBuf.toList should have).size(2)
         }
         .run
         .finish

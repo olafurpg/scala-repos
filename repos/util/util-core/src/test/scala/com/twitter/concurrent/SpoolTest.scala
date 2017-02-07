@@ -18,16 +18,16 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
 
     "iterate over all elements" in {
       val xs = new ArrayBuffer[Int]
-      s foreach { xs += _ }
+      s.foreach { xs += _ }
       assert(xs.size == 0)
     }
 
     "map" in {
-      assert((s map { _ * 2 }) == Spool.empty[Int])
+      assert((s.map { _ * 2 }) == Spool.empty[Int])
     }
 
     "mapFuture" in {
-      val mapFuture = s mapFuture { Future.value(_) }
+      val mapFuture = s.mapFuture { Future.value(_) }
       assert(mapFuture.poll == Some(Return(s)))
     }
 
@@ -52,7 +52,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
 
       val s2 =
         s ++ Future(3 *:: Future.value(4 *:: Future.value(Spool.empty[Int])))
-      assert(Await.result(s2 flatMap (_.toSeq)) == Seq(3, 4))
+      assert(Await.result(s2.flatMap(_.toSeq)) == Seq(3, 4))
     }
 
     "flatMap" in {
@@ -60,7 +60,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
         Future(
           x.toString *:: Future.value(
             (x * 2).toString *:: Future.value(Spool.empty[String])))
-      assert(Await.result(s flatMap f) == Spool.empty[Int])
+      assert(Await.result(s.flatMap(f)) == Spool.empty[Int])
     }
 
     "fold left" in {
@@ -99,7 +99,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
 
     "iterate over all elements" in {
       val xs = new ArrayBuffer[Int]
-      s foreach { xs += _ }
+      s.foreach { xs += _ }
       assert(xs.toSeq == Seq(1, 2))
     }
 
@@ -136,20 +136,20 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
 
     "append via ++ with Future rhs" in {
       assert(Await.result(
-        s ++ Future.value(Spool.empty[Int]) flatMap (_.toSeq)) == Seq(1, 2))
+        (s ++ Future.value(Spool.empty[Int])).flatMap(_.toSeq)) == Seq(1, 2))
       assert(Await.result(
-        Spool.empty[Int] ++ Future.value(s) flatMap (_.toSeq)) == Seq(1, 2))
+        (Spool.empty[Int] ++ Future.value(s)).flatMap(_.toSeq)) == Seq(1, 2))
 
       val s2 =
         s ++ Future.value(
           3 *:: Future.value(4 *:: Future.value(Spool.empty[Int])))
-      assert(Await.result(s2 flatMap (_.toSeq)) == Seq(1, 2, 3, 4))
+      assert(Await.result(s2.flatMap(_.toSeq)) == Seq(1, 2, 3, 4))
     }
 
     "flatMap" in {
       val f = (x: Int) => Future(Seq(x.toString, (x * 2).toString).toSpool)
-      val s2 = s flatMap f
-      assert(Await.result(s2 flatMap (_.toSeq)) == Seq("1", "2", "2", "4"))
+      val s2 = s.flatMap(f)
+      assert(Await.result(s2.flatMap(_.toSeq)) == Seq("1", "2", "2", "4"))
     }
 
     "fold left" in {
@@ -212,7 +212,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
 
     "EOF iteration on EOFException" in {
       val xs = new ArrayBuffer[Option[Int]]
-      s foreachElem { xs += _ }
+      s.foreachElem { xs += _ }
       assert(xs.toSeq == Seq(Some(1), Some(2), None))
     }
   }
@@ -223,7 +223,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
 
     "return with exception on error" in {
       val xs = new ArrayBuffer[Option[Int]]
-      s foreachElem { xs += _ }
+      s.foreachElem { xs += _ }
       intercept[Exception] {
         Await.result(s.toSeq)
       }
@@ -232,7 +232,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
     "return with exception on error in callback" in {
       val xs = new ArrayBuffer[Option[Int]]
       val f =
-        s foreach { _ =>
+        s.foreach { _ =>
           throw new Exception("sad panda")
         }
       intercept[Exception] {
@@ -243,7 +243,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
     "return with exception on EOFException in callback" in {
       val xs = new ArrayBuffer[Option[Int]]
       val f =
-        s foreach { _ =>
+        s.foreach { _ =>
           throw new EOFException("sad panda")
         }
       intercept[EOFException] {
@@ -265,7 +265,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
       import h._
 
       val xs = new ArrayBuffer[Int]
-      s foreach { xs += _ }
+      s.foreach { xs += _ }
       assert(xs.toSeq == Seq(1))
       p() = Return(2 *:: p1)
       assert(xs.toSeq == Seq(1, 2))
@@ -278,7 +278,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
       import h._
 
       val xs = new ArrayBuffer[Option[Int]]
-      s foreachElem { xs += _ }
+      s.foreachElem { xs += _ }
       assert(xs.toSeq == Seq(Some(1)))
       p() = Throw(new EOFException("sad panda"))
       assert(xs.toSeq == Seq(Some(1), None))
@@ -289,7 +289,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
       import h._
 
       val xs = new ArrayBuffer[Option[Int]]
-      s foreachElem { xs += _ }
+      s.foreachElem { xs += _ }
       assert(xs.toSeq == Seq(Some(1)))
       p() = Throw(new Exception("sad panda"))
       intercept[Exception] {
@@ -303,7 +303,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
 
       val xs = new ArrayBuffer[Option[Int]]
       val f =
-        s foreach { _ =>
+        s.foreach { _ =>
           throw new Exception("sad panda")
         }
       p() = Return(2 *:: p1)
@@ -318,7 +318,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
 
       val xs = new ArrayBuffer[Option[Int]]
       val f =
-        s foreach { _ =>
+        s.foreach { _ =>
           throw new EOFException("sad panda")
         }
       p() = Return(2 *:: p1)
@@ -355,7 +355,7 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
       import h._
 
       val f =
-        s collect {
+        s.collect {
           case x if x % 2 == 0 => x * 2
         }
 

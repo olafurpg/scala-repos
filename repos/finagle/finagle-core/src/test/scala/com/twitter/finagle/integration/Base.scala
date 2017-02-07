@@ -38,7 +38,7 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
     val codec = mock[Codec[String, String]]
     when(
       codec.prepareConnFactory(any[ServiceFactory[String, String]],
-                               any[Stack.Params])) thenAnswer {
+                               any[Stack.Params])).thenAnswer {
       new Answer[ServiceFactory[String, String]] {
         def answer(
             invocation: InvocationOnMock): ServiceFactory[String, String] = {
@@ -47,38 +47,43 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
         }
       }
     }
-    when(codec.prepareServiceFactory(any[ServiceFactory[String, String]])) thenAnswer {
-      new Answer[ServiceFactory[String, String]] {
-        def answer(
-            invocation: InvocationOnMock): ServiceFactory[String, String] = {
-          val arg = invocation.getArguments.head
-          arg.asInstanceOf[ServiceFactory[String, String]]
-        }
-      }
-    }
-    when(codec.newClientTransport(any[Channel], any[StatsReceiver])) thenAnswer {
-      new Answer[ChannelTransport[Any, Any]] {
-        def answer(invocation: InvocationOnMock): ChannelTransport[Any, Any] =
-          invocation.getArguments match {
-            case args: Array[Object] =>
-              new ChannelTransport[Any, Any](args.head.asInstanceOf[Channel])
+    when(codec.prepareServiceFactory(any[ServiceFactory[String, String]]))
+      .thenAnswer {
+        new Answer[ServiceFactory[String, String]] {
+          def answer(
+              invocation: InvocationOnMock): ServiceFactory[String, String] = {
+            val arg = invocation.getArguments.head
+            arg.asInstanceOf[ServiceFactory[String, String]]
           }
-      }
-    }
-    when(codec.newClientDispatcher(any[Transport[Any, Any]],
-                                   any[Stack.Params])) thenAnswer {
-      new Answer[SerialClientDispatcher[String, String]] {
-        def answer(invocation: InvocationOnMock)
-          : SerialClientDispatcher[String, String] = {
-          val arg = invocation.getArguments.head
-          new SerialClientDispatcher[String, String](
-            arg.asInstanceOf[Transport[String, String]])
         }
       }
-    }
+    when(codec.newClientTransport(any[Channel], any[StatsReceiver]))
+      .thenAnswer {
+        new Answer[ChannelTransport[Any, Any]] {
+          def answer(
+              invocation: InvocationOnMock): ChannelTransport[Any, Any] =
+            invocation.getArguments match {
+              case args: Array[Object] =>
+                new ChannelTransport[Any, Any](args.head.asInstanceOf[Channel])
+            }
+        }
+      }
+    when(
+      codec.newClientDispatcher(any[Transport[Any, Any]], any[Stack.Params]))
+      .thenAnswer {
+        new Answer[SerialClientDispatcher[String, String]] {
+          def answer(invocation: InvocationOnMock)
+            : SerialClientDispatcher[String, String] = {
+            val arg = invocation.getArguments.head
+            new SerialClientDispatcher[String, String](
+              arg.asInstanceOf[Transport[String, String]])
+          }
+        }
+      }
 
-    when(codec.newTraceInitializer) thenReturn TraceInitializerFilter
-      .clientModule[String, String]
+    when(codec.newTraceInitializer).thenReturn(
+      TraceInitializerFilter
+        .clientModule[String, String])
 
     when(codec.failFastOk).thenReturn(true)
     when(codec.protocolLibraryName).thenReturn("fancy")
@@ -88,8 +93,8 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
     // Pipeline
     val clientPipelineFactory = mock[ChannelPipelineFactory]
     val channelPipeline = mock[ChannelPipeline]
-    when(clientPipelineFactory.getPipeline) thenReturn channelPipeline
-    when(codec.pipelineFactory) thenReturn clientPipelineFactory
+    when(clientPipelineFactory.getPipeline).thenReturn(channelPipeline)
+    when(codec.pipelineFactory).thenReturn(clientPipelineFactory)
 
     /*
         val codec = new Codec[String, String] {
@@ -101,12 +106,12 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
     val channel = mock[Channel]
     val connectFuture = Mockito.spy(Channels.future(channel, true))
     val closeFuture = Mockito.spy(Channels.future(channel))
-    when(channel.getCloseFuture) thenReturn closeFuture
+    when(channel.getCloseFuture).thenReturn(closeFuture)
     val channelConfig = new DefaultChannelConfig
-    when(channel.getConfig()) thenReturn channelConfig
-    when(channel.connect(clientAddress)) thenReturn connectFuture
-    when(channel.getPipeline) thenReturn channelPipeline
-    when(channelFactory.newChannel(channelPipeline)) thenReturn channel
+    when(channel.getConfig()).thenReturn(channelConfig)
+    when(channel.connect(clientAddress)).thenReturn(connectFuture)
+    when(channel.getPipeline).thenReturn(channelPipeline)
+    when(channelFactory.newChannel(channelPipeline)).thenReturn(channel)
 
     val codecFactory = Function.const(codec) _
 

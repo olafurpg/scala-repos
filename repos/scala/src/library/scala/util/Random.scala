@@ -138,7 +138,7 @@ class Random(val self: java.util.Random) extends AnyRef with Serializable {
     def nextAlphaNum: Char = {
       val chars =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-      chars charAt (self nextInt chars.length)
+      chars.charAt(self nextInt chars.length)
     }
 
     Stream continually nextAlphaNum

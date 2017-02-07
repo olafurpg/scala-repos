@@ -46,9 +46,9 @@ final class MultiHandler[S, T](builtIn: S => Option[T],
   def setRoot(resolver: S => Option[T]) =
     new MultiHandler(builtIn, Some(resolver), nonRoots, getURI, log)
   def applyNonRoots(info: S): List[(URI, T)] =
-    nonRoots flatMap {
+    nonRoots.flatMap {
       case (definingURI, loader) =>
-        loader(info) map { unit =>
+        loader(info).map { unit =>
           (definingURI, unit)
         }
     }
@@ -84,7 +84,7 @@ object BuildLoader {
                      builder | cs.builder,
                      seq(transformer, cs.transformer),
                      full | cs.full,
-                     transformAll andThen cs.transformAll)
+                     transformAll.andThen(cs.transformAll))
   }
   def transform(t: Transformer): Components = components(transformer = t)
   def resolve(r: Resolver): Components = components(resolver = r)
@@ -182,7 +182,7 @@ final class BuildLoader(val fail: URI => Nothing,
       builders.addNonRoot(uri, loaders.builder),
       seq(transformer, loaders.transformer),
       full.addNonRoot(uri, loaders.full),
-      transformAll andThen loaders.transformAll
+      transformAll.andThen(loaders.transformAll)
     )
   def setRoot(loaders: Components): BuildLoader =
     new BuildLoader(
@@ -193,7 +193,7 @@ final class BuildLoader(val fail: URI => Nothing,
       builders.setRoot(loaders.builder),
       seq(loaders.transformer, transformer),
       full.setRoot(loaders.full),
-      loaders.transformAll andThen transformAll
+      loaders.transformAll.andThen(transformAll)
     )
   def resetPluginDepth: BuildLoader =
     copyWithNewPM(config.pluginManagement.resetDepth)
@@ -223,7 +223,7 @@ final class BuildLoader(val fail: URI => Nothing,
   def apply(uri: URI): BuildUnit = {
     val info =
       new LoadInfo(uri, config.stagingDirectory, config, state, components)
-    val load = full(info) getOrElse fail(uri)
+    val load = full(info).getOrElse(fail(uri))
     load()
   }
 }

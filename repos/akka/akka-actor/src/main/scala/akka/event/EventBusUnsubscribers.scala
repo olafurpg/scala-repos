@@ -42,7 +42,7 @@ private[akka] class EventStreamUnsubscriber(eventStream: EventStream,
             simpleName(getClass),
             getClass,
             s"watching $actor in order to unsubscribe from EventStream when it terminates"))
-      context watch actor
+      context.watch(actor)
 
     case UnregisterIfNoMoreSubscribedChannels(actor)
         if eventStream.hasSubscriptions(actor) ⇒
@@ -55,7 +55,7 @@ private[akka] class EventStreamUnsubscriber(eventStream: EventStream,
           Logging.Debug(simpleName(getClass),
                         getClass,
                         s"unwatching $actor, since has no subscriptions"))
-      context unwatch actor
+      context.unwatch(actor)
 
     case Terminated(actor) ⇒
       if (debug)
@@ -126,7 +126,7 @@ private[akka] class ActorClassificationUnsubscriber(
           Logging.Debug(simpleName(getClass),
                         getClass,
                         s"registered watch for $actor in $bus"))
-      context watch actor
+      context.watch(actor)
       atSeq = nextSeq
       unstashAll()
 
@@ -139,7 +139,7 @@ private[akka] class ActorClassificationUnsubscriber(
           Logging.Debug(simpleName(getClass),
                         getClass,
                         s"unregistered watch of $actor in $bus"))
-      context unwatch actor
+      context.unwatch(actor)
       atSeq = nextSeq
       unstashAll()
 

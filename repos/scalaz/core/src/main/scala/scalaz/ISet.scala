@@ -243,11 +243,8 @@ sealed abstract class ISet[A] {
           join(x, l.filterGt(blo), r.filterLt(bhi))
         case (t, Bin(x, l, r)) =>
           val bmi = some(x)
-          hedgeDiff(blo, bmi, t.trim(blo, bmi), l) merge hedgeDiff(
-            bmi,
-            bhi,
-            t.trim(bmi, bhi),
-            r)
+          hedgeDiff(blo, bmi, t.trim(blo, bmi), l)
+            .merge(hedgeDiff(bmi, bhi, t.trim(bmi, bhi), r))
       }
 
     (this, other) match {
@@ -278,7 +275,7 @@ sealed abstract class ISet[A] {
           val bmi = some(x)
           val l2 = hedgeInt(blo, bmi, l, t2.trim(blo, bmi))
           val r2 = hedgeInt(bmi, bhi, r, t2.trim(bmi, bhi))
-          if (t2.member(x)) join(x, l2, r2) else l2 merge r2
+          if (t2.member(x)) join(x, l2, r2) else l2.merge(r2)
       }
 
     (this, other) match {
@@ -297,7 +294,7 @@ sealed abstract class ISet[A] {
       case Tip() => this
       case Bin(x, l, r) =>
         if (p(x)) join(x, l.filter(p), r.filter(p))
-        else l.filter(p) merge r.filter(p)
+        else l.filter(p).merge(r.filter(p))
     }
 
   final def partition(p: A => Boolean): (ISet[A], ISet[A]) =
@@ -307,8 +304,8 @@ sealed abstract class ISet[A] {
       case Bin(x, l, r) =>
         val (l1, l2) = l.partition(p)
         val (r1, r2) = r.partition(p)
-        if (p(x)) (join(x, l1, r1), l2 merge r2)
-        else (l1 merge r1, join(x, l2, r2))
+        if (p(x)) (join(x, l1, r1), l2.merge(r2))
+        else (l1.merge(r1), join(x, l2, r2))
     }
 
   final def split(x: A)(implicit o: Order[A]): (ISet[A], ISet[A]) =
@@ -557,8 +554,8 @@ sealed abstract class ISet[A] {
       case (Tip(), r) => r
       case (l, Tip()) => l
       case (l @ Bin(x, lx, rx), r @ Bin(y, ly, ry)) =>
-        if (delta * l.size < r.size) balanceL(y, l merge ly, ry)
-        else if (delta * r.size < l.size) balanceR(x, lx, rx merge r)
+        if (delta * l.size < r.size) balanceL(y, l.merge(ly), ry)
+        else if (delta * r.size < l.size) balanceR(x, lx, rx.merge(r))
         else glue(l, r)
     }
 
@@ -658,7 +655,7 @@ sealed abstract class ISetInstances {
       empty[A]
 
     def append(a: ISet[A], b: => ISet[A]): ISet[A] =
-      a union b
+      a.union(b)
   }
 
   implicit val setFoldable: Foldable[ISet] = new Foldable[ISet] {
@@ -774,7 +771,7 @@ object ISet extends ISetInstances {
     F.foldLeft(xs, empty[A])((a, b) => a insert b)
 
   final def unions[A](xs: List[ISet[A]])(implicit o: Order[A]): ISet[A] =
-    xs.foldLeft(ISet.empty[A])(_ union _)
+    xs.foldLeft(ISet.empty[A])(_.union(_))
 
   private[scalaz] final val delta = 3
   private[scalaz] final val ratio = 2

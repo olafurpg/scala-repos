@@ -32,9 +32,9 @@ private[exception] class TestServiceException(
                                   throwable,
                                   time.getOrElse(Time.now),
                                   traceId.getOrElse(0L))
-    clientAddress foreach (ca => se = se.withClient(ca))
-    sourceAddress foreach (sa => se = se.withSource(sa))
-    cardinality foreach (c => se = se.incremented(c))
+    clientAddress.foreach(ca => se = se.withClient(ca))
+    sourceAddress.foreach(sa => se = se.withSource(sa))
+    cardinality.foreach(c => se = se.incremented(c))
     se
   }
 
@@ -88,7 +88,7 @@ private[exception] class TestServiceException(
     var hasCardinality = false
 
     assert(s.isObject)
-    s.fields.asScala foreach { mapEntry =>
+    s.fields.asScala.foreach { mapEntry =>
       val jsonValue = mapEntry.getValue
 
       mapEntry.getKey match {
@@ -117,7 +117,7 @@ private[exception] class TestServiceException(
           hasExceptionContents = true
 
           assert(jsonValue.isObject)
-          jsonValue.fields.asScala foreach { contentsMapEntry =>
+          jsonValue.fields.asScala.foreach { contentsMapEntry =>
             val contentsJsonValue = contentsMapEntry.getValue
 
             contentsMapEntry.getKey match {
@@ -155,7 +155,7 @@ private[exception] class TestServiceException(
                                    hasSource)
         case "cardinality" =>
           assert(jsonValue.isNumber)
-          hasCardinality = verifyOption(jsonValue.intValue, cardinality map {
+          hasCardinality = verifyOption(jsonValue.intValue, cardinality.map {
             _ + 1
           }, "cardinality", hasCardinality, false)
         case a => fail(a, "service exception")

@@ -65,7 +65,7 @@ abstract class NodePrinters {
       if (infolevel == InfoLevel.Quiet) ""
       else {
         try {
-          List(showSymbol(tree), showType(tree)) filterNot (_ == "") mkString ", " trim
+          List(showSymbol(tree), showType(tree)).filterNot(_ == "") mkString ", " trim
         } catch { case ex: Throwable => "sym= <error> " + ex.getMessage }
       }
     }
@@ -125,22 +125,22 @@ abstract class NodePrinters {
     def traverseAny(x: Any) {
       x match {
         case t: Tree => traverse(t)
-        case xs: List[_] => printMultiline("List", "")(xs foreach traverseAny)
+        case xs: List[_] => printMultiline("List", "")(xs.foreach(traverseAny))
         case _ => println("" + x)
       }
     }
     def println(s: String) = printLine(s, "")
 
     def printLine(value: String, comment: String) {
-      buf append "  " * level
-      buf append value
+      buf.append("  " * level)
+      buf.append(value)
       if (comment != "") {
-        if (value != "") buf append " "
+        if (value != "") buf.append(" ")
 
-        buf append "// "
-        buf append comment
+        buf.append("// ")
+        buf.append(comment)
       }
-      buf append EOL
+      buf.append(EOL)
     }
 
     def annotationInfoToString(annot: AnnotationInfo): String = {
@@ -158,7 +158,7 @@ abstract class NodePrinters {
       // SI-5885: by default this won't print annotations of not yet initialized symbols
       val annots0 = tree.symbol.annotations match {
         case Nil => tree.mods.annotations
-        case xs => xs map annotationInfoToString
+        case xs => xs.map(annotationInfoToString)
       }
       val annots = annots0 match {
         case Nil => ""
@@ -206,7 +206,7 @@ abstract class NodePrinters {
       else if (trees.tail.isEmpty) traverse(trees.head)
       else {
         printLine("", trees.length + " " + what + "s")
-        trees foreach traverse
+        trees.foreach(traverse)
       }
     }
 
@@ -292,10 +292,10 @@ abstract class NodePrinters {
               case ListOfNil => println("List(Nil)")
               case ps :: Nil =>
                 printLine("", "1 parameter list")
-                ps foreach traverse
+                ps.foreach(traverse)
               case pss =>
                 printLine("", pss.length + " parameter lists")
-                pss foreach (ps => traverseList("()", "parameter")(ps))
+                pss.foreach(ps => traverseList("()", "parameter")(ps))
             }
             traverse(tpt)
             traverse(rhs)
@@ -316,7 +316,7 @@ abstract class NodePrinters {
         case Template(parents, self, body) =>
           printMultiline(tree) {
             val ps0 =
-              parents map { p =>
+              parents.map { p =>
                 if (p.tpe eq null)
                   p match {
                     case x: RefTree => showRefTree(x)
@@ -353,14 +353,14 @@ abstract class NodePrinters {
           }
 
         case PackageDef(pid, stats) =>
-          printMultiline("PackageDef", "")(pid :: stats foreach traverse)
+          printMultiline("PackageDef", "")((pid :: stats).foreach(traverse))
 
         case _ =>
           tree match {
             case t: RefTree => println(showRefTree(t))
             case t if t.productArity == 0 => println(treePrefix(t))
             case t =>
-              printMultiline(tree)(tree.productIterator foreach traverseAny)
+              printMultiline(tree)(tree.productIterator.foreach(traverseAny))
           }
       }
     }
@@ -369,11 +369,11 @@ abstract class NodePrinters {
   def printUnit(unit: CompilationUnit) {
     print("// Scala source: " + unit.source + "\n")
     println(
-      Option(unit.body) map (x => nodeToString(x) + "\n") getOrElse "<null>")
+      Option(unit.body).map(x => nodeToString(x) + "\n").getOrElse("<null>"))
   }
 
   def printAll() {
     print("[[syntax trees at end of " + phase + "]]")
-    global.currentRun.units foreach printUnit
+    global.currentRun.units.foreach(printUnit)
   }
 }

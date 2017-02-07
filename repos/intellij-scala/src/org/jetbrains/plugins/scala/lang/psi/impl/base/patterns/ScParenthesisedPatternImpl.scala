@@ -31,5 +31,5 @@ class ScParenthesisedPatternImpl(node: ASTNode)
   override def toString: String = "PatternInParenthesis"
 
   override def getType(ctx: TypingContext): TypeResult[ScType] =
-    wrap(subpattern) flatMap { _.getType(ctx) }
+    wrap(subpattern).flatMap { _.getType(ctx) }
 }

@@ -18,6 +18,6 @@ object Test {
     buf.insertAll(7, List(8, 9, 10))
     0 +=: buf
     List(-2, -1) ++=: buf
-    buf remove 0
+    buf.remove(0)
   }
 }

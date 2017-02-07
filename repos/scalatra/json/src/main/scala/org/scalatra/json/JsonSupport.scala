@@ -29,22 +29,26 @@ trait JsonSupport[T] extends JsonOutput[T] {
   protected def parseRequestBody(format: String)(
       implicit request: HttpServletRequest) =
     try {
-      val ct = request.contentType getOrElse ""
+      val ct = request.contentType.getOrElse("")
       if (format == "json") {
         val bd = {
           if (ct == "application/x-www-form-urlencoded")
-            multiParams.keys.headOption map readJsonFromBody getOrElse JNothing
+            multiParams.keys.headOption
+              .map(readJsonFromBody)
+              .getOrElse(JNothing)
           else if (cacheRequestBodyAsString) readJsonFromBody(request.body)
           else
             readJsonFromStreamWithCharset(
               request.inputStream,
-              request.characterEncoding getOrElse defaultCharacterEncoding)
+              request.characterEncoding.getOrElse(defaultCharacterEncoding))
         }
         transformRequestBody(bd)
       } else if (format == "xml") {
         val bd = {
           if (ct == "application/x-www-form-urlencoded")
-            multiParams.keys.headOption map readXmlFromBody getOrElse JNothing
+            multiParams.keys.headOption
+              .map(readXmlFromBody)
+              .getOrElse(JNothing)
           else if (cacheRequestBodyAsString) readXmlFromBody(request.body)
           else readXmlFromStream(request.inputStream)
         }
@@ -95,7 +99,7 @@ trait JsonSupport[T] extends JsonOutput[T] {
     withRouteMultiParams(Some(matchedRoute)) {
       val mt = request.contentType.fold("application/x-www-form-urlencoded")(
         _.split(";").head)
-      val fmt = mimeTypes get mt getOrElse "html"
+      val fmt = mimeTypes.get(mt).getOrElse("html")
       if (shouldParseBody(fmt)) {
         request(ParsedBodyKey) = parseRequestBody(fmt).asInstanceOf[AnyRef]
       }

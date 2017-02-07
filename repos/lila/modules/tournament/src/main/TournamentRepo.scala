@@ -74,11 +74,11 @@ object TournamentRepo {
     coll.find(selectId(id) ++ finishedSelect).one[Tournament]
 
   def startedOrFinishedById(id: String): Fu[Option[Tournament]] =
-    byId(id) map { _ filterNot (_.isCreated) }
+    byId(id).map { _.filterNot(_.isCreated) }
 
   def createdByIdAndCreator(id: String,
                             userId: String): Fu[Option[Tournament]] =
-    createdById(id) map (_ filter (_.createdBy == userId))
+    createdById(id).map(_.filter(_.createdBy == userId))
 
   def allEnterable: Fu[List[Tournament]] =
     coll.find(enterableSelect).cursor[Tournament]().collect[List]()
@@ -211,29 +211,33 @@ object TournamentRepo {
           "private" -> BSONDocument("$exists" -> false)
         ))
       .sort(BSONDocument("startsAt" -> 1))
-      .toList[Tournament](none) map {
-      _.filter(_.isStillWorthEntering)
-    }
+      .toList[Tournament](none)
+      .map {
+        _.filter(_.isStillWorthEntering)
+      }
 
   private def isPromotable(tour: Tournament) =
-    tour.startsAt isBefore DateTime.now.plusMinutes {
-      tour.schedule.map(_.freq) map {
-        case Schedule.Freq.Marathon => 24 * 60
-        case Schedule.Freq.Unique => 24 * 60
-        case Schedule.Freq.Monthly => 6 * 60
-        case Schedule.Freq.Weekly => 3 * 60
-        case Schedule.Freq.Daily => 1 * 60
-        case _ => 30
-      } getOrElse 30
-    }
+    tour.startsAt.isBefore(DateTime.now.plusMinutes {
+      tour.schedule
+        .map(_.freq)
+        .map {
+          case Schedule.Freq.Marathon => 24 * 60
+          case Schedule.Freq.Unique => 24 * 60
+          case Schedule.Freq.Monthly => 6 * 60
+          case Schedule.Freq.Weekly => 3 * 60
+          case Schedule.Freq.Daily => 1 * 60
+          case _ => 30
+        }
+        .getOrElse(30)
+    })
 
   def promotable: Fu[List[Tournament]] =
-    stillWorthEntering zip publicCreatedSorted(24 * 60) map {
+    stillWorthEntering.zip(publicCreatedSorted(24 * 60)).map {
       case (started, created) =>
         (started ::: created)
           .foldLeft(List.empty[Tournament]) {
             case (acc, tour) if !isPromotable(tour) => acc
-            case (acc, tour) if acc.exists(_ similarTo tour) => acc
+            case (acc, tour) if acc.exists(_.similarTo(tour)) => acc
             case (acc, tour) => tour :: acc
           }
           .reverse
@@ -253,10 +257,10 @@ object TournamentRepo {
       .cursor[Tournament]()
       .collect[List]()
 
-  def scheduledDedup: Fu[List[Tournament]] = scheduledCreated map {
+  def scheduledDedup: Fu[List[Tournament]] = scheduledCreated.map {
     import Schedule.Freq
     _.flatMap { tour =>
-      tour.schedule map (tour -> _)
+      tour.schedule.map(tour -> _)
     }.foldLeft(List[Tournament]() -> none[Freq]) {
         case ((tours, skip), (_, sched)) if skip.contains(sched.freq) =>
           (tours, skip)
@@ -302,11 +306,12 @@ object TournamentRepo {
   def remove(tour: Tournament) = coll.remove(BSONDocument("_id" -> tour.id))
 
   def exists(id: String) =
-    coll.count(BSONDocument("_id" -> id).some) map (0 !=)
+    coll.count(BSONDocument("_id" -> id).some).map(0 !=)
 
   def isFinished(id: String): Fu[Boolean] =
-    coll.count(BSONDocument("_id" -> id, "status" -> Status.Finished.id).some) map
-      (0 !=)
+    coll
+      .count(BSONDocument("_id" -> id, "status" -> Status.Finished.id).some)
+      .map(0 !=)
 
   def toursToWithdrawWhenEntering(tourId: String): Fu[List[Tournament]] =
     coll

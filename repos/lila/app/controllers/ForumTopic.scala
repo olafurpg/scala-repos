@@ -15,7 +15,7 @@ object ForumTopic extends LilaController with ForumController {
     NotForKids {
       CategGrantWrite(categSlug) {
         OptionFuOk(CategRepo bySlug categSlug) { categ =>
-          forms.anyCaptcha map { html.forum.topic.form(categ, forms.topic, _) }
+          forms.anyCaptcha.map { html.forum.topic.form(categ, forms.topic, _) }
         }
       }
     }
@@ -28,11 +28,11 @@ object ForumTopic extends LilaController with ForumController {
         OptionFuResult(CategRepo bySlug categSlug) { categ =>
           forms.topic.bindFromRequest.fold(
             err =>
-              forms.anyCaptcha map { captcha =>
+              forms.anyCaptcha.map { captcha =>
                 BadRequest(html.forum.topic.form(categ, err, captcha))
             },
             data =>
-              topicApi.makeTopic(categ, data) map { topic =>
+              topicApi.makeTopic(categ, data).map { topic =>
                 Redirect(routes.ForumTopic.show(categ.slug, topic.slug, 1))
             }
           )
@@ -46,11 +46,12 @@ object ForumTopic extends LilaController with ForumController {
       CategGrantRead(categSlug) {
         OptionFuOk(topicApi.show(categSlug, slug, page, ctx.troll)) {
           case (categ, topic, posts) =>
-            ctx.userId ?? Env.timeline.status(s"forum:${topic.id}") flatMap {
+            (ctx.userId ?? Env.timeline.status(s"forum:${topic.id}")).flatMap {
               unsub =>
-                (!posts.hasNextPage && isGrantedWrite(categSlug) &&
-                topic.open) ?? forms.postWithCaptcha.map(_.some) map { form =>
-                  html.forum.topic.show(categ, topic, posts, form, unsub)
+                ((!posts.hasNextPage && isGrantedWrite(categSlug) &&
+                  topic.open) ?? forms.postWithCaptcha.map(_.some)).map {
+                  form =>
+                    html.forum.topic.show(categ, topic, posts, form, unsub)
                 }
             }
         }

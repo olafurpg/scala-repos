@@ -22,7 +22,7 @@ object Traversers {
       // Control flow constructs
 
       case Block(stats) =>
-        stats foreach traverse
+        stats.foreach(traverse)
 
       case Labeled(label, tpe, body) =>
         traverse(body)
@@ -57,13 +57,13 @@ object Traversers {
 
       case Match(selector, cases, default) =>
         traverse(selector)
-        cases foreach (c => (c._1 map traverse, traverse(c._2)))
+        cases.foreach(c => (c._1.map(traverse), traverse(c._2)))
         traverse(default)
 
       // Scala expressions
 
       case New(cls, ctor, args) =>
-        args foreach traverse
+        args.foreach(traverse)
 
       case StoreModule(cls, value) =>
         traverse(value)
@@ -73,14 +73,14 @@ object Traversers {
 
       case Apply(receiver, method, args) =>
         traverse(receiver)
-        args foreach traverse
+        args.foreach(traverse)
 
       case ApplyStatically(receiver, cls, method, args) =>
         traverse(receiver)
-        args foreach traverse
+        args.foreach(traverse)
 
       case ApplyStatic(cls, method, args) =>
-        args foreach traverse
+        args.foreach(traverse)
 
       case UnaryOp(op, lhs) =>
         traverse(lhs)
@@ -90,10 +90,10 @@ object Traversers {
         traverse(rhs)
 
       case NewArray(tpe, lengths) =>
-        lengths foreach traverse
+        lengths.foreach(traverse)
 
       case ArrayValue(tpe, elems) =>
-        elems foreach traverse
+        elems.foreach(traverse)
 
       case ArrayLength(array) =>
         traverse(array)
@@ -103,7 +103,7 @@ object Traversers {
         traverse(index)
 
       case RecordValue(tpe, elems) =>
-        elems foreach traverse
+        elems.foreach(traverse)
 
       case IsInstanceOf(expr, cls) =>
         traverse(expr)
@@ -118,13 +118,13 @@ object Traversers {
         traverse(expr)
 
       case CallHelper(helper, args) =>
-        args foreach traverse
+        args.foreach(traverse)
 
       // JavaScript expressions
 
       case JSNew(ctor, args) =>
         traverse(ctor)
-        args foreach traverse
+        args.foreach(traverse)
 
       case JSDotSelect(qualifier, item) =>
         traverse(qualifier)
@@ -135,16 +135,16 @@ object Traversers {
 
       case JSFunctionApply(fun, args) =>
         traverse(fun)
-        args foreach traverse
+        args.foreach(traverse)
 
       case JSDotMethodApply(receiver, method, args) =>
         traverse(receiver)
-        args foreach traverse
+        args.foreach(traverse)
 
       case JSBracketMethodApply(receiver, method, args) =>
         traverse(receiver)
         traverse(method)
-        args foreach traverse
+        args.foreach(traverse)
 
       case JSSuperBracketSelect(cls, qualifier, item) =>
         traverse(qualifier)
@@ -153,10 +153,10 @@ object Traversers {
       case JSSuperBracketCall(cls, receiver, method, args) =>
         traverse(receiver)
         traverse(method)
-        args foreach traverse
+        args.foreach(traverse)
 
       case JSSuperConstructorCall(args) =>
-        args foreach traverse
+        args.foreach(traverse)
 
       case JSSpread(items) =>
         traverse(items)
@@ -172,10 +172,10 @@ object Traversers {
         traverse(rhs)
 
       case JSArrayConstr(items) =>
-        items foreach traverse
+        items.foreach(traverse)
 
       case JSObjectConstr(fields) =>
-        fields foreach { f =>
+        fields.foreach { f =>
           traverse(f._2)
         }
 
@@ -188,7 +188,7 @@ object Traversers {
       // Classes
 
       case ClassDef(name, kind, superClass, parents, jsName, defs) =>
-        defs foreach traverse
+        defs.foreach(traverse)
 
       case MethodDef(static, name, args, resultType, body) =>
         traverse(body)

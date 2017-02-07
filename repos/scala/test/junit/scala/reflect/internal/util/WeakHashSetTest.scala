@@ -13,7 +13,7 @@ class WeakHashSetTest {
       extends Comparable[Collider]
       with Serializable {
     override def hashCode = 0
-    def compareTo(y: Collider) = this.x compareTo y.x
+    def compareTo(y: Collider) = this.x.compareTo(y.x)
   }
 
   // basic emptiness check
@@ -29,7 +29,7 @@ class WeakHashSetTest {
   def checkPlusEquals {
     val hs = new WeakHashSet[String]()
     val elements = List("hello", "goodbye")
-    elements foreach (hs += _)
+    elements.foreach(hs += _)
     assert(hs.size == 2)
     assert(hs contains "hello")
     assert(hs contains "goodbye")
@@ -40,8 +40,8 @@ class WeakHashSetTest {
   @Test
   def checkPlusEqualsCollisions {
     val hs = new WeakHashSet[Collider]()
-    val elements = List("hello", "goodbye") map Collider
-    elements foreach (hs += _)
+    val elements = List("hello", "goodbye").map(Collider)
+    elements.foreach(hs += _)
     assert(hs.size == 2)
     assert(hs contains Collider("hello"))
     assert(hs contains Collider("goodbye"))
@@ -53,9 +53,9 @@ class WeakHashSetTest {
   def checkRehashing {
     val size = 200
     val hs = new WeakHashSet[String]()
-    val elements = (0 until size).toList map ("a" + _)
-    elements foreach (hs += _)
-    elements foreach { i =>
+    val elements = (0 until size).toList.map("a" + _)
+    elements.foreach(hs += _)
+    elements.foreach { i =>
       assert(hs contains i)
     }
     hs.diagnostics.fullyValidate
@@ -67,11 +67,11 @@ class WeakHashSetTest {
     val size = 200
     val hs = new WeakHashSet[Collider]()
     val elements =
-      (0 until size).toList map { x =>
+      (0 until size).toList.map { x =>
         Collider("a" + x)
       }
-    elements foreach (hs += _)
-    elements foreach { i =>
+    elements.foreach(hs += _)
+    elements.foreach { i =>
       assert(hs contains i)
     }
     hs.diagnostics.fullyValidate
@@ -84,10 +84,10 @@ class WeakHashSetTest {
     val size = 200
     val hs = new WeakHashSet[Collider]()
     val elements =
-      (0 until size).toList map { x =>
+      (0 until size).toList.map { x =>
         Collider("a" + x)
       }
-    elements foreach (hs += _)
+    elements.foreach(hs += _)
     // don't throw the following into a retained collection so gc
     // can remove them
     for (i <- 0 until size) {
@@ -96,7 +96,7 @@ class WeakHashSetTest {
     System.gc()
     Thread.sleep(1000)
     assert(hs.size == 200)
-    elements foreach { i =>
+    elements.foreach { i =>
       assert(hs contains i)
     }
     for (i <- 0 until size) {
@@ -111,10 +111,10 @@ class WeakHashSetTest {
     val size = 200
     val hs = new WeakHashSet[Collider]()
     val elements =
-      (0 until size).toList map { x =>
+      (0 until size).toList.map { x =>
         Collider("a" + x)
       }
-    elements foreach { x =>
+    elements.foreach { x =>
       assert(hs findEntryOrUpdate x eq x)
     }
     for (i <- 0 until size) {
@@ -130,7 +130,7 @@ class WeakHashSetTest {
   def checkMinusEquals {
     val hs = new WeakHashSet[String]()
     val elements = List("hello", "goodbye")
-    elements foreach (hs += _)
+    elements.foreach(hs += _)
     hs -= "goodbye"
     assert(hs.size == 1)
     assert(hs contains "hello")
@@ -143,7 +143,7 @@ class WeakHashSetTest {
   def checkMinusEqualsCollisions {
     val hs = new WeakHashSet[Collider]
     val elements = List(Collider("hello"), Collider("goodbye"))
-    elements foreach (hs += _)
+    elements.foreach(hs += _)
     hs -= Collider("goodbye")
     assert(hs.size == 1)
     assert(hs contains Collider("hello"))
@@ -159,11 +159,11 @@ class WeakHashSetTest {
   def checkClear {
     val size = 200
     val hs = new WeakHashSet[String]()
-    val elements = (0 until size).toList map ("a" + _)
-    elements foreach (hs += _)
+    val elements = (0 until size).toList.map("a" + _)
+    elements.foreach(hs += _)
     hs.clear()
     assert(hs.size == 0)
-    elements foreach { i =>
+    elements.foreach { i =>
       assert(!(hs contains i))
     }
     hs.diagnostics.fullyValidate
@@ -173,8 +173,8 @@ class WeakHashSetTest {
   @Test
   def checkIterator {
     val hs = new WeakHashSet[String]()
-    val elements = (0 until 20).toList map ("a" + _)
-    elements foreach (hs += _)
+    val elements = (0 until 20).toList.map("a" + _)
+    elements.foreach(hs += _)
     assert(elements.iterator.toList.sorted == elements.sorted)
     hs.diagnostics.fullyValidate
   }
@@ -184,10 +184,10 @@ class WeakHashSetTest {
   def checkIteratorCollisions {
     val hs = new WeakHashSet[Collider]
     val elements =
-      (0 until 20).toList map { x =>
+      (0 until 20).toList.map { x =>
         Collider("a" + x)
       }
-    elements foreach (hs += _)
+    elements.foreach(hs += _)
     assert(elements.iterator.toList.sorted == elements.sorted)
     hs.diagnostics.fullyValidate
   }

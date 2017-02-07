@@ -178,7 +178,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def **(e: T)(implicit f: Field[T],
                n: NRoot[T],
                t: Trig[T],
-               o: IsReal[T]): Complex[T] = this pow e
+               o: IsReal[T]): Complex[T] = this.pow(e)
   def pow(e: T)(implicit f: Field[T],
                 n: NRoot[T],
                 t: Trig[T],
@@ -190,7 +190,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
         throw new Exception("raising 0 to negative/complex power")
       Complex.zero[T]
     } else {
-      Complex.polar(abs fpow e, arg * e)
+      Complex.polar(abs.fpow(e), arg * e)
     }
 
   def +(b: Complex[T])(implicit r: Semiring[T]): Complex[T] =
@@ -266,11 +266,11 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
         throw new Exception("raising 0 to negative/complex power")
       Complex.zero[T]
     } else if (b.imag =!= f.zero) {
-      val len = (abs fpow b.real) / t.exp(arg * b.imag)
+      val len = (abs.fpow(b.real)) / t.exp(arg * b.imag)
       val phase = arg * b.real + t.log(abs) * b.imag
       Complex.polar(len, phase)
     } else {
-      Complex.polar(abs fpow b.real, arg * b.real)
+      Complex.polar(abs.fpow(b.real), arg * b.real)
     }
 
   // we are going with the "principal value" definition of Log.
@@ -441,11 +441,11 @@ object FloatComplex {
   * The underlying implementation lives in the FastComplex object.
   */
 class FloatComplex(val u: Long) extends AnyVal {
-  override final def toString: String = "(%s+%si)" format (real, imag)
+  override final def toString: String = "(%s+%si)".format(real, imag)
 
   final def real: Float = FastComplex.real(u)
   final def imag: Float = FastComplex.imag(u)
-  final def repr: String = "FloatComplex(%s, %s)" format (real, imag)
+  final def repr: String = "FloatComplex(%s, %s)".format(real, imag)
   final def abs: Float = FastComplex.abs(u)
   final def angle: Float = FastComplex.angle(u)
   final def conjugate: FloatComplex =
@@ -550,7 +550,7 @@ object FastComplex {
 
   // produces a string representation of the Long/(Float,Float)
   final def toRepr(d: Long): String =
-    "FastComplex(%s -> %s)" format (d, decode(d))
+    "FastComplex(%s -> %s)".format(d, decode(d))
 
   // get the magnitude/absolute value
   final def abs(d: Long): Float = {
@@ -570,7 +570,7 @@ object FastComplex {
     real(d) % 1.0F == 0.0F && imag(d) % 1.0F == 0.0F
 
   // get the sign of the complex number
-  final def signum(d: Long): Int = real(d) compare 0.0F
+  final def signum(d: Long): Int = real(d).compare(0.0F)
 
   // get the complex sign of the complex number
   final def complexSignum(d: Long): Long = {

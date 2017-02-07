@@ -7,7 +7,7 @@ final class Env(config: Config,
                 mongoCache: lila.memo.MongoCache.Builder,
                 db: lila.db.Env) {
 
-  private val CachedRatingChartTtl = config duration "cached.rating_chart.ttl"
+  private val CachedRatingChartTtl = config.duration("cached.rating_chart.ttl")
 
   private val Collectionhistory = config getString "collection.history"
 
@@ -21,7 +21,8 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "history" boot new Env(config = lila.common.PlayApp loadConfig "history",
-                           mongoCache = lila.memo.Env.current.mongoCache,
-                           db = lila.db.Env.current)
+    "history".boot(
+      new Env(config = lila.common.PlayApp.loadConfig("history"),
+              mongoCache = lila.memo.Env.current.mongoCache,
+              db = lila.db.Env.current))
 }

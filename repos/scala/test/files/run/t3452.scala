@@ -16,7 +16,7 @@ object Test {
   def main(args: Array[String]): Unit = {
     val a = new StringPair("A", "B")
     val b = new StringPair("1", "2")
-    val c = a cat b
+    val c = a.cat(b)
     println(c.len)
   }
 }

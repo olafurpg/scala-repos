@@ -27,7 +27,7 @@ class StatsFilter[REQUEST <: Request](stats: StatsReceiver)
             service: Service[REQUEST, Response]): Future[Response] = {
     val elapsed = Stopwatch.start()
     val future = service(request)
-    future respond {
+    future.respond {
       case Return(response) =>
         count(elapsed(), response)
       case Throw(_) =>

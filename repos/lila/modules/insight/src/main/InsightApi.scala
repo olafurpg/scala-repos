@@ -17,14 +17,14 @@ final class InsightApi(storage: Storage,
   import InsightApi._
 
   def userCache(user: User): Fu[UserCache] =
-    userCacheApi find user.id flatMap {
+    (userCacheApi find user.id).flatMap {
       case Some(c) => fuccess(c)
       case None =>
         for {
-          count <- storage count user.id
-          ecos <- storage ecos user.id
+          count <- storage.count(user.id)
+          ecos <- storage.ecos(user.id)
           c = UserCache(user.id, count, ecos, DateTime.now)
-          _ <- userCacheApi save c
+          _ <- userCacheApi.save(c)
         } yield c
     }
 
@@ -34,20 +34,20 @@ final class InsightApi(storage: Storage,
       .flatMap { res =>
         val clusters = AggregationClusters(question, res)
         val gameIds =
-          scala.util.Random.shuffle(clusters.flatMap(_.gameIds)) take 4
-        GameRepo.userPovsByGameIds(gameIds, user) map { povs =>
+          scala.util.Random.shuffle(clusters.flatMap(_.gameIds)).take(4)
+        GameRepo.userPovsByGameIds(gameIds, user).map { povs =>
           Answer(question, clusters, povs)
         }
       }
       .mon(_.insight.request.time) >>- lila.mon.insight.request.count()
 
   def userStatus(user: User): Fu[UserStatus] =
-    GameRepo lastFinishedRatedNotFromPosition user flatMap {
+    (GameRepo lastFinishedRatedNotFromPosition user).flatMap {
       case None => fuccess(UserStatus.NoGame)
       case Some(game) =>
-        storage fetchLast user map {
+        storage.fetchLast(user).map {
           case None => UserStatus.Empty
-          case Some(entry) if entry.date isBefore game.createdAt =>
+          case Some(entry) if entry.date.isBefore(game.createdAt) =>
             UserStatus.Stale
           case _ => UserStatus.Fresh
         }
@@ -63,7 +63,7 @@ final class InsightApi(storage: Storage,
     Pov(g)
       .map { pov =>
         pov.player.userId ?? { userId =>
-          storage find Entry.povToId(pov) flatMap {
+          (storage find Entry.povToId(pov)).flatMap {
             _ ?? { old =>
               indexer.update(g, userId, old)
             }

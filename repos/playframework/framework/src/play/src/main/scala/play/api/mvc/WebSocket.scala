@@ -68,7 +68,7 @@ object WebSocket {
       new MessageFlowTransformer[In, NewOut] {
         def transform(flow: Flow[In, NewOut, _]) = {
           self.transform(
-            flow map f
+            flow.map(f)
           )
         }
       }
@@ -81,7 +81,7 @@ object WebSocket {
       new MessageFlowTransformer[NewIn, Out] {
         def transform(flow: Flow[NewIn, Out, _]) = {
           self.transform(
-            Flow[In] map f via flow
+            Flow[In].map(f).via(flow)
           )
         }
       }
@@ -96,7 +96,7 @@ object WebSocket {
       new MessageFlowTransformer[NewIn, NewOut] {
         def transform(flow: Flow[NewIn, NewOut, _]) = {
           self.transform(
-            Flow[In] map f via flow map g
+            Flow[In].map(f).via(flow).map(g)
           )
         }
       }
@@ -122,13 +122,13 @@ object WebSocket {
       new MessageFlowTransformer[String, String] {
         def transform(flow: Flow[String, String, _]) = {
           AkkaStreams.bypassWith[Message, String, Message](
-            Flow[Message] collect {
+            Flow[Message].collect {
               case TextMessage(text) => Left(text)
               case BinaryMessage(_) =>
                 Right(
                   CloseMessage(Some(CloseCodes.Unacceptable),
                                "This WebSocket only supports text frames"))
-            })(flow map TextMessage.apply)
+            })(flow.map(TextMessage.apply))
         }
       }
     }
@@ -142,13 +142,13 @@ object WebSocket {
       new MessageFlowTransformer[ByteString, ByteString] {
         def transform(flow: Flow[ByteString, ByteString, _]) = {
           AkkaStreams.bypassWith[Message, ByteString, Message](
-            Flow[Message] collect {
+            Flow[Message].collect {
               case BinaryMessage(data) => Left(data)
               case TextMessage(_) =>
                 Right(
                   CloseMessage(Some(CloseCodes.Unacceptable),
                                "This WebSocket only supports binary frames"))
-            })(flow map BinaryMessage.apply)
+            })(flow.map(BinaryMessage.apply))
         }
       }
     }
@@ -185,7 +185,7 @@ object WebSocket {
               case BinaryMessage(data) =>
                 closeOnException(Json.parse(data.iterator.asInputStream))
               case TextMessage(text) => closeOnException(Json.parse(text))
-            })(flow map { json =>
+            })(flow.map { json =>
             TextMessage(Json.stringify(json))
           })
         }

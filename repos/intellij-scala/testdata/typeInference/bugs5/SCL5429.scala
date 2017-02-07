@@ -10,7 +10,7 @@ object TestCase {
   def demonstrate[Coll, That](stuff: Coll)(
       implicit ev: Coll <:< IterableLike[String, Coll],
       cbf1: CanBuildFrom[Coll, String, That]): That = {
-    stuff map (_.toLowerCase)
+    stuff.map(_.toLowerCase)
   }
 }
 //String

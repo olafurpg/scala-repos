@@ -64,10 +64,11 @@ object NettyFutureBridge {
     val p = Promise[Channel]()
     nettyFuture.addListener(new ChannelFutureListener {
       def operationComplete(future: ChannelFuture): Unit =
-        p complete Try(
-          if (future.isSuccess) future.getChannel
-          else if (future.isCancelled) throw new CancellationException
-          else throw future.getCause)
+        p.complete(
+          Try(
+            if (future.isSuccess) future.getChannel
+            else if (future.isCancelled) throw new CancellationException
+            else throw future.getCause))
     })
     p.future
   }
@@ -77,14 +78,16 @@ object NettyFutureBridge {
     val p = Promise[ChannelGroup]
     nettyFuture.addListener(new ChannelGroupFutureListener {
       def operationComplete(future: ChannelGroupFuture): Unit =
-        p complete Try(
-          if (future.isCompleteSuccess) future.getGroup
+        p.complete(
+          Try(if (future.isCompleteSuccess) future.getGroup
           else
-            throw future.iterator.asScala.collectFirst {
-              case f if f.isCancelled ⇒ new CancellationException
-              case f if !f.isSuccess ⇒ f.getCause
-            } getOrElse new IllegalStateException(
-              "Error reported in ChannelGroupFuture, but no error found in individual futures."))
+            throw future.iterator.asScala
+              .collectFirst {
+                case f if f.isCancelled ⇒ new CancellationException
+                case f if !f.isSuccess ⇒ f.getCause
+              }
+              .getOrElse(new IllegalStateException(
+                "Error reported in ChannelGroupFuture, but no error found in individual futures."))))
     })
     p.future
   }
@@ -269,7 +272,7 @@ private[netty] abstract class ServerHandler(
           .getOrElse(throw new NettyTransportException(
             s"Unknown inbound remote address type [${remoteSocketAddress.getClass.getName}]"))
         init(channel, remoteSocketAddress, remoteAddress, msg) {
-          listener notify InboundAssociation(_)
+          listener.notify(InboundAssociation(_))
         }
     }
   }
@@ -301,7 +304,7 @@ private[transport] object NettyTransport {
   // 4 bytes will be used to represent the frame length. Used by netty LengthFieldPrepender downstream handler.
   val FrameLengthFieldLength = 4
   def gracefulClose(channel: Channel)(implicit ec: ExecutionContext): Unit = {
-    def always(c: ChannelFuture) = NettyFutureBridge(c) recover {
+    def always(c: ChannelFuture) = NettyFutureBridge(c).recover {
       case _ ⇒ c.getChannel
     }
     for {
@@ -377,8 +380,10 @@ class NettyTransport(val settings: NettyTransportSettings,
     new ConcurrentHashMap[SocketAddress, HandleEventListener]()
 
   private def createExecutorService() =
-    UseDispatcherForIo.map(system.dispatchers.lookup) getOrElse Executors
-      .newCachedThreadPool(system.threadFactory)
+    UseDispatcherForIo
+      .map(system.dispatchers.lookup)
+      .getOrElse(Executors
+        .newCachedThreadPool(system.threadFactory))
 
   /*
    * Be aware, that the close() method of DefaultChannelGroup is racy, because it uses an iterator over a ConcurrentHashMap.
@@ -612,8 +617,8 @@ class NettyTransport(val settings: NettyTransportSettings,
 
       (for {
         socketAddress ← addressToSocketAddress(remoteAddress)
-        readyChannel ← NettyFutureBridge(bootstrap.connect(socketAddress)) map {
-          channel ⇒
+        readyChannel ← NettyFutureBridge(bootstrap.connect(socketAddress))
+          .map { channel ⇒
             if (EnableSsl)
               blocking {
                 channel.getPipeline
@@ -623,7 +628,7 @@ class NettyTransport(val settings: NettyTransportSettings,
               }
             if (!isDatagram) channel.setReadable(false)
             channel
-        }
+          }
         handle ← if (isDatagram)
           Future {
             readyChannel.getRemoteAddress match {
@@ -644,7 +649,7 @@ class NettyTransport(val settings: NettyTransportSettings,
             }
           } else
           readyChannel.getPipeline.get(classOf[ClientHandler]).statusFuture
-      } yield handle) recover {
+      } yield handle).recover {
         case c: CancellationException ⇒
           throw new NettyTransportException("Connection was cancelled")
           with NoStackTrace
@@ -657,7 +662,7 @@ class NettyTransport(val settings: NettyTransportSettings,
 
   override def shutdown(): Future[Boolean] = {
     def always(c: ChannelGroupFuture) =
-      NettyFutureBridge(c).map(_ ⇒ true) recover { case _ ⇒ false }
+      NettyFutureBridge(c).map(_ ⇒ true).recover { case _ ⇒ false }
     for {
       // Force flush by trying to write an empty buffer and wait for success
       unbindStatus ← always(channelGroup.unbind())

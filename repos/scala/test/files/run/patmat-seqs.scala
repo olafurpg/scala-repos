@@ -24,9 +24,9 @@ object Test {
         Seq(),
         Seq(1, 2, 3, 4, 5, "abcd"),
         "abc"
-      ) map f1
+      ).map(f1)
 
-    xs1 foreach println
+    xs1.foreach(println)
 
     val xs2 =
       List(
@@ -37,8 +37,8 @@ object Test {
         List(5, 6, 7),
         Nil,
         5
-      ) map f2
+      ).map(f2)
 
-    xs2 foreach println
+    xs2.foreach(println)
   }
 }

@@ -14,14 +14,16 @@ object $primitive {
                           max: Option[Int] = None,
                           hint: BSONDocument = BSONDocument())(
       extract: JsValue => Option[B]): Fu[List[B]] =
-    modifier {
+    (modifier {
       implicitly[InColl[A]].coll.genericQueryBuilder
         .query(query)
         .hint(hint)
         .projection(Json.obj(field -> true))
-    } toList [BSONDocument] max map2 { (obj: BSONDocument) =>
-      extract(JsObjectReader.read(obj) \ field get)
-    } map (_.flatten)
+    } toList [BSONDocument] max)
+      .map2 { (obj: BSONDocument) =>
+        extract(JsObjectReader.read(obj) \ field get)
+      }
+      .map(_.flatten)
 
   def one[A: InColl, B](query: JsObject,
                         field: String,
@@ -31,7 +33,9 @@ object $primitive {
       implicitly[InColl[A]].coll.genericQueryBuilder
         .query(query)
         .projection(Json.obj(field -> true))
-    }.one[BSONDocument] map2 { (obj: BSONDocument) =>
-      (JsObjectReader.read(obj) \ field).toOption flatMap extract
-    } map (_.flatten)
+    }.one[BSONDocument]
+      .map2 { (obj: BSONDocument) =>
+        (JsObjectReader.read(obj) \ field).toOption.flatMap(extract)
+      }
+      .map(_.flatten)
 }

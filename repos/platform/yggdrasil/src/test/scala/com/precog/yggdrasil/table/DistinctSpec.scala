@@ -212,11 +212,11 @@ trait DistinctSpec[M[+ _]]
 
   def removeUndefined(jv: JValue): JValue = jv match {
     case JObject(jfields) =>
-      JObject(jfields collect {
+      JObject(jfields.collect {
         case (s, v) if v != JUndefined => JField(s, removeUndefined(v))
       })
     case JArray(jvs) =>
-      JArray(jvs map { jv =>
+      JArray(jvs.map { jv =>
         removeUndefined(jv)
       })
     case v => v

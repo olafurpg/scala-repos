@@ -106,7 +106,7 @@ class IODocSpec extends AkkaSpec {
   class Parent extends Actor {
     context.actorOf(Props[Server], "server")
     def receive = {
-      case msg => testActor forward msg
+      case msg => testActor.forward(msg)
     }
   }
 

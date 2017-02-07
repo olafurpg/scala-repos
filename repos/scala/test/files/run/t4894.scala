@@ -13,7 +13,7 @@ object Test {
     assert(phs.isEmpty)
 
     val phm = parallel.mutable.ParHashMap[Int, Int]()
-    phm ++= ((1 to 10) zip (1 to 10))
+    phm ++= (((1 to 10)).zip(1 to 10))
     for (i <- 1 to 10) assert(phm(i) == i)
     phm --= 1 to 10
     assert(phm.isEmpty)

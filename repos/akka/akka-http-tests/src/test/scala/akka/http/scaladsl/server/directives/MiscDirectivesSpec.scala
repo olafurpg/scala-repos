@@ -35,19 +35,19 @@ class MiscDirectivesSpec extends RoutingSpec {
   }
 
   "the selectPreferredLanguage directive" should {
-    "Accept-Language: de, en" test { selectFrom ⇒
+    "Accept-Language: de, en".test { selectFrom ⇒
       selectFrom("de", "en") shouldEqual "de"
       selectFrom("en", "de") shouldEqual "en"
     }
-    "Accept-Language: en, de;q=.5" test { selectFrom ⇒
+    "Accept-Language: en, de;q=.5".test { selectFrom ⇒
       selectFrom("de", "en") shouldEqual "en"
       selectFrom("en", "de") shouldEqual "en"
     }
-    "Accept-Language: en;q=.5, de" test { selectFrom ⇒
+    "Accept-Language: en;q=.5, de".test { selectFrom ⇒
       selectFrom("de", "en") shouldEqual "de"
       selectFrom("en", "de") shouldEqual "de"
     }
-    "Accept-Language: en-US, en;q=.7, *;q=.1, de;q=.5" test { selectFrom ⇒
+    "Accept-Language: en-US, en;q=.7, *;q=.1, de;q=.5".test { selectFrom ⇒
       selectFrom("en", "en-US") shouldEqual "en-US"
       selectFrom("de", "en") shouldEqual "en"
       selectFrom("de", "hu") shouldEqual "de"
@@ -55,12 +55,12 @@ class MiscDirectivesSpec extends RoutingSpec {
       selectFrom("hu", "es") shouldEqual "hu"
       selectFrom("es", "hu") shouldEqual "es"
     }
-    "Accept-Language: en, *;q=.5, de;q=0" test { selectFrom ⇒
+    "Accept-Language: en, *;q=.5, de;q=0".test { selectFrom ⇒
       selectFrom("es", "de") shouldEqual "es"
       selectFrom("de", "es") shouldEqual "es"
       selectFrom("es", "en") shouldEqual "en"
     }
-    "Accept-Language: en, *;q=0" test { selectFrom ⇒
+    "Accept-Language: en, *;q=0".test { selectFrom ⇒
       selectFrom("es", "de") shouldEqual "es"
       selectFrom("de", "es") shouldEqual "de"
       selectFrom("es", "en") shouldEqual "en"

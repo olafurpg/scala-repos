@@ -32,7 +32,7 @@ final case class Metric private[metrics] (name: String,
     * Returns the updated metric.
     */
   def :+(latest: Metric): Metric =
-    if (this sameAs latest)
+    if (this.sameAs(latest))
       average match {
         case Some(avg) ⇒
           copy(value = latest.value,
@@ -317,7 +317,7 @@ final case class NodeMetrics(address: Address,
     if (timestamp >= that.timestamp) this // that is older
     else {
       // equality is based on the name of the Metric and Set doesn't replace existing element
-      copy(metrics = that.metrics union metrics, timestamp = that.timestamp)
+      copy(metrics = that.metrics.union(metrics), timestamp = that.timestamp)
     }
   }
 
@@ -334,13 +334,13 @@ final case class NodeMetrics(address: Address,
     // Average metrics present in both latest and current.
     val updated = for {
       latest ← latestNode.metrics
-      current ← currentNode.metrics if (latest sameAs current)
+      current ← currentNode.metrics if (latest.sameAs(current))
     } yield {
       current :+ latest
     }
     // Append metrics missing from either latest or current.
     // Equality is based on the [[Metric.name]] and [[Set]] doesn't replace existing elements.
-    val merged = updated union latestNode.metrics union currentNode.metrics
+    val merged = updated.union(latestNode.metrics).union(currentNode.metrics)
     copy(metrics = merged, timestamp = latestNode.timestamp)
   }
 
@@ -385,13 +385,13 @@ private[metrics] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
     * Removes nodes if their correlating node ring members are not [[akka.cluster.MemberStatus]] `Up`.
     */
   def remove(node: Address): MetricsGossip =
-    copy(nodes = nodes filterNot (_.address == node))
+    copy(nodes = nodes.filterNot(_.address == node))
 
   /**
     * Only the nodes that are in the `includeNodes` Set.
     */
   def filter(includeNodes: Set[Address]): MetricsGossip =
-    copy(nodes = nodes filter { includeNodes contains _.address })
+    copy(nodes = nodes.filter { includeNodes contains _.address })
 
   /**
     * Adds new remote [[NodeMetrics]] and merges existing from a remote gossip.
@@ -409,7 +409,7 @@ private[metrics] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
       case Some(existingNodeMetrics) ⇒
         copy(
           nodes = nodes - existingNodeMetrics +
-              (existingNodeMetrics update newNodeMetrics))
+              (existingNodeMetrics.update(newNodeMetrics)))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
     }
 

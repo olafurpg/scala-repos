@@ -36,7 +36,7 @@ sealed abstract class TopicRepo(troll: Boolean) {
   def nextSlug(categ: Categ, name: String, it: Int = 1): Fu[String] = {
     val slug = Topic.nameToId(name) + ~(it != 1).option("-" + it)
     // also take troll topic into accounts
-    TopicRepoTroll.byTree(categ.slug, slug) flatMap {
+    TopicRepoTroll.byTree(categ.slug, slug).flatMap {
       _.isDefined.fold(
         nextSlug(categ, name, it + 1),
         fuccess(slug)

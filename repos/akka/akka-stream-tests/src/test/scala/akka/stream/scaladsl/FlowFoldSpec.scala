@@ -36,22 +36,24 @@ class FlowFoldSpec extends AkkaSpec {
     }
 
     "work when using Source.fold" in assertAllStagesStopped {
-      Await.result(foldSource runWith Sink.head, 3.seconds) should be(expected)
+      Await.result(foldSource.runWith(Sink.head), 3.seconds) should be(
+        expected)
     }
 
     "work when using Sink.fold" in assertAllStagesStopped {
-      Await.result(inputSource runWith foldSink, 3.seconds) should be(expected)
+      Await.result(inputSource.runWith(foldSink), 3.seconds) should be(
+        expected)
     }
 
     "work when using Flow.fold" in assertAllStagesStopped {
       Await
-        .result(inputSource via foldFlow runWith Sink.head, 3.seconds) should be(
+        .result(inputSource.via(foldFlow).runWith(Sink.head), 3.seconds) should be(
         expected)
     }
 
     "work when using Source.fold + Flow.fold + Sink.fold" in assertAllStagesStopped {
       Await
-        .result(foldSource via foldFlow runWith foldSink, 3.seconds) should be(
+        .result(foldSource.via(foldFlow).runWith(foldSink), 3.seconds) should be(
         expected)
     }
 

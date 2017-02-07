@@ -95,7 +95,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       }
       if (skipIt) skip()
     }
-    def errorTypeTree = TypeTree().setType(ErrorType) setPos in.currentPos
+    def errorTypeTree = TypeTree().setType(ErrorType).setPos(in.currentPos)
 
     // --------- tree building -----------------------------
 
@@ -227,7 +227,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
     /** Convert (qual)ident to type identifier
       */
     def convertToTypeId(tree: Tree): Tree = gen.convertToTypeName(tree) match {
-      case Some(t) => t setPos tree.pos
+      case Some(t) => t.setPos(tree.pos)
       case _ =>
         tree match {
           case AppliedTypeTree(_, _) | ExistentialTypeTree(_, _) |
@@ -400,7 +400,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
               if (isPackageAccess && !inInterface) thisPackageName
               else tpnme.EMPTY
 
-            return Modifiers(flags, privateWithin) withAnnotations annots
+            return Modifiers(flags, privateWithin).withAnnotations(annots)
         }
       }
       abort("should not be here")
@@ -484,7 +484,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       var rtpt =
         if (isVoid) {
           in.nextToken()
-          TypeTree(UnitTpe) setPos in.pos
+          TypeTree(UnitTpe).setPos(in.pos)
         } else typ()
       var pos = in.currentPos
       val rtptName = rtpt match {
@@ -507,7 +507,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
         }
       } else {
         var mods1 = mods
-        if (mods hasFlag Flags.ABSTRACT)
+        if (mods.hasFlag(Flags.ABSTRACT))
           mods1 = mods &~ Flags.ABSTRACT | Flags.DEFERRED
         pos = in.currentPos
         val name = ident()
@@ -517,10 +517,10 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
           if (!isVoid) rtpt = optArrayBrackets(rtpt)
           optThrows()
           val isConcreteInterfaceMethod =
-            !inInterface || (mods hasFlag Flags.JAVA_DEFAULTMETHOD) ||
-              (mods hasFlag Flags.STATIC)
+            !inInterface || (mods.hasFlag(Flags.JAVA_DEFAULTMETHOD)) ||
+              (mods.hasFlag(Flags.STATIC))
           val bodyOk =
-            !(mods1 hasFlag Flags.DEFERRED) && isConcreteInterfaceMethod
+            !(mods1.hasFlag(Flags.DEFERRED)) && isConcreteInterfaceMethod
           val body =
             if (bodyOk && in.token == LBRACE) {
               methodBody()
@@ -531,7 +531,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
                     Select(scalaDot(nme.runtime), tpnme.AnnotationDefaultATTR),
                     Nil)
                 }
-                mods1 = mods1 withAnnotations annot :: Nil
+                mods1 = mods1.withAnnotations(annot :: Nil)
                 skipTo(SEMI)
                 accept(SEMI)
                 blankExpr
@@ -784,22 +784,22 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
             mods |= Flags.STATIC
           val decls = memberDecl(mods, parentToken)
           (if (mods.hasStaticFlag || inInterface &&
-               !(decls exists (_.isInstanceOf[DefDef]))) statics
+               !(decls.exists(_.isInstanceOf[DefDef]))) statics
            else members) ++= decls
         }
       }
       def forwarders(sdef: Tree): List[Tree] = sdef match {
         case ClassDef(mods, name, tparams, _) if (parentToken == INTERFACE) =>
-          val tparams1: List[TypeDef] = tparams map (_.duplicate)
+          val tparams1: List[TypeDef] = tparams.map(_.duplicate)
           var rhs: Tree = Select(Ident(parentName.toTermName), name)
           if (!tparams1.isEmpty)
-            rhs = AppliedTypeTree(rhs, tparams1 map (tp => Ident(tp.name)))
+            rhs = AppliedTypeTree(rhs, tparams1.map(tp => Ident(tp.name)))
           List(TypeDef(Modifiers(Flags.PROTECTED), name, tparams1, rhs))
         case _ =>
           List()
       }
       val sdefs = statics.toList
-      val idefs = members.toList ::: (sdefs flatMap forwarders)
+      val idefs = members.toList ::: (sdefs.flatMap(forwarders))
       (sdefs, idefs)
     }
     def annotationParents = List(

@@ -57,7 +57,7 @@ trait CheckAnalysis {
         u.failAnalysis(s"Table not found: ${u.tableIdentifier}")
 
       case operator: LogicalPlan =>
-        operator transformExpressionsUp {
+        operator.transformExpressionsUp {
           case a: Attribute if !a.resolved =>
             val from = operator.inputSet.map(_.name).mkString(", ")
             a.failAnalysis(

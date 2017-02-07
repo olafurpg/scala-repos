@@ -26,7 +26,7 @@ abstract class Comment {
     def scan(i: Inline) {
       i match {
         case Chain(list) =>
-          list foreach scan
+          list.foreach(scan)
         case tag: HtmlTag => {
           if (stack.length > 0 && tag.canClose(stack.last)) {
             stack.remove(stack.length - 1)
@@ -50,7 +50,7 @@ abstract class Comment {
   /** A shorter version of the body. Either from `@shortDescription` or the
     *  first sentence of the body. */
   def short: Inline = {
-    shortDescription orElse body.summary match {
+    shortDescription.orElse(body.summary) match {
       case Some(s) =>
         closeHtmlTags(s)
       case _ =>
@@ -131,7 +131,8 @@ abstract class Comment {
   def shortDescription: Option[Text]
 
   override def toString =
-    body.toString + "\n" + (authors map ("@author " + _.toString))
-      .mkString("\n") + (result map ("@return " + _.toString)).mkString("\n") +
-      (version map ("@version " + _.toString)).mkString
+    body.toString + "\n" + (authors
+      .map("@author " + _.toString))
+      .mkString("\n") + (result.map("@return " + _.toString)).mkString("\n") +
+      (version.map("@version " + _.toString)).mkString
 }

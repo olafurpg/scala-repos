@@ -32,8 +32,8 @@ class EventAdapters(map: ConcurrentHashMap[Class[_], EventAdapter],
   def get(clazz: Class[_]): EventAdapter = {
     map.get(clazz) match {
       case null ⇒ // bindings are ordered from most specific to least specific
-        val value = bindings filter {
-          _._1 isAssignableFrom clazz
+        val value = bindings.filter {
+          _._1.isAssignableFrom(clazz)
         } match {
           case (_, bestMatch) +: _ ⇒ bestMatch
           case _ ⇒ IdentityEventAdapter
@@ -112,12 +112,12 @@ private[akka] object EventAdapters {
   def instantiateAdapter(adapterFQN: String,
                          system: ExtendedActorSystem): Try[EventAdapter] = {
     val clazz = system.dynamicAccess.getClassFor[Any](adapterFQN).get
-    if (classOf[EventAdapter] isAssignableFrom clazz)
+    if (classOf[EventAdapter].isAssignableFrom(clazz))
       instantiate[EventAdapter](adapterFQN, system)
-    else if (classOf[WriteEventAdapter] isAssignableFrom clazz)
+    else if (classOf[WriteEventAdapter].isAssignableFrom(clazz))
       instantiate[WriteEventAdapter](adapterFQN, system)
         .map(NoopReadEventAdapter)
-    else if (classOf[ReadEventAdapter] isAssignableFrom clazz)
+    else if (classOf[ReadEventAdapter].isAssignableFrom(clazz))
       instantiate[ReadEventAdapter](adapterFQN, system)
         .map(NoopWriteEventAdapter)
     else
@@ -148,12 +148,12 @@ private[akka] object EventAdapters {
     */
   private def instantiate[T: ClassTag](fqn: FQN,
                                        system: ExtendedActorSystem): Try[T] =
-    system.dynamicAccess.createInstanceFor[T](
-      fqn,
-      List(classOf[ExtendedActorSystem] -> system)) recoverWith {
-      case _: NoSuchMethodException ⇒
-        system.dynamicAccess.createInstanceFor[T](fqn, Nil)
-    }
+    system.dynamicAccess
+      .createInstanceFor[T](fqn, List(classOf[ExtendedActorSystem] -> system))
+      .recoverWith {
+        case _: NoSuchMethodException ⇒
+          system.dynamicAccess.createInstanceFor[T](fqn, Nil)
+      }
 
   /**
     * Sort so that subtypes always precede their supertypes, but without
@@ -162,8 +162,8 @@ private[akka] object EventAdapters {
   private def sort[T](
       in: Iterable[(Class[_], T)]): immutable.Seq[(Class[_], T)] =
     (new ArrayBuffer[(Class[_], T)](in.size) /: in) { (buf, ca) ⇒
-      buf.indexWhere(_._1 isAssignableFrom ca._1) match {
-        case -1 ⇒ buf append ca
+      buf.indexWhere(_._1.isAssignableFrom(ca._1)) match {
+        case -1 ⇒ buf.append(ca)
         case x ⇒ buf insert (x, ca)
       }
       buf
@@ -173,7 +173,7 @@ private[akka] object EventAdapters {
                                 path: String): Map[String, String] = {
     import scala.collection.JavaConverters._
     if (config.hasPath(path)) {
-      config.getConfig(path).root.unwrapped.asScala.toMap map {
+      config.getConfig(path).root.unwrapped.asScala.toMap.map {
         case (k, v) ⇒ k -> v.toString
       }
     } else Map.empty
@@ -184,7 +184,7 @@ private[akka] object EventAdapters {
       path: String): Map[String, immutable.Seq[String]] = {
     import scala.collection.JavaConverters._
     if (config.hasPath(path)) {
-      config.getConfig(path).root.unwrapped.asScala.toMap map {
+      config.getConfig(path).root.unwrapped.asScala.toMap.map {
         case (k, v: util.ArrayList[_]) if v.isInstanceOf[util.ArrayList[_]] ⇒
           k -> v.asScala.map(_.toString).toList
         case (k, v) ⇒ k -> List(v.toString)

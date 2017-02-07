@@ -18,7 +18,7 @@ private[message] final class UnreadCache(
   def apply(userId: String): Fu[List[String]] = cache(userId)
 
   def refresh(userId: String): Fu[List[String]] =
-    (cache remove userId) >> apply(userId)
+    (cache.remove(userId)) >> apply(userId)
 
-  def clear(userId: String) = cache remove userId
+  def clear(userId: String) = cache.remove(userId)
 }

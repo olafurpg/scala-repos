@@ -149,19 +149,21 @@ object XmlExamples extends Specification {
   // { ..., "fieldName": { "attrName": f("someValue") }, ... }
   def attrToObject(fieldName: String, attrName: String, f: JString => JValue)(
       json: JValue) =
-    json.transformField {
-      case JField(n, v: JString) if n == attrName =>
-        JField(fieldName, JObject(JField(n, f(v)) :: Nil))
-      case JField(n, JString("")) if n == fieldName => JField(n, JNothing)
-    } transformField {
-      case JField(n, x: JObject) if n == attrName => JField(fieldName, x)
-    }
+    json
+      .transformField {
+        case JField(n, v: JString) if n == attrName =>
+          JField(fieldName, JObject(JField(n, f(v)) :: Nil))
+        case JField(n, JString("")) if n == fieldName => JField(n, JNothing)
+      }
+      .transformField {
+        case JField(n, x: JObject) if n == attrName => JField(fieldName, x)
+      }
 
   "Example with multiple attributes, multiple nested elements " in {
     val a1 = attrToObject("stats", "count", s => JInt(s.s.toInt)) _
     val a2 = attrToObject("messages", "href", identity) _
     val json = a1(a2(toJson(messageXml1)))
-    (json diff parse(expected1)) mustEqual Diff(JNothing, JNothing, JNothing)
+    (json.diff(parse(expected1))) mustEqual Diff(JNothing, JNothing, JNothing)
   }
 
   "Example with one attribute, one nested element " in {

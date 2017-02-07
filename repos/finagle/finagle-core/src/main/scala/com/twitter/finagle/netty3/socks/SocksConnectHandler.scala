@@ -101,7 +101,7 @@ class SocksConnectHandler(proxyAddr: SocketAddress,
   object ReplayError extends scala.Error
 
   private[this] def fail(c: Channel, t: Throwable) {
-    Option(connectFuture.get) foreach { _.setFailure(t) }
+    Option(connectFuture.get).foreach { _.setFailure(t) }
     Channels.close(c)
   }
 

@@ -18,11 +18,11 @@ trait TBddDsl extends FieldConversions with TypedPipeOperationsConversions {
     def data: Iterable[T]
 
     def asSource: Source =
-      IterableSource(data map { Tuple1(_) }, 'tuple)
+      IterableSource(data.map { Tuple1(_) }, 'tuple)
 
     def readFromSourceAsTyped(implicit flowDef: FlowDef,
                               mode: Mode): TypedPipe[T] =
-      asSource.read.toTypedPipe[Tuple1[T]]('tuple) map { _._1 }
+      asSource.read.toTypedPipe[Tuple1[T]]('tuple).map { _._1 }
 
     def addSourceDataToJobTest(jobTest: JobTest) =
       jobTest.source(asSource, data)
@@ -110,7 +110,7 @@ trait TBddDsl extends FieldConversions with TypedPipeOperationsConversions {
       val jobTest = JobTest(new DummyJob(_))
 
       // Add Sources
-      sources foreach { _.addSourceDataToJobTest(jobTest) }
+      sources.foreach { _.addSourceDataToJobTest(jobTest) }
 
       implicit val td: TypeDescriptor[OutputType] =
         new TypeDescriptor[OutputType] {

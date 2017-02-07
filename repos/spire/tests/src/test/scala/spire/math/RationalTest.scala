@@ -182,27 +182,27 @@ class RationalTest extends FunSuite {
   test("pow") {
     val a = Rational(1, 2)
     assertResult(Rational(1, BigInt("4294967296"))) {
-      a pow 32
+      a.pow(32)
     }
     assertResult(Rational(2, 1)) {
-      a pow -1
+      a.pow(-1)
     }
     val b = Rational(-3, 1)
     assertResult(Rational.one) {
-      b pow 0
+      b.pow(0)
     }
     assertResult(Rational(9, 1)) {
-      b pow 2
+      b.pow(2)
     }
     assertResult(Rational(-27, 1)) {
-      b pow 3
+      b.pow(3)
     }
     val l = Rational(Long.MaxValue) * 2
     assertResult(Rational.one) {
-      l pow 0
+      l.pow(0)
     }
     assertResult(l.reciprocal) {
-      l pow -1
+      l.pow(-1)
     }
   }
 
@@ -269,7 +269,7 @@ class RationalTest extends FunSuite {
     * that was closest to `a`.
     */
   def bruteForceLimitDen(a: Rational, limit: Int): Rational =
-    (1 to limit) map (BigInt(_)) flatMap { d =>
+    ((1 to limit)).map(BigInt(_)).flatMap { d =>
       val ln = (a * d).toBigInt
       List(Rational(ln - 1, d), Rational(ln, d), Rational(ln + 1, d))
     } minBy (b => (b - a).abs)
@@ -282,7 +282,7 @@ class RationalTest extends FunSuite {
 
     val rng = new Random(9281)
     val rationals = List.fill(100)(Rational(rng.nextInt, rng.nextInt.abs + 1))
-    rationals foreach { a =>
+    rationals.foreach { a =>
       //assert(a.limitDenominatorTo(255) === bruteForceLimitDen(a, 255), {
       //    "%s != %s (original: %s)" format (
       //      a.limitDenominatorTo(255),
@@ -302,11 +302,10 @@ class RationalTest extends FunSuite {
     val rng = new Random(2919234)
     val rationals =
       List.fill(100)(Rational(BigInt(128, rng), BigInt(128, rng).abs + 1))
-    rationals foreach { a =>
+    rationals.foreach { a =>
       val b = a.limitToInt
-      assert(
-        b.numerator.isValidInt && b.denominator.isValidInt,
-        "%s (from %s) doesn't fit in Ints" format (b.toString, a.toString))
+      assert(b.numerator.isValidInt && b.denominator.isValidInt,
+             "%s (from %s) doesn't fit in Ints".format(b.toString, a.toString))
     }
   }
 

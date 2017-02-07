@@ -31,7 +31,7 @@ abstract class Phase(val prev: Phase) {
   def hasNext = next != this
   // this definition excludes the terminal phase
   //def iterator = Iterator.iterate(this)(_.nx) takeWhile (p => p.next != p)
-  def iterator = Iterator.iterate(this)(_.nx) takeWhile (_ ne NoPhase)
+  def iterator = Iterator.iterate(this)(_.nx).takeWhile(_ ne NoPhase)
 
   def name: String
   def description: String = name

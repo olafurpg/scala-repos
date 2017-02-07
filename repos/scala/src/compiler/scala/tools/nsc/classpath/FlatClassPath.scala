@@ -35,7 +35,7 @@ trait FlatClassPath extends ClassFileLookup[AbstractFile] {
 
     def findClassInSources = sources(pkg).find(_.name == simpleClassName)
 
-    foundClassFromClassFiles orElse findClassInSources
+    foundClassFromClassFiles.orElse(findClassInSources)
   }
 
   override def asClassPathString: String =

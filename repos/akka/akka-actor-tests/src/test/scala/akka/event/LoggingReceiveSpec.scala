@@ -106,9 +106,10 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
           def switch: Actor.Receive = {
             case "becomenull" ⇒ context.become(r, false)
           }
-          def receive = switch orElse LoggingReceive {
-            case x ⇒ sender() ! "x"
-          }
+          def receive =
+            switch.orElse(LoggingReceive {
+              case x ⇒ sender() ! "x"
+            })
         })
 
         val name = actor.path.toString
@@ -167,7 +168,8 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
         actor ! PoisonPill
         expectMsgPF() {
           case Logging.Debug(`name`, _, msg: String)
-              if msg startsWith "received AutoReceiveMessage Envelope(PoisonPill" ⇒
+              if msg.startsWith(
+                "received AutoReceiveMessage Envelope(PoisonPill") ⇒
             true
         }
         awaitCond(actor.isTerminated, 100 millis)
@@ -186,7 +188,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
 
           fishForMessage(hint = "now supervising") {
             case Logging.Debug(`lname`, _, msg: String)
-                if msg startsWith "now supervising" ⇒
+                if msg.startsWith("now supervising") ⇒
               true
             case _ ⇒ false
           }
@@ -195,7 +197,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
 
           fishForMessage(hint = "now supervising") {
             case Logging.Debug(`sname`, _, msg: String)
-                if msg startsWith "now supervising" ⇒
+                if msg.startsWith("now supervising") ⇒
               true
             case _ ⇒ false
           }
@@ -213,7 +215,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
             TestActorRef[TestLogActor](Props[TestLogActor], supervisor, "none")
           val aname = actor.path.toString
 
-          supervisor watch actor
+          supervisor.watch(actor)
           fishForMessage(hint = "now watched by") {
             case Logging.Debug(`aname`, `sclass`, msg: String)
                 if msg.startsWith("now watched by") ⇒
@@ -221,7 +223,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
             case _ ⇒ false
           }
 
-          supervisor unwatch actor
+          supervisor.unwatch(actor)
           expectMsgPF(hint = "no longer watched by") {
             case Logging.Debug(`aname`, `sclass`, msg: String)
                 if msg.startsWith("no longer watched by") ⇒
@@ -241,7 +243,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
 
           fishForMessage(hint = "started") {
             case Logging.Debug(`sname`, `sclass`, msg: String)
-                if msg startsWith "started" ⇒
+                if msg.startsWith("started") ⇒
               true
             case _ ⇒ false
           }
@@ -253,7 +255,7 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
 
           fishForMessage(hint = "started") {
             case Logging.Debug(`aname`, `aclass`, msg: String)
-                if msg startsWith "started" ⇒
+                if msg.startsWith("started") ⇒
               true
             case _ ⇒ false
           }

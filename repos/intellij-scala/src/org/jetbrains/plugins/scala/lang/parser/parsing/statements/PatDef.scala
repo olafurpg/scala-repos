@@ -48,7 +48,7 @@ object PatDef {
       ParserUtils.eatElement(builder, ScalaTokenTypes.tCOLON)
 
       if (!Type.parse(builder)) {
-        builder error "type declaration expected"
+        builder.error("type declaration expected")
       }
 
       hasTypeDcl = true
@@ -60,7 +60,7 @@ object PatDef {
       ParserUtils.eatElement(builder, ScalaTokenTypes.tASSIGN)
 
       if (!Expr.parse(builder)) {
-        builder error "expression expected"
+        builder.error("expression expected")
       }
 
       someMarker.drop()

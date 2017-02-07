@@ -31,12 +31,12 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
 
   def addCookies(cookies: List[HTTPCookie]) = cookies.foreach {
     case c =>
-      val cookie = new javax.servlet.http.Cookie(c.name, c.value openOr null)
-      c.domain map (cookie.setDomain(_))
-      c.path map (cookie.setPath(_))
-      c.maxAge map (cookie.setMaxAge(_))
-      c.version map (cookie.setVersion(_))
-      c.secure_? map (cookie.setSecure(_))
+      val cookie = new javax.servlet.http.Cookie(c.name, c.value.openOr(null))
+      c.domain.map(cookie.setDomain(_))
+      c.path.map(cookie.setPath(_))
+      c.maxAge.map(cookie.setMaxAge(_))
+      c.version.map(cookie.setVersion(_))
+      c.secure_?.map(cookie.setSecure(_))
       c.httpOnly.foreach { bv =>
         import scala.language.reflectiveCalls
 
@@ -61,7 +61,7 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
     */
   def encodeUrl(url: String): String =
     if (shouldEncodeUrl) {
-      resp encodeURL url
+      resp.encodeURL(url)
     } else {
       url
     }
@@ -79,14 +79,14 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
 
   def setStatus(status: Int) = {
     _status = status
-    resp setStatus status
+    resp.setStatus(status)
   }
 
   def getStatus = _status
 
   def setStatusWithReason(status: Int, reason: String) = {
     _status = status
-    resp sendError (status, reason)
+    resp.sendError(status, reason)
   }
 
   def outputStream: OutputStream = resp.getOutputStream

@@ -12,7 +12,7 @@ final class Env(config: Config,
                 system: ActorSystem) {
 
   private val IndexName = config getString "index"
-  private val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
+  private val PaginatorMaxPerPage = config.getInt("paginator.max_per_page")
   private val ActorName = config getString "actor.name"
 
   private val client = makeClient(Index(IndexName))
@@ -32,20 +32,23 @@ final class Env(config: Config,
       searchApi = api,
       maxPerPage = PaginatorMaxPerPage)
 
-  system.actorOf(Props(new Actor {
-    import lila.team.actorApi._
-    def receive = {
-      case InsertTeam(team) => api store team
-      case RemoveTeam(id) => client deleteById Id(id)
-    }
-  }), name = ActorName)
+  system.actorOf(
+    Props(new Actor {
+      import lila.team.actorApi._
+      def receive = {
+        case InsertTeam(team) => api store team
+        case RemoveTeam(id) => client.deleteById(Id(id))
+      }
+    }),
+    name = ActorName
+  )
 }
 
 object Env {
 
   lazy val current =
-    "teamSearch" boot new Env(
-      config = lila.common.PlayApp loadConfig "teamSearch",
-      makeClient = lila.search.Env.current.makeClient,
-      system = lila.common.PlayApp.system)
+    "teamSearch".boot(
+      new Env(config = lila.common.PlayApp.loadConfig("teamSearch"),
+              makeClient = lila.search.Env.current.makeClient,
+              system = lila.common.PlayApp.system))
 }

@@ -95,8 +95,8 @@ trait JoinOptimizerModule[M[+ _]]
               else (eqB, eqA)
             }
 
-            val ancestorLHS = findOrderAncestor(lhs, ctx) getOrElse lhs
-            val ancestorRHS = findOrderAncestor(rhs, ctx) getOrElse rhs
+            val ancestorLHS = findOrderAncestor(lhs, ctx).getOrElse(lhs)
+            val ancestorRHS = findOrderAncestor(rhs, ctx).getOrElse(rhs)
 
             val liftedLHS = lift(eqLHS, ancestorLHS)
             val liftedRHS = lift(eqRHS, ancestorRHS)

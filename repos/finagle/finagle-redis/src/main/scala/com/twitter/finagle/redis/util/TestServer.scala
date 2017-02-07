@@ -31,7 +31,7 @@ object RedisCluster { self =>
   }
 
   def start(count: Int = 1) {
-    0 until count foreach { i =>
+    (0 until count).foreach { i =>
       val instance = new ExternalRedis()
       instance.start()
       instanceStack.push(instance)

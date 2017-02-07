@@ -279,7 +279,7 @@ object HttpEntity {
         transformer: Flow[ByteString, ByteString, Any]): UniversalEntity =
       HttpEntity.Default(contentType,
                          newContentLength,
-                         Source.single(data) via transformer)
+                         Source.single(data).via(transformer))
 
     override def withContentType(contentType: ContentType): HttpEntity.Strict =
       if (contentType == this.contentType) this
@@ -288,10 +288,11 @@ object HttpEntity {
     override def withSizeLimit(maxBytes: Long): UniversalEntity =
       if (data.length <= maxBytes || isKnownEmpty) this
       else
-        HttpEntity.Default(
-          contentType,
-          data.length,
-          limitableByteSource(Source.single(data))) withSizeLimit maxBytes
+        HttpEntity
+          .Default(contentType,
+                   data.length,
+                   limitableByteSource(Source.single(data)))
+          .withSizeLimit(maxBytes)
 
     override def withoutSizeLimit: UniversalEntity =
       withSizeLimit(SizeLimit.Disabled)
@@ -341,12 +342,12 @@ object HttpEntity {
 
     override def transformDataBytes(
         transformer: Flow[ByteString, ByteString, Any]): HttpEntity.Chunked =
-      HttpEntity.Chunked.fromData(contentType, data via transformer)
+      HttpEntity.Chunked.fromData(contentType, data.via(transformer))
 
     override def transformDataBytes(
         newContentLength: Long,
         transformer: Flow[ByteString, ByteString, Any]): UniversalEntity =
-      HttpEntity.Default(contentType, newContentLength, data via transformer)
+      HttpEntity.Default(contentType, newContentLength, data.via(transformer))
 
     def withContentType(contentType: ContentType): HttpEntity.Default =
       if (contentType == this.contentType) this
@@ -354,8 +355,8 @@ object HttpEntity {
 
     override def withSizeLimit(maxBytes: Long): HttpEntity.Default =
       copy(
-        data = data withAttributes Attributes(
-            SizeLimit(maxBytes, Some(contentLength))))
+        data = data.withAttributes(
+          Attributes(SizeLimit(maxBytes, Some(contentLength)))))
 
     override def withoutSizeLimit: HttpEntity.Default =
       withSizeLimit(SizeLimit.Disabled)
@@ -380,14 +381,14 @@ object HttpEntity {
     override def dataBytes: Source[ByteString, Any] = data
 
     override def withSizeLimit(maxBytes: Long): Self =
-      withData(data withAttributes Attributes(SizeLimit(maxBytes)))
+      withData(data.withAttributes(Attributes(SizeLimit(maxBytes))))
 
     override def withoutSizeLimit: Self =
-      withData(data withAttributes Attributes(SizeLimit(SizeLimit.Disabled)))
+      withData(data.withAttributes(Attributes(SizeLimit(SizeLimit.Disabled))))
 
     override def transformDataBytes(
         transformer: Flow[ByteString, ByteString, Any]): Self =
-      withData(data via transformer)
+      withData(data.via(transformer))
 
     def withData(data: Source[ByteString, Any]): Self
   }
@@ -458,7 +459,7 @@ object HttpEntity {
       chunks.map(_.data).filter(_.nonEmpty)
 
     override def withSizeLimit(maxBytes: Long): HttpEntity.Chunked =
-      copy(chunks = chunks withAttributes Attributes(SizeLimit(maxBytes)))
+      copy(chunks = chunks.withAttributes(Attributes(SizeLimit(maxBytes))))
 
     override def withoutSizeLimit: HttpEntity.Chunked =
       withSizeLimit(SizeLimit.Disabled)
@@ -466,13 +467,15 @@ object HttpEntity {
     override def transformDataBytes(
         transformer: Flow[ByteString, ByteString, Any]): HttpEntity.Chunked = {
       val newData =
-        chunks.map {
-          case Chunk(data, "") ⇒ data
-          case LastChunk("", Nil) ⇒ ByteString.empty
-          case _ ⇒
-            throw new IllegalArgumentException(
-              "Chunked.transformDataBytes not allowed for chunks with metadata")
-        } via transformer
+        chunks
+          .map {
+            case Chunk(data, "") ⇒ data
+            case LastChunk("", Nil) ⇒ ByteString.empty
+            case _ ⇒
+              throw new IllegalArgumentException(
+                "Chunked.transformDataBytes not allowed for chunks with metadata")
+          }
+          .via(transformer)
 
       HttpEntity.Chunked.fromData(contentType, newData)
     }

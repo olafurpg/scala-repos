@@ -51,13 +51,13 @@ class GSetSpec extends WordSpec with Matchers {
       c23.elements should contain(user4)
 
       // merge both ways
-      val merged1 = c13 merge c23
+      val merged1 = c13.merge(c23)
       merged1.elements should contain(user1)
       merged1.elements should contain(user2)
       merged1.elements should contain(user3)
       merged1.elements should contain(user4)
 
-      val merged2 = c23 merge c13
+      val merged2 = c23.merge(c13)
       merged2.elements should contain(user1)
       merged2.elements should contain(user2)
       merged2.elements should contain(user3)
@@ -88,13 +88,13 @@ class GSetSpec extends WordSpec with Matchers {
       c23.elements should contain(user4)
 
       // merge both ways
-      val merged1 = c13 merge c23
+      val merged1 = c13.merge(c23)
       merged1.elements should contain(user1)
       merged1.elements should contain(user2)
       merged1.elements should contain(user3)
       merged1.elements should contain(user4)
 
-      val merged2 = c23 merge c13
+      val merged2 = c23.merge(c13)
       merged2.elements should contain(user1)
       merged2.elements should contain(user2)
       merged2.elements should contain(user3)

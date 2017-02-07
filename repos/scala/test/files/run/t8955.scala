@@ -6,6 +6,7 @@ object Test {
   }
 
   def test() {
-    ParSet[Int]((1 to 10000): _*) foreach (x => ()) // hangs non deterministically
+    ParSet[Int]((1 to 10000): _*)
+      .foreach(x => ()) // hangs non deterministically
   }
 }

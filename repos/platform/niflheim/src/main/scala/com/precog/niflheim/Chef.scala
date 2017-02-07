@@ -53,13 +53,13 @@ final case class Chef(blockFormat: CookedBlockFormat, format: SegmentFormat)
     assert(root.isDirectory)
     assert(root.canWrite)
     val files0 =
-      reader.snapshot(None).segments map { seg =>
+      reader.snapshot(None).segments.map { seg =>
         val file = File.createTempFile(prefix(seg), ".cooked", root)
         val relativized = new File(file.getName)
         val channel: WritableByteChannel =
           new FileOutputStream(file).getChannel()
         val result = try {
-          format.writer.writeSegment(channel, seg) map { _ =>
+          format.writer.writeSegment(channel, seg).map { _ =>
             (seg.id, relativized)
           }
         } finally {
@@ -71,7 +71,7 @@ final case class Chef(blockFormat: CookedBlockFormat, format: SegmentFormat)
     val files =
       files0.toList.sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
                              (SegmentId, File)]
-    files flatMap { segs =>
+    files.flatMap { segs =>
       val metadata =
         CookedBlockMetadata(reader.id, reader.length, segs.toArray)
       val mdFile = File

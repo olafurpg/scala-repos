@@ -198,10 +198,10 @@ class ResidentTaskIntegrationTest
     all.map(_.version).forall(_.contains(newVersion)) shouldBe true
 
     And("exactly 5 instances are running")
-    all.filter(_.launched) should have size (5)
+    (all.filter(_.launched) should have).size(5)
 
     And("no extra task was created")
-    all should have size (5)
+    (all should have).size(5)
   }
 
   /**
@@ -307,7 +307,7 @@ class ResidentTaskIntegrationTest
     def createAsynchronously(app: AppDefinition): AppDefinition = {
       val result = marathon.createAppV2(app)
       result.code should be(201) //Created
-      extractDeploymentIds(result) should have size 1
+      (extractDeploymentIds(result) should have).size(1)
       app
     }
 

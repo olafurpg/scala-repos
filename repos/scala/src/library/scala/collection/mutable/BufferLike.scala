@@ -182,7 +182,7 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *  @param n  the number of elements to remove from the end
     *            of this buffer.
     */
-  def trimEnd(n: Int) { remove(length - n max 0, n) }
+  def trimEnd(n: Int) { remove((length - n).max(0), n) }
 
   /** Send a message to this scriptable object.
     *
@@ -205,7 +205,7 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     case Remove(NoLo, x) => this -= x
 
     case Reset() => clear()
-    case s: Script[_] => s.iterator foreach <<
+    case s: Script[_] => s.iterator.foreach(<<)
     case _ =>
       throw new UnsupportedOperationException(
         "message " + cmd + " not understood")

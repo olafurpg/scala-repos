@@ -31,30 +31,30 @@ class MigrationTest
     val all = f.migration.migrations
       .filter(_._1 > StorageVersions(0, 0, 0))
       .sortBy(_._1)
-    all should have size f.migration.migrations.size.toLong
+    (all should have).size(f.migration.migrations.size.toLong)
 
     val none =
       f.migration.migrations.filter(_._1 > StorageVersions(Int.MaxValue, 0, 0))
-    none should have size 0
+    (none should have).size(0)
 
     val some = f.migration.migrations.filter(_._1 < StorageVersions(0, 10, 0))
-    some should have size 1
+    (some should have).size(1)
   }
 
   test("migration calls initialization") {
     val f = new Fixture
 
-    f.groupRepo.rootGroup() returns Future.successful(None)
-    f.groupRepo.store(any, any) returns Future.successful(Group.empty)
-    f.store.load("internal:storage:version") returns Future.successful(None)
-    f.store.create(any, any) returns Future.successful(mock[PersistentEntity])
-    f.store.update(any) returns Future.successful(mock[PersistentEntity])
-    f.store.allIds() returns Future.successful(Seq.empty)
-    f.store.initialize() returns Future.successful(())
-    f.store.load(any) returns Future.successful(None)
-    f.appRepo.apps() returns Future.successful(Seq.empty)
-    f.appRepo.allPathIds() returns Future.successful(Seq.empty)
-    f.groupRepo.group("root") returns Future.successful(None)
+    f.groupRepo.rootGroup().returns(Future.successful(None))
+    f.groupRepo.store(any, any).returns(Future.successful(Group.empty))
+    f.store.load("internal:storage:version").returns(Future.successful(None))
+    f.store.create(any, any).returns(Future.successful(mock[PersistentEntity]))
+    f.store.update(any).returns(Future.successful(mock[PersistentEntity]))
+    f.store.allIds().returns(Future.successful(Seq.empty))
+    f.store.initialize().returns(Future.successful(()))
+    f.store.load(any).returns(Future.successful(None))
+    f.appRepo.apps().returns(Future.successful(Seq.empty))
+    f.appRepo.allPathIds().returns(Future.successful(Seq.empty))
+    f.groupRepo.group("root").returns(Future.successful(None))
 
     f.migration.migrate()
     verify(f.store, atLeastOnce).initialize()
@@ -63,18 +63,18 @@ class MigrationTest
   test("migration is executed sequentially") {
     val f = new Fixture
 
-    f.groupRepo.rootGroup() returns Future.successful(None)
-    f.groupRepo.store(any, any) returns Future.successful(Group.empty)
-    f.store.load("internal:storage:version") returns Future.successful(None)
-    f.store.create(any, any) returns Future.successful(mock[PersistentEntity])
-    f.store.update(any) returns Future.successful(mock[PersistentEntity])
-    f.store.allIds() returns Future.successful(Seq.empty)
-    f.store.initialize() returns Future.successful(())
-    f.store.load(any) returns Future.successful(None)
-    f.appRepo.apps() returns Future.successful(Seq.empty)
-    f.appRepo.allPathIds() returns Future.successful(Seq.empty)
-    f.groupRepo.group("root") returns Future.successful(None)
-    f.groupRepo.listVersions(any) returns Future.successful(Seq.empty)
+    f.groupRepo.rootGroup().returns(Future.successful(None))
+    f.groupRepo.store(any, any).returns(Future.successful(Group.empty))
+    f.store.load("internal:storage:version").returns(Future.successful(None))
+    f.store.create(any, any).returns(Future.successful(mock[PersistentEntity]))
+    f.store.update(any).returns(Future.successful(mock[PersistentEntity]))
+    f.store.allIds().returns(Future.successful(Seq.empty))
+    f.store.initialize().returns(Future.successful(()))
+    f.store.load(any).returns(Future.successful(None))
+    f.appRepo.apps().returns(Future.successful(Seq.empty))
+    f.appRepo.allPathIds().returns(Future.successful(Seq.empty))
+    f.groupRepo.group("root").returns(Future.successful(None))
+    f.groupRepo.listVersions(any).returns(Future.successful(Seq.empty))
 
     val result =
       f.migration.applyMigrationSteps(StorageVersions(0, 8, 0)).futureValue
@@ -103,23 +103,27 @@ class MigrationTest
     val f = new Fixture
     val minVersion = f.migration.minSupportedStorageVersion
 
-    f.groupRepo.rootGroup() returns Future.successful(None)
-    f.groupRepo.store(any, any) returns Future.successful(Group.empty)
+    f.groupRepo.rootGroup().returns(Future.successful(None))
+    f.groupRepo.store(any, any).returns(Future.successful(Group.empty))
 
-    f.store.load("internal:storage:version") returns Future.successful(
-      Some(
-        InMemoryEntity(id = "internal:storage:version",
-                       version = 0,
-                       bytes = minVersion.toByteArray)))
-    f.store.initialize() returns Future.successful(())
+    f.store
+      .load("internal:storage:version")
+      .returns(
+        Future.successful(
+          Some(InMemoryEntity(id = "internal:storage:version",
+                              version = 0,
+                              bytes = minVersion.toByteArray))))
+    f.store.initialize().returns(Future.successful(()))
 
     Given("An unsupported storage version")
     val unsupportedVersion = StorageVersions(0, 2, 0)
-    f.store.load("internal:storage:version") returns Future.successful(
-      Some(
-        InMemoryEntity(id = "internal:storage:version",
-                       version = 0,
-                       bytes = unsupportedVersion.toByteArray)))
+    f.store
+      .load("internal:storage:version")
+      .returns(
+        Future.successful(
+          Some(InMemoryEntity(id = "internal:storage:version",
+                              version = 0,
+                              bytes = unsupportedVersion.toByteArray))))
 
     When("A migration is approached for that version")
     val ex = intercept[RuntimeException] {

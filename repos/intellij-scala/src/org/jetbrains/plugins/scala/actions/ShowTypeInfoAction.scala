@@ -88,7 +88,7 @@ class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
           case _ => "Could not find type for selection"
         }
       }
-      val hint = hintForPattern orElse hintForExpression
+      val hint = hintForPattern.orElse(hintForExpression)
       hint.foreach(ScalaActionUtil.showHint(editor, _))
     } else {
       val offset = TargetElementUtil.adjustOffset(

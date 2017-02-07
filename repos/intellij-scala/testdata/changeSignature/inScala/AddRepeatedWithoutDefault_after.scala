@@ -2,7 +2,7 @@ class AddRepeatedParams {
   def foo(i: Int, xs: Int*): Int = i
 
   foo(i = 1)
-  this foo (2)
+  this.foo(2)
 }
 
 class AddRepeatedParamsTest extends AddRepeatedParams {

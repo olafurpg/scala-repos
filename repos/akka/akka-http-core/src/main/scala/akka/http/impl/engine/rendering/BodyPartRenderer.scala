@@ -113,7 +113,7 @@ private[http] object BodyPartRenderer {
   private def renderHeaders(r: Rendering,
                             headers: immutable.Seq[HttpHeader],
                             log: LoggingAdapter): Unit = {
-    headers foreach renderHeader(r, log)
+    headers.foreach(renderHeader(r, log))
     r ~~ CrLf
   }
 
@@ -131,7 +131,7 @@ private[http] object BodyPartRenderer {
         x,
         "explicit `Content-Type` header is not allowed. Set `HttpRequest.entity.contentType` instead.")
 
-    case x: RawHeader if (x is "content-type") || (x is "content-length") ⇒
+    case x: RawHeader if (x.is("content-type")) || (x.is("content-length")) ⇒
       suppressionWarning(log, x, "illegal RawHeader")
 
     case x ⇒ r ~~ x ~~ CrLf

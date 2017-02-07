@@ -11,7 +11,7 @@ private[game] final class GameJs(path: String, useCache: Boolean) {
   private lazy val cached: String = readFromSource
 
   private def readFromSource = {
-    val source = scala.io.Source fromFile path
+    val source = scala.io.Source.fromFile(path)
     source.mkString ~ { _ =>
       source.close
     }

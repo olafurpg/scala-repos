@@ -224,11 +224,11 @@ trait SQLiteProfile extends JdbcProfile {
 
     override protected def addTableOptions(b: StringBuilder) {
       for (pk <- table.primaryKeys) {
-        b append ","
+        b.append(",")
         addPrimaryKey(pk, b)
       }
       for (fk <- table.foreignKeys) {
-        b append ","
+        b.append(",")
         addForeignKey(fk, b)
       }
     }
@@ -237,10 +237,10 @@ trait SQLiteProfile extends JdbcProfile {
   class ColumnDDLBuilder(column: FieldSymbol)
       extends super.ColumnDDLBuilder(column) {
     override protected def appendOptions(sb: StringBuilder) {
-      if (defaultLiteral ne null) sb append " DEFAULT " append defaultLiteral
-      if (autoIncrement) sb append " PRIMARY KEY AUTOINCREMENT"
-      else if (primaryKey) sb append " PRIMARY KEY"
-      if (notNull) sb append " NOT NULL"
+      if (defaultLiteral ne null) sb.append(" DEFAULT ").append(defaultLiteral)
+      if (autoIncrement) sb.append(" PRIMARY KEY AUTOINCREMENT")
+      else if (primaryKey) sb.append(" PRIMARY KEY")
+      if (notNull) sb.append(" NOT NULL")
     }
   }
 

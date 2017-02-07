@@ -33,7 +33,7 @@ object Qual_Id {
             qualMarker.done(ScalaElementTypes.REFERENCE)
             builder.advanceLexer //Ate dot
             //recursively parse qualified identifier
-            Qual_Id parse (builder, newMarker)
+            Qual_Id.parse(builder, newMarker)
             return true
           }
           case _ => {
@@ -43,7 +43,7 @@ object Qual_Id {
           }
         }
       case _ =>
-        builder error ScalaBundle.message("wrong.qual.identifier")
+        builder.error(ScalaBundle.message("wrong.qual.identifier"))
         qualMarker.drop
         return true
     }

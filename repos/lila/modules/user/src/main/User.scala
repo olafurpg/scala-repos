@@ -39,7 +39,7 @@ case class User(id: String,
 
   def langs = ("en" :: lang.toList).distinct.sorted
 
-  def compare(other: User) = id compare other.id
+  def compare(other: User) = id.compare(other.id)
 
   def noTroll = !troll
 
@@ -72,7 +72,7 @@ case class User(id: String,
 
   def lameOrTroll = lame || troll
 
-  def lightPerf(key: String) = perfs(key) map { perf =>
+  def lightPerf(key: String) = perfs(key).map { perf =>
     User.LightPerf(light, key, perf.intRating, perf.progress)
   }
 
@@ -96,7 +96,7 @@ object User {
   case class PlayTime(total: Int, tv: Int) {
     import org.joda.time.Period
     def totalPeriod = new Period(total * 1000l)
-    def tvPeriod = (tv > 0) option new Period(tv * 1000l)
+    def tvPeriod = ((tv > 0)).option(new Period(tv * 1000l))
   }
   import lila.db.BSON.BSONJodaDateTimeHandler
   implicit def playTimeHandler = reactivemongo.bson.Macros.handler[PlayTime]
@@ -119,7 +119,7 @@ object User {
 
   val titlesMap = titles.toMap
 
-  def titleName(title: String) = titlesMap get title getOrElse title
+  def titleName(title: String) = titlesMap.get(title).getOrElse(title)
 
   object BSONFields {
     val id = "_id"
@@ -159,24 +159,24 @@ object User {
 
     def reads(r: BSON.Reader): User =
       User(
-        id = r str id,
-        username = r str username,
+        id = r.str(id),
+        username = r.str(username),
         perfs = r.getO[Perfs](perfs) | Perfs.default,
         count = r.get[Count](count),
-        troll = r boolD troll,
-        ipBan = r boolD ipBan,
-        enabled = r bool enabled,
+        troll = r.boolD(troll),
+        ipBan = r.boolD(ipBan),
+        enabled = r.bool(enabled),
         roles = ~r.getO[List[String]](roles),
         profile = r.getO[Profile](profile),
-        engine = r boolD engine,
-        booster = r boolD booster,
-        toints = r nIntD toints,
+        engine = r.boolD(engine),
+        booster = r.boolD(booster),
+        toints = r.nIntD(toints),
         playTime = r.getO[PlayTime](playTime),
-        createdAt = r date createdAt,
-        seenAt = r dateO seenAt,
-        kid = r boolD kid,
-        lang = r strO lang,
-        title = r strO title
+        createdAt = r.date(createdAt),
+        seenAt = r.dateO(seenAt),
+        kid = r.boolD(kid),
+        lang = r.strO(lang),
+        title = r.strO(title)
       )
 
     def writes(w: BSON.Writer, o: User) =

@@ -153,7 +153,7 @@ object Test extends DirectTest {
 
     val fos = new FileOutputStream(
       new File(s"${testOutput.path}/$invokerClassName.class"))
-    try fos write bytes
+    try fos.write(bytes)
     finally fos.close()
   }
 
@@ -175,7 +175,7 @@ object Driver {
         generateClass()
         compile()
         ()
-      } otherwise {
+      }.otherwise {
         ()
       }
     } finally System.setErr(prevErr)

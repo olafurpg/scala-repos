@@ -58,14 +58,14 @@ object KleisliUsage extends App {
 
   // with map we can map a function B => C over a kleisli function of the
   // structure A => M[B]
-  val cityInhabitants = allCities map inhabitants
+  val cityInhabitants = allCities.map(inhabitants)
   (cityInhabitants) =<< List("Amer", "Asi")
 
   // with mapK you can map a kleisli function into
   // another monadic structure, e.g. provide a function
   // M[A] => N[B]
   // Note : the example is not particularily useful here.
-  val getandSave = (allCities mapK save)
+  val getandSave = (allCities.mapK(save))
   getandSave("America").map(println)
 
   // local can be used to prepend a kleisli function of
@@ -73,6 +73,6 @@ object KleisliUsage extends App {
   // AA => A, resulting in a kleisli function of the form
   // AA => M[B]
   def index(i: Int) = data(i).name
-  val allCitiesByIndex = allCities local index
+  val allCitiesByIndex = allCities.local(index)
   allCitiesByIndex(1).map(println)
 }

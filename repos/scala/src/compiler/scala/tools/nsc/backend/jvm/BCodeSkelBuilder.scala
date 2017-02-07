@@ -70,7 +70,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
     def paramTKs(app: Apply): List[BType] = {
       val Apply(fun, _) = app
       val funSym = fun.symbol
-      funSym.info.paramTypes map typeToBType
+      funSym.info.paramTypes.map(typeToBType)
     }
 
     def symInfoTK(sym: Symbol): BType = typeToBType(sym.info)
@@ -98,7 +98,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
 
       initJClass(cnode)
 
-      val hasStaticCtor = methodSymbols(cd) exists (_.isStaticConstructor)
+      val hasStaticCtor = methodSymbols(cd).exists(_.isStaticConstructor)
       if (!hasStaticCtor) {
         // but needs one ...
         if (isCZStaticModule || isCZParcelable) {
@@ -535,7 +535,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
 
         case dd: DefDef => genDefDef(dd)
 
-        case Template(_, _, body) => body foreach gen
+        case Template(_, _, body) => body.foreach(gen)
 
         case _ => abort(s"Illegal tree in gen: $tree")
       }
@@ -549,7 +549,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
       val jgensig = getGenericSignature(methSymbol, claszSymbol)
       addRemoteExceptionAnnot(isCZRemote, hasPublicBitSet(flags), methSymbol)
       val (excs, others) =
-        methSymbol.annotations partition (_.symbol == definitions.ThrowsClass)
+        methSymbol.annotations.partition(_.symbol == definitions.ThrowsClass)
       val thrownExceptions: List[String] = getExceptions(excs)
 
       val bytecodeName =
@@ -648,7 +648,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
                        methSymbol.owner.info.decls.toList.mkString(", ") + ")"
                    else ""))
             case _ =>
-              bc emitRETURN returnType
+              bc.emitRETURN(returnType)
           }
           if (emitVars) {
             // add entries to LocalVariableTable JVM attribute
@@ -707,7 +707,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
 
       // collect all return instructions
       var rets: List[asm.tree.AbstractInsnNode] = Nil
-      mnode foreachInsn { i =>
+      mnode.foreachInsn { i =>
         if (i.getOpcode() == asm.Opcodes.RETURN) { rets ::= i }
       }
       if (rets.isEmpty) { return }

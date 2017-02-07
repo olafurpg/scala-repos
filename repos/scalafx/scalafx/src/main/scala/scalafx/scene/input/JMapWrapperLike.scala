@@ -41,14 +41,14 @@ private[input] trait JMapWrapperLike[
   override def size = underlying.size
 
   def get(k: A) = {
-    val v = underlying get k
+    val v = underlying.get(k)
     if (v != null) Some(v)
     else if (underlying containsKey k) Some(null.asInstanceOf[B])
     else None
   }
 
   def +=(kv: (A, B)): this.type = { underlying.put(kv._1, kv._2); this }
-  def -=(key: A): this.type = { underlying remove key; this }
+  def -=(key: A): this.type = { underlying.remove(key); this }
 
   override def put(k: A, v: B): Option[B] = {
     val r = underlying.put(k, v)
@@ -58,7 +58,7 @@ private[input] trait JMapWrapperLike[
   override def update(k: A, v: B) { underlying.put(k, v) }
 
   override def remove(k: A): Option[B] = {
-    val r = underlying remove k
+    val r = underlying.remove(k)
     if (r != null) Some(r) else None
   }
 

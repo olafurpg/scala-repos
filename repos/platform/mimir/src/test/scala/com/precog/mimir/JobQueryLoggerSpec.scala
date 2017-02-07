@@ -63,7 +63,7 @@ class JobQueryLoggerSpec extends Specification {
         messages <- report.jobManager.listMessages(report.jobId, channel, None)
       } yield messages).copoint.toList
 
-      messages map {
+      messages.map {
         case Message(_, _, _, jobj) =>
           val JString(msg) = jobj \ "message"
           msg

@@ -57,7 +57,7 @@ trait IndexedSeqLike[+A, +Repr] extends Any with SeqLike[A, Repr] { self =>
       with BufferedIterator[A]
       with Serializable {
     private var index = start
-    private def available = (end - index) max 0
+    private def available = ((end - index)).max(0)
 
     def hasNext: Boolean = index < end
 
@@ -84,7 +84,7 @@ trait IndexedSeqLike[+A, +Repr] extends Any with SeqLike[A, Repr] { self =>
       else if (n <= available) new Elements(index, index + n)
       else new Elements(index, end)
     override def slice(from: Int, until: Int): Iterator[A] =
-      this take until drop from
+      this.take(until).drop(from)
   }
 
   override /*IterableLike*/

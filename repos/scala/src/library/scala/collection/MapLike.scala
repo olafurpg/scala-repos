@@ -177,7 +177,7 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
       (Set[A]() ++ this - elem)
         .asInstanceOf[Set[A]] // !!! concrete overrides abstract problem
     override def size = self.size
-    override def foreach[U](f: A => U) = self.keysIterator foreach f
+    override def foreach[U](f: A => U) = self.keysIterator.foreach(f)
   }
 
   /** Creates an iterator for all keys.
@@ -214,7 +214,7 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
       with Serializable {
     def iterator = valuesIterator
     override def size = self.size
-    override def foreach[U](f: B => U) = self.valuesIterator foreach f
+    override def foreach[U](f: B => U) = self.valuesIterator.foreach(f)
   }
 
   /** Creates an iterator for all values in this map.

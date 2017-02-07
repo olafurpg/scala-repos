@@ -388,7 +388,7 @@ private[akka] object ActorProcessorFactory {
   def props(materializer: ActorMaterializer,
             op: StageModule,
             parentAttributes: Attributes): (Props, Any) = {
-    val att = parentAttributes and op.attributes
+    val att = parentAttributes.and(op.attributes)
     // USE THIS TO AVOID CLOSING OVER THE MATERIALIZER BELOW
     // Also, otherwise the attributes will not affect the settings properly!
     val settings = materializer.effectiveSettings(att)

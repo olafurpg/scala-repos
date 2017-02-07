@@ -25,21 +25,21 @@ sealed abstract class Cofree[S[_], A] {
   final def out: S[Cofree[S, A]] = tail
 
   final def map[B](f: A => B)(implicit S: Functor[S]): Cofree[S, B] =
-    applyCofree(f, _ map f)
+    applyCofree(f, _.map(f))
 
   /** Alias for `extend` */
   final def =>>[B](f: Cofree[S, A] => B)(
-      implicit S: Functor[S]): Cofree[S, B] = this extend f
+      implicit S: Functor[S]): Cofree[S, B] = this.extend(f)
 
   /** Redecorates this structure with a computation whose context is the entire structure under that value. */
   final def extend[B](f: Cofree[S, A] => B)(
       implicit S: Functor[S]): Cofree[S, B] =
-    applyTail(f(this), _ extend f)
+    applyTail(f(this), _.extend(f))
 
   /** Folds over this cofree structure, returning all the intermediate values in a new structure. */
   def scanr[B](g: (A, S[Cofree[S, B]]) => B)(
       implicit S: Functor[S]): Cofree[S, B] = {
-    val qs = S.map(tail)(_ scanr g)
+    val qs = S.map(tail)(_.scanr(g))
     Cofree(g(head, qs), qs)
   }
 
@@ -211,16 +211,16 @@ private trait CofreeComonad[S[_]] extends Comonad[Cofree[S, ?]] {
 
   override def cojoin[A](a: Cofree[S, A]) = a.duplicate
 
-  override final def map[A, B](fa: Cofree[S, A])(f: A => B) = fa map f
+  override final def map[A, B](fa: Cofree[S, A])(f: A => B) = fa.map(f)
 
-  def cobind[A, B](fa: Cofree[S, A])(f: (Cofree[S, A]) => B) = fa extend f
+  def cobind[A, B](fa: Cofree[S, A])(f: (Cofree[S, A]) => B) = fa.extend(f)
 }
 
 private trait CofreeZipFunctor[F[_]] extends Functor[CofreeZip[F, ?]] {
   implicit def F: Functor[F]
 
   override final def map[A, B](fa: CofreeZip[F, A])(f: A => B) =
-    Tags.Zip(Tag unwrap fa map f)
+    Tags.Zip(Tag.unwrap(fa).map(f))
 }
 
 private trait CofreeZipApply[F[_]]

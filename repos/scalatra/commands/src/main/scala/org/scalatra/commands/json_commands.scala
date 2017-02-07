@@ -54,6 +54,6 @@ trait JsonCommand extends Command with JsonTypeConverterFactories {
     ({
       case r: JsonValueReader =>
         tc.resolveJson.asInstanceOf[TypeConverter[I, _]]
-    }: PartialFunction[ValueReader[_, _], TypeConverter[I, _]]) orElse super
-      .typeConverterBuilder(tc)
+    }: PartialFunction[ValueReader[_, _], TypeConverter[I, _]]).orElse(super
+      .typeConverterBuilder(tc))
 }

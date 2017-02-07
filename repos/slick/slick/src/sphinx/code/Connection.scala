@@ -134,7 +134,7 @@ object Connection extends App {
 
       // Here we show that that coffee count is the same before and after the attempted insert.
       // We also show that the result of the action is filled in with the exception's message.
-      val f = db.run(countAction zip errorHandleAction zip countAction).map {
+      val f = db.run(countAction.zip(errorHandleAction).zip(countAction)).map {
         case ((initialCount, result), finalCount) =>
           // init: 5, final: 5, result: Roll it back
           println(

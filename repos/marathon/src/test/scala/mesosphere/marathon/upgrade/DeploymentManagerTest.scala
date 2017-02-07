@@ -104,7 +104,7 @@ class DeploymentManagerTest
     val newGroup = Group("/".toRootPath, Set(app))
     val plan = DeploymentPlan(oldGroup, newGroup)
 
-    taskQueue.get(app.id) returns None
+    taskQueue.get(app.id).returns(None)
     manager ! PerformDeployment(driver, plan)
 
     awaitCond(

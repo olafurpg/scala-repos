@@ -74,7 +74,7 @@ private[math] trait UShortIsRig extends Rig[UShort] {
   def plus(a: UShort, b: UShort): UShort = a + b
   override def pow(a: UShort, b: Int): UShort = {
     if (b < 0)
-      throw new IllegalArgumentException("negative exponent: %s" format b)
+      throw new IllegalArgumentException("negative exponent: %s".format(b))
     a ** UShort(b)
   }
   override def times(a: UShort, b: UShort): UShort = a * b

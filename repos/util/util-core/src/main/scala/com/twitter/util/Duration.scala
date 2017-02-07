@@ -191,7 +191,7 @@ object Duration extends TimeLikeOps[Duration] {
     .values()
     .flatMap { u =>
       val pluralK = u.toString.toLowerCase
-      val singularK = pluralK dropRight 1
+      val singularK = pluralK.dropRight(1)
       Seq(pluralK -> u, singularK -> u)
     }
     .toMap
@@ -224,36 +224,42 @@ object Duration extends TimeLikeOps[Duration] {
     val ss = s.toLowerCase
     ss match {
       case FullDurationRegex(_ *) =>
-        SingleDurationRegex.findAllIn(ss).matchData.zipWithIndex map {
-          case (m, i) =>
-            val List(signStr, numStr, unitStr, special) = m.subgroups
-            val absDuration = special match {
-              case "top" => Top
-              case "bottom" => Bottom
-              case "undefined" => Undefined
-              case _ =>
-                val u = nameToUnit.get(unitStr) match {
-                  case Some(t) => t
-                  case None =>
-                    throw new NumberFormatException("Invalid unit: " + unitStr)
-                }
-                Duration(numStr.toLong, u)
-            }
+        SingleDurationRegex
+          .findAllIn(ss)
+          .matchData
+          .zipWithIndex
+          .map {
+            case (m, i) =>
+              val List(signStr, numStr, unitStr, special) = m.subgroups
+              val absDuration = special match {
+                case "top" => Top
+                case "bottom" => Bottom
+                case "undefined" => Undefined
+                case _ =>
+                  val u = nameToUnit.get(unitStr) match {
+                    case Some(t) => t
+                    case None =>
+                      throw new NumberFormatException(
+                        "Invalid unit: " + unitStr)
+                  }
+                  Duration(numStr.toLong, u)
+              }
 
-            signStr match {
-              case "-" => -absDuration
+              signStr match {
+                case "-" => -absDuration
 
-              // It's only OK to omit the sign for the first duration.
-              case "" if i > 0 =>
-                throw new NumberFormatException(
-                  "Expected a sign between durations")
+                // It's only OK to omit the sign for the first duration.
+                case "" if i > 0 =>
+                  throw new NumberFormatException(
+                    "Expected a sign between durations")
 
-              case _ => absDuration
-            }
+                case _ => absDuration
+              }
 
-          // It's OK to use reduce because the regex ensures that there is
-          // at least one element
-        } reduce { _ + _ }
+            // It's OK to use reduce because the regex ensures that there is
+            // at least one element
+          }
+          .reduce { _ + _ }
       case _ => throw new NumberFormatException("Invalid duration: " + s)
     }
   }

@@ -44,9 +44,13 @@ class OfferMatcherReconcilerTest
                                                     localVolumeIdLaunched)
 
     And("no groups")
-    f.groupRepository.rootGroupOrEmpty() returns Future.successful(Group.empty)
+    f.groupRepository
+      .rootGroupOrEmpty()
+      .returns(Future.successful(Group.empty))
     And("no tasks")
-    f.taskTracker.tasksByApp()(any) returns Future.successful(TasksByApp.empty)
+    f.taskTracker
+      .tasksByApp()(any)
+      .returns(Future.successful(TasksByApp.empty))
 
     When("reconciling")
     val matchedTaskOps =
@@ -79,10 +83,13 @@ class OfferMatcherReconcilerTest
 
     And("a bogus app")
     val app = AppDefinition(appId)
-    f.groupRepository.rootGroupOrEmpty() returns Future.successful(
-      Group.empty.copy(apps = Set(app)))
+    f.groupRepository
+      .rootGroupOrEmpty()
+      .returns(Future.successful(Group.empty.copy(apps = Set(app))))
     And("no tasks")
-    f.taskTracker.tasksByApp()(any) returns Future.successful(TasksByApp.empty)
+    f.taskTracker
+      .tasksByApp()(any)
+      .returns(Future.successful(TasksByApp.empty))
 
     When("reconciling")
     val matchedTaskOps =
@@ -114,11 +121,14 @@ class OfferMatcherReconcilerTest
                                                     localVolumeIdLaunched)
 
     And("no groups")
-    f.groupRepository.rootGroupOrEmpty() returns Future.successful(Group.empty)
+    f.groupRepository
+      .rootGroupOrEmpty()
+      .returns(Future.successful(Group.empty))
     And("a matching bogus task")
     val bogusTask = MarathonTestHelper.mininimalTask(taskId.idString)
-    f.taskTracker.tasksByApp()(any) returns Future.successful(
-      TasksByApp.forTasks(bogusTask))
+    f.taskTracker
+      .tasksByApp()(any)
+      .returns(Future.successful(TasksByApp.forTasks(bogusTask)))
 
     When("reconciling")
     val matchedTaskOps =
@@ -152,12 +162,15 @@ class OfferMatcherReconcilerTest
 
     And("a matching bogus app")
     val app = AppDefinition(appId)
-    f.groupRepository.rootGroupOrEmpty() returns Future.successful(
-      Group.empty.copy(apps = Set(app)))
+    f.groupRepository
+      .rootGroupOrEmpty()
+      .returns(Future.successful(Group.empty.copy(apps = Set(app))))
     And("a matching bogus task")
-    f.taskTracker.tasksByApp()(any) returns Future.successful(
-      TasksByApp.forTasks(MarathonTestHelper.mininimalTask(taskId.idString))
-    )
+    f.taskTracker
+      .tasksByApp()(any)
+      .returns(Future.successful(
+        TasksByApp.forTasks(MarathonTestHelper.mininimalTask(taskId.idString))
+      ))
 
     When("reconciling")
     val matchedTaskOps =

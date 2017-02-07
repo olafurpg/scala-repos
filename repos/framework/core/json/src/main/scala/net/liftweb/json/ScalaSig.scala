@@ -58,7 +58,7 @@ private[json] object ScalaSigReader {
           .orElse {
             sig.topLevelObjects.map { obj =>
               val t = obj.infoType.asInstanceOf[TypeRefType]
-              t.symbol.children collect { case c: ClassSymbol => c } find
+              t.symbol.children.collect { case c: ClassSymbol => c } find
                 (_.symbolInfo.name == clazz.getSimpleName)
             }.head
           }
@@ -68,12 +68,12 @@ private[json] object ScalaSigReader {
   private def findConstructor(c: ClassSymbol,
                               argNames: List[String]): Option[MethodSymbol] = {
     val ms =
-      c.children collect { case m: MethodSymbol if m.name == "<init>" => m }
+      c.children.collect { case m: MethodSymbol if m.name == "<init>" => m }
     ms.find(m => m.children.map(_.name) == argNames)
   }
 
   private def findField(c: ClassSymbol, name: String): Option[MethodSymbol] =
-    (c.children collect { case m: MethodSymbol if m.name == name => m }).headOption
+    (c.children.collect { case m: MethodSymbol if m.name == name => m }).headOption
 
   private def findArgType(s: MethodSymbol,
                           argIdx: Int,

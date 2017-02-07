@@ -11,7 +11,7 @@ class GroupTest extends FunSuite {
     val group = Group.mutable[Int]()
     var mapped = mutable.Buffer[Int]()
     val derived =
-      group map { i =>
+      group.map { i =>
         mapped += i
         i + 1
       }
@@ -51,7 +51,7 @@ class GroupTest extends FunSuite {
     val ctx = new Ctx
     import ctx._
 
-    val group2 = group collect { case i if i % 2 == 0 => i * 2 }
+    val group2 = group.collect { case i if i % 2 == 0 => i * 2 }
     assert(group2().isEmpty)
     group() = Set(1, 2, 3, 4, 5)
     assert(group2() == Set(4, 8))

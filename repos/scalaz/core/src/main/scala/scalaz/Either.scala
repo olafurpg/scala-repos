@@ -128,7 +128,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** Apply a function in the environment of the right of this disjunction. */
   def ap[AA >: A, C](f: => AA \/ (B => C)): (AA \/ C) =
-    f flatMap (ff => map(ff(_)))
+    f.flatMap(ff => map(ff(_)))
 
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, D](g: B => (AA \/ D)): (AA \/ D) =
@@ -373,7 +373,7 @@ object \/ extends DisjunctionInstances {
 
   /** Construct a disjunction value from a standard `scala.Either`. */
   def fromEither[A, B](e: Either[A, B]): A \/ B =
-    e fold (left, right)
+    e.fold(left, right)
 
   def fromTryCatchThrowable[T, E <: Throwable](
       a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T =
@@ -423,7 +423,7 @@ sealed abstract class DisjunctionInstances extends DisjunctionInstances0 {
   implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] =
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
-        a1 compare a2
+        a1.compare(a2)
       override def equal(a1: A \/ B, a2: A \/ B) =
         a1 === a2
     }
@@ -464,7 +464,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
     with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?]
     with MonadError[L \/ ?, L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
-        fa map f
+        fa.map(f)
 
       @scala.annotation.tailrec
       def tailrecM[A, B](f: A => L \/ (A \/ B))(a: A): L \/ B =
@@ -475,7 +475,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         }
 
       def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
-        fa flatMap f
+        fa.flatMap(f)
 
       def point[A](a: => A) =
         \/-(a)
@@ -497,7 +497,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         }
 
       def plus[A](a: L \/ A, b: => L \/ A) =
-        a orElse b
+        a.orElse(b)
 
       def pextract[B, A](fa: L \/ A): (L \/ B) \/ A = fa match {
         case l @ -\/(_) => -\/(l)
@@ -517,7 +517,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
 sealed abstract class DisjunctionInstances2 {
   implicit val DisjunctionInstances2: Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)(f: A => C, g: B => D) =
-      fab bimap (f, g)
+      fab.bimap(f, g)
 
     def bitraverseImpl[G[_]: Applicative, A, B, C, D](
         fab: A \/ B)(f: A => G[C], g: B => G[D]) =

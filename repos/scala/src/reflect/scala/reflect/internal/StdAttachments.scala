@@ -25,7 +25,7 @@ trait StdAttachments { self: SymbolTable =>
 
     // cannot be final due to SynchronizedSymbols
     def pos: Position = rawatt.pos
-    def pos_=(pos: Position): Unit = rawatt = (rawatt withPos pos)
+    def pos_=(pos: Position): Unit = rawatt = (rawatt.withPos(pos))
     def setPos(newpos: Position): this.type = { pos = newpos; this }
   }
 

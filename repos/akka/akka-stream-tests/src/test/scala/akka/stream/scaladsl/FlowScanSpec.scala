@@ -40,8 +40,8 @@ class FlowScanSpec extends AkkaSpec {
 
     "Scan empty failed" in assertAllStagesStopped {
       val e = new Exception("fail!")
-      intercept[Exception](scan(Source.failed[Int](e))) should be theSameInstanceAs
-        (e)
+      (intercept[Exception](scan(Source.failed[Int](e))) should be)
+        .theSameInstanceAs(e)
     }
 
     "Scan empty" in assertAllStagesStopped {

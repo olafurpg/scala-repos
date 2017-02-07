@@ -31,8 +31,8 @@ object ScaloidBuild extends Build {
     publishTo <<= version { (v: String) =>
       val nexus = "https://oss.sonatype.org/"
       if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+        Some("snapshots".at(nexus + "content/repositories/snapshots"))
+      else Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
     },
     pomIncludeRepository := { _ =>
       false
@@ -63,10 +63,13 @@ object ScaloidBuild extends Build {
       "-feature"
     ),
     javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
-    resolvers += "Android Repository" at
-      (new File(System.getenv("ANDROID_HOME")) / "extras" / "android" / "m2repository").getCanonicalFile.toURI.toString,
+    resolvers += "Android Repository"
+      .at(new File(System.getenv("ANDROID_HOME")) / "extras" / "android" / "m2repository")
+      .getCanonicalFile
+      .toURI
+      .toString,
     addCompilerPlugin(
-      "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+      ("org.scalamacros" % "paradise" % "2.0.1").cross(CrossVersion.full))
   )
 
   // configure prompt to show current project

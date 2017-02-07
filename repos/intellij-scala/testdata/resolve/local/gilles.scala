@@ -10,6 +10,6 @@ class OuterTest {
   def f: Int = 4
 
   trait I extends InnerSuper { is: TestTree =>
-    this.< ref > iii +this.fooo
+    this.<.ref(>).iii(+this.fooo)
   }
 }

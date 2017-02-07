@@ -68,7 +68,7 @@ private[manager] object OfferMatcherManagerActor {
     def addMatcher(matcher: OfferMatcher): OfferData =
       copy(matcherQueue = matcherQueue.enqueue(matcher))
     def nextMatcherOpt: Option[(OfferMatcher, OfferData)] = {
-      matcherQueue.dequeueOption map {
+      matcherQueue.dequeueOption.map {
         case (nextMatcher, newQueue) =>
           nextMatcher -> copy(matcherQueue = newQueue)
       }

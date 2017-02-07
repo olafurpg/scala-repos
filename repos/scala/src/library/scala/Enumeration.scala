@@ -69,8 +69,13 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
   /** The name of this enumeration.
     */
   override def toString =
-    ((getClass.getName stripSuffix MODULE_SUFFIX_STRING split '.').last split Regex
-      .quote(NAME_JOIN_STRING)).last
+    ((getClass.getName
+      .stripSuffix(MODULE_SUFFIX_STRING)
+      .split('.'))
+      .last
+      .split(Regex
+        .quote(NAME_JOIN_STRING)))
+      .last
 
   /** The mapping from the integer used to identify values to the actual
     * values. */
@@ -165,23 +170,23 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
   private def populateNameMap() {
     val fields: Array[JField] = getClass.getDeclaredFields
     def isValDef(m: JMethod): Boolean =
-      fields exists
-        (fd => fd.getName == m.getName && fd.getType == m.getReturnType)
+      fields.exists(fd =>
+        fd.getName == m.getName && fd.getType == m.getReturnType)
 
     // The list of possible Value methods: 0-args which return a conforming type
     val methods: Array[JMethod] =
-      getClass.getMethods filter
-        (m =>
-           m.getParameterTypes.isEmpty &&
-             classOf[Value].isAssignableFrom(m.getReturnType) &&
-             m.getDeclaringClass != classOf[Enumeration] && isValDef(m))
-    methods foreach { m =>
+      getClass.getMethods.filter(
+        m =>
+          m.getParameterTypes.isEmpty &&
+            classOf[Value].isAssignableFrom(m.getReturnType) &&
+            m.getDeclaringClass != classOf[Enumeration] && isValDef(m))
+    methods.foreach { m =>
       val name = m.getName
       // invoke method to obtain actual `Value` instance
       val value = m.invoke(this).asInstanceOf[Value]
       // verify that outer points to the correct Enumeration: ticket #3616.
       if (value.outerEnum eq thisenum) {
-        val id = Int.unbox(classOf[Val] getMethod "id" invoke value)
+        val id = Int.unbox(classOf[Val].getMethod("id") invoke value)
         nmap += ((id, name))
       }
     }
@@ -254,7 +259,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
 
   /** An ordering by id for values of this set */
   object ValueOrdering extends Ordering[Value] {
-    def compare(x: Value, y: Value): Int = x compare y
+    def compare(x: Value, y: Value): Int = x.compare(y)
   }
 
   /** A class for sets of values.
@@ -279,9 +284,10 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     def contains(v: Value) = nnIds contains (v.id - bottomId)
     def +(value: Value) = new ValueSet(nnIds + (value.id - bottomId))
     def -(value: Value) = new ValueSet(nnIds - (value.id - bottomId))
-    def iterator = nnIds.iterator map (id => thisenum.apply(bottomId + id))
+    def iterator = nnIds.iterator.map(id => thisenum.apply(bottomId + id))
     override def keysIteratorFrom(start: Value) =
-      nnIds keysIteratorFrom start.id map (id => thisenum.apply(bottomId + id))
+      (nnIds keysIteratorFrom start.id).map(id =>
+        thisenum.apply(bottomId + id))
     override def stringPrefix = thisenum + ".ValueSet"
 
     /** Creates a bit mask for the zero-adjusted ids in this set as a

@@ -53,9 +53,10 @@ class DotRunner(settings: doc.Settings) {
                             settings.docDiagramsDotPath,
                             settings.docDiagramsDotRestart,
                             settings.docDiagramsDotTimeout)
-        val width = (baseList map (_.helpSyntax.length)).max
+        val width = (baseList.map(_.helpSyntax.length)).max
         def helpStr(s: doc.Settings#Setting) =
-          ("%-" + width + "s") format (s.helpSyntax) + "  " + s.helpDescription
+          (("%-" + width + "s"))
+            .format(s.helpSyntax) + "  " + s.helpDescription
         baseList.foreach((sett: doc.Settings#Setting) =>
           settings.printMsg(helpStr(sett)))
         settings.printMsg(

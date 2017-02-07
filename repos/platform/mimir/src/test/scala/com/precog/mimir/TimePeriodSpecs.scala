@@ -61,7 +61,7 @@ trait TimePeriodSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect { case (ids, period) if ids.size == 0 => period }
+        result.collect { case (ids, period) if ids.size == 0 => period }
       result2 mustEqual (Set(SString("P3Y6M4DT12H30M5S")))
     }
 
@@ -74,7 +74,7 @@ trait TimePeriodSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect { case (ids, period) if ids.size == 0 => period }
+        result.collect { case (ids, period) if ids.size == 0 => period }
       result2 mustEqual (Set(SString("P6M4DT30M5S")))
     }
 

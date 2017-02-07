@@ -80,7 +80,7 @@ abstract class RatioBasedEstimator extends ReducerEstimator {
               new InputSizeReducerEstimator().estimateReducers(info)
             inputSizeBasedEstimate.map { baseEstimate =>
               // scale reducer estimate based on the historical input ratio
-              val e = (baseEstimate * reducerRatio).ceil.toInt max 1
+              val e = (baseEstimate * reducerRatio).ceil.toInt.max(1)
 
               LOG.info(
                 "\nRatioBasedEstimator" + "\n - past reducer ratio: " +

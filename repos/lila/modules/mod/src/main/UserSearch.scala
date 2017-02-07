@@ -20,13 +20,13 @@ final class UserSearch(securityApi: lila.security.Api,
     else searchUsername(query)
 
   private def searchIp(ip: String) =
-    securityApi recentUserIdsByIp ip flatMap UserRepo.byOrderedIds
+    securityApi.recentUserIdsByIp(ip).flatMap(UserRepo.byOrderedIds)
 
   private def searchUsername(username: String) =
-    UserRepo named username map (_.toList)
+    UserRepo.named(username).map(_.toList)
 
   private def searchEmail(email: String) = emailAddress.validate(email) ?? {
     fixed =>
-      UserRepo byEmail fixed map (_.toList)
+      (UserRepo byEmail fixed).map(_.toList)
   }
 }

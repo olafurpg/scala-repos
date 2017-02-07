@@ -50,7 +50,7 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
 
   def largestBelow(n: SafeLong): SafeLong = {
     if (n < 3)
-      throw new IllegalArgumentException("invalid argument: %s" format n)
+      throw new IllegalArgumentException("invalid argument: %s".format(n))
     if (n == 3) return SafeLong(2)
 
     var i = 3
@@ -103,7 +103,7 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     limit += chunkSize
     val csq = cutoff ** 2
     if (limit >= csq)
-      sys.error("too big: %s > %s (%s)" format (limit, csq, cutoff))
+      sys.error("too big: %s > %s (%s)".format(limit, csq, cutoff))
     arr.clear()
     sieve = SieveSegment(start, arr, cutoff)
     sieve.init(fastq, slowq)

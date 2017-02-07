@@ -14,8 +14,8 @@ object Util extends Build {
   val zkClientVersion = "0.0.79"
   val zkGroupVersion = "0.0.90"
   val zkDependency =
-    "org.apache.zookeeper" % "zookeeper" % zkVersion excludeAll
-      (ExclusionRule("com.sun.jdmk", "jmxtools"),
+    ("org.apache.zookeeper" % "zookeeper" % zkVersion).excludeAll(
+      ExclusionRule("com.sun.jdmk", "jmxtools"),
       ExclusionRule("com.sun.jmx", "jmxri"),
       ExclusionRule("javax.jms", "jms"))
 
@@ -55,7 +55,7 @@ object Util extends Build {
       "org.mockito" % "mockito-all" % "1.9.5" % "test",
       "org.scalatest" %% "scalatest" % "2.2.4" % "test"
     ),
-    resolvers += "twitter repo" at "https://maven.twttr.com",
+    resolvers += "twitter repo".at("https://maven.twttr.com"),
     ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting :=
       (CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 10)) => false
@@ -98,8 +98,8 @@ object Util extends Build {
     publishTo <<= version { (v: String) =>
       val nexus = "https://oss.sonatype.org/"
       if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+        Some("snapshots".at(nexus + "content/repositories/snapshots"))
+      else Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
     },
     // Prevent eviction warnings
     dependencyOverrides <++= scalaVersion { vsn =>
@@ -115,12 +115,30 @@ object Util extends Build {
       id = "util",
       base = file("."),
       settings = Defaults.coreDefaultSettings ++ sharedSettings ++ unidocSettings
-    ) aggregate
-      (utilFunction, utilRegistry, utilCore, utilCodec, utilCollection,
-      utilCache, utilReflect, utilLint, utilLogging, utilTest, utilThrift,
-      utilHashing, utilJvm, utilZk, utilZkCommon, utilZkTest,
-      utilClassPreloader, utilBenchmark, utilApp, utilEvents, utilStats,
-      utilEval)
+    ).aggregate(
+      utilFunction,
+      utilRegistry,
+      utilCore,
+      utilCodec,
+      utilCollection,
+      utilCache,
+      utilReflect,
+      utilLint,
+      utilLogging,
+      utilTest,
+      utilThrift,
+      utilHashing,
+      utilJvm,
+      utilZk,
+      utilZkCommon,
+      utilZkTest,
+      utilClassPreloader,
+      utilBenchmark,
+      utilApp,
+      utilEvents,
+      utilStats,
+      utilEval
+    )
 
   lazy val utilApp = Project(
     id = "util-app",
@@ -206,7 +224,7 @@ object Util extends Build {
       ),
       libraryDependencies <++= parserCombinators,
       resourceGenerators in Compile <+=
-        (resourceManaged in Compile, name, version) map { (dir, name, ver) =>
+        (resourceManaged in Compile, name, version).map { (dir, name, ver) =>
           val file = dir / "com" / "twitter" / name / "build.properties"
           val buildRev = Process("git" :: "rev-parse" :: "HEAD" :: Nil).!!.trim
           val buildName = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")

@@ -266,7 +266,7 @@ class IsotonicRegressionSuite
                                             isotonic = true)
     assert(model.predict(-0.5) === 1.0)
     assert(model.predict(0.0) === 1.0)
-    assert(model.predict(0.5) ~== 1.5 absTol 1e-14)
+    assert(model.predict(0.5) ~== 1.5.absTol(1e-14))
     assert(model.predict(1.0) === 2.0)
     assert(model.predict(1.5) === 2.0)
 

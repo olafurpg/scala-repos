@@ -14,16 +14,17 @@ object Test extends DirectTest {
     exitingTyper {
       //def isFeature(s: Symbol) = s.annotations.exists((a: AnnotationInfo) => a.tpe <:< typeOf[scala.annotation.meta.languageFeature])
       def isFeature(s: Symbol) =
-        s hasAnnotation definitions.LanguageFeatureAnnot
+        s.hasAnnotation(definitions.LanguageFeatureAnnot)
       val langf = definitions.languageFeatureModule.typeSignature
       val feats =
-        langf.declarations filter (s => isFeature(s)) map (_.name.decoded)
+        langf.declarations.filter(s => isFeature(s)).map(_.name.decoded)
       val xmen =
         langf
           .member(TermName("experimental"))
           .typeSignature
-          .declarations filter
-          (s => isFeature(s)) map (s => s"experimental.${s.name.decoded}")
+          .declarations
+          .filter(s => isFeature(s))
+          .map(s => s"experimental.${s.name.decoded}")
       val all = (feats ++ xmen) mkString ","
 
       assert(feats.nonEmpty, "Test must find feature flags.")

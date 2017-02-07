@@ -77,7 +77,7 @@ trait Index[T] extends Iterable[T] with (T => Int) with Serializable {
   override def equals(other: Any): Boolean = {
     other match {
       case that: Index[_] if this.size == that.size =>
-        this sameElements that
+        this.sameElements(that)
       case _ => false
     }
   }
@@ -222,7 +222,7 @@ class DenseIntIndex(beg: Int, end: Int) extends Index[Int] {
 
   override def iterator = (beg until end).iterator
 
-  def pairs = iterator zip iterator.map(_ + min)
+  def pairs = iterator.zip(iterator.map(_ + min))
 
   override def hashCode = beg + 37 * end
 }

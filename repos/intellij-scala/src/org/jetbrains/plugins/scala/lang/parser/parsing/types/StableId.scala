@@ -53,7 +53,7 @@ object StableId extends ParserNode {
             case ScalaTokenTypes.kSUPER =>
               return parseSuperReference(builder, nm, element, forImport)
             case _ =>
-              builder error ErrMsg("identifier.expected")
+              builder.error(ErrMsg("identifier.expected"))
               nm.drop()
               return true
           }

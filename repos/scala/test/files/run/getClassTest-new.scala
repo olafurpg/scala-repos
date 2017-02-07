@@ -54,13 +54,14 @@ class MoreAnyRefs {
 
 object Test {
   def returnTypes[T: ClassTag] =
-    (classTag[T].runtimeClass.getMethods.toList filter
-      (_.getName startsWith "f") sortBy (_.getName) map
-      (m => m.getName + ": " + m.getGenericReturnType.toString))
+    (classTag[T].runtimeClass.getMethods.toList
+      .filter(_.getName.startsWith("f"))
+      .sortBy(_.getName)
+      .map(m => m.getName + ": " + m.getGenericReturnType.toString))
 
   def main(args: Array[String]): Unit = {
-    returnTypes[AnyVals] foreach println
-    returnTypes[AnyRefs] foreach println
-    returnTypes[MoreAnyRefs] foreach println
+    returnTypes[AnyVals].foreach(println)
+    returnTypes[AnyRefs].foreach(println)
+    returnTypes[MoreAnyRefs].foreach(println)
   }
 }

@@ -29,10 +29,10 @@ class ConstraintsTest extends MarathonSpec with GivenWhenThen with Matchers {
     val result = Constraints.selectTasksToKill(app, tasks, 10)
 
     Then("10 tasks got selected and evenly distributed")
-    result should have size 10
+    (result should have).size(10)
     val dist = result.groupBy(_.taskId.idString.toInt % 2 == 1)
-    dist should have size 2
-    dist.values.head should have size 5
+    (dist should have).size(2)
+    (dist.values.head should have).size(5)
   }
 
   test("Select only tasks to kill for an unbalanced distribution") {
@@ -49,7 +49,7 @@ class ConstraintsTest extends MarathonSpec with GivenWhenThen with Matchers {
     val result = Constraints.selectTasksToKill(app, tasks, 10)
 
     Then("All 10 tasks are from srv1")
-    result should have size 10
+    (result should have).size(10)
     result.forall(_.agentInfo.host == "srv1") should be(true)
   }
 
@@ -82,7 +82,7 @@ class ConstraintsTest extends MarathonSpec with GivenWhenThen with Matchers {
     val result = Constraints.selectTasksToKill(app, tasks, 20)
 
     Then("20 tasks got selected and evenly distributed")
-    result should have size 20
+    (result should have).size(20)
     result.count(_.agentInfo.attributes.exists(_.getText.getValue == "rack-1")) should be(
       10)
     result.count(_.agentInfo.attributes.exists(_.getText.getValue == "rack-2")) should be(
@@ -106,7 +106,7 @@ class ConstraintsTest extends MarathonSpec with GivenWhenThen with Matchers {
     val result = Constraints.selectTasksToKill(app, tasks, 5)
 
     Then("0 tasks got selected")
-    result should have size 0
+    (result should have).size(0)
   }
 
   test("UniqueHostConstraint") {

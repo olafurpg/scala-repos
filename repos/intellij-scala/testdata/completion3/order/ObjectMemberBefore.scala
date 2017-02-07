@@ -4,5 +4,5 @@ object ObjectMemberBefore {
 }
 
 class Test {
-  ObjectMemberBefore.< caret >
+  ObjectMemberBefore.<.caret(>)
 }

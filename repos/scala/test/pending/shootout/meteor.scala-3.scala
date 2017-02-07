@@ -151,10 +151,9 @@ final class Board {
 
   def asString() =
     new String(
-      cells map
-        (c =>
-           if (c.piece == null) '-'.toByte
-           else (c.piece.number + 48).toByte))
+      cells.map(c =>
+        if (c.piece == null) '-'.toByte
+        else (c.piece.number + 48).toByte))
 
   def firstEmptyCellIndex() = cells.findIndexOf(c => c.isEmpty)
 

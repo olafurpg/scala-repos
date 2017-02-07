@@ -163,7 +163,7 @@ abstract class AdaptiveLoadBalancingRouterSpec
         Thread.sleep(cluster.settings.MetricsInterval.toMillis * 10)
 
         val iterationCount = 100
-        1 to iterationCount foreach { _ ⇒
+        (1 to iterationCount).foreach { _ ⇒
           router1 ! "hit"
           // wait a while between each message, since metrics is collected periodically
           Thread.sleep(10)
@@ -199,7 +199,7 @@ abstract class AdaptiveLoadBalancingRouterSpec
         Thread.sleep(cluster.settings.MetricsInterval.toMillis * 10)
 
         val iterationCount = 3000
-        1 to iterationCount foreach { _ ⇒
+        (1 to iterationCount).foreach { _ ⇒
           router2 ! "hit"
         }
 

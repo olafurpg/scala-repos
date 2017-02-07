@@ -93,12 +93,12 @@ class HtmlFactory(val universe: doc.Universe, val reporter: ScalaDocReporter) {
       finally out.close()
     }
 
-    libResources foreach (s => copyResource("lib/" + s))
+    libResources.foreach(s => copyResource("lib/" + s))
 
-    IndexScript(universe) writeFor this
+    IndexScript(universe).writeFor(this)
 
     try {
-      writeTemplates(_ writeFor this)
+      writeTemplates(_.writeFor(this))
     } finally {
       DiagramStats.printStats(universe.settings)
       universe.dotRunner.cleanup()
@@ -115,7 +115,9 @@ class HtmlFactory(val universe: doc.Universe, val reporter: ScalaDocReporter) {
         writeForThis(
           page.EntityPage(universe, diagramGenerator, tpl, reporter))
         written += tpl
-        tpl.templates collect { case d: DocTemplateEntity => d } map writeTemplate
+        tpl.templates
+          .collect { case d: DocTemplateEntity => d }
+          .map(writeTemplate)
       }
     }
 

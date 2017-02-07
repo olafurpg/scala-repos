@@ -90,9 +90,10 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
         } else None
       }
 
-      dropPrefix(methodExportPrefix).map((_, false)) orElse dropPrefix(
-        propExportPrefix).map((_, true)) getOrElse sys.error(
-        "non-exported name passed to jsInfoSpec")
+      dropPrefix(methodExportPrefix)
+        .map((_, false))
+        .orElse(dropPrefix(propExportPrefix).map((_, true)))
+        .getOrElse(sys.error("non-exported name passed to jsInfoSpec"))
     }
 
     def isJSProperty(sym: Symbol): Boolean = isJSGetter(sym) || isJSSetter(sym)
@@ -131,7 +132,7 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
       *  JS name is inferred from the Scala name.
       */
     def jsNameOf(sym: Symbol): String = {
-      sym.getAnnotation(JSNameAnnotation).flatMap(_.stringArg(0)) getOrElse {
+      sym.getAnnotation(JSNameAnnotation).flatMap(_.stringArg(0)).getOrElse {
         val base = sym.unexpandedName.decoded.stripSuffix("_=")
         if (!sym.isMethod) base.stripSuffix(" ")
         else base
@@ -147,9 +148,10 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
       assert(sym.isClass, s"fullJSNameOf called for non-class symbol $sym")
       sym
         .getAnnotation(JSFullNameAnnotation)
-        .flatMap(_.stringArg(0)) getOrElse {
-        jsNameOf(sym)
-      }
+        .flatMap(_.stringArg(0))
+        .getOrElse {
+          jsNameOf(sym)
+        }
     }
   }
 }

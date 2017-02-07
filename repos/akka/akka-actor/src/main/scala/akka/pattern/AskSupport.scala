@@ -671,10 +671,10 @@ private[akka] final class PromiseActorRef private (
   @tailrec
   override def stop(): Unit = {
     def ensureCompleted(): Unit = {
-      result tryComplete ActorStopResult
+      result.tryComplete(ActorStopResult)
       val watchers = clearWatchers()
       if (!watchers.isEmpty) {
-        watchers foreach { watcher ⇒
+        watchers.foreach { watcher ⇒
           // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
           watcher
             .asInstanceOf[InternalActorRef]
@@ -721,10 +721,10 @@ private[akka] object PromiseActorRef {
     val a = new PromiseActorRef(provider, result, messageClassName)
     implicit val ec = a.internalCallingThreadExecutionContext
     val f = scheduler.scheduleOnce(timeout.duration) {
-      result tryComplete Failure(new AskTimeoutException(
-        s"""Ask timed out on [$targetName] after [${timeout.duration.toMillis} ms]. Sender[$sender] sent message of type "${a.messageClassName}"."""))
+      result.tryComplete(Failure(new AskTimeoutException(
+        s"""Ask timed out on [$targetName] after [${timeout.duration.toMillis} ms]. Sender[$sender] sent message of type "${a.messageClassName}".""")))
     }
-    result.future onComplete { _ ⇒
+    result.future.onComplete { _ ⇒
       try a.stop()
       finally f.cancel()
     }

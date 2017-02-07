@@ -53,8 +53,8 @@ final class NIHDBProjection(snapshot: NIHDBSnapshot,
       implicit MP: Monad[Future])
     : Future[Option[BlockProjectionData[Long, Slice]]] = MP.point {
     val id = id0.map(_ + 1)
-    val index = id getOrElse 0L
-    getSnapshotBlock(id, columns.map(_.map(_.selector))) map {
+    val index = id.getOrElse(0L)
+    getSnapshotBlock(id, columns.map(_.map(_.selector))).map {
       case Block(_, segments, _) =>
         val slice = SegmentsWrapper(segments, projectionId, index)
         BlockProjectionData(index, index, slice)
@@ -65,12 +65,15 @@ final class NIHDBProjection(snapshot: NIHDBSnapshot,
     readers.foldLeft(Map.empty[CType, A]) { (acc, reader) =>
       reader.snapshot(Some(Set(path))).segments.foldLeft(acc) {
         (acc, segment) =>
-          reduction.reduce(segment, None) map { a =>
-            val key = segment.ctype
-            val value =
-              acc.get(key).map(reduction.semigroup.append(_, a)).getOrElse(a)
-            acc + (key -> value)
-          } getOrElse acc
+          reduction
+            .reduce(segment, None)
+            .map { a =>
+              val key = segment.ctype
+              val value =
+                acc.get(key).map(reduction.semigroup.append(_, a)).getOrElse(a)
+              acc + (key -> value)
+            }
+            .getOrElse(acc)
       }
     }
   }
@@ -95,7 +98,7 @@ final class NIHDBProjection(snapshot: NIHDBSnapshot,
 }
 
 object NIHDBProjection {
-  def wrap(nihdb: NIHDB): Future[NIHDBProjection] = nihdb.getSnapshot map {
+  def wrap(nihdb: NIHDB): Future[NIHDBProjection] = nihdb.getSnapshot.map {
     snap =>
       new NIHDBProjection(snap, nihdb.authorities, nihdb.projectionId)
   }

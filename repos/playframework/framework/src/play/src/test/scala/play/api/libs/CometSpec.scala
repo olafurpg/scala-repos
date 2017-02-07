@@ -24,7 +24,7 @@ class CometSpec extends Specification {
     def cometString = Action {
       implicit val m = materializer
       def stringSource: Source[String, _] = Source(List("kiki", "foo", "bar"))
-      Ok.chunked(stringSource via Comet.string("parent.cometMessage"))
+      Ok.chunked(stringSource.via(Comet.string("parent.cometMessage")))
         .as(ContentTypes.HTML)
     }
     //#comet-string
@@ -34,7 +34,7 @@ class CometSpec extends Specification {
       implicit val m = materializer
       def stringSource: Source[JsValue, _] =
         Source(List(JsString("jsonString")))
-      Ok.chunked(stringSource via Comet.json("parent.cometMessage"))
+      Ok.chunked(stringSource.via(Comet.json("parent.cometMessage")))
         .as(ContentTypes.HTML)
     }
     //#comet-json

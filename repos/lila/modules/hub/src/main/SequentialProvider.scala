@@ -43,7 +43,7 @@ trait SequentialProvider extends Actor {
       }
 
     case msg =>
-      queue enqueue Envelope(msg, sender)
+      queue.enqueue(Envelope(msg, sender))
       debugQueue
   }
 
@@ -75,12 +75,14 @@ trait SequentialProvider extends Actor {
       // we don't want to send Done after actor death
       case SequentialProvider.Terminate => self ! PoisonPill
       case Envelope(msg, replyTo) =>
-        (process orElse fallback)(msg)
+        (process
+          .orElse(fallback))(msg)
           .withTimeout(
             futureTimeout,
             LilaException(s"Sequential provider timeout: $futureTimeout"))(
             context.system)
-          .pipeTo(replyTo) andThenAnyway { self ! Done }
+          .pipeTo(replyTo)
+          .andThenAnyway { self ! Done }
       case x =>
         logger
           .branch("SequentialProvider")

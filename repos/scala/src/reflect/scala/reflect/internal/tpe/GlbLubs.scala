@@ -26,14 +26,14 @@ private[internal] trait GlbLubs { self: SymbolTable =>
       else {
         val s = ("" + tp).replaceAll("""[\w.]+\.(\w+)""", "$1")
         if (s.length < 60) s
-        else (s take 57) + "..."
+        else (s.take(57)) + "..."
       }
     }
 
     val sorted =
-      btsMap.toList.sortWith((x, y) => x._1.typeSymbol isLess y._1.typeSymbol)
+      btsMap.toList.sortWith((x, y) => x._1.typeSymbol.isLess(y._1.typeSymbol))
     val maxSeqLength = sorted.map(_._2.size).max
-    val padded = sorted map (_._2.padTo(maxSeqLength, NoType))
+    val padded = sorted.map(_._2.padTo(maxSeqLength, NoType))
     val transposed = padded.transpose
 
     val columns: List[Column[List[Type]]] = mapWithIndex(sorted) {
@@ -57,7 +57,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     if (ts.isEmpty) Nil
     else {
       val sym = ts.head.typeSymbol
-      require(ts.tail forall (_.typeSymbol == sym), ts)
+      require(ts.tail.forall(_.typeSymbol == sym), ts)
       for (p <- sym.typeParams; in <- sym.typeParams;
            if in.info.bounds contains p) yield p -> in
     }
@@ -69,11 +69,11 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                                          tsElimSub: List[Type]) = {
     val typeSym =
       ts.head.typeSymbol // we're uniform, the `.head` is as good as any.
-    def fbounds = findRecursiveBounds(ts) map (_._2)
-    def isRecursive = typeSym.typeParams exists fbounds.contains
+    def fbounds = findRecursiveBounds(ts).map(_._2)
+    def isRecursive = typeSym.typeParams.exists(fbounds.contains)
 
     isRecursive &&
-    (transposeSafe(tsElimSub map (_.normalize.typeArgs)) match {
+    (transposeSafe(tsElimSub.map(_.normalize.typeArgs)) match {
       case Some(arggsTransposed) =>
         val mergedTypeArgs = (tp match {
           case et: ExistentialType => et.underlying; case _ => tp
@@ -107,7 +107,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     // This catches some recursive situations which would otherwise
     // befuddle us, e.g. pos/hklub0.scala
     def isHotForTs(xs: List[Type]) =
-      ts exists (_.typeParams == xs.map(_.typeSymbol))
+      ts.exists(_.typeParams == xs.map(_.typeSymbol))
 
     def elimHigherOrderTypeParam(tp: Type) = tp match {
       case TypeRef(_, _, args) if args.nonEmpty && isHotForTs(args) =>
@@ -120,17 +120,17 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     def loop(pretypes: List[Type], tsBts: List[List[Type]]): List[Type] = {
       lubListDepth = lubListDepth.incr
 
-      if (tsBts.isEmpty || (tsBts exists typeListIsEmpty)) pretypes.reverse
+      if (tsBts.isEmpty || (tsBts.exists(typeListIsEmpty))) pretypes.reverse
       else if (tsBts.tail.isEmpty) pretypes.reverse ++ tsBts.head
       else {
         // ts0 is the 1-dimensional frontier of symbols cutting through 2-dimensional tsBts.
         // Invariant: all symbols "under" (closer to the first row) the frontier
         // are smaller (according to _.isLess) than the ones "on and beyond" the frontier
-        val ts0 = tsBts map (_.head)
+        val ts0 = tsBts.map(_.head)
 
         // Is the frontier made up of types with the same symbol?
         val isUniformFrontier = (ts0: @unchecked) match {
-          case t :: ts => ts forall (_.typeSymbol == t.typeSymbol)
+          case t :: ts => ts.forall(_.typeSymbol == t.typeSymbol)
         }
 
         // Produce a single type for this frontier by merging the prefixes and arguments of those
@@ -139,8 +139,8 @@ private[internal] trait GlbLubs { self: SymbolTable =>
         // merging, strip targs that refer to bound tparams (when we're computing the lub of type
         // constructors.) Also filter out all types that are a subtype of some other type.
         if (isUniformFrontier) {
-          val tails = tsBts map (_.tail)
-          val ts1 = elimSub(ts0, depth) map elimHigherOrderTypeParam
+          val tails = tsBts.map(_.tail)
+          val ts1 = elimSub(ts0, depth).map(elimHigherOrderTypeParam)
           mergePrefixAndArgs(ts1, Covariant, depth) match {
             case NoType => loop(pretypes, tails)
             case tp
@@ -157,17 +157,19 @@ private[internal] trait GlbLubs { self: SymbolTable =>
           // lather, rinse, repeat
           val sym = minSym(ts0)
           val newtps =
-            tsBts map (ts => if (ts.head.typeSymbol == sym) ts.tail else ts)
+            tsBts.map(ts => if (ts.head.typeSymbol == sym) ts.tail else ts)
           if (printLubs) {
-            val str = (newtps.zipWithIndex map {
-              case (tps, idx) =>
-                tps
-                  .map("        " + _ + "\n")
-                  .mkString("   (" + idx + ")\n", "", "\n")
-            }).mkString("")
+            val str = (newtps.zipWithIndex
+              .map {
+                case (tps, idx) =>
+                  tps
+                    .map("        " + _ + "\n")
+                    .mkString("   (" + idx + ")\n", "", "\n")
+              })
+              .mkString("")
 
             println("Frontier(\n" + str + ")")
-            printLubMatrix((ts zip tsBts).toMap, lubListDepth)
+            printLubMatrix((ts.zip(tsBts)).toMap, lubListDepth)
           }
 
           loop(pretypes, newtps)
@@ -175,8 +177,8 @@ private[internal] trait GlbLubs { self: SymbolTable =>
       }
     }
 
-    val initialBTSes = ts map (_.baseTypeSeq.toList)
-    if (printLubs) printLubMatrix((ts zip initialBTSes).toMap, depth)
+    val initialBTSes = ts.map(_.baseTypeSeq.toList)
+    if (printLubs) printLubMatrix((ts.zip(initialBTSes)).toMap, depth)
 
     loop(Nil, initialBTSes)
   }
@@ -184,7 +186,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
   /** The minimal symbol of a list of types (as determined by `Symbol.isLess`). */
   private def minSym(tps: List[Type]): Symbol =
     (tps.head.typeSymbol /: tps.tail) { (sym1, tp2) =>
-      if (tp2.typeSymbol isLess sym1) tp2.typeSymbol else sym1
+      if (tp2.typeSymbol.isLess(sym1)) tp2.typeSymbol else sym1
     }
 
   /** A minimal type list which has a given list of types as its base type sequence */
@@ -192,7 +194,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     case List() => List()
     case first :: rest =>
       first :: spanningTypes(
-        rest filter (t => !first.typeSymbol.isSubClass(t.typeSymbol)))
+        rest.filter(t => !first.typeSymbol.isSubClass(t.typeSymbol)))
   }
 
   /** Eliminate from list of types all elements which are a supertype
@@ -201,8 +203,8 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     case List() => List()
     case List(t) => List(t)
     case t :: ts1 =>
-      val rest = elimSuper(ts1 filter (t1 => !(t <:< t1)))
-      if (rest exists (t1 => t1 <:< t)) rest else t :: rest
+      val rest = elimSuper(ts1.filter(t1 => !(t <:< t1)))
+      if (rest.exists(t1 => t1 <:< t)) rest else t :: rest
   }
 
   /** Eliminate from list of types all elements which are a subtype
@@ -212,14 +214,14 @@ private[internal] trait GlbLubs { self: SymbolTable =>
       case List() => List()
       case List(t) => List(t)
       case t :: ts1 =>
-        val rest = elimSub0(ts1 filter (t1 => !isSubType(t1, t, depth.decr)))
-        if (rest exists (t1 => isSubType(t, t1, depth.decr))) rest
+        val rest = elimSub0(ts1.filter(t1 => !isSubType(t1, t, depth.decr)))
+        if (rest.exists(t1 => isSubType(t, t1, depth.decr))) rest
         else t :: rest
     }
     val ts0 = elimSub0(ts)
     if (ts0.isEmpty || ts0.tail.isEmpty) ts0
     else {
-      val ts1 = ts0 mapConserve (t => elimAnonymousClass(t.dealiasWiden))
+      val ts1 = ts0.mapConserve(t => elimAnonymousClass(t.dealiasWiden))
       if (ts1 eq ts0) ts0
       else elimSub(ts1, depth)
     }
@@ -228,7 +230,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
   private def stripExistentialsAndTypeVars(
       ts: List[Type]): (List[Type], List[Symbol]) = {
     val quantified =
-      ts flatMap {
+      ts.flatMap {
         case ExistentialType(qs, _) => qs
         case t => List()
       }
@@ -241,7 +243,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
         else abort("trying to do lub/glb of typevar " + tp)
       case t => t
     }
-    val strippedTypes = ts mapConserve stripType
+    val strippedTypes = ts.mapConserve(stripType)
     (strippedTypes, quantified)
   }
 
@@ -255,7 +257,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     case Nil => true
     case tp :: Nil => !typeHasAnnotations(tp)
     case tps =>
-      !(tps exists typeHasAnnotations) && !(tps forall isNumericValueType)
+      !(tps.exists(typeHasAnnotations)) && !(tps.forall(isNumericValueType))
   }
 
   /** If the arguments are all numeric value types, the numeric
@@ -266,21 +268,18 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     */
   def weakLub(tps: List[Type]): Type =
     (if (tps.isEmpty) NothingTpe
-     else if (tps forall isNumericValueType)
+     else if (tps.forall(isNumericValueType))
        numericLub(tps)
-     else if (tps exists typeHasAnnotations)
-       annotationsLub(lub(
-                        tps map
-                          (_.withoutAnnotations)),
-                      tps)
+     else if (tps.exists(typeHasAnnotations))
+       annotationsLub(lub(tps.map(_.withoutAnnotations)), tps)
      else lub(tps))
 
   def numericLub(ts: List[Type]) =
-    ts reduceLeft
-      ((t1, t2) =>
-         if (isNumericSubType(t1, t2)) t2
-         else if (isNumericSubType(t2, t1)) t1
-         else IntTpe)
+    ts.reduceLeft(
+      (t1, t2) =>
+        if (isNumericSubType(t1, t2)) t2
+        else if (isNumericSubType(t2, t1)) t1
+        else IntTpe)
 
   private val _lubResults = new mutable.HashMap[(Depth, List[Type]), Type]
   def lubResults = _lubResults
@@ -332,12 +331,12 @@ private[internal] trait GlbLubs { self: SymbolTable =>
       case ts @ NullaryMethodType(_) :: rest =>
         NullaryMethodType(lub0(matchingRestypes(ts, Nil)))
       case ts @ TypeBounds(_, _) :: rest =>
-        TypeBounds(glb(ts map (_.bounds.lo), depth),
-                   lub(ts map (_.bounds.hi), depth))
+        TypeBounds(glb(ts.map(_.bounds.lo), depth),
+                   lub(ts.map(_.bounds.hi), depth))
       case ts @ AnnotatedType(annots, tpe) :: rest =>
-        annotationsLub(lub0(ts map (_.withoutAnnotations)), ts)
+        annotationsLub(lub0(ts.map(_.withoutAnnotations)), ts)
       case ts =>
-        lubResults get ((depth, ts)) match {
+        lubResults.get((depth, ts)) match {
           case Some(lubType) =>
             lubType
           case None =>
@@ -358,7 +357,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
         else {
           val lubRefined = refinedType(lubParents, lubOwner)
           val lubThisType = lubRefined.typeSymbol.thisType
-          val narrowts = ts map (_.narrow)
+          val narrowts = ts.map(_.narrow)
           def excludeFromLub(sym: Symbol) =
             (sym.isClass ||
               sym.isConstructor || !sym.isPublic || isGetClass(sym) ||
@@ -366,14 +365,14 @@ private[internal] trait GlbLubs { self: SymbolTable =>
           def lubsym(proto: Symbol): Symbol = {
             val prototp = lubThisType.memberInfo(proto)
             val syms =
-              narrowts map
-                (t =>
-                   // SI-7602 With erroneous code, we could end up with overloaded symbols after filtering
-                   //         so `suchThat` unsuitable.
-                   t.nonPrivateMember(proto.name)
-                     .filter(sym =>
-                       sym.tpe matches prototp
-                         .substThis(lubThisType.typeSymbol, t)))
+              narrowts.map(
+                t =>
+                  // SI-7602 With erroneous code, we could end up with overloaded symbols after filtering
+                  //         so `suchThat` unsuitable.
+                  t.nonPrivateMember(proto.name)
+                    .filter(sym =>
+                      sym.tpe.matches(prototp
+                        .substThis(lubThisType.typeSymbol, t))))
 
             if (syms contains NoSymbol) NoSymbol
             else {
@@ -383,35 +382,35 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                 proto
                   .cloneSymbol(lubRefined.typeSymbol)
                   .setInfoOwnerAdjusted(lub(symtypes, depth.decr))
-              else if (symtypes.tail forall (symtypes.head =:= _))
+              else if (symtypes.tail.forall(symtypes.head =:= _))
                 proto
                   .cloneSymbol(lubRefined.typeSymbol)
                   .setInfoOwnerAdjusted(symtypes.head)
               else {
                 def lubBounds(bnds: List[TypeBounds]): TypeBounds =
-                  TypeBounds(glb(bnds map (_.lo), depth.decr),
-                             lub(bnds map (_.hi), depth.decr))
+                  TypeBounds(glb(bnds.map(_.lo), depth.decr),
+                             lub(bnds.map(_.hi), depth.decr))
                 lubRefined.typeSymbol
                   .newAbstractType(proto.name.toTypeName, proto.pos)
-                  .setInfoOwnerAdjusted(lubBounds(symtypes map (_.bounds)))
+                  .setInfoOwnerAdjusted(lubBounds(symtypes.map(_.bounds)))
               }
             }
           }
           def refines(tp: Type, sym: Symbol): Boolean = {
             val syms = tp.nonPrivateMember(sym.name).alternatives
             !syms.isEmpty &&
-            (syms forall
-              (alt =>
-                 // todo alt != sym is strictly speaking not correct, but without it we lose
-                 // efficiency.
-                 alt != sym &&
-                   !specializesSym(lubThisType, sym, tp, alt, depth)))
+            (syms.forall(
+              alt =>
+                // todo alt != sym is strictly speaking not correct, but without it we lose
+                // efficiency.
+                alt != sym &&
+                  !specializesSym(lubThisType, sym, tp, alt, depth)))
           }
           // add a refinement symbol for all non-class members of lubBase
           // which are refined by every type in ts.
           for (sym <- lubBase.nonPrivateMembers; if !excludeFromLub(sym)) {
-            try lubsym(sym) andAlso
-              (addMember(lubThisType, lubRefined, _, depth))
+            try lubsym(sym).andAlso(
+              addMember(lubThisType, lubRefined, _, depth))
             catch {
               case ex: NoCommonType =>
             }
@@ -423,7 +422,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
             // In theory this should not be necessary, but higher-order type
             // parameters are not handled correctly.
             val ok =
-              ts forall { t =>
+              ts.forall { t =>
                 isSubType(t, lubRefined, depth) || {
                   if (settings.debug || printLubs) {
                     Console.println(
@@ -452,7 +451,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     if (Statistics.canEnable) Statistics.incCounter(nestedLubCount)
     val res = lub0(ts)
     if (printLubs) {
-      indent = indent stripSuffix "  "
+      indent = indent.stripSuffix("  ")
       println(indent + "lub of " + ts + " is " + res) //debug
     }
     res
@@ -509,10 +508,10 @@ private[internal] trait GlbLubs { self: SymbolTable =>
       case ts @ NullaryMethodType(_) :: rest =>
         NullaryMethodType(glbNorm(matchingRestypes(ts, Nil), depth))
       case ts @ TypeBounds(_, _) :: rest =>
-        TypeBounds(lub(ts map (_.bounds.lo), depth),
-                   glb(ts map (_.bounds.hi), depth))
+        TypeBounds(lub(ts.map(_.bounds.lo), depth),
+                   glb(ts.map(_.bounds.hi), depth))
       case ts =>
-        glbResults get ((depth, ts)) match {
+        glbResults.get((depth, ts)) match {
           case Some(glbType) =>
             glbType
           case _ =>
@@ -527,16 +526,16 @@ private[internal] trait GlbLubs { self: SymbolTable =>
         val (ts, tparams) = stripExistentialsAndTypeVars(ts0)
         val glbOwner = commonOwner(ts)
         def refinedToParents(t: Type): List[Type] = t match {
-          case RefinedType(ps, _) => ps flatMap refinedToParents
+          case RefinedType(ps, _) => ps.flatMap(refinedToParents)
           case _ => List(t)
         }
         def refinedToDecls(t: Type): List[Scope] = t match {
           case RefinedType(ps, decls) =>
-            val dss = ps flatMap refinedToDecls
+            val dss = ps.flatMap(refinedToDecls)
             if (decls.isEmpty) dss else decls :: dss
           case _ => List()
         }
-        val ts1 = ts flatMap refinedToParents
+        val ts1 = ts.flatMap(refinedToParents)
         val glbBase = intersectionType(ts1, glbOwner)
         val glbType =
           if (phase.erasedTypes || depth.isZero) glbBase
@@ -549,9 +548,9 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                               alt <- (t
                                 .nonPrivateMember(proto.name)
                                 .alternatives)
-                              if glbThisType.memberInfo(alt) matches prototp)
+                              if glbThisType.memberInfo(alt).matches(prototp))
                 yield alt
-              val symtypes = syms map glbThisType.memberInfo
+              val symtypes = syms.map(glbThisType.memberInfo)
               assert(!symtypes.isEmpty)
               proto
                 .cloneSymbol(glbRefined.typeSymbol)
@@ -563,12 +562,12 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                       case _ => false
                     }
                     def glbBounds(bnds: List[Type]): TypeBounds = {
-                      val lo = lub(bnds map (_.bounds.lo), depth.decr)
-                      val hi = glb(bnds map (_.bounds.hi), depth.decr)
+                      val lo = lub(bnds.map(_.bounds.lo), depth.decr)
+                      val hi = glb(bnds.map(_.bounds.hi), depth.decr)
                       if (lo <:< hi) TypeBounds(lo, hi)
                       else throw GlbFailure
                     }
-                    val symbounds = symtypes filter isTypeBound
+                    val symbounds = symtypes.filter(isTypeBound)
                     var result: Type =
                       if (symbounds.isEmpty) TypeBounds.empty
                       else glbBounds(symbounds)
@@ -583,7 +582,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
             if (globalGlbDepth < globalGlbLimit)
               try {
                 globalGlbDepth = globalGlbDepth.incr
-                val dss = ts flatMap refinedToDecls
+                val dss = ts.flatMap(refinedToDecls)
                 for (ds <- dss; sym <- ds.iterator)
                   if (globalGlbDepth < globalGlbLimit &&
                       !specializesSym(glbThisType, sym, depth))
@@ -600,7 +599,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
         existentialAbstraction(tparams, glbType)
       } catch {
         case GlbFailure =>
-          if (ts forall (t => NullTpe <:< t)) NullTpe
+          if (ts.forall(t => NullTpe <:< t)) NullTpe
           else NothingTpe
       }
     }
@@ -619,12 +618,12 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                              tparams: List[Symbol]): List[List[Type]] = {
     def getBounds(tp: Type): List[Type] = tp match {
       case PolyType(tparams1, _) if sameLength(tparams1, tparams) =>
-        tparams1 map (tparam => tparam.info.substSym(tparams1, tparams))
+        tparams1.map(tparam => tparam.info.substSym(tparams1, tparams))
       case tp =>
         if (tp ne tp.normalize) getBounds(tp.normalize)
         else throw new NoCommonType(tps)
     }
-    tps map getBounds
+    tps.map(getBounds)
   }
 
   /** All types in list must be polytypes with type parameter lists of
@@ -641,14 +640,14 @@ private[internal] trait GlbLubs { self: SymbolTable =>
         if (tp ne tp.normalize) transformResultType(tp.normalize)
         else throw new NoCommonType(tps)
     }
-    tps map transformResultType
+    tps.map(transformResultType)
   }
 
   /** All types in list must be method types with equal parameter types.
     *  Returns list of their result types.
     */
   private def matchingRestypes(tps: List[Type], pts: List[Type]): List[Type] =
-    tps map {
+    tps.map {
       case mt @ MethodType(params1, res) if isSameTypes(mt.paramTypes, pts) =>
         res
       case NullaryMethodType(res) if pts.isEmpty =>

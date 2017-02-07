@@ -40,7 +40,7 @@ class ScTryStmtImpl(node: ASTNode)
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
     val lifted = tryBlock.getType(ctx)
-    lifted flatMap { result =>
+    lifted.flatMap { result =>
       catchBlock match {
         case None => lifted
         case Some(cb) => {

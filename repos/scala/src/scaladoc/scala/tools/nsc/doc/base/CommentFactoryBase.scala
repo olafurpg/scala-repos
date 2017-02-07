@@ -50,7 +50,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
       hideImplicitConversions0: List[Body] = List.empty,
       shortDescription0: List[Body] = List.empty
   ): Comment = new Comment {
-    val body = body0 getOrElse Body(Seq.empty)
+    val body = body0.getOrElse(Body(Seq.empty))
     val authors = authors0
     val see = see0
     val result = result0
@@ -73,7 +73,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
       case _ => None
     }
     val groupPrio =
-      groupPrio0 flatMap {
+      groupPrio0.flatMap {
         case (group, body) =>
           try {
             body match {
@@ -86,7 +86,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
           }
       }
     val groupNames =
-      groupNames0 flatMap {
+      groupNames0.flatMap {
         case (group, body) =>
           body match {
             case Body(List(Paragraph(Chain(List(Summary(Text(name)))))))
@@ -97,14 +97,14 @@ trait CommentFactoryBase { this: MemberLookupBase =>
       }
 
     override val shortDescription: Option[Text] =
-      shortDescription0.lastOption collect {
+      shortDescription0.lastOption.collect {
         case Body(List(Paragraph(Chain(List(Summary(Text(e)))))))
             if !e.trim.contains("\n") =>
           Text(e)
       }
 
     override val hideImplicitConversions: List[String] =
-      hideImplicitConversions0 flatMap {
+      hideImplicitConversions0.flatMap {
         case Body(List(Paragraph(Chain(List(Summary(Text(e)))))))
             if !e.trim.contains("\n") =>
           List(e)
@@ -232,7 +232,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
           java.util.regex.Matcher
             .quoteReplacement(safeTagMarker + mtch.matched + safeTagMarker)
       })
-      markedTagComment.lines.toList map (cleanLine(_))
+      markedTagComment.lines.toList.map(cleanLine(_))
     }
 
     /** Parses a comment (in the form of a list of lines) to a `Comment`
@@ -277,7 +277,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
         else
           lastTagKey match {
             case Some(key) =>
-              val value = ((tags get key): @unchecked) match {
+              val value = ((tags.get(key)): @unchecked) match {
                 case Some(b :: bs) => (b + endOfLine + marker) :: bs
                 case None => oops("lastTagKey set when no tag exists for key")
               }
@@ -287,7 +287,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
                      ls,
                      inCodeBlock = true)
             case None =>
-              parse0(docBody append endOfLine append marker,
+              parse0(docBody.append(endOfLine).append(marker),
                      tags,
                      lastTagKey,
                      ls,
@@ -316,7 +316,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
         else
           lastTagKey match {
             case Some(key) =>
-              val value = ((tags get key): @unchecked) match {
+              val value = ((tags.get(key)): @unchecked) match {
                 case Some(b :: bs) => (b + endOfLine + marker) :: bs
                 case None =>
                   oops("lastTagKey set when no tag exists for key")
@@ -327,7 +327,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
                      ls,
                      inCodeBlock = false)
             case None =>
-              parse0(docBody append endOfLine append marker,
+              parse0(docBody.append(endOfLine).append(marker),
                      tags,
                      lastTagKey,
                      ls,
@@ -357,7 +357,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
         val newtags =
           if (!line.isEmpty) {
             val key = lastTagKey.get
-            val value = ((tags get key): @unchecked) match {
+            val value = ((tags.get(key)): @unchecked) match {
               case Some(b :: bs) => (b + endOfLine + line) :: bs
               case None => oops("lastTagKey set when no tag exists for key")
             }
@@ -367,8 +367,8 @@ trait CommentFactoryBase { this: MemberLookupBase =>
       }
 
       case line :: ls => {
-        if (docBody.length > 0) docBody append endOfLine
-        docBody append line
+        if (docBody.length > 0) docBody.append(endOfLine)
+        docBody.append(line)
         parse0(docBody, tags, lastTagKey, ls, inCodeBlock)
       }
 
@@ -397,13 +397,13 @@ trait CommentFactoryBase { this: MemberLookupBase =>
           tags.filterNot(pair => stripTags.contains(pair._1))
 
         val bodyTags: mutable.Map[TagKey, List[Body]] =
-          mutable.Map(tagsWithoutDiagram mapValues { tag =>
-            tag map (parseWikiAtSymbol(_, pos, site))
+          mutable.Map(tagsWithoutDiagram.mapValues { tag =>
+            tag.map(parseWikiAtSymbol(_, pos, site))
           } toSeq: _*)
 
         def oneTag(key: SimpleTagKey,
                    filterEmpty: Boolean = true): Option[Body] =
-          ((bodyTags remove key): @unchecked) match {
+          ((bodyTags.remove(key)): @unchecked) match {
             case Some(r :: rs) if !(filterEmpty && r.blocks.isEmpty) =>
               if (!rs.isEmpty)
                 reporter
@@ -413,12 +413,12 @@ trait CommentFactoryBase { this: MemberLookupBase =>
           }
 
         def allTags(key: SimpleTagKey): List[Body] =
-          (bodyTags remove key).getOrElse(Nil).filterNot(_.blocks.isEmpty)
+          (bodyTags.remove(key)).getOrElse(Nil).filterNot(_.blocks.isEmpty)
 
         def allSymsOneTag(key: TagKey,
                           filterEmpty: Boolean = true): Map[String, Body] = {
           val keys: Seq[SymbolTagKey] =
-            bodyTags.keys.toSeq flatMap {
+            bodyTags.keys.toSeq.flatMap {
               case stk: SymbolTagKey if (stk.name == key.name) => Some(stk)
               case stk: SimpleTagKey if (stk.name == key.name) =>
                 reporter.warning(
@@ -428,7 +428,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
               case _ => None
             }
           val pairs: Seq[(String, Body)] = for (key <- keys) yield {
-            val bs = (bodyTags remove key).get
+            val bs = (bodyTags.remove(key)).get
             if (bs.length > 1)
               reporter.warning(
                 pos,
@@ -553,7 +553,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
     /** Checks if the current line is formed with more than one space and one the listStyles */
     def checkList =
       (countWhitespace > 0) &&
-        (listStyles.keys exists { checkSkipInitWhitespace(_) })
+        (listStyles.keys.exists { checkSkipInitWhitespace(_) })
 
     /** {{{
       * nListBlock ::= nLine { mListBlock }
@@ -811,9 +811,9 @@ trait CommentFactoryBase { this: MemberLookupBase =>
 
       (target, title) match {
         case (SchemeUri(uri), optTitle) =>
-          Link(uri, optTitle getOrElse Text(uri))
+          Link(uri, optTitle.getOrElse(Text(uri)))
         case (qualName, optTitle) =>
-          makeEntityLink(optTitle getOrElse Text(target), pos, target, site)
+          makeEntityLink(optTitle.getOrElse(Text(target)), pos, target, site)
       }
     }
 
@@ -843,7 +843,8 @@ trait CommentFactoryBase { this: MemberLookupBase =>
     def normalizeIndentation(_code: String): String = {
 
       val code =
-        _code.replaceAll("\\s+$", "")
+        _code
+          .replaceAll("\\s+$", "")
           .dropWhile(_ == '\n') // right-trim + remove all leading '\n'
       val lines = code.split("\n")
 
@@ -893,7 +894,7 @@ trait CommentFactoryBase { this: MemberLookupBase =>
 
     var offset: Int = 0
     def char: Char =
-      if (offset >= buffer.length) endOfText else buffer charAt offset
+      if (offset >= buffer.length) endOfText else buffer.charAt(offset)
 
     final def nextChar() {
       offset += 1

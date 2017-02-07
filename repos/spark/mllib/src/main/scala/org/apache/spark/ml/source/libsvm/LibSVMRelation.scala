@@ -160,7 +160,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     // TODO: This does not handle cases where column pruning has been performed.
 
     verifySchema(dataSchema)
-    val dataFiles = inputFiles.filterNot(_.getPath.getName startsWith "_")
+    val dataFiles = inputFiles.filterNot(_.getPath.getName.startsWith("_"))
 
     val path =
       if (dataFiles.length == 1) dataFiles(0).getPath.toUri.toString

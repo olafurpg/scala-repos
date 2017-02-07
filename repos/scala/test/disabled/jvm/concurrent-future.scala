@@ -4,7 +4,7 @@ object Test extends App {
 
   def once(body: (() => Unit) => Unit) {
     val sv = new SyncVar[Boolean]
-    body(() => sv put true)
+    body(() => sv.put(true))
     sv.take()
   }
 
@@ -16,7 +16,7 @@ object Test extends App {
     val f = future {
       output(1, "hai world")
     }
-    f onSuccess {
+    f.onSuccess {
       case _ =>
         output(1, "kthxbye")
         done()
@@ -27,10 +27,10 @@ object Test extends App {
     val f = future {
       output(2, "hai world")
     }
-    f onSuccess {
+    f.onSuccess {
       case _ =>
         output(2, "awsum thx")
-        f onSuccess {
+        f.onSuccess {
           case _ =>
             output(2, "kthxbye")
             done()
@@ -44,7 +44,7 @@ object Test extends App {
       done()
       throw new Exception
     }
-    f onSuccess {
+    f.onSuccess {
       case _ =>
         output(3, "onoes")
     }
@@ -55,12 +55,12 @@ object Test extends App {
       output(4, "hai world")
       throw new Exception
     }
-    f onSuccess {
+    f.onSuccess {
       case _ =>
         output(4, "onoes")
         done()
     }
-    f onFailure {
+    f.onFailure {
       case _ =>
         output(4, "kthxbye")
         done()
@@ -73,12 +73,12 @@ object Test extends App {
         output(num, "hai world")
         throw cause
       }
-      f onSuccess {
+      f.onSuccess {
         case _ =>
           output(num, "onoes")
           done()
       }
-      f onFailure {
+      f.onFailure {
         case e: ExecutionException if (e.getCause == cause) =>
           output(num, "kthxbye")
           done()

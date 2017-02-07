@@ -92,16 +92,16 @@ object Test {
     (c: T).f1()
 
     // Test whether the method definitions are still available.
-    List("Test", "Test$", "O", "O$", "C", "T") foreach { className =>
-      List("f1", "f2", "f3", "f4") foreach { methodName =>
+    List("Test", "Test$", "O", "O$", "C", "T").foreach { className =>
+      List("f1", "f2", "f3", "f4").foreach { methodName =>
         Class.forName(className).getMethod(methodName)
       }
     }
-    List("Test", "Test$") foreach { className =>
-      List("f5", "f6", "f7", "f8", "f9", "fa", "fb", "fc", "fd", "fe") foreach {
-        methodName =>
+    List("Test", "Test$").foreach { className =>
+      List("f5", "f6", "f7", "f8", "f9", "fa", "fb", "fc", "fd", "fe")
+        .foreach { methodName =>
           Class.forName(className).getMethod(methodName)
-      }
+        }
     }
   }
 }

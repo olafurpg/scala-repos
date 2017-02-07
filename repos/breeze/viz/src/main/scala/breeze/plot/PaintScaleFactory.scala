@@ -47,9 +47,10 @@ case class CategoricalPaintScaleFactory[T]() extends PaintScaleFactory[T] {
     val distinct = items.toList.distinct
     CategoricalPaintScale[T](
       Map() ++
-        (distinct zip Stream
-          .continually(PaintScale.Category20.values.toList)
-          .flatten))
+        (distinct.zip(
+          Stream
+            .continually(PaintScale.Category20.values.toList)
+            .flatten)))
   }
 }
 

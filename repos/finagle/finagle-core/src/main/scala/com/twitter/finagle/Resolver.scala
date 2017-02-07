@@ -41,7 +41,7 @@ class MultipleResolversPerSchemeException(
     extends NoStacktrace {
   override def getMessage = {
     val msgs =
-      resolvers map {
+      resolvers.map {
         case (scheme, rs) =>
           "%s=(%s)".format(scheme, rs.map(_.getClass.getName).mkString(", "))
       } mkString (" ")
@@ -183,7 +183,7 @@ private[finagle] class InetResolver(
 
   def bindHostPortsToAddr(hosts: Seq[HostPortMetadata]): Var[Addr] = {
     Var.async(Addr.Pending: Addr) { u =>
-      toAddr(hosts) onSuccess { u() = _ }
+      toAddr(hosts).onSuccess { u() = _ }
       pollIntervalOpt match {
         case Some(pollInterval) =>
           val updater = new Updater[Unit] {
@@ -305,7 +305,7 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
   }
 
   def get[T <: Resolver](clazz: Class[T]): Option[T] =
-    resolvers find { _.getClass isAssignableFrom clazz } map {
+    (resolvers find { _.getClass.isAssignableFrom(clazz) }).map {
       _.asInstanceOf[T]
     }
 
@@ -315,7 +315,7 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
   private[this] object Bang extends Token
 
   private[this] def delex(ts: Seq[Token]) =
-    ts map {
+    ts.map {
       case El(e) => e
       case Bang => "!"
       case Eq => "="
@@ -353,7 +353,7 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
     */
   @deprecated("Use Resolver.eval", "6.7.x")
   def resolve(addr: String): Try[Group[SocketAddress]] =
-    Try { eval(addr) } flatMap {
+    Try { eval(addr) }.flatMap {
       case Name.Path(_) =>
         Throw(
           new IllegalArgumentException(
@@ -381,7 +381,7 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
     * @see [[Resolvers.eval]] for Java support
     */
   def eval(name: String): Name =
-    if (name startsWith "/") Name(name)
+    if (name.startsWith("/")) Name(name)
     else {
       val (resolver, arg) = lex(name) match {
         case (Eq :: _) | (Bang :: _) =>

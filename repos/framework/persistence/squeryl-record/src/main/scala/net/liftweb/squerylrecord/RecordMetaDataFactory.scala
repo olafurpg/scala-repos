@@ -54,13 +54,13 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
               name + " in Record metadata for " + clasz)
       }
 
-    metaRecordsByClass get clasz match {
+    metaRecordsByClass.get(clasz) match {
       case Some(mr) => fieldFrom(mr)
       case None =>
         try {
           val rec = clasz.newInstance.asInstanceOf[Record[Rec]]
           val mr = rec.meta
-          metaRecordsByClass = metaRecordsByClass updated (clasz, mr)
+          metaRecordsByClass = metaRecordsByClass.updated(clasz, mr)
           fieldFrom(mr)
         } catch {
           case ex: Exception =>
@@ -155,7 +155,7 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
           }
           case _ => None
         }
-        fieldLength getOrElse super.length
+        fieldLength.getOrElse(super.length)
       }
 
       override def scale = {
@@ -165,7 +165,7 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
             Some(decimalField.scale)
           case _ => None
         }
-        fieldScale getOrElse super.scale
+        fieldScale.getOrElse(super.scale)
       }
 
       private def fieldFor(o: AnyRef) = getter.get.invoke(o) match {

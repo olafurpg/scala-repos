@@ -35,7 +35,7 @@ trait Reduction[A] {
 object Reductions {
   private def bitsOrBust[A](defined: BitSet, mask: Option[BitSet])(
       f: BitSet => A): Option[A] = {
-    val bits = mask map (_ & defined) getOrElse defined
+    val bits = mask.map(_ & defined).getOrElse(defined)
     if (bits.isEmpty) None else Some(f(bits))
   }
 
@@ -101,7 +101,7 @@ object Reductions {
 
   object max extends Reduction[BigDecimal] {
     object semigroup extends Semigroup[BigDecimal] {
-      def append(x: BigDecimal, y: => BigDecimal): BigDecimal = x max y
+      def append(x: BigDecimal, y: => BigDecimal): BigDecimal = x.max(y)
     }
 
     def reduce(segment: Segment, mask: Option[BitSet]): Option[BigDecimal] =

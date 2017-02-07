@@ -53,5 +53,5 @@ private[controllers] trait TheftPrevention { self: LilaController =>
     Unauthorized(
       jsonError(
         "This game requires authentication"
-      )) as JSON
+      )).as(JSON)
 }

@@ -273,7 +273,7 @@ class InterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
             //debug(s"pendingFields: ${pendingFields.size}")
             //debug(s"fieldVals: ${fieldVals.size}")
 
-            pendingFields.zip(fieldVals) foreach {
+            pendingFields.zip(fieldVals).foreach {
               case (fir, fval) =>
                 if (fir.field.nonEmpty) {
                   val fmX = im.reflectField(fir.field.get)
@@ -378,7 +378,7 @@ class ShareNothingInterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
             //debug(s"pendingFields: ${pendingFields.size}")
             //debug(s"fieldVals: ${fieldVals.size}")
 
-            pendingFields.zip(fieldVals) foreach {
+            pendingFields.zip(fieldVals).foreach {
               case (fir, fval) =>
                 if (fir.field.nonEmpty) {
                   val fmX = im.reflectField(fir.field.get)

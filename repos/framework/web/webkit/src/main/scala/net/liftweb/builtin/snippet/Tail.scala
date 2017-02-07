@@ -43,7 +43,7 @@ object Head extends DispatchSnippet {
 
   def render(_xhtml: NodeSeq): NodeSeq = {
     def validHeadTagsOnly(in: NodeSeq): NodeSeq =
-      in flatMap {
+      in.flatMap {
         case Group(ns) => validHeadTagsOnly(ns)
         case e: Elem if (null eq e.prefix) && valid.contains(e.label) => {
           new Elem(e.prefix,

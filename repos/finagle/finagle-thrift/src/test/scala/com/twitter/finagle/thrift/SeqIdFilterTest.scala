@@ -40,7 +40,7 @@ class SeqIdFilterTest
     val p = new Promise[Array[Byte]]
     when(service(Matchers.any[ThriftClientRequest])).thenReturn(p)
     val filter = new SeqIdFilter
-    val filtered = filter andThen service
+    val filtered = filter.andThen(service)
 
     test("SeqIdFilter(%s) maintain seqids passed in by the client".format(how)) {
       val f = filtered(
@@ -65,7 +65,7 @@ class SeqIdFilterTest
 
     test("SeqIdFilter(%s) use its own seqids to the server".format(how)) {
       Time.withCurrentTimeFrozen { _ =>
-        val filtered = new SeqIdFilter andThen service
+        val filtered = new SeqIdFilter.andThen(service)
         val expected =
           (new scala.util.Random(Time.now.inMilliseconds)).nextInt()
         val f = filtered(
@@ -80,7 +80,7 @@ class SeqIdFilterTest
 
     test("SeqIdFilter(%s) fail when sequence ids are out of order".format(how)) {
       Time.withCurrentTimeFrozen { _ =>
-        val filtered = new SeqIdFilter andThen service
+        val filtered = new SeqIdFilter.andThen(service)
         val expected =
           (new scala.util.Random(Time.now.inMilliseconds)).nextInt()
         val f = filtered(

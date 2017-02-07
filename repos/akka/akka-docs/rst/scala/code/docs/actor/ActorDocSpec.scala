@@ -343,7 +343,7 @@ class ActorDocSpec extends AkkaSpec("""
         case message =>
           val target = testActor
           //#forward
-          target forward message
+          target.forward(message)
         //#forward
       }
     }
@@ -576,11 +576,11 @@ class ActorDocSpec extends AkkaSpec("""
 
     val f: Future[Result] = for {
       x <- ask(actorA, Request).mapTo[Int] // call pattern directly
-      s <- (actorB ask Request).mapTo[String] // call by implicit conversion
+      s <- (actorB.ask(Request)).mapTo[String] // call by implicit conversion
       d <- (actorC ? Request).mapTo[Double] // call by symbolic name
     } yield Result(x, s, d)
 
-    f pipeTo actorD // .. or ..
+    f.pipeTo(actorD) // .. or ..
     pipe(f) to actorD
     //#ask-pipeTo
   }

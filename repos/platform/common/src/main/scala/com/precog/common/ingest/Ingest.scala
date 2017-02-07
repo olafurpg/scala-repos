@@ -88,11 +88,13 @@ case class Ingest(apiKey: APIKey,
               storeFile: StoreFile => A): A = ingest(this)
 
   def split(n: Int): List[Event] = {
-    val splitSize = (data.length / n) max 1
+    val splitSize = ((data.length / n)).max(1)
     val splitData = data.grouped(splitSize).toSeq
-    (splitData zip streamRef.split(splitData.size)).map({
-      case (d, ref) => this.copy(data = d, streamRef = ref)
-    })(collection.breakOut)
+    (splitData
+      .zip(streamRef.split(splitData.size)))
+      .map({
+        case (d, ref) => this.copy(data = d, streamRef = ref)
+      })(collection.breakOut)
   }
 
   def length = data.length
@@ -179,7 +181,7 @@ object Archive {
 
   // Support un-versioned V1 schemas and out-of-order fields due to an earlier bug
   val extractorV1a: Extractor[Archive] =
-    extractorV[Archive](schemaV1, None) map {
+    extractorV[Archive](schemaV1, None).map {
       // FIXME: This is a complete hack to work around an accidental mis-ordering of fields for serialization
       case Archive(apiKey, path, jobId, timestamp)
           if (apiKey.startsWith("/")) =>
@@ -252,20 +254,23 @@ object StreamRef {
     def validated(jv: JValue) = jv match {
       case JString("append") => Success(Append)
       case other =>
-        ((other \? "create") map { jv =>
-          (jv, Create.apply _)
-        }) orElse
-          ((other \? "replace") map { jv =>
+        (((other \? "create"))
+          .map { jv =>
+            (jv, Create.apply _)
+          })
+          .orElse(((other \? "replace")).map { jv =>
             (jv, Replace.apply _)
-          }) map {
-          case (jv, f) =>
-            (jv.validated[UUID]("uuid") |@| jv
-              .validated[Boolean]("terminal")) {
-              f
-            }
-        } getOrElse {
-          Failure(Invalid("Storage mode %s not recogized.".format(other)))
-        }
+          })
+          .map {
+            case (jv, f) =>
+              (jv.validated[UUID]("uuid") |@| jv
+                .validated[Boolean]("terminal")) {
+                f
+              }
+          }
+          .getOrElse {
+            Failure(Invalid("Storage mode %s not recogized.".format(other)))
+          }
     }
   }
 }

@@ -87,7 +87,7 @@ object string {
             if (c <= 255) {
               "\\x%02x".format(c.asInstanceOf[Int])
             } else {
-              "\\u%04x" format c.asInstanceOf[Int]
+              "\\u%04x".format(c.asInstanceOf[Int])
             }
         }
       }
@@ -151,9 +151,9 @@ object string {
       val b = array(i)
       val s = (b.toInt & 0xff).toHexString
       if (s.length < 2) {
-        out append '0'
+        out.append('0')
       }
-      out append s
+      out.append(s)
     }
     out.toString
   }

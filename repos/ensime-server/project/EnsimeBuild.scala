@@ -61,26 +61,26 @@ object EnsimeBuild extends Build {
     Project("monkeys", file("monkeys")) settings (commonSettings) settings
       (libraryDependencies ++= Seq(
         "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-        "org.apache.commons" % "commons-vfs2" % "2.0" exclude
-          ("commons-logging", "commons-logging")
+        ("org.apache.commons" % "commons-vfs2" % "2.0")
+          .exclude("commons-logging", "commons-logging")
       ))
 
   lazy val util =
     Project("util", file("util")) settings (commonSettings) settings
       (libraryDependencies ++= List(
-        "org.apache.commons" % "commons-vfs2" % "2.0" exclude
-          ("commons-logging", "commons-logging")
+        ("org.apache.commons" % "commons-vfs2" % "2.0")
+          .exclude("commons-logging", "commons-logging")
       ) ++ Sensible.guava)
 
   lazy val testutil =
-    Project("testutil", file("testutil")) settings (commonSettings) dependsOn
-      (util, api) settings
+    (Project("testutil", file("testutil")) settings (commonSettings))
+      .dependsOn(util, api) settings
       (libraryDependencies += "commons-io" % "commons-io" % "2.4",
       libraryDependencies ++= Sensible.testLibs("compile"))
 
   lazy val s_express =
-    Project("s-express", file("s-express")) settings (commonSettings) dependsOn
-      (util, testutil % "test") settings
+    (Project("s-express", file("s-express")) settings (commonSettings))
+      .dependsOn(util, testutil % "test") settings
       (libraryDependencies ++= Seq(
         "org.parboiled" %% "parboiled" % "2.1.2"
       ) ++ Sensible.shapeless(scalaVersion.value))
@@ -93,9 +93,12 @@ object EnsimeBuild extends Build {
 
   // the JSON protocol
   lazy val jerky =
-    Project("jerky", file("protocol-jerky")) settings (commonSettings) dependsOn
-      (util, api, testutil % "test", api % "test->test" // for the test data
-    ) settings
+    (Project("jerky", file("protocol-jerky")) settings (commonSettings))
+      .dependsOn(util,
+                 api,
+                 testutil % "test",
+                 api % "test->test" // for the test data
+      ) settings
       (libraryDependencies ++= Seq(
         "com.github.fommil" %% "spray-json-shapeless" % "1.2.0",
         "com.typesafe.akka" %% "akka-slf4j" % Sensible.akkaVersion
@@ -103,9 +106,11 @@ object EnsimeBuild extends Build {
 
   // the S-Exp protocol
   lazy val swanky =
-    Project("swanky", file("protocol-swanky")) settings (commonSettings) dependsOn
-      (api, testutil % "test", api % "test->test", // for the test data
-      s_express) settings
+    (Project("swanky", file("protocol-swanky")) settings (commonSettings))
+      .dependsOn(api,
+                 testutil % "test",
+                 api % "test->test", // for the test data
+                 s_express) settings
       (libraryDependencies ++= Seq(
         "com.typesafe.akka" %% "akka-slf4j" % Sensible.akkaVersion
       ) ++ Sensible.shapeless(scalaVersion.value))
@@ -161,7 +166,7 @@ object EnsimeBuild extends Build {
       ) enablePlugins BuildInfoPlugin settings
       (buildInfoPackage := organization.value,
       buildInfoKeys += BuildInfoKey.action("gitSha")(
-        Try("git rev-parse --verify HEAD".!! dropRight 1) getOrElse "n/a"),
+        Try("git rev-parse --verify HEAD".!!.dropRight(1)).getOrElse("n/a")),
       buildInfoOptions += BuildInfoOption.BuildTime)
 
   val luceneVersion = "4.7.2"
@@ -243,9 +248,17 @@ object EnsimeBuild extends Build {
 
   // manual root project so we can exclude the testing projects from publication
   lazy val root =
-    Project(id = "ensime", base = file(".")) settings (commonSettings) aggregate
-      (api, monkeys, util, testutil, s_express, jerky, swanky, core,
-      server) dependsOn (server) settings
+    (Project(id = "ensime", base = file(".")) settings (commonSettings))
+      .aggregate(api,
+                 monkeys,
+                 util,
+                 testutil,
+                 s_express,
+                 jerky,
+                 swanky,
+                 core,
+                 server)
+      .dependsOn(server) settings
       (// e.g. `sbt ++2.11.8 ensime/assembly`
       test in assembly := {}, aggregate in assembly := false,
       assemblyMergeStrategy in assembly := {

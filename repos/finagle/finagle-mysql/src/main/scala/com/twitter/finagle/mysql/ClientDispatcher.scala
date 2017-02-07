@@ -47,7 +47,7 @@ private[mysql] class PrepareCache(
       // make sure prepared futures get removed eventually
       def onRemoval(
           notification: RemovalNotification[Request, Future[Result]]): Unit = {
-        notification.getValue() onSuccess {
+        notification.getValue().onSuccess {
           case r: PrepareOK => svc(CloseRequest(r.id))
           case _ => // nop
         }
@@ -100,7 +100,7 @@ object ClientDispatcher {
     * error (or corrupt data) between the client and server.
     */
   private def const[T](result: Try[T]): Future[T] =
-    Future.const(result rescue { case exc => Throw(LostSyncException(exc)) })
+    Future.const(result.rescue { case exc => Throw(LostSyncException(exc)) })
 }
 
 /**
@@ -118,15 +118,17 @@ class ClientDispatcher(
   import ClientDispatcher._
 
   override def apply(req: Request): Future[Result] =
-    connPhase flatMap { _ =>
-      super.apply(req)
-    } onFailure {
-      // a LostSyncException represents a fatal state between
-      // the client / server. The error is unrecoverable
-      // so we close the service.
-      case e @ LostSyncException(_) => close()
-      case _ =>
-    }
+    connPhase
+      .flatMap { _ =>
+        super.apply(req)
+      }
+      .onFailure {
+        // a LostSyncException represents a fatal state between
+        // the client / server. The error is unrecoverable
+        // so we close the service.
+        case e @ LostSyncException(_) => close()
+        case _ =>
+      }
 
   /**
     * Performs the connection phase. The phase should only be performed
@@ -135,17 +137,20 @@ class ClientDispatcher(
     * [[http://dev.mysql.com/doc/internals/en/connection-phase.html]]
     */
   private[this] val connPhase: Future[Result] =
-    trans.read() flatMap { packet =>
-      const(HandshakeInit(packet)) flatMap { init =>
-        const(handshake(init)) flatMap { req =>
-          val rep = new Promise[Result]
-          dispatch(req, rep)
-          rep
+    trans
+      .read()
+      .flatMap { packet =>
+        const(HandshakeInit(packet)).flatMap { init =>
+          const(handshake(init)).flatMap { req =>
+            val rep = new Promise[Result]
+            dispatch(req, rep)
+            rep
+          }
         }
       }
-    } onFailure { _ =>
-      close()
-    }
+      .onFailure { _ =>
+        close()
+      }
 
   /**
     * Returns a Future that represents the result of an exchange
@@ -155,7 +160,7 @@ class ClientDispatcher(
     * This leaves room for implementing streaming results.
     */
   protected def dispatch(req: Request, rep: Promise[Result]): Future[Unit] =
-    trans.write(req.toPacket) rescue {
+    trans.write(req.toPacket).rescue {
       wrapWriteException
     } before {
       val signal = new Promise[Unit]
@@ -165,7 +170,7 @@ class ClientDispatcher(
         rep.updateIfEmpty(Return(CloseStatementOK))
         signal
       } else
-        trans.read() flatMap { packet =>
+        trans.read().flatMap { packet =>
           rep.become(decodePacket(packet, req.cmd, signal))
           signal
         }
@@ -195,15 +200,15 @@ class ClientDispatcher(
         ok <- const(PrepareOK(packet))
         (seq1, _) <- readTx(ok.numOfParams)
         (seq2, _) <- readTx(ok.numOfCols)
-        ps <- Future.collect(seq1 map { p =>
+        ps <- Future.collect(seq1.map { p =>
           const(Field(p))
         })
-        cs <- Future.collect(seq2 map { p =>
+        cs <- Future.collect(seq2.map { p =>
           const(Field(p))
         })
       } yield ok.copy(params = ps, columns = cs)
 
-      result ensure signal.setDone()
+      result.ensure(signal.setDone())
 
     // decode OK Result
     case Some(Packet.OkByte) =>
@@ -213,7 +218,7 @@ class ClientDispatcher(
     // decode Error result
     case Some(Packet.ErrorByte) =>
       signal.setDone()
-      const(Error(packet)) flatMap { err =>
+      const(Error(packet)).flatMap { err =>
         val Error(code, state, msg) = err
         Future.exception(ServerError(code, state, msg))
       }
@@ -236,7 +241,7 @@ class ClientDispatcher(
       // TODO: When streaming is implemented the
       // done signal should dependent on the
       // completion of the stream.
-      result ensure signal.setDone()
+      result.ensure(signal.setDone())
 
     case _ =>
       signal.setDone()
@@ -259,14 +264,14 @@ class ClientDispatcher(
     def aux(numRead: Int, xs: List[Packet]): Future[(List[Packet], EOF)] = {
       if (numRead > limit) Future.exception(lostSyncExc)
       else
-        trans.read() flatMap { packet =>
+        trans.read().flatMap { packet =>
           packet.body.headOption match {
             case Some(Packet.EofByte) =>
-              const(EOF(packet)) map { eof =>
+              const(EOF(packet)).map { eof =>
                 (xs.reverse, eof)
               }
             case Some(Packet.ErrorByte) =>
-              const(Error(packet)) flatMap { err =>
+              const(Error(packet)).flatMap { err =>
                 val Error(code, state, msg) = err
                 Future.exception(ServerError(code, state, msg))
               }

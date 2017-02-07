@@ -36,7 +36,7 @@ final class ModlogApi {
   }
 
   def setTitle(mod: String, user: String, title: Option[String]) = add {
-    val name = title flatMap lila.user.User.titlesMap.get
+    val name = title.flatMap(lila.user.User.titlesMap.get)
     Modlog(mod,
            user.some,
            name.isDefined.fold(Modlog.setTitle, Modlog.removeTitle),
@@ -92,21 +92,21 @@ final class ModlogApi {
     Modlog(mod,
            user.some,
            Modlog.deleteQaQuestion,
-           details = Some(title take 140))
+           details = Some(title.take(140)))
   }
 
   def deleteQaAnswer(mod: String, user: String, text: String) = add {
     Modlog(mod,
            user.some,
            Modlog.deleteQaAnswer,
-           details = Some(text take 140))
+           details = Some(text.take(140)))
   }
 
   def deleteQaComment(mod: String, user: String, text: String) = add {
     Modlog(mod,
            user.some,
            Modlog.deleteQaComment,
-           details = Some(text take 140))
+           details = Some(text.take(140)))
   }
 
   def deleteTeam(mod: String, name: String, desc: String) = add {
@@ -120,7 +120,7 @@ final class ModlogApi {
     Modlog(mod, none, Modlog.terminateTournament, details = name.some)
   }
 
-  def recent = $find($query($select.all) sort $sort.naturalDesc, 100)
+  def recent = $find($query($select.all).sort($sort.naturalDesc), 100)
 
   def wasUnengined(userId: String) =
     $count.exists(
@@ -137,7 +137,7 @@ final class ModlogApi {
       ))
 
   def userHistory(userId: String): Fu[List[Modlog]] =
-    $find($query(Json.obj("user" -> userId)) sort $sort.desc("date"), 100)
+    $find($query(Json.obj("user" -> userId)).sort($sort.desc("date")), 100)
 
   private def add(m: Modlog): Funit = {
     lila.mon.mod.log.create()

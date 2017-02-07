@@ -34,7 +34,7 @@ object Test {
   val iv: IndexedSeq[Int] = immutable.Vector(1, 2, 3)
 
   def main(args: Array[String]): Unit = {
-    List(cbf1, cbf2, cbf3, cbf4, cbf5, cbf6) foreach checkRealMccoy
+    List(cbf1, cbf2, cbf3, cbf4, cbf5, cbf6).foreach(checkRealMccoy)
     check(v.:+(4)(cbf1))
     check(v.:+(4)(cbf2))
     check(v.:+(4)(cbf3))

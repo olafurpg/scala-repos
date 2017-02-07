@@ -64,7 +64,7 @@ trait Mapper[A <: Mapper[A]]
     thisToMappee(this)
   }
 
-  def connectionIdentifier = dbConnectionIdentifier openOr calcDbId
+  def connectionIdentifier = dbConnectionIdentifier.openOr(calcDbId)
 
   def dbCalculateConnectionIdentifier: PartialFunction[A, ConnectionIdentifier] =
     Map.empty
@@ -235,11 +235,11 @@ trait Mapper[A <: Mapper[A]]
       (name: String) =>
         (<input type='hidden' name={name} value="n/a" />)
     } ++
-      (button.map(
-        b =>
-          getSingleton.formatFormElement(
-            <xml:group>&nbsp;</xml:group>,
-            <input type="submit" value={b}/>)) openOr scala.xml.Text(""))
+      (button
+        .map(b =>
+          getSingleton.formatFormElement(<xml:group>&nbsp;</xml:group>,
+                                         <input type="submit" value={b}/>))
+        .openOr(scala.xml.Text("")))
 
   def toForm(button: Box[String],
              redoSnippet: NodeSeq => NodeSeq,
@@ -256,11 +256,11 @@ trait Mapper[A <: Mapper[A]]
 
     getSingleton.toForm(this) ++ S.fmapFunc((ignore: List[String]) =>
       doSubmit())(name => <input type='hidden' name={name} value="n/a" />) ++
-      (button.map(
-        b =>
-          getSingleton.formatFormElement(
-            <xml:group>&nbsp;</xml:group>,
-            <input type="submit" value={b}/>)) openOr scala.xml.Text(""))
+      (button
+        .map(b =>
+          getSingleton.formatFormElement(<xml:group>&nbsp;</xml:group>,
+                                         <input type="submit" value={b}/>))
+        .openOr(scala.xml.Text("")))
   }
 
   def saved_? : Boolean = getSingleton.saved_?(this)
@@ -463,7 +463,7 @@ trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
     primaryKeyField.get == other.primaryKeyField.get
 
   def reload: OwnerType =
-    getSingleton.find(By(primaryKeyField, primaryKeyField.get)) openOr this
+    getSingleton.find(By(primaryKeyField, primaryKeyField.get)).openOr(this)
 
   def asSafeJs(f: KeyObfuscator): JsExp = getSingleton.asSafeJs(this, f)
 

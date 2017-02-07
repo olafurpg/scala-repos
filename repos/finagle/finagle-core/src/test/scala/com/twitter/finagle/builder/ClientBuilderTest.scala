@@ -29,11 +29,12 @@ class ClientBuilderTest
   trait ClientBuilderHelper {
     val preparedFactory = mock[ServiceFactory[String, String]]
     val preparedServicePromise = new Promise[Service[String, String]]
-    when(preparedFactory.status) thenReturn Status.Open
-    when(preparedFactory()) thenReturn preparedServicePromise
-    when(preparedFactory.close(any[Time])) thenReturn Future.Done
-    when(preparedFactory.map(Matchers.any())) thenReturn preparedFactory
-      .asInstanceOf[ServiceFactory[Any, Nothing]]
+    when(preparedFactory.status).thenReturn(Status.Open)
+    when(preparedFactory()).thenReturn(preparedServicePromise)
+    when(preparedFactory.close(any[Time])).thenReturn(Future.Done)
+    when(preparedFactory.map(Matchers.any())).thenReturn(
+      preparedFactory
+        .asInstanceOf[ServiceFactory[Any, Nothing]])
 
     val m = new MockChannel
     when(
@@ -53,8 +54,8 @@ class ClientBuilderTest
 
       assert(!requestFuture.isDefined)
       val service = mock[Service[String, String]]
-      when(service("123")) thenReturn Future.value("321")
-      when(service.close(any[Time])) thenReturn Future.Done
+      when(service("123")).thenReturn(Future.value("321"))
+      when(service.close(any[Time])).thenReturn(Future.Done)
       preparedServicePromise() = Return(service)
 
       verify(service)("123")
@@ -175,8 +176,8 @@ class ClientBuilderTest
       val client = builder.build()
 
       val service = mock[Service[String, String]]
-      when(service("123")) thenReturn Future.exception(new MyException())
-      when(service.close(any[Time])) thenReturn Future.Done
+      when(service("123")).thenReturn(Future.exception(new MyException()))
+      when(service.close(any[Time])).thenReturn(Future.Done)
       preparedServicePromise() = Return(service)
 
       val f = client("123")
@@ -205,9 +206,9 @@ class ClientBuilderTest
       val numFailures = 5
 
       val service = mock[Service[String, String]]
-      when(service("123")) thenReturn Future.exception(
-        WriteException(new Exception()))
-      when(service.close(any[Time])) thenReturn Future.Done
+      when(service("123"))
+        .thenReturn(Future.exception(WriteException(new Exception())))
+      when(service.close(any[Time])).thenReturn(Future.Done)
       preparedServicePromise() = Return(service)
 
       val f = client("123")
@@ -236,8 +237,8 @@ class ClientBuilderTest
       val client = builder.build()
 
       val service = mock[Service[String, String]]
-      when(service("123")) thenReturn Future.exception(new MyException())
-      when(service.close(any[Time])) thenReturn Future.Done
+      when(service("123")).thenReturn(Future.exception(new MyException()))
+      when(service.close(any[Time])).thenReturn(Future.Done)
       preparedServicePromise() = Return(service)
 
       val f = client("123")
@@ -267,9 +268,9 @@ class ClientBuilderTest
       val client = builder.build()
 
       val service = mock[Service[String, String]]
-      when(service("123")) thenReturn Future.exception(
-        WriteException(new Exception()))
-      when(service.close(any[Time])) thenReturn Future.Done
+      when(service("123"))
+        .thenReturn(Future.exception(WriteException(new Exception())))
+      when(service.close(any[Time])).thenReturn(Future.Done)
       preparedServicePromise() = Return(service)
 
       val f = client("123")

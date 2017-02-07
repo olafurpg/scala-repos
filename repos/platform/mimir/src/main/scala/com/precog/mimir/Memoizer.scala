@@ -45,7 +45,7 @@ trait Memoizer extends DAG {
     // todo investigate why if we use a `DepGraphWrapper` here, tests fail in MiscStackSpecs
     val memotable = mutable.Map[DepGraph, DepGraph]()
 
-    def numRefs(node: DepGraph) = refs get node map { _.size } getOrElse 0
+    def numRefs(node: DepGraph) = refs.get(node).map { _.size }.getOrElse(0)
 
     def memoized(node: DepGraph): DepGraph = {
       def inner(target: DepGraph): DepGraph = target match {
@@ -209,7 +209,7 @@ trait Memoizer extends DAG {
           dag.Extra(memoized(target))
       }
 
-      memotable.get(node) getOrElse {
+      memotable.get(node).getOrElse {
         val result = inner(node)
         memotable += (node -> result)
         result
@@ -417,7 +417,7 @@ trait Memoizer extends DAG {
   private def updateMap(refs: Map[DepGraph, Set[OpSide]],
                         graph: DepGraph,
                         force: OpSide): Map[DepGraph, Set[OpSide]] = {
-    val set = refs get graph getOrElse Set()
+    val set = refs.get(graph).getOrElse(Set())
     refs + (graph -> (set + force))
   }
 

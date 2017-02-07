@@ -125,7 +125,7 @@ private[twitter] object ClientDispatcher {
     */
   def newRequestResponse(
       trans: Transport[Message, Message]): Service[Request, Response] =
-    new ReqRepFilter andThen new ClientDispatcher(trans)
+    new ReqRepFilter.andThen(new ClientDispatcher(trans))
 }
 
 /**

@@ -159,7 +159,7 @@ sealed trait DBIOAction[+R, +S <: NoStream, -E <: Effect] extends Dumpable {
     * database actions, they will all use the same session, even when sequenced with non-database
     * actions. For non-composite or non-database actions, this has no effect. */
   def withPinnedSession: DBIOAction[R, S, E] =
-    DBIO.Pin andThen this andFinally DBIO.Unpin
+    DBIO.Pin.andThen(this) andFinally DBIO.Unpin
 
   /** Get a wrapping action which has a name that will be included in log output. */
   def named(name: String): DBIOAction[R, S, E] =
@@ -285,12 +285,14 @@ object DBIOAction {
       case 0 => DBIO.successful(cbf().result())
       case 1 => sequenceGroupAsM(grouped.head)
       case n =>
-        grouped.foldLeft(
-          DBIO.successful(cbf(in)): DBIOAction[mutable.Builder[R, M[R]],
-                                               NoStream,
-                                               E]) { (ar, g) =>
-          for (r <- ar; ge <- sequenceGroupAsSeq(g)) yield r ++= ge
-        } map (_.result)
+        grouped
+          .foldLeft(
+            DBIO.successful(cbf(in)): DBIOAction[mutable.Builder[R, M[R]],
+                                                 NoStream,
+                                                 E]) { (ar, g) =>
+            for (r <- ar; ge <- sequenceGroupAsSeq(g)) yield r ++= ge
+          }
+          .map(_.result)
     }
   }
 

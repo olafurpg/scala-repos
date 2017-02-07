@@ -74,17 +74,19 @@ private[cluster] final case class Gossip(
           s"got [${members.filter(_.status == Removed)}]")
 
     val inReachabilityButNotMember =
-      overview.reachability.allObservers diff members.map(_.uniqueAddress)
+      overview.reachability.allObservers.diff(members.map(_.uniqueAddress))
     if (inReachabilityButNotMember.nonEmpty)
       throw new IllegalArgumentException(
-        "Nodes not part of cluster in reachability table, got [%s]" format inReachabilityButNotMember
-          .mkString(", "))
+        "Nodes not part of cluster in reachability table, got [%s]".format(
+          inReachabilityButNotMember
+            .mkString(", ")))
 
-    val seenButNotMember = overview.seen diff members.map(_.uniqueAddress)
+    val seenButNotMember = overview.seen.diff(members.map(_.uniqueAddress))
     if (seenButNotMember.nonEmpty)
       throw new IllegalArgumentException(
-        "Nodes not part of cluster have marked the Gossip as seen, got [%s]" format seenButNotMember
-          .mkString(", "))
+        "Nodes not part of cluster have marked the Gossip as seen, got [%s]"
+          .format(seenButNotMember
+            .mkString(", ")))
   }
 
   @transient private lazy val membersMap: Map[UniqueAddress, Member] =
@@ -100,7 +102,7 @@ private[cluster] final case class Gossip(
     */
   def :+(member: Member): Gossip = {
     if (members contains member) this
-    else this copy (members = members + member)
+    else this.copy(members = members + member)
   }
 
   /**
@@ -108,14 +110,14 @@ private[cluster] final case class Gossip(
     */
   def seen(node: UniqueAddress): Gossip = {
     if (seenByNode(node)) this
-    else this copy (overview = overview copy (seen = overview.seen + node))
+    else this.copy(overview = overview.copy(seen = overview.seen + node))
   }
 
   /**
     * Marks the gossip as seen by only this node (address) by replacing the 'gossip.overview.seen'
     */
   def onlySeen(node: UniqueAddress): Gossip = {
-    this copy (overview = overview copy (seen = Set(node)))
+    this.copy(overview = overview.copy(seen = Set(node)))
   }
 
   /**
@@ -132,8 +134,8 @@ private[cluster] final case class Gossip(
     * Merges the seen table of two Gossip instances.
     */
   def mergeSeen(that: Gossip): Gossip =
-    this copy
-      (overview = overview copy (seen = overview.seen union that.overview.seen))
+    this.copy(
+      overview = overview.copy(seen = overview.seen.union(that.overview.seen)))
 
   /**
     * Merges two Gossip instances including membership tables, and the VectorClock histories.
@@ -141,12 +143,12 @@ private[cluster] final case class Gossip(
   def merge(that: Gossip): Gossip = {
 
     // 1. merge vector clocks
-    val mergedVClock = this.version merge that.version
+    val mergedVClock = this.version.merge(that.version)
 
     // 2. merge members by selecting the single Member with highest MemberStatus out of the Member groups
     val mergedMembers =
-      Gossip.emptyMembers union Member.pickHighestPriority(this.members,
-                                                           that.members)
+      Gossip.emptyMembers.union(
+        Member.pickHighestPriority(this.members, that.members))
 
     // 3. merge reachability table by picking records with highest version
     val mergedReachability = this.overview.reachability

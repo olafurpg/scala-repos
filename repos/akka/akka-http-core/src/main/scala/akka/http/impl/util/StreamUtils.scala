@@ -356,7 +356,8 @@ private[http] object StreamUtils {
           .drop(1) // we are only interested in the completion event
 
       def source[T]: Source[T, NotUsed] =
-        _source.asInstanceOf[Source[T, NotUsed]] // safe, because source won't generate any elements
+        _source
+          .asInstanceOf[Source[T, NotUsed]] // safe, because source won't generate any elements
       def open(): Unit = promise.success(())
     }
   }

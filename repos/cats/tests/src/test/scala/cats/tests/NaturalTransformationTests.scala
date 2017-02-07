@@ -56,7 +56,7 @@ class NaturalTransformationTests extends CatsSuite {
   }
 
   test("or") {
-    val combinedInterpreter = Test1NT or Test2NT
+    val combinedInterpreter = Test1NT.or(Test2NT)
     forAll { (a: Int, b: Int) =>
       combinedInterpreter(Coproduct.left(Test1(a))) should ===(Id.pure(a))
       combinedInterpreter(Coproduct.right(Test2(b))) should ===(Id.pure(b))

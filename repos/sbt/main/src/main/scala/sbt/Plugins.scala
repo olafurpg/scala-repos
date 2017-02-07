@@ -167,14 +167,14 @@ object Plugins extends PluginsFunctions {
     if (defined0.isEmpty)(_, _) => Nil
     else {
       // TODO: defined should return all the plugins
-      val allReqs = (defined0 flatMap { asRequirements }).toSet
-      val diff = allReqs diff defined0.toSet
+      val allReqs = (defined0.flatMap { asRequirements }).toSet
+      val diff = allReqs.diff(defined0.toSet)
       val defined =
         if (diff.nonEmpty) diff.toList ::: defined0
         else defined0
 
       val byAtom =
-        defined map { x =>
+        defined.map { x =>
           (Atom(x.label), x)
         }
       val byAtomMap = byAtom.toMap
@@ -195,12 +195,12 @@ object Plugins extends PluginsFunctions {
           val alwaysEnabled: List[AutoPlugin] =
             defined.filter(_.isAlwaysEnabled).filterNot(explicitlyDisabled)
           val knowlege0: Set[Atom] =
-            ((flatten(requestedPlugins) ++ alwaysEnabled) collect {
+            (((flatten(requestedPlugins) ++ alwaysEnabled)).collect {
               case x: AutoPlugin => Atom(x.label)
             }).toSet
           val clauses = Clauses(
-            (allRequirementsClause ::: allEnabledByClause) filterNot {
-              _.head subsetOf knowlege0
+            ((allRequirementsClause ::: allEnabledByClause)).filterNot {
+              _.head.subsetOf(knowlege0)
             })
           log.debug(
             s"deducing auto plugins based on known facts ${knowlege0.toString} and clauses ${clauses.toString}")
@@ -212,19 +212,19 @@ object Plugins extends PluginsFunctions {
               log.debug(s"  :: deduced result: ${results}")
               val selectedAtoms: List[Atom] = results.ordered
               val selectedPlugins =
-                selectedAtoms map { a =>
+                selectedAtoms.map { a =>
                   byAtomMap.getOrElse(a,
                                       throw AutoPluginException(
                                         s"${a} was not found in atom map."))
                 }
-              val forbidden: Set[AutoPlugin] = (selectedPlugins flatMap {
+              val forbidden: Set[AutoPlugin] = (selectedPlugins.flatMap {
                 Plugins.asExclusions
               }).toSet
               val c = selectedPlugins.toSet & forbidden
               if (c.nonEmpty) {
                 exlusionConflictError(requestedPlugins,
                                       selectedPlugins,
-                                      c.toSeq sortBy {
+                                      c.toSeq.sortBy {
                                         _.label
                                       })
               }
@@ -248,13 +248,13 @@ object Plugins extends PluginsFunctions {
       else if (notFound0.isEmpty) found0
       else {
         val (found1, notFound1) =
-          notFound0 partition { n =>
-            asRequirements(n).toSet subsetOf found0.toSet
+          notFound0.partition { n =>
+            asRequirements(n).toSet.subsetOf(found0.toSet)
           }
         doSort(found0 ::: found1, notFound1, limit0 - 1)
       }
     }
-    val (roots, nonRoots) = ns partition (_.isRoot)
+    val (roots, nonRoots) = ns.partition(_.isRoot)
     doSort(roots, nonRoots, ns.size * ns.size + 1)
   }
   private[sbt] def translateMessage(e: LogicException) = e match {
@@ -268,7 +268,7 @@ object Plugins extends PluginsFunctions {
       s"Cycles in plugin requirements cannot involve excludes.  The problematic cycle is: ${literalsString(cn.cycle)}"
   }
   private[this] def literalsString(lits: Seq[Literal]): String =
-    lits map { case Atom(l) => l; case Negated(Atom(l)) => l } mkString (", ")
+    lits.map { case Atom(l) => l; case Negated(Atom(l)) => l } mkString (", ")
 
   private[this] def duplicateProvidesError(
       byAtom: Seq[(Atom, AutoPlugin)]): Unit = {
@@ -285,31 +285,33 @@ object Plugins extends PluginsFunctions {
       selected: Seq[AutoPlugin],
       conflicting: Seq[AutoPlugin]): Unit = {
     def listConflicts(ns: Seq[AutoPlugin]) =
-      (ns map { c =>
-        val reasons =
-          (if (flatten(requested) contains c) List("requested")
-           else Nil) ++
-            (if (c.requires != empty && c.trigger == allRequirements)
-               List(s"enabled by ${c.requires.toString}")
-             else Nil) ++ {
-            val reqs =
-              selected filter { x =>
-                asRequirements(x) contains c
-              }
-            if (reqs.nonEmpty)
-              List(s"""required by ${reqs.mkString(", ")}""")
-            else Nil
-          } ++ {
-            val exs =
-              selected filter { x =>
-                asExclusions(x) contains c
-              }
-            if (exs.nonEmpty)
-              List(s"""excluded by ${exs.mkString(", ")}""")
-            else Nil
-          }
-        s"""  - conflict: ${c.label} is ${reasons.mkString("; ")}"""
-      }).mkString("\n")
+      (ns
+        .map { c =>
+          val reasons =
+            (if (flatten(requested) contains c) List("requested")
+             else Nil) ++
+              (if (c.requires != empty && c.trigger == allRequirements)
+                 List(s"enabled by ${c.requires.toString}")
+               else Nil) ++ {
+              val reqs =
+                selected.filter { x =>
+                  asRequirements(x) contains c
+                }
+              if (reqs.nonEmpty)
+                List(s"""required by ${reqs.mkString(", ")}""")
+              else Nil
+            } ++ {
+              val exs =
+                selected.filter { x =>
+                  asExclusions(x) contains c
+                }
+              if (exs.nonEmpty)
+                List(s"""excluded by ${exs.mkString(", ")}""")
+              else Nil
+            }
+          s"""  - conflict: ${c.label} is ${reasons.mkString("; ")}"""
+        })
+        .mkString("\n")
     throw AutoPluginException(s"""Contradiction in enabled plugins:
   - requested: ${requested.toString}
   - enabled: ${selected.mkString(", ")}
@@ -356,15 +358,15 @@ ${listConflicts(conflicting)}""")
   /** Defines requirements clauses for `ap`. */
   private[sbt] def asRequirementsClauses(ap: AutoPlugin): List[Clause] =
     // required plugin is the head and `ap` is the body.
-    asRequirements(ap) map { x =>
+    asRequirements(ap).map { x =>
       Clause(convert(ap), Set(Atom(x.label)))
     }
   private[sbt] def asRequirements(ap: AutoPlugin): List[AutoPlugin] =
-    flatten(ap.requires).toList collect {
+    flatten(ap.requires).toList.collect {
       case x: AutoPlugin => x
     }
   private[sbt] def asExclusions(ap: AutoPlugin): List[AutoPlugin] =
-    flatten(ap.requires).toList collect {
+    flatten(ap.requires).toList.collect {
       case Exclude(x) => x
     }
   // TODO - This doesn't handle nested AND boolean logic...
@@ -407,11 +409,11 @@ ${listConflicts(conflicting)}""")
     case a: AutoPlugin => Atom(a.label)
   }
   private[this] def convertAll(ns: Seq[Basic]): Seq[Literal] =
-    ns map convertBasic
+    ns.map(convertBasic)
 
   /** True if the trigger clause `n` is satisifed by `model`. */
   def satisfied(n: Plugins, model: Set[AutoPlugin]): Boolean =
-    flatten(n) forall {
+    flatten(n).forall {
       case Exclude(a) => !model(a)
       case ap: AutoPlugin => model(ap)
     }
@@ -423,13 +425,13 @@ ${listConflicts(conflicting)}""")
     val m = ru.runtimeMirror(loader)
     val im = m.reflect(ap)
     val hasGetterOpt =
-      catching(classOf[ScalaReflectionException]) opt {
+      catching(classOf[ScalaReflectionException]).opt {
         im.symbol.asType.toType
           .declaration(ru.newTermName("autoImport")) match {
           case ru.NoSymbol => false
           case sym => sym.asTerm.isGetter || sym.asTerm.isModule
         }
       }
-    hasGetterOpt getOrElse false
+    hasGetterOpt.getOrElse(false)
   }
 }

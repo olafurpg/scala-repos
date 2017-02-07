@@ -198,7 +198,7 @@ trait SecurityDirectives {
       authenticator: Option[C] ⇒ Future[AuthenticationResult[T]])
     : AuthenticationDirective[T] =
     authenticateOrRejectWithChallenge[T](cred ⇒
-      authenticator(cred collect { case c: C ⇒ c }))
+      authenticator(cred.collect { case c: C ⇒ c }))
 
   /**
     * Applies the given authorization check to the request.
@@ -268,11 +268,12 @@ object Credentials {
     cred match {
       case Some(BasicHttpCredentials(username, receivedSecret)) ⇒
         new Credentials.Provided(username) {
-          def verify(secret: String): Boolean = secret secure_== receivedSecret
+          def verify(secret: String): Boolean =
+            secret.secure_==(receivedSecret)
         }
       case Some(OAuth2BearerToken(token)) ⇒
         new Credentials.Provided(token) {
-          def verify(secret: String): Boolean = secret secure_== token
+          def verify(secret: String): Boolean = secret.secure_==(token)
         }
       case Some(GenericHttpCredentials(scheme, token, params)) ⇒
         throw new UnsupportedOperationException(
@@ -300,7 +301,7 @@ trait AuthenticationDirective[T] extends Directive1[T] {
     * were supplied and otherwise `None`.
     */
   def optional: Directive1[Option[T]] =
-    this.map(Some(_): Option[T]) recover {
+    this.map(Some(_): Option[T]).recover {
       case AuthenticationFailedRejection(CredentialsMissing, _) +: _ ⇒
         provide(None)
       case rejs ⇒ reject(rejs: _*)
@@ -311,7 +312,7 @@ trait AuthenticationDirective[T] extends Directive1[T] {
     * anonymous user which will be used if no credentials were supplied in the request.
     */
   def withAnonymousUser(anonymous: T): Directive1[T] =
-    optional map (_ getOrElse anonymous)
+    optional.map(_.getOrElse(anonymous))
 }
 object AuthenticationDirective {
   implicit def apply[T](other: Directive1[T]): AuthenticationDirective[T] =

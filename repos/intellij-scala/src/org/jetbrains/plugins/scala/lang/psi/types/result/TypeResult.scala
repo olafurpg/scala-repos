@@ -83,10 +83,10 @@ case class Success[+T](result: T, elem: Option[PsiElement])
 }
 
 class TypeResultWithFilter[+T](self: TypeResult[T], p: T => Boolean) {
-  def map[B](f: T => B): TypeResult[B] = self filter p map f
-  def foreach[B](f: T => B): Unit = self filter p foreach f
+  def map[B](f: T => B): TypeResult[B] = self.filter(p).map(f)
+  def foreach[B](f: T => B): Unit = self.filter(p).foreach(f)
   def flatMap[B](f: T => TypeResult[B]): TypeResult[B] =
-    self filter p flatMap f
+    self.filter(p).flatMap(f)
   def withFilter(q: T => Boolean): TypeResultWithFilter[T] =
     new TypeResultWithFilter[T](self, x => p(x) && q(x))
 }

@@ -311,7 +311,7 @@ trait Counter2Ops {
       override def apply(a: Counter2[K1, K2, V], b: Counter[K2, V]) = {
         val r = Counter[K1, V]()
         for ((row, ctr) <- a.data.iterator) {
-          r(row) = ctr dot b
+          r(row) = ctr.dot(b)
         }
         r
       }

@@ -31,7 +31,7 @@ trait SymbolTables { self: Utils =>
       symName(sym) match {
         case name if name.isEmpty => Nil
         case _ =>
-          (aliases.distinct groupBy (_._1) mapValues (_ map (_._2)))(sym)
+          (aliases.distinct.groupBy(_._1).mapValues(_.map(_._2)))(sym)
       }
 
     def symBinding(sym: Symbol): Tree =
@@ -46,9 +46,9 @@ trait SymbolTables { self: Utils =>
     def symRef(sym: Symbol): Tree =
       symtab.get(sym) match {
         case Some(FreeDef(_, name, binding, _, _)) =>
-          Ident(name) updateAttachment binding
+          Ident(name).updateAttachment(binding)
         case Some(SymDef(_, name, _, _)) =>
-          Ident(name) updateAttachment ReifyBindingAttachment(Ident(sym))
+          Ident(name).updateAttachment(ReifyBindingAttachment(Ident(sym)))
         case None => EmptyTree
       }
 
@@ -69,15 +69,15 @@ trait SymbolTables { self: Utils =>
     def --(names: Iterable[TermName]): SymbolTable =
       (this /: names)((symtab, name) => symtab.remove(name))
     def --(symDefs: TraversableOnce[Tree]): SymbolTable =
-      this -- (symDefs map (reifyBinding(_)))
+      this -- (symDefs.map(reifyBinding(_)))
     def --(symtab: SymbolTable): SymbolTable = {
       val updated = this -- symtab.symtab.values;
-      new SymbolTable(updated.symtab, updated.aliases diff symtab.aliases)
+      new SymbolTable(updated.symtab, updated.aliases.diff(symtab.aliases))
     }
     def filterSyms(p: Symbol => Boolean): SymbolTable =
-      this -- (syms filterNot p)
+      this -- (syms.filterNot(p))
     def filterAliases(p: (Symbol, TermName) => Boolean): SymbolTable =
-      this -- (aliases filterNot (tuple => p(tuple._1, tuple._2)) map (_._2))
+      this -- (aliases.filterNot(tuple => p(tuple._1, tuple._2)).map(_._2))
 
     private def add(symDef: Tree): SymbolTable = {
       val sym = reifyBinding(symDef).symbol
@@ -105,22 +105,23 @@ trait SymbolTables { self: Utils =>
       val bindingAttachment =
         reification.attachments.get[ReifyBindingAttachment].get
       add(
-        ValDef(NoMods, freshName(name0), TypeTree(), reification) updateAttachment bindingAttachment)
+        ValDef(NoMods, freshName(name0), TypeTree(), reification)
+          .updateAttachment(bindingAttachment))
     }
 
     private def remove(sym: Symbol): SymbolTable = {
       val newSymtab = symtab - sym
-      val newAliases = aliases filter (_._1 != sym)
+      val newAliases = aliases.filter(_._1 != sym)
       new SymbolTable(newSymtab, newAliases)
     }
 
     private def remove(name: TermName): SymbolTable = {
       var newSymtab = symtab
-      val newAliases = aliases filter (_._2 != name)
-      newSymtab = newSymtab filter {
-        case ((sym, _)) => newAliases exists (_._1 == sym)
+      val newAliases = aliases.filter(_._2 != name)
+      newSymtab = newSymtab.filter {
+        case ((sym, _)) => newAliases.exists(_._1 == sym)
       }
-      newSymtab = newSymtab map {
+      newSymtab = newSymtab.map {
         case ((sym, tree)) =>
           val ValDef(mods, primaryName, tpt, rhs) = tree
           val tree1 =
@@ -135,7 +136,7 @@ trait SymbolTables { self: Utils =>
 
     private val cache = mutable.Map[SymbolTable, List[Tree]]()
     def encode: List[Tree] =
-      cache.getOrElseUpdate(this, SymbolTable.encode(this)) map (_.duplicate)
+      cache.getOrElseUpdate(this, SymbolTable.encode(this)).map(_.duplicate)
 
     override def toString = {
       val symtabString = symtab.keys.map(symName(_)).mkString(", ")
@@ -154,7 +155,7 @@ trait SymbolTables { self: Utils =>
       buf
         .append("symbol table = " + (if (syms.length == 0) "<empty>" else ""))
         .append(EOL)
-      syms foreach (sym => buf.append(symDef(sym)).append(EOL))
+      syms.foreach(sym => buf.append(symDef(sym)).append(EOL))
       buf.delete(buf.length - EOL.length, buf.length)
       buf.toString
     }
@@ -166,17 +167,17 @@ trait SymbolTables { self: Utils =>
 
     def apply(encoded: List[Tree]): SymbolTable = {
       var result = new SymbolTable(original = Some(encoded))
-      encoded foreach
-        (entry =>
-           (entry.attachments.get[ReifyBindingAttachment],
-            entry.attachments.get[ReifyAliasAttachment]) match {
-             case (Some(ReifyBindingAttachment(_)), _) => result += entry
-             case (_, Some(ReifyAliasAttachment(sym, alias))) =>
-               result = new SymbolTable(result.symtab,
-                                        result.aliases :+ ((sym, alias)))
-             case _ =>
-             // do nothing, this is boilerplate that can easily be recreated by subsequent `result.encode`
-           })
+      encoded.foreach(
+        entry =>
+          (entry.attachments.get[ReifyBindingAttachment],
+           entry.attachments.get[ReifyAliasAttachment]) match {
+            case (Some(ReifyBindingAttachment(_)), _) => result += entry
+            case (_, Some(ReifyAliasAttachment(sym, alias))) =>
+              result = new SymbolTable(result.symtab,
+                                       result.aliases :+ ((sym, alias)))
+            case _ =>
+            // do nothing, this is boilerplate that can easily be recreated by subsequent `result.encode`
+        })
       result
     }
 
@@ -218,7 +219,7 @@ trait SymbolTables { self: Utils =>
             reifier.mirrorBuildCall(
               nme.setAnnotations,
               rset,
-              reifier.mkList(sym.annotations map reifier.reifyAnnotationInfo))
+              reifier.mkList(sym.annotations.map(reifier.reifyAnnotationInfo)))
         }
 
         // `fillInSymbol` might add symbols to `symtab`, that's why this is done iteratively
@@ -229,37 +230,31 @@ trait SymbolTables { self: Utils =>
             val symtabProgress = currtab.symtab.size
             val aliasesProgress = currtab.aliases.length
             val fillIn = fillInSymbol(sym)
-            cumulativeSymtab ++= currtab.symtab.values drop symtabProgress
-            cumulativeAliases ++= currtab.aliases drop aliasesProgress
+            cumulativeSymtab ++= currtab.symtab.values.drop(symtabProgress)
+            cumulativeAliases ++= currtab.aliases.drop(aliasesProgress)
             cumulativeSymtab += fillIn
           }
           progress += 1
         }
 
         val withAliases =
-          cumulativeSymtab flatMap
-            (entry => {
-               val result = mutable.ListBuffer[Tree]()
-               result += entry
-               val sym = reifyBinding(entry).symbol
-               if (sym != NoSymbol)
-                 result ++= cumulativeAliases.distinct filter
-                   (alias =>
-                      alias._1 == sym &&
-                        alias._2 != currtab.symName(sym)) map
-                   (alias => {
-                      val canonicalName = currtab.symName(sym)
-                      val aliasName = alias._2
-                      ValDef(
-                        NoMods,
-                        aliasName,
-                        TypeTree(),
-                        Ident(canonicalName)) updateAttachment ReifyAliasAttachment(
-                        sym,
-                        aliasName)
-                    })
-               result.toList
-             })
+          cumulativeSymtab.flatMap(entry => {
+            val result = mutable.ListBuffer[Tree]()
+            result += entry
+            val sym = reifyBinding(entry).symbol
+            if (sym != NoSymbol)
+              result ++= cumulativeAliases.distinct
+                .filter(alias =>
+                  alias._1 == sym &&
+                    alias._2 != currtab.symName(sym))
+                .map(alias => {
+                  val canonicalName = currtab.symName(sym)
+                  val aliasName = alias._2
+                  ValDef(NoMods, aliasName, TypeTree(), Ident(canonicalName))
+                    .updateAttachment(ReifyAliasAttachment(sym, aliasName))
+                })
+            result.toList
+          })
 
         withAliases.toList
       } finally {

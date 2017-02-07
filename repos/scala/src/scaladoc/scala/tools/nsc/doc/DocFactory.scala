@@ -43,10 +43,10 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
     assert(settings.docformat.value == "html")
     source match {
       case Left(files) =>
-        new compiler.Run() compile files
+        new compiler.Run().compile(files)
       case Right(sourceCode) =>
-        new compiler.Run() compileSources List(
-          new BatchSourceFile("newSource", sourceCode))
+        new compiler.Run()
+          .compileSources(List(new BatchSourceFile("newSource", sourceCode)))
     }
 
     if (reporter.hasErrors) return None
@@ -120,10 +120,10 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
       docletInstance match {
         case universer: Universer =>
           val universe =
-            makeUniverse(Left(files)) getOrElse {
+            makeUniverse(Left(files)).getOrElse {
               throw NoCompilerRunException
             }
-          universer setUniverse universe
+          universer.setUniverse(universe)
         case _ => ()
       }
       docletInstance.generate()

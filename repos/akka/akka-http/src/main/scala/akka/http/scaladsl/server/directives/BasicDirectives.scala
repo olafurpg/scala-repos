@@ -74,11 +74,11 @@ trait BasicDirectives {
     }
 
   def mapResponseEntity(f: ResponseEntity ⇒ ResponseEntity): Directive0 =
-    mapResponse(_ mapEntity f)
+    mapResponse(_.mapEntity(f))
 
   def mapResponseHeaders(
       f: immutable.Seq[HttpHeader] ⇒ immutable.Seq[HttpHeader]): Directive0 =
-    mapResponse(_ mapHeaders f)
+    mapResponse(_.mapHeaders(f))
 
   /**
     * A Directive0 that always passes the request on to its inner route
@@ -123,20 +123,20 @@ trait BasicDirectives {
     * to the list of rejections potentially coming back from the inner route.
     */
   def cancelRejections(classes: Class[_]*): Directive0 =
-    cancelRejections(r ⇒ classes.exists(_ isInstance r))
+    cancelRejections(r ⇒ classes.exists(_.isInstance(r)))
 
   /**
     * Adds a TransformationRejection cancelling all rejections for which the given filter function returns true
     * to the list of rejections potentially coming back from the inner route.
     */
   def cancelRejections(cancelFilter: Rejection ⇒ Boolean): Directive0 =
-    mapRejections(_ :+ TransformationRejection(_ filterNot cancelFilter))
+    mapRejections(_ :+ TransformationRejection(_.filterNot(cancelFilter)))
 
   /**
     * Transforms the unmatchedPath of the RequestContext using the given function.
     */
   def mapUnmatchedPath(f: Uri.Path ⇒ Uri.Path): Directive0 =
-    mapRequestContext(_ mapUnmatchedPath f)
+    mapRequestContext(_.mapUnmatchedPath(f))
 
   /**
     * Extracts the yet unmatched path from the RequestContext.
@@ -158,7 +158,7 @@ trait BasicDirectives {
     * Runs its inner route with the given alternative [[scala.concurrent.ExecutionContextExecutor]].
     */
   def withExecutionContext(ec: ExecutionContextExecutor): Directive0 =
-    mapRequestContext(_ withExecutionContext ec)
+    mapRequestContext(_.withExecutionContext(ec))
 
   /**
     * Extracts the [[scala.concurrent.ExecutionContextExecutor]] from the [[akka.http.scaladsl.server.RequestContext]].
@@ -170,7 +170,7 @@ trait BasicDirectives {
     * Runs its inner route with the given alternative [[akka.stream.Materializer]].
     */
   def withMaterializer(materializer: Materializer): Directive0 =
-    mapRequestContext(_ withMaterializer materializer)
+    mapRequestContext(_.withMaterializer(materializer))
 
   /**
     * Extracts the [[akka.stream.Materializer]] from the [[akka.http.scaladsl.server.RequestContext]].
@@ -182,7 +182,7 @@ trait BasicDirectives {
     * Runs its inner route with the given alternative [[akka.event.LoggingAdapter]].
     */
   def withLog(log: LoggingAdapter): Directive0 =
-    mapRequestContext(_ withLog log)
+    mapRequestContext(_.withLog(log))
 
   /**
     * Extracts the [[akka.event.LoggingAdapter]] from the [[akka.http.scaladsl.server.RequestContext]].

@@ -22,11 +22,12 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       val a: AnyRef = "asdf"
       def x = a.isInstanceOf[JSRaw]
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: isInstanceOf[JSRaw] not supported because it is a raw JS trait
       |      def x = a.isInstanceOf[JSRaw]
       |                            ^
-    """
+    """)
   }
 
   @Test
@@ -42,7 +43,8 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       val b = js.constructorOf[ScalaTrait]
       val c = js.constructorOf[ScalaObject.type]
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: type arguments [ScalaClass] do not conform to method constructorOf's type parameter bounds [T <: scala.scalajs.js.Any]
       |      val a = js.constructorOf[ScalaClass]
       |                              ^
@@ -52,7 +54,7 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |newSource1.scala:10: error: type arguments [ScalaObject.type] do not conform to method constructorOf's type parameter bounds [T <: scala.scalajs.js.Any]
       |      val c = js.constructorOf[ScalaObject.type]
       |                              ^
-    """
+    """)
 
     """
     @js.native class NativeJSClass extends js.Object
@@ -79,7 +81,8 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       def foo[A <: js.Any] = js.constructorOf[A]
       def bar[A <: js.Any: scala.reflect.ClassTag] = js.constructorOf[A]
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:12: error: non-trait class type required but NativeJSTrait found
       |      val a = js.constructorOf[NativeJSTrait]
       |                               ^
@@ -110,7 +113,7 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |newSource1.scala:25: error: class type required but A found
       |      def bar[A <: js.Any: scala.reflect.ClassTag] = js.constructorOf[A]
       |                                                                      ^
-    """
+    """)
   }
 
   @Test
@@ -126,7 +129,8 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       val b = js.constructorTag[ScalaTrait]
       val c = js.constructorTag[ScalaObject.type]
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:8: error: type arguments [ScalaClass] do not conform to method constructorTag's type parameter bounds [T <: scala.scalajs.js.Any]
       |      val a = js.constructorTag[ScalaClass]
       |                               ^
@@ -136,7 +140,7 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |newSource1.scala:10: error: type arguments [ScalaObject.type] do not conform to method constructorTag's type parameter bounds [T <: scala.scalajs.js.Any]
       |      val c = js.constructorTag[ScalaObject.type]
       |                               ^
-    """
+    """)
 
     """
     @js.native class NativeJSClass extends js.Object
@@ -163,7 +167,8 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       def foo[A <: js.Any] = js.constructorTag[A]
       def bar[A <: js.Any: scala.reflect.ClassTag] = js.constructorTag[A]
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:12: error: non-trait class type required but NativeJSTrait found
       |      val a = js.constructorTag[NativeJSTrait]
       |                               ^
@@ -194,7 +199,7 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |newSource1.scala:25: error: class type required but A found
       |      def bar[A <: js.Any: scala.reflect.ClassTag] = js.constructorTag[A]
       |                                                                      ^
-    """
+    """)
   }
 
   @Test
@@ -212,7 +217,8 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       val b = runtime.constructorOf(classOf[NativeJSObject.type])
       val c = runtime.constructorOf(classOf[JSObject.type])
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:10: error: class type required but ScalaObject.type found
       |      val a = runtime.constructorOf(classOf[ScalaObject.type].asInstanceOf[Class[_ <: js.Any]])
       |                                                       ^
@@ -222,7 +228,7 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |newSource1.scala:12: error: class type required but JSObject.type found
       |      val c = runtime.constructorOf(classOf[JSObject.type])
       |                                                    ^
-    """
+    """)
 
     """
     import scala.scalajs.runtime
@@ -251,7 +257,8 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       val f = runtime.constructorOf(NativeJSObject.getClass)
       val g = runtime.constructorOf(JSObject.getClass)
     }
-    """ hasErrors """
+    """.hasErrors(
+      """
       |newSource1.scala:17: error: runtime.constructorOf() must be called with a constant classOf[T] representing a class extending js.Any (not a trait nor an object)
       |      val a = runtime.constructorOf(classOf[ScalaClass].asInstanceOf[Class[_ <: js.Any]])
       |                                   ^
@@ -273,6 +280,6 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |newSource1.scala:27: error: runtime.constructorOf() must be called with a constant classOf[T] representing a class extending js.Any (not a trait nor an object)
       |      val g = runtime.constructorOf(JSObject.getClass)
       |                                   ^
-    """
+    """)
   }
 }

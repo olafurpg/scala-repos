@@ -15,7 +15,7 @@ class SeqModule[A, SA <: SeqLike[A, SA]](implicit val scalar: Ring[A],
     with Serializable {
   def zero: SA = cbf().result
 
-  def negate(sa: SA): SA = sa map (scalar.negate)
+  def negate(sa: SA): SA = sa.map(scalar.negate)
 
   def plus(x: SA, y: SA): SA = {
     @tailrec
@@ -76,7 +76,7 @@ class SeqModule[A, SA <: SeqLike[A, SA]](implicit val scalar: Ring[A],
     sub2(x.toIterator, y.toIterator, cbf(x))
   }
 
-  def timesl(r: A, sa: SA): SA = sa map (scalar.times(r, _))
+  def timesl(r: A, sa: SA): SA = sa.map(scalar.times(r, _))
 }
 
 @SerialVersionUID(0L)

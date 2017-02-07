@@ -74,8 +74,11 @@ class BufTest
     val a3 = Array[Byte](7, 8, 9)
 
     val buf =
-      Buf.ByteArray.Owned(a1) concat Buf.ByteArray.Owned(a2) concat Buf.ByteArray
-        .Owned(a3)
+      Buf.ByteArray
+        .Owned(a1)
+        .concat(Buf.ByteArray.Owned(a2))
+        .concat(Buf.ByteArray
+          .Owned(a3))
     assert(buf.length == 9)
     val x = Array.fill(9) { 0.toByte }
     buf.write(x, 0)
@@ -88,8 +91,11 @@ class BufTest
     val a3 = Array.range(16, 24).map(_.toByte)
     val arr = a1 ++ a2 ++ a3
     val buf =
-      Buf.ByteArray.Owned(a1) concat Buf.ByteArray.Owned(a2) concat Buf.ByteArray
-        .Owned(a3)
+      Buf.ByteArray
+        .Owned(a1)
+        .concat(Buf.ByteArray.Owned(a2))
+        .concat(Buf.ByteArray
+          .Owned(a3))
 
     for (i <- 0 until arr.length; j <- i until arr.length) {
       val w = new Array[Byte](j - i)
@@ -103,8 +109,11 @@ class BufTest
     val a2 = Array.range(8, 16).map(_.toByte)
     val a3 = Array.range(16, 24).map(_.toByte)
     val buf =
-      Buf.ByteArray.Owned(a1) concat Buf.ByteArray.Owned(a2) concat Buf.ByteArray
-        .Owned(a3)
+      Buf.ByteArray
+        .Owned(a1)
+        .concat(Buf.ByteArray.Owned(a2))
+        .concat(Buf.ByteArray
+          .Owned(a3))
 
     assert(buf.slice(25, 30) == Buf.Empty)
   }
@@ -114,8 +123,11 @@ class BufTest
     val a2 = Array.range(8, 16).map(_.toByte)
     val a3 = Array.range(16, 24).map(_.toByte)
     val buf =
-      Buf.ByteArray.Owned(a1) concat Buf.ByteArray.Owned(a2) concat Buf.ByteArray
-        .Owned(a3)
+      Buf.ByteArray
+        .Owned(a1)
+        .concat(Buf.ByteArray.Owned(a2))
+        .concat(Buf.ByteArray
+          .Owned(a3))
 
     assert(buf.slice(20, 30) == buf.slice(20, 24)) // just last
     assert(buf.slice(12, 30) == buf.slice(12, 24)) // two bufs
@@ -127,8 +139,11 @@ class BufTest
     val a2 = Array.range(8, 16).map(_.toByte)
     val a3 = Array.range(16, 24).map(_.toByte)
     val buf =
-      Buf.ByteArray.Owned(a1) concat Buf.ByteArray.Owned(a2) concat Buf.ByteArray
-        .Owned(a3)
+      Buf.ByteArray
+        .Owned(a1)
+        .concat(Buf.ByteArray.Owned(a2))
+        .concat(Buf.ByteArray
+          .Owned(a3))
 
     intercept[IllegalArgumentException] {
       buf.slice(-1, 0)
@@ -176,7 +191,7 @@ class BufTest
       def slice(i: Int, j: Int) = throw new Exception("not implemented")
       def length = 12
       def write(output: Array[Byte], off: Int) =
-        (off until off + length) foreach { i =>
+        ((off until off + length)).foreach { i =>
           output(i) = 'a'.toByte
         }
     }
@@ -185,7 +200,7 @@ class BufTest
     assert(str == "aaaaaaaaaaaa")
   }
 
-  AllCharsets foreach { charset =>
+  AllCharsets.foreach { charset =>
     test(
       "Buf.StringCoder: decoding to %s does not modify underlying byte buffer"
         .format(charset.name)) {
@@ -200,7 +215,7 @@ class BufTest
     }
   }
 
-  AllCharsets foreach { charset =>
+  AllCharsets.foreach { charset =>
     test(
       "Buf.StringCoder: %s charset can encode and decode an English phrase"
         .format(charset.name)) {
@@ -323,7 +338,7 @@ class BufTest
     ae(Buf.Utf8(string), bbuf)
     ae(Buf.Utf8(""), Buf.Empty)
 
-    val concat = bbuf.slice(0, 3) concat bbuf.slice(3, 6)
+    val concat = bbuf.slice(0, 3).concat(bbuf.slice(3, 6))
     ae(concat, Buf.ByteArray.Owned(bytes))
 
     val shifted = new Array[Byte](bytes.length + 3)
@@ -407,9 +422,9 @@ class BufTest
 
     val arr = a1 ++ a2 ++ a3 ++ a4
 
-    val cbuf1 = Buf.ByteArray.Owned(a1) concat Buf.ByteArray.Owned(a2)
-    val cbuf2 = Buf.ByteArray.Owned(a3) concat Buf.ByteArray.Owned(a4)
-    val cbuf = cbuf1 concat cbuf2
+    val cbuf1 = Buf.ByteArray.Owned(a1).concat(Buf.ByteArray.Owned(a2))
+    val cbuf2 = Buf.ByteArray.Owned(a3).concat(Buf.ByteArray.Owned(a4))
+    val cbuf = cbuf1.concat(cbuf2)
 
     for (i <- 0 until arr.length; j <- i until arr.length) {
       val w = new Array[Byte](j - i)
@@ -422,7 +437,7 @@ class BufTest
     val size = 50 * 1000
     val b = 'x'.toByte
     val bigBuf = (1 to size).foldLeft(Buf.Empty) {
-      case (buf, _) => buf concat Buf.ByteArray.Owned(Array[Byte](b))
+      case (buf, _) => buf.concat(Buf.ByteArray.Owned(Array[Byte](b)))
     }
 
     val expected = Array.fill(size) { 'x'.toByte }

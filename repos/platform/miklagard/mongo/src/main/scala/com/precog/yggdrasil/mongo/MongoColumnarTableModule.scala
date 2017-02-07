@@ -136,7 +136,7 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
     def safeOp[A](nullMessage: String)(v: => A): Option[A] =
       try {
-        Option(v) orElse { logger.error(nullMessage); None }
+        Option(v).orElse { logger.error(nullMessage); None }
       } catch {
         case t: Throwable =>
           logger.error(
@@ -177,23 +177,25 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                               logger.trace("Running auth setup for " + dbName)
                               dbAuthParams
                                 .get(dbName)
-                                .map(_.split(':')) flatMap {
-                                case Array(user, password) =>
-                                  if (d.authenticate(user,
-                                                     password.toCharArray)) {
-                                    Some(d)
-                                  } else {
-                                    logger.error(
-                                      "Authentication failed for database " +
-                                        dbName); None
-                                  }
+                                .map(_.split(':'))
+                                .flatMap {
+                                  case Array(user, password) =>
+                                    if (d.authenticate(user,
+                                                       password.toCharArray)) {
+                                      Some(d)
+                                    } else {
+                                      logger.error(
+                                        "Authentication failed for database " +
+                                          dbName); None
+                                    }
 
-                                case invalid =>
-                                  logger.error(
-                                    "Invalid user:password for %s: \"%s\""
-                                      .format(dbName, invalid.mkString(":")));
-                                  None
-                              }
+                                  case invalid =>
+                                    logger.error(
+                                      "Invalid user:password for %s: \"%s\""
+                                        .format(dbName,
+                                                invalid.mkString(":")));
+                                    None
+                                }
                             } else {
                               Some(d)
                             }
@@ -257,10 +259,13 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
         val size = size0
         val columns =
           if (includeIdField) {
-            columns0 get ColumnRef(Key \ 0, CString) map { idCol =>
-              columns0 +
-                (ColumnRef(Value \ CPathField("_id"), CString) -> idCol)
-            } getOrElse columns0
+            columns0
+              .get(ColumnRef(Key \ 0, CString))
+              .map { idCol =>
+                columns0 +
+                  (ColumnRef(Value \ CPathField("_id"), CString) -> idCol)
+              }
+              .getOrElse(columns0)
           } else columns0
       }
 

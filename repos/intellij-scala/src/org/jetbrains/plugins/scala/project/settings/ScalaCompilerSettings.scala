@@ -114,7 +114,7 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
       .map(_._2)
       .getOrElse(DebuggingInfoLevel.Vars)
 
-    plugins = options collect {
+    plugins = options.collect {
       case PluginOptionPattern(path) => path
     }
 

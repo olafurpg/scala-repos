@@ -189,10 +189,12 @@ final class ClusterSingletonProxy(singletonManagerPath: String,
 
   def handleInitial(state: CurrentClusterState): Unit = {
     trackChange { () ⇒
-      membersByAge = immutable.SortedSet.empty(ageOrdering) union state.members
+      membersByAge = immutable.SortedSet
+        .empty(ageOrdering)
+        .union(state.members
           .collect {
-          case m if m.status == MemberStatus.Up && matchingRole(m) ⇒ m
-        }
+            case m if m.status == MemberStatus.Up && matchingRole(m) ⇒ m
+          })
     }
   }
 
@@ -286,7 +288,7 @@ final class ClusterSingletonProxy(singletonManagerPath: String,
               "Forwarding message of type [{}] to current singleton instance at [{}]: {}",
               Logging.simpleName(msg.getClass.getName),
               s.path)
-          s forward msg
+          s.forward(msg)
         case None ⇒
           buffer(msg)
       }

@@ -10,14 +10,14 @@ final class ForumSearchApi(client: ESClient, postApi: PostApi)
     extends SearchReadApi[PostView, Query] {
 
   def search(query: Query, from: From, size: Size) =
-    client.search(query, from, size) flatMap { res =>
+    client.search(query, from, size).flatMap { res =>
       postApi.viewsFromIds(res.ids)
     }
 
   def count(query: Query) =
-    client.count(query) map (_.count)
+    client.count(query).map(_.count)
 
-  def store(post: Post) = postApi liteView post flatMap {
+  def store(post: Post) = postApi.liteView(post).flatMap {
     _ ?? { view =>
       client.store(Id(view.post.id), toDoc(view))
     }
@@ -27,8 +27,9 @@ final class ForumSearchApi(client: ESClient, postApi: PostApi)
     Json.obj(
       Fields.body -> view.post.text.take(10000),
       Fields.topic -> view.topic.name,
-      Fields.author -> ~(view.post.userId orElse view.post.author map
-        (_.toLowerCase)),
+      Fields.author -> ~(view.post.userId
+        .orElse(view.post.author)
+        .map(_.toLowerCase)),
       Fields.topicId -> view.topic.id,
       Fields.staff -> view.post.isStaff,
       Fields.troll -> view.post.troll,
@@ -43,8 +44,8 @@ final class ForumSearchApi(client: ESClient, postApi: PostApi)
         import lila.forum.tube.postTube
         $enumerate.bulk[Option[Post]]($query[Post](Json.obj()), 500) {
           postOptions =>
-            (postApi liteViews postOptions.flatten) flatMap { views =>
-              c.storeBulk(views map (v => Id(v.post.id) -> toDoc(v)))
+            (postApi.liteViews(postOptions.flatten)).flatMap { views =>
+              c.storeBulk(views.map(v => Id(v.post.id) -> toDoc(v)))
             }
         }
       }

@@ -171,7 +171,7 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
 
       When(
         "A number of consecutive request equal to the maxFailures configuration of the circuit breaker is failing")
-      (1 to baseCircuitBreakerPropsBuilder.maxFailures) foreach { index ⇒
+      ((1 to baseCircuitBreakerPropsBuilder.maxFailures)).foreach { index ⇒
         receiverRespondsWithFailureToRequest(s"request$index")
       }
 
@@ -189,7 +189,7 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
 
       When(
         "A number of consecutive request equal to the maxFailures configuration of the circuit breaker is failing")
-      (1 to baseCircuitBreakerPropsBuilder.maxFailures) foreach { index ⇒
+      ((1 to baseCircuitBreakerPropsBuilder.maxFailures)).foreach { index ⇒
         receiverRespondsWithFailureToRequest(s"request$index")
       }
 
@@ -213,7 +213,7 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
 
       When(
         "A number of consecutive request equal to the maxFailures configuration of the circuit breaker is failing")
-      (1 to baseCircuitBreakerPropsBuilder.maxFailures) foreach { index ⇒
+      ((1 to baseCircuitBreakerPropsBuilder.maxFailures)).foreach { index ⇒
         receiverRespondsWithFailureToRequest(s"request$index")
       }
 
@@ -435,7 +435,7 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
       val circuitBreaker = defaultCircuitBreaker
 
       When("Circuit enters OPEN state")
-      (1 to baseCircuitBreakerPropsBuilder.maxFailures) foreach { index ⇒
+      ((1 to baseCircuitBreakerPropsBuilder.maxFailures)).foreach { index ⇒
         receiverRespondsWithFailureToRequest(s"request$index")
       }
 
@@ -451,7 +451,7 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
       val circuitBreaker = defaultCircuitBreaker
 
       When("Circuit enters OPEN state")
-      (1 to baseCircuitBreakerPropsBuilder.maxFailures) foreach { index ⇒
+      ((1 to baseCircuitBreakerPropsBuilder.maxFailures)).foreach { index ⇒
         receiverRespondsWithFailureToRequest(s"request$index")
       }
 

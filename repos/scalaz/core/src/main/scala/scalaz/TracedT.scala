@@ -5,7 +5,7 @@ package scalaz
   */
 final case class TracedT[W[_], A, B](run: W[A => B]) {
   def map[C](f: B => C)(implicit W: Functor[W]): TracedT[W, A, C] =
-    TracedT(W.map(run)(_ andThen f))
+    TracedT(W.map(run)(_.andThen(f)))
 
   def cobind[C](f: TracedT[W, A, B] => C)(implicit W: Cobind[W],
                                           A: Semigroup[A]): TracedT[W, A, C] =
@@ -22,7 +22,7 @@ final case class TracedT[W[_], A, B](run: W[A => B]) {
     W.copoint(run).apply(A.zero)
 
   def lower(implicit W: Functor[W], A: Monoid[A]): W[B] =
-    W.map(run)(_ apply A.zero)
+    W.map(run)(_.apply(A.zero))
 
   def contramap[C](f: C => A)(implicit W: Functor[W]): TracedT[W, C, B] =
     TracedT(W.map(run)(f.andThen))
@@ -39,7 +39,7 @@ sealed abstract class TracedTInstances5 {
     : Contravariant[TracedT[W, ?, C]] =
     new Contravariant[TracedT[W, ?, C]] {
       override def contramap[A, B](r: TracedT[W, A, C])(f: B => A) =
-        r contramap f
+        r.contramap(f)
     }
 }
 
@@ -136,7 +136,7 @@ private trait TracedTFunctor[W[_], C] extends Functor[TracedT[W, C, ?]] {
   implicit def W: Functor[W]
 
   override final def map[A, B](fa: TracedT[W, C, A])(f: A => B) =
-    fa map f
+    fa.map(f)
 }
 
 private trait TracedTDistributive[W[_], C]

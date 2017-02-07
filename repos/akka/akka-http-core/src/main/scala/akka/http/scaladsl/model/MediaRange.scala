@@ -79,7 +79,7 @@ object MediaRange {
       r ~~ mainType ~~ '/' ~~ '*'
       if (qValue < 1.0f) r ~~ ";q=" ~~ qValue
       if (params.nonEmpty)
-        params foreach { case (k, v) ⇒ r ~~ ';' ~~ ' ' ~~ k ~~ '=' ~~# v }
+        params.foreach { case (k, v) ⇒ r ~~ ';' ~~ ' ' ~~ k ~~ '=' ~~# v }
       r
     }
     override def isApplication = mainType == "application"
@@ -131,7 +131,7 @@ object MediaRanges extends ObjectRegistry[String, MediaRange] {
   sealed abstract case class PredefinedMediaRange(value: String)
       extends MediaRange
       with LazyValueBytesRenderable {
-    val mainType = value takeWhile (_ != '/')
+    val mainType = value.takeWhile(_ != '/')
     register(mainType, this)
     def params = Map.empty
     def qValue = 1.0f

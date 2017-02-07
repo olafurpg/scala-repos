@@ -93,7 +93,7 @@ class SerialServerDispatcherTest extends FunSuite with MockitoSugar {
     val s = new Service[String, String] {
       def apply(req: String) = {
         ncall += 1
-        val prev = l() getOrElse "undefined"
+        val prev = l().getOrElse("undefined")
         l() = req
         Future.value(prev)
       }

@@ -27,7 +27,7 @@ class WrappedArrayTest extends FunSuite {
 
         builder.beginCollection(coll.size)
         coll.foreach { (elem: AnyRef) =>
-          builder putElement { b =>
+          builder.putElement { b =>
             val elemClass = elem.getClass
             // TODO: allow passing in ClassLoader to picklers selected from registry
             val classLoader: ClassLoader = elemClass.getClassLoader

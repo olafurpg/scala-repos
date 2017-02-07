@@ -27,7 +27,7 @@ object CaseClassMergeDemo extends App {
   val foo = Foo(23, "foo", true)
   val bar = Bar(false, "bar")
 
-  val merged = foo merge bar
+  val merged = foo.merge(bar)
   assert(merged == Foo(23, "bar", false))
 }
 

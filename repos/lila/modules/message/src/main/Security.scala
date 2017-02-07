@@ -10,10 +10,10 @@ private[message] final class MessageSecurity(
   import lila.pref.Pref.Message._
 
   def canMessage(from: String, to: String): Fu[Boolean] =
-    blocks(to, from) flatMap {
+    blocks(to, from).flatMap {
       case true => fuccess(false)
       case false =>
-        getPref(to).map(_.message) flatMap {
+        getPref(to).map(_.message).flatMap {
           case NEVER => fuccess(false)
           case FRIEND => follows(to, from)
           case ALWAYS => fuccess(true)

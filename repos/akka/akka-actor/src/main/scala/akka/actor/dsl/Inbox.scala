@@ -60,7 +60,7 @@ trait Inbox { this: ActorDSL.type ⇒
 
   private implicit val deadlineOrder: Ordering[Query] = new Ordering[Query] {
     def compare(left: Query, right: Query): Int =
-      left.deadline.time compare right.deadline.time
+      left.deadline.time.compare(right.deadline.time)
   }
 
   private class InboxActor(size: Int) extends Actor with ActorLogging {
@@ -70,13 +70,13 @@ trait Inbox { this: ActorDSL.type ⇒
     var printedWarning = false
 
     def enqueueQuery(q: Query) {
-      val query = q withClient sender()
-      clients enqueue query
+      val query = q.withClient(sender())
+      clients.enqueue(query)
       clientsByTimeout += query
     }
 
     def enqueueMessage(msg: Any) {
-      if (messages.size < size) messages enqueue msg
+      if (messages.size < size) messages.enqueue(msg)
       else {
         if (!printedWarning) {
           log.warning(
@@ -115,7 +115,7 @@ trait Inbox { this: ActorDSL.type ⇒
             }
             currentSelect = null
           }
-        case StartWatch(target) ⇒ context watch target
+        case StartWatch(target) ⇒ context.watch(target)
         case Kick ⇒
           val now = Deadline.now
           val pred = (q: Query) ⇒ q.deadline.time < now.time
@@ -137,7 +137,7 @@ trait Inbox { this: ActorDSL.type ⇒
             }
             currentMsg = null
           }
-      }: Receive) andThen { _ ⇒
+      }: Receive).andThen { _ ⇒
         if (clients.isEmpty) {
           if (currentDeadline.isDefined) {
             currentDeadline.get._2.cancel()

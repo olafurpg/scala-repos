@@ -72,7 +72,7 @@ class Hotspot extends Jvm {
     counters(name).get(name)
 
   object opts extends Opts {
-    def compileThresh = opt("CompileThreshold") map (_.toInt)
+    def compileThresh = opt("CompileThreshold").map(_.toInt)
   }
 
   private[this] def ticksToDuration(ticks: Long, freq: Long) =
@@ -114,7 +114,7 @@ class Hotspot extends Jvm {
         bucket <- cs.get("sun.gc.generation.0.agetable.bytes.%02d".format(i))
       } yield long(bucket)
 
-      Heap(allocated, tenuringThreshold getOrElse -1, ageHisto)
+      Heap(allocated, tenuringThreshold.getOrElse(-1), ageHisto)
     }
 
     val timestamp = for {
@@ -187,7 +187,7 @@ class Hotspot extends Jvm {
         used <- cs.get("sun.gc.generation.0.space.0.used").map(long)
       } yield PoolState(invocations, capacity.bytes, used.bytes)
 
-      state getOrElse NilJvm.edenPool.state()
+      state.getOrElse(NilJvm.edenPool.state())
     }
   }
 
@@ -201,7 +201,7 @@ class Hotspot extends Jvm {
   }
 
   def snapCounters: Map[String, String] =
-    counters("") mapValues (_.getValue().toString)
+    counters("").mapValues(_.getValue().toString)
 
   def forceGc(): Unit = System.gc()
 }

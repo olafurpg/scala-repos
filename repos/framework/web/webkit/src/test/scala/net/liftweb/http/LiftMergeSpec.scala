@@ -57,7 +57,7 @@ class WithLiftContext(val rules: LiftRules,
 
 class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
   val mockReq = mock[Req]
-  mockReq.contextPath returns "/context-path"
+  mockReq.contextPath.returns("/context-path")
 
   val testSession = new LiftSession("/context-path", "underlying id", Empty)
 

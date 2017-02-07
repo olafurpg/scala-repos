@@ -321,7 +321,7 @@ abstract class ClusterRoundRobinSpec
         // note that router2 has totalInstances = 3, maxInstancesPerNode = 1
         val routees = currentRoutees(router2)
         val routeeAddresses =
-          routees map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }
+          routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }
 
         routeeAddresses.size should ===(3)
         replies.values.sum should ===(iterationCount)
@@ -337,7 +337,7 @@ abstract class ClusterRoundRobinSpec
 
       def routees = currentRoutees(router4)
       def routeeAddresses =
-        (routees map {
+        (routees.map {
           case ActorSelectionRoutee(sel) ⇒ fullAddress(sel.anchor)
         }).toSet
 
@@ -364,11 +364,11 @@ abstract class ClusterRoundRobinSpec
       runOn(first) {
         def routees = currentRoutees(router2)
         def routeeAddresses =
-          (routees map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }).toSet
+          (routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }).toSet
 
-        routees foreach { case ActorRefRoutee(ref) ⇒ watch(ref) }
+        routees.foreach { case ActorRefRoutee(ref) ⇒ watch(ref) }
         val notUsedAddress =
-          ((roles map address).toSet diff routeeAddresses).head
+          ((roles.map(address)).toSet.diff(routeeAddresses)).head
         val downAddress = routeeAddresses.find(_ != address(first)).get
         val downRouteeRef = routees.collectFirst {
           case ActorRefRoutee(ref) if ref.path.address == downAddress ⇒ ref

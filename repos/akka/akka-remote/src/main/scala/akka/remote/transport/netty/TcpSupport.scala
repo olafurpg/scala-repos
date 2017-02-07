@@ -26,7 +26,7 @@ private[remote] object ChannelLocalActor
   override def initialValue(channel: Channel): Option[HandleEventListener] =
     None
   def notifyListener(channel: Channel, msg: HandleEvent): Unit =
-    get(channel) foreach { _ notify msg }
+    get(channel).foreach { _.notify(msg) }
 }
 
 /**

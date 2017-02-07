@@ -109,7 +109,7 @@ class Tester(ntests: Int, inputs: Array[SourceFile], settings: Settings) {
     def insertAll() {
       for (chr <- if (toLeft) deleted else deleted.reverse) {
         val sf = inputs(sfidx)
-        val (pre, post) = sf. /*!*/ content splitAt pos
+        val (pre, post) = sf. /*!*/ content.splitAt(pos)
         pos += 1
         val sf1 = new BatchSourceFile(sf.file, pre ++ (chr +: post))
         inputs(sfidx) = sf1
@@ -165,11 +165,11 @@ class Tester(ntests: Int, inputs: Array[SourceFile], settings: Settings) {
              testPositions: Seq[Int],
              otherTest: () => Unit): Option[ErrorTrace] = {
     print("new round with " + changes.length + " changes:")
-    changes foreach (_.deleteAll())
+    changes.foreach(_.deleteAll())
     otherTest()
     def errorCount() = compiler.ask(() => reporter.ERROR.count)
 //    println("\nhalf test round: "+errorCount())
-    changes.view.reverse foreach (_.insertAll())
+    changes.view.reverse.foreach(_.insertAll())
     otherTest()
     println("done test round: " + errorCount())
     if (errorCount() != 0)
@@ -212,8 +212,8 @@ object Tester {
     val (_, filenames) = settings.processArguments(args.toList.tail, true)
     println("filenames = " + filenames)
     val files =
-      filenames.toArray map
-        (str => new BatchSourceFile(AbstractFile.getFile(str)): SourceFile)
+      filenames.toArray.map(str =>
+        new BatchSourceFile(AbstractFile.getFile(str)): SourceFile)
     new Tester(args(0).toInt, files, settings).run()
     sys.exit(0)
   }

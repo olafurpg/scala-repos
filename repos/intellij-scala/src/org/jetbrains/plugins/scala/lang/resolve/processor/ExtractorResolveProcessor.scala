@@ -113,7 +113,8 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
                 for (paramType <- clauses(0).parameters
                        .apply(0)
                        .getType(TypingContext.empty)
-                     if tp conforms r.substitutor.subst(paramType)) return true
+                     if tp.conforms(r.substitutor.subst(paramType)))
+                  return true
               }
               false
             case _ => true

@@ -34,7 +34,7 @@ class RingTest extends FunSuite {
     //val cls = m.runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
-    def runTest(name: String)(f: => Unit) = test("%s:%s" format (cls, name))(f)
+    def runTest(name: String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
 
     // Ring[A]'s zero
     val z: A = Ring[A].zero
@@ -61,7 +61,7 @@ class RingTest extends FunSuite {
 
     runTest("fromInt(3)")(assert(Ring[A].fromInt(3) == b))
 
-    runTest("3 pow 2")(assert((b pow 2) === -c))
+    runTest("3 pow 2")(assert((b.pow(2)) === -c))
   }
 
   implicit val mc: MathContext = MathContext.DECIMAL128

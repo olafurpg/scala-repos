@@ -38,10 +38,10 @@ object ConnectionPoolSettingsImpl
       "akka.http.host-connection-pool") {
   def fromSubConfig(root: Config, c: Config) = {
     ConnectionPoolSettingsImpl(
-      c getInt "max-connections",
-      c getInt "max-retries",
-      c getInt "max-open-requests",
-      c getInt "pipelining-limit",
+      c.getInt("max-connections"),
+      c.getInt("max-retries"),
+      c.getInt("max-open-requests"),
+      c.getInt("pipelining-limit"),
       c getPotentiallyInfiniteDuration "idle-timeout",
       ClientConnectionSettingsImpl.fromSubConfig(root, c.getConfig("client"))
     )

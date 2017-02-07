@@ -237,7 +237,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
 
           // store boxed value(s) into localSlots
           val storeOps =
-            localSlots.toList reverseMap {
+            localSlots.toList.reverseMap {
               case (slot, tp) =>
                 new VarInsnNode(tp.getOpcode(ISTORE), slot)
             }
@@ -257,7 +257,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
           }
 
           // rewrite consumers
-          finalCons foreach {
+          finalCons.foreach {
             case write: StaticSetterOrInstanceWrite =>
               assert(
                 !keepBox,
@@ -314,7 +314,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
               case Some(List(local)) =>
                 local.desc = tp.getDescriptor
               case Some(locals) =>
-                locals foreach method.localVariables.remove
+                locals.foreach(method.localVariables.remove)
               case _ =>
             }
         }
@@ -362,7 +362,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
                 } else {
                   var loadOps: List[AbstractInsnNode] = null
                   val consumeStack =
-                    boxKind.boxedTypes.zipWithIndex reverseMap {
+                    boxKind.boxedTypes.zipWithIndex.reverseMap {
                       case (tp, i) =>
                         if (i == valueIndex) {
                           val resultSlot = getLocal(tp.getSize)
@@ -646,9 +646,12 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
     def valueCreationKind(
         insn: AbstractInsnNode,
         prodCons: ProdConsAnalyzer): Option[(BoxCreation, BoxKind)] = {
-      PrimitiveBox.checkPrimitiveBox(insn, None, prodCons) orElse Ref
-        .checkRefCreation(insn, None, prodCons) orElse Tuple
-        .checkTupleCreation(insn, None, prodCons)
+      PrimitiveBox
+        .checkPrimitiveBox(insn, None, prodCons)
+        .orElse(Ref
+          .checkRefCreation(insn, None, prodCons))
+        .orElse(Tuple
+          .checkTupleCreation(insn, None, prodCons))
     }
 
     /**
@@ -675,7 +678,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
         if (prodCons.producersForInputsOf(dupOp) == Set(newOp)) {
           val dupCons = prodCons.consumersOfOutputsFrom(dupOp)
           val initCalls =
-            dupCons collect {
+            dupCons.collect {
               case mi: MethodInsnNode
                   if mi.name == GenBCode.INSTANCE_CONSTRUCTOR_NAME &&
                     mi.owner == newOp.desc =>

@@ -7,7 +7,7 @@ object Test extends App {
   val t = new java.util.Date
   val x = new java.util.Formattable {
     def formatTo(ff: java.util.Formatter, g: Int, w: Int, p: Int): Unit =
-      ff format "xxx"
+      ff.format("xxx")
   }
 
   // 1) number of arguments

@@ -11,9 +11,9 @@ abstract class ScalazArbitraryPlatform {
 
   import scalaz.concurrent.Future
   implicit def FutureArbitrary[A: Arbitrary]: Arbitrary[Future[A]] =
-    Arbitrary(arbitrary[A] map ((x: A) => Future.now(x)))
+    Arbitrary(arbitrary[A].map((x: A) => Future.now(x)))
 
   import scalaz.concurrent.Task
   implicit def TaskArbitrary[A: Arbitrary]: Arbitrary[Task[A]] =
-    Arbitrary(arbitrary[A] map ((x: A) => Task.now(x)))
+    Arbitrary(arbitrary[A].map((x: A) => Task.now(x)))
 }

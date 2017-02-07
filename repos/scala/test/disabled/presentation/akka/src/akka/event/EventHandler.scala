@@ -224,7 +224,7 @@ object EventHandler extends ListenerManagement {
     case Nil => "akka.event.EventHandler$DefaultListener" :: Nil
     case listeners => listeners
   }
-  defaultListeners foreach { listenerName =>
+  defaultListeners.foreach { listenerName =>
     try {
       ReflectiveAccess.getClassFor[Actor](listenerName) match {
         case r: Right[_, Class[Actor]] =>

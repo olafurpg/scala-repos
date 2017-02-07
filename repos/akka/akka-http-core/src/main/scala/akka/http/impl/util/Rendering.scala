@@ -200,7 +200,7 @@ private[http] trait Rendering {
     * or in double quotes (if it contains at least one non-token char).
     */
   def ~~#(s: String): this.type =
-    if (CharacterClasses.tchar matchesAll s) this ~~ s else ~~#!(s)
+    if (CharacterClasses.tchar.matchesAll(s)) this ~~ s else ~~#!(s)
 
   /**
     * Renders the given string in double quotes.

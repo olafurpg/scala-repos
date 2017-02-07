@@ -228,16 +228,16 @@ class TlsSpec
     }
 
     object MediumMessages extends PayloadScenario {
-      val strs = "0123456789" map (d ⇒ d.toString * (rnd.nextInt(9000) + 1000))
-      def inputs = strs map (s ⇒ SendBytes(ByteString(s)))
+      val strs = "0123456789".map(d ⇒ d.toString * (rnd.nextInt(9000) + 1000))
+      def inputs = strs.map(s ⇒ SendBytes(ByteString(s)))
       def output = ByteString((strs :\ "")(_ ++ _))
     }
 
     object LargeMessages extends PayloadScenario {
       // TLS max packet size is 16384 bytes
       val strs =
-        "0123456789" map (d ⇒ d.toString * (rnd.nextInt(9000) + 17000))
-      def inputs = strs map (s ⇒ SendBytes(ByteString(s)))
+        "0123456789".map(d ⇒ d.toString * (rnd.nextInt(9000) + 17000))
+      def inputs = strs.map(s ⇒ SendBytes(ByteString(s)))
       def output = ByteString((strs :\ "")(_ ++ _))
     }
 

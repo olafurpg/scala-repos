@@ -158,7 +158,7 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     * only to the contained processing stages).
     */
   override def addAttributes(attr: Attributes): BidiFlow[I1, O1, I2, O2, Mat] =
-    withAttributes(module.attributes and attr)
+    withAttributes(module.attributes.and(attr))
 
   /**
     * Add a ``name`` attribute to this Flow.

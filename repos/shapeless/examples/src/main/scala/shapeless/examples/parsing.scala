@@ -65,7 +65,7 @@ object CombinatorTesting extends App {
     */
   implicit def flattenParseResult[T](implicit flattenP: Flatten[T]) =
     new Flatten[ParseResult[T]] {
-      def apply(p: ParseResult[T]) = (p map flattenP) getOrElse Nil
+      def apply(p: ParseResult[T]) = (p.map(flattenP)).getOrElse(Nil)
     }
 
   def flatten[P](p: P)(implicit flatten: Flatten[P]) = flatten(p)

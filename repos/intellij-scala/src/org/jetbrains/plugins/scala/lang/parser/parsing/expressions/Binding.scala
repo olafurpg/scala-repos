@@ -30,7 +30,7 @@ object Binding {
     builder.getTokenType match {
       case ScalaTokenTypes.tCOLON =>
         builder.advanceLexer //Ate :
-        if (!ParamType.parse(builder)) builder error ErrMsg("wrong.type")
+        if (!ParamType.parse(builder)) builder.error(ErrMsg("wrong.type"))
       case _ =>
     }
 

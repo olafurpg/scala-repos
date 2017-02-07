@@ -21,11 +21,11 @@ final class History[Metadata](ttl: Duration) {
     if (v > version) None
     else if (v == version) Some(Nil)
     else {
-      val msgs = (v + 1 to version).toList flatMap message
-      (msgs.size == version - v) option msgs
+      val msgs = (v + 1 to version).toList.flatMap(message)
+      ((msgs.size == version - v)).option(msgs)
     }
 
-  private def message(v: Int) = Option(messages getIfPresent v)
+  private def message(v: Int) = Option(messages.getIfPresent(v))
 
   def +=(payload: JsObject, metadata: Metadata): Message = {
     privateVersion = privateVersion + 1

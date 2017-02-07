@@ -94,7 +94,7 @@ class appTest extends JUnitSuite with ShouldMatchers {
     shadowAlert.getMessage shouldBe "MESSAGE"
 
     alert.getButton(DialogInterface.BUTTON_POSITIVE).performClick()
-    alert shouldNot be a 'showing
+    (alert shouldNot be).a('showing)
   }
 
   @Test

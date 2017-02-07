@@ -50,7 +50,7 @@ trait CounterLike[
   def contains(k: K) = data.contains(k)
 
   override def apply(k: K) = {
-    data.get(k) getOrElse default
+    data.get(k).getOrElse(default)
   }
 
   def update(k: K, v: V) { data(k) = v }

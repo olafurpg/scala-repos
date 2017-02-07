@@ -82,7 +82,7 @@ trait Kinds { self: SymbolTable =>
                              f: (Symbol, Symbol) => String) =
       (if (xs.isEmpty) ""
        else
-         xs map f.tupled mkString
+         xs.map(f.tupled) mkString
            ("\n", ", ",
            ""))
 
@@ -180,7 +180,7 @@ trait Kinds { self: SymbolTable =>
           if (hkparam.typeParams.isEmpty && hkarg.typeParams.isEmpty) {
             // base-case: kind *
             kindCheck(variancesMatch(hkarg, hkparam),
-                      _ varianceError (hkarg -> hkparam))
+                      _.varianceError(hkarg -> hkparam))
             // instantiateTypeParams(tparams, targs)
             //   higher-order bounds, may contain references to type arguments
             // substSym(hkparams, hkargs)
@@ -303,7 +303,7 @@ trait Kinds { self: SymbolTable =>
                                              alias: Option[String])
         extends ScalaNotation {
       override def toString: String = {
-        alias getOrElse {
+        alias.getOrElse {
           typeAlias(order) + n.map(_.toString).getOrElse("")
         }
       }
@@ -333,20 +333,20 @@ trait Kinds { self: SymbolTable =>
           else Some(sym.nameString)
         StringState(tokens :+ Head(order, Some(n), alias))
       }
-      def countByOrder(o: Int): Int = tokens count {
+      def countByOrder(o: Int): Int = tokens.count {
         case Head(`o`, _, _) => true
         case t => false
       }
       // Replace Head(o, Some(1), a) with Head(o, None, a) if countByOrder(o) <= 1, so F1[A] becomes F[A]
       def removeOnes: StringState = {
-        val maxOrder = (tokens map {
+        val maxOrder = (tokens.map {
           case Head(o, _, _) => o
           case _ => 0
         }).max
         StringState((tokens /: (0 to maxOrder)) {
           (ts: Seq[ScalaNotation], o: Int) =>
             if (countByOrder(o) <= 1)
-              ts map {
+              ts.map {
                 case Head(`o`, _, a) => Head(o, None, a)
                 case t => t
               } else ts
@@ -354,7 +354,7 @@ trait Kinds { self: SymbolTable =>
       }
       // Replace Head(o, n, Some(_)) with Head(o, n, None), so F[F] becomes F[A].
       def removeAlias: StringState = {
-        StringState(tokens map {
+        StringState(tokens.map {
           case Head(o, n, Some(_)) => Head(o, n, None)
           case t => t
         })
@@ -390,7 +390,7 @@ trait Kinds { self: SymbolTable =>
                     val args: Seq[TypeConKind.Argument])
       extends Kind {
     import Kind.StringState
-    val order = (args map (_.kind.order)).max + 1
+    val order = (args.map(_.kind.order)).max + 1
     def description: String =
       if (order == 1) "This is a type constructor: a 1st-order-kinded type."
       else
@@ -409,7 +409,7 @@ trait Kinds { self: SymbolTable =>
         s0: StringState): StringState = {
       var s: StringState = s0
       s = s.append(v.symbolicString).appendHead(order, sym).append("[")
-      args.zipWithIndex foreach {
+      args.zipWithIndex.foreach {
         case (arg, i) =>
           s = arg.kind.buildState(arg.sym, arg.variance)(s)
           if (i != args.size - 1) {
@@ -421,7 +421,7 @@ trait Kinds { self: SymbolTable =>
     }
     def starNotation: String = {
       import Variance._
-      (args map { arg =>
+      (args.map { arg =>
         (if (arg.kind.order == 0) arg.kind.starNotation
          else "(" + arg.kind.starNotation + ")") +
           (if (arg.variance == Invariant) " -> "
@@ -462,7 +462,7 @@ trait Kinds { self: SymbolTable =>
           else tpe.asSeenFrom(pre, owner).bounds
         if (!tpe.isHigherKinded) ProperTypeKind(bounds)
         else
-          TypeConKind(bounds, tpe.typeParams map { p =>
+          TypeConKind(bounds, tpe.typeParams.map { p =>
             Argument(p.variance, infer(p, false))(p)
           })
       }

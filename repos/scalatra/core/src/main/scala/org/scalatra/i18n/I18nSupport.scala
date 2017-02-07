@@ -63,7 +63,8 @@ trait I18nSupport { this: ScalatraBase =>
   /*
    * Resolve Locale based on HTTP request parameter or Cookie
    */
-  private def resolveLocale: Locale = resolveHttpLocale getOrElse defaultLocale
+  private def resolveLocale: Locale =
+    resolveHttpLocale.getOrElse(defaultLocale)
 
   /*
    * Get locale either from HTTP param, Cookie or Accept-Language header.
@@ -82,7 +83,7 @@ trait I18nSupport { this: ScalatraBase =>
         cookies.set(LocaleKey, localeValue)
         Some(localeValue)
       case _ => cookies.get(LocaleKey)
-    }).map(localeFromString(_)) orElse resolveHttpLocaleFromUserAgent
+    }).map(localeFromString(_)).orElse(resolveHttpLocaleFromUserAgent)
   }
 
   /**
@@ -92,7 +93,7 @@ trait I18nSupport { this: ScalatraBase =>
     * @return first preferred found locale or None
     */
   private def resolveHttpLocaleFromUserAgent: Option[Locale] = {
-    request.headers.get("Accept-Language") map { s =>
+    request.headers.get("Accept-Language").map { s =>
       val locales = s
         .split(",")
         .map(s => {

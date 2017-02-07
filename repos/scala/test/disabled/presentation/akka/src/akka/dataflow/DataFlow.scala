@@ -96,10 +96,10 @@ object DataFlow {
       def receive = {
         case Get =>
           dataFlow.value.get match {
-            case Some(value) => self reply value
+            case Some(value) => self.reply(value)
             case None => readerFuture = self.senderFuture
           }
-        case Set(v: T) => readerFuture.map(_ completeWithResult v)
+        case Set(v: T) => readerFuture.map(_.completeWithResult(v))
         case Exit => self.stop()
       }
     }
@@ -149,11 +149,11 @@ object DataFlow {
       * Retrieves the value of variable, throws a DataFlowVariableException if it times out.
       */
     def apply(): T = {
-      value.get getOrElse {
+      value.get.getOrElse {
         val out = actorOf(new Out(this)).start()
 
         val result = try {
-          blockedReaders offer out
+          blockedReaders.offer(out)
           (out !! Get).as[T]
         } catch {
           case e: Exception =>

@@ -500,7 +500,7 @@ private[akka] class ActorCell(
       // As each state accepts a strict subset of another state, it is enough to unstash if we "walk up" the state
       // chain
       val todo =
-        if (newState < currentState) unstashAll() reverse_::: rest else rest
+        if (newState < currentState) unstashAll().reverse_:::(rest) else rest
 
       if (isTerminated) sendAllToDeadLetters(todo)
       else if (todo.nonEmpty) invokeAll(todo, newState)
@@ -622,7 +622,7 @@ private[akka] class ActorCell(
       }
     }
 
-    failure foreach { throw _ }
+    failure.foreach { throw _ }
 
     try {
       val created = newActor()

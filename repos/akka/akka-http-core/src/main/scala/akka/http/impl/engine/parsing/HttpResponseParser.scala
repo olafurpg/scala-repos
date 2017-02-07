@@ -67,7 +67,7 @@ private[http] class HttpResponseParser(_settings: ParserSettings,
         case _ ⇒
           StatusCodes.getForKey(code) match {
             case Some(x) ⇒ x
-            case None ⇒ customStatusCodes(code) getOrElse badStatusCode
+            case None ⇒ customStatusCodes(code).getOrElse(badStatusCode)
           }
       }
     }

@@ -40,16 +40,18 @@ private[io] class OutputStreamWriter(out: OutputStream, bufsize: Int)
   def write(buf: Buf): Future[Unit] =
     if (done.isDefined) done
     else
-      (done or writeOp.getAndSet(_ => Future.exception(WriteExc))(buf)) transform {
-        case Return(_) =>
-          writeOp.set(doWrite)
-          Future.Done
+      (done
+        .or(writeOp.getAndSet(_ => Future.exception(WriteExc))(buf)))
+        .transform {
+          case Return(_) =>
+            writeOp.set(doWrite)
+            Future.Done
 
-        case Throw(cause) =>
-          // We don't need to wait for the close, we care only that it is called.
-          if (cause != WriteExc) close()
-          Future.exception(cause)
-      }
+          case Throw(cause) =>
+            // We don't need to wait for the close, we care only that it is called.
+            if (cause != WriteExc) close()
+            Future.exception(cause)
+        }
 
   def fail(cause: Throwable): Unit =
     done.updateIfEmpty(Throw(cause))

@@ -35,14 +35,14 @@ private[opening] final class OpeningApi(openingColl: Coll,
         Try(json.as[Generated]) match {
           case Failure(err) => fufail(err.getMessage)
           case Success(generated) =>
-            generated.toOpening.future flatMap insertOpening
+            generated.toOpening.future.flatMap(insertOpening)
         }
       }
 
     def insertOpening(opening: Opening.ID => Opening): Fu[Opening.ID] =
-      lila.db.Util findNextId openingColl flatMap { id =>
+      (lila.db.Util findNextId openingColl).flatMap { id =>
         val o = opening(id)
-        openingColl.count(BSONDocument("fen" -> o.fen).some) flatMap {
+        openingColl.count(BSONDocument("fen" -> o.fen).some).flatMap {
           case 0 => openingColl insert o inject o.id
           case _ => fufail("Duplicate opening")
         }
@@ -62,10 +62,12 @@ private[opening] final class OpeningApi(openingColl: Coll,
     def add(a: Attempt) = attemptColl insert a void
 
     def hasPlayed(user: User, opening: Opening): Fu[Boolean] =
-      attemptColl.count(
-        BSONDocument(
-          Attempt.BSONFields.id -> Attempt.makeId(opening.id, user.id)
-        ).some) map (0 !=)
+      attemptColl
+        .count(
+          BSONDocument(
+            Attempt.BSONFields.id -> Attempt.makeId(opening.id, user.id)
+          ).some)
+        .map(0 !=)
 
     def playedIds(user: User, max: Int): Fu[BSONArray] = {
       val col = attemptColl
@@ -96,8 +98,9 @@ private[opening] final class OpeningApi(openingColl: Coll,
           BSONDocument("_id" -> fen),
           BSONDocument("_id" -> false)
         )
-        .one[BSONDocument] map { obj =>
-        ~obj.??(_.getAs[List[String]]("names"))
-      }
+        .one[BSONDocument]
+        .map { obj =>
+          ~obj.??(_.getAs[List[String]]("names"))
+        }
   }
 }

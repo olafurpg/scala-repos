@@ -21,20 +21,20 @@ abstract class Flatten extends InfoTransform {
     */
   private def replaceSymbolInCurrentScope(sym: Symbol): Unit = exitingFlatten {
     removeSymbolInCurrentScope(sym)
-    sym.owner.info.decls enter sym
+    sym.owner.info.decls.enter(sym)
   }
 
   private def removeSymbolInCurrentScope(sym: Symbol): Unit = exitingFlatten {
     val scope = sym.owner.info.decls
-    val old = (scope lookupUnshadowedEntries sym.name).toList
-    old foreach (scope unlink _)
-    def old_s = old map (_.sym) mkString ", "
+    val old = (scope.lookupUnshadowedEntries(sym.name)).toList
+    old.foreach(scope unlink _)
+    def old_s = old.map(_.sym) mkString ", "
     if (old.nonEmpty) debuglog(s"In scope of ${sym.owner}, unlinked $old_s")
   }
 
   private def liftClass(sym: Symbol) {
     if (!sym.isLifted) {
-      sym setFlag LIFTED
+      sym.setFlag(LIFTED)
       debuglog("re-enter " + sym.fullLocationString)
       replaceSymbolInCurrentScope(sym)
     }
@@ -65,15 +65,15 @@ abstract class Flatten extends InfoTransform {
         val decls1 = scopeTransform(clazz) {
           val decls1 = newScope
           if (clazz.isPackageClass) {
-            exitingFlatten { decls foreach (decls1 enter _) }
+            exitingFlatten { decls.foreach(decls1.enter(_)) }
           } else {
             val oldowner = clazz.owner
             exitingFlatten { oldowner.info }
-            parents1 = parents mapConserve (this)
+            parents1 = parents.mapConserve(this)
 
             for (sym <- decls) {
               if (sym.isTerm && !sym.isStaticModule) {
-                decls1 enter sym
+                decls1.enter(sym)
                 if (sym.isModule) {
                   // In theory, we could assert(sym.isMethod), because nested, non-static modules are
                   // transformed to methods (lateMETHOD flag added in RefChecks). But this requires
@@ -86,7 +86,7 @@ abstract class Flatten extends InfoTransform {
                   // classes.
                   // TODO: should we also set the LIFTED flag for static, nested module classes?
                   // currently they don't get the flag, even though they are lifted to the package
-                  sym.moduleClass setFlag LIFTED
+                  sym.moduleClass.setFlag(LIFTED)
                 }
               } else if (sym.isClass) liftSymbol(sym)
             }
@@ -161,7 +161,7 @@ abstract class Flatten extends InfoTransform {
         case _ =>
           tree
       }
-      tree1 setType flattened(tree1.tpe)
+      tree1.setType(flattened(tree1.tpe))
     }
 
     /** Transform statements and add lifted definitions to them. */

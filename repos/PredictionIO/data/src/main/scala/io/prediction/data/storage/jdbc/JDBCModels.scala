@@ -37,11 +37,11 @@ class JDBCModels(client: String, config: StorageClientConfig, prefix: String)
       models $binaryColumnType not null)""".execute().apply()
   }
 
-  def insert(i: Model): Unit = DB localTx { implicit session =>
+  def insert(i: Model): Unit = DB.localTx { implicit session =>
     sql"insert into $tableName values(${i.id}, ${i.models})".update().apply()
   }
 
-  def get(id: String): Option[Model] = DB readOnly { implicit session =>
+  def get(id: String): Option[Model] = DB.readOnly { implicit session =>
     sql"select id, models from $tableName where id = $id"
       .map { r =>
         Model(id = r.string("id"), models = r.bytes("models"))
@@ -50,7 +50,7 @@ class JDBCModels(client: String, config: StorageClientConfig, prefix: String)
       .apply()
   }
 
-  def delete(id: String): Unit = DB localTx { implicit session =>
+  def delete(id: String): Unit = DB.localTx { implicit session =>
     sql"delete from $tableName where id = $id".execute().apply()
   }
 }

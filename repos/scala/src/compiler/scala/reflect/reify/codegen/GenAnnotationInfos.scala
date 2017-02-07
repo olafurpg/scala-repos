@@ -10,7 +10,7 @@ trait GenAnnotationInfos { self: Reifier =>
   // why is that bad? take a look inside
   def reifyAnnotationInfo(ann: AnnotationInfo): Tree = {
     val reifiedArgs =
-      ann.args map { arg =>
+      ann.args.map { arg =>
         val saved1 = reifyTreeSymbols
         val saved2 = reifyTreeTypes
 

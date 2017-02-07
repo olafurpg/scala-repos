@@ -256,10 +256,10 @@ private[scalajs] object UseAsMacros {
             tpe match {
               case MethodType(params, returnTpe) =>
                 val ps =
-                  params map { p =>
+                  params.map { p =>
                     JSMethodParam(p.info, p.asTerm.isParamWithDefault)
                   }
-                flatParams(returnTpe, ps reverse_::: acc)
+                flatParams(returnTpe, ps.reverse_:::(acc))
               case tpe =>
                 JSMethod(acc.reverse, tpe)
             }

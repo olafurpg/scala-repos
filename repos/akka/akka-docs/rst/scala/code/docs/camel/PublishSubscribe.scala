@@ -10,7 +10,7 @@ object PublishSubscribe {
 
     def receive = {
       case msg: CamelMessage =>
-        println("%s received: %s" format (name, msg.body))
+        println("%s received: %s".format(name, msg.body))
     }
   }
 

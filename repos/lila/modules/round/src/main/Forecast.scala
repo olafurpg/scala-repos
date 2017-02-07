@@ -12,7 +12,7 @@ case class Forecast(_id: String, // player full id
                     date: DateTime) {
 
   def apply(g: Game, lastMove: Move): Option[(Forecast, Uci.Move)] =
-    nextMove(g, lastMove) map { move =>
+    nextMove(g, lastMove).map { move =>
       copy(
         steps = steps.collect {
           case (fst :: snd :: rest)
@@ -25,7 +25,7 @@ case class Forecast(_id: String, // player full id
     }
 
   // accept up to 30 lines of 30 moves each
-  def truncate = copy(steps = steps.take(30).map(_ take 30))
+  def truncate = copy(steps = steps.take(30).map(_.take(30)))
 
   private def nextMove(g: Game, last: Move) = steps.foldLeft(none[Uci.Move]) {
     case (None, fst :: snd :: _) if g.turns == fst.ply && fst.is(last) =>

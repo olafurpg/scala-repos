@@ -15,9 +15,9 @@ final class StreamerList(val store: {
     validate(text)._1
   }
 
-  def find(id: String): Fu[Option[Streamer]] = get map (_ find (_.id == id))
+  def find(id: String): Fu[Option[Streamer]] = get.map(_ find (_.id == id))
 
-  private[tv] def lichessIds: Fu[Set[String]] = get map {
+  private[tv] def lichessIds: Fu[Set[String]] = get.map {
     _.filter(_.featured).map(_.lichessName.toLowerCase).toSet
   }
 
@@ -34,7 +34,7 @@ final class StreamerList(val store: {
                 case s if s == "twitch" => Twitch
                 case s if s == "hitbox" => Hitbox
                 case s if s == "youtube" => Youtube
-                case s => sys error s"Invalid service name: $s"
+                case s => sys.error(s"Invalid service name: $s")
               },
               streamerName = c getString "streamer_name",
               streamerNameForDisplay =

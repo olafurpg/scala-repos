@@ -22,5 +22,5 @@ object Msg {
 }
 object Oops {
   implicit def someImplicit(s: Seq[_]): String = sys.error("stub")
-  def item: String = Nil map { case e: Any => e }
+  def item: String = Nil.map { case e: Any => e }
 }

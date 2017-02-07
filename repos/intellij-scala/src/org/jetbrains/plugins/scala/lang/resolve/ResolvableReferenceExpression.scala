@@ -282,7 +282,7 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
               args.getContext match {
                 case methodCall: ScMethodCall
                     if methodCall.isNamedParametersEnabledEverywhere =>
-                  method.getParameterList.getParameters foreach { p =>
+                  method.getParameterList.getParameters.foreach { p =>
                     processor.execute(p,
                                       ResolveState
                                         .initial()

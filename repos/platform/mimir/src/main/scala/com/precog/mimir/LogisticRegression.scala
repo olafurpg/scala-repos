@@ -161,7 +161,7 @@ trait LogisticRegressionLibModule[M[+ _]]
 
       def reduceDouble(seq0: Seq[ColumnValues]): Result = {
         val seq =
-          seq0 filter { arr =>
+          seq0.filter { arr =>
             arr.last == 0 || arr.last == 1
           }
 
@@ -174,15 +174,17 @@ trait LogisticRegressionLibModule[M[+ _]]
           val features = schema.columns(JArrayHomogeneousT(JNumberT))
 
           val result: Set[Result] =
-            features map {
+            features.map {
               case c: HomogeneousArrayColumn[_]
                   if c.tpe.manifest.erasure == classOf[Array[Double]] =>
                 val mapped =
-                  range filter { r =>
-                    c.isDefinedAt(r)
-                  } map { i =>
-                    1.0 +: c.asInstanceOf[HomogeneousArrayColumn[Double]](i)
-                  }
+                  range
+                    .filter { r =>
+                      c.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      1.0 +: c.asInstanceOf[HomogeneousArrayColumn[Double]](i)
+                    }
                 reduceDouble(mapped)
               case _ => None
             }
@@ -198,7 +200,7 @@ trait LogisticRegressionLibModule[M[+ _]]
                    alpha: Double): Theta = {
         val theta = gradient(seq, theta0, alpha)
 
-        val diffs = theta0.zip(theta) map { case (t0, t) => math.abs(t0 - t) }
+        val diffs = theta0.zip(theta).map { case (t0, t) => math.abs(t0 - t) }
         val sum = diffs.sum
 
         if (sum / theta.length < 0.01) {
@@ -214,58 +216,63 @@ trait LogisticRegressionLibModule[M[+ _]]
       def extract(res: Result, jtype: JType): Table = {
         val cpaths = Schema.cpath(jtype)
 
-        res map {
-          case seq => {
-            val initialTheta: Theta = {
-              val thetaLength =
-                seq.headOption map { _.length } getOrElse sys.error(
-                  "unreachable: `res` would have been None")
-              val thetas = Seq.fill(100)(
-                Array.fill(thetaLength - 1)(Random.nextGaussian * 10))
+        res
+          .map {
+            case seq => {
+              val initialTheta: Theta = {
+                val thetaLength =
+                  seq.headOption
+                    .map { _.length }
+                    .getOrElse(
+                      sys.error("unreachable: `res` would have been None"))
+                val thetas = Seq.fill(100)(
+                  Array.fill(thetaLength - 1)(Random.nextGaussian * 10))
 
-              val (result, _) =
-                (thetas.tail).foldLeft((thetas.head, cost(seq, thetas.head))) {
-                  case ((theta0, cost0), theta) => {
-                    val costnew = cost(seq, theta)
+                val (result, _) =
+                  (thetas.tail).foldLeft((thetas.head, cost(seq, thetas.head))) {
+                    case ((theta0, cost0), theta) => {
+                      val costnew = cost(seq, theta)
 
-                    if (costnew < cost0) (theta, costnew)
-                    else (theta0, cost0)
+                      if (costnew < cost0) (theta, costnew)
+                      else (theta0, cost0)
+                    }
                   }
-                }
 
-              result
-            }
-
-            val initialAlpha = 1.0
-
-            val finalTheta: Theta = gradloop(seq, initialTheta, initialAlpha)
-
-            val tree =
-              CPath.makeTree(cpaths, Range(1, finalTheta.length).toSeq :+ 0)
-
-            val spec = TransSpec.concatChildren(tree)
-
-            val res =
-              finalTheta map { v =>
-                RObject(Map("estimate" -> CNum(v)))
+                result
               }
 
-            val theta = Table.fromRValues(Stream(RArray(res.toList)))
+              val initialAlpha = 1.0
 
-            val result = theta.transform(spec)
+              val finalTheta: Theta = gradloop(seq, initialTheta, initialAlpha)
 
-            val coeffsTable =
-              result.transform(trans.WrapObject(Leaf(Source), "coefficients"))
+              val tree =
+                CPath.makeTree(cpaths, Range(1, finalTheta.length).toSeq :+ 0)
 
-            val valueTable = coeffsTable.transform(
-              trans.WrapObject(Leaf(Source), paths.Value.name))
-            val keyTable = Table.constEmptyArray.transform(
-              trans.WrapObject(Leaf(Source), paths.Key.name))
+              val spec = TransSpec.concatChildren(tree)
 
-            valueTable.cross(keyTable)(
-              InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+              val res =
+                finalTheta.map { v =>
+                  RObject(Map("estimate" -> CNum(v)))
+                }
+
+              val theta = Table.fromRValues(Stream(RArray(res.toList)))
+
+              val result = theta.transform(spec)
+
+              val coeffsTable =
+                result.transform(
+                  trans.WrapObject(Leaf(Source), "coefficients"))
+
+              val valueTable = coeffsTable.transform(
+                trans.WrapObject(Leaf(Source), paths.Value.name))
+              val keyTable = Table.constEmptyArray.transform(
+                trans.WrapObject(Leaf(Source), paths.Key.name))
+
+              valueTable.cross(keyTable)(
+                InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+            }
           }
-        } getOrElse Table.empty
+          .getOrElse(Table.empty)
       }
 
       private val morph1 = new Morph1Apply {
@@ -282,11 +289,11 @@ trait LogisticRegressionLibModule[M[+ _]]
           val valueSpec = DerefObjectStatic(TransSpec1.Id, paths.Value)
           val table = table0.transform(valueSpec).transform(arraySpec)
 
-          val schemas: M[Seq[JType]] = table.schemas map { _.toSeq }
+          val schemas: M[Seq[JType]] = table.schemas.map { _.toSeq }
 
           val specs: M[Seq[TransSpec1]] =
-            schemas map {
-              _ map { jtype =>
+            schemas.map {
+              _.map { jtype =>
                 trans.Typed(
                   trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble),
                   jtype)
@@ -294,7 +301,7 @@ trait LogisticRegressionLibModule[M[+ _]]
             }
 
           val sampleTables: M[Seq[Table]] =
-            specs flatMap { seq =>
+            specs.flatMap { seq =>
               table.sample(10000, seq)
             }
 
@@ -302,7 +309,7 @@ trait LogisticRegressionLibModule[M[+ _]]
             samples <- sampleTables
             jtypes <- schemas
           } yield {
-            samples zip jtypes
+            samples.zip(jtypes)
           }
 
           val tableReducer: (Table, JType) => M[Table] = (table, jtype) =>
@@ -312,14 +319,14 @@ trait LogisticRegressionLibModule[M[+ _]]
               .map(res => extract(res, jtype))
 
           val reducedTables: M[Seq[Table]] =
-            tablesWithType flatMap {
-              _.map { case (table, jtype) => tableReducer(table, jtype) }.toStream.sequence map
-                (_.toSeq)
+            tablesWithType.flatMap {
+              _.map { case (table, jtype) => tableReducer(table, jtype) }.toStream.sequence
+                .map(_.toSeq)
             }
 
           val objectTables: M[Seq[Table]] =
-            reducedTables map {
-              _.zipWithIndex map {
+            reducedTables.map {
+              _.zipWithIndex.map {
                 case (tbl, idx) =>
                   val modelId = "model" + (idx + 1)
                   tbl.transform(
@@ -331,10 +338,10 @@ trait LogisticRegressionLibModule[M[+ _]]
             DerefObjectStatic(Leaf(SourceLeft), paths.Value),
             DerefObjectStatic(Leaf(SourceRight), paths.Value))
 
-          objectTables map {
+          objectTables.map {
             _.reduceOption { (tl, tr) =>
               tl.cross(tr)(buildConstantWrapSpec(spec))
-            } getOrElse Table.empty
+            }.getOrElse(Table.empty)
           }
         }
       }
@@ -355,7 +362,7 @@ trait LogisticRegressionLibModule[M[+ _]]
         val spec = liftToValues(
           trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble))
         def sigmoid(d: Double): Double = 1.0 / (1.0 + math.exp(d))
-        t2.transform(spec).reduce(reducer) map { models =>
+        t2.transform(spec).reduce(reducer).map { models =>
           (t1.transform(spec), morph1Apply(models, sigmoid _))
         }
       }

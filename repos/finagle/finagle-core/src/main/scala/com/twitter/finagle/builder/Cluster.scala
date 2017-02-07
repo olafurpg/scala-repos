@@ -52,7 +52,7 @@ trait Cluster[T] { self =>
     def snap: (Seq[U], Future[Spool[Cluster.Change[U]]]) = {
       val (seqT, changeT) = self.snap
       val seqU = mapped.synchronized {
-        seqT map { t =>
+        seqT.map { t =>
           val q = mapped.getOrElseUpdate(t, mutable.Queue[U]())
           val u = f(t)
           q.enqueue(u)
@@ -61,8 +61,8 @@ trait Cluster[T] { self =>
       }
 
       val changeU =
-        changeT map { spoolT =>
-          spoolT map { elem =>
+        changeT.map { spoolT =>
+          spoolT.map { elem =>
             mapped.synchronized {
               elem match {
                 case Cluster.Add(t) =>

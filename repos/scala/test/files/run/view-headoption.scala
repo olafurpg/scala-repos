@@ -11,7 +11,7 @@ object Test {
                 failer,
                 succeeder)
 
-  def f0 = fs.view flatMap (f => f())
+  def f0 = fs.view.flatMap(f => f())
   def f1 = f0.headOption
   def f2 = f0.head
   def f3 = f0.lastOption

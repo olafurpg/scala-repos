@@ -107,7 +107,7 @@ private[serverset2] class ZkSession(
 
       def loop(): Future[Unit] = {
         if (!closed)
-          safeRetry(go) respond {
+          safeRetry(go).respond {
             case Throw(e @ KeeperException.SessionExpired(_)) =>
               // don't retry. The session has expired while trying to set the watch.
               // In case our activity is still active, notify the listener
@@ -204,10 +204,10 @@ private[serverset2] class ZkSession(
         new IllegalArgumentException("Invalid pattern"))
 
     val (path, prefix) = ZooKeeperReader.patToPathAndPrefix(pattern)
-    existsOf(path) flatMap {
+    existsOf(path).flatMap {
       case None => Activity.value(Set.empty)
       case Some(_) =>
-        getChildrenWatchOp(path) transform {
+        getChildrenWatchOp(path).transform {
           case Activity.Pending => Activity.pending
           case Activity.Ok(Node.Children(children, _)) =>
             noteGoodChildWatch(path)
@@ -252,7 +252,7 @@ private[serverset2] class ZkSession(
     def pathDataOf(path: String): Future[(String, Option[Buf])] =
       immutableDataOf(path).map(path -> _)
 
-    Future.collect(paths map pathDataOf)
+    Future.collect(paths.map(pathDataOf))
   }
 
   def addAuthInfo(scheme: String, auth: Buf): Future[Unit] =
@@ -281,7 +281,7 @@ private[serverset2] object ZkSession {
 
   val DefaultSessionTimeout = 10.seconds
 
-  private val authUser = Identities.get().headOption getOrElse (("/null"))
+  private val authUser = Identities.get().headOption.getOrElse(("/null"))
   private val authInfo: String = "%s:%s".format(authUser, authUser)
   private val logger = Logger("ZkSession")
 
@@ -334,13 +334,13 @@ private[serverset2] object ZkSession {
       logger.info(s"Starting new zk session ${zkSession.sessionId}")
 
       // Upon initial connection, send auth info, then update `u`.
-      zkSession.state.changes
+      (zkSession.state.changes
         .filter {
           _ == WatchState.SessionState(SessionState.SyncConnected)
         }
         .toFuture
         .unit before zkSession
-        .addAuthInfo("digest", Buf.Utf8(authInfo)) onSuccess { _ =>
+        .addAuthInfo("digest", Buf.Utf8(authInfo))).onSuccess { _ =>
         logger.info(
           s"New ZKSession is connected. Session ID: ${zkSession.sessionIdAsHex}")
         v() = zkSession

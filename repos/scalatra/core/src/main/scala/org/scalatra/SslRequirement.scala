@@ -14,7 +14,7 @@ trait SslRequirement extends Handler with ServletApiImplicits {
                                res: HttpServletResponse) {
     if (!req.isSecure) {
       val oldUri = req.uri
-      val port = securePortMap.lift(oldUri.getPort) getOrElse 443
+      val port = securePortMap.lift(oldUri.getPort).getOrElse(443)
       val uri = new URI(
         "https",
         oldUri.getRawUserInfo,

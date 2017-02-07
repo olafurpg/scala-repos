@@ -41,7 +41,7 @@ trait XLightWebHttpClientModule[M[+ _]] extends HttpClientModule[M] {
 
     private def fromTryCatch[A](req: Option[IHttpRequest])(
         f: => A): HttpClientError \/ A = { (t: Throwable) =>
-      HttpClientError.ConnectionError(req map (_.getRequestURI), t)
+      HttpClientError.ConnectionError(req.map(_.getRequestURI), t)
     } <-: \/.fromTryCatch(f)
 
     private def buildUrl(path: String): HttpClientError \/ URL =
@@ -55,16 +55,18 @@ trait XLightWebHttpClientModule[M[+ _]] extends HttpClientModule[M] {
 
     private def buildRequest(
         request: Request[String]): HttpClientError \/ IHttpRequest = {
-      buildUrl(request.path) map { url =>
+      buildUrl(request.path).map { url =>
         val req = request.method match {
           case HttpMethod.GET => new GetRequest(url.toString)
           case HttpMethod.POST =>
-            request.body map {
-              case Request.Body(contenType, body) =>
-                new PostRequest(url.toString, contenType, body)
-            } getOrElse new PostRequest(url.toString)
+            request.body
+              .map {
+                case Request.Body(contenType, body) =>
+                  new PostRequest(url.toString, contenType, body)
+              }
+              .getOrElse(new PostRequest(url.toString))
         }
-        request.params foreach (req.setParameter(_: String, _: String)).tupled
+        request.params.foreach(req.setParameter(_: String, _: String)).tupled
         req
       }
     }
@@ -82,7 +84,7 @@ trait XLightWebHttpClientModule[M[+ _]] extends HttpClientModule[M] {
         response <- execute0(httpRequest)
         body <- EitherT(
           M point fromTryCatch(Some(httpRequest))(
-            Option(response.getBody) map (_.readString("UTF-8"))))
+            Option(response.getBody).map(_.readString("UTF-8"))))
       } yield {
         Response(response.getStatus, response.getReason, body)
       }

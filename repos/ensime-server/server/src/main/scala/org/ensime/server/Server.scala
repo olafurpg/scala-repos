@@ -101,7 +101,7 @@ class ServerActor(
           }
       }(context.system.dispatcher)
 
-    Environment.info foreach log.info
+    Environment.info.foreach(log.info)
   }
 
   override def preStart(): Unit = {

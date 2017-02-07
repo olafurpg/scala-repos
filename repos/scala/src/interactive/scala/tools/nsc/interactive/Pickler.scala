@@ -82,7 +82,7 @@ abstract class Pickler[T] {
     *  @param    c     the class of values handled by this pickler.
     */
   def asClass[U <: T](c: Class[U]): CondPickler[T] =
-    this.labelled(c.getName).cond(c isInstance _)
+    this.labelled(c.getName).cond(c.isInstance(_))
 }
 
 object Pickler {
@@ -200,7 +200,7 @@ object Pickler {
   def wrappedPickler[S, T](p: Pickler[S])(in: S => T)(out: T => S) =
     new Pickler[T] {
       def pickle(wr: Writer, x: T) = p.pickle(wr, out(x))
-      def unpickle(rd: Lexer) = p.unpickle(rd) map in
+      def unpickle(rd: Lexer) = p.unpickle(rd).map(in)
     }
 
   /** Same as `p.cond(condition)`
@@ -237,7 +237,7 @@ object Pickler {
         require(
           tryPickle(wr, x),
           "no pickler found for " + x + " of class " + x.getClass.getName)
-      def unpickle(rd: Lexer) = p.unpickle(rd) orElse qq.unpickle(rd)
+      def unpickle(rd: Lexer) = p.unpickle(rd).orElse(qq.unpickle(rd))
     }
 
   /** A conditional pickler for singleton objects. It represents these
@@ -327,11 +327,11 @@ object Pickler {
 
   /** A conditional pickler for the boolean value `true` */
   private val truePickler =
-    tokenPickler("boolean literal") { case TrueLit => true } cond { _ == true }
+    tokenPickler("boolean literal") { case TrueLit => true }.cond { _ == true }
 
   /** A conditional pickler for the boolean value `false` */
   private val falsePickler =
-    tokenPickler("boolean literal") { case FalseLit => false } cond {
+    tokenPickler("boolean literal") { case FalseLit => false }.cond {
       _ == false
     }
 

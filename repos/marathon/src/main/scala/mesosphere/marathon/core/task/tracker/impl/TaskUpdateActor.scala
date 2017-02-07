@@ -85,7 +85,7 @@ private[impl] class TaskUpdateActor(clock: Clock,
     super.postStop()
 
     // Answer all outstanding requests.
-    operationsByTaskId.values.iterator.flatten.map(_.sender) foreach {
+    operationsByTaskId.values.iterator.flatten.map(_.sender).foreach {
       sender =>
         sender ! Status.Failure(
           new IllegalStateException("TaskUpdateActor stopped"))
@@ -131,7 +131,7 @@ private[impl] class TaskUpdateActor(clock: Clock,
   }
 
   private[this] def processNextOpIfExists(taskId: Task.Id): Unit = {
-    operationsByTaskId(taskId).headOption foreach { op =>
+    operationsByTaskId(taskId).headOption.foreach { op =>
       val queuedCount = metrics.numberOfQueuedOps.decrement()
       val activeCount = metrics.numberOfActiveOps.increment()
       log.debug(

@@ -48,15 +48,15 @@ object GameFilterMenu {
     val filters = NonEmptyList.nel(
       All,
       List(
-        (info.nbWithMe > 0) option Me,
-        (info.nbRated > 0) option Rated,
-        (info.user.count.win > 0) option Win,
-        (info.user.count.loss > 0) option Loss,
-        (info.user.count.draw > 0) option Draw,
-        (info.nbPlaying > 0) option Playing,
-        (info.nbBookmark > 0) option Bookmark,
-        (info.nbImported > 0) option Imported,
-        (info.user.count.game > 0) option Search
+        ((info.nbWithMe > 0)).option(Me),
+        ((info.nbRated > 0)).option(Rated),
+        ((info.user.count.win > 0)).option(Win),
+        ((info.user.count.loss > 0)).option(Loss),
+        ((info.user.count.draw > 0)).option(Draw),
+        ((info.nbPlaying > 0)).option(Playing),
+        ((info.nbBookmark > 0)).option(Bookmark),
+        ((info.nbImported > 0)).option(Imported),
+        ((info.user.count.game > 0)).option(Search)
       ).flatten
     )
 
@@ -104,20 +104,22 @@ object GameFilterMenu {
     filter match {
       case Bookmark => Env.bookmark.api.gamePaginatorByUser(user, page)
       case Imported =>
-        pag.apply(selector = Query imported user.id,
+        pag.apply(selector = Query.imported(user.id),
                   sort = Seq("pgni.ca" -> SortOrder.Descending),
                   nb = nb)(page)
-      case All => std(Query started user)
+      case All => std(Query.started(user))
       case Me => std(Query.opponents(user, me | user))
-      case Rated => std(Query rated user)
+      case Rated => std(Query.rated(user))
       case Win => std(Query win user)
-      case Loss => std(Query loss user)
-      case Draw => std(Query draw user)
+      case Loss => std(Query.loss(user))
+      case Draw => std(Query.draw(user))
       case Playing =>
-        pag(selector = Query nowPlaying user.id, sort = Seq(), nb = nb)(page) addEffect {
-          p =>
-            p.currentPageResults.filter(_.finishedOrAborted) foreach GameRepo.unsetPlayingUids
-        }
+        pag(selector = Query nowPlaying user.id, sort = Seq(), nb = nb)(page)
+          .addEffect { p =>
+            p.currentPageResults
+              .filter(_.finishedOrAborted)
+              .foreach(GameRepo.unsetPlayingUids)
+          }
       case Search => userGameSearch(user, page)
     }
   }

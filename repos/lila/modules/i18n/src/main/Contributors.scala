@@ -88,5 +88,5 @@ private[i18n] object Contributors {
     "jb" -> List("username05")
   )
 
-  def apply(code: String): List[String] = ~(all get code)
+  def apply(code: String): List[String] = ~(all.get(code))
 }

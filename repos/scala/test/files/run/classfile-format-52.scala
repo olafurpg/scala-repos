@@ -54,7 +54,7 @@ object Test extends DirectTest {
 
     val fos = new FileOutputStream(
       new File(s"${testOutput.path}/$interfaceName.class"))
-    try fos write bytes
+    try fos.write(bytes)
     finally fos.close()
   }
 
@@ -77,7 +77,7 @@ class Driver extends HasDefaultMethod {
         compile()
         Class.forName("Driver").newInstance()
         ()
-      } otherwise {
+      }.otherwise {
         println("hello from publicMethod")
         println("hello from staticMethod")
       }

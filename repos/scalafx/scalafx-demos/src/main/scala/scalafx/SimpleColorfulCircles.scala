@@ -59,8 +59,8 @@ object SimpleColorfulCircles extends JFXApp {
             centerX = random * 800
             centerY = random * 600
             radius = 150
-            fill = White opacity 0.05
-            stroke = White opacity 0.16
+            fill = White.opacity(0.05)
+            stroke = White.opacity(0.16)
             strokeWidth = 4
             strokeType = Outside
             effect = new BoxBlur(10, 10, 3)

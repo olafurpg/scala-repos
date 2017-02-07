@@ -24,13 +24,13 @@ object $update {
 
   def doc[ID: Writes, A <: Identified[ID]: TubeInColl](id: ID)(
       op: A => JsObject): Funit =
-    $find byId id flatten "[db] cannot update missing doc" flatMap { doc =>
+    ($find byId id).flatten("[db] cannot update missing doc").flatMap { doc =>
       apply($select(id), op(doc))
     }
 
   def docBson[ID: Writes, A <: Identified[ID]: TubeInColl](id: ID)(
       op: A => BSONDocument): Funit =
-    $find byId id flatten "[db] cannot update missing doc" flatMap { doc =>
+    ($find byId id).flatten("[db] cannot update missing doc").flatMap { doc =>
       apply($select(id), op(doc))
     }
 

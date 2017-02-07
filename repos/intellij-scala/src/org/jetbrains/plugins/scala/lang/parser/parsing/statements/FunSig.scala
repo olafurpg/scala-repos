@@ -21,11 +21,11 @@ object FunSig {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     if (ScalaTokenTypes.tIDENTIFIER.equals(builder.getTokenType)) {
       ParserUtils.eatElement(builder, ScalaTokenTypes.tIDENTIFIER)
-      FunTypeParamClause parse builder
-      ParamClauses parse builder
+      FunTypeParamClause.parse(builder)
+      ParamClauses.parse(builder)
       true
     } else {
-      builder error "identifier expected"
+      builder.error("identifier expected")
       false
     }
   }

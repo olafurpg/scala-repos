@@ -29,7 +29,7 @@ object Test extends App {
     case Bar() => Console.println("NO")
   }
   try {
-    Bar() productElement 3
+    Bar().productElement(3)
     throw new NullPointerException("duh")
   } catch {
     case x: IndexOutOfBoundsException =>
@@ -41,7 +41,7 @@ object Test extends App {
   }
 
   try {
-    f(2) productElement 3
+    f(2).productElement(3)
     throw new NullPointerException("duh")
   } catch {
     case x: IndexOutOfBoundsException =>

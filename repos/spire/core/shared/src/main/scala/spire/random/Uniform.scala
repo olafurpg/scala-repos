@@ -85,7 +85,7 @@ object Uniform {
             "Both min and max provided to UniformBigDecimal have unlimited precision. Cannot produce uniform distributions with unlimited precision.")
         }
         val range = max - min
-        val dist = UniformBigInt(0, BigInt(10) pow precision)
+        val dist = UniformBigInt(0, BigInt(10).pow(precision))
         new DistFromGen[BigDecimal]({ gen =>
           min + range * BigDecimal(dist(gen), precision)
         })

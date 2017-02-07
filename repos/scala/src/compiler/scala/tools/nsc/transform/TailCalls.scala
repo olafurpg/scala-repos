@@ -92,9 +92,11 @@ abstract class TailCalls extends Transform {
     private def defaultReason =
       "it contains a recursive call not in tail position"
     private val failPositions =
-      perRunCaches.newMap[TailContext, Position]() withDefault (_.methodPos)
+      perRunCaches.newMap[TailContext, Position]().withDefault(_.methodPos)
     private val failReasons =
-      perRunCaches.newMap[TailContext, String]() withDefaultValue defaultReason
+      perRunCaches
+        .newMap[TailContext, String]()
+        .withDefaultValue(defaultReason)
     private def tailrecFailure(ctx: TailContext) {
       val method = ctx.method
       val failReason = failReasons(ctx)
@@ -133,8 +135,10 @@ abstract class TailCalls extends Transform {
               method.ownerChain.mkString(" -> "),
               currentClass.ownerChain.mkString(" -> ")
             )
-        logResult(msg)(method
-          .newValue(nme.THIS, pos, SYNTHETIC) setInfo currentClass.typeOfThis)
+        logResult(msg)(
+          method
+            .newValue(nme.THIS, pos, SYNTHETIC)
+            .setInfo(currentClass.typeOfThis))
       }
       override def toString =
         s"${method.name} tparams=$tparams tailPos=$tailPos label=$label label info=${label.info}"
@@ -161,7 +165,7 @@ abstract class TailCalls extends Transform {
 
     class DefDefTailContext(dd: DefDef) extends TailContext {
       def method = dd.symbol
-      def tparams = dd.tparams map (_.symbol)
+      def tparams = dd.tparams.map(_.symbol)
       def methodPos = dd.pos
       def tailPos = true
 
@@ -169,16 +173,17 @@ abstract class TailCalls extends Transform {
       lazy val tailLabels = {
         // labels are local to a method, so only traverse the rhs of a defdef
         val collector = new TailPosLabelsTraverser
-        collector traverse dd.rhs
+        collector.traverse(dd.rhs)
         collector.tailLabels.toSet
       }
 
       private def mkLabel() = {
         val label = method.newLabel(newTermName("_" + method.name), method.pos)
         val thisParam = method.newSyntheticValueParam(currentClass.typeOfThis)
-        label setInfo MethodType(thisParam :: method.tpe.params,
-                                 method.tpe_*.finalResultType)
-        if (isEligible) label substInfo (method.tpe.typeParams, tparams)
+        label.setInfo(
+          MethodType(thisParam :: method.tpe.params,
+                     method.tpe_*.finalResultType))
+        if (isEligible) label.substInfo(method.tpe.typeParams, tparams)
 
         label
       }
@@ -187,9 +192,9 @@ abstract class TailCalls extends Transform {
 
         ((receiver != null) && receiver.isMethod &&
         (method.name == receiver.name) &&
-        (method.enclClass isSubClass receiver.enclClass))
+        (method.enclClass.isSubClass(receiver.enclClass)))
       }
-      def containsRecursiveCall(t: Tree) = t exists isRecursiveCall
+      def containsRecursiveCall(t: Tree) = t.exists(isRecursiveCall)
     }
     class ClonedTailContext(val that: TailContext,
                             override val tailPos: Boolean)
@@ -228,7 +233,7 @@ abstract class TailCalls extends Transform {
       transform(tree, ctx.noTailContext())
     def noTailTransforms(trees: List[Tree]) = {
       val nctx = ctx.noTailContext()
-      trees mapConserve (t => transform(t, nctx))
+      trees.mapConserve(t => transform(t, nctx))
     }
 
     override def transform(tree: Tree): Tree = {
@@ -248,7 +253,7 @@ abstract class TailCalls extends Transform {
         def transformArgs =
           if (mustTransformArgs) noTailTransforms(args) else args
         def matchesTypeArgs =
-          ctx.tparams sameElements (targs map (_.tpe.typeSymbol))
+          ctx.tparams.sameElements(targs.map(_.tpe.typeSymbol))
 
         /* Records failure reason in Context for reporting.
          * Position is unchanged (by default, the method definition.)
@@ -331,7 +336,7 @@ abstract class TailCalls extends Transform {
                 }
               }
               val newThis = newCtx.newThis(tree.pos)
-              val vpSyms = vparamss0.flatten map (_.symbol)
+              val vpSyms = vparamss0.flatten.map(_.symbol)
 
               typedPos(tree.pos)(
                 Block(
@@ -350,10 +355,10 @@ abstract class TailCalls extends Transform {
           }
 
         // a translated match
-        case Block(stats, expr) if stats forall hasSynthCaseSymbol =>
+        case Block(stats, expr) if stats.forall(hasSynthCaseSymbol) =>
           // the assumption is once we encounter a case, the remainder of the block will consist of cases
           // the prologue may be empty, usually it is the valdef that stores the scrut
-          val (prologue, cases) = stats span (s => !s.isInstanceOf[LabelDef])
+          val (prologue, cases) = stats.span(s => !s.isInstanceOf[LabelDef])
           val transformedPrologue = noTailTransforms(prologue)
           val transformedCases = transformTrees(cases)
           val transformedStats =
@@ -460,7 +465,7 @@ abstract class TailCalls extends Transform {
     }
 
     def traverseNoTail(tree: Tree) = traverse(tree, maybeTailNew = false)
-    def traverseTreesNoTail(trees: List[Tree]) = trees foreach traverseNoTail
+    def traverseTreesNoTail(trees: List[Tree]) = trees.foreach(traverseNoTail)
 
     // intentionally shadowing imports from definitions for performance
     private val runDefinitions = currentRun.runDefinitions
@@ -487,10 +492,10 @@ abstract class TailCalls extends Transform {
         traverse(body)
 
       // a translated match
-      case Block(stats, expr) if stats forall hasSynthCaseSymbol =>
+      case Block(stats, expr) if stats.forall(hasSynthCaseSymbol) =>
         // the assumption is once we encounter a case, the remainder of the block will consist of cases
         // the prologue may be empty, usually it is the valdef that stores the scrut
-        val (prologue, cases) = stats span (s => !s.isInstanceOf[LabelDef])
+        val (prologue, cases) = stats.span(s => !s.isInstanceOf[LabelDef])
         traverse(expr)
         traverseTrees(cases.reverse) // reverse so that we enter the matchEnd LabelDef before we see jumps to it
         traverseTreesNoTail(prologue) // selector (may be absent)

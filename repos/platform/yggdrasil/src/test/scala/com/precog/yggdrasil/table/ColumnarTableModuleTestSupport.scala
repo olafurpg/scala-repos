@@ -83,7 +83,7 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
     Table(
       StreamT.unfoldM(values) { events =>
         M.point {
-          (!events.isEmpty) option {
+          (!events.isEmpty).option {
             makeSlice(events.toStream, sliceSize)
           }
         }
@@ -94,7 +94,7 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
 
   def fromJson(values: Stream[JValue],
                maxSliceSize: Option[Int] = None): Table =
-    fromJson0(values, maxSliceSize orElse Some(defaultSliceSize))
+    fromJson0(values, maxSliceSize.orElse(Some(defaultSliceSize)))
 
   def lookupF1(namespace: List[String], name: String): F1 = {
     val lib = Map[String, CF1](
@@ -126,15 +126,15 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
                  cols: Map[ColumnRef, Column],
                  range: Range): (A, Map[ColumnRef, Column]) = {
           val identityPath =
-            cols collect { case c @ (ColumnRef(CPath.Identity, _), _) => c }
+            cols.collect { case c @ (ColumnRef(CPath.Identity, _), _) => c }
           val prioritized =
-            identityPath.values filter {
+            identityPath.values.filter {
               case (_: LongColumn | _: DoubleColumn | _: NumColumn) => true
               case _ => false
             }
 
           val mask = BitSetUtil.filteredRange(range.start, range.end) { i =>
-            prioritized exists { _ isDefinedAt i }
+            prioritized.exists { _ isDefinedAt i }
           }
 
           val (a2, arr) =
@@ -143,7 +143,7 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
                 val col = prioritized find { _ isDefinedAt i }
 
                 val acc2 =
-                  col map {
+                  col.map {
                     case lc: LongColumn =>
                       acc + lc(i)
 
@@ -154,9 +154,9 @@ trait ColumnarTableModuleTestSupport[M[+ _]]
                       acc + nc(i)
                   }
 
-                acc2 foreach { arr(i) = _ }
+                acc2.foreach { arr(i) = _ }
 
-                (acc2 getOrElse acc, arr)
+                (acc2.getOrElse(acc), arr)
               }
             }
 

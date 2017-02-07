@@ -47,7 +47,7 @@ abstract class SymbolLoaders {
                            completer: SymbolLoader): Symbol = {
     assert(owner.info.decls.lookup(member.name) == NoSymbol,
            owner.fullName + "." + member.name)
-    owner.info.decls enter member
+    owner.info.decls.enter(member)
     member
   }
 
@@ -66,7 +66,7 @@ abstract class SymbolLoaders {
                  name: String,
                  completer: SymbolLoader): Symbol = {
     val clazz = owner.newClass(newTypeName(name))
-    clazz setInfo completer
+    clazz.setInfo(completer)
     enterIfNew(owner, clazz, completer)
   }
 
@@ -77,8 +77,8 @@ abstract class SymbolLoaders {
                   name: String,
                   completer: SymbolLoader): Symbol = {
     val module = owner.newModule(newTermName(name))
-    module setInfo completer
-    module.moduleClass setInfo moduleClassLoader
+    module.setInfo(completer)
+    module.moduleClass.setInfo(moduleClassLoader)
     enterIfNew(owner, module, completer)
   }
 
@@ -89,7 +89,7 @@ abstract class SymbolLoaders {
                    name: String,
                    completer: SymbolLoader): Symbol = {
     val pname = newTermName(name)
-    val preExisting = root.info.decls lookup pname
+    val preExisting = root.info.decls.lookup(pname)
     if (preExisting != NoSymbol) {
       // Some jars (often, obfuscated ones) include a package and
       // object with the same name. Rather than render them unusable,
@@ -116,9 +116,9 @@ abstract class SymbolLoaders {
     }
     // todo: find out initialization sequence for pkg/pkg.moduleClass is different from enterModule
     val pkg = root.newPackage(pname)
-    pkg.moduleClass setInfo completer
-    pkg setInfo pkg.moduleClass.tpe
-    root.info.decls enter pkg
+    pkg.moduleClass.setInfo(completer)
+    pkg.setInfo(pkg.moduleClass.tpe)
+    root.info.decls.enter(pkg)
     pkg
   }
 
@@ -216,13 +216,12 @@ abstract class SymbolLoaders {
     private var ok = false
 
     private def setSource(sym: Symbol) {
-      sourcefile foreach
-        (sf =>
-           sym match {
-             case cls: ClassSymbol => cls.associatedFile = sf
-             case mod: ModuleSymbol => mod.moduleClass.associatedFile = sf
-             case _ => ()
-           })
+      sourcefile.foreach(sf =>
+        sym match {
+          case cls: ClassSymbol => cls.associatedFile = sf
+          case mod: ModuleSymbol => mod.moduleClass.associatedFile = sf
+          case _ => ()
+      })
     }
 
     override def complete(root: Symbol) {
@@ -250,10 +249,11 @@ abstract class SymbolLoaders {
     private def markAbsent(sym: Symbol): Unit = {
       val tpe: Type = if (ok) NoType else ErrorType
 
-      if (sym != NoSymbol) sym setInfo tpe
+      if (sym != NoSymbol) sym.setInfo(tpe)
     }
     private def initRoot(root: Symbol) {
-      if (root.rawInfo == this) List(root, root.moduleClass) foreach markAbsent
+      if (root.rawInfo == this)
+        List(root, root.moduleClass).foreach(markAbsent)
       else if (root.isClass && !root.isModuleClass) root.rawInfo.load(root)
     }
   }

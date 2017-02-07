@@ -45,7 +45,7 @@ object SbtRepositoryLayout extends RepositoryLayout {
       artifact.getProperties.get(SbtPomExtraProperties.POM_SCALA_VERSION))
     val path = new StringBuilder(128)
     path.append(artifact.getGroupId.replace('.', '/')).append('/')
-    (sbtVersion zip scalaVersion).headOption match {
+    (sbtVersion.zip(scalaVersion)).headOption match {
       case Some((sbt, scala)) =>
         if (artifact.getArtifactId contains "_sbt_") {
           val SbtNameVersionSplit(name, sbt2) = artifact.getArtifactId
@@ -100,7 +100,7 @@ object SbtRepositoryLayout extends RepositoryLayout {
       metadata.getProperties.get(SbtPomExtraProperties.POM_SCALA_VERSION))
     val path = new StringBuilder(128)
     path.append(metadata.getGroupId.replace('.', '/')).append('/')
-    (sbtVersion zip scalaVersion).headOption match {
+    (sbtVersion.zip(scalaVersion)).headOption match {
       case Some((sbt, scala)) =>
         if (metadata.getArtifactId contains "_sbt_") {
           val SbtNameVersionSplit(name, sbt2) = metadata.getArtifactId

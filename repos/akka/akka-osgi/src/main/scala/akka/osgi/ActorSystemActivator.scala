@@ -42,8 +42,8 @@ abstract class ActorSystemActivator extends BundleActivator {
     system = Some(
       OsgiActorSystemFactory(context, getActorSystemConfiguration(context))
         .createActorSystem(Option(getActorSystemName(context))))
-    system foreach (addLogServiceListener(context, _))
-    system foreach (configure(context, _))
+    system.foreach(addLogServiceListener(context, _))
+    system.foreach(configure(context, _))
   }
 
   /**
@@ -89,8 +89,8 @@ abstract class ActorSystemActivator extends BundleActivator {
     * @param context the BundleContext
     */
   def stop(context: BundleContext): Unit = {
-    registration foreach (_.unregister())
-    system foreach (_.terminate())
+    registration.foreach(_.unregister())
+    system.foreach(_.terminate())
   }
 
   /**

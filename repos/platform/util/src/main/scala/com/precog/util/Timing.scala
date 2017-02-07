@@ -45,7 +45,7 @@ object Timing {
     val t0 = System.nanoTime()
     val result = thunk
     val t = System.nanoTime() - t0
-    System.err.println("%s took %.2fms" format (s, t / m))
+    System.err.println("%s took %.2fms".format(s, t / m))
     result
   }
 
@@ -53,24 +53,24 @@ object Timing {
     val t0 = System.nanoTime()
     val result = thunk
     val t = System.nanoTime() - t0
-    System.err.println("%s took %.2fms" format (f(result), t / m))
+    System.err.println("%s took %.2fms".format(f(result), t / m))
     result
   }
 
   def timeM[M[+ _]: Monad, A](s: String)(ma: => M[A]): M[A] = {
     val t0 = System.nanoTime()
-    ma map { a =>
+    ma.map { a =>
       val t = System.nanoTime() - t0
-      System.err.println("%s took %.2fms" format (s, t / m))
+      System.err.println("%s took %.2fms".format(s, t / m))
       a
     }
   }
 
   def timeM[M[+ _]: Monad, A](f: A => String)(ma: => M[A]): M[A] = {
     val t0 = System.nanoTime()
-    ma map { a =>
+    ma.map { a =>
       val t = System.nanoTime() - t0
-      System.err.println("%s took %.2fms" format (f(a), t / m))
+      System.err.println("%s took %.2fms".format(f(a), t / m))
       a
     }
   }
@@ -82,7 +82,7 @@ object Timing {
       (StreamT
         .Skip {
           val t = System.nanoTime() - t0
-          System.err.println("%s took %.2fms" format (s, t / m))
+          System.err.println("%s took %.2fms".format(s, t / m))
           StreamT.empty[M, A]
         })
         .point[M])
@@ -93,10 +93,10 @@ object Timing {
       stream0: => StreamT[M, A]): StreamT[M, A] = {
     def timeElem(stream: StreamT[M, A]): StreamT[M, A] = {
       val t0 = System.nanoTime()
-      StreamT(stream.uncons map {
+      StreamT(stream.uncons.map {
         case Some((a, tail)) =>
           val t = System.nanoTime() - t0
-          System.err.println("%s took %.2fms" format (s, t / m))
+          System.err.println("%s took %.2fms".format(s, t / m))
           StreamT.Yield(a, timeElem(tail))
 
         case None =>

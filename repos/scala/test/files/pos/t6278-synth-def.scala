@@ -10,7 +10,7 @@ object test {
     implicit def toFoo(i: Int): Foo = new Foo(i)
 
     val k = 1
-    k foo println("k?")
+    k.foo(println("k?"))
     val j = 2
   }
   def nope() {
@@ -19,7 +19,7 @@ object test {
     }
 
     val k = 1
-    k foo println("k?")
+    k.foo(println("k?"))
     //lazy
     val j = 2
   }

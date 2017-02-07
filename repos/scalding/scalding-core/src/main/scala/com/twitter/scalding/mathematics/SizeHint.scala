@@ -124,10 +124,10 @@ case class SparseHint(sparsity: Double, rows: BigInt, cols: BigInt)
       case SparseHint(sp, r, c) => {
         // if I occupy a bin with probability p, and you q, then either: p + q - pq
         if ((sparsity == 1.0) || (sp == 1.0)) {
-          FiniteHint(rows max r, cols max c)
+          FiniteHint(rows.max(r), cols.max(c))
         } else {
           val newSp = sparsity + sp - sp * sparsity
-          SparseHint(newSp, rows max r, cols max c)
+          SparseHint(newSp, rows.max(r), cols.max(c))
         }
       }
     }

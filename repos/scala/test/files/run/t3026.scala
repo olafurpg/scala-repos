@@ -4,5 +4,5 @@ object Test {
   case object YELLOW extends Colour
   val items = Array(RED, YELLOW)
 
-  def main(args: Array[String]): Unit = items foreach println
+  def main(args: Array[String]): Unit = items.foreach(println)
 }

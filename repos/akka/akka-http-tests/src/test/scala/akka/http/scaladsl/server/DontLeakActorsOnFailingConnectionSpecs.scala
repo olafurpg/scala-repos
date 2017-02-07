@@ -72,7 +72,7 @@ class DontLeakActorsOnFailingConnectionSpecs
 
   "Http.superPool" should {
 
-    "not leak connection Actors when hitting non-existing endpoint" ignore {
+    "not leak connection Actors when hitting non-existing endpoint".ignore {
       assertAllStagesStopped("InternalConnectionFlow") {
         val reqsCount = 100
         val clientFlow = Http().superPool[Int]()

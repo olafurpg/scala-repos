@@ -72,14 +72,14 @@ trait StandaloneIngestServer
       new InMemoryJobManager[({ type λ[+α] = EitherT[Future, String, α] })#λ]()
 
     val (eventStore, stoppable) =
-      KafkaEventStore(config.detach("eventStore"), permissionsFinder) valueOr {
+      KafkaEventStore(config.detach("eventStore"), permissionsFinder).valueOr {
         errors =>
           sys.error(
             "Could not configure event store: " + errors.list.mkString(", "))
       }
 
     val serviceConfig =
-      EventService.ServiceConfig.fromConfiguration(config) valueOr { errors =>
+      EventService.ServiceConfig.fromConfiguration(config).valueOr { errors =>
         sys.error(
           "Unable to obtain self-referential service locator for event service: %s"
             .format(errors.list.mkString("; ")))

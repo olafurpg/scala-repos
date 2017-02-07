@@ -17,17 +17,17 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
   protected def allSettings: scala.collection.Set[Setting]
 
   // settings minus internal usage settings
-  def visibleSettings = allSettings filterNot (_.isInternalOnly)
+  def visibleSettings = allSettings.filterNot(_.isInternalOnly)
 
   // only settings which differ from default
-  def userSetSettings = visibleSettings filterNot (_.isDefault)
+  def userSetSettings = visibleSettings.filterNot(_.isDefault)
 
   // an argument list which (should) be usable to recreate the Settings
-  def recreateArgs = userSetSettings.toList flatMap (_.unparse)
+  def recreateArgs = userSetSettings.toList.flatMap(_.unparse)
 
   // checks both name and any available abbreviations
   def lookupSetting(cmd: String): Option[Setting] =
-    allSettings find (_ respondsTo cmd)
+    allSettings find (_.respondsTo(cmd))
 
   // two AbsSettings objects are equal if their visible settings are equal.
   override def hashCode() = visibleSettings.size // going for cheap
@@ -43,17 +43,18 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
   def toConciseString = userSetSettings.mkString("(", " ", ")")
 
   def checkDependencies =
-    visibleSettings filterNot (_.isDefault) forall
-      (setting =>
-         setting.dependencies forall {
-           case (dep, value) =>
-             (Option(dep.value) exists (_.toString == value)) || {
-               errorFn(
-                 "incomplete option %s (requires %s)".format(setting.name,
-                                                             dep.name))
-               false
-             }
-         })
+    visibleSettings
+      .filterNot(_.isDefault)
+      .forall(setting =>
+        setting.dependencies.forall {
+          case (dep, value) =>
+            (Option(dep.value).exists(_.toString == value)) || {
+              errorFn(
+                "incomplete option %s (requires %s)".format(setting.name,
+                                                            dep.name))
+              false
+            }
+      })
 
   trait AbsSetting extends Ordered[Setting] with AbsSettingValue {
     def name: String
@@ -106,7 +107,7 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
       */
     protected[nsc] def tryToSetColon(
         args: List[String]): Option[ResultOfTryToSet] =
-      errorAndValue("'%s' does not accept multiple arguments" format name,
+      errorAndValue("'%s' does not accept multiple arguments".format(name),
                     None)
 
     /** Attempt to set from a properties file style property value.
@@ -119,17 +120,17 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
       *  the standard options and -Y among the advanced options.
       */
     def isAdvanced = name match {
-      case "-Y" => true; case "-X" => false; case _ => name startsWith "-X"
+      case "-Y" => true; case "-X" => false; case _ => name.startsWith("-X")
     }
     def isPrivate = name match {
-      case "-Y" => false; case _ => name startsWith "-Y"
+      case "-Y" => false; case _ => name.startsWith("-Y")
     }
     def isStandard = !isAdvanced && !isPrivate
     def isForDebug =
-      name endsWith "-debug" // by convention, i.e. -Ytyper-debug
+      name.endsWith("-debug") // by convention, i.e. -Ytyper-debug
     def isDeprecated = deprecationMessage.isDefined
 
-    def compare(that: Setting): Int = name compare that.name
+    def compare(that: Setting): Int = name.compare(that.name)
 
     /** Equality tries to sidestep all the drama and define it simply and
       *  in one place: two AbsSetting objects are equal if their names and

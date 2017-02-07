@@ -42,7 +42,7 @@ object ScalarTagLong extends ScalarTag[Long] {
   def inf(implicit ev: NUM[Long]) = Long.MaxValue
   def negInf(implicit ev: NUM[Long]) = Long.MinValue
 
-  def show(v: Long) = if (isMissing(v)) "%s" format "NA" else "%d" format v
+  def show(v: Long) = if (isMissing(v)) "%s".format("NA") else "%d".format(v)
 
   override def runtimeClass = classOf[Long]
 

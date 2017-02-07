@@ -34,7 +34,7 @@ object Test {
       assert(clazz != loaderCClass)
       clazz.newInstance()
     }
-    (1 to 4) foreach { i =>
+    ((1 to 4)).foreach { i =>
       // This would OOM by the third iteration if we leaked `throwawayLoader` during
       // deserialization.
       deserializedInThrowawayClassloader

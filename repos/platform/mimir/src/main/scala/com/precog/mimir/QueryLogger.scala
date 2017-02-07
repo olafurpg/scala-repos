@@ -120,7 +120,7 @@ trait JobQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
   }
 
   private def send(channel: String, pos: P, msg: String): M[Unit] =
-    jobManager.addMessage(jobId, channel, mkMessage(pos, msg)) map { _ =>
+    jobManager.addMessage(jobId, channel, mkMessage(pos, msg)).map { _ =>
       ()
     }
 
@@ -177,7 +177,7 @@ trait TimingQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
   def timing(pos: P, nanos: Long): M[Unit] = {
     @tailrec
     def loop() {
-      val stats = table get pos
+      val stats = table.get(pos)
 
       if (stats == null) {
         val stats = Stats(1, nanos, nanos * nanos, nanos, nanos)
@@ -186,7 +186,7 @@ trait TimingQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
           loop()
         }
       } else {
-        if (!table.replace(pos, stats, stats derive nanos)) {
+        if (!table.replace(pos, stats, stats.derive(nanos))) {
           loop()
         }
       }
@@ -199,7 +199,7 @@ trait TimingQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
 
   def done: M[Unit] = {
     val logging =
-      table.asScala map {
+      table.asScala.map {
         case (pos, stats) =>
           log(pos,
               """{"count":%d,"sum":%d,"sumSq":%d,"min":%d,"max":%d}""".format(
@@ -210,7 +210,7 @@ trait TimingQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
                 stats.max))
       }
 
-    logging reduceOption { _ >> _ } getOrElse (M point ())
+    logging.reduceOption { _ >> _ }.getOrElse(M point ())
   }
 
   private case class Stats(count: Long,
@@ -223,7 +223,7 @@ trait TimingQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
            sum = sum + nanos,
            sumSq = sumSq + (nanos * nanos),
            min = min min nanos,
-           max = max max nanos)
+           max = max.max(nanos))
     }
   }
 }

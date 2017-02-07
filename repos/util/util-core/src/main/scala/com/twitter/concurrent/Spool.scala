@@ -67,7 +67,7 @@ sealed trait Spool[+A] {
     * Apply {{f}} for each item in the spool, until the end.  {{f}} is
     * applied as the items become available.
     */
-  def foreach[B](f: A => B) = foreachElem(_ foreach f)
+  def foreach[B](f: A => B) = foreachElem(_.foreach(f))
 
   /**
     * A version of {{foreach}} that wraps each element in an
@@ -76,8 +76,8 @@ sealed trait Spool[+A] {
     */
   def foreachElem[B](f: Option[A] => B): Future[Unit] = {
     if (!isEmpty) {
-      Future { f(Some(head)) } flatMap { _ =>
-        tail transform {
+      Future { f(Some(head)) }.flatMap { _ =>
+        tail.transform {
           case Return(s) => s.foreachElem(f)
           case Throw(_: EOFException) => Future { f(None) }
           case Throw(cause) => Future.exception(cause)
@@ -132,7 +132,7 @@ sealed trait Spool[+A] {
   def collect[B](f: PartialFunction[A, B]): Future[Spool[B]] =
     if (isEmpty) Future.value(empty[B])
     else {
-      def _tail = tail flatMap (_.collect(f))
+      def _tail = tail.flatMap(_.collect(f))
 
       // NB: we use lift instead of isDefinedAt to avoid calling isDefinedAt
       // twice, since in some places we depend upon the assumption that f can
@@ -161,8 +161,8 @@ sealed trait Spool[+A] {
   def mapFuture[B](f: A => Future[B]): Future[Spool[B]] = {
     if (isEmpty) Future.value(empty[B])
     else {
-      f(head) map { h =>
-        new LazyCons(h, tail flatMap (_ mapFuture f))
+      f(head).map { h =>
+        new LazyCons(h, tail.flatMap(_.mapFuture(f)))
       }
     }
   }
@@ -178,7 +178,7 @@ sealed trait Spool[+A] {
     if (isEmpty) {
       this
     } else if (f(head)) {
-      new LazyCons(head, tail map (_ takeWhile f))
+      new LazyCons(head, tail.map(_.takeWhile(f)))
     } else {
       empty[A]
     }
@@ -192,7 +192,7 @@ sealed trait Spool[+A] {
     } else if (n == 1) {
       new LazyCons(head, Future.value(empty[A]))
     } else {
-      new LazyCons(head, tail map (_ take (n - 1)))
+      new LazyCons(head, tail.map(_.take(n - 1)))
     }
   }
 
@@ -200,7 +200,7 @@ sealed trait Spool[+A] {
     * Concatenates two spools.
     */
   def ++[B >: A](that: => Spool[B]): Spool[B] =
-    if (isEmpty) that else new LazyCons(head: B, tail map (_ ++ that))
+    if (isEmpty) that else new LazyCons(head: B, tail.map(_ ++ that))
 
   /**
     * @see operator ++
@@ -242,7 +242,7 @@ sealed trait Spool[+A] {
     */
   def ++[B >: A](that: => Future[Spool[B]]): Future[Spool[B]] =
     if (isEmpty) that
-    else Future.value(new LazyCons(head: B, tail flatMap (_ ++ that)))
+    else Future.value(new LazyCons(head: B, tail.flatMap(_ ++ that)))
 
   /**
     * @see operator ++
@@ -265,7 +265,7 @@ sealed trait Spool[+A] {
     val as = new ArrayBuffer[A]
     foreach { a =>
       as += a
-    } map { _ =>
+    }.map { _ =>
       as
     }
   }

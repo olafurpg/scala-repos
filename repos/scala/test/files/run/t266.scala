@@ -2,9 +2,9 @@
 
 trait O { self: Test.type =>
 
-  Nil foreach identity
+  Nil.foreach(identity)
 
-  def f = (1 to 10).toList map identity
+  def f = (1 to 10).toList.map(identity)
 }
 
 object Test extends O {
@@ -18,5 +18,5 @@ object Test extends O {
 object Pip
 
 trait P { self: Pip.type =>
-  Nil foreach identity
+  Nil.foreach(identity)
 }

@@ -39,7 +39,7 @@ class CommonConnectorTest extends WordSpec with BeforeAndAfter {
   }
 
   // A simple live test
-  Option { System.getProperty("com.twitter.zk.TEST_CONNECT") } foreach {
+  Option { System.getProperty("com.twitter.zk.TEST_CONNECT") }.foreach {
     connectString =>
       val address = InetSocketAddressHelper.parse(connectString)
 
@@ -55,7 +55,7 @@ class CommonConnectorTest extends WordSpec with BeforeAndAfter {
 
         "have 'zookeeper' in '/'" in {
           assert(
-            Await.result(zkClient("/").getChildren(), timeout).children map {
+            Await.result(zkClient("/").getChildren(), timeout).children.map {
               _.name
             } contains ("zookeeper"))
         }

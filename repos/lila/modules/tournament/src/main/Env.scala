@@ -31,15 +31,15 @@ final class Env(config: Config,
     val CollectionPlayer = config getString "collection.player"
     val CollectionPairing = config getString "collection.pairing"
     val CollectionLeaderboard = config getString "collection.leaderboard"
-    val HistoryMessageTtl = config duration "history.message.ttl"
-    val CreatedCacheTtl = config duration "created.cache.ttl"
-    val LeaderboardCacheTtl = config duration "leaderboard.cache.ttl"
-    val RankingCacheTtl = config duration "ranking.cache.ttl"
-    val UidTimeout = config duration "uid.timeout"
-    val SocketTimeout = config duration "socket.timeout"
+    val HistoryMessageTtl = config.duration("history.message.ttl")
+    val CreatedCacheTtl = config.duration("created.cache.ttl")
+    val LeaderboardCacheTtl = config.duration("leaderboard.cache.ttl")
+    val RankingCacheTtl = config.duration("ranking.cache.ttl")
+    val UidTimeout = config.duration("uid.timeout")
+    val SocketTimeout = config.duration("socket.timeout")
     val SocketName = config getString "socket.name"
     val ApiActorName = config getString "api_actor.name"
-    val SequencerTimeout = config duration "sequencer.timeout"
+    val SequencerTimeout = config.duration("sequencer.timeout")
     val NetDomain = config getString "net.domain"
   }
   import settings._
@@ -140,7 +140,7 @@ final class Env(config: Config,
   system.actorOf(Props(new Scheduler(api)))
 
   def version(tourId: String): Fu[Int] =
-    socketHub ? Ask(tourId, GetVersion) mapTo manifest[Int]
+    (socketHub ? Ask(tourId, GetVersion)).mapTo(manifest[Int])
 
   def cli = new lila.common.Cli {
     def process = {
@@ -163,19 +163,20 @@ object Env {
   private def hub = lila.hub.Env.current
 
   lazy val current =
-    "tournament" boot new Env(
-      config = lila.common.PlayApp loadConfig "tournament",
-      system = lila.common.PlayApp.system,
-      db = lila.db.Env.current,
-      mongoCache = lila.memo.Env.current.mongoCache,
-      flood = lila.security.Env.current.flood,
-      hub = lila.hub.Env.current,
-      roundMap = lila.round.Env.current.roundMap,
-      roundSocketHub = lila.hub.Env.current.socket.round,
-      lightUser = lila.user.Env.current.lightUser,
-      isOnline = lila.user.Env.current.isOnline,
-      onStart = lila.game.Env.current.onStart,
-      trophyApi = lila.user.Env.current.trophyApi,
-      scheduler = lila.common.PlayApp.scheduler
-    )
+    "tournament".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("tournament"),
+        system = lila.common.PlayApp.system,
+        db = lila.db.Env.current,
+        mongoCache = lila.memo.Env.current.mongoCache,
+        flood = lila.security.Env.current.flood,
+        hub = lila.hub.Env.current,
+        roundMap = lila.round.Env.current.roundMap,
+        roundSocketHub = lila.hub.Env.current.socket.round,
+        lightUser = lila.user.Env.current.lightUser,
+        isOnline = lila.user.Env.current.isOnline,
+        onStart = lila.game.Env.current.onStart,
+        trophyApi = lila.user.Env.current.trophyApi,
+        scheduler = lila.common.PlayApp.scheduler
+      ))
 }

@@ -209,8 +209,9 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
             }
             .getOrElse(withLateralView)
 
-          val select = (selectClause orElse selectDistinctClause).getOrElse(
-            sys.error("No select clause."))
+          val select = (selectClause
+            .orElse(selectDistinctClause))
+            .getOrElse(sys.error("No select clause."))
 
           val transformation =
             nodeToTransformation(select.children.head, withWhere)
@@ -349,8 +350,9 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
 
           // TOK_INSERT_INTO means to add files to the table.
           // TOK_DESTINATION means to overwrite the table.
-          val resultDestination = (intoClause orElse destClause).getOrElse(
-            sys.error("No destination found."))
+          val resultDestination = (intoClause
+            .orElse(destClause))
+            .getOrElse(sys.error("No destination found."))
           val overwrite = intoClause.isEmpty
           nodeToDest(resultDestination, withWindowDefinitions, overwrite)
       }
@@ -411,7 +413,8 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
         val relation = UnresolvedRelation(tableIdent, alias)
 
         // Apply sampling if requested.
-        (bucketSampleClause orElse splitSampleClause)
+        (bucketSampleClause
+          .orElse(splitSampleClause))
           .map {
             case Token(
                 "TOK_TABLESPLITSAMPLE",

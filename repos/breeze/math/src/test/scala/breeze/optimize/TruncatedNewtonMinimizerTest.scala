@@ -64,7 +64,7 @@ class TruncatedNewtonMinimizerTest extends OptimizeTestBase {
     def optimizeThis(init: Counter[String, Double]) = {
       val f = new DiffFunction[Counter[String, Double]] {
         def calculate(x: Counter[String, Double]) = {
-          (((x - 3.0) dot (x - 3.0)), (x * 2.0) - 6.0)
+          ((((x - 3.0)).dot(x - 3.0)), (x * 2.0) - 6.0)
         }
       }
 

@@ -119,7 +119,7 @@ abstract class QueryServiceHandler[A](implicit M: Monad[Future])
       (apiKey: APIKey, account: AccountDetails, path: Path, query: String,
        opts: QueryOptions) =>
         val responseEither = for {
-          executor <- execution.executorFor(apiKey) leftMap {
+          executor <- execution.executorFor(apiKey).leftMap {
             EvaluationError.invalidState
           }
           ctx = EvaluationContext(apiKey,
@@ -134,7 +134,7 @@ abstract class QueryServiceHandler[A](implicit M: Monad[Future])
           appendHeaders(opts) { httpResponse }
         }
 
-        responseEither valueOr { handleErrors(query, _) }
+        responseEither.valueOr { handleErrors(query, _) }
     }
   }
 
@@ -154,14 +154,14 @@ class AnalysisServiceHandler(
   import blueeyes.core.http.HttpHeaders._
 
   val service = (request: HttpRequest[ByteChunk]) => {
-    ShardServiceCombinators.queryOpts(request) map { queryOptions =>
+    ShardServiceCombinators.queryOpts(request).map { queryOptions =>
       { (details: (APIKey, AccountDetails), path: Path) =>
         val (apiKey, accountDetails) = details
         // The context needs to use the prefix of the requested script, not th script path
         val context = EvaluationContext(apiKey,
                                         accountDetails,
                                         Path.Root,
-                                        path.prefix getOrElse Path.Root,
+                                        path.prefix.getOrElse(Path.Root),
                                         clock.now())
         val cacheDirectives =
           request.headers.header[`Cache-Control`].toSeq.flatMap(_.directives)
@@ -172,30 +172,33 @@ class AnalysisServiceHandler(
         val cacheControl0 =
           CacheControl.fromCacheDirectives(cacheDirectives: _*)
         // Internally maxAge/maxStale are compared against ms times
-        platform.vfs.executeStoredQuery(
-          platform,
-          scheduler,
-          context,
-          path,
-          queryOptions.copy(cacheControl = cacheControl0)) map { sqr =>
-          HttpResponse(
-            OK,
-            headers = HttpHeaders(sqr.cachedAt.toSeq map { lmod =>
-              `Last-Modified`(HttpDateTimes.StandardDateTime(lmod.toDateTime))
-            }: _*),
-            content = Some(
-              Right(
-                ColumnarTableModule
-                  .toCharBuffers(
-                    queryOptions.output,
-                    sqr.data.map(_.deref(TransSpecModule.paths.Value)))))
-          )
-        } valueOr { evaluationError =>
-          logger.error(
-            "Evaluation errors prevented returning results from stored query: " +
-              evaluationError)
-          HttpResponse(InternalServerError)
-        }
+        platform.vfs
+          .executeStoredQuery(platform,
+                              scheduler,
+                              context,
+                              path,
+                              queryOptions.copy(cacheControl = cacheControl0))
+          .map { sqr =>
+            HttpResponse(
+              OK,
+              headers = HttpHeaders(sqr.cachedAt.toSeq.map { lmod =>
+                `Last-Modified`(
+                  HttpDateTimes.StandardDateTime(lmod.toDateTime))
+              }: _*),
+              content = Some(
+                Right(
+                  ColumnarTableModule
+                    .toCharBuffers(
+                      queryOptions.output,
+                      sqr.data.map(_.deref(TransSpecModule.paths.Value)))))
+            )
+          }
+          .valueOr { evaluationError =>
+            logger.error(
+              "Evaluation errors prevented returning results from stored query: " +
+                evaluationError)
+            HttpResponse(InternalServerError)
+          }
       }
     }
   }
@@ -235,11 +238,14 @@ class SyncQueryServiceHandler(
       slices.map(_.deref(TransSpecModule.paths.Value)))
 
     val format =
-      request.parameters get 'format map {
-        case "simple" => Right(Simple)
-        case "detailed" => Right(Detailed)
-        case badFormat => Left("unknown format '%s'" format badFormat)
-      } getOrElse Right(defaultFormat)
+      request.parameters
+        .get('format)
+        .map {
+          case "simple" => Right(Simple)
+          case "detailed" => Right(Detailed)
+          case badFormat => Left("unknown format '%s'".format(badFormat))
+        }
+        .getOrElse(Right(defaultFormat))
 
     (format, jobId, charBuffers) match {
       case (Left(msg), _, _) =>
@@ -252,13 +258,13 @@ class SyncQueryServiceHandler(
 
       case (Right(Simple), Some(jobId), data) =>
         val errorsM = jobManager.listMessages(jobId, channels.Error, None)
-        errorsM map { errors =>
+        errorsM.map { errors =>
           if (errors.isEmpty) {
             HttpResponse[QueryResult](OK,
                                       content =
                                         Some(Right(ensureTermination(data))))
           } else {
-            val json = JArray(errors.toList map (_.value))
+            val json = JArray(errors.toList.map(_.value))
             HttpResponse[QueryResult](BadRequest, content = Some(Left(json)))
           }
         }
@@ -278,7 +284,7 @@ class SyncQueryServiceHandler(
         val data = ensureTermination(data0)
         val result = StreamT.unfoldM(some(prefix :: data)) {
           case Some(stream) =>
-            stream.uncons flatMap {
+            stream.uncons.flatMap {
               case Some((buffer, tail)) =>
                 M.point(Some((buffer, Some(tail))))
               case None =>
@@ -293,11 +299,13 @@ class SyncQueryServiceHandler(
                 (warningsM |@| errorsM |@| serverErrorsM |@| serverWarningsM) {
                   (warnings, errors, serverErrors, serverWarnings) =>
                     val suffix =
-                      """, "errors": %s, "warnings": %s, "serverErrors": %s, "serverWarnings": %s }""" format
-                        (JArray(errors.toList map (_.value)).renderCompact,
-                        JArray(warnings.toList map (_.value)).renderCompact,
-                        JArray(serverErrors.toList map (_.value)).renderCompact,
-                        JArray(serverWarnings.toList map (_.value)).renderCompact)
+                      """, "errors": %s, "warnings": %s, "serverErrors": %s, "serverWarnings": %s }"""
+                        .format(
+                          JArray(errors.toList.map(_.value)).renderCompact,
+                          JArray(warnings.toList.map(_.value)).renderCompact,
+                          JArray(serverErrors.toList.map(_.value)).renderCompact,
+                          JArray(serverWarnings.toList.map(_.value)).renderCompact
+                        )
                     Some((CharBuffer.wrap(suffix), None))
                 }
             }
@@ -320,20 +328,23 @@ class SyncQueryServiceHandler(
       stream0: StreamT[Future, CharBuffer]): StreamT[Future, CharBuffer] = {
     def loop(
         stream: StreamT[Future, CharBuffer]): StreamT[Future, CharBuffer] = {
-      StreamT(stream.uncons map {
-        case Some((s, tail)) => StreamT.Yield(s, loop(tail))
-        case None => StreamT.Done
-      } recover {
-        case _: QueryCancelledException =>
-          StreamT.Done
-        case _: QueryExpiredException =>
-          StreamT.Done
-        case ex =>
-          val msg = new StringWriter()
-          ex.printStackTrace(new PrintWriter(msg))
-          logger.error("Error executing bifrost query:\n" + msg.toString())
-          StreamT.Done
-      })
+      StreamT(
+        stream.uncons
+          .map {
+            case Some((s, tail)) => StreamT.Yield(s, loop(tail))
+            case None => StreamT.Done
+          }
+          .recover {
+            case _: QueryCancelledException =>
+              StreamT.Done
+            case _: QueryExpiredException =>
+              StreamT.Done
+            case ex =>
+              val msg = new StringWriter()
+              ex.printStackTrace(new PrintWriter(msg))
+              logger.error("Error executing bifrost query:\n" + msg.toString())
+              StreamT.Done
+          })
     }
 
     loop(stream0)

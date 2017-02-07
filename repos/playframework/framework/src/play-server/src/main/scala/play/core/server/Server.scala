@@ -120,7 +120,7 @@ object Server {
     Play.start(application)
     val server = provider.createServer(config, application)
     try {
-      block(new Port((server.httpPort orElse server.httpsPort).get))
+      block(new Port((server.httpPort.orElse(server.httpsPort)).get))
     } finally {
       server.stop()
     }

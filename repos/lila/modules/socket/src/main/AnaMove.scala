@@ -14,7 +14,7 @@ case class AnaMove(orig: chess.Pos,
                    promotion: Option[chess.PromotableRole]) {
 
   def step: Valid[Step] =
-    chess.Game(variant.some, fen.some)(orig, dest, promotion) map {
+    chess.Game(variant.some, fen.some)(orig, dest, promotion).map {
       case (game, move) =>
         val movable = !game.situation.end
         val fen = chess.format.Forsyth >> game
@@ -39,13 +39,13 @@ object AnaMove {
 
   def parse(o: JsObject) =
     for {
-      d ← o obj "d"
-      orig ← d str "orig" flatMap chess.Pos.posAt
-      dest ← d str "dest" flatMap chess.Pos.posAt
-      variant = chess.variant.Variant orDefault ~d.str("variant")
-      fen ← d str "fen"
-      path ← d str "path"
-      prom = d str "promotion" flatMap chess.Role.promotable
+      d ← o.obj("d")
+      orig ← d.str("orig").flatMap(chess.Pos.posAt)
+      dest ← d.str("dest").flatMap(chess.Pos.posAt)
+      variant = chess.variant.Variant.orDefault(~d.str("variant"))
+      fen ← d.str("fen")
+      path ← d.str("path")
+      prom = d.str("promotion").flatMap(chess.Role.promotable)
     } yield
       AnaMove(orig = orig,
               dest = dest,

@@ -155,7 +155,7 @@ object ScalaSigParsers extends RulesWithState with MemoisableRules {
   val size = symTab ^^ (_.size)
 
   def entry(index: Int) = memo(("entry", index)) {
-    cond(_ hasEntry index) -~ read(_ getEntry index) >-> { entry =>
+    cond(_.hasEntry(index)) -~ read(_.getEntry(index)) >-> { entry =>
       Success(entry, entry.entryType)
     }
   }
@@ -167,14 +167,15 @@ object ScalaSigParsers extends RulesWithState with MemoisableRules {
     }
 
   def allEntries[A](f: ScalaSigEntryParsers.EntryParser[A]) = size >> { n =>
-    anyOf((0 until n) map parseEntry(f))
+    anyOf(((0 until n)).map(parseEntry(f)))
   }
 
-  lazy val entries = allEntries(ScalaSigEntryParsers.entry) as "entries"
-  lazy val symbols = allEntries(ScalaSigEntryParsers.symbol) as "symbols"
-  lazy val methods = allEntries(ScalaSigEntryParsers.methodSymbol) as "methods"
+  lazy val entries = allEntries(ScalaSigEntryParsers.entry).as("entries")
+  lazy val symbols = allEntries(ScalaSigEntryParsers.symbol).as("symbols")
+  lazy val methods =
+    allEntries(ScalaSigEntryParsers.methodSymbol).as("methods")
   lazy val attributes =
-    allEntries(ScalaSigEntryParsers.attributeInfo) as "attributes"
+    allEntries(ScalaSigEntryParsers.attributeInfo).as("attributes")
 
   lazy val topLevelClasses = allEntries(ScalaSigEntryParsers.topLevelClass)
   lazy val topLevelObjects = allEntries(ScalaSigEntryParsers.topLevelObject)
@@ -189,7 +190,7 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
   implicit def byteCodeEntryParser[A](
       rule: ScalaSigAttributeParsers.Parser[A]): EntryParser[A] = apply {
     entry =>
-      rule(entry.byteCode) mapOut (entry setByteCode _)
+      rule(entry.byteCode).mapOut(entry.setByteCode(_))
   }
 
   def toEntry[A](index: Int) = apply { sigEntry =>
@@ -199,7 +200,7 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
   def parseEntry[A](parser: EntryParser[A])(index: Int) =
     (toEntry(index) -~ parser)
 
-  implicit def entryType(code: Int) = key filter (_ == code)
+  implicit def entryType(code: Int) = key.filter(_ == code)
 
   val index = read(_.index)
   val key = read(_.entryType)
@@ -212,7 +213,7 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
   val termName = 1 -~ utf8
   val typeName = 2 -~ utf8
 
-  val name = termName | typeName as "name"
+  val name = (termName | typeName).as("name")
 
   def refTo[A](rule: EntryParser[A]): EntryParser[A] = ref >>& parseEntry(rule)
 
@@ -229,16 +230,18 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
   def symbolEntry(key: Int) = symHeader(key) -~ symbolInfo
 
   val noSymbol = 3 -^ NoSymbol
-  val typeSymbol = symbolEntry(4) ^^ TypeSymbol as "typeSymbol"
-  val aliasSymbol = symbolEntry(5) ^^ AliasSymbol as "alias"
-  val classSymbol = symbolEntry(6) ~ (ref ?) ^~^ ClassSymbol as "class"
-  val objectSymbol = symbolEntry(7) ^^ ObjectSymbol as "object"
+  val typeSymbol = (symbolEntry(4) ^^ TypeSymbol).as("typeSymbol")
+  val aliasSymbol = (symbolEntry(5) ^^ AliasSymbol).as("alias")
+  val classSymbol = (symbolEntry(6) ~ (ref ?) ^~^ ClassSymbol).as("class")
+  val objectSymbol = (symbolEntry(7) ^^ ObjectSymbol).as("object")
   val methodSymbol =
-    symHeader(8) -~ /*(ref?) -~*/ symbolInfo ~ (ref ?) ^~^ MethodSymbol as "method"
+    (symHeader(8) -~ /*(ref?) -~*/ symbolInfo ~ (ref ?) ^~^ MethodSymbol)
+      .as("method")
   val extRef =
-    9 -~ nameRef ~ (symbolRef ?) ~ get ^~~^ ExternalSymbol as "extRef"
+    (9 -~ nameRef ~ (symbolRef ?) ~ get ^~~^ ExternalSymbol).as("extRef")
   val extModClassRef =
-    10 -~ nameRef ~ (symbolRef ?) ~ get ^~~^ ExternalSymbol as "extModClassRef"
+    (10 -~ nameRef ~ (symbolRef ?) ~ get ^~~^ ExternalSymbol)
+      .as("extModClassRef")
 
   lazy val symbol: EntryParser[Symbol] =
     oneOf(noSymbol,
@@ -248,7 +251,7 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
           objectSymbol,
           methodSymbol,
           extRef,
-          extModClassRef) as "symbol"
+          extModClassRef).as("symbol")
 
   val classSymRef = refTo(classSymbol)
   val attribTreeRef = ref
@@ -275,7 +278,7 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
       42 -~ typeRef ~ (attribTreeRef *) ^~^ AnnotatedType,
       51 -~ typeRef ~ symbolRef ~ (attribTreeRef *) ^~~^ AnnotatedWithSelfType,
       48 -~ typeRef ~ (symbolRef *) ^~^ ExistentialType
-    ) as "type"
+    ).as("type")
 
   lazy val literal: EntryParser[Any] = oneOf(
     24 -^ (()),
@@ -298,8 +301,8 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
   lazy val annotInfo =
     43 -~ (nat *) ^^ AnnotInfo // attarg_Ref {constant_Ref attarg_Ref}
 
-  lazy val topLevelClass = classSymbol filter isTopLevelClass
-  lazy val topLevelObject = objectSymbol filter isTopLevel
+  lazy val topLevelClass = classSymbol.filter(isTopLevelClass)
+  lazy val topLevelObject = objectSymbol.filter(isTopLevel)
 
   def isTopLevel(symbol: Symbol) = symbol.parent match {
     case Some(ext: ExternalSymbol) => true

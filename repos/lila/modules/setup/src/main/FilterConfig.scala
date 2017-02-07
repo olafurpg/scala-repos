@@ -10,9 +10,9 @@ case class FilterConfig(variant: List[chess.variant.Variant],
 
   def >> =
     (
-      variant map (_.id),
-      mode map (_.id),
-      speed map (_.id),
+      variant.map(_.id),
+      mode.map(_.id),
+      speed.map(_.id),
       ratingRange.toString
     ).some
 
@@ -55,10 +55,10 @@ object FilterConfig {
 
   def <<(v: List[Int], m: List[Int], s: List[Int], e: String) =
     new FilterConfig(
-      variant = v map chess.variant.Variant.apply flatten,
-      mode = m map Mode.apply flatten,
-      speed = s map Speed.apply flatten,
-      ratingRange = RatingRange orDefault e
+      variant = v.map(chess.variant.Variant.apply) flatten,
+      mode = m.map(Mode.apply) flatten,
+      speed = s.map(Speed.apply) flatten,
+      ratingRange = RatingRange.orDefault(e)
     ).nonEmpty
 
   import reactivemongo.bson._
@@ -69,10 +69,13 @@ object FilterConfig {
 
       def reads(r: BSON.Reader): FilterConfig =
         FilterConfig(
-          variant = r intsD "v" flatMap { chess.variant.Variant(_) },
-          mode = r intsD "m" flatMap { Mode(_) },
-          speed = r intsD "s" flatMap { Speed(_) },
-          ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default
+          variant = (r intsD "v").flatMap { chess.variant.Variant(_) },
+          mode = (r intsD "m").flatMap { Mode(_) },
+          speed = (r intsD "s").flatMap { Speed(_) },
+          ratingRange = r
+            .strO("e")
+            .flatMap(RatingRange.apply)
+            .getOrElse(RatingRange.default)
         )
 
       def writes(w: BSON.Writer, o: FilterConfig) =

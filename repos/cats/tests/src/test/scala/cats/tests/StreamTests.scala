@@ -38,7 +38,7 @@ class StreamTests extends CatsSuite {
   test("Show[Stream] is referentially transparent, unlike Stream.toString") {
     forAll { stream: Stream[Int] =>
       if (!stream.isEmpty) {
-        val unevaluatedStream = stream map identity
+        val unevaluatedStream = stream.map(identity)
         val initialShow = unevaluatedStream.show
 
         // Evaluating the tail can cause Stream.toString to return different values,

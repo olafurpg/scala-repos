@@ -67,14 +67,14 @@ private[sbtplugin] final class FrameworkDetector(jsEnv: JSEnv) {
 
     // Filter jsDependencies unexpected output
     val results =
-      console.buf collect {
+      console.buf.collect {
         case s if s.startsWith(ConsoleFrameworkPrefix) =>
           s.stripPrefix(ConsoleFrameworkPrefix)
       }
 
     assert(results.size == frameworks.size)
 
-    (frameworks zip results).filter(_._2.nonEmpty).toMap
+    (frameworks.zip(results)).filter(_._2.nonEmpty).toMap
   }
 }
 

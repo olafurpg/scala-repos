@@ -133,21 +133,29 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
           "Job created in %d ms".format(System.currentTimeMillis - start))
       }
     for {
-      job <- futureJob map { job =>
-        Some(job)
-      } recover { case _ => None }
-      queryStateManager = job map { job =>
-        val mgr = JobQueryStateManager(
-          job.id,
-          yggConfig.clock
-            .now() plus timeout.getOrElse(defaultTimeout).toMillis)
-        mgr.start()
-        mgr
-      } getOrElse FakeJobQueryStateManager(
-        yggConfig.clock.now() plus timeout.getOrElse(defaultTimeout).toMillis)
+      job <- futureJob
+        .map { job =>
+          Some(job)
+        }
+        .recover { case _ => None }
+      queryStateManager = job
+        .map { job =>
+          val mgr = JobQueryStateManager(
+            job.id,
+            yggConfig.clock
+              .now()
+              .plus(timeout.getOrElse(defaultTimeout).toMillis))
+          mgr.start()
+          mgr
+        }
+        .getOrElse(
+          FakeJobQueryStateManager(
+            yggConfig.clock
+              .now()
+              .plus(timeout.getOrElse(defaultTimeout).toMillis)))
     } yield {
       new JobQueryTFMonad {
-        val jobId = job map (_.id)
+        val jobId = job.map(_.id)
         val Q: JobQueryStateMonad = queryStateManager
         val M: Monad[Future] = new blueeyes.bkka.FutureMonad(asyncContext)
       }
@@ -164,30 +172,33 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
     */
   implicit def sink(implicit M: JobQueryTFMonad) = new (JobQueryTF ~> Future) {
     def apply[A](f: JobQueryTF[A]): Future[A] =
-      f.run recover {
-        case ex =>
-          M.jobId map { jobId =>
-            jobManager.addMessage(jobId,
-                                  JobManager.channels.ServerError,
-                                  JString("Internal server error."))
-            jobManager.abort(jobId,
-                             "Internal server error.",
-                             yggConfig.clock.now())
-          }
-          throw ex
-      } map {
-        case Running(_, value) =>
-          value
-        case Cancelled =>
-          M.jobId map
-            (jobManager
-              .abort(_, "Query was cancelled.", yggConfig.clock.now()))
-          throw QueryCancelledException(
-            "Query was cancelled before it was completed.")
-        case Expired =>
-          M.jobId map (jobManager.expire(_, yggConfig.clock.now()))
-          throw QueryExpiredException("Query expired before it was completed.")
-      }
+      f.run
+        .recover {
+          case ex =>
+            M.jobId.map { jobId =>
+              jobManager.addMessage(jobId,
+                                    JobManager.channels.ServerError,
+                                    JString("Internal server error."))
+              jobManager.abort(jobId,
+                               "Internal server error.",
+                               yggConfig.clock.now())
+            }
+            throw ex
+        }
+        .map {
+          case Running(_, value) =>
+            value
+          case Cancelled =>
+            M.jobId.map(
+              jobManager
+                .abort(_, "Query was cancelled.", yggConfig.clock.now()))
+            throw QueryCancelledException(
+              "Query was cancelled before it was completed.")
+          case Expired =>
+            M.jobId.map(jobManager.expire(_, yggConfig.clock.now()))
+            throw QueryExpiredException(
+              "Query expired before it was completed.")
+        }
   }
 
   /**
@@ -204,7 +215,7 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
       t: JobQueryTF ~> N): StreamT[N, A] = {
     val finish: StreamT[JobQueryTF, A] =
       StreamT[JobQueryTF, A](M.point(StreamT.Skip {
-        M.jobId map (jobManager.finish(_, yggConfig.clock.now()))
+        M.jobId.map(jobManager.finish(_, yggConfig.clock.now()))
         StreamT.empty[JobQueryTF, A]
       }))
 
@@ -217,7 +228,7 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
     private val cancelled: AtomicBoolean = new AtomicBoolean()
     def abort(): Boolean = { cancelled.set(true); true }
     def isCancelled() = cancelled.get()
-    def hasExpired() = yggConfig.clock.now() isAfter expiresAt
+    def hasExpired() = yggConfig.clock.now().isAfter(expiresAt)
   }
 
   private final case class JobQueryStateManager(jobId: JobId,
@@ -232,8 +243,8 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
     private def poll() = lock.synchronized {
       import JobState._
 
-      jobManager.findJob(jobId) map { job =>
-        if (job map (_.state.isTerminal) getOrElse true) {
+      jobManager.findJob(jobId).map { job =>
+        if (job.map(_.state.isTerminal).getOrElse(true)) {
           logger.debug("Terminal state for " + jobId)
           abort()
         } else if (hasExpired) {
@@ -242,10 +253,14 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
         } else {
           logger.trace("Non-Terminal state for " + jobId)
           // We only update cancelled if we have not yet cancelled.
-          cancelled.compareAndSet(false, job map {
-            case Job(_, _, _, _, _, Cancelled(_, _, _)) => true
-            case _ => false
-          } getOrElse false)
+          cancelled.compareAndSet(
+            false,
+            job
+              .map {
+                case Job(_, _, _, _, _, Cancelled(_, _, _)) => true
+                case _ => false
+              }
+              .getOrElse(false))
         }
       }
     }
@@ -257,7 +272,7 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
     }
 
     def hasExpired(): Boolean = {
-      yggConfig.clock.now() isAfter expiresAt
+      yggConfig.clock.now().isAfter(expiresAt)
     }
 
     def isCancelled(): Boolean = cancelled.get()
@@ -276,7 +291,7 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
 
     def stop(): Unit = lock.synchronized {
       logger.debug("Stopping scheduled poll for " + jobId)
-      poller foreach { c =>
+      poller.foreach { c =>
         c.cancel();
         logger.debug("Cancelled %s: %s".format(jobId, c.isCancelled))
       }

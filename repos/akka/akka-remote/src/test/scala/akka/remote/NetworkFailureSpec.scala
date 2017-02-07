@@ -67,7 +67,7 @@ trait NetworkFailureSpec extends DefaultTimeout { self: AkkaSpec ⇒
 
   def sleepFor(duration: Duration) = {
     println("===>>> Sleeping for [" + duration + "]")
-    Thread sleep (duration.toMillis)
+    Thread.sleep(duration.toMillis)
   }
 
   def enableNetworkThrottling() = {

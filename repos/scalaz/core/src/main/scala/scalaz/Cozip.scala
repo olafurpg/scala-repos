@@ -15,21 +15,21 @@ trait Cozip[F[_]] { self =>
 
   def cozip4[A, B, C, D](
       x: F[A \/ (B \/ (C \/ D))]): (F[A] \/ (F[B] \/ (F[C] \/ F[D]))) =
-    cozip(x).map(cozip(_) map (cozip(_)))
+    cozip(x).map(cozip(_).map(cozip(_)))
 
   def cozip5[A, B, C, D, E](x: F[(A \/ (B \/ (C \/ (D \/ E))))])
     : (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ F[E])))) =
-    cozip(x).map(cozip(_) map (cozip(_) map (cozip(_))))
+    cozip(x).map(cozip(_).map(cozip(_).map(cozip(_))))
 
   def cozip6[A, B, C, D, E, G](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ G)))))])
     : (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ F[G]))))) =
-    cozip(x).map(cozip(_) map (cozip(_) map (cozip(_) map (cozip(_)))))
+    cozip(x).map(cozip(_).map(cozip(_).map(cozip(_).map(cozip(_)))))
 
   def cozip7[A, B, C, D, E, G, H](
       x: F[(A \/ (B \/ (C \/ (D \/ (E \/ (G \/ H))))))])
     : (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ (F[G] \/ F[H])))))) =
     cozip(x).map(
-      cozip(_) map (cozip(_) map (cozip(_) map (cozip(_) map (cozip(_))))))
+      cozip(_).map(cozip(_).map(cozip(_).map(cozip(_).map(cozip(_))))))
 
   ////
   val cozipSyntax = new scalaz.syntax.CozipSyntax[F] { def F = Cozip.this }

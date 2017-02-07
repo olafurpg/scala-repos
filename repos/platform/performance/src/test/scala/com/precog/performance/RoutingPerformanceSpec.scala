@@ -57,18 +57,20 @@ trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
         DistributedSampleSet(0, sampler = AdSamples.adCampaignSample)
 
       val samples =
-        0.until(batchSize) map { _ =>
+        0.until(batchSize).map { _ =>
           sampler.next._1
         }
 
       val seq = new AtomicInteger(0)
 
       val batch: Seq[IngestMessage] =
-        samples map { jval =>
-          Event(Path("/"), "apiKey", jval, Map())
-        } map { event =>
-          EventMessage(0, seq.getAndIncrement, event)
-        }
+        samples
+          .map { jval =>
+            Event(Path("/"), "apiKey", jval, Map())
+          }
+          .map { event =>
+            EventMessage(0, seq.getAndIncrement, event)
+          }
 
       val metadataActor: ActorRef =
         system.actorOf(Props(new MockMetadataActor()), "mock_metadata_actor")

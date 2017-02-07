@@ -56,7 +56,7 @@ private final class PushApi(
         .void
 
   def move(move: MoveEvent): Funit = move.mobilePushable ?? {
-    GameRepo game move.gameId flatMap {
+    GameRepo.game(move.gameId).flatMap {
       _ ?? { game =>
         val pov = Pov(game, !move.color)
         game.player(!move.color).userId ?? { userId =>
@@ -112,7 +112,7 @@ private final class PushApi(
   def challengeAccept(c: Challenge, joinerId: Option[String]): Funit =
     c.challengerUser.ifTrue(c.finalColor.white && !c.hasClock) ?? {
       challenger =>
-        val lightJoiner = joinerId flatMap lightUser
+        val lightJoiner = joinerId.flatMap(lightUser)
         pushToAll(
           challenger.id,
           _.challenge.accept,
@@ -159,11 +159,12 @@ private final class PushApi(
 
   private def IfAway(pov: Pov)(f: => Funit): Funit = {
     import makeTimeout.short
-    roundSocketHub ? Ask(pov.gameId, IsOnGame(pov.color)) mapTo manifest[
-      Boolean] flatMap {
-      case true => funit
-      case false => f
-    }
+    (roundSocketHub ? Ask(pov.gameId, IsOnGame(pov.color)))
+      .mapTo(manifest[Boolean])
+      .flatMap {
+        case true => funit
+        case false => f
+      }
   }
 
   private def opponentName(pov: Pov) = Namer playerString pov.opponent

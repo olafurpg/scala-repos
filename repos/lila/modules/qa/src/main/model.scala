@@ -21,7 +21,7 @@ case class Question(_id: QuestionId, // autoincrement integer
   def id = _id
 
   def slug = {
-    val s = lila.common.String slugify title
+    val s = lila.common.String.slugify(title)
     if (s.isEmpty) "-" else s
   }
 

@@ -26,7 +26,7 @@ class BasicLibraryTest extends ScalaOsgiHelper {
     import scala.concurrent._
     import scala.concurrent.duration.Duration.Inf
     import ExecutionContext.Implicits._
-    val x = Future(2) map (_ + 1)
+    val x = Future(2).map(_ + 1)
     assertEquals(3, Await.result(x, Inf))
   }
 }

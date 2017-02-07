@@ -135,7 +135,7 @@ object SessionSettings {
     * @return The new build state
     */
   def withSettings(s: State)(f: SessionSettings => State): State = {
-    val extracted = Project extract s
+    val extracted = Project.extract(s)
     import extracted._
     if (session.append.isEmpty) {
       s.log.info("No session settings defined.")
@@ -149,7 +149,9 @@ object SessionSettings {
 
   /** Checks to see if any session settings are being discarded and issues a warning. */
   def checkSession(newSession: SessionSettings, oldState: State): Unit = {
-    val oldSettings = (oldState get Keys.sessionSettings).toList
+    val oldSettings = (oldState
+      .get(Keys.sessionSettings))
+      .toList
       .flatMap(_.append)
       .flatMap(_._2)
     if (newSession.append.isEmpty && oldSettings.nonEmpty)
@@ -252,16 +254,17 @@ object SessionSettings {
             case Some(ss @ (ns, newLines))
                 if !ns.init.dependencies.contains(ns.key) =>
               val shifted =
-                ns withPos RangePosition(
-                  path,
-                  LineRange(start - offs, start - offs + newLines.size))
+                ns.withPos(
+                  RangePosition(path,
+                                LineRange(start - offs,
+                                          start - offs + newLines.size)))
               (offs + end - start - newLines.size, shifted :: olds, ss +: repl)
             case _ =>
-              val shifted = s withPos RangePosition(path, r shift -offs)
+              val shifted = s.withPos(RangePosition(path, r.shift(-offs)))
               (offs, shifted :: olds, repl)
           }
       }
-    val newSettings = settings diff replace
+    val newSettings = settings.diff(replace)
     val oldContent = IO.readLines(writeTo)
     val (_, exist) =
       SbtRefactorings.applySessionSettings((writeTo, oldContent), replace)
@@ -274,7 +277,7 @@ object SessionSettings {
       ((List[SessionSetting](), adjusted.size + 1) /: newSettings) {
         case ((acc, line), (s, newLines)) =>
           val endLine = line + newLines.size
-          ((s withPos RangePosition(path, LineRange(line, endLine)), newLines) :: acc,
+          ((s.withPos(RangePosition(path, LineRange(line, endLine))), newLines) :: acc,
            endLine + 1)
       }
     (newWithPos.reverse, other ++ oldShifted)
@@ -369,7 +372,7 @@ save, save-all
   def natSelect = rep1sep(token(range, "<range>"), ',')
 
   def range: Parser[(Int, Int)] = (NatBasic ~ ('-' ~> NatBasic).?).map {
-    case lo ~ hi => (lo, hi getOrElse lo)
+    case lo ~ hi => (lo, hi.getOrElse(lo))
   }
 
   /** The raw implementation of the session command. */

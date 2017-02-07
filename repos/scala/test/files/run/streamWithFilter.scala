@@ -6,6 +6,6 @@ object Test {
   val fizzbuzzes = for (n <- nums; if isFizz(n); if isBuzz(n)) yield n
 
   def main(args: Array[String]): Unit = {
-    fizzbuzzes take 5 foreach println
+    fizzbuzzes.take(5).foreach(println)
   }
 }

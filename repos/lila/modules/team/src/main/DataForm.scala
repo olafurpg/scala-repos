@@ -35,10 +35,10 @@ private[team] final class DataForm(val captcher: akka.actor.ActorSelection)
   def edit(team: Team) =
     Form(
       mapping(Fields.location, Fields.description, Fields.open)(
-        TeamEdit.apply)(TeamEdit.unapply)) fill TeamEdit(
-      location = team.location,
-      description = team.description,
-      open = team.open.fold(1, 0))
+        TeamEdit.apply)(TeamEdit.unapply)).fill(
+      TeamEdit(location = team.location,
+               description = team.description,
+               open = team.open.fold(1, 0)))
 
   val request =
     Form(
@@ -47,10 +47,10 @@ private[team] final class DataForm(val captcher: akka.actor.ActorSelection)
         Fields.gameId,
         Fields.move
       )(RequestSetup.apply)(RequestSetup.unapply)
-        .verifying(captchaFailMessage, validateCaptcha _)) fill RequestSetup(
-      message = "Hello, I would like to join the team!",
-      gameId = "",
-      move = "")
+        .verifying(captchaFailMessage, validateCaptcha _)).fill(
+      RequestSetup(message = "Hello, I would like to join the team!",
+                   gameId = "",
+                   move = ""))
 
   val processRequest = Form(
     tuple(
@@ -66,7 +66,7 @@ private[team] final class DataForm(val captcher: akka.actor.ActorSelection)
   def createWithCaptcha = withCaptcha(create)
 
   private def teamExists(setup: TeamSetup) =
-    $count.exists[Team]($select(Team nameToId setup.trim.name))
+    $count.exists[Team]($select(Team.nameToId(setup.trim.name)))
 }
 
 private[team] case class TeamSetup(name: String,
@@ -80,7 +80,7 @@ private[team] case class TeamSetup(name: String,
 
   def trim =
     copy(name = name.trim,
-         location = location map (_.trim) filter (_.nonEmpty),
+         location = location.map(_.trim).filter(_.nonEmpty),
          description = description.trim)
 }
 
@@ -91,7 +91,7 @@ private[team] case class TeamEdit(location: Option[String],
   def isOpen = open == 1
 
   def trim =
-    copy(location = location map (_.trim) filter (_.nonEmpty),
+    copy(location = location.map(_.trim).filter(_.nonEmpty),
          description = description.trim)
 }
 

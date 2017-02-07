@@ -91,8 +91,9 @@ object Pattern {
       if ((flags & LITERAL) != 0) {
         (quote(regex), flags)
       } else {
-        trySplitHack(regex, flags) orElse tryFlagHack(regex, flags) getOrElse
-          (regex, flags)
+        trySplitHack(regex, flags)
+          .orElse(tryFlagHack(regex, flags))
+          .getOrElse(regex, flags)
       }
     }
 

@@ -36,7 +36,7 @@ abstract class IndexingTestCase extends ScalaFixtureTestCase {
                                 versions: Set[String]): Unit = {
     assertEquals(index.groups(), groups)
     assertEquals(index.artifacts(), artifacts)
-    artifacts foreach { a =>
+    artifacts.foreach { a =>
       assertEquals(index.versions(groups.head, a), versions)
     }
   }

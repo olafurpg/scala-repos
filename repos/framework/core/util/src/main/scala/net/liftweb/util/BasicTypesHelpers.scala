@@ -241,7 +241,7 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
       case i: Int => i != 0
       case lo: Long => lo != 0
       case n: Number => n.intValue != 0
-      case s: String => asBoolean(s) openOr false
+      case s: String => asBoolean(s).openOr(false)
       case None => false
       case Empty | Failure(_, _, _) => false
       case Full(n) => toBoolean(n)

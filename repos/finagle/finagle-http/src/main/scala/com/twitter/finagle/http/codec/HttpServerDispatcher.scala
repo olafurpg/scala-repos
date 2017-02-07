@@ -31,7 +31,7 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
 
   import ReaderUtils.{readChunk, streamChunks}
 
-  trans.onClose ensure {
+  trans.onClose.ensure {
     service.close()
   }
 

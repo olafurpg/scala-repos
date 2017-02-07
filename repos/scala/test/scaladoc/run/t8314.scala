@@ -11,6 +11,6 @@ object Test extends ScaladocModelTest {
 
   def testModel(root: Package) = {
     import access._
-    root._class("A").comment foreach println
+    root._class("A").comment.foreach(println)
   }
 }

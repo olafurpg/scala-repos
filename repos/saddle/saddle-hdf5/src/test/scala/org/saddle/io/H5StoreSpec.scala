@@ -57,7 +57,7 @@ class H5StoreSpec extends Specification {
   }
 
   def hdfTest[T: AsResult](test: String)(logic: => T): Fragment = {
-    allCatch either {
+    allCatch.either {
       java.lang.Runtime.getRuntime.loadLibrary("jhdf5")
     } match {
       case Left(exception) => Skipped("Could not import HDF5")
@@ -76,12 +76,12 @@ class H5StoreSpec extends Specification {
 
       val fid1 = H5Store.createFile(tmp)
 
-      fid1 must be greaterThan 0
+      (fid1 must be).greaterThan(0)
 
       H5Store.closeFile(fid1)
 
       val fid2 = H5Store.openFile(tmp)
-      fid2 must be greaterThan 0
+      (fid2 must be).greaterThan(0)
       H5Store.closeFile(fid2)
 
       Files.deleteIfExists(Paths.get(tmp))

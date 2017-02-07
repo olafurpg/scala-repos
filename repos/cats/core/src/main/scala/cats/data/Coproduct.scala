@@ -172,7 +172,7 @@ private[data] trait CoproductFunctor[F[_], G[_]]
   implicit def G: Functor[G]
 
   def map[A, B](a: Coproduct[F, G, A])(f: A => B): Coproduct[F, G, B] =
-    a map f
+    a.map(f)
 }
 
 private[data] trait CoproductContravariant[F[_], G[_]]
@@ -182,7 +182,7 @@ private[data] trait CoproductContravariant[F[_], G[_]]
   implicit def G: Contravariant[G]
 
   def contramap[A, B](a: Coproduct[F, G, A])(f: B => A): Coproduct[F, G, B] =
-    a contramap f
+    a.contramap(f)
 }
 
 private[data] trait CoproductFoldable[F[_], G[_]]
@@ -200,7 +200,7 @@ private[data] trait CoproductFoldable[F[_], G[_]]
 
   override def foldMap[A, B](fa: Coproduct[F, G, A])(f: A => B)(
       implicit M: Monoid[B]): B =
-    fa foldMap f
+    fa.foldMap(f)
 }
 
 private[data] trait CoproductTraverse[F[_], G[_]]
@@ -212,11 +212,11 @@ private[data] trait CoproductTraverse[F[_], G[_]]
 
   override def map[A, B](a: Coproduct[F, G, A])(
       f: A => B): Coproduct[F, G, B] =
-    a map f
+    a.map(f)
 
   override def traverse[X[_]: Applicative, A, B](fa: Coproduct[F, G, A])(
       f: A => X[B]): X[Coproduct[F, G, B]] =
-    fa traverse f
+    fa.traverse(f)
 }
 
 private[data] trait CoproductCoflatMap[F[_], G[_]]
@@ -226,11 +226,11 @@ private[data] trait CoproductCoflatMap[F[_], G[_]]
   implicit def G: CoflatMap[G]
 
   def map[A, B](a: Coproduct[F, G, A])(f: A => B): Coproduct[F, G, B] =
-    a map f
+    a.map(f)
 
   def coflatMap[A, B](a: Coproduct[F, G, A])(
       f: Coproduct[F, G, A] => B): Coproduct[F, G, B] =
-    a coflatMap f
+    a.coflatMap(f)
 
   override def coflatten[A](
       fa: Coproduct[F, G, A]): Coproduct[F, G, Coproduct[F, G, A]] =

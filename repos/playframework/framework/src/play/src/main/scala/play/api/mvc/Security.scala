@@ -59,8 +59,9 @@ object Security {
     * Key of the username attribute stored in session.
     */
   lazy val username: String =
-    Play.privateMaybeApplication.flatMap(
-      _.configuration.getString("session.username")) getOrElse ("username")
+    Play.privateMaybeApplication
+      .flatMap(_.configuration.getString("session.username"))
+      .getOrElse("username")
 
   /**
     * Wraps another action, allowing only authenticated HTTP requests.
@@ -149,11 +150,13 @@ object Security {
     def authenticate[A](
         request: Request[A],
         block: (AuthenticatedRequest[A, U]) => Future[Result]) = {
-      userinfo(request).map { user =>
-        block(new AuthenticatedRequest(user, request))
-      } getOrElse {
-        Future.successful(onUnauthorized(request))
-      }
+      userinfo(request)
+        .map { user =>
+          block(new AuthenticatedRequest(user, request))
+        }
+        .getOrElse {
+          Future.successful(onUnauthorized(request))
+        }
     }
   }
 

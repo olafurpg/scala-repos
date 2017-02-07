@@ -82,7 +82,7 @@ object Actor extends ActorInstances with ActorFunctions
 sealed abstract class ActorInstances {
   implicit val actorContravariant: Contravariant[Actor] =
     new Contravariant[Actor] {
-      def contramap[A, B](r: Actor[A])(f: B => A): Actor[B] = r contramap f
+      def contramap[A, B](r: Actor[A])(f: B => A): Actor[B] = r.contramap(f)
     }
 }
 

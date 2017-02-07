@@ -54,7 +54,7 @@ object BuildSettings {
     homepage := Some(url("https://playframework.com")),
     ivyLoggingLevel := UpdateLogging.DownloadOnly,
     resolvers ++= Seq(
-      "Scalaz Bintray Repo" at "https://dl.bintray.com/scalaz/releases",
+      "Scalaz Bintray Repo".at("https://dl.bintray.com/scalaz/releases"),
       Resolver.typesafeRepo("releases"),
       Resolver.typesafeIvyRepo("releases")
     ),
@@ -148,7 +148,7 @@ object BuildSettings {
 
   def playFullScriptedSettings: Seq[Setting[_]] =
     ScriptedPlugin.scriptedSettings ++ Seq(
-      ScriptedPlugin.scriptedLaunchOpts <+= version apply { v =>
+      ScriptedPlugin.scriptedLaunchOpts <+= version.apply { v =>
         s"-Dproject.version=$v"
       }
     ) ++ playScriptedSettings
@@ -255,7 +255,8 @@ object PlayBuild extends Build {
       sourceGenerators in Compile <+= (version,
                                        scalaVersion,
                                        sbtVersion,
-                                       sourceManaged in Compile) map PlayVersion,
+                                       sourceManaged in Compile).map(
+        PlayVersion),
       sourceDirectories in (Compile, TwirlKeys.compileTemplates) :=
         (unmanagedSourceDirectories in Compile).value,
       TwirlKeys.templateImports += "play.api.templates.PlayMagic._",
@@ -263,8 +264,8 @@ object PlayBuild extends Build {
         // Add both the templates, useful for end users to read, and the Scala sources that they get compiled to,
         // so omnidoc can compile and produce scaladocs for them.
         val twirlSources =
-          (sources in (Compile, TwirlKeys.compileTemplates)).value pair relativeTo(
-            (sourceDirectories in (Compile, TwirlKeys.compileTemplates)).value)
+          (sources in (Compile, TwirlKeys.compileTemplates)).value.pair(relativeTo(
+            (sourceDirectories in (Compile, TwirlKeys.compileTemplates)).value))
 
         val twirlTarget =
           (target in (Compile, TwirlKeys.compileTemplates)).value
@@ -377,7 +378,7 @@ object PlayBuild extends Build {
         (version,
          scalaVersion in PlayProject,
          sbtVersion,
-         sourceManaged in Compile) map PlayVersion,
+         sourceManaged in Compile).map(PlayVersion),
       // This only publishes the sbt plugin projects on each scripted run.
       // The runtests script does a full publish before running tests.
       // When developing the sbt plugins, run a publishLocal in the root project first.
@@ -436,8 +437,8 @@ object PlayBuild extends Build {
       libraryDependencies ++= logback,
       parallelExecution in Test := false,
       // quieten deprecation warnings in tests
-      scalacOptions in Test := (scalacOptions in Test).value diff Seq(
-        "-deprecation")
+      scalacOptions in Test := (scalacOptions in Test).value.diff(
+        Seq("-deprecation"))
     )
     .dependsOn(PlayProject)
 
@@ -446,8 +447,8 @@ object PlayBuild extends Build {
       libraryDependencies ++= playWsDeps,
       parallelExecution in Test := false,
       // quieten deprecation warnings in tests
-      scalacOptions in Test := (scalacOptions in Test).value diff Seq(
-        "-deprecation")
+      scalacOptions in Test := (scalacOptions in Test).value.diff(
+        Seq("-deprecation"))
     )
     .dependsOn(PlayProject)
     .dependsOn(PlaySpecs2Project % "test")

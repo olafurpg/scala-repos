@@ -105,7 +105,7 @@ object ArraySeq extends SeqFactory[ArraySeq] {
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, ArraySeq[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, ArraySeq[A]] =
-    new ArrayBuffer[A] mapResult { buf =>
+    new ArrayBuffer[A].mapResult { buf =>
       val result = new ArraySeq[A](buf.length)
       buf.copyToArray(result.array.asInstanceOf[Array[Any]], 0)
       result

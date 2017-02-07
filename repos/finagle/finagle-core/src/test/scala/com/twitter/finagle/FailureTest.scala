@@ -92,7 +92,7 @@ class FailureTest
 
   test("Failure.ProcessFailures") {
     val echo = Service.mk((exc: Throwable) => Future.exception(exc))
-    val service = (new Failure.ProcessFailures) andThen echo
+    val service = (new Failure.ProcessFailures).andThen(echo)
 
     def assertFail(exc: Throwable, expect: Throwable) = {
       val exc1 = intercept[Throwable] { Await.result(service(exc)) }

@@ -7,5 +7,5 @@ trait P[A] {
 
 trait Other {
   // was infinite loop trying to dealias `x$1.CC`
-  def g[A](p: A => Boolean): P[A] => M[P] = _ f p
+  def g[A](p: A => Boolean): P[A] => M[P] = _.f(p)
 }

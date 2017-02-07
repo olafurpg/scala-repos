@@ -134,7 +134,7 @@ object Validators {
       messageFormat: String = "%%s must be greater than %s."): Validator[T] =
     new PredicateValidator[T](fieldName,
                               _ > min,
-                              messageFormat format min.toString)
+                              messageFormat.format(min.toString))
 
   /**
     * Must be less than the max param.
@@ -145,7 +145,7 @@ object Validators {
                                   "%%s must be less than %s."): Validator[T] =
     new PredicateValidator[T](fieldName,
                               _ < max,
-                              messageFormat format max.toString)
+                              messageFormat.format(max.toString))
 
   /**
     * Must be greater than or equal to the min param.
@@ -155,7 +155,7 @@ object Validators {
       min: T,
       messageFormat: String = "%%s must be greater than or equal to %s.")
     : Validator[T] =
-    new PredicateValidator[T](fieldName, _ >= min, messageFormat format min)
+    new PredicateValidator[T](fieldName, _ >= min, messageFormat.format(min))
 
   /**
     * Must be less than or equal to the max param.
@@ -188,7 +188,7 @@ object Validators {
     new PredicateValidator[TResult](
       fieldName,
       expected.contains,
-      messageFormat format expected.mkString("[", ", ", "]"))
+      messageFormat.format(expected.mkString("[", ", ", "]")))
 
   /**
     * Checks if the value of the data is a value of the specified enum.
@@ -206,7 +206,7 @@ object Validators {
                                   "%s must be a valid url.",
                                 schemes: Seq[String]): Validator[String] = {
     val validator = (url: String) ⇒ {
-      (allCatch opt {
+      (allCatch.opt {
         val u = URI.create(url).normalize()
         !absolute || u.isAbsolute
       }).isDefined &&

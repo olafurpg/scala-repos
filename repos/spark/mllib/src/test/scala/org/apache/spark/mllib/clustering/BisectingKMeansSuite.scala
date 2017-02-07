@@ -81,18 +81,18 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     val model = bkm.run(data)
     assert(model.k === 4)
     // The total cost should be 8 * 0.5 * 0.5 = 2.0.
-    assert(model.computeCost(data) ~== 2.0 relTol 1e-12)
+    assert(model.computeCost(data) ~== 2.0.relTol(1e-12))
     val predictions = data.map(v => (v(0), model.predict(v))).collectAsMap()
     Range(0, 8, 2).foreach { i =>
       assert(predictions(i) === predictions(i + 1),
              s"$i and ${i + 1} should belong to the same cluster.")
     }
     val root = model.root
-    assert(root.center(0) ~== 3.5 relTol 1e-12)
-    assert(root.height ~== 2.0 relTol 1e-12)
+    assert(root.center(0) ~== 3.5.relTol(1e-12))
+    assert(root.height ~== 2.0.relTol(1e-12))
     assert(root.children.length === 2)
-    assert(root.children(0).height ~== 1.0 relTol 1e-12)
-    assert(root.children(1).height ~== 1.0 relTol 1e-12)
+    assert(root.children(0).height ~== 1.0.relTol(1e-12))
+    assert(root.children(1).height ~== 1.0.relTol(1e-12))
   }
 
   test("points are the same") {
@@ -167,17 +167,17 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     val bkm = new BisectingKMeans().setK(3).setMaxIterations(4).setSeed(1L)
     val model = bkm.run(data)
     assert(model.k === 3)
-    assert(model.root.center ~== Vectors.dense(8, 0) relTol 1e-12)
+    assert(model.root.center ~== Vectors.dense(8, 0).relTol(1e-12))
     model.root.leafNodes.foreach { node =>
       if (node.center(0) < 5) {
         assert(node.size === 2)
-        assert(node.center ~== Vectors.dense(0, 0) relTol 1e-12)
+        assert(node.center ~== Vectors.dense(0, 0).relTol(1e-12))
       } else if (node.center(1) > 0) {
         assert(node.size === 4)
-        assert(node.center ~== Vectors.dense(10, 10) relTol 1e-12)
+        assert(node.center ~== Vectors.dense(10, 10).relTol(1e-12))
       } else {
         assert(node.size === 4)
-        assert(node.center ~== Vectors.dense(10, -10) relTol 1e-12)
+        assert(node.center ~== Vectors.dense(10, -10).relTol(1e-12))
       }
     }
   }

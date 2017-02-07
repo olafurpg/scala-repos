@@ -87,12 +87,12 @@ class ConnectionPoolSpec
       acceptIncomingConnection()
       val r2 = responseOut.expectNext()
 
-      Seq(r1, r2) foreach {
+      Seq(r1, r2).foreach {
         case (Success(x), 42) ⇒ requestUri(x) should endWith("/a")
         case (Success(x), 43) ⇒ requestUri(x) should endWith("/b")
         case x ⇒ fail(x.toString)
       }
-      Seq(r1, r2).map(t ⇒ connNr(t._1.get)) should contain allOf (1, 2)
+      (Seq(r1, r2).map(t ⇒ connNr(t._1.get)) should contain).allOf(1, 2)
     }
 
     "open a second connection if the request on the first one is dispatch but not yet completed" in new TestSetup {
@@ -106,7 +106,7 @@ class ConnectionPoolSpec
           val entity = HttpEntity.Chunked.fromData(
             ContentTypes.`text/plain(UTF-8)`,
             Source.fromPublisher(responseEntityPub))
-          super.testServerHandler(connNr)(request) withEntity entity
+          super.testServerHandler(connNr)(request).withEntity(entity)
         case x ⇒ super.testServerHandler(connNr)(x)
       }
 
@@ -321,7 +321,8 @@ class ConnectionPoolSpec
       val thrown =
         the[IllegalUriException] thrownBy Await.result(responseFuture,
                                                        1.second)
-      thrown should have message "Cannot determine request scheme and target endpoint as HttpMethod(GET) request to /foo doesn't have an absolute URI"
+      (thrown should have).message(
+        "Cannot determine request scheme and target endpoint as HttpMethod(GET) request to /foo doesn't have an absolute URI")
     }
   }
 
@@ -342,7 +343,7 @@ class ConnectionPoolSpec
         HttpRequest(uri = s"http://$serverHostName2:$serverPort2/b") -> 43)
 
       responseOutSub.request(2)
-      Seq(responseOut.expectNext(), responseOut.expectNext()) foreach {
+      Seq(responseOut.expectNext(), responseOut.expectNext()).foreach {
         case (Success(x), 42) ⇒
           requestUri(x) shouldEqual s"http://$serverHostName:$serverPort/a"
         case (Success(x), 43) ⇒
@@ -459,9 +460,9 @@ class ConnectionPoolSpec
     }
 
     def connNr(r: HttpResponse): Int =
-      r.headers.find(_ is "conn-nr").get.value.toInt
+      r.headers.find(_.is("conn-nr")).get.value.toInt
     def requestUri(r: HttpResponse): String =
-      r.headers.find(_ is "req-uri").get.value
+      r.headers.find(_.is("req-uri")).get.value
   }
 
   case class ConnNrHeader(nr: Int) extends CustomHeader {
@@ -473,7 +474,7 @@ class ConnectionPoolSpec
 
   implicit class MustContain[T](specimen: Seq[T]) {
     def mustContainLike(pf: PartialFunction[T, Unit]): Unit =
-      specimen.collectFirst(pf) getOrElse fail("did not contain")
+      specimen.collectFirst(pf).getOrElse(fail("did not contain"))
   }
 
   object NoErrorComplete extends SingletonException

@@ -72,7 +72,7 @@ class MavenRemoteRepositoryResolver(val repo: MavenRepository,
   protected def publishArtifacts(artifacts: Seq[AetherArtifact]): Unit = {
     val request = new AetherDeployRequest()
     request.setRepository(aetherRepository)
-    artifacts foreach request.addArtifact
+    artifacts.foreach(request.addArtifact)
     system.deploy(session, request)
   }
   protected def getPublicationTime(mrid: ModuleRevisionId): Option[Long] = {
@@ -112,7 +112,7 @@ class MavenRemoteRepositoryResolver(val repo: MavenRepository,
           d <- MavenRepositoryResolver.parseTimeString(lu)
         } yield d
         // TODO - Only look at timestamp *IF* the version is for a snapshot.
-        timestampOpt orElse lastUpdatedOpt
+        timestampOpt.orElse(lastUpdatedOpt)
       case _ => None
     }
   }

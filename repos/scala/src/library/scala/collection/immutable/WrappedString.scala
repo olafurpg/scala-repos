@@ -64,5 +64,5 @@ object WrappedString {
     }
 
   def newBuilder: Builder[Char, WrappedString] =
-    StringBuilder.newBuilder mapResult (x => new WrappedString(x))
+    StringBuilder.newBuilder.mapResult(x => new WrappedString(x))
 }

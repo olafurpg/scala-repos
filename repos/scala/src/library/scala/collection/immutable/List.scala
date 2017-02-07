@@ -244,7 +244,7 @@ sealed abstract class List[+A]
   override def slice(from: Int, until: Int): List[A] = {
     val lo = scala.math.max(from, 0)
     if (until <= lo || isEmpty) Nil
-    else this drop lo take (until - lo)
+    else this.drop(lo).take(until - lo)
   }
 
   override def takeRight(n: Int): List[A] = {

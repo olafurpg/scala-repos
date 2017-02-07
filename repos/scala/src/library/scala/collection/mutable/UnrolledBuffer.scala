@@ -165,7 +165,7 @@ class UnrolledBuffer[T](implicit val tag: ClassTag[T])
     } else throw new IndexOutOfBoundsException(idx.toString)
 
   def +=:(elem: T) = {
-    headptr = headptr prepend elem
+    headptr = headptr.prepend(elem)
     sz += 1
     this
   }
@@ -178,8 +178,8 @@ class UnrolledBuffer[T](implicit val tag: ClassTag[T])
 
   private def writeObject(out: java.io.ObjectOutputStream) {
     out.defaultWriteObject
-    out writeInt sz
-    for (elem <- this) out writeObject elem
+    out.writeInt(sz)
+    for (elem <- this) out.writeObject(elem)
   }
 
   private def readObject(in: java.io.ObjectInputStream) {
@@ -239,7 +239,7 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
         this
       } else {
         next = new Unrolled[T](0, new Array[T](nextlength), null, buff)
-        next append elem
+        next.append(elem)
       }
     def foreach[U](f: T => U) {
       var unrolled = this
@@ -275,7 +275,7 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
         // allocate a new node and store element
         // then make it point to this
         val newhead = new Unrolled[T](buff)
-        newhead append elem
+        newhead.append(elem)
         newhead.next = this
         newhead
       }
@@ -336,7 +336,7 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
 
         // insert everything from iterable to this
         var curr = this
-        for (elem <- t) curr = curr append elem
+        for (elem <- t) curr = curr.append(elem)
         curr.next = newnextnode
 
         // try to merge the last node of this with the newnextnode and fix tail pointer if needed
@@ -344,7 +344,7 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
         else if (newnextnode.next eq null) buffer.lastPtr = newnextnode
       } else if (idx == size || (next eq null)) {
         var curr = this
-        for (elem <- t) curr = curr append elem
+        for (elem <- t) curr = curr.append(elem)
       } else next.insertAll(idx - size, t, buffer)
     }
     private def nullout(from: Int, until: Int) {

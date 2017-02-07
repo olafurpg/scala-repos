@@ -30,8 +30,8 @@ object Test {
   // fork the data spewer, wait for input, then destroy the process
   def test() {
     val f =
-      new File(javaHome, "bin").listFiles.sorted filter
-        (_.getName startsWith "java") find (_.canExecute) getOrElse {
+      (new File(javaHome, "bin").listFiles.sorted
+        .filter(_.getName.startsWith("java")) find (_.canExecute)).getOrElse {
         // todo signal test runner that test is skipped
         new File("/bin/ls") // innocuous
       }
@@ -41,13 +41,13 @@ object Test {
     def counted = count.get
     val command = s"${f.getAbsolutePath} -classpath ${javaClassPath} Test data"
     Try {
-      Process(command) run ProcessLogger { (s: String) =>
+      Process(command).run(ProcessLogger { (s: String) =>
         //Console println s"[[$s]]"     // java help
         count.getAndIncrement
         reading.countDown
         Thread.`yield`()
-      }
-    } foreach { (p: Process) =>
+      })
+    }.foreach { (p: Process) =>
       val ok = reading.await(10, SECONDS)
       if (!ok) Console println "Timed out waiting for process output!"
       p.destroy()

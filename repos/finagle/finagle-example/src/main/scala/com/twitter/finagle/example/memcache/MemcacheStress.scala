@@ -22,8 +22,8 @@ class PersistentService[Req, Rep](factory: ServiceFactory[Req, Rep])
     factory()
 
   def apply(req: Req) =
-    currentService flatMap { service =>
-      service(req) onFailure { _ =>
+    currentService.flatMap { service =>
+      service(req).onFailure { _ =>
         currentService = factory()
       }
     }
@@ -42,7 +42,7 @@ object MemcacheStress extends App {
   val count = new AtomicLong
 
   def proc(client: memcached.Client, key: String, value: Buf) {
-    client.set(key, value) ensure {
+    client.set(key, value).ensure {
       count.incrementAndGet()
       proc(client, key, value)
     }

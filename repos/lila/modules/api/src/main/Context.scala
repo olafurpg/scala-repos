@@ -55,7 +55,7 @@ sealed trait Context extends lila.user.UserContextWrapper {
 
   lazy val currentBg = ctxPref("bg") | "light"
 
-  def transpBgImg = currentBg == "transp" option bgImg
+  def transpBgImg = (currentBg == "transp").option(bgImg)
 
   def bgImg = ctxPref("bgImg") | Pref.defaultBgImg
 
@@ -64,7 +64,7 @@ sealed trait Context extends lila.user.UserContextWrapper {
   def requiresFingerprint = isAuth && !pageData.hasFingerprint
 
   private def ctxPref(name: String): Option[String] =
-    userContext.req.session get name orElse { pref get name }
+    userContext.req.session.get(name).orElse { pref.get(name) }
 }
 
 sealed abstract class BaseContext(val userContext: lila.user.UserContext,

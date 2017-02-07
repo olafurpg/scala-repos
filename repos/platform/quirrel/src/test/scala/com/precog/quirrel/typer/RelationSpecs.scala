@@ -89,7 +89,8 @@ object RelationSpecs
     "accept object definition on static and dynamic provenances when related" in {
       val tree @ Let(_, _, _, _, Relate(_, _, _, in)) =
         compileSingle("s := new 1 //foo ~ s { a: //foo, b: s }")
-      (in.relations.keys.toList sorted Provenance.order.toScalaOrdering) must beLike {
+      (in.relations.keys.toList
+        .sorted(Provenance.order.toScalaOrdering)) must beLike {
         case DynamicProvenance(_) :: StaticProvenance("/foo") :: Nil => ok
       }
       in.relations(StaticProvenance("/foo")).toList(0) must beLike {

@@ -47,7 +47,7 @@ class ScTypeProjectionImpl(node: ASTNode)
           case Success(ScDesignatorType(pack: PsiPackage), a) =>
             Success(ScType.designator(elem), Some(this))
           case _ =>
-            te map { ScProjectionType(_, elem, superReference = false) }
+            te.map { ScProjectionType(_, elem, superReference = false) }
         }
       case _ => Failure("Cannot Resolve reference", Some(this))
     }

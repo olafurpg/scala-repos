@@ -29,7 +29,7 @@ object BooleanLatch {
       }
     }
 
-    override def release() = sync release 0
-    override def await() = sync acquireInterruptibly 0
+    override def release() = sync.release(0)
+    override def await() = sync.acquireInterruptibly(0)
   }
 }

@@ -88,7 +88,7 @@ private[finagle] class ExceptionRemoteInfoFactory[Req, Rep](
                              service: Service[Req, Rep]): Future[Rep] =
             service(request).rescue(requestAddRemoteInfo)
         }
-        filter andThen service
+        filter.andThen(service)
       }
       .rescue(connectionAddRemoteInfo)
 }

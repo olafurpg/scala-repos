@@ -72,7 +72,7 @@ class CounterTest extends FunSuite with Checkers {
                     3 -> 0.56002,
                     4 -> 0.57797,
                     5 -> 0.54450)
-    assertClose(a dot b, .90249)
+    assertClose(a.dot(b), .90249)
   }
 
   test("Zero + non zero is nonzero") {

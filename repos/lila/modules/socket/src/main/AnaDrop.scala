@@ -13,7 +13,7 @@ case class AnaDrop(role: chess.Role,
                    path: String) {
 
   def step: Valid[Step] =
-    chess.Game(variant.some, fen.some).drop(role, pos) map {
+    chess.Game(variant.some, fen.some).drop(role, pos).map {
       case (game, drop) =>
         val movable = !game.situation.end
         val fen = chess.format.Forsyth >> game
@@ -38,12 +38,12 @@ object AnaDrop {
 
   def parse(o: JsObject) =
     for {
-      d ← o obj "d"
-      role ← d str "role" flatMap chess.Role.allByName.get
-      pos ← d str "pos" flatMap chess.Pos.posAt
-      variant = chess.variant.Variant orDefault ~d.str("variant")
-      fen ← d str "fen"
-      path ← d str "path"
+      d ← o.obj("d")
+      role ← d.str("role").flatMap(chess.Role.allByName.get)
+      pos ← d.str("pos").flatMap(chess.Pos.posAt)
+      variant = chess.variant.Variant.orDefault(~d.str("variant"))
+      fen ← d.str("fen")
+      path ← d.str("path")
     } yield
       AnaDrop(role = role,
               pos = pos,

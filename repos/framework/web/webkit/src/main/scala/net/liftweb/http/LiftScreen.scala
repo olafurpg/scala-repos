@@ -204,8 +204,11 @@ trait AbstractScreen extends Factory with Loggable {
 
     def toForm: Box[NodeSeq] = {
       val func: Box[(ValueType, ValueType => Any) => NodeSeq] =
-        AbstractScreen.this.vendForm(manifest) or otherFuncVendors(manifest) or LiftRules
+        AbstractScreen.this
           .vendForm(manifest)
+          .or(otherFuncVendors(manifest))
+          .or(LiftRules
+            .vendForm(manifest))
 
       func
         .map(f => f(is, set _))
@@ -291,20 +294,25 @@ trait AbstractScreen extends Factory with Loggable {
       }).headOption
 
       val confirmInfo =
-        stuff.collect {
-          case NotOnConfirmScreen => false
-        }.headOption orElse stuff.collect {
-          case OnConfirmScreen => true
-        }.headOption
+        stuff
+          .collect {
+            case NotOnConfirmScreen => false
+          }
+          .headOption
+          .orElse(stuff.collect {
+            case OnConfirmScreen => true
+          }.headOption)
 
       val newBinding: Box[FieldBinding] = (stuff.collect {
         case AFieldBinding(i) => i
       }).headOption
 
       val newHelp: Box[NodeSeq] =
-        help or (stuff.collect {
-          case Help(ns) => ns
-        }).headOption
+        help
+          .or(stuff.collect {
+            case Help(ns) => ns
+          })
+          .headOption
 
       val newTransforms: List[BaseField => NodeSeq => NodeSeq] = stuff
         .collect({
@@ -323,7 +331,7 @@ trait AbstractScreen extends Factory with Loggable {
           * Is this field on the confirm screen
           */
         override def onConfirm_? : Boolean =
-          confirmInfo getOrElse super.onConfirm_?
+          confirmInfo.getOrElse(super.onConfirm_?)
 
         override def name: String = FieldBuilder.this.name
 
@@ -345,7 +353,7 @@ trait AbstractScreen extends Factory with Loggable {
         override def setFilter = FieldBuilder.this.filters
 
         override def uniqueFieldId: Box[String] =
-          paramFieldId or Full(_theFieldId.get)
+          paramFieldId.or(Full(_theFieldId.get))
 
         override def binding = newBinding
 
@@ -354,24 +362,25 @@ trait AbstractScreen extends Factory with Loggable {
 
         override def transforms = newTransforms
 
-        override def show_? = newShow map (_(this)) openOr (super.show_?)
+        override def show_? = newShow.map(_(this)).openOr(super.show_?)
       }
     }
   }
 
   implicit def strToListFieldError(msg: String): List[FieldError] =
-    List(FieldError(currentField.box openOr new FieldIdentifier {}, Text(msg)))
+    List(
+      FieldError(currentField.box.openOr(new FieldIdentifier {}), Text(msg)))
 
   implicit def xmlToListFieldError(msg: NodeSeq): List[FieldError] =
-    List(FieldError(currentField.box openOr new FieldIdentifier {}, msg))
+    List(FieldError(currentField.box.openOr(new FieldIdentifier {}), msg))
 
   implicit def boxStrToListFieldError(msg: Box[String]): List[FieldError] =
     msg.toList.map(msg =>
-      FieldError(currentField.box openOr new FieldIdentifier {}, Text(msg)))
+      FieldError(currentField.box.openOr(new FieldIdentifier {}), Text(msg)))
 
   implicit def boxXmlToListFieldError(msg: Box[NodeSeq]): List[FieldError] =
     msg.toList.map(msg =>
-      FieldError(currentField.box openOr new FieldIdentifier {}, msg))
+      FieldError(currentField.box.openOr(new FieldIdentifier {}), msg))
 
   /**
     * Create a FieldBuilder so you can add help screens, validations and filters.  Remember to invoke "make" on
@@ -463,11 +472,14 @@ trait AbstractScreen extends Factory with Loggable {
     }).headOption
 
     val confirmInfo =
-      stuff.collect {
-        case NotOnConfirmScreen => false
-      }.headOption orElse stuff.collect {
-        case OnConfirmScreen => true
-      }.headOption
+      stuff
+        .collect {
+          case NotOnConfirmScreen => false
+        }
+        .headOption
+        .orElse(stuff.collect {
+          case OnConfirmScreen => true
+        }.headOption)
 
     val newBinding: Box[FieldBinding] = (stuff.collect {
       case AFieldBinding(i) => i
@@ -494,7 +506,7 @@ trait AbstractScreen extends Factory with Loggable {
         * Is this field on the confirm screen
         */
       override def onConfirm_? : Boolean =
-        confirmInfo getOrElse super.onConfirm_?
+        confirmInfo.getOrElse(super.onConfirm_?)
 
       override def toForm: Box[NodeSeq] =
         underlying.toForm.map(ns =>
@@ -503,7 +515,7 @@ trait AbstractScreen extends Factory with Loggable {
       /**
         * Given the current state of things, should this field be shown
         */
-      override def show_? = newShow map (_(this)) openOr underlying.show_?
+      override def show_? = newShow.map(_(this)).openOr(underlying.show_?)
 
       /**
         * What form elements are we going to add to this field?
@@ -527,7 +539,7 @@ trait AbstractScreen extends Factory with Loggable {
 
       override implicit def manifest: Manifest[ValueType] = man
 
-      override def helpAsHtml = newHelp or underlying.helpAsHtml
+      override def helpAsHtml = newHelp.or(underlying.helpAsHtml)
 
       override def validate = underlying.validate ::: super.validate
 
@@ -549,9 +561,9 @@ trait AbstractScreen extends Factory with Loggable {
         underlying.set(setFilter.foldLeft(v)((v, f) => f(v)))
 
       override def uniqueFieldId: Box[String] =
-        paramFieldId or underlying.uniqueFieldId or super.uniqueFieldId
+        paramFieldId.or(underlying.uniqueFieldId).or(super.uniqueFieldId)
 
-      override def binding = newBinding or super.binding
+      override def binding = newBinding.or(super.binding)
 
       override def transforms = super.transforms ++ newTransforms
     }
@@ -592,11 +604,14 @@ trait AbstractScreen extends Factory with Loggable {
     }).headOption
 
     val confirmInfo =
-      stuff.collect {
-        case NotOnConfirmScreen => false
-      }.headOption orElse stuff.collect {
-        case OnConfirmScreen => true
-      }.headOption
+      stuff
+        .collect {
+          case NotOnConfirmScreen => false
+        }
+        .headOption
+        .orElse(stuff.collect {
+          case OnConfirmScreen => true
+        }.headOption)
 
     new Field {
       type ValueType = T
@@ -605,7 +620,7 @@ trait AbstractScreen extends Factory with Loggable {
         * Is this field on the confirm screen
         */
       override def onConfirm_? : Boolean =
-        confirmInfo getOrElse super.onConfirm_?
+        confirmInfo.getOrElse(super.onConfirm_?)
 
       override def toForm: Box[NodeSeq] =
         underlying
@@ -616,7 +631,7 @@ trait AbstractScreen extends Factory with Loggable {
         * Given the current state of things, should this field be shown
         */
       override def show_? =
-        newShow map (_(this)) openOr (underlying.map(_.show_?) openOr false)
+        newShow.map(_(this)).openOr(underlying.map(_.show_?).openOr(false))
 
       /**
         * What form elements are we going to add to this field?
@@ -627,22 +642,22 @@ trait AbstractScreen extends Factory with Loggable {
         * Given the current context, should this field be displayed
         */
       override def shouldDisplay_? =
-        underlying.map(_.shouldDisplay_?) openOr false
+        underlying.map(_.shouldDisplay_?).openOr(false)
 
-      override def displayName = underlying.map(_.displayName) openOr "N/A"
+      override def displayName = underlying.map(_.displayName).openOr("N/A")
 
       override def displayNameHtml: Box[NodeSeq] =
         underlying.flatMap(_.displayNameHtml)
 
-      override def asHtml = underlying.map(_.asHtml) openOr NodeSeq.Empty
+      override def asHtml = underlying.map(_.asHtml).openOr(NodeSeq.Empty)
 
-      override def name: String = underlying.map(_.name) openOr "N/A"
+      override def name: String = underlying.map(_.name).openOr("N/A")
 
       override def default = underlying.openOrThrowException("legacy code").get
 
       override implicit def manifest: Manifest[ValueType] = man
 
-      override def helpAsHtml = newHelp or underlying.flatMap(_.helpAsHtml)
+      override def helpAsHtml = newHelp.or(underlying.flatMap(_.helpAsHtml))
 
       override def validate =
         underlying.toList.flatMap(_.validate) ::: super.validate
@@ -667,9 +682,11 @@ trait AbstractScreen extends Factory with Loggable {
           .set(setFilter.foldLeft(v)((v, f) => f(v)))
 
       override def uniqueFieldId: Box[String] =
-        paramFieldId or underlying.flatMap(_.uniqueFieldId) or super.uniqueFieldId
+        paramFieldId
+          .or(underlying.flatMap(_.uniqueFieldId))
+          .or(super.uniqueFieldId)
 
-      override def binding = newBinding or super.binding
+      override def binding = newBinding.or(super.binding)
 
       override def transforms = super.transforms ++ newTransforms
     }
@@ -750,7 +767,7 @@ trait AbstractScreen extends Factory with Loggable {
         case str if (null ne str) && str.length >= len => Nil
         case _ =>
           List(
-            FieldError(currentField.box openOr new FieldIdentifier {},
+            FieldError(currentField.box.openOr(new FieldIdentifier {}),
                        Text(msg)))
     }
 
@@ -765,7 +782,7 @@ trait AbstractScreen extends Factory with Loggable {
         case str if (null eq str) || str.length <= len => Nil
         case _ =>
           List(
-            FieldError(currentField.box openOr new FieldIdentifier {},
+            FieldError(currentField.box.openOr(new FieldIdentifier {}),
                        Text(msg)))
     }
 
@@ -779,7 +796,7 @@ trait AbstractScreen extends Factory with Loggable {
         case str if (null ne str) && pat.matcher(str).matches => Nil
         case _ =>
           List(
-            FieldError(currentField.box openOr new FieldIdentifier {},
+            FieldError(currentField.box.openOr(new FieldIdentifier {}),
                        Text(msg)))
     }
 
@@ -793,8 +810,9 @@ trait AbstractScreen extends Factory with Loggable {
 
   def noticeTypeToAttr(
       screen: AbstractScreen): Box[NoticeType.Value => MetaData] =
-    inject[NoticeType.Value => MetaData] or LiftScreenRules
-      .inject[NoticeType.Value => MetaData]
+    inject[NoticeType.Value => MetaData].or(
+      LiftScreenRules
+        .inject[NoticeType.Value => MetaData])
 
   /**
     * Create a field that's added to the Screen
@@ -883,7 +901,7 @@ trait AbstractScreen extends Factory with Loggable {
 
           override def transforms = newTransforms
 
-          override def show_? = newShow map (_(this)) openOr (super.show_?)
+          override def show_? = newShow.map(_(this)).openOr(super.show_?)
         }
       }
 
@@ -922,7 +940,7 @@ trait AbstractScreen extends Factory with Loggable {
 
           override def transforms = newTransforms
 
-          override def show_? = newShow map (_(this)) openOr (super.show_?)
+          override def show_? = newShow.map(_(this)).openOr(super.show_?)
         }
       }
     }
@@ -1148,11 +1166,11 @@ trait ScreenWizardRendered extends Loggable {
 
   private object FieldBindingUtils {
     def sel(f: CssClassBinding => String, sel: String) =
-      sel format (f(cssClassBinding))
+      sel.format(f(cssClassBinding))
     def replace(f: CssClassBinding => String) =
-      ".%s" format (f(cssClassBinding))
+      ".%s".format(f(cssClassBinding))
     def replaceChildren(f: CssClassBinding => String) =
-      ".%s *" format (f(cssClassBinding))
+      ".%s *".format(f(cssClassBinding))
 
     def remove(f: CssClassBinding => String) =
       traceInline("Removing %s".format(f(cssClassBinding)),
@@ -1219,10 +1237,8 @@ trait ScreenWizardRendered extends Loggable {
       logger.trace(
         "Looking for fields with style %s, includeMissing = %s"
           .format(style, includeMissing),
-        fields filter
-          (field =>
-             field.binding map (_.bindingStyle == style) openOr
-               (includeMissing))
+        fields.filter(field =>
+          field.binding.map(_.bindingStyle == style).openOr(includeMissing))
       )
 
     def bindingInfoWithFields(style: BindingStyle) =
@@ -1237,7 +1253,7 @@ trait ScreenWizardRendered extends Loggable {
     def templateFields: List[CssBindFunc] =
       List(
         sel(_.fieldContainer, ".%s") #>
-          (fieldsWithStyle(Template, true) map (field => bindField(field))))
+          (fieldsWithStyle(Template, true).map(field => bindField(field))))
 
     def selfFields: List[CssBindFunc] =
       for ((bindingInfo, field) <- bindingInfoWithFields(Self))
@@ -1260,7 +1276,7 @@ trait ScreenWizardRendered extends Loggable {
       for {
         field <- fields
         bindingInfo <- field.binding
-        custom <- Some(bindingInfo.bindingStyle) collect {
+        custom <- Some(bindingInfo.bindingStyle).collect {
           case c: Custom => c
         }
       } yield
@@ -1274,7 +1290,7 @@ trait ScreenWizardRendered extends Loggable {
       for {
         field <- fields
         bindingInfo <- field.binding
-        dynamic <- Some(bindingInfo.bindingStyle) collect {
+        dynamic <- Some(bindingInfo.bindingStyle).collect {
           case d: Dynamic => d
         }
       } yield {
@@ -1297,7 +1313,10 @@ trait ScreenWizardRendered extends Loggable {
     def bindField(f: ScreenFieldInfo): NodeSeq => NodeSeq = {
       val theFormEarly = f.input
       val curId =
-        theFormEarly.flatMap(Helpers.findId) or f.field.uniqueFieldId openOr Helpers.nextFuncName
+        theFormEarly
+          .flatMap(Helpers.findId)
+          .or(f.field.uniqueFieldId)
+          .openOr(Helpers.nextFuncName)
 
       val theForm = theFormEarly.map { fe =>
         {
@@ -1328,7 +1347,7 @@ trait ScreenWizardRendered extends Loggable {
                 .sortWith { _.id > _.id }
                 .head // get the maximum type of notice (Error > Warning > Notice)
             val metaData: MetaData =
-              noticeTypeToAttr(theScreen).map(_(maxN)) openOr Null
+              noticeTypeToAttr(theScreen).map(_(maxN)).openOr(Null)
             basicLabel & update(_.label, metaData)
         }
       }
@@ -1350,7 +1369,7 @@ trait ScreenWizardRendered extends Loggable {
             replaceChildren(_.errors) #> xs.map {
               case (noticeType, msg, _) =>
                 val metaData: MetaData =
-                  noticeTypeToAttr(theScreen).map(_(noticeType)) openOr Null
+                  noticeTypeToAttr(theScreen).map(_(noticeType)).openOr(Null)
                 nsSetChildren(_.error, msg) & update(_.error, metaData)
             }
         }
@@ -1359,8 +1378,8 @@ trait ScreenWizardRendered extends Loggable {
 
       if (f.transforms.isEmpty) bindAll()
       else
-        (bindAll() :: f.transforms.map(_ apply (f.field)))
-          .reduceLeft(_ andThen _)
+        (bindAll() :: f.transforms.map(_.apply(f.field)))
+          .reduceLeft(_.andThen(_))
     }
 
     def url = S.uri
@@ -1373,14 +1392,13 @@ trait ScreenWizardRendered extends Loggable {
         replaceChildren(_.globalErrors) #> xs.map {
           case (noticeType, msg, _) =>
             val metaData: MetaData =
-              noticeTypeToAttr(theScreen).map(_(noticeType)) openOr Null
+              noticeTypeToAttr(theScreen).map(_(noticeType)).openOr(Null)
             nsSetChildren(_.error, msg) & update(_.error, metaData)
         }
     }
 
     def bindFieldsWithAdditional(xhtml: NodeSeq) =
-      (savAdditionalFormBindings map (bindFields & _) openOr (bindFields))(
-        xhtml)
+      (savAdditionalFormBindings.map(bindFields & _).openOr(bindFields))(xhtml)
 
     def liftScreenAttr(s: String) =
       new UnprefixedAttribute("data-lift-screen-control", Text(s), Null)
@@ -1447,19 +1465,20 @@ trait ScreenWizardRendered extends Loggable {
         _.screenTop,
         screenTop) & optSetChildren(_.wizardBottom, wizardBottom) & optSetChildren(
         _.screenBottom,
-        screenBottom) & nsReplace(_.prev, prev openOr EntityRef("nbsp")) & nsReplace(
+        screenBottom) & nsReplace(_.prev, prev.openOr(EntityRef("nbsp"))) & nsReplace(
         _.next,
-        ((next or finish) openOr EntityRef("nbsp"))) & nsReplace(
+        ((next.or(finish)).openOr(EntityRef("nbsp")))) & nsReplace(
         _.cancel,
-        cancel openOr EntityRef("nbsp")) & bindErrors & funcSetChildren(
+        cancel.openOr(EntityRef("nbsp"))) & bindErrors & funcSetChildren(
         _.fields,
         bindForm _)
 
     val processed =
-      S.session map (_.runTemplate("css-bound-screen", allTemplate)) openOr
-        (allTemplate)
+      S.session
+        .map(_.runTemplate("css-bound-screen", allTemplate))
+        .openOr(allTemplate)
 
-    (savAdditionalFormBindings map (bindingFunc & _) openOr (bindingFunc))(
+    (savAdditionalFormBindings.map(bindingFunc & _).openOr(bindingFunc))(
       processed)
   }
 
@@ -1563,13 +1582,13 @@ trait ScreenWizardRendered extends Loggable {
     * Calculate the referer (the page to go back to on finish).
     * defaults to S.referer openOr "/"
     */
-  protected def calcReferer: String = S.referer openOr "/"
+  protected def calcReferer: String = S.referer.openOr("/")
 
   /**
     * Calculate if this Screen/Wizard should be ajax
     */
   protected def calcAjax: Boolean =
-    S.attr("ajax").flatMap(Helpers.asBoolean) openOr defaultToAjax_?
+    S.attr("ajax").flatMap(Helpers.asBoolean).openOr(defaultToAjax_?)
 
   protected def redirectBack(): JsCmd = {
     if (ajaxForms_?) {
@@ -1750,14 +1769,14 @@ trait LiftScreen
       ScreenVarHandler.clear(name)
 
     override protected def wasInitialized(name: String, bn: String): Boolean = {
-      val old: Boolean = ScreenVarHandler.get(bn) openOr false
+      val old: Boolean = ScreenVarHandler.get(bn).openOr(false)
       ScreenVarHandler.set(bn, this, true)
       old
     }
 
     override protected def testWasSet(name: String, bn: String): Boolean = {
       ScreenVarHandler.get(name).isDefined ||
-      (ScreenVarHandler.get(bn) openOr false)
+      (ScreenVarHandler.get(bn).openOr(false))
     }
 
     /**
@@ -1918,7 +1937,7 @@ trait LiftScreen
     LiftScreenRules.allTemplatePath.vend
 
   protected def allTemplate: NodeSeq = {
-    val ret = Templates(allTemplatePath) openOr allTemplateNodeSeq
+    val ret = Templates(allTemplatePath).openOr(allTemplateNodeSeq)
 
     ret
   }
@@ -1935,8 +1954,10 @@ trait LiftScreen
   protected def doFinish(): JsCmd = {
     val fMap: Map[String, () => JsCmd] = LocalActions.get.get
     if (!LocalAction.get.isEmpty)
-      fMap.get(LocalAction.get) map (_()) getOrElse
-        (throw new IllegalArgumentException(
+      fMap
+        .get(LocalAction.get)
+        .map(_())
+        .getOrElse(throw new IllegalArgumentException(
           "No local action available with that binding"))
     else {
       validate match {
@@ -2001,7 +2022,7 @@ trait StringField extends FieldIdentifier with StringValidators {
 
   protected def valueTypeToBoxString(in: ValueType): Box[String] = Full(in)
 
-  protected def boxStrToValType(in: Box[String]): ValueType = in openOr ""
+  protected def boxStrToValType(in: Box[String]): ValueType = in.openOr("")
 }
 
 object LiftScreenRules extends Factory with FormVendor {
@@ -2023,9 +2044,9 @@ object LiftScreenRules extends Factory with FormVendor {
 
 case class FieldBinding(val fieldName: String,
                         val bindingStyle: FieldBinding.BindingStyle) {
-  def fieldId(formName: String) = "%s_%s_field" format (formName, fieldName)
-  def selector(formName: String) = "#%s" format (fieldId(formName))
-  def childSelector(formName: String) = "#%s *" format (fieldId(formName))
+  def fieldId(formName: String) = "%s_%s_field".format(formName, fieldName)
+  def selector(formName: String) = "#%s".format(fieldId(formName))
+  def childSelector(formName: String) = "#%s *".format(fieldId(formName))
   def idSelector(formName: String) = selector(formName) + " [id]"
 }
 

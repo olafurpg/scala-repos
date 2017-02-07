@@ -211,7 +211,7 @@ case class DefaultResizer(val lowerBound: Int = 1,
     * @return number of busy routees, between 0 and routees.size
     */
   def pressure(routees: immutable.IndexedSeq[Routee]): Int = {
-    routees count {
+    routees.count {
       case ActorRefRoutee(a: ActorRefWithCell) ⇒
         a.underlying match {
           case cell: ActorCell ⇒
@@ -366,5 +366,5 @@ private[akka] class ResizablePoolActor(supervisorStrategy: SupervisorStrategy)
     ({
       case Resize ⇒
         resizerCell.resize(initial = false)
-    }: Actor.Receive) orElse super.receive
+    }: Actor.Receive).orElse(super.receive)
 }

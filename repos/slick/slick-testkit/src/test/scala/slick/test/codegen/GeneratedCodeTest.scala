@@ -75,7 +75,7 @@ object GeneratedCodeTest {
         val dIdx = D.baseTableRow.indexes.head
         val dIdxFieldsName = convertColumnsToString(dIdx.on)
         assertTrue("Indices should refer to correct field",
-                   dIdxFieldsName sameElements List("f1", "f2"))
+                   dIdxFieldsName.sameElements(List("f1", "f2")))
 
         def optionsOfColumn(c: slick.lifted.Rep[_]) =
           c.toNode

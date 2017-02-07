@@ -21,19 +21,19 @@ object Iso {
     }
 
     def mkTpt() = {
-      val core = Ident(TupleClass(fields.length) orElse UnitClass)
+      val core = Ident(TupleClass(fields.length).orElse(UnitClass))
       if (fields.length == 0) core
-      else AppliedTypeTree(core, fields map (f => TypeTree(f.info)))
+      else AppliedTypeTree(core, fields.map(f => TypeTree(f.info)))
     }
 
     def mkFrom() = {
       if (fields.length == 0) Literal(Constant(Unit))
       else
         Apply(Ident(newTermName("Tuple" + fields.length)),
-              fields map
-                (f =>
-                   Select(Ident(newTermName("f")),
-                          newTermName(f.name.toString.trim))))
+              fields.map(
+                f =>
+                  Select(Ident(newTermName("f")),
+                         newTermName(f.name.toString.trim))))
     }
 
     val evidenceClass = ClassDef(

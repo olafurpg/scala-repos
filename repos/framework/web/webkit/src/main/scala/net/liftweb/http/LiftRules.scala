@@ -547,7 +547,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       ma <- """Implementation-Version: (.*)""".r.findFirstMatchIn(str)
     } yield ma.group(1)
 
-    ret openOr "Unknown Lift Version"
+    ret.openOr("Unknown Lift Version")
   }
 
   lazy val liftBuildDate: Date = {
@@ -563,7 +563,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       asLong <- asLong(ma.group(1))
     } yield new Date(asLong)
 
-    ret openOr new Date(0L)
+    ret.openOr(new Date(0L))
   }
 
   /**
@@ -948,7 +948,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * IE6/7/8 compatibility mode
     */
   @volatile var calcIEMode: () => Boolean = () =>
-    (for (r <- S.request) yield r.isIE6 || r.isIE7 || r.isIE8) openOr true
+    (for (r <- S.request) yield r.isIE6 || r.isIE7 || r.isIE8).openOr(true)
 
   /**
     * The JavaScript to execute to log a message on the client side when
@@ -1430,14 +1430,14 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   def defaultGetResource(name: String): Box[java.net.URL] =
     for {
-      rf <- (Box !! resourceFinder(name)) or (Box !! defaultFinder(name))
+      rf <- ((Box !! resourceFinder(name))).or(Box !! defaultFinder(name))
     } yield rf
 
   /**
     * Open a resource by name and process its contents using the supplied function.
     */
   def doWithResource[T](name: String)(f: InputStream => T): Box[T] =
-    getResource(name) map { _.openStream } map { is =>
+    getResource(name).map { _.openStream }.map { is =>
       try { f(is) } finally { is.close }
     }
 
@@ -1794,7 +1794,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
             css.map(
               str =>
                 CSSHelpers.fixCSS(new BufferedReader(new StringReader(str)),
-                                  prefix openOr (S.contextPath)) match {
+                                  prefix.openOr(S.contextPath)) match {
                   case (Full(c), _) => CSSResponse(c)
                   case (x, input) => {
                     logger.info(
@@ -1896,7 +1896,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   }
 
   @volatile var calcIE6ForResponse: () => Boolean = () =>
-    S.request.map(_.isIE6) openOr false
+    S.request.map(_.isIE6).openOr(false)
 
   @volatile var flipDocTypeForIE6 = true
 
@@ -2377,7 +2377,7 @@ trait FormVendor {
   def vendForm[T](implicit man: Manifest[T]): Box[(T, T => Any) => NodeSeq] = {
     val name = man.toString
     val first: Option[List[FormBuilderLocator[_]]] =
-      requestForms.is.get(name) orElse sessionForms.is.get(name)
+      requestForms.is.get(name).orElse(sessionForms.is.get(name))
 
     first match {
       case Some(x :: _) => Full(x.func.asInstanceOf[(T, T => Any) => NodeSeq])

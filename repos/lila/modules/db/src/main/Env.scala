@@ -14,13 +14,13 @@ final class Env(config: Config,
     val parsedUri: MongoConnection.ParsedURI =
       MongoConnection.parseURI(config.getString("uri")) match {
         case Success(parsedURI) => parsedURI
-        case Failure(e) => sys error s"Invalid mongodb.uri"
+        case Failure(e) => sys.error(s"Invalid mongodb.uri")
       }
     val driver = new MongoDriver(Some(config))
     val connection = driver.connection(parsedUri)
 
     parsedUri.db.fold[DefaultDB](
-      sys error s"cannot resolve database from URI: $parsedUri") { dbUri =>
+      sys.error(s"cannot resolve database from URI: $parsedUri")) { dbUri =>
       val db = DB(dbUri, connection)
       registerDriverShutdownHook(driver)
       logger.info(
@@ -44,6 +44,7 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "db" boot new Env(config = lila.common.PlayApp loadConfig "mongodb",
-                      lifecycle = lila.common.PlayApp.lifecycle)
+    "db".boot(
+      new Env(config = lila.common.PlayApp.loadConfig("mongodb"),
+              lifecycle = lila.common.PlayApp.lifecycle))
 }

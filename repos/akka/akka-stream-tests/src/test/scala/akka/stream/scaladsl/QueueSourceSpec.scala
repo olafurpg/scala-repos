@@ -129,7 +129,7 @@ class QueueSourceSpec extends AkkaSpec {
       val sub = s.expectSubscription
 
       queue.watchCompletion.pipeTo(testActor)
-      queue.offer(1) pipeTo testActor
+      queue.offer(1).pipeTo(testActor)
       expectNoMsg(pause)
 
       sub.cancel()
@@ -202,7 +202,7 @@ class QueueSourceSpec extends AkkaSpec {
       val sub = s.expectSubscription
 
       queue.offer(1)
-      queue.offer(2) pipeTo testActor
+      queue.offer(2).pipeTo(testActor)
       expectMsg(QueueOfferResult.Dropped)
 
       sub.request(1)
@@ -219,7 +219,7 @@ class QueueSourceSpec extends AkkaSpec {
       val sub = s.expectSubscription
       assertSuccess(queue.offer(1))
 
-      queue.offer(2) pipeTo testActor
+      queue.offer(2).pipeTo(testActor)
       expectNoMsg(pause)
 
       sub.request(1)
@@ -263,7 +263,7 @@ class QueueSourceSpec extends AkkaSpec {
       sourceQueue1.offer("hello")
       mat1subscriber.expectNext("hello")
       mat1subscriber.cancel()
-      sourceQueue1.watchCompletion pipeTo testActor
+      sourceQueue1.watchCompletion.pipeTo(testActor)
       expectMsg(Done)
 
       sourceQueue2.watchCompletion().isCompleted should ===(false)

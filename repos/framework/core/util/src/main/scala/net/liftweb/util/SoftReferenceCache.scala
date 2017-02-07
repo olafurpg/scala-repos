@@ -58,7 +58,7 @@ object SoftReferenceCache {
       }
     })
     thread.setDaemon(true)
-    thread setContextClassLoader null
+    thread.setContextClassLoader(null)
     thread.start
   }
 
@@ -123,7 +123,7 @@ class SoftReferenceCache[K, V](cacheSize: Int) {
     val result: (Boolean, Box[V]) /* (doRemove, retval) */ = lock(readLock) {
       Box.!!(cache.get(key)) match {
         case Full(value) =>
-          Box.!!(value.get).map(value => (false, Full(value))) openOr {
+          Box.!!(value.get).map(value => (false, Full(value))).openOr {
             (true, Empty)
           }
         case _ => (false, Empty)

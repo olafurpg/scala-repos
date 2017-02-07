@@ -1024,7 +1024,7 @@ object BinderSpecs
         val d @ Dispatch(_, _, _) = parseSingle(f.fqn + "(1)")
         d.binding mustEqual Morphism1Binding(f)
         d.isReduction mustEqual false
-        d.errors filterNot isWarning must beEmpty
+        d.errors.filterNot(isWarning) must beEmpty
       }
     }
 
@@ -1035,7 +1035,7 @@ object BinderSpecs
         val d @ Dispatch(_, _, _) = parseSingle(f.fqn + "(1, 2)")
         d.binding mustEqual Morphism2Binding(f)
         d.isReduction mustEqual false
-        d.errors filterNot isWarning must beEmpty
+        d.errors.filterNot(isWarning) must beEmpty
       }
     }
 
@@ -1046,7 +1046,7 @@ object BinderSpecs
         val d @ Dispatch(_, _, _) = parseSingle(f.fqn + "(1)")
         d.binding mustEqual ReductionBinding(f)
         d.isReduction mustEqual true
-        d.errors filterNot isWarning must beEmpty
+        d.errors.filterNot(isWarning) must beEmpty
       }
     }
 
@@ -1055,7 +1055,7 @@ object BinderSpecs
         val d @ Dispatch(_, _, _) = parseSingle(f.fqn + "(1)")
         d.binding mustEqual Op1Binding(f)
         d.isReduction mustEqual false
-        d.errors filterNot isWarning must beEmpty
+        d.errors.filterNot(isWarning) must beEmpty
       }
     }
 
@@ -1064,7 +1064,7 @@ object BinderSpecs
         val d @ Dispatch(_, _, _) = parseSingle(f.fqn + "(1, 2)")
         d.binding mustEqual Op2Binding(f)
         d.isReduction mustEqual false
-        d.errors filterNot isWarning must beEmpty
+        d.errors.filterNot(isWarning) must beEmpty
       }
     }
 
@@ -1251,7 +1251,7 @@ object BinderSpecs
 
   if (exampleDir.exists) {
     "specification examples" >> {
-      for (file <- exampleDir.listFiles if file.getName endsWith ".qrl") {
+      for (file <- exampleDir.listFiles if file.getName.endsWith(".qrl")) {
         file.getName >> {
           val result = parseSingle(LineStream(Source.fromFile(file)))
           result.errors must beEmpty

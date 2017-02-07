@@ -263,12 +263,12 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
         if (value eq null) "NULL"
         else {
           val sb = new StringBuilder
-          sb append '\''
+          sb.append('\'')
           for (c <- value) c match {
-            case '\'' => sb append "''"
-            case _ => sb append c
+            case '\'' => sb.append("''")
+            case _ => sb.append(c)
           }
-          sb append '\''
+          sb.append('\'')
           sb.toString
         }
     }

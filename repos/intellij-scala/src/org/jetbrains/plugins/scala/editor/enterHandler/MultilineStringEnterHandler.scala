@@ -237,8 +237,8 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
         val isCurrentLineEmpty = currentLine.trim.length == 0
         val currentLineOffset = document.getLineStartOffset(prevLineNumber + 1)
 
-        val isPrevLineFirst = prevLine startsWith firstMLQuote
-        val isPrevLineTrimmedFirst = prevLine.trim startsWith firstMLQuote
+        val isPrevLineFirst = prevLine.startsWith(firstMLQuote)
+        val isPrevLineTrimmedFirst = prevLine.trim.startsWith(firstMLQuote)
         val prevLineStartOffset = document getLineStartOffset prevLineNumber
 
         val wsPrefix =

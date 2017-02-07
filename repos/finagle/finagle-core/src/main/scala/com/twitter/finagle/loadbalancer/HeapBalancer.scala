@@ -83,7 +83,7 @@ class HeapBalancer[Req, Rep](
   def onReady: Future[Unit] = ready
 
   private[this] val observation =
-    factories.run.changes respond {
+    factories.run.changes.respond {
       case Activity.Pending =>
       case Activity.Ok(newSet) =>
         updateGroup(newSet)
@@ -101,7 +101,7 @@ class HeapBalancer[Req, Rep](
 
   private[this] val loadGauge = statsReceiver.addGauge("load") {
     val loads = synchronized {
-      heap drop (1) map { n =>
+      heap.drop(1).map { n =>
         if (n.load < 0) n.load + Penalty
         else n.load
       }
@@ -197,7 +197,7 @@ class HeapBalancer[Req, Rep](
   private[this] class Wrapped(n: Node, underlying: Service[Req, Rep])
       extends ServiceProxy[Req, Rep](underlying) {
     override def close(deadline: Time) =
-      super.close(deadline) ensure {
+      super.close(deadline).ensure {
         put(n)
       }
   }
@@ -218,7 +218,7 @@ class HeapBalancer[Req, Rep](
       n
     }
 
-    node.factory(conn) map { new Wrapped(node, _) } onFailure { _ =>
+    node.factory(conn).map { new Wrapped(node, _) }.onFailure { _ =>
       put(node)
     }
   }

@@ -113,7 +113,7 @@ abstract class TreeInfo {
         isStableMemberOf(tree.symbol, qual, allowVolatile) &&
           isPath(qual, allowVolatile)
       case Apply(Select(free @ Ident(_), nme.apply), _)
-          if free.symbol.name endsWith nme.REIFY_FREE_VALUE_SUFFIX =>
+          if free.symbol.name.endsWith(nme.REIFY_FREE_VALUE_SUFFIX) =>
         // see a detailed explanation of this trick in `GenSymbols.reifyFreeTerm`
         free.symbol.hasStableFlag && isPath(free, allowVolatile)
       case _ => false
@@ -194,7 +194,7 @@ abstract class TreeInfo {
     case TypeApply(fn, _) =>
       isExprSafeToInline(fn)
     case Apply(Select(free @ Ident(_), nme.apply), _)
-        if free.symbol.name endsWith nme.REIFY_FREE_VALUE_SUFFIX =>
+        if free.symbol.name.endsWith(nme.REIFY_FREE_VALUE_SUFFIX) =>
       // see a detailed explanation of this trick in `GenSymbols.reifyFreeTerm`
       free.symbol.hasStableFlag && isExprSafeToInline(free)
     case Apply(fn, List()) =>
@@ -209,7 +209,7 @@ abstract class TreeInfo {
     case Typed(expr, _) =>
       isExprSafeToInline(expr)
     case Block(stats, expr) =>
-      (stats forall isPureDef) && isExprSafeToInline(expr)
+      (stats.forall(isPureDef)) && isExprSafeToInline(expr)
     case _ =>
       false
   }
@@ -272,8 +272,8 @@ abstract class TreeInfo {
         else foreach2(params.init, args)(f)
       } else if (alen < plenInit) return fail()
       else {
-        foreach2(params.init, args take plenInit)(f)
-        val remainingArgs = args drop plenInit
+        foreach2(params.init, args.take(plenInit))(f)
+        val remainingArgs = args.drop(plenInit)
         foreach2(List.fill(remainingArgs.size)(params.last), remainingArgs)(f)
       }
     } else return fail()
@@ -455,7 +455,7 @@ abstract class TreeInfo {
 
   /** Recover tree body to parsed state */
   private[internal] def untypecheckedTreeBody(tree: Tree, tbody: List[Tree]) = {
-    def filterBody(body: List[Tree]) = body filter {
+    def filterBody(body: List[Tree]) = body.filter {
       case _: ValDef | _: TypeDef => true
       // keep valdef or getter for val/var
       case dd: DefDef if dd.mods.hasAccessorFlag =>
@@ -473,20 +473,21 @@ abstract class TreeInfo {
         case _ => body
       }
 
-    def recoverBody(body: List[Tree]) = body map {
+    def recoverBody(body: List[Tree]) = body.map {
       case vd @ ValDef(vmods, vname, _, vrhs) if nme.isLocalName(vname) =>
-        tbody find {
+        (tbody find {
           case dd: DefDef => dd.name == vname.dropLocal
           case _ => false
-        } map { dd =>
-          val DefDef(dmods, dname, _, _, _, drhs) = dd
-          // get access flags from DefDef
-          val vdMods =
-            (vmods &~ Flags.AccessFlags) | (dmods & Flags.AccessFlags).flags
-          // for most cases lazy body should be taken from accessor DefDef
-          val vdRhs = if (vmods.isLazy) lazyValDefRhs(drhs) else vrhs
-          copyValDef(vd)(mods = vdMods, name = dname, rhs = vdRhs)
-        } getOrElse (vd)
+        }).map { dd =>
+            val DefDef(dmods, dname, _, _, _, drhs) = dd
+            // get access flags from DefDef
+            val vdMods =
+              (vmods &~ Flags.AccessFlags) | (dmods & Flags.AccessFlags).flags
+            // for most cases lazy body should be taken from accessor DefDef
+            val vdRhs = if (vmods.isLazy) lazyValDefRhs(drhs) else vrhs
+            copyValDef(vd)(mods = vdMods, name = dname, rhs = vdRhs)
+          }
+          .getOrElse(vd)
       // for abstract and some lazy val/vars
       case dd @ DefDef(mods, name, _, _, tpt, rhs) if mods.hasAccessorFlag =>
         // transform getter mods to field
@@ -504,10 +505,10 @@ abstract class TreeInfo {
 
   /** The first constructor definitions in `stats` */
   def firstConstructor(stats: List[Tree]): Tree =
-    stats find {
+    (stats find {
       case x: DefDef => nme.isConstructorName(x.name)
       case _ => false
-    } getOrElse EmptyTree
+    }).getOrElse(EmptyTree)
 
   /** The arguments to the first constructor in `stats`. */
   def firstConstructorArgs(stats: List[Tree]): List[Tree] =
@@ -518,19 +519,19 @@ abstract class TreeInfo {
 
   /** The value definitions marked PRESUPER in this statement sequence */
   def preSuperFields(stats: List[Tree]): List[ValDef] =
-    stats collect { case vd: ValDef if isEarlyValDef(vd) => vd }
+    stats.collect { case vd: ValDef if isEarlyValDef(vd) => vd }
 
   def hasUntypedPreSuperFields(stats: List[Tree]): Boolean =
-    preSuperFields(stats) exists (_.tpt.isEmpty)
+    preSuperFields(stats).exists(_.tpt.isEmpty)
 
   def isEarlyDef(tree: Tree) = tree match {
-    case TypeDef(mods, _, _, _) => mods hasFlag PRESUPER
-    case ValDef(mods, _, _, _) => mods hasFlag PRESUPER
+    case TypeDef(mods, _, _, _) => mods.hasFlag(PRESUPER)
+    case ValDef(mods, _, _, _) => mods.hasFlag(PRESUPER)
     case _ => false
   }
 
   def isEarlyValDef(tree: Tree) = tree match {
-    case ValDef(mods, _, _, _) => mods hasFlag PRESUPER
+    case ValDef(mods, _, _, _) => mods.hasFlag(PRESUPER)
     case _ => false
   }
 
@@ -563,11 +564,12 @@ abstract class TreeInfo {
     operator.nonEmpty && (operator.endChar != ':')
 
   /** a Match(Typed(_, tpt), _) must be translated into a switch if isSwitchAnnotation(tpt.tpe) */
-  def isSwitchAnnotation(tpe: Type) = tpe hasAnnotation definitions.SwitchClass
+  def isSwitchAnnotation(tpe: Type) =
+    tpe.hasAnnotation(definitions.SwitchClass)
 
   /** can this type be a type pattern */
   def mayBeTypePat(tree: Tree): Boolean = tree match {
-    case CompoundTypeTree(Template(tps, _, Nil)) => tps exists mayBeTypePat
+    case CompoundTypeTree(Template(tps, _, Nil)) => tps.exists(mayBeTypePat)
     case Annotated(_, tp) => mayBeTypePat(tp)
     case AppliedTypeTree(constr, args) =>
       mayBeTypePat(constr) || args.exists(_.isInstanceOf[Bind])
@@ -682,7 +684,7 @@ abstract class TreeInfo {
 
   /** Is this pattern node a sequence-valued pattern? */
   def isSequenceValued(tree: Tree): Boolean = unbind(tree) match {
-    case Alternative(ts) => ts exists isSequenceValued
+    case Alternative(ts) => ts.exists(isSequenceValued)
     case ArrayValue(_, _) | Star(_) => true
     case _ => false
   }
@@ -712,7 +714,7 @@ abstract class TreeInfo {
     flattenedPatternArgs(args).length
 
   def flattenedPatternArgs(args: List[Tree]): List[Tree] =
-    args map unbind match {
+    args.map(unbind) match {
       case build.SyntacticTuple(xs) :: Nil => xs
       case xs => xs
     }
@@ -722,7 +724,7 @@ abstract class TreeInfo {
   // TODO: move to Flags
   final val SYNTH_CASE_FLAGS = CASE | SYNTHETIC
 
-  def isSynthCaseSymbol(sym: Symbol) = sym hasAllFlags SYNTH_CASE_FLAGS
+  def isSynthCaseSymbol(sym: Symbol) = sym.hasAllFlags(SYNTH_CASE_FLAGS)
   def hasSynthCaseSymbol(t: Tree) =
     t.symbol != null && isSynthCaseSymbol(t.symbol)
 
@@ -874,7 +876,7 @@ abstract class TreeInfo {
   def noPredefImportForUnit(body: Tree) = {
     // Top-level definition whose leading imports include Predef.
     def isLeadingPredefImport(defn: Tree): Boolean = defn match {
-      case PackageDef(_, defs1) => defs1 exists isLeadingPredefImport
+      case PackageDef(_, defs1) => defs1.exists(isLeadingPredefImport)
       case Import(expr, _) => isReferenceToPredef(expr)
       case _ => false
     }

@@ -29,15 +29,16 @@ object ScalaWebSockets extends PlaySpecification {
         val promise = Promise[List[Message]]()
         if (expectOut == 0) promise.success(Nil)
         val flowResult =
-          in via flow runWith Sink
-            .fold[(List[Message], Int), Message]((Nil, expectOut)) {
-              (state, out) =>
-                val (result, remaining) = state
-                if (remaining == 1) {
-                  promise.success(result :+ out)
-                }
-                (result :+ out, remaining - 1)
-            }
+          in.via(flow)
+            .runWith(Sink
+              .fold[(List[Message], Int), Message]((Nil, expectOut)) {
+                (state, out) =>
+                  val (result, remaining) = state
+                  if (remaining == 1) {
+                    promise.success(result :+ out)
+                  }
+                  (result :+ out, remaining - 1)
+              })
         import play.api.libs.iteratee.Execution.Implicits.trampoline
         await(
           Future.firstCompletedOf(Seq(promise.future, flowResult.map(_._1))))
@@ -339,7 +340,7 @@ object Samples {
         println(msg)
         // the Enumerator returned by Concurrent.broadcast subscribes to the channel and will
         // receive the pushed messages
-        channel push ("I received your message: " + msg)
+        channel.push("I received your message: " + msg)
       }
       (in, out)
     }

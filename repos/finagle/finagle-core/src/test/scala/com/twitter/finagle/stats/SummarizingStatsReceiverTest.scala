@@ -21,7 +21,7 @@ class SummarizingStatsReceiverTest extends FunSuite {
       |toto                           n=1 min=1.0 med=1.0 p90=1.0 p95=1.0 p99=1.0 p999=1.0 p9999=1.0 max=1.0""".stripMargin
     assert(receiver.summary() == expected)
 
-    (2 to 10) foreach { stats.add(_) }
+    ((2 to 10)).foreach { stats.add(_) }
     val expected2 =
       """# counters
       |

@@ -74,17 +74,17 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
 
       def build(states: List[SampleState],
                 slices: StreamT[M, Slice]): M[List[Table]] = {
-        slices.uncons flatMap {
+        slices.uncons.flatMap {
           case Some((origSlice, tail)) =>
             val nextStates =
-              states map {
+              states.map {
                 case SampleState(maybePrevInserters, len0, transform) =>
-                  transform advance origSlice map {
+                  transform.advance(origSlice).map {
                     case (nextTransform, slice) => {
                       val inserter =
-                        maybePrevInserters map { _.withSource(slice) } getOrElse RowInserter(
-                          sampleSize,
-                          slice)
+                        maybePrevInserters
+                          .map { _.withSource(slice) }
+                          .getOrElse(RowInserter(sampleSize, slice))
 
                       val defined = slice.definedAt
 
@@ -113,27 +113,30 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
                   }
               }
 
-            Traverse[List].sequence(nextStates) flatMap { build(_, tail) }
+            Traverse[List].sequence(nextStates).flatMap { build(_, tail) }
 
           case None =>
             M.point {
-              states map {
+              states.map {
                 case SampleState(inserter, length, _) =>
                   val len = length min sampleSize
-                  inserter map { _.toSlice(len) } map { slice =>
-                    Table(slice :: StreamT.empty[M, Slice], ExactSize(len))
-                      .paged(yggConfig.maxSliceSize)
-                  } getOrElse {
-                    Table(StreamT.empty[M, Slice], ExactSize(0))
-                  }
+                  inserter
+                    .map { _.toSlice(len) }
+                    .map { slice =>
+                      Table(slice :: StreamT.empty[M, Slice], ExactSize(len))
+                        .paged(yggConfig.maxSliceSize)
+                    }
+                    .getOrElse {
+                      Table(StreamT.empty[M, Slice], ExactSize(0))
+                    }
               }
             }
         }
       }
 
-      val transforms = specs map { SliceTransform.composeSliceTransform }
+      val transforms = specs.map { SliceTransform.composeSliceTransform }
       val states =
-        transforms map { transform =>
+        transforms.map { transform =>
           SampleState(None, 0, transform)
         }
       build(states.toList, slices)
@@ -252,8 +255,8 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
             }
           case (src, dest) =>
             sys.error(
-              "Slice lied about column type. Expected %s, but found %s." format
-                (ref.ctype, src.tpe))
+              "Slice lied about column type. Expected %s, but found %s."
+                .format(ref.ctype, src.tpe))
         }
     }
   }

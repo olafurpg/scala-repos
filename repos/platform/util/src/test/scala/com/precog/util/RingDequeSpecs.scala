@@ -69,23 +69,23 @@ object RingDequeSpecs extends Specification with ScalaCheck {
 
     "append a full list following a half-appending" in check { xs: List[Int] =>
       val deque = new RingDeque[Int](xs.length)
-      xs take (xs.length / 2) foreach deque.pushBack
-      (0 until (xs.length / 2)) foreach { _ =>
+      xs.take(xs.length / 2).foreach(deque.pushBack)
+      ((0 until (xs.length / 2))).foreach { _ =>
         deque.popFront()
       }
-      xs foreach deque.pushBack
+      xs.foreach(deque.pushBack)
       deque.toList mustEqual xs
     }
 
     "reverse a list by prepending" in check { xs: List[Int] =>
       val deque = new RingDeque[Int](xs.length)
-      xs foreach deque.pushFront
+      xs.foreach(deque.pushFront)
       deque.toList mustEqual xs.reverse
     }
   }
 
   private def fromList(xs: List[Int], bound: Int): RingDeque[Int] =
     xs.foldLeft(new RingDeque[Int](bound)) { (deque, x) =>
-      deque pushBack x; deque
+      deque.pushBack(x); deque
     }
 }

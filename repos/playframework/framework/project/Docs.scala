@@ -41,34 +41,34 @@ object Docs {
     apiDocsInclude := false,
     apiDocsIncludeManaged := false,
     apiDocsScalaSources <<=
-      (thisProjectRef, buildStructure) flatMap allSources(Compile, ".scala"),
+      (thisProjectRef, buildStructure).flatMap(allSources(Compile, ".scala")),
     apiDocsClasspath <<=
-      (thisProjectRef, buildStructure) flatMap allClasspaths,
+      (thisProjectRef, buildStructure).flatMap(allClasspaths),
     apiDocsJavaSources <<=
-      (thisProjectRef, buildStructure) flatMap allSources(Compile, ".java"),
+      (thisProjectRef, buildStructure).flatMap(allSources(Compile, ".java")),
     apiDocsUseCache := true,
     apiDocs <<= apiDocsTask,
     ivyConfigurations += Webjars,
     extractWebjars <<= extractWebjarContents,
     allConfs in Global <<=
-      (thisProjectRef, buildStructure) flatMap allConfsTask,
+      (thisProjectRef, buildStructure).flatMap(allConfsTask),
     mappings in (Compile, packageBin) <++=
-      (baseDirectory, apiDocs, extractWebjars, version, allConfs) map {
+      (baseDirectory, apiDocs, extractWebjars, version, allConfs).map {
         (base, apiBase, webjars, playVersion, confs) =>
           // Include documentation and API docs in main binary JAR
           val docBase = base / "../../../documentation"
           val raw = (docBase \ "manual" ** "*") +++ (docBase \ "style" ** "*")
           val filtered = raw.filter(_.getName != ".DS_Store")
           val docMappings =
-            filtered.get pair rebase(docBase, "play/docs/content/")
+            filtered.get.pair(rebase(docBase, "play/docs/content/"))
 
           val apiDocMappings =
-            (apiBase ** "*").get pair rebase(apiBase, "play/docs/content/api")
+            (apiBase ** "*").get.pair(rebase(apiBase, "play/docs/content/api"))
 
           // The play version is added so that resource paths are versioned
           val webjarMappings =
-            webjars.*** pair rebase(webjars,
-                                    "play/docs/content/webjars/" + playVersion)
+            webjars.***.pair(
+              rebase(webjars, "play/docs/content/webjars/" + playVersion))
 
           // Gather all the conf files into the project
           val referenceConfMappings = confs.map {
@@ -89,13 +89,13 @@ object Docs {
       val docBase = base.getParentFile / "documentation"
       val raw = (docBase / "manual").*** +++ (docBase / "style").***
       val filtered = raw.filter(_.getName != ".DS_Store")
-      val docMappings = filtered.get pair relativeTo(docBase)
+      val docMappings = filtered.get.pair(relativeTo(docBase))
 
       // The play version is added so that resource paths are versioned
       val webjars = extractWebjars.value
       val playVersion = version.value
       val webjarMappings =
-        webjars.*** pair rebase(webjars, "webjars/" + playVersion)
+        webjars.***.pair(rebase(webjars, "webjars/" + playVersion))
 
       // Gather all the conf files into the project
       val referenceConfs = allConfs.value.map {
@@ -199,23 +199,23 @@ object Docs {
                    structure: BuildStructure): Task[Seq[(String, File)]] = {
     val projects = allApiProjects(projectRef.build, structure)
     val unmanagedResourcesTasks =
-      projects map { ref =>
+      projects.map { ref =>
         def taskFromProject[T](task: TaskKey[T]) =
-          task in Compile in ref get structure.data
+          (task in Compile in ref).get(structure.data)
 
-        val projectId = moduleName in ref get structure.data
+        val projectId = (moduleName in ref).get(structure.data)
 
         val confs =
-          (unmanagedResources in Compile in ref get structure.data).map(_.map {
-            resources =>
+          ((unmanagedResources in Compile in ref)
+            .get(structure.data))
+            .map(_.map { resources =>
               (for {
-                conf <- resources.filter(
-                  resource =>
-                    resource.name == "reference.conf" ||
-                      resource.name.endsWith(".xml"))
+                conf <- resources.filter(resource =>
+                  resource.name == "reference.conf" ||
+                    resource.name.endsWith(".xml"))
                 id <- projectId.toSeq
               } yield id -> conf).distinct
-          })
+            })
 
         // Join them
         val tasks = confs.toSeq
@@ -229,9 +229,9 @@ object Docs {
       structure: BuildStructure): Task[Seq[File]] = {
     val projects = allApiProjects(projectRef.build, structure)
     val sourceTasks =
-      projects map { ref =>
+      projects.map { ref =>
         def taskFromProject[T](task: TaskKey[T]) =
-          task in conf in ref get structure.data
+          (task in conf in ref).get(structure.data)
 
         // Get all the Scala sources (not the Java ones)
         val filteredSources = taskFromProject(sources).map(
@@ -252,7 +252,7 @@ object Docs {
     def aggregated(projectRef: ProjectRef): Seq[ProjectRef] = {
       val project = Project.getProject(projectRef, structure)
       val childRefs = project.toSeq.flatMap(_.aggregate)
-      childRefs flatMap { childRef =>
+      childRefs.flatMap { childRef =>
         val includeApiDocs =
           (apiDocsInclude in childRef).get(structure.data).getOrElse(false)
         if (includeApiDocs) childRef +: aggregated(childRef)
@@ -269,13 +269,13 @@ object Docs {
     val projects = allApiProjects(projectRef.build, structure)
     // Full classpath is necessary to ensure that scaladoc and javadoc can see the compiled classes of the other language.
     val tasks =
-      projects flatMap { fullClasspath in Compile in _ get structure.data }
+      projects.flatMap { (fullClasspath in Compile in _).get(structure.data) }
     tasks.join.map(_.flatten.map(_.data).distinct)
   }
 
   // Note: webjars are extracted without versions
   def extractWebjarContents: Def.Initialize[Task[File]] =
-    (update, target, streams) map { (report, targetDir, s) =>
+    (update, target, streams).map { (report, targetDir, s) =>
       val webjars = report.matching(configurationFilter(name = Webjars.name))
       val webjarsDir = targetDir / "webjars"
       val cache = new FileSystemCache(s.cacheDirectory / "webjars-cache")

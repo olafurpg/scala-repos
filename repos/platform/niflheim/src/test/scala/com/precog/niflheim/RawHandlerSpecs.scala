@@ -258,7 +258,7 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       val ps = makeps(tmp8)
       RawLoader.writeHeader(ps, blockid)
       def makejson(i: Int) =
-        json("""{"a": %s, "b": %s}""" format (i * 2, i * 3))
+        json("""{"a": %s, "b": %s}""".format(i * 2, i * 3))
       range.foreach(i => RawLoader.writeEvents(ps, i, makejson(i)))
       ps.println("biewjgwijgjigiwej")
       ps.close()

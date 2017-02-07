@@ -25,7 +25,7 @@ final class QaApi(questionColl: Coll,
     private[qa] implicit val questionBSONHandler = Macros.handler[Question]
 
     def create(data: QuestionData, user: User): Fu[Question] =
-      lila.db.Util findNextId questionColl flatMap { id =>
+      (lila.db.Util findNextId questionColl).flatMap { id =>
         val q = Question(
           _id = id,
           userId = user.id,
@@ -47,7 +47,7 @@ final class QaApi(questionColl: Coll,
       }
 
     def edit(data: QuestionData, id: QuestionId): Fu[Option[Question]] =
-      findById(id) flatMap {
+      findById(id).flatMap {
         _ ?? { q =>
           val q2 = q
             .copy(title = data.title, body = data.body, tags = data.tags)
@@ -124,7 +124,7 @@ final class QaApi(questionColl: Coll,
         BSONDocument("$push" -> BSONDocument("comments" -> c)))
 
     def vote(id: QuestionId, user: User, v: Boolean): Fu[Option[Vote]] =
-      question findById id flatMap {
+      (question findById id).flatMap {
         _ ?? { q =>
           val newVote = q.vote.add(user.id, v)
           questionColl.update(
@@ -139,7 +139,7 @@ final class QaApi(questionColl: Coll,
         BSONDocument("_id" -> q.id),
         BSONDocument("$inc" -> BSONDocument("views" -> BSONInteger(1))))
 
-    def recountAnswers(id: QuestionId) = answer.countByQuestionId(id) flatMap {
+    def recountAnswers(id: QuestionId) = answer.countByQuestionId(id).flatMap {
       setAnswers(id, _)
     }
 
@@ -156,7 +156,7 @@ final class QaApi(questionColl: Coll,
 
     def remove(id: QuestionId) =
       questionColl.remove(BSONDocument("_id" -> id)) >>
-        (answer removeByQuestion id) >> tag.clearCache >> relation.clearCache
+        (answer.removeByQuestion(id)) >> tag.clearCache >> relation.clearCache
 
     def removeComment(id: QuestionId, c: CommentId) = questionColl.update(
       BSONDocument("_id" -> id),
@@ -172,7 +172,7 @@ final class QaApi(questionColl: Coll,
     private implicit val answerBSONHandler = Macros.handler[Answer]
 
     def create(data: AnswerData, q: Question, user: User): Fu[Answer] =
-      lila.db.Util findNextId answerColl flatMap { id =>
+      (lila.db.Util findNextId answerColl).flatMap { id =>
         val a = Answer(
           _id = id,
           questionId = q.id,
@@ -185,12 +185,12 @@ final class QaApi(questionColl: Coll,
           editedAt = None
         )
 
-        (answerColl insert a) >> (question recountAnswers q.id) >>- notifier
+        (answerColl insert a) >> (question.recountAnswers(q.id)) >>- notifier
           .createAnswer(q, a, user) inject a
       }
 
     def edit(body: String, id: AnswerId): Fu[Option[Answer]] =
-      findById(id) flatMap {
+      findById(id).flatMap {
         _ ?? { a =>
           val a2 = a.copy(body = body).editNow
           answerColl.update(BSONDocument("_id" -> a2.id), a2) inject a2.some
@@ -201,7 +201,7 @@ final class QaApi(questionColl: Coll,
       answerColl.find(BSONDocument("_id" -> id)).one[Answer]
 
     def accept(q: Question, a: Answer) =
-      (question accept q) >> answerColl.update(
+      (question.accept(q)) >> answerColl.update(
         BSONDocument("questionId" -> q.id),
         BSONDocument("$unset" -> BSONDocument("acceptedAt" -> true)),
         multi = true
@@ -218,9 +218,9 @@ final class QaApi(questionColl: Coll,
         .collect[List]()
 
     def zipWithQuestions(answers: List[Answer]): Fu[List[AnswerWithQuestion]] =
-      question.findByIds(answers.map(_.questionId)) map { qs =>
-        answers flatMap { a =>
-          qs find (_.id == a.questionId) map { AnswerWithQuestion(a, _) }
+      question.findByIds(answers.map(_.questionId)).map { qs =>
+        answers.flatMap { a =>
+          (qs find (_.id == a.questionId)).map { AnswerWithQuestion(a, _) }
         }
       }
 
@@ -229,7 +229,7 @@ final class QaApi(questionColl: Coll,
                         BSONDocument("$push" -> BSONDocument("comments" -> c)))
 
     def vote(id: QuestionId, user: User, v: Boolean): Fu[Option[Vote]] =
-      answer findById id flatMap {
+      (answer findById id).flatMap {
         _ ?? { a =>
           val newVote = a.vote.add(user.id, v)
           answerColl.update(
@@ -241,9 +241,9 @@ final class QaApi(questionColl: Coll,
 
     def remove(a: Answer): Fu[Unit] =
       answerColl.remove(BSONDocument("_id" -> a.id)) >>
-        (question recountAnswers a.questionId).void
+        (question.recountAnswers(a.questionId)).void
 
-    def remove(id: AnswerId): Fu[Unit] = findById(id) flatMap { _ ?? remove }
+    def remove(id: AnswerId): Fu[Unit] = findById(id).flatMap { _ ?? remove }
 
     def removeByQuestion(id: QuestionId) =
       answerColl.remove(BSONDocument("questionId" -> id))
@@ -265,7 +265,7 @@ final class QaApi(questionColl: Coll,
     }
 
     def moveToAnswerComment(a: Answer, toAnswerId: AnswerId) =
-      findById(toAnswerId) flatMap {
+      findById(toAnswerId).flatMap {
         _ ?? { toAnswer =>
           val allComments =
             Comment(id = Comment.makeId,
@@ -289,12 +289,12 @@ final class QaApi(questionColl: Coll,
                       userId = user.id,
                       body = data.body,
                       createdAt = DateTime.now)
-      subject.fold(question addComment c, answer addComment c) >>- {
+      subject.fold(question.addComment(c), answer.addComment(c)) >>- {
         subject match {
           case Left(q) => notifier.createQuestionComment(q, c, user)
           case Right(a) =>
-            question findById a.questionId foreach {
-              _ foreach { q =>
+            (question findById a.questionId).foreach {
+              _.foreach { q =>
                 notifier.createAnswerComment(q, a, c, user)
               }
             }
@@ -343,10 +343,12 @@ final class QaApi(questionColl: Coll,
 
     def questions(q: Question, max: Int): Fu[List[Question]] =
       questionsCache(q.id -> max) {
-        question.byTags(q.tags, 2000) map { qs =>
-          qs.filter(_.id != q.id) sortBy { q2 =>
-            -q.tags.union(q2.tags).size
-          } take max
+        question.byTags(q.tags, 2000).map { qs =>
+          qs.filter(_.id != q.id)
+            .sortBy { q2 =>
+              -q.tags.union(q2.tags).size
+            }
+            .take(max)
         }
       }
 

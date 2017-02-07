@@ -247,7 +247,7 @@ private[spark] object ClosureCleaner extends Logging {
     // List of outer (class, object) pairs, ordered from outermost to innermost
     // Note that all outer objects but the outermost one (first one in this list) must be closures
     var outerPairs: List[(Class[_], AnyRef)] =
-      (outerClasses zip outerObjects).reverse
+      (outerClasses.zip(outerObjects)).reverse
     var parent: AnyRef = null
     if (outerPairs.size > 0 && !isClosure(outerPairs.head._1)) {
       // The closure is ultimately nested inside a class; keep the object of that

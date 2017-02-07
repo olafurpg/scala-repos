@@ -28,7 +28,7 @@ private[round] final class Rematcher(messenger: Messenger,
                                      isRematchCache: ExpireSetMemo) {
 
   def yes(pov: Pov): Fu[Events] = pov match {
-    case Pov(game, color) if (game playerCanRematch color) =>
+    case Pov(game, color) if (game.playerCanRematch(color)) =>
       (game.opponent(color).isOfferingRematch ||
         game.opponent(color).isAi).fold(
         game.next.fold(rematchJoin(pov))(rematchExists(pov)),
@@ -39,16 +39,16 @@ private[round] final class Rematcher(messenger: Messenger,
 
   def no(pov: Pov): Fu[Events] = pov match {
     case Pov(game, color) if pov.player.isOfferingRematch =>
-      GameRepo save {
+      GameRepo.save {
         messenger.system(game, _.rematchOfferCanceled)
-        Progress(game) map { g =>
+        Progress(game).map { g =>
           g.updatePlayer(color, _.removeRematchOffer)
         }
       } inject List(Event.ReloadOwner)
     case Pov(game, color) if pov.opponent.isOfferingRematch =>
-      GameRepo save {
+      GameRepo.save {
         messenger.system(game, _.rematchOfferDeclined)
-        Progress(game) map { g =>
+        Progress(game).map { g =>
           g.updatePlayer(!color, _.removeRematchOffer)
         }
       } inject List(Event.ReloadOwner)
@@ -56,13 +56,13 @@ private[round] final class Rematcher(messenger: Messenger,
   }
 
   private def rematchExists(pov: Pov)(nextId: String): Fu[Events] =
-    GameRepo game nextId flatMap {
+    GameRepo.game(nextId).flatMap {
       _.fold(rematchJoin(pov))(g => fuccess(redirectEvents(g)))
     }
 
   private def rematchJoin(pov: Pov): Fu[Events] =
     for {
-      nextGame ← returnGame(pov) map (_.start)
+      nextGame ← returnGame(pov).map(_.start)
       _ ← (GameRepo insertDenormalized nextGame) >> GameRepo
         .saveNext(pov.game, nextGame.id) >>- messenger
         .system(pov.game, _.rematchOfferAccepted) >>- {
@@ -76,9 +76,9 @@ private[round] final class Rematcher(messenger: Messenger,
     }
 
   private def rematchCreate(pov: Pov): Fu[Events] =
-    GameRepo save {
+    GameRepo.save {
       messenger.system(pov.game, _.rematchOfferSent)
-      Progress(pov.game) map { g =>
+      Progress(pov.game).map { g =>
         g.updatePlayer(pov.color, _ offerRematch)
       }
     } inject List(Event.ReloadOwner)
@@ -86,7 +86,7 @@ private[round] final class Rematcher(messenger: Messenger,
   private def returnGame(pov: Pov): Fu[Game] =
     for {
       initialFen <- GameRepo initialFen pov.game
-      situation = initialFen flatMap Forsyth.<<<
+      situation = initialFen.flatMap(Forsyth.<<<)
       pieces = pov.game.variant match {
         case Chess960 =>
           if (rematch960Cache.get(pov.game.id)) Chess960.pieces
@@ -102,7 +102,7 @@ private[round] final class Rematcher(messenger: Messenger,
           board = Board(pieces, variant = pov.game.variant).withCastles {
             situation.fold(Castles.init)(_.situation.board.history.castles)
           },
-          clock = pov.game.clock map (_.reset),
+          clock = pov.game.clock.map(_.reset),
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)
         ),
@@ -134,8 +134,8 @@ private[round] final class Rematcher(messenger: Messenger,
   }
 
   private def redirectEvents(game: Game): Events = {
-    val whiteId = game fullIdOf White
-    val blackId = game fullIdOf Black
+    val whiteId = game.fullIdOf(White)
+    val blackId = game.fullIdOf(Black)
     List(
       Event.RedirectOwner(White, blackId, AnonCookie.json(game, Black)),
       Event.RedirectOwner(Black, whiteId, AnonCookie.json(game, White)),

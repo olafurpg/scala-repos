@@ -361,9 +361,9 @@ private object UpdatableVar {
     // This is safe because observers are compared
     // only from the same counter.
     def compare(a: Party[T], b: Party[T]): Int = {
-      val c1 = a.depth compare b.depth
+      val c1 = a.depth.compare(b.depth)
       if (c1 != 0) return c1
-      a.n compare b.n
+      a.n.compare(b.n)
     }
   }
 }

@@ -119,7 +119,7 @@ object Event {
         check = situation.check,
         threefold = situation.threefoldRepetition,
         promotion = move.promotion.map { Promotion(_, move.dest) },
-        enpassant = (move.capture ifTrue move.enpassant).map {
+        enpassant = (move.capture.ifTrue(move.enpassant)).map {
           Event.Enpassant(_, !move.color)
         },
         castle = move.castle.map {
@@ -186,7 +186,7 @@ object Event {
       if (moves.isEmpty) JsNull
       else
         moves.foldLeft(JsObject(Nil)) {
-          case (res, (o, d)) => res + (o.key, JsString(d map (_.key) mkString))
+          case (res, (o, d)) => res + (o.key, JsString(d.map(_.key) mkString))
         }
   }
 

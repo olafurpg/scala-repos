@@ -31,10 +31,10 @@ object ShowPickled extends Names {
     }
     def readName =
       if (isName) new String(bytes, "UTF-8")
-      else sys.error("%s is no name" format tagName)
+      else sys.error("%s is no name".format(tagName))
     def nameIndex =
       if (hasName) readNat(bytes, 0)
-      else sys.error("%s has no name" format tagName)
+      else sys.error("%s has no name".format(tagName))
 
     def tagName = tag2string(tag)
     override def toString = "%d,%d: %s".format(num, startIndex, tagName)
@@ -51,7 +51,7 @@ object ShowPickled extends Names {
 
   def makeEntryList(buf: PickleBuffer, index: Array[Int]) = {
     val entries =
-      buf.toIndexedSeq.zipWithIndex map {
+      buf.toIndexedSeq.zipWithIndex.map {
         case ((tag, data), num) =>
           PickleBufferEntry(num, index(num), tag, data)
       }
@@ -133,7 +133,7 @@ object ShowPickled extends Names {
 
     def printNameRef() {
       val idx = buf.readNat()
-      val name = entryList nameAt idx
+      val name = entryList.nameAt(idx)
       val toPrint = " %s(%s)".format(idx, name)
 
       out print toPrint
@@ -155,7 +155,7 @@ object ShowPickled extends Names {
       val pflags = buf.readLongNat()
       def printFlags(privateWithin: Option[Int]) = {
         val accessBoundary = (for (idx <- privateWithin) yield {
-          val s = entryList nameAt idx
+          val s = entryList.nameAt(idx)
           idx + "(" + s + ")"
         })
         val flagString = {
@@ -270,7 +270,7 @@ object ShowPickled extends Names {
           "BAD ENTRY END: computed = %d, actual = %d, bytes = %s".format(
             end,
             buf.readIndex,
-            buf.bytes.slice(index(i), (end max buf.readIndex)).mkString(", ")
+            buf.bytes.slice(index(i), (end.max(buf.readIndex))).mkString(", ")
           ))
       }
     }
@@ -294,7 +294,7 @@ object ShowPickled extends Names {
   }
 
   def main(args: Array[String]) {
-    args foreach { arg =>
+    args.foreach { arg =>
       fromFile(arg) match {
         case Some(pb) => show(arg + ":", pb)
         case _ => Console.println("Cannot read " + arg)

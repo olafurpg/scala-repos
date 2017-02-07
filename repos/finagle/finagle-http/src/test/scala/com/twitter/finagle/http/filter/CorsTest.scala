@@ -17,7 +17,7 @@ class CorsTest extends FlatSpec with MustMatchers {
     } else {
       response.status = Status.MethodNotAllowed
     }
-    Future value response
+    Future.value(response)
   }
 
   val policy = Cors.Policy(
@@ -38,7 +38,7 @@ class CorsTest extends FlatSpec with MustMatchers {
   )
 
   val corsFilter = new Cors.HttpFilter(policy)
-  val service = corsFilter andThen underlying
+  val service = corsFilter.andThen(underlying)
 
   "Cors.HttpFilter" should "handle preflight requests" in {
     val request = Request()
@@ -46,7 +46,7 @@ class CorsTest extends FlatSpec with MustMatchers {
     request.headers.set("Origin", "thestreet")
     request.headers.set("Access-Control-Request-Method", "BRR")
 
-    val response = Await result service(request)
+    val response = Await.result(service(request))
     response.headerMap.get("Access-Control-Allow-Origin") must be(
       Some("thestreet"))
     response.headerMap.get("Access-Control-Allow-Credentials") must be(
@@ -63,7 +63,7 @@ class CorsTest extends FlatSpec with MustMatchers {
     val request = Request()
     request.method = Method.Options
 
-    val response = Await result service(request)
+    val response = Await.result(service(request))
     response.status must be(Status.Ok)
     response.headerMap.get("Access-Control-Allow-Origin") must be(None)
     response.headerMap.get("Access-Control-Allow-Credentials") must be(None)
@@ -77,7 +77,7 @@ class CorsTest extends FlatSpec with MustMatchers {
     request.method = Method.Options
     request.headers.set("Origin", "theclub")
 
-    val response = Await result service(request)
+    val response = Await.result(service(request))
     response.status must be(Status.Ok)
     response.headerMap.get("Access-Control-Allow-Origin") must be(None)
     response.headerMap.get("Access-Control-Allow-Credentials") must be(None)
@@ -91,7 +91,7 @@ class CorsTest extends FlatSpec with MustMatchers {
     request.method = TRAP
     request.headers.set("Origin", "juughaus")
 
-    val response = Await result service(request)
+    val response = Await.result(service(request))
     response.headerMap.get("Access-Control-Allow-Origin") must be(
       Some("juughaus"))
     response.headerMap.get("Access-Control-Allow-Credentials") must be(
@@ -106,7 +106,7 @@ class CorsTest extends FlatSpec with MustMatchers {
     val request = Request()
     request.method = TRAP
 
-    val response = Await result service(request)
+    val response = Await.result(service(request))
     response.headerMap.get("Access-Control-Allow-Origin") must be(None)
     response.headerMap.get("Access-Control-Allow-Credentials") must be(None)
     response.headerMap.get("Access-Control-Expose-Headers") must be(None)

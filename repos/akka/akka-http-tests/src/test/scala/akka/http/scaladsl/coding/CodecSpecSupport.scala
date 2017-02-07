@@ -14,7 +14,7 @@ import scala.concurrent.Await
 trait CodecSpecSupport extends Matchers with BeforeAndAfterAll { self: Suite ⇒
 
   def readAs(string: String, charset: String = "UTF8") =
-    equal(string).matcher[String] compose {
+    equal(string).matcher[String].compose {
       (_: ByteString).decodeString(charset)
     }
   def hexDump(bytes: ByteString) = bytes.map("%02x".format(_)).mkString

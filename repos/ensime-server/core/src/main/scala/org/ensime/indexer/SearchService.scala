@@ -182,7 +182,7 @@ class SearchService(
         Future {
           blocking {
             val vJar = vfs.vjar(jar)
-            try scan(vJar) flatMap (extractSymbols(jar, _))
+            try scan(vJar).flatMap(extractSymbols(jar, _))
             finally vfs.nuke(vJar)
           }
         }
@@ -256,13 +256,13 @@ class SearchService(
   /** free-form search for classes */
   def searchClasses(query: String, max: Int): List[FqnSymbol] = {
     val fqns = index.searchClasses(query, max)
-    Await.result(db.find(fqns), QUERY_TIMEOUT) take max
+    Await.result(db.find(fqns), QUERY_TIMEOUT).take(max)
   }
 
   /** free-form search for classes and methods */
   def searchClassesMethods(terms: List[String], max: Int): List[FqnSymbol] = {
     val fqns = index.searchClassesMethods(terms, max)
-    Await.result(db.find(fqns), QUERY_TIMEOUT) take max
+    Await.result(db.find(fqns), QUERY_TIMEOUT).take(max)
   }
 
   /** only for exact fqns */

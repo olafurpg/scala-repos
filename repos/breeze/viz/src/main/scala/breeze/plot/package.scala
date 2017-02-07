@@ -213,7 +213,8 @@ package object plot {
         counts(binner.bin(value)) += 1
       }
 
-      val width = (binner.splits.iterator zip binner.splits.iterator.drop(1))
+      val width = (binner.splits.iterator
+        .zip(binner.splits.iterator.drop(1)))
         .map(tup => tup._2 - tup._1)
         .min
 

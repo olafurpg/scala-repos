@@ -37,7 +37,7 @@ class HttpEventStreamActorTest
     streamActor ! HttpEventStreamConnectionOpen(handle)
 
     Then("An actor is created and subscribed to the event stream")
-    streamActor.underlyingActor.streamHandleActors should have size 1
+    (streamActor.underlyingActor.streamHandleActors should have).size(1)
     streamActor.underlyingActor.streamHandleActors.get(handle) should be(
       'nonEmpty)
   }
@@ -59,7 +59,7 @@ class HttpEventStreamActorTest
     Then("All handler actors are stopped and the connection is closed")
     val terminated = expectMsgClass(1.second, classOf[Terminated])
     terminated.getActor should be(handleActor)
-    streamActor.underlyingActor.streamHandleActors should have size 0
+    (streamActor.underlyingActor.streamHandleActors should have).size(0)
     streamActor.underlyingActor.streamHandleActors.get(handle) should be(
       'empty)
     verify(handle).close()
@@ -74,7 +74,7 @@ class HttpEventStreamActorTest
     streamActor ! HttpEventStreamConnectionOpen(handle)
 
     Then("The connection is immediately closed without creating an actor")
-    streamActor.underlyingActor.streamHandleActors should have size 0
+    (streamActor.underlyingActor.streamHandleActors should have).size(0)
     streamActor.underlyingActor.streamHandleActors.get(handle) should be(
       'empty)
     verify(handle).close()
@@ -87,13 +87,13 @@ class HttpEventStreamActorTest
     call(handle.id).thenReturn("1")
     streamActor ! LocalLeadershipEvent.ElectedAsLeader
     streamActor ! HttpEventStreamConnectionOpen(handle)
-    streamActor.underlyingActor.streamHandleActors should have size 1
+    (streamActor.underlyingActor.streamHandleActors should have).size(1)
 
     When("A connection closed message is sent to the stream actor")
     streamActor ! HttpEventStreamConnectionClosed(handle)
 
     Then("The actor is unsubscribed from the event stream")
-    streamActor.underlyingActor.streamHandleActors should have size 0
+    (streamActor.underlyingActor.streamHandleActors should have).size(0)
   }
 
   var streamActor: TestActorRef[HttpEventStreamActor] = _

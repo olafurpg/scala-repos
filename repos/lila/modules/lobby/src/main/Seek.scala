@@ -22,16 +22,17 @@ case class Seek(_id: String,
 
   def id = _id
 
-  val realColor = Color orDefault color
+  val realColor = Color.orDefault(color)
 
-  val realVariant = chess.variant.Variant orDefault variant
+  val realVariant = chess.variant.Variant.orDefault(variant)
 
-  val realMode = Mode orDefault mode
+  val realMode = Mode.orDefault(mode)
 
   def compatibleWith(h: Seek) =
     user.id != h.user.id &&
       compatibilityProperties == h.compatibilityProperties &&
-      (realColor compatibleWith h.realColor) && ratingRangeCompatibleWith(h) &&
+      (realColor
+        .compatibleWith(h.realColor)) && ratingRangeCompatibleWith(h) &&
       h.ratingRangeCompatibleWith(this)
 
   private def ratingRangeCompatibleWith(h: Seek) = realRatingRange.fold(true) {
@@ -44,7 +45,7 @@ case class Seek(_id: String,
   lazy val realRatingRange: Option[RatingRange] =
     RatingRange noneIfDefault ratingRange
 
-  def rating = perfType map (_.key) flatMap user.ratingMap.get
+  def rating = perfType.map(_.key).flatMap(user.ratingMap.get)
 
   def render: JsObject = Json.obj(
     "id" -> _id,

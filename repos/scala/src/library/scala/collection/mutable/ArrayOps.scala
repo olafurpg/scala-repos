@@ -101,7 +101,7 @@ trait ArrayOps[T]
     else {
       def mkRowBuilder() =
         Array.newBuilder(ClassTag[U](arrayElementClass(elementClass)))
-      val bs = asArray(head) map (_ => mkRowBuilder())
+      val bs = asArray(head).map(_ => mkRowBuilder())
       for (xs <- this) {
         var i = 0
         for (x <- asArray(xs)) {

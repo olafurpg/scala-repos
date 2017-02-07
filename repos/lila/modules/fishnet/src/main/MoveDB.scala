@@ -33,7 +33,7 @@ private final class MoveDB {
       if (m.nonAcquired)
         Some {
           acc.fold(m) { a =>
-            if (m.createdAt isBefore a.createdAt) m else a
+            if (m.createdAt.isBefore(a.createdAt)) m else a
           }
         } else acc
   }

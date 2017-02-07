@@ -35,25 +35,25 @@ private[round] final class SocketHandler(roundMap: ActorRef,
 
     member.playerIdOption.fold[Handler.Controller]({
       case ("p", o) =>
-        o int "v" foreach { v =>
+        (o int "v").foreach { v =>
           socket ! PingVersion(uid, v)
         }
       case ("talk", o) =>
-        o str "d" foreach { text =>
+        o.str("d").foreach { text =>
           messenger.watcher(gameId, member, text, socket)
         }
       case ("outoftime", _) => send(Outoftime)
     }) { playerId =>
       {
         case ("p", o) =>
-          o int "v" foreach { v =>
+          (o int "v").foreach { v =>
             socket ! PingVersion(uid, v)
           }
         case ("move", o) =>
-          parseMove(o) foreach {
+          parseMove(o).foreach {
             case (move, blur, lag) =>
               val promise = Promise[Unit]
-              promise.future onFailure {
+              promise.future.onFailure {
                 case _: Exception => socket ! Resync(uid)
               }
               send(
@@ -64,14 +64,14 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                   lag.millis,
                   promise.some
                 ))
-              member push ackEvent
+              member.push(ackEvent)
           }
         case ("drop", o) =>
-          parseDrop(o) foreach {
+          parseDrop(o).foreach {
             case (drop, blur, lag) =>
-              member push ackEvent
+              member.push(ackEvent)
               val promise = Promise[Unit]
-              promise.future onFailure {
+              promise.future.onFailure {
                 case _: Exception => socket ! Resync(uid)
               }
               send(
@@ -98,17 +98,17 @@ private[round] final class SocketHandler(roundMap: ActorRef,
         case ("outoftime", _) => send(Outoftime)
         case ("bye", _) => socket ! Bye(ref.color)
         case ("talk", o) =>
-          o str "d" foreach { text =>
+          o.str("d").foreach { text =>
             messenger.owner(gameId, member, text, socket)
           }
         case ("hold", o) =>
           for {
-            d ← o obj "d"
+            d ← o.obj("d")
             mean ← d int "mean"
             sd ← d int "sd"
           } send(HoldAlert(playerId, mean, sd, member.ip))
         case ("berserk", _) =>
-          member.userId foreach { userId =>
+          member.userId.foreach { userId =>
             hub.actor.tournamentApi ! Berserk(gameId, userId)
           }
       }
@@ -121,8 +121,8 @@ private[round] final class SocketHandler(roundMap: ActorRef,
               user: Option[User],
               ip: String,
               userTv: Option[String]): Fu[Option[JsSocketHandler]] =
-    GameRepo.pov(gameId, colorName) flatMap {
-      _ ?? { join(_, none, uid, "", user, ip, userTv = userTv) map some }
+    GameRepo.pov(gameId, colorName).flatMap {
+      _ ?? { join(_, none, uid, "", user, ip, userTv = userTv).map(some) }
     }
 
   def player(pov: Pov,
@@ -145,8 +145,8 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                     playerId = playerId,
                     ip = ip,
                     userTv = userTv)
-    socketHub ? Get(pov.gameId) mapTo manifest[ActorRef] flatMap { socket =>
-      Handler(hub, socket, uid, join, user map (_.id)) {
+    (socketHub ? Get(pov.gameId)).mapTo(manifest[ActorRef]).flatMap { socket =>
+      Handler(hub, socket, uid, join, user.map(_.id)) {
         case Connected(enum, member) =>
           (controller(pov.gameId, socket, uid, pov.ref, member), enum, member)
       }
@@ -155,10 +155,10 @@ private[round] final class SocketHandler(roundMap: ActorRef,
 
   private def parseMove(o: JsObject) =
     for {
-      d ← o obj "d"
-      orig ← d str "from"
-      dest ← d str "to"
-      prom = d str "promotion"
+      d ← o.obj("d")
+      orig ← d.str("from")
+      dest ← d.str("to")
+      prom = d.str("promotion")
       move <- Uci.Move.fromStrings(orig, dest, prom)
       blur = (d int "b") == Some(1)
       lag = d int "lag"
@@ -166,9 +166,9 @@ private[round] final class SocketHandler(roundMap: ActorRef,
 
   private def parseDrop(o: JsObject) =
     for {
-      d ← o obj "d"
-      role ← d str "role"
-      pos ← d str "pos"
+      d ← o.obj("d")
+      role ← d.str("role")
+      pos ← d.str("pos")
       drop <- Uci.Drop.fromStrings(role, pos)
       blur = (d int "b") == Some(1)
       lag = d int "lag"

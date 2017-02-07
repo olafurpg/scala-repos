@@ -48,7 +48,7 @@ object Test extends ScaladocModelTest {
 
     def check(memberDef: Def, expected: Int) {
       val externals =
-        memberDef.valueParams(0)(0).resultType.refEntity collect {
+        memberDef.valueParams(0)(0).resultType.refEntity.collect {
           case (_, (LinkToExternal(name, url), _)) =>
             assert(url.contains(scalaURL)); name
         }

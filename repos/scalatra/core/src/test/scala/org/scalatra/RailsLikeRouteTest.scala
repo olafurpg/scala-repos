@@ -8,7 +8,7 @@ class RailsLikeRouteTestServlet extends ScalatraServlet {
 
   // This syntax wouldn't work in Sinatra
   get("/:file(.:ext)") {
-    List("file", "ext") foreach { param =>
+    List("file", "ext").foreach { param =>
       response.addHeader(param, params.getOrElse(param, ""))
     }
   }

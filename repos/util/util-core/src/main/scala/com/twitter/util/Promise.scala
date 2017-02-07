@@ -536,21 +536,21 @@ class Promise[A]
         p.detach(k)
 
       case s @ Interruptible(waitq, handler) =>
-        if (!cas(s, Interruptible(waitq filterNot (_ eq k), handler)))
+        if (!cas(s, Interruptible(waitq.filterNot(_ eq k), handler)))
           detach(k)
         else waitq.contains(k)
 
       case s @ Transforming(waitq, other) =>
-        if (!cas(s, Transforming(waitq filterNot (_ eq k), other))) detach(k)
+        if (!cas(s, Transforming(waitq.filterNot(_ eq k), other))) detach(k)
         else waitq.contains(k)
 
       case s @ Interrupted(waitq, intr) =>
-        if (!cas(s, Interrupted(waitq filterNot (_ eq k), intr))) detach(k)
+        if (!cas(s, Interrupted(waitq.filterNot(_ eq k), intr))) detach(k)
         else waitq.contains(k)
 
       case s @ Waiting(first, rest) =>
         val waitq = if (first eq null) rest else first :: rest
-        val next = (waitq filterNot (_ eq k)) match {
+        val next = (waitq.filterNot(_ eq k)) match {
           case Nil => initState[A]
           case head :: tail => Waiting(head, tail)
         }

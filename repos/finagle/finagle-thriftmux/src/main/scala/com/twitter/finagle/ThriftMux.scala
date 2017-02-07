@@ -116,7 +116,7 @@ object ThriftMux
     }
 
     override def make(next: ServiceFactory[mux.Request, mux.Response]) =
-      rpcTracer andThen super.make(next)
+      rpcTracer.andThen(super.make(next))
   }
 
   case class Client(
@@ -216,12 +216,12 @@ object ThriftMux
 
     def newService(dest: Name,
                    label: String): Service[ThriftClientRequest, Array[Byte]] =
-      ThriftMuxToMux andThen deserializingClassifier.newService(dest, label)
+      ThriftMuxToMux.andThen(deserializingClassifier.newService(dest, label))
 
     def newClient(
         dest: Name,
         label: String): ServiceFactory[ThriftClientRequest, Array[Byte]] =
-      ThriftMuxToMux andThen deserializingClassifier.newClient(dest, label)
+      ThriftMuxToMux.andThen(deserializingClassifier.newClient(dest, label))
 
     // Java-friendly forwarders
     // See https://issues.scala-lang.org/browse/SI-8905
@@ -383,7 +383,7 @@ object ThriftMux
             service: Service[Array[Byte], Array[Byte]]
         ): Future[mux.Response] = {
           val reqBytes = Buf.ByteArray.Owned.extract(request.body)
-          service(reqBytes) map { repBytes =>
+          service(reqBytes).map { repBytes =>
             mux.Response(Buf.ByteArray.Owned(repBytes))
           }
         }

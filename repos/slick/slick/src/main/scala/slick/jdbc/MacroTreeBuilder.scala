@@ -18,7 +18,7 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
     //Deconstruct macro application to determine the passed string and the actual parameters
     val Apply(Select(Apply(_, List(Apply(_, strArg))), _), paramList) =
       c.macroApplication
-    strArg map {
+    strArg.map {
       case Literal(Constant(x: String)) => x
       case _ =>
         abort("The interpolation contained something other than constants...")
@@ -33,7 +33,7 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
   private def createClassTreeFromString(classString: String,
                                         generator: String => Name): Tree = {
     val tokens = classString.split('.').toList
-    val packages = tokens.dropRight(1) map (TermName(_))
+    val packages = tokens.dropRight(1).map(TermName(_))
     val classType = generator(tokens.last)
     val firstPackage = Ident(termNames.ROOTPKG)
     val others = (packages :+ classType)
@@ -112,7 +112,7 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
           }
         }
         val zero = Select(HeterogenousTree, TermName("HNil"))
-        val zipped = (0 until n) zip resultTypeTrees
+        val zipped = ((0 until n)).zip(resultTypeTrees)
         val << = Select(Ident(TermName("p")), TermName("$less$less"))
         Apply(
           TypeApply(
@@ -225,12 +225,12 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                          EmptyTree)
                 ),
                 Block(
-                  remaining.toList map
-                    (sp =>
-                       Apply(
-                         Select(sp.tree, TermName("apply")),
-                         List(Ident(TermName("u")), Ident(TermName("pp")))
-                       )),
+                  remaining.toList.map(
+                    sp =>
+                      Apply(
+                        Select(sp.tree, TermName("apply")),
+                        List(Ident(TermName("u")), Ident(TermName("pp")))
+                    )),
                   Literal(Constant(()))
                 )
               )

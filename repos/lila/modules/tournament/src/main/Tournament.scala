@@ -35,12 +35,12 @@ case class Tournament(id: String,
     else if (scheduled && clock.hasIncrement) s"$name Inc $system"
     else s"$name $system"
 
-  def isMarathon = schedule.map(_.freq) exists {
+  def isMarathon = schedule.map(_.freq).exists {
     case Schedule.Freq.ExperimentalMarathon | Schedule.Freq.Marathon => true
     case _ => false
   }
 
-  def isUnique = schedule.map(_.freq) exists (Schedule.Freq.Unique ==)
+  def isUnique = schedule.map(_.freq).exists(Schedule.Freq.Unique ==)
 
   def isMarathonOrUnique = isMarathon || isUnique
 
@@ -48,11 +48,11 @@ case class Tournament(id: String,
 
   def finishesAt = startsAt plusMinutes minutes
 
-  def hasWaitedEnough = startsAt isBefore DateTime.now
+  def hasWaitedEnough = startsAt.isBefore(DateTime.now)
 
-  def secondsToStart = (startsAt.getSeconds - nowSeconds).toInt max 0
+  def secondsToStart = (startsAt.getSeconds - nowSeconds).toInt.max(0)
 
-  def secondsToFinish = (finishesAt.getSeconds - nowSeconds).toInt max 0
+  def secondsToFinish = (finishesAt.getSeconds - nowSeconds).toInt.max(0)
 
   def isAlmostFinished =
     secondsToFinish < math.max(30, math.min(clock.limit / 2, 120))
@@ -67,10 +67,10 @@ case class Tournament(id: String,
 
   def interval = new Interval(startsAt, finishesAt)
 
-  def overlaps(other: Tournament) = interval overlaps other.interval
+  def overlaps(other: Tournament) = interval.overlaps(other.interval)
 
   def similarTo(other: Tournament) = (schedule, other.schedule) match {
-    case (Some(s1), Some(s2)) if s1 similarTo s2 => true
+    case (Some(s1), Some(s2)) if s1.similarTo(s2) => true
     case _ => false
   }
 
@@ -92,11 +92,13 @@ case class Tournament(id: String,
   }
 
   def spotlightedNow =
-    spotlight.filter { s =>
-      !isFinished && s.homepageHours.?? { hours =>
-        startsAt.minusHours(hours) isBefore DateTime.now
+    spotlight
+      .filter { s =>
+        !isFinished && s.homepageHours.?? { hours =>
+          startsAt.minusHours(hours).isBefore(DateTime.now)
+        }
       }
-    } map { this -> _ }
+      .map { this -> _ }
 }
 
 case class EnterableTournaments(tours: List[Tournament],
@@ -142,7 +144,7 @@ object Tournament {
       name = sched.name,
       status = Status.Created,
       system = System.default,
-      clock = Schedule clockFor sched,
+      clock = Schedule.clockFor(sched),
       minutes = minutes,
       createdBy = "lichess",
       createdAt = DateTime.now,

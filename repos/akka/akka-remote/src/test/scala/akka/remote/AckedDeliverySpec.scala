@@ -96,7 +96,7 @@ class AckedDeliverySpec extends AkkaSpec {
         .buffer(msg(3))
 
       intercept[ResendBufferCapacityReachedException] {
-        buffer buffer msg(4)
+        buffer.buffer(msg(4))
       }
     }
 
@@ -268,7 +268,7 @@ class AckedDeliverySpec extends AkkaSpec {
       val MsgCount = 1000
       val DeliveryProbability = 0.5
       val referenceList: Seq[Sequenced] =
-        (0 until MsgCount).toSeq map { i ⇒
+        (0 until MsgCount).toSeq.map { i ⇒
           msg(i.toLong)
         }
 
@@ -291,7 +291,7 @@ class AckedDeliverySpec extends AkkaSpec {
             tmp
           } else Seq.empty[Sequenced]
 
-        (resends ++ sends) foreach { msg ⇒
+        ((resends ++ sends)).foreach { msg ⇒
           if (sends.contains(msg)) sndBuf = sndBuf.buffer(msg)
           if (happened(p)) {
             val (updatedRcvBuf, delivers, ack) =

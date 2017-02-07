@@ -58,7 +58,7 @@ object SimpleType {
         val tupleMarker = builder.mark
         builder.advanceLexer()
         builder.disableNewlines
-        val (_, isTuple) = Types parse builder
+        val (_, isTuple) = Types.parse(builder)
         builder.getTokenType match {
           case ScalaTokenTypes.tCOMMA =>
             builder.advanceLexer() //Ate ,
@@ -71,7 +71,7 @@ object SimpleType {
                   tupleMarker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
                 }
               case _ =>
-                builder error ScalaBundle.message("rparenthesis.expected")
+                builder.error(ScalaBundle.message("rparenthesis.expected"))
                 if (isTuple) tupleMarker.done(ScalaElementTypes.TUPLE_TYPE)
                 else tupleMarker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
             }
@@ -80,7 +80,7 @@ object SimpleType {
             if (isTuple) tupleMarker.done(ScalaElementTypes.TUPLE_TYPE)
             else tupleMarker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
           case _ =>
-            builder error ScalaBundle.message("rparenthesis.expected")
+            builder.error(ScalaBundle.message("rparenthesis.expected"))
             if (isTuple) tupleMarker.done(ScalaElementTypes.TUPLE_TYPE)
             else tupleMarker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
         }
@@ -88,7 +88,7 @@ object SimpleType {
       case ScalaTokenTypes.kTHIS | ScalaTokenTypes.tIDENTIFIER |
           ScalaTokenTypes.kSUPER =>
         val newMarker = builder.mark
-        Path parse (builder, ScalaElementTypes.REFERENCE)
+        Path.parse(builder, ScalaElementTypes.REFERENCE)
         builder.getTokenType match {
           case ScalaTokenTypes.tDOT =>
             builder.advanceLexer() //Ate .
@@ -99,13 +99,13 @@ object SimpleType {
               case _ =>
                 newMarker.rollbackTo()
                 val fMarker = builder.mark
-                StableId parse (builder, ScalaElementTypes.REFERENCE)
+                StableId.parse(builder, ScalaElementTypes.REFERENCE)
                 fMarker.done(ScalaElementTypes.SIMPLE_TYPE)
             }
           case _ =>
             newMarker.rollbackTo()
             val fMarker = builder.mark
-            StableId parse (builder, ScalaElementTypes.REFERENCE)
+            StableId.parse(builder, ScalaElementTypes.REFERENCE)
             fMarker.done(ScalaElementTypes.SIMPLE_TYPE)
         }
       case _ =>

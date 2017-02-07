@@ -124,7 +124,7 @@ abstract class CurrencyZone {
                                         java.math.BigDecimal.ROUND_HALF_UP)))
     def /(that: Int): Currency = this / make(that)
 
-    def compare(that: Currency) = this.amount compare that.amount
+    def compare(that: Currency) = this.amount.compare(that.amount)
 
     override def equals(that: Any) = that match {
       case that: AbstractCurrency =>

@@ -97,20 +97,23 @@ object Status {
     extractorV[Status](schemaV1, Some("1.0".v))
 
   def fromMessage(message: Message): Option[Status] = {
-    (message.channel == channels.Status) option {
-      ((message.value \ "message").validated[String] |@|
-        (message.value \ "progress").validated[BigDecimal] |@|
-        (message.value \ "unit").validated[String]) { (msg, progress, unit) =>
-        Status(message.job,
-               message.id,
-               msg,
-               progress,
-               unit,
-               message.value \? "info")
+    ((message.channel == channels.Status))
+      .option {
+        ((message.value \ "message").validated[String] |@|
+          (message.value \ "progress").validated[BigDecimal] |@|
+          (message.value \ "unit").validated[String]) {
+          (msg, progress, unit) =>
+            Status(message.job,
+                   message.id,
+                   msg,
+                   progress,
+                   unit,
+                   message.value \? "info")
+        }
       }
-    } flatMap {
-      _.toOption
-    }
+      .flatMap {
+        _.toOption
+      }
   }
 
   def toMessage(status: Status): Message = {
@@ -122,7 +125,7 @@ object Status {
         jfield("message", status.message) :: jfield(
           "progress",
           status.progress) :: jfield("unit", status.unit) ::
-          (status.info map (jfield("info", _) :: Nil) getOrElse Nil)
+          (status.info.map(jfield("info", _) :: Nil).getOrElse(Nil))
       )
     )
   }

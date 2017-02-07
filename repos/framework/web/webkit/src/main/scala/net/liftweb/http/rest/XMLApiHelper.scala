@@ -95,7 +95,7 @@ trait XMLApiHelper {
     * of the root element will be set to the Failure's msg value.
     */
   implicit def canBoolToResponse(in: Box[Boolean]): LiftResponse =
-    buildResponse(in openOr false, in match {
+    buildResponse(in.openOr(false), in match {
       case Failure(msg, _, _) => Full(Text(msg))
       case _ => Empty
     }, <xml:group/>)

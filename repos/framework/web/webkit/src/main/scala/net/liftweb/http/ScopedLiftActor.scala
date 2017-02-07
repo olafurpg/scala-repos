@@ -35,7 +35,7 @@ trait ScopedLiftActor extends LiftActor with LazyLoggable {
     * in the scope of a request
     */
   protected val _session: LiftSession =
-    S.session openOr new LiftSession("", Helpers.nextFuncName, Empty)
+    S.session.openOr(new LiftSession("", Helpers.nextFuncName, Empty))
 
   /**
     * The render version of the page that this was created in the scope of
@@ -67,7 +67,7 @@ trait ScopedLiftActor extends LiftActor with LazyLoggable {
   private def composeFunction_i: PartialFunction[Any, Unit] = {
     // if we're no longer running don't pass messages to the other handlers
     // just pass them to our handlers
-    highPriority orElse mediumPriority orElse lowPriority
+    highPriority.orElse(mediumPriority).orElse(lowPriority)
   }
 
   /**

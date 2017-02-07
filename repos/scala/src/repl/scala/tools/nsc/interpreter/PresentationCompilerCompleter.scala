@@ -41,7 +41,7 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
       val pos1 =
         result.unit.source.position(offset).withEnd(offset + buf.length)
       import result.compiler._
-      val tree = new Locator(pos1) locateIn result.unit.body match {
+      val tree = new Locator(pos1).locateIn(result.unit.body) match {
         case Template(_, _, constructor :: (rest :+ last)) =>
           if (rest.isEmpty) last else Block(rest, last)
         case t => t

@@ -19,7 +19,7 @@ final class A {
   def f2 = true
   @inline def f3 = f1 || f2
   class B {
-    def f() = 1 to 10 foreach (_ => f3)
+    def f() = (1 to 10).foreach(_ => f3)
   }
   def f = (new B).f()
 }

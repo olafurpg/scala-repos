@@ -14,10 +14,10 @@ class OptionallyServableFilterTest extends FunSuite with MockitoSugar {
 
   class OptionnallyServableFilterHelper {
     val underlying = mock[Service[String, String]]
-    when(underlying.close(any)) thenReturn Future.Done
+    when(underlying.close(any)).thenReturn(Future.Done)
 
     val fn = mock[String => Future[Boolean]]
-    val service = new OptionallyServableFilter(fn) andThen underlying
+    val service = new OptionallyServableFilter(fn).andThen(underlying)
     val request = "request"
     val response = Future.value("response")
   }
@@ -26,8 +26,8 @@ class OptionallyServableFilterTest extends FunSuite with MockitoSugar {
     val h = new OptionnallyServableFilterHelper
     import h._
 
-    when(fn.apply(request)) thenReturn Future.value(true)
-    when(underlying(request)) thenReturn response
+    when(fn.apply(request)).thenReturn(Future.value(true))
+    when(underlying(request)).thenReturn(response)
     assert(Await.result(service(request)) == Await.result(response))
 
     verify(fn).apply(request)
@@ -38,7 +38,7 @@ class OptionallyServableFilterTest extends FunSuite with MockitoSugar {
     val h = new OptionnallyServableFilterHelper
     import h._
 
-    when(fn.apply(request)) thenReturn Future.value(false)
+    when(fn.apply(request)).thenReturn(Future.value(false))
 
     intercept[NotServableException] {
       Await.result(service(request))

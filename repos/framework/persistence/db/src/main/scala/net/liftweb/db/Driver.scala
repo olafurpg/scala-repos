@@ -128,7 +128,7 @@ abstract class DriverType(val name: String) {
     * mapping for columns should override the customColumnTypeMap method.
     */
   def columnTypeMap: TypeMapFunc =
-    customColumnTypeMap orElse {
+    customColumnTypeMap.orElse {
       case x => x
     }
 

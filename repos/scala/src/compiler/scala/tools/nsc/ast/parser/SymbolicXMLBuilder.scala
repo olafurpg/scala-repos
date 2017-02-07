@@ -150,7 +150,7 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
   // create scala.xml.Text here <: scala.xml.Node
   final def text(pos: Position, txt: String): Tree = atPos(pos) {
     val t = if (isPattern) makeTextPat(const(txt)) else makeText1(const(txt))
-    if (coalescing) t updateAttachment TextAttache(pos, txt) else t
+    if (coalescing) t.updateAttachment(TextAttache(pos, txt)) else t
   }
 
   def makeTextPat(txt: Tree) = Apply(_scala_xml__Text, List(txt))
@@ -192,7 +192,7 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
     case _ => t
   }
   protected def convertToTextPat(buf: Seq[Tree]): List[Tree] =
-    (buf map convertToTextPat).toList
+    (buf.map(convertToTextPat)).toList
 
   def parseAttribute(pos: Position, s: String): Tree = {
     import xml.Utility.parseAttributeValue
@@ -214,8 +214,9 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
     val buffer =
       ValDef(NoMods, _buf, TypeTree(), New(_scala_xml_NodeBuffer, ListOfNil))
     val applies =
-      args filterNot isEmptyText map
-        (t => Apply(Select(Ident(_buf), _plus), List(t)))
+      args
+        .filterNot(isEmptyText)
+        .map(t => Apply(Select(Ident(_buf), _plus), List(t)))
 
     atPos(pos)(Block(buffer :: applies.toList, Ident(_buf)))
   }
@@ -264,7 +265,7 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
 
     /* Extract all the namespaces from the attribute map. */
     val namespaces: List[Tree] =
-      for (z <- attrMap.keys.toList; if z startsWith "xmlns") yield {
+      for (z <- attrMap.keys.toList; if z.startsWith("xmlns")) yield {
         val ns = splitPrefix(z) match {
           case (Some(_), rest) => rest
           case _ => null

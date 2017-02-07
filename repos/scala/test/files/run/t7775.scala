@@ -15,7 +15,7 @@ object Test extends App {
       case (k, v) => assert(k != null && v != null, fail(i))
     }
   }
-  probe onComplete {
+  probe.onComplete {
     case _ => done = true
   }
 

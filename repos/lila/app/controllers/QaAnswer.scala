@@ -16,10 +16,9 @@ object QaAnswer extends QaController {
       forms.answer.bindFromRequest.fold(
         err => renderQuestion(q, Some(err)),
         data =>
-          api.answer.create(data, q, me) map { answer =>
-            Redirect(
-              routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
-                answer.id)
+          api.answer.create(data, q, me).map { answer =>
+            Redirect(routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
+              answer.id)
         }
       )
     }
@@ -27,12 +26,14 @@ object QaAnswer extends QaController {
 
   def accept(questionId: QuestionId, answerId: AnswerId) = AuthBody {
     implicit ctx => me =>
-      (api.question findById questionId) zip (api.answer findById answerId) flatMap {
-        case (Some(q), Some(a)) if (QaAuth canEdit q) =>
-          api.answer.accept(q, a) inject Redirect(
-            routes.QaQuestion.show(q.id, q.slug))
-        case _ => notFound
-      }
+      ((api.question findById questionId))
+        .zip(api.answer findById answerId)
+        .flatMap {
+          case (Some(q), Some(a)) if (QaAuth.canEdit(q)) =>
+            api.answer.accept(q, a) inject Redirect(
+              routes.QaQuestion.show(q.id, q.slug))
+          case _ => notFound
+        }
   }
 
   def vote(questionId: QuestionId, answerId: AnswerId) = AuthBody {
@@ -41,7 +42,7 @@ object QaAnswer extends QaController {
       forms.vote.bindFromRequest.fold(
         err => fuccess(BadRequest),
         v =>
-          api.answer.vote(answerId, me, v == 1) map {
+          api.answer.vote(answerId, me, v == 1).map {
             case Some(vote) =>
               Ok(
                 html.qa.vote(routes.QaAnswer.vote(questionId, answerId).url,
@@ -59,12 +60,11 @@ object QaAnswer extends QaController {
         forms.editAnswer.bindFromRequest.fold(
           err => renderQuestion(q),
           body =>
-            api.answer.edit(body, a.id) map {
+            api.answer.edit(body, a.id).map {
               case None => NotFound
               case Some(a2) =>
-                Redirect(
-                  routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
-                    a2.id)
+                Redirect(routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
+                  a2.id)
           }
         )
       }
@@ -73,7 +73,7 @@ object QaAnswer extends QaController {
   def remove(questionId: QuestionId, answerId: AnswerId) =
     Secure(_.ModerateQa) { implicit ctx => me =>
       OptionFuRedirect(api.answer findById answerId) { a =>
-        (api.answer remove a.id) >> Env.mod.logApi.deleteQaAnswer(
+        (api.answer.remove(a.id)) >> Env.mod.logApi.deleteQaAnswer(
           me.id,
           a.userId,
           a.body) inject routes.QaQuestion.show(questionId, "redirect")

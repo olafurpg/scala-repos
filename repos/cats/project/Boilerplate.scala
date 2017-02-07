@@ -15,8 +15,8 @@ object Boilerplate {
   implicit final class BlockHelper(val sc: StringContext) extends AnyVal {
     def block(args: Any*): String = {
       val interpolated = sc.standardInterpolator(treatEscapes, args)
-      val rawLines = interpolated split '\n'
-      val trimmedLines = rawLines map { _ dropWhile (_.isWhitespace) }
+      val rawLines = interpolated.split('\n')
+      val trimmedLines = rawLines.map { _.dropWhile(_.isWhitespace) }
       trimmedLines mkString "\n"
     }
   }
@@ -40,10 +40,10 @@ object Boilerplate {
   val maxArity = 22
 
   final class TemplateVals(val arity: Int) {
-    val synTypes = (0 until arity) map (n => s"A$n")
-    val synVals = (0 until arity) map (n => s"a$n")
+    val synTypes = ((0 until arity)).map(n => s"A$n")
+    val synVals = ((0 until arity)).map(n => s"a$n")
     val synTypedVals =
-      (synVals zip synTypes) map { case (v, t) => v + ":" + t }
+      (synVals.zip(synTypes)).map { case (v, t) => v + ":" + t }
     val `A..N` = synTypes.mkString(", ")
     val `a..n` = synVals.mkString(", ")
     val `_.._` = Seq.fill(arity)("_").mkString(", ")
@@ -62,17 +62,19 @@ object Boilerplate {
     def content(tv: TemplateVals): String
     def range = 1 to maxArity
     def body: String = {
-      val headerLines = header split '\n'
+      val headerLines = header.split('\n')
       val rawContents =
-        range map { n =>
-          content(new TemplateVals(n)) split '\n' filterNot (_.isEmpty)
+        range.map { n =>
+          content(new TemplateVals(n)).split('\n').filterNot(_.isEmpty)
         }
-      val preBody = rawContents.head takeWhile (_ startsWith "|") map (_.tail)
+      val preBody = rawContents.head.takeWhile(_.startsWith("|")).map(_.tail)
       val instances =
-        rawContents flatMap { _ filter (_ startsWith "-") map (_.tail) }
+        rawContents.flatMap { _.filter(_.startsWith("-")).map(_.tail) }
       val postBody =
-        rawContents.head dropWhile (_ startsWith "|") dropWhile
-          (_ startsWith "-") map (_.tail)
+        rawContents.head
+          .dropWhile(_.startsWith("|"))
+          .dropWhile(_.startsWith("-"))
+          .map(_.tail)
       (headerLines ++ preBody ++ instances ++ postBody) mkString "\n"
     }
   }
@@ -100,12 +102,12 @@ object Boilerplate {
       import tv._
 
       val tpes =
-        synTypes map { tpe =>
+        synTypes.map { tpe =>
           s"F[$tpe]"
         }
       val tpesString = synTypes mkString ", "
       val params =
-        (synVals zip tpes) map { case (v, t) => s"$v:$t" } mkString ", "
+        (synVals.zip(tpes)).map { case (v, t) => s"$v:$t" } mkString ", "
       val next =
         if (arity + 1 <= maxArity) {
           s"def |@|[Z](z: F[Z]) = new CartesianBuilder${arity + 1}(${`a..n`}, z)"
@@ -169,28 +171,28 @@ object Boilerplate {
       import tv._
 
       val tpes =
-        synTypes map { tpe =>
+        synTypes.map { tpe =>
           s"F[$tpe]"
         }
-      val fargs = (0 until arity) map { "f" + _ }
+      val fargs = ((0 until arity)).map { "f" + _ }
       val fparams =
-        (fargs zip tpes) map { case (v, t) => s"$v:$t" } mkString ", "
+        (fargs.zip(tpes)).map { case (v, t) => s"$v:$t" } mkString ", "
 
       val a = arity / 2
       val b = arity - a
 
-      val fArgsA = (0 until a) map { "f" + _ } mkString ","
-      val fArgsB = (a until arity) map { "f" + _ } mkString ","
+      val fArgsA = ((0 until a)).map { "f" + _ } mkString ","
+      val fArgsB = ((a until arity)).map { "f" + _ } mkString ","
       val argsA =
-        (0 until a) map { n =>
+        ((0 until a)).map { n =>
           "a" + n + ":A" + n
         } mkString ","
       val argsB =
-        (a until arity) map { n =>
+        ((a until arity)).map { n =>
           "a" + n + ":A" + n
         } mkString ","
       def apN(n: Int) = if (n == 1) { "ap" } else { s"ap$n" }
-      def allArgs = (0 until arity) map { "a" + _ } mkString ","
+      def allArgs = ((0 until arity)).map { "a" + _ } mkString ","
 
       val apply = block"""
           -    ${apN(b)}(${apN(a)}(map(f)(f =>
@@ -217,12 +219,12 @@ object Boilerplate {
       import tv._
 
       val tpes =
-        synTypes map { tpe =>
+        synTypes.map { tpe =>
           s"F[$tpe]"
         }
-      val fargs = (0 until arity) map { "f" + _ }
+      val fargs = ((0 until arity)).map { "f" + _ }
       val fparams =
-        (fargs zip tpes) map { case (v, t) => s"$v:$t" } mkString ", "
+        (fargs.zip(tpes)).map { case (v, t) => s"$v:$t" } mkString ", "
       val fargsS = fargs mkString ", "
 
       val nestedProducts = (0 until (arity - 2)).foldRight(

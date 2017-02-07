@@ -153,24 +153,27 @@ object WebSocketClientBlueprint {
       }
     }
 
-    BidiFlow.fromGraph(GraphDSL.create() { implicit b ⇒
-      import GraphDSL.Implicits._
+    BidiFlow
+      .fromGraph(GraphDSL.create() { implicit b ⇒
+        import GraphDSL.Implicits._
 
-      val networkIn = b.add(Flow[ByteString].transform(() ⇒ new UpgradeStage))
-      val wsIn = b.add(Flow[ByteString])
+        val networkIn =
+          b.add(Flow[ByteString].transform(() ⇒ new UpgradeStage))
+        val wsIn = b.add(Flow[ByteString])
 
-      val handshakeRequestSource =
-        b.add(Source.single(renderedInitialRequest) ++ valve.source)
-      val httpRequestBytesAndThenWSBytes = b.add(Concat[ByteString]())
+        val handshakeRequestSource =
+          b.add(Source.single(renderedInitialRequest) ++ valve.source)
+        val httpRequestBytesAndThenWSBytes = b.add(Concat[ByteString]())
 
-      handshakeRequestSource ~> httpRequestBytesAndThenWSBytes
-      wsIn.outlet ~> httpRequestBytesAndThenWSBytes
+        handshakeRequestSource ~> httpRequestBytesAndThenWSBytes
+        wsIn.outlet ~> httpRequestBytesAndThenWSBytes
 
-      BidiShape(networkIn.in,
-                networkIn.out,
-                wsIn.in,
-                httpRequestBytesAndThenWSBytes.out)
-    }) mapMaterializedValue (_ ⇒ result.future)
+        BidiShape(networkIn.in,
+                  networkIn.out,
+                  wsIn.in,
+                  httpRequestBytesAndThenWSBytes.out)
+      })
+      .mapMaterializedValue(_ ⇒ result.future)
   }
 
   def simpleTls: BidiFlow[SslTlsInbound,

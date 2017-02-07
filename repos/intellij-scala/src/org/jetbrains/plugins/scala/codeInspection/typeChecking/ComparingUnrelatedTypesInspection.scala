@@ -93,7 +93,7 @@ class ComparingUnrelatedTypesInspection
             left.getText,
             right.getParent,
             right)
-        Seq(leftOnTheRight, right) map (_.getType()) match {
+        Seq(leftOnTheRight, right).map(_.getType()) match {
           case Seq(Success(leftType, _), Success(rightType, _))
               if cannotBeCompared(leftType, rightType) =>
             holder.registerProblem(

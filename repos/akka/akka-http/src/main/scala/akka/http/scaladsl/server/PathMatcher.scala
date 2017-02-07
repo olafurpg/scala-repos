@@ -29,7 +29,7 @@ abstract class PathMatcher[L](implicit val ev: Tuple[L])
 
   def |[R >: L: Tuple](other: PathMatcher[_ <: R]): PathMatcher[R] =
     new PathMatcher[R] {
-      def apply(path: Path) = self(path) orElse other(path)
+      def apply(path: Path) = self(path).orElse(other(path))
     }
 
   def ~[R](other: PathMatcher[R])(
@@ -160,8 +160,8 @@ object PathMatcher extends ImplicitPathMatcherConstruction {
     else
       new PathMatcher[L] {
         def apply(path: Path) =
-          if (path startsWith prefix)
-            Matched(path dropChars prefix.charCount, extractions)(ev)
+          if (path.startsWith(prefix))
+            Matched(path.dropChars(prefix.charCount), extractions)(ev)
           else Unmatched
       }
 
@@ -429,7 +429,7 @@ trait PathMatchers {
         @tailrec def digits(ix: Int = 0, value: T = minusOne)
           : Matching[Tuple1[T]] = {
           val a =
-            if (ix < segment.length) fromChar(segment charAt ix) else minusOne
+            if (ix < segment.length) fromChar(segment.charAt(ix)) else minusOne
           if (a == minusOne) {
             if (value == minusOne) Unmatched
             else
@@ -467,7 +467,7 @@ trait PathMatchers {
     * optionally signed form of a double value, i.e. without exponent.
     */
   val DoubleNumber: PathMatcher1[Double] =
-    PathMatcher("""[+-]?\d*\.?\d*""".r) flatMap { string ⇒
+    PathMatcher("""[+-]?\d*\.?\d*""".r).flatMap { string ⇒
       try Some(java.lang.Double.parseDouble(string))
       catch {
         case _: NumberFormatException ⇒ None
@@ -479,13 +479,13 @@ trait PathMatchers {
     */
   val JavaUUID: PathMatcher1[UUID] =
     PathMatcher(
-      """[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}""".r) flatMap {
-      string ⇒
+      """[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}""".r)
+      .flatMap { string ⇒
         try Some(UUID.fromString(string))
         catch {
           case _: IllegalArgumentException ⇒ None
         }
-    }
+      }
 
   /**
     * A PathMatcher that always matches, doesn't consume anything and extracts nothing.

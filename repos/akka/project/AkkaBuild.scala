@@ -49,7 +49,7 @@ object AkkaBuild extends Build {
       S3.host in S3.upload := "downloads.typesafe.com.s3.amazonaws.com",
       S3.progress in S3.upload := true,
       mappings in S3.upload <<=
-        (Release.releaseDirectory, version) map { (d, v) =>
+        (Release.releaseDirectory, version).map { (d, v) =>
           val downloads = d / "downloads"
           val archivesPathFinder = downloads * s"*$v.zip"
           archivesPathFinder.get.map(file =>
@@ -206,7 +206,7 @@ object AkkaBuild extends Build {
       id = "akka-remote-tests",
       base = file("akka-remote-tests"),
       dependencies = Seq(actorTests % "test->test", multiNodeTestkit)
-    ) configs (MultiJvm)
+    ).configs(MultiJvm)
 
   lazy val cluster =
     Project(
@@ -214,7 +214,7 @@ object AkkaBuild extends Build {
       base = file("akka-cluster"),
       dependencies =
         Seq(remote, remoteTests % "test->test", testkit % "test->test")
-    ) configs (MultiJvm)
+    ).configs(MultiJvm)
 
   lazy val clusterMetrics =
     Project(
@@ -223,7 +223,7 @@ object AkkaBuild extends Build {
       dependencies =
         Seq(cluster % "compile->compile;test->test;multi-jvm->multi-jvm",
             slf4j % "test->compile")
-    ) configs (MultiJvm)
+    ).configs(MultiJvm)
 
   lazy val clusterTools =
     Project(
@@ -231,7 +231,7 @@ object AkkaBuild extends Build {
       base = file("akka-cluster-tools"),
       dependencies =
         Seq(cluster % "compile->compile;test->test;multi-jvm->multi-jvm")
-    ) configs (MultiJvm)
+    ).configs(MultiJvm)
 
   lazy val clusterSharding =
     Project(
@@ -246,7 +246,7 @@ object AkkaBuild extends Build {
             persistence % "compile;test->provided",
             distributedData % "provided;test",
             clusterTools)
-    ) configs (MultiJvm)
+    ).configs(MultiJvm)
 
   lazy val distributedData =
     Project(
@@ -254,7 +254,7 @@ object AkkaBuild extends Build {
       base = file("akka-distributed-data"),
       dependencies =
         Seq(cluster % "compile->compile;test->test;multi-jvm->multi-jvm")
-    ) configs (MultiJvm)
+    ).configs(MultiJvm)
 
   lazy val slf4j = Project(
     id = "akka-slf4j",
@@ -442,7 +442,7 @@ object AkkaBuild extends Build {
                          cluster,
                          clusterTools,
                          persistence % "compile;test->provided")
-    ) configs (MultiJvm)
+    ).configs(MultiJvm)
 
   lazy val samplesSettings = parentSettings ++ ActivatorDist.settings
 
@@ -523,8 +523,8 @@ object AkkaBuild extends Build {
                               publishM2 in osgi,
                               publishM2 in slf4j,
                               publishM2 in persistence,
-                              compile in Compile) map
-        ((_, _, _, _, _, _, _, c) => c),
+                              compile in Compile).map(
+        (_, _, _, _, _, _, _, c) => c),
       test in Test ~= { x =>
         {
           def executeMvnCommands(failureMessage: String, commands: String*) = {

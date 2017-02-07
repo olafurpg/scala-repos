@@ -33,7 +33,7 @@ object SwaggerSerializers {
   private[swagger] def dontAddOnEmpty(key: String, value: List[String])(
       json: JValue) = {
     if (value.nonEmpty)
-      json merge JObject(List(key -> JArray(value map (JString(_)))))
+      json.merge(JObject(List(key -> JArray(value.map(JString(_))))))
     else json
   }
 
@@ -237,8 +237,10 @@ object SwaggerSerializers {
       throw new MappingException(
         "Couldn't determine the type for this data type from " + value)
     val t =
-      str(value \ "format") orElse str(value \ "type") orElse str(
-        value \ "$ref") getOrElse karmaIsABitch
+      str(value \ "format")
+        .orElse(str(value \ "type"))
+        .orElse(str(value \ "$ref"))
+        .getOrElse(karmaIsABitch)
     if (isSimpleType(t)) {
       if (t == "array") {
         val items = value \ "items" match {
@@ -247,9 +249,9 @@ object SwaggerSerializers {
         }
         value \ "uniqueItems" match {
           case JBool(true) =>
-            items map (DataType.GenSet(_)) getOrElse DataType.GenSet()
+            items.map(DataType.GenSet(_)).getOrElse(DataType.GenSet())
           case _ =>
-            items map (DataType.GenList(_)) getOrElse DataType.GenList()
+            items.map(DataType.GenList(_)).getOrElse(DataType.GenList())
         }
       } else {
         DataType((value \ "type").as[String], format = str(value \ "format"))
@@ -316,8 +318,10 @@ object SwaggerSerializers {
           case x: ModelProperty =>
             val json: JValue =
               ("description" -> x.description) ~ ("position" -> x.position)
-            (json merge writeDataType(x.`type`, "$ref")) merge Extraction
-              .decompose(x.allowableValues)
+            (json
+              .merge(writeDataType(x.`type`, "$ref")))
+              .merge(Extraction
+                .decompose(x.allowableValues))
         }))
 
   class ModelSerializer
@@ -352,7 +356,7 @@ object SwaggerSerializers {
                 s.nonBlank && !s.trim.equalsIgnoreCase("VOID"))) ~
               ("discriminator" -> x.discriminator) ~
               ("properties" ->
-                (x.properties.sortBy { case (_, p) ⇒ p.position } map {
+                (x.properties.sortBy { case (_, p) ⇒ p.position }.map {
                   case (k, v) => k -> Extraction.decompose(v)
                 }))
         }))
@@ -407,8 +411,9 @@ object SwaggerSerializers {
                 ("paramType" -> x.paramType.toString) ~
                 ("paramAccess" -> x.paramAccess)
 
-            (output merge writeDataType(x.`type`)) merge Extraction.decompose(
-              x.allowableValues)
+            (output
+              .merge(writeDataType(x.`type`)))
+              .merge(Extraction.decompose(x.allowableValues))
         }))
 
   class OperationSerializer
@@ -421,7 +426,7 @@ object SwaggerSerializers {
               (value \ "summary").extract[String],
               (value \ "position").extract[Int],
               (value \ "notes").extractOpt[String].flatMap(_.blankOption),
-              (value \ "deprecated").extractOpt[Boolean] getOrElse false,
+              (value \ "deprecated").extractOpt[Boolean].getOrElse(false),
               (value \ "nickname").extractOpt[String].flatMap(_.blankOption),
               (value \ "parameters").extract[List[Parameter]],
               (value \ "responseMessages").extract[List[ResponseMessage[_]]],
@@ -450,9 +455,11 @@ object SwaggerSerializers {
             val authorizations =
               dontAddOnEmpty("authorizations", obj.authorizations) _
             val r =
-              (consumes andThen produces andThen authorizations andThen protocols)(
-                json)
-            r merge writeDataType(obj.responseClass)
+              (consumes
+                .andThen(produces)
+                .andThen(authorizations)
+                .andThen(protocols))(json)
+            r.merge(writeDataType(obj.responseClass))
         }))
 
   class EndpointSerializer

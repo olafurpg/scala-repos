@@ -25,7 +25,7 @@ object StatsSample {
   }
 
   def startup(ports: Seq[String]): Unit = {
-    ports foreach { port =>
+    ports.foreach { port =>
       // Override the configuration of the port when specified as program argument
       val config = ConfigFactory
         .parseString(s"akka.remote.netty.tcp.port=" + port)
@@ -56,7 +56,8 @@ class StatsSampleClient(servicePath: String) extends Actor {
     case RelativeActorPath(elements) => elements
     case _ =>
       throw new IllegalArgumentException(
-        "servicePath [%s] is not a valid relative actor path" format servicePath)
+        "servicePath [%s] is not a valid relative actor path".format(
+          servicePath))
   }
   import context.dispatcher
   val tickTask =

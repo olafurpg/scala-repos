@@ -240,7 +240,7 @@ final class BackoffSupervisor(val childProps: Props,
       restartCount += 1
   }
 
-  def receive = onTerminated orElse handleBackoff
+  def receive = onTerminated.orElse(handleBackoff)
 }
 
 private[akka] trait HandleBackoff { this: Actor ⇒

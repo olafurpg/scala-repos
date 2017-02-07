@@ -30,7 +30,7 @@ trait SequentialActor extends Actor {
         case Some(msg) => processThenDone(msg)
       }
 
-    case msg => queue enqueue msg
+    case msg => queue.enqueue(msg)
   }
 
   def receive = idle
@@ -51,7 +51,7 @@ trait SequentialActor extends Actor {
       // we don't want to send Done after actor death
       case SequentialActor.Terminate => self ! PoisonPill
       case msg =>
-        val future = (process orElse fallback)(msg)
+        val future = (process.orElse(fallback))(msg)
         futureTimeout
           .fold(future) { timeout =>
             future.withTimeout(

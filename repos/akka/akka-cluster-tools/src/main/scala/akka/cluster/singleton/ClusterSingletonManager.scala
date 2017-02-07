@@ -279,11 +279,13 @@ object ClusterSingletonManager {
       }
 
       def handleInitial(state: CurrentClusterState): Unit = {
-        membersByAge = immutable.SortedSet.empty(ageOrdering) union state.members
-            .filter(
-              m ⇒
+        membersByAge = immutable.SortedSet
+          .empty(ageOrdering)
+          .union(
+            state.members
+              .filter(m ⇒
                 (m.status == MemberStatus.Up ||
-                  m.status == MemberStatus.Leaving) && matchingRole(m))
+                  m.status == MemberStatus.Leaving) && matchingRole(m)))
         val safeToBeOldest = !state.members.exists { m ⇒
           (m.status == MemberStatus.Down || m.status == MemberStatus.Exiting)
         }
@@ -454,7 +456,7 @@ class ClusterSingletonManager(singletonProps: Props,
     removed += address -> (Deadline.now + 15.minutes)
 
   def cleanupOverdueNotMemberAnyMore(): Unit = {
-    removed = removed filter {
+    removed = removed.filter {
       case (address, deadline) ⇒ deadline.hasTimeLeft
     }
   }
@@ -607,13 +609,13 @@ class ClusterSingletonManager(singletonProps: Props,
         logInfo("Retry [{}], sending HandOverToMe to [{}]",
                 count,
                 previousOldestOption)
-        previousOldestOption foreach { peer(_) ! HandOverToMe }
+        previousOldestOption.foreach { peer(_) ! HandOverToMe }
         setTimer(HandOverRetryTimer,
                  HandOverRetry(count + 1),
                  handOverRetryInterval,
                  repeat = false)
         stay()
-      } else if (previousOldestOption forall removed.contains) {
+      } else if (previousOldestOption.forall(removed.contains)) {
         // can't send HandOverToMe, previousOldest unknown for new node (or restart)
         // previous oldest might be down or removed, so no TakeOverFromMe message is received
         logInfo(
@@ -636,7 +638,7 @@ class ClusterSingletonManager(singletonProps: Props,
 
   def gotoOldest(): State = {
     val singleton =
-      context watch context.actorOf(singletonProps, singletonName)
+      context.watch(context.actorOf(singletonProps, singletonName))
     logInfo("Singleton manager starting singleton actor [{}]", singleton.path)
     goto(Oldest) using OldestData(singleton)
   }
@@ -689,7 +691,7 @@ class ClusterSingletonManager(singletonProps: Props,
         logInfo("Retry [{}], sending TakeOverFromMe to [{}]",
                 count,
                 newOldestOption)
-        newOldestOption foreach { peer(_) ! TakeOverFromMe }
+        newOldestOption.foreach { peer(_) ! TakeOverFromMe }
         setTimer(TakeOverRetryTimer,
                  TakeOverRetry(count + 1),
                  handOverRetryInterval,
@@ -726,7 +728,7 @@ class ClusterSingletonManager(singletonProps: Props,
     if (singletonTerminated) {
       handOverDone(handOverTo)
     } else {
-      handOverTo foreach { _ ! HandOverInProgress }
+      handOverTo.foreach { _ ! HandOverInProgress }
       singleton ! terminationMessage
       goto(HandingOver) using HandingOverData(singleton, handOverTo)
     }
@@ -749,7 +751,7 @@ class ClusterSingletonManager(singletonProps: Props,
     logInfo("Singleton terminated, hand-over done [{} -> {}]",
             cluster.selfAddress,
             newOldest)
-    handOverTo foreach { _ ! HandOverDone }
+    handOverTo.foreach { _ ! HandOverDone }
     if (removed.contains(cluster.selfAddress)) {
       logInfo("Self removed, stopping ClusterSingletonManager")
       stop()

@@ -35,7 +35,7 @@ object OpenIDSpec extends Specification with Mockito {
       val ws = createMockWithValidOpDiscoveryAndVerification
       val openId = new WsOpenIdClient(ws, new WsDiscovery(ws))
       openId.redirectURL("http://example.com", "http://foo.bar.com/openid")
-      there was one(ws.request).get()
+      there.was(one(ws.request).get())
     }
 
     "generate a valid redirectUrl" in {
@@ -149,8 +149,9 @@ object OpenIDSpec extends Specification with Mockito {
 
       val argument = ArgumentCaptor.forClass(classOf[Params])
       "direct verification using a POST request was used" in {
-        there was one(ws.request)
-          .post(argument.capture())(any[Writeable[Params]])
+        there.was(
+          one(ws.request)
+            .post(argument.capture())(any[Writeable[Params]]))
 
         val verificationQuery = argument.getValue
 
@@ -160,7 +161,7 @@ object OpenIDSpec extends Specification with Mockito {
         }
 
         "every query parameter apart from openid.mode is used in the verification request" in {
-          (verificationQuery - "openid.mode") forall {
+          ((verificationQuery - "openid.mode")).forall {
             case (key, value) => responseQueryString.get(key) == Some(value)
           } must beTrue
         }
@@ -205,30 +206,36 @@ object OpenIDSpec extends Specification with Mockito {
     "fail response verification if direct verification fails" in {
       val ws = new WSMock
 
-      ws.response.status returns OK thenReturns OK
-      ws.response.header(HeaderNames.CONTENT_TYPE) returns Some(
-        "application/xrds+xml") thenReturns Some("text/plain")
-      ws.response.xml returns scala.xml.XML
-        .loadString(readFixture("discovery/xrds/simple-op.xml"))
-      ws.response.body returns "is_valid:false\n"
+      ws.response.status.returns(OK).thenReturns(OK)
+      ws.response
+        .header(HeaderNames.CONTENT_TYPE)
+        .returns(Some("application/xrds+xml"))
+        .thenReturns(Some("text/plain"))
+      ws.response.xml.returns(
+        scala.xml.XML
+          .loadString(readFixture("discovery/xrds/simple-op.xml")))
+      ws.response.body.returns("is_valid:false\n")
 
       val openId = new WsOpenIdClient(ws, new WsDiscovery(ws))
 
       Await.result(openId.verifiedId(setupMockRequest()), dur) must throwA[
         AUTH_ERROR.type]
 
-      there was one(ws.request).post(any[Params])(any[Writeable[Params]])
+      there.was(one(ws.request).post(any[Params])(any[Writeable[Params]]))
     }
 
     "fail response verification if the response indicates an error" in {
       val ws = new WSMock
 
-      ws.response.status returns OK thenReturns OK
-      ws.response.header(HeaderNames.CONTENT_TYPE) returns Some(
-        "application/xrds+xml") thenReturns Some("text/plain")
-      ws.response.xml returns scala.xml.XML
-        .loadString(readFixture("discovery/xrds/simple-op.xml"))
-      ws.response.body returns "is_valid:false\n"
+      ws.response.status.returns(OK).thenReturns(OK)
+      ws.response
+        .header(HeaderNames.CONTENT_TYPE)
+        .returns(Some("application/xrds+xml"))
+        .thenReturns(Some("text/plain"))
+      ws.response.xml.returns(
+        scala.xml.XML
+          .loadString(readFixture("discovery/xrds/simple-op.xml")))
+      ws.response.body.returns("is_valid:false\n")
 
       val openId = new WsOpenIdClient(ws, new WsDiscovery(ws))
 
@@ -268,18 +275,22 @@ object OpenIDSpec extends Specification with Mockito {
 
   def createMockWithValidOpDiscoveryAndVerification = {
     val ws = new WSMock
-    ws.response.status returns OK thenReturns OK
-    ws.response.header(HeaderNames.CONTENT_TYPE) returns Some(
-      "application/xrds+xml") thenReturns Some("text/plain")
-    ws.response.xml returns scala.xml.XML
-      .loadString(readFixture("discovery/xrds/simple-op.xml"))
-    ws.response.body returns "is_valid:true\n" // http://openid.net/specs/openid-authentication-2_0.html#kvform
+    ws.response.status.returns(OK).thenReturns(OK)
+    ws.response
+      .header(HeaderNames.CONTENT_TYPE)
+      .returns(Some("application/xrds+xml"))
+      .thenReturns(Some("text/plain"))
+    ws.response.xml.returns(
+      scala.xml.XML
+        .loadString(readFixture("discovery/xrds/simple-op.xml")))
+    ws.response.body
+      .returns("is_valid:true\n") // http://openid.net/specs/openid-authentication-2_0.html#kvform
     ws
   }
 
   def setupMockRequest(queryString: Params = openIdResponse) = {
     val request = mock[Request[_]]
-    request.queryString returns queryString
+    request.queryString.returns(queryString)
     request
   }
 

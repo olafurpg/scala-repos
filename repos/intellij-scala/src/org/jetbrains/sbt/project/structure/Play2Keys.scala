@@ -51,7 +51,7 @@ object Play2Keys {
         val values = children.flatMap {
           case _: Text => None
           case projectKey =>
-            Some((projectKey.label, projectKey \ ENTRY_SEQ_NAME map (_.text)))
+            Some((projectKey.label, (projectKey \ ENTRY_SEQ_NAME).map(_.text)))
         }.toMap
         Some(new SeqStringXmlKey(keyName, values))
       } else None
@@ -63,13 +63,13 @@ object Play2Keys {
         keys: Seq[SettingKey[_]]): Map[String, Map[String, ParsedValue[_]]] = {
       val map = mutable.HashMap[String, Map[String, ParsedValue[_]]]()
 
-      keys foreach {
+      keys.foreach {
         case str: StringXmlKey =>
           map.put(str.name, str.values.map {
             case (k, v) => (k, new StringParsedValue(v))
           })
         case seqStr: SeqStringXmlKey =>
-          map.put(seqStr.name, seqStr.values map {
+          map.put(seqStr.name, seqStr.values.map {
             case (k, v) => (k, new SeqStringParsedValue(v))
           })
         case _ =>
@@ -89,7 +89,7 @@ object Play2Keys {
 
     abstract class ParsedKey[T](val name: String) {
       def in(allKeys: Map[String, Map[String, ParsedValue[_]]]) =
-        allKeys get name
+        allKeys.get(name)
 
       def in(projectName: String,
              allKeys: Map[String, Map[String, ParsedValue[_]]]): Option[T] = {
@@ -105,14 +105,16 @@ object Play2Keys {
     class StringParsedKey(name: String) extends ParsedKey[String](name) {
       override def allIn(allKeys: Map[String, Map[String, ParsedValue[_]]])
         : Seq[(String, String)] = {
-        in(allKeys) map {
-          case vs =>
-            vs.toSeq flatMap {
-              case (projectName, projectValue: StringParsedValue) =>
-                Some((projectName, projectValue.parsed))
-              case _ => None
-            }
-        } getOrElse Seq.empty
+        in(allKeys)
+          .map {
+            case vs =>
+              vs.toSeq.flatMap {
+                case (projectName, projectValue: StringParsedValue) =>
+                  Some((projectName, projectValue.parsed))
+                case _ => None
+              }
+          }
+          .getOrElse(Seq.empty)
       }
     }
 
@@ -120,14 +122,16 @@ object Play2Keys {
         extends ParsedKey[Seq[String]](name) {
       override def allIn(allKeys: Map[String, Map[String, ParsedValue[_]]])
         : Seq[(String, Seq[String])] = {
-        in(allKeys) map {
-          case vs =>
-            vs.toSeq flatMap {
-              case (projectName, projectValue: SeqStringParsedValue) =>
-                Some((projectName, projectValue.parsed))
-              case _ => None
-            }
-        } getOrElse Seq.empty
+        in(allKeys)
+          .map {
+            case vs =>
+              vs.toSeq.flatMap {
+                case (projectName, projectValue: SeqStringParsedValue) =>
+                  Some((projectName, projectValue.parsed))
+                case _ => None
+              }
+          }
+          .getOrElse(Seq.empty)
       }
     }
 

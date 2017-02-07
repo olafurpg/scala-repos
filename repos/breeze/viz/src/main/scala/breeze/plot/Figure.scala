@@ -180,11 +180,11 @@ class Figure(name: String,
         plots(i).get
       }
 
-    plot listen new Plot.Listener {
+    plot.listen(new Plot.Listener {
       def refresh(pl: Plot) {
         Figure.this.refresh()
       }
-    }
+    })
 
     plot
   }

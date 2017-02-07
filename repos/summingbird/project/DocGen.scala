@@ -13,7 +13,7 @@ object DocGen {
   val docDirectory = "target/site"
   val aggregateName = "summingbird"
 
-  def syncLocal = (ghkeys.updatedRepository, GitKeys.gitRunner, streams) map {
+  def syncLocal = (ghkeys.updatedRepository, GitKeys.gitRunner, streams).map {
     (repo, git, s) =>
       cleanSite(repo, git, s) // First, remove 'stale' files.
       val rootPath = file(docDirectory) // Now copy files.

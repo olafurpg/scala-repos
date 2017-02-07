@@ -345,7 +345,7 @@ object DenseVector
     */
   def horzcat[V: ClassTag: Zero](vectors: DenseVector[V]*): DenseMatrix[V] = {
     val size = vectors.head.size
-    if (!(vectors forall (_.size == size)))
+    if (!(vectors.forall(_.size == size)))
       throw new IllegalArgumentException(
         "All vectors must have the same size!")
     val result = DenseMatrix.zeros[V](size, vectors.size)
@@ -589,7 +589,7 @@ object DenseVector
                                                  DenseMatrix[Complex]] = {
     new CanTranspose[DenseVector[Complex], DenseMatrix[Complex]] {
       def apply(from: DenseVector[Complex]): DenseMatrix[Complex] = {
-        new DenseMatrix(data = from.data map { _.conjugate },
+        new DenseMatrix(data = from.data.map { _.conjugate },
                         offset = from.offset,
                         cols = from.length,
                         rows = 1,

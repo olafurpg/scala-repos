@@ -283,7 +283,7 @@ private[akka] trait SubscriberManagement[T]
       : Subscriptions =
       remaining match {
         case head :: tail ⇒
-          if (head eq subscription) tail reverse_::: result
+          if (head eq subscription) tail.reverse_:::(result)
           else removeFrom(tail, head :: result)
         case _ ⇒
           throw new IllegalStateException(

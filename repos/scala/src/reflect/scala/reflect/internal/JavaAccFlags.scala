@@ -59,9 +59,9 @@ final class JavaAccFlags private (val coded: Int) extends AnyVal {
 
   def toJavaFlags: Int = flags
   def toScalaFlags: Long = flagCarrierId match {
-    case Method | Constructor => FlagTranslation methodFlags flags
-    case Class => FlagTranslation classFlags flags
-    case _ => FlagTranslation fieldFlags flags
+    case Method | Constructor => FlagTranslation.methodFlags(flags)
+    case Class => FlagTranslation.classFlags(flags)
+    case _ => FlagTranslation.fieldFlags(flags)
   }
 }
 

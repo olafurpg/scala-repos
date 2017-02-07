@@ -520,24 +520,26 @@ class ParArray[T] private[mutable] (val arrayseq: ArraySeq[T])
         cb: Bld): Bld = {
       cb.sizeHint(remaining)
       cb.ifIs[ResizableParArrayCombiner[T]] { pac =>
-        // with res. combiner:
-        val targetarr: Array[Any] =
-          pac.lastbuff.internalArray.asInstanceOf[Array[Any]]
-        Array.copy(arr, i, targetarr, pac.lastbuff.size, until - i)
-        pac.lastbuff.setInternalSize(remaining)
-      } otherwise {
-        cb.ifIs[UnrolledParArrayCombiner[T]] { pac =>
-          // with unr. combiner:
+          // with res. combiner:
           val targetarr: Array[Any] =
-            pac.buff.lastPtr.array.asInstanceOf[Array[Any]]
-          Array.copy(arr, i, targetarr, 0, until - i)
-          pac.buff.size = pac.buff.size + until - i
-          pac.buff.lastPtr.size = until - i
-        } otherwise {
-          copy2builder_quick(cb, arr, until, i)
-          i = until
+            pac.lastbuff.internalArray.asInstanceOf[Array[Any]]
+          Array.copy(arr, i, targetarr, pac.lastbuff.size, until - i)
+          pac.lastbuff.setInternalSize(remaining)
         }
-      }
+        .otherwise {
+          cb.ifIs[UnrolledParArrayCombiner[T]] { pac =>
+              // with unr. combiner:
+              val targetarr: Array[Any] =
+                pac.buff.lastPtr.array.asInstanceOf[Array[Any]]
+              Array.copy(arr, i, targetarr, 0, until - i)
+              pac.buff.size = pac.buff.size + until - i
+              pac.buff.lastPtr.size = until - i
+            }
+            .otherwise {
+              copy2builder_quick(cb, arr, until, i)
+              i = until
+            }
+        }
       cb
     }
 
@@ -600,25 +602,27 @@ class ParArray[T] private[mutable] (val arrayseq: ArraySeq[T])
     override def reverse2combiner[U >: T, This](
         cb: Combiner[U, This]): Combiner[U, This] = {
       cb.ifIs[ResizableParArrayCombiner[T]] { pac =>
-        // with res. combiner:
-        val sz = remaining
-        pac.sizeHint(sz)
-        val targetarr: Array[Any] =
-          pac.lastbuff.internalArray.asInstanceOf[Array[Any]]
-        reverse2combiner_quick(targetarr, arr, 0, i, until)
-        pac.lastbuff.setInternalSize(sz)
-      } otherwise {
-        cb.ifIs[UnrolledParArrayCombiner[T]] { pac =>
-          // with unr. combiner:
+          // with res. combiner:
           val sz = remaining
           pac.sizeHint(sz)
           val targetarr: Array[Any] =
-            pac.buff.lastPtr.array.asInstanceOf[Array[Any]]
+            pac.lastbuff.internalArray.asInstanceOf[Array[Any]]
           reverse2combiner_quick(targetarr, arr, 0, i, until)
-          pac.buff.size = pac.buff.size + sz
-          pac.buff.lastPtr.size = sz
-        } otherwise super.reverse2combiner(cb)
-      }
+          pac.lastbuff.setInternalSize(sz)
+        }
+        .otherwise {
+          cb.ifIs[UnrolledParArrayCombiner[T]] { pac =>
+              // with unr. combiner:
+              val sz = remaining
+              pac.sizeHint(sz)
+              val targetarr: Array[Any] =
+                pac.buff.lastPtr.array.asInstanceOf[Array[Any]]
+              reverse2combiner_quick(targetarr, arr, 0, i, until)
+              pac.buff.size = pac.buff.size + sz
+              pac.buff.lastPtr.size = sz
+            }
+            .otherwise(super.reverse2combiner(cb))
+        }
       cb
     }
 
@@ -699,7 +703,7 @@ class ParArray[T] private[mutable] (val arrayseq: ArraySeq[T])
       // do a parallel prefix scan
       if (length > 0)
         tasksupport.executeAndWaitResult(
-          new CreateScanTree[U](0, size, z, op, splitter) mapResult { tree =>
+          new CreateScanTree[U](0, size, z, op, splitter).mapResult { tree =>
             tasksupport.executeAndWaitResult(
               new ScanToArray(tree, z, op, targetarr))
           })

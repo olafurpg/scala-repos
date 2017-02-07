@@ -39,14 +39,16 @@ object TestUtils {
       numberOfAddresses: Int,
       hostname: String = "127.0.0.1",
       udp: Boolean = false): immutable.IndexedSeq[InetSocketAddress] = {
-    Vector.fill(numberOfAddresses) {
-      val serverSocket: GeneralSocket =
-        if (udp) DatagramChannel.open().socket()
-        else ServerSocketChannel.open().socket()
+    Vector
+      .fill(numberOfAddresses) {
+        val serverSocket: GeneralSocket =
+          if (udp) DatagramChannel.open().socket()
+          else ServerSocketChannel.open().socket()
 
-      serverSocket.bind(new InetSocketAddress(hostname, 0))
-      (serverSocket,
-       new InetSocketAddress(hostname, serverSocket.getLocalPort))
-    } collect { case (socket, address) ⇒ socket.close(); address }
+        serverSocket.bind(new InetSocketAddress(hostname, 0))
+        (serverSocket,
+         new InetSocketAddress(hostname, serverSocket.getLocalPort))
+      }
+      .collect { case (socket, address) ⇒ socket.close(); address }
   }
 }

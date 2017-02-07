@@ -34,7 +34,7 @@ object FromString {
     def apply(s: String): Directory =
       if (isDefinedAt(s)) toDir(s)
       else
-        cmd.runAndExit(println("'%s' is not an existing directory." format s))
+        cmd.runAndExit(println("'%s' is not an existing directory.".format(s)))
   }
   def ExistingDirRelativeTo(root: Directory) = new FromString[Directory] {
     private def resolve(s: String) =
@@ -44,7 +44,7 @@ object FromString {
       if (isDefinedAt(s)) resolve(s)
       else
         cmd.runAndExit(
-          println("'%s' is not an existing directory." format resolve(s)))
+          println("'%s' is not an existing directory.".format(resolve(s))))
   }
 
   /** Argument expander, i.e. turns single argument "foo bar baz" into argument

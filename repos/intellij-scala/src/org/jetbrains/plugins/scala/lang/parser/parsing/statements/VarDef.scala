@@ -20,7 +20,7 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
  */
 object VarDef {
   def parse(builder: ScalaPsiBuilder): Boolean = {
-    if (PatDef parse builder) {
+    if (PatDef.parse(builder)) {
       return true
     }
 
@@ -28,13 +28,13 @@ object VarDef {
     val valDefMarker = builder.mark
     builder.getTokenType match {
       case ScalaTokenTypes.tIDENTIFIER =>
-        Ids parse builder
+        Ids.parse(builder)
         var hasTypeDcl = false
 
         if (ScalaTokenTypes.tCOLON.equals(builder.getTokenType)) {
           ParserUtils.eatElement(builder, ScalaTokenTypes.tCOLON)
           if (!Type.parse(builder)) {
-            builder error "type declaration expected"
+            builder.error("type declaration expected")
           }
           hasTypeDcl = true
         } else {

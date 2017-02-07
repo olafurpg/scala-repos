@@ -26,10 +26,10 @@ object EmitManPage {
     def emitText(text: AbstractText) {
       text match {
         case seq: SeqText =>
-          seq.components foreach emitText
+          seq.components.foreach(emitText)
 
         case seq: SeqPara =>
-          seq.components foreach emitPara
+          seq.components.foreach(emitPara)
 
         case Text(text) =>
           out print escape(text)
@@ -143,7 +143,7 @@ object EmitManPage {
       else section.title
     out.println(tag + " " + title)
 
-    section.paragraphs foreach emitParagraph
+    section.paragraphs.foreach(emitParagraph)
   }
 
   def emitDocument(doc: Document) {
@@ -162,7 +162,7 @@ object EmitManPage {
       ".TH " + doc.title + " " + doc.category.id + "  \"" + doc.date +
         "\" \"version " + doc.version + "\" \"" + doc.category + "\"")
 
-    doc.sections foreach (s => emitSection(s, 1))
+    doc.sections.foreach(s => emitSection(s, 1))
   }
 
   def main(args: Array[String]) = args match {
@@ -174,11 +174,11 @@ object EmitManPage {
 
   def emitManPage(classname: String,
                   outStream: java.io.OutputStream = out.out) {
-    if (outStream != out.out) out setOut outStream
+    if (outStream != out.out) out.setOut(outStream)
     try {
       val cl = this.getClass.getClassLoader()
-      val clasz = cl loadClass classname
-      val meth = clasz getDeclaredMethod "manpage"
+      val clasz = cl.loadClass(classname)
+      val meth = clasz.getDeclaredMethod("manpage")
       val doc = meth.invoke(null).asInstanceOf[Document]
       emitDocument(doc)
     } catch {

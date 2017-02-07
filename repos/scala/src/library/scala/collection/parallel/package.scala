@@ -253,7 +253,7 @@ package parallel {
             while (i < bucketnumber) {
               if (buckets(i) eq null) buckets(i) = that.buckets(i)
               else if (that.buckets(i) ne null)
-                buckets(i) concat that.buckets(i)
+                buckets(i).concat(that.buckets(i))
 
               i += 1
             }

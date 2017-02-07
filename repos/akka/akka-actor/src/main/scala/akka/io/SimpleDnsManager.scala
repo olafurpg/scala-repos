@@ -28,7 +28,7 @@ class SimpleDnsManager(val ext: DnsExt)
   }
 
   private val cleanupTimer =
-    cacheCleanup map { _ ⇒
+    cacheCleanup.map { _ ⇒
       val interval = Duration(
         ext.Settings.ResolverConfig
           .getDuration("cache-cleanup-interval", TimeUnit.MILLISECONDS),

@@ -209,7 +209,7 @@ object JsonParser {
       }
     } while (token != End)
 
-    root getOrElse JNothing
+    root.getOrElse(JNothing)
   }
 
   private val EOF = (-1).asInstanceOf[Char]
@@ -405,7 +405,7 @@ object JsonParser {
     }
 
     def near = {
-      val start = (cur - 20) max 0
+      val start = ((cur - 20)).max(0)
       val len = ((cur + 1) min Segments.segmentSize) - start
       new String(segment, start, len)
     }

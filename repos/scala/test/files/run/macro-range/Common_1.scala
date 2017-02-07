@@ -32,7 +32,7 @@ abstract class Utils {
   }
   def makeApply(fn: Tree, args: List[Tree]): Tree = fn match {
     case Function(vparams, body) =>
-      new TreeSubstituter(vparams map (_.symbol), args) transform body
+      new TreeSubstituter(vparams.map(_.symbol), args).transform(body)
     case Block(stats, expr) =>
       Block(stats, makeApply(expr, args))
     case _ =>

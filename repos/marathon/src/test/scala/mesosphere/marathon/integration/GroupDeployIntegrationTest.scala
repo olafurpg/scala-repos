@@ -90,7 +90,7 @@ class GroupDeployIntegrationTest
 
     Then("A success event is send and the application has been started")
     val tasks = waitForTasks(app.id, app.instances)
-    tasks should have size 2
+    (tasks should have).size(2)
   }
 
   test("update a group with applications to restart") {
@@ -327,7 +327,7 @@ class GroupDeployIntegrationTest
     waitForChange(marathon.createGroup(group))
 
     Then("The correct order is maintained")
-    ping should have size 3
+    (ping should have).size(3)
     ping(db.id) should be < ping(service.id)
     ping(service.id) should be < ping(frontend.id)
   }
@@ -363,7 +363,7 @@ class GroupDeployIntegrationTest
     waitForChange(marathon.createGroup(group))
 
     Then("The correct order is maintained")
-    ping should have size 3
+    (ping should have).size(3)
     ping(db.id) should be < ping(service.id)
     ping(service.id) should be < ping(frontend.id)
   }
@@ -406,7 +406,7 @@ class GroupDeployIntegrationTest
     waitForHealthCheck(dbV2)
 
     Then("The correct order is maintained")
-    ping should have size 4
+    (ping should have).size(4)
     ping(key(dbV1)) should be < ping(key(serviceV1))
     ping(key(serviceV1)) should be < ping(key(frontendV1))
     WaitTestSupport.validFor("all v1 apps are available as well as db v2",
@@ -420,7 +420,7 @@ class GroupDeployIntegrationTest
 
     waitForHealthCheck(serviceV2)
     Then("The correct order is maintained")
-    ping should have size 5
+    (ping should have).size(5)
     ping(key(serviceV1)) should be < ping(key(frontendV1))
     ping(key(dbV2)) should be < ping(key(serviceV2))
     WaitTestSupport.validFor(
@@ -435,7 +435,7 @@ class GroupDeployIntegrationTest
 
     waitForHealthCheck(frontendV2)
     Then("The correct order is maintained")
-    ping should have size 6
+    (ping should have).size(6)
     ping(key(dbV2)) should be < ping(key(serviceV2))
     ping(key(serviceV2)) should be < ping(key(frontendV2))
     WaitTestSupport.validFor("frontend v1 is available as well as all v2",

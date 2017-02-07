@@ -36,8 +36,8 @@ object UntrustedSpec {
     def receive = {
       case IdentifyReq(path) ⇒
         context.actorSelection(path).tell(Identify(None), sender())
-      case StopChild(name) ⇒ context.child(name) foreach context.stop
-      case msg ⇒ testActor forward msg
+      case StopChild(name) ⇒ context.child(name).foreach(context.stop)
+      case msg ⇒ testActor.forward(msg)
     }
   }
 
@@ -46,14 +46,14 @@ object UntrustedSpec {
       testActor ! s"${self.path.name} stopped"
     }
     def receive = {
-      case msg ⇒ testActor forward msg
+      case msg ⇒ testActor.forward(msg)
     }
   }
 
   class FakeUser(testActor: ActorRef) extends Actor {
     context.actorOf(Props(classOf[Child], testActor), "receptionist")
     def receive = {
-      case msg ⇒ testActor forward msg
+      case msg ⇒ testActor.forward(msg)
     }
   }
 }
@@ -154,7 +154,7 @@ akka.loglevel = DEBUG
       client.actorOf(Props(new Actor {
         context.watch(target2)
         def receive = {
-          case x ⇒ testActor forward x
+          case x ⇒ testActor.forward(x)
         }
       }).withDeploy(Deploy.local))
       receptionist ! StopChild("child2")

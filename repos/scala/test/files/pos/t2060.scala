@@ -36,7 +36,7 @@ object Test {
 
   // works as expected --
   //   problem isn't in binding type variable I
-  val b = 1.0 plus new Op[Int];
+  val b = 1.0.plus(new Op[Int]);
 
   // works as expected --
   //   problem isn't in using Rich.+[I](op : Op[I])

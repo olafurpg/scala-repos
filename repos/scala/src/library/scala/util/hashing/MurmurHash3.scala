@@ -89,7 +89,7 @@ private[hashing] class MurmurHash3 {
   final def unorderedHash(xs: TraversableOnce[Any], seed: Int): Int = {
     var a, b, n = 0
     var c = 1
-    xs foreach { x =>
+    xs.foreach { x =>
       val h = x.##
       a += h
       b ^= h
@@ -108,7 +108,7 @@ private[hashing] class MurmurHash3 {
   final def orderedHash(xs: TraversableOnce[Any], seed: Int): Int = {
     var n = 0
     var h = seed
-    xs foreach { x =>
+    xs.foreach { x =>
       h = mix(h, x.##)
       n += 1
     }

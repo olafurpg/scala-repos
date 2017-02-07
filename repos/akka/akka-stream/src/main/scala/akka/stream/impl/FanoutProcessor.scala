@@ -57,7 +57,7 @@ private[akka] abstract class FanoutOutputs(val maxBufferSize: Int,
     downstreamBufferSpace += elements
 
   private def subscribePending(): Unit =
-    exposedPublisher.takePendingSubscribers() foreach registerSubscriber
+    exposedPublisher.takePendingSubscribers().foreach(registerSubscriber)
 
   override protected def shutdown(completed: Boolean): Unit = {
     if (exposedPublisher ne null) {

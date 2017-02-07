@@ -12,9 +12,9 @@ class TreeSetTest {
   def hasCorrectDropAndTakeMethods() {
     val set = TreeSet(1, 2, 3)
 
-    assertEquals(TreeSet.empty[Int], set take Int.MinValue)
-    assertEquals(TreeSet.empty[Int], set takeRight Int.MinValue)
-    assertEquals(set, set drop Int.MinValue)
-    assertEquals(set, set dropRight Int.MinValue)
+    assertEquals(TreeSet.empty[Int], set.take(Int.MinValue))
+    assertEquals(TreeSet.empty[Int], set.takeRight(Int.MinValue))
+    assertEquals(set, set.drop(Int.MinValue))
+    assertEquals(set, set.dropRight(Int.MinValue))
   }
 }

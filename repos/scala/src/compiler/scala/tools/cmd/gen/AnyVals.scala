@@ -17,9 +17,8 @@ trait AnyValReps { self: AnyVals =>
     case class Op(op: String, doc: String)
 
     private def companionCoercions(tos: AnyValRep*) = {
-      tos.toList map
-        (to =>
-           s"implicit def @javaequiv@2${to.javaEquiv}(x: @name@): ${to.name} = x.to${to.name}")
+      tos.toList.map(to =>
+        s"implicit def @javaequiv@2${to.javaEquiv}(x: @name@): ${to.name} = x.to${to.name}")
     }
     def coercionComment =
       """/** Language mandated coercions from @name@ to "wider" types. */
@@ -168,28 +167,28 @@ import scala.language.implicitConversions"""
       val rank = IndexedSeq(I, L, F, D)
       (rank indexOf this, rank indexOf that) match {
         case (-1, -1) => I
-        case (r1, r2) => rank apply (r1 max r2)
+        case (r1, r2) => rank.apply(r1.max(r2))
       }
     }
 
-    def mkCoercions = numeric map (x => "def to%s: %s".format(x, x))
+    def mkCoercions = numeric.map(x => "def to%s: %s".format(x, x))
     def mkUnaryOps =
-      unaryOps map
-        (x => "%s\n  def unary_%s : %s".format(x.doc, x.op, this opType I))
+      unaryOps.map(x =>
+        "%s\n  def unary_%s : %s".format(x.doc, x.op, this.opType(I)))
     def mkStringOps = List("def +(x: String): String")
     def mkShiftOps =
       (for (op <- shiftOps; arg <- List(I, L))
         yield
-          "%s\n  def %s(x: %s): %s".format(op.doc, op.op, arg, this opType I))
+          "%s\n  def %s(x: %s): %s".format(op.doc, op.op, arg, this.opType(I)))
 
     def clumps: List[List[String]] = {
       val xs1 =
-        List(mkCoercions, mkUnaryOps, mkStringOps, mkShiftOps) map
-          (xs => if (xs.isEmpty) xs else xs :+ "")
+        List(mkCoercions, mkUnaryOps, mkStringOps, mkShiftOps).map(xs =>
+          if (xs.isEmpty) xs else xs :+ "")
       val xs2 = List(
         mkBinOpsGroup(comparisonOps, numeric, _ => Z),
-        mkBinOpsGroup(bitwiseOps, cardinal, this opType _),
-        mkBinOpsGroup(otherOps, numeric, this opType _)
+        mkBinOpsGroup(bitwiseOps, cardinal, this.opType(_)),
+        mkBinOpsGroup(otherOps, numeric, this.opType(_))
       )
       xs1 ++ xs2
     }
@@ -197,7 +196,7 @@ import scala.language.implicitConversions"""
       case (res, Nil) => res
       case (res, lines) =>
         val xs =
-          lines map {
+          lines.map {
             case "" => ""
             case s => interpolate(s)
           }
@@ -206,7 +205,7 @@ import scala.language.implicitConversions"""
     def objectLines = {
       val comp = if (isCardinal) cardinalCompanion else floatingCompanion
       interpolate(comp + allCompanions + "\n" + nonUnitCompanions).trim.lines.toList ++
-        (implicitCoercions map interpolate)
+        (implicitCoercions.map(interpolate))
     }
 
     /** Makes a set of binary operations based on the given set of ops, args, and resultFn.
@@ -219,12 +218,13 @@ import scala.language.implicitConversions"""
     def mkBinOpsGroup(ops: List[Op],
                       args: List[AnyValNum],
                       resultFn: AnyValNum => AnyValRep): List[String] =
-      (ops flatMap
-        (op =>
-           args.map(
-             arg =>
-               "%s\n  def %s(x: %s): %s"
-                 .format(op.doc, op.op, arg, resultFn(arg))) :+ "")).toList
+      (ops
+        .flatMap(
+          op =>
+            args.map(arg =>
+              "%s\n  def %s(x: %s): %s"
+                .format(op.doc, op.op, arg, resultFn(arg))) :+ ""))
+        .toList
   }
 
   sealed abstract class AnyValRep(val name: String,
@@ -256,7 +256,7 @@ import scala.language.implicitConversions"""
     def representation = repr.map(", a " + _).getOrElse("")
 
     def indent(s: String) = if (s == "") "" else "  " + s
-    def indentN(s: String) = s.lines map indent mkString "\n"
+    def indentN(s: String) = s.lines.map(indent) mkString "\n"
 
     def boxUnboxImpls = Map(
       "@boxRunTimeDoc@" -> """
@@ -306,7 +306,7 @@ import scala.language.implicitConversions"""
     def assemble(decl: String, lines: List[String]): String = {
       val body =
         if (lines.isEmpty) " { }\n\n"
-        else lines map indent mkString (" {\n", "\n", "\n}\n")
+        else lines.map(indent) mkString (" {\n", "\n", "\n}\n")
 
       decl + body + "\n"
     }
@@ -531,9 +531,9 @@ override def getClass(): Class[Boolean] = null
   def isFloatingType = Set(F, D)
   def isWideType = Set(L, D)
 
-  def cardinal = numeric filter isIntegerType
+  def cardinal = numeric.filter(isIntegerType)
   def numeric = List(B, S, C, I, L, F, D)
   def values = List(U, Z) ++ numeric
 
-  def make() = values map (x => (x.name, x.make()))
+  def make() = values.map(x => (x.name, x.make()))
 }

@@ -43,10 +43,10 @@ object WithResourceId extends DispatchSnippet {
   import Helpers._
 
   def render(xhtml: NodeSeq): NodeSeq = {
-    xhtml flatMap
-      (_ match {
-        case e: Elem if e.label == "link" =>
-          attrStr(e.attributes, "href").map { href =>
+    xhtml.flatMap(_ match {
+      case e: Elem if e.label == "link" =>
+        attrStr(e.attributes, "href")
+          .map { href =>
             e.copy(
               attributes = MetaData.update(
                 e.attributes,
@@ -54,9 +54,11 @@ object WithResourceId extends DispatchSnippet {
                 new UnprefixedAttribute("href",
                                         LiftRules.attachResourceId(href),
                                         Null)))
-          } openOr e
-        case e: Elem if e.label == "script" =>
-          attrStr(e.attributes, "src") map { src =>
+          }
+          .openOr(e)
+      case e: Elem if e.label == "script" =>
+        attrStr(e.attributes, "src")
+          .map { src =>
             e.copy(
               attributes = MetaData.update(
                 e.attributes,
@@ -64,9 +66,10 @@ object WithResourceId extends DispatchSnippet {
                 new UnprefixedAttribute("src",
                                         LiftRules.attachResourceId(src),
                                         Null)))
-          } openOr e
-        case e => e
-      })
+          }
+          .openOr(e)
+      case e => e
+    })
   }
 
   private def attrStr(attrs: MetaData, attr: String): Box[String] =
@@ -74,10 +77,9 @@ object WithResourceId extends DispatchSnippet {
       case None => Empty
       case Some(Nil) => Empty
       case Some(x) => Full(x.toString)
-    }) or
-      (attrs.get(attr.toLowerCase) match {
-        case None => Empty
-        case Some(Nil) => Empty
-        case Some(x) => Full(x.toString)
-      })
+    }).or(attrs.get(attr.toLowerCase) match {
+      case None => Empty
+      case Some(Nil) => Empty
+      case Some(x) => Full(x.toString)
+    })
 }

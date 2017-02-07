@@ -118,8 +118,8 @@ trait ContextErrors { self: Analyzer =>
   def notAnyRefMessage(found: Type): String = {
     val tp = found.widen
     def name = tp.typeSymbol.nameString
-    def parents = tp.parents filterNot isTrivialTopType
-    def onlyAny = tp.parents forall (_.typeSymbol == AnyClass)
+    def parents = tp.parents.filterNot(isTrivialTopType)
+    def onlyAny = tp.parents.forall(_.typeSymbol == AnyClass)
     def parents_s =
       (if (parents.isEmpty) tp.parents else parents) mkString ", "
     def what =
@@ -166,7 +166,7 @@ trait ContextErrors { self: Analyzer =>
       val paramName = param.name
       val paramTp = param.tpe
       def evOrParam =
-        (if (paramName startsWith nme.EVIDENCE_PARAM_PREFIX)
+        (if (paramName.startsWith(nme.EVIDENCE_PARAM_PREFIX))
            "evidence parameter of type"
          else s"parameter $paramName:")
       paramTp.typeSymbolDirect match {
@@ -217,13 +217,13 @@ trait ContextErrors { self: Analyzer =>
               if !decls.isEmpty && found.typeSymbol.isAnonOrRefinementClass =>
             val retyped = typed(tree.duplicate.clearType())
             val foundDecls =
-              retyped.tpe.decls filter
-                (sym => !sym.isConstructor && !sym.isSynthetic)
+              retyped.tpe.decls.filter(sym =>
+                !sym.isConstructor && !sym.isSynthetic)
             if (foundDecls.isEmpty || (found.typeSymbol eq NoSymbol)) found
             else {
               // The members arrive marked private, presumably because there was no
               // expected type and so they're considered members of an anon class.
-              foundDecls foreach (_.makePublic)
+              foundDecls.foreach(_.makePublic)
               // TODO: if any of the found parents match up with required parents after normalization,
               // print the error so that they match. The major beneficiary there would be
               // java.lang.Object vs. AnyRef.
@@ -514,8 +514,8 @@ trait ContextErrors { self: Analyzer =>
           val addendum: String = fun match {
             case Function(params, _) if withTupleAddendum =>
               val funArity = params.length
-              val example = analyzer.exampleTuplePattern(params map (_.name))
-              (pt baseType FunctionClass(1)) match {
+              val example = analyzer.exampleTuplePattern(params.map(_.name))
+              (pt.baseType(FunctionClass(1))) match {
                 case TypeRef(_, _, arg :: _)
                     if arg.typeSymbol == TupleClass(funArity) &&
                       funArity > 1 =>
@@ -675,9 +675,9 @@ trait ContextErrors { self: Analyzer =>
           val suffix =
             if (missing.isEmpty) ""
             else {
-              val keep = missing take 3 map (_.name)
+              val keep = missing.take(3).map(_.name)
               val ess = if (missing.tail.isEmpty) "" else "s"
-              f".%nUnspecified value parameter$ess ${keep.mkString("", ", ", if ((missing drop 3).nonEmpty) "..." else ".")}"
+              f".%nUnspecified value parameter$ess ${keep.mkString("", ", ", if ((missing.drop(3)).nonEmpty) "..." else ".")}"
             }
           s"not enough arguments for ${treeSymTypeMsg(fun)}$suffix"
         }
@@ -764,7 +764,7 @@ trait ContextErrors { self: Analyzer =>
       def MissingArgsForMethodTpeError(tree: Tree, meth: Symbol) = {
         val f = meth.name
         val paf =
-          s"$f(${meth.asMethod.paramLists map (_ map (_ => "_") mkString ",") mkString ")("})"
+          s"$f(${meth.asMethod.paramLists.map(_.map(_ => "_") mkString ",") mkString ")("})"
         val advice = s"""
           |Unapplied methods are only converted to functions when a function type is expected.
           |You can make this conversion explicit by writing `$f _` or `$paf` instead of `$f`.""".stripMargin
@@ -887,7 +887,7 @@ trait ContextErrors { self: Analyzer =>
         // Most of this hard work is associated with SI-4893.
         val isBug =
           sym0.isAbstractType && sym1.isAbstractType &&
-            (sym0.name startsWith "_$")
+            (sym0.name.startsWith("_$"))
         val addendums = List(
           if (sym0.associatedFile eq sym1.associatedFile)
             Some(
@@ -1005,7 +1005,7 @@ trait ContextErrors { self: Analyzer =>
             // [Paul] See Exceptional.scala and Origins.scala.
             val relevancyThreshold = realex
               .getStackTrace()
-              .indexWhere(_.getMethodName endsWith "macroExpandWithRuntime")
+              .indexWhere(_.getMethodName.endsWith("macroExpandWithRuntime"))
             if (relevancyThreshold == -1) None
             else {
               var relevantElements =
@@ -1019,7 +1019,7 @@ trait ContextErrors { self: Analyzer =>
               while (threshold != relevantElements.length &&
                      isMacroInvoker(relevantElements(
                        relevantElements.length - threshold - 1))) threshold += 1
-              relevantElements = relevantElements dropRight threshold
+              relevantElements = relevantElements.dropRight(threshold)
 
               realex.setStackTrace(relevantElements)
               Some(EOL + stackTraceString(realex))
@@ -1035,7 +1035,7 @@ trait ContextErrors { self: Analyzer =>
                   "error = " + stackTraceString(ex))
               None
           }
-        } getOrElse {
+        }.getOrElse {
           val msg = realex.getMessage
           if (msg != null) msg else realex.getClass.getName
         }
@@ -1100,8 +1100,8 @@ trait ContextErrors { self: Analyzer =>
       def resType =
         if (pt.isWildcard) "" else " with expected result type " + pt
       def allTypes =
-        (alternatives(tree) flatMap (_.paramTypes)) ++ argtpes :+ pt
-      def locals = alternatives(tree) flatMap (_.typeParams)
+        (alternatives(tree).flatMap(_.paramTypes)) ++ argtpes :+ pt
+      def locals = alternatives(tree).flatMap(_.typeParams)
 
       withDisambiguation(locals, allTypes: _*) {
         treeSymTypeMsg(tree) + msg + asParams(argtpes) + resType
@@ -1184,7 +1184,7 @@ trait ContextErrors { self: Analyzer =>
           "no type parameters for " +
             applyErrorMsg(fn,
                           " exist so that it can be applied to arguments ",
-                          args map (_.tpe.widen),
+                          args.map(_.tpe.widen),
                           WildcardType) + "\n --- because ---\n" + msg
         )
 
@@ -1235,7 +1235,7 @@ trait ContextErrors { self: Analyzer =>
                                           pt: Type,
                                           lastTry: Boolean) = {
 
-        if (!(argtpes exists (_.isErroneous)) && !pt.isErroneous) {
+        if (!(argtpes.exists(_.isErroneous)) && !pt.isErroneous) {
           val msg0 =
             "argument types " + argtpes.mkString("(", ",", ")") +
               (if (pt == WildcardType) ""
@@ -1294,18 +1294,19 @@ trait ContextErrors { self: Analyzer =>
                                                      explaintypes: Boolean) = {
         if (explaintypes) {
           val bounds =
-            tparams map
-              (tp => tp.info.instantiateTypeParams(tparams, targs).bounds)
-          (targs, bounds).zipped foreach
-            ((targ, bound) => explainTypes(bound.lo, targ))
-          (targs, bounds).zipped foreach
-            ((targ, bound) => explainTypes(targ, bound.hi))
+            tparams.map(tp =>
+              tp.info.instantiateTypeParams(tparams, targs).bounds)
+          (targs, bounds).zipped.foreach((targ, bound) =>
+            explainTypes(bound.lo, targ))
+          (targs, bounds).zipped.foreach((targ, bound) =>
+            explainTypes(targ, bound.hi))
           ()
         }
 
         prefix + "type arguments " + targs.mkString("[", ",", "]") +
           " do not conform to " + tparams.head.owner +
-          "'s type parameter bounds " + (tparams map (_.defString))
+          "'s type parameter bounds " + (tparams
+          .map(_.defString))
           .mkString("[", ",", "]")
       }
 
@@ -1419,7 +1420,8 @@ trait ContextErrors { self: Analyzer =>
             val error = new NormalTypeErrorFromCyclicReference(
               tree,
               typer
-                .cyclicReferenceMessage(sym, info.tree) getOrElse ex.getMessage)
+                .cyclicReferenceMessage(sym, info.tree)
+                .getOrElse(ex.getMessage))
             issueTypeError(error)
           case _ =>
             contextNamerErrorGen.issue(TypeErrorWithUnderlyingTree(tree, ex))
@@ -1585,12 +1587,14 @@ trait ContextErrors { self: Analyzer =>
                  (sm"""|Note: ${sym.name} is not implicitly converted to AnyRef.  You can safely
                       |pattern match `x: AnyRef` or cast `x.asInstanceOf[AnyRef]` to do so.""")
                else
-                 boxedClass get sym map
-                   (boxed =>
-                      sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
+                 boxedClass
+                   .get(sym)
+                   .map(boxed =>
+                     sm"""|Note: an implicit exists from ${sym.fullName} => ${boxed.fullName}, but
                       |methods inherited from Object are rendered ambiguous.  This is to avoid
                       |a blanket implicit which would convert any ${sym.fullName} to any AnyRef.
-                      |You may wish to use a type ascription: `x: ${boxed.fullName}`.""") getOrElse "")
+                      |You may wish to use a type ascription: `x: ${boxed.fullName}`.""")
+                   .getOrElse(""))
             else
               sm"""|Note that implicit conversions are not applicable because they are ambiguous:
                     |${coreMsg}are possible conversion functions from $found to $req"""

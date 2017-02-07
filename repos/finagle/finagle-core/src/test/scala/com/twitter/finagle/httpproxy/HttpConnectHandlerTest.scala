@@ -18,16 +18,16 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
   class HttpConnectHandlerHelper {
     val ctx = mock[ChannelHandlerContext]
     val channel = mock[Channel]
-    when(ctx.getChannel) thenReturn channel
+    when(ctx.getChannel).thenReturn(channel)
     val pipeline = mock[ChannelPipeline]
-    when(ctx.getPipeline) thenReturn pipeline
-    when(channel.getPipeline) thenReturn pipeline
+    when(ctx.getPipeline).thenReturn(pipeline)
+    when(channel.getPipeline).thenReturn(pipeline)
     val closeFuture = Channels.future(channel)
-    when(channel.getCloseFuture) thenReturn closeFuture
+    when(channel.getCloseFuture).thenReturn(closeFuture)
     val remoteAddress =
       new InetSocketAddress(InetAddress.getLoopbackAddress, 80)
     val port = remoteAddress.getPort
-    when(channel.getRemoteAddress) thenReturn remoteAddress
+    when(channel.getRemoteAddress).thenReturn(remoteAddress)
     val proxyAddress = mock[SocketAddress]
     val connectFuture = Channels.future(channel, true)
     val connectRequested = new DownstreamChannelStateEvent(

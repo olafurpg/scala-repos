@@ -394,8 +394,8 @@ class Flags extends ModifierFlags {
     (ABSTRACT, ABSTRACT_PKL)
   )
 
-  private val mappedRawFlags = rawPickledCorrespondence map (_._1)
-  private val mappedPickledFlags = rawPickledCorrespondence map (_._2)
+  private val mappedRawFlags = rawPickledCorrespondence.map(_._1)
+  private val mappedPickledFlags = rawPickledCorrespondence.map(_._2)
 
   private class MapFlags(from: Array[Long], to: Array[Long])
       extends (Long => Long) {
@@ -509,7 +509,7 @@ class Flags extends ModifierFlags {
     val access = accessString(flags, privateWithin)
     val nonAccess = flagsToString(flags & ~AccessFlags)
 
-    List(nonAccess, access) filterNot (_ == "") mkString " "
+    List(nonAccess, access).filterNot(_ == "") mkString " "
   }
 
   @deprecated("Use flagString on the flag-carrying member", "2.10.0")
@@ -524,9 +524,9 @@ class Flags extends ModifierFlags {
         if ((flags & mask) != 0L) {
           val s = flagToString(mask)
           if (s.length > 0) {
-            if (sb eq null) sb = new StringBuilder append s
-            else if (sb.length == 0) sb append s
-            else sb append " " append s
+            if (sb eq null) sb = new StringBuilder.append(s)
+            else if (sb.length == 0) sb.append(s)
+            else sb.append(" ").append(s)
           }
         }
         i += 1
@@ -539,10 +539,10 @@ class Flags extends ModifierFlags {
   final val MaxBitPosition = 62
 
   final val pickledListOrder: List[Long] = {
-    val all = 0 to MaxBitPosition map (1L << _)
-    val front = mappedRawFlags map (_.toLong)
+    val all = (0 to MaxBitPosition).map(1L << _)
+    val front = mappedRawFlags.map(_.toLong)
 
-    front.toList ++ (all filterNot (front contains _))
+    front.toList ++ (all.filterNot(front contains _))
   }
   final val rawFlagPickledOrder: Array[Long] = pickledListOrder.toArray
 }

@@ -87,8 +87,8 @@ class GroupManagerTest
       )
     val update = manager(10, 20).assignDynamicServicePorts(Group.empty, group)
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
-    update.transitiveApps.flatMap(_.portNumbers.filter(x =>
-      x >= 10 && x <= 20)) should have size 5
+    (update.transitiveApps.flatMap(_.portNumbers.filter(x =>
+      x >= 10 && x <= 20)) should have).size(5)
   }
 
   test("Assign dynamic service ports specified in the container") {
@@ -125,8 +125,8 @@ class GroupManagerTest
     val update = manager(minServicePort = 10, maxServicePort = 20)
       .assignDynamicServicePorts(Group.empty, group)
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
-    update.transitiveApps.flatMap(_.portNumbers.filter(x =>
-      x >= 10 && x <= 20)) should have size 2
+    (update.transitiveApps.flatMap(_.portNumbers.filter(x =>
+      x >= 10 && x <= 20)) should have).size(2)
   }
 
   //regression for #2743
@@ -194,8 +194,8 @@ class GroupManagerTest
       )
     val update = manager(10, 20).assignDynamicServicePorts(Group.empty, group)
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
-    update.transitiveApps.flatMap(_.portNumbers.filter(x =>
-      x >= 10 && x <= 20)) should have size 5
+    (update.transitiveApps.flatMap(_.portNumbers.filter(x =>
+      x >= 10 && x <= 20)) should have).size(5)
   }
 
   // Regression test for #2868
@@ -209,7 +209,7 @@ class GroupManagerTest
     val update = manager(10, 20).assignDynamicServicePorts(Group.empty, group)
 
     val assignedPorts: Set[Int] = update.transitiveApps.flatMap(_.portNumbers)
-    assignedPorts should have size 2
+    (assignedPorts should have).size(2)
   }
 
   test(
@@ -231,7 +231,7 @@ class GroupManagerTest
       manager(10, 20).assignDynamicServicePorts(originalGroup, updatedGroup)
 
     val assignedPorts: Set[Int] = result.transitiveApps.flatMap(_.portNumbers)
-    assignedPorts should have size 3
+    (assignedPorts should have).size(3)
   }
 
   test("If there are not enough ports, a PortExhausted exception is thrown") {

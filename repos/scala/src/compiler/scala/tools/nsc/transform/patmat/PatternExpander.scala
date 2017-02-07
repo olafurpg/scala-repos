@@ -166,11 +166,11 @@ trait PatternExpander[Pattern, Type] {
       TypedPat(pat, extractor.elementType)
     private def typedAsSequence(pat: Pattern) =
       TypedPat(pat, extractor.sequenceType)
-    private def productPats = patterns.fixed take productArity
-    private def elementPats = patterns.fixed drop productArity
-    private def products = (productPats, productTypes).zipped map TypedPat
-    private def elements = elementPats map typedAsElement
-    private def stars = patterns.starPatterns map typedAsSequence
+    private def productPats = patterns.fixed.take(productArity)
+    private def elementPats = patterns.fixed.drop(productArity)
+    private def products = (productPats, productTypes).zipped.map(TypedPat)
+    private def elements = elementPats.map(typedAsElement)
+    private def stars = patterns.starPatterns.map(typedAsSequence)
 
     override def toString = s"""
       |Aligned {

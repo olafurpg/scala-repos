@@ -65,10 +65,10 @@ class ActivatorProjectBuilder
     setModuleFilePath(path)
 
     val settings = getExternalProjectSettings
-    settings setExternalProjectPath path
+    settings.setExternalProjectPath(path)
     settings setUseAutoImport true
 
-    ModuleBuilder deleteModuleFile oldPath
+    ModuleBuilder.deleteModuleFile(oldPath)
 
     val moduleType = getModuleType
     val module: Module = moduleModel.newModule(path, moduleType.getId)
@@ -84,7 +84,7 @@ class ActivatorProjectBuilder
     allTemplates.get(selected) match {
       case Some(info) =>
         val contentPath = getContentEntryPath
-        if (StringUtil isEmpty contentPath) return
+        if (StringUtil.isEmpty(contentPath)) return
 
         val contentRootDir = new File(contentPath)
         FileUtilRt createDirectory contentRootDir
@@ -107,7 +107,7 @@ class ActivatorProjectBuilder
         SbtProjectSettings,
         _ <: ExternalSystemSettingsListener[SbtProjectSettings]]]
 
-    getExternalProjectSettings setExternalProjectPath getContentEntryPath
+    getExternalProjectSettings.setExternalProjectPath(getContentEntryPath)
     settings linkProject getExternalProjectSettings
   }
 
@@ -123,7 +123,7 @@ class ActivatorProjectBuilder
     }) {
 
       override def updateDataModel() {
-        settingsStep.getContext setProjectJdk myJdkComboBox.getSelectedJdk
+        settingsStep.getContext.setProjectJdk(myJdkComboBox.getSelectedJdk)
       }
 
       override def validate(): Boolean = {

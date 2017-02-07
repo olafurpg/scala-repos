@@ -26,13 +26,13 @@ class AlgebraicTest extends SpireProperties {
   }
 
   property("relative approximation of addition is correct") {
-    val sum = Iterator.fill(29)(Algebraic(1) / 29) reduce (_ + _)
+    val sum = Iterator.fill(29)(Algebraic(1) / 29).reduce(_ + _)
     sum.toDouble shouldBe 1.0
     sum.toBigDecimal(DECIMAL128) shouldBe BigDecimal(1)
   }
 
   property("absolute approximation of subtraction is correct") {
-    val negSqrt2x98 = Iterator.fill(100)(Algebraic(2).sqrt) reduce (_ - _)
+    val negSqrt2x98 = Iterator.fill(100)(Algebraic(2).sqrt).reduce(_ - _)
     val dblNegSqrt2x98 = -math.sqrt(2) * 98
     approximation(negSqrt2x98, 4, BigDecimal(dblNegSqrt2x98))
   }
@@ -65,7 +65,7 @@ class AlgebraicTest extends SpireProperties {
     approximation(Algebraic(2).sqrt, 5, BigDecimal(1.4142135623730951))
 
     // give or take
-    approximation(Algebraic(-4) nroot 3, 5, BigDecimal(-1.5874010519681994))
+    approximation(Algebraic(-4).nroot(3), 5, BigDecimal(-1.5874010519681994))
   }
 
   property("associativity with large and small numbers") {
@@ -154,7 +154,7 @@ class AlgebraicTest extends SpireProperties {
     )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
-    (roots.sorted zip algebraicRoots).forall {
+    (roots.sorted.zip(algebraicRoots)).forall {
       case (qRoot, aRoot) =>
         aRoot == Algebraic(qRoot)
     }
@@ -172,7 +172,7 @@ class AlgebraicTest extends SpireProperties {
     )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
-    (roots.sorted zip algebraicRoots).forall {
+    (roots.sorted.zip(algebraicRoots)).forall {
       case (qRoot, aRoot) =>
         aRoot == Algebraic(qRoot)
     }

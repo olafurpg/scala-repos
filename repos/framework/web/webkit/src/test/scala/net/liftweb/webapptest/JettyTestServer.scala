@@ -29,7 +29,7 @@ import common.Box
 
 final class JettyTestServer(baseUrlBox: Box[URL]) {
 
-  def baseUrl = baseUrlBox getOrElse new URL("http://127.0.0.1:8080")
+  def baseUrl = baseUrlBox.getOrElse(new URL("http://127.0.0.1:8080"))
 
   private val (server_, context_) = {
     val server = new Server(baseUrl.getPort)

@@ -121,7 +121,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
 
     // Explicit join with condition
     val q1b_0 =
-      coffees.sortBy(_.price).take(3) join suppliers on (_.supID === _.id)
+      (coffees.sortBy(_.price).take(3) join suppliers).on(_.supID === _.id)
     def q1b =
       for {
         (c, s) <- q1b_0
@@ -276,7 +276,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
 
     // Explicit self-join with condition
     val q5b = for {
-      t <- q5_0 join q5_0 on (_.name === _.name)
+      t <- (q5_0 join q5_0).on(_.name === _.name)
     } yield (t._1, t._2)
 
     // Unused outer query result, unbound TableQuery
@@ -317,14 +317,18 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
 
     // Simple union
     val q7a = for {
-      c <- coffees.filter(_.price < 800) union coffees.filter(_.price > 950)
+      c <- coffees.filter(_.price < 800).union(coffees.filter(_.price > 950))
     } yield (c.name, c.supID, c.total)
 
     // Union
     val q7 = for {
-      c <- coffees.filter(_.price < 800).map((_, 1)) union coffees
-        .filter(_.price > 950)
-        .map((_, 2))
+      c <- coffees
+        .filter(_.price < 800)
+        .map((_, 1))
+        .union(
+          coffees
+            .filter(_.price > 950)
+            .map((_, 2)))
     } yield (c._1.name, c._1.supID, c._2)
 
     // Transitive push-down without union
@@ -359,21 +363,21 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
     )
 
     // Union with filter on the outside
-    val q7b = q7 filter (_._1 =!= "Colombian")
+    val q7b = q7.filter(_._1 =!= "Colombian")
 
     // Outer join
     val q8 = for {
-      (c1, c2) <- coffees.filter(_.price < 900) joinLeft coffees.filter(
-        _.price < 800) on (_.name === _.name)
+      (c1, c2) <- (coffees.filter(_.price < 900) joinLeft coffees.filter(
+        _.price < 800)).on(_.name === _.name)
     } yield (c1.name, c2.map(_.name))
 
     // Nested outer join
     val q8b = for {
-      t <- coffees.sortBy(_.sales).take(1) joinLeft coffees
+      t <- ((coffees.sortBy(_.sales).take(1) joinLeft coffees
         .sortBy(_.sales)
-        .take(2) on (_.name === _.name) joinLeft coffees
+        .take(2)).on(_.name === _.name) joinLeft coffees
         .sortBy(_.sales)
-        .take(4) on (_._1.supID === _.supID)
+        .take(4)).on(_._1.supID === _.supID)
     } yield (t._1, t._2)
 
     def a6 = seq(
@@ -432,15 +436,15 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
 
     val q2 = for {
       u <- users.sortBy(u => (u.first, u.last.desc))
-      o <- orders filter { o =>
+      o <- orders.filter { o =>
         u.id === o.userID
       }
     } yield u.first ~ u.last ~ o.orderID
 
-    val q3 = for (u <- users filter (_.id === 42)) yield u.first ~ u.last
+    val q3 = for (u <- users.filter(_.id === 42)) yield u.first ~ u.last
 
     val q4 = (for {
-      (u, o) <- users join orders on (_.id === _.userID)
+      (u, o) <- (users join orders).on(_.id === _.userID)
     } yield (u.last, u.first ~ o.orderID)).sortBy(_._1).map(_._2)
 
     val q6a = (for (o <- orders if o.orderID === (for {
@@ -543,7 +547,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       q1 = as.map(identity).filter(_.b === "b3")
       _ <- q1.result.named("q1").map(r1 => r1.toSet shouldBe Set((3, "a3")))
 
-      q2a = as.sortBy(_.a) join as on (_.b === _.b)
+      q2a = (as.sortBy(_.a) join as).on(_.b === _.b)
       q2 = for {
         (c, s) <- q2a
         c2 <- as
@@ -573,8 +577,8 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
 
     val data = Set((1, "a", "a"), (2, "a", "b"), (3, "c", "b"))
 
-    val q1 = (as join as on (_.id === _.id))
-    val q2 = (as join as on (_.id === _.id) join as on (_._1.id === _.id))
+    val q1 = ((as join as).on(_.id === _.id))
+    val q2 = (((as join as).on(_.id === _.id) join as).on(_._1.id === _.id))
     val q3 = q2.map { case ((a1, a2), a3) => (a1.id, a2.a, a3.b) }
     val q4 = as.map(a => (a.id, a.a, a.b, a)).filter(_._3 === "b").map {
       case (id, a1, b, a2) => (id, a2)
@@ -603,14 +607,25 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
     val q11e = q10.drop(7)
     val q11f = q10.take(6).drop(2).filter(_ =!= 5)
     val q12 = as.filter(_.id <= as.map(_.id).max - 1).map(_.a)
-    val q13 = (as.filter(_.id < 2) union as.filter(_.id > 2)).map(_.id)
+    val q13 = (as.filter(_.id < 2).union(as.filter(_.id > 2))).map(_.id)
     val q14 = q13.to[Set]
-    val q15 = (as.map(a => a.id.?).filter(_ < 2) unionAll as
+    val q15 = (as
       .map(a => a.id.?)
-      .filter(_ > 2)).map(_.get).to[Set]
-    val q16 = (as.map(a => a.id.?).filter(_ < 2) unionAll as
+      .filter(_ < 2)
+      .unionAll(
+        as.map(a => a.id.?)
+          .filter(_ > 2)))
+      .map(_.get)
+      .to[Set]
+    val q16 = (as
       .map(a => a.id.?)
-      .filter(_ > 2)).map(_.getOrElse(-1)).to[Set].filter(_ =!= 42)
+      .filter(_ < 2)
+      .unionAll(as
+        .map(a => a.id.?)
+        .filter(_ > 2)))
+      .map(_.getOrElse(-1))
+      .to[Set]
+      .filter(_ =!= 42)
     val q17 = as.sortBy(_.id).zipWithIndex.filter(_._2 < 2L).map {
       case (a, i) => (a.id, i)
     }

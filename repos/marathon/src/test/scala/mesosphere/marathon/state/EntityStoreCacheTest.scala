@@ -28,7 +28,7 @@ class EntityStoreCacheTest
 
     Then("All values are cached")
     entityCache.cacheOpt should not be (empty)
-    entityCache.cacheOpt.get should have size 3
+    (entityCache.cacheOpt.get should have).size(3)
     entityCache.cacheOpt.get.keySet should be(names)
   }
 
@@ -80,7 +80,7 @@ class EntityStoreCacheTest
     "Fetching an unversioned entry will succeed with querying store in direct mode") {
     Given("A UNfilled entityCache")
     val store = mock[EntityStore[TestApp]]
-    store.fetch("a") returns Future.successful(Some(TestApp("a")))
+    store.fetch("a").returns(Future.successful(Some(TestApp("a"))))
     entityCache = new EntityStoreCache[TestApp](store)
 
     When("Fetch an existing entry from the cache")
@@ -96,7 +96,7 @@ class EntityStoreCacheTest
     "Fetching an unknown unversioned entry will succeed with querying store in direct mode") {
     Given("A UNfilled entityCache")
     val store = mock[EntityStore[TestApp]]
-    store.fetch("notExisting") returns Future.successful(None)
+    store.fetch("notExisting").returns(Future.successful(None))
     entityCache = new EntityStoreCache[TestApp](store)
 
     When("Fetch an unknown entry from store")
@@ -112,8 +112,9 @@ class EntityStoreCacheTest
     "Fetching a versioned entry will succeed with querying store in direct mode") {
     Given("A UNfilled entityCache")
     val store = mock[EntityStore[TestApp]]
-    store.fetch("b:1970-01-01T00:00:00.000Z") returns Future.successful(
-      Some(TestApp("b")))
+    store
+      .fetch("b:1970-01-01T00:00:00.000Z")
+      .returns(Future.successful(Some(TestApp("b"))))
     entityCache = new EntityStoreCache[TestApp](store)
 
     When("Fetching an existing entry with version")
@@ -213,16 +214,16 @@ class EntityStoreCacheTest
     content ++=
       (names.map(t => t -> TestApp(t)) ++ names.map(t =>
         s"$t:$now" -> TestApp(t, now)))
-    content should have size 6
+    (content should have).size(6)
     entityCache.onElected.futureValue
 
     When("Get all names in the cache")
     val allNames = entityCache.names().futureValue
 
     Then("All names are returned")
-    allNames should have size 6
-    entityCache.cacheOpt.get should have size 6
-    entityCache.cacheOpt.get.values.flatten should have size 3
+    (allNames should have).size(6)
+    (entityCache.cacheOpt.get should have).size(6)
+    (entityCache.cacheOpt.get.values.flatten should have).size(3)
   }
 
   test(
@@ -233,13 +234,13 @@ class EntityStoreCacheTest
     content ++=
       (names.map(t => t -> TestApp(t)) ++ names.map(t =>
         s"$t:$now" -> TestApp(t, now)))
-    content should have size 6
+    (content should have).size(6)
 
     When("Get all names in the cache")
     val allNames = entityCache.names().futureValue
 
     Then("All names are returned")
-    allNames should have size 6
+    (allNames should have).size(6)
   }
 
   var content: mutable.Map[String, TestApp] = _

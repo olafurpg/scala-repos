@@ -172,7 +172,7 @@ class PolynomialCheck
         Polynomial(rs.take(4).zipWithIndex.map { case (c, e) => Term(c, e) })
 
       val (p1, p2) = (xyz(rs1), xyz(rs2))
-      val p3 = p1 compose p2
+      val p3 = p1.compose(p2)
       p3(r) shouldBe p1(p2(r))
     }
   }
@@ -273,7 +273,7 @@ class PolynomialCheck
       Arbitrary(for {
         ts <- Gen.listOf(for {
           c <- arbitrary[Rational]
-          e <- arbitrary[Int] map { n =>
+          e <- arbitrary[Int].map { n =>
             (n % 10).abs
           }
         } yield (e, c))

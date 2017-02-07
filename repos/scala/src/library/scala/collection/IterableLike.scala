@@ -119,7 +119,7 @@ trait IterableLike[+A, +Repr]
     else {
       b.sizeHintBounded(elems, this)
       var i = 0
-      val it = iterator drop lo
+      val it = iterator.drop(lo)
       while (i < elems && it.hasNext) {
         b += it.next
         i += 1
@@ -176,7 +176,7 @@ trait IterableLike[+A, +Repr]
     *          last will be less than size `size` if the elements don't divide evenly.
     */
   def grouped(size: Int): Iterator[Repr] =
-    for (xs <- iterator grouped size) yield {
+    for (xs <- iterator.grouped(size)) yield {
       val b = newBuilder
       b ++= xs
       b.result()
@@ -222,7 +222,7 @@ trait IterableLike[+A, +Repr]
   def takeRight(n: Int): Repr = {
     val b = newBuilder
     b.sizeHintBounded(n, this)
-    val lead = this.iterator drop n
+    val lead = this.iterator.drop(n)
     val it = this.iterator
     while (lead.hasNext) {
       lead.next()
@@ -242,7 +242,7 @@ trait IterableLike[+A, +Repr]
   def dropRight(n: Int): Repr = {
     val b = newBuilder
     if (n >= 0) b.sizeHint(this, -n)
-    val lead = iterator drop n
+    val lead = iterator.drop(n)
     val it = iterator
     while (lead.hasNext) {
       b += it.next

@@ -173,7 +173,7 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
       // retrieve it and compare
       val mother2 = Person.find(mother.id.get)
       mother2.isDefined must_== true
-      mother2 foreach { m =>
+      mother2.foreach { m =>
         m.children.value mustEqual mother.children.value
         m.firstBorn.value mustEqual mother.firstBorn.value
       }
@@ -229,7 +229,7 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
       // retrieve it and compare
       val mother2 = Person2.find(mother.id.get)
       mother2.isDefined must_== true
-      mother2 foreach { m =>
+      mother2.foreach { m =>
         m.children.value mustEqual mother.children.value
         m.firstBorn.value mustEqual mother.firstBorn.value
       }
@@ -294,7 +294,7 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
       // retrieve it and compare
       val nfl2 = League.find(nfl.id.get)
       nfl2.isDefined must_== true
-      nfl2 foreach { l =>
+      nfl2.foreach { l =>
         l.teams.value mustEqual nfl.teams.value
         l.champion.value mustEqual nfl.champion.value
       }
@@ -302,7 +302,7 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
       // find a player
       val vqb = Player.find(vikes.qb)
       vqb.isDefined must_== true
-      vqb foreach { p =>
+      vqb.foreach { p =>
         p.name.value mustEqual "Brett Favre"
       }
 
@@ -315,14 +315,14 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
       S.initIfUninitted(session) {
         val form = nfl.id.toForm
         form.isDefined must_== true
-        form foreach { fprime =>
+        form.foreach { fprime =>
           val f = ("* [name]" #> ".*" & "select *" #>
             (((ns: NodeSeq) =>
                 ns.filter {
                   case e: Elem =>
                     e.attribute("selected").map(_.text) == Some("selected")
                   case _ => false
-                }) andThen "* [value]" #> ".*"))(fprime)
+                }).andThen("* [value]" #> ".*")))(fprime)
           val ret: Boolean = Helpers.compareXml(f, formPattern)
           ret must_== true
         }
@@ -365,7 +365,7 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
       // retrieve it and compare
       val nfl2 = League2.find(nfl.id.toString)
       nfl2.isDefined must_== true
-      nfl2 foreach { l =>
+      nfl2.foreach { l =>
         l.teams.value mustEqual nfl.teams.value
         l.champion.value mustEqual nfl.champion.value
       }
@@ -373,7 +373,7 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
       // find a player
       val vqb = Player.find(vikes.qb)
       vqb.isDefined must_== true
-      vqb foreach { p =>
+      vqb.foreach { p =>
         p.name.value mustEqual "Brett Favre"
       }
 
@@ -388,14 +388,14 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
       S.initIfUninitted(session) {
         val form = nfl.id.toForm
         form.isDefined must_== true
-        form foreach { fprime =>
+        form.foreach { fprime =>
           val f = ("* [name]" #> ".*" & "select *" #>
             (((ns: NodeSeq) =>
                 ns.filter {
                   case e: Elem =>
                     e.attribute("selected").map(_.text) == Some("selected")
                   case _ => false
-                }) andThen "* [value]" #> ".*"))(fprime)
+                }).andThen("* [value]" #> ".*")))(fprime)
           val ret: Boolean = Helpers.compareXml(f, formPattern)
           ret must_== true
         }

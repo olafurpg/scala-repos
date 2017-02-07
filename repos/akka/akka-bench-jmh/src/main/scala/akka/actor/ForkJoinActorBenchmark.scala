@@ -109,10 +109,10 @@ object ForkJoinActorBenchmark {
   class Pipe(next: Option[ActorRef]) extends Actor {
     def receive = {
       case m @ `message` =>
-        if (next.isDefined) next.get forward m
+        if (next.isDefined) next.get.forward(m)
       case s @ `stop` =>
         context stop self
-        if (next.isDefined) next.get forward s
+        if (next.isDefined) next.get.forward(s)
     }
   }
   class PingPong extends Actor {

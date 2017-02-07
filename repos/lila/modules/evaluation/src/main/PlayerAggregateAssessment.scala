@@ -55,19 +55,19 @@ case class PlayerAggregateAssessment(user: User,
       (relatedCheatersCount == relatedUsersCount) && relatedUsersCount >= 1
 
     def sigDif(dif: Int)(a: Option[Int], b: Option[Int]): Option[Boolean] =
-      (a |@| b) apply { case (a, b) => b - a > dif }
+      ((a |@| b)).apply { case (a, b) => b - a > dif }
 
     val difs = List((sfAvgBlurs, sfAvgNoBlurs),
                     (sfAvgLowVar, sfAvgHighVar),
                     (sfAvgHold, sfAvgNoHold))
 
     val actionable: Boolean = {
-      val difFlags = difs map (sigDif(10) _).tupled
+      val difFlags = difs.map(sigDif(10) _).tupled
       difFlags.forall(_.isEmpty) || difFlags.exists(~_) ||
       assessmentsCount < 50
     }
 
-    val exceptionalDif: Boolean = difs map (sigDif(30) _).tupled exists (~_)
+    val exceptionalDif: Boolean = difs.map(sigDif(30) _).tupled.exists(~_)
 
     if (actionable) {
       if (markable && bannable) EngineAndBan
@@ -83,7 +83,7 @@ case class PlayerAggregateAssessment(user: User,
   }
 
   def countAssessmentValue(assessment: GameAssessment) =
-    playerAssessments count {
+    playerAssessments.count {
       _.assessment == assessment
     }
 
@@ -145,7 +145,7 @@ object PlayerAggregateAssessment {
 
   case class WithGames(pag: PlayerAggregateAssessment,
                        games: List[lila.game.Game]) {
-    def pov(pa: PlayerAssessment) = games find (_.id == pa.gameId) map {
+    def pov(pa: PlayerAssessment) = (games find (_.id == pa.gameId)).map {
       lila.game.Pov(_, pa.color)
     }
   }
@@ -168,13 +168,13 @@ object PlayerFlags {
 
     def reads(r: BSON.Reader): PlayerFlags =
       PlayerFlags(
-        suspiciousErrorRate = r boolD "ser",
-        alwaysHasAdvantage = r boolD "aha",
-        highBlurRate = r boolD "hbr",
-        moderateBlurRate = r boolD "mbr",
-        consistentMoveTimes = r boolD "cmt",
-        noFastMoves = r boolD "nfm",
-        suspiciousHoldAlert = r boolD "sha"
+        suspiciousErrorRate = r.boolD("ser"),
+        alwaysHasAdvantage = r.boolD("aha"),
+        highBlurRate = r.boolD("hbr"),
+        moderateBlurRate = r.boolD("mbr"),
+        consistentMoveTimes = r.boolD("cmt"),
+        noFastMoves = r.boolD("nfm"),
+        suspiciousHoldAlert = r.boolD("sha")
       )
 
     def writes(w: BSON.Writer, o: PlayerFlags) =

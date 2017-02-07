@@ -42,17 +42,18 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
 
     /** Todo: organize similar to mkStatic in scala.reflect.Base */
     private def getModuleOrClass(path: Name, len: Int): Symbol = {
-      val point = path lastPos ('.', len - 1)
+      val point = path.lastPos('.', len - 1)
       val owner =
         if (point > 0) getModuleOrClass(path.toTermName, point)
         else RootClass
-      val name = path subName (point + 1, len)
+      val name = path.subName(point + 1, len)
       val sym = owner.info member name
-      val result = if (path.isTermName) sym.suchThat(_ hasFlag MODULE) else sym
+      val result =
+        if (path.isTermName) sym.suchThat(_.hasFlag(MODULE)) else sym
       if (result != NoSymbol) result
       else {
         if (settings.debug) { log(sym.info); log(sym.info.members) } //debug
-        thisMirror.missingHook(owner, name) orElse {
+        thisMirror.missingHook(owner, name).orElse {
           MissingRequirementError.notFound(
             (if (path.isTermName) "object " else "class ") + path + " in " +
               thisMirror)
@@ -77,7 +78,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
       */
     private def staticModuleOrClass(path: Name): Symbol = {
       val isPackageless = path.pos('.') == path.length
-      if (isPackageless) EmptyPackageClass.info decl path
+      if (isPackageless) EmptyPackageClass.info.decl(path)
       else getModuleOrClass(path)
     }
 
@@ -89,7 +90,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
 
     private[scala] def missingHook(owner: Symbol, name: Name): Symbol =
       logResult(s"missingHook($owner, $name)")(
-        mirrorMissingHook(owner, name) orElse universeMissingHook(owner, name)
+        mirrorMissingHook(owner, name).orElse(universeMissingHook(owner, name))
       )
 
     // todo: get rid of most the methods here and keep just staticClass/Module/Package
@@ -158,7 +159,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     // a method which returns a usable name, one which doesn't expose this
     // detail of the backend.
     def requiredModule[T: ClassTag]: ModuleSymbol =
-      getRequiredModule(erasureName[T] stripSuffix "$")
+      getRequiredModule(erasureName[T].stripSuffix("$"))
 
     def getModuleIfDefined(fullname: String): Symbol =
       getModuleIfDefined(newTermNameCached(fullname))
@@ -268,29 +269,28 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
       // Still fiddling with whether it's cleaner to do some of this setup here
       // or from constructors.  The latter approach tends to invite init order issues.
 
-      EmptyPackageClass setInfo rootLoader
-      EmptyPackage setInfo EmptyPackageClass.tpe
+      EmptyPackageClass.setInfo(rootLoader)
+      EmptyPackage.setInfo(EmptyPackageClass.tpe)
 
       connectModuleToClass(EmptyPackage, EmptyPackageClass)
       connectModuleToClass(RootPackage, RootClass)
 
-      RootClass.info.decls enter EmptyPackage
-      RootClass.info.decls enter RootPackage
+      RootClass.info.decls.enter(EmptyPackage)
+      RootClass.info.decls.enter(RootPackage)
 
       if (rootOwner != NoSymbol) {
         // synthetic core classes are only present in root mirrors
         // because Definitions.scala, which initializes and enters them, only affects rootMirror
         // therefore we need to enter them manually for non-root mirrors
-        definitions.syntheticCoreClasses foreach
-          (theirSym => {
-             val theirOwner = theirSym.owner
-             assert(theirOwner.isPackageClass,
-                    s"theirSym = $theirSym, theirOwner = $theirOwner")
-             val ourOwner = staticPackage(theirOwner.fullName).moduleClass
-             val ourSym =
-               theirSym // just copy the symbol into our branch of the symbol table
-             ourOwner.info.decls enterIfNew ourSym
-           })
+        definitions.syntheticCoreClasses.foreach(theirSym => {
+          val theirOwner = theirSym.owner
+          assert(theirOwner.isPackageClass,
+                 s"theirSym = $theirSym, theirOwner = $theirOwner")
+          val ourOwner = staticPackage(theirOwner.fullName).moduleClass
+          val ourSym =
+            theirSym // just copy the symbol into our branch of the symbol table
+          ourOwner.info.decls.enterIfNew(ourSym)
+        })
       }
 
       initialized = true
@@ -323,7 +323,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     class RootPackage
         extends ModuleSymbol(rootOwner, NoPosition, nme.ROOTPKG)
         with RootSymbol {
-      this setInfo NullaryMethodType(RootClass.tpe)
+      this.setInfo(NullaryMethodType(RootClass.tpe))
 
       override def isRootPackage = true
     }
@@ -335,7 +335,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     class RootClass
         extends PackageClassSymbol(rootOwner, NoPosition, tpnme.ROOT)
         with RootSymbol {
-      this setInfo rootLoader
+      this.setInfo(rootLoader)
 
       override def isRoot = true
       override def isEffectiveRoot = true

@@ -24,7 +24,7 @@ trait ScalacPatternExpanders {
 
   implicit class AlignedOps(val aligned: PatternAligned) {
     import aligned._
-    def expectedTypes = typedPatterns map (_.tpe)
+    def expectedTypes = typedPatterns.map(_.tpe)
     def unexpandedFormals = extractor.varargsTypes
   }
   trait ScalacPatternExpander extends PatternExpander[Tree, Type] {
@@ -38,8 +38,10 @@ trait ScalacPatternExpanders {
     def elementTypeOf(tpe: Type) = {
       val seq = repeatedToSeq(tpe)
 
-      (typeOfMemberNamedHead(seq) orElse typeOfMemberNamedApply(seq) orElse definitions
-        .elementType(ArrayClass, seq))
+      (typeOfMemberNamedHead(seq)
+        .orElse(typeOfMemberNamedApply(seq))
+        .orElse(definitions
+          .elementType(ArrayClass, seq)))
     }
     def newExtractor(whole: Type,
                      fixed: List[Type],

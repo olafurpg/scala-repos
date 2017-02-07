@@ -20,7 +20,7 @@ object CustomRoute {
         case msg: CamelMessage =>
           sender() !
             (msg.mapBody { body: String =>
-              "received %s" format body
+              "received %s".format(body)
             })
       }
     }
@@ -48,7 +48,7 @@ object CustomRoute {
         extends Consumer {
       def receive = {
         case msg: CamelMessage =>
-          throw new Exception("error: %s" format msg.body)
+          throw new Exception("error: %s".format(msg.body))
       }
       override def onRouteDefinition =
         (rd) =>

@@ -17,7 +17,7 @@ trait SortedSets { self: BaseClient =>
       case MBulkReply(messages) => withScoresHelper(withScores)(messages)
       case EmptyMBulkReply() => withScoresHelper(withScores)(Nil)
     }
-    parse andThen Future.value
+    parse.andThen(Future.value)
   }
 
   private[this] def withScoresHelper(

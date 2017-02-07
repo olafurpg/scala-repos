@@ -35,7 +35,7 @@ object Opt {
     def --^[T: FromString]
       : Option[T] // --opt <arg: T> is optional, result is Option[T]
 
-    def optMap[T](f: String => T) = --| map f
+    def optMap[T](f: String => T) = --|.map(f)
 
     /** Names.
       */
@@ -80,25 +80,25 @@ object Opt {
                  val name: String)
       extends Implicit
       with Error {
-    def --? = parsed isSet opt
+    def --? = parsed.isSet(opt)
     def -->(body: => Unit) = {
-      val isSet = parsed isSet opt; if (isSet) body; isSet
+      val isSet = parsed.isSet(opt); if (isSet) body; isSet
     }
-    def --| = parsed get opt
+    def --| = parsed.get(opt)
     def --^[T: FromString] = {
       val fs = implicitly[FromString[T]]
-      --| map { arg =>
+      --|.map { arg =>
         if (fs isDefinedAt arg) fs(arg)
         else failOption(arg, "not a " + fs.targetString)
       }
     }
 
-    def defaultTo[T: FromString](default: T) = --^[T] getOrElse default
-    def defaultToEnv(envVar: String) = --| getOrElse envOrElse(envVar, "")
+    def defaultTo[T: FromString](default: T) = --^[T].getOrElse(default)
+    def defaultToEnv(envVar: String) = --|.getOrElse(envOrElse(envVar, ""))
     def expandTo(args: String*) = ()
 
     def choiceOf[T: FromString](choices: T*) = {
-      --^[T] map { arg =>
+      --^[T].map { arg =>
         if (choices contains arg) arg
         else failOption(arg.toString, "not a valid choice from " + choices)
       }

@@ -23,8 +23,8 @@ object Test extends App {
     for { x <- xs if x % 2 == 0 } print(x + " "); println
     var n = 0
     for (_ <- xs) n += 1; println(n)
-    for ((x, y) <- xs zip ys) print(x + " "); println
-    for (p @ (x, y) <- xs zip ys) print(p._1 + " "); println
+    for ((x, y) <- xs.zip(ys)) print(x + " "); println
+    for (p @ (x, y) <- xs.zip(ys)) print(p._1 + " "); println
 
     // iterators
     for (x <- it) print(x + " "); println
@@ -45,8 +45,8 @@ object Test extends App {
     // lists
     var n = 0
     for (_ <- xs) n += 1; println(n)
-    for ((x, y) <- xs zip ys) print(x + " "); println
-    for (p @ (x, y) <- xs zip ys) print(p._1 + " "); println
+    for ((x, y) <- xs.zip(ys)) print(x + " "); println
+    for (p @ (x, y) <- xs.zip(ys)) print(p._1 + " "); println
 
     // iterators
     for (x <- it) print(x + " "); println

@@ -18,76 +18,82 @@ class TypeclassExistenceTest extends FunSuite {
   def hasAbGroup[A](implicit g: AbGroup[A] = null, m: ClassTag[A]): Unit = {
     assert(
       g != null,
-      "Expected implicit AbGroup[%s] instance, but it was not found." format m)
+      "Expected implicit AbGroup[%s] instance, but it was not found.".format(
+        m))
   }
 
   def hasRig[A](implicit rig: Rig[A] = null, m: ClassTag[A]): Unit = {
     assert(
       rig != null,
-      "Expected implicit Rig[%s] instance, but it was not found." format m)
+      "Expected implicit Rig[%s] instance, but it was not found.".format(m))
   }
 
   def hasRing[A](implicit ring: Ring[A] = null, m: ClassTag[A]): Unit = {
     assert(
       ring != null,
-      "Expected implicit Ring[%s] instance, but it was not found." format m)
+      "Expected implicit Ring[%s] instance, but it was not found.".format(m))
   }
 
   def hasEuclideanRing[A](implicit e: EuclideanRing[A] = null,
                           m: ClassTag[A]): Unit = {
     assert(
       e != null,
-      "Expected implicit EuclideanRing[%s] instance, but it was not found." format m)
+      "Expected implicit EuclideanRing[%s] instance, but it was not found."
+        .format(m))
   }
 
   def hasField[A](implicit f: Field[A] = null, m: ClassTag[A]): Unit = {
     assert(
       f != null,
-      "Expected implicit Field[%s] instance, but it was not found." format m)
+      "Expected implicit Field[%s] instance, but it was not found.".format(m))
   }
 
   def hasNumeric[A](implicit n: Numeric[A] = null, m: ClassTag[A]): Unit = {
     assert(
       n != null,
-      "Expected implicit Numeric[%s] instance, but it was not found." format m)
+      "Expected implicit Numeric[%s] instance, but it was not found.".format(
+        m))
   }
 
   def hasFractional[A](implicit f: Fractional[A] = null,
                        m: ClassTag[A]): Unit = {
-    assert(
-      f != null,
-      "Expected implicit Fractional[%s] instance, but it was not found." format m)
+    assert(f != null,
+           "Expected implicit Fractional[%s] instance, but it was not found."
+             .format(m))
   }
 
   def hasOrder[A](implicit ev: Order[A] = null, m: ClassTag[A]): Unit = {
     assert(
       ev != null,
-      "Expected implicit Order[%s] instance, but it was not found." format m)
+      "Expected implicit Order[%s] instance, but it was not found.".format(m))
   }
 
   def hasEq[A](implicit ev: Eq[A] = null, m: ClassTag[A]): Unit = {
-    assert(ev != null,
-           "Expected implicit Eq[%s] instance, but it was not found." format m)
+    assert(
+      ev != null,
+      "Expected implicit Eq[%s] instance, but it was not found.".format(m))
   }
 
   def hasConvertableFrom[A](implicit ev: ConvertableFrom[A] = null,
                             m: ClassTag[A]): Unit = {
     assert(
       ev != null,
-      "Expected implicit ConvertableFrom[%s] instance, but it was not found." format m)
+      "Expected implicit ConvertableFrom[%s] instance, but it was not found."
+        .format(m))
   }
 
   def hasConvertableTo[A](implicit ev: ConvertableTo[A] = null,
                           m: ClassTag[A]): Unit = {
     assert(
       ev != null,
-      "Expected implicit ConvertableTo[%s] instance, but it was not found." format m)
+      "Expected implicit ConvertableTo[%s] instance, but it was not found."
+        .format(m))
   }
 
   def hasNRoot[A](implicit ev: NRoot[A] = null, m: ClassTag[A]): Unit = {
     assert(
       ev != null,
-      "Expected implicit NRoot[%s] instance, but it was not found." format m)
+      "Expected implicit NRoot[%s] instance, but it was not found.".format(m))
   }
 
   test("Numeric is ConvertableTo") {

@@ -64,13 +64,13 @@ object Transformers {
 
         case Match(selector, cases, default) =>
           Match(transformExpr(selector),
-                cases map (c => (c._1, transform(c._2, isStat))),
+                cases.map(c => (c._1, transform(c._2, isStat))),
                 transform(default, isStat))(tree.tpe)
 
         // Scala expressions
 
         case New(cls, ctor, args) =>
-          New(cls, ctor, args map transformExpr)
+          New(cls, ctor, args.map(transformExpr))
 
         case StoreModule(cls, value) =>
           StoreModule(cls, transformExpr(value))
@@ -79,17 +79,17 @@ object Transformers {
           Select(transformExpr(qualifier), item)(tree.tpe)
 
         case Apply(receiver, method, args) =>
-          Apply(transformExpr(receiver), method, args map transformExpr)(
+          Apply(transformExpr(receiver), method, args.map(transformExpr))(
             tree.tpe)
 
         case ApplyStatically(receiver, cls, method, args) =>
           ApplyStatically(transformExpr(receiver),
                           cls,
                           method,
-                          args map transformExpr)(tree.tpe)
+                          args.map(transformExpr))(tree.tpe)
 
         case ApplyStatic(cls, method, args) =>
-          ApplyStatic(cls, method, args map transformExpr)(tree.tpe)
+          ApplyStatic(cls, method, args.map(transformExpr))(tree.tpe)
 
         case UnaryOp(op, lhs) =>
           UnaryOp(op, transformExpr(lhs))
@@ -98,10 +98,10 @@ object Transformers {
           BinaryOp(op, transformExpr(lhs), transformExpr(rhs))
 
         case NewArray(tpe, lengths) =>
-          NewArray(tpe, lengths map transformExpr)
+          NewArray(tpe, lengths.map(transformExpr))
 
         case ArrayValue(tpe, elems) =>
-          ArrayValue(tpe, elems map transformExpr)
+          ArrayValue(tpe, elems.map(transformExpr))
 
         case ArrayLength(array) =>
           ArrayLength(transformExpr(array))
@@ -110,7 +110,7 @@ object Transformers {
           ArraySelect(transformExpr(array), transformExpr(index))(tree.tpe)
 
         case RecordValue(tpe, elems) =>
-          RecordValue(tpe, elems map transformExpr)
+          RecordValue(tpe, elems.map(transformExpr))
 
         case IsInstanceOf(expr, cls) =>
           IsInstanceOf(transformExpr(expr), cls)
@@ -125,12 +125,12 @@ object Transformers {
           GetClass(transformExpr(expr))
 
         case CallHelper(helper, args) =>
-          CallHelper(helper, args map transformExpr)(tree.tpe)
+          CallHelper(helper, args.map(transformExpr))(tree.tpe)
 
         // JavaScript expressions
 
         case JSNew(ctor, args) =>
-          JSNew(transformExpr(ctor), args map transformExpr)
+          JSNew(transformExpr(ctor), args.map(transformExpr))
 
         case JSDotSelect(qualifier, item) =>
           JSDotSelect(transformExpr(qualifier), item)
@@ -139,17 +139,17 @@ object Transformers {
           JSBracketSelect(transformExpr(qualifier), transformExpr(item))
 
         case JSFunctionApply(fun, args) =>
-          JSFunctionApply(transformExpr(fun), args map transformExpr)
+          JSFunctionApply(transformExpr(fun), args.map(transformExpr))
 
         case JSDotMethodApply(receiver, method, args) =>
           JSDotMethodApply(transformExpr(receiver),
                            method,
-                           args map transformExpr)
+                           args.map(transformExpr))
 
         case JSBracketMethodApply(receiver, method, args) =>
           JSBracketMethodApply(transformExpr(receiver),
                                transformExpr(method),
-                               args map transformExpr)
+                               args.map(transformExpr))
 
         case JSSuperBracketSelect(cls, qualifier, item) =>
           JSSuperBracketSelect(cls,
@@ -160,10 +160,10 @@ object Transformers {
           JSSuperBracketCall(cls,
                              transformExpr(receiver),
                              transformExpr(method),
-                             args map transformExpr)
+                             args.map(transformExpr))
 
         case JSSuperConstructorCall(args) =>
-          JSSuperConstructorCall(args map transformExpr)
+          JSSuperConstructorCall(args.map(transformExpr))
 
         case JSSpread(items) =>
           JSSpread(transformExpr(items))
@@ -178,10 +178,10 @@ object Transformers {
           JSBinaryOp(op, transformExpr(lhs), transformExpr(rhs))
 
         case JSArrayConstr(items) =>
-          JSArrayConstr(items map transformExpr)
+          JSArrayConstr(items.map(transformExpr))
 
         case JSObjectConstr(fields) =>
-          JSObjectConstr(fields map {
+          JSObjectConstr(fields.map {
             case (name, value) => (name, transformExpr(value))
           })
 

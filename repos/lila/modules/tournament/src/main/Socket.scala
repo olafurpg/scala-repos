@@ -34,7 +34,7 @@ private[tournament] final class Socket(tournamentId: String,
 
   override def preStart() {
     super.preStart()
-    TournamentRepo byId tournamentId map SetTournament.apply pipeTo self
+    (TournamentRepo byId tournamentId).map(SetTournament.apply).pipeTo(self)
   }
 
   def receiveSpecific = {
@@ -43,10 +43,10 @@ private[tournament] final class Socket(tournamentId: String,
       clock = tour.clock.chessClock.some
 
     case StartGame(game) =>
-      game.players foreach { player =>
-        player.userId foreach { userId =>
-          membersByUserId(userId) foreach { member =>
-            notifyMember("redirect", game fullIdOf player.color)(member)
+      game.players.foreach { player =>
+        player.userId.foreach { userId =>
+          membersByUserId(userId).foreach { member =>
+            notifyMember("redirect", game.fullIdOf(player.color))(member)
           }
         }
       }
@@ -62,7 +62,7 @@ private[tournament] final class Socket(tournamentId: String,
       ping(uid)
       timeBomb.delay
       withMember(uid) { m =>
-        history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+        history.since(v).fold(resync(m))(_.foreach(sendMessage(m)))
       }
     }
 

@@ -9,7 +9,7 @@ case class JsonQuestion(dimension: String,
   def question: Option[Question[_]] = {
     import Dimension._
     for {
-      realMetric <- Metric.byKey get metric
+      realMetric <- Metric.byKey.get(metric)
       realFilters = filters
         .map {
           case (filterKey, valueKeys) => {

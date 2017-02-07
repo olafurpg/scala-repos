@@ -420,7 +420,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         if (sym.hasModuleFlag) (sym.tpe nonPrivateMember nme.main).alternatives
         else Nil
       val hasApproximate =
-        possibles exists { m =>
+        possibles.exists { m =>
           m.info match {
             case MethodType(p :: Nil, _) =>
               p.tpe.typeSymbol == definitions.ArrayClass
@@ -443,13 +443,13 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           // Now either succeeed, or issue some additional warnings for things which look like
           // attempts to be java main methods.
           else
-            (possibles exists definitions.isJavaMainMethod) || {
-              possibles exists { m =>
+            (possibles.exists(definitions.isJavaMainMethod)) || {
+              possibles.exists { m =>
                 m.info match {
                   case PolyType(_, _) =>
                     fail("main methods cannot be generic.")
                   case MethodType(params, res) =>
-                    if (res.typeSymbol :: params exists (_.isAbstractType))
+                    if ((res.typeSymbol :: params).exists(_.isAbstractType))
                       fail(
                         "main methods cannot refer to type parameters or abstract types.",
                         m.pos)
@@ -473,11 +473,11 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
    */
   def initBytecodeWriter(entryPoints: List[Symbol]): BytecodeWriter = {
     settings.outputDirs.getSingleOutput match {
-      case Some(f) if f hasExtension "jar" =>
+      case Some(f) if f.hasExtension("jar") =>
         // If no main class was specified, see if there's only one
         // entry point among the classes going into the jar.
         if (settings.mainClass.isDefault) {
-          entryPoints map (_.fullName('.')) match {
+          entryPoints.map(_.fullName('.')) match {
             case Nil =>
               log("No Main-Class designated or discovered.")
             case name :: Nil =>
@@ -507,14 +507,14 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
    * can-multi-thread
    */
   def methodSymbols(cd: ClassDef): List[Symbol] = {
-    cd.impl.body collect { case dd: DefDef => dd.symbol }
+    cd.impl.body.collect { case dd: DefDef => dd.symbol }
   }
 
   /*
    *  must-single-thread
    */
   def serialVUID(csym: Symbol): Option[Long] =
-    csym getAnnotation definitions.SerialVersionUIDAttr collect {
+    csym.getAnnotation(definitions.SerialVersionUIDAttr).collect {
       case AnnotationInfo(_, _, (_, LiteralAnnotArg(const)) :: Nil) =>
         const.longValue
     }
@@ -563,9 +563,9 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     val versionPickle = {
       val vp = new PickleBuffer(new Array[Byte](16), -1, 0)
       assert(vp.writeIndex == 0, vp)
-      vp writeNat PickleFormat.MajorVersion
-      vp writeNat PickleFormat.MinorVersion
-      vp writeNat 0
+      vp.writeNat(PickleFormat.MajorVersion)
+      vp.writeNat(PickleFormat.MinorVersion)
+      vp.writeNat(0)
       vp
     }
 
@@ -621,7 +621,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      */
     def getAnnotPickle(jclassName: String,
                        sym: Symbol): Option[AnnotationInfo] = {
-      currentRun.symData get sym match {
+      currentRun.symData.get(sym) match {
         case Some(pickle) if !nme.isModuleName(newTermName(jclassName)) =>
           val scalaAnnot = {
             val sigBytes = ScalaSigBytes(pickle.bytes.take(pickle.writeIndex))
@@ -884,8 +884,8 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      */
     def emitParamAnnotations(jmethod: asm.MethodVisitor,
                              pannotss: List[List[AnnotationInfo]]) {
-      val annotationss = pannotss map (_ filter shouldEmitAnnotation)
-      if (annotationss forall (_.isEmpty)) return
+      val annotationss = pannotss.map(_.filter(shouldEmitAnnotation))
+      if (annotationss.forall(_.isEmpty)) return
       for ((annots, idx) <- annotationss.zipWithIndex;
            annot <- annots) {
         val AnnotationInfo(typ, args, assocs) = annot
@@ -955,9 +955,9 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         val isValidSignature = wrap {
           // Alternative: scala.tools.reflect.SigParser (frontend to sun.reflect.generics.parser.SignatureParser)
           import scala.tools.asm.util.CheckClassAdapter
-          if (sym.isMethod) { CheckClassAdapter checkMethodSignature sig } // requires asm-util.jar
-          else if (sym.isTerm) { CheckClassAdapter checkFieldSignature sig } else {
-            CheckClassAdapter checkClassSignature sig
+          if (sym.isMethod) { CheckClassAdapter.checkMethodSignature(sig) } // requires asm-util.jar
+          else if (sym.isTerm) { CheckClassAdapter.checkFieldSignature(sig) } else {
+            CheckClassAdapter.checkClassSignature(sig)
           }
         }
 
@@ -1024,7 +1024,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       }
       if (needsAnnotation) {
         val c = Constant(definitions.RemoteExceptionClass.tpe)
-        val arg = Literal(c) setType c.tpe
+        val arg = Literal(c).setType(c.tpe)
         meth.addAnnotation(appliedType(definitions.ThrowsClass, c.tpe), arg)
       }
     }
@@ -1057,7 +1057,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       val moduleName = internalName(module)
       val methodInfo = module.thisType.memberInfo(m)
-      val paramJavaTypes: List[BType] = methodInfo.paramTypes map typeToBType
+      val paramJavaTypes: List[BType] = methodInfo.paramTypes.map(typeToBType)
       // val paramNames     = 0 until paramJavaTypes.length map ("x_" + _)
 
       /* Forwarders must not be marked final,
@@ -1074,7 +1074,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       val jgensig = staticForwarderGenericSignature(m, module)
       addRemoteExceptionAnnot(isRemoteClass, hasPublicBitSet(flags), m)
       val (throws, others) =
-        m.annotations partition (_.symbol == definitions.ThrowsClass)
+        m.annotations.partition(_.symbol == definitions.ThrowsClass)
       val thrownExceptions: List[String] = getExceptions(throws)
 
       val jReturnType = typeToBType(methodInfo.resultType)
@@ -1133,7 +1133,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       val linkedClass = moduleClass.companionClass
       lazy val conflictingNames: Set[Name] = {
-        (linkedClass.info.members collect {
+        (linkedClass.info.members.collect {
           case sym if sym.name.isTermName => sym.name
         }).toSet
       }
@@ -1298,7 +1298,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       for (f <- fieldSymbols if f.hasGetter;
            g = f.getterIn(cls);
-           s = f.setterIn(cls); if g.isPublic && !(f.name startsWith "$")) {
+           s = f.setterIn(cls); if g.isPublic && !(f.name.startsWith("$"))) {
         // inserting $outer breaks the bean
         fieldList = javaSimpleName(f) :: javaSimpleName(g) :: (if (s != NoSymbol)
                                                                  javaSimpleName(
@@ -1309,7 +1309,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       val methodList: List[String] =
         for (m <- methodSymbols if !m.isConstructor && m.isPublic &&
-               !(m.name startsWith "$") && !m.isGetter && !m.isSetter)
+               !(m.name.startsWith("$")) && !m.isGetter && !m.isSetter)
           yield javaSimpleName(m)
 
       val constructor = beanInfoClass.visitMethod(

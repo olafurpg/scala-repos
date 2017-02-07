@@ -53,16 +53,16 @@ class DynamicVariable[T](init: T) {
     */
   def withValue[S](newval: T)(thunk: => S): S = {
     val oldval = value
-    tl set newval
+    tl.set(newval)
 
     try thunk
-    finally tl set oldval
+    finally tl.set(oldval)
   }
 
   /** Change the currently bound value, discarding the old value.
     * Usually withValue() gives better semantics.
     */
-  def value_=(newval: T) = tl set newval
+  def value_=(newval: T) = tl.set(newval)
 
   override def toString: String = "DynamicVariable(" + value + ")"
 }

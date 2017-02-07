@@ -42,7 +42,7 @@ class TypedFieldsTest extends WordSpec with Matchers {
           val outMap = outputBuffer.map {
             case (opaque: Opaque, i: Int) => (opaque.str, i)
           }.toMap
-          outMap should have size 2
+          (outMap should have).size(2)
           outMap("foo") shouldBe 14
           outMap("bar") shouldBe 6
         }
@@ -80,7 +80,7 @@ class UntypedFieldsJob(args: Args) extends Job(args) {
 class TypedFieldsJob(args: Args) extends Job(args) {
 
   implicit val ordering = new Ordering[Opaque] {
-    def compare(a: Opaque, b: Opaque) = a.str compare b.str
+    def compare(a: Opaque, b: Opaque) = a.str.compare(b.str)
   }
 
   val xField = Field[String]('x)

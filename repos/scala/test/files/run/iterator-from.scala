@@ -25,13 +25,13 @@ object Test extends App {
             s"set iteratorFrom $key",
             s"(set from $key).iterator",
             iteratorFrom,
-            (set from key).iterator.toList)
+            (set.from(key)).iterator.toList)
       check(clazz,
             list,
             s"set.iteratorFrom $key",
             s"distinctSorted dropWhile (_ < $key)",
             iteratorFrom,
-            distinctSorted dropWhile (_ < key))
+            distinctSorted.dropWhile(_ < key))
       check(clazz,
             list,
             s"set iteratorFrom $key",
@@ -56,24 +56,24 @@ object Test extends App {
             s"map iteratorFrom $key",
             s"(map from $key).iterator",
             iteratorFrom,
-            (map from key).iterator.toList)
+            (map.from(key)).iterator.toList)
       check(clazz,
             list,
             s"map iteratorFrom $key",
             s"distinctSorted dropWhile (_._1 < $key)",
             iteratorFrom,
-            distinctSorted dropWhile (_._1 < key))
+            distinctSorted.dropWhile(_._1 < key))
       check(clazz,
             list,
             s"map iteratorFrom $key map (_._1)",
             s"map keysIteratorFrom $key",
-            iteratorFrom map (_._1),
+            iteratorFrom.map(_._1),
             (map keysIteratorFrom key).toList)
       check(clazz,
             list,
             s"map iteratorFrom $key map (_._2)",
             s"map valuesIteratorFrom $key",
-            iteratorFrom map (_._2),
+            iteratorFrom.map(_._2),
             (map valuesIteratorFrom key).toList)
     }
   }
@@ -99,24 +99,24 @@ object Test extends App {
     val Mon, Tue, Wed, Thu, Fri, Sat, Sun = Value
   }
 
-  0 until maxLength foreach { length =>
-    val keyValues = (0 until length map { _ =>
+  (0 until maxLength).foreach { length =>
+    val keyValues = ((0 until length).map { _ =>
       (R nextInt maxKey, R nextInt maxValue)
     }).toList
-    val keys = keyValues map (_._2)
+    val keys = keyValues.map(_._2)
     testSet(immutable.BitSet(keys: _*), keys)
     testSet(immutable.TreeSet(keys: _*), keys)
     testSet(mutable.TreeSet(keys: _*), keys)
     val days =
-      keys map { n =>
+      keys.map { n =>
         Weekday(n % Weekday.values.size)
       }
     testSet(Weekday.ValueSet(days: _*), days)
 
     val treeMap = immutable.TreeMap(keyValues: _*)
     testMap(treeMap, keyValues)
-    testMap(treeMap.filterKeys(_ % 2 == 0), keyValues filter (_._1 % 2 == 0))
-    testMap(treeMap mapValues (_ + 1), keyValues map {
+    testMap(treeMap.filterKeys(_ % 2 == 0), keyValues.filter(_._1 % 2 == 0))
+    testMap(treeMap.mapValues(_ + 1), keyValues.map {
       case (k, v) => (k, v + 1)
     })
   }

@@ -33,14 +33,14 @@ abstract class ConstantFolder {
     */
   def apply(tree: Tree, pt: Type): Tree =
     fold(apply(tree), tree.tpe match {
-      case ConstantType(x) => x convertTo pt
+      case ConstantType(x) => x.convertTo(pt)
       case _ => null
     })
 
   private def fold(tree: Tree, compX: => Constant): Tree =
     try {
       val x = compX
-      if ((x ne null) && x.tag != UnitTag) tree setType ConstantType(x)
+      if ((x ne null) && x.tag != UnitTag) tree.setType(ConstantType(x))
       else tree
     } catch {
       case _: ArithmeticException => tree // the code will crash at runtime,

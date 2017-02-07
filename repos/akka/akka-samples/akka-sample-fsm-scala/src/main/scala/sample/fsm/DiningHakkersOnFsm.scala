@@ -136,8 +136,8 @@ class FSMHakker(name: String, left: ActorRef, right: ActorRef)
     println(
       "%s has picked up %s and %s and starts to eat"
         .format(name, left.path.name, right.path.name))
-    goto(Eating) using TakenChopsticks(Some(left), Some(right)) forMax
-      (5.seconds)
+    (goto(Eating) using TakenChopsticks(Some(left), Some(right)))
+      .forMax(5.seconds)
   }
 
   // When the results of the other grab comes back,
@@ -165,7 +165,7 @@ class FSMHakker(name: String, left: ActorRef, right: ActorRef)
   initialize()
 
   private def startThinking(duration: FiniteDuration): State = {
-    goto(Thinking) using TakenChopsticks(None, None) forMax duration
+    (goto(Thinking) using TakenChopsticks(None, None)).forMax(duration)
   }
 }
 

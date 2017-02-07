@@ -52,6 +52,6 @@ package object p4 {
     }
 
     // was: illegal cyclic reference involving package ...
-    Seq(code1, code2, code3, code4) foreach typecheckTwice
+    Seq(code1, code2, code3, code4).foreach(typecheckTwice)
   }
 }

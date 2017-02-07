@@ -140,9 +140,11 @@ abstract class UnCurry
     private def nonLocalReturnKey(meth: Symbol) =
       nonLocalReturnKeys.getOrElseUpdate(
         meth,
-        meth.newValue(unit.freshTermName("nonLocalReturnKey"),
-                      meth.pos,
-                      SYNTHETIC) setInfo ObjectTpe)
+        meth
+          .newValue(unit.freshTermName("nonLocalReturnKey"),
+                    meth.pos,
+                    SYNTHETIC)
+          .setInfo(ObjectTpe))
 
     /** Generate a non-local return throw with given return expression from given method.
       *  I.e. for the method's non-local return key, generate:
@@ -152,7 +154,7 @@ abstract class UnCurry
       *  (but what to do about exceptions that miss their targets?)
       */
     private def nonLocalReturnThrow(expr: Tree, meth: Symbol) =
-      localTyper typed {
+      localTyper.typed {
         Throw(
           nonLocalReturnExceptionType(expr.tpe.widen),
           Ident(nonLocalReturnKey(meth)),
@@ -174,17 +176,18 @@ abstract class UnCurry
       *  }
       */
     private def nonLocalReturnTry(body: Tree, key: Symbol, meth: Symbol) = {
-      localTyper typed {
+      localTyper.typed {
         val restpe = meth.tpe_*.finalResultType
         val extpe = nonLocalReturnExceptionType(restpe)
-        val ex = meth.newValue(nme.ex, body.pos) setInfo extpe
+        val ex = meth.newValue(nme.ex, body.pos).setInfo(extpe)
         val argType =
-          restpe withAnnotation (AnnotationInfo marker UncheckedClass.tpe)
+          restpe.withAnnotation(AnnotationInfo.marker(UncheckedClass.tpe))
         val pat =
           gen.mkBindForCase(ex, NonLocalReturnControlClass, List(argType))
         val rhs =
-          (IF((ex DOT nme.key)() OBJ_EQ Ident(key)) THEN ((ex DOT nme.value)()) ELSE
-            (Throw(Ident(ex))))
+          (IF((ex.DOT(nme.key))().OBJ_EQ(Ident(key)))
+            .THEN((ex.DOT(nme.value))())
+            .ELSE(Throw(Ident(ex))))
         val keyDef = ValDef(key, New(ObjectTpe))
         val tryCatch = Try(body, pat -> rhs)
 
@@ -237,7 +240,7 @@ abstract class UnCurry
         case fun1 if fun1 ne fun => fun1
         case _ =>
           def typedFunPos(t: Tree) = localTyper.typedPos(fun.pos)(t)
-          val funParams = fun.vparams map (_.symbol)
+          val funParams = fun.vparams.map(_.symbol)
           def mkMethod(owner: Symbol,
                        name: TermName,
                        additionalFlags: FlagSet = NoFlags): DefDef =
@@ -258,17 +261,17 @@ abstract class UnCurry
             val parents = addSerializable(
               abstractFunctionForFunctionType(fun.tpe))
             val anonClass =
-              fun.symbol.owner newAnonymousFunctionClass
+              (fun.symbol.owner newAnonymousFunctionClass
                 (fun.pos,
-                inConstructorFlag) addAnnotation SerialVersionUIDAnnotation
+                inConstructorFlag)).addAnnotation(SerialVersionUIDAnnotation)
             // The original owner is used in the backend for the EnclosingMethod attribute. If fun is
             // nested in a value-class method, its owner was already changed to the extension method.
             // Saving the original owner allows getting the source structure from the class symbol.
             defineOriginalOwner(anonClass, fun.symbol.originalOwner)
-            anonClass setInfo ClassInfoType(parents, newScope, anonClass)
+            anonClass.setInfo(ClassInfoType(parents, newScope, anonClass))
 
             val applyMethodDef = mkMethod(anonClass, nme.apply)
-            anonClass.info.decls enter applyMethodDef.symbol
+            anonClass.info.decls.enter(applyMethodDef.symbol)
 
             typedFunPos {
               Block(ClassDef(anonClass,
@@ -303,7 +306,7 @@ abstract class UnCurry
       val isJava = fun.isJavaDefined
       def transformVarargs(varargsElemType: Type) = {
         def mkArrayValue(ts: List[Tree], elemtp: Type) =
-          ArrayValue(TypeTree(elemtp), ts) setType arrayType(elemtp)
+          ArrayValue(TypeTree(elemtp), ts).setType(arrayType(elemtp))
 
         // when calling into scala varargs, make sure it's a sequence.
         def arrayToSequence(tree: Tree, elemtp: Type) = {
@@ -332,7 +335,7 @@ abstract class UnCurry
             else localTyper.TyperErrorGen.MissingClassTagError(tree, tp)
           }
           def traversableClassTag(tpe: Type): Tree = {
-            (tpe baseType TraversableClass).typeArgs match {
+            (tpe.baseType(TraversableClass)).typeArgs match {
               case targ :: _ => getClassTag(targ)
               case _ => EmptyTree
             }
@@ -348,16 +351,16 @@ abstract class UnCurry
         }
 
         var suffix: Tree =
-          if (treeInfo isWildcardStarArgList args) {
+          if (treeInfo.isWildcardStarArgList(args)) {
             val Typed(tree, _) = args.last
             if (isJava)
               if (tree.tpe.typeSymbol == ArrayClass) tree
               else sequenceToArray(tree)
-            else if (tree.tpe.typeSymbol isSubClass SeqClass) tree
+            else if (tree.tpe.typeSymbol.isSubClass(SeqClass)) tree
             else arrayToSequence(tree, varargsElemType)
           } else {
             def mkArray =
-              mkArrayValue(args drop (formals.length - 1), varargsElemType)
+              mkArrayValue(args.drop(formals.length - 1), varargsElemType)
             if (isJava) mkArray
             else if (args.isEmpty)
               gen.mkNil // avoid needlessly double-wrapping an empty argument list
@@ -373,7 +376,7 @@ abstract class UnCurry
             }
           }
         }
-        args.take(formals.length - 1) :+ (suffix setType formals.last)
+        args.take(formals.length - 1) :+ (suffix.setType(formals.last))
       }
 
       val args1 =
@@ -385,7 +388,7 @@ abstract class UnCurry
         if (!isByNameParamType(formal)) arg
         else if (isByNameRef(arg)) {
           byNameArgs += arg
-          arg setType functionType(Nil, arg.tpe)
+          arg.setType(functionType(Nil, arg.tpe))
         } else {
           log(
             s"Argument '$arg' at line ${arg.pos.line} is $formal from ${fun.fullName}")
@@ -413,10 +416,12 @@ abstract class UnCurry
         case DefDef(_, _, _, _, _, rhs) =>
           val rhs1 =
             if (rhs == EmptyTree) rhs
-            else Block(Nil, gen.mkZero(rhs.tpe)) setType rhs.tpe
-          deriveDefDef(tree)(_ => rhs1) setSymbol tree.symbol setType tree.tpe
+            else Block(Nil, gen.mkZero(rhs.tpe)).setType(rhs.tpe)
+          deriveDefDef(tree)(_ => rhs1)
+            .setSymbol(tree.symbol)
+            .setType(tree.tpe)
         case _ =>
-          gen.mkZero(tree.tpe) setType tree.tpe
+          gen.mkZero(tree.tpe).setType(tree.tpe)
       }
     }
 
@@ -435,7 +440,7 @@ abstract class UnCurry
       case dd @ DefDef(_, _, _, _, _, Apply(fn, body :: Nil))
           if isSelfSynchronized(dd) =>
         log("Translating " + dd.symbol.defString + " into synchronized method")
-        dd.symbol setFlag SYNCHRONIZED
+        dd.symbol.setFlag(SYNCHRONIZED)
         deriveDefDef(dd)(_ => body)
       case _ => tree
     }
@@ -490,12 +495,11 @@ abstract class UnCurry
              case dd @ DefDef(mods, name, tparams, _, tpt, rhs) =>
                // Remove default argument trees from parameter ValDefs, SI-4812
                val vparamssNoRhs =
-                 dd.vparamss mapConserve
-                   (_ mapConserve { p =>
-                     treeCopy.ValDef(p, p.mods, p.name, p.tpt, EmptyTree)
-                   })
+                 dd.vparamss.mapConserve(_.mapConserve { p =>
+                   treeCopy.ValDef(p, p.mods, p.name, p.tpt, EmptyTree)
+                 })
 
-               if (dd.symbol hasAnnotation VarargsClass) validateVarargs(dd)
+               if (dd.symbol.hasAnnotation(VarargsClass)) validateVarargs(dd)
 
                withNeedLift(needLift = false) {
                  if (dd.symbol.isClassConstructor) {
@@ -507,11 +511,13 @@ abstract class UnCurry
                              transform(stat)
                            }
                          val presupers =
-                           treeInfo.preSuperFields(stats) map transformInConstructor
-                         val rest = stats drop presupers.length
+                           treeInfo
+                             .preSuperFields(stats)
+                             .map(transformInConstructor)
+                         val rest = stats.drop(presupers.length)
                          val supercalls =
-                           rest take 1 map transformInConstructor
-                         val others = rest drop 1 map transform
+                           rest.take(1).map(transformInConstructor)
+                         val others = rest.drop(1).map(transform)
                          treeCopy.Block(rhs,
                                         presupers ::: supercalls ::: others,
                                         transform(expr))
@@ -591,7 +597,7 @@ abstract class UnCurry
              case _ =>
                val tree1 = super.transform(tree)
                if (isByNameRef(tree1)) {
-                 val tree2 = tree1 setType functionType(Nil, tree1.tpe)
+                 val tree2 = tree1.setType(functionType(Nil, tree1.tpe))
                  return {
                    if (noApply contains tree2) tree2
                    else
@@ -603,7 +609,7 @@ abstract class UnCurry
            })
       assert(result.tpe != null,
              result.shortClass + " tpe is null:\n" + result)
-      result modifyType uncurry
+      result.modifyType(uncurry)
     }
 
     def postTransform(tree: Tree): Tree = exitingUncurry {
@@ -612,11 +618,11 @@ abstract class UnCurry
         // whole tree is a polymorphic nullary method application
         def removeNullary() = tree.tpe match {
           case MethodType(_, _) => tree
-          case tp => tree setType MethodType(Nil, tp.resultType)
+          case tp => tree.setType(MethodType(Nil, tp.resultType))
         }
         if (tree.symbol.isMethod && !tree.tpe.isInstanceOf[PolyType])
           gen.mkApplyIfNeeded(removeNullary())
-        else if (tree.isType) TypeTree(tree.tpe) setPos tree.pos
+        else if (tree.isType) TypeTree(tree.tpe).setPos(tree.pos)
         else tree
       }
 
@@ -647,8 +653,8 @@ abstract class UnCurry
         case dd @ DefDef(_, _, _, vparamss0, _, rhs0) =>
           val ddSym = dd.symbol
           val (newParamss, newRhs): (List[List[ValDef]], Tree) =
-            if (dependentParamTypeErasure isDependent dd)
-              dependentParamTypeErasure erase dd
+            if (dependentParamTypeErasure.isDependent(dd))
+              dependentParamTypeErasure.erase(dd)
             else {
               val vparamss1 = vparamss0 match {
                 case _ :: Nil => vparamss0
@@ -665,14 +671,16 @@ abstract class UnCurry
               // We know newParamss.length == 1 from above
               ddSym.info.resultType match {
                 case tp @ ConstantType(value) =>
-                  Literal(value) setType tp setPos newRhs.pos // inlining of gen.mkAttributedQualifier(tp)
+                  Literal(value)
+                    .setType(tp)
+                    .setPos(newRhs.pos) // inlining of gen.mkAttributedQualifier(tp)
                 case _ => newRhs
               }
             } else newRhs
 
           val flatdd = copyDefDef(dd)(
             vparamss = newParamss,
-            rhs = nonLocalReturnKeys get ddSym match {
+            rhs = nonLocalReturnKeys.get(ddSym) match {
               case Some(k) =>
                 atPos(newRhs.pos)(
                   nonLocalReturnTry(literalRhsIfConst, k, ddSym))
@@ -682,7 +690,7 @@ abstract class UnCurry
           addJavaVarargsForwarders(dd, flatdd)
 
         case tree: Try =>
-          if (tree.catches exists (cd => !treeInfo.isCatchCase(cd)))
+          if (tree.catches.exists(cd => !treeInfo.isCatchCase(cd)))
             devWarning("VPM BUG - illegal try/catch " + tree.catches)
           tree
 
@@ -702,7 +710,7 @@ abstract class UnCurry
         case TypeTree() =>
           tree
         case _ =>
-          if (tree.isType) TypeTree(tree.tpe) setPos tree.pos else tree
+          if (tree.isType) TypeTree(tree.tpe).setPos(tree.pos) else tree
       }
     }
 
@@ -748,7 +756,7 @@ abstract class UnCurry
         enteringUncurry {
           val methType = dd.symbol.info
           methType.isDependentMethodType &&
-          mexists(methType.paramss)(_.info exists (_.isImmediatelyDependent))
+          mexists(methType.paramss)(_.info.exists(_.isImmediatelyDependent))
         }
 
       /**
@@ -766,7 +774,7 @@ abstract class UnCurry
                 // from the previous parameter lists.
 
                 // Change the type of the param symbol
-                p.symbol updateInfo packedType
+                p.symbol.updateInfo(packedType)
 
                 // Create a new param tree
                 val newParam: ValDef =
@@ -812,7 +820,7 @@ abstract class UnCurry
                       tpe
                   }
                   val info = info0.normalize
-                  val tempValName = unit freshTermName (p.name + "$")
+                  val tempValName = unit.freshTermName(p.name + "$")
                   val newSym = dd.symbol
                     .newTermSymbol(tempValName, p.pos, SYNTHETIC)
                     .setInfo(info)
@@ -824,7 +832,7 @@ abstract class UnCurry
               }
           }
 
-        val allParams = paramTransforms map (_.param)
+        val allParams = paramTransforms.map(_.param)
         val (packedParams, tempVals) = paramTransforms.collect {
           case Packed(param, tempVal) => (param, tempVal)
         }.unzip
@@ -835,8 +843,8 @@ abstract class UnCurry
             localTyper.typedPos(rhs.pos) {
               // Patch the method body to refer to the temp vals
               val rhsSubstituted =
-                rhs.substituteSymbols(packedParams map (_.symbol),
-                                      tempVals map (_.symbol))
+                rhs.substituteSymbols(packedParams.map(_.symbol),
+                                      tempVals.map(_.symbol))
               // The new method body: { val p$1 = p.asInstanceOf[<dependent type>]; ...; <rhsSubstituted> }
               Block(tempVals, rhsSubstituted)
             }
@@ -908,10 +916,11 @@ abstract class UnCurry
 
       // create the symbol
       val forwsym =
-        currentClass.newMethod(
-          dd.name.toTermName,
-          dd.pos,
-          VARARGS | SYNTHETIC | flatdd.symbol.flags) setInfo forwtype
+        currentClass
+          .newMethod(dd.name.toTermName,
+                     dd.pos,
+                     VARARGS | SYNTHETIC | flatdd.symbol.flags)
+          .setInfo(forwtype)
       def forwParams = forwsym.info.paramss.flatten
 
       // create the tree
@@ -949,7 +958,7 @@ abstract class UnCurry
               s.tpe + " as an existing method.")
         case None =>
           // enter symbol into scope
-          currentClass.info.decls enter forwsym
+          currentClass.info.decls.enter(forwsym)
           addNewMember(forwtree)
       }
 

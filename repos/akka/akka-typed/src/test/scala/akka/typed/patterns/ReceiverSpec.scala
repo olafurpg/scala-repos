@@ -75,8 +75,8 @@ class ReceiverSpec extends TypedSpec {
                                           system)
       withClue(
         s"[running for starting point '$description' (${ctx.currentBehavior})]: ") {
-        dummyInbox.receiveAll() should have size messages
-        ctx.getAllEffects() should have size effects
+        (dummyInbox.receiveAll() should have).size(messages)
+        (ctx.getAllEffects() should have).size(effects)
         proc(ctx,
              ctx.asInstanceOf[EffectfulActorContext[Msg]],
              Inbox.sync[Replies[Msg]](name))
@@ -130,7 +130,7 @@ class ReceiverSpec extends TypedSpec {
         ext.run(Msg(1))
         int.getAllEffects() match {
           case ReceiveTimeoutSet(d) :: Nil ⇒
-            d should be theSameInstanceAs (Duration.Undefined)
+            (d should be).theSameInstanceAs(Duration.Undefined)
         }
         inbox.receiveAll() should be(
           GetOneResult(int.self, Some(Msg(1))) :: Nil)
@@ -159,7 +159,7 @@ class ReceiverSpec extends TypedSpec {
         int.signal(ReceiveTimeout)
         int.getAllEffects() match {
           case ReceiveTimeoutSet(d) :: Nil ⇒
-            d should be theSameInstanceAs (Duration.Undefined)
+            (d should be).theSameInstanceAs(Duration.Undefined)
           case other ⇒ fail(s"$other was not List(ReceiveTimeoutSet(_))")
         }
         inbox.receiveAll() should be(GetOneResult(int.self, None) :: Nil)
@@ -266,7 +266,7 @@ class ReceiverSpec extends TypedSpec {
         }
         inbox.hasMessages should be(false)
         int.run(GetAll(Duration.Zero)(inbox.ref))
-        int.getAllEffects() should have size 1
+        (int.getAllEffects() should have).size(1)
         inbox.receiveAll() should be(GetAllResult(int.self, Nil) :: Nil)
       }
 

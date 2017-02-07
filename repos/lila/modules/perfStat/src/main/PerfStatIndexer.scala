@@ -25,7 +25,7 @@ final class PerfStatIndexer(storage: PerfStatStorage, sequencer: ActorRef) {
     import lila.game.BSONHandlers.gameBSONHandler
     pimpQB($query {
       Query.user(user.id) ++ Query.finished ++ Query.turnsMoreThan(2) ++ Query
-        .variant(PerfType variantOf perfType)
+        .variant(PerfType.variantOf(perfType))
     }).sort(Query.sortChronological)
       .cursor[Game]()
       .enumerate(Int.MaxValue, stopOnError = true) |>>> Iteratee
@@ -34,7 +34,7 @@ final class PerfStatIndexer(storage: PerfStatStorage, sequencer: ActorRef) {
           Pov.ofUserId(game, user.id).fold(perfStat)(perfStat.agg)
         case (perfStat, _) => perfStat
       }
-  } flatMap storage.insert
+  }.flatMap(storage.insert)
 
   def addGame(game: Game): Funit =
     game.players
@@ -48,9 +48,9 @@ final class PerfStatIndexer(storage: PerfStatStorage, sequencer: ActorRef) {
 
   private def addPov(pov: Pov, userId: String): Funit = pov.game.perfType ?? {
     perfType =>
-      storage.find(userId, perfType) flatMap {
+      storage.find(userId, perfType).flatMap {
         _ ?? { perfStat =>
-          storage.update(perfStat agg pov)
+          storage.update(perfStat.agg(pov))
         }
       }
   }

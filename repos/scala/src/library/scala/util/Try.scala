@@ -137,9 +137,9 @@ sealed abstract class Try[+T] extends Product with Serializable {
     "You were never supposed to be able to extend this class.",
     "2.12")
   class WithFilter(p: T => Boolean) {
-    def map[U](f: T => U): Try[U] = Try.this filter p map f
-    def flatMap[U](f: T => Try[U]): Try[U] = Try.this filter p flatMap f
-    def foreach[U](f: T => U): Unit = Try.this filter p foreach f
+    def map[U](f: T => U): Try[U] = Try.this.filter(p).map(f)
+    def flatMap[U](f: T => Try[U]): Try[U] = Try.this.filter(p).flatMap(f)
+    def foreach[U](f: T => U): Unit = Try.this.filter(p).foreach(f)
     def withFilter(q: T => Boolean): WithFilter =
       new WithFilter(x => p(x) && q(x))
   }
@@ -266,7 +266,7 @@ final case class Success[+T](value: T) extends Try[T] {
   override def flatten[U](implicit ev: T <:< Try[U]): Try[U] = value
   override def foreach[U](f: T => U): Unit = f(value)
   override def transform[U](s: T => Try[U], f: Throwable => Try[U]): Try[U] =
-    this flatMap s
+    this.flatMap(s)
   override def map[U](f: T => U): Try[U] = Try[U](f(value))
   override def collect[U](pf: PartialFunction[T, U]): Try[U] =
     try {

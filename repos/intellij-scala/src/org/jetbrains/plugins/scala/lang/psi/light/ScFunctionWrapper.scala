@@ -199,16 +199,18 @@ with LightScalaMethod {
         case Some(i) =>
           val param = function.parameters(i - 1)
           val scalaType =
-            generifySubst subst ScFunctionWrapper
-              .getSubstitutor(cClass, function)
-              .subst(param.getType(TypingContext.empty).getOrAny)
+            generifySubst.subst(
+              ScFunctionWrapper
+                .getSubstitutor(cClass, function)
+                .subst(param.getType(TypingContext.empty).getOrAny))
           returnType = ScType
             .toPsi(scalaType, function.getProject, function.getResolveScope)
         case None =>
           val scalaType =
-            generifySubst subst ScFunctionWrapper
-              .getSubstitutor(cClass, function)
-              .subst(function.returnType.getOrAny)
+            generifySubst.subst(
+              ScFunctionWrapper
+                .getSubstitutor(cClass, function)
+                .subst(function.returnType.getOrAny))
           returnType = ScType
             .toPsi(scalaType, function.getProject, function.getResolveScope)
       }

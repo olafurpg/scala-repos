@@ -595,7 +595,7 @@ object Replicator {
                   mergedRemovedNodePruning.updated(key, thisValue)
               case Some(thatValue) ⇒
                 mergedRemovedNodePruning = mergedRemovedNodePruning
-                  .updated(key, thisValue merge thatValue)
+                  .updated(key, thisValue.merge(thatValue))
             }
           }
 
@@ -607,8 +607,8 @@ object Replicator {
       def merge(otherData: ReplicatedData): DataEnvelope =
         if (otherData == DeletedData) DeletedEnvelope
         else
-          copy(
-            data = data merge cleaned(otherData, pruning).asInstanceOf[data.T])
+          copy(data =
+            data.merge(cleaned(otherData, pruning).asInstanceOf[data.T]))
 
       private def cleaned(
           c: ReplicatedData,
@@ -1142,7 +1142,7 @@ final class Replicator(settings: ReplicatorSettings)
   }
 
   def receiveGossipTick(): Unit =
-    selectRandomNode(nodes.toVector) foreach gossipTo
+    selectRandomNode(nodes.toVector).foreach(gossipTo)
 
   def gossipTo(address: Address): Unit = {
     val to = replica(address)
@@ -1200,7 +1200,7 @@ final class Replicator(settings: ReplicatorSettings)
       if (totChunks == 1) dataEntries.keySet
       else
         dataEntries.keysIterator.filter(_.hashCode % totChunks == chunk).toSet
-    val otherMissingKeys = myKeys diff otherKeys
+    val otherMissingKeys = myKeys.diff(otherKeys)
     val keys = (otherDifferentKeys ++ otherMissingKeys).take(maxDeltaElements)
     if (keys.nonEmpty) {
       if (log.isDebugEnabled)
@@ -1211,7 +1211,7 @@ final class Replicator(settings: ReplicatorSettings)
                      sendBack = otherDifferentKeys.nonEmpty)
       sender() ! g
     }
-    val myMissingKeys = otherKeys diff myKeys
+    val myMissingKeys = otherKeys.diff(myKeys)
     if (myMissingKeys.nonEmpty) {
       if (log.isDebugEnabled)
         log.debug("Sending gossip status to [{}], requesting missing [{}]",
@@ -1382,7 +1382,7 @@ final class Replicator(settings: ReplicatorSettings)
   def tombstoneRemovedNodePruning(): Unit = {
 
     def allPruningPerformed(removed: UniqueAddress): Boolean = {
-      dataEntries forall {
+      dataEntries.forall {
         case (
             key,
             (envelope @ DataEnvelope(data: RemovedNodePruning, pruning), _)) ⇒

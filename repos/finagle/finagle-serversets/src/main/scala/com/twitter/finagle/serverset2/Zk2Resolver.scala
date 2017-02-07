@@ -161,7 +161,7 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
           case Activity.Ok(eps) =>
             val endpoint = endpointOption.getOrElse(null)
             val subseq =
-              eps collect {
+              eps.collect {
                 case (Endpoint(names,
                                host,
                                port,
@@ -194,7 +194,7 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
         // address coupled with statistics from the stabilization
         // process.
         val states =
-          stabilized.changes.joinLast(va.changes) collect {
+          stabilized.changes.joinLast(va.changes).collect {
             case (stable, unstable) if stable != Addr.Pending =>
               val nstable = sizeOf(stable)
               val nunstable = sizeOf(unstable)
@@ -215,7 +215,7 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
               if (chatty()) {
                 eprintf("New state for %s!%s: %s\n",
                         path,
-                        endpointOption getOrElse "default",
+                        endpointOption.getOrElse("default"),
                         state)
               }
 
@@ -239,7 +239,7 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
             })
 
           Closable.make { deadline =>
-            reg.close(deadline) ensure {
+            reg.close(deadline).ensure {
               nsets.decrementAndGet()
             }
           }
@@ -257,7 +257,7 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
         // serverset resolution in perpetuity, we close the observation
         // after 5 minutes.
         val c =
-          stabilizedVa.changes respond { _ =>
+          stabilizedVa.changes.respond { _ =>
             /*ignore*/
             ()
           }

@@ -8,9 +8,9 @@ object Test extends App {
   // sublist stuff for a single level of slicing
   val min = list.min
   val max = list.max
-  val nonlist = ((min - 10) until (max + 20) filterNot list.contains).toList
+  val nonlist = (((min - 10) until (max + 20)).filterNot(list.contains)).toList
   val sublist =
-    list filter { x =>
+    list.filter { x =>
       x >= (min + 1) && x < max
     }
   val distinctSublist = sublist.distinct
@@ -21,7 +21,7 @@ object Test extends App {
   val almostmin = sublist.min
   val almostmax = sublist.max
   val subsublist =
-    sublist filter { x =>
+    sublist.filter { x =>
       x >= (almostmin + 1) && x < almostmax
     }
   val distinctSubsublist = subsublist.distinct
@@ -39,24 +39,24 @@ object Test extends App {
     check(set, distinct)
     check(set.clone, distinct)
 
-    val subset = set from (min + 1) until max
+    val subset = set.from(min + 1) until max
     check(subset, distinctSublist)
     check(subset.clone, distinctSublist)
 
-    val subsubset = subset from (almostmin + 1) until almostmax
+    val subsubset = subset.from(almostmin + 1) until almostmax
     check(subsubset, distinctSubsublist)
     check(subsubset.clone, distinctSubsublist)
   }
 
   def testContains {
     def check(set: TreeSet[Int], list: List[Int], nonlist: List[Int]) {
-      assert(list forall set.apply,
+      assert(list.forall(set.apply),
              s"$set did not contain all elements of $list using apply")
-      assert(list forall set.contains,
+      assert(list.forall(set.contains),
              s"$set did not contain all elements of $list using contains")
-      assert(!(nonlist exists set.apply),
+      assert(!(nonlist.exists(set.apply)),
              s"$set had an element from $nonlist using apply")
-      assert(!(nonlist exists set.contains),
+      assert(!(nonlist.exists(set.contains)),
              s"$set had an element from $nonlist using contains")
     }
 
@@ -64,11 +64,11 @@ object Test extends App {
     check(set, list, nonlist)
     check(set.clone, list, nonlist)
 
-    val subset = set from (min + 1) until max
+    val subset = set.from(min + 1) until max
     check(subset, sublist, subnonlist)
     check(subset.clone, sublist, subnonlist)
 
-    val subsubset = subset from (almostmin + 1) until almostmax
+    val subsubset = subset.from(almostmin + 1) until almostmax
     check(subsubset, subsublist, subsubnonlist)
     check(subsubset.clone, subsublist, subsubnonlist)
   }
@@ -78,24 +78,25 @@ object Test extends App {
       var builtList = List[Int]()
       for (x <- list) {
         set += x
-        builtList = (builtList :+ x).distinct.sorted filterNot nonlist.contains
-        assert(builtList forall set.apply,
+        builtList =
+          (builtList :+ x).distinct.sorted.filterNot(nonlist.contains)
+        assert(builtList.forall(set.apply),
                s"$set did not contain all elements of $builtList using apply")
         assert(
           builtList.size == set.size,
           s"$set had size ${set.size} while $builtList had size ${builtList.size}")
       }
-      assert(!(nonlist exists set.apply),
+      assert(!(nonlist.exists(set.apply)),
              s"$set had an element from $nonlist using apply")
-      assert(!(nonlist exists set.contains),
+      assert(!(nonlist.exists(set.contains)),
              s"$set had an element from $nonlist using contains")
     }
 
     val set = TreeSet[Int]()
     val clone = set.clone
-    val subset = set.clone from (min + 1) until max
+    val subset = set.clone.from(min + 1) until max
     val subclone = subset.clone
-    val subsubset = subset.clone from (almostmin + 1) until almostmax
+    val subsubset = subset.clone.from(almostmin + 1) until almostmax
     val subsubclone = subsubset.clone
 
     check(set, list, nonlist)
@@ -112,9 +113,9 @@ object Test extends App {
     def check(set: TreeSet[Int], sorted: List[Int]) {
       var builtList = sorted
       for (x <- list) {
-        set remove x
-        builtList = builtList filterNot (_ == x)
-        assert(builtList forall set.apply,
+        set.remove(x)
+        builtList = builtList.filterNot(_ == x)
+        assert(builtList.forall(set.apply),
                s"$set did not contain all elements of $builtList using apply")
         assert(
           builtList.size == set.size,
@@ -123,9 +124,9 @@ object Test extends App {
     }
     val set = TreeSet(list: _*)
     val clone = set.clone
-    val subset = set.clone from (min + 1) until max
+    val subset = set.clone.from(min + 1) until max
     val subclone = subset.clone
-    val subsubset = subset.clone from (almostmin + 1) until almostmax
+    val subsubset = subset.clone.from(almostmin + 1) until almostmax
     val subsubclone = subsubset.clone
 
     check(set, sorted)
@@ -147,11 +148,11 @@ object Test extends App {
     check(set, sorted)
     check(set.clone, sorted)
 
-    val subset = set from (min + 1) until max
+    val subset = set.from(min + 1) until max
     check(subset, subsorted)
     check(subset.clone, subsorted)
 
-    val subsubset = subset from (almostmin + 1) until almostmax
+    val subsubset = subset.from(almostmin + 1) until almostmax
     check(subsubset, subsubsorted)
     check(subsubset.clone, subsubsorted)
   }

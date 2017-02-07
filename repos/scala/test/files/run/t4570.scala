@@ -3,6 +3,6 @@ object Test extends Enumeration {
   def bar = withName("foo")
 
   def main(args: Array[String]): Unit = {
-    values foreach println
+    values.foreach(println)
   }
 }

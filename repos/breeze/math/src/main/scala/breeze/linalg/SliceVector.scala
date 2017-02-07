@@ -30,7 +30,7 @@ class SliceVector[@spec(Int) K, @spec(Double, Int, Float, Long) V: ClassTag](
 
   def update(i: Int, v: V) { tensor(slices(i)) = v }
 
-  def copy: Vector[V] = DenseVector((slices map (tensor.apply _)): _*)
+  def copy: Vector[V] = DenseVector((slices.map(tensor.apply _)): _*)
 
   def length: Int = slices.length
 
@@ -90,7 +90,7 @@ object SliceVector {
 
       /** Iterates all key-value pairs from the given collection. */
       def traverse(from: SliceVector[K, V], fn: ValuesVisitor[V]): Unit = {
-        from.valuesIterator foreach {
+        from.valuesIterator.foreach {
           fn.visit(_)
         }
       }
@@ -103,7 +103,7 @@ object SliceVector {
       /** Traverses all values from the given collection. */
       override def traverse(from: SliceVector[K, V],
                             fn: KeyValuePairsVisitor[Int, V]): Unit = {
-        from.iterator foreach {
+        from.iterator.foreach {
           case (k, v) => fn.visit(k, v)
         }
       }

@@ -21,7 +21,7 @@ abstract class Driver {
 
   /** True to continue compilation. */
   protected def processSettingsHook(): Boolean = {
-    if (settings.version) { reporter echo versionMsg; false } else
+    if (settings.version) { reporter.echo(versionMsg); false } else
       !reporter.hasErrors
   }
 
@@ -33,7 +33,7 @@ abstract class Driver {
       reporter.echo(compiler.pluginOptionsHelp)
     } else {
       val run = new compiler.Run()
-      run compile command.files
+      run.compile(command.files)
       reporter.finish()
     }
   }

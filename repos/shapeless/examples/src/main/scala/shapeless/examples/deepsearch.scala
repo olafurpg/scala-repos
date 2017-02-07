@@ -60,7 +60,7 @@ object DeepSearchExamples extends App {
         ts: Searchable[T, Q]
     ): Searchable[H :: T, Q] = new Searchable[H :: T, Q] {
       def find(p: Q => Boolean)(a: H :: T) =
-        Option(hs).flatMap(_.find(p)(a.head)) orElse ts.find(p)(a.tail)
+        Option(hs).flatMap(_.find(p)(a.head)).orElse(ts.find(p)(a.tail))
     }
   }
 
@@ -73,7 +73,7 @@ object DeepSearchExamples extends App {
     SearchableWrapper(a)
 
   // An example predicate:
-  val p = (_: String) endsWith "o"
+  val p = (_: String).endsWith("o")
 
   // On strings:
   assert("hello".deepFind(p) == Some("hello"))

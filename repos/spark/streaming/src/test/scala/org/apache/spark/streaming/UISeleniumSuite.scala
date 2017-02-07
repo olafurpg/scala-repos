@@ -206,7 +206,7 @@ class UISeleniumSuite
         // Check stacktrace
         val errorCells =
           findAll(cssSelector(""".stacktrace-details""")).map(_.text).toSeq
-        errorCells should have size 1
+        (errorCells should have).size(1)
         errorCells(0) should include("java.lang.RuntimeException: Oops")
 
         // Check the job link in the batch page is right

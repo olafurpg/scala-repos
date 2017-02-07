@@ -47,9 +47,9 @@ class DerefSlice(source: Slice, derefBy: PartialFunction[Int, CPathNode])
     node match {
       case CPathIndex(i) if !indexableArrays.isEmpty =>
         Some(
-          (indexableArrays mapValues (_.select(i))) ++ forwardIndex
+          (indexableArrays.mapValues(_.select(i))) ++ forwardIndex
             .getOrElse(node, Map.empty))
-      case _ => forwardIndex get node
+      case _ => forwardIndex.get(node)
     }
 
   val size = source.size

@@ -19,9 +19,9 @@ abstract class AbstractReporter extends Reporter {
   def displayPrompt(): Unit
 
   private val positions =
-    mutable.Map[Position, Severity]() withDefaultValue INFO
+    mutable.Map[Position, Severity]().withDefaultValue(INFO)
   private val messages =
-    mutable.Map[Position, List[String]]() withDefaultValue Nil
+    mutable.Map[Position, List[String]]().withDefaultValue(Nil)
 
   override def reset() {
     super.reset()

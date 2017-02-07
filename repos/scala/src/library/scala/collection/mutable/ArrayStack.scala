@@ -157,7 +157,9 @@ class ArrayStack[T] private (private var table: Array[AnyRef],
     *  @param xs The source of elements to push.
     *  @return   A reference to this stack.
     */
-  override def ++=(xs: TraversableOnce[T]): this.type = { xs foreach +=; this }
+  override def ++=(xs: TraversableOnce[T]): this.type = {
+    xs.foreach(+=); this
+  }
 
   /** Does the same as `push`, but returns the updated stack.
     *

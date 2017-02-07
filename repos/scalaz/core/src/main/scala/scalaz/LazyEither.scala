@@ -85,7 +85,7 @@ sealed abstract class LazyEither[+A, +B] {
     fold(left = _ => z, right = a => f(a, z))
 
   def ap[AA >: A, C](f: => LazyEither[AA, B => C]): LazyEither[AA, C] =
-    f flatMap (k => map(k apply _))
+    f.flatMap(k => map(k.apply(_)))
 
   def left: LeftProjection[A, B] =
     new LeftProjection[A, B](this)
@@ -173,7 +173,7 @@ sealed abstract class LazyEitherInstances {
 
       def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(
           f: A => G[B]): G[LazyEither[E, B]] =
-        fa traverse f
+        fa.traverse(f)
 
       override def foldRight[A, B](fa: LazyEither[E, A], z: => B)(
           f: (A, => B) => B): B =
@@ -181,11 +181,11 @@ sealed abstract class LazyEitherInstances {
 
       def bind[A, B](fa: LazyEither[E, A])(
           f: A => LazyEither[E, B]): LazyEither[E, B] =
-        fa flatMap (a => f(a))
+        fa.flatMap(a => f(a))
 
       override def ap[A, B](fa: => LazyEither[E, A])(
           f: => LazyEither[E, A => B]): LazyEither[E, B] =
-        fa ap f
+        fa.ap(f)
 
       def point[A](a: => A): LazyEither[E, A] =
         LazyEither.lazyRight(a)

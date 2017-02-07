@@ -321,7 +321,7 @@ private[stream] object ActorGraphInterpreter {
     )
 
     def subscribePending(): Unit =
-      exposedPublisher.takePendingSubscribers() foreach { sub ⇒
+      exposedPublisher.takePendingSubscribers().foreach { sub ⇒
         if (subscriber eq null) {
           subscriber = sub
           tryOnSubscribe(subscriber,

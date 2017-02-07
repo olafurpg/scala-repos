@@ -31,8 +31,8 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     // `syms map f` should be: true false false
-    assert(syms forall (s => f(s) == fDirect(s)))
+    assert(syms.forall(s => f(s) == fDirect(s)))
     // `syms map g` should be: 1 2 3
-    assert(syms forall (s => g(s) == gDirect(s)))
+    assert(syms.forall(s => g(s) == gDirect(s)))
   }
 }

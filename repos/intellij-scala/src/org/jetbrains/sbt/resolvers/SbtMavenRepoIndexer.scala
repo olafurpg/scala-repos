@@ -95,16 +95,16 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
   private def updateLocal(progressIndicator: Option[ProgressIndicator]) {
     val scannerListener = new ArtifactScanningListener {
       override def scanningStarted(p1: IndexingContext) =
-        progressIndicator foreach { indicator =>
+        progressIndicator.foreach { indicator =>
           indicator.setText2(
             SbtBundle("sbt.resolverIndexer.progress.scanning"))
           indicator.setFraction(0.0)
         }
       override def scanningFinished(p1: IndexingContext, p2: ScanningResult) =
-        progressIndicator foreach { _.setFraction(0.5) }
+        progressIndicator.foreach { _.setFraction(0.5) }
       override def artifactError(p1: ArtifactContext, p2: Exception) {}
       override def artifactDiscovered(p1: ArtifactContext): Unit =
-        progressIndicator foreach { _.checkCanceled() }
+        progressIndicator.foreach { _.checkCanceled() }
     }
 
     val repoDir = context.getRepository
@@ -148,14 +148,14 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
       override def transferProgress(evt: TransferEvent,
                                     bytes: Array[Byte],
                                     length: Int) =
-        progressIndicator foreach { indicator =>
+        progressIndicator.foreach { indicator =>
           downloadedBytes += length
           val done =
             (downloadedBytes.toFloat / evt.getResource.getContentLength) / 2.0
           indicator.setFraction(done)
         }
       override def transferStarted(evt: TransferEvent) =
-        progressIndicator foreach { indicator =>
+        progressIndicator.foreach { indicator =>
           indicator.setText2(
             SbtBundle("sbt.resolverIndexer.progress.downloading"))
           indicator.setFraction(0.0)
@@ -169,19 +169,19 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
 
   def foreach(f: (ArtifactInfo => Unit),
               progressIndicator: Option[ProgressIndicator]) {
-    progressIndicator foreach
-      (_.setText2(SbtBundle("sbt.resolverIndexer.progress.converting")))
+    progressIndicator.foreach(
+      _.setText2(SbtBundle("sbt.resolverIndexer.progress.converting")))
     val searcher = context.acquireIndexSearcher()
     try {
       val reader = searcher.getIndexReader
       val maxDoc = reader.maxDoc()
-      1.to(maxDoc) foreach { i =>
-        progressIndicator foreach { _.checkCanceled() }
+      1.to(maxDoc).foreach { i =>
+        progressIndicator.foreach { _.checkCanceled() }
         val info =
           IndexUtils.constructArtifactInfo(reader.document(i - 1), context)
         if (info != null) f(info)
-        progressIndicator foreach
-          (_.setFraction(0.5 + 0.5 * (i.toFloat / maxDoc)))
+        progressIndicator.foreach(
+          _.setFraction(0.5 + 0.5 * (i.toFloat / maxDoc)))
       }
     } finally {
       context.releaseIndexSearcher(searcher)

@@ -13,7 +13,7 @@ object Test {
   def f2() = {
     for (x <- g(true); y <- g(true); z <- g(true)) yield {
       for (x <- g(true); y <- g(true); z <- g(true)) yield {
-        g(true) map { _ =>
+        g(true).map { _ =>
           (null: Any) match {
             case Some(x: Int) => x
             case _ => 5

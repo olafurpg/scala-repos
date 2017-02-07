@@ -213,7 +213,7 @@ trait Constants extends api.Constants { self: SymbolTable =>
     }
 
     def escapedStringValue: String = {
-      def escape(text: String): String = text flatMap escapedChar
+      def escape(text: String): String = text.flatMap(escapedChar)
       tag match {
         case NullTag => "null"
         case StringTag => "\"" + escape(stringValue) + "\""

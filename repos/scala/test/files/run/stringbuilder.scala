@@ -14,8 +14,8 @@ object Test extends App {
   import scala.collection.mutable.{StringBuilder => ScalaStringBuilder}
   import java.lang.{StringBuilder => JavaStringBuilder}
 
-  val sbScala = new ScalaStringBuilder() append str
-  val sbJava = new JavaStringBuilder() append str
+  val sbScala = new ScalaStringBuilder().append(str)
+  val sbJava = new JavaStringBuilder().append(str)
   val sbs: List[SB] = List[SB](sbScala, sbJava)
 
   def sameAnswers(f: (SB) => Int) = assert(f(sbScala) == f(sbJava))

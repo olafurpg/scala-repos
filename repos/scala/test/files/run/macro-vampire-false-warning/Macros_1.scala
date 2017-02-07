@@ -19,7 +19,7 @@ object Macros {
     import Flag._
     // val kvps = xs.toList map { case q"${_}(${Literal(Constant(name: String))}).->[${_}]($value)" => name -> value }
     val kvps =
-      xs.map(_.tree).toList map {
+      xs.map(_.tree).toList.map {
         case Apply(
             TypeApply(
               Select(Apply(_, List(Literal(Constant(name: String)))), _),
@@ -29,7 +29,7 @@ object Macros {
       }
     // val fields = kvps map { case (k, v) => q"@body($v) def ${TermName(k)} = macro Macros.selFieldImpl" }
     val fields =
-      kvps map {
+      kvps.map {
         case (k, v) =>
           DefDef(
             Modifiers(MACRO,

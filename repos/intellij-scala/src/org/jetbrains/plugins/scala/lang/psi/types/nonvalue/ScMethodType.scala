@@ -150,7 +150,7 @@ class TypeParameter(val name: String,
 
   override def equals(other: Any): Boolean = other match {
     case that: TypeParameter =>
-      (that canEqual this) && name == that.name &&
+      (that.canEqual(this)) && name == that.name &&
         typeParams == that.typeParams && lowerType() == that.lowerType() &&
         upperType() == that.upperType() && ptp == that.ptp
     case _ => false

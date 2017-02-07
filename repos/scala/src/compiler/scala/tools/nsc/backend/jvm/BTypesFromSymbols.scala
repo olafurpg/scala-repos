@@ -152,7 +152,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     val resultType: BType =
       if (isConstructor) UNIT
       else typeToBType(tpe.resultType)
-    MethodBType(tpe.paramTypes map typeToBType, resultType)
+    MethodBType(tpe.paramTypes.map(typeToBType), resultType)
   }
 
   def bootstrapMethodArg(t: Constant, pos: Position): AnyRef = t match {
@@ -448,7 +448,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
           // the top-level companion class, see comment below.
           val members = exitingPickler(
             memberClassesForInnerClassTable(classSym))
-          nested diff members
+          nested.diff(members)
         } else {
           nested
         }
@@ -665,7 +665,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         val c = ClassBType(internalName)
         // class info consistent with BCodeHelpers.genMirrorClass
         val nested =
-          exitingPickler(memberClassesForInnerClassTable(moduleClassSym)) map classBTypeFromSymbol
+          exitingPickler(memberClassesForInnerClassTable(moduleClassSym))
+            .map(classBTypeFromSymbol)
         c.info = Right(
           ClassInfo(
             superClass = Some(ObjectRef),
@@ -722,7 +723,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
   }
 
   // legacy, to be removed when the @remote annotation gets removed
-  final def isRemote(s: Symbol) = s hasAnnotation definitions.RemoteAttr
+  final def isRemote(s: Symbol) = s.hasAnnotation(definitions.RemoteAttr)
   final def hasPublicBitSet(flags: Int) = (flags & asm.Opcodes.ACC_PUBLIC) != 0
 
   /**
@@ -811,8 +812,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
 
   def javaFieldFlags(sym: Symbol) = {
     javaFlags(sym) | GenBCode.mkFlags(
-      if (sym hasAnnotation TransientAttr) asm.Opcodes.ACC_TRANSIENT else 0,
-      if (sym hasAnnotation VolatileAttr) asm.Opcodes.ACC_VOLATILE else 0,
+      if (sym.hasAnnotation(TransientAttr)) asm.Opcodes.ACC_TRANSIENT else 0,
+      if (sym.hasAnnotation(VolatileAttr)) asm.Opcodes.ACC_VOLATILE else 0,
       if (sym.isMutable) 0 else asm.Opcodes.ACC_FINAL
     )
   }

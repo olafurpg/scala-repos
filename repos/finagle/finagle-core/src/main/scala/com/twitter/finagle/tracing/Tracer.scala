@@ -120,12 +120,12 @@ object BroadcastTracer {
 
   private class N(tracers: Seq[Tracer]) extends Tracer {
     def record(record: Record): Unit = {
-      tracers foreach { _.record(record) }
+      tracers.foreach { _.record(record) }
     }
 
     def sampleTrace(traceId: TraceId): Option[Boolean] = {
-      if (tracers exists { _.sampleTrace(traceId) == Some(true) }) Some(true)
-      else if (tracers forall { _.sampleTrace(traceId) == Some(false) })
+      if (tracers.exists { _.sampleTrace(traceId) == Some(true) }) Some(true)
+      else if (tracers.forall { _.sampleTrace(traceId) == Some(false) })
         Some(false)
       else None
     }

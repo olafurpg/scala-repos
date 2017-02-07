@@ -14,7 +14,7 @@ object ForumPost extends LilaController with ForumController {
     NotForKids {
       text.trim.isEmpty.fold(
         Redirect(routes.ForumCateg.index).fuccess,
-        Env.forumSearch(text, page, isGranted(_.StaffForum), ctx.troll) map {
+        Env.forumSearch(text, page, isGranted(_.StaffForum), ctx.troll).map {
           paginator =>
             html.forum.search(text, paginator)
         }
@@ -24,7 +24,7 @@ object ForumPost extends LilaController with ForumController {
 
   def recent = Open { implicit ctx =>
     NotForKids {
-      Env.forum.recent(ctx.me, teamCache.teamIds) map { posts =>
+      Env.forum.recent(ctx.me, teamCache.teamIds).map { posts =>
         html.forum.post.recent(posts)
       }
     }
@@ -41,9 +41,9 @@ object ForumPost extends LilaController with ForumController {
               else
                 forms.post.bindFromRequest.fold(
                   err =>
-                    forms.anyCaptcha flatMap { captcha =>
-                      ctx.userId ?? Env.timeline
-                        .status(s"forum:${topic.id}") map { unsub =>
+                    forms.anyCaptcha.flatMap { captcha =>
+                      (ctx.userId ?? Env.timeline
+                        .status(s"forum:${topic.id}")).map { unsub =>
                         BadRequest(
                           html.forum.topic.show(categ,
                                                 topic,
@@ -53,7 +53,7 @@ object ForumPost extends LilaController with ForumController {
                       }
                   },
                   data =>
-                    postApi.makePost(categ, topic, data) map { post =>
+                    postApi.makePost(categ, topic, data).map { post =>
                       Redirect(routes.ForumPost.redirect(post.id))
                   }
                 )
@@ -64,7 +64,7 @@ object ForumPost extends LilaController with ForumController {
 
   def delete(categSlug: String, id: String) = Auth { implicit ctx => me =>
     CategGrantMod(categSlug) {
-      postApi.delete(categSlug, id, me) map { Ok(_) }
+      postApi.delete(categSlug, id, me).map { Ok(_) }
     }
   }
 

@@ -85,22 +85,25 @@ trait AuthenticationCombinators extends HttpRequestHandlerCombinators {
     private implicit val M = new FutureMonad(executor)
     val service = (request: HttpRequest[A]) => {
       logger.info("Got authentication request " + request)
-      delegate.service(request) map { (f: Account => Future[B]) =>
-        request.headers.header[Authorization] flatMap {
-          _.basic map {
-            case BasicAuthCredentials(email, password) =>
-              accountManager.authAccount(email, password) flatMap {
-                case Success(account) => f(account)
-                case Failure(error) =>
-                  logger.warn("Authentication failure from %s for %s: %s"
-                    .format(NetUtils.remoteIpFrom(request), email, error))
-                  Future(err(AuthMismatch(
-                    "Credentials provided were formatted correctly, but did not match a known account.")))
-              }
+      delegate.service(request).map { (f: Account => Future[B]) =>
+        request.headers
+          .header[Authorization]
+          .flatMap {
+            _.basic.map {
+              case BasicAuthCredentials(email, password) =>
+                accountManager.authAccount(email, password).flatMap {
+                  case Success(account) => f(account)
+                  case Failure(error) =>
+                    logger.warn("Authentication failure from %s for %s: %s"
+                      .format(NetUtils.remoteIpFrom(request), email, error))
+                    Future(err(AuthMismatch(
+                      "Credentials provided were formatted correctly, but did not match a known account.")))
+                }
+            }
           }
-        } getOrElse {
-          Future(err(NotProvided))
-        }
+          .getOrElse {
+            Future(err(NotProvided))
+          }
       }
     }
 

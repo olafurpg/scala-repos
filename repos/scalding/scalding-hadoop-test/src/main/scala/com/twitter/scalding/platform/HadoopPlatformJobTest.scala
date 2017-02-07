@@ -77,7 +77,7 @@ case class HadoopPlatformJobTest(
     copy(flowCheckers = flowCheckers :+ checker)
 
   private def createSources() {
-    dataToCreate foreach {
+    dataToCreate.foreach {
       case (location, lines) =>
         val tmpFile = File.createTempFile("hadoop_platform", "job_test")
         tmpFile.deleteOnExit()

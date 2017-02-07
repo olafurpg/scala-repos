@@ -67,8 +67,8 @@ object ColorfulCircles extends JFXApp {
                 yield
                   new Circle {
                     radius = 200
-                    fill = White opacity 0.05
-                    stroke = White opacity 0.2
+                    fill = White.opacity(0.05)
+                    stroke = White.opacity(0.2)
                     strokeWidth = 4
                     strokeType = Outside
                   }
@@ -81,8 +81,8 @@ object ColorfulCircles extends JFXApp {
                 yield
                   new Circle {
                     radius = 70
-                    fill = White opacity 0.05
-                    stroke = White opacity 0.1
+                    fill = White.opacity(0.05)
+                    stroke = White.opacity(0.1)
                     strokeWidth = 2
                     strokeType = Outside
                   }
@@ -95,8 +95,8 @@ object ColorfulCircles extends JFXApp {
                 yield
                   new Circle {
                     radius = 150
-                    fill = White opacity 0.05
-                    stroke = White opacity 0.16
+                    fill = White.opacity(0.05)
+                    stroke = White.opacity(0.16)
                     strokeWidth = 4
                     strokeType = Outside
                   }

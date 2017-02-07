@@ -91,7 +91,7 @@ class SeqIdFilter extends SimpleFilter[ThriftClientRequest, Array[Byte]] {
       }
       val newReq = new ThriftClientRequest(reqBuf, req.oneway)
 
-      service(newReq) flatMap { resBuf =>
+      service(newReq).flatMap { resBuf =>
         // We know it's safe to mutate the response buffer since the
         // codec never touches it again.
         getAndSetId(resBuf, givenId) match {

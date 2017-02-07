@@ -70,7 +70,7 @@ abstract class BytecodeTest {
       println(s"Different member counts in $name1 and $name2")
       false
     } else
-      (ms1, ms2).zipped forall { (m1, m2) =>
+      (ms1, ms2).zipped.forall { (m1, m2) =>
         val c1 = f(m1)
         val c2 = f(m2).replaceAllLiterally(name2, name1)
         if (c1 == c2) println(s"[ok] $m1")
@@ -101,9 +101,9 @@ abstract class BytecodeTest {
     if (len > 0) {
       val width = isa.map(_.toString.length).max
       val lineWidth = len.toString.length
-      (1 to len) foreach { line =>
-        val isaPadded = isa.map(_.toString) orElse Stream.continually("")
-        val isbPadded = isb.map(_.toString) orElse Stream.continually("")
+      ((1 to len)).foreach { line =>
+        val isaPadded = isa.map(_.toString).orElse(Stream.continually(""))
+        val isbPadded = isb.map(_.toString).orElse(Stream.continually(""))
         val a = isaPadded(line - 1)
         val b = isbPadded(line - 1)
 
@@ -117,8 +117,10 @@ abstract class BytecodeTest {
 
 // loading
   protected def getMethod(classNode: ClassNode, name: String): MethodNode =
-    classNode.methods.asScala.find(_.name == name) getOrElse sys.error(
-      s"Didn't find method '$name' in class '${classNode.name}'")
+    classNode.methods.asScala
+      .find(_.name == name)
+      .getOrElse(
+        sys.error(s"Didn't find method '$name' in class '${classNode.name}'"))
 
   protected def loadClassNode(name: String,
                               skipDebugInfo: Boolean = true): ClassNode = {

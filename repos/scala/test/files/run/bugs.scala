@@ -404,7 +404,7 @@ class Bug316MyIterator extends Iterator[Int] {
 
 object Bug316Test {
   def test(args: Array[String]): Unit =
-    (new Bug316MyIterator) filter { x: Int =>
+    (new Bug316MyIterator).filter { x: Int =>
       x == 1
     };
 }

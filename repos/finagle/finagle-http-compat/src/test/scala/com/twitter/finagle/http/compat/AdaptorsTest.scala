@@ -62,12 +62,12 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
   } yield {
     if (chunked) {
       val res = Response(version, Status(code), Reader.fromBuf(Buf.Utf8(body)))
-      headers foreach { case (k, v) => res.headerMap.add(k, v) }
+      headers.foreach { case (k, v) => res.headerMap.add(k, v) }
       res.headerMap.set(Fields.TransferEncoding, "chunked")
       (res, body)
     } else {
       val res = Response(version, Status(code))
-      headers foreach { case (k, v) => res.headerMap.add(k, v) }
+      headers.foreach { case (k, v) => res.headerMap.add(k, v) }
       res.contentString = body
       (res, body)
     }
@@ -82,7 +82,7 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
     body <- arbitrary[String]
   } yield {
     val reqIn = Request(version, method, uri)
-    headers foreach { case (k, v) => reqIn.headers.add(k, v) }
+    headers.foreach { case (k, v) => reqIn.headers.add(k, v) }
     val req = Request(reqIn.httpRequest,
                       BufReader(Buf.Utf8(body)),
                       new InetSocketAddress(InetAddress.getLoopbackAddress, 0))

@@ -23,7 +23,7 @@ class HoconEnterBetweenBracesHandler extends EnterBetweenBracesHandler {
                                caretAdvance: Ref[Integer],
                                dataContext: DataContext,
                                originalHandler: EditorActionHandler): Result =
-    if (file.getLanguage is HoconLanguage)
+    if (file.getLanguage.is(HoconLanguage))
       super.preprocessEnter(file,
                             editor,
                             caretOffsetRef,

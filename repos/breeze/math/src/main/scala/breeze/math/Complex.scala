@@ -452,11 +452,11 @@ object Complex { outer =>
 
   // pow
   implicit object PowCD extends OpPow.Impl2[Complex, Double, Complex] {
-    def apply(a: Complex, b: Double) = a pow b
+    def apply(a: Complex, b: Double) = a.pow(b)
   }
 
   implicit object PowCC extends OpPow.Impl2[Complex, Complex, Complex] {
-    def apply(a: Complex, b: Complex) = a pow b
+    def apply(a: Complex, b: Complex) = a.pow(b)
   }
 
   //

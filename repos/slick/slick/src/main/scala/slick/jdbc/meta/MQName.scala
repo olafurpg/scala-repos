@@ -20,7 +20,7 @@ object MQName {
   private[meta] def optionalFrom(r: PositionedResult) = {
     val cat = r.nextStringOption
     val schema = r.nextStringOption
-    r.nextStringOption map (MQName(cat, schema, _))
+    r.nextStringOption.map(MQName(cat, schema, _))
   }
 
   def local(name: String) = MQName(Some(""), Some(""), name)

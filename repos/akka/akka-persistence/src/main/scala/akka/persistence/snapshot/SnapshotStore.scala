@@ -39,20 +39,27 @@ trait SnapshotStore extends Actor with ActorLogging {
 
   final val receiveSnapshotStore: Actor.Receive = {
     case LoadSnapshot(persistenceId, criteria, toSequenceNr) ⇒
-      breaker.withCircuitBreaker(
-        loadAsync(persistenceId, criteria.limit(toSequenceNr))) map { sso ⇒
-        LoadSnapshotResult(sso, toSequenceNr)
-      } recover {
-        case e ⇒ LoadSnapshotResult(None, toSequenceNr)
-      } pipeTo senderPersistentActor()
+      breaker
+        .withCircuitBreaker(
+          loadAsync(persistenceId, criteria.limit(toSequenceNr)))
+        .map { sso ⇒
+          LoadSnapshotResult(sso, toSequenceNr)
+        }
+        .recover {
+          case e ⇒ LoadSnapshotResult(None, toSequenceNr)
+        }
+        .pipeTo(senderPersistentActor())
 
     case SaveSnapshot(metadata, snapshot) ⇒
       val md = metadata.copy(timestamp = System.currentTimeMillis)
-      breaker.withCircuitBreaker(saveAsync(md, snapshot)) map { _ ⇒
-        SaveSnapshotSuccess(md)
-      } recover {
-        case e ⇒ SaveSnapshotFailure(metadata, e)
-      } to (self, senderPersistentActor())
+      breaker
+        .withCircuitBreaker(saveAsync(md, snapshot))
+        .map { _ ⇒
+          SaveSnapshotSuccess(md)
+        }
+        .recover {
+          case e ⇒ SaveSnapshotFailure(metadata, e)
+        } to (self, senderPersistentActor())
 
     case evt: SaveSnapshotSuccess ⇒
       try tryReceivePluginInternal(evt)

@@ -59,7 +59,7 @@ class StubVFSMetadata[M[+ _]](
     EitherT.right {
       import PathMetadata._
       M point {
-        projectionMetadata.keySet collect {
+        projectionMetadata.keySet.collect {
           case key if key.isChildOf(path) =>
             PathMetadata(
               Path(key.components(path.length)),
@@ -84,14 +84,14 @@ class StubVFSMetadata[M[+ _]](
       property: CPath,
       version: Version): EitherT[M, ResourceError, PathStructure] = {
     for {
-      types <- getPathMeta(path) map {
-        _ collect {
+      types <- getPathMeta(path).map {
+        _.collect {
           case (ColumnRef(`property`, ctype), count) => (ctype, count)
         }
       }
 
-      children <- getPathMeta(path) map {
-        _ flatMap {
+      children <- getPathMeta(path).map {
+        _.flatMap {
           case t @ (ColumnRef(s, ctype), count) =>
             if (s.hasPrefix(property)) s.take(property.length + 1)
             else None
@@ -103,6 +103,6 @@ class StubVFSMetadata[M[+ _]](
   def size(apiKey: APIKey,
            path: Path,
            version: Version): EitherT[M, ResourceError, Long] = {
-    getPathMeta(path) map (_.values.max)
+    getPathMeta(path).map(_.values.max)
   }
 }

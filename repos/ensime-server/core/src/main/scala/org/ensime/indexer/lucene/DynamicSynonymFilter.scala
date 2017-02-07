@@ -73,7 +73,7 @@ class DynamicSynonymFilter(input: TokenStream, engine: SynonymEngine)
     val term = termAtt.toString
     val synonyms = engine.synonyms(term)
     if (synonyms.nonEmpty) {
-      synonyms foreach { synonym =>
+      synonyms.foreach { synonym =>
         if (!synonym.equals(term)) stack.push(synonym)
       }
       current = captureState()

@@ -243,7 +243,7 @@ private[ui] class StreamingPage(parent: StreamingTab)
     // Y axis ranges same.
     val _maxTime = (for (m1 <- schedulingDelay.max; m2 <- processingTime.max;
                          m3 <- totalDelay.max)
-      yield m1 max m2 max m3).getOrElse(0L)
+      yield m1.max(m2).max(m3)).getOrElse(0L)
     // Should start at 0
     val minTime = 0L
     val (maxTime, normalizedUnit) = UIUtils.normalizeDuration(_maxTime)

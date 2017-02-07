@@ -250,8 +250,8 @@ trait Mailer extends SimpleInjector {
 
   def msgSendImpl(from: From, subject: Subject, info: List[MailTypes]) {
     val session = authenticator match {
-      case Full(a) => jndiSession openOr Session.getInstance(buildProps, a)
-      case _ => jndiSession openOr Session.getInstance(buildProps)
+      case Full(a) => jndiSession.openOr(Session.getInstance(buildProps, a))
+      case _ => jndiSession.openOr(Session.getInstance(buildProps))
     }
     val subj = MimeUtility.encodeText(subject.subject, "utf-8", "Q")
     val message = new MimeMessage(session)

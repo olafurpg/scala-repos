@@ -404,7 +404,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
            attribs,
            scope,
            true,
-           child map (x => transform(x)): _*) % new UnprefixedAttribute(
+           child.map(x => transform(x)): _*) % new UnprefixedAttribute(
         "id",
         "graph" + counter,
         Null) % new UnprefixedAttribute("class", klass, Null)
@@ -427,7 +427,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
                          attribs,
                          scope,
                          true,
-                         (children map (x => transform(x))): _*)
+                         (children.map(x => transform(x))): _*)
       val dotId = (g \ "@id").toString
       if (dotId.count(_ == '|') == 1) {
         val Array(klass, id) = dotId.toString.split("\\|")
@@ -475,7 +475,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
            attribs,
            scope,
            true,
-           child map (x => transform(x)): _*)
+           child.map(x => transform(x)): _*)
     case x => x
   }
 

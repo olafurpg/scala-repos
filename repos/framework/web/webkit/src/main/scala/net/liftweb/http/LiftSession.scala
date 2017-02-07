@@ -132,14 +132,16 @@ object LiftSession {
                   .isAssignableFrom(classOf[LiftSession])
               }
             }
-            .map(const => PAndSessionConstructor(const)) orElse const
-            .find { cp =>
-              {
-                cp.getParameterTypes.length == 1 &&
-                cp.getParameterTypes().apply(0).isAssignableFrom(clz)
+            .map(const => PAndSessionConstructor(const))
+            .orElse(const
+              .find { cp =>
+                {
+                  cp.getParameterTypes.length == 1 &&
+                  cp.getParameterTypes().apply(0).isAssignableFrom(clz)
+                }
               }
-            }
-            .map(const => PConstructor(const)) orElse nullConstructor()
+              .map(const => PConstructor(const)))
+            .orElse(nullConstructor())
 
         case _ =>
           nullConstructor()
@@ -243,7 +245,7 @@ private[http] object RenderVersion {
       tret
     }
 
-    ret openOr ver.doWith(v)(f)
+    ret.openOr(ver.doWith(v)(f))
   }
 }
 
@@ -256,14 +258,14 @@ trait HowStateful {
   /**
     * Test the statefulness of this session.
     */
-  def stateful_? = howStateful.box openOr true
+  def stateful_? = howStateful.box.openOr(true)
 
   /**
     * There may be cases when you are allowed container state (e.g.,
     * migratory session, but you're not allowed to write Lift
     * non-migratory state, return true here.
     */
-  def allowContainerState_? = howStateful.box openOr true
+  def allowContainerState_? = howStateful.box.openOr(true)
 
   /**
     * Within the scope of the call, this session is forced into
@@ -337,7 +339,7 @@ private[http] final case class AjaxRequestInfo(
     lastSeen: Long)
 
 private[http] class BooleanThreadGlobal extends ThreadGlobal[Boolean] {
-  def ? = this.box openOr false
+  def ? = this.box.openOr(false)
 }
 
 /**
@@ -350,11 +352,12 @@ class LiftSession(private[http] val _contextPath: String,
     with Loggable
     with HowStateful {
   def sessionHtmlProperties =
-    LiftRules.htmlProperties.session.is.make openOr LiftRules.htmlProperties.default.is.vend
+    LiftRules.htmlProperties.session.is.make
+      .openOr(LiftRules.htmlProperties.default.is.vend)
 
   val requestHtmlProperties: TransientRequestVar[HtmlProperties] =
     new TransientRequestVar[HtmlProperties](
-      sessionHtmlProperties(S.request openOr Req.nil)) {}
+      sessionHtmlProperties(S.request.openOr(Req.nil))) {}
 
   /**
     * The unique id of this session. Can be used to securely and uniquely
@@ -438,7 +441,7 @@ class LiftSession(private[http] val _contextPath: String,
 
   @volatile
   private[http] var inactivityLength: Long =
-    LiftRules.sessionInactivityTimeout.vend openOr ((30.minutes): Long)
+    LiftRules.sessionInactivityTimeout.vend.openOr((30.minutes): Long)
 
   private[http] var highLevelSessionDispatcher =
     new HashMap[String, LiftRules.DispatchPF]()
@@ -659,7 +662,7 @@ class LiftSession(private[http] val _contextPath: String,
         funcHolder.owner.foreach(availableOwners += _)
     }
 
-    val fullyRemovedOwners = removedOwners diff availableOwners
+    val fullyRemovedOwners = removedOwners.diff(availableOwners)
     if (fullyRemovedOwners.nonEmpty) {
       functionOwnerRemovalListeners.foreach(_(fullyRemovedOwners))
     }
@@ -963,7 +966,7 @@ class LiftSession(private[http] val _contextPath: String,
     * Define the context path for this session.  This allows different
     * sessions to have different context paths.
     */
-  def contextPath = LiftRules.calculateContextPath() openOr _contextPath
+  def contextPath = LiftRules.calculateContextPath().openOr(_contextPath)
 
   /**
     * Convert a template into a Lift Response.
@@ -981,7 +984,7 @@ class LiftSession(private[http] val _contextPath: String,
                       path: ParsePath,
                       code: Int): Box[LiftResponse] = {
     overrideResponseCode.doWith(Empty) {
-      (template or findVisibleTemplate(path, request)).map { xhtml =>
+      (template.or(findVisibleTemplate(path, request))).map { xhtml =>
         fullPageLoad.doWith(true) {
           // allow parallel snippets
           // Phase 1: snippets & templates processing
@@ -1011,7 +1014,7 @@ class LiftSession(private[http] val _contextPath: String,
           notices = Nil
           // Phase 3: Response conversion including fixHtml
           LiftRules.convertResponse(
-            (xml, overrideResponseCode.is openOr code),
+            (xml, overrideResponseCode.is.openOr(code)),
             S.getResponseHeaders(LiftRules.defaultHeaders((xml, request))),
             S.responseCookies,
             request)
@@ -1087,37 +1090,41 @@ class LiftSession(private[http] val _contextPath: String,
 
           // Process but make sure we're okay, sitemap wise
           val response: Box[LiftResponse] =
-            early or
-              (request.testLocation match {
-                case Left(true) =>
-                  checkStatelessInSiteMap(request) {
-                    cleanUpBeforeRender
+            early.or(request.testLocation match {
+              case Left(true) =>
+                checkStatelessInSiteMap(request) {
+                  cleanUpBeforeRender
 
-                    PageName(request.uri + " -> " + request.path)
-                    LiftRules.allowParallelSnippets.doWith(() => !Props.inGAE) {
-                      (request.location.flatMap(_.earlyResponse) or LiftRules.earlyResponse
-                        .firstFull(request)) or
-                        (processTemplate(locTemplate,
-                                         request,
-                                         request.path,
-                                         200) or request.createNotFound {
+                  PageName(request.uri + " -> " + request.path)
+                  LiftRules.allowParallelSnippets.doWith(() => !Props.inGAE) {
+                    (request.location
+                      .flatMap(_.earlyResponse)
+                      .or(LiftRules.earlyResponse
+                        .firstFull(request)))
+                      .or(
+                        processTemplate(locTemplate,
+                                        request,
+                                        request.path,
+                                        200).or(request.createNotFound {
                           processTemplate(Empty, request, _, 404)
-                        })
-                    }
+                        }))
                   }
+                }
 
-                case Right(Full(resp)) => Full(resp)
-                case _ if (LiftRules.passNotFoundToChain) => Empty
-                case _ if Props.mode == Props.RunModes.Development =>
-                  request.createNotFound {
-                    processTemplate(Empty, request, _, 404)
-                  } or Full(ForbiddenResponse(
-                    "The requested page was not defined in your SiteMap, so access was blocked.  (This message is displayed in development mode only)"))
-                case _ =>
-                  request.createNotFound {
+              case Right(Full(resp)) => Full(resp)
+              case _ if (LiftRules.passNotFoundToChain) => Empty
+              case _ if Props.mode == Props.RunModes.Development =>
+                request
+                  .createNotFound {
                     processTemplate(Empty, request, _, 404)
                   }
-              })
+                  .or(Full(ForbiddenResponse(
+                    "The requested page was not defined in your SiteMap, so access was blocked.  (This message is displayed in development mode only)")))
+              case _ =>
+                request.createNotFound {
+                  processTemplate(Empty, request, _, 404)
+                }
+            })
 
           // Before returning the response check for redirect and set the appropriate state.
           response.map(checkRedirect)
@@ -1193,16 +1200,17 @@ class LiftSession(private[http] val _contextPath: String,
   }
 
   private[http] def attachRedirectFunc(uri: String, f: Box[() => Unit]) = {
-    f map { fnc =>
-      val func: String = {
-        val funcName = Helpers.nextFuncName
-        nmessageCallback.put(funcName, S.NFuncHolder(() => {
-          fnc()
-        }))
-        funcName
+    f.map { fnc =>
+        val func: String = {
+          val funcName = Helpers.nextFuncName
+          nmessageCallback.put(funcName, S.NFuncHolder(() => {
+            fnc()
+          }))
+          funcName
+        }
+        Helpers.appendFuncToURL(uri, func + "=_")
       }
-      Helpers.appendFuncToURL(uri, func + "=_")
-    } openOr uri
+      .openOr(uri)
   }
 
   private[http] def checkRedirect(resp: LiftResponse): LiftResponse =
@@ -1408,19 +1416,16 @@ class LiftSession(private[http] val _contextPath: String,
       val (cls, method) = splitColonPair(attrValue)
 
       first(LiftRules.snippetNamesToSearch.vend(cls)) { nameToTry =>
-        LiftSession.findSnippetClass(nameToTry) flatMap { clz =>
-          instantiateOrRedirect(clz) flatMap { inst =>
-            invokeMethod(clz, inst, method) or invokeMethod(
-              clz,
-              inst,
-              method,
-              params.toList.toArray) match {
+        LiftSession.findSnippetClass(nameToTry).flatMap { clz =>
+          instantiateOrRedirect(clz).flatMap { inst =>
+            invokeMethod(clz, inst, method).or(
+              invokeMethod(clz, inst, method, params.toList.toArray)) match {
               case Full(md: MetaData) => Full(md.copy(rest))
               case _ => Empty
             }
           }
         }
-      } openOr rest
+      }.openOr(rest)
     }
   }
 
@@ -1526,10 +1531,14 @@ class LiftSession(private[http] val _contextPath: String,
    * class is a StatefulSnippet so that the registration function works on return calls.
    */
   private def findSnippetInstance(cls: String): Box[AnyRef] =
-    S.snippetForClass(cls) or
-      (LiftRules.snippet(cls) or LiftSession
-        .findSnippetClass(cls)
-        .flatMap(c => instantiateOrRedirect(c) or findSnippetObject(cls))) match {
+    S.snippetForClass(cls)
+      .or(
+        LiftRules
+          .snippet(cls)
+          .or(LiftSession
+            .findSnippetClass(cls)
+            .flatMap(c =>
+              instantiateOrRedirect(c).or(findSnippetObject(cls))))) match {
       case Full(inst: StatefulSnippet) =>
         inst.addName(cls); S.overrideSnippetForClass(cls, inst); Full(inst)
       case Full(ret) => Full(ret)
@@ -1549,9 +1558,9 @@ class LiftSession(private[http] val _contextPath: String,
       nodeSeq <- S.currentSnippetNodeSeq if S.ignoreFailedSnippets
     } yield {
       // don't keep nailing the same snippet name if we just failed it
-      (snippetName or S.currentSnippet).foreach(s => _lastFoundSnippet.set(s))
+      (snippetName.or(S.currentSnippet)).foreach(s => _lastFoundSnippet.set(s))
       nodeSeq
-    }) openOr {
+    }).openOr {
 
       for {
         f <- LiftRules.snippetFailedFunc.toList
@@ -1576,7 +1585,7 @@ class LiftSession(private[http] val _contextPath: String,
         <pre style="background: lightgrey; padding: 6px; border: 1px solid">
           {whole.toString}
         </pre>
-      </div>) openOr NodeSeq.Empty
+      </div>).openOr(NodeSeq.Empty)
     }
   }
 
@@ -1692,11 +1701,13 @@ class LiftSession(private[http] val _contextPath: String,
     val isForm = !attrs.get("form").toList.isEmpty
 
     val eagerEval: Boolean =
-      (attrs.get("eager_eval").map(toBoolean) orElse findNSAttr(attrs,
-                                                                "lift",
-                                                                "eager_eval")
-        .map(toBoolean) orElse findNSAttr(attrs, "l", "eager_eval").map(
-        toBoolean)) getOrElse false
+      (attrs
+        .get("eager_eval")
+        .map(toBoolean)
+        .orElse(findNSAttr(attrs, "lift", "eager_eval")
+          .map(toBoolean))
+        .orElse(findNSAttr(attrs, "l", "eager_eval").map(toBoolean)))
+        .getOrElse(false)
 
     val kids =
       if (eagerEval) processSurroundAndInclude(page, passedKids)
@@ -1708,7 +1719,7 @@ class LiftSession(private[http] val _contextPath: String,
            func <- loc.snippet(snippet)) yield func(kids)
 
     def locateAndCacheSnippet(tagName: String): Box[AnyRef] =
-      snippetMap.is.get(tagName) orElse {
+      snippetMap.is.get(tagName).orElse {
         first(LiftRules.snippetNamesToSearch.vend(tagName)) { nameToTry =>
           val ret = findSnippetInstance(nameToTry)
           // Update the snippetMap so that we reuse the same instance in this request (unless the snippet is transient)
@@ -1728,12 +1739,14 @@ class LiftSession(private[http] val _contextPath: String,
       val pair = (cls, method)
       if (pf.isDefinedAt(pair)) {
         val func = pf(pair)
-        func.map(_.apply(kids)) openOr reportSnippetError(
-          page,
-          snippetName,
-          LiftRules.SnippetFailures.MethodNotFound,
-          NodeSeq.Empty,
-          wholeTag)
+        func
+          .map(_.apply(kids))
+          .openOr(
+            reportSnippetError(page,
+                               snippetName,
+                               LiftRules.SnippetFailures.MethodNotFound,
+                               NodeSeq.Empty,
+                               wholeTag))
       } else f
     }
 
@@ -1743,9 +1756,10 @@ class LiftSession(private[http] val _contextPath: String,
         .map { snippet =>
           val (cls, method) = splitColonPair(snippet)
           S.doSnippet(snippet)(runWhitelist(snippet, cls, method, kids) {
-            (S.locateMappedSnippet(snippet).map(_(kids)) or locSnippet(
-              snippet))
-              .openOr(S.locateSnippet(snippet).map(_(kids)) openOr {
+            (S.locateMappedSnippet(snippet)
+              .map(_(kids))
+              .or(locSnippet(snippet)))
+              .openOr(S.locateSnippet(snippet).map(_(kids)).openOr {
 
                 (locateAndCacheSnippet(cls)) match {
                   // deal with a stateless request when a snippet has
@@ -1806,13 +1820,13 @@ class LiftSession(private[http] val _contextPath: String,
                     def isFunc1(tpe: Type): Boolean = tpe match {
                       case null => false
                       case c: Class[_] =>
-                        classOf[Function1[_, _]] isAssignableFrom c
+                        classOf[Function1[_, _]].isAssignableFrom(c)
                       case _ => false
                     }
 
                     def isNodeSeq(tpe: Type): Boolean = tpe match {
                       case null => false
-                      case c: Class[_] => classOf[NodeSeq] isAssignableFrom c
+                      case c: Class[_] => classOf[NodeSeq].isAssignableFrom(c)
                       case _ => false
                     }
 
@@ -1837,7 +1851,8 @@ class LiftSession(private[http] val _contextPath: String,
                     }
 
                     def isFuncNodeSeq(meth: Method): Boolean = {
-                      (classOf[Function1[_, _]] isAssignableFrom meth.getReturnType) &&
+                      (classOf[Function1[_, _]]
+                        .isAssignableFrom(meth.getReturnType)) &&
                       testGeneric(meth.getGenericReturnType)
                     }
 
@@ -1851,16 +1866,17 @@ class LiftSession(private[http] val _contextPath: String,
                           .asInstanceOf[Function1[NodeSeq, NodeSeq]]
                           .apply(kids)
 
-                    (gotIt or nodeSeqFunc) openOr {
+                    (gotIt.or(nodeSeqFunc)).openOr {
 
                       val ar: Array[AnyRef] = List(Group(kids)).toArray
-                      ((Helpers.invokeMethod(
-                        inst.getClass,
-                        inst,
-                        method,
-                        ar,
-                        Array(classOf[NodeSeq]))) or Helpers
-                        .invokeMethod(inst.getClass, inst, method)) match {
+                      ((Helpers
+                        .invokeMethod(inst.getClass,
+                                      inst,
+                                      method,
+                                      ar,
+                                      Array(classOf[NodeSeq])))
+                        .or(Helpers
+                          .invokeMethod(inst.getClass, inst, method))) match {
                         case CheckNodeSeq(md) => md
                         case it =>
                           val intersection =
@@ -2624,7 +2640,7 @@ class LiftSession(private[http] val _contextPath: String,
     testStatefulFeature {
       val existingComet = Box.legacyNullTest(nasyncComponents.get(cometInfo))
 
-      (existingComet.asA[T] or newCometFn(creationInfo)).map { comet =>
+      (existingComet.asA[T].or(newCometFn(creationInfo))).map { comet =>
         cometPreMessages.atomicUpdate(_.filter {
           // Pass messages for this comet on and remove them from pending list.
           case (info, message) if info == cometInfo =>
@@ -2678,7 +2694,7 @@ class LiftSession(private[http] val _contextPath: String,
   // Runs some base setup tasks before returning the comet.
   private def buildCometByCreationInfo(
       creationInfo: CometCreationInfo): Box[LiftCometActor] = {
-    LiftRules.cometCreationFactory.vend.apply(creationInfo) or {
+    LiftRules.cometCreationFactory.vend.apply(creationInfo).or {
       val cometType = findType[LiftCometActor](
         creationInfo.cometType,
         LiftRules.buildPackage("comet") ::: ("lift.app.comet" :: Nil)
@@ -2718,7 +2734,7 @@ class LiftSession(private[http] val _contextPath: String,
     }
 
     val attemptedComet =
-      tryo(buildWithNoArgConstructor) or tryo(buildWithCreateInfoConstructor)
+      tryo(buildWithNoArgConstructor).or(tryo(buildWithCreateInfoConstructor))
 
     attemptedComet match {
       case fail @ Failure(_, Full(e: java.lang.NoSuchMethodException), _) =>
@@ -2847,7 +2863,7 @@ class LiftSession(private[http] val _contextPath: String,
       }
 
       nasyncComponents
-        .put(CometId(ca.theType openOr "Roundtrip Comet Actor", ca.name), ca)
+        .put(CometId(ca.theType.openOr("Roundtrip Comet Actor"), ca.name), ca)
       nasyncById.put(ca.uniqueId, ca)
 
       ca.callInitCometActor(
@@ -3053,7 +3069,7 @@ private object SnippetNode {
       } yield {
         snip
       }
-    } orElse in.attribute("lift").map(_.text)
+    }.orElse(in.attribute("lift").map(_.text))
 
     snippetInvocation.map { snip =>
       snip.charSplit('?') match {
@@ -3136,7 +3152,8 @@ private object SnippetNode {
                  case up: UnprefixedAttribute if up.key == "parallel" => true
                  case _ => false
                }
-               .flatMap(up => AsBoolean.unapply(up.value.text)) getOrElse false),
+               .flatMap(up => AsBoolean.unapply(up.value.text))
+               .getOrElse(false)),
            lift,
            snippetName)
         }

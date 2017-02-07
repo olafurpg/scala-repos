@@ -49,7 +49,7 @@ class VotingService extends Actor {
   def becomeOpen(): Unit = {
     replicator ! Unsubscribe(OpenedKey, self)
     replicator ! Subscribe(ClosedKey, self)
-    context.become(open orElse getVotes(open = true))
+    context.become(open.orElse(getVotes(open = true)))
   }
 
   def open: Receive = {

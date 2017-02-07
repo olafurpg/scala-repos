@@ -17,16 +17,16 @@ object Timeline extends LilaController {
       negotiate(
         html = {
           if (HTTPRequest.isXhr(ctx.req))
-            Env.timeline.entryRepo.userEntries(me.id) map {
+            Env.timeline.entryRepo.userEntries(me.id).map {
               html.timeline.entries(_)
             } else {
             val entries = Env.timeline.entryRepo.moreUserEntries(me.id, nb)
-            entries map { html.timeline.more(_) }
+            entries.map { html.timeline.more(_) }
           }
         },
         _ => {
           val entries = Env.timeline.entryRepo.moreUserEntries(me.id, nb)
-          entries map { es =>
+          entries.map { es =>
             Ok(Json.obj("entries" -> es))
           }
         }

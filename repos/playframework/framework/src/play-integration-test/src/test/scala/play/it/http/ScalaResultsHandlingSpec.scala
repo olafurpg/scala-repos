@@ -87,7 +87,7 @@ trait ScalaResultsHandlingSpec
 
     "chunk results for event source strategy" in makeRequest(
       Results.Ok
-        .chunked(Source(List("a", "b")) via EventSource.flow)
+        .chunked(Source(List("a", "b")).via(EventSource.flow))
         .as("text/event-stream")
     ) { response =>
       response.header(CONTENT_TYPE) must beSome.like {

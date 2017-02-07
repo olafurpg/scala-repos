@@ -65,7 +65,7 @@ object Cors {
        * If the Origin header is not present terminate this set of steps. The request is outside
        * the scope of this specification.
        */
-      Option(request.headers.get("Origin")) flatMap { origin =>
+      Option(request.headers.get("Origin")).flatMap { origin =>
         /*
          * If the value of the Origin header is not a case-sensitive match for any of the values
          * in list of origins, do not set any additional headers and terminate this set of steps.
@@ -127,11 +127,14 @@ object Cors {
     /** http://www.w3.org/TR/cors/#resource-requests */
     protected[this] def handleSimple(request: Request,
                                      response: Response): Response =
-      getOrigin(request) map {
-        setOriginAndCredentials(response, _)
-      } map {
-        addExposedHeaders(_)
-      } getOrElse response
+      getOrigin(request)
+        .map {
+          setOriginAndCredentials(response, _)
+        }
+        .map {
+          addExposedHeaders(_)
+        }
+        .getOrElse(response)
 
     /*
      * Preflight (OPTIONS) requests
@@ -164,7 +167,7 @@ object Cors {
       * the user agent is allowed to cache the result of the request.
       */
     protected[this] def setMaxAge(response: Response): Response = {
-      policy.maxAge foreach { maxAge =>
+      policy.maxAge.foreach { maxAge =>
         response.headers
           .add("Access-Control-Max-Age", maxAge.inSeconds.toString)
       }
@@ -179,9 +182,11 @@ object Cors {
       * headers let header field-names be the empty list.
       */
     protected[this] def getHeaders(request: Request): Seq[String] =
-      Option(request.headers.get("Access-Control-Request-Headers")) map {
-        commaSpace.split(_).toSeq
-      } getOrElse List.empty[String]
+      Option(request.headers.get("Access-Control-Request-Headers"))
+        .map {
+          commaSpace.split(_).toSeq
+        }
+        .getOrElse(List.empty[String])
 
     /**
       * If each of the header field-names is a simple header and none is Content-Type, than this step
@@ -201,11 +206,11 @@ object Cors {
 
     /** http://www.w3.org/TR/cors/#resource-preflight-requests */
     protected[this] def handlePreflight(request: Request): Option[Response] =
-      getOrigin(request) flatMap { origin =>
-        getMethod(request) flatMap { method =>
+      getOrigin(request).flatMap { origin =>
+        getMethod(request).flatMap { method =>
           val headers = getHeaders(request)
-          policy.allowsMethods(method) flatMap { allowedMethods =>
-            policy.allowsHeaders(headers) map { allowedHeaders =>
+          policy.allowsMethods(method).flatMap { allowedMethods =>
+            policy.allowsHeaders(headers).map { allowedHeaders =>
               setHeaders(
                 setMethod(
                   setMaxAge(setOriginAndCredentials(request.response, origin)),
@@ -229,11 +234,11 @@ object Cors {
         case Preflight() =>
           Future {
             // If preflight is not acceptable, just return a 200 without CORS headers
-            handlePreflight(request) getOrElse request.response
+            handlePreflight(request).getOrElse(request.response)
           }
-        case _ => service(request) map { handleSimple(request, _) }
+        case _ => service(request).map { handleSimple(request, _) }
       }
-      response map { setVary(_) }
+      response.map { setVary(_) }
     }
   }
 }

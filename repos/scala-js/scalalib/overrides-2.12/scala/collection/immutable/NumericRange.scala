@@ -165,12 +165,12 @@ abstract class NumericRange[T](
 
       private lazy val underlyingRange: NumericRange[T] = self
       override def foreach[U](f: A => U) {
-        underlyingRange foreach (x => f(fm(x)))
+        underlyingRange.foreach(x => f(fm(x)))
       }
       override def isEmpty = underlyingRange.isEmpty
       override def apply(idx: Int): A = fm(underlyingRange(idx))
       override def containsTyped(el: A) =
-        underlyingRange exists (x => fm(x) == el)
+        underlyingRange.exists(x => fm(x) == el)
     }
   }
 
@@ -193,9 +193,9 @@ abstract class NumericRange[T](
         (num eq scala.math.Numeric.LongIsIntegral)) {
       val numAsIntegral = num.asInstanceOf[Integral[B]]
       import numAsIntegral._
-      if (isEmpty) num fromInt 0
+      if (isEmpty) num.fromInt(0)
       else if (numRangeElements == 1) head
-      else ((num fromInt numRangeElements) * (head + last) / (num fromInt 2))
+      else ((num.fromInt(numRangeElements)) * (head + last) / (num.fromInt(2)))
     } else {
       // user provided custom Numeric, we cannot rely on arithmetic series formula
       if (isEmpty) num.zero
@@ -216,7 +216,7 @@ abstract class NumericRange[T](
   override lazy val hashCode = super.hashCode()
   override def equals(other: Any) = other match {
     case x: NumericRange[_] =>
-      (x canEqual this) && (length == x.length) &&
+      (x.canEqual(this)) && (length == x.length) &&
         ((length == 0) || // all empty sequences are equal
           (start == x.start &&
             last == x.last) // same length and same endpoints implies equality

@@ -133,7 +133,7 @@ class SymbolTableForUnitTesting extends SymbolTable {
   val phaseWithId: Array[Phase] = {
     val maxId = phases.map(_.id).max
     val phasesArray = Array.ofDim[Phase](maxId + 1)
-    phases foreach { phase =>
+    phases.foreach { phase =>
       phasesArray(phase.id) = phase
     }
     phasesArray

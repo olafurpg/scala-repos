@@ -10,15 +10,15 @@ object Util {
     for (lock <- held) {
       sb.append(if (holdsLock(lock)) '.' else '!')
     }
-    print("%5s|" format sb)
+    print("%5s|".format(sb))
 
     sb.clear()
     for (lock <- notHeld) {
       sb.append(if (holdsLock(lock)) '!' else '.')
     }
-    print("%-15s " format sb)
+    print("%-15s ".format(sb))
 
-    (held forall holdsLock) && !(notHeld exists holdsLock)
+    (held.forall(holdsLock)) && !(notHeld.exists(holdsLock))
   }
 }
 
@@ -679,7 +679,7 @@ object O2 extends T
 
 object Test extends App {
   def check(name: String, result: Boolean) {
-    println("%-10s %s" format (name + ":", if (result) "OK" else "FAILED"))
+    println("%-10s %s".format(name + ":", if (result) "OK" else "FAILED"))
   }
 
   val c1 = new C1

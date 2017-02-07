@@ -24,18 +24,20 @@ private[report] final class ReportApi {
           !isAlreadySlain(report, user) ?? {
             lila.mon.mod.report.create(reason.name)
             if (by.id == UserRepo.lichessId)
-              reportTube.coll.update(
-                selectRecent(user, reason),
-                Json.obj("$set" ->
-                  (reportTube.toMongo(report).get - "processedBy" - "_id"))
-              ) flatMap { res =>
-                (res.n == 0) ?? $insert(report)
-              } else $insert(report)
+              reportTube.coll
+                .update(
+                  selectRecent(user, reason),
+                  Json.obj("$set" ->
+                    (reportTube.toMongo(report).get - "processedBy" - "_id"))
+                )
+                .flatMap { res =>
+                  (res.n == 0) ?? $insert(report)
+                } else $insert(report)
           }
       } >>- monitorUnprocessed
   }
 
-  private def monitorUnprocessed = nbUnprocessed foreach { nb =>
+  private def monitorUnprocessed = nbUnprocessed.foreach { nb =>
     lila.mon.mod.report.unprocessed(nb)
   }
 
@@ -45,7 +47,7 @@ private[report] final class ReportApi {
       (report.isTrollOrInsult && user.troll)
 
   def autoCheatPrintReport(userId: String): Funit = {
-    UserRepo byId userId zip UserRepo.lichess flatMap {
+    (UserRepo byId userId).zip(UserRepo.lichess).flatMap {
       case (Some(user), Some(lichess)) =>
         create(ReportSetup(user = user,
                            reason = "cheatprint",
@@ -59,7 +61,7 @@ private[report] final class ReportApi {
 
   def autoCheatReport(userId: String, text: String): Funit = {
     lila.mon.cheat.autoReport.count()
-    UserRepo byId userId zip UserRepo.lichess flatMap {
+    (UserRepo byId userId).zip(UserRepo.lichess).flatMap {
       case (Some(user), Some(lichess)) =>
         create(ReportSetup(user = user,
                            reason = "cheat",
@@ -72,7 +74,7 @@ private[report] final class ReportApi {
   }
 
   def autoBotReport(userId: String, referer: Option[String]): Funit = {
-    UserRepo byId userId zip UserRepo.lichess flatMap {
+    (UserRepo byId userId).zip(UserRepo.lichess).flatMap {
       case (Some(user), Some(lichess)) =>
         create(ReportSetup(user = user,
                            reason = "cheat",
@@ -86,17 +88,21 @@ private[report] final class ReportApi {
   }
 
   def autoBoostReport(userId: String, accompliceId: String): Funit = {
-    UserRepo.byId(userId) zip UserRepo.byId(accompliceId) zip UserRepo.lichess flatMap {
-      case ((Some(user), Some(accomplice)), Some(lichess)) =>
-        create(ReportSetup(user = user,
-                           reason = "boost",
-                           text =
-                             s"with their accomplice @${accomplice.username}",
-                           gameId = "",
-                           move = ""),
-               lichess)
-      case _ => funit
-    }
+    UserRepo
+      .byId(userId)
+      .zip(UserRepo.byId(accompliceId))
+      .zip(UserRepo.lichess)
+      .flatMap {
+        case ((Some(user), Some(accomplice)), Some(lichess)) =>
+          create(ReportSetup(
+                   user = user,
+                   reason = "boost",
+                   text = s"with their accomplice @${accomplice.username}",
+                   gameId = "",
+                   move = ""),
+                 lichess)
+        case _ => funit
+      }
   }
 
   def clean(userId: String): Funit =
@@ -107,7 +113,7 @@ private[report] final class ReportApi {
             $set("processedBy" -> "lichess"),
             multi = true)
 
-  def process(id: String, by: User): Funit = $find byId id flatMap {
+  def process(id: String, by: User): Funit = ($find byId id).flatMap {
     _ ?? { report =>
       $update(Json.obj(
                 "user" -> report.user,
@@ -138,7 +144,7 @@ private[report] final class ReportApi {
     ) >>- monitorUnprocessed
 
   def autoInsultReport(userId: String, text: String): Funit = {
-    UserRepo byId userId zip UserRepo.lichess flatMap {
+    (UserRepo byId userId).zip(UserRepo.lichess).flatMap {
       case (Some(user), Some(lichess)) =>
         create(ReportSetup(user = user,
                            reason = "insult",
@@ -159,23 +165,23 @@ private[report] final class ReportApi {
 
   def nbUnprocessed = $count(unprocessedSelect)
 
-  def recent(nb: Int) = $find($query.all sort $sort.createdDesc, nb)
+  def recent(nb: Int) = $find($query.all.sort($sort.createdDesc), nb)
 
   def unprocessedAndRecent(nb: Int): Fu[List[Report.WithUser]] =
-    recentUnprocessed(nb) |+| recentProcessed(nb) flatMap { all =>
-      val reports = all take nb
-      UserRepo byIds reports.map(_.user).distinct map { users =>
+    (recentUnprocessed(nb) |+| recentProcessed(nb)).flatMap { all =>
+      val reports = all.take(nb)
+      (UserRepo byIds reports.map(_.user).distinct).map { users =>
         reports.flatMap { r =>
-          users.find(_.id == r.user) map { Report.WithUser(r, _) }
+          users.find(_.id == r.user).map { Report.WithUser(r, _) }
         }
       }
     }
 
   def recentUnprocessed(nb: Int) =
-    $find($query(unprocessedSelect) sort $sort.createdDesc, nb)
+    $find($query(unprocessedSelect).sort($sort.createdDesc), nb)
 
   def recentProcessed(nb: Int) =
-    $find($query(processedSelect) sort $sort.createdDesc, nb)
+    $find($query(processedSelect).sort($sort.createdDesc), nb)
 
   private def selectRecent(user: User, reason: Reason) =
     Json.obj("createdAt" -> $gt($date(DateTime.now minusDays 7)),

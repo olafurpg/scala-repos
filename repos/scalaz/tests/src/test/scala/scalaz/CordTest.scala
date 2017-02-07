@@ -10,7 +10,7 @@ object CordTest extends SpecLite {
   "split() must result in two cords whose summary length is equal to the length of original cord " in {
     val x = Cord("Once upon a midnight dreary")
     for (i <- 0 until x.length) {
-      val split = x split i
+      val split = x.split(i)
       split._1.length + split._2.length must_== x.length
     }
   }
@@ -19,7 +19,7 @@ object CordTest extends SpecLite {
     val theString = "While I pondered, weak and weary"
     val x = Cord(theString)
     for (i <- 0 until x.length) {
-      val y = x drop i
+      val y = x.drop(i)
       y.toString must_== theString.substring(i)
     }
   }

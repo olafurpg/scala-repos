@@ -177,7 +177,7 @@ class SbtProjectResolver
       moduleNode.addAll(project.android.map(createFacet(project, _)).toSeq)
       moduleNode.addAll(
         createUnmanagedDependencies(project.dependencies.jars)(moduleNode))
-      unmanagedSourcesAndDocsLibrary foreach { lib =>
+      unmanagedSourcesAndDocsLibrary.foreach { lib =>
         val dependency =
           new LibraryDependencyNode(moduleNode, lib, LibraryLevel.MODULE)
         dependency.setScope(DependencyScope.COMPILE)
@@ -422,7 +422,7 @@ class SbtProjectResolver
     val imports =
       project.build.imports.flatMap(_.trim.substring(7).split(", "))
     val resolvers =
-      project.resolvers map { r =>
+      project.resolvers.map { r =>
         new SbtResolver(SbtResolver.Kind.Maven, r.name, r.root)
       }
     new SbtModuleNode(

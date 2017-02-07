@@ -60,7 +60,7 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
 
       @volatile var states = Seq.empty[SessionState]
       val state =
-        session1 flatMap { session1 =>
+        session1.flatMap { session1 =>
           session1.state
         }
       state.changes.register(Witness({ ws =>
@@ -109,7 +109,7 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
                              ZkSession(retryStream,
                                        inst.zookeeperConnectString,
                                        statsReceiver = NullStatsReceiver))
-      val varZkState = varZkSession flatMap { _.state }
+      val varZkState = varZkSession.flatMap { _.state }
 
       @volatile var zkStates = Seq[(SessionState, Duration)]()
       varZkState.changes.register(Witness({ ws =>
@@ -177,7 +177,7 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
 
       eventually {
         assert(
-          (zkStates map { case (s, _) => s }).reverse == Seq(
+          (zkStates.map { case (s, _) => s }).reverse == Seq(
             SessionState.SyncConnected,
             SessionState.Disconnected,
             SessionState.Expired,

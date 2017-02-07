@@ -251,7 +251,7 @@ object M6 {
 
 object M7 {
 
-  def heads[a](xss: List[List[a]]): List[a] = xss flatMap {
+  def heads[a](xss: List[List[a]]): List[a] = xss.flatMap {
     case x :: xs => List(x)
     case List() => List()
   }
@@ -341,8 +341,8 @@ object M9 {
     def derive(v: Var): Expr = this match {
       case Number(_) => Number(0)
       case Var(name) => if (name == v.name) Number(1) else Number(0)
-      case Sum(e1, e2) => Sum(e1 derive v, e2 derive v)
-      case Prod(e1, e2) => Sum(Prod(e1, e2 derive v), Prod(e2, e1 derive v))
+      case Sum(e1, e2) => Sum(e1.derive(v), e2.derive(v))
+      case Prod(e1, e2) => Sum(Prod(e1, e2.derive(v)), Prod(e2, e1.derive(v)))
     }
   }
   case class Number(x: Int) extends Expr {
@@ -361,7 +361,7 @@ object M9 {
   def test = {
     val x = Var("x");
     val f0 = Prod(x, x);
-    val f1 = f0 derive x;
+    val f1 = f0.derive(x);
     Console.println("f (x) = " + f0);
     Console.println("f'(x) = " + f1);
     Console.println;
@@ -383,8 +383,8 @@ object MA {
     def derive(v: Var): Expr = this match {
       case Number(_) => Number(0)
       case Var(name) => if (name == v.name) Number(1) else Number(0)
-      case Sum(e1, e2) => (e1 derive v) + (e2 derive v)
-      case Prod(e1, e2) => e1 * (e2 derive v) + e2 * (e1 derive v)
+      case Sum(e1, e2) => (e1.derive(v)) + (e2.derive(v))
+      case Prod(e1, e2) => e1 * (e2.derive(v)) + e2 * (e1.derive(v))
     }
   }
   case class Number(x: Int) extends Expr {
@@ -427,12 +427,12 @@ object MA {
     val x = Var("x");
 
     val f0 = x * x;
-    val f1 = f0 derive x;
+    val f1 = f0.derive(x);
     Console.println("f (x) = " + f0);
     Console.println("f'(x) = " + f1);
 
     val g0 = Number(2) * x * x + Number(3) * x;
-    val g1 = g0 derive x;
+    val g1 = g0.derive(x);
     Console.println("g (x) = " + g0);
     Console.println("g'(x) = " + g1);
     Console.println("g (3) = " + evalvars(List(("x", 3)))(g0));
@@ -570,9 +570,9 @@ object MB {
     def derive(v: Var): Expr = this match {
       case Lit(_) => Lit(0)
       case Var(name) => if (name == v.name) Lit(1) else Lit(0)
-      case Add(e1, e2) => (e1 derive v) + (e2 derive v)
-      case Mul(e1, e2) => e1 * (e2 derive v) + e2 * (e1 derive v)
-      case Pow(e1, i2) => Lit(i2) * (e1 derive v) * (e1 ^ (i2 - 1))
+      case Add(e1, e2) => (e1.derive(v)) + (e2.derive(v))
+      case Mul(e1, e2) => e1 * (e2.derive(v)) + e2 * (e1.derive(v))
+      case Pow(e1, i2) => Lit(i2) * (e1.derive(v)) * (e1 ^ (i2 - 1))
     }
 
     def evaluate(vars: List[(String, Int)]): Int = this match {

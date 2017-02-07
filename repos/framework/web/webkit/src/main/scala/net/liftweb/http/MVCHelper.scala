@@ -59,8 +59,8 @@ trait MVCHelper extends LiftRules.DispatchPF {
 
   private object curSession
       extends RequestVar[LiftSession](
-        S.session openOr LiftRules.statelessSession.vend
-          .apply(curRequest.is)) {
+        S.session.openOr(LiftRules.statelessSession.vend
+          .apply(curRequest.is))) {
     override def __nameSalt = Helpers.nextFuncName
   }
 

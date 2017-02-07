@@ -32,7 +32,7 @@ object Metric {
       extends Metric(
         "acpl",
         "Average centipawn loss",
-        F moves "c",
+        F.moves("c"),
         Move,
         Move,
         Average,
@@ -43,7 +43,7 @@ object Metric {
   case object Movetime
       extends Metric("movetime",
                      "Move time",
-                     F moves "t",
+                     F.moves("t"),
                      Move,
                      Move,
                      Seconds,
@@ -92,7 +92,7 @@ object Metric {
       extends Metric(
         "nbMoves",
         "Moves per game",
-        F moves "r",
+        F.moves("r"),
         Move,
         Game,
         Average,
@@ -102,7 +102,7 @@ object Metric {
   case object PieceRole
       extends Metric("piece",
                      "Piece moved",
-                     F moves "r",
+                     F.moves("r"),
                      Move,
                      Move,
                      Percent,
@@ -112,7 +112,7 @@ object Metric {
       extends Metric(
         "opportunism",
         "Opportunism",
-        F moves "o",
+        F.moves("o"),
         Move,
         Move,
         Percent,
@@ -124,7 +124,7 @@ object Metric {
       extends Metric(
         "luck",
         "Luck",
-        F moves "l",
+        F.moves("l"),
         Move,
         Move,
         Percent,
@@ -135,7 +135,7 @@ object Metric {
   case object Material
       extends Metric("material",
                      "Material imbalance",
-                     F moves "i",
+                     F.moves("i"),
                      Move,
                      Move,
                      Average,
@@ -152,7 +152,7 @@ object Metric {
                  Opportunism,
                  Luck,
                  Material)
-  val byKey = all map { p =>
+  val byKey = all.map { p =>
     (p.key, p)
   } toMap
 

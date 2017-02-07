@@ -93,7 +93,8 @@ object Test {
     println(classTag[A].runtimeClass.getName)
     classTag[A].runtimeClass.getDeclaredMethods.toList
       .sortBy(_.toString)
-      .flatMap(m => List(m.toString, m.toGenericString)) foreach println
+      .flatMap(m => List(m.toString, m.toGenericString))
+      .foreach(println)
     println("")
   }
 

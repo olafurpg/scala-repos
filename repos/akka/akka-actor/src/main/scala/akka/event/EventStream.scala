@@ -43,7 +43,7 @@ class EventStream(sys: ActorSystem, private val debug: Boolean)
 
   protected implicit val subclassification = new Subclassification[Class[_]] {
     def isEqual(x: Class[_], y: Class[_]) = x == y
-    def isSubclass(x: Class[_], y: Class[_]) = y isAssignableFrom x
+    def isSubclass(x: Class[_], y: Class[_]) = y.isAssignableFrom(x)
   }
 
   protected def classify(event: AnyRef): Class[_] = event.getClass
@@ -120,7 +120,7 @@ class EventStream(sys: ActorSystem, private val debug: Boolean)
                   "initialized unsubscriber to: " +
                     unsubscriber + ", registering " + subscribers.size +
                     " initial subscribers with it"))
-            subscribers foreach registerWithUnsubscriber
+            subscribers.foreach(registerWithUnsubscriber)
             true
           } else {
             // recurse, because either new subscribers have been registered since `get` (retry Left case),

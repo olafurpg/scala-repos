@@ -21,7 +21,7 @@ trait Connector {
   protected[this] val sessionBroker: EventBroker = new EventBroker
 
   // a broker may only be used for 1:1 communication, so we fan-out event notifications
-  sessionBroker.recv foreach { event =>
+  sessionBroker.recv.foreach { event =>
     val listening = listeners.get()
     log.debug("propagating event to %d listeners %s", listening.size, event)
     val stateEvent = StateEvent(event)
@@ -76,8 +76,8 @@ object Connector {
       connectors(i)
     }
 
-    connectors foreach {
-      _ onSessionEvent { case event => sessionBroker.send(event()).sync() }
+    connectors.foreach {
+      _.onSessionEvent { case event => sessionBroker.send(event()).sync() }
     }
 
     def apply(): Future[ZooKeeper] = nextConnector().apply()
@@ -85,7 +85,7 @@ object Connector {
     /** Disconnect from all ZooKeeper servers. */
     def release(): Future[Unit] = Future.join {
       log.trace("release")
-      connectors map { _.release() }
+      connectors.map { _.release() }
     }
   }
 }

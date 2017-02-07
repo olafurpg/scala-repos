@@ -242,10 +242,10 @@ case class RRule private (
 
           // heuristic: take 4 observations, find the largest daycount between subsequent
           // occurrences, with a day of padding, and with a minimum of 1 day
-          val dseq = { outer from dt take 4 }.toSeq
-          val ival = { dseq.tail zip dseq }.foldLeft(1) {
+          val dseq = { outer.from(dt).take(4) }.toSeq
+          val ival = { dseq.tail.zip(dseq) }.foldLeft(1) {
             case (days, (d1, d2)) =>
-              days max { Days.daysBetween(d2, d1).getDays + 2 }
+              days.max { Days.daysBetween(d2, d1).getDays + 2 }
           }
 
           // use this daycount to estimate lower bound from which to start generating dates
@@ -284,7 +284,7 @@ case class RRule private (
 
     val iterWithJoins = joins.foldLeft(riter) {
       case (i1, (rrule, t)) =>
-        val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
+        val tmpfrom = t.map { dt2dtv }.getOrElse(dt2dtv(dt))
         val tmpiter = RecurrenceIteratorFactory
           .createRecurrenceIterator(rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.join(i1, tmpiter)
@@ -292,16 +292,17 @@ case class RRule private (
 
     val iterWithJoinsWithExcepts = excepts.foldLeft(iterWithJoins) {
       case (i1, (rrule, t)) =>
-        val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
+        val tmpfrom = t.map { dt2dtv }.getOrElse(dt2dtv(dt))
         val tmpiter = RecurrenceIteratorFactory
           .createRecurrenceIterator(rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.except(i1, tmpiter)
     }
 
-    DateTimeIteratorFactory.createDateTimeIterator(iterWithJoinsWithExcepts) map {
-      dt =>
+    DateTimeIteratorFactory
+      .createDateTimeIterator(iterWithJoinsWithExcepts)
+      .map { dt =>
         dt.withZone(inzone)
-    }
+      }
   }
 
   override def toString = toICal.toIcal

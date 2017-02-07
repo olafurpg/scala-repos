@@ -17,7 +17,7 @@ abstract class DirectTest {
   /** create settings objects for test from arg string */
   def newSettings(args: List[String]): Settings = {
     val s = new Settings
-    s processArguments (args, true)
+    s.processArguments(args, true)
     s
   }
 
@@ -42,7 +42,7 @@ abstract class DirectTest {
 
   def newReporter(settings: Settings): Reporter = new ConsoleReporter(settings)
 
-  private def newSources(codes: String*) = codes.toList.zipWithIndex map {
+  private def newSources(codes: String*) = codes.toList.zipWithIndex.map {
     case (src, idx) => new BatchSourceFile(s"newSource${idx + 1}.scala", src)
   }
 
@@ -52,7 +52,7 @@ abstract class DirectTest {
   }
 
   def compileSources(global: Global)(sources: SourceFile*): Boolean = {
-    withRun(global)(_ compileSources sources.toList)
+    withRun(global)(_.compileSources(sources.toList))
     !global.reporter.hasErrors
   }
 

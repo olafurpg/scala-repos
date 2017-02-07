@@ -231,8 +231,9 @@ package docs.serialization {
 
       class ExternalAddressExt(system: ExtendedActorSystem) extends Extension {
         def addressFor(remoteAddr: Address): Address =
-          system.provider.getExternalAddressFor(remoteAddr) getOrElse
-            (throw new UnsupportedOperationException(
+          system.provider
+            .getExternalAddressFor(remoteAddr)
+            .getOrElse(throw new UnsupportedOperationException(
               "cannot send to " + remoteAddr))
       }
 

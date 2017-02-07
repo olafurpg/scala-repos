@@ -38,7 +38,7 @@ object Decode {
     val bytes = classLoader.classBytes(name)
     val reader = new ByteArrayReader(bytes)
     val cf = new Classfile(reader)
-    cf.scalaSigAttribute map (_.data)
+    cf.scalaSigAttribute.map(_.data)
   }
 
   /** Return the bytes representing the annotation
@@ -53,7 +53,7 @@ object Decode {
     val classFile = ClassFileParser.parse(byteCode)
     import classFile._
 
-    classFile annotation SCALA_SIG_ANNOTATION map {
+    classFile.annotation(SCALA_SIG_ANNOTATION).map {
       case Annotation(_, els) =>
         val bytesElem = els find
           (x => constant(x.elementNameIndex) == BYTES_VALUE) orNull
@@ -63,7 +63,7 @@ object Decode {
         val bytes = _bytes.asInstanceOf[StringBytesPair].bytes
         val length = ByteCodecs.decode(bytes)
 
-        bytes take length
+        bytes.take(length)
     }
   }
 
@@ -72,7 +72,7 @@ object Decode {
   private[scala] def caseParamNames(path: String): Option[List[String]] = {
     val (outer, inner) = (path indexOf '$') match {
       case -1 => (path, "")
-      case x => (path take x, path drop (x + 1))
+      case x => (path.take(x), path.drop(x + 1))
     }
 
     for {
@@ -81,17 +81,17 @@ object Decode {
     } yield {
       val f: PartialFunction[Symbol, List[String]] =
         if (inner == "") {
-          case x: MethodSymbol if x.isCaseAccessor && (x.name endsWith " ") =>
-            List(x.name dropRight 1)
+          case x: MethodSymbol if x.isCaseAccessor && (x.name.endsWith(" ")) =>
+            List(x.name.dropRight(1))
         } else {
           case x: ClassSymbol if x.name == inner =>
             val xs =
-              x.children filter
-                (child => child.isCaseAccessor && (child.name endsWith " "))
-            xs.toList map (_.name dropRight 1)
+              x.children.filter(child =>
+                child.isCaseAccessor && (child.name.endsWith(" ")))
+            xs.toList.map(_.name.dropRight(1))
         }
 
-      (ssig.symbols collect f).flatten.toList
+      (ssig.symbols.collect(f)).flatten.toList
     }
   }
 
@@ -102,8 +102,8 @@ object Decode {
       clazz <- appLoader.tryToLoadClass[AnyRef](pkg + ".package")
       ssig <- ScalaSigParser.parse(clazz)
     } yield {
-      val typeAliases = ssig.symbols collect { case x: AliasSymbol => x }
-      Map(typeAliases map (x => (x.name, getAliasSymbol(x.infoType).path)): _*)
+      val typeAliases = ssig.symbols.collect { case x: AliasSymbol => x }
+      Map(typeAliases.map(x => (x.name, getAliasSymbol(x.infoType).path)): _*)
     }
   }
 }

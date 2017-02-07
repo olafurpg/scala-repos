@@ -21,17 +21,19 @@ final class ModApi(logApi: ModlogApi,
   def setEngine(mod: String, username: String, v: Boolean): Funit =
     withUser(username) { user =>
       (user.engine != v) ?? {
-        logApi.engine(mod, user.id, v) zip UserRepo.setEngine(user.id, v) >>- {
-          if (v)
-            lilaBus.publish(lila.hub.actorApi.mod.MarkCheater(user.id),
-                            'adjustCheater)
-          reporter ! lila.hub.actorApi.report.MarkCheater(user.id, mod)
-        } void
+        logApi
+          .engine(mod, user.id, v)
+          .zip(UserRepo.setEngine(user.id, v) >>- {
+            if (v)
+              lilaBus.publish(lila.hub.actorApi.mod.MarkCheater(user.id),
+                              'adjustCheater)
+            reporter ! lila.hub.actorApi.report.MarkCheater(user.id, mod)
+        }) void
       }
     }
 
   def autoAdjust(username: String): Funit =
-    logApi.wasUnengined(User.normalize(username)) flatMap {
+    logApi.wasUnengined(User.normalize(username)).flatMap {
       case true => funit
       case false =>
         lila.mon.cheat.autoMark.count()
@@ -46,16 +48,18 @@ final class ModApi(logApi: ModlogApi,
   def setBooster(mod: String, username: String, v: Boolean): Funit =
     withUser(username) { user =>
       (user.booster != v) ?? {
-        logApi.booster(mod, user.id, v) zip UserRepo.setBooster(user.id, v) >>- {
-          if (v)
-            lilaBus.publish(lila.hub.actorApi.mod.MarkBooster(user.id),
+        logApi
+          .booster(mod, user.id, v)
+          .zip(UserRepo.setBooster(user.id, v) >>- {
+            if (v)
+              lilaBus.publish(lila.hub.actorApi.mod.MarkBooster(user.id),
                             'adjustBooster)
-        } void
+        }) void
       }
     }
 
   def autoBooster(userId: String, accomplice: String): Funit =
-    logApi.wasUnbooster(userId) map {
+    logApi.wasUnbooster(userId).map {
       case false =>
         reporter ! lila.hub.actorApi.report.Booster(userId, accomplice)
       case true =>
@@ -72,13 +76,17 @@ final class ModApi(logApi: ModlogApi,
     }
 
   def ban(mod: String, username: String): Funit = withUser(username) { user =>
-    userSpy(user.id) flatMap { spy =>
-      UserRepo.toggleIpBan(user.id) zip logApi
-        .ban(mod, user.id, !user.ipBan) zip user.ipBan.fold(
-        firewall unblockIps spy.ipStrings,
-        (spy.ipStrings map firewall.blockIp).sequenceFu >>
-          (SecurityStore disconnect user.id)
-      ) void
+    userSpy(user.id).flatMap { spy =>
+      UserRepo
+        .toggleIpBan(user.id)
+        .zip(logApi
+          .ban(mod, user.id, !user.ipBan))
+        .zip(
+          user.ipBan.fold(
+            firewall.unblockIps(spy.ipStrings),
+            (spy.ipStrings.map(firewall.blockIp)).sequenceFu >>
+              (SecurityStore disconnect user.id)
+        )) void
     }
   }
 
@@ -92,7 +100,7 @@ final class ModApi(logApi: ModlogApi,
   def reopenAccount(mod: String, username: String): Funit =
     withUser(username) { user =>
       !user.enabled ?? {
-        (UserRepo enable user.id) >> logApi.reopenAccount(mod, user.id)
+        (UserRepo.enable(user.id)) >> logApi.reopenAccount(mod, user.id)
       }
     }
 
@@ -111,8 +119,11 @@ final class ModApi(logApi: ModlogApi,
     }
 
   def ipban(mod: String, ip: String): Funit =
-    (firewall blockIp ip) >> logApi.ipban(mod, ip)
+    (firewall.blockIp(ip)) >> logApi.ipban(mod, ip)
 
   private def withUser[A](username: String)(op: User => Fu[A]): Fu[A] =
-    UserRepo named username flatten "[mod] missing user " + username flatMap op
+    UserRepo
+      .named(username)
+      .flatten("[mod] missing user " + username)
+      .flatMap(op)
 }

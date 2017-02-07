@@ -92,7 +92,7 @@ trait RouteTest
   def mediaType: MediaType = contentType.mediaType
   def charsetOption: Option[HttpCharset] = contentType.charsetOption
   def charset: HttpCharset =
-    charsetOption getOrElse sys.error("Binary entity does not have charset")
+    charsetOption.getOrElse(sys.error("Binary entity does not have charset"))
   def headers: immutable.Seq[HttpHeader] = response.headers
   def header[T <: HttpHeader: ClassTag]: Option[T] = response.header[T]
   def header(name: String): Option[HttpHeader] =

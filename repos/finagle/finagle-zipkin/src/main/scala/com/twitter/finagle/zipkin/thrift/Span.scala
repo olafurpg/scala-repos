@@ -25,15 +25,15 @@ case class Span(traceId: TraceId,
                 annotations: Seq[ZipkinAnnotation],
                 bAnnotations: Seq[BinaryAnnotation],
                 endpoint: Endpoint) {
-  val serviceName = _serviceName getOrElse "Unknown"
-  val name = _name getOrElse "Unknown"
+  val serviceName = _serviceName.getOrElse("Unknown")
+  val name = _name.getOrElse("Unknown")
 
   /**
     * @return a pretty string for this span ID.
     */
   def idString = {
     val spanString = traceId.spanId.toString
-    val parentSpanString = traceId._parentId map (_.toString)
+    val parentSpanString = traceId._parentId.map(_.toString)
 
     parentSpanString match {
       case Some(parentSpanString) =>
@@ -55,7 +55,7 @@ case class Span(traceId: TraceId,
     span.setDebug(traceId.flags.isDebug)
 
     // fill in the host/service data for all the annotations
-    annotations foreach { ann =>
+    annotations.foreach { ann =>
       val a = ann.toThrift
       val ep =
         if (a.isSetHost) a.getHost() else endpoint.boundEndpoint.toThrift
@@ -64,7 +64,7 @@ case class Span(traceId: TraceId,
       span.addToAnnotations(a)
     }
 
-    bAnnotations foreach { ann =>
+    bAnnotations.foreach { ann =>
       val a = ann.toThrift
       val ep =
         if (a.isSetHost) a.getHost() else endpoint.boundEndpoint.toThrift

@@ -19,7 +19,7 @@ class ShardCoordinatorTest extends WordSpec with MockitoSugar {
 
     val path = "/testing/twitter/service/charm/shards/test"
 
-    Option { System.getProperty("com.twitter.zk.TEST_CONNECT") } foreach {
+    Option { System.getProperty("com.twitter.zk.TEST_CONNECT") }.foreach {
       connectString =>
         def withClient(f: (ZkClient) => Unit) = {
           implicit val timer = new JavaTimer(true)
@@ -28,7 +28,7 @@ class ShardCoordinatorTest extends WordSpec with MockitoSugar {
             .withRetryPolicy(RetryPolicy.Basic(3))
             .withAcl(OPEN_ACL_UNSAFE.asScala)
 
-          Await.result(Future { f(zk) } ensure { zk.release })
+          Await.result(Future { f(zk) }.ensure { zk.release })
         }
 
         def acquire(coord: ShardCoordinator) = {

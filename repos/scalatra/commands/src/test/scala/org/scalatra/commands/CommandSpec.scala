@@ -42,7 +42,11 @@ class MixAndMatchCommand extends ParamsOnlyCommand {
   val name: Field[String] = asString("name").notBlank
   val age: Field[Int] = "age"
   val token: Field[String] =
-    (asString("API-TOKEN").notBlank sourcedFrom Header description "The API token for this request" notes "Invalid data kills kittens" allowableValues "123")
+    (asString("API-TOKEN").notBlank
+      .sourcedFrom(Header)
+      .description("The API token for this request")
+      .notes("Invalid data kills kittens")
+      .allowableValues("123"))
   val skip: Field[Int] = asInt("skip")
     .sourcedFrom(Query)
     .description("The offset for this collection index")
@@ -96,7 +100,7 @@ class CommandSpec extends Specification {
       val form = new MixAndMatchCommand
       val params =
         Map("name" -> "John", "age" -> "45", "limit" -> "30", "skip" -> "20")
-      val multi = MultiMap(params map { case (k, v) => k -> Seq(v) })
+      val multi = MultiMap(params.map { case (k, v) => k -> Seq(v) })
       val hdrs = Map("API-TOKEN" -> "123")
       form.bindTo(params, multi, hdrs)
       form.name.value must beSome("John")
@@ -210,7 +214,7 @@ class CommandSupportSpec extends Specification with Mockito {
       val page = new ScalatraPage
       val instance = new CommandSample
       val key = page.commandRequestKey[CommandSample]
-      mockRequest.getAttribute(key) answers { k =>
+      mockRequest.getAttribute(key).answers { k =>
         instance
       }
       page.commandOption[CommandSample] must beSome[CommandSample]
@@ -227,11 +231,11 @@ class CommandSupportSpec extends Specification with Mockito {
       }
       val key = page.commandRequestKey[CommandSample]
       var cmd: CommandSample = null
-      req.setAttribute(anyString, any[CommandSample]) answers { k =>
+      req.setAttribute(anyString, any[CommandSample]).answers { k =>
         cmd = k.asInstanceOf[Array[Any]](1).asInstanceOf[CommandSample]
         ()
       }
-      req.getAttribute(key) returns cmd
+      req.getAttribute(key).returns(cmd)
 
       val command = page.command[CommandSample]
       command.bound must beTrue

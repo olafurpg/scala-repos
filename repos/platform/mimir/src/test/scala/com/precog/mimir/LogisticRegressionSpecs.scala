@@ -64,7 +64,7 @@ trait LogisticRegressionTestSupport[M[+ _]]
 
     val testSeqX = {
       def createXs: Array[Double] = {
-        val seq = Seq.fill(length - 1)(Random.nextDouble) map { x =>
+        val seq = Seq.fill(length - 1)(Random.nextDouble).map { x =>
           x * 2.0 - 1.0
         } toArray
 
@@ -77,7 +77,7 @@ trait LogisticRegressionTestSupport[M[+ _]]
     val deciders = Seq.fill(noSamples)(Random.nextDouble)
 
     val testSeqY = {
-      (testSeqX zip deciders) map {
+      (testSeqX.zip(deciders)).map {
         case (xs, p) => {
           val product: Double = dotProduct(actualThetas, 1.0 +: xs)
           if (sigmoid(product) > p) 1.0
@@ -86,7 +86,7 @@ trait LogisticRegressionTestSupport[M[+ _]]
       }
     }
 
-    testSeqX zip testSeqY
+    testSeqX.zip(testSeqY)
   }
 }
 
@@ -147,7 +147,7 @@ trait LogisticRegressionSpecs[M[+ _]]
         Seq(CPath(CPathIndex(0), CPathIndex(0)), CPath(CPathIndex(1))) sorted
 
       val samples = createLogisticSamplePoints(num, 100, actualThetas)
-      val points = jvalues(samples, cpaths) map { _.renderCompact }
+      val points = jvalues(samples, cpaths).map { _.renderCompact }
 
       val tmpFile = File.createTempFile("values", ".json")
       IOUtils.writeSeqToFile(points, tmpFile).unsafePerformIO
@@ -161,7 +161,7 @@ trait LogisticRegressionSpecs[M[+ _]]
       tmpFile.delete()
 
       val theta =
-        result collect {
+        result.collect {
           case (ids, SObject(elems)) if ids.length == 0 =>
             elems.keys mustEqual Set("model1")
 
@@ -188,9 +188,9 @@ trait LogisticRegressionSpecs[M[+ _]]
       i += 1
     }
 
-    val allThetas = actualThetas zip combineResults(num, thetas)
+    val allThetas = actualThetas.zip(combineResults(num, thetas))
 
-    val ok = allThetas map { case (t, ts) => isOk(t, ts) }
+    val ok = allThetas.map { case (t, ts) => isOk(t, ts) }
 
     ok mustEqual Array.fill(num)(true)
   }
@@ -214,7 +214,7 @@ trait LogisticRegressionSpecs[M[+ _]]
                        CPath(CPathIndex(1))) sorted
 
       val samples = createLogisticSamplePoints(num, 100, actualThetas)
-      val points = jvalues(samples, cpaths) map { _.renderCompact }
+      val points = jvalues(samples, cpaths).map { _.renderCompact }
 
       val tmpFile = File.createTempFile("values", ".json")
       IOUtils.writeSeqToFile(points, tmpFile).unsafePerformIO
@@ -228,7 +228,7 @@ trait LogisticRegressionSpecs[M[+ _]]
       tmpFile.delete()
 
       val theta =
-        result collect {
+        result.collect {
           case (ids, SObject(elems)) if ids.length == 0 => {
             elems.keys mustEqual Set("model1")
 
@@ -272,9 +272,9 @@ trait LogisticRegressionSpecs[M[+ _]]
       i += 1
     }
 
-    val allThetas = actualThetas zip combineResults(num, thetas)
+    val allThetas = actualThetas.zip(combineResults(num, thetas))
 
-    val ok = allThetas map { case (t, ts) => isOk(t, ts) }
+    val ok = allThetas.map { case (t, ts) => isOk(t, ts) }
 
     ok mustEqual Array.fill(num)(true)
   }
@@ -308,11 +308,11 @@ trait LogisticRegressionSpecs[M[+ _]]
 
       val samples = {
         val samples0 = createLogisticSamplePoints(num, 100, actualThetas)
-        samples0 map {
+        samples0.map {
           case (xs, y) => (Random.nextGaussian +: Random.nextGaussian +: xs, y)
         }
       }
-      val points = jvalues(samples, cpaths, num) map { _.renderCompact }
+      val points = jvalues(samples, cpaths, num).map { _.renderCompact }
 
       val suffix = ".json"
       val tmpFile = File.createTempFile("values", suffix)
@@ -329,7 +329,7 @@ trait LogisticRegressionSpecs[M[+ _]]
 
       result must haveSize(1)
 
-      def theta(model: String) = result collect {
+      def theta(model: String) = result.collect {
         case (ids, SObject(elems)) if ids.length == 0 => {
           elems.keys mustEqual Set("model1", "model2", "model3")
 
@@ -375,13 +375,13 @@ trait LogisticRegressionSpecs[M[+ _]]
     }
 
     def getBooleans(thetas: List[List[Double]]): Array[Boolean] = {
-      val zipped = actualThetas zip combineResults(num, thetas)
-      zipped map { case (t, ts) => isOk(t, ts) }
+      val zipped = actualThetas.zip(combineResults(num, thetas))
+      zipped.map { case (t, ts) => isOk(t, ts) }
     }
 
     val allThetas = List(thetasSchema1, thetasSchema2, thetasSchema3)
 
-    val result = allThetas map { getBooleans }
+    val result = allThetas.map { getBooleans }
 
     val expected = Array.fill(num)(true)
 
@@ -392,11 +392,11 @@ trait LogisticRegressionSpecs[M[+ _]]
 
   "logistic regression" should {
     "pass randomly generated test with a single feature" in
-      (testTrivial or testTrivial)
+      (testTrivial.or(testTrivial))
     "pass randomly generated test with three features inside an object" in
-      (testThreeFeatures or testThreeFeatures)
+      (testThreeFeatures.or(testThreeFeatures))
     "pass randomly generated test with three distinct schemata" in
-      (testThreeSchema or testThreeSchema)
+      (testThreeSchema.or(testThreeSchema))
   }
 
   "logistic prediction" should {
@@ -411,7 +411,7 @@ trait LogisticRegressionSpecs[M[+ _]]
       result0 must haveSize(19)
 
       val result =
-        result0 collect { case (ids, value) if ids.size == 2 => value }
+        result0.collect { case (ids, value) if ids.size == 2 => value }
 
       result mustEqual Set(
         (SObject(
@@ -496,7 +496,7 @@ trait LogisticRegressionSpecs[M[+ _]]
       result0 must haveSize(14)
 
       val result =
-        result0 collect { case (ids, value) if ids.size == 2 => value }
+        result0.collect { case (ids, value) if ids.size == 2 => value }
 
       result mustEqual Set(
         (SObject(Map(

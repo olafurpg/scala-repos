@@ -11,31 +11,31 @@ class FileUploadSupportTestServlet
     extends ScalatraServlet
     with FileUploadSupport {
   post("""/multipart.*""".r) {
-    multiParams.get("string") foreach { ps: Seq[String] =>
+    multiParams.get("string").foreach { ps: Seq[String] =>
       response.setHeader("string", ps.mkString(";"))
     }
-    fileParams.get("file") foreach { fi =>
+    fileParams.get("file").foreach { fi =>
       response.setHeader("file", new String(fi.get).trim)
     }
-    fileParams.get("file-none") foreach { fi =>
+    fileParams.get("file-none").foreach { fi =>
       response.setHeader("file-none", new String(fi.get).trim)
     }
-    fileParams.get("file-two[]") foreach { fi =>
+    fileParams.get("file-two[]").foreach { fi =>
       response.setHeader("file-two", new String(fi.get).trim)
     }
-    fileMultiParams.get("file-two[]") foreach { fis =>
+    fileMultiParams.get("file-two[]").foreach { fis =>
       response.setHeader("file-two-with-brackets", fis.foldLeft("") {
         (acc, fi) =>
           acc + new String(fi.get).trim
       })
     }
-    fileMultiParams.get("file-two") foreach { fis =>
+    fileMultiParams.get("file-two").foreach { fis =>
       response.setHeader("file-two-without-brackets", fis.foldLeft("") {
         (acc, fi) =>
           acc + new String(fi.get).trim
       })
     }
-    params.get("file") foreach { response.setHeader("file-as-param", _) }
+    params.get("file").foreach { response.setHeader("file-as-param", _) }
     params("utf8-string")
   }
 
@@ -44,7 +44,7 @@ class FileUploadSupportTestServlet
   }
 
   post("/multipart-param") {
-    params.get("queryParam") foreach { p =>
+    params.get("queryParam").foreach { p =>
       response.addHeader("Query-Param", p)
     }
     pass()

@@ -8,7 +8,7 @@ object Test extends App {
   }
 
   def immutableStack[T](xs: T*): immutable.Stack[T] = {
-    immutable.Stack.empty[T] pushAll xs
+    immutable.Stack.empty[T].pushAll(xs)
   }
 
   def check[T](expected: T, got: T) {

@@ -158,7 +158,7 @@ class StreamExecution(val sqlContext: SQLContext,
       case Some(c: CompositeOffset) =>
         val storedProgress = c.offsets
         val sources =
-          logicalPlan collect {
+          logicalPlan.collect {
             case StreamingRelation(source, _) => source
           }
 
@@ -188,7 +188,7 @@ class StreamExecution(val sqlContext: SQLContext,
     var replacements = new ArrayBuffer[(Attribute, Attribute)]
     // Replace sources in the logical plan with data that has arrived since the last batch.
     val withNewSources =
-      logicalPlan transform {
+      logicalPlan.transform {
         case StreamingRelation(source, output) =>
           val prevOffset = streamProgress.get(source)
           val newBatch = source.getNextBatch(prevOffset)
@@ -210,7 +210,7 @@ class StreamExecution(val sqlContext: SQLContext,
     // Rewire the plan to use the new attributes that were returned by the source.
     val replacementMap = AttributeMap(replacements)
     val newPlan =
-      withNewSources transformAllExpressions {
+      withNewSources.transformAllExpressions {
         case a: Attribute if replacementMap.contains(a) => replacementMap(a)
       }
 

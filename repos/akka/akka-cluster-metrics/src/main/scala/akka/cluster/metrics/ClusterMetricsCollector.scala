@@ -166,7 +166,7 @@ private[metrics] class ClusterMetricsCollector
     * Start periodic gossip to random nodes in cluster
     */
   val gossipTask = scheduler.schedule(
-    PeriodicTasksInitialDelay max CollectorGossipInterval,
+    PeriodicTasksInitialDelay.max(CollectorGossipInterval),
     CollectorGossipInterval,
     self,
     GossipTick)
@@ -175,7 +175,7 @@ private[metrics] class ClusterMetricsCollector
     * Start periodic metrics collection
     */
   val sampleTask = scheduler.schedule(
-    PeriodicTasksInitialDelay max CollectorSampleInterval,
+    PeriodicTasksInitialDelay.max(CollectorSampleInterval),
     CollectorSampleInterval,
     self,
     MetricsTick)
@@ -218,7 +218,7 @@ private[metrics] class ClusterMetricsCollector
     */
   def removeMember(member: Member): Unit = {
     nodes -= member.address
-    latestGossip = latestGossip remove member.address
+    latestGossip = latestGossip.remove(member.address)
     publish()
   }
 
@@ -226,7 +226,7 @@ private[metrics] class ClusterMetricsCollector
     * Updates the initial node ring for those nodes that are [[akka.cluster.MemberStatus]] `Up`.
     */
   def receiveState(state: CurrentClusterState): Unit =
-    nodes = (state.members diff state.unreachable) collect {
+    nodes = (state.members.diff(state.unreachable)).collect {
       case m
           if m.status == MemberStatus.Up || m.status == MemberStatus.WeaklyUp ⇒
         m.address
@@ -251,7 +251,7 @@ private[metrics] class ClusterMetricsCollector
     // remote node might not have same view of member nodes, this side should only care
     // about nodes that are known here, otherwise removed nodes can come back
     val otherGossip = envelope.gossip.filter(nodes)
-    latestGossip = latestGossip merge otherGossip
+    latestGossip = latestGossip.merge(otherGossip)
     // changes will be published in the period collect task
     if (!envelope.reply) replyGossipTo(envelope.from)
   }
@@ -260,7 +260,7 @@ private[metrics] class ClusterMetricsCollector
     * Gossip to peer nodes.
     */
   def gossip(): Unit =
-    selectRandomNode((nodes - selfAddress).toVector) foreach gossipTo
+    selectRandomNode((nodes - selfAddress).toVector).foreach(gossipTo)
 
   def gossipTo(address: Address): Unit =
     sendGossip(address,
@@ -282,6 +282,6 @@ private[metrics] class ClusterMetricsCollector
     * Publishes to the event stream.
     */
   def publish(): Unit =
-    context.system.eventStream publish ClusterMetricsChanged(
-      latestGossip.nodes)
+    context.system.eventStream
+      .publish(ClusterMetricsChanged(latestGossip.nodes))
 }

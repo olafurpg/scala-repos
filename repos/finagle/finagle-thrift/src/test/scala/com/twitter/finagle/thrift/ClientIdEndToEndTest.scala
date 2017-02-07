@@ -19,7 +19,7 @@ class ClientIdEndToEndTest extends FunSuite with ThriftTest {
     def multiply(a: Int, b: Int) = Future { a * b }
     // Re-purpose `complex_return` to return the serversize ClientId.
     def complex_return(someString: String) = Future {
-      val clientIdStr = ClientId.current map { _.name } getOrElse ("")
+      val clientIdStr = ClientId.current.map { _.name }.getOrElse("")
       new SomeStruct(123, clientIdStr)
     }
     def someway() = Future.Void

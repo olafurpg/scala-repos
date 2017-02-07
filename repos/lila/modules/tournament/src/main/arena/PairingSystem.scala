@@ -29,12 +29,14 @@ object PairingSystem extends AbstractPairingSystem {
       data = Data(tour, lastOpponents, ranking, onlyTwoActivePlayers)
       preps <- if (lastOpponents.hash.isEmpty) evenOrAll(data, users)
       else
-        makePreps(data, users.waiting) flatMap {
+        makePreps(data, users.waiting).flatMap {
           case Nil => fuccess(Nil)
           case _ => evenOrAll(data, users)
         }
       pairings <- preps.map { prep =>
-        UserRepo.firstGetsWhite(prep.user1.some, prep.user2.some) map prep.toPairing
+        UserRepo
+          .firstGetsWhite(prep.user1.some, prep.user2.some)
+          .map(prep.toPairing)
       }.sequenceFu
     } yield pairings
   }.chronometer
@@ -44,7 +46,7 @@ object PairingSystem extends AbstractPairingSystem {
     .result
 
   private def evenOrAll(data: Data, users: WaitingUsers) =
-    makePreps(data, users.evenNumber) flatMap {
+    makePreps(data, users.evenNumber).flatMap {
       case Nil if users.isOdd => makePreps(data, users.all)
       case x => fuccess(x)
     }
@@ -56,14 +58,14 @@ object PairingSystem extends AbstractPairingSystem {
     import data._
     if (users.size < 2) fuccess(Nil)
     else
-      PlayerRepo.rankedByTourAndUserIds(tour.id, users, ranking) map { idles =>
+      PlayerRepo.rankedByTourAndUserIds(tour.id, users, ranking).map { idles =>
         if (lastOpponents.hash.isEmpty) naivePairings(tour, idles)
         else
           idles.grouped(pairingGroupSize).toList match {
             case a :: b :: c :: _ =>
               smartPairings(data, a) ::: smartPairings(data, b) ::: naivePairings(
                 tour,
-                c take pairingGroupSize)
+                c.take(pairingGroupSize))
             case a :: b :: Nil =>
               smartPairings(data, a) ::: smartPairings(data, b)
             case a :: Nil => smartPairings(data, a)
@@ -78,8 +80,10 @@ object PairingSystem extends AbstractPairingSystem {
 
   private def naivePairings(tour: Tournament,
                             players: RankedPlayers): List[Pairing.Prep] =
-    players grouped 2 collect {
-      case List(p1, p2) => Pairing.prep(tour, p1.player, p2.player)
+    players
+      .grouped(2)
+      .collect {
+        case List(p1, p2) => Pairing.prep(tour, p1.player, p2.player)
     } toList
 
   private val smartPairingsMaxMillis = 400
@@ -171,17 +175,17 @@ object PairingSystem extends AbstractPairingSystem {
           case ps =>
             findBetter(Nil, Int.MaxValue) match {
               case Found(best) =>
-                best map {
+                best.map {
                   case (rp0, rp1) => rp0.player -> rp1.player
                 }
               case _ =>
                 pairingLogger.warn(
                   "Could not make smart pairings for arena tournament")
-                players map (_.player) grouped 2 collect {
+                players.map(_.player).grouped(2).collect {
                   case List(p1, p2) => (p1, p2)
                 } toList
             }
-        }) map {
+        }).map {
           Pairing.prep(tour, _)
         }
       if (!continue)

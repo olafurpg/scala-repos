@@ -46,7 +46,7 @@ object ScalaUdpDocSpec {
     def receive = {
       case Udp.Bound(local) =>
         //#listener
-        nextActor forward local
+        nextActor.forward(local)
         //#listener
         context.become(ready(sender()))
     }

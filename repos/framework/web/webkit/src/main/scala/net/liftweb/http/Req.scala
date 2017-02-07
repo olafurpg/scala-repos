@@ -55,8 +55,10 @@ object UserAgentCalculator extends Factory {
       userAgent <- userAgent
       ieMatch = iePattern.pattern.matcher(userAgent)
       findResult = ieMatch.find if findResult
-      ieVersionString <- Box.legacyNullTest(ieMatch.group(2)) or Box
-        .legacyNullTest(ieMatch.group(3))
+      ieVersionString <- Box
+        .legacyNullTest(ieMatch.group(2))
+        .or(Box
+          .legacyNullTest(ieMatch.group(3)))
       ver <- Helpers.asDouble(ieVersionString)
     } yield ver
 
@@ -150,12 +152,12 @@ trait UserAgentCalculator {
   lazy val ieVersion: Box[Int] =
     UserAgentCalculator.ieCalcFunction.vend.apply(userAgent).map(_.toInt)
 
-  lazy val isIE6: Boolean = ieVersion.map(_ == 6) openOr false
-  lazy val isIE7: Boolean = ieVersion.map(_ == 7) openOr false
-  lazy val isIE8: Boolean = ieVersion.map(_ == 8) openOr false
-  lazy val isIE9: Boolean = ieVersion.map(_ == 9) openOr false
-  lazy val ieIE10: Boolean = ieVersion.map(_ == 10) openOr false
-  lazy val isIE11: Boolean = ieVersion.map(_ == 11) openOr false
+  lazy val isIE6: Boolean = ieVersion.map(_ == 6).openOr(false)
+  lazy val isIE7: Boolean = ieVersion.map(_ == 7).openOr(false)
+  lazy val isIE8: Boolean = ieVersion.map(_ == 8).openOr(false)
+  lazy val isIE9: Boolean = ieVersion.map(_ == 9).openOr(false)
+  lazy val ieIE10: Boolean = ieVersion.map(_ == 10).openOr(false)
+  lazy val isIE11: Boolean = ieVersion.map(_ == 11).openOr(false)
   lazy val isIE = ieVersion.isDefined
 
   lazy val safariVersion: Box[Int] =
@@ -163,11 +165,11 @@ trait UserAgentCalculator {
 
   def isSafari2: Boolean = false
 
-  lazy val isSafari3: Boolean = safariVersion.map(_ == 3) openOr false
-  lazy val isSafari4: Boolean = safariVersion.map(_ == 4) openOr false
-  lazy val isSafari5: Boolean = safariVersion.map(_ == 5) openOr false
+  lazy val isSafari3: Boolean = safariVersion.map(_ == 3).openOr(false)
+  lazy val isSafari4: Boolean = safariVersion.map(_ == 4).openOr(false)
+  lazy val isSafari5: Boolean = safariVersion.map(_ == 5).openOr(false)
 
-  def isSafari3_+ = safariVersion.map(_ >= 3) openOr false
+  def isSafari3_+ = safariVersion.map(_ >= 3).openOr(false)
   def isSafari = safariVersion.isDefined
 
   /**
@@ -175,49 +177,52 @@ trait UserAgentCalculator {
     */
   lazy val isIPhone: Boolean =
     UserAgentCalculator.iPhoneCalcFunction.vend
-      .map(_.apply(userAgent)) openOr isSafari &&
-      (userAgent.map(s => s.indexOf("(iPhone") >= 0) openOr false)
+      .map(_.apply(userAgent))
+      .openOr(isSafari &&
+        (userAgent.map(s => s.indexOf("(iPhone") >= 0).openOr(false)))
 
   /**
     * Is the Req coming from an iPad
     */
   lazy val isIPad: Boolean =
     UserAgentCalculator.iPadCalcFunction.vend
-      .map(_.apply(userAgent)) openOr isSafari &&
-      (userAgent.map(s => s.indexOf("(iPad") >= 0) openOr false)
+      .map(_.apply(userAgent))
+      .openOr(isSafari &&
+        (userAgent.map(s => s.indexOf("(iPad") >= 0).openOr(false)))
 
   lazy val firefoxVersion: Box[Double] =
     UserAgentCalculator.firefoxCalcFunction.vend.apply(userAgent)
 
   lazy val isFirefox2: Boolean =
-    firefoxVersion.map(v => v >= 2d && v < 3d) openOr false
+    firefoxVersion.map(v => v >= 2d && v < 3d).openOr(false)
   lazy val isFirefox3: Boolean =
-    firefoxVersion.map(v => v >= 3d && v < 3.5d) openOr false
+    firefoxVersion.map(v => v >= 3d && v < 3.5d).openOr(false)
   lazy val isFirefox35: Boolean =
-    firefoxVersion.map(v => v >= 3.5d && v < 3.6d) openOr false
+    firefoxVersion.map(v => v >= 3.5d && v < 3.6d).openOr(false)
   lazy val isFirefox36: Boolean =
-    firefoxVersion.map(v => v >= 3.6d && v < 4d) openOr false
-  lazy val isFirefox40: Boolean = firefoxVersion.map(v => v >= 4d) openOr false
+    firefoxVersion.map(v => v >= 3.6d && v < 4d).openOr(false)
+  lazy val isFirefox40: Boolean =
+    firefoxVersion.map(v => v >= 4d).openOr(false)
 
-  def isFirefox35_+ : Boolean = firefoxVersion.map(_ >= 3.5d) openOr false
+  def isFirefox35_+ : Boolean = firefoxVersion.map(_ >= 3.5d).openOr(false)
 
   def isFirefox = firefoxVersion.isDefined
 
   lazy val chromeVersion: Box[Double] =
     UserAgentCalculator.chromeCalcFunction.vend.apply(userAgent)
 
-  lazy val isChrome2 = chromeVersion.map(v => v >= 2d && v < 3d) openOr false
-  lazy val isChrome3 = chromeVersion.map(v => v >= 3d && v < 4d) openOr false
-  lazy val isChrome4 = chromeVersion.map(v => v >= 4d && v < 5d) openOr false
-  lazy val isChrome5 = chromeVersion.map(v => v >= 5d && v < 6d) openOr false
-  lazy val isChrome6 = chromeVersion.map(v => v >= 6d && v < 7d) openOr false
+  lazy val isChrome2 = chromeVersion.map(v => v >= 2d && v < 3d).openOr(false)
+  lazy val isChrome3 = chromeVersion.map(v => v >= 3d && v < 4d).openOr(false)
+  lazy val isChrome4 = chromeVersion.map(v => v >= 4d && v < 5d).openOr(false)
+  lazy val isChrome5 = chromeVersion.map(v => v >= 5d && v < 6d).openOr(false)
+  lazy val isChrome6 = chromeVersion.map(v => v >= 6d && v < 7d).openOr(false)
 
-  def isChrome3_+ = chromeVersion.map(_ >= 3d) openOr false
+  def isChrome3_+ = chromeVersion.map(_ >= 3d).openOr(false)
 
   def isChrome = chromeVersion.isDefined
 
   lazy val isOpera9: Boolean =
-    (userAgent.map(s => s.indexOf("Opera/9.") >= 0) openOr false)
+    (userAgent.map(s => s.indexOf("Opera/9.") >= 0).openOr(false))
 
   def isOpera = isOpera9
 
@@ -413,9 +418,10 @@ object Req {
     val wholePath = rewritten.path.wholePath
 
     val stateless =
-      NamedPF.applyBox(
-        StatelessReqTest(wholePath, original.request),
-        otherStatelessTest) or NamedPF.applyBox(wholePath, statelessTest)
+      NamedPF
+        .applyBox(StatelessReqTest(wholePath, original.request),
+                  otherStatelessTest)
+        .or(NamedPF.applyBox(wholePath, statelessTest))
 
     new Req(
       rewritten.path,
@@ -425,7 +431,7 @@ object Req {
       original.request,
       original.nanoStart,
       original.nanoEnd,
-      stateless openOr original.stateless_?,
+      stateless.openOr(original.stateless_?),
       original.paramCalculator,
       original.addlParams ++ rewritten.params
     )
@@ -443,7 +449,7 @@ object Req {
             nanoStart: Long): Req = {
     val reqType = RequestType(request)
     val contextPath =
-      LiftRules.calculateContextPath() openOr request.contextPath
+      LiftRules.calculateContextPath().openOr(request.contextPath)
     val turi =
       if (request.uri.length >= contextPath.length)
         request.uri.substring(contextPath.length)
@@ -569,9 +575,9 @@ object Req {
     val wholePath = rewritten.path.wholePath
 
     val stateless =
-      NamedPF.applyBox(
-        StatelessReqTest(wholePath, request),
-        otherStatelessTest) or NamedPF.applyBox(wholePath, statelessTest)
+      NamedPF
+        .applyBox(StatelessReqTest(wholePath, request), otherStatelessTest)
+        .or(NamedPF.applyBox(wholePath, statelessTest))
 
     new Req(rewritten.path,
             contextPath,
@@ -580,7 +586,7 @@ object Req {
             request,
             nanoStart,
             System.nanoTime,
-            stateless openOr false,
+            stateless.openOr(false),
             paramCalculator,
             Map())
   }
@@ -777,10 +783,10 @@ final case class ContentType(theType: String,
     * explicit and then order.
     */
   def compare(that: ContentType): Int =
-    ((that.q openOr 1d) compare (q openOr 1d)) match {
+    ((that.q.openOr(1d)).compare(q.openOr(1d))) match {
       case 0 =>
         def doDefault = {
-          order compare that.order
+          order.compare(that.order)
         }
 
         (theType, that.theType, subtype, that.subtype) match {
@@ -966,7 +972,7 @@ class Req(val path: ParsePath,
     * Should the request be treated as stateless (no session created for it)?
     */
   lazy val stateless_? = {
-    val ret = _stateless_? || (location.map(_.stateless_?) openOr false)
+    val ret = _stateless_? || (location.map(_.stateless_?).openOr(false))
     ret
   }
 
@@ -1045,9 +1051,9 @@ class Req(val path: ParsePath,
 
   val id = pathParam(0)
 
-  def pathParam(n: Int) = path.wholePath.drop(n + 2).headOption getOrElse ""
+  def pathParam(n: Int) = path.wholePath.drop(n + 2).headOption.getOrElse("")
 
-  def path(n: Int): String = path.wholePath.drop(n).headOption getOrElse ""
+  def path(n: Int): String = path.wholePath.drop(n).headOption.getOrElse("")
 
   def param(n: String): Box[String] =
     params.get(n) match {
@@ -1175,22 +1181,24 @@ class Req(val path: ParsePath,
     * does not exist, the DNS name or IP address of the server.
     */
   lazy val hostName: String =
-    containerRequest.map(_.serverName) openOr Req.localHostName
+    containerRequest.map(_.serverName).openOr(Req.localHostName)
 
   /**
     * The host and path of the request up to and including the context path. This does
     * not include the template path or query string.
     */
   lazy val hostAndPath: String =
-    containerRequest.map(r =>
-      (r.scheme, r.serverPort) match {
-        case ("http", 80) if r.header("X-SSL").isDefined =>
-          "https://" + r.serverName + contextPath
-        case ("http", 80) => "http://" + r.serverName + contextPath
-        case ("https", 443) => "https://" + r.serverName + contextPath
-        case (sch, port) =>
-          sch + "://" + r.serverName + ":" + port + contextPath
-    }) openOr ""
+    containerRequest
+      .map(r =>
+        (r.scheme, r.serverPort) match {
+          case ("http", 80) if r.header("X-SSL").isDefined =>
+            "https://" + r.serverName + contextPath
+          case ("http", 80) => "http://" + r.serverName + contextPath
+          case ("https", 443) => "https://" + r.serverName + contextPath
+          case (sch, port) =>
+            sch + "://" + r.serverName + ":" + port + contextPath
+      })
+      .openOr("")
 
   /**
     * The Elem representation of this Req's body, if the body is XML-parsable
@@ -1246,7 +1254,7 @@ class Req(val path: ParsePath,
   }
 
   lazy val buildMenu: CompleteMenu =
-    location.map(_.buildMenu) openOr CompleteMenu(Nil)
+    location.map(_.buildMenu).openOr(CompleteMenu(Nil))
 
   private def initIfUnitted[T](f: T): T = S.session match {
     case Full(_) => f
@@ -1352,7 +1360,7 @@ class Req(val path: ParsePath,
           case x => Req.fixURI(x)
         }
       }
-      ret openOr "/"
+      ret.openOr("/")
   }
 
   /**
@@ -1372,7 +1380,7 @@ class Req(val path: ParsePath,
 
   def testIfModifiedSince(when: Long): Boolean =
     (when == 0L) ||
-      ((when / 1000L) > ((ifModifiedSince.map(_.getTime) openOr 0L) / 1000L))
+      ((when / 1000L) > ((ifModifiedSince.map(_.getTime).openOr(0L)) / 1000L))
 
   def testFor304(lastModified: Long,
                  headers: (String, String)*): Box[LiftResponse] =
@@ -1412,27 +1420,34 @@ class Req(val path: ParsePath,
     * Returns true if the request accepts XML
     */
   lazy val acceptsXml_? =
-    (weightedAccept.find(_.matches("text" -> "xml")) orElse weightedAccept
-      .find(_.matches("application" -> "xml"))).isDefined
+    (weightedAccept
+      .find(_.matches("text" -> "xml"))
+      .orElse(weightedAccept
+        .find(_.matches("application" -> "xml"))))
+      .isDefined
 
   /**
     * Returns true if the request accepts JSON
     */
   lazy val acceptsJson_? =
-    (weightedAccept.find(_.matches("text" -> "json")) orElse weightedAccept
-      .find(_.matches("application" -> "json"))).isDefined
+    (weightedAccept
+      .find(_.matches("text" -> "json"))
+      .orElse(weightedAccept
+        .find(_.matches("application" -> "json"))))
+      .isDefined
 
   /**
     * Is the Accepts Header * / *
     */
-  lazy val acceptsStarStar: Boolean = accepts.map(_ == "*/*") openOr false
+  lazy val acceptsStarStar: Boolean = accepts.map(_ == "*/*").openOr(false)
 
   /**
     * Returns true if the request accepts JavaScript
     */
-  lazy val acceptsJavaScript_? = (weightedAccept.find(
-    _.matches("text" -> "javascript")) orElse weightedAccept.find(
-    _.matches("application" -> "javascript"))).isDefined
+  lazy val acceptsJavaScript_? = (weightedAccept
+    .find(_.matches("text" -> "javascript"))
+    .orElse(weightedAccept.find(_.matches("application" -> "javascript"))))
+    .isDefined
 
   def updateWithContextPath(uri: String): String =
     if (uri.startsWith("/")) contextPath + uri else uri

@@ -18,7 +18,9 @@ private[message] final class DataForm(security: MessageSecurity) {
           .verifying(
             "Sorry, this player doesn't accept new messages", { name =>
               Granter(_.MessageAnyone)(me) || {
-                security.canMessage(me.id, User normalize name) awaitSeconds 2 // damn you blocking API
+                security
+                  .canMessage(me.id, User.normalize(name))
+                  .awaitSeconds(2) // damn you blocking API
               }
             }
           ),
@@ -26,8 +28,8 @@ private[message] final class DataForm(security: MessageSecurity) {
         "text" -> text(minLength = 3, maxLength = 8000)
       )({
         case (username, subject, text) =>
-          ThreadData(user = fetchUser(username) err "Unknown username " +
-                         username,
+          ThreadData(user = fetchUser(username).err("Unknown username " +
+                       username),
                      subject = subject,
                      text = text)
       })(_.export.some))
@@ -39,7 +41,7 @@ private[message] final class DataForm(security: MessageSecurity) {
       ))
 
   private def fetchUser(username: String) =
-    UserRepo named username awaitSeconds 2
+    UserRepo.named(username).awaitSeconds(2)
 }
 
 object DataForm {

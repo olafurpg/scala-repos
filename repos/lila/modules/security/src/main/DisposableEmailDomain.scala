@@ -12,13 +12,16 @@ final class DisposableEmailDomain(providerUrl: String,
   private var matchers = List.empty[Matcher]
 
   private[security] def refresh {
-    WS.url(providerUrl).get() map { res =>
-      setDomains(res.json)
-      lila.mon.email.disposableDomain(matchers.size)
-    } recover {
-      case _: java.net.ConnectException => // ignore network errors
-      case e: Exception => onError(e)
-    }
+    WS.url(providerUrl)
+      .get()
+      .map { res =>
+        setDomains(res.json)
+        lila.mon.email.disposableDomain(matchers.size)
+      }
+      .recover {
+        case _: java.net.ConnectException => // ignore network errors
+        case e: Exception => onError(e)
+      }
   }
 
   private[security] def setDomains(json: JsValue): Unit =
@@ -49,10 +52,10 @@ final class DisposableEmailDomain(providerUrl: String,
   }
 
   private def makeMatcher(regex: String): Matcher = {
-    val matcher = regex.r.pattern matcher _
+    val matcher = regex.r.pattern.matcher(_)
     (s: String) =>
       matcher(s).matches
   }
 
-  def apply(domain: String) = matchers exists { _(domain) }
+  def apply(domain: String) = matchers.exists { _(domain) }
 }

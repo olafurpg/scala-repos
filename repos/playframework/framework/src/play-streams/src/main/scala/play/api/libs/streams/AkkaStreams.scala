@@ -64,7 +64,7 @@ object AkkaStreams {
           FlowShape(broadcast.in, merge.out)
       })
 
-    splitter via bypasser
+    splitter.via(bypasser)
   }
 
   def onlyFirstCanFinishMerge[T](inputPorts: Int) =

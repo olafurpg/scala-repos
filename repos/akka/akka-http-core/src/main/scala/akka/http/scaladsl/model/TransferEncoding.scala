@@ -33,7 +33,7 @@ object TransferEncodings {
       extends TransferEncoding {
     def render[R <: Rendering](r: R): r.type = {
       r ~~ name
-      params foreach { case (k, v) ⇒ r ~~ "; " ~~ k ~~ '=' ~~# v }
+      params.foreach { case (k, v) ⇒ r ~~ "; " ~~ k ~~ '=' ~~# v }
       r
     }
   }

@@ -89,8 +89,10 @@ object WorksheetDiffSplitters {
       override def mouseReleased(mouseEvent: MouseEvent) {
         val f = getProportion
 
-        Option(PsiDocumentManager
-          .getInstance(editor1.getProject) getCachedPsiFile editor1.getDocument) foreach {
+        Option(
+          PsiDocumentManager
+            .getInstance(editor1.getProject)
+            .getCachedPsiFile(editor1.getDocument)).foreach {
           case file: ScalaFile =>
             WorksheetEditorPrinter.saveOnlyRatio(file, f)
           case _ =>
@@ -140,7 +142,7 @@ object WorksheetDiffSplitters {
         val lineHeight2 = editor2.getLineHeight
 
         val plainPolygons =
-          intervals zip changes collect {
+          intervals.zip(changes).collect {
             case ((from, to), (offset, spaces))
                 if spaces != 0 && firstVisible1 <= from &&
                   lastVisible1 >= to && firstVisible2 <= (offset - to + from) &&
@@ -158,7 +160,7 @@ object WorksheetDiffSplitters {
 
         DividerPolygon.paintPolygons(
           new util.ArrayList[DividerPolygon](
-            wrapAsJava asJavaCollection plainPolygons),
+            wrapAsJava.asJavaCollection(plainPolygons)),
           gg,
           width)
         gg.dispose()

@@ -49,7 +49,7 @@ sealed trait CPath { self =>
   def combine(paths: Seq[CPath]): Seq[CPath] = {
     if (paths.isEmpty) Seq(this)
     else
-      paths map { path =>
+      paths.map { path =>
         CPath(this.nodes ++ path.nodes)
       }
   }
@@ -226,7 +226,7 @@ object CPath {
 
   def apply(path: JPath): CPath = {
     val nodes2 =
-      path.nodes map {
+      path.nodes.map {
         case JPathField(name) => CPathField(name)
         case JPathIndex(idx) => CPathIndex(idx)
       }
@@ -278,17 +278,17 @@ object CPath {
         List(LeafNode(paths.head.value))
       } else {
         val filtered =
-          paths filterNot { case PathWithLeaf(path, _) => path.isEmpty }
+          paths.filterNot { case PathWithLeaf(path, _) => path.isEmpty }
         val grouped =
-          filtered groupBy { case PathWithLeaf(path, _) => path.head }
+          filtered.groupBy { case PathWithLeaf(path, _) => path.head }
 
         def recurse[A](paths: Seq[PathWithLeaf[A]]) =
-          inner(paths map {
+          inner(paths.map {
             case PathWithLeaf(path, v) => PathWithLeaf(path.tail, v)
           })
 
         val result =
-          grouped.toSeq.sortBy(_._1) map {
+          grouped.toSeq.sortBy(_._1).map {
             case (node, paths) =>
               node match {
                 case (field: CPathField) => FieldNode(field, recurse(paths))
@@ -301,7 +301,7 @@ object CPath {
     }
 
     val leaves =
-      pathsAndValues.sortBy(_._1) map {
+      pathsAndValues.sortBy(_._1).map {
         case (path, value) =>
           PathWithLeaf[A](path.nodes, value)
       }
@@ -313,7 +313,7 @@ object CPath {
     if (cpaths0.isEmpty && values.length == 1)
       RootNode(Seq(LeafNode(values.head)))
     else if (cpaths0.length == values.length)
-      makeStructuredTree(cpaths0.sorted zip values)
+      makeStructuredTree(cpaths0.sorted.zip(values))
     else RootNode(Seq.empty[CPathTree[A]])
   }
 

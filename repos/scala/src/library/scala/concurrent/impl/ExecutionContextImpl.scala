@@ -34,7 +34,7 @@ private[scala] class ExecutionContextImpl private[impl] (
     val reporter: Throwable => Unit)
     extends ExecutionContextExecutor {
   require(executor ne null, "Executor must not be null")
-  override def execute(runnable: Runnable) = executor execute runnable
+  override def execute(runnable: Runnable) = executor.execute(runnable)
   override def reportFailure(t: Throwable) = reporter(t)
 }
 

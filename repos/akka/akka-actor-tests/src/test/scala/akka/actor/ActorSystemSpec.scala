@@ -242,7 +242,7 @@ class ActorSystemSpec
       for (i ← 1 to count) {
         system2.registerOnTermination {
           Thread.sleep((i % 3).millis.dilated.toMillis)
-          result add i
+          result.add(i)
           latch.countDown()
         }
       }
@@ -284,7 +284,7 @@ class ActorSystemSpec
       terminated.actor should ===(system.provider.rootGuardian)
       terminated.addressTerminated should ===(true)
       terminated.existenceConfirmed should ===(true)
-      terminated should be theSameInstanceAs Await.result(f, 10 seconds)
+      (terminated should be).theSameInstanceAs(Await.result(f, 10 seconds))
       system.awaitTermination(10 seconds)
       system.isTerminated should ===(true)
     }
@@ -341,12 +341,12 @@ class ActorSystemSpec
         }
       }
 
-      created filter
-        (ref ⇒
-           !ref.isTerminated && !ref
-             .asInstanceOf[ActorRefWithCell]
-             .underlying
-             .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
+      created.filter(
+        ref ⇒
+          !ref.isTerminated && !ref
+            .asInstanceOf[ActorRefWithCell]
+            .underlying
+            .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
     }
 
     "shut down when /user fails" in {

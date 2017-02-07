@@ -23,7 +23,7 @@ object Test {
     output(
       set ++ List(new Foo("bar", 2), new Foo("bar", 3), new Foo("bar", 4)))
     output(
-      set union Set(new Foo("bar", 2), new Foo("baz", 3), new Foo("bazz", 4)))
+      set.union(Set(new Foo("bar", 2), new Foo("baz", 3), new Foo("bazz", 4))))
   }
 
   def main(args: Array[String]) {

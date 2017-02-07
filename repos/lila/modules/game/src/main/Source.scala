@@ -20,11 +20,11 @@ object Source {
 
   val all =
     List(Lobby, Friend, Ai, Api, Tournament, Position, Import, Simul, Relay)
-  val byId = all map { v =>
+  val byId = all.map { v =>
     (v.id, v)
   } toMap
 
   val searchable = List(Lobby, Friend, Ai, Position, Import, Tournament, Simul)
 
-  def apply(id: Int): Option[Source] = byId get id
+  def apply(id: Int): Option[Source] = byId.get(id)
 }

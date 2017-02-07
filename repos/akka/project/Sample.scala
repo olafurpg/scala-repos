@@ -38,7 +38,9 @@ object Sample {
 
   private def libraryToProjectDeps(projects: Seq[Project]) =
     projects.map(
-      addProjectDependencies andThen excludeLibraryDependencies andThen enableAutoPlugins)
+      addProjectDependencies
+        .andThen(excludeLibraryDependencies)
+        .andThen(enableAutoPlugins))
 
   private val addProjectDependencies = (project: Project) =>
     project.settings(

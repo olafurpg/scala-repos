@@ -16,7 +16,7 @@ object ProjectionGeneric {
   class Child extends Matchers {
     val clazz = new Clazz[Int](2)
     /*start*/
-    "" foo clazz /*end*/
+    "".foo(clazz) /*end*/
   }
 }
 //Int

@@ -88,7 +88,7 @@ private[akka] trait DeathWatch { this: ActorCell ⇒
                             set: Set[ActorRef]): Set[ActorRef] =
     if (subject.path.uid != ActorCell.undefinedUid)
       (set - subject) - new UndefinedUidActorRef(subject)
-    else set filterNot (_.path == subject.path)
+    else set.filterNot(_.path == subject.path)
 
   protected def tellWatchersWeDied(): Unit =
     if (!watchedBy.isEmpty) {
@@ -117,8 +117,8 @@ private[akka] trait DeathWatch { this: ActorCell ⇒
          *
          * If the remote watchers are notified first, then the mailbox of the Remoting will guarantee the correct order.
          */
-        watchedBy foreach sendTerminated(ifLocal = false)
-        watchedBy foreach sendTerminated(ifLocal = true)
+        watchedBy.foreach(sendTerminated(ifLocal = false))
+        watchedBy.foreach(sendTerminated(ifLocal = true))
       } finally {
         maintainAddressTerminatedSubscription() {
           watchedBy = ActorCell.emptyActorRefSet
@@ -130,7 +130,7 @@ private[akka] trait DeathWatch { this: ActorCell ⇒
     if (!watching.isEmpty) {
       maintainAddressTerminatedSubscription() {
         try {
-          watching foreach {
+          watching.foreach {
             // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
             case watchee: InternalActorRef ⇒
               watchee.sendSystemMessage(Unwatch(watchee, self))
@@ -229,7 +229,7 @@ private[akka] trait DeathWatch { this: ActorCell ⇒
 
     if (isNonLocal(change)) {
       def hasNonLocalAddress: Boolean =
-        ((watching exists isNonLocal) || (watchedBy exists isNonLocal))
+        ((watching.exists(isNonLocal)) || (watchedBy.exists(isNonLocal)))
       val had = hasNonLocalAddress
       val result = block
       val has = hasNonLocalAddress

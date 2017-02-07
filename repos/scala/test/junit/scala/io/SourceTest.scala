@@ -61,8 +61,9 @@ class SourceTest {
         extends Source {
       override val iter = {
         val r = new InputStreamReader(is, codec.decoder)
-        Iterator continually (codec wrap r.read()) takeWhile (_ != -1) map
-          (_.toChar)
+        (Iterator continually (codec.wrap(r.read())))
+          .takeWhile(_ != -1)
+          .map(_.toChar)
       }
       override def report(pos: Int, msg: String, out: PrintStream): Unit = {
         out print f"$pos%04x: ${msg.toUpperCase}"

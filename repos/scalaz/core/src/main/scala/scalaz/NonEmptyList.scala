@@ -28,7 +28,7 @@ final class NonEmptyList[A] private[scalaz] (val head: A, val tail: IList[A]) {
 
   def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = {
     val rev = reverse
-    rev.tail.foldLeft(f(rev.head))((nel, b) => f(b) append nel)
+    rev.tail.foldLeft(f(rev.head))((nel, b) => f(b).append(nel))
   }
 
   def distinct(implicit A: Order[A]): NonEmptyList[A] =
@@ -108,7 +108,7 @@ final class NonEmptyList[A] private[scalaz] (val head: A, val tail: IList[A]) {
 
   def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] = {
     val _b = b
-    nel((head, _b.head), tail zip _b.tail)
+    nel((head, _b.head), tail.zip(_b.tail))
   }
 
   def unzip[X, Y](
@@ -177,7 +177,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
       def traverse1Impl[G[_]: Apply, A, B](fa: NonEmptyList[A])(
           f: A => G[B]): G[NonEmptyList[B]] =
-        fa traverse1 f
+        fa.traverse1(f)
 
       override def foldMapRight1[A, B](fa: NonEmptyList[A])(z: A => B)(
           f: (A, => B) => B): B = {
@@ -200,7 +200,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
         fa.tail.foldLeft(f(z, fa.head))(f)
 
       def bind[A, B](fa: NonEmptyList[A])(
-          f: A => NonEmptyList[B]): NonEmptyList[B] = fa flatMap f
+          f: A => NonEmptyList[B]): NonEmptyList[B] = fa.flatMap(f)
 
       def point[A](a: => A): NonEmptyList[A] = NonEmptyList(a)
 
@@ -215,7 +215,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def cojoin[A](
           a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
 
-      def zip[A, B](a: => NonEmptyList[A], b: => NonEmptyList[B]) = a zip b
+      def zip[A, B](a: => NonEmptyList[A], b: => NonEmptyList[B]) = a.zip(b)
 
       def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
 
@@ -245,7 +245,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] =
     new Semigroup[NonEmptyList[A]] {
-      def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1 append f2
+      def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1.append(f2)
     }
 
   implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =

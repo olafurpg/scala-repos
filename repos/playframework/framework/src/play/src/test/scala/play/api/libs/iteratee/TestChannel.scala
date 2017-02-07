@@ -90,7 +90,7 @@ class TestChannel[A](defaultTimeout: Duration) extends Concurrent.Channel[A] {
            s"timeout ($timeout) waiting for end with failure [$expected]")
     end match {
       case Some(throwable) =>
-        assert(expected isInstance throwable,
+        assert(expected.isInstance(throwable),
                s"expected end with failure [$expected] but found [$throwable]")
         throwable.asInstanceOf[T]
       case None =>

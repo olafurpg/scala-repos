@@ -1127,8 +1127,8 @@ class Class54_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1162,8 +1162,8 @@ object Object55_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1197,8 +1197,8 @@ trait Trait56_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1232,8 +1232,8 @@ class Class58_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1267,8 +1267,8 @@ object Object59_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1302,8 +1302,8 @@ trait Trait60_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1337,8 +1337,8 @@ class Class62_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1372,8 +1372,8 @@ object Object63_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1407,8 +1407,8 @@ trait Trait64_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1442,8 +1442,8 @@ class Class66_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1477,8 +1477,8 @@ object Object67_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1512,8 +1512,8 @@ trait Trait68_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1547,8 +1547,8 @@ class Class70_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1582,8 +1582,8 @@ object Object71_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1617,8 +1617,8 @@ trait Trait72_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1652,8 +1652,8 @@ class Class74_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1687,8 +1687,8 @@ object Object75_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1722,8 +1722,8 @@ trait Trait76_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -1759,8 +1759,8 @@ class Class78_1 {
               def run = Obj
             })
 
-        threads foreach (_.start())
-        threads foreach (_.join())
+        threads.foreach(_.start())
+        threads.foreach(_.join())
       }
 
       def runTest {
@@ -1797,8 +1797,8 @@ object Object79_1 {
               def run = Obj
             })
 
-        threads foreach (_.start())
-        threads foreach (_.join())
+        threads.foreach(_.start())
+        threads.foreach(_.join())
       }
 
       def runTest {
@@ -1835,8 +1835,8 @@ trait Trait80_1 {
               def run = Obj
             })
 
-        threads foreach (_.start())
-        threads foreach (_.join())
+        threads.foreach(_.start())
+        threads.foreach(_.join())
       }
 
       def runTest {
@@ -1873,8 +1873,8 @@ class Class82_1 {
               def run = Obj
             })
 
-        threads foreach (_.start())
-        threads foreach (_.join())
+        threads.foreach(_.start())
+        threads.foreach(_.join())
       }
 
       def runTest {
@@ -1911,8 +1911,8 @@ object Object83_1 {
               def run = Obj
             })
 
-        threads foreach (_.start())
-        threads foreach (_.join())
+        threads.foreach(_.start())
+        threads.foreach(_.join())
       }
 
       def runTest {
@@ -1949,8 +1949,8 @@ trait Trait84_1 {
               def run = Obj
             })
 
-        threads foreach (_.start())
-        threads foreach (_.join())
+        threads.foreach(_.start())
+        threads.foreach(_.join())
       }
 
       def runTest {
@@ -1985,8 +1985,8 @@ class Class90_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {
@@ -2020,8 +2020,8 @@ trait Trait92_1 {
             def run = Obj
           })
 
-      threads foreach (_.start())
-      threads foreach (_.join())
+      threads.foreach(_.start())
+      threads.foreach(_.join())
     }
 
     def runTest {

@@ -207,7 +207,7 @@ private[http] trait LiftMerge { self: LiftSession =>
                   }
 
                   deferredNodes.foldLeft(soFar.append(normalizedResults))(
-                    _ append _)
+                    _.append(_))
 
                 case _ =>
                   if (headChild) {
@@ -226,9 +226,10 @@ private[http] trait LiftMerge { self: LiftSession =>
                     soFar.append(normalizedResults)
                   }
               }
-            } getOrElse {
-            soFar
-          }
+            }
+            .getOrElse {
+              soFar
+            }
       }
     }
 
@@ -237,10 +238,12 @@ private[http] trait LiftMerge { self: LiftSession =>
         xhtml,
         HtmlState(mergeHeadAndTail = false)).nodes
 
-      fixedHtml.find {
-        case e: Elem => true
-        case _ => false
-      } getOrElse Text("")
+      fixedHtml
+        .find {
+          case e: Elem => true
+          case _ => false
+        }
+        .getOrElse(Text(""))
     } else {
       val eventJs = normalizeMergeAndExtractEvents(
         xhtml,
@@ -281,7 +284,9 @@ private[http] trait LiftMerge { self: LiftSession =>
         if (stateful_? && (autoIncludeComet || LiftRules.enableLiftGC)) {
           ("data-lift-gc" -> RenderVersion.get) ::
             (if (autoIncludeComet) {
-               ("data-lift-session-id" -> (S.session.map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList
+               ("data-lift-session-id" -> (S.session
+                 .map(_.uniqueId)
+                 .openOr("xx"))) :: S.requestCometVersions.is.toList
                  .map {
                    case CometVersionPair(guid, version) =>
                      (s"data-lift-comet-$guid" -> version.toString)

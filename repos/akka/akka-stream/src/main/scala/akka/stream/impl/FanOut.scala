@@ -235,7 +235,7 @@ private[akka] object FanOut {
     def subreceive: SubReceive =
       new SubReceive({
         case ExposedPublishers(publishers) ⇒
-          publishers.zip(outputs) foreach {
+          publishers.zip(outputs).foreach {
             case (pub, output) ⇒
               output.subreceive(ExposedPublisher(pub))
           }

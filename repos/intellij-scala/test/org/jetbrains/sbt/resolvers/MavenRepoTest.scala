@@ -13,7 +13,7 @@ class MavenRepoTest extends IndexingTestCase with UsefulTestCaseHelper {
     val testIndex = createAndUpdateIndex(
       SbtResolver(SbtResolver.Kind.Maven,
                   "Test repo",
-                  "file:/%s/sbt/resolvers/testRepository" format rootPath))
+                  "file:/%s/sbt/resolvers/testRepository".format(rootPath)))
     assertIndexContentsEquals(testIndex,
                               Set("org.jetbrains"),
                               Set("test-one", "test-two"),

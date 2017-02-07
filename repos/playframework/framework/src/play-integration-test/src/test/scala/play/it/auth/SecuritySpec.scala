@@ -39,7 +39,7 @@ object SecuritySpec extends PlaySpecification {
 
   case class User(name: String)
   def getUserFromRequest(req: RequestHeader) =
-    req.session.get("user") map (User(_))
+    req.session.get("user").map(User(_))
 
   class AuthenticatedDbRequest[A](val user: User,
                                   val conn: Connection,

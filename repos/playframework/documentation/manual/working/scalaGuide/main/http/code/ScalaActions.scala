@@ -132,7 +132,7 @@ package scalaguide.http.scalaactions {
         }
         //#redirect-action
         assertAction(index, expectedResponse = SEE_OTHER) { result =>
-          header(LOCATION, result) must be some "/user/home"
+          (header(LOCATION, result) must be).some("/user/home")
         }
       }
 
@@ -143,7 +143,7 @@ package scalaguide.http.scalaactions {
         }
         //#moved-permanently-action
         assertAction(index, expectedResponse = MOVED_PERMANENTLY) { result =>
-          header(LOCATION, result) must be some "/user/home"
+          (header(LOCATION, result) must be).some("/user/home")
         }
       }
 

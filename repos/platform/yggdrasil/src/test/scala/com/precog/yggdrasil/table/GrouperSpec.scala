@@ -96,7 +96,7 @@ trait GrouperSpec[M[+ _]]
       }
   }
 
-  def augmentWithIdentities(json: Stream[JValue]) = json.zipWithIndex map {
+  def augmentWithIdentities(json: Stream[JValue]) = json.zipWithIndex.map {
     case (v, i) =>
       JObject(
         JField("key", JArray(JNum(i) :: Nil)) :: JField("value", v) :: Nil)
@@ -150,7 +150,7 @@ trait GrouperSpec[M[+ _]]
     resultIter must haveSize(set.distinct.size)
 
     val expectedSet =
-      (set.toSeq groupBy identity values) map { _.length } map { JNum(_) }
+      (set.toSeq.groupBy(identity) values).map { _.length }.map { JNum(_) }
 
     forall(resultIter) { i =>
       expectedSet must contain(i)
@@ -216,7 +216,7 @@ trait GrouperSpec[M[+ _]]
     resultIter must haveSize(set.distinct.size)
 
     val expectedSet =
-      (set.toSeq groupBy identity values) map { _.length } map { JNum(_) }
+      (set.toSeq.groupBy(identity) values).map { _.length }.map { JNum(_) }
 
     forall(resultIter) { i =>
       expectedSet must contain(i)
@@ -275,10 +275,10 @@ trait GrouperSpec[M[+ _]]
 
     val resultIter = result.flatMap(_.toJson).copoint
 
-    resultIter must haveSize((set map { _ % 2 } distinct) size)
+    resultIter must haveSize((set.map { _ % 2 } distinct) size)
 
     val expectedSet =
-      (set.toSeq groupBy { _ % 2 } values) map { _.length } map { JNum(_) }
+      (set.toSeq.groupBy { _ % 2 } values).map { _.length }.map { JNum(_) }
 
     forall(resultIter) { i =>
       expectedSet must contain(i)
@@ -641,7 +641,7 @@ trait GrouperSpec[M[+ _]]
       val JNum(k) = record \ "key"
       val JNum(v) = record \ "value"
 
-      v mustEqual ((rawData1 ++ rawData2) filter { k == _ } length)
+      v mustEqual (((rawData1 ++ rawData2)).filter { k == _ } length)
     }
   }
 
@@ -652,13 +652,13 @@ trait GrouperSpec[M[+ _]]
     import trans._
     import constants._
 
-    val data1 = augmentWithIdentities(rawData1 map {
+    val data1 = augmentWithIdentities(rawData1.map {
       case (a, b0) =>
         JObject(
           JField("a", JNum(a)) :: b0.map(b => JField("b", JNum(b))).toList)
     })
 
-    val data2 = augmentWithIdentities(rawData2 map { v =>
+    val data2 = augmentWithIdentities(rawData2.map { v =>
       JObject(JField("a", JNum(v)) :: Nil)
     })
 
@@ -771,13 +771,13 @@ trait GrouperSpec[M[+ _]]
     import trans._
     import constants._
 
-    val data1 = augmentWithIdentities(rawData1 map {
+    val data1 = augmentWithIdentities(rawData1.map {
       case (a, b0) =>
         JObject(
           JField("a", JNum(a)) :: b0.map(b => JField("b", JNum(b))).toList)
     })
 
-    val data2 = augmentWithIdentities(rawData2 map { v =>
+    val data2 = augmentWithIdentities(rawData2.map { v =>
       JObject(JField("a", JNum(v)) :: Nil)
     })
 
@@ -839,7 +839,7 @@ trait GrouperSpec[M[+ _]]
         gs2Json must not(beEmpty)
 
         forall(gs1Json) { row =>
-          ((row \ "a") must_== ka) or ((row \ "b") must_== kb)
+          (((row \ "a") must_== ka)).or((row \ "b") must_== kb)
         }
 
         forall(gs2Json) { row =>
@@ -1023,7 +1023,7 @@ trait GrouperSpec[M[+ _]]
       }
     }
 
-    val forallJson = forallResult flatMap { _.toJson } copoint
+    val forallJson = forallResult.flatMap { _.toJson } copoint
 
     forallJson must not(beEmpty)
     forallJson must haveSize(3)

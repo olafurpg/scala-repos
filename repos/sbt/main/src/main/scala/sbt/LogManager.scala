@@ -34,8 +34,9 @@ object LogManager {
   def construct(data: Settings[Scope], state: State) =
     (task: ScopedKey[_], to: PrintWriter) => {
       val manager =
-        logManager in task.scope get data getOrElse defaultManager(
-          state.globalLogging.console)
+        (logManager in task.scope)
+          .get(data)
+          .getOrElse(defaultManager(state.globalLogging.console))
       manager(data, state, task, to)
     }
   @deprecated("Use defaultManager to explicitly specify standard out.",
@@ -86,7 +87,7 @@ object LogManager {
     val scope = task.scope
     // to change from global being the default to overriding, switch the order of state.get and data.get
     def getOr[T](key: AttributeKey[T], default: T): T =
-      data.get(scope, key) orElse state.get(key) getOrElse default
+      data.get(scope, key).orElse(state.get(key)).getOrElse(default)
     val screenLevel = getOr(logLevel.key, Level.Info)
     val backingLevel = getOr(persistLogLevel.key, Level.Debug)
     val screenTrace = getOr(traceLevel.key, defaultTraceLevel(state))
@@ -126,7 +127,7 @@ object LogManager {
     if (hasExplicitGlobalLogLevels(s)) s
     else {
       val logging = s.globalLogging
-      def get[T](key: SettingKey[T]) = key in GlobalScope get data
+      def get[T](key: SettingKey[T]) = (key in GlobalScope).get(data)
       def transfer(l: AbstractLogger,
                    traceKey: SettingKey[Int],
                    levelKey: SettingKey[Level.Value]): Unit = {
@@ -167,8 +168,8 @@ object LogManager {
       private[this] val ref =
         new java.lang.ref.WeakReference(s.globalLogging.full)
       private[this] def slog: Logger =
-        Option(ref.get) getOrElse sys.error(
-          "Settings logger used after project was loaded.")
+        Option(ref.get).getOrElse(
+          sys.error("Settings logger used after project was loaded."))
 
       override val ansiCodesSupported = slog.ansiCodesSupported
       override def trace(t: => Throwable) = slog.trace(t)

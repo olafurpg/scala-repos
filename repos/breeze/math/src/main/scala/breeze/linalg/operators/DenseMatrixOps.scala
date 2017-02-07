@@ -38,7 +38,7 @@ trait DenseMatrixMultiplyStuff
                           Transpose[DenseVector[T]]] {
       override def apply(v: Transpose[DenseVector[T]],
                          v2: DenseMatrix[T]): Transpose[DenseVector[T]] = {
-        (v.inner.asDenseMatrix * v2) apply (0, ::)
+        ((v.inner.asDenseMatrix * v2)).apply(0, ::)
       }
     }
 
@@ -632,7 +632,7 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T],
       @expand.sequence[Op]({ _ += _ }, { _ -= _ }, { _ :*= _ }, { _ :/= _ }, {
         _ := _
       }, { _ %= _ }, { _ :^= _ }) vecOp: Op.Impl2[T, T, T])
@@ -743,7 +743,7 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
           _ / _
         }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.InPlaceImpl2[DenseMatrix[T], T] =
     new Op.InPlaceImpl2[DenseMatrix[T], T] {
       def apply(a: DenseMatrix[T], b: T): Unit = {
@@ -880,7 +880,7 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
         _ + _
       }, { _ - _ }, { _ * _ }, { _ * _ }, {
         _ / _
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[T, DenseMatrix[T], DenseMatrix[T]] =
     new Op.Impl2[T, DenseMatrix[T], DenseMatrix[T]] {
       def apply(b: T, a: DenseMatrix[T]): DenseMatrix[T] = {

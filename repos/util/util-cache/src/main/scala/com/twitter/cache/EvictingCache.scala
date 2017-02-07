@@ -6,7 +6,7 @@ import com.twitter.util.{Future, Throw}
 private[cache] class EvictingCache[K, V](underlying: FutureCache[K, V])
     extends FutureCacheProxy[K, V](underlying) {
   private[this] def evictOnFailure(k: K, f: Future[V]): Future[V] = {
-    f onFailure {
+    f.onFailure {
       case t: Throwable =>
         evict(k, f)
     }
@@ -36,7 +36,7 @@ private[cache] class LazilyEvictingCache[K, V](
 
   override def get(k: K): Option[Future[V]] = {
     val result = super.get(k)
-    result foreach { fut =>
+    result.foreach { fut =>
       invalidateLazily(k, fut)
     }
     result

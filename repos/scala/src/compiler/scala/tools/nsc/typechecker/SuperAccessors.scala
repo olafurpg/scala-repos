@@ -84,7 +84,7 @@ abstract class SuperAccessors
     private def storeAccessorDefinition(clazz: Symbol, tree: Tree) = {
       val buf =
         accDefs.getOrElse(clazz, sys.error("no acc def buf for " + clazz))
-      buf += typers(clazz) typed tree
+      buf += typers(clazz).typed(tree)
     }
     private def ensureAccessor(sel: Select, mixName: TermName = nme.EMPTY) = {
       val Select(qual, name) = sel
@@ -92,17 +92,19 @@ abstract class SuperAccessors
       val clazz = qual.symbol
       val supername = nme.superName(name, mixName)
       val superAcc =
-        clazz.info.decl(supername).suchThat(_.alias == sym) orElse {
+        clazz.info.decl(supername).suchThat(_.alias == sym).orElse {
           debuglog(s"add super acc ${sym.fullLocationString} to $clazz")
           val acc =
-            clazz.newMethod(supername,
-                            sel.pos,
-                            SUPERACCESSOR | PRIVATE | ARTIFACT) setAlias sym
+            clazz
+              .newMethod(supername,
+                         sel.pos,
+                         SUPERACCESSOR | PRIVATE | ARTIFACT)
+              .setAlias(sym)
           val tpe = clazz.thisType memberType sym match {
             case t if sym.isModuleNotMethod => NullaryMethodType(t)
             case t => t
           }
-          acc setInfoAndEnter (tpe cloneInfo acc)
+          acc.setInfoAndEnter(tpe cloneInfo acc)
           // Diagnostic for SI-7091
           if (!accDefs.contains(clazz))
             reporter.error(
@@ -114,7 +116,7 @@ abstract class SuperAccessors
         }
 
       atPos(sel.pos)(
-        Select(gen.mkAttributedThis(clazz), superAcc) setType sel.tpe)
+        Select(gen.mkAttributedThis(clazz), superAcc).setType(sel.tpe))
     }
 
     private def transformArgs(params: List[Symbol], args: List[Tree]) = {
@@ -287,7 +289,8 @@ abstract class SuperAccessors
             //
             // [1] https://groups.google.com/forum/#!topic/scala-internals/iPkMCygzws4
             //
-            if (closestEnclMethod(currentOwner) hasAnnotation definitions.ScalaInlineClass)
+            if (closestEnclMethod(currentOwner).hasAnnotation(
+                  definitions.ScalaInlineClass))
               sym.makeNotPrivate(sym.owner)
 
             qual match {
@@ -298,22 +301,23 @@ abstract class SuperAccessors
                 // field. See SI-4762.
                 if (settings.warnPrivateShadow) {
                   if (sym.isPrivateLocal && sym.paramss.isEmpty) {
-                    qual.symbol.ancestors foreach { parent =>
-                      parent.info.decls filterNot
-                        (x => x.isPrivate || x.isLocalToThis) foreach { m2 =>
-                        if (sym.name == m2.name && m2.isGetter &&
-                            m2.accessed.isMutable) {
-                          reporter.warning(
-                            sel.pos,
-                            sym.accessString + " " + sym.fullLocationString +
-                              " shadows mutable " +
-                              m2.name + " inherited from " + m2.owner +
-                              ".  Changes to " + m2.name +
-                              " will not be visible within " + sym.owner +
-                              " - you may want to give them distinct names."
-                          )
+                    qual.symbol.ancestors.foreach { parent =>
+                      parent.info.decls
+                        .filterNot(x => x.isPrivate || x.isLocalToThis)
+                        .foreach { m2 =>
+                          if (sym.name == m2.name && m2.isGetter &&
+                              m2.accessed.isMutable) {
+                            reporter.warning(
+                              sel.pos,
+                              sym.accessString + " " + sym.fullLocationString +
+                                " shadows mutable " +
+                                m2.name + " inherited from " + m2.owner +
+                                ".  Changes to " + m2.name +
+                                " will not be visible within " + sym.owner +
+                                " - you may want to give them distinct names."
+                            )
+                          }
                         }
-                      }
                     }
                   }
                 }
@@ -330,7 +334,7 @@ abstract class SuperAccessors
                     isAccessibleFromSuper(sym.alias)) {
                   val result = (localTyper
                     .typedPos(tree.pos) {
-                      Select(Super(qual, tpnme.EMPTY) setPos qual.pos,
+                      Select(Super(qual, tpnme.EMPTY).setPos(qual.pos),
                              sym.alias)
                     })
                     .asInstanceOf[Select]
@@ -447,7 +451,7 @@ abstract class SuperAccessors
       localTyper = localTyper.atOwner(
         tree,
         if (owner.isModuleNotMethod) owner.moduleClass else owner)
-      typers = typers updated (owner, localTyper)
+      typers = typers.updated(owner, localTyper)
       val result = super.atOwner(tree, owner)(trans)
       localTyper = savedLocalTyper
       validCurrentOwner = savedValid
@@ -501,27 +505,28 @@ abstract class SuperAccessors
       val protAcc =
         clazz.info
           .decl(accName)
-          .suchThat(s => s == NoSymbol || s.tpe =:= accType(s)) orElse {
-          val newAcc = clazz.newMethod(nme.protName(sym.unexpandedName),
-                                       tree.pos,
-                                       newFlags = ARTIFACT)
-          newAcc setInfoAndEnter accType(newAcc)
+          .suchThat(s => s == NoSymbol || s.tpe =:= accType(s))
+          .orElse {
+            val newAcc = clazz.newMethod(nme.protName(sym.unexpandedName),
+                                         tree.pos,
+                                         newFlags = ARTIFACT)
+            newAcc.setInfoAndEnter(accType(newAcc))
 
-          val code = DefDef(
-            newAcc, {
-              val (receiver :: _) :: tail = newAcc.paramss
-              val base: Tree = Select(Ident(receiver), sym)
-              val allParamTypes = mapParamss(sym)(_.tpe)
-              val args = map2(tail, allParamTypes)((params, tpes) =>
-                map2(params, tpes)(makeArg(_, receiver, _)))
-              args.foldLeft(base)(Apply(_, _))
-            }
-          )
+            val code = DefDef(
+              newAcc, {
+                val (receiver :: _) :: tail = newAcc.paramss
+                val base: Tree = Select(Ident(receiver), sym)
+                val allParamTypes = mapParamss(sym)(_.tpe)
+                val args = map2(tail, allParamTypes)((params, tpes) =>
+                  map2(params, tpes)(makeArg(_, receiver, _)))
+                args.foldLeft(base)(Apply(_, _))
+              }
+            )
 
-          debuglog("created protected accessor: " + code)
-          storeAccessorDefinition(clazz, code)
-          newAcc
-        }
+            debuglog("created protected accessor: " + code)
+            storeAccessorDefinition(clazz, code)
+            newAcc
+          }
       val selection = Select(This(clazz), protAcc)
       def mkApply(fn: Tree) = Apply(fn, qual :: Nil)
       val res = atPos(tree.pos) {
@@ -552,7 +557,8 @@ abstract class SuperAccessors
         case _ => NoSymbol
       }
       val result = gen.paramToArg(v)
-      if (clazz != NoSymbol && (obj.tpe.typeSymbol isSubClass clazz)) // path-dependent type
+      if (clazz != NoSymbol && (obj.tpe.typeSymbol
+            .isSubClass(clazz))) // path-dependent type
         gen.mkAsInstanceOf(result,
                            pt.asSeenFrom(singleType(NoPrefix, obj), clazz))
       else result
@@ -569,14 +575,14 @@ abstract class SuperAccessors
 
       val accName = nme.protSetterName(field.unexpandedName)
       val protectedAccessor =
-        clazz.info decl accName orElse {
+        clazz.info.decl(accName).orElse {
           val protAcc =
             clazz.newMethod(accName, field.pos, newFlags = ARTIFACT)
           val paramTypes = List(clazz.typeOfThis, field.tpe)
           val params = protAcc newSyntheticValueParams paramTypes
           val accessorType = MethodType(params, UnitTpe)
 
-          protAcc setInfoAndEnter accessorType
+          protAcc.setInfoAndEnter(accessorType)
           val obj :: value :: Nil = params
           storeAccessorDefinition(
             clazz,
@@ -663,7 +669,7 @@ abstract class SuperAccessors
       case ThisType(sym) => sym.isClass && !sym.isPackageClass
       case TypeRef(pre, _, _) => isThisType(pre)
       case SingleType(pre, _) => isThisType(pre)
-      case RefinedType(parents, _) => parents exists isThisType
+      case RefinedType(parents, _) => parents.exists(isThisType)
       case AnnotatedType(_, tp) => isThisType(tp)
       case _ => false
     }

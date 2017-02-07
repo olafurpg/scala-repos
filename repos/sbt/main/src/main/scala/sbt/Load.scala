@@ -244,7 +244,7 @@ object Load {
     val data = Def.make(settings)(delegates,
                                   config.scopeLocal,
                                   Project.showLoadingKey(loaded))
-    Project.checkTargets(data) foreach sys.error
+    Project.checkTargets(data).foreach(sys.error)
     val index = structureIndex(data, settings, loaded.extra(data), projects)
     val streams = mkStreams(projects, loaded.root, data)
     (rootEval,
@@ -287,8 +287,11 @@ object Load {
           case _ => None
         }
     }
-    ss.map(s =>
-      s mapConstant setResolved(s.key) mapReferenced mapSpecial(s.key) mapInit setDefining)
+    ss.map(
+      s =>
+        s.mapConstant(setResolved(s.key))
+          .mapReferenced(mapSpecial(s.key))
+          .mapInit(setDefining))
   }
   def setDefinitionKey[T](tk: Task[T], key: ScopedKey[_]): Task[T] =
     if (isDummy(tk)) tk
@@ -351,9 +354,10 @@ object Load {
         val plugins = build.unit.plugins.detected.plugins.values
         val pluginBuildSettings =
           plugins.flatMap(_.buildSettings) ++ loaded.autos.buildSettings(uri)
-        val pluginNotThis = plugins.flatMap(_.settings) filterNot isProjectThis
+        val pluginNotThis =
+          plugins.flatMap(_.settings).filterNot(isProjectThis)
         val projectSettings =
-          build.defined flatMap {
+          build.defined.flatMap {
             case (id, project) =>
               val ref = ProjectRef(uri, id)
               val defineConfig: Seq[Setting[_]] =
@@ -380,9 +384,9 @@ object Load {
   @deprecated("Does not account for AutoPlugins and will be made private.",
               "0.13.2")
   def pluginGlobalSettings(loaded: sbt.LoadedBuild): Seq[Setting[_]] =
-    loaded.units.toSeq flatMap {
+    loaded.units.toSeq.flatMap {
       case (_, build) =>
-        build.unit.plugins.detected.plugins.values flatMap { _.globalSettings }
+        build.unit.plugins.detected.plugins.values.flatMap { _.globalSettings }
     }
 
   @deprecated("No longer used.", "0.13.0")
@@ -484,7 +488,7 @@ object Load {
       loadAll(uri :: extra, Map.empty, loaders, Map.empty)
     checkAll(referenced, map)
     val build = new sbt.PartBuild(uri, map)
-    newLoaders transformAll build
+    newLoaders.transformAll(build)
   }
   def addOverrides(unit: sbt.BuildUnit, loaders: BuildLoader): BuildLoader =
     loaders updatePluginManagement PluginManagement.extractOverrides(
@@ -549,7 +553,7 @@ object Load {
                                                     loaders.resetPluginDepth))
           // it is important to keep the load order stable, so we sort the remaining URIs
           val remainingBases =
-            (refs.flatMap(Reference.uri) reverse_::: bs).sorted
+            (refs.flatMap(Reference.uri).reverse_:::(bs)).sorted
           loadAll(remainingBases,
                   references.updated(b, refs),
                   newLoader,
@@ -573,7 +577,7 @@ object Load {
   def resolveAll(
       builds: Map[URI, sbt.PartBuildUnit]): Map[URI, sbt.LoadedBuildUnit] = {
     val rootProject = getRootProject(builds)
-    builds map {
+    builds.map {
       case (uri, unit) =>
         (uri,
          unit.resolveRefs(ref =>
@@ -608,7 +612,7 @@ object Load {
   def resolveProjects(loaded: sbt.PartBuild): sbt.LoadedBuild = {
     val rootProject = getRootProject(loaded.units)
     val units =
-      loaded.units map {
+      loaded.units.map {
         case (uri, unit) =>
           IO.assertAbsolute(uri)
           (uri, resolveProjects(uri, unit, rootProject))
@@ -622,7 +626,7 @@ object Load {
     val resolve = (_: Project).resolve(ref =>
       Scope.resolveProjectRef(uri, rootProject, ref))
     new sbt.LoadedBuildUnit(unit.unit,
-                            unit.defined mapValues resolve,
+                            unit.defined.mapValues(resolve),
                             unit.rootProjects,
                             unit.buildSettings)
   }
@@ -633,17 +637,17 @@ object Load {
       Scope.resolveProjectBuild(unit.uri, ref))
     // although the default loader will resolve the project base directory, other loaders may not, so run resolveBase here as well
     unit.definitions.projects
-      .map(resolveBuild compose resolveBase(unit.localBase))
+      .map(resolveBuild.compose(resolveBase(unit.localBase)))
   }
   def getRootProject(map: Map[URI, sbt.BuildUnitBase]): URI => String =
-    uri => getBuild(map, uri).rootProjects.headOption getOrElse emptyBuild(uri)
+    uri =>
+      getBuild(map, uri).rootProjects.headOption.getOrElse(emptyBuild(uri))
   def getConfiguration(map: Map[URI, sbt.LoadedBuildUnit],
                        uri: URI,
                        id: String,
                        conf: ConfigKey): Configuration =
-    configurationOpt(map, uri, id, conf) getOrElse noConfiguration(uri,
-                                                                   id,
-                                                                   conf.name)
+    configurationOpt(map, uri, id, conf).getOrElse(
+      noConfiguration(uri, id, conf.name))
   def configurationOpt(map: Map[URI, sbt.LoadedBuildUnit],
                        uri: URI,
                        id: String,
@@ -829,7 +833,7 @@ object Load {
     // Step two, Finalize a project with all its settings/configuration.
     def finalizeProject(p: Project, configFiles: Seq[File]): Project = {
       val loadedFiles =
-        configFiles flatMap { f =>
+        configFiles.flatMap { f =>
           memoSettings.get(f)
         }
       resolveProject(p,
@@ -910,8 +914,8 @@ object Load {
                                                context,
                                                Nil)
             val otherGenerated = otherProjects.generatedConfigClassFiles
-            val existingIds = otherProjects.projects map (_.id)
-            val refs = existingIds map (id => ProjectRef(buildUri, id))
+            val existingIds = otherProjects.projects.map(_.id)
+            val refs = existingIds.map(id => ProjectRef(buildUri, id))
             val defaultID = autoID(buildBase, context, existingIds)
             val root0 =
               if (discovered.isEmpty ||
@@ -1012,7 +1016,7 @@ object Load {
       def settings(files: Seq[File]): Seq[Setting[_]] =
         for {
           file <- files
-          config <- (memoSettings get file).toSeq
+          config <- (memoSettings.get(file)).toSeq
           setting <- config.settings
         } yield setting
       // Expand the AddSettings instance into a real Seq[Setting[_]] we'll use on the project
@@ -1071,7 +1075,7 @@ object Load {
                                              0)(loader)
     // How to merge SbtFiles we read into one thing
     def merge(ls: Seq[LoadedSbtFile]): LoadedSbtFile =
-      (LoadedSbtFile.empty /: ls) { _ merge _ }
+      (LoadedSbtFile.empty /: ls) { _.merge(_) }
     // Loads a given file, or pulls from the cache.
 
     def memoLoadSettingsFile(src: File): LoadedSbtFile =
@@ -1146,7 +1150,7 @@ object Load {
       cp: Seq[Attributed[File]],
       remove: Seq[Attributed[File]]): Seq[Attributed[File]] = {
     val files = data(remove).toSet
-    cp filter { f =>
+    cp.filter { f =>
       !files.contains(f.data)
     }
   }
@@ -1214,7 +1218,7 @@ object Load {
       else (depcp ++ config.classpath).distinct
     val pm = config.pluginManagement
     // only the dependencyClasspath goes in the common plugin class loader ...
-    def addToLoader() = pm.loader add Path.toURLs(data(depcp))
+    def addToLoader() = pm.loader.add(Path.toURLs(data(depcp)))
 
     val parentLoader =
       if (depcp.isEmpty) pm.initialLoader else { addToLoader(); pm.loader }
@@ -1237,7 +1241,7 @@ object Load {
 
   @deprecated("Use ModuleUtilities.getCheckedObjects[Build].", "0.13.2")
   def loadDefinitions(loader: ClassLoader, defs: Seq[String]): Seq[Build] =
-    defs map { definition =>
+    defs.map { definition =>
       loadDefinition(loader, definition)
     }
 
@@ -1295,11 +1299,13 @@ object Load {
   def initialSession(structure: sbt.BuildStructure,
                      rootEval: () => Eval,
                      s: State): SessionSettings = {
-    val session = s get Keys.sessionSettings
-    val currentProject = session map (_.currentProject) getOrElse Map.empty
+    val session = s.get(Keys.sessionSettings)
+    val currentProject = session.map(_.currentProject).getOrElse(Map.empty)
     val currentBuild =
-      session map (_.currentBuild) filter
-        (uri => structure.units.keys exists (uri ==)) getOrElse structure.root
+      session
+        .map(_.currentBuild)
+        .filter(uri => structure.units.keys.exists(uri ==))
+        .getOrElse(structure.root)
     new SessionSettings(currentBuild,
                         projectMap(structure, currentProject),
                         structure.settings,
@@ -1322,9 +1328,12 @@ object Load {
     val units = structure.units
     val getRoot = getRootProject(units)
     def project(uri: URI) = {
-      current get uri filter { p =>
-        structure allProjects uri map (_.id) contains p
-      } getOrElse getRoot(uri)
+      current
+        .get(uri)
+        .filter { p =>
+          structure.allProjects(uri).map(_.id) contains p
+        }
+        .getOrElse(getRoot(uri))
     }
     units.keys.map(uri => (uri, project(uri))).toMap
   }
@@ -1347,7 +1356,7 @@ object Load {
   def getImports(unit: sbt.BuildUnit): Seq[String] = BuildUtil.getImports(unit)
 
   def referenced[PR <: ProjectReference](
-      definitions: Seq[ProjectDefinition[PR]]): Seq[PR] = definitions flatMap {
+      definitions: Seq[ProjectDefinition[PR]]): Seq[PR] = definitions.flatMap {
     _.referenced
   }
 

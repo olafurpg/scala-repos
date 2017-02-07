@@ -27,10 +27,10 @@ class MonitorFilterTest
   class MonitorFilterHelper {
     val monitor = Mockito.spy(new MockMonitor)
     val underlying = mock[Service[Int, Int]]
-    when(underlying.close(any[Time])) thenReturn Future.Done
+    when(underlying.close(any[Time])).thenReturn(Future.Done)
     val reply = new Promise[Int]
-    when(underlying(any[Int])) thenReturn reply
-    val service = new MonitorFilter(monitor) andThen underlying
+    when(underlying(any[Int])).thenReturn(reply)
+    val service = new MonitorFilter(monitor).andThen(underlying)
     val exc = new RuntimeException
   }
 
@@ -50,7 +50,7 @@ class MonitorFilterTest
     val h = new MonitorFilterHelper
     import h._
 
-    when(underlying(any[Int])) thenThrow exc
+    when(underlying(any[Int])).thenThrow(exc)
 
     val f = service(123)
     assert(f.poll == Some(Throw(exc)))
@@ -83,7 +83,7 @@ class MonitorFilterTest
 
     val address = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
     val service = mock[Service[String, String]]
-    when(service.close(any[Time])) thenReturn Future.Done
+    when(service.close(any[Time])).thenReturn(Future.Done)
     val server = ServerBuilder()
       .codec(StringCodec)
       .name("FakeService2")
@@ -100,7 +100,8 @@ class MonitorFilterTest
       .hostConnectionLimit(1)
       .build()
 
-    when(service(any[String])) thenThrow outer // make server service throw the mock exception
+    when(service(any[String]))
+      .thenThrow(outer) // make server service throw the mock exception
 
     try {
       val f = Await.result(client("123"))
@@ -126,16 +127,17 @@ class MonitorFilterTest
     // mock channel to mock the service provided by a server
     val preparedFactory = mock[ServiceFactory[String, String]]
     val preparedServicePromise = new Promise[Service[String, String]]
-    when(preparedFactory()) thenReturn preparedServicePromise
-    when(preparedFactory.close(any[Time])) thenReturn Future.Done
-    when(preparedFactory.map(Matchers.any())) thenReturn preparedFactory
-      .asInstanceOf[ServiceFactory[Any, Nothing]]
-    when(preparedFactory.status) thenReturn (Status.Open)
+    when(preparedFactory()).thenReturn(preparedServicePromise)
+    when(preparedFactory.close(any[Time])).thenReturn(Future.Done)
+    when(preparedFactory.map(Matchers.any())).thenReturn(preparedFactory
+      .asInstanceOf[ServiceFactory[Any, Nothing]])
+    when(preparedFactory.status).thenReturn(Status.Open)
 
     val m = new MockChannel
     when(
       m.codec.prepareConnFactory(any[ServiceFactory[String, String]],
-                                 any[Stack.Params])) thenReturn preparedFactory
+                                 any[Stack.Params]))
+      .thenReturn(preparedFactory)
 
     val client =
       m.clientBuilder.monitor(_ => monitor).logger(mockLogger).build()

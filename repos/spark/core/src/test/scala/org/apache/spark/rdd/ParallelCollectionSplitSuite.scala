@@ -172,7 +172,7 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
     val gen = for {
       a <- Gen.choose(-100, 100)
       b <- Gen.choose(-100, 100)
-      step <- Gen.choose(-5, 5) suchThat (_ != 0)
+      step <- Gen.choose(-5, 5).suchThat(_ != 0)
       n <- Gen.choose(1, 100)
     } yield (a until b by step, n)
     val prop = forAll(gen) {
@@ -193,7 +193,7 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
     val gen = for {
       a <- Gen.choose(-100, 100)
       b <- Gen.choose(-100, 100)
-      step <- Gen.choose(-5, 5) suchThat (_ != 0)
+      step <- Gen.choose(-5, 5).suchThat(_ != 0)
       n <- Gen.choose(1, 100)
     } yield (a to b by step, n)
     val prop = forAll(gen) {

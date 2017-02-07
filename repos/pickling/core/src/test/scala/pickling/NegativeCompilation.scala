@@ -15,7 +15,7 @@ object NegativeCompilation {
   implicit class stringops(text: String) {
     def mustContain(substring: String) = assert(text contains substring, text)
 
-    def mustStartWith(prefix: String) = assert(text startsWith prefix, text)
+    def mustStartWith(prefix: String) = assert(text.startsWith(prefix), text)
   }
 
   implicit class listops(list: List[String]) {
@@ -71,7 +71,7 @@ object NegativeCompilation {
     val f1 = new java.io.File(
       s"test-util/target/scala-${scalaBinaryVersion}/test-classes")
     val fs = Vector(f0, f1)
-    fs foreach { f =>
+    fs.foreach { f =>
       if (!f.exists)
         sys.error(s"output directory ${f.getAbsolutePath} does not exist.")
     }

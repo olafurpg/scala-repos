@@ -15,11 +15,11 @@ final class Env(config: Config,
     val CollectionVideo = config getString "collection.video"
     val CollectionView = config getString "collection.view"
     val SheetUrl = config getString "sheet.url"
-    val SheetDelay = config duration "sheet.delay"
+    val SheetDelay = config.duration("sheet.delay")
     val YoutubeUrl = config getString "youtube.url"
     val YoutubeApiKey = config getString "youtube.api_key"
-    val YoutubeMax = config getInt "youtube.max"
-    val YoutubeDelay = config duration "youtube.delay"
+    val YoutubeMax = config.getInt("youtube.max")
+    val YoutubeDelay = config.duration("youtube.delay")
   }
   import settings._
 
@@ -34,11 +34,11 @@ final class Env(config: Config,
 
   if (!isDev) {
     scheduler.effect(SheetDelay, "video update from sheet") {
-      sheet.fetchAll logFailure logger
+      sheet.fetchAll.logFailure(logger)
     }
 
     scheduler.effect(YoutubeDelay, "video update from youtube") {
-      youtube.updateAll logFailure logger
+      youtube.updateAll.logFailure(logger)
     }
   }
 
@@ -49,8 +49,9 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "video" boot new Env(config = lila.common.PlayApp loadConfig "video",
-                         scheduler = lila.common.PlayApp.scheduler,
-                         isDev = lila.common.PlayApp.isDev,
-                         db = lila.db.Env.current)
+    "video".boot(
+      new Env(config = lila.common.PlayApp.loadConfig("video"),
+              scheduler = lila.common.PlayApp.scheduler,
+              isDev = lila.common.PlayApp.isDev,
+              db = lila.db.Env.current))
 }

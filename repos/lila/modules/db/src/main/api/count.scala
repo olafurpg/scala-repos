@@ -14,7 +14,7 @@ object $count {
   def apply[A: InColl]: Fu[Int] =
     implicitly[InColl[A]].coll |> { _.count(none) }
 
-  def exists[A: InColl](q: JsObject): Fu[Boolean] = apply(q) map (0 !=)
+  def exists[A: InColl](q: JsObject): Fu[Boolean] = apply(q).map(0 !=)
 
   def exists[ID: Writes, A: InColl](id: ID): Fu[Boolean] =
     exists($select(id))

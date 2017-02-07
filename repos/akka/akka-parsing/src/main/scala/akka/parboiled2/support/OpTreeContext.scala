@@ -133,12 +133,10 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
         case _ ⇒ c.abort(x.pos, "Illegal `separatedBy` base: " + base)
       }
     case call @ (Apply(_, _) | Select(_, _) | Ident(_) | TypeApply(_, _)) ⇒
-      RuleCall(
-        Right(call),
-        Literal(
-          Constant(
-            callName(call) getOrElse c.abort(call.pos,
-                                             "Illegal rule call: " + call))))
+      RuleCall(Right(call),
+               Literal(
+                 Constant(callName(call).getOrElse(
+                   c.abort(call.pos, "Illegal rule call: " + call)))))
   }
 
   def OpTree(tree: Tree): OpTree =
@@ -206,14 +204,14 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
     def render(wrapped: Boolean): Tree = {
       def unrollUnwrapped(s: String, ix: Int = 0): Tree =
         if (ix < s.length) q"""
-          if (cursorChar == ${s charAt ix}) {
+          if (cursorChar == ${s.charAt(ix)}) {
             __advance()
             ${unrollUnwrapped(s, ix + 1)}:Boolean
           } else false"""
         else q"true"
       def unrollWrapped(s: String, ix: Int = 0): Tree =
         if (ix < s.length) {
-          val ch = s charAt ix
+          val ch = s.charAt(ix)
           q"""if (cursorChar == $ch) {
             __advance()
             __updateMaxCursor()
@@ -273,14 +271,15 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
     def render(wrapped: Boolean): Tree = {
       def unrollUnwrapped(s: String, ix: Int = 0): Tree =
         if (ix < s.length) q"""
-          if (_root_.java.lang.Character.toLowerCase(cursorChar) == ${s charAt ix}) {
+          if (_root_.java.lang.Character.toLowerCase(cursorChar) == ${s.charAt(
+          ix)}) {
             __advance()
             ${unrollUnwrapped(s, ix + 1)}
           } else false"""
         else q"true"
       def unrollWrapped(s: String, ix: Int = 0): Tree =
         if (ix < s.length) {
-          val ch = s charAt ix
+          val ch = s.charAt(ix)
           q"""if (_root_.java.lang.Character.toLowerCase(cursorChar) == $ch) {
             __advance()
             __updateMaxCursor()
@@ -748,12 +747,15 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
     }
     def ruleTraceNonTerminalKey = reify(RuleTrace.Action).tree
     def renderInner(wrapped: Boolean): Tree = {
-      val argTypes = actionType dropRight 1
+      val argTypes = actionType.dropRight(1)
 
       def popToVals(valNames: List[TermName]): List[Tree] =
-        (valNames zip argTypes).map {
-          case (n, t) ⇒ q"val $n = valueStack.pop().asInstanceOf[$t]"
-        }.reverse
+        (valNames
+          .zip(argTypes))
+          .map {
+            case (n, t) ⇒ q"val $n = valueStack.pop().asInstanceOf[$t]"
+          }
+          .reverse
 
       def actionBody(tree: Tree): Tree =
         tree match {
@@ -763,7 +765,7 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
             val valNames: List[TermName] = argTypes.indices.map { i ⇒
               newTermName("value" + i)
             }(collection.breakOut)
-            val args = valNames map Ident.apply
+            val args = valNames.map(Ident.apply)
             block(popToVals(valNames), q"__push($x(..$args))")
 
           case q"(..$args ⇒ $body)" ⇒

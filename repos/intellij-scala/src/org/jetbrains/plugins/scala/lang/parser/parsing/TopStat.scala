@@ -32,7 +32,7 @@ object TopStat {
 
     builder.getTokenType match {
       case ScalaTokenTypes.kIMPORT =>
-        Import parse builder
+        Import.parse(builder)
         ParserState.ADDITIONAL_STATE
       case ScalaTokenTypes.kPACKAGE =>
         if (state == 2) ParserState.EMPTY_STATE
@@ -40,10 +40,10 @@ object TopStat {
           if (ParserUtils.lookAhead(builder,
                                     ScalaTokenTypes.kPACKAGE,
                                     ScalaTokenTypes.kOBJECT)) {
-            if (PackageObject parse builder) ParserState.FILE_STATE
+            if (PackageObject.parse(builder)) ParserState.FILE_STATE
             else ParserState.EMPTY_STATE
           } else {
-            if (Packaging parse builder) ParserState.FILE_STATE
+            if (Packaging.parse(builder)) ParserState.FILE_STATE
             else ParserState.EMPTY_STATE
           }
         }

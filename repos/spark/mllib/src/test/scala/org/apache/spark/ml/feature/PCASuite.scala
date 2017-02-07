@@ -68,7 +68,7 @@ class PCASuite
 
     pca.transform(df).select("pca_features", "expected").collect().foreach {
       case Row(x: Vector, y: Vector) =>
-        assert(x ~== y absTol 1e-5,
+        assert(x ~== y.absTol(1e-5),
                "Transformed vector is different with expected vector.")
     }
   }

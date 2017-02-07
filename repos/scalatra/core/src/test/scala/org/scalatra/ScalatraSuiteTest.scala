@@ -95,7 +95,7 @@ class ScalatraSuiteTest extends ScalatraFunSuite {
     get("/redirect") {
       status should equal(response status)
       body should equal(response body)
-      header("Location") should equal(response header ("Location"))
+      header("Location") should equal(response.header("Location"))
     }
   }
 

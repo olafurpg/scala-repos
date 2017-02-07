@@ -55,20 +55,20 @@ object Test {
     test2 -> output2
   )
   // def lines(s: String) = s split """\r\n|\r|\n""" toList
-  def lines(s: String) = s split "\\n" toList
+  def lines(s: String) = s.split("\\n") toList
 
   // strip the random temp filename from error msgs
   def stripFilename(s: String) = (s indexOf ".scala:") match {
     case -1 => s
-    case idx => s drop (idx + 7)
+    case idx => s.drop(idx + 7)
   }
-  def toLines(text: String) = lines(text) map stripFilename
+  def toLines(text: String) = lines(text).map(stripFilename)
 
   def main(args: Array[String]): Unit = {
     for ((code, expected) <- tests) {
       val out = toLines(runScript(code))
       val exp = toLines(expected)
-      val nomatch = out zip exp filter { case (x, y) => x != y }
+      val nomatch = out.zip(exp).filter { case (x, y) => x != y }
       val success = out.size == exp.size && nomatch.isEmpty
 
       assert(

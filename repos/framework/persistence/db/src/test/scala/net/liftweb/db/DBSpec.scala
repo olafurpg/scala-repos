@@ -37,7 +37,7 @@ class DBSpec extends Specification with Mockito {
 
   def dBVendor(connection: Connection) = new ProtoDBVendor {
     def createOne = {
-      connection.createStatement returns mock[PreparedStatement]
+      connection.createStatement.returns(mock[PreparedStatement])
       Full(connection)
     }
   }
@@ -56,8 +56,8 @@ class DBSpec extends Specification with Mockito {
             }
         }
       }
-      there was one(activeConnection).commit
-      there was one(m).f(true)
+      there.was(one(activeConnection).commit)
+      there.was(one(m).f(true))
     }
 
     "call postTransaction functions with false if transaction is rolled back" in {
@@ -77,8 +77,8 @@ class DBSpec extends Specification with Mockito {
         throw new RuntimeException("oh no")
         42
       })
-      there was one(activeConnection).rollback
-      there was one(m).f(false)
+      there.was(one(activeConnection).rollback)
+      there.was(one(m).f(false))
     }
   }
 
@@ -100,8 +100,8 @@ class DBSpec extends Specification with Mockito {
             }
         }
       }
-      there was one(activeConnection).commit
-      there was one(m).f(true)
+      there.was(one(activeConnection).commit)
+      there.was(one(m).f(true))
     }
 
     "call postTransaction functions with false if transaction is rolled back" in {
@@ -125,8 +125,8 @@ class DBSpec extends Specification with Mockito {
         }
         42
       })
-      there was one(activeConnection).rollback
-      there was one(m).f(false)
+      there.was(one(activeConnection).rollback)
+      there.was(one(m).f(false))
     }
   }
 
@@ -143,8 +143,8 @@ class DBSpec extends Specification with Mockito {
           }
       }
 
-      there was one(activeConnection).commit
-      there was one(m).f(true)
+      there.was(one(activeConnection).commit)
+      there.was(one(m).f(true))
     }
 
     "call postTransaction functions with false if transaction is rolled back" in {
@@ -161,8 +161,8 @@ class DBSpec extends Specification with Mockito {
         42
       })
 
-      there was one(activeConnection).rollback
-      there was one(m).f(false)
+      there.was(one(activeConnection).rollback)
+      there.was(one(m).f(false))
       success
     }
   }
@@ -188,8 +188,8 @@ class DBSpec extends Specification with Mockito {
         42
       })
 
-      there was one(activeConnection).rollback
-      there was one(m).f(false)
+      there.was(one(activeConnection).rollback)
+      there.was(one(m).f(false))
     }
   }
 }

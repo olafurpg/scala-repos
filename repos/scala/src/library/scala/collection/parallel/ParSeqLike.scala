@@ -84,7 +84,7 @@ trait ParSeqLike[
 
     def psplit(sizes: Int*) = {
       val incr = sizes.scanLeft(0)(_ + _)
-      for ((from, until) <- incr.init zip incr.tail) yield {
+      for ((from, until) <- incr.init.zip(incr.tail)) yield {
         new Elements(start + from, (start + until) min end) {}
       }
     }
@@ -114,11 +114,12 @@ trait ParSeqLike[
       ctx.setIndexFlag(Int.MaxValue)
       tasksupport
         .executeAndWaitResult(
-          new SegmentLength(p,
-                            0,
-                            splitter.psplitWithSignalling(
-                              realfrom,
-                              length - realfrom)(1) assign ctx))
+          new SegmentLength(
+            p,
+            0,
+            splitter
+              .psplitWithSignalling(realfrom, length - realfrom)(1)
+              .assign(ctx)))
         ._1
     }
 
@@ -142,9 +143,9 @@ trait ParSeqLike[
       tasksupport.executeAndWaitResult(
         new IndexWhere(p,
                        realfrom,
-                       splitter.psplitWithSignalling(
-                         realfrom,
-                         length - realfrom)(1) assign ctx))
+                       splitter
+                         .psplitWithSignalling(realfrom, length - realfrom)(1)
+                         .assign(ctx)))
     }
 
   /** Finds the last element satisfying some predicate.
@@ -168,12 +169,12 @@ trait ParSeqLike[
         new LastIndexWhere(
           p,
           0,
-          splitter.psplitWithSignalling(until, length - until)(0) assign ctx))
+          splitter.psplitWithSignalling(until, length - until)(0).assign(ctx)))
     }
 
   def reverse: Repr = {
     tasksupport.executeAndWaitResult(
-      new Reverse(() => newCombiner, splitter) mapResult {
+      new Reverse(() => newCombiner, splitter).mapResult {
         _.resultWithTaskSupport
       })
   }
@@ -182,9 +183,10 @@ trait ParSeqLike[
       implicit bf: CanBuildFrom[Repr, S, That]): That =
     if (bf(repr).isCombiner) {
       tasksupport.executeAndWaitResult(
-        new ReverseMap[S, That](f, () => bf(repr).asCombiner, splitter) mapResult {
-          _.resultWithTaskSupport
-        }
+        new ReverseMap[S, That](f, () => bf(repr).asCombiner, splitter)
+          .mapResult {
+            _.resultWithTaskSupport
+          }
       )
     } else setTaskSupport(seq.reverseMap(f)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
@@ -201,7 +203,7 @@ trait ParSeqLike[
     *  @return        `true` if there is a sequence `that` starting at `offset` in this sequence, `false` otherwise
     */
   def startsWith[S](that: GenSeq[S], offset: Int): Boolean =
-    that ifParSeq { pthat =>
+    (that ifParSeq { pthat =>
       if (offset < 0 || offset >= length) offset == length && pthat.length == 0
       else if (pthat.length == 0) true
       else if (pthat.length > length - offset) false
@@ -209,18 +211,18 @@ trait ParSeqLike[
         val ctx = new DefaultSignalling with VolatileAbort
         tasksupport.executeAndWaitResult(
           new SameElements(
-            splitter.psplitWithSignalling(offset, pthat.length)(1) assign ctx,
+            splitter.psplitWithSignalling(offset, pthat.length)(1).assign(ctx),
             pthat.splitter)
         )
       }
-    } otherwise seq.startsWith(that, offset)
+    }).otherwise(seq.startsWith(that, offset))
 
   override def sameElements[U >: T](that: GenIterable[U]): Boolean =
-    that ifParSeq { pthat =>
+    (that ifParSeq { pthat =>
       val ctx = new DefaultSignalling with VolatileAbort
       length == pthat.length && tasksupport.executeAndWaitResult(
-        new SameElements(splitter assign ctx, pthat.splitter))
-    } otherwise seq.sameElements(that)
+        new SameElements(splitter.assign(ctx), pthat.splitter))
+    }).otherwise(seq.sameElements(that))
 
   /** Tests whether this $coll ends with the given parallel sequence.
     *
@@ -231,7 +233,7 @@ trait ParSeqLike[
     *  @return         `true` if this $coll has `that` as a suffix, `false` otherwise
     */
   def endsWith[S](that: GenSeq[S]): Boolean =
-    that ifParSeq { pthat =>
+    (that ifParSeq { pthat =>
       if (that.length == 0) true
       else if (that.length > length) false
       else {
@@ -239,10 +241,10 @@ trait ParSeqLike[
         val tlen = that.length
         tasksupport.executeAndWaitResult(
           new SameElements(
-            splitter.psplitWithSignalling(length - tlen, tlen)(1) assign ctx,
+            splitter.psplitWithSignalling(length - tlen, tlen)(1).assign(ctx),
             pthat.splitter))
       }
-    } otherwise seq.endsWith(that)
+    }).otherwise(seq.endsWith(that))
 
   def patch[U >: T, That](from: Int, patch: GenSeq[U], replaced: Int)(
       implicit bf: CanBuildFrom[Repr, U, That]): That = {
@@ -260,11 +262,14 @@ trait ParSeqLike[
       }
       val copyend = new Copy[U, That](cfactory, pits(2))
       tasksupport.executeAndWaitResult(
-        ((copystart parallel copymiddle) { _ combine _ } parallel copyend) {
-          _ combine _
-        } mapResult {
-          _.resultWithTaskSupport
-        })
+        ((copystart
+          .parallel(copymiddle)) { _ combine _ }
+          .parallel(copyend)) {
+            _ combine _
+          }
+          .mapResult {
+            _.resultWithTaskSupport
+          })
     } else patch_sequential(from, patch.seq, replaced)
   }
 
@@ -272,9 +277,9 @@ trait ParSeqLike[
       fromarg: Int,
       patch: Seq[U],
       r: Int)(implicit bf: CanBuildFrom[Repr, U, That]): That = {
-    val from = 0 max fromarg
+    val from = 0.max(fromarg)
     val b = bf(repr)
-    val repl = (r min (length - from)) max 0
+    val repl = ((r min (length - from))).max(0)
     val pits = splitter.psplitWithSignalling(from, repl, length - from - repl)
     b ++= pits(0)
     b ++= patch
@@ -289,7 +294,7 @@ trait ParSeqLike[
         new Updated(index,
                     elem,
                     combinerFactory(() => bf(repr).asCombiner),
-                    splitter) mapResult {
+                    splitter).mapResult {
           _.resultWithTaskSupport
         }
       )
@@ -322,7 +327,7 @@ trait ParSeqLike[
         new Zip(length min thatseq.length,
                 combinerFactory(() => bf(repr).asCombiner),
                 splitter,
-                thatseq.splitter) mapResult {
+                thatseq.splitter).mapResult {
           _.resultWithTaskSupport
         }
       )
@@ -341,14 +346,14 @@ trait ParSeqLike[
     *                   and `y` of `that`, otherwise `false`
     */
   def corresponds[S](that: GenSeq[S])(p: (T, S) => Boolean): Boolean =
-    that ifParSeq { pthat =>
+    (that ifParSeq { pthat =>
       val ctx = new DefaultSignalling with VolatileAbort
       length == pthat.length && tasksupport.executeAndWaitResult(
-        new Corresponds(p, splitter assign ctx, pthat.splitter))
-    } otherwise seq.corresponds(that)(p)
+        new Corresponds(p, splitter.assign(ctx), pthat.splitter))
+    }).otherwise(seq.corresponds(that)(p))
 
   def diff[U >: T](that: GenSeq[U]): Repr = sequentially {
-    _ diff that
+    _.diff(that)
   }
 
   /** Computes the multiset intersection between this $coll and another sequence.
@@ -421,7 +426,7 @@ trait ParSeqLike[
       throw new UnsupportedOperationException
     override def split = {
       val pits = pit.splitWithSignalling
-      for ((p, untilp) <- pits zip pits.scanLeft(0)(_ + _.remaining))
+      for ((p, untilp) <- pits.zip(pits.scanLeft(0)(_ + _.remaining)))
         yield new SegmentLength(pred, from + untilp, p)
     }
     override def merge(that: SegmentLength) =
@@ -445,7 +450,7 @@ trait ParSeqLike[
       throw new UnsupportedOperationException
     override def split = {
       val pits = pit.splitWithSignalling
-      for ((p, untilp) <- pits zip pits.scanLeft(from)(_ + _.remaining))
+      for ((p, untilp) <- pits.zip(pits.scanLeft(from)(_ + _.remaining)))
         yield new IndexWhere(pred, untilp, p)
     }
     override def merge(that: IndexWhere) =
@@ -473,14 +478,14 @@ trait ParSeqLike[
       throw new UnsupportedOperationException
     override def split = {
       val pits = pit.splitWithSignalling
-      for ((p, untilp) <- pits zip pits.scanLeft(pos)(_ + _.remaining))
+      for ((p, untilp) <- pits.zip(pits.scanLeft(pos)(_ + _.remaining)))
         yield new LastIndexWhere(pred, untilp, p)
     }
     override def merge(that: LastIndexWhere) =
       result =
         if (result == -1) that.result
         else {
-          if (that.result != -1) result max that.result else result
+          if (that.result != -1) result.max(that.result) else result
         }
     override def requiresStrictSplitters = true
   }
@@ -526,8 +531,10 @@ trait ParSeqLike[
     override def split = {
       val fp = pit.remaining / 2
       val sp = pit.remaining - fp
-      for ((p, op) <- pit.psplitWithSignalling(fp, sp) zip otherpit
-             .psplitWithSignalling(fp, sp))
+      for ((p, op) <- pit
+             .psplitWithSignalling(fp, sp)
+             .zip(otherpit
+               .psplitWithSignalling(fp, sp)))
         yield new SameElements(p, op)
     }
     override def merge(that: SameElements[U]) = result = result && that.result
@@ -547,7 +554,7 @@ trait ParSeqLike[
       throw new UnsupportedOperationException
     override def split = {
       val pits = pit.splitWithSignalling
-      for ((p, untilp) <- pits zip pits.scanLeft(0)(_ + _.remaining))
+      for ((p, untilp) <- pits.zip(pits.scanLeft(0)(_ + _.remaining)))
         yield new Updated(pos - untilp, elem, pbf, p)
     }
     override def merge(that: Updated[U, That]) =
@@ -594,8 +601,10 @@ trait ParSeqLike[
     override def split = {
       val fp = pit.remaining / 2
       val sp = pit.remaining - fp
-      for ((p, op) <- pit.psplitWithSignalling(fp, sp) zip otherpit
-             .psplitWithSignalling(fp, sp))
+      for ((p, op) <- pit
+             .psplitWithSignalling(fp, sp)
+             .zip(otherpit
+               .psplitWithSignalling(fp, sp)))
         yield new Corresponds(corr, p, op)
     }
     override def merge(that: Corresponds[S]) = result = result && that.result

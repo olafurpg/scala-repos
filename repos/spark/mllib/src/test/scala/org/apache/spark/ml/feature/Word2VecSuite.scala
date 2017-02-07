@@ -85,7 +85,7 @@ class Word2VecSuite
       .dense(0.30153007534417237, -0.6833061711354689, 0.5116530778733167)
     model.transform(docDF).select("result", "expected").collect().foreach {
       case Row(vector1: Vector, vector2: Vector) =>
-        assert(vector1 ~== magicExp absTol 1E-5,
+        assert(vector1 ~== magicExp.absTol(1E-5),
                "Transformed vector is different with expected.")
     }
   }
@@ -144,7 +144,7 @@ class Word2VecSuite
 
     realVectors.zip(magicExpected).foreach {
       case (real, expected) =>
-        assert(real ~== expected absTol 1E-5,
+        assert(real ~== expected.absTol(1E-5),
                "Actual vector is different from expected.")
     }
   }

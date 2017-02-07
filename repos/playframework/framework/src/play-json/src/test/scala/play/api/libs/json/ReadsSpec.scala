@@ -38,7 +38,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
       _.drop(2))
 
     "be successfully read from number" in {
-      reads(JsNumber(BigDecimal valueOf 123L)).aka("read date") must_==
+      reads(JsNumber(BigDecimal.valueOf(123L))).aka("read date") must_==
         JsSuccess(
           LocalDateTime.ofInstant(
             Instant.ofEpochMilli(123L),
@@ -47,7 +47,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
     }
 
     "not be read from invalid string" in {
-      reads(JsString("invalid")) aka "read date" must beLike {
+      reads(JsString("invalid")).aka("read date") must beLike {
         case JsError((_,
                       ValidationError("error.expected.date.isoformat" :: Nil,
                                       _) :: Nil) :: Nil) =>
@@ -62,7 +62,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
       }
 
       "from '2011-12-03T10:15:30+01:00' (with TZ offset)" in {
-        reads(JsString("2011-12-03T10:15:30+01:00")) aka "read date" must_==
+        reads(JsString("2011-12-03T10:15:30+01:00")).aka("read date") must_==
           (JsSuccess(dateTime("2011-12-03T10:15:30+01:00")))
       }
 
@@ -139,7 +139,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
 
     "not be read" >> {
       "from an invalid string" in {
-        reads(JsString("invalid")) aka "read date" must beLike {
+        reads(JsString("invalid")).aka("read date") must beLike {
           case JsError((_,
                         ValidationError("error.expected.date.isoformat" :: Nil,
                                         _) :: Nil) :: Nil) =>
@@ -148,7 +148,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
       }
 
       "from a number" in {
-        reads(JsNumber(123L)) aka "read date" must beLike {
+        reads(JsNumber(123L)).aka("read date") must beLike {
           case JsError(
               (_, ValidationError("error.expected.date" :: Nil) :: Nil) :: Nil) =>
             ok
@@ -224,7 +224,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
     )
 
     "be successfully read from number" in {
-      reads(JsNumber(BigDecimal valueOf 123L)).aka("read date") must_==
+      reads(JsNumber(BigDecimal.valueOf(123L))).aka("read date") must_==
         JsSuccess(
           ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(123L),
@@ -233,7 +233,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
     }
 
     "not be read from invalid string" in {
-      reads(JsString("invalid")) aka "read date" must beLike {
+      reads(JsString("invalid")).aka("read date") must beLike {
         case JsError((_,
                       ValidationError("error.expected.date.isoformat" :: Nil,
                                       _) :: Nil) :: Nil) =>
@@ -243,7 +243,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
 
     "be successfully read with default implicit" >> {
       "from '2011-12-03T10:15:30+01:00' (with TZ offset)" in {
-        reads(JsString("2011-12-03T10:15:30+01:00")) aka "read date" must_==
+        reads(JsString("2011-12-03T10:15:30+01:00")).aka("read date") must_==
           (JsSuccess(dateTime("2011-12-03T10:15:30+01:00")))
       }
 
@@ -316,12 +316,12 @@ object ReadsSpec extends org.specs2.mutable.Specification {
       val beforeMidnight = Instant.parse("1970-01-01T23:55:00Z")
       val d = LocalDate.parse("1970-01-01")
 
-      reads(JsNumber(BigDecimal valueOf beforeMidnight.toEpochMilli))
+      reads(JsNumber(BigDecimal.valueOf(beforeMidnight.toEpochMilli)))
         .aka("read date") must_== JsSuccess(d)
     }
 
     "not be read from invalid string" in {
-      reads(JsString("invalid")) aka "read date" must beLike {
+      reads(JsString("invalid")).aka("read date") must beLike {
         case JsError((_,
                       ValidationError("error.expected.date.isoformat" :: Nil,
                                       _) :: Nil) :: Nil) =>
@@ -393,12 +393,12 @@ object ReadsSpec extends org.specs2.mutable.Specification {
     )
 
     "be successfully read from number" in {
-      reads(JsNumber(BigDecimal valueOf 123L)).aka("read date") must_==
-        JsSuccess(Instant ofEpochMilli 123L)
+      reads(JsNumber(BigDecimal.valueOf(123L))).aka("read date") must_==
+        JsSuccess(Instant.ofEpochMilli(123L))
     }
 
     "not be read from invalid string" in {
-      reads(JsString("invalid")) aka "read date" must beLike {
+      reads(JsString("invalid")).aka("read date") must beLike {
         case JsError((_,
                       ValidationError("error.expected.date.isoformat" :: Nil,
                                       _) :: Nil) :: Nil) =>
@@ -424,7 +424,7 @@ object ReadsSpec extends org.specs2.mutable.Specification {
       }
 
       "from '2011-12-03T10:15:30+01:00' (with TZ offset)" in {
-        reads(JsString("2011-12-03T10:15:30+01:00")) aka "read date" must_==
+        reads(JsString("2011-12-03T10:15:30+01:00")).aka("read date") must_==
           (JsSuccess(Instant.parse("2011-12-03T09:15:30Z")))
       }
 

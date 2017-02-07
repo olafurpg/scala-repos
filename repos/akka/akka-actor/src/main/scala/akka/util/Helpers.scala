@@ -76,7 +76,7 @@ object Helpers {
   def base64(l: Long,
              sb: java.lang.StringBuilder = new java.lang.StringBuilder("$"))
     : String = {
-    sb append base64chars.charAt(l.toInt & 63)
+    sb.append(base64chars.charAt(l.toInt & 63))
     val next = l >>> 6
     if (next == 0) sb.toString
     else base64(next, sb)

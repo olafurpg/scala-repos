@@ -19,11 +19,11 @@ object Unidoc extends Plugin {
     unidocDirectory <<= crossTarget { _ / "unidoc" },
     unidocExclude := Seq.empty,
     unidocAllSources <<=
-      (thisProjectRef, buildStructure, unidocExclude) flatMap allSources,
-    unidocSources <<= unidocAllSources map { _.flatten },
+      (thisProjectRef, buildStructure, unidocExclude).flatMap(allSources),
+    unidocSources <<= unidocAllSources.map { _.flatten },
     unidocAllClasspaths <<=
-      (thisProjectRef, buildStructure, unidocExclude) flatMap allClasspaths,
-    unidocClasspath <<= unidocAllClasspaths map {
+      (thisProjectRef, buildStructure, unidocExclude).flatMap(allClasspaths),
+    unidocClasspath <<= unidocAllClasspaths.map {
       _.flatten.map(_.data).distinct
     },
     unidoc <<= unidocTask
@@ -33,8 +33,8 @@ object Unidoc extends Plugin {
                  structure: BuildStructure,
                  exclude: Seq[String]): Task[Seq[Seq[File]]] = {
     val projects = aggregated(projectRef, structure, exclude)
-    projects flatMap {
-      sources in Compile in LocalProject(_) get structure.data
+    projects.flatMap {
+      (sources in Compile in LocalProject(_)).get(structure.data)
     } join
   }
 
@@ -42,8 +42,8 @@ object Unidoc extends Plugin {
                     structure: BuildStructure,
                     exclude: Seq[String]): Task[Seq[Classpath]] = {
     val projects = aggregated(projectRef, structure, exclude)
-    projects flatMap {
-      dependencyClasspath in Compile in LocalProject(_) get structure.data
+    projects.flatMap {
+      (dependencyClasspath in Compile in LocalProject(_)).get(structure.data)
     } join
   }
 
@@ -52,19 +52,19 @@ object Unidoc extends Plugin {
                  exclude: Seq[String]): Seq[String] = {
     val aggregate =
       Project.getProject(projectRef, structure).toSeq.flatMap(_.aggregate)
-    aggregate flatMap { ref =>
+    aggregate.flatMap { ref =>
       if (exclude contains ref.project) Seq.empty
       else ref.project +: aggregated(ref, structure, exclude)
     }
   }
 
   def unidocTask: Def.Initialize[Task[File]] = {
-    (compilers, unidocSources, unidocDirectory, scalacOptions in doc, streams) map {
-      (compilers, sources, target, options, s) =>
+    (compilers, unidocSources, unidocDirectory, scalacOptions in doc, streams)
+      .map { (compilers, sources, target, options, s) =>
         {
           Doc.scaladoc("Scalatra", s.cacheDirectory, compilers.scalac, options)
           target
         }
-    }
+      }
   }
 }

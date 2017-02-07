@@ -149,7 +149,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       }
     }
 
-    legacyOptionalBox map { legacyOptional =>
+    legacyOptionalBox.map { legacyOptional =>
       "support 'legacy' optional fields (override optional_?)" in {
         "which are configured correctly" in {
           legacyOptional.optional_? must_== true
@@ -212,20 +212,20 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
     }
 
     "convert to form XML" in {
-      formPattern foreach { fp =>
+      formPattern.foreach { fp =>
         mandatory.set(example)
         val session = new LiftSession("", randomString(20), Empty)
         S.initIfUninitted(session) {
           val formXml = mandatory.toForm
           formXml.isDefined must_== true
-          formXml foreach { fprime =>
+          formXml.foreach { fprime =>
             val f = ("* [name]" #> ".*" & "select *" #>
               (((ns: NodeSeq) =>
                   ns.filter {
                     case e: Elem =>
                       e.attribute("selected").map(_.text) == Some("selected")
                     case _ => false
-                  }) andThen "* [value]" #> ".*"))(fprime)
+                  }).andThen("* [value]" #> ".*")))(fprime)
             val ret: Boolean = Helpers.compareXml(f, fp)
 
             ret must_== true
@@ -704,7 +704,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       val recFromJson = rec.mandatoryJObjectField.setFromJValue(json)
 
       recFromJson.isDefined must_== true
-      recFromJson foreach { r =>
+      recFromJson.foreach { r =>
         r must_== json
       }
       success
@@ -717,7 +717,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
 
       fromJsonBox.isDefined must_== true
 
-      fromJsonBox foreach { fromJson =>
+      fromJsonBox.foreach { fromJson =>
         //Convert the test record, make a DBObject out of it, and make a record from that DBObject
         val fromBson = JObjectFieldTestRecord.fromDBObject(fromJson.asDBObject)
         fromBson.asJValue must_== fromJson.asJValue

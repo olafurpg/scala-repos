@@ -20,13 +20,13 @@ class LoadGenerator[Req, Rep](
     timer: MockTimer = new MockTimer()
 ) {
   val svc =
-    filter andThen Service.mk[Event[Req, Rep], Rep] { evt: Event[Req, Rep] =>
+    filter.andThen(Service.mk[Event[Req, Rep], Rep] { evt: Event[Req, Rep] =>
       val p = Promise[Rep]()
       timer.schedule(evt.finish) {
         p.updateIfEmpty(evt())
       }
       p
-    }
+    })
 
   def forward(dur: Duration, ctl: TimeControl) {
     ctl.advance(dur - 1.nanosecond)
@@ -65,7 +65,7 @@ class LoadGenerator[Req, Rep](
 
     var maxSeen = cur
     Time.withTimeAt(cur) { ctl =>
-      history foreach { evt =>
+      history.foreach { evt =>
         val diff = (evt.start - cur)
         if (diff > Duration.Zero) {
           removeInterstices(evt.start, ctl)
@@ -73,7 +73,7 @@ class LoadGenerator[Req, Rep](
         cur = evt.start
         endTimes += (evt.finish)
         recorder(evt.length, svc(evt))
-        maxSeen = maxSeen max (evt.finish)
+        maxSeen = maxSeen.max(evt.finish)
       }
       removeInterstices(maxSeen, ctl)
     }

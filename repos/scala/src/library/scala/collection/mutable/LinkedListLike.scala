@@ -135,7 +135,7 @@ trait LinkedListLike[A, This <: Seq[A] with LinkedListLike[A, This]]
   def insert(that: This): Unit = {
     require(nonEmpty, "insert into empty list")
     if (that.nonEmpty) {
-      that append next
+      that.append(next)
       next = that
     }
   }

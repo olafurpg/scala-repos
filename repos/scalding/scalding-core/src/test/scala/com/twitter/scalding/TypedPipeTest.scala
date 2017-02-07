@@ -51,7 +51,7 @@ class TupleAdderTest extends WordSpec with Matchers {
       .sink[(Int, String, String, Int, Int)](
         TypedText.tsv[(Int, String, String, Int, Int)]("output")) { outBuf =>
         "be able to use generated tuple adders" in {
-          outBuf should have size 2
+          (outBuf should have).size(2)
           outBuf.toSet shouldBe Set((1, "a", "a", 2, 3), (1, "b", "b", 2, 3))
         }
       }
@@ -150,7 +150,7 @@ class TypedPipeJoinTest extends WordSpec with Matchers {
         outputBuffer =>
           val outMap = outputBuffer.toMap
           "correctly join" in {
-            outMap should have size 5
+            (outMap should have).size(5)
             outMap(0) shouldBe (0, Some(1))
             outMap(1) shouldBe (1, Some(2))
             outMap(2) shouldBe (2, Some(3))
@@ -200,7 +200,7 @@ class TypedPipeJoinKryoTest extends WordSpec with Matchers {
         outputBuffer =>
           val outMap = outputBuffer.toMap
           "correctly join" in {
-            outMap should have size 4
+            (outMap should have).size(4)
             outMap(0) shouldBe 0
             outMap(1) shouldBe 4
             outMap(2) shouldBe 12
@@ -227,7 +227,7 @@ class TypedPipeDistinctTest extends WordSpec with Matchers {
         outputBuffer =>
           val outMap = outputBuffer.toMap
           "correctly count unique item sizes" in {
-            outputBuffer.toSet should have size 4
+            (outputBuffer.toSet should have).size(4)
           }
       }
       .run
@@ -250,7 +250,7 @@ class TypedPipeDistinctByTest extends WordSpec with Matchers {
       .typedSink(TypedText.tsv[(Int, Int)]("outputFile")) { outputBuffer =>
         "correctly count unique item sizes" in {
           val outSet = outputBuffer.toSet
-          outSet should have size 3
+          (outSet should have).size(3)
           List(outSet) should contain oneOf
             (Set((0, 1), (2, 2), (2, 5)), Set((1, 1), (2, 2), (2, 5)))
         }
@@ -276,7 +276,7 @@ class TypedPipeGroupedDistinctJobTest extends WordSpec with Matchers {
         outputBuffer =>
           val outSet = outputBuffer.toSet
           "correctly generate unique items" in {
-            outSet should have size 4
+            (outSet should have).size(4)
           }
       }
       .sink[(Int, Int)](TypedText.tsv[(Int, Long)]("outputFile2")) {
@@ -312,7 +312,7 @@ class TypedPipeHashJoinTest extends WordSpec with Matchers {
         outputBuffer =>
           val outMap = outputBuffer.toMap
           "correctly join" in {
-            outMap should have size 5
+            (outMap should have).size(5)
             outMap(0) shouldBe (0, Some(1))
             outMap(1) shouldBe (1, Some(2))
             outMap(2) shouldBe (2, Some(3))
@@ -356,7 +356,7 @@ class TypedPipeTypedTest extends WordSpec with Matchers {
       .typedSink(TypedText.tsv[(String, Int)]("outputFile")) { outputBuffer =>
         val outMap = outputBuffer.toMap
         "find max word" in {
-          outMap should have size 1
+          (outMap should have).size(1)
           outMap("hack") shouldBe 4
         }
       }
@@ -559,7 +559,7 @@ class TypedPipeJoinCountTest extends WordSpec with Matchers {
         .typedSink(TypedText.tsv[(Int, Long)]("out")) { outbuf =>
           val outMap = outbuf.toMap
           (idx + ": correctly reduce after cogroup") in {
-            outMap should have size 2
+            (outMap should have).size(2)
             outMap(0) shouldBe 2
             outMap(1) shouldBe 6
           }
@@ -568,7 +568,7 @@ class TypedPipeJoinCountTest extends WordSpec with Matchers {
         .typedSink(TypedText.tsv[(Int, Int, Int)]("out2")) { outbuf2 =>
           val outMap = outbuf2.groupBy { _._1 }
           (idx + ": correctly do a simple join") in {
-            outMap should have size 2
+            (outMap should have).size(2)
             outMap(0).toList.sorted shouldBe List((0, 1, 10), (0, 2, 10))
             outMap(1).toList.sorted shouldBe List((1, 1, 10),
                                                   (1, 1, 20),
@@ -582,7 +582,7 @@ class TypedPipeJoinCountTest extends WordSpec with Matchers {
         .typedSink(TypedText.tsv[(Int, Int, Int)]("out3")) { outbuf =>
           val outMap = outbuf.groupBy { _._1 }
           (idx + ": correctly do a simple leftJoin") in {
-            outMap should have size 3
+            (outMap should have).size(3)
             outMap(0).toList.sorted shouldBe List((0, 1, 10), (0, 2, 10))
             outMap(1).toList.sorted shouldBe List((1, 1, 10),
                                                   (1, 1, 20),
@@ -602,7 +602,8 @@ class TypedPipeJoinCountTest extends WordSpec with Matchers {
 }
 
 class TCrossJob(args: Args) extends Job(args) {
-  (TextLine("in0") cross TextLine("in1"))
+  (TextLine("in0")
+    .cross(TextLine("in1")))
     .write(TypedText.tsv[(String, String)]("crossed"))
 }
 
@@ -880,7 +881,7 @@ class TypedShardTest extends WordSpec with Matchers {
       .source(TypedText.tsv[String]("input"), mk)
       .typedSink(TypedText.tsv[String]("output")) { outBuf =>
         "correctly flatten" in {
-          outBuf should have size (mk.size + 1)
+          (outBuf should have).size(mk.size + 1)
           outBuf.toSet shouldBe (mk.toSet + "item")
         }
       }
@@ -948,7 +949,7 @@ class TypedHeadTest extends WordSpec with Matchers {
       .typedSink(TypedText.tsv[(Int, Int)]("output")) { outBuf =>
         "correctly take the first" in {
           val correct = mk.groupBy(_._1).mapValues(_.head._2)
-          outBuf should have size (correct.size)
+          (outBuf should have).size(correct.size)
           outBuf.toMap shouldBe correct
         }
       }
@@ -1037,7 +1038,7 @@ class TypedLookupJobTest extends WordSpec with Matchers {
             }
             .toList
             .sorted
-          outBuf should have size (correct.size)
+          (outBuf should have).size(correct.size)
           outBuf.toList.sorted shouldBe correct
         }
       }(implicitly[TypeDescriptor[(Int, String)]].converter)
@@ -1081,7 +1082,7 @@ class TypedLookupReduceJobTest extends WordSpec with Matchers {
             }
             .toList
             .sorted
-          outBuf should have size (correct.size)
+          (outBuf should have).size(correct.size)
           outBuf.toList.sorted shouldBe correct
         }
       }(implicitly[TypeDescriptor[(Int, String)]].converter)
@@ -1104,7 +1105,7 @@ class TypedFilterTest extends WordSpec with Matchers {
     "filter and filterNot elements" in {
       val input = -1 to 100
       val isEven = (i: Int) => i % 2 == 0
-      val expectedOutput = input filter { _ > 50 } filterNot isEven
+      val expectedOutput = input.filter { _ > 50 }.filterNot(isEven)
 
       TUtil.printStack {
         JobTest(new com.twitter.scalding.TypedFilterJob(_))
@@ -1132,7 +1133,7 @@ class TypedPartitionTest extends WordSpec with Matchers {
   "A TypedPipe" should {
     "partition elements" in {
       val input = -1 to 100
-      val (expected1, expected2) = input partition { _ > 50 }
+      val (expected1, expected2) = input.partition { _ > 50 }
 
       TUtil.printStack {
         JobTest(new com.twitter.scalding.TypedPartitionJob(_))
@@ -1213,7 +1214,7 @@ class TypedMultiJoinJobTest extends WordSpec with Matchers {
             .toList
             .sorted
 
-          outBuf should have size (correct.size)
+          (outBuf should have).size(correct.size)
           outBuf.toList.sorted shouldBe correct
         }
       }
@@ -1267,7 +1268,7 @@ class TypedMultiSelfJoinJobTest extends WordSpec with Matchers {
               .toMap
 
           val d0 = mk0.groupBy(_._1).mapValues(_.map { case (_, v) => v })
-          val d1 = group(mk1)(_ max _)
+          val d1 = group(mk1)(_.max(_))
           val d2 = group(mk1)(_ min _)
 
           val correct = (d0.keySet ++ d1.keySet ++ d2.keySet).toList
@@ -1285,7 +1286,7 @@ class TypedMultiSelfJoinJobTest extends WordSpec with Matchers {
             .toList
             .sorted
 
-          outBuf should have size (correct.size)
+          (outBuf should have).size(correct.size)
           outBuf.toList.sorted shouldBe correct
         }
       }
@@ -1325,7 +1326,7 @@ class TypedMapGroupTest extends WordSpec with Matchers {
               }
               .toMap
           val correct = mapGroup(mk).toList.sorted
-          outBuf should have size (correct.size)
+          (outBuf should have).size(correct.size)
           outBuf.toList.sorted shouldBe correct
         }
       }
@@ -1353,7 +1354,7 @@ class TypedSelfCrossTest extends WordSpec with Matchers {
       .source(TypedText.tsv[Int]("input"), input)
       .typedSink(TypedText.tsv[(Int, Int)]("output")) { outBuf =>
         (idx + ": not change the length of the input") in {
-          outBuf should have size (input.size)
+          (outBuf should have).size(input.size)
         }
         idx += 1
       }
@@ -1380,7 +1381,7 @@ class TypedSelfLeftCrossTest extends WordSpec with Matchers {
       .source(TypedText.tsv[Int]("input"), input)
       .typedSink(TypedText.tsv[(Int, Option[Int])]("output")) { outBuf =>
         s"$idx: attach the sum of all values correctly" in {
-          outBuf should have size (input.size)
+          (outBuf should have).size(input.size)
           val sum = input.reduceOption(_ + _)
           // toString to deal with our hadoop testing jank
           outBuf.toList.sortBy(_._1).toString shouldBe

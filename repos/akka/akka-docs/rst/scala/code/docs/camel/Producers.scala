@@ -43,7 +43,7 @@ object Producers {
         with Producer {
       def endpointUri = uri
 
-      override def routeResponse(msg: Any) { target forward msg }
+      override def routeResponse(msg: Any) { target.forward(msg) }
     }
     val system = ActorSystem("some-system")
     val receiver = system.actorOf(Props[ResponseReceiver])

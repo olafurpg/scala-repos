@@ -25,10 +25,13 @@ final class Winners(mongoCache: lila.memo.MongoCache.Builder,
         TournamentRepo.lastFinishedScheduledByFreq(freq, since)
       }
       .sequenceFu
-      .map(_.flatten) flatMap { stds =>
-      TournamentRepo.lastFinishedDaily(chess.variant.Crazyhouse) map
-        (stds ::: _.toList)
-    } flatMap toursToWinners
+      .map(_.flatten)
+      .flatMap { stds =>
+        TournamentRepo
+          .lastFinishedDaily(chess.variant.Crazyhouse)
+          .map(stds ::: _.toList)
+      }
+      .flatMap(toursToWinners)
   }
 
   private def toursToWinners(tours: List[Tournament]): Fu[List[Winner]] =
@@ -36,15 +39,16 @@ final class Winners(mongoCache: lila.memo.MongoCache.Builder,
       .sortBy(_.schedule.map(_.freq))
       .reverse
       .map { tour =>
-        PlayerRepo winner tour.id flatMap {
+        (PlayerRepo winner tour.id).flatMap {
           case Some(player) =>
-            UserRepo isEngine player.userId map { engine =>
-              !engine option Winner(tour.id, tour.name, player.userId)
+            (UserRepo isEngine player.userId).map { engine =>
+              !engine.option(Winner(tour.id, tour.name, player.userId))
             }
           case _ => fuccess(none)
         }
       }
-      .sequenceFu map (_.flatten take 10)
+      .sequenceFu
+      .map(_.flatten.take(10))
 
-  def scheduled(nb: Int): Fu[List[Winner]] = scheduledCache apply nb
+  def scheduled(nb: Int): Fu[List[Winner]] = scheduledCache.apply(nb)
 }

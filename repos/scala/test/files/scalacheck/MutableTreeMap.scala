@@ -32,7 +32,7 @@ package scala.collection.mutable {
       for {
         keys <- listOf(arbitrary[A])
         values <- listOfN(keys.size, arbitrary[B])
-      } yield mutable.TreeMap(keys zip values: _*)
+      } yield mutable.TreeMap(keys.zip(values): _*)
     }
 
     implicit def arbRedBlackTree[A: Arbitrary: Ordering, B: Arbitrary] =

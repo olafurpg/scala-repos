@@ -40,7 +40,7 @@ object PlayReload {
     analysis.apis.internal.foldLeft(Map.empty[String, Source]) {
       case (sourceMap, (file, source)) =>
         sourceMap ++ {
-          source.api.definitions map { d =>
+          source.api.definitions.map { d =>
             d.name -> Source(file, originalSource(file))
           }
         }
@@ -79,9 +79,9 @@ object PlayReload {
   }
 
   def getScopedKey(incomplete: Incomplete): Option[ScopedKey[_]] =
-    incomplete.node flatMap {
+    incomplete.node.flatMap {
       case key: ScopedKey[_] => Option(key)
-      case task: Task[_] => task.info.attributes get taskDefinitionKey
+      case task: Task[_] => task.info.attributes.get(taskDefinitionKey)
     }
 
   def getProblems(incomplete: Incomplete,
@@ -157,7 +157,7 @@ object PlayReload {
   }
 
   def problems(es: Seq[Throwable]): Seq[xsbti.Problem] = {
-    es flatMap {
+    es.flatMap {
       case cf: xsbti.CompileFailed => cf.problems
       case _ => Nil
     }

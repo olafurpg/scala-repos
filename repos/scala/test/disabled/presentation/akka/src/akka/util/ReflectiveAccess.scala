@@ -55,7 +55,7 @@ object ReflectiveAccess {
     }
 
     protected[akka] val defaultRemoteSupport: Option[() => RemoteSupport] =
-      remoteSupportClass map { remoteClass => () =>
+      remoteSupportClass.map { remoteClass => () =>
         createInstance[RemoteSupport](remoteClass,
                                       Array[Class[_]](),
                                       Array[AnyRef]()) match {

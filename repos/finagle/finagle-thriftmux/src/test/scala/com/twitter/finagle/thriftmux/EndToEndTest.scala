@@ -135,7 +135,7 @@ class EndToEndTest
         Name.bound(
           Address(server.boundAddress.asInstanceOf[InetSocketAddress])),
         "client")
-      1 to 5 foreach { _ =>
+      (1 to 5).foreach { _ =>
         assert(Await.result(client.query("ok"), 5.seconds) == "okok")
       }
     }
@@ -365,7 +365,7 @@ class EndToEndTest
       new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
       new TestService.FutureIface {
         def query(x: String) =
-          Future.value(ClientId.current map { _.name } getOrElse (""))
+          Future.value(ClientId.current.map { _.name }.getOrElse(""))
       }
     )
 
@@ -377,7 +377,7 @@ class EndToEndTest
           Address(server.boundAddress.asInstanceOf[InetSocketAddress])),
         "client")
 
-    1 to 5 foreach { _ =>
+    (1 to 5).foreach { _ =>
       assert(Await.result(client.query("ok"), 5.seconds) == clientId)
     }
   }
@@ -388,7 +388,7 @@ class EndToEndTest
       new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
       new TestService.FutureIface {
         def query(x: String) =
-          Future.value(ClientId.current map { _.name } getOrElse (""))
+          Future.value(ClientId.current.map { _.name }.getOrElse(""))
       }
     )
 
@@ -401,7 +401,7 @@ class EndToEndTest
           Address(server.boundAddress.asInstanceOf[InetSocketAddress])),
         "client")
 
-    1 to 5 foreach { _ =>
+    (1 to 5).foreach { _ =>
       otherClientId.asCurrent {
         assert(Await.result(client.query("ok"), 5.seconds) == clientId.name)
       }
@@ -439,7 +439,7 @@ class EndToEndTest
       new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
       new TestService.FutureIface {
         def query(x: String) =
-          Future.value(ClientId.current map { _.name } getOrElse (""))
+          Future.value(ClientId.current.map { _.name }.getOrElse(""))
       }
     )
 
@@ -452,7 +452,7 @@ class EndToEndTest
           Address(server.boundAddress.asInstanceOf[InetSocketAddress])),
         "client")
 
-    1 to 5 foreach { _ =>
+    (1 to 5).foreach { _ =>
       otherClientId.asCurrent {
         assert(Await.result(client.query("ok"), 5.seconds) == clientId.name)
       }
@@ -469,7 +469,7 @@ class EndToEndTest
         Name.bound(
           Address(server.boundAddress.asInstanceOf[InetSocketAddress])),
         "client")
-      1 to 5 foreach { _ =>
+      (1 to 5).foreach { _ =>
         assert(Await.result(client.query("ok"), 5.seconds) == "okok")
       }
     }
@@ -720,18 +720,18 @@ class EndToEndTest
     val client =
       new TestService.FinagledClient(service, Protocols.binaryFactory())
     val reqs =
-      1 to nreqs map { i =>
+      (1 to nreqs).map { i =>
         client.query("ok" + i)
       }
     // Although the requests are pipelined in the client, they must be
     // received by the service serially.
-    1 to nreqs foreach { i =>
+    (1 to nreqs).foreach { i =>
       val req = Await.result(requestReceived(i - 1), 5.seconds)
       if (i != nreqs) assert(!requestReceived(i).isDefined)
       assert(testService.nReqReceived == i)
       servicePromises(i - 1).setValue(req + req)
     }
-    1 to nreqs foreach { i =>
+    (1 to nreqs).foreach { i =>
       assert(Await.result(reqs(i - 1)) == "ok" + i + "ok" + i)
     }
   }

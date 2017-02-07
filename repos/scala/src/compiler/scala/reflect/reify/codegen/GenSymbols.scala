@@ -67,7 +67,7 @@ trait GenSymbols { self: Reifier =>
        *    object B { package B } => impossible
        */
       val hasPackagelessParent =
-        sym.ownerChain.tail.tail exists (_.isEmptyPackageClass)
+        sym.ownerChain.tail.tail.exists(_.isEmptyPackageClass)
       if (sym.isStatic && (sym.isClass || sym.isModule) &&
           !hasPackagelessParent) {
         // SI-6238: if applicable, emit references to StandardDefinitions instead of staticClass/staticModule calls
@@ -138,7 +138,7 @@ trait GenSymbols { self: Reifier =>
       //
       // To overcome this glitch, we note whether a given free term is stable or not (because vars can also end up being free terms).
       // Then, if a free term is stable, we tell the compiler to treat `free.apply()` specially and assume that it's stable.
-      if (!sym.isMutable) sym setFlag STABLE
+      if (!sym.isMutable) sym.setFlag(STABLE)
       if (sym.isCapturedVariable) {
         assert(binding.isInstanceOf[Ident], showRaw(binding))
         val capturedBinding = referenceCapturedVariable(sym)
@@ -168,7 +168,7 @@ trait GenSymbols { self: Reifier =>
       if (reifyDebug)
         println("Free type: %s (%s)".format(sym, sym.accurateKindString))
       state.reificationIsConcrete = false
-      val name: TermName = nme.REIFY_FREE_PREFIX append sym.name
+      val name: TermName = nme.REIFY_FREE_PREFIX.append(sym.name)
       Reification(
         name,
         binding,
@@ -182,7 +182,7 @@ trait GenSymbols { self: Reifier =>
     reifyIntoSymtab(sym) { sym =>
       if (reifyDebug)
         println("Sym def: %s (%s)".format(sym, sym.accurateKindString))
-      val name: TermName = nme.REIFY_SYMDEF_PREFIX append sym.name
+      val name: TermName = nme.REIFY_SYMDEF_PREFIX.append(sym.name)
       def reifiedOwner =
         if (sym.owner.isLocatable) reify(sym.owner) else reifySymDef(sym.owner)
       Reification(
@@ -201,7 +201,7 @@ trait GenSymbols { self: Reifier =>
 
   private def reifyIntoSymtab(sym: Symbol)(
       reificode: Symbol => Reification): Tree = {
-    def fromSymtab = symtab symRef sym
+    def fromSymtab = symtab.symRef(sym)
     if (fromSymtab == EmptyTree) {
       // reification is lazy, so that we can carefully choose where to evaluate it
       // and we choose this place to be exactly here:
@@ -217,7 +217,7 @@ trait GenSymbols { self: Reifier =>
       val reification = reificode(sym)
       import reification.{name, binding}
       val tree =
-        reification.tree updateAttachment ReifyBindingAttachment(binding)
+        reification.tree.updateAttachment(ReifyBindingAttachment(binding))
       state.symtab += (sym, name.toTermName, tree)
     }
     fromSymtab

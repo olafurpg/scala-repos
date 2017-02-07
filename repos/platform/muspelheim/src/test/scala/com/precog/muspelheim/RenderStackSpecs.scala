@@ -65,22 +65,22 @@ trait RenderStackSpecs extends EvalStackSpecs with Logging {
 
       val evaluator = Evaluator[Future](M)
 
-      val forest = compile(str) filter { _.errors.isEmpty }
+      val forest = compile(str).filter { _.errors.isEmpty }
       forest must haveSize(1)
 
       val tree = forest.head
       tree.errors must beEmpty
       val Right(dag) = decorate(emit(tree))
       val tableM = evaluator.eval(dag, dummyEvaluationContext, true)
-      tableM map {
-        _ transform DerefObjectStatic(Leaf(Source), CPathField("value"))
+      tableM.map {
+        _.transform(DerefObjectStatic(Leaf(Source), CPathField("value")))
       } copoint
     }
 
     "render a set of numbers interleaved by delimiters" in {
       val stream =
         evalTable("(//tutorial/transactions).quantity").renderJson("", ",", "")
-      val strings = stream map { _.toString }
+      val strings = stream.map { _.toString }
       val str = strings.foldLeft("") { _ + _ } copoint
 
       str must contain(",")

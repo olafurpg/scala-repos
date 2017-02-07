@@ -35,14 +35,14 @@ class TracingFilterTest
   }
 
   def record(filter: Filter[Int, Int, Int, Int]): Seq[Record] = {
-    val composed = filter andThen service
+    val composed = filter.andThen(service)
     Await.result(composed(4))
     verify(tracer, atLeastOnce()).record(captor.capture())
     captor.getAllValues.asScala
   }
 
   def recordException(filter: Filter[Int, Int, Int, Int]): Seq[Record] = {
-    val composed = filter andThen exceptingService
+    val composed = filter.andThen(exceptingService)
     intercept[Exception] { Await.result(composed(4)) }
     verify(tracer, atLeastOnce()).record(captor.capture())
     captor.getAllValues.asScala
@@ -54,7 +54,7 @@ class TracingFilterTest
   ): Unit = {
     test(s"$prefix: should trace service name") {
       val services =
-        record(mkFilter("")) collect {
+        record(mkFilter("")).collect {
           case Record(_, _, Annotation.ServiceName(svc), _) => svc
         }
       assert(services == Seq(serviceName))
@@ -62,7 +62,7 @@ class TracingFilterTest
 
     test(s"$prefix: should trace Finagle version") {
       val versions =
-        record(mkFilter("1.2.3")) collect {
+        record(mkFilter("1.2.3")).collect {
           case Record(_, _, Annotation.BinaryAnnotation(key, ver), _)
               if key == s"$prefix/finagle.version" =>
             ver
@@ -72,7 +72,7 @@ class TracingFilterTest
 
     test(s"$prefix: should trace unknown Finagle version") {
       val versions =
-        record(mkFilter("?")) collect {
+        record(mkFilter("?")).collect {
           case Record(_, _, Annotation.BinaryAnnotation(key, ver), _)
               if key == s"$prefix/finagle.version" =>
             ver
@@ -90,7 +90,7 @@ class TracingFilterTest
     test(s"$prefix: should trace Dtab.local") {
       val dtab = Dtab.read("/fox=>/spooky;/dana=>/starbuck")
       val dtabs =
-        record(withDtab(dtab) andThen mkFilter("")) collect {
+        record(withDtab(dtab).andThen(mkFilter(""))).collect {
           case Record(_, _, Annotation.BinaryAnnotation(key, dtab), _)
               if key == s"$prefix/dtab.local" =>
             dtab
@@ -100,7 +100,7 @@ class TracingFilterTest
 
     test(s"$prefix: should not trace empty Dtab.local") {
       val dtabs =
-        record(withDtab(Dtab.empty) andThen mkFilter("")) collect {
+        record(withDtab(Dtab.empty).andThen(mkFilter(""))).collect {
           case Record(_, _, Annotation.BinaryAnnotation(key, dtab), _)
               if key == s"$prefix/dtab.local" =>
             dtab
@@ -120,7 +120,7 @@ class TracingFilterTest
 
   test("clnt: send and then recv") {
     val annotations =
-      record(mkClient()) collect {
+      record(mkClient()).collect {
         case Record(_, _, a @ Annotation.ClientSend(), _) => a
         case Record(_, _, a @ Annotation.ClientRecv(), _) => a
       }
@@ -130,7 +130,7 @@ class TracingFilterTest
 
   test("clnt: recv error") {
     val annotations =
-      recordException(mkClient()) collect {
+      recordException(mkClient()).collect {
         case Record(_, _, a @ Annotation.ClientSend(), _) => a
         case Record(_, _, a @ Annotation.ClientRecv(), _) => a
         case Record(_, _, a @ Annotation.ClientRecvError(_), _) => a
@@ -153,7 +153,7 @@ class TracingFilterTest
 
   test("srv: recv and then send") {
     val annotations =
-      record(mkServer()) collect {
+      record(mkServer()).collect {
         case Record(_, _, a @ Annotation.ServerRecv(), _) => a
         case Record(_, _, a @ Annotation.ServerSend(), _) => a
       }

@@ -41,7 +41,7 @@ object Team {
       createdBy = createdBy.id
     )
 
-  def nameToId(name: String) = (lila.common.String slugify name) |> { slug =>
+  def nameToId(name: String) = (lila.common.String.slugify(name)) |> { slug =>
     // if most chars are not latin, go for random slug
     (slug.size > (name.size / 2)).fold(slug, Random nextStringUppercase 8)
   }
@@ -50,7 +50,7 @@ object Team {
   import play.api.libs.json._
 
   private[team] lazy val tube = JsTube(
-    (__.json update readDate('createdAt)) andThen Json.reads[Team],
-    Json.writes[Team] andThen (__.json update writeDate('createdAt))
+    (__.json.update(readDate('createdAt))).andThen(Json.reads[Team]),
+    Json.writes[Team].andThen(__.json.update(writeDate('createdAt)))
   )
 }

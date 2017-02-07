@@ -9,9 +9,9 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
     Cokleisli(c => g(run(b.map(c)(f)))) // b.map(run(f(c)))(g))
 
   def contramapValue[C](f: F[C] => F[A]): Cokleisli[F, C, B] =
-    Cokleisli(run compose f)
+    Cokleisli(run.compose(f))
 
-  def map[C](f: B => C): Cokleisli[F, A, C] = Cokleisli(f compose run)
+  def map[C](f: B => C): Cokleisli[F, A, C] = Cokleisli(f.compose(run))
 
   def flatMap[C](f: B => Cokleisli[F, A, C]): Cokleisli[F, A, C] =
     Cokleisli(fa => f(self.run(fa)).run(fa))
@@ -21,7 +21,7 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
 
   def =>=[C](c: Cokleisli[F, B, C])(
       implicit F: Cobind[F]): Cokleisli[F, A, C] =
-    Cokleisli(fa => c run (<<=(fa)))
+    Cokleisli(fa => c.run(<<=(fa)))
 
   def compose[C](c: Cokleisli[F, C, A])(
       implicit F: Cobind[F]): Cokleisli[F, C, B] =
@@ -66,12 +66,12 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
 private trait CokleisliMonad[F[_], R]
     extends Monad[Cokleisli[F, R, ?]]
     with BindRec[Cokleisli[F, R, ?]] {
-  override def map[A, B](fa: Cokleisli[F, R, A])(f: A => B) = fa map f
+  override def map[A, B](fa: Cokleisli[F, R, A])(f: A => B) = fa.map(f)
   override def ap[A, B](fa: => Cokleisli[F, R, A])(
-      f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)
+      f: => Cokleisli[F, R, A => B]) = f.flatMap(fa.map(_))
   def point[A](a: => A) = Cokleisli(_ => a)
   def bind[A, B](fa: Cokleisli[F, R, A])(f: A => Cokleisli[F, R, B]) =
-    fa flatMap f
+    fa.flatMap(f)
   def tailrecM[A, B](f: A => Cokleisli[F, R, A \/ B])(
       a: A): Cokleisli[F, R, B] = {
     @annotation.tailrec
@@ -89,7 +89,7 @@ private trait CokleisliCompose[F[_]] extends Compose[Cokleisli[F, ?, ?]] {
   implicit def F: Cobind[F]
 
   override def compose[A, B, C](f: Cokleisli[F, B, C], g: Cokleisli[F, A, B]) =
-    f compose g
+    f.compose(g)
 }
 
 private trait CokleisliProfunctor[F[_]]
@@ -104,7 +104,7 @@ private trait CokleisliProfunctor[F[_]]
     Cokleisli[F, C, B](fc => fa(F.map(fc)(f)))
 
   override final def mapsnd[A, B, C](fa: Cokleisli[F, A, B])(f: B => C) =
-    fa map f
+    fa.map(f)
 }
 
 private trait CokleisliArrow[F[_]]
@@ -118,7 +118,7 @@ private trait CokleisliArrow[F[_]]
   def left[A, B, C](fa: Cokleisli[F, A, B]): Cokleisli[F, A \/ C, B \/ C] =
     Cokleisli { (ac: F[A \/ C]) =>
       F.copoint(ac) match {
-        case -\/(a) => -\/(fa run (F.map(ac)(_ => a)))
+        case -\/(a) => -\/(fa.run(F.map(ac)(_ => a)))
         case \/-(b) => \/-(b)
       }
     }
@@ -127,7 +127,7 @@ private trait CokleisliArrow[F[_]]
     Cokleisli { (ac: F[C \/ A]) =>
       F.copoint(ac) match {
         case -\/(b) => -\/(b)
-        case \/-(a) => \/-(fa run (F.map(ac)(_ => a)))
+        case \/-(a) => \/-(fa.run(F.map(ac)(_ => a)))
       }
     }
 

@@ -2612,7 +2612,7 @@ trait Trees { self: Universe =>
       if (self ne noSelfType) traverse(self)
 
     /** Traverses a list of trees. */
-    def traverseTrees(trees: List[Tree]): Unit = trees foreach traverse
+    def traverseTrees(trees: List[Tree]): Unit = trees.foreach(traverse)
     def traverseTypeArgs(args: List[Tree]): Unit = traverseTrees(args)
     def traverseParents(parents: List[Tree]): Unit = traverseTrees(parents)
     def traverseCases(cases: List[CaseDef]): Unit = traverseTrees(cases)
@@ -2620,17 +2620,17 @@ trait Trees { self: Universe =>
 
     /** Traverses a list of lists of trees. */
     def traverseTreess(treess: List[List[Tree]]): Unit =
-      treess foreach traverseTrees
+      treess.foreach(traverseTrees)
     def traverseParams(params: List[Tree]): Unit = traverseTrees(params)
     def traverseParamss(vparamss: List[List[Tree]]): Unit =
-      vparamss foreach traverseParams
+      vparamss.foreach(traverseParams)
 
     /** Traverses a list of trees with a given owner symbol. */
     def traverseStats(stats: List[Tree], exprOwner: Symbol) {
-      stats foreach
-        (stat =>
-           if (exprOwner != currentOwner) atOwner(exprOwner)(traverse(stat))
-           else traverse(stat))
+      stats.foreach(
+        stat =>
+          if (exprOwner != currentOwner) atOwner(exprOwner)(traverse(stat))
+          else traverse(stat))
     }
 
     /** Performs a traversal with a given owner symbol. */
@@ -2693,7 +2693,7 @@ trait Trees { self: Universe =>
 
     /** Transforms a list of trees. */
     def transformTrees(trees: List[Tree]): List[Tree] =
-      if (trees.isEmpty) Nil else trees mapConserve transform
+      if (trees.isEmpty) Nil else trees.mapConserve(transform)
 
     /** Transforms a `Template`. */
     def transformTemplate(tree: Template): Template =
@@ -2701,7 +2701,7 @@ trait Trees { self: Universe =>
 
     /** Transforms a list of `TypeDef` trees. */
     def transformTypeDefs(trees: List[TypeDef]): List[TypeDef] =
-      trees mapConserve (tree => transform(tree).asInstanceOf[TypeDef])
+      trees.mapConserve(tree => transform(tree).asInstanceOf[TypeDef])
 
     /** Transforms a `ValDef`. */
     def transformValDef(tree: ValDef): ValDef =
@@ -2710,34 +2710,36 @@ trait Trees { self: Universe =>
 
     /** Transforms a list of `ValDef` nodes. */
     def transformValDefs(trees: List[ValDef]): List[ValDef] =
-      trees mapConserve (transformValDef(_))
+      trees.mapConserve(transformValDef(_))
 
     /** Transforms a list of lists of `ValDef` nodes. */
     def transformValDefss(treess: List[List[ValDef]]): List[List[ValDef]] =
-      treess mapConserve (transformValDefs(_))
+      treess.mapConserve(transformValDefs(_))
 
     /** Transforms a list of `CaseDef` nodes. */
     def transformMemberDefs(trees: List[MemberDef]): List[MemberDef] =
-      trees mapConserve (tree => transform(tree).asInstanceOf[MemberDef])
+      trees.mapConserve(tree => transform(tree).asInstanceOf[MemberDef])
     def transformCaseDefs(trees: List[CaseDef]): List[CaseDef] =
-      trees mapConserve (tree => transform(tree).asInstanceOf[CaseDef])
+      trees.mapConserve(tree => transform(tree).asInstanceOf[CaseDef])
 
     /** Transforms a list of `Ident` nodes. */
     def transformIdents(trees: List[Ident]): List[Ident] =
-      trees mapConserve (tree => transform(tree).asInstanceOf[Ident])
+      trees.mapConserve(tree => transform(tree).asInstanceOf[Ident])
 
     /** Traverses a list of trees with a given owner symbol. */
     def transformStats(stats: List[Tree], exprOwner: Symbol): List[Tree] =
-      stats mapConserve
-        (stat =>
-           if (exprOwner != currentOwner && stat.isTerm)
-             atOwner(exprOwner)(transform(stat))
-           else transform(stat)) filter (EmptyTree != _)
+      stats
+        .mapConserve(
+          stat =>
+            if (exprOwner != currentOwner && stat.isTerm)
+              atOwner(exprOwner)(transform(stat))
+            else transform(stat))
+        .filter(EmptyTree != _)
 
     /** Transforms `Modifiers`. */
     def transformModifiers(mods: Modifiers): Modifiers = {
       if (mods.annotations.isEmpty) mods
-      else mods mapAnnotations transformTrees
+      else mods.mapAnnotations(transformTrees)
     }
 
     /** Transforms a tree with a given owner symbol. */

@@ -38,18 +38,17 @@ class CodecSpec extends Specification with ScalaCheck {
   import ByteBufferPool._
 
   implicit lazy val arbBigDecimal: Arbitrary[BigDecimal] = Arbitrary(
-    Gen.chooseNum(Double.MinValue / 2, Double.MaxValue / 2) map
-      (BigDecimal(_)))
+    Gen.chooseNum(Double.MinValue / 2, Double.MaxValue / 2).map(BigDecimal(_)))
 
   //implicit def arbBitSet = Arbitrary(Gen.listOf(Gen.choose(0, 500)) map (BitSet(_: _*)))
   implicit def arbBitSet =
-    Arbitrary(Gen.listOf(Gen.choose(0, 500)) map BitSetUtil.create)
+    Arbitrary(Gen.listOf(Gen.choose(0, 500)).map(BitSetUtil.create))
 
   implicit def arbSparseBitSet: Arbitrary[(Codec[BitSet], BitSet)] = {
-    Arbitrary(Gen.chooseNum(0, 500) flatMap { size =>
+    Arbitrary(Gen.chooseNum(0, 500).flatMap { size =>
       val codec = Codec.SparseBitSetCodec(size)
       if (size > 0) {
-        Gen.listOf(Gen.choose(0, size - 1)) map { bits =>
+        Gen.listOf(Gen.choose(0, size - 1)).map { bits =>
           //(codec, BitSet(bits: _*))
           (codec, BitSetUtil.create(bits))
         }
@@ -60,13 +59,13 @@ class CodecSpec extends Specification with ScalaCheck {
   }
 
   implicit def arbSparseRawBitSet: Arbitrary[(Codec[RawBitSet], RawBitSet)] = {
-    Arbitrary(Gen.chooseNum(0, 500) flatMap { size =>
+    Arbitrary(Gen.chooseNum(0, 500).flatMap { size =>
       val codec = Codec.SparseRawBitSetCodec(size)
       if (size > 0) {
-        Gen.listOf(Gen.choose(0, size - 1)) map { bits =>
+        Gen.listOf(Gen.choose(0, size - 1)).map { bits =>
           //(codec, BitSet(bits: _*))
           val bs = RawBitSet.create(size)
-          bits foreach { RawBitSet.set(bs, _) }
+          bits.foreach { RawBitSet.set(bs, _) }
           (codec, bs)
         }
       } else {
@@ -77,7 +76,7 @@ class CodecSpec extends Specification with ScalaCheck {
 
   implicit def arbIndexedSeq[A](
       implicit a: Arbitrary[A]): Arbitrary[IndexedSeq[A]] =
-    Arbitrary(Gen.listOf(a.arbitrary) map (Vector(_: _*)))
+    Arbitrary(Gen.listOf(a.arbitrary).map(Vector(_: _*)))
 
   implicit def arbArray[A: Manifest: Gen]: Arbitrary[Array[A]] =
     Arbitrary(for {

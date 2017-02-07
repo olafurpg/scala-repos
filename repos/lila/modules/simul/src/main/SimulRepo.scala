@@ -18,7 +18,8 @@ private[simul] final class SimulRepo(simulColl: Coll) {
   private implicit val SimulStatusBSONHandler =
     new BSONHandler[BSONInteger, SimulStatus] {
       def read(bsonInt: BSONInteger): SimulStatus =
-        SimulStatus(bsonInt.value) err s"No such simul status: ${bsonInt.value}"
+        SimulStatus(bsonInt.value)
+          .err(s"No such simul status: ${bsonInt.value}")
       def write(x: SimulStatus) = BSONInteger(x.id)
     }
   private implicit val ChessStatusBSONHandler =
@@ -26,7 +27,7 @@ private[simul] final class SimulRepo(simulColl: Coll) {
   private implicit val VariantBSONHandler =
     new BSONHandler[BSONInteger, Variant] {
       def read(bsonInt: BSONInteger): Variant =
-        Variant(bsonInt.value) err s"No such variant: ${bsonInt.value}"
+        Variant(bsonInt.value).err(s"No such variant: ${bsonInt.value}")
       def write(x: Variant) = BSONInteger(x.id)
     }
   private implicit val ClockBSONHandler = Macros.handler[SimulClock]
@@ -36,9 +37,9 @@ private[simul] final class SimulRepo(simulColl: Coll) {
     def reads(r: BSON.Reader) =
       SimulPairing(
         player = r.get[SimulPlayer]("player"),
-        gameId = r str "gameId",
+        gameId = r.str("gameId"),
         status = r.get[Status]("status"),
-        wins = r boolO "wins",
+        wins = r.boolO("wins"),
         hostColor = r
             .strO("hostColor")
             .flatMap(chess.Color.apply) | chess.White
@@ -63,7 +64,7 @@ private[simul] final class SimulRepo(simulColl: Coll) {
     simulColl.find(BSONDocument("_id" -> id)).one[Simul]
 
   def exists(id: Simul.ID): Fu[Boolean] =
-    simulColl.count(BSONDocument("_id" -> id).some) map (0 !=)
+    simulColl.count(BSONDocument("_id" -> id).some).map(0 !=)
 
   def createdByHostId(hostId: String): Fu[List[Simul]] =
     simulColl
@@ -72,10 +73,10 @@ private[simul] final class SimulRepo(simulColl: Coll) {
       .collect[List]()
 
   def findStarted(id: Simul.ID): Fu[Option[Simul]] =
-    find(id) map (_ filter (_.isStarted))
+    find(id).map(_.filter(_.isStarted))
 
   def findCreated(id: Simul.ID): Fu[Option[Simul]] =
-    find(id) map (_ filter (_.isCreated))
+    find(id).map(_.filter(_.isCreated))
 
   def allCreated: Fu[List[Simul]] =
     simulColl

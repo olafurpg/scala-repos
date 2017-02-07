@@ -35,8 +35,8 @@ object Finagle extends Build {
   val jacksonLibs = Seq(
     "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
     "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
-    "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion exclude
-      ("com.google.guava", "guava"),
+    ("com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion)
+      .exclude("com.google.guava", "guava"),
     guavaLib
   )
   val thriftLibs = Seq(
@@ -47,8 +47,8 @@ object Finagle extends Build {
     thriftLibs ++ Seq("com.twitter" %% "scrooge-core" % scroogeVersion)
 
   def util(which: String) =
-    "com.twitter" %% ("util-" + which) % utilVersion excludeAll
-      (ExclusionRule(organization = "junit"),
+    ("com.twitter" %% ("util-" + which) % utilVersion).excludeAll(
+      ExclusionRule(organization = "junit"),
       ExclusionRule(organization = "org.scala-tools.testing"),
       ExclusionRule(organization = "org.mockito"))
 
@@ -83,7 +83,7 @@ object Finagle extends Build {
       "junit" % "junit" % "4.10" % "test",
       "org.mockito" % "mockito-all" % "1.9.5" % "test"
     ),
-    resolvers += "twitter-repo" at "https://maven.twttr.com",
+    resolvers += "twitter-repo".at("https://maven.twttr.com"),
     ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting :=
       (CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 10)) => false
@@ -135,8 +135,8 @@ object Finagle extends Build {
     publishTo <<= version { (v: String) =>
       val nexus = "https://oss.sonatype.org/"
       if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+        Some("snapshots".at(nexus + "content/repositories/snapshots"))
+      else Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
     },
     // Prevent eviction warnings
     dependencyOverrides <++= scalaVersion { vsn =>
@@ -145,7 +145,7 @@ object Finagle extends Build {
       )
     },
     resourceGenerators in Compile <+=
-      (resourceManaged in Compile, name, version) map { (dir, name, ver) =>
+      (resourceManaged in Compile, name, version).map { (dir, name, ver) =>
         val file = dir / "com" / "twitter" / name / "build.properties"
         val buildRev = Process("git" :: "rev-parse" :: "HEAD" :: Nil).!!.trim
         val buildName = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
@@ -618,9 +618,9 @@ object Finagle extends Build {
           ("*.html" | "*.png" | "*.svg" | "*.js" | "*.css" | "*.gif" | "*.txt"),
         // Workaround for sbt bug: Without a testGrouping for all test configs,
         // the wrong tests are run
-        testGrouping <<= definedTests in Test map partitionTests,
+        testGrouping <<= (definedTests in Test).map(partitionTests),
         testGrouping in DocTest <<=
-          definedTests in DocTest map partitionTests
+          (definedTests in DocTest).map(partitionTests)
       )
   ).configs(DocTest)
     .settings(inConfig(DocTest)(Defaults.testSettings): _*)
@@ -635,7 +635,7 @@ object Finagle extends Build {
     .dependsOn(finagleCore, finagleHttp, finagleMySQL)
 
   /* Test Configuration for running tests on doc sources */
-  lazy val DocTest = config("doctest") extend Test
+  lazy val DocTest = config("doctest").extend(Test)
 
   // A dummy partitioning scheme for tests
   def partitionTests(tests: Seq[TestDefinition]) = {

@@ -265,7 +265,7 @@ object BuiltinCommands {
         val verboseFilter =
           if (prominentOnly) highPass(cutoff) else topNRanked(25 * verbosity)
         System.out.println(
-          tasksHelp(s, keys => verboseFilter(keys filter keep), selected))
+          tasksHelp(s, keys => verboseFilter(keys.filter(keep)), selected))
         System.out.println()
         if (prominentOnly)
           System.out.println(moreAvailableMessage(command, selected.isDefined))
@@ -282,7 +282,7 @@ object BuiltinCommands {
     success(1) |
       ((Space ~ "-") ~> ('v'.id.+.map(_.size + 1) | ("V" ^^^ Int.MaxValue)))
   def taskDetail(keys: Seq[AttributeKey[_]]): Seq[(String, String)] =
-    sortByLabel(withDescription(keys)) flatMap taskStrings
+    sortByLabel(withDescription(keys)).flatMap(taskStrings)
 
   def allTaskAndSettingKeys(s: State): Seq[AttributeKey[_]] = {
     val extracted = Project.extract(s)
@@ -295,7 +295,7 @@ object BuiltinCommands {
         try Some(index.keyMap(key))
         catch {
           case NonFatal(ex) =>
-            s.log error ex.getMessage
+            s.log.error(ex.getMessage)
             None
         }
       }
@@ -331,7 +331,7 @@ object BuiltinCommands {
   }
 
   def taskStrings(key: AttributeKey[_]): Option[(String, String)] =
-    key.description map { d =>
+    key.description.map { d =>
       (key.label, d)
     }
 
@@ -351,7 +351,7 @@ object BuiltinCommands {
         s
     }
   private[this] def loadedEval(s: State, arg: String): Unit = {
-    val extracted = Project extract s
+    val extracted = Project.extract(s)
     import extracted._
     val result = session
       .currentEval()
@@ -382,7 +382,7 @@ object BuiltinCommands {
   }
   def set = Command(SetCommand, setBrief, setDetailed)(setParser) {
     case (s, (all, arg)) =>
-      val extracted = Project extract s
+      val extracted = Project.extract(s)
       import extracted._
       val dslVals = extracted.currentUnit.unit.definitions.dslDefinitions
       // TODO - This is possibly inefficient (or stupid).  We should try to only attach the
@@ -470,7 +470,7 @@ object BuiltinCommands {
   val exportParser: State => Parser[() => State] = (s: State) =>
     Act.requireSession(s, token(Space) ~> exportParser0(s))
   private[sbt] def exportParser0(s: State): Parser[() => State] = {
-    val extracted = Project extract s
+    val extracted = Project.extract(s)
     import extracted.{showKey, structure}
     val keysParser =
       token(flag("--last" <~ Space)) ~ Act.aggregatedKeyParser(extracted)
@@ -542,7 +542,7 @@ object BuiltinCommands {
     */
   def isLastOnly(s: State): Boolean = s.history.previous.forall(_ == Shell)
 
-  def printLast(s: State): Seq[String] => Unit = _ foreach println
+  def printLast(s: State): Seq[String] => Unit = _.foreach(println)
 
   def autoImports(extracted: Extracted): EvalImports =
     new EvalImports(imports(extracted), "<auto-imports>")
@@ -595,7 +595,7 @@ object BuiltinCommands {
       case (s, None) => showProjects(s); s
     }
   def showProjects(s: State): Unit = {
-    val extracted = Project extract s
+    val extracted = Project.extract(s)
     import extracted._
     import currentRef.{build => curi, project => cid}
     listBuild(curi, structure.units(curi), true, cid, s.log)
@@ -634,10 +634,12 @@ object BuiltinCommands {
 
   @tailrec
   private[this] def doLoadFailed(s: State, loadArg: String): State = {
-    val result = (SimpleReader.readLine(
-      "Project loading failed: (r)etry, (q)uit, (l)ast, or (i)gnore? ") getOrElse Quit)
+    val result = (SimpleReader
+      .readLine(
+        "Project loading failed: (r)etry, (q)uit, (l)ast, or (i)gnore? ")
+      .getOrElse(Quit))
       .toLowerCase(Locale.ENGLISH)
-    def matches(s: String) = !result.isEmpty && (s startsWith result)
+    def matches(s: String) = !result.isEmpty && (s.startsWith(result))
 
     if (result.isEmpty || matches("retry"))
       loadProjectCommand(LoadProject, loadArg) :: s.clearGlobalLog
@@ -677,7 +679,7 @@ object BuiltinCommands {
     val (s1, base) = Project.loadAction(SessionVar.clear(s0), action)
     IO.createDirectory(base)
     val s =
-      if (s1 has Keys.stateCompilerCache) s1 else registerCompilerCache(s1)
+      if (s1.has(Keys.stateCompilerCache)) s1 else registerCompilerCache(s1)
 
     val (eval, structure) = try Load.defaultLoad(s,
                                                  base,
@@ -687,7 +689,7 @@ object BuiltinCommands {
     catch {
       case ex: compiler.EvalException =>
         s0.log.debug(ex.getMessage)
-        ex.getStackTrace map (ste => s"\tat $ste") foreach (s0.log.debug(_))
+        ex.getStackTrace.map(ste => s"\tat $ste").foreach(s0.log.debug(_))
         ex.setStackTrace(Array.empty)
         throw ex
     }

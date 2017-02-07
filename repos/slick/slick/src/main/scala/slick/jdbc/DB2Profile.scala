@@ -133,11 +133,14 @@ trait DB2Profile extends JdbcProfile {
          * reference columns which have a UNIQUE INDEX but not a nominal UNIQUE
          * CONSTRAINT. */
         val sb =
-          new StringBuilder append "ALTER TABLE " append quoteIdentifier(
-            table.tableName) append " ADD "
-        sb append "CONSTRAINT " append quoteIdentifier(idx.name) append " UNIQUE("
+          new StringBuilder.append("ALTER TABLE ")
+            .append(quoteIdentifier(table.tableName))
+            .append(" ADD ")
+        sb.append("CONSTRAINT ")
+          .append(quoteIdentifier(idx.name))
+          .append(" UNIQUE(")
         addIndexColumnList(idx.on, sb, idx.table.tableName)
-        sb append ")"
+        sb.append(")")
         sb.toString
       } else super.createIndex(idx)
     }
@@ -147,12 +150,15 @@ trait DB2Profile extends JdbcProfile {
       extends super.ColumnDDLBuilder(column) {
     override def appendColumn(sb: StringBuilder) {
       val qname = quoteIdentifier(column.name)
-      sb append qname append ' '
+      sb.append(qname).append(' ')
       appendType(sb)
       appendOptions(sb)
       if (jdbcType.isInstanceOf[JdbcTypes#BooleanJdbcType]) {
-        sb append " constraint " + quoteIdentifier(column.name + "__bool") +
-          " check (" append qname append " in (0, 1))"
+        sb.append(
+            " constraint " + quoteIdentifier(column.name + "__bool") +
+              " check (")
+          .append(qname)
+          .append(" in (0, 1))")
       }
     }
   }
@@ -161,14 +167,14 @@ trait DB2Profile extends JdbcProfile {
       extends super.SequenceDDLBuilder(seq) {
     override def buildDDL: DDL = {
       val b =
-        new StringBuilder append "create sequence " append quoteIdentifier(
-          seq.name)
-      b append " as " append jdbcTypeFor(seq.tpe).sqlTypeName(None)
-      seq._start.foreach { b append " start with " append _ }
-      seq._increment.foreach { b append " increment by " append _ }
-      seq._minValue.foreach { b append " minvalue " append _ }
-      seq._maxValue.foreach { b append " maxvalue " append _ }
-      if (seq._cycle) b append " cycle"
+        new StringBuilder.append("create sequence ")
+          .append(quoteIdentifier(seq.name))
+      b.append(" as ").append(jdbcTypeFor(seq.tpe).sqlTypeName(None))
+      seq._start.foreach { b.append(" start with ").append(_) }
+      seq._increment.foreach { b.append(" increment by ").append(_) }
+      seq._minValue.foreach { b.append(" minvalue ").append(_) }
+      seq._maxValue.foreach { b.append(" maxvalue ").append(_) }
+      if (seq._cycle) b.append(" cycle")
       DDL(b.toString, "drop sequence " + quoteIdentifier(seq.name))
     }
   }

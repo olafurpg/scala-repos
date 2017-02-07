@@ -28,7 +28,7 @@ object Test extends App {
 
       object record {
         def parse(lines: List[String]) = {
-          lines drop (1) map { line =>
+          lines.drop(1).map { line =>
             line.split(";", -1).toList match {
               case phase$whitespace$name :: id :: description :: _ =>
                 record(phase$whitespace$name.trim(),
@@ -41,6 +41,6 @@ object Test extends App {
       }
     }
 
-    Csv.record.parse(csv) foreach println
+    Csv.record.parse(csv).foreach(println)
   }).eval
 }

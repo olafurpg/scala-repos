@@ -33,14 +33,14 @@ trait Phased {
 
   private def parsePhaseChange(str: String): Option[Int] = {
     if (str == "") Some(0)
-    else if (str startsWith ".prev") parsePhaseChange(str drop 5) map (_ - 1)
-    else if (str startsWith ".next") parsePhaseChange(str drop 5) map (_ + 1)
+    else if (str.startsWith(".prev")) parsePhaseChange(str.drop(5)).map(_ - 1)
+    else if (str.startsWith(".next")) parsePhaseChange(str.drop(5)).map(_ + 1)
     else
       str.head match {
         case '+' | '-' =>
           val (num, rest) = str.tail.span(_.isDigit)
           val diff = if (str.head == '+') num.toInt else -num.toInt
-          parsePhaseChange(rest) map (_ + diff)
+          parsePhaseChange(rest).map(_ + diff)
         case _ =>
           None
       }
@@ -51,9 +51,9 @@ trait Phased {
     */
   private def parseInternal(str: String): PhaseName = {
     if (str == "") NoPhaseName
-    else if (str forall (_.isDigit)) PhaseName(str.toInt)
+    else if (str.forall(_.isDigit)) PhaseName(str.toInt)
     else {
-      val (name, rest) = str.toLowerCase span (_.isLetter)
+      val (name, rest) = str.toLowerCase.span(_.isLetter)
       val start = PhaseName(name)
       val change = parsePhaseChange(rest)
 
@@ -66,7 +66,7 @@ trait Phased {
     catch { case _: Exception => NoPhaseName }
 
   def atCurrent[T](body: => T): T = enteringPhase(get)(body)
-  def multi[T](body: => T): Seq[T] = multi map (ph => at(ph)(body))
+  def multi[T](body: => T): Seq[T] = multi.map(ph => at(ph)(body))
 
   def at[T](ph: PhaseName)(body: => T): T = {
     val saved = get
@@ -82,11 +82,11 @@ trait Phased {
   }
 
   def atMap[T](phs: Seq[PhaseName])(body: => T): Seq[(PhaseName, T)] =
-    phs zip atMulti(phs)(body)
+    phs.zip(atMulti(phs)(body))
 
   object PhaseName {
     implicit lazy val phaseNameOrdering: Ordering[PhaseName] =
-      Ordering[Int] on (_.id)
+      Ordering[Int].on(_.id)
 
     lazy val all = List(
       Parser,
@@ -112,10 +112,11 @@ trait Phased {
       Terminal
     )
     lazy val nameMap =
-      all.map(x => x.name -> x).toMap withDefaultValue NoPhaseName
+      all.map(x => x.name -> x).toMap.withDefaultValue(NoPhaseName)
     multi = all
 
-    def apply(id: Int): PhaseName = all find (_.id == id) getOrElse NoPhaseName
+    def apply(id: Int): PhaseName =
+      (all find (_.id == id)).getOrElse(NoPhaseName)
     implicit def apply(s: String): PhaseName = nameMap(s)
   }
   sealed abstract class PhaseName {

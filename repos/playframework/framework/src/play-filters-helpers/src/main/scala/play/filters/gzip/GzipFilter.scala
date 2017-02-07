@@ -84,8 +84,9 @@ class GzipFilter @Inject()(config: GzipFilterConfig)(
         case HttpEntity.Streamed(data, _, contentType) =>
           // It's above the chunked threshold, compress through the gzip flow, and send as chunked
           val gzipped =
-            data via GzipFlow.gzip(config.bufferSize) map
-              (d => HttpChunk.Chunk(d))
+            data
+              .via(GzipFlow.gzip(config.bufferSize))
+              .map(d => HttpChunk.Chunk(d))
           Future.successful(
             Result(header, HttpEntity.Chunked(gzipped, contentType)))
 
@@ -96,7 +97,7 @@ class GzipFilter @Inject()(config: GzipFilterConfig)(
                 import GraphDSL.Implicits._
 
                 val extractChunks =
-                  Flow[HttpChunk] collect {
+                  Flow[HttpChunk].collect {
                     case HttpChunk.Chunk(data) => data
                   }
                 val createChunks =
@@ -123,7 +124,7 @@ class GzipFilter @Inject()(config: GzipFilterConfig)(
 
           Future.successful(
             Result(header,
-                   HttpEntity.Chunked(chunks via gzipFlow, contentType)))
+                   HttpEntity.Chunked(chunks.via(gzipFlow), contentType)))
       }
     } else {
       Future.successful(result)
@@ -148,14 +149,15 @@ class GzipFilter @Inject()(config: GzipFilterConfig)(
 
   private def gzipIsAcceptedAndPreferredBy(request: RequestHeader) = {
     val codings = acceptHeader(request.headers, ACCEPT_ENCODING)
-    def explicitQValue(coding: String) = codings collectFirst {
+    def explicitQValue(coding: String) = codings.collectFirst {
       case (q, c) if c equalsIgnoreCase coding => q
     }
     def defaultQValue(coding: String) =
       if (coding == "identity") 0.001d else 0d
     def qvalue(coding: String) =
-      explicitQValue(coding) orElse explicitQValue("*") getOrElse defaultQValue(
-        coding)
+      explicitQValue(coding)
+        .orElse(explicitQValue("*"))
+        .getOrElse(defaultQValue(coding))
 
     qvalue("gzip") > 0d && qvalue("gzip") >= qvalue("identity")
   }

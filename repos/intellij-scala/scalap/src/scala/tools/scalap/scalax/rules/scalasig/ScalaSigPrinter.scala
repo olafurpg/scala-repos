@@ -191,7 +191,7 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
     } else if (symbol.isProtected) {
       print("protected")
       if (symbol.isLocal) print("[this]")
-      else privateWithin foreach print
+      else privateWithin.foreach(print)
       print(" ")
     } else privateWithin.foreach(s => print("private" + s + " "))
 
@@ -494,7 +494,7 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
 
   // TODO char, float, etc.
   def valueToString(value: Any): String = value match {
-    case t: Type => "classOf[%s]" format toString(t)
+    case t: Type => "classOf[%s]".format(toString(t))
     case s: String =>
       if (s.contains("\n") || s.contains("\r")) {
         "\"\"\"" + s + "\"\"\""

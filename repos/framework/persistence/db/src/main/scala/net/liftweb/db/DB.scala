@@ -112,7 +112,7 @@ trait DB extends Loggable {
     first(toTry)(f =>
       tryo { t: Throwable =>
         logger.trace("JNDI Lookup failed: " + t)
-      }(f())) or {
+      }(f())).or {
       logger.trace(
         "Unable to obtain Connection for JNDI name %s".format(name.jndiName))
       Empty
@@ -143,7 +143,7 @@ trait DB extends Loggable {
   def doWithConnectionManagers[T](
       mgrs: (ConnectionIdentifier, ConnectionManager)*)(f: => T): T = {
     val newMap =
-      mgrs.foldLeft(threadLocalConnectionManagers.box openOr Map())(_ + _)
+      mgrs.foldLeft(threadLocalConnectionManagers.box.openOr(Map()))(_ + _)
     threadLocalConnectionManagers.doWith(newMap)(f)
   }
 
@@ -191,9 +191,10 @@ trait DB extends Loggable {
 
   private def newConnection(name: ConnectionIdentifier): SuperConnection = {
     def cmSuperConnection(cm: ConnectionManager): Box[SuperConnection] =
-      cm.newSuperConnection(name) or cm
-        .newConnection(name)
-        .map(c => new SuperConnection(c, () => cm.releaseConnection(c)))
+      cm.newSuperConnection(name)
+        .or(
+          cm.newConnection(name)
+            .map(c => new SuperConnection(c, () => cm.releaseConnection(c))))
 
     def jndiSuperConnection: Box[SuperConnection] =
       jndiConnection(name).map(c => {
@@ -211,16 +212,17 @@ trait DB extends Loggable {
       })
 
     val cmConn = for {
-      connectionManager <- threadLocalConnectionManagers.box.flatMap(
-        _.get(name)) or Box(connectionManagers.get(name))
+      connectionManager <- threadLocalConnectionManagers.box
+        .flatMap(_.get(name))
+        .or(Box(connectionManagers.get(name)))
       connection <- cmSuperConnection(connectionManager)
     } yield connection
 
-    val ret = cmConn or jndiSuperConnection
+    val ret = cmConn.or(jndiSuperConnection)
 
     ret.foreach(_.setAutoCommit(false))
 
-    ret openOr {
+    ret.openOr {
       throw new NullPointerException(
         "Looking for Connection Identifier " +
           name + " but failed to find either a JNDI data source " +
@@ -331,7 +333,7 @@ trait DB extends Loggable {
   private def releaseConnection(conn: SuperConnection): Unit = conn.close
 
   private def calcBaseCount(conn: ConnectionIdentifier): Int =
-    CurrentConnectionSet.is.map(_.use(conn)) openOr 0
+    CurrentConnectionSet.is.map(_.use(conn)).openOr(0)
 
   private def getConnection(name: ConnectionIdentifier): SuperConnection = {
     logger.trace("Acquiring " + name + " On thread " + Thread.currentThread)
@@ -809,7 +811,7 @@ trait DB extends Loggable {
     * The SQL reserved words.  These words will be changed if they are used for column or table names.
     */
   def reservedWords: scala.collection.immutable.Set[String] =
-    userReservedWords openOr defaultReservedWords
+    userReservedWords.openOr(defaultReservedWords)
 
   /**
     *  If you need to change some of the reserved word, you can supply your own set in Boot.scala:

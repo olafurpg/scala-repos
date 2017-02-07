@@ -18,57 +18,57 @@ object Test {
 object Test_multiset {
   def run() {
     def isSubListOf[A](thiz: List[A], that: List[A]): Boolean =
-      thiz forall (that contains _)
+      thiz.forall(that contains _)
     val xs = List(1, 1, 2)
     val ys = List(1, 2, 2, 3)
-    assert(List(1, 1, 2, 1, 2, 2, 3) == (xs union ys), "xs_union_ys")
-    assert(List(1, 2, 2, 3, 1, 1, 2) == (ys union xs), "ys_union_xs")
+    assert(List(1, 1, 2, 1, 2, 2, 3) == (xs.union(ys)), "xs_union_ys")
+    assert(List(1, 2, 2, 3, 1, 1, 2) == (ys.union(xs)), "ys_union_xs")
     assert(List(1, 2) == (xs intersect ys), "xs_intersect_ys")
     assert(List(1, 2) == (ys intersect xs), "ys_intersect_xs")
-    assert(List(1) == (xs diff ys), "xs_diff_ys")
-    assert(List(2, 3) == (ys diff xs), "ys_diff_xs")
-    assert(isSubListOf(xs filterNot (ys contains), xs diff ys), "xs_subset_ys")
+    assert(List(1) == (xs.diff(ys)), "xs_diff_ys")
+    assert(List(2, 3) == (ys.diff(xs)), "ys_diff_xs")
+    assert(isSubListOf(xs.filterNot(ys contains), xs.diff(ys)), "xs_subset_ys")
 
     val zs = List(0, 1, 1, 2, 2, 2)
-    assert(List(0, 1, 1, 2, 2, 2, 1, 2, 2, 3) == (zs union ys), "zs_union_ys")
-    assert(List(1, 2, 2, 3, 0, 1, 1, 2, 2, 2) == (ys union zs), "ys_union_zs")
+    assert(List(0, 1, 1, 2, 2, 2, 1, 2, 2, 3) == (zs.union(ys)), "zs_union_ys")
+    assert(List(1, 2, 2, 3, 0, 1, 1, 2, 2, 2) == (ys.union(zs)), "ys_union_zs")
     assert(List(1, 2, 2) == (zs intersect ys), "zs_intersect_ys")
     assert(List(1, 2, 2) == (ys intersect zs), "ys_intersect_zs")
-    assert(List(0, 1, 2) == (zs diff ys), "zs_diff_ys")
-    assert(List(3) == (ys diff zs), "ys_diff_zs")
-    assert(isSubListOf(zs filterNot (ys contains), zs diff ys), "xs_subset_ys")
+    assert(List(0, 1, 2) == (zs.diff(ys)), "zs_diff_ys")
+    assert(List(3) == (ys.diff(zs)), "ys_diff_zs")
+    assert(isSubListOf(zs.filterNot(ys contains), zs.diff(ys)), "xs_subset_ys")
 
     val ws = List(2)
-    assert(List(2, 1, 2, 2, 3) == (ws union ys), "ws_union_ys")
-    assert(List(1, 2, 2, 3, 2) == (ys union ws), "ys_union_ws")
+    assert(List(2, 1, 2, 2, 3) == (ws.union(ys)), "ws_union_ys")
+    assert(List(1, 2, 2, 3, 2) == (ys.union(ws)), "ys_union_ws")
     assert(List(2) == (ws intersect ys), "ws_intersect_ys")
     assert(List(2) == (ys intersect ws), "ys_intersect_ws")
-    assert(List() == (ws diff ys), "ws_diff_ys")
-    assert(List(1, 2, 3) == (ys diff ws), "ys_diff_ws")
-    assert(isSubListOf(ws filterNot (ys contains), ws diff ys), "ws_subset_ys")
+    assert(List() == (ws.diff(ys)), "ws_diff_ys")
+    assert(List(1, 2, 3) == (ys.diff(ws)), "ys_diff_ws")
+    assert(isSubListOf(ws.filterNot(ys contains), ws.diff(ys)), "ws_subset_ys")
 
     val vs = List(3, 2, 2, 1)
-    assert(List(1, 1, 2, 3, 2, 2, 1) == (xs union vs), "xs_union_vs")
-    assert(List(3, 2, 2, 1, 1, 1, 2) == (vs union xs), "vs_union_xs")
+    assert(List(1, 1, 2, 3, 2, 2, 1) == (xs.union(vs)), "xs_union_vs")
+    assert(List(3, 2, 2, 1, 1, 1, 2) == (vs.union(xs)), "vs_union_xs")
     assert(List(1, 2) == (xs intersect vs), "xs_intersect_vs")
     assert(List(2, 1) == (vs intersect xs), "vs_intersect_xs")
-    assert(List(1) == (xs diff vs), "xs_diff_vs")
-    assert(List(3, 2) == (vs diff xs), "vs_diff_xs")
-    assert(isSubListOf(xs filterNot (vs contains), xs diff vs), "xs_subset_vs")
+    assert(List(1) == (xs.diff(vs)), "xs_diff_vs")
+    assert(List(3, 2) == (vs.diff(xs)), "vs_diff_xs")
+    assert(isSubListOf(xs.filterNot(vs contains), xs.diff(vs)), "xs_subset_vs")
 
     // tests adapted from Thomas Jung
     assert({
-      def sort(zs: List[Int]) = zs sortWith (_ > _)
+      def sort(zs: List[Int]) = zs.sortWith(_ > _)
       sort(xs intersect ys) == sort(ys intersect xs)
     }, "be symmetric after sorting")
     assert(
       {
-        def cardinality[A](zs: List[A], e: A): Int = zs count (e == _)
+        def cardinality[A](zs: List[A], e: A): Int = zs.count(e == _)
         val intersection = xs intersect ys
-        xs forall
-          (e =>
-             cardinality(intersection, e) ==
-               (cardinality(xs, e) min cardinality(ys, e)))
+        xs.forall(
+          e =>
+            cardinality(intersection, e) ==
+              (cardinality(xs, e) min cardinality(ys, e)))
       },
       "obey min cardinality"
     )
@@ -96,33 +96,33 @@ object Test1 {
 
     {
       val n1 =
-        xs1 count { e =>
+        xs1.count { e =>
           e % 2 != 0
         }
       val n2 =
-        xs4 count { e =>
+        xs4.count { e =>
           e < 5
         }
       assert(4 == (n1 + n2), "check_count")
     }
     {
       val b1 =
-        xs1 exists { e =>
+        xs1.exists { e =>
           e % 2 == 0
         }
       val b2 =
-        xs4 exists { e =>
+        xs4.exists { e =>
           e == 5
         }
       assert(!(b1 & b2), "check_exists")
     }
     {
       val ys1 =
-        xs1 filter { e =>
+        xs1.filter { e =>
           e % 2 == 0
         }
       val ys2 =
-        xs4 filter { e =>
+        xs4.filter { e =>
           e < 5
         }
       assert(3 == ys1.length + ys2.length, "check_filter")
@@ -134,29 +134,29 @@ object Test1 {
     }
     {
       val b1 =
-        xs1 forall { e =>
+        xs1.forall { e =>
           e < 10
         }
       val b2 =
-        xs4 forall { e =>
+        xs4.forall { e =>
           e % 2 == 0
         }
       assert(b1 & b2, "check_forall")
     }
     {
       val ys1 =
-        xs1 filterNot { e =>
+        xs1.filterNot { e =>
           e % 2 != 0
         }
       val ys2 =
-        xs4 filterNot { e =>
+        xs4.filterNot { e =>
           e < 5
         }
       assert(3 == ys1.length + ys2.length, "check_remove")
     }
     {
-      val ys1 = xs1 zip xs2
-      val ys2 = xs1 zip xs3
+      val ys1 = xs1.zip(xs2)
+      val ys2 = xs1.zip(xs3)
       assert(4 == ys1.length + ys2.length, "check_zip")
     }
     {
@@ -176,7 +176,7 @@ object Test2 {
     val ys1 = xs1 ::: List(4)
     assert(List(1, 2, 3, 4) == ys1, "check_:::")
 
-    val ys2 = ys1 filterNot (_ == 4)
+    val ys2 = ys1.filterNot(_ == 4)
     assert(xs1 == ys2, "check_-")
 
     val n2 = (xs1 ++ ys1).length

@@ -59,12 +59,12 @@ trait ArrayLike[V] {
     * @tparam U
     */
   // TODO: maybe make this iterate all elements?
-  def foreach[U](f: (V) => U) = valuesIterator foreach f
+  def foreach[U](f: (V) => U) = valuesIterator.foreach(f)
 
   /**
     * Only iterates "active" elements
     */
-  def iterator = keysIterator zip valuesIterator
+  def iterator = keysIterator.zip(valuesIterator)
 
   def toArray[U >: V: ClassTag] = Array.tabulate[U](length)(apply)
 
@@ -72,5 +72,5 @@ trait ArrayLike[V] {
 
   def toIndexedSeq = List.tabulate(length)(apply)
 
-  def toMap = (keysIterator zip valuesIterator).toMap
+  def toMap = (keysIterator.zip(valuesIterator)).toMap
 }

@@ -32,12 +32,13 @@ package object util {
     */
   def waitingForThreads[T](body: => T) = {
     val (result, created) = trackingThreads(body)
-    val threads = created filterNot (_.isDaemon)
+    val threads = created.filterNot(_.isDaemon)
 
     // As long as there are non-daemon, live threads (the latter
     // condition should exclude shutdown hooks) we will wait.
-    while (threads exists (_.isAlive)) threads filter (_.isAlive) foreach
-      (_.join())
+    while (threads.exists(_.isAlive)) threads
+      .filter(_.isAlive)
+      .foreach(_.join())
 
     result
   }
@@ -50,7 +51,7 @@ package object util {
     val result = body
     val ts2 = sys.allThreads()
 
-    (result, ts2 filterNot (ts1 contains _))
+    (result, ts2.filterNot(ts1 contains _))
   }
 
   def stringFromReader(reader: Reader) = {
@@ -88,7 +89,9 @@ package object util {
     */
   def stackTraceHeadString(ex: Throwable): String = {
     val frame =
-      ex.getStackTrace.dropWhile(_.getClassName contains "Predef") take 1 mkString ""
+      ex.getStackTrace
+        .dropWhile(_.getClassName contains "Predef")
+        .take(1) mkString ""
     val msg = ex.getMessage match {
       case null | "" => ""; case s => s"""("$s")"""
     }

@@ -53,8 +53,8 @@ class FastFuture[A](val future: Future[A]) extends AnyVal {
           case None ⇒
             val p = Promise[B]()
             future.onComplete {
-              case Success(a) ⇒ p completeWith strictTransform(a, s)
-              case Failure(e) ⇒ p completeWith strictTransform(e, f)
+              case Success(a) ⇒ p.completeWith(strictTransform(a, s))
+              case Failure(e) ⇒ p.completeWith(strictTransform(e, f))
             }
             p.future
           case Some(Success(a)) ⇒ strictTransform(a, s)
@@ -142,7 +142,7 @@ object FastFuture {
     if (futures.isEmpty)
       failed(
         new NoSuchElementException("reduce attempted on empty collection"))
-    else sequence(futures).fast.map(_ reduceLeft op)
+    else sequence(futures).fast.map(_.reduceLeft(op))
 
   def traverse[A, B, M[_] <: TraversableOnce[_]](in: M[A])(fn: A ⇒ Future[B])(
       implicit cbf: CanBuildFrom[M[A], B, M[B]],

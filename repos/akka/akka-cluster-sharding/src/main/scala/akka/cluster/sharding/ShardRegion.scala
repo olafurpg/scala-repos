@@ -342,7 +342,7 @@ object ShardRegion {
     import ShardCoordinator.Internal.ShardStopped
 
     entities.foreach { a ⇒
-      context watch a
+      context.watch(a)
       a ! stopMessage
     }
 
@@ -465,8 +465,10 @@ class ShardRegion(typeName: String,
 
   def receiveClusterState(state: CurrentClusterState): Unit = {
     changeMembers(
-      immutable.SortedSet.empty(ageOrdering) union state.members.filter(m ⇒
-        m.status == MemberStatus.Up && matchingRole(m)))
+      immutable.SortedSet
+        .empty(ageOrdering)
+        .union(state.members.filter(m ⇒
+          m.status == MemberStatus.Up && matchingRole(m))))
   }
 
   def receiveClusterEvent(evt: ClusterDomainEvent): Unit = evt match {
@@ -541,7 +543,7 @@ class ShardRegion(typeName: String,
 
       if (shards.contains(shard)) {
         handingOff += shards(shard)
-        shards(shard) forward msg
+        shards(shard).forward(msg)
       } else sender() ! ShardStopped(shard)
 
     case _ ⇒ unhandled(msg)
@@ -580,7 +582,8 @@ class ShardRegion(typeName: String,
       replyToRegionStatsQuery(sender())
 
     case msg: GetClusterShardingStats ⇒
-      coordinator.fold(sender ! ClusterShardingStats(Map.empty))(_ forward msg)
+      coordinator
+        .fold(sender ! ClusterShardingStats(Map.empty))(_.forward(msg))
 
     case _ ⇒ unhandled(query)
   }

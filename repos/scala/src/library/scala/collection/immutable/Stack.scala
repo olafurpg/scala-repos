@@ -23,7 +23,7 @@ object Stack extends SeqFactory[Stack] {
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Stack[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, Stack[A]] =
-    new ArrayBuffer[A] mapResult (buf => new Stack(buf.toList))
+    new ArrayBuffer[A].mapResult(buf => new Stack(buf.toList))
 }
 
 /** This class implements immutable stacks using a list-based data
@@ -96,7 +96,7 @@ class Stack[+A] protected (protected val elems: List[A])
     *  @return the stack with the new elements on top.
     */
   def pushAll[B >: A](xs: TraversableOnce[B]): Stack[B] =
-    ((this: Stack[B]) /: xs.toIterator)(_ push _)
+    ((this: Stack[B]) /: xs.toIterator)(_.push(_))
 
   /** Returns the top element of the stack. An error is signaled if
     *  there is no element on the stack.

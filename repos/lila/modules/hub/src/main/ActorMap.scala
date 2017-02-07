@@ -17,30 +17,30 @@ trait ActorMap extends Actor {
 
     case Get(id) => sender ! getOrMake(id)
 
-    case Tell(id, msg) => getOrMake(id) forward msg
+    case Tell(id, msg) => getOrMake(id).forward(msg)
 
-    case TellAll(msg) => actors.values foreach (_ forward msg)
+    case TellAll(msg) => actors.values.foreach(_.forward(msg))
 
     case TellIds(ids, msg) =>
-      ids foreach { id =>
-        actors get id foreach (_ forward msg)
+      ids.foreach { id =>
+        actors.get(id).foreach(_.forward(msg))
       }
 
-    case Ask(id, msg) => getOrMake(id) forward msg
+    case Ask(id, msg) => getOrMake(id).forward(msg)
 
     case Terminated(actor) =>
-      context unwatch actor
-      actors foreach {
+      context.unwatch(actor)
+      actors.foreach {
         case (id, a) => if (a == actor) actors -= id
       }
   }
 
   protected def size = actors.size
 
-  private def getOrMake(id: String) = actors get id getOrElse {
+  private def getOrMake(id: String) = actors.get(id).getOrElse {
     context.actorOf(Props(mkActor(id)), name = id) ~ { actor =>
       actors += (id -> actor)
-      context watch actor
+      context.watch(actor)
     }
   }
 }

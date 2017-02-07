@@ -52,11 +52,11 @@ trait PasswordTypedField extends TypedField[String] {
     in
   }
 
-  def setPlain(in: String): String = setBoxPlain(Full(in)) openOr defaultValue
+  def setPlain(in: String): String = setBoxPlain(Full(in)).openOr(defaultValue)
 
   def setBoxPlain(in: Box[String]): Box[String] = {
     if (!validatePassword(in)) {
-      val hashed = in.map(s => PasswordField.hashpw(s) openOr s)
+      val hashed = in.map(s => PasswordField.hashpw(s).openOr(s))
       setBox(hashed)
     } else setBox(defaultValueBox)
   }
@@ -129,10 +129,10 @@ trait PasswordTypedField extends TypedField[String] {
 
   def defaultValue = ""
 
-  def asJs = valueBox.map(Str) openOr JsNull
+  def asJs = valueBox.map(Str).openOr(JsNull)
 
   def asJValue: JValue =
-    valueBox.map(v => JString(v)) openOr (JNothing: JValue)
+    valueBox.map(v => JString(v)).openOr(JNothing: JValue)
 
   def setFromJValue(jvalue: JValue): Box[MyType] = jvalue match {
     case JNothing | JNull if optional_? => setBoxPlain(Empty)

@@ -43,7 +43,7 @@ object ExistentialDclSeq {
             EmptyDcl.parse(builder, isMod = false)
           }
         case _ =>
-          builder error ScalaBundle.message("wrong.existential.declaration")
+          builder.error(ScalaBundle.message("wrong.existential.declaration"))
       }
     }
   }

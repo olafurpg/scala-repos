@@ -39,10 +39,10 @@ class HashVectorTest extends FunSuite {
     val bdSplit = DenseVector(0.0, 0.15951, 0.0, 0.83671, 0.0, 0.56002, 0.0,
       0.57797, 0.0, 0.54450)
     val bdd = bdSplit(1 to 9 by 2)
-    assertClose(a dot b, .90249)
+    assertClose(a.dot(b), .90249)
 //    assertClose(a dot bd, .90249)
-    assertClose(bd dot a, .90249)
-    assertClose(bdd dot a, .90249)
+    assertClose(bd.dot(a), .90249)
+    assertClose(bdd.dot(a), .90249)
   }
 
   test("Subtraction") {
@@ -75,7 +75,7 @@ class HashVectorTest extends FunSuite {
     val b = HashVector(3.0, 4.0, 5.0)
     (a: Vector[Double]) += (b: Vector[Double])
     assert(a === HashVector(4.0, 6.0, 8.0))
-    assert((a: Vector[Double]).dot(b: Vector[Double]) === (a dot b))
+    assert((a: Vector[Double]).dot(b: Vector[Double]) === (a.dot(b)))
     (a: Vector[Double]) *= (b: Vector[Double])
     assert(a === HashVector(12.0, 24.0, 40.0))
   }

@@ -136,7 +136,7 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
     var counter = 0
     while (!found && counter < 10) {
       for (server <- this.servers) {
-        val previousEpoch = (epochMap get server.config.brokerId) match {
+        val previousEpoch = (epochMap.get(server.config.brokerId)) match {
           case Some(epoch) =>
             epoch
           case None =>

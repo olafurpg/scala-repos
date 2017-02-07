@@ -242,7 +242,7 @@ class SerializeSpec extends AkkaSpec(SerializationTests.serializeConf) {
       EventFilter.warning(start = "Multiple serializers found",
                           occurrences = 1) intercept {
         ser.serializerFor(classOf[Both]).getClass should
-          (be(classOf[TestSerializer]) or be(classOf[JavaSerializer]))
+          (be(classOf[TestSerializer]).or(be(classOf[JavaSerializer])))
       }
     }
 
@@ -254,7 +254,7 @@ class SerializeSpec extends AkkaSpec(SerializationTests.serializeConf) {
       EventFilter.warning(start = "Multiple serializers found",
                           occurrences = 1) intercept {
         ser.serializerFor(classOf[C]).getClass should
-          (be(classOf[TestSerializer]) or be(classOf[JavaSerializer]))
+          (be(classOf[TestSerializer]).or(be(classOf[JavaSerializer])))
       }
     }
 
@@ -275,11 +275,12 @@ class SerializeSpec extends AkkaSpec(SerializationTests.serializeConf) {
 
     "use ByteArraySerializer for byte arrays" in {
       val byteSerializer = ser.serializerFor(classOf[Array[Byte]])
-      byteSerializer.getClass should be theSameInstanceAs classOf[
-        ByteArraySerializer]
+      (byteSerializer.getClass should be)
+        .theSameInstanceAs(classOf[ByteArraySerializer])
 
       for (a ← Seq("foo".getBytes("UTF-8"), null: Array[Byte], Array[Byte]()))
-        byteSerializer.fromBinary(byteSerializer.toBinary(a)) should be theSameInstanceAs a
+        (byteSerializer.fromBinary(byteSerializer.toBinary(a)) should be)
+          .theSameInstanceAs(a)
 
       intercept[IllegalArgumentException] {
         byteSerializer.toBinary("pigdog")

@@ -3,8 +3,8 @@ class NamedAndDefaultArgsTest extends NamedAndDefaultArgs {
     super.foo(s, b, true)
 
   foo(b = true, b2 = true)
-  this foo (s = "bbb", b = true, true)
-  this foo (b = true, b2 = true)
+  this.foo(s = "bbb", b = true, true)
+  this.foo(b = true, b2 = true)
   foo(b = true, b2 = true)
 
   super.foo("", true, true)

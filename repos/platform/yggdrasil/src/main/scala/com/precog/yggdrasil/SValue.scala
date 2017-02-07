@@ -109,7 +109,7 @@ sealed trait SValue {
         else {
           m.toSeq.flatMap {
             case (name, value) =>
-              value.structure map {
+              value.structure.map {
                 case (path, ctype) => (JPathField(name) \ path, ctype)
               }
           }
@@ -120,7 +120,7 @@ sealed trait SValue {
         else {
           a.zipWithIndex.flatMap {
             case (value, index) =>
-              value.structure map {
+              value.structure.map {
                 case (path, ctype) => (JPathIndex(index) \ path, ctype)
               }
           }
@@ -199,7 +199,9 @@ trait SValueInstances {
     private val objectOrder = (o1: Map[String, SValue]) =>
       (o2: Map[String, SValue]) => {
         (o1.size ?|? o2.size) |+|
-          (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1))
+          (o1.toSeq
+            .sortBy(_._1)
+            .zip(o2.toSeq.sortBy(_._1)))
             .foldLeft[Ordering](EQ) {
               case (ord, ((k1, v1), (k2, v2))) =>
                 ord |+| (k1 ?|? k2) |+| (v1 ?|? v2)
@@ -208,7 +210,7 @@ trait SValueInstances {
 
     private val arrayOrder = (o1: Vector[SValue]) =>
       (o2: Vector[SValue]) => {
-        (o1.length ?|? o2.length) |+| (o1 zip o2).foldLeft[Ordering](EQ) {
+        (o1.length ?|? o2.length) |+| (o1.zip(o2)).foldLeft[Ordering](EQ) {
           case (ord, (v1, v2)) => ord |+| (v1 ?|? v2)
         }
     }
@@ -234,13 +236,13 @@ trait SValueInstances {
     private val objectEqual = (o1: Map[String, SValue]) =>
       (o2: Map[String, SValue]) =>
         (o1.size == o2.size) &&
-          (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1)).foldLeft(true) {
+          (o1.toSeq.sortBy(_._1).zip(o2.toSeq.sortBy(_._1))).foldLeft(true) {
             case (eql, ((k1, v1), (k2, v2))) => eql && k1 == k2 && v1 === v2
       }
 
     private val arrayEqual = (o1: Vector[SValue]) =>
       (o2: Vector[SValue]) =>
-        (o1.length == o2.length) && (o1 zip o2).foldLeft(true) {
+        (o1.length == o2.length) && (o1.zip(o2)).foldLeft(true) {
           case (eql, (v1, v2)) => eql && v1 === v2
     }
 
@@ -293,7 +295,7 @@ object SValue extends SValueInstances {
         fields.map { case JField(name, v) => (name, fromJValue(v)) }(
           collection.breakOut))
     case JArray(elements) =>
-      SArray((elements map fromJValue)(collection.breakOut))
+      SArray((elements.map(fromJValue))(collection.breakOut))
     case JString(s) => SString(s)
     case JBool(s) => SBoolean(s)
     case JNum(d) => SDecimal(d)

@@ -368,9 +368,8 @@ private[persistence] trait Eventsourced
     */
   def persist[A](event: A)(handler: A ⇒ Unit): Unit = {
     pendingStashingPersistInvocations += 1
-    pendingInvocations addLast StashingHandlerInvocation(
-      event,
-      handler.asInstanceOf[Any ⇒ Unit])
+    pendingInvocations.addLast(
+      StashingHandlerInvocation(event, handler.asInstanceOf[Any ⇒ Unit]))
     eventBatch ::= AtomicWrite(
       PersistentRepr(event,
                      persistenceId = persistenceId,
@@ -391,9 +390,8 @@ private[persistence] trait Eventsourced
     if (events.nonEmpty) {
       events.foreach { event ⇒
         pendingStashingPersistInvocations += 1
-        pendingInvocations addLast StashingHandlerInvocation(
-          event,
-          handler.asInstanceOf[Any ⇒ Unit])
+        pendingInvocations.addLast(
+          StashingHandlerInvocation(event, handler.asInstanceOf[Any ⇒ Unit]))
       }
       eventBatch ::= AtomicWrite(
         events.map(
@@ -433,9 +431,8 @@ private[persistence] trait Eventsourced
     * @param handler handler for each persisted `event`
     */
   def persistAsync[A](event: A)(handler: A ⇒ Unit): Unit = {
-    pendingInvocations addLast AsyncHandlerInvocation(
-      event,
-      handler.asInstanceOf[Any ⇒ Unit])
+    pendingInvocations.addLast(
+      AsyncHandlerInvocation(event, handler.asInstanceOf[Any ⇒ Unit]))
     eventBatch ::= AtomicWrite(
       PersistentRepr(event,
                      persistenceId = persistenceId,
@@ -455,9 +452,8 @@ private[persistence] trait Eventsourced
   def persistAllAsync[A](events: immutable.Seq[A])(handler: A ⇒ Unit): Unit =
     if (events.nonEmpty) {
       events.foreach { event ⇒
-        pendingInvocations addLast AsyncHandlerInvocation(
-          event,
-          handler.asInstanceOf[Any ⇒ Unit])
+        pendingInvocations.addLast(
+          AsyncHandlerInvocation(event, handler.asInstanceOf[Any ⇒ Unit]))
       }
       eventBatch ::= AtomicWrite(
         events.map(
@@ -493,9 +489,8 @@ private[persistence] trait Eventsourced
     if (pendingInvocations.isEmpty) {
       handler(event)
     } else {
-      pendingInvocations addLast AsyncHandlerInvocation(
-        event,
-        handler.asInstanceOf[Any ⇒ Unit])
+      pendingInvocations.addLast(
+        AsyncHandlerInvocation(event, handler.asInstanceOf[Any ⇒ Unit]))
       eventBatch = NonPersistentRepr(event, sender()) :: eventBatch
     }
   }

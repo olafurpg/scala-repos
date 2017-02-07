@@ -3,7 +3,7 @@ final class C(val x: Int) extends AnyVal {
 }
 
 class Foo {
-  def f = new C(1) ppp 2
+  def f = new C(1).ppp(2)
 }
 
 /* Original SI-5853 test-case. */

@@ -115,9 +115,9 @@ class HttpModelIntegrationSpec
       // List[HttpHeader].
 
       val parsingResults =
-        textHeaders map { case (name, value) ⇒ HttpHeader.parse(name, value) }
+        textHeaders.map { case (name, value) ⇒ HttpHeader.parse(name, value) }
       val convertedHeaders =
-        parsingResults collect { case HttpHeader.ParsingResult.Ok(h, _) ⇒ h }
+        parsingResults.collect { case HttpHeader.ParsingResult.Ok(h, _) ⇒ h }
       val parseErrors = parsingResults.flatMap(_.errors)
       parseErrors shouldBe empty
 

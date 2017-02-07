@@ -39,7 +39,7 @@ case class ScalaTool(mainClass: String,
       ("@@" -> "@"), // for backwards compatibility
       ("@class@" -> mainClass),
       ("@properties@" ->
-        (properties map { case (k, v) => s"""-D$k="$v"""" } mkString " ")),
+        (properties.map { case (k, v) => s"""-D$k="$v"""" } mkString " ")),
       ("@javaflags@" -> javaOpts),
       ("@toolflags@" -> toolFlags),
       ("@classpath@" -> platformClasspath)

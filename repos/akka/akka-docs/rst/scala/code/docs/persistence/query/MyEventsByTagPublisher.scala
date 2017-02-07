@@ -101,9 +101,9 @@ class MyEventsByTagPublisher(tag: String,
       if (totalDemand <= Int.MaxValue) {
         val (use, keep) = buf.splitAt(totalDemand.toInt)
         buf = keep
-        use foreach onNext
+        use.foreach(onNext)
       } else {
-        buf foreach onNext
+        buf.foreach(onNext)
         buf = Vector.empty
       }
     }

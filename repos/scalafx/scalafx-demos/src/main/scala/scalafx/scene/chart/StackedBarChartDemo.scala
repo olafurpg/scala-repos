@@ -60,7 +60,7 @@ object StackedBarChartDemo extends JFXApp {
 
   /** Create XYChart.Series from a sequence of numbers matching year strings. */
   def xySeries(name: String, data: Seq[Int]) = {
-    val series = years zip data
+    val series = years.zip(data)
     XYChart.Series[String, Number](
       name,
       ObservableBuffer(series.map {

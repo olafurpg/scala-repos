@@ -27,36 +27,37 @@ private[tv] final class TvActor(rendererActor: ActorSelection,
   def receive = {
 
     case GetGameId(channel) =>
-      channelActors get channel foreach { actor =>
-        actor ? ChannelActor.GetGameId pipeTo sender
+      channelActors.get(channel).foreach { actor =>
+        (actor ? ChannelActor.GetGameId).pipeTo(sender)
       }
 
     case GetGameIds(channel, max) =>
-      channelActors get channel foreach { actor =>
-        actor ? ChannelActor.GetGameIds(max) pipeTo sender
+      channelActors.get(channel).foreach { actor =>
+        (actor ? ChannelActor.GetGameIds(max)).pipeTo(sender)
       }
 
     case GetChampions => sender ! Tv.Champions(channelChampions)
 
     case Select =>
-      GameRepo.featuredCandidates foreach { candidates =>
-        channelActors foreach {
+      GameRepo.featuredCandidates.foreach { candidates =>
+        channelActors.foreach {
           case (channel, actor) =>
-            actor forward ChannelActor.Select(candidates filter channel.filter)
+            actor.forward(
+              ChannelActor.Select(candidates.filter(channel.filter)))
         }
       }
 
     case Selected(channel, game, previousId) =>
       import lila.socket.Socket.makeMessage
       val player = game.firstPlayer
-      val user = player.userId flatMap lightUser
-      (user |@| player.rating) apply {
+      val user = player.userId.flatMap(lightUser)
+      ((user |@| player.rating)).apply {
         case (u, r) => channelChampions += (channel -> Tv.Champion(u, r))
       }
       channelActors
         .collect {
           case (c, actor) if c != channel =>
-            actor ? ChannelActor.GetGameId mapTo manifest[Option[String]]
+            (actor ? ChannelActor.GetGameId).mapTo(manifest[Option[String]])
         }
         .sequenceFu
         .foreach { otherIds =>
@@ -81,7 +82,7 @@ private[tv] final class TvActor(rendererActor: ActorSelection,
           )
         }
       if (channel == Tv.Channel.Best)
-        rendererActor ? actorApi.RenderFeaturedJs(game) onSuccess {
+        (rendererActor ? actorApi.RenderFeaturedJs(game)).onSuccess {
           case html: play.twirl.api.Html =>
             val event = lila.hub.actorApi.game.ChangeFeatured(
               game.id,
@@ -91,7 +92,7 @@ private[tv] final class TvActor(rendererActor: ActorSelection,
                                    "id" -> game.id)))
             context.system.lilaBus.publish(event, 'changeFeaturedGame)
         }
-      GameRepo setTv game.id
+      GameRepo.setTv(game.id)
   }
 }
 

@@ -513,7 +513,7 @@ object PlayDocsValidation {
           .get
         val notLabel = (s: String) => !s.contains("#" + sample.segment)
         val segment =
-          sourceCode dropWhile (notLabel) drop (1) takeWhile (notLabel)
+          sourceCode.dropWhile(notLabel).drop(1).takeWhile(notLabel)
         !segment.isEmpty
       } else {
         true

@@ -45,7 +45,7 @@ object GridFSFileStorage {
     // Shamefully ripped off from BlueEyes.
 
     val servers =
-      config[List[String]]("servers").toList map {
+      config[List[String]]("servers").toList.map {
         case ServerAndPortPattern(host, port) =>
           new ServerAddress(host.trim(), port.trim().toInt)
         case server => new ServerAddress(server, ServerAddress.defaultPort())
@@ -86,33 +86,35 @@ trait GridFSFileStorage[M[+ _]] extends FileStorage[M] {
 
   def save(file: String, data: FileData[M]): M[Unit] =
     M.point {
-      gridFS.remove(file) // Ugly hack to get around Mongo not respecting new content-type.
-      val inFile = gridFS.createFile(file)
-      data.mimeType foreach { contentType =>
-        inFile.setContentType(contentType.toString)
+        gridFS.remove(file) // Ugly hack to get around Mongo not respecting new content-type.
+        val inFile = gridFS.createFile(file)
+        data.mimeType.foreach { contentType =>
+          inFile.setContentType(contentType.toString)
+        }
+        inFile.getOutputStream()
       }
-      inFile.getOutputStream()
-    } flatMap { out =>
-      def save(data: StreamT[M, Array[Byte]]): M[Unit] = data.uncons flatMap {
-        case Some((bytes, tail)) =>
-          out.write(bytes)
-          save(tail)
+      .flatMap { out =>
+        def save(data: StreamT[M, Array[Byte]]): M[Unit] =
+          data.uncons.flatMap {
+            case Some((bytes, tail)) =>
+              out.write(bytes)
+              save(tail)
 
-        case None =>
-          M.point { out.close() }
+            case None =>
+              M.point { out.close() }
+          }
+
+        save(data.data)
       }
-
-      save(data.data)
-    }
 
   def load(filename: String): M[Option[FileData[M]]] = M.point {
-    Option(gridFS.findOne(filename)) map { file =>
+    Option(gridFS.findOne(filename)).map { file =>
       val idealChunkSize = file.getChunkSize
       val chunkSize =
         if (idealChunkSize > MaxChunkSize) MaxChunkSize
         else idealChunkSize.toInt
       val mimeType =
-        Option(file.getContentType) flatMap { ct =>
+        Option(file.getContentType).flatMap { ct =>
           MimeTypes.parseMimeTypes(ct).headOption
         }
       val in0 = file.getInputStream()

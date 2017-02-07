@@ -21,7 +21,7 @@ object Test extends App {
     s = s + (3, 4000, 10000)
     println("test1: " + sum(s))
     time {
-      s = s ++ (List.range(0, iters) map (2 *))
+      s = s ++ (List.range(0, iters).map(2 *))
       println("test2: " + sum(s) + ", iters = " + iters)
     }
     time {
@@ -38,7 +38,7 @@ object Test extends App {
     s = s + (3, 4000, 10000)
     println("test1: " + sum(s))
     time {
-      s = s ++ (List.range(0, iters) map (2 *))
+      s = s ++ (List.range(0, iters).map(2 *))
       println("test2: " + sum(s) + ", iters = " + iters)
     }
     time {
@@ -53,14 +53,14 @@ object Test extends App {
     var s = s0
     s = s + (2 -> 2)
     s = s + (3 -> 3, 4000 -> 4000, 10000 -> 10000)
-    println("test1: " + sum(s map (_._2)))
+    println("test1: " + sum(s.map(_._2)))
     time {
-      s = s ++ (List.range(0, iters) map (x => x * 2 -> x * 2))
-      println("test2: " + sum(s map (_._2)) + ", iters = " + iters)
+      s = s ++ (List.range(0, iters).map(x => x * 2 -> x * 2))
+      println("test2: " + sum(s.map(_._2)) + ", iters = " + iters)
     }
     time {
       var x = 0
-      for (i <- 0 to 10000) s get i match {
+      for (i <- 0 to 10000) s.get(i) match {
         case Some(i) => x += i
         case None =>
       }
@@ -71,7 +71,7 @@ object Test extends App {
         var s1 = s
         var x = 0
         for (i <- 0 to 10000) {
-          s get i match {
+          s.get(i) match {
             case Some(i) => x += i
             case None =>
           }
@@ -87,14 +87,14 @@ object Test extends App {
     var s = s0
     s = s + (2 -> 2)
     s = s + (3 -> 3, 4000 -> 4000, 10000 -> 10000)
-    println("test1: " + sum(s map (_._2)))
+    println("test1: " + sum(s.map(_._2)))
     time {
-      s = s ++ (List.range(0, iters) map (x => x * 2 -> x * 2))
-      println("test2: " + sum(s map (_._2)) + ", iters = " + iters)
+      s = s ++ (List.range(0, iters).map(x => x * 2 -> x * 2))
+      println("test2: " + sum(s.map(_._2)) + ", iters = " + iters)
     }
     time {
       var x = 0
-      for (i <- 0 to 10000) s get i match {
+      for (i <- 0 to 10000) s.get(i) match {
         case Some(i) => x += i
         case None =>
       }

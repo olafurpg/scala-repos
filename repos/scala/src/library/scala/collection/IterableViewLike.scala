@@ -46,7 +46,7 @@ trait IterableViewLike[
       extends IterableView[B, Coll]
       with super.Transformed[B] {
     def iterator: Iterator[B]
-    override def foreach[U](f: B => U): Unit = iterator foreach f
+    override def foreach[U](f: B => U): Unit = iterator.foreach(f)
     override def toString = viewToString
     override def isEmpty = !iterator.hasNext
   }
@@ -64,11 +64,11 @@ trait IterableViewLike[
   }
 
   trait Mapped[B] extends super.Mapped[B] with Transformed[B] {
-    def iterator = self.iterator map mapping
+    def iterator = self.iterator.map(mapping)
   }
 
   trait FlatMapped[B] extends super.FlatMapped[B] with Transformed[B] {
-    def iterator: Iterator[B] = self.iterator flatMap mapping
+    def iterator: Iterator[B] = self.iterator.flatMap(mapping)
   }
 
   trait Appended[B >: A] extends super.Appended[B] with Transformed[B] {
@@ -80,20 +80,20 @@ trait IterableViewLike[
   }
 
   trait Filtered extends super.Filtered with Transformed[A] {
-    def iterator = self.iterator filter pred
+    def iterator = self.iterator.filter(pred)
   }
 
   trait TakenWhile extends super.TakenWhile with Transformed[A] {
-    def iterator = self.iterator takeWhile pred
+    def iterator = self.iterator.takeWhile(pred)
   }
 
   trait DroppedWhile extends super.DroppedWhile with Transformed[A] {
-    def iterator = self.iterator dropWhile pred
+    def iterator = self.iterator.dropWhile(pred)
   }
 
   trait Zipped[B] extends Transformed[(A, B)] {
     protected[this] val other: GenIterable[B]
-    def iterator: Iterator[(A, B)] = self.iterator zip other.iterator
+    def iterator: Iterator[(A, B)] = self.iterator.zip(other.iterator)
     final override protected[this] def viewIdentifier = "Z"
   }
 
@@ -166,7 +166,7 @@ trait IterableViewLike[
 
   override def zipWithIndex[A1 >: A, That](
       implicit bf: CanBuildFrom[This, (A1, Int), That]): That =
-    zip[A1, Int, That](Stream from 0)(bf)
+    zip[A1, Int, That](Stream.from(0))(bf)
 
   override def zipAll[B, A1 >: A, That](
       that: GenIterable[B],
@@ -175,11 +175,10 @@ trait IterableViewLike[
     newZippedAll(that, thisElem, thatElem).asInstanceOf[That]
 
   override def grouped(size: Int): Iterator[This] =
-    self.iterator grouped size map (x => newForced(x).asInstanceOf[This])
+    self.iterator.grouped(size).map(x => newForced(x).asInstanceOf[This])
 
   override def sliding(size: Int, step: Int): Iterator[This] =
-    self.iterator.sliding(size, step) map
-      (x => newForced(x).asInstanceOf[This])
+    self.iterator.sliding(size, step).map(x => newForced(x).asInstanceOf[This])
 
   override def sliding(size: Int): Iterator[This] =
     sliding(size, 1) // we could inherit this, but that implies knowledge of the way the super class is implemented.

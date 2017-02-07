@@ -81,15 +81,18 @@ object Example extends App {
       r <- selectQuery(client)
     } yield r
 
-    resultFuture onSuccess { seq =>
-      seq foreach println
-    } onFailure { e =>
-      println(e)
-    } ensure {
-      client.query("DROP TABLE IF EXISTS `finagle-mysql-example`") ensure {
-        client.close()
+    resultFuture
+      .onSuccess { seq =>
+        seq.foreach(println)
       }
-    }
+      .onFailure { e =>
+        println(e)
+      }
+      .ensure {
+        client.query("DROP TABLE IF EXISTS `finagle-mysql-example`").ensure {
+          client.close()
+        }
+      }
 
     Await.ready(resultFuture)
   }
@@ -103,7 +106,7 @@ object Example extends App {
       "INSERT INTO `finagle-mysql-example` (`event`, `time`, `name`, `nationality`, `date`) VALUES (?,?,?,?,?)"
     val ps = client.prepare(insertSQL)
     val insertResults =
-      SwimmingRecord.records map { r =>
+      SwimmingRecord.records.map { r =>
         ps(r.event, r.time, r.name, r.nationality, r.date)
       }
     Future.collect(insertResults)

@@ -23,11 +23,11 @@ trait ExistentialsAndSkolems { self: SymbolTable =>
   def deriveFreshSkolems(tparams: List[Symbol]): List[Symbol] = {
     class Deskolemizer extends LazyType {
       override val typeParams = tparams
-      val typeSkolems = typeParams map (_.newTypeSkolem setInfo this)
+      val typeSkolems = typeParams.map(_.newTypeSkolem.setInfo(this))
       override def complete(sym: Symbol) {
         // The info of a skolem is the skolemized info of the
         // actual type parameter of the skolem
-        sym setInfo sym.deSkolemize.info.substSym(typeParams, typeSkolems)
+        sym.setInfo(sym.deSkolemize.info.substSym(typeParams, typeSkolems))
       }
     }
 
@@ -56,7 +56,7 @@ trait ExistentialsAndSkolems { self: SymbolTable =>
     def hiBound(s: Symbol): Type =
       safeBound(s.existentialBound.bounds.hi) match {
         case tp @ RefinedType(parents, decls) =>
-          val parents1 = parents mapConserve safeBound
+          val parents1 = parents.mapConserve(safeBound)
           if (parents eq parents1) tp
           else copyRefinedType(tp, parents1, decls)
         case tp => tp
@@ -93,27 +93,27 @@ trait ExistentialsAndSkolems { self: SymbolTable =>
       rawOwner: Symbol = NoSymbol)(creator: (List[Symbol], Type) => T): T = {
     val allBounds = existentialBoundsExcludingHidden(rawSyms)
     val typeParams: List[Symbol] =
-      rawSyms map { sym =>
+      rawSyms.map { sym =>
         val name = sym.name match {
           case x: TypeName => x
           case x => tpnme.singletonName(x)
         }
         def rawOwner0 =
-          rawOwner orElse abort(
-            s"no owner provided for existential transform over raw parameter: $sym")
+          rawOwner.orElse(abort(
+            s"no owner provided for existential transform over raw parameter: $sym"))
         val bound = allBounds(sym)
         val sowner = if (isRawParameter(sym)) rawOwner0 else sym.owner
         val quantified = sowner.newExistential(name, sym.pos)
 
-        quantified setInfo bound.cloneInfo(quantified)
+        quantified.setInfo(bound.cloneInfo(quantified))
       }
     // Higher-kinded existentials are not yet supported, but this is
     // tpeHK for when they are: "if a type constructor is expected/allowed,
     // tpeHK must be called instead of tpe."
-    val typeParamTypes = typeParams map (_.tpeHK)
+    val typeParamTypes = typeParams.map(_.tpeHK)
     def doSubst(info: Type) = info.subst(rawSyms, typeParamTypes)
 
-    creator(typeParams map (_ modifyInfo doSubst), doSubst(tp))
+    creator(typeParams.map(_.modifyInfo(doSubst)), doSubst(tp))
   }
 
   /**

@@ -24,7 +24,7 @@ class SegmentIOAuthSpec extends Specification {
                               appId: Int,
                               channelId: Option[Int])(
         implicit ec: ExecutionContext): Future[String] =
-      Future successful "event_id"
+      Future.successful("event_id")
 
     override def futureFind(appId: Int,
                             channelId: Option[Int],
@@ -38,13 +38,13 @@ class SegmentIOAuthSpec extends Specification {
                             limit: Option[Int],
                             reversed: Option[Boolean])(
         implicit ec: ExecutionContext): Future[Iterator[Event]] =
-      Future successful List.empty[Event].iterator
+      Future.successful(List.empty[Event].iterator)
 
     override def futureGet(eventId: String,
                            appId: Int,
                            channelId: Option[Int])(
         implicit ec: ExecutionContext): Future[Option[Event]] =
-      Future successful None
+      Future.successful(None)
 
     override def remove(appId: Int, channelId: Option[Int]): Boolean = true
 
@@ -52,7 +52,7 @@ class SegmentIOAuthSpec extends Specification {
                               appId: Int,
                               channelId: Option[Int])(
         implicit ec: ExecutionContext): Future[Boolean] =
-      Future successful true
+      Future.successful(true)
 
     override def close(): Unit = {}
   }

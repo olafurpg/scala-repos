@@ -291,7 +291,7 @@ object StackTrace {
   // end of decodeClassName ----------------------------------------------------
 
   private def decodeMethodName(encodedName: String): String = {
-    if (encodedName startsWith "init___") {
+    if (encodedName.startsWith("init___")) {
       "<init>"
     } else {
       val methodNameLen = encodedName.indexOf("__")

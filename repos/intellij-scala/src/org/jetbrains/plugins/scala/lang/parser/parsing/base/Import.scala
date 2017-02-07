@@ -21,12 +21,12 @@ object Import {
     builder.getTokenType match {
       case ScalaTokenTypes.kIMPORT =>
         builder.advanceLexer //Ate import
-      case _ => builder error ErrMsg("unreachable.error")
+      case _ => builder.error(ErrMsg("unreachable.error"))
     }
-    ImportExpr parse builder
+    ImportExpr.parse(builder)
     while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
       builder.advanceLexer() //Ate ,
-      ImportExpr parse builder
+      ImportExpr.parse(builder)
     }
     importMarker.done(ScalaElementTypes.IMPORT_STMT)
   }

@@ -87,7 +87,7 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
   }
 
   def activeIterator: Iterator[(Int, V)] =
-    activeKeysIterator zip activeValuesIterator
+    activeKeysIterator.zip(activeValuesIterator)
 
   def activeValuesIterator: Iterator[V] = data.iterator.take(activeSize)
 
@@ -99,7 +99,8 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
 
   override def equals(p1: Any) = p1 match {
     case x: Vector[_] =>
-      this.length == x.length && (valuesIterator sameElements x.valuesIterator)
+      this.length == x.length && (valuesIterator.sameElements(
+        x.valuesIterator))
     case _ => false
   }
 
@@ -228,7 +229,7 @@ object SparseVector
 
   def vertcat[V: Zero: ClassTag](vectors: SparseVector[V]*): SparseVector[V] = {
     val resultArray =
-      vectors.map(_.array).foldLeft(new SparseArray[V](0))(_ concatenate _)
+      vectors.map(_.array).foldLeft(new SparseArray[V](0))(_.concatenate(_))
     new SparseVector(resultArray)
   }
 

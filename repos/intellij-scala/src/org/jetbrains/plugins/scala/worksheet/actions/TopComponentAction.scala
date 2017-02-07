@@ -21,7 +21,7 @@ trait TopComponentAction extends TopComponentDisplayable { this: AnAction =>
 
   def shortcutId: Option[String] = None
 
-  def genericText = ScalaBundle message bundleKey
+  def genericText = ScalaBundle.message(bundleKey)
 
   def bundleKey: String
 
@@ -32,28 +32,31 @@ trait TopComponentAction extends TopComponentDisplayable { this: AnAction =>
                                   getTemplatePresentation,
                                   ActionPlaces.EDITOR_TOOLBAR,
                                   ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE)
-    button setToolTipText genericText
+    button.setToolTipText(genericText)
     button
   }
 
   override def init(panel: JPanel) {
     val presentation = getTemplatePresentation
 
-    presentation setIcon actionIcon
-    presentation setEnabled true
+    presentation.setIcon(actionIcon)
+    presentation.setEnabled(true)
 
     val text =
-      shortcutId flatMap {
-        case id =>
-          KeymapManager.getInstance.getActiveKeymap
-            .getShortcuts(id)
-            .headOption map {
-            case shortcut =>
-              genericText + (" (" + KeymapUtil.getShortcutText(shortcut) + ")")
-          }
-      } getOrElse genericText
+      shortcutId
+        .flatMap {
+          case id =>
+            KeymapManager.getInstance.getActiveKeymap
+              .getShortcuts(id)
+              .headOption
+              .map {
+                case shortcut =>
+                  genericText + (" (" + KeymapUtil.getShortcutText(shortcut) + ")")
+              }
+        }
+        .getOrElse(genericText)
 
-    presentation setText text
+    presentation.setText(text)
 
     val actionButton = getActionButton
     WorksheetUiConstructor.fixUnboundMaxSize(actionButton)
@@ -70,13 +73,13 @@ trait TopComponentAction extends TopComponentDisplayable { this: AnAction =>
     if (project == null) return
 
     def enable() {
-      presentation setEnabled true
-      presentation setVisible true
+      presentation.setEnabled(true)
+      presentation.setVisible(true)
     }
 
     def disable() {
-      presentation setEnabled false
-      presentation setVisible false
+      presentation.setEnabled(false)
+      presentation.setVisible(false)
     }
 
     try {

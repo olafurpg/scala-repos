@@ -55,7 +55,7 @@ class PersistentVolumeMatcherTest
     Then("We receive a Match")
     matchOpt should not be empty
     matchOpt.get.task.taskId shouldEqual tasks.head.taskId
-    matchOpt.get.persistentVolumeResources should have size 1
+    (matchOpt.get.persistentVolumeResources should have).size(1)
     matchOpt.get.persistentVolumeResources.head shouldEqual offer.getResources(
       0)
   }
@@ -100,7 +100,7 @@ class PersistentVolumeMatcherTest
     Then("We receive a Match for the first task and the second offered volume")
     matchOpt should not be empty
     matchOpt.get.task.taskId shouldEqual tasks.head.taskId
-    matchOpt.get.persistentVolumeResources should have size 1
+    (matchOpt.get.persistentVolumeResources should have).size(1)
     matchOpt.get.persistentVolumeResources.head shouldEqual offer.getResources(
       1)
   }

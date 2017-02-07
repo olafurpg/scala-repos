@@ -154,7 +154,7 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
       req: HttpServletRequest,
       bodyParams: BodyParams): Map[String, List[String]] = {
     var mergedParams = bodyParams.formParams
-    req.getParameterMap.asScala foreach {
+    req.getParameterMap.asScala.foreach {
       case (name, values) =>
         val formValues = mergedParams.getOrElse(name, List.empty)
         mergedParams += name -> (values.toList ++ formValues)
@@ -168,21 +168,27 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
       formMap: Map[String, Seq[String]]): HttpServletRequestWrapper = {
     val wrapped = new HttpServletRequestWrapper(req) {
       override def getParameter(name: String): String =
-        formMap.get(name) map {
-          _.head
-        } getOrElse null
+        formMap
+          .get(name)
+          .map {
+            _.head
+          }
+          .getOrElse(null)
 
       override def getParameterNames: java.util.Enumeration[String] =
         formMap.keysIterator.asJavaEnumeration
 
       override def getParameterValues(name: String): Array[String] =
-        formMap.get(name) map {
-          _.toArray
-        } getOrElse null
+        formMap
+          .get(name)
+          .map {
+            _.toArray
+          }
+          .getOrElse(null)
 
       override def getParameterMap: JMap[String, Array[String]] = {
         (new JHashMap[String, Array[String]].asScala ++
-          (formMap transform { (k, v) =>
+          (formMap.transform { (k, v) =>
             v.toArray
           })).asJava
       }
@@ -227,7 +233,7 @@ class FileMultiParams(wrapped: Map[String, Seq[FileItem]] = Map.empty)
     extends Map[String, Seq[FileItem]] {
 
   def get(key: String): Option[Seq[FileItem]] = {
-    (wrapped.get(key) orElse wrapped.get(key + "[]"))
+    (wrapped.get(key).orElse(wrapped.get(key + "[]")))
   }
 
   def get(key: Symbol): Option[Seq[FileItem]] = get(key.name)

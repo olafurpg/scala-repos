@@ -19,7 +19,7 @@ object Codegen {
 
     if (args0.isEmpty) return println(CodegenSpec.helpMsg)
 
-    val out = outDir getOrElse { return println("--out is required.") }
+    val out = outDir.getOrElse { return println("--out is required.") }
     val all = genall || !anyvals
 
     echo("Generating sources into " + out)
@@ -27,11 +27,11 @@ object Codegen {
     if (anyvals || all) {
       val av = new AnyVals {}
 
-      av.make() foreach {
+      av.make().foreach {
         case (name, code) =>
           val file = (out / (name + ".scala")).toFile
           echo("Writing: " + file)
-          file writeAll code
+          file.writeAll(code)
       }
     }
   }

@@ -67,14 +67,18 @@ case class Capability(mask: Int) {
   def -(flag: Int) = Capability(mask & ~flag)
   def has(flag: Int) = hasAll(flag)
   def hasAll(flags: Int*) =
-    flags map { f: Int =>
-      (f & mask) > 0
-    } reduceLeft { _ && _ }
+    flags
+      .map { f: Int =>
+        (f & mask) > 0
+      }
+      .reduceLeft { _ && _ }
   override def toString() = {
     val cs =
-      Capability.CapabilityMap filter { t =>
-        has(t._2)
-      } map { _._1 } mkString (", ")
+      Capability.CapabilityMap
+        .filter { t =>
+          has(t._2)
+        }
+        .map { _._1 } mkString (", ")
     "Capability(" + mask + ": " + cs + ")"
   }
 }

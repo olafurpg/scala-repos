@@ -24,7 +24,7 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
 
     def reads(r: BSON.Reader): Pref =
       Pref(
-        _id = r str "_id",
+        _id = r.str("_id"),
         dark = r.getD("dark", Pref.default.dark),
         transp = r.getD("transp", Pref.default.transp),
         bgImg = r.strO("bgImg"),
@@ -103,61 +103,67 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
       .update(BSONDocument("_id" -> user.id),
               BSONDocument("$set" -> BSONDocument(s"tags.$name" -> value)),
               upsert = true)
-      .void >>- { cache remove user.id }
+      .void >>- { cache.remove(user.id) }
 
   def getPrefById(id: String): Fu[Pref] =
-    cache(id) map (_ getOrElse Pref.create(id))
+    cache(id).map(_.getOrElse(Pref.create(id)))
   val getPref = getPrefById _
   def getPref(user: User): Fu[Pref] = getPref(user.id)
   def getPref(user: Option[User]): Fu[Pref] =
     user.fold(fuccess(Pref.default))(getPref)
 
-  def getPref[A](user: User, pref: Pref => A): Fu[A] = getPref(user) map pref
+  def getPref[A](user: User, pref: Pref => A): Fu[A] = getPref(user).map(pref)
   def getPref[A](userId: String, pref: Pref => A): Fu[A] =
-    getPref(userId) map pref
+    getPref(userId).map(pref)
 
   def followable(userId: String): Fu[Boolean] =
     coll
       .find(BSONDocument("_id" -> userId), BSONDocument("follow" -> true))
-      .one[BSONDocument] map {
-      _ flatMap (_.getAs[Boolean]("follow")) getOrElse Pref.default.follow
-    }
+      .one[BSONDocument]
+      .map {
+        _.flatMap(_.getAs[Boolean]("follow")).getOrElse(Pref.default.follow)
+      }
 
   def unfollowableIds(userIds: List[String]): Fu[Set[String]] =
-    coll.distinct("_id",
-                  BSONDocument(
-                    "_id" -> BSONDocument("$in" -> userIds),
-                    "follow" -> false
-                  ).some) map lila.db.BSON.asStringSet
+    coll
+      .distinct("_id",
+                BSONDocument(
+                  "_id" -> BSONDocument("$in" -> userIds),
+                  "follow" -> false
+                ).some)
+      .map(lila.db.BSON.asStringSet)
 
   def followableIds(userIds: List[String]): Fu[Set[String]] =
-    unfollowableIds(userIds) map userIds.toSet.diff
+    unfollowableIds(userIds).map(userIds.toSet.diff)
 
   def followables(userIds: List[String]): Fu[List[Boolean]] =
-    followableIds(userIds) map { followables =>
-      userIds map followables.contains
+    followableIds(userIds).map { followables =>
+      userIds.map(followables.contains)
     }
 
   def setPref(pref: Pref, notifyChange: Boolean): Funit =
     coll.update(BSONDocument("_id" -> pref.id), pref, upsert = true).void >>- {
-      cache remove pref.id
+      cache.remove(pref.id)
       if (notifyChange)
         bus.publish(SendTo(pref.id, "prefChange", true), 'users)
     }
 
   def setPref(user: User, change: Pref => Pref, notifyChange: Boolean): Funit =
-    getPref(user) map change flatMap { setPref(_, notifyChange) }
+    getPref(user).map(change).flatMap { setPref(_, notifyChange) }
 
   def setPref(userId: String,
               change: Pref => Pref,
               notifyChange: Boolean): Funit =
-    getPref(userId) map change flatMap { setPref(_, notifyChange) }
+    getPref(userId).map(change).flatMap { setPref(_, notifyChange) }
 
   def setPrefString(user: User,
                     name: String,
                     value: String,
                     notifyChange: Boolean): Funit =
-    getPref(user) map { _.set(name, value) } flatten s"Bad pref ${user.id} $name -> $value" flatMap {
-      setPref(_, notifyChange)
-    }
+    getPref(user)
+      .map { _.set(name, value) }
+      .flatten(s"Bad pref ${user.id} $name -> $value")
+      .flatMap {
+        setPref(_, notifyChange)
+      }
 }

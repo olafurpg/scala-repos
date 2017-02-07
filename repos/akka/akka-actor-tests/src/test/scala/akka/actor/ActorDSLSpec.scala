@@ -46,10 +46,10 @@ class ActorDSLSpec extends AkkaSpec {
       actor(new Act {})
       //#watch
       val i = inbox()
-      i watch target
+      i.watch(target)
       //#watch
       target ! PoisonPill
-      i receive 1.second should ===(Terminated(target)(true, false))
+      i.receive(1.second) should ===(Terminated(target)(true, false))
     }
 
     "support queueing multiple queries" in {
@@ -57,15 +57,15 @@ class ActorDSLSpec extends AkkaSpec {
       import system.dispatcher
       val res = Future.sequence(
         Seq(
-          Future { i.receive() } recover {
+          Future { i.receive() }.recover {
             case x ⇒ x
           },
           Future {
             Thread.sleep(100); i.select() { case "world" ⇒ 1 }
-          } recover { case x ⇒ x },
+          }.recover { case x ⇒ x },
           Future {
             Thread.sleep(200); i.select() { case "hello" ⇒ 2 }
-          } recover { case x ⇒ x }
+          }.recover { case x ⇒ x }
         ))
       Thread.sleep(1000)
       res.isCompleted should ===(false)
@@ -100,7 +100,7 @@ class ActorDSLSpec extends AkkaSpec {
         i.receiver ! 42
         expectNoMsg(1 second)
         val gotit = for (_ ← 1 to 1000) yield i.receive()
-        gotit should ===((1 to 1000) map (_ ⇒ 0))
+        gotit should ===(((1 to 1000)).map(_ ⇒ 0))
         intercept[TimeoutException] {
           i.receive(1 second)
         }

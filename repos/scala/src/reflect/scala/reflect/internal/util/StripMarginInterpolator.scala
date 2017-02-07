@@ -34,7 +34,7 @@ trait StripMarginInterpolator {
       pre + post.stripMargin
     }
     val stripped: List[String] = stringContext.parts.toList match {
-      case head :: tail => head.stripMargin :: (tail map stripTrailingPart)
+      case head :: tail => head.stripMargin :: (tail.map(stripTrailingPart))
       case Nil => Nil
     }
     new StringContext(stripped: _*).raw(args: _*)

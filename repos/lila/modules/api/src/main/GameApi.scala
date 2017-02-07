@@ -59,14 +59,14 @@ private[api] final class GameApi(netBaseUrl: String,
       ),
       currentPage = math.max(0, page | 1),
       maxPerPage = math.max(1, math.min(100, nb | 10))
-    ) flatMap { pag =>
+    ).flatMap { pag =>
       gamesJson(withAnalysis = withAnalysis,
                 withMoves = withMoves,
                 withOpening = withOpening,
                 withFens = false,
                 withMoveTimes = withMoveTimes,
-                token = token)(pag.currentPageResults) map { games =>
-        PaginatorJson(pag withCurrentPageResults games)
+                token = token)(pag.currentPageResults).map { games =>
+        PaginatorJson(pag.withCurrentPageResults(games))
       }
     }
 
@@ -77,7 +77,7 @@ private[api] final class GameApi(netBaseUrl: String,
           withFens: Boolean,
           withMoveTimes: Boolean,
           token: Option[String]): Fu[Option[JsObject]] =
-    $find byId id flatMap {
+    ($find byId id).flatMap {
       _ ?? { g =>
         gamesJson(
           withAnalysis = withAnalysis,
@@ -86,7 +86,7 @@ private[api] final class GameApi(netBaseUrl: String,
           withFens = withFens && g.finished,
           withMoveTimes = withMoveTimes,
           token = token
-        )(List(g)) map (_.headOption)
+        )(List(g)).map(_.headOption)
       }
     }
 
@@ -100,12 +100,12 @@ private[api] final class GameApi(netBaseUrl: String,
       withFens: Boolean,
       withMoveTimes: Boolean,
       token: Option[String])(games: Seq[Game]): Fu[Seq[JsObject]] =
-    AnalysisRepo byIds games.map(_.id) flatMap { analysisOptions =>
-      (games map GameRepo.initialFen).sequenceFu map { initialFens =>
+    (AnalysisRepo byIds games.map(_.id)).flatMap { analysisOptions =>
+      (games.map(GameRepo.initialFen)).sequenceFu.map { initialFens =>
         val validToken = check(token)
-        games zip analysisOptions zip initialFens map {
+        games.zip(analysisOptions).zip(initialFens).map {
           case ((g, analysisOption), initialFen) =>
-            val pgnOption = withAnalysis option pgnDump(g, initialFen)
+            val pgnOption = withAnalysis.option(pgnDump(g, initialFen))
             gameToJson(
               g,
               makeUrl(g),
@@ -157,7 +157,7 @@ private[api] final class GameApi(netBaseUrl: String,
           )
         },
         "daysPerTurn" -> g.daysPerTurn,
-        "players" -> JsObject(g.players.zipWithIndex map {
+        "players" -> JsObject(g.players.zipWithIndex.map {
           case (p, i) =>
             p.color.name -> Json
               .obj(
@@ -192,10 +192,12 @@ private[api] final class GameApi(netBaseUrl: String,
         "moves" -> withMoves.option(g.pgnMoves mkString " "),
         "opening" -> withOpening.??(g.opening),
         "fens" -> withFens ?? {
-          chess.Replay.boards(g.pgnMoves, initialFen, g.variant).toOption map {
+          chess.Replay.boards(g.pgnMoves, initialFen, g.variant).toOption.map {
             boards =>
               JsArray(
-                boards map chess.format.Forsyth.exportBoard map JsString.apply)
+                boards
+                  .map(chess.format.Forsyth.exportBoard)
+                  .map(JsString.apply))
           }
         },
         "winner" -> g.winnerColor.map(_.name),

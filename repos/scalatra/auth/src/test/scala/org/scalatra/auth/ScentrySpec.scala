@@ -22,15 +22,15 @@ object ScentrySpec extends Specification with Mockito {
         .HashMap[String, Any](Scentry.scentryAuthKey -> "6789")
       val mockSession = smartMock[HttpSession]
       override def session(implicit request: HttpServletRequest) = mockSession
-      mockSession.getAttribute(anyString) answers { k =>
+      mockSession.getAttribute(anyString).answers { k =>
         sessionMap.getOrElse(k.asInstanceOf[String], null).asInstanceOf[AnyRef]
       }
-      mockSession.setAttribute(anyString, anyObject) answers {
+      mockSession.setAttribute(anyString, anyObject).answers {
         (kv, wtfIsThis) =>
           val Array(k: String, v: Any) = kv
           sessionMap(k) = v
       }
-      mockSession.invalidate() answers { k =>
+      mockSession.invalidate().answers { k =>
         invalidateCalled = true
         sessionMap.clear()
       }
@@ -58,7 +58,7 @@ object ScentrySpec extends Specification with Mockito {
     var defaultUnauthenticatedCalled = false
 
     Scentry.clearGlobalStrategies
-    theScentry unauthenticated {
+    theScentry.unauthenticated {
       defaultUnauthenticatedCalled = true
     }
 
@@ -137,7 +137,7 @@ object ScentrySpec extends Specification with Mockito {
 
     "run all fetch user callbacks" in {
       theScentry.register("LocalFoo", _ => s)
-      req.getAttribute("scentry.auth.default.user") returns null
+      req.getAttribute("scentry.auth.default.user").returns(null)
       theScentry.user must be_==(User("6789"))
       beforeFetchCalled must beTrue
       afterFetchCalled must beTrue
@@ -145,20 +145,21 @@ object ScentrySpec extends Specification with Mockito {
 
     "run all set user callbacks" in {
       theScentry.register("LocalFoo", _ => s)
-      req.getAttribute("scentry.auth.default.user") returns null
+      req.getAttribute("scentry.auth.default.user").returns(null)
       (theScentry.user = User("6789")) must be_==("6789")
-      req.getAttribute("scentry.auth.default.user") returns User("6789")
-      there was atLeastOne(req).setAttribute("scentry.auth.default.user",
-                                             User("6789"))
+      req.getAttribute("scentry.auth.default.user").returns(User("6789"))
+      there.was(
+        atLeastOne(req).setAttribute("scentry.auth.default.user",
+                                     User("6789")))
       beforeSetUserCalled must beTrue
       afterSetUserCalled must beTrue
     }
 
     "run all logout callbacks" in {
       theScentry.register("LocalFoo", _ => s)
-      req.getAttribute("scentry.auth.default.user") returns User("6789")
+      req.getAttribute("scentry.auth.default.user").returns(User("6789"))
       theScentry.logout
-      there was one(req).removeAttribute("scentry.auth.default.user")
+      there.was(one(req).removeAttribute("scentry.auth.default.user"))
       beforeLogoutCalled must beTrue
       afterLogoutCalled must beTrue
       invalidateCalled must beTrue
@@ -166,11 +167,11 @@ object ScentrySpec extends Specification with Mockito {
 
     "run all login callbacks on successful authentication" in {
       theScentry.register("LocalFoo", _ => s)
-      req.getAttribute("scentry.auth.default.user") returns null
+      req.getAttribute("scentry.auth.default.user").returns(null)
       theScentry.authenticate()
-      there were two(req).setAttribute("scentry.auth.default.user",
-                                       User("12345"))
-      req.getAttribute("scentry.auth.default.user") returns User("12345")
+      there.were(
+        two(req).setAttribute("scentry.auth.default.user", User("12345")))
+      req.getAttribute("scentry.auth.default.user").returns(User("12345"))
       beforeAuthenticateCalled must beTrue
       afterAuthenticateCalled must beTrue
       beforeSetUserCalled must beTrue

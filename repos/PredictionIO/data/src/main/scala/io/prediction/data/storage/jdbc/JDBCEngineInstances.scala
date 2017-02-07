@@ -49,7 +49,7 @@ class JDBCEngineInstances(client: String,
       servingParams text not null)""".execute().apply()
   }
 
-  def insert(i: EngineInstance): String = DB localTx { implicit session =>
+  def insert(i: EngineInstance): String = DB.localTx { implicit session =>
     val id = java.util.UUID.randomUUID().toString
     sql"""
     INSERT INTO $tableName VALUES(
@@ -71,7 +71,7 @@ class JDBCEngineInstances(client: String,
     id
   }
 
-  def get(id: String): Option[EngineInstance] = DB localTx {
+  def get(id: String): Option[EngineInstance] = DB.localTx {
     implicit session =>
       sql"""
     SELECT
@@ -96,7 +96,7 @@ class JDBCEngineInstances(client: String,
         .apply()
   }
 
-  def getAll(): Seq[EngineInstance] = DB localTx { implicit session =>
+  def getAll(): Seq[EngineInstance] = DB.localTx { implicit session =>
     sql"""
     SELECT
       id,
@@ -124,7 +124,7 @@ class JDBCEngineInstances(client: String,
 
   def getCompleted(engineId: String,
                    engineVersion: String,
-                   engineVariant: String): Seq[EngineInstance] = DB localTx {
+                   engineVariant: String): Seq[EngineInstance] = DB.localTx {
     implicit s =>
       sql"""
     SELECT
@@ -152,7 +152,7 @@ class JDBCEngineInstances(client: String,
     ORDER BY startTime DESC""".map(resultToEngineInstance).list().apply()
   }
 
-  def update(i: EngineInstance): Unit = DB localTx { implicit session =>
+  def update(i: EngineInstance): Unit = DB.localTx { implicit session =>
     sql"""
     update $tableName set
       status = ${i.status},
@@ -172,7 +172,7 @@ class JDBCEngineInstances(client: String,
     where id = ${i.id}""".update().apply()
   }
 
-  def delete(id: String): Unit = DB localTx { implicit session =>
+  def delete(id: String): Unit = DB.localTx { implicit session =>
     sql"DELETE FROM $tableName WHERE id = $id".update().apply()
   }
 

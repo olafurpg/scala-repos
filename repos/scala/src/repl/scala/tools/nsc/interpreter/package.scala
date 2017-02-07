@@ -47,7 +47,7 @@ package object interpreter extends ReplConfig with ReplStrings {
   private[interpreter] implicit def javaCharSeqCollectionToScala(
       xs: JCollection[_ <: CharSequence]): List[String] = {
     import scala.collection.JavaConverters._
-    xs.asScala.toList map ("" + _)
+    xs.asScala.toList.map("" + _)
   }
 
   private[nsc] implicit def enrichClass[T](clazz: Class[T]) =
@@ -86,55 +86,55 @@ package object interpreter extends ReplConfig with ReplStrings {
 
       // If an argument is given, only show a source with that
       // in its name somewhere.
-      val args = line split "\\s+"
+      val args = line.split("\\s+")
       val filtered =
-        intp.implicitSymbolsBySource filter {
+        intp.implicitSymbolsBySource.filter {
           case (source, syms) =>
             (args contains "-v") || {
               if (line == "") (source.fullName.toString != "scala.Predef")
-              else (args exists (source.name.toString contains _))
+              else (args.exists(source.name.toString contains _))
             }
         }
 
       if (filtered.isEmpty)
         return "No implicits have been imported other than those in Predef."
 
-      filtered foreach {
+      filtered.foreach {
         case (source, syms) =>
           p(
             "/* " + syms.size + " implicit members imported from " +
               source.fullName + " */")
 
           // This groups the members by where the symbol is defined
-          val byOwner = syms groupBy (_.owner)
+          val byOwner = syms.groupBy(_.owner)
           val sortedOwners =
-            byOwner.toList sortBy {
+            byOwner.toList.sortBy {
               case (owner, _) =>
                 exitingTyper(source.info.baseClasses indexOf owner)
             }
 
-          sortedOwners foreach {
+          sortedOwners.foreach {
             case (owner, members) =>
               // Within each owner, we cluster results based on the final result type
               // if there are more than a couple, and sort each cluster based on name.
               // This is really just trying to make the 100 or so implicits imported
               // by default into something readable.
               val memberGroups: List[List[Symbol]] = {
-                val groups = members groupBy (_.tpe.finalResultType) toList
-                val (big, small) = groups partition (_._2.size > 3)
+                val groups = members.groupBy(_.tpe.finalResultType) toList
+                val (big, small) = groups.partition(_._2.size > 3)
                 val xss =
-                  ((big sortBy (_._1.toString) map (_._2)) :+
-                    (small flatMap (_._2)))
+                  ((big.sortBy(_._1.toString).map(_._2)) :+
+                    (small.flatMap(_._2)))
 
-                xss map (xs => xs sortBy (_.name.toString))
+                xss.map(xs => xs.sortBy(_.name.toString))
               }
 
               val ownerMessage =
                 if (owner == source) " defined in " else " inherited from "
               p("  /* " + members.size + ownerMessage + owner.fullName + " */")
 
-              memberGroups foreach { group =>
-                group foreach (s => p("  " + intp.symbolDefString(s)))
+              memberGroups.foreach { group =>
+                group.foreach(s => p("  " + intp.symbolDefString(s)))
                 p("")
               }
           }
@@ -146,14 +146,14 @@ package object interpreter extends ReplConfig with ReplStrings {
     def kindCommandInternal(expr: String, verbose: Boolean): Unit = {
       val catcher = catching(classOf[MissingRequirementError],
                              classOf[ScalaReflectionException])
-      def typeFromTypeString: Option[ClassSymbol] = catcher opt {
+      def typeFromTypeString: Option[ClassSymbol] = catcher.opt {
         exprTyper.typeOfTypeString(expr).typeSymbol.asClass
       }
-      def typeFromNameTreatedAsTerm: Option[ClassSymbol] = catcher opt {
+      def typeFromNameTreatedAsTerm: Option[ClassSymbol] = catcher.opt {
         val moduleClass = exprTyper.typeOfExpression(expr).typeSymbol
         moduleClass.linkedClassOfClass.asClass
       }
-      def typeFromFullName: Option[ClassSymbol] = catcher opt {
+      def typeFromFullName: Option[ClassSymbol] = catcher.opt {
         intp.global.rootMirror.staticClass(expr)
       }
       def typeOfTerm: Option[TypeSymbol] =
@@ -161,14 +161,17 @@ package object interpreter extends ReplConfig with ReplStrings {
           case sym: TypeSymbol => Some(sym)
           case _ => None
         }
-      (typeFromTypeString orElse typeFromNameTreatedAsTerm orElse typeFromFullName orElse typeOfTerm) foreach {
-        sym =>
+      (typeFromTypeString
+        .orElse(typeFromNameTreatedAsTerm)
+        .orElse(typeFromFullName)
+        .orElse(typeOfTerm))
+        .foreach { sym =>
           val (kind, tpe) = exitingTyper {
             val tpe = sym.tpeHK
             (intp.global.inferKind(NoPrefix)(tpe, sym.owner), tpe)
           }
           echoKind(tpe, kind, verbose)
-      }
+        }
     }
 
     def echoKind(tpe: Type, kind: Kind, verbose: Boolean) {
@@ -192,7 +195,7 @@ package object interpreter extends ReplConfig with ReplStrings {
       *  -c complete - leave nothing out
       */
     def typeCommandInternal(expr: String, verbose: Boolean): Unit =
-      symbolOfLine(expr) andAlso (echoTypeSignature(_, verbose))
+      symbolOfLine(expr).andAlso(echoTypeSignature(_, verbose))
 
     def printAfterTyper(msg: => String) =
       reporter printUntruncatedMessage exitingTyper(msg)
@@ -222,6 +225,6 @@ package object interpreter extends ReplConfig with ReplStrings {
   private[nsc] implicit class `try lastly`[A](val t: Try[A]) extends AnyVal {
     private def effect[X](last: => Unit)(a: X): Try[A] = { last; t }
     def lastly(last: => Unit): Try[A] =
-      t transform (effect(last) _, effect(last) _)
+      t.transform(effect(last) _, effect(last) _)
   }
 }

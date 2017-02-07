@@ -40,7 +40,7 @@ trait Tracer extends parser.AST with typer.Binder {
 
     parentIdx match {
       case Some(idx) => {
-        copied.indices(idx) set copied.nodes.indexOf((sigma, expr))
+        copied.indices(idx).set(copied.nodes.indexOf((sigma, expr)))
         copied
       }
       case None => copied
@@ -96,9 +96,9 @@ trait Tracer extends parser.AST with typer.Binder {
       case expr @ Dispatch(_, name, actuals) => {
         expr.binding match {
           case LetBinding(let) => {
-            val ids = let.params map { Identifier(Vector(), _) }
+            val ids = let.params.map { Identifier(Vector(), _) }
             val sigma2 =
-              sigma ++ (ids zip Stream.continually(let) zip actuals)
+              sigma ++ (ids.zip(Stream.continually(let)).zip(actuals))
 
             if (actuals.length > 0) {
               val updated = addNode(trace, sigma, expr, parentIdx)
@@ -131,19 +131,19 @@ trait Tracer extends parser.AST with typer.Binder {
     */
   def buildBacktrace(trace: Trace)(target0: Expr): List[List[(Sigma, Expr)]] = {
     val targetLocations: Array[Int] =
-      trace.nodes.zipWithIndex collect {
+      trace.nodes.zipWithIndex.collect {
         case ((_, expr), idx) if target0 == expr => idx
       }
 
     def loop(stack: List[(Sigma, Expr)])(location: Int): List[(Sigma, Expr)] = {
       val newTargets: Array[(Int, (Sigma, Expr))] = {
-        trace.indices.zipWithIndex collect {
+        trace.indices.zipWithIndex.collect {
           case (bitset, idx) if bitset(location) => (idx, trace.nodes(idx))
         }
       }
 
       val result =
-        newTargets flatMap {
+        newTargets.flatMap {
           case (idx, grph) =>
             loop(stack :+ grph)(idx)
         }
@@ -152,6 +152,6 @@ trait Tracer extends parser.AST with typer.Binder {
       else result.toList
     }
 
-    targetLocations map { loop(Nil) } toList
+    targetLocations.map { loop(Nil) } toList
   }
 }

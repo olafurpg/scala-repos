@@ -171,7 +171,7 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
     : AhcConfigBuilder = {
     new AhcConfigBuilder(ahcConfig) {
       override val addCustomSettings =
-        modify compose AhcConfigBuilder.this.addCustomSettings
+        modify.compose(AhcConfigBuilder.this.addCustomSettings)
       override val builder = AhcConfigBuilder.this.builder
     }
   }
@@ -195,7 +195,7 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
       .setUseProxyProperties(config.useProxyProperties)
       .setCompressionEnforced(config.compressionEnabled)
 
-    config.userAgent foreach builder.setUserAgent
+    config.userAgent.foreach(builder.setUserAgent)
 
     builder.setMaxConnectionsPerHost(ahcConfig.maxConnectionsPerHost)
     builder.setMaxConnections(ahcConfig.maxConnectionsTotal)

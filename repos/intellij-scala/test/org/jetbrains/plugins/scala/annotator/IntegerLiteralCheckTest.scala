@@ -61,7 +61,7 @@ class IntegerLiteralCheckTest extends SimpleTestCase {
       assertNothing(messages(s"val a = $s"))
     }
     val longStrings =
-      (intStrings flatMap appendL) ++
+      (intStrings.flatMap(appendL)) ++
         (longValues ++ randomLongValues(numOfGenInteger))
           .flatMap(expandIntegerLiteral)
           .flatMap(prependSign)

@@ -21,26 +21,26 @@ object Message extends LilaController {
 
   def inbox(page: Int) = Auth { implicit ctx => me =>
     NotForKids {
-      api updateUser me
-      api.inbox(me, page) map { html.message.inbox(me, _) }
+      api.updateUser(me)
+      api.inbox(me, page).map { html.message.inbox(me, _) }
     }
   }
 
   def preview = Auth { implicit ctx => me =>
-    api.preview(me.id) map { html.message.preview(me, _) }
+    api.preview(me.id).map { html.message.preview(me, _) }
   }
 
   def thread(id: String) = Auth { implicit ctx => implicit me =>
     NotForKids {
       OptionFuOk(api.thread(id, me)) { thread =>
-        relationApi.fetchBlocks(thread otherUserId me, me.id) map { blocked =>
+        relationApi.fetchBlocks(thread.otherUserId(me), me.id).map { blocked =>
           html.message.thread(thread,
                               forms.post,
                               blocked,
                               answerable = !Env.message.LichessSenders
                                 .contains(thread.creatorId))
         }
-      } map NoCache
+      }.map(NoCache)
     }
   }
 
@@ -49,7 +49,7 @@ object Message extends LilaController {
       implicit val req = ctx.body
       forms.post.bindFromRequest.fold(
         err =>
-          relationApi.fetchBlocks(thread otherUserId me, me.id) map {
+          relationApi.fetchBlocks(thread.otherUserId(me), me.id).map {
             blocked =>
               BadRequest(
                 html.message.thread(thread,
@@ -67,7 +67,7 @@ object Message extends LilaController {
 
   def form = Auth { implicit ctx => implicit me =>
     NotForKids {
-      renderForm(me, get("title"), identity) map { Ok(_) }
+      renderForm(me, get("title"), identity).map { Ok(_) }
     }
   }
 
@@ -77,9 +77,9 @@ object Message extends LilaController {
       forms
         .thread(me)
         .bindFromRequest
-        .fold(err => renderForm(me, none, _ => err) map { BadRequest(_) },
+        .fold(err => renderForm(me, none, _ => err).map { BadRequest(_) },
               data =>
-                api.makeThread(data, me) map { thread =>
+                api.makeThread(data, me).map { thread =>
                   Redirect(routes.Message.thread(thread.id))
               })
     }
@@ -89,10 +89,10 @@ object Message extends LilaController {
       me: UserModel,
       title: Option[String],
       f: Form[_] => Form[_])(implicit ctx: Context): Fu[Html] =
-    get("user") ?? UserRepo.named flatMap { user =>
-      user.fold(fuccess(true))(u => security.canMessage(me.id, u.id)) map {
+    (get("user") ?? UserRepo.named).flatMap { user =>
+      user.fold(fuccess(true))(u => security.canMessage(me.id, u.id)).map {
         canMessage =>
-          html.message.form(f(forms thread me),
+          html.message.form(f(forms.thread(me)),
                             user,
                             title,
                             canMessage = canMessage ||

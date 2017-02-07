@@ -59,7 +59,7 @@ class ParamsExtensionSpec extends Specification {
 
       params.getAs[Bogus]("a") must beSome
 
-      params.getAs[Bogus]("a").get aka "The bogus value" must_==
+      params.getAs[Bogus]("a").get.aka("The bogus value") must_==
         Bogus("buffybuffy")
     }
 

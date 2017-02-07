@@ -145,7 +145,7 @@ class ReceivedBlockTrackerSuite
     // Verify whether write ahead log has correct contents
     val expectedWrittenData1 = blockInfos1.map(BlockAdditionEvent)
     getWrittenLogData() shouldEqual expectedWrittenData1
-    getWriteAheadLogFiles() should have size 1
+    (getWriteAheadLogFiles() should have).size(1)
 
     incrementTime()
 

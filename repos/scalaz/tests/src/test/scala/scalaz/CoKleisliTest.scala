@@ -16,9 +16,9 @@ object CokleisliTest extends SpecLite {
     Arbitrary(
       Gen.oneOf(
         arb((_, n, _) => n),
-        arb((a, b, c) => a getOrElse b),
-        arb((a, b, c) => a.map(_ + b) getOrElse c),
-        arb((a, b, c) => a.map(_ - b) getOrElse c)
+        arb((a, b, c) => a.getOrElse(b)),
+        arb((a, b, c) => a.map(_ + b).getOrElse(c)),
+        arb((a, b, c) => a.map(_ - b).getOrElse(c))
       ))
   }
 
@@ -34,8 +34,8 @@ object CokleisliTest extends SpecLite {
         arb((_, _) => x => x),
         arb((_, n) => _ + n),
         arb((_, n) => _ - n),
-        arb((a, b) => a.map(_ + b) getOrElse _),
-        arb((a, b) => a.map(_ - b) getOrElse _)
+        arb((a, b) => a.map(_ + b).getOrElse(_)),
+        arb((a, b) => a.map(_ - b).getOrElse(_))
       ))
   }
 
@@ -54,7 +54,7 @@ object CokleisliTest extends SpecLite {
     import std.AllInstances._
 
     val ck = Cokleisli((a: NonEmptyList[Int]) => a.size)
-    val ck1 = ck compose ck
+    val ck1 = ck.compose(ck)
     val run: Int = ck1.run(NonEmptyList(0, 0))
     run must_=== (2)
   }

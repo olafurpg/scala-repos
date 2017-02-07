@@ -39,7 +39,7 @@ class JDBCAccessKeys(client: String,
       events text)""".execute().apply()
   }
 
-  def insert(accessKey: AccessKey): Option[String] = DB localTx { implicit s =>
+  def insert(accessKey: AccessKey): Option[String] = DB.localTx { implicit s =>
     val key = if (accessKey.key.isEmpty) generateKey else accessKey.key
     val events =
       if (accessKey.events.isEmpty) None
@@ -52,21 +52,21 @@ class JDBCAccessKeys(client: String,
     Some(key)
   }
 
-  def get(key: String): Option[AccessKey] = DB readOnly { implicit session =>
+  def get(key: String): Option[AccessKey] = DB.readOnly { implicit session =>
     sql"SELECT accesskey, appid, events FROM $tableName WHERE accesskey = $key"
       .map(resultToAccessKey)
       .single()
       .apply()
   }
 
-  def getAll(): Seq[AccessKey] = DB readOnly { implicit session =>
+  def getAll(): Seq[AccessKey] = DB.readOnly { implicit session =>
     sql"SELECT accesskey, appid, events FROM $tableName"
       .map(resultToAccessKey)
       .list()
       .apply()
   }
 
-  def getByAppid(appid: Int): Seq[AccessKey] = DB readOnly {
+  def getByAppid(appid: Int): Seq[AccessKey] = DB.readOnly {
     implicit session =>
       sql"SELECT accesskey, appid, events FROM $tableName WHERE appid = $appid"
         .map(resultToAccessKey)
@@ -74,7 +74,7 @@ class JDBCAccessKeys(client: String,
         .apply()
   }
 
-  def update(accessKey: AccessKey): Unit = DB localTx { implicit session =>
+  def update(accessKey: AccessKey): Unit = DB.localTx { implicit session =>
     val events =
       if (accessKey.events.isEmpty) None
       else Some(accessKey.events.mkString(","))
@@ -85,7 +85,7 @@ class JDBCAccessKeys(client: String,
     WHERE accesskey = ${accessKey.key}""".update().apply()
   }
 
-  def delete(key: String): Unit = DB localTx { implicit session =>
+  def delete(key: String): Unit = DB.localTx { implicit session =>
     sql"DELETE FROM $tableName WHERE accesskey = $key".update().apply()
   }
 

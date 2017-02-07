@@ -23,13 +23,17 @@ private[opening] final class Selector(openingColl: Coll,
         openingColl
           .find(BSONDocument())
           .options(QueryOpts(skipN = Random nextInt anonSkipMax))
-          .one[Opening] flatten "Can't find a opening for anon player!"
+          .one[Opening]
+          .flatten("Can't find a opening for anon player!")
       case Some(user) =>
-        api.attempt.playedIds(user, modulo) flatMap { ids =>
-          tryRange(user, toleranceStep, ids)
-        } recoverWith {
-          case e: Exception => apply(none)
-        }
+        api.attempt
+          .playedIds(user, modulo)
+          .flatMap { ids =>
+            tryRange(user, toleranceStep, ids)
+          }
+          .recoverWith {
+            case e: Exception => apply(none)
+          }
     }).mon(_.opening.selector.time) >>- lila.mon.opening.selector.count()
 
   private def tryRange(user: User,
@@ -44,11 +48,12 @@ private[opening] final class Selector(openingColl: Coll,
             "$lt" -> BSONInteger(user.perfs.opening.intRating + tolerance)
           )
         ))
-      .one[Opening] flatMap {
-      case Some(opening) => fuccess(opening)
-      case None =>
-        if ((tolerance + toleranceStep) <= toleranceMax)
-          tryRange(user, tolerance + toleranceStep, ids)
-        else fufail(s"Can't find a opening for user $user!")
-    }
+      .one[Opening]
+      .flatMap {
+        case Some(opening) => fuccess(opening)
+        case None =>
+          if ((tolerance + toleranceStep) <= toleranceMax)
+            tryRange(user, tolerance + toleranceStep, ids)
+          else fufail(s"Can't find a opening for user $user!")
+      }
 }

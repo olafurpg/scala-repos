@@ -11,9 +11,9 @@ import akka.http.scaladsl.model._
 trait MultipartMarshallers {
   implicit def multipartMarshaller[T <: Multipart](
       implicit log: LoggingAdapter = NoLogging): ToEntityMarshaller[T] =
-    Marshaller strict { value ⇒
+    Marshaller.strict { value ⇒
       val boundary = randomBoundary()
-      val mediaType = value.mediaType withBoundary boundary
+      val mediaType = value.mediaType.withBoundary(boundary)
       Marshalling.WithOpenCharset(mediaType, { charset ⇒
         value.toEntity(charset, boundary)(log)
       })

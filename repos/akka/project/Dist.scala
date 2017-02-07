@@ -35,26 +35,26 @@ object Dist {
   lazy val settings: Seq[Setting[_]] = Seq(
     distExclude := Seq.empty,
     distAllClasspaths <<=
-      (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-        dependencyClasspath.task in Compile),
-    distDependencies <<= distAllClasspaths map {
+      (thisProjectRef, buildStructure, distExclude).flatMap(
+        aggregated(dependencyClasspath.task in Compile)),
+    distDependencies <<= distAllClasspaths.map {
       _.flatten.map(_.data).filter(ClasspathUtilities.isArchive).distinct
     },
     distLibJars <<=
-      (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-        packageBin.task in Compile),
+      (thisProjectRef, buildStructure, distExclude).flatMap(
+        aggregated(packageBin.task in Compile)),
     distSrcJars <<=
-      (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-        packageSrc.task in Compile),
+      (thisProjectRef, buildStructure, distExclude).flatMap(
+        aggregated(packageSrc.task in Compile)),
     distDocJars <<=
-      (thisProjectRef, buildStructure, distExclude) flatMap aggregated(
-        packageDoc.task in Compile),
+      (thisProjectRef, buildStructure, distExclude).flatMap(
+        aggregated(packageDoc.task in Compile)),
     distSources <<= (distDependencies,
                      distLibJars,
                      distSrcJars,
                      distDocJars,
                      doc in ScalaUnidoc,
-                     generate in Sphinx in docsProject) map DistSources,
+                     generate in Sphinx in docsProject).map(DistSources),
     distDirectory <<= crossTarget / "dist",
     distUnzipped <<= distDirectory / "unzipped",
     distFile <<= (distDirectory, version, scalaBinaryVersion) {
@@ -71,7 +71,7 @@ object Dist {
       structure: Load.BuildStructure,
       exclude: Seq[String]): Task[Seq[T]] = {
     val projects = aggregatedProjects(projectRef, structure, exclude)
-    projects flatMap { task in LocalProject(_) get structure.data } join
+    projects.flatMap { (task in LocalProject(_)).get(structure.data) } join
   }
 
   def aggregatedProjects(projectRef: ProjectRef,
@@ -79,15 +79,15 @@ object Dist {
                          exclude: Seq[String]): Seq[String] = {
     val aggregate =
       Project.getProject(projectRef, structure).toSeq.flatMap(_.aggregate)
-    aggregate flatMap { ref =>
+    aggregate.flatMap { ref =>
       if (exclude contains ref.project) Seq.empty
       else ref.project +: aggregatedProjects(ref, structure, exclude)
     }
   }
 
   def distTask: Initialize[Task[File]] = {
-    (baseDirectory, distSources, distUnzipped, version, distFile, streams) map {
-      (projectBase, allSources, unzipped, version, zipFile, s) =>
+    (baseDirectory, distSources, distUnzipped, version, distFile, streams)
+      .map { (projectBase, allSources, unzipped, version, zipFile, s) =>
         {
           val base = unzipped / ("akka-" + version)
           val distBase = projectBase / "akka-kernel" / "src" / "main" / "dist"
@@ -98,7 +98,7 @@ object Dist {
           val docJars = doc / "jars"
           val libs = allSources.depJars ++ allSources.libJars
           val (scalaLibs, akkaLibs) =
-            libs partition (_.name.contains("scala-library"))
+            libs.partition(_.name.contains("scala-library"))
           val lib = base / "lib"
           val libAkka = lib / "akka"
           val src = base / "src" / "akka"
@@ -112,7 +112,7 @@ object Dist {
           copyFlat(allSources.srcJars, src)
           zip(unzipped, zipFile)
         }
-    }
+      }
   }
 
   def copyDirectory(source: File,
@@ -120,7 +120,7 @@ object Dist {
                     overwrite: Boolean = false,
                     preserveLastModified: Boolean = false,
                     setExecutable: Boolean = false): Set[File] = {
-    val sources = (source ***) x rebase(source, target)
+    val sources = (source ***).x(rebase(source, target))
     copyMapped(sources, overwrite, preserveLastModified, setExecutable)
   }
 
@@ -131,7 +131,7 @@ object Dist {
                setExecutable: Boolean = false): Set[File] = {
     IO.createDirectory(target)
     val sources =
-      files map { f =>
+      files.map { f =>
         (f, target / f.name)
       }
     copyMapped(sources, overwrite, preserveLastModified, setExecutable)
@@ -141,7 +141,7 @@ object Dist {
                  overwrite: Boolean,
                  preserveLastModified: Boolean,
                  setExecutable: Boolean): Set[File] = {
-    sources map {
+    sources.map {
       Function.tupled(copy(overwrite, preserveLastModified, setExecutable))
     } toSet
   }
@@ -163,7 +163,7 @@ object Dist {
 
   def zip(source: File, target: File): File = {
     val files = source ** -DirectoryFilter
-    val sources = files x relativeTo(source)
+    val sources = files.x(relativeTo(source))
     IO.zip(sources, target)
     target
   }

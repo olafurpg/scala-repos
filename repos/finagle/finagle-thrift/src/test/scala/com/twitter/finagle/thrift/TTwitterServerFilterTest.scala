@@ -50,7 +50,7 @@ class TTwitterServerFilterTest extends FunSuite {
         ByteArrays.concat(OutputBuffer.messageToArray(header, protocolFactory),
                           buffer.toArray)
 
-      filter(bytes, service) map { bytes =>
+      filter(bytes, service).map { bytes =>
         // Strip the response header.
         InputBuffer.peelMessage(bytes,
                                 new thrift.ResponseHeader,

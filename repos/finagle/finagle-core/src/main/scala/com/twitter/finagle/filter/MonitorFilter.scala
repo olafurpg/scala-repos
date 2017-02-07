@@ -15,7 +15,7 @@ private[finagle] object MonitorFilter {
       val description = "Act as last-resort exception handler"
       def make(_monitor: param.Monitor, next: ServiceFactory[Req, Rep]) = {
         val param.Monitor(monitor) = _monitor
-        new MonitorFilter(monitor) andThen next
+        new MonitorFilter(monitor).andThen(next)
       }
     }
 }

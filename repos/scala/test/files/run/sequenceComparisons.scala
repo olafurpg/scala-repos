@@ -46,15 +46,15 @@ object Test {
 
     lazy val eqeq = Method(
       _ == _,
-      (List(seqList), List(Nil, seqList drop 1, seqList ::: seqList)),
+      (List(seqList), List(Nil, seqList.drop(1), seqList ::: seqList)),
       "%s == %s")
 
     val startsWithInputs: Inputs
     lazy val startsWith =
-      Method(_ startsWith _, startsWithInputs, "%s startsWith %s")
+      Method(_.startsWith(_), startsWithInputs, "%s startsWith %s")
 
     val endsWithInputs: Inputs
-    lazy val endsWith = Method(_ endsWith _, endsWithInputs, "%s endsWith %s")
+    lazy val endsWith = Method(_.endsWith(_), endsWithInputs, "%s endsWith %s")
 
     val indexOfSliceInputs: Inputs
     private def subseqTest(s1: Seq[T], s2: Seq[T]) = (s1 indexOfSlice s2) != -1
@@ -63,7 +63,7 @@ object Test {
 
     val sameElementsInputs: Inputs
     lazy val sameElements =
-      Method(_ sameElements _, sameElementsInputs, "%s sameElements %s")
+      Method(_.sameElements(_), sameElementsInputs, "%s sameElements %s")
 
     def methodList =
       List(eqeq, startsWith, endsWith, indexOfSlice, sameElements)

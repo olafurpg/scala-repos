@@ -13,7 +13,7 @@ final class Analyser(indexer: ActorSelection,
 
   def get(id: String): Fu[Option[Analysis]] = AnalysisRepo byId id
 
-  def save(analysis: Analysis): Funit = GameRepo game analysis.id flatMap {
+  def save(analysis: Analysis): Funit = GameRepo.game(analysis.id).flatMap {
     _ ?? { game =>
       GameRepo.setAnalysed(game.id)
       AnalysisRepo.save(analysis) >>- {

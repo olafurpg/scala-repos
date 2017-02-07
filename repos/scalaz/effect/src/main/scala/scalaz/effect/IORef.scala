@@ -12,9 +12,9 @@ sealed abstract class IORef[A] {
 
   def read: IO[A] = STToIO(value.read)
 
-  def write(a: => A): IO[Unit] = STToIO(value.write(a) map (_ => ()))
+  def write(a: => A): IO[Unit] = STToIO(value.write(a).map(_ => ()))
 
-  def mod(f: A => A): IO[A] = STToIO(value.mod(f) flatMap (_.read))
+  def mod(f: A => A): IO[A] = STToIO(value.mod(f).flatMap(_.read))
 }
 
 object IORef extends IORefs

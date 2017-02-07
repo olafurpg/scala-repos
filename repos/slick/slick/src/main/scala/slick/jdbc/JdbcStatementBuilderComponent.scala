@@ -330,7 +330,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
                             alias: Option[TermSymbol],
                             skipParens: Boolean = false): Unit =
       building(FromPart) {
-        def addAlias = alias foreach { s =>
+        def addAlias = alias.foreach { s =>
           b += ' ' += symbolName(s)
         }
         n match {
@@ -777,15 +777,16 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
 
     protected def createTable: String = {
       val b =
-        new StringBuilder append "create table " append quoteTableName(
-          tableNode) append " ("
+        new StringBuilder.append("create table ")
+          .append(quoteTableName(tableNode))
+          .append(" (")
       var first = true
       for (c <- columns) {
-        if (first) first = false else b append ","
+        if (first) first = false else b.append(",")
         c.appendColumn(b)
       }
       addTableOptions(b)
-      b append ")"
+      b.append(")")
       b.toString
     }
 
@@ -794,48 +795,59 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
     protected def dropTable: String = "drop table " + quoteTableName(tableNode)
 
     protected def createIndex(idx: Index): String = {
-      val b = new StringBuilder append "create "
-      if (idx.unique) b append "unique "
-      b append "index " append quoteIdentifier(idx.name) append " on " append quoteTableName(
-        tableNode) append " ("
+      val b = new StringBuilder.append("create ")
+      if (idx.unique) b.append("unique ")
+      b.append("index ")
+        .append(quoteIdentifier(idx.name))
+        .append(" on ")
+        .append(quoteTableName(tableNode))
+        .append(" (")
       addIndexColumnList(idx.on, b, idx.table.tableName)
-      b append ")"
+      b.append(")")
       b.toString
     }
 
     protected def createForeignKey(fk: ForeignKey): String = {
       val sb =
-        new StringBuilder append "alter table " append quoteTableName(
-          tableNode) append " add "
+        new StringBuilder.append("alter table ")
+          .append(quoteTableName(tableNode))
+          .append(" add ")
       addForeignKey(fk, sb)
       sb.toString
     }
 
     protected def addForeignKey(fk: ForeignKey, sb: StringBuilder) {
-      sb append "constraint " append quoteIdentifier(fk.name) append " foreign key("
+      sb.append("constraint ")
+        .append(quoteIdentifier(fk.name))
+        .append(" foreign key(")
       addForeignKeyColumnList(fk.linearizedSourceColumns,
                               sb,
                               tableNode.tableName)
-      sb append ") references " append quoteTableName(fk.targetTable) append "("
+      sb.append(") references ")
+        .append(quoteTableName(fk.targetTable))
+        .append("(")
       addForeignKeyColumnList(fk.linearizedTargetColumnsForOriginalTargetTable,
                               sb,
                               fk.targetTable.tableName)
-      sb append ") on update " append fk.onUpdate.action
-      sb append " on delete " append fk.onDelete.action
+      sb.append(") on update ").append(fk.onUpdate.action)
+      sb.append(" on delete ").append(fk.onDelete.action)
     }
 
     protected def createPrimaryKey(pk: PrimaryKey): String = {
       val sb =
-        new StringBuilder append "alter table " append quoteTableName(
-          tableNode) append " add "
+        new StringBuilder.append("alter table ")
+          .append(quoteTableName(tableNode))
+          .append(" add ")
       addPrimaryKey(pk, sb)
       sb.toString
     }
 
     protected def addPrimaryKey(pk: PrimaryKey, sb: StringBuilder) {
-      sb append "constraint " append quoteIdentifier(pk.name) append " primary key("
+      sb.append("constraint ")
+        .append(quoteIdentifier(pk.name))
+        .append(" primary key(")
       addPrimaryKeyColumnList(pk.columns, sb, tableNode.tableName)
-      sb append ")"
+      sb.append(")")
     }
 
     protected def dropForeignKey(fk: ForeignKey): String =
@@ -869,8 +881,8 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       for (c <- columns) c match {
         case Select(t: TableNode, field: FieldSymbol) =>
           if (first) first = false
-          else sb append ","
-          sb append quoteIdentifier(field.name)
+          else sb.append(",")
+          sb.append(quoteIdentifier(field.name))
           if (requiredTableName != t.tableName)
             throw new SlickException(
               "All columns in " + typeInfo + " must belong to table " +
@@ -917,20 +929,20 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
         defaultLiteral = valueToSQLLiteral(v, column.tpe)
     }
 
-    def appendType(sb: StringBuilder): Unit = sb append sqlType
+    def appendType(sb: StringBuilder): Unit = sb.append(sqlType)
 
     def appendColumn(sb: StringBuilder) {
-      sb append quoteIdentifier(column.name) append ' '
+      sb.append(quoteIdentifier(column.name)).append(' ')
       appendType(sb)
       appendOptions(sb)
     }
 
     protected def appendOptions(sb: StringBuilder) {
-      if (defaultLiteral ne null) sb append " DEFAULT " append defaultLiteral
+      if (defaultLiteral ne null) sb.append(" DEFAULT ").append(defaultLiteral)
       if (autoIncrement)
-        sb append " GENERATED BY DEFAULT AS IDENTITY(START WITH 1)"
-      if (notNull) sb append " NOT NULL"
-      if (primaryKey) sb append " PRIMARY KEY"
+        sb.append(" GENERATED BY DEFAULT AS IDENTITY(START WITH 1)")
+      if (notNull) sb.append(" NOT NULL")
+      if (primaryKey) sb.append(" PRIMARY KEY")
     }
   }
 
@@ -938,13 +950,13 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
   class SequenceDDLBuilder(seq: Sequence[_]) {
     def buildDDL: DDL = {
       val b =
-        new StringBuilder append "create sequence " append quoteIdentifier(
-          seq.name)
-      seq._increment.foreach { b append " increment " append _ }
-      seq._minValue.foreach { b append " minvalue " append _ }
-      seq._maxValue.foreach { b append " maxvalue " append _ }
-      seq._start.foreach { b append " start " append _ }
-      if (seq._cycle) b append " cycle"
+        new StringBuilder.append("create sequence ")
+          .append(quoteIdentifier(seq.name))
+      seq._increment.foreach { b.append(" increment ").append(_) }
+      seq._minValue.foreach { b.append(" minvalue ").append(_) }
+      seq._maxValue.foreach { b.append(" maxvalue ").append(_) }
+      seq._start.foreach { b.append(" start ").append(_) }
+      if (seq._cycle) b.append(" cycle")
       DDL(b.toString, "drop sequence " + quoteIdentifier(seq.name))
     }
   }

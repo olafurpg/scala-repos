@@ -11,7 +11,7 @@ object Test {
 
   def main(args: Array[String]) {
     val iteratorBuilder =
-      (new AlarmingBuffer[Int]) mapResult { res =>
+      (new AlarmingBuffer[Int]).mapResult { res =>
         res.iterator
       }
 

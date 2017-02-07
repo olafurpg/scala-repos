@@ -43,8 +43,8 @@ trait Aggregator { this: Actor ⇒
     * @return True if the partial function is removed, false if not found.
     */
   def unexpect(fn: Actor.Receive): Boolean = {
-    if (expectList remove fn) true
-    else if (processing && (addBuffer remove fn)) true
+    if (expectList.remove(fn)) true
+    else if (processing && (addBuffer.remove(fn))) true
     else false
   }
 
@@ -63,14 +63,14 @@ trait Aggregator { this: Actor ⇒
   def handleMessage(msg: Any): Boolean = {
     processing = true
     try {
-      expectList process { fn ⇒
+      expectList.process { fn ⇒
         var processed = true
         fn.applyOrElse(msg, (_: Any) ⇒ processed = false)
         processed
       }
     } finally {
       processing = false
-      expectList addAll addBuffer
+      expectList.addAll(addBuffer)
       addBuffer.removeAll()
     }
   }

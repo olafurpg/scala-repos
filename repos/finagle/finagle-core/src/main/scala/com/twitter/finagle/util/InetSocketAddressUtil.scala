@@ -39,7 +39,7 @@ object InetSocketAddressUtil {
     *
     */
   def parseHostPorts(hosts: String): Seq[HostPort] =
-    hosts split Array(' ', ',') filter (_.nonEmpty) map (_.split(":")) map {
+    hosts.split(Array(' ', ',')).filter(_.nonEmpty).map(_.split(":")).map {
       hp =>
         require(hp.length == 2, "You must specify host and port")
         hp match {
@@ -64,11 +64,14 @@ object InetSocketAddressUtil {
 
   private[finagle] def resolveHostPortsSeq(
       hostPorts: Seq[HostPort]): Seq[Seq[SocketAddress]] =
-    hostPorts map {
+    hostPorts.map {
       case (host, port) =>
-        (InetAddress.getAllByName(host) map { addr =>
-          new InetSocketAddress(addr, port)
-        }).toSeq
+        (InetAddress
+          .getAllByName(host)
+          .map { addr =>
+            new InetSocketAddress(addr, port)
+          })
+          .toSeq
     }
 
   /**
@@ -84,7 +87,7 @@ object InetSocketAddressUtil {
   def parseHosts(hosts: String): Seq[InetSocketAddress] = {
     if (hosts == ":*") return Seq(new InetSocketAddress(0))
 
-    (parseHostPorts(hosts) map {
+    (parseHostPorts(hosts).map {
       case (host, port) =>
         if (host == "") new InetSocketAddress(port)
         else new InetSocketAddress(host, port)

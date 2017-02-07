@@ -89,7 +89,7 @@ class DirectCompileTest extends ClearAfterClass {
     val codeB = "class B extends A { def g = f }"
     val List(a, b) = compileClassesSeparately(List(codeA, codeB))
     val ins = getSingleMethod(b, "g").instructions
-    assert(ins exists {
+    assert(ins.exists {
       case Invoke(_, "B", "f", _, _) => true
       case _ => false
     }, ins)

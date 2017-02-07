@@ -118,7 +118,7 @@ private[remote] object AkkaPduProtobufCodec extends AkkaPduCodec {
   private def ackBuilder(ack: Ack): AcknowledgementInfo.Builder = {
     val ackBuilder = AcknowledgementInfo.newBuilder()
     ackBuilder.setCumulativeAck(ack.cumulativeAck.rawValue)
-    ack.nacks foreach { nack ⇒
+    ack.nacks.foreach { nack ⇒
       ackBuilder.addNacks(nack.rawValue)
     }
     ackBuilder
@@ -137,13 +137,13 @@ private[remote] object AkkaPduProtobufCodec extends AkkaPduCodec {
 
     envelopeBuilder.setRecipient(
       serializeActorRef(recipient.path.address, recipient))
-    senderOption foreach { ref ⇒
+    senderOption.foreach { ref ⇒
       envelopeBuilder.setSender(serializeActorRef(localAddress, ref))
     }
-    seqOption foreach { seq ⇒
+    seqOption.foreach { seq ⇒
       envelopeBuilder.setSeq(seq.rawValue)
     }
-    ackOption foreach { ack ⇒
+    ackOption.foreach { ack ⇒
       ackAndEnvelopeBuilder.setAck(ackBuilder(ack))
     }
     envelopeBuilder.setMessage(serializedMessage)
@@ -171,7 +171,7 @@ private[remote] object AkkaPduProtobufCodec extends AkkaPduCodec {
     val handshakeInfo = AkkaHandshakeInfo.newBuilder
       .setOrigin(serializeAddress(info.origin))
       .setUid(info.uid)
-    info.cookie foreach handshakeInfo.setCookie
+    info.cookie.foreach(handshakeInfo.setCookie)
     constructControlMessagePdu(WireFormats.CommandType.ASSOCIATE,
                                Some(handshakeInfo))
   }
@@ -289,7 +289,7 @@ private[remote] object AkkaPduProtobufCodec extends AkkaPduCodec {
 
     val controlMessageBuilder = AkkaControlMessage.newBuilder()
     controlMessageBuilder.setCommandType(code)
-    handshakeInfo foreach controlMessageBuilder.setHandshakeInfo
+    handshakeInfo.foreach(controlMessageBuilder.setHandshakeInfo)
 
     ByteString.ByteString1C(
       AkkaProtocolMessage

@@ -19,7 +19,7 @@ abstract class AbstractFutureCacheTest extends FunSuite {
     val cache: FutureCache[String, String]
   }
 
-  test("%s should get nothing when there's nothing" format name) {
+  test("%s should get nothing when there's nothing".format(name)) {
     val ctx = mkCtx()
     import ctx._
 
@@ -27,7 +27,7 @@ abstract class AbstractFutureCacheTest extends FunSuite {
     assert(cache.size == 0)
   }
 
-  test("%s should get something when something's set" format name) {
+  test("%s should get something when something's set".format(name)) {
     val ctx = mkCtx()
     import ctx._
 
@@ -37,7 +37,7 @@ abstract class AbstractFutureCacheTest extends FunSuite {
     assert(cache.size == 1)
   }
 
-  test("%s should evict when something's set" format name) {
+  test("%s should evict when something's set".format(name)) {
     val ctx = mkCtx()
     import ctx._
 
@@ -51,7 +51,7 @@ abstract class AbstractFutureCacheTest extends FunSuite {
     assert(cache.get("key") == None)
   }
 
-  test("%s should refuse to evict incorrectly" format name) {
+  test("%s should refuse to evict incorrectly".format(name)) {
     val ctx = mkCtx()
     import ctx._
 
@@ -64,7 +64,7 @@ abstract class AbstractFutureCacheTest extends FunSuite {
     assert(cache.get("key") == None)
   }
 
-  test("%s should not update if gettable" format name) {
+  test("%s should not update if gettable".format(name)) {
     val ctx = mkCtx()
     import ctx._
 
@@ -79,7 +79,7 @@ abstract class AbstractFutureCacheTest extends FunSuite {
     assert(mod == false)
   }
 
-  test("%s should update if ungettable" format name) {
+  test("%s should update if ungettable".format(name)) {
     val ctx = mkCtx()
     import ctx._
 
@@ -88,7 +88,7 @@ abstract class AbstractFutureCacheTest extends FunSuite {
     assert(cache.size == 1)
   }
 
-  test("%s should report correct size" format name) {
+  test("%s should report correct size".format(name)) {
     val ctx = mkCtx()
     import ctx._
 

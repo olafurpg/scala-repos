@@ -166,7 +166,7 @@ object DesktopIngestShardServer
 
     guiNotifier.foreach(_("Internal services started, bringing up Precog"))
 
-    this.run(config) map {
+    this.run(config).map {
       _.onSuccess {
         case (runningState, stoppable) =>
           guiNotifier.foreach(_("Precog startup complete"))

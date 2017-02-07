@@ -64,7 +64,7 @@ object Comet extends DispatchSnippet with LazyLoggable {
         cometActor.buildSpan(response.inSpan)
 
       case failedResult =>
-        cometActor.cometRenderTimeoutHandler openOr {
+        cometActor.cometRenderTimeoutHandler.openOr {
           throw new CometTimeoutException(
             s"Type: ${cometActor.theType}, name: ${cometActor.name}; result was: $failedResult")
         }
@@ -98,9 +98,11 @@ object Comet extends DispatchSnippet with LazyLoggable {
   private def buildComet(cometHtml: NodeSeq): NodeSeq = {
     val theType: Box[String] = S.attr.~("type").map(_.text)
     val cometName: Box[String] =
-      S.currentAttr("name") or S.currentAttr("metaname").flatMap(S.param) or S
-        .currentAttr("randomname")
-        .map(_ => Helpers.nextFuncName)
+      S.currentAttr("name")
+        .or(S.currentAttr("metaname").flatMap(S.param))
+        .or(
+          S.currentAttr("randomname")
+            .map(_ => Helpers.nextFuncName))
 
     try {
       theType match {

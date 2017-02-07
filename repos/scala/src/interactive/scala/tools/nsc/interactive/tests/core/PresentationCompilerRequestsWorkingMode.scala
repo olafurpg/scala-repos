@@ -22,7 +22,7 @@ trait PresentationCompilerRequestsWorkingMode extends TestResources {
     val positions = allPositionsOf(str = marker.marker)
     val responses = for (pos <- positions) yield askAt(pos)
 
-    for ((pos, r) <- positions zip responses) withResponse(pos, r)(f)
+    for ((pos, r) <- positions.zip(responses)) withResponse(pos, r)(f)
   }
 
   /** Synchronous version of askAllSources. Each position is treated in turn, waiting for the

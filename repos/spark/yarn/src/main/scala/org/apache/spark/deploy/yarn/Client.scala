@@ -1317,7 +1317,7 @@ object Client extends Logging {
           "DEFAULT_YARN_APPLICATION_CLASSPATH")
         val value = field.get(null).asInstanceOf[Array[String]]
         value.toSeq
-      } recoverWith {
+      }.recoverWith {
         case e: NoSuchFieldException => Success(Seq.empty[String])
       }
 
@@ -1339,7 +1339,7 @@ object Client extends Logging {
         val field = classOf[MRJobConfig].getField(
           "DEFAULT_MAPREDUCE_APPLICATION_CLASSPATH")
         StringUtils.getStrings(field.get(null).asInstanceOf[String]).toSeq
-      } recoverWith {
+      }.recoverWith {
         case e: NoSuchFieldException => Success(Seq.empty[String])
       }
 

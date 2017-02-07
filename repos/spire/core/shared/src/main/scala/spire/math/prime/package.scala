@@ -155,7 +155,7 @@ package object prime {
             y = f(y)
             q = (q * (x - y).abs) % n
           }
-          if (q == 0) g = n else g = n gcd q
+          if (q == 0) g = n else g = n.gcd(q)
           k = k + m
         }
 
@@ -166,7 +166,7 @@ package object prime {
 
       @tailrec def slowRho(x: SafeLong, ys: SafeLong): SafeLong = {
         val yys = f(ys)
-        val g = n gcd (x - yys).abs
+        val g = n.gcd(x - yys).abs
         if (g == 1) slowRho(x, yys) else g
       }
 

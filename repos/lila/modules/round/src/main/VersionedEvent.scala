@@ -15,7 +15,7 @@ case class VersionedEvent(version: Int,
                           troll: Boolean) {
 
   lazy val decoded: JsValue = encoded match {
-    case Left(s) => Json parse s
+    case Left(s) => Json.parse(s)
     case Right(js) => js
   }
 
@@ -52,12 +52,12 @@ private[round] object VersionedEvent {
     def reads(r: BSON.Reader) =
       VersionedEvent(
         version = r int "v",
-        typ = r str "t",
+        typ = r.str("t"),
         encoded = r.strO("d").map(Left.apply).getOrElse(Right(JsNull)),
-        only = r boolO "o" map Color.apply,
-        owner = r boolD "ow",
-        watcher = r boolD "w",
-        troll = r boolD "r"
+        only = r.boolO("o").map(Color.apply),
+        owner = r.boolD("ow"),
+        watcher = r.boolD("w"),
+        troll = r.boolD("r")
       )
     def writes(w: BSON.Writer, o: VersionedEvent) =
       BSONDocument(

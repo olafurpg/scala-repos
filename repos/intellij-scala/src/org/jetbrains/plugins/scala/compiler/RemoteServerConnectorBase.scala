@@ -43,7 +43,7 @@ abstract class RemoteServerConnectorBase(module: Module,
       Array(
         new URL(
           "jar:file:" +
-            (if (libCanonicalPath startsWith "/") "" else "/") +
+            (if (libCanonicalPath.startsWith("/")) "" else "/") +
             libCanonicalPath + "/jps/sbt-interface.jar!/")),
       getClass.getClassLoader),
     new File(libRoot, "jps"),
@@ -74,8 +74,8 @@ abstract class RemoteServerConnectorBase(module: Module,
 
   protected def classpath: String = {
     val classesRoots =
-      assemblyClasspath().toSeq map
-        (f => new File(f.getCanonicalPath stripSuffix "!" stripSuffix "!/"))
+      assemblyClasspath().toSeq.map(f =>
+        new File(f.getCanonicalPath.stripSuffix("!").stripSuffix("!/")))
     (classesRoots ++ additionalCp).mkString("\n")
   }
 
@@ -83,9 +83,9 @@ abstract class RemoteServerConnectorBase(module: Module,
 
   implicit def file2path(file: File): String =
     FileUtil.toCanonicalPath(file.getAbsolutePath)
-  implicit def option2string(opt: Option[String]): String = opt getOrElse ""
+  implicit def option2string(opt: Option[String]): String = opt.getOrElse("")
   implicit def files2paths(files: Iterable[File]): String =
-    files map file2path mkString "\n"
+    files.map(file2path) mkString "\n"
   implicit def array2string(arr: Array[String]): String = arr mkString "\n"
 
   /**

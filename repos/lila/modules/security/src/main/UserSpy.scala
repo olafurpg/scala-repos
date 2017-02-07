@@ -17,7 +17,7 @@ case class UserSpy(ips: List[UserSpy.IPData],
 
   import UserSpy.OtherUser
 
-  def ipStrings = ips map (_.ip)
+  def ipStrings = ips.map(_.ip)
 
   def ipsByLocations: List[(Location, List[UserSpy.IPData])] =
     ips.sortBy(_.ip).groupBy(_.location).toList.sortBy(_._1.comparable)
@@ -44,18 +44,18 @@ object UserSpy {
   private[security] def apply(firewall: Firewall, geoIP: GeoIP)(
       userId: String): Fu[UserSpy] =
     for {
-      user ← UserRepo named userId flatten "[spy] user not found"
+      user ← UserRepo.named(userId).flatten("[spy] user not found")
       infos ← Store.findInfoByUser(user.id)
       ips = infos.map(_.ip).distinct
-      blockedIps ← (ips map firewall.blocksIp).sequenceFu
+      blockedIps ← (ips.map(firewall.blocksIp)).sequenceFu
       locations <- scala.concurrent.Future {
-        ips map geoIP.orUnknown
+        ips.map(geoIP.orUnknown)
       }
       sharingIp ← exploreSimilar("ip")(user)
       sharingFingerprint ← exploreSimilar("fp")(user)
     } yield
       UserSpy(
-        ips = ips zip blockedIps zip locations map {
+        ips = ips.zip(blockedIps).zip(locations).map {
           case ((ip, blocked), location) => IPData(ip, blocked, location)
         },
         uas = infos.map(_.ua).distinct,
@@ -66,8 +66,8 @@ object UserSpy {
       )
 
   private def exploreSimilar(field: String)(user: User): Fu[Set[User]] =
-    nextValues(field)(user) flatMap { nValues =>
-      nextUsers(field)(nValues, user) map { _ + user }
+    nextValues(field)(user).flatMap { nValues =>
+      nextUsers(field)(nValues, user).map { _ + user }
     }
 
   private def nextValues(field: String)(user: User): Fu[Set[Value]] =
@@ -77,20 +77,23 @@ object UserSpy {
         BSONDocument(field -> true)
       )
       .cursor[BSONDocument]()
-      .collect[List]() map {
-      _.flatMap(_.getAs[Value](field)).toSet
-    }
+      .collect[List]()
+      .map {
+        _.flatMap(_.getAs[Value](field)).toSet
+      }
 
   private def nextUsers(field: String)(values: Set[Value],
                                        user: User): Fu[Set[User]] =
     values.nonEmpty ?? {
-      storeColl.distinct("user",
-                         BSONDocument(
-                           field -> BSONDocument("$in" -> values),
-                           "user" -> BSONDocument("$ne" -> user.id)
-                         ).some) map lila.db.BSON.asStrings flatMap {
-        userIds =>
-          userIds.nonEmpty ?? (UserRepo byIds userIds) map (_.toSet)
-      }
+      storeColl
+        .distinct("user",
+                  BSONDocument(
+                    field -> BSONDocument("$in" -> values),
+                    "user" -> BSONDocument("$ne" -> user.id)
+                  ).some)
+        .map(lila.db.BSON.asStrings)
+        .flatMap { userIds =>
+          (userIds.nonEmpty ?? (UserRepo byIds userIds)).map(_.toSet)
+        }
     }
 }

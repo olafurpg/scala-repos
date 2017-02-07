@@ -111,7 +111,7 @@ private[io] case class ConcatBuf(chain: Vector[Buf]) extends Buf {
   def write(output: Array[Byte], off: Int) = {
     require(length <= output.length - off)
     var offset = off
-    chain foreach { buf =>
+    chain.foreach { buf =>
       buf.write(output, offset)
       offset += buf.length
     }

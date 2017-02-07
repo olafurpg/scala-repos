@@ -47,7 +47,7 @@ class ScanLeftTest extends WordSpec with Matchers {
       .source(Tsv("input1", ('gender, 'height)), sampleInput1)
       .sink[(String, Double, Long)](Tsv("result1")) { outBuf1 =>
         "produce correct number of records when filtering out null values" in {
-          outBuf1 should have size 5
+          (outBuf1 should have).size(5)
         }
         "create correct ranking per group, 1st being the heighest person of that group" in {
           outBuf1.toSet shouldBe expectedOutput1

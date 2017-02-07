@@ -66,7 +66,7 @@ object NameTransformer {
     val len = name.length()
     var i = 0
     while (i < len) {
-      val c = name charAt i
+      val c = name.charAt(i)
       if (c < nops && (op2code(c.toInt) ne null)) {
         if (buf eq null) {
           buf = new StringBuilder()
@@ -104,7 +104,7 @@ object NameTransformer {
     while (i < len) {
       var ops: OpCodes = null
       var unicode = false
-      val c = name charAt i
+      val c = name.charAt(i)
       if (c == '$' && i + 2 < len) {
         val ch1 = name.charAt(i + 1)
         if ('a' <= ch1 && ch1 <= 'z') {

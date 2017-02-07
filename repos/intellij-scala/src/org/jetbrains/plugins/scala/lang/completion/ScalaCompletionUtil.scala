@@ -330,14 +330,16 @@ object ScalaCompletionUtil {
     * @return (End PsiElement, ContainingFile.isScriptFile)
     */
   def processPsiLeafForFilter(leaf: PsiElement): (PsiElement, Boolean) =
-    Option(leaf) map { l =>
-      l.getContainingFile match {
-        case scriptFile: ScalaFile if scriptFile.isScriptFile() =>
-          (leaf.getParent, true)
-        case scalaFile: ScalaFile => (leaf, false)
-        case _ => (null, false)
+    Option(leaf)
+      .map { l =>
+        l.getContainingFile match {
+          case scriptFile: ScalaFile if scriptFile.isScriptFile() =>
+            (leaf.getParent, true)
+          case scalaFile: ScalaFile => (leaf, false)
+          case _ => (null, false)
+        }
       }
-    } getOrElse (null, false)
+      .getOrElse(null, false)
 
   def getDummyIdentifier(offset: Int, file: PsiFile): String = {
     def isOpChar(c: Char): Boolean = {

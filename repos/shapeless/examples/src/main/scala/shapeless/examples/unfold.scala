@@ -110,5 +110,5 @@ object UnfoldExamples extends App {
 
   val l2 = unfold(_6)(unfoldFibs)(Nat(0))
   typed[_0 :: _1 :: _1 :: _2 :: _3 :: _5 :: HNil](l2)
-  println(l2 map toInt)
+  println(l2.map(toInt))
 }

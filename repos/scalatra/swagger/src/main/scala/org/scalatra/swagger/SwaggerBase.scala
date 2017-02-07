@@ -58,20 +58,19 @@ trait SwaggerBaseBase extends Initializable with ScalatraBase {
 
   protected def renderDoc(doc: ApiType): JValue = {
     val json =
-      docToJson(doc) merge
-        ("basePath" -> fullUrl("/",
-                               includeContextPath =
-                                 swagger.baseUrlIncludeContextPath,
-                               includeServletPath =
-                                 swagger.baseUrlIncludeServletPath)) ~
-          ("swaggerVersion" -> swagger.swaggerVersion) ~
-          ("apiVersion" -> swagger.apiVersion)
+      docToJson(doc).merge(
+        "basePath" -> fullUrl(
+          "/",
+          includeContextPath = swagger.baseUrlIncludeContextPath,
+          includeServletPath = swagger.baseUrlIncludeServletPath)) ~
+        ("swaggerVersion" -> swagger.swaggerVersion) ~
+        ("apiVersion" -> swagger.apiVersion)
     val consumes = dontAddOnEmpty("consumes", doc.consumes) _
     val produces = dontAddOnEmpty("produces", doc.produces) _
     val protocols = dontAddOnEmpty("protocols", doc.protocols) _
     val authorizations = dontAddOnEmpty("authorizations", doc.authorizations) _
     val jsonDoc =
-      (consumes andThen produces andThen protocols andThen authorizations)(
+      (consumes.andThen(produces).andThen(protocols).andThen(authorizations))(
         json)
     //    println("The rendered json doc:\n" + jackson.prettyJson(jsonDoc))
     jsonDoc
@@ -80,14 +79,14 @@ trait SwaggerBaseBase extends Initializable with ScalatraBase {
   private[this] def dontAddOnEmpty(key: String, value: List[String])(
       json: JValue) = {
     val v: JValue = if (value.nonEmpty) key -> value else JNothing
-    json merge v
+    json.merge(v)
   }
 
   protected def renderIndex(docs: List[ApiType]): JValue = {
     ("apiVersion" -> swagger.apiVersion) ~
       ("swaggerVersion" -> swagger.swaggerVersion) ~
       ("apis" ->
-        (docs.filter(_.apis.nonEmpty).toList map { doc =>
+        (docs.filter(_.apis.nonEmpty).toList.map { doc =>
           ("path" ->
             (url(doc.resourcePath,
                  includeServletPath = false,
@@ -97,7 +96,7 @@ trait SwaggerBaseBase extends Initializable with ScalatraBase {
         })) ~
       ("authorizations" -> swagger.authorizations.foldLeft(JObject(Nil)) {
         (acc, auth) =>
-          acc merge JObject(List(auth.`type` -> Extraction.decompose(auth)))
+          acc.merge(JObject(List(auth.`type` -> Extraction.decompose(auth))))
       }) ~ ("info" -> Option(swagger.apiInfo).map(Extraction.decompose(_)))
   }
 

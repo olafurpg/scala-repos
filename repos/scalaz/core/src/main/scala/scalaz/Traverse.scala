@@ -132,7 +132,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._1
 
   override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
-    foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
+    foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))).apply(z)
 
   def reverse[A](fa: F[A]): F[A] = {
     val (as, shape) = mapAccumL(fa, scala.List[A]())((t, h) => (h :: t, h))
@@ -193,7 +193,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
       val t1: MN[F[C]] =
         M.map(traverse[M, A, B](fa)(amb))(fb => traverse[N, B, C](fb)(bnc))
       val t2: MN[F[C]] =
-        traverse[MN, A, C](fa)(a => M.map(amb(a))(bnc))(M compose N)
+        traverse[MN, A, C](fa)(a => M.map(amb(a))(bnc))(M.compose(N))
       MN.equal(t1, t2)
     }
 
@@ -227,7 +227,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
       val t1: MN[F[B]] =
         (traverse[M, A, B](fa)(amb), traverse[N, A, B](fa)(anb))
       val t2: MN[F[B]] =
-        traverse[MN, A, B](fa)(a => (amb(a), anb(a)))(M product N)
+        traverse[MN, A, B](fa)(a => (amb(a), anb(a)))(M.product(N))
       MN.equal(t1, t2)
     }
   }

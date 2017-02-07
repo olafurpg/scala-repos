@@ -170,7 +170,7 @@ abstract class EndToEndEventAdapterSpec(journalName: String,
 
   def withActorSystem[T](name: String, config: Config)(
       block: ActorSystem ⇒ T): T = {
-    val system = ActorSystem(name, journalConfig withFallback config)
+    val system = ActorSystem(name, journalConfig.withFallback(config))
     try block(system)
     finally Await.ready(system.terminate(), 3.seconds)
   }

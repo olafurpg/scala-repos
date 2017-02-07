@@ -27,9 +27,9 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     val h = new DispatchHelper
     import h._
 
-    when(trans.write("one")) thenReturn Future.value(())
+    when(trans.write("one")).thenReturn(Future.value(()))
     val p = new Promise[String]
-    when(trans.read()) thenReturn p
+    when(trans.read()).thenReturn(p)
     val f = disp("one")
     verify(trans).write("one")
     verify(trans).read()
@@ -43,9 +43,9 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     val h = new DispatchHelper
     import h._
 
-    when(trans.write(any[String])) thenReturn Future.value(())
+    when(trans.write(any[String])).thenReturn(Future.value(()))
     val p0, p1 = new Promise[String]
-    when(trans.read()) thenReturn p0
+    when(trans.read()).thenReturn(p0)
     val f0 = disp("one")
     verify(trans).write(any[String])
     verify(trans).read()
@@ -56,7 +56,7 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     assert(!f0.isDefined)
     assert(!f1.isDefined)
 
-    when(trans.read()) thenReturn p1
+    when(trans.read()).thenReturn(p1)
     p0.setValue("ok: one")
     assert(f0.poll == Some(Return("ok: one")))
     verify(trans, times(2)).write(any[String])
@@ -72,9 +72,9 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     val h = new DispatchHelper
     import h._
 
-    when(trans.write(any[String])) thenReturn Future.value(())
+    when(trans.write(any[String])).thenReturn(Future.value(()))
     val p0 = new Promise[String]
-    when(trans.read()) thenReturn p0
+    when(trans.read()).thenReturn(p0)
     val f0 = disp("zero")
     val f1 = disp("one")
     verify(trans).write("zero")
@@ -92,9 +92,9 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     val h = new DispatchHelper
     import h._
 
-    when(trans.write(any[String])) thenReturn Future.value(())
+    when(trans.write(any[String])).thenReturn(Future.value(()))
     val p0 = new Promise[String]
-    when(trans.read()) thenReturn p0
+    when(trans.read()).thenReturn(p0)
     val f0 = disp("zero")
     val f1 = disp("one")
     verify(trans).write("zero")
@@ -119,7 +119,7 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     import h._
 
     val exc = mock[Exception]
-    when(trans.write(any[String])) thenReturn Future.exception(exc)
+    when(trans.write(any[String])).thenReturn(Future.exception(exc))
     val resultOpt = disp("hello").poll
 
     assert(resultOpt.isDefined)

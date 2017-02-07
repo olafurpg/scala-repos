@@ -340,7 +340,7 @@ object ProducerFeatureTest {
                 timeout.duration)
     def receive = {
       case msg: CamelMessage ⇒
-        child forward (msg)
+        child.forward(msg)
       case (aref: ActorRef, msg: String) ⇒
         aref ! msg
     }
@@ -398,7 +398,7 @@ object ProducerFeatureTest {
 
     override def headersToCopy = Set(CamelMessage.MessageExchangeId, "test")
 
-    override def routeResponse(msg: Any): Unit = target forward msg
+    override def routeResponse(msg: Any): Unit = target.forward(msg)
   }
 
   class TestResponder extends Actor {
@@ -411,7 +411,7 @@ object ProducerFeatureTest {
           case _ ⇒
             context.sender() !
               (msg.mapBody { body: String ⇒
-                "received %s" format body
+                "received %s".format(body)
               })
         }
     }
@@ -450,7 +450,7 @@ object ProducerFeatureTest {
         def process(exchange: Exchange) = {
           exchange.getIn.getBody match {
             case "fail" ⇒ throw new Exception("failure")
-            case body ⇒ exchange.getOut.setBody("received %s" format body)
+            case body ⇒ exchange.getOut.setBody("received %s".format(body))
           }
         }
       })

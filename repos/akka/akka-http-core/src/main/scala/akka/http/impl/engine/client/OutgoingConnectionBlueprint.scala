@@ -67,9 +67,9 @@ private[http] object OutgoingConnectionBlueprint {
         import GraphDSL.Implicits._
 
         val renderingContextCreation = b.add {
-          Flow[HttpRequest] map { request ⇒
+          Flow[HttpRequest].map { request ⇒
             val sendEntityTrigger =
-              request.headers collectFirst {
+              request.headers.collectFirst {
                 case headers.Expect.`100-continue` ⇒ Promise[NotUsed]().future
               }
             RequestRenderingContext(request, hostHeader, sendEntityTrigger)
@@ -94,7 +94,7 @@ private[http] object OutgoingConnectionBlueprint {
         }
 
         val bypass =
-          Flow[RequestRenderingContext] map { ctx ⇒
+          Flow[RequestRenderingContext].map { ctx ⇒
             HttpResponseParser.ResponseContext(
               ctx.request.method,
               ctx.sendEntityTrigger.map(_.asInstanceOf[Promise[Unit]]))
@@ -110,7 +110,7 @@ private[http] object OutgoingConnectionBlueprint {
                 HttpHeaderParser(parserSettings) { info ⇒
                   if (parserSettings.illegalHeaderWarnings)
                     logParsingError(
-                      info withSummaryPrepended "Illegal response header",
+                      info.withSummaryPrepended("Illegal response header"),
                       log,
                       parserSettings.errorLoggingVerbosity)
                 }
@@ -222,7 +222,8 @@ private[http] object OutgoingConnectionBlueprint {
                              entityCreator,
                              closeRequested) ⇒
             val entity =
-              createEntity(entityCreator) withSizeLimit parserSettings.maxContentLength
+              createEntity(entityCreator).withSizeLimit(
+                parserSettings.maxContentLength)
             push(out, HttpResponse(statusCode, headers, entity, protocol))
             if (closeRequested) completeStage()
 

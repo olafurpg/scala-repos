@@ -34,7 +34,7 @@ object TraverseTest extends SpecLite {
     }
 
     "traverse int function as monoidal applicative" in {
-      val s: Int = List(1, 2, 3) traverseU { _ + 1 }
+      val s: Int = List(1, 2, 3).traverseU { _ + 1 }
       s must_=== (9)
     }
 

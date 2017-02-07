@@ -78,7 +78,7 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     * Start periodic gossip to random nodes in cluster
     */
   val gossipTask = scheduler.schedule(
-    PeriodicTasksInitialDelay max MetricsGossipInterval,
+    PeriodicTasksInitialDelay.max(MetricsGossipInterval),
     MetricsGossipInterval,
     self,
     GossipTick)
@@ -87,7 +87,7 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     * Start periodic metrics collection
     */
   val metricsTask = scheduler.schedule(
-    PeriodicTasksInitialDelay max MetricsInterval,
+    PeriodicTasksInitialDelay.max(MetricsInterval),
     MetricsInterval,
     self,
     MetricsTick)
@@ -130,7 +130,7 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     */
   def removeMember(member: Member): Unit = {
     nodes -= member.address
-    latestGossip = latestGossip remove member.address
+    latestGossip = latestGossip.remove(member.address)
     publish()
   }
 
@@ -138,7 +138,7 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     * Updates the initial node ring for those nodes that are [[akka.cluster.MemberStatus]] `Up`.
     */
   def receiveState(state: CurrentClusterState): Unit =
-    nodes = state.members collect {
+    nodes = state.members.collect {
       case m if m.status == Up || m.status == WeaklyUp ⇒ m.address
     }
 
@@ -161,7 +161,7 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     // remote node might not have same view of member nodes, this side should only care
     // about nodes that are known here, otherwise removed nodes can come back
     val otherGossip = envelope.gossip.filter(nodes)
-    latestGossip = latestGossip merge otherGossip
+    latestGossip = latestGossip.merge(otherGossip)
     // changes will be published in the period collect task
     if (!envelope.reply) replyGossipTo(envelope.from)
   }
@@ -170,7 +170,7 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     * Gossip to peer nodes.
     */
   def gossip(): Unit =
-    selectRandomNode((nodes - selfAddress).toVector) foreach gossipTo
+    selectRandomNode((nodes - selfAddress).toVector).foreach(gossipTo)
 
   def gossipTo(address: Address): Unit =
     sendGossip(address,
@@ -214,13 +214,13 @@ private[cluster] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
     * Removes nodes if their correlating node ring members are not [[akka.cluster.MemberStatus]] `Up`.
     */
   def remove(node: Address): MetricsGossip =
-    copy(nodes = nodes filterNot (_.address == node))
+    copy(nodes = nodes.filterNot(_.address == node))
 
   /**
     * Only the nodes that are in the `includeNodes` Set.
     */
   def filter(includeNodes: Set[Address]): MetricsGossip =
-    copy(nodes = nodes filter { includeNodes contains _.address })
+    copy(nodes = nodes.filter { includeNodes contains _.address })
 
   /**
     * Adds new remote [[akka.cluster.NodeMetrics]] and merges existing from a remote gossip.
@@ -238,7 +238,7 @@ private[cluster] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
       case Some(existingNodeMetrics) ⇒
         copy(
           nodes = nodes - existingNodeMetrics +
-              (existingNodeMetrics merge newNodeMetrics))
+              (existingNodeMetrics.merge(newNodeMetrics)))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
     }
 
@@ -351,7 +351,7 @@ final case class Metric private[cluster] (
     * Returns the updated metric.
     */
   def :+(latest: Metric): Metric =
-    if (this sameAs latest)
+    if (this.sameAs(latest))
       average match {
         case Some(avg) ⇒
           copy(value = latest.value,
@@ -450,7 +450,7 @@ final case class NodeMetrics(address: Address,
     if (timestamp >= that.timestamp) this // that is older
     else {
       // equality is based on the name of the Metric and Set doesn't replace existing element
-      copy(metrics = that.metrics union metrics, timestamp = that.timestamp)
+      copy(metrics = that.metrics.union(metrics), timestamp = that.timestamp)
     }
   }
 
@@ -821,9 +821,9 @@ class SigarMetricsCollector(address: Address,
   }
 
   override def metrics: Set[Metric] = {
-    super.metrics.filterNot(_.name == SystemLoadAverage) union Set(
-      systemLoadAverage,
-      cpuCombined).flatten
+    super.metrics
+      .filterNot(_.name == SystemLoadAverage)
+      .union(Set(systemLoadAverage, cpuCombined).flatten)
   }
 
   /**
@@ -834,13 +834,15 @@ class SigarMetricsCollector(address: Address,
     * Creates a new instance each time.
     */
   override def systemLoadAverage: Option[Metric] =
-    Metric.create(name = SystemLoadAverage,
-                  value = Try(
-                    LoadAverage.get
-                      .invoke(sigar)
-                      .asInstanceOf[Array[AnyRef]](0)
-                      .asInstanceOf[Number]),
-                  decayFactor = None) orElse super.systemLoadAverage
+    Metric
+      .create(name = SystemLoadAverage,
+              value = Try(
+                LoadAverage.get
+                  .invoke(sigar)
+                  .asInstanceOf[Array[AnyRef]](0)
+                  .asInstanceOf[Number]),
+              decayFactor = None)
+      .orElse(super.systemLoadAverage)
 
   /**
     * (SIGAR) Returns the combined CPU sum of User + Sys + Nice + Wait, in percentage. This metric can describe

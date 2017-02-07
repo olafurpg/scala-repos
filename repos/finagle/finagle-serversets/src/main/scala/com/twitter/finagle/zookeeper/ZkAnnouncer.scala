@@ -58,12 +58,12 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
         try {
           val conf = change.conf
 
-          conf.status foreach { status =>
+          conf.status.foreach { status =>
             status.leave()
             conf.status = None
           }
 
-          change.addr foreach { addr =>
+          change.addr.foreach { addr =>
             conf.status = Some(
               conf.serverSet.join(addr, change.endpoints.asJava, conf.shardId))
           }
@@ -105,9 +105,9 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
       endpoint: Option[String]
   ): Future[Announcement] = {
     val conf =
-      serverSets find { s =>
+      (serverSets find { s =>
         s.client == client && s.path == path && s.shardId == shardId
-      } getOrElse {
+      }).getOrElse {
         val serverSetConf =
           ServerSetConf(client, path, shardId, new ServerSetImpl(client, path))
         synchronized { serverSets += serverSetConf }
@@ -120,7 +120,7 @@ class ZkAnnouncer(factory: ZkClientFactory) extends Announcer { self =>
         case None => conf.addr = Some(addr)
       }
 
-      doChange(conf) map { _ =>
+      doChange(conf).map { _ =>
         new Announcement {
           def unannounce() = {
             conf.synchronized {

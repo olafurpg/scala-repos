@@ -4,7 +4,7 @@ object Spam {
 
   def detect(texts: String*) = {
     val text = texts mkString " "
-    blacklist exists text.contains
+    blacklist.exists(text.contains)
   }
 
   private val blacklist = List(

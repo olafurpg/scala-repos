@@ -72,7 +72,7 @@ class SpdyRawFrameCodecTest extends FunSuite {
     channel.offer(spdyHeadersFrame)
     val channelBuffer = channel.poll().asInstanceOf[ChannelBuffer]
     assert(channelBuffer.readableBytes == headersFrame.length)
-    headersFrame foreach { b =>
+    headersFrame.foreach { b =>
       assert(channelBuffer.readByte == b)
     }
     assert(channel.finish == false)

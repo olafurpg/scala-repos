@@ -42,8 +42,8 @@ trait EnrichmentSpecs extends EvalStackSpecs {
       val results = stack.evalE(input)
       val results2 = stack.evalE(input2)
 
-      val data = results map { case (_, x) => x }
-      val data2 = results2 map { case (_, x) => x }
+      val data = results.map { case (_, x) => x }
+      val data2 = results2.map { case (_, x) => x }
 
       data must haveSize(1019)
       data must_== data2

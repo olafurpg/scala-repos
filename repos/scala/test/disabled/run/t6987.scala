@@ -12,15 +12,15 @@ object Test extends App {
       CompileServer.execute(() => startupLatch.countDown(), Array[String]())
     }
   })
-  t setDaemon true
+  t.setDaemon(true)
   t.start()
   if (!startupLatch.await(2, TimeUnit.MINUTES))
-    sys error "Timeout waiting for server to start"
+    sys.error("Timeout waiting for server to start")
 
   val baos = new ByteArrayOutputStream()
   val ps = new PrintStream(baos)
 
-  val success = (scala.Console withOut ps) {
+  val success = (scala.Console.withOut(ps)) {
     // shut down the server via the client using the verbose flag
     CompileClient.process(Array("-shutdown", "-verbose"))
   }

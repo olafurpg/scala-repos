@@ -308,23 +308,23 @@ class IntervalCheck
 
   property("x ⊆ x") {
     forAll { (x: Interval[Rational]) =>
-      (x isSupersetOf x) shouldBe true
+      (x.isSupersetOf(x)) shouldBe true
     }
   }
 
   property("x ⊆ (x | y) && y ⊆ (x | y)") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       val z = x | y
-      (z isSupersetOf x) shouldBe true
-      (z isSupersetOf y) shouldBe true
+      (z.isSupersetOf(x)) shouldBe true
+      (z.isSupersetOf(y)) shouldBe true
     }
   }
 
   property("(x & y) ⊆ x && (x & y) ⊆ y") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       val z = x & y
-      (x isSupersetOf z) shouldBe true
-      (y isSupersetOf z) shouldBe true
+      (x.isSupersetOf(z)) shouldBe true
+      (y.isSupersetOf(z)) shouldBe true
     }
   }
 
@@ -333,7 +333,7 @@ class IntervalCheck
   property("(x -- y) ⊆ x && (x -- y) & y = Ø") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       (x -- y).foreach { zi =>
-        (zi isSubsetOf x) shouldBe true
+        (zi.isSubsetOf(x)) shouldBe true
         (zi intersects y) shouldBe false
       }
     }
@@ -406,7 +406,7 @@ class IntervalCheck
       val c: Interval[Rational] = f(a)
       sample(a, tries).foreach { x =>
         val ok = c.contains(g(x))
-        if (!ok) println("%s failed on %s" format (a, x.toString))
+        if (!ok) println("%s failed on %s".format(a, x.toString))
         ok shouldBe true
       }
     }
@@ -419,13 +419,13 @@ class IntervalCheck
       val c: Interval[Rational] = f(a, b)
       sample(a, tries).zip(sample(b, tries)).foreach {
         case (x, y) =>
-          if (!a.contains(x)) println("%s does not contain %s" format (a, x))
-          if (!b.contains(y)) println("%s does not contain %s" format (b, y))
+          if (!a.contains(x)) println("%s does not contain %s".format(a, x))
+          if (!b.contains(y)) println("%s does not contain %s".format(b, y))
           val ok = c.contains(g(x, y))
           if (!ok)
             println(
-              "(%s, %s) failed on (%s, %s)" format
-                (a, b, x.toString, y.toString))
+              "(%s, %s) failed on (%s, %s)"
+                .format(a, b, x.toString, y.toString))
           ok shouldBe true
       }
     }
@@ -440,7 +440,7 @@ class IntervalCheck
   property("sampled binop -") { testBinop(_ - _)(_ - _) }
   property("sampled binop *") { testBinop(_ * _)(_ * _) }
   property("sampled binop vmin") { testBinop(_ vmin _)(_ min _) }
-  property("sampled binop vmax") { testBinop(_ vmax _)(_ max _) }
+  property("sampled binop vmax") { testBinop(_.vmax(_))(_.max(_)) }
 
   property("toString/apply") {
     forAll { (x: Interval[Rational]) =>

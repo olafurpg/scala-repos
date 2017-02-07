@@ -101,20 +101,25 @@ object Template extends Logging {
     }
 
     val (host, port) =
-      gitProxy map { p =>
-        val proxyUri = new URI(p)
-        (Option(proxyUri.getHost),
-         if (proxyUri.getPort == -1) None else Some(proxyUri.getPort))
-      } getOrElse {
-        (sys.props.get("http.proxyHost"), sys.props.get("http.proxyPort").map {
-          p =>
-            try {
-              Some(p.toInt)
-            } catch {
-              case e: NumberFormatException => None
-            }
-        } getOrElse None)
-      }
+      gitProxy
+        .map { p =>
+          val proxyUri = new URI(p)
+          (Option(proxyUri.getHost),
+           if (proxyUri.getPort == -1) None else Some(proxyUri.getPort))
+        }
+        .getOrElse {
+          (sys.props.get("http.proxyHost"),
+           sys.props
+             .get("http.proxyPort")
+             .map { p =>
+               try {
+                 Some(p.toInt)
+               } catch {
+                 case e: NumberFormatException => None
+               }
+             }
+             .getOrElse(None))
+        }
 
     (host, port) match {
       case (Some(h), Some(p)) => Http(url).proxy(h, p)
@@ -139,15 +144,21 @@ object Template extends Logging {
             val url = s"https://api.github.com/repos/$repo/$apiType"
             val http = httpOptionalProxy(url)
             val response =
-              reposCache.get(repo).map { cache =>
-                cache.headers.get("ETag").map { etag =>
-                  http.header("If-None-Match", etag).asString
-                } getOrElse {
+              reposCache
+                .get(repo)
+                .map { cache =>
+                  cache.headers
+                    .get("ETag")
+                    .map { etag =>
+                      http.header("If-None-Match", etag).asString
+                    }
+                    .getOrElse {
+                      http.asString
+                    }
+                }
+                .getOrElse {
                   http.asString
                 }
-              } getOrElse {
-                http.asString
-              }
 
             val body =
               if (response.code == 304) {
@@ -226,23 +237,26 @@ object Template extends Logging {
     val repos =
       getGitHubRepos(Seq(ca.template.repository), "tags", ".templates-cache")
 
-    repos.get(ca.template.repository).map { repo =>
-      try {
-        read[List[GitHubTag]](repo.body)
-      } catch {
-        case e: MappingException =>
-          error(
-            s"Either ${ca.template.repository} is not a valid GitHub " +
-              "repository, or it does not have any tag. Aborting.")
-          return 1
+    repos
+      .get(ca.template.repository)
+      .map { repo =>
+        try {
+          read[List[GitHubTag]](repo.body)
+        } catch {
+          case e: MappingException =>
+            error(
+              s"Either ${ca.template.repository} is not a valid GitHub " +
+                "repository, or it does not have any tag. Aborting.")
+            return 1
+        }
       }
-    } getOrElse {
-      error(s"Failed to retrieve ${ca.template.repository}. Aborting.")
-      return 1
-    }
+      .getOrElse {
+        error(s"Failed to retrieve ${ca.template.repository}. Aborting.")
+        return 1
+      }
 
     val name =
-      ca.template.name getOrElse {
+      ca.template.name.getOrElse {
         try {
           Process("git config --global user.name").lines.toList(0)
         } catch {
@@ -252,13 +266,13 @@ object Template extends Logging {
       }
 
     val organization =
-      ca.template.packageName getOrElse {
+      ca.template.packageName.getOrElse {
         readLine(
           "Please enter the template's Scala package name (e.g. com.mycompany): ")
       }
 
     val email =
-      ca.template.email getOrElse {
+      ca.template.email.getOrElse {
         try {
           Process("git config --global user.email").lines.toList(0)
         } catch {
@@ -302,12 +316,15 @@ object Template extends Logging {
     }
 
     val tag =
-      ca.template.version.map { v =>
-        tags.find(_.name == v).getOrElse {
-          println(s"${ca.template.repository} does not have tag $v. Aborting.")
-          return 1
+      ca.template.version
+        .map { v =>
+          tags.find(_.name == v).getOrElse {
+            println(
+              s"${ca.template.repository} does not have tag $v. Aborting.")
+            return 1
+          }
         }
-      } getOrElse tags.head
+        .getOrElse(tags.head)
 
     println(s"Using tag ${tag.name}")
     val url =
@@ -321,10 +338,12 @@ object Template extends Logging {
         return 1
     }
     val finalTrial = try {
-      trial.location.map { loc =>
-        println(s"Redirecting to $loc")
-        httpOptionalProxy(loc).asBytes
-      } getOrElse trial
+      trial.location
+        .map { loc =>
+          println(s"Redirecting to $loc")
+          httpOptionalProxy(loc).asBytes
+        }
+        .getOrElse(trial)
     } catch {
       case e: ConnectException =>
         githubConnectErrorMessage(e)
@@ -387,27 +406,31 @@ object Template extends Logging {
     }
 
     val engineFactory =
-      engineJson.map { ej =>
-        (ej \ "engineFactory").extractOpt[String]
-      } getOrElse None
+      engineJson
+        .map { ej =>
+          (ej \ "engineFactory").extractOpt[String]
+        }
+        .getOrElse(None)
 
-    engineFactory.map { ef =>
-      val pkgName = ef.split('.').dropRight(1).mkString(".")
-      println(s"Replacing $pkgName with $organization...")
+    engineFactory
+      .map { ef =>
+        val pkgName = ef.split('.').dropRight(1).mkString(".")
+        println(s"Replacing $pkgName with $organization...")
 
-      filesToModify.foreach { ftm =>
-        println(s"Processing $ftm...")
-        val fileContent = Source.fromFile(ftm).getLines()
-        val processedLines =
-          fileContent.map(_.replaceAllLiterally(pkgName, organization))
-        FileUtils.writeStringToFile(new File(ftm),
-                                    processedLines.mkString("\n"))
+        filesToModify.foreach { ftm =>
+          println(s"Processing $ftm...")
+          val fileContent = Source.fromFile(ftm).getLines()
+          val processedLines =
+            fileContent.map(_.replaceAllLiterally(pkgName, organization))
+          FileUtils.writeStringToFile(new File(ftm),
+                                      processedLines.mkString("\n"))
+        }
       }
-    } getOrElse {
-      error(
-        "engineFactory is not found in engine.json. Skipping automatic " +
-          "package name replacement.")
-    }
+      .getOrElse {
+        error(
+          "engineFactory is not found in engine.json. Skipping automatic " +
+            "package name replacement.")
+      }
 
     verifyTemplateMinVersion(new File(ca.template.directory, "template.json"))
 

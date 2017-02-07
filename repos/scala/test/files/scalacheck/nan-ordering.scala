@@ -26,7 +26,7 @@ object Test extends Properties("NaN-Ordering") {
   property("Float max") = forAll(specFloats, specFloats) { (d1, d2) =>
     {
       val mathmax = math.max(d1, d2)
-      val numericmax = d1 max d2
+      val numericmax = d1.max(d2)
       mathmax == numericmax || mathmax.isNaN && numericmax.isNaN
     }
   }
@@ -113,7 +113,7 @@ object Test extends Properties("NaN-Ordering") {
   property("Double max") = forAll(specDoubles, specDoubles) { (d1, d2) =>
     {
       val mathmax = math.max(d1, d2)
-      val numericmax = d1 max d2
+      val numericmax = d1.max(d2)
       mathmax == numericmax || mathmax.isNaN && numericmax.isNaN
     }
   }

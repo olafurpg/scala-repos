@@ -23,7 +23,7 @@ object HttpClient {
     def apply(request: Request, service: Service[Request, Response]) = {
       // flatMap asynchronously responds to requests and can "map" them to both
       // success and failure values:
-      service(request) flatMap { response =>
+      service(request).flatMap { response =>
         response.status match {
           case Status.Ok => Future.value(response)
           case Status.Forbidden => Future.exception(new InvalidRequest)
@@ -45,14 +45,14 @@ object HttpClient {
 
     // compose the Filter with the client:
     val client: Service[Request, Response] =
-      handleErrors andThen clientWithoutErrorHandling
+      handleErrors.andThen(clientWithoutErrorHandling)
 
     println("))) Issuing two requests in parallel: ")
     val request1 = makeAuthorizedRequest(client)
     val request2 = makeUnauthorizedRequest(client)
 
     // When both request1 and request2 have completed, close the TCP connection(s).
-    (request1 join request2) ensure {
+    ((request1 join request2)).ensure {
       client.close()
     }
   }
@@ -61,7 +61,7 @@ object HttpClient {
     val authorizedRequest = Request(Version.Http11, Method.Get, "/")
     authorizedRequest.headerMap.add(Fields.Authorization, "open sesame")
 
-    client(authorizedRequest) onSuccess { response =>
+    client(authorizedRequest).onSuccess { response =>
       val responseString = response.contentString
       println("))) Received result for authorized request: " + responseString)
     }
@@ -73,7 +73,7 @@ object HttpClient {
 
     // use the onFailure callback since we convert HTTP 4xx and 5xx class
     // responses to Exceptions.
-    client(unauthorizedRequest) onFailure { error =>
+    client(unauthorizedRequest).onFailure { error =>
       println(
         "))) Unauthorized request errored (as desired): " +
           error.getClass.getName)

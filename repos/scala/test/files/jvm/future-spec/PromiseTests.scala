@@ -34,14 +34,14 @@ class PromiseTests extends MinimalScalaTest {
       val empty = Promise[String]().future
       val timedOut = Promise.successful[String]("Timedout").future
 
-      Await.result(failure fallbackTo timedOut, defaultTimeout) mustBe
+      Await.result(failure.fallbackTo(timedOut), defaultTimeout) mustBe
         ("Timedout")
-      Await.result(timedOut fallbackTo empty, defaultTimeout) mustBe
+      Await.result(timedOut.fallbackTo(empty), defaultTimeout) mustBe
         ("Timedout")
-      Await.result(otherFailure fallbackTo failure fallbackTo timedOut,
+      Await.result(otherFailure.fallbackTo(failure).fallbackTo(timedOut),
                    defaultTimeout) mustBe ("Timedout")
       intercept[RuntimeException] {
-        Await.result(failure fallbackTo otherFailure, defaultTimeout)
+        Await.result(failure.fallbackTo(otherFailure), defaultTimeout)
       }.getMessage mustBe ("br0ken")
     }
 
@@ -163,10 +163,10 @@ class PromiseTests extends MinimalScalaTest {
 
     "filter result" in {
       f { (future, result) =>
-        Await.result((future filter (_ => true)), defaultTimeout) mustBe
+        Await.result((future.filter(_ => true)), defaultTimeout) mustBe
           (result)
         intercept[NoSuchElementException] {
-          Await.result((future filter (_ => false)), defaultTimeout)
+          Await.result((future.filter(_ => false)), defaultTimeout)
         }
       }
     }
@@ -174,7 +174,7 @@ class PromiseTests extends MinimalScalaTest {
     "transform result with map" in {
       f(
         (future, result) =>
-          Await.result((future map (_.toString.length)), defaultTimeout) mustBe
+          Await.result((future.map(_.toString.length)), defaultTimeout) mustBe
             (result.toString.length))
     }
 
@@ -189,18 +189,18 @@ class PromiseTests extends MinimalScalaTest {
     "perform action with foreach" in {
       f { (future, result) =>
         val p = Promise[Any]()
-        future foreach p.success
+        future.foreach(p.success)
         Await.result(p.future, defaultTimeout) mustBe (result)
       }
     }
 
     "zip properly" in {
       f { (future, result) =>
-        Await.result(future zip Promise.successful("foo").future,
+        Await.result(future.zip(Promise.successful("foo").future),
                      defaultTimeout) mustBe ((result, "foo"))
         intercept[RuntimeException] {
           Await.result(
-            future zip Promise.failed(new RuntimeException("ohnoes")).future,
+            future.zip(Promise.failed(new RuntimeException("ohnoes")).future),
             defaultTimeout)
         }.getMessage mustBe ("ohnoes")
       }
@@ -267,10 +267,10 @@ class PromiseTests extends MinimalScalaTest {
     "retain exception with filter" in {
       f { (future, message) =>
         intercept[E] {
-          Await.result(future filter (_ => true), defaultTimeout)
+          Await.result(future.filter(_ => true), defaultTimeout)
         }.getMessage mustBe (message)
         intercept[E] {
-          Await.result(future filter (_ => false), defaultTimeout)
+          Await.result(future.filter(_ => false), defaultTimeout)
         }.getMessage mustBe (message)
       }
     }
@@ -278,7 +278,7 @@ class PromiseTests extends MinimalScalaTest {
     "retain exception with map" in {
       f { (future, message) =>
         intercept[E] {
-          Await.result(future map (_.toString.length), defaultTimeout)
+          Await.result(future.map(_.toString.length), defaultTimeout)
         }.getMessage mustBe (message)
       }
     }
@@ -286,7 +286,7 @@ class PromiseTests extends MinimalScalaTest {
     "retain exception with flatMap" in {
       f { (future, message) =>
         intercept[E] {
-          Await.result(future flatMap (_ => Promise.successful("foo").future),
+          Await.result(future.flatMap(_ => Promise.successful("foo").future),
                        defaultTimeout)
         }.getMessage mustBe (message)
       }
@@ -295,7 +295,7 @@ class PromiseTests extends MinimalScalaTest {
     "zip properly" in {
       f { (future, message) =>
         intercept[E] {
-          Await.result(future zip Promise.successful("foo").future,
+          Await.result(future.zip(Promise.successful("foo").future),
                        defaultTimeout)
         }.getMessage mustBe (message)
       }

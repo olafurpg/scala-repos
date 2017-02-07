@@ -113,7 +113,7 @@ object FingerTreeTest extends SpecLite {
       val tree =
         streamToTree(intStream.take(20)).traverseTree[Option, Int, Int](i =>
           Some(i * 2))
-      tree.map(_.toStream) getOrElse (Stream.empty) must_===
+      tree.map(_.toStream).getOrElse(Stream.empty) must_===
         (streamToTree(intStream.take(20).map(_ * 2)).toStream)
     }
 
@@ -128,7 +128,7 @@ object FingerTreeTest extends SpecLite {
       val tree: Option[FingerTree[Int, Int]] =
         streamToTree(intStream.take(32 * 1024))
           .traverseTree[Option, Int, Int](x => Some(x))
-      tree.map(_.toStream.take(100)) getOrElse Stream.empty must_===
+      tree.map(_.toStream.take(100)).getOrElse(Stream.empty) must_===
         (intStream.take(100))
     }
   }

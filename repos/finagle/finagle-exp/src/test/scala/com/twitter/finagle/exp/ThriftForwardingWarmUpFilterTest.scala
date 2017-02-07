@@ -29,8 +29,8 @@ class ThriftForwardingWarmUpFilterTest extends FunSuite with MockitoSugar {
     val rep = new Array[Byte](2)
 
     def mockService[A](service: Service[A, Array[Byte]]) =
-      when(service(any[A])) thenReturn Future.value(rep)
-    def sendRequests() = 0 until numRequests foreach { _ =>
+      when(service(any[A])).thenReturn(Future.value(rep))
+    def sendRequests() = (0 until numRequests).foreach { _ =>
       filter(req, service)
     }
   }

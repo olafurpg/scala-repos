@@ -118,7 +118,7 @@ abstract class MappedString[T <: Mapper[T]](val fieldOwner: T, val maxLen: Int)
     )
 
   protected def valueTypeToBoxString(in: String): Box[String] = Full(in)
-  protected def boxStrToValType(in: Box[String]): String = in openOr ""
+  protected def boxStrToValType(in: Box[String]): String = in.openOr("")
 
   protected def real_i_set_!(value: String): String = {
     if (!data.defined_? || value != data.get) {

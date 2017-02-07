@@ -28,16 +28,16 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
   import BijectionT._
 
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1): LensFamily[X1, X2, B1, B2] =
-    lensFamily(x => run(g(x)) map f)
+    lensFamily(x => run(g(x)).map(f))
 
   def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X]): LensFamily[X, X, B1, B2] =
-    xmapA(b to _)(b from _)
+    xmapA(b to _)(b.from(_))
 
   def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2): LensFamily[A1, A2, X1, X2] =
     lensFamily(a => run(a).xmap(f)(g))
 
   def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X]): LensFamily[A1, A2, X, X] =
-    xmapB(b to _)(b from _)
+    xmapB(b to _)(b.from(_))
 
   def get(a: A1): B1 =
     run(a).pos
@@ -60,7 +60,7 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
   /** Modify the value viewed through the lens, returning a functor `X` full of results. */
   def modf[X[_]](f: B1 => X[B2], a: A1)(implicit XF: Functor[X]): X[A2] = {
     val c = run(a)
-    XF.map(f(c.pos))(c put _)
+    XF.map(f(c.pos))(c.put(_))
   }
 
   def =>>=[X[_]](f: B1 => X[B2])(implicit XF: Functor[X]): A1 => X[A2] =
@@ -77,7 +77,7 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
     IndexedState(a => {
       val c = run(a)
       val b = f(c.pos)
-      (c put b, b)
+      (c.put(b), b)
     })
 
   /** Modify the portion of the state viewed through the lens and return its new value. */
@@ -91,7 +91,7 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
     IndexedState(a => {
       val c = run(a)
       val o = c.pos
-      (c put f(o), o)
+      (c.put(f(o)), o)
     })
 
   /** Modify the portion of the state viewed through the lens and return its old value. alias for `modo`
@@ -167,7 +167,7 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
     lensFamily(c => {
       val (ac, a) = that.run(c).run
       val (ba, b) = run(a).run
-      IndexedStore(ac compose ba, b)
+      IndexedStore(ac.compose(ba), b)
     })
 
   /** alias for `compose` */
@@ -177,7 +177,7 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
 
   def andThen[C1, C2](
       that: LensFamily[B1, B2, C1, C2]): LensFamily[A1, A2, C1, C2] =
-    that compose this
+    that.compose(this)
 
   /** alias for `andThen` */
   def >=>[C1, C2](
@@ -189,9 +189,9 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
     : LensFamily[A1 \/ C1, A2 \/ C2, B1, B2] =
     lensFamily {
       case -\/(a) =>
-        run(a) map (\/.left)
+        run(a).map(\/.left)
       case \/-(c) =>
-        that run c map (\/.right)
+        that.run(c).map(\/.right)
     }
 
   /** Alias for `sum` */
@@ -221,7 +221,7 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
     def doubleSet[A >: A2 <: A1, B >: B1 <: B2](a: A, b1: B, b2: B)(
         implicit A: Equal[A]): Boolean = {
       val r = run(a)
-      A.equal(run(r.put(b1): A) put b2, r put b2)
+      A.equal(run(r.put(b1): A).put(b2), r.put(b2))
     }
   }
 
@@ -299,7 +299,7 @@ trait LensFamilyFunctions {
         case \/-(r) => Store(_ => false, r)
       }, {
         val x = q.pos
-        if (q put x) -\/(x) else \/-(x)
+        if (q.put(x)) -\/(x) else \/-(x)
       }))
 
   def factorLensFamily[A1, A2, B1, B2, C1, C2]
@@ -391,7 +391,7 @@ trait LensFunctions extends LensFamilyFunctions {
               case None => m - k
               case Some(v) => m.updated(k, v)
             }: Option[V] => Map[K, V]),
-          _ get k)
+          _.get(k))
 
   /** Access the value at a particular key of a Map.WithDefault */
   def mapWithDefaultLens[K, V](k: K): Map.WithDefault[K, V] @> V =
@@ -404,7 +404,7 @@ trait LensFunctions extends LensFamilyFunctions {
   def applyLens[A, B](k: B => A)(implicit e: Equal[A]): Store[A, B] @> B =
     lens(q => {
       lazy val x = q.pos
-      lazy val y = q put x
+      lazy val y = q.put(x)
       Store(b => Store(w => if (e equal (x, w)) b else y, x), y)
     })
 
@@ -415,7 +415,7 @@ trait LensFunctions extends LensFamilyFunctions {
         case \/-(r) => Store(_ => false, r)
       }, {
         val x = q.pos
-        if (q put x) -\/(x) else \/-(x)
+        if (q.put(x)) -\/(x) else \/-(x)
       }))
 
   def factorLens[A, B, C]: ((A, B) \/ (A, C)) @> (A, B \/ C) =
@@ -467,12 +467,12 @@ abstract class LensInstances extends LensInstances0 {
       def unzip[A, B](a: LensFamily[S, R, (A, B), (A, B)]) =
         (
           lensFamily(x => {
-            val c = a run x
+            val c = a.run(x)
             val (p, q) = c.pos
             IndexedStore(a => c.put((a, q)): R, p)
           }),
           lensFamily(x => {
-            val c = a run x
+            val c = a.run(x)
             val (p, q) = c.pos
             IndexedStore(a => c.put((p, a)): R, q)
           })
@@ -545,7 +545,7 @@ abstract class LensInstances extends LensInstances0 {
     /** This lens has undefined behavior when accessing an element not present in the map! */
     def at(k: K): LensFamily[S1, S2, V, V] =
       lensFamilyg[S1, S2, V, V](s => v => lens.mod(_ + (k -> v), s): Id[S2],
-                                lens.get(_) apply k)
+                                lens.get(_).apply(k))
 
     def +=(elem1: (K, V),
            elem2: (K, V),
@@ -583,10 +583,10 @@ abstract class LensInstances extends LensInstances0 {
   case class SeqLikeLensFamily[S1, S2, A, Repr <: SeqLike[A, Repr]](
       lens: LensFamily[S1, S2, Repr, Repr]) {
     def sortWith(lt: (A, A) => Boolean): IndexedState[S1, S2, Unit] =
-      lens %== (_ sortWith lt)
+      lens %== (_.sortWith(lt))
 
     def sortBy[B: math.Ordering](f: A => B): IndexedState[S1, S2, Unit] =
-      lens %== (_ sortBy f)
+      lens %== (_.sortBy(f))
 
     def sort[B >: A](
         implicit ord: math.Ordering[B]): IndexedState[S1, S2, Unit] =
@@ -607,7 +607,7 @@ abstract class LensInstances extends LensInstances0 {
   case class QueueLensFamily[S1, S2, A](
       lens: LensFamily[S1, S2, Queue[A], Queue[A]]) {
     def enqueue(elem: A): IndexedState[S1, S2, Unit] =
-      lens %== (_ enqueue elem)
+      lens %== (_.enqueue(elem))
 
     def dequeue: IndexedState[S1, S2, A] =
       lens %%= State[Queue[A], A](_.dequeue.swap)
@@ -635,7 +635,7 @@ abstract class LensInstances extends LensInstances0 {
               copy.update(n, v)
               copy
             }, s): Id[S2],
-        s => lens.get(s) apply n
+        s => lens.get(s).apply(n)
       )
 
     def length: State[S1, Int] =
@@ -754,9 +754,9 @@ private[scalaz] trait LensCategory extends Choice[Lens] with Split[Lens] {
   def choice[A, B, C](f: => Lens[A, C], g: => Lens[B, C]): Lens[A \/ B, C] =
     LensFamily.lens {
       case -\/(a) =>
-        f run a map (\/.left)
+        f.run(a).map(\/.left)
       case \/-(b) =>
-        g run b map (\/.right)
+        g.run(b).map(\/.right)
     }
 
   def split[A, B, C, D](f: Lens[A, B], g: Lens[C, D]): Lens[(A, C), (B, D)] =

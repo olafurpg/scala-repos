@@ -39,13 +39,13 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
   implicit def listOrdering[A](implicit ord0: Ordering[A]) =
     new Ordering[List[A]] {
       def compare(a: List[A], b: List[A]): Int =
-        (a zip b) map ((ord0.compare _).tupled) find (_ != 0) getOrElse
-          (a.length - b.length)
+        ((a.zip(b)).map((ord0.compare _).tupled) find (_ != 0))
+          .getOrElse(a.length - b.length)
     }
 
   def extractCValues(colGroups: List[List[Column]], row: Int): List[CValue] = {
-    colGroups map {
-      _ find (_.isDefinedAt(row)) map (_.cValue(row)) getOrElse CUndefined
+    colGroups.map {
+      (_ find (_.isDefinedAt(row))).map(_.cValue(row)).getOrElse(CUndefined)
     }
   }
 
@@ -65,7 +65,7 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
   }
 
   def toCValues(slice: Slice) =
-    sortableCValues(slice, VectorCase.empty) map (_._2)
+    sortableCValues(slice, VectorCase.empty).map(_._2)
 
   def fakeSort(slice: Slice, sortKey: VectorCase[CPath]) =
     sortableCValues(slice, sortKey).sortBy(_._1).map(_._2)
@@ -77,7 +77,7 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
   }
 
   def stripUndefineds(cvals: List[CValue]): Set[CValue] =
-    (cvals filter (_ != CUndefined)).toSet
+    (cvals.filter(_ != CUndefined)).toSet
 
   // Commented out for now. sortWith is correct semantically, but it ruins
   // the semantics of sortBy (which uses sortWith). Need to add a global ID.
@@ -173,7 +173,7 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
 
       check { fullSlices: List[Slice] =>
         val slices =
-          fullSlices collect {
+          fullSlices.collect {
             case slice if Random.nextBoolean => slice
             case _ => emptySlice
           }
@@ -183,7 +183,7 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
     }
 
     "concat heterogeneous slices" in {
-      val pds = List.fill(25)(concatProjDesc filter (_ => Random.nextBoolean))
+      val pds = List.fill(25)(concatProjDesc.filter(_ => Random.nextBoolean))
       val g1 :: g2 :: gs = pds.map(genSlice(0, _, 17))
 
       implicit val arbSlice = Arbitrary(Gen.oneOf(g1, g2, gs: _*))

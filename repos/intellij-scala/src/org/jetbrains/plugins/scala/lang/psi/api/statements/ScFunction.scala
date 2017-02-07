@@ -362,7 +362,7 @@ trait ScFunction
   def returnTypeInner: TypeResult[ScType]
 
   def declaredType: TypeResult[ScType] =
-    wrap(returnTypeElement) flatMap (_.getType(TypingContext.empty))
+    wrap(returnTypeElement).flatMap(_.getType(TypingContext.empty))
 
   def clauses: Option[ScParameters] = Some(paramClauses)
 

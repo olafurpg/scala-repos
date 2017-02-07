@@ -92,7 +92,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
     def genSubclassDispatch(x: SubclassDispatch): c.Tree = {
       val tpe = x.parent.tpe[c.universe.type](c.universe)
       val clazzName = newTermName("clazz")
-      val compileTimeDispatch: List[CaseDef] = (x.subClasses map { subtpe =>
+      val compileTimeDispatch: List[CaseDef] = (x.subClasses.map { subtpe =>
         val tpe = subtpe.tpe[c.universe.type](c.universe)
         CaseDef(Bind(clazzName, Ident(nme.WILDCARD)),
                 q"clazz == classOf[$tpe]",
@@ -135,7 +135,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
       }
     }
     def genPickleEntry(op: PickleEntry): c.Tree = {
-      val nested = op.ops.toList map genPickleOp
+      val nested = op.ops.toList.map(genPickleOp)
       val oid = c.fresh(newTermName("oid"))
       // TODO - hint known size
       val shareHint: List[c.Tree] =
@@ -249,8 +249,8 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
     val names = cons.fieldNames
     val tpess = cons.constructor.parameterTypes[c.universe.type](c.universe)
     val argss =
-      tpess map { tpes =>
-        tpes map { tpe =>
+      tpess.map { tpes =>
+        tpes.map { tpe =>
           val name = names(idx)
           idx += 1
           readField(name, tpe)
@@ -273,8 +273,8 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
     val names = cons.fields
     val tpess = cons.factoryMethod.parameterTypes[c.universe.type](c.universe)
     val argss =
-      tpess map { tpes =>
-        tpes map { tpe =>
+      tpess.map { tpes =>
+        tpes.map { tpe =>
           val name = names(idx)
           idx += 1
           readField(name, tpe)
@@ -367,7 +367,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
           q"""throw new _root_.scala.pickling.PicklingException("Cannot unpickle, Unexpected tag: " + tagKey + " not recognized.")"""
         )
     val subClassCases =
-      x.subClasses.toList map { sc =>
+      x.subClasses.toList.map { sc =>
         val stpe = sc.tpe[c.universe.type](c.universe)
         val skey = stpe.key
         CaseDef(Literal(Constant(skey)), EmptyTree, createUnpickler(stpe))

@@ -185,13 +185,14 @@ object SparkBuild extends PomBuild {
 
   override val userPropertiesMap = System.getProperties.asScala.toMap
 
-  lazy val MavenCompile = config("m2r") extend (Compile)
+  lazy val MavenCompile = config("m2r").extend(Compile)
   lazy val publishLocalBoth =
     TaskKey[Unit]("publish-local", "publish local for m2 and ivy")
 
   lazy val sparkGenjavadocSettings: Seq[sbt.Def.Setting[_]] = Seq(
     libraryDependencies += compilerPlugin(
-      "org.spark-project" %% "genjavadoc-plugin" % unidocGenjavadocVersion.value cross CrossVersion.full),
+      ("org.spark-project" %% "genjavadoc-plugin" % unidocGenjavadocVersion.value)
+        .cross(CrossVersion.full)),
     scalacOptions <+= target.map(t => "-P:genjavadoc:out=" + (t / "java"))
   )
 
@@ -223,7 +224,7 @@ object SparkBuild extends PomBuild {
       otherResolvers <<= SbtPomKeys.mvnLocalRepository(dotM2 =>
         Seq(Resolver.file("dotM2", dotM2))),
       publishLocalConfiguration in MavenCompile <<=
-        (packagedArtifacts, deliverLocal, ivyLoggingLevel) map {
+        (packagedArtifacts, deliverLocal, ivyLoggingLevel).map {
           (arts, _, level) =>
             new PublishConfiguration(None, "dotM2", arts, Seq(), level)
         },
@@ -277,7 +278,7 @@ object SparkBuild extends PomBuild {
         var failed = 0
         analysis.infos.allInfos.foreach {
           case (k, i) =>
-            i.reportedProblems foreach { p =>
+            i.reportedProblems.foreach { p =>
               val deprecation = p.message.contains("is deprecated")
 
               if (!deprecation) {
@@ -514,7 +515,7 @@ object Catalyst {
         .flatMap(gFileName => (sourceDir ** gFileName).get)
         .foreach {
           gFilePath =>
-            val relGFilePath = (gFilePath relativeTo sourceDir).get.getPath
+            val relGFilePath = (gFilePath.relativeTo(sourceDir)).get.getPath
             log.info("ANTLR: Grammar file '%s' detected.".format(relGFilePath))
             antlr.addGrammarFile(relGFilePath)
             // We will set library directory multiple times here. However, only the
@@ -576,7 +577,7 @@ object Hive {
     javaOptions in Test := (javaOptions in Test).value.filterNot(_ == "-ea"),
     // Supporting all SerDes requires us to depend on deprecated APIs, so we turn off the warnings
     // only for this subproject.
-    scalacOptions <<= scalacOptions map { currentOpts: Seq[String] =>
+    scalacOptions <<= scalacOptions.map { currentOpts: Seq[String] =>
       currentOpts.filterNot(_ == "-deprecation")
     },
     initialCommands in console := """
@@ -627,7 +628,7 @@ object Assembly {
               .asInstanceOf[String])
       },
       jarName in assembly <<=
-        (version, moduleName, hadoopVersion) map { (v, mName, hv) =>
+        (version, moduleName, hadoopVersion).map { (v, mName, hv) =>
           if (mName.contains("streaming-kafka-assembly") ||
               mName.contains("streaming-kinesis-asl-assembly")) {
             // This must match the same name used in maven (see external/kafka-assembly/pom.xml)
@@ -637,7 +638,7 @@ object Assembly {
           }
         },
       jarName in (Test, assembly) <<=
-        (version, moduleName, hadoopVersion) map { (v, mName, hv) =>
+        (version, moduleName, hadoopVersion).map { (v, mName, hv) =>
           s"${mName}-test-${v}.jar"
         },
       mergeStrategy in assembly := {
@@ -681,7 +682,7 @@ object PySparkAssembly {
     // to be included in the assembly. We can't just add "python/" to the assembly's resource dir
     // list since that will copy unneeded / unwanted files.
     resourceGenerators in Compile <+=
-      resourceManaged in Compile map { outDir: File =>
+      (resourceManaged in Compile).map { outDir: File =>
         val src = new File(BuildCommons.sparkHome, "python/pyspark")
         val zipFile =
           new File(BuildCommons.sparkHome, "python/lib/pyspark.zip")
@@ -978,7 +979,7 @@ object TestSettings {
     // Only allow one test at a time, even across projects, since they run in the same JVM
     parallelExecution in Test := false,
     // Make sure the test temp directory exists.
-    resourceGenerators in Test <+= resourceManaged in Test map {
+    resourceGenerators in Test <+= (resourceManaged in Test).map {
       outDir: File =>
         if (!new File(testTempDir).isDirectory()) {
           require(new File(testTempDir).mkdirs())

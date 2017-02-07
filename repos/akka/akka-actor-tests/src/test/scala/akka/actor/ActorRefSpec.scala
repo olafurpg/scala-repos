@@ -70,7 +70,7 @@ object ActorRefSpec {
   class OuterActor(val inner: ActorRef) extends Actor {
     def receive = {
       case "self" ⇒ sender() ! self
-      case x ⇒ inner forward x
+      case x ⇒ inner.forward(x)
     }
   }
 
@@ -79,7 +79,7 @@ object ActorRefSpec {
 
     def receive = {
       case "self" ⇒ sender() ! self
-      case x ⇒ inner forward x
+      case x ⇒ inner.forward(x)
     }
   }
 

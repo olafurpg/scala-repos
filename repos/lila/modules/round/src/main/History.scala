@@ -35,7 +35,7 @@ private[round] final class History(load: Fu[VersionedEvents],
     if (v > version) None
     else if (v == version) Some(Nil)
     else
-      events.takeWhile(_.version > v).reverse.some filter {
+      events.takeWhile(_.version > v).reverse.some.filter {
         case first :: rest => first.version == v + 1
         case _ => true
       }
@@ -48,14 +48,14 @@ private[round] final class History(load: Fu[VersionedEvents],
         case ((vevs, v), e) => (VersionedEvent(e, v + 1) :: vevs, v + 1)
       }
       ._1
-    events = (vevs ::: events) take History.size
+    events = ((vevs ::: events)).take(History.size)
     if (persistenceEnabled) persist(events)
     vevs.reverse
   }
 
   private def waitForLoadedEvents {
     if (events == null) {
-      events = load awaitSeconds 3
+      events = load.awaitSeconds(3)
     }
   }
 
@@ -83,13 +83,17 @@ private[round] object History {
   private def load(coll: Coll,
                    gameId: String,
                    withPersistence: Boolean): Fu[VersionedEvents] =
-    coll.find(BSONDocument("_id" -> gameId)).one[BSONDocument].map {
-      _.flatMap(_.getAs[VersionedEvents]("e")) ?? (_.reverse)
-    } addEffect {
-      case events if events.nonEmpty && !withPersistence =>
-        coll.remove(BSONDocument("_id" -> gameId)).void
-      case _ =>
-    }
+    coll
+      .find(BSONDocument("_id" -> gameId))
+      .one[BSONDocument]
+      .map {
+        _.flatMap(_.getAs[VersionedEvents]("e")) ?? (_.reverse)
+      }
+      .addEffect {
+        case events if events.nonEmpty && !withPersistence =>
+          coll.remove(BSONDocument("_id" -> gameId)).void
+        case _ =>
+      }
 
   private def persist(coll: Coll, gameId: String)(vevs: List[VersionedEvent]) {
     if (vevs.nonEmpty)

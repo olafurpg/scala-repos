@@ -314,7 +314,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
       FC.equal(
         ap(ap(fa)(fab))(fbc),
         ap(fa)(
-          ap(fab)(map(fbc)((bc: B => C) => (ab: A => B) => bc compose ab))))
+          ap(fab)(map(fbc)((bc: B => C) => (ab: A => B) => bc.compose(ab)))))
   }
   def applyLaw = new ApplyLaw {}
 

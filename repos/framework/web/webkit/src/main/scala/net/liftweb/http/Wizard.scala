@@ -157,9 +157,12 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
 
   def noticeTypeToAttr(
       screen: AbstractScreen): Box[NoticeType.Value => MetaData] = {
-    screen.inject[NoticeType.Value => MetaData] or inject[
-      NoticeType.Value => MetaData] or WizardRules
-      .inject[NoticeType.Value => MetaData] or screen.noticeTypeToAttr(screen)
+    screen
+      .inject[NoticeType.Value => MetaData]
+      .or(inject[NoticeType.Value => MetaData])
+      .or(WizardRules
+        .inject[NoticeType.Value => MetaData])
+      .or(screen.noticeTypeToAttr(screen))
   }
 
   /**
@@ -209,7 +212,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     val cancelId = Helpers.nextFuncName
 
     val theScreen: Screen =
-      currentScreen openOr {
+      currentScreen.openOr {
         WizardRules.deregisterWizardSession(CurrentSession.is)
         S.seeOther(Referer.is) // this should never happen
       }
@@ -284,7 +287,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     WizardRules.allTemplatePath.vend
 
   protected def allTemplate: NodeSeq =
-    Templates(allTemplatePath) openOr allTemplateNodeSeq
+    Templates(allTemplatePath).openOr(allTemplateNodeSeq)
 
   /**
     * What additional attributes should be put on the
@@ -448,7 +451,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
           SetHtml(FormGUID, renderHtml())
         }
       }
-    }) openOr AjaxOnDone.is
+    }).openOr(AjaxOnDone.is)
   }
 
   def prevScreen(): JsCmd = {
@@ -466,7 +469,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
       }
 
       SetHtml(FormGUID, renderHtml())
-    }) openOr AjaxOnDone.is
+    }).openOr(AjaxOnDone.is)
   }
 
   protected def vendForm[T](
@@ -540,7 +543,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
 
       override protected def otherFuncVendors(what: Manifest[ValueType])
         : Box[(ValueType, ValueType => Any) => NodeSeq] =
-        Wizard.this.vendForm(manifest) or WizardRules.vendForm(manifest)
+        Wizard.this.vendForm(manifest).or(WizardRules.vendForm(manifest))
     }
 
     Wizard.this._register(this)
@@ -564,7 +567,7 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
     def postFinish() {}
 
     private[http] def enterScreen() {
-      if (! _touched) {
+      if (!_touched) {
         _touched.set(true)
         localSetup()
       }
@@ -600,14 +603,14 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
       WizardVarHandler.clear(name)
 
     override protected def wasInitialized(name: String, bn: String): Boolean = {
-      val old: Boolean = WizardVarHandler.get(bn) openOr false
+      val old: Boolean = WizardVarHandler.get(bn).openOr(false)
       WizardVarHandler.set(bn, this, true)
       old
     }
 
     override protected def testWasSet(name: String, bn: String): Boolean = {
       WizardVarHandler.get(name).isDefined ||
-      (WizardVarHandler.get(bn) openOr false)
+      (WizardVarHandler.get(bn).openOr(false))
     }
 
     /**

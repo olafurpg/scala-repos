@@ -280,7 +280,7 @@ object ProcessKeeper {
       }, 5.seconds)
     }
     //retry on fail
-    Try(killProcess) recover { case _ => killProcess } match {
+    Try(killProcess).recover { case _ => killProcess } match {
       case Success(value) => processes -= name
       case Failure(NonFatal(e)) =>
         log.error("giving up waiting for processes to finish", e)

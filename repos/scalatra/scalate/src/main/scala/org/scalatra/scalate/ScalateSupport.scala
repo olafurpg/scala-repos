@@ -283,10 +283,11 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     val context = createRenderContext(out)
     val attrs =
       templateAttributes ++
-        (defaultLayoutPath map (p => Map("layout" -> p) ++ Map(attributes: _*)) getOrElse Map(
-          attributes: _*))
+        (defaultLayoutPath
+          .map(p => Map("layout" -> p) ++ Map(attributes: _*))
+          .getOrElse(Map(attributes: _*)))
 
-    attrs foreach {
+    attrs.foreach {
       case (k, v) => context.attributes(k) = v
     }
     templateEngine.layout(uri, context)
@@ -316,8 +317,10 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     val finder = new TemplateFinder(templateEngine) {
       override lazy val extensions = extensionSet
     }
-    finder.findTemplate(("/" + path).replaceAll("//", "/")) orElse finder
-      .findTemplate("/%s/%s".format(path, defaultIndexName))
+    finder
+      .findTemplate(("/" + path).replaceAll("//", "/"))
+      .orElse(finder
+        .findTemplate("/%s/%s".format(path, defaultIndexName)))
   }
 
   /**

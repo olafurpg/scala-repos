@@ -320,7 +320,7 @@ object ByteString {
       } else throw new IndexOutOfBoundsException(idx.toString)
 
     override def iterator: ByteIterator.MultiByteArrayIterator =
-      ByteIterator.MultiByteArrayIterator(bytestrings.toStream map {
+      ByteIterator.MultiByteArrayIterator(bytestrings.toStream.map {
         _.iterator
       })
 
@@ -345,7 +345,7 @@ object ByteString {
       else {
         val ar = new Array[Byte](length)
         var pos = 0
-        bytestrings foreach { b ⇒
+        bytestrings.foreach { b ⇒
           b.copyToArray(ar, pos, b.length)
           pos += b.length
         }
@@ -356,7 +356,7 @@ object ByteString {
     def asByteBuffer: ByteBuffer = compact.asByteBuffer
 
     def asByteBuffers: scala.collection.immutable.Iterable[ByteBuffer] =
-      bytestrings map { _.asByteBuffer }
+      bytestrings.map { _.asByteBuffer }
 
     def decodeString(charset: String): String = compact.decodeString(charset)
 
@@ -474,7 +474,7 @@ sealed abstract class ByteString
                                       len: Int): Unit =
     iterator.copyToArray(xs, start, len)
 
-  override def foreach[@specialized U](f: Byte ⇒ U): Unit = iterator foreach f
+  override def foreach[@specialized U](f: Byte ⇒ U): Unit = iterator.foreach(f)
 
   private[akka] def writeToOutputStream(os: ObjectOutputStream): Unit
 
@@ -553,7 +553,7 @@ sealed abstract class ByteString
   /**
     * map method that will automatically cast Int back into Byte.
     */
-  final def mapI(f: Byte ⇒ Int): ByteString = map(f andThen (_.toByte))
+  final def mapI(f: Byte ⇒ Int): ByteString = map(f.andThen(_.toByte))
 }
 
 object CompactByteString {
@@ -840,11 +840,11 @@ final class ByteStringBuilder extends Builder[Byte, ByteString] { builder ⇒
     fillArray(n) { (target, offset) ⇒
       if (byteOrder == ByteOrder.BIG_ENDIAN) {
         val start = n * 8 - 8
-        (0 until n) foreach { i ⇒
+        ((0 until n)).foreach { i ⇒
           target(offset + i) = (x >>> start - 8 * i).toByte
         }
       } else if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-        (0 until n) foreach { i ⇒
+        ((0 until n)).foreach { i ⇒
           target(offset + i) = (x >>> 8 * i).toByte
         }
       } else

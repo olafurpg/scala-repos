@@ -12,7 +12,7 @@ final class MixedCache[K, V] private (cache: SyncCache[K, V],
 
   def get(k: K): V =
     try {
-      cache get k
+      cache.get(k)
     } catch {
       case e: java.util.concurrent.ExecutionException =>
         logger.debug(e.getMessage)
@@ -36,11 +36,12 @@ object MixedCache {
                   logger: lila.log.Logger): MixedCache[K, V] = {
     val async = AsyncCache(f, maxCapacity = 10000, timeToLive = 1 minute)
     val sync = Builder
-      .cache[K, V](timeToLive, (k: K) => async(k) await makeTimeout(awaitTime))
+      .cache[K, V](timeToLive,
+                   (k: K) => async(k).await(makeTimeout(awaitTime)))
     new MixedCache(sync,
                    default,
                    invalidate(async, sync) _,
-                   logger branch "MixedCache")
+                   logger.branch("MixedCache"))
   }
 
   def single[V](f: => Fu[V],
@@ -51,10 +52,10 @@ object MixedCache {
     val async = AsyncCache.single(f, timeToLive = 1 minute)
     val sync = Builder.cache[Boolean, V](
       timeToLive,
-      (_: Boolean) => async(true) await makeTimeout(awaitTime))
+      (_: Boolean) => async(true).await(makeTimeout(awaitTime)))
     new MixedCache(sync,
                    _ => default,
                    invalidate(async, sync) _,
-                   logger branch "MixedCache")
+                   logger.branch("MixedCache"))
   }
 }

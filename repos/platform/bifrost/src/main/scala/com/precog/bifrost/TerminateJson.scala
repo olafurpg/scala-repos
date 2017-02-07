@@ -172,14 +172,16 @@ object TerminateJson {
 
     def rec(stack0: ArrayStack[Int],
             stream: StreamT[M, CharBuffer]): StreamT[M, CharBuffer] = {
-      StreamT(stream.uncons map {
+      StreamT(stream.uncons.map {
         case Some((buf0, tail)) =>
           val (stack, buf) = build(stack0, buf0)
           StreamT.Yield(buf, rec(stack, tail))
         case None =>
-          terminal(stack0) map { buf =>
-            StreamT.Yield(buf, StreamT.empty)
-          } getOrElse StreamT.Done
+          terminal(stack0)
+            .map { buf =>
+              StreamT.Yield(buf, StreamT.empty)
+            }
+            .getOrElse(StreamT.Done)
       })
     }
 

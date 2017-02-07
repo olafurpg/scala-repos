@@ -120,8 +120,8 @@ trait ApiFormats extends ScalatraBase {
 
   private[this] def getFromResponseHeader(
       implicit response: HttpServletResponse): Option[String] = {
-    response.contentType flatMap
-      (ctt => ctt.split(";").headOption flatMap mimeTypes.get)
+    response.contentType.flatMap(ctt =>
+      ctt.split(";").headOption.flatMap(mimeTypes.get))
   }
 
   private def parseAcceptHeader(
@@ -131,26 +131,30 @@ trait ApiFormats extends ScalatraBase {
       a.length == 2 && a(0) == "q" && validRange.contains(a(1).toDouble)
     }
 
-    request.headers.get("Accept") map { s =>
-      val fmts = s.split(",").map(_.trim)
-      val accepted = fmts.foldLeft(Map.empty[Int, List[String]]) { (acc, f) =>
-        val parts = f.split(";").map(_.trim)
-        val i =
-          if (parts.size > 1) {
-            val pars = parts(1)
-              .split("=")
-              .map(_.trim)
-              .grouped(2)
-              .find(isValidQPair)
-              .getOrElse(Array("q", "0"))
-            (pars(1).toDouble * 10).ceil.toInt
-          } else 10
-        acc + (i -> (parts(0) :: acc.get(i).getOrElse(List.empty)))
+    request.headers
+      .get("Accept")
+      .map { s =>
+        val fmts = s.split(",").map(_.trim)
+        val accepted = fmts.foldLeft(Map.empty[Int, List[String]]) {
+          (acc, f) =>
+            val parts = f.split(";").map(_.trim)
+            val i =
+              if (parts.size > 1) {
+                val pars = parts(1)
+                  .split("=")
+                  .map(_.trim)
+                  .grouped(2)
+                  .find(isValidQPair)
+                  .getOrElse(Array("q", "0"))
+                (pars(1).toDouble * 10).ceil.toInt
+              } else 10
+            acc + (i -> (parts(0) :: acc.get(i).getOrElse(List.empty)))
+        }
+        accepted.toList
+          .sortWith((kv1, kv2) => kv1._1 > kv2._1)
+          .flatMap(_._2.reverse)
       }
-      accepted.toList
-        .sortWith((kv1, kv2) => kv1._1 > kv2._1)
-        .flatMap(_._2.reverse)
-    } getOrElse Nil
+      .getOrElse(Nil)
   }
 
   protected def formatForMimeTypes(mimeTypes: String*): Option[String] = {
@@ -159,10 +163,10 @@ trait ApiFormats extends ScalatraBase {
       tm.toLowerCase(ENGLISH).startsWith(f) ||
       (defaultMimeType == f && tm.contains(defaultMimeType))
     }
-    mimeTypes find { hdr =>
-      formats exists { case (k, v) => matchMimeType(hdr, v) }
-    } flatMap { hdr =>
-      formats find { case (k, v) => matchMimeType(hdr, v) } map { _._1 }
+    (mimeTypes find { hdr =>
+      formats.exists { case (k, v) => matchMimeType(hdr, v) }
+    }).flatMap { hdr =>
+      (formats find { case (k, v) => matchMimeType(hdr, v) }).map { _._1 }
     }
   }
 
@@ -174,11 +178,11 @@ trait ApiFormats extends ScalatraBase {
     */
   protected def inferFromFormats: ContentTypeInferrer = {
     case _ if format.nonBlank =>
-      formats.get(format) getOrElse "application/octet-stream"
+      formats.get(format).getOrElse("application/octet-stream")
   }
 
   override protected def contentTypeInferrer: ContentTypeInferrer = {
-    inferFromFormats orElse super.contentTypeInferrer
+    inferFromFormats.orElse(super.contentTypeInferrer)
   }
 
   protected def acceptedFormats(accepted: Symbol*): Boolean = {
@@ -187,14 +191,17 @@ trait ApiFormats extends ScalatraBase {
       else accepted.map(_.name).toList
     }
     conditions.isEmpty ||
-    (conditions filter { s =>
+    (conditions.filter { s =>
       formats.get(s).isDefined
     } contains contentType)
   }
 
   private def getFormat(implicit request: HttpServletRequest,
                         response: HttpServletResponse): String = {
-    getFromResponseHeader orElse getFromParams orElse getFromAcceptHeader getOrElse defaultFormat.name
+    getFromResponseHeader
+      .orElse(getFromParams)
+      .orElse(getFromAcceptHeader)
+      .getOrElse(defaultFormat.name)
   }
 
   protected[scalatra] override def withRouteMultiParams[S](
@@ -222,7 +229,7 @@ trait ApiFormats extends ScalatraBase {
 
   def requestFormat(implicit request: HttpServletRequest): String = {
     request.contentType
-      .flatMap(t => t.split(";").headOption flatMap mimeTypes.get)
+      .flatMap(t => t.split(";").headOption.flatMap(mimeTypes.get))
       .getOrElse(format)
   }
 

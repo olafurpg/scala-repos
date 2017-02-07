@@ -65,8 +65,8 @@ private[scalaz] sealed class CodensityMonad[F[_]]
   final def point[A](a: => A) = Codensity.pureCodensity(a)
 
   override final def map[A, B](fa: Codensity[F, A])(f: A => B) =
-    fa map f
+    fa.map(f)
 
   final def bind[A, B](fa: Codensity[F, A])(k: A => Codensity[F, B]) =
-    fa flatMap k
+    fa.flatMap(k)
 }

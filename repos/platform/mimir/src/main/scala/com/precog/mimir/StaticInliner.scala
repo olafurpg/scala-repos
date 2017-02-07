@@ -44,7 +44,7 @@ trait StdLibStaticInlinerModule[M[+ _]]
 
   trait StdLibStaticInliner extends StaticInliner {
     def inlineStatics(graph: DepGraph, ctx: EvaluationContext): DepGraph = {
-      graph mapDown { recurse =>
+      graph.mapDown { recurse =>
         {
           case graph @ Operate(op, child) => {
             recurse(child) match {
@@ -67,9 +67,9 @@ trait StdLibStaticInlinerModule[M[+ _]]
                           col <- newOp1
                             .f1(MorphContext(ctx, graph))
                             .apply(cvalue) if col isDefinedAt 0
-                        } yield col cValue 0
+                        } yield col.cValue(0)
 
-                        Const(result getOrElse CUndefined)(graph.loc)
+                        Const(result.getOrElse(CUndefined))(graph.loc)
                       }
                     )
                   }
@@ -199,16 +199,16 @@ trait StdLibStaticInlinerModule[M[+ _]]
                       .f2(MorphContext(ctx, graph))
                       .partialLeft(leftCValue)
                       .apply(rightCValue) if col isDefinedAt 0
-                  } yield col cValue 0
+                  } yield col.cValue(0)
 
-                  Some(Const(result getOrElse CUndefined)(graph.loc))
+                  Some(Const(result.getOrElse(CUndefined))(graph.loc))
                 }
 
                 case _ => None
               }
             } yield result
 
-            graphM getOrElse Join(op, sort, left2, right2)(graph.loc)
+            graphM.getOrElse(Join(op, sort, left2, right2)(graph.loc))
           }
 
           case Filter(sort @ (IdentitySort | ValueSort(_)), left, right) => {
@@ -223,7 +223,7 @@ trait StdLibStaticInlinerModule[M[+ _]]
               case _ => None
             }
 
-            back getOrElse Filter(sort, left2, right2)(graph.loc)
+            back.getOrElse(Filter(sort, left2, right2)(graph.loc))
           }
 
           case graph @ Filter(sort @ Cross(_), left, right) => {
@@ -241,7 +241,7 @@ trait StdLibStaticInlinerModule[M[+ _]]
               case _ => None
             }
 
-            back getOrElse Filter(sort, left2, right2)(graph.loc)
+            back.getOrElse(Filter(sort, left2, right2)(graph.loc))
           }
         }
       }

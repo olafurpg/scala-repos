@@ -30,7 +30,7 @@ class TensorKeys[K, V, +This](private val tensor: This,
     if (active) tensor.activeKeysIterator else tensor.keysIterator
   }.filter(f)
 
-  def foreach[U](fn: K => U) = iterator foreach fn
+  def foreach[U](fn: K => U) = iterator.foreach(fn)
   def filter(p: K => Boolean): TensorKeys[K, V, This] = withFilter(p)
   def withFilter(p: K => Boolean): TensorKeys[K, V, This] =
     new TensorKeys[K, V, This](tensor, active, { (a: K) =>

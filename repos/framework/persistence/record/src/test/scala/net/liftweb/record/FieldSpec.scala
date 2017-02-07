@@ -279,7 +279,7 @@ object FieldSpec extends Specification {
       }
     }
 
-    formPattern foreach { fp =>
+    formPattern.foreach { fp =>
       "convert to form XML" in {
         mandatory.set(example)
         val session = new LiftSession("", randomString(20), Empty)
@@ -293,7 +293,7 @@ object FieldSpec extends Specification {
                       case e: Elem =>
                         e.attribute("selected").map(_.text) == Some("selected")
                       case _ => false
-                    }) andThen "* [value]" #> ".*"))(fprime)
+                    }).andThen("* [value]" #> ".*")))(fprime)
               val ret: Boolean = Helpers.compareXml(f, fp)
               ret must_== true
           }
@@ -335,19 +335,19 @@ object FieldSpec extends Specification {
       rec.mandatoryBooleanField.setFromAny(java.lang.Boolean.TRUE)
       rec.optionalBooleanField.setFromAny(java.lang.Boolean.TRUE)
       (rec.mandatoryBooleanField.get &&
-      (rec.optionalBooleanField.get getOrElse false)) must_== true
+      (rec.optionalBooleanField.get.getOrElse(false))) must_== true
     }
     "support Full(java.lang.Boolean)" in {
       rec.mandatoryBooleanField.setFromAny(Full(java.lang.Boolean.TRUE))
       rec.optionalBooleanField.setFromAny(Full(java.lang.Boolean.TRUE))
       (rec.mandatoryBooleanField.get &&
-      (rec.optionalBooleanField.get getOrElse false)) must_== true
+      (rec.optionalBooleanField.get.getOrElse(false))) must_== true
     }
     "support Some(java.lang.Boolean)" in {
       rec.mandatoryBooleanField.setFromAny(Some(java.lang.Boolean.TRUE))
       rec.optionalBooleanField.setFromAny(Some(java.lang.Boolean.TRUE))
       (rec.mandatoryBooleanField.get &&
-      (rec.optionalBooleanField.get getOrElse false)) must_== true
+      (rec.optionalBooleanField.get.getOrElse(false))) must_== true
     }
   }
 
@@ -475,25 +475,25 @@ object FieldSpec extends Specification {
     "pass validation if field is optional and value is Empty" in {
       S.initIfUninitted(session) {
         rec.legacyOptionalEmailField(Empty)
-        rec.legacyOptionalEmailField.validate must have length (0)
+        (rec.legacyOptionalEmailField.validate must have).length(0)
 
         rec.optionalEmailField(Empty)
-        rec.optionalEmailField.validate must have length (0)
+        (rec.optionalEmailField.validate must have).length(0)
       }
     }
     "pass validation if field is optional and value is an empty string" in {
       S.initIfUninitted(session) {
         rec.legacyOptionalEmailField("")
-        rec.legacyOptionalEmailField.validate must have length (0)
+        (rec.legacyOptionalEmailField.validate must have).length(0)
 
         rec.optionalEmailField("")
-        rec.optionalEmailField.validate must have length (0)
+        (rec.optionalEmailField.validate must have).length(0)
       }
     }
     "fail validation if value is invalid" in {
       S.initIfUninitted(session) {
         rec.mandatoryEmailField("invalid email")
-        rec.mandatoryEmailField.validate must have length (1)
+        (rec.mandatoryEmailField.validate must have).length(1)
       }
     }
   }
@@ -644,25 +644,25 @@ object FieldSpec extends Specification {
     "pass validation if field is optional and value is Empty" in {
       S.initIfUninitted(session) {
         rec.legacyOptionalPostalCodeField(Empty)
-        rec.legacyOptionalPostalCodeField.validate must have length (0)
+        (rec.legacyOptionalPostalCodeField.validate must have).length(0)
 
         rec.optionalPostalCodeField(Empty)
-        rec.optionalPostalCodeField.validate must have length (0)
+        (rec.optionalPostalCodeField.validate must have).length(0)
       }
     }
     "pass validation if field is optional and value is an empty string" in {
       S.initIfUninitted(session) {
         rec.legacyOptionalPostalCodeField("")
-        rec.legacyOptionalPostalCodeField.validate must have length (0)
+        (rec.legacyOptionalPostalCodeField.validate must have).length(0)
 
         rec.optionalPostalCodeField("")
-        rec.optionalPostalCodeField.validate must have length (0)
+        (rec.optionalPostalCodeField.validate must have).length(0)
       }
     }
     "fail validation if value is invalid" in {
       S.initIfUninitted(session) {
         rec.mandatoryPostalCodeField("invalid zip")
-        rec.mandatoryPostalCodeField.validate must have length (1)
+        (rec.mandatoryPostalCodeField.validate must have).length(1)
       }
     }
   }

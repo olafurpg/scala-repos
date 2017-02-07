@@ -42,7 +42,7 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
 
     // PAlgo2.Model doesn't have IPersistentModel trait implemented. Hence the
     // model extract after train is Unit.
-    models should contain theSameElementsAs Seq(Unit)
+    (models should contain).theSameElementsAs(Seq(Unit))
   }
 
   test("Engine.train persisting PAlgo.Model") {
@@ -77,7 +77,7 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
     val pModel21 = PersistentModelManifest(model21.getClass.getName)
     val pModel22 = PersistentModelManifest(model22.getClass.getName)
 
-    models should contain theSameElementsAs Seq(Unit, pModel21, pModel22)
+    (models should contain).theSameElementsAs(Seq(Unit, pModel21, pModel22))
   }
 
   test("Engine.train persisting LAlgo.Model") {
@@ -114,7 +114,7 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
     val pModel20 = PersistentModelManifest(model20.getClass.getName)
     val pModel21 = PersistentModelManifest(model21.getClass.getName)
 
-    models should contain theSameElementsAs Seq(pModel20, pModel21, model22)
+    (models should contain).theSameElementsAs(Seq(pModel20, pModel21, model22))
   }
 
   test("Engine.train persisting P&NAlgo.Model") {
@@ -161,12 +161,8 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
     val pModel22 = PersistentModelManifest(model22.getClass.getName)
     val pModel23 = PersistentModelManifest(model23.getClass.getName)
 
-    models should contain theSameElementsAs Seq(Unit,
-                                                pModel21,
-                                                pModel22,
-                                                pModel23,
-                                                model24,
-                                                model25)
+    (models should contain).theSameElementsAs(
+      Seq(Unit, pModel21, pModel22, pModel23, model24, model25))
   }
 
   test("Engine.eval") {
@@ -192,7 +188,7 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
 
     val evalDataSet = engine.eval(sc, engineParams, WorkflowParams())
 
-    evalDataSet should have size en
+    (evalDataSet should have).size(en)
 
     forAll(evalDataSet.zipWithIndex) {
       case (evalData, ex) => {
@@ -201,7 +197,7 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
 
         val qpaSeq: Seq[(Query, Prediction, Actual)] = qpaRDD.collect
 
-        qpaSeq should have size qn
+        (qpaSeq should have).size(qn)
 
         forAll(qpaSeq) {
           case (q, p, a) =>
@@ -217,7 +213,7 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
                 pId shouldBe 3
                 pQ shouldBe q
                 pModels shouldBe None
-                pPs should have size algoCount
+                (pPs should have).size(algoCount)
                 pPs shouldBe Seq(
                   Prediction(id = 2, q = q, models = Some(model0)))
               }
@@ -281,12 +277,8 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
       params = WorkflowParams()
     )
 
-    deployableModels should contain theSameElementsAs Seq(model20,
-                                                          model21,
-                                                          model22,
-                                                          model23,
-                                                          model24,
-                                                          model25)
+    (deployableModels should contain).theSameElementsAs(
+      Seq(model20, model21, model22, model23, model24, model25))
   }
 }
 
@@ -305,9 +297,8 @@ class EngineTrainSuite extends FunSuite with SharedSparkContext {
 
     val pd = ProcessedData(1, TrainingData(0))
 
-    models should contain theSameElementsAs Seq(PAlgo0.Model(2, pd),
-                                                PAlgo1.Model(3, pd),
-                                                PAlgo0.Model(4, pd))
+    (models should contain).theSameElementsAs(
+      Seq(PAlgo0.Model(2, pd), PAlgo1.Model(3, pd), PAlgo0.Model(4, pd)))
   }
 
   test("Local DS/P/Algos") {
@@ -328,7 +319,7 @@ class EngineTrainSuite extends FunSuite with SharedSparkContext {
       case (model, expected) =>
         model shouldBe a[RDD[_]]
         val localModel = model.asInstanceOf[RDD[_]].collect
-        localModel should contain theSameElementsAs Seq(expected)
+        (localModel should contain).theSameElementsAs(Seq(expected))
     }
   }
 
@@ -343,9 +334,8 @@ class EngineTrainSuite extends FunSuite with SharedSparkContext {
 
     val pd = ProcessedData(1, TrainingData(0))
 
-    models should contain theSameElementsAs Seq(NAlgo0.Model(2, pd),
-                                                NAlgo1.Model(3, pd),
-                                                NAlgo0.Model(4, pd))
+    (models should contain).theSameElementsAs(
+      Seq(NAlgo0.Model(2, pd), NAlgo1.Model(3, pd), NAlgo0.Model(4, pd)))
   }
 
   test("Parallel DS/P/Algos Stop-After-Read") {
@@ -397,9 +387,8 @@ class EngineTrainSuite extends FunSuite with SharedSparkContext {
 
     val pd = ProcessedData(1, TrainingData(0, error = true))
 
-    models should contain theSameElementsAs Seq(PAlgo0.Model(2, pd),
-                                                PAlgo1.Model(3, pd),
-                                                PAlgo0.Model(4, pd))
+    (models should contain).theSameElementsAs(
+      Seq(PAlgo0.Model(2, pd), PAlgo1.Model(3, pd), PAlgo0.Model(4, pd)))
   }
 }
 
@@ -442,7 +431,7 @@ class EngineEvalSuite extends FunSuite with Inside with SharedSparkContext {
                 pId shouldBe 10
                 pQ shouldBe q
                 pModels shouldBe None
-                pPs should have size 1
+                (pPs should have).size(1)
                 pPs shouldBe Seq(
                   Prediction(id = 3, q = q, models = Some(model0)))
               }
@@ -489,7 +478,7 @@ class EngineEvalSuite extends FunSuite with Inside with SharedSparkContext {
                 pId shouldBe 10
                 pQ shouldBe q
                 pModels shouldBe None
-                pPs should have size 3
+                (pPs should have).size(3)
                 pPs shouldBe Seq(
                   Prediction(id = 3, q = q, models = Some(model0)),
                   Prediction(id = 4, q = q, models = Some(model1)),
@@ -540,7 +529,7 @@ class EngineEvalSuite extends FunSuite with Inside with SharedSparkContext {
                 pId shouldBe 10
                 pQ shouldBe q
                 pModels shouldBe None
-                pPs should have size 3
+                (pPs should have).size(3)
                 // queries inside prediction should have supp set to true, since it
                 // represents what the algorithms see.
                 val qSupp = q.copy(supp = true)
@@ -593,7 +582,7 @@ class EngineEvalSuite extends FunSuite with Inside with SharedSparkContext {
                 pId shouldBe 10
                 pQ shouldBe q
                 pModels shouldBe None
-                pPs should have size 3
+                (pPs should have).size(3)
                 pPs shouldBe Seq(
                   Prediction(id = 3, q = q, models = Some(model0)),
                   Prediction(id = 4, q = q, models = Some(model1)),

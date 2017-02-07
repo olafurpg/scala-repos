@@ -44,7 +44,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
     * classes. But we should keep an eye on this.
     */
   val callsites: mutable.Map[MethodNode, Map[MethodInsnNode, Callsite]] =
-    recordPerRunCache(concurrent.TrieMap.empty withDefaultValue Map.empty)
+    recordPerRunCache(concurrent.TrieMap.empty.withDefaultValue(Map.empty))
 
   /**
     * Closure instantiations in the program being compiled.
@@ -56,7 +56,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
   val closureInstantiations: mutable.Map[
     MethodNode,
     Map[InvokeDynamicInsnNode, ClosureInstantiation]] =
-    recordPerRunCache(concurrent.TrieMap.empty withDefaultValue Map.empty)
+    recordPerRunCache(concurrent.TrieMap.empty.withDefaultValue(Map.empty))
 
   def removeCallsite(invocation: MethodInsnNode,
                      methodNode: MethodNode): Option[Callsite] = {
@@ -143,7 +143,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
         lazy val prodCons =
           new ProdConsAnalyzer(methodNode, definingClass.internalName)
 
-        methodNode.instructions.iterator.asScala foreach {
+        methodNode.instructions.iterator.asScala.foreach {
           case call: MethodInsnNode if a.frameAt(call) != null =>
             // skips over unreachable code
             val callee: Either[OptimizerWarning, Callee] = for {
@@ -270,7 +270,7 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
       val consumerFrame = prodConsI.frameAt(consumerInsn)
       consumerFrame.stackTop - numConsumed + 1
     }
-    sams flatMap {
+    sams.flatMap {
       case (index, _) =>
         val prods = prodConsI
           .initialProducersForValueAt(consumerInsn, firstConsumedSlot + index)

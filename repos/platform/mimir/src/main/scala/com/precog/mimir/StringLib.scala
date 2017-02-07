@@ -168,11 +168,11 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     object equalsIgnoreCase
         extends Op2SSB("equalsIgnoreCase", _ equalsIgnoreCase _)
 
-    object startsWith extends Op2SSB("startsWith", _ startsWith _)
+    object startsWith extends Op2SSB("startsWith", _.startsWith(_))
 
-    object endsWith extends Op2SSB("endsWith", _ endsWith _)
+    object endsWith extends Op2SSB("endsWith", _.endsWith(_))
 
-    object matches extends Op2SSB("matches", _ matches _)
+    object matches extends Op2SSB("matches", _.matches(_))
 
     object regexMatch
         extends Op2(StringNamespace, "regexMatch")
@@ -201,7 +201,7 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
                 str match {
                   case reg(capture @ _ *) => {
                     val capture2 =
-                      capture map { str =>
+                      capture.map { str =>
                         if (str == null) ""
                         else str
                       }
@@ -229,16 +229,16 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       val tpe = BinaryOperationType(StrAndDateT, StrAndDateT, JTextT)
       def f2(ctx: MorphContext): F2 = CF2P("builtin::str::concat") {
         case (c1: StrColumn, c2: StrColumn) =>
-          new StrFrom.SS(c1, c2, neitherNull, _ concat _)
+          new StrFrom.SS(c1, c2, neitherNull, _.concat(_))
         case (c1: DateColumn, c2: StrColumn) =>
-          new StrFrom.SS(dateToStrCol(c1), c2, neitherNull, _ concat _)
+          new StrFrom.SS(dateToStrCol(c1), c2, neitherNull, _.concat(_))
         case (c1: StrColumn, c2: DateColumn) =>
-          new StrFrom.SS(c1, dateToStrCol(c2), neitherNull, _ concat _)
+          new StrFrom.SS(c1, dateToStrCol(c2), neitherNull, _.concat(_))
         case (c1: DateColumn, c2: DateColumn) =>
           new StrFrom.SS(dateToStrCol(c1),
                          dateToStrCol(c2),
                          neitherNull,
-                         _ concat _)
+                         _.concat(_))
       }
     }
 
@@ -367,23 +367,23 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       }
     }
 
-    object compareTo extends Op2SSL("compareTo", _ compareTo _) {
+    object compareTo extends Op2SSL("compareTo", _.compareTo(_)) {
       override val deprecation = Some("use compare instead")
     }
 
-    object compare extends Op2SSL("compare", _ compareTo _)
+    object compare extends Op2SSL("compare", _.compareTo(_))
 
     object compareToIgnoreCase
-        extends Op2SSL("compareToIgnoreCase", _ compareToIgnoreCase _) {
+        extends Op2SSL("compareToIgnoreCase", _.compareToIgnoreCase(_)) {
       override val deprecation = Some("use compareIgnoreCase instead")
     }
 
     object compareIgnoreCase
-        extends Op2SSL("compareIgnoreCase", _ compareToIgnoreCase _)
+        extends Op2SSL("compareIgnoreCase", _.compareToIgnoreCase(_))
 
     object indexOf extends Op2SSL("indexOf", _ indexOf _)
 
-    object lastIndexOf extends Op2SSL("lastIndexOf", _ lastIndexOf _)
+    object lastIndexOf extends Op2SSL("lastIndexOf", _.lastIndexOf(_))
 
     object parseNum extends Op1F1(StringNamespace, "parseNum") {
       val intPattern = Pattern.compile("^-?(?:0|[1-9][0-9]*)$")

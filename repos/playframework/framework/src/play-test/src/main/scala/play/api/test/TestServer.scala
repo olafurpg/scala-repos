@@ -73,7 +73,7 @@ object TestServer {
     val process = new TestServerProcess
     val serverProvider: ServerProvider = {
       testServerProvider
-    } getOrElse {
+    }.getOrElse {
       ServerProvider.fromConfiguration(process.classLoader,
                                        config.configuration)
     }

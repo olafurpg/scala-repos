@@ -94,7 +94,7 @@ object Arguments {
           val j = i
           while ((i == j) && iter.hasNext) {
             val prefix = iter.next
-            if (args(i) startsWith prefix) {
+            if (args(i).startsWith(prefix)) {
               res.addPrefixed(prefix,
                               args(i).substring(prefix.length()).trim());
               i += 1
@@ -104,7 +104,7 @@ object Arguments {
             val iter = prefixedBindings.keysIterator;
             while ((i == j) && iter.hasNext) {
               val prefix = iter.next
-              if (args(i) startsWith prefix) {
+              if (args(i).startsWith(prefix)) {
                 val arg = args(i).substring(prefix.length()).trim()
                 i = i + 1
                 res.addBinding(prefix,
@@ -124,7 +124,7 @@ object Arguments {
   def parse(options: String*)(args: Array[String]): Arguments = {
     val parser = new Parser('-')
     val iter = options.iterator
-    while (iter.hasNext) parser withOption iter.next
+    while (iter.hasNext) parser.withOption(iter.next)
     parser.parse(args)
   }
 }
@@ -167,7 +167,7 @@ class Arguments {
 
   def contains(option: String): Boolean = options contains option
 
-  def getArgument(option: String): Option[String] = arguments get option
+  def getArgument(option: String): Option[String] = arguments.get(option)
 
   def getSuffixes(prefix: String): Set[String] =
     prefixes.get(prefix) match {
@@ -190,7 +190,7 @@ class Arguments {
   def getBinding(option: String, key: String): Option[String] =
     bindings.get(option) match {
       case None => None
-      case Some(map) => map get key
+      case Some(map) => map.get(key)
     }
 
   def getOthers: List[String] = others.toList

@@ -143,8 +143,8 @@ object TestSolver extends Logic with Solving {
       def merge(a: Clause, b: Clause) = a ++ b
 
       def negationNormalFormNot(p: Prop): Prop = p match {
-        case And(ps) => Or(ps map negationNormalFormNot)
-        case Or(ps) => And(ps map negationNormalFormNot)
+        case And(ps) => Or(ps.map(negationNormalFormNot))
+        case Or(ps) => And(ps.map(negationNormalFormNot))
         case Not(p) => negationNormalForm(p)
         case True => False
         case False => True
@@ -152,8 +152,8 @@ object TestSolver extends Logic with Solving {
       }
 
       def negationNormalForm(p: Prop): Prop = p match {
-        case Or(ps) => Or(ps map negationNormalForm)
-        case And(ps) => And(ps map negationNormalForm)
+        case Or(ps) => Or(ps.map(negationNormalForm))
+        case And(ps) => And(ps.map(negationNormalForm))
         case Not(negated) => negationNormalFormNot(negated)
         case True | False | (_: Sym) => p
       }
@@ -176,7 +176,7 @@ object TestSolver extends Logic with Solving {
             // d \/ (c1 /\ ... /\ cn) = ((d \/ c1) /\ ... /\ (d \/ cn))
             case (cs, ds) =>
               val (big, small) = if (cs.size > ds.size) (cs, ds) else (ds, cs)
-              big flatMap (c => distribute(formula(c), small))
+              big.flatMap(c => distribute(formula(c), small))
           }
 
         p match {
@@ -185,9 +185,9 @@ object TestSolver extends Logic with Solving {
           case s: Sym => lit(s)
           case Not(s: Sym) => negLit(s)
           case And(ps) =>
-            ps.toArray flatMap conjunctiveNormalForm
+            ps.toArray.flatMap(conjunctiveNormalForm)
           case Or(ps) =>
-            ps map conjunctiveNormalForm reduceLeft { (a, b) =>
+            ps.map(conjunctiveNormalForm).reduceLeft { (a, b) =>
               distribute(a, b)
             }
         }
@@ -748,7 +748,7 @@ class SolvingTest {
       sym("V3=scala.collection.immutable.::[?]")
     )
 
-    formulas foreach { f =>
+    formulas.foreach { f =>
       // build CNF
       val tseitinCnf = propToSolvable(f)
       val expansionCnf = eqFreePropToSolvableViaDistribution(f)

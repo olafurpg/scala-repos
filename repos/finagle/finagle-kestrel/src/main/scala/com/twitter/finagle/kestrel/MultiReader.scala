@@ -86,7 +86,7 @@ private[finagle] object MultiReaderHelper {
     }
 
     def onClose(handles: Set[ReadHandle]) {
-      handles foreach { _.close() }
+      handles.foreach { _.close() }
       error ! ReadClosedException
     }
 
@@ -98,7 +98,7 @@ private[finagle] object MultiReaderHelper {
 
       val queues = handles.map { _.messages }.toSeq
       val errors = handles.map { h =>
-        h.error map { e =>
+        h.error.map { e =>
           logger.warning(
             s"Read handle ${_root_.java.lang.System.identityHashCode(h)} " +
               s"encountered exception : ${e.getMessage}")
@@ -127,7 +127,7 @@ private[finagle] object MultiReaderHelper {
           },
           clusterUpdate.recv { newHandles =>
             // Close any handles that exist in old set but not the new one.
-            (handles &~ newHandles) foreach { h =>
+            ((handles &~ newHandles)).foreach { h =>
               logger.info(
                 s"Closed read handle ${_root_.java.lang.System.identityHashCode(h)} due " +
                   s"to its host disappeared")
@@ -148,30 +148,32 @@ private[finagle] object MultiReaderHelper {
       .toFuture()
 
     val closeWitness: Future[Closable] =
-      readHandlesPopulatedFuture flatMap {
-        // Flatten the Future[Try[T]] to Future[T].
-        Future.const
-      } map { handles =>
-        // Once the cluster is non-empty, start looping and observing updates.
-        exposeNumReadHandles(handles)
-        loop(handles)
+      readHandlesPopulatedFuture
+        .flatMap {
+          // Flatten the Future[Try[T]] to Future[T].
+          Future.const
+        }
+        .map { handles =>
+          // Once the cluster is non-empty, start looping and observing updates.
+          exposeNumReadHandles(handles)
+          loop(handles)
 
-        // Send cluster updates on the appropriate broker.
-        val witness = Witness { tsr: Try[Set[ReadHandle]] =>
-          synchronized {
-            tsr match {
-              case Return(newHandles) => clusterUpdate !! newHandles
-              case Throw(t) => error !! t
+          // Send cluster updates on the appropriate broker.
+          val witness = Witness { tsr: Try[Set[ReadHandle]] =>
+            synchronized {
+              tsr match {
+                case Return(newHandles) => clusterUpdate !! newHandles
+                case Throw(t) => error !! t
+              }
             }
           }
+
+          readHandles.changes.register(witness)
         }
 
-        readHandles.changes.register(witness)
-      }
-
     val closeHandleOf: Offer[Unit] =
-      close.send(()) map { _ =>
-        closeWitness onSuccess { _.close() }
+      close.send(()).map { _ =>
+        closeWitness.onSuccess { _.close() }
       }
 
     def createReadHandle(
@@ -389,7 +391,7 @@ object MultiReader {
 
   @deprecated("Use Var[Addr]-based `apply` method", "6.8.2")
   def apply(clients: Seq[Client], queueName: String): ReadHandle =
-    apply(clients map { _.readReliably(queueName) })
+    apply(clients.map { _.readReliably(queueName) })
 
   /**
     * A java friendly interface: we use scala's implicit conversions to
@@ -409,7 +411,7 @@ object MultiReader {
 
   @deprecated("Use Var[Addr]-based `apply` method", "6.8.2")
   def merge(readHandleCluster: Cluster[ReadHandle]): ReadHandle = {
-    val varTrySet = Group.fromCluster(readHandleCluster).set map { Try(_) }
+    val varTrySet = Group.fromCluster(readHandleCluster).set.map { Try(_) }
     MultiReaderHelper.merge(varTrySet)
   }
 }
@@ -554,14 +556,14 @@ abstract class MultiReaderBuilder[Req, Rep, Builder] private[kestrel] (
     val currentHandles = mutable.Map.empty[Address, ReadHandle]
 
     val event =
-      config.va.changes map {
+      config.va.changes.map {
         case Addr.Bound(addrs, _) => {
-          (currentHandles.keySet &~ addrs) foreach { addr =>
+          ((currentHandles.keySet &~ addrs)).foreach { addr =>
             logger.info(
               s"Host ${addr} left for reading queue ${config.queueName}")
           }
           val newHandles =
-            (addrs &~ currentHandles.keySet) map { addr =>
+            ((addrs &~ currentHandles.keySet)).map { addr =>
               val factory = baseClientBuilder.addrs(addr).buildFactory()
 
               val client = createClient(factory)
@@ -572,7 +574,7 @@ abstract class MultiReaderBuilder[Req, Rep, Builder] private[kestrel] (
                 case _ => client.readReliably(config.queueName)
               }
 
-              handle.error foreach {
+              handle.error.foreach {
                 case NonFatal(cause) =>
                   logger.warning(
                     s"Closing service factory for address: ${addr}")

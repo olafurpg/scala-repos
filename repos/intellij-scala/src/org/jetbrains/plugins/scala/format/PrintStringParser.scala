@@ -26,7 +26,7 @@ object PrintStringParser extends StringParser {
 
   def extractPrintCall(
       element: PsiElement): Option[(ScLiteral, Seq[ScExpression])] =
-    Some(element) collect {
+    Some(element).collect {
       // printf("%d", 1)
       case MethodInvocation(
           PsiReferenceEx.resolve(

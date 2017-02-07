@@ -215,7 +215,7 @@ private[akka] class SimpleOutputs(val actor: ActorRef, val pump: Pump)
     new ActorSubscription(actor, subscriber)
 
   private def subscribePending(subscribers: Seq[Subscriber[Any]]): Unit =
-    subscribers foreach { sub ⇒
+    subscribers.foreach { sub ⇒
       if (subscriber eq null) {
         subscriber = sub
         tryOnSubscribe(subscriber, createSubscription())

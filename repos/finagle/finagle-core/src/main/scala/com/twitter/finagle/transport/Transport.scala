@@ -251,7 +251,7 @@ object Transport {
       chunkOfA: A => Future[Option[Buf]]): Reader with Future[Unit] =
     new Promise[Unit] with Reader {
       private[this] val rw = Reader.writable()
-      become(Transport.copyToWriter(trans, rw)(chunkOfA) respond {
+      become(Transport.copyToWriter(trans, rw)(chunkOfA).respond {
         case Throw(exc) => rw.fail(exc)
         case Return(_) => rw.close()
       })
@@ -311,7 +311,7 @@ class QueueTransport[In, Out](writeq: AsyncQueue[In], readq: AsyncQueue[Out])
   }
 
   def read(): Future[Out] =
-    readq.poll() onFailure { exc =>
+    readq.poll().onFailure { exc =>
       closep.updateIfEmpty(Throw(exc))
     }
 

@@ -55,7 +55,7 @@ trait StartingBehavior { this: Actor with ActorLogging =>
     val behavior =
       if (withHealthChecks) checkForHealthy
       else checkForRunning
-    behavior orElse commonBehavior: PartialFunction[Any, Unit] // type annotation makes Intellij happy
+    behavior.orElse(commonBehavior): PartialFunction[Any, Unit] // type annotation makes Intellij happy
   }
 
   final def checkForHealthy: Receive = {

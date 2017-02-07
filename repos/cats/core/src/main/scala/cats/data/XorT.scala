@@ -95,7 +95,7 @@ final case class XorT[F[_], A, B](value: F[A Xor B]) {
 
   def flatMapF[AA >: A, D](f: B => F[AA Xor D])(
       implicit F: Monad[F]): XorT[F, AA, D] =
-    flatMap(f andThen XorT.apply)
+    flatMap(f.andThen(XorT.apply))
 
   def transform[C, D](f: Xor[A, B] => Xor[C, D])(
       implicit F: Functor[F]): XorT[F, C, D] =
@@ -315,7 +315,7 @@ private[data] abstract class XorTInstances3 {
 private[data] trait XorTFunctor[F[_], L] extends Functor[XorT[F, L, ?]] {
   implicit val F: Functor[F]
   override def map[A, B](fa: XorT[F, L, A])(f: A => B): XorT[F, L, B] =
-    fa map f
+    fa.map(f)
 }
 
 private[data] trait XorTMonadError[F[_], L]
@@ -324,7 +324,7 @@ private[data] trait XorTMonadError[F[_], L]
   implicit val F: Monad[F]
   def pure[A](a: A): XorT[F, L, A] = XorT.pure[F, L, A](a)
   def flatMap[A, B](fa: XorT[F, L, A])(f: A => XorT[F, L, B]): XorT[F, L, B] =
-    fa flatMap f
+    fa.flatMap(f)
   def handleErrorWith[A](fea: XorT[F, L, A])(
       f: L => XorT[F, L, A]): XorT[F, L, A] =
     XorT(F.flatMap(fea.value) {
@@ -395,7 +395,7 @@ private[data] sealed trait XorTTraverse[F[_], L]
 
   override def traverse[G[_]: Applicative, A, B](fa: XorT[F, L, A])(
       f: A => G[B]): G[XorT[F, L, B]] =
-    fa traverse f
+    fa.traverse(f)
 }
 
 private[data] sealed trait XorTEq[F[_], L, A] extends Eq[XorT[F, L, A]] {
@@ -410,7 +410,7 @@ private[data] sealed trait XorTPartialOrder[F[_], L, A]
   override implicit def F0: PartialOrder[F[L Xor A]]
 
   override def partialCompare(x: XorT[F, L, A], y: XorT[F, L, A]): Double =
-    x partialCompare y
+    x.partialCompare(y)
 }
 
 private[data] sealed trait XorTOrder[F[_], L, A]
@@ -418,5 +418,5 @@ private[data] sealed trait XorTOrder[F[_], L, A]
     with XorTPartialOrder[F, L, A] {
   override implicit def F0: Order[F[L Xor A]]
 
-  override def compare(x: XorT[F, L, A], y: XorT[F, L, A]): Int = x compare y
+  override def compare(x: XorT[F, L, A], y: XorT[F, L, A]): Int = x.compare(y)
 }

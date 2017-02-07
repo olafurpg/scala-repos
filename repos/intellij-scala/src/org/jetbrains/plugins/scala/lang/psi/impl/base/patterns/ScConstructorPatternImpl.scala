@@ -115,7 +115,7 @@ class ScConstructorPatternImpl(node: ASTNode)
                   if (t) {
                     val undefSubst = Conformance.undefinedSubst(tp, clazzType)
                     undefSubst.getSubstitutor match {
-                      case Some(subst) => subst followed emptySubst
+                      case Some(subst) => subst.followed(emptySubst)
                       case _ => emptySubst
                     }
                   } else emptySubst
@@ -150,7 +150,7 @@ class ScConstructorPatternImpl(node: ASTNode)
                     (s, p) =>
                       s.bindT((p.name, ScalaPsiUtil.getPsiElementId(p)),
                               p.upperBound.getOrAny))
-                val emptyRes = substitutor followed emptySubst
+                val emptyRes = substitutor.followed(emptySubst)
                 val result = fun.parameters(0).getType(TypingContext.empty)
                 if (result.isEmpty) emptyRes
                 else {
@@ -163,7 +163,7 @@ class ScConstructorPatternImpl(node: ASTNode)
                           Conformance.undefinedSubst(tp, funType)
                         undefSubst.getSubstitutor match {
                           case Some(newSubst) =>
-                            newSubst followed substitutor followed emptySubst
+                            newSubst.followed(substitutor).followed(emptySubst)
                           case _ => emptyRes
                         }
                       } else emptyRes

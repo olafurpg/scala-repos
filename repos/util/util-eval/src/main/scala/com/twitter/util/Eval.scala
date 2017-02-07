@@ -103,7 +103,7 @@ class Eval(target: Option[File]) {
         new FilesystemResolver(new File(".")),
         new FilesystemResolver(new File("." + File.separator + "config"))
       ) ++
-        (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
+        (Option(System.getProperty("com.twitter.util.Eval.includePath")).map {
           path =>
             new FilesystemResolver(new File(path))
         })
@@ -451,7 +451,7 @@ class Eval(target: Option[File]) {
 
     def apply(code: String, maxDepth: Int): String = {
       val lines =
-        code.lines map { line: String =>
+        code.lines.map { line: String =>
           val tokens = line.trim.split(' ')
           if (tokens.length == 2 && tokens(0).equals("#include")) {
             val path = tokens(1)
@@ -510,7 +510,7 @@ class Eval(target: Option[File]) {
     }
 
     val reporter =
-      messageHandler getOrElse new AbstractReporter with MessageCollector {
+      messageHandler.getOrElse(new AbstractReporter with MessageCollector {
         val settings = StringCompiler.this.settings
         val messages = new mutable.ListBuffer[List[String]]
 
@@ -544,7 +544,7 @@ class Eval(target: Option[File]) {
           super.reset
           messages.clear()
         }
-      }
+      })
 
     val global = new Global(settings, reporter)
 
@@ -582,7 +582,7 @@ class Eval(target: Option[File]) {
         printf("Code follows (%d bytes)\n", code.length)
 
         var numLines = 0
-        code.lines foreach { line: String =>
+        code.lines.foreach { line: String =>
           numLines += 1
           println(numLines.toString.padTo(5, ' ') + "| " + line)
         }

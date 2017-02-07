@@ -84,7 +84,7 @@ trait LensTests {
     val addressLens = lens[Person] >> 2
     val streetLens = lens[Address] >> 0
 
-    val personStreetLens1 = streetLens compose addressLens
+    val personStreetLens1 = streetLens.compose(addressLens)
     val personStreetLens2 = compose(streetLens, addressLens)
     val personStreetLens3 =
       (streetLens :: addressLens :: HNil).reduceLeft(compose)

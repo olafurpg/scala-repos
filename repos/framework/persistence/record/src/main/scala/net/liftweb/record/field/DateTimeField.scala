@@ -41,8 +41,9 @@ trait DateTimeTypedField extends TypedField[Calendar] {
   }
 
   def setFromAny(in: Any): Box[Calendar] =
-    toDate(in).flatMap(d => setBox(Full(dateToCal(d)))) or genericSetFromAny(
-      in)
+    toDate(in)
+      .flatMap(d => setBox(Full(dateToCal(d))))
+      .or(genericSetFromAny(in))
 
   def setFromString(s: String): Box[Calendar] = s match {
     case null | "" if optional_? => setBox(Empty)
@@ -65,7 +66,7 @@ trait DateTimeTypedField extends TypedField[Calendar] {
     }
 
   def asJs =
-    valueBox.map(v => Str(formats.dateFormat.format(v.getTime))) openOr JsNull
+    valueBox.map(v => Str(formats.dateFormat.format(v.getTime))).openOr(JsNull)
 
   def asJValue: JValue = asJString(v => formats.dateFormat.format(v.getTime))
   def setFromJValue(jvalue: JValue) = setFromJString(jvalue) { v =>

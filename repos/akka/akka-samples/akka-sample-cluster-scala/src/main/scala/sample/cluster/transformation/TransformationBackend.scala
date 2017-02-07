@@ -28,7 +28,7 @@ class TransformationBackend extends Actor {
     case TransformationJob(text) =>
       sender() ! TransformationResult(text.toUpperCase)
     case state: CurrentClusterState =>
-      state.members.filter(_.status == MemberStatus.Up) foreach register
+      state.members.filter(_.status == MemberStatus.Up).foreach(register)
     case MemberUp(m) => register(m)
   }
 

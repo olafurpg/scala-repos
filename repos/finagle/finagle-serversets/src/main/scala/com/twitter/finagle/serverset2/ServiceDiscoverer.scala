@@ -19,7 +19,7 @@ private[serverset2] object ServiceDiscoverer {
     */
   def zipWithWeights(ents: Seq[Entry],
                      vecs: Set[Vector]): Seq[(Entry, Double)] = {
-    ents map { ent =>
+    ents.map { ent =>
       val w = vecs.foldLeft(1.0) { case (w, vec) => w * vec.weightOf(ent) }
       ent -> w
     }

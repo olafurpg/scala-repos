@@ -316,26 +316,26 @@ class UriSpec extends WordSpec with Matchers {
                                                Charset.forName("UTF-16BE"))
     }
     "support the `startsWith` predicate" in {
-      Empty startsWith Empty shouldBe true
-      Path./ startsWith Empty shouldBe true
-      Path("abc") startsWith Empty shouldBe true
-      Empty startsWith Path./ shouldBe false
-      Empty startsWith Path("abc") shouldBe false
-      Path./ startsWith Path./ shouldBe true
-      Path./ startsWith Path("abc") shouldBe false
-      Path("/abc") startsWith Path./ shouldBe true
-      Path("abc") startsWith Path./ shouldBe false
-      Path("abc") startsWith Path("ab") shouldBe true
-      Path("abc") startsWith Path("abc") shouldBe true
-      Path("/abc") startsWith Path("/a") shouldBe true
-      Path("/abc") startsWith Path("/abc") shouldBe true
-      Path("/ab") startsWith Path("/abc") shouldBe false
-      Path("/abc") startsWith Path("/abd") shouldBe false
-      Path("/abc/def") startsWith Path("/ab") shouldBe true
-      Path("/abc/def") startsWith Path("/abc/") shouldBe true
-      Path("/abc/def") startsWith Path("/abc/d") shouldBe true
-      Path("/abc/def") startsWith Path("/abc/def") shouldBe true
-      Path("/abc/def") startsWith Path("/abc/def/") shouldBe false
+      Empty.startsWith(Empty) shouldBe true
+      Path./.startsWith(Empty) shouldBe true
+      Path("abc").startsWith(Empty) shouldBe true
+      Empty.startsWith(Path./) shouldBe false
+      Empty.startsWith(Path("abc")) shouldBe false
+      Path./.startsWith(Path./) shouldBe true
+      Path./.startsWith(Path("abc")) shouldBe false
+      Path("/abc").startsWith(Path./) shouldBe true
+      Path("abc").startsWith(Path./) shouldBe false
+      Path("abc").startsWith(Path("ab")) shouldBe true
+      Path("abc").startsWith(Path("abc")) shouldBe true
+      Path("/abc").startsWith(Path("/a")) shouldBe true
+      Path("/abc").startsWith(Path("/abc")) shouldBe true
+      Path("/ab").startsWith(Path("/abc")) shouldBe false
+      Path("/abc").startsWith(Path("/abd")) shouldBe false
+      Path("/abc/def").startsWith(Path("/ab")) shouldBe true
+      Path("/abc/def").startsWith(Path("/abc/")) shouldBe true
+      Path("/abc/def").startsWith(Path("/abc/d")) shouldBe true
+      Path("/abc/def").startsWith(Path("/abc/def")) shouldBe true
+      Path("/abc/def").startsWith(Path("/abc/def/")) shouldBe false
     }
     "support the `endsWithSlash` predicate" in {
       Empty.endsWithSlash shouldBe false

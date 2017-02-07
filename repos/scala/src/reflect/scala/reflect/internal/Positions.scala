@@ -41,13 +41,13 @@ trait Positions extends api.Positions { self: SymbolTable =>
                   focus: Boolean): Position = {
     if (useOffsetPositions) default
     else {
-      val ranged = trees filter (_.pos.isRange)
+      val ranged = trees.filter(_.pos.isRange)
       if (ranged.isEmpty) if (focus) default.focus else default
       else
         Position.range(default.source,
-                       (ranged map (_.pos.start)).min,
+                       (ranged.map(_.pos.start)).min,
                        default.point,
-                       (ranged map (_.pos.end)).max)
+                       (ranged.map(_.pos.end)).max)
     }
   }
 
@@ -74,15 +74,15 @@ trait Positions extends api.Positions { self: SymbolTable =>
     if (useOffsetPositions) return
 
     def isOverlapping(pos: Position) =
-      pos.isRange && (others exists (pos overlaps _.pos))
+      pos.isRange && (others.exists(pos.overlaps(_.pos)))
 
     if (isOverlapping(tree.pos)) {
       val children = tree.children
-      children foreach (ensureNonOverlapping(_, others, focus))
+      children.foreach(ensureNonOverlapping(_, others, focus))
       if (tree.pos.isOpaqueRange) {
         val wpos = wrappingPos(tree.pos, children, focus)
-        tree setPos
-          (if (isOverlapping(wpos)) tree.pos.makeTransparent else wpos)
+        tree.setPos(
+          if (isOverlapping(wpos)) tree.pos.makeTransparent else wpos)
       }
     }
   }
@@ -113,7 +113,7 @@ trait Positions extends api.Positions { self: SymbolTable =>
       inform("\nWhile validating #" + tree.id)
       inform(treeStatus(tree))
       inform("\nChildren:")
-      tree.children foreach (t => inform("  " + treeStatus(t, tree)))
+      tree.children.foreach(t => inform("  " + treeStatus(t, tree)))
       inform("=======")
       throw new ValidateException(msg)
     }
@@ -129,9 +129,8 @@ trait Positions extends api.Positions { self: SymbolTable =>
             inform(
               "%15s %s".format("unpositioned", treeStatus(tree, encltree)))
             inform("%15s %s".format("enclosing", treeStatus(encltree)))
-            encltree.children foreach
-              (t =>
-                 inform("%15s %s".format("sibling", treeStatus(t, encltree))))
+            encltree.children.foreach(t =>
+              inform("%15s %s".format("sibling", treeStatus(t, encltree))))
           }
         if (tree.pos.isRange) {
           if (!encltree.pos.isRange)
@@ -149,7 +148,7 @@ trait Positions extends api.Positions { self: SymbolTable =>
               reportTree("Enclosed", tree)
             }
 
-          findOverlapping(tree.children flatMap solidDescendants) match {
+          findOverlapping(tree.children.flatMap(solidDescendants)) match {
             case List() => ;
             case xs => {
               positionError(
@@ -167,7 +166,7 @@ trait Positions extends api.Positions { self: SymbolTable =>
             }
           }
         }
-        for (ct <- tree.children flatMap solidDescendants) validate(ct, tree)
+        for (ct <- tree.children.flatMap(solidDescendants)) validate(ct, tree)
       }
     }
 
@@ -175,7 +174,7 @@ trait Positions extends api.Positions { self: SymbolTable =>
   }
 
   def solidDescendants(tree: Tree): List[Tree] =
-    if (tree.pos.isTransparent) tree.children flatMap solidDescendants
+    if (tree.pos.isTransparent) tree.children.flatMap(solidDescendants)
     else List(tree)
 
   /** A free range from `lo` to `hi` */
@@ -208,7 +207,7 @@ trait Positions extends api.Positions { self: SymbolTable =>
             r.pos.start,
             t.pos.start) ::: rs1
         } else {
-          if (!r.isFree && (r.pos overlaps t.pos)) conflicting += r.tree
+          if (!r.isFree && (r.pos.overlaps(t.pos))) conflicting += r.tree
           r :: insert(rs1, t, conflicting)
         }
     }
@@ -229,7 +228,7 @@ trait Positions extends api.Positions { self: SymbolTable =>
       if (ct.pos.isOpaqueRange) {
         val conflicting = new ListBuffer[Tree]
         ranges = insert(ranges, ct, conflicting)
-        if (conflicting.nonEmpty) return conflicting.toList map (t => (t, ct))
+        if (conflicting.nonEmpty) return conflicting.toList.map(t => (t, ct))
       }
     }
     List()
@@ -248,10 +247,10 @@ trait Positions extends api.Positions { self: SymbolTable =>
         if (!tree.isEmpty && tree.canHaveAttrs && tree.pos == NoPosition) {
           val children = tree.children
           if (children.isEmpty) {
-            tree setPos pos.focus
+            tree.setPos(pos.focus)
           } else {
             setChildrenPos(pos, children)
-            tree setPos wrappingPos(pos, children)
+            tree.setPos(wrappingPos(pos, children))
           }
         }
       }

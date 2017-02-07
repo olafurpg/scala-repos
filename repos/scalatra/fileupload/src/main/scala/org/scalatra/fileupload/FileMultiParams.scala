@@ -12,7 +12,7 @@ class FileMultiParams(wrapped: Map[String, Seq[FileItem]] = Map.empty)
     extends Map[String, Seq[FileItem]] {
 
   def get(key: String): Option[Seq[FileItem]] = {
-    (wrapped.get(key) orElse wrapped.get(key + "[]"))
+    (wrapped.get(key).orElse(wrapped.get(key + "[]")))
   }
 
   def get(key: Symbol): Option[Seq[FileItem]] = get(key.name)

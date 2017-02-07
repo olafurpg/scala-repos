@@ -63,24 +63,24 @@ class ZookeeperServerSetCluster(serverSet: ServerSet,
   private[this] def performChange(serverSet: ImmutableSet[ServiceInstance]) =
     synchronized {
       val newSet =
-        serverSet flatMap { serviceInstance =>
+        serverSet.flatMap { serviceInstance =>
           val endpoint = endpointName match {
             case Some(name) =>
               Option(serviceInstance.getAdditionalEndpoints.get(name))
             case None => Some(serviceInstance.getServiceEndpoint)
           }
 
-          endpoint map { endpoint =>
+          endpoint.map { endpoint =>
             new InetSocketAddress(endpoint.getHost, endpoint.getPort): SocketAddress
           }
         }
       val added = newSet &~ underlyingSet
       val removed = underlyingSet &~ newSet
-      added foreach { address =>
+      added.foreach { address =>
         underlyingSet += address
         appendUpdate(Cluster.Add(address))
       }
-      removed foreach { address =>
+      removed.foreach { address =>
         underlyingSet -= address
         appendUpdate(Cluster.Rem(address))
       }

@@ -57,7 +57,7 @@ object EvaluationError {
     new Semigroup[EvaluationError] {
       def append(a: EvaluationError, b: => EvaluationError) = (a, b) match {
         case (AccumulatedErrors(a0), AccumulatedErrors(b0)) =>
-          AccumulatedErrors(a0 append b0)
+          AccumulatedErrors(a0.append(b0))
         case (a0, AccumulatedErrors(b0)) => AccumulatedErrors(a0 <:: b0)
         case (AccumulatedErrors(a0), b0) => AccumulatedErrors(b0 <:: a0)
         case (a0, b0) => AccumulatedErrors(nels(a0, b0))
@@ -100,8 +100,8 @@ object CacheControl {
     val maxStale = cacheDirectives.collectFirst {
       case `max-stale`(Some(n)) => n.number * 1000
     }
-    val cacheable = cacheDirectives exists { _ != `no-cache` }
-    val onlyIfCached = cacheDirectives exists { _ == `only-if-cached` }
+    val cacheable = cacheDirectives.exists { _ != `no-cache` }
+    val onlyIfCached = cacheDirectives.exists { _ == `only-if-cached` }
     CacheControl(maxAge |+| maxStale, maxAge, cacheable, onlyIfCached)
   }
 }
@@ -116,7 +116,7 @@ trait QueryExecutor[M[+ _], +A] { self =>
       def execute(query: String,
                   context: EvaluationContext,
                   opts: QueryOptions): EitherT[M, EvaluationError, B] = {
-        self.execute(query, context, opts) map f
+        self.execute(query, context, opts).map(f)
       }
     }
 }

@@ -44,8 +44,9 @@ abstract class Plugin {
   def options: List[String] = {
     // Process plugin options of form plugin:option
     def namec = name + ":"
-    global.settings.pluginOptions.value filter (_ startsWith namec) map
-      (_ stripPrefix namec)
+    global.settings.pluginOptions.value
+      .filter(_.startsWith(namec))
+      .map(_.stripPrefix(namec))
   }
 
   /** Handle any plugin-specific options.
@@ -92,9 +93,9 @@ object Plugin {
     */
   private def loaderFor(locations: Seq[Path]): ScalaClassLoader = {
     val compilerLoader = classOf[Plugin].getClassLoader
-    val urls = locations map (_.toURL)
+    val urls = locations.map(_.toURL)
 
-    ScalaClassLoader fromURLs (urls, compilerLoader)
+    ScalaClassLoader.fromURLs(urls, compilerLoader)
   }
 
   /** Try to load a plugin description from the specified location.
@@ -120,7 +121,7 @@ object Plugin {
   def load(classname: String, loader: ClassLoader): Try[AnyClass] = {
     import scala.util.control.NonFatal
     try {
-      Success[AnyClass](loader loadClass classname)
+      Success[AnyClass](loader.loadClass(classname))
     } catch {
       case NonFatal(e) =>
         Failure(
@@ -146,15 +147,17 @@ object Plugin {
                   ignoring: List[String]): List[Try[AnyClass]] = {
     // List[(jar, Try(descriptor))] in dir
     def scan(d: Directory) =
-      d.files.toList sortBy (_.name) filter (Jar isJarOrZip _) map
-        (j => (j, loadDescriptionFromJar(j)))
+      d.files.toList
+        .sortBy(_.name)
+        .filter(Jar.isJarOrZip(_))
+        .map(j => (j, loadDescriptionFromJar(j)))
 
     type PDResults = List[Try[(PluginDescription, ScalaClassLoader)]]
 
     // scan plugin dirs for jars containing plugins, ignoring dirs with none and other jars
     val fromDirs: PDResults =
-      dirs filter (_.isDirectory) flatMap { d =>
-        scan(d.toDirectory) collect {
+      dirs.filter(_.isDirectory).flatMap { d =>
+        scan(d.toDirectory).collect {
           case (j, Success(pd)) => Success((pd, loaderFor(Seq(j))))
         }
       }
@@ -166,22 +169,23 @@ object Plugin {
         case Nil => Failure(new MissingPluginException(ps))
         case p :: rest =>
           if (p.isDirectory)
-            loadDescriptionFromFile(p.toDirectory / PluginXML) orElse loop(
-              rest)
-          else if (p.isFile) loadDescriptionFromJar(p.toFile) orElse loop(rest)
+            loadDescriptionFromFile(p.toDirectory / PluginXML)
+              .orElse(loop(rest))
+          else if (p.isFile)
+            loadDescriptionFromJar(p.toFile).orElse(loop(rest))
           else loop(rest)
       }
       loop(ps)
     }
     val fromPaths: PDResults =
-      paths map (p => (p, findDescriptor(p))) map {
+      paths.map(p => (p, findDescriptor(p))).map {
         case (p, Success(pd)) => Success((pd, loaderFor(p)))
         case (_, Failure(e)) => Failure(e)
       }
 
     val seen = mutable.HashSet[String]()
     val enabled =
-      (fromPaths ::: fromDirs) map {
+      ((fromPaths ::: fromDirs)).map {
         case Success((pd, loader)) if seen(pd.classname) =>
           // a nod to SI-7494, take the plugin classes distinctly
           Failure(

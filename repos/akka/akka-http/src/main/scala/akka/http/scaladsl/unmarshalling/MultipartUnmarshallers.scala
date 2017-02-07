@@ -40,7 +40,7 @@ trait MultipartUnmarshallers {
                           Multipart.General.BodyPart,
                           Multipart.General.BodyPart.Strict](
       mediaRange = `multipart/*`,
-      defaultContentType = MediaTypes.`text/plain` withCharset defaultCharset,
+      defaultContentType = MediaTypes.`text/plain`.withCharset(defaultCharset),
       createBodyPart = Multipart.General.BodyPart(_, _),
       createStreamed = Multipart.General(_, _),
       createStrictBodyPart = Multipart.General.BodyPart.Strict,
@@ -81,7 +81,7 @@ trait MultipartUnmarshallers {
                           Multipart.ByteRanges.BodyPart,
                           Multipart.ByteRanges.BodyPart.Strict](
       mediaRange = `multipart/byteranges`,
-      defaultContentType = MediaTypes.`text/plain` withCharset defaultCharset,
+      defaultContentType = MediaTypes.`text/plain`.withCharset(defaultCharset),
       createBodyPart = (entity, headers) ⇒
         Multipart.General.BodyPart(entity, headers).toByteRangesBodyPart.get,
       createStreamed = (_, parts) ⇒ Multipart.ByteRanges(parts),

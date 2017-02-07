@@ -276,7 +276,7 @@ object Infos {
 
     var exportedConstructors: List[ConstructorExportDef] = Nil
 
-    classDef.defs foreach {
+    classDef.defs.foreach {
       case methodDef: MethodDef =>
         builder.addMethod(generateMethodInfo(methodDef))
       case propertyDef: PropertyDef =>

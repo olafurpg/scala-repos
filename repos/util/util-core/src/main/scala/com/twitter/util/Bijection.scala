@@ -57,5 +57,5 @@ trait Bijection[A, B] extends (A => B) { self =>
   /**
     * Composes two instances of Bijection in a new Bijection, with this one applied last.
     */
-  def compose[T](g: Bijection[T, A]) = g andThen this
+  def compose[T](g: Bijection[T, A]) = g.andThen(this)
 }

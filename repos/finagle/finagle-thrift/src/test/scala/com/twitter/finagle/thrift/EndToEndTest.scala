@@ -179,13 +179,13 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
   testThrift("unique trace ID") { (client, tracer) =>
     val f1 = client.add(1, 2)
     intercept[AnException] { Await.result(f1, Duration.fromSeconds(15)) }
-    val idSet1 = (tracer map (_.traceId.traceId)).toSet
+    val idSet1 = (tracer.map(_.traceId.traceId)).toSet
 
     tracer.clear()
 
     val f2 = client.add(2, 3)
     intercept[AnException] { Await.result(f2, Duration.fromSeconds(15)) }
-    val idSet2 = (tracer map (_.traceId.traceId)).toSet
+    val idSet2 = (tracer.map(_.traceId.traceId)).toSet
 
     assert(idSet1.nonEmpty)
     assert(idSet2.nonEmpty)

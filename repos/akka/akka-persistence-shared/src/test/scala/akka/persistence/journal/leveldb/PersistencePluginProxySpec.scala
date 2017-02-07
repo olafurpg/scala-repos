@@ -86,21 +86,22 @@ object PersistencePluginProxySpec {
       Props(classOf[ExamplePersistentActor], probe, context.system.name))
 
     def receive = {
-      case m ⇒ p forward m
+      case m ⇒ p.forward(m)
     }
   }
 }
 
 class PersistencePluginProxySpec
     extends AkkaSpec(
-      PersistencePluginProxySpec.startTargetConfig withFallback PersistencePluginProxySpec.config)
+      PersistencePluginProxySpec.startTargetConfig.withFallback(
+        PersistencePluginProxySpec.config))
     with Cleanup {
   import PersistencePluginProxySpec._
 
   val systemA = ActorSystem("SysA", config)
-  val systemB = ActorSystem(
-    "SysB",
-    targetAddressConfig(system) withFallback PersistencePluginProxySpec.config)
+  val systemB = ActorSystem("SysB",
+                            targetAddressConfig(system).withFallback(
+                              PersistencePluginProxySpec.config))
 
   override protected def afterTermination() {
     shutdown(systemA)
@@ -108,7 +109,7 @@ class PersistencePluginProxySpec
     super.afterTermination()
   }
 
-  "A persistence proxy" can {
+  "A persistence proxy".can {
     "be shared by multiple actor systems" in {
 
       val address =

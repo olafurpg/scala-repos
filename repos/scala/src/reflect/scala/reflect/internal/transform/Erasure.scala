@@ -62,7 +62,7 @@ trait Erasure {
     case GenericArray(level, core) if !(core <:< AnyRefTpe) => level
     case RefinedType(ps, _) if ps.nonEmpty =>
       logResult(s"Unbounded generic level for $tp is")(
-        (ps map unboundedGenericArrayLevel).max)
+        (ps.map(unboundedGenericArrayLevel)).max)
     case _ => 0
   }
 
@@ -126,7 +126,7 @@ trait Erasure {
         if (sym == ArrayClass)
           if (unboundedGenericArrayLevel(tp) == 1) ObjectTpe
           else if (args.head.typeSymbol.isBottomClass) arrayType(ObjectTpe)
-          else typeRef(apply(pre), sym, args map applyInArray)
+          else typeRef(apply(pre), sym, args.map(applyInArray))
         else if (sym == AnyClass || sym == AnyValClass ||
                  sym == SingletonClass) ObjectTpe
         else if (sym == UnitClass) BoxedUnitTpe
@@ -134,7 +134,7 @@ trait Erasure {
         else if (sym.isDerivedValueClass) eraseDerivedValueClassRef(tref)
         else if (sym.isClass) eraseNormalClassRef(tref)
         else
-          apply(sym.info asSeenFrom (pre, sym.owner)) // alias type or abstract type
+          apply(sym.info.asSeenFrom(pre, sym.owner)) // alias type or abstract type
       case PolyType(tparams, restpe) =>
         apply(restpe)
       case ExistentialType(tparams, restpe) =>
@@ -155,7 +155,7 @@ trait Erasure {
         ClassInfoType(if (clazz == ObjectClass || isPrimitiveValueClass(clazz))
                         Nil
                       else if (clazz == ArrayClass) ObjectTpe :: Nil
-                      else removeLaterObjects(parents map this),
+                      else removeLaterObjects(parents.map(this)),
                       decls,
                       clazz)
       case _ =>
@@ -323,18 +323,17 @@ trait Erasure {
   def intersectionDominator(parents: List[Type]): Type = {
     if (parents.isEmpty) ObjectTpe
     else {
-      val psyms = parents map (_.typeSymbol)
+      val psyms = parents.map(_.typeSymbol)
       if (psyms contains ArrayClass) {
         // treat arrays specially
         arrayType(
           intersectionDominator(
-            parents filter
-              (_.typeSymbol == ArrayClass) map (_.typeArgs.head)))
+            parents.filter(_.typeSymbol == ArrayClass).map(_.typeArgs.head)))
       } else {
         // implement new spec for erasure of refined types.
         def isUnshadowed(psym: Symbol) =
-          !(psyms exists
-            (qsym => (psym ne qsym) && (qsym isNonBottomSubClass psym)))
+          !(psyms.exists(qsym =>
+            (psym ne qsym) && (qsym isNonBottomSubClass psym)))
         val cs = parents.iterator.filter { p =>
           // isUnshadowed is a bit expensive, so try classes first
           val psym = p.typeSymbol

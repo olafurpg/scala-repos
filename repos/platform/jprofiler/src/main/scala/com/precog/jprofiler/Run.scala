@@ -87,12 +87,12 @@ object Run {
         println("finishing benchmark")
 
       case Some(d) =>
-        println("ERROR: --root-dir %s not found!" format d)
+        println("ERROR: --root-dir %s not found!".format(d))
         println("did you forget to run 'extract-data'?")
 
       case None =>
         println("ERROR: --root-dir is missing somehow")
-        println("default should have been %s" format db)
+        println("default should have been %s".format(db))
     }
   }
 }

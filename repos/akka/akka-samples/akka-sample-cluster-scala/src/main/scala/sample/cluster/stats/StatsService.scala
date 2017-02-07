@@ -23,7 +23,7 @@ class StatsService extends Actor {
       // create actor that collects replies from workers
       val aggregator =
         context.actorOf(Props(classOf[StatsAggregator], words.size, replyTo))
-      words foreach { word =>
+      words.foreach { word =>
         workerRouter.tell(ConsistentHashableEnvelope(word, word), aggregator)
       }
   }

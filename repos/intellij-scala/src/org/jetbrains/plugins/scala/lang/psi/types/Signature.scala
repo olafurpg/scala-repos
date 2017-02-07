@@ -81,7 +81,7 @@ case class TypeAliasSignature(name: String,
 
   override def equals(other: Any): Boolean = other match {
     case that: TypeAliasSignature =>
-      (that canEqual this) && name == that.name &&
+      (that.canEqual(this)) && name == that.name &&
         typeParams == that.typeParams && lowerBound == that.lowerBound &&
         upperBound == that.upperBound && isDefinition == that.isDefinition
     case _ => false

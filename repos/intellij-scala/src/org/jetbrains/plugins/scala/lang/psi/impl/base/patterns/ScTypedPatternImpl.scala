@@ -45,7 +45,7 @@ class ScTypedPatternImpl(node: ASTNode)
     t match {
       case Some(t) =>
         getType(TypingContext.empty) match {
-          case Success(tp, _) if t conforms tp => true
+          case Success(tp, _) if t.conforms(tp) => true
           case _ => false
         }
       case _ => false
@@ -78,11 +78,11 @@ class ScTypedPatternImpl(node: ASTNode)
                             case (arg: ScSkolemizedType, param: ScTypeParam) =>
                               val lowerBound =
                                 if (arg.lower.equiv(psi.types.Nothing))
-                                  subst subst param.lowerBound.getOrNothing
+                                  subst.subst(param.lowerBound.getOrNothing)
                                 else arg.lower //todo: lub?
                               val upperBound =
                                 if (arg.upper.equiv(psi.types.Any))
-                                  subst subst param.upperBound.getOrAny
+                                  subst.subst(param.upperBound.getOrAny)
                                 else arg.upper //todo: glb?
                               ScSkolemizedType(arg.name,
                                                arg.args,

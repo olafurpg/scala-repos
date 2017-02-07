@@ -82,11 +82,11 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
   def execute(numTicks: Int,
               ticksToTimeout: Option[Int] = None): Future[JobId] = {
     val timeout =
-      ticksToTimeout map { t =>
+      ticksToTimeout.map { t =>
         Duration(clock.duration * t, TimeUnit.MILLISECONDS)
       }
     val executionResult = for {
-      executor <- asyncExecutorFor(apiKey) leftMap {
+      executor <- asyncExecutorFor(apiKey).leftMap {
         EvaluationError.invalidState
       }
       ctx = EvaluationContext(apiKey,
@@ -109,11 +109,11 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
   }
 
   def poll(jobId: JobId): Future[Option[(Option[MimeType], String)]] = {
-    jobManager.getResult(jobId) flatMap {
+    jobManager.getResult(jobId).flatMap {
       case Left(_) =>
         Future(None)
       case Right((mimeType, stream)) =>
-        stream.foldLeft(new Array[Byte](0))(_ ++ _) map { data =>
+        stream.foldLeft(new Array[Byte](0))(_ ++ _).map { data =>
           Some(mimeType -> new String(data, "UTF-8"))
         }
     }

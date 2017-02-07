@@ -49,7 +49,7 @@ class GraphStageTimersSpec extends AkkaSpec {
       extends SimpleLinearGraphStage[Int] {
     override def createLogic(inheritedAttributes: Attributes) =
       new TimerGraphStageLogic(shape) {
-        val tickCount = Iterator from 1
+        val tickCount = Iterator.from(1)
 
         setHandler(in, new InHandler {
           override def onPush() = push(out, grab(in))
@@ -155,7 +155,7 @@ class GraphStageTimersSpec extends AkkaSpec {
       val seq = receiveWhile(2.seconds) {
         case t: Tick ⇒ t
       }
-      seq should have length 5
+      (seq should have).length(5)
       expectNoMsg(1.second)
 
       driver.stopStage()

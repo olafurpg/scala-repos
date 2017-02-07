@@ -55,7 +55,7 @@ object FutureSequencer {
           case Some(work) => processThenDone(work)
         }
 
-      case msg => queue enqueue msg
+      case msg => queue.enqueue(msg)
     }
 
     def receive = idle
@@ -69,17 +69,18 @@ object FutureSequencer {
       work match {
         case ReceiveTimeout => self ! PoisonPill
         case FSequencer.Work(run, promise, timeoutOption) =>
-          promise completeWith timeoutOption
-            .orElse(executionTimeout)
-            .fold(run()) { timeout =>
-              run().withTimeout(
-                duration = timeout,
-                error = Timeout(timeout)
-              )(context.system)
-            }
-            .andThenAnyway {
-              self ! Done
-            }
+          promise.completeWith(
+            timeoutOption
+              .orElse(executionTimeout)
+              .fold(run()) { timeout =>
+                run().withTimeout(
+                  duration = timeout,
+                  error = Timeout(timeout)
+                )(context.system)
+              }
+              .andThenAnyway {
+                self ! Done
+              })
         case FSequencer.WithQueueSize(f) =>
           f(queue.size)
           self ! Done

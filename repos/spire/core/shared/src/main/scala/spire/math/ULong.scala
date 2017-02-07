@@ -139,7 +139,7 @@ private[math] trait ULongIsRig extends Rig[ULong] {
   def plus(a: ULong, b: ULong): ULong = a + b
   override def pow(a: ULong, b: Int): ULong = {
     if (b < 0)
-      throw new IllegalArgumentException("negative exponent: %s" format b)
+      throw new IllegalArgumentException("negative exponent: %s".format(b))
     a ** ULong(b)
   }
   override def times(a: ULong, b: ULong): ULong = a * b

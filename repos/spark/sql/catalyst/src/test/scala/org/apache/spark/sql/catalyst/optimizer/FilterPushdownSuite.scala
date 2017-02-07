@@ -87,11 +87,11 @@ class FilterPushdownSuite extends PlanTest {
 
   test("can't push without rewrite") {
     val originalQuery =
-      testRelation.select('a + 'b as 'e).where('e === 1).analyze
+      testRelation.select(('a + 'b).as('e)).where('e === 1).analyze
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val correctAnswer =
-      testRelation.where('a + 'b === 1).select('a + 'b as 'e).analyze
+      testRelation.where('a + 'b === 1).select(('a + 'b).as('e)).analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -576,14 +576,14 @@ class FilterPushdownSuite extends PlanTest {
 
   test("aggregate: push down filter when filter on group by expression") {
     val originalQuery = testRelation
-      .groupBy('a)('a, count('b) as 'c)
+      .groupBy('a)('a, count('b).as('c))
       .select('a, 'c)
       .where('a === 2)
 
     val optimized = Optimize.execute(originalQuery.analyze)
 
     val correctAnswer =
-      testRelation.where('a === 2).groupBy('a)('a, count('b) as 'c).analyze
+      testRelation.where('a === 2).groupBy('a)('a, count('b).as('c)).analyze
     comparePlans(optimized, correctAnswer)
   }
 
@@ -591,7 +591,7 @@ class FilterPushdownSuite extends PlanTest {
     "aggregate: don't push down filter when filter not on group by expression") {
     val originalQuery = testRelation
       .select('a, 'b)
-      .groupBy('a)('a, count('b) as 'c)
+      .groupBy('a)('a, count('b).as('c))
       .where('c === 2L)
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -603,7 +603,7 @@ class FilterPushdownSuite extends PlanTest {
     "aggregate: push down filters partially which are subset of group by expressions") {
     val originalQuery = testRelation
       .select('a, 'b)
-      .groupBy('a)('a, count('b) as 'c)
+      .groupBy('a)('a, count('b).as('c))
       .where('c === 2L && 'a === 3)
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -611,7 +611,7 @@ class FilterPushdownSuite extends PlanTest {
     val correctAnswer = testRelation
       .select('a, 'b)
       .where('a === 3)
-      .groupBy('a)('a, count('b) as 'c)
+      .groupBy('a)('a, count('b).as('c))
       .where('c === 2L)
       .analyze
 
@@ -621,7 +621,7 @@ class FilterPushdownSuite extends PlanTest {
   test("aggregate: push down filters with alias") {
     val originalQuery = testRelation
       .select('a, 'b)
-      .groupBy('a)(('a + 1) as 'aa, count('b) as 'c)
+      .groupBy('a)((('a + 1)).as('aa), count('b).as('c))
       .where(('c === 2L || 'aa > 4) && 'aa < 3)
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -629,7 +629,7 @@ class FilterPushdownSuite extends PlanTest {
     val correctAnswer = testRelation
       .select('a, 'b)
       .where('a + 1 < 3)
-      .groupBy('a)(('a + 1) as 'aa, count('b) as 'c)
+      .groupBy('a)((('a + 1)).as('aa), count('b).as('c))
       .where('c === 2L || 'aa > 4)
       .analyze
 
@@ -639,7 +639,7 @@ class FilterPushdownSuite extends PlanTest {
   test("aggregate: push down filters with literal") {
     val originalQuery = testRelation
       .select('a, 'b)
-      .groupBy('a)('a, count('b) as 'c, "s" as 'd)
+      .groupBy('a)('a, count('b).as('c), "s".as('d))
       .where('c === 2L && 'd === "s")
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -647,7 +647,7 @@ class FilterPushdownSuite extends PlanTest {
     val correctAnswer = testRelation
       .select('a, 'b)
       .where("s" === "s")
-      .groupBy('a)('a, count('b) as 'c, "s" as 'd)
+      .groupBy('a)('a, count('b).as('c), "s".as('d))
       .where('c === 2L)
       .analyze
 
@@ -657,14 +657,18 @@ class FilterPushdownSuite extends PlanTest {
   test("aggregate: don't push down filters that are nondeterministic") {
     val originalQuery = testRelation
       .select('a, 'b)
-      .groupBy('a)('a + Rand(10) as 'aa, count('b) as 'c, Rand(11).as("rnd"))
+      .groupBy('a)(('a + Rand(10)).as('aa),
+                   count('b).as('c),
+                   Rand(11).as("rnd"))
       .where('c === 2L && 'aa + Rand(10).as("rnd") === 3 && 'rnd === 5)
 
     val optimized = Optimize.execute(originalQuery.analyze)
 
     val correctAnswer = testRelation
       .select('a, 'b)
-      .groupBy('a)('a + Rand(10) as 'aa, count('b) as 'c, Rand(11).as("rnd"))
+      .groupBy('a)(('a + Rand(10)).as('aa),
+                   count('b).as('c),
+                   Rand(11).as("rnd"))
       .where('c === 2L && 'aa + Rand(10).as("rnd") === 3 && 'rnd === 5)
       .analyze
 

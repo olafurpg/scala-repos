@@ -112,10 +112,10 @@ case class SegmentsWrapper(segments: Seq[Segment],
 
   private val cols: Map[ColumnRef, Column] =
     buildMap(segments) + buildKeyColumn(
-      segments.headOption map (_.length) getOrElse 0)
+      segments.headOption.map(_.length).getOrElse(0))
 
   val size: Int = {
-    val sz = segments.foldLeft(0)(_ max _.length)
+    val sz = segments.foldLeft(0)(_.max(_.length))
     if (logger.isTraceEnabled) {
       logger.trace(
         "Computed size %d from:\n  %s".format(sz, segments.mkString("\n  ")))

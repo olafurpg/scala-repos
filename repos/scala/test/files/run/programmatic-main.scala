@@ -3,7 +3,7 @@ import scala.tools.nsc._
 import io.Path
 
 object Test {
-  val cwd = Option(System.getProperty("partest.cwd")) getOrElse "."
+  val cwd = Option(System.getProperty("partest.cwd")).getOrElse(".")
   val basedir = Path(cwd).parent / "lib" path
   val baseargs = Array("-usejavacp",
                        "-bootclasspath",
@@ -13,8 +13,8 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     Console.withErr(Console.out) {
-      Main process
-        (baseargs ++ "-Xpluginsdir /does/not/exist/foo/quux -Xshow-phases"
+      Main.process(
+        baseargs ++ "-Xpluginsdir /does/not/exist/foo/quux -Xshow-phases"
           .split(' '))
     }
   }

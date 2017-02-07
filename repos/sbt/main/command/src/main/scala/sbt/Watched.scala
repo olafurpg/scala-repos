@@ -65,8 +65,8 @@ object Watched {
     @tailrec def shouldTerminate: Boolean =
       (System.in.available > 0) &&
         (watched.terminateWatch(System.in.read()) || shouldTerminate)
-    val sourcesFinder = PathFinder { watched watchPaths s }
-    val watchState = s get ContinuousState getOrElse WatchState.empty
+    val sourcesFinder = PathFinder { watched.watchPaths(s) }
+    val watchState = s.get(ContinuousState).getOrElse(WatchState.empty)
 
     if (watchState.count > 0)
       printIfDefined(watched watchingMessage watchState)
@@ -87,7 +87,7 @@ object Watched {
     }
 
     if (triggered) {
-      printIfDefined(watched triggeredMessage newWatchState)
+      printIfDefined(watched.triggeredMessage(newWatchState))
       (ClearOnFailure :: next :: FailureWall :: repeat :: s)
         .put(ContinuousState, newWatchState)
     } else {

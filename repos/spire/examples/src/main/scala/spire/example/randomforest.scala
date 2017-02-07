@@ -44,7 +44,7 @@ object RandomForestExample extends App {
       implicit space => data =>
         RandomForest.classification(data, opts)
     }
-    println("... accuracy of %.2f%%\n" format (real.toDouble(accuracy) * 100))
+    println("... accuracy of %.2f%%\n".format(real.toDouble(accuracy) * 100))
   }
 
   def testRegression[V, @sp(Double) F](dataset: DataSet[V, F, F],
@@ -60,7 +60,7 @@ object RandomForestExample extends App {
     val rSquared = crossValidateRegression(dataset) { implicit space => data =>
       RandomForest.regression(data, opts)
     }
-    println("... R^2 of %.3f" format real.toDouble(rSquared))
+    println("... R^2 of %.3f".format(real.toDouble(rSquared)))
   }
 }
 
@@ -235,8 +235,8 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
         val boundary =
           (data(members(minIdx)).coord(minVar) +
             data(members(minIdx + 1)).coord(minVar)) / 2
-        val left = members take (minIdx + 1)
-        val right = members drop (minIdx + 1)
+        val left = members.take(minIdx + 1)
+        val right = members.drop(minIdx + 1)
         Split(minVar, boundary, growTree(left), growTree(right))
       }
     }
@@ -264,10 +264,10 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
                          options: RandomForestOptions): FixedOptions = {
     val defaults = defaultOptions(size)
     FixedOptions(
-      options.numAxesSample getOrElse defaults.numAxesSample,
-      options.numPointsSample getOrElse defaults.numPointsSample,
-      options.numTrees getOrElse defaults.numTrees,
-      options.minSplitSize getOrElse defaults.minSplitSize,
+      options.numAxesSample.getOrElse(defaults.numAxesSample),
+      options.numPointsSample.getOrElse(defaults.numPointsSample),
+      options.numTrees.getOrElse(defaults.numTrees),
+      options.minSplitSize.getOrElse(defaults.minSplitSize),
       options.parallel
     )
   }

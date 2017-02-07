@@ -250,7 +250,7 @@ object BytecodeUtils {
     def add(l: LabelNode, ref: AnyRef) =
       if (res contains l) res(l) = res(l) + ref else res(l) = Set(ref)
 
-    method.instructions.iterator().asScala foreach {
+    method.instructions.iterator().asScala.foreach {
       case jump: JumpInsnNode => add(jump.label, jump)
       case line: LineNumberNode => add(line.start, line)
       case switch: LookupSwitchInsnNode =>

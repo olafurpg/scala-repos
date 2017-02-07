@@ -30,12 +30,12 @@ private[tv] final class ChannelActor(channel: Tv.Channel) extends Actor {
 
     case Select(candidates) =>
       if (candidates.nonEmpty) {
-        oneId ?? GameRepo.game foreach {
+        (oneId ?? GameRepo.game).foreach {
           case Some(game) if channel.filter(game) =>
-            wayBetter(game, candidates) orElse rematch(game) foreach elect
+            wayBetter(game, candidates).orElse(rematch(game)).foreach(elect)
           case Some(game) =>
-            rematch(game) orElse feature(candidates) foreach elect
-          case _ => feature(candidates) foreach elect
+            rematch(game).orElse(feature(candidates)).foreach(elect)
+          case _ => feature(candidates).foreach(elect)
         }
         manyIds = candidates
           .sortBy { g =>
@@ -46,10 +46,10 @@ private[tv] final class ChannelActor(channel: Tv.Channel) extends Actor {
   }
 
   def elect(gameOption: Option[Game]) {
-    gameOption foreach { self ! SetGame(_) }
+    gameOption.foreach { self ! SetGame(_) }
   }
 
-  def wayBetter(game: Game, candidates: List[Game]) = feature(candidates) map {
+  def wayBetter(game: Game, candidates: List[Game]) = feature(candidates).map {
     case Some(next) if isWayBetter(game, next) => next.some
     case _ => none
   }
@@ -60,11 +60,11 @@ private[tv] final class ChannelActor(channel: Tv.Channel) extends Actor {
   def rematch(game: Game) = game.next ?? GameRepo.game
 
   def feature(candidates: List[Game]) = fuccess {
-    candidates sortBy { -score(_) } headOption
+    candidates.sortBy { -score(_) } headOption
   }
 
   def score(game: Game): Int = math.round {
-    (heuristics map {
+    (heuristics.map {
       case (fn, coefficient) => heuristicBox(fn(game)) * coefficient
     }).sum * 1000
   }

@@ -32,16 +32,16 @@ case class HealthCheck(
       .setMaxConsecutiveFailures(this.maxConsecutiveFailures)
       .setIgnoreHttp1Xx(this.ignoreHttp1xx)
 
-    command foreach { c =>
+    command.foreach { c =>
       builder.setCommand(c.toProto)
     }
 
-    path foreach builder.setPath
+    path.foreach(builder.setPath)
 
-    portIndex foreach { p =>
+    portIndex.foreach { p =>
       builder.setPortIndex(p.toInt)
     }
-    port foreach { p =>
+    port.foreach { p =>
       builder.setPort(p.toInt)
     }
 
@@ -123,8 +123,8 @@ object HealthCheck {
   val DefaultPort = None
 
   implicit val healthCheck = validator[HealthCheck] { hc =>
-    (hc.portIndex.nonEmpty is true) or (hc.port.nonEmpty is true)
-    hc is validProtocol
+    (hc.portIndex.nonEmpty.is(true)).or(hc.port.nonEmpty.is(true))
+    hc.is(validProtocol)
   }
 
   //scalastyle:off

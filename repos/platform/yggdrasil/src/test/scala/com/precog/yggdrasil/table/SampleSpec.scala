@@ -60,8 +60,8 @@ trait SampleSpec[M[+ _]]
       case s1 :: s2 :: Nil =>
         val result1 = toJson(s1).copoint
         val result2 = toJson(s2).copoint
-        result1 must have size (15)
-        result2 must have size (15)
+        (result1 must have).size(15)
+        (result2 must have).size(15)
         simpleData must containAllOf(result1)
         simpleData must containAllOf(result2)
     }
@@ -84,8 +84,8 @@ trait SampleSpec[M[+ _]]
       case s1 :: s2 :: Nil =>
         val result1 = toJson(s1).copoint
         val result2 = toJson(s2).copoint
-        result1 must have size (15)
-        result2 must have size (15)
+        (result1 must have).size(15)
+        (result2 must have).size(15)
 
         val expected1 = toJson(
           table.transform(
@@ -105,7 +105,7 @@ trait SampleSpec[M[+ _]]
       .toList must beLike {
       case s :: Nil =>
         val result = toJson(s).copoint
-        result must have size (100)
+        (result must have).size(100)
     }
   }
 
@@ -114,7 +114,7 @@ trait SampleSpec[M[+ _]]
     fromSample(data).sample(0, Seq(TransSpec1.Id)).copoint.toList must beLike {
       case s :: Nil =>
         val result = toJson(s).copoint
-        result must have size (0)
+        (result must have).size(0)
     }
   }
 }

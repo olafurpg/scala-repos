@@ -44,7 +44,7 @@ abstract class MembershipChangeListenerUpSpec
 
       runOn(first, second) {
         val latch = TestLatch()
-        val expectedAddresses = Set(first, second) map address
+        val expectedAddresses = Set(first, second).map(address)
         cluster.subscribe(
           system.actorOf(Props(new Actor {
             var members = Set.empty[Member]
@@ -74,7 +74,7 @@ abstract class MembershipChangeListenerUpSpec
     "(when three nodes) after cluster convergence updates the membership table then all MembershipChangeListeners should be triggered" taggedAs LongRunningTest in {
 
       val latch = TestLatch()
-      val expectedAddresses = Set(first, second, third) map address
+      val expectedAddresses = Set(first, second, third).map(address)
       cluster.subscribe(
         system.actorOf(Props(new Actor {
           var members = Set.empty[Member]

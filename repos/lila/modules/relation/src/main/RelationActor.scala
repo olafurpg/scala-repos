@@ -23,11 +23,11 @@ private[relation] final class RelationActor(
 
   def receive = {
 
-    case GetOnlineFriends(userId) => onlineFriends(userId) pipeTo sender
+    case GetOnlineFriends(userId) => onlineFriends(userId).pipeTo(sender)
 
     // triggers following reloading for this user id
     case ReloadOnlineFriends(userId) =>
-      onlineFriends(userId) foreach {
+      onlineFriends(userId).foreach {
         case OnlineFriends(users) =>
           bus.publish(
             SendTo(userId, "following_onlines", users.map(_.titleName)),
@@ -37,8 +37,8 @@ private[relation] final class RelationActor(
     case NotifyMovement =>
       val prevIds = onlineIds
       val curIds = getOnlineUserIds()
-      val leaveIds = (prevIds diff curIds).toList
-      val enterIds = (curIds diff prevIds).toList
+      val leaveIds = (prevIds.diff(curIds)).toList
+      val enterIds = (curIds.diff(prevIds)).toList
       val leaves = leaveIds.flatMap(i => lightUser(i))
       val enters = enterIds.flatMap(i => lightUser(i))
       onlines = onlines -- leaveIds ++ enters.map(e => e.id -> e)
@@ -49,13 +49,13 @@ private[relation] final class RelationActor(
   private def onlineIds: Set[ID] = onlines.keySet
 
   private def onlineFriends(userId: String): Fu[OnlineFriends] =
-    api fetchFollowing userId map { ids =>
+    (api fetchFollowing userId).map { ids =>
       OnlineFriends(ids.flatMap(onlines.get).toList)
     }
 
   private def notifyFollowers(users: List[LightUser], message: String) {
-    users foreach { user =>
-      api fetchFollowers user.id map (_ filter onlines.contains) foreach {
+    users.foreach { user =>
+      api.fetchFollowers(user.id).map(_.filter(onlines.contains)).foreach {
         ids =>
           if (ids.nonEmpty)
             bus.publish(SendTos(ids.toSet, message, user.titleName), 'users)

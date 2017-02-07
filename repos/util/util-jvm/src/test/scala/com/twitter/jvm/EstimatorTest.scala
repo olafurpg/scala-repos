@@ -43,7 +43,7 @@ object EstimatorApp extends App {
     case Array("windowed", n, windows) =>
       new WindowedMeans(
         n.toInt,
-        windows.split(",") map { w =>
+        windows.split(",").map { w =>
           w.split(":") match {
             case Array(w, i) => (w.toInt, i.toInt)
             case _ =>
@@ -58,7 +58,7 @@ object EstimatorApp extends App {
 
   val lines = scala.io.Source.stdin.getLines().drop(1)
   val states =
-    lines.toArray map (_.split(" ") filter (_ != "") map (_.toDouble)) collect {
+    lines.toArray.map(_.split(" ").filter(_ != "").map(_.toDouble)).collect {
       case Array(s0c,
                  s1c,
                  s0u,

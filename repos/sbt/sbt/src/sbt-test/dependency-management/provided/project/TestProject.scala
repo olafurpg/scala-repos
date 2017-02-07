@@ -12,7 +12,7 @@ object TestProject extends Build {
       (provided <<= baseDirectory(_ / "useProvided" exists), configuration <<=
         provided(p => if (p) Provided else Compile), libraryDependencies <+=
         configuration(c => "javax.servlet" % "servlet-api" % "2.5" % c.name),
-      managedClasspath in Provided <<= (classpathTypes, update) map {
+      managedClasspath in Provided <<= (classpathTypes, update).map {
         (cpts, report) =>
           Classpaths.managedJars(Provided, cpts, report)
       }, check <<= InputTask(_ =>
@@ -23,7 +23,7 @@ object TestProject extends Build {
          managedClasspath in Provided,
          fullClasspath in Runtime,
          fullClasspath in Compile,
-         fullClasspath in Test) map {
+         fullClasspath in Test).map {
           case ((conf, expected), p, r, c, t) =>
             val cp =
               if (conf == Compile.name) c

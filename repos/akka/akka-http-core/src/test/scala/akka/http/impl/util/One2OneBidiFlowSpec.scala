@@ -153,7 +153,7 @@ class One2OneBidiFlowSpec extends AkkaSpec {
 
       Thread.sleep(50)
       val x = seen.get()
-      (1 to 8) foreach out.sendNext
+      ((1 to 8)).foreach(out.sendNext)
       Thread.sleep(50)
       seen.get should ===(x + 8)
 

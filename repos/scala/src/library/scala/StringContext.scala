@@ -122,8 +122,8 @@ case class StringContext(parts: String*) {
     val ai = args.iterator
     val bldr = new JLSBuilder(process(pi.next()))
     while (ai.hasNext) {
-      bldr append ai.next
-      bldr append process(pi.next())
+      bldr.append(ai.next)
+      bldr.append(process(pi.next()))
     }
     bldr.toString
   }
@@ -240,7 +240,7 @@ object StringContext {
             case _ => throw new InvalidEscapeException(str, next)
           }
           idx += 1 // advance
-          b append c
+          b.append(c)
           loop(idx, str.indexOf('\\', idx))
         } else {
           if (i < len) b.append(str, i, len)

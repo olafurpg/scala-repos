@@ -113,7 +113,7 @@ class TFinagleBinaryProtocolTest
     val offset = 2
 
     val bbuf = ByteBuffer.allocate(len)
-    0 until len foreach { i =>
+    (0 until len).foreach { i =>
       bbuf.put(i.toByte)
     }
     bbuf.position(offset)

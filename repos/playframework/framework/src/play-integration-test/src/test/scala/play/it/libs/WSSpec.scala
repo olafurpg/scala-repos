@@ -96,8 +96,8 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
       val rep =
         req.toCompletableFuture.get(10, TimeUnit.SECONDS) // AWait result
 
-      rep.getStatus aka "status" must_== 200 and
-        (rep.asJson.path("origin").textValue must not beNull)
+      (rep.getStatus.aka("status") must_== 200)
+        .and(rep.asJson.path("origin").textValue must not beNull)
     }
 
     "use queryString in url" in withServer { ws =>
@@ -107,8 +107,8 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
         .toCompletableFuture
         .get(10, TimeUnit.SECONDS)
 
-      rep.getStatus aka "status" must_== 200 and
-        (rep.asJson().path("args").path("foo").textValue() must_== "bar")
+      (rep.getStatus.aka("status") must_== 200)
+        .and(rep.asJson().path("args").path("foo").textValue() must_== "bar")
     }
 
     "use user:password in url" in Server.withApplication(app) {
@@ -121,8 +121,8 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
             .toCompletableFuture
             .get(10, TimeUnit.SECONDS)
 
-          rep.getStatus aka "status" must_== 200 and
-            (rep.asJson().path("authenticated").booleanValue() must beTrue)
+          (rep.getStatus.aka("status") must_== 200)
+            .and(rep.asJson().path("authenticated").booleanValue() must beTrue)
         }
     }
 
@@ -155,8 +155,8 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
         .toCompletableFuture
         .get(10, TimeUnit.SECONDS)
 
-      empty.asJson.path("args").path("foo").textValue() must_== "" and
-        (bar.asJson.path("args").path("foo").textValue() must_== "bar")
+      (empty.asJson.path("args").path("foo").textValue() must_== "")
+        .and(bar.asJson.path("args").path("foo").textValue() must_== "bar")
     }
 
     "get a streamed response" in withResult(
@@ -273,13 +273,13 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
     "make GET Requests" in withServer { ws =>
       val req = ws.url("/get").get()
 
-      Await.result(req, Duration(1, SECONDS)).status aka "status" must_== 200
+      Await.result(req, Duration(1, SECONDS)).status.aka("status") must_== 200
     }
 
     "Get 404 errors" in withServer { ws =>
       val req = ws.url("/post").get()
 
-      Await.result(req, Duration(1, SECONDS)).status aka "status" must_== 404
+      Await.result(req, Duration(1, SECONDS)).status.aka("status") must_== 404
     }
 
     "get a streamed response" in withResult(
@@ -338,7 +338,8 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
       "with query string" in withServer { ws =>
         ws.url("/")
           .withQueryString("lorem" -> "ipsum")
-          .sign(calc) aka "signed request" must not(throwA[Exception])
+          .sign(calc)
+          .aka("signed request") must not(throwA[Exception])
       }
     }
   }

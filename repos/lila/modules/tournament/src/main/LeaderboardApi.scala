@@ -36,13 +36,13 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
                           "ratios" -> Push("w")))
       )
       .map {
-        _.documents map leaderboardAggregationResultBSONHandler.read
+        _.documents.map(leaderboardAggregationResultBSONHandler.read)
       }
       .map { aggs =>
         ChartData {
           aggs
             .flatMap { agg =>
-              PerfType.byId get agg._id map {
+              PerfType.byId.get(agg._id).map {
                 _ -> ChartData.PerfResult(nb = agg.nb,
                                           points = ChartData.Ints(agg.points),
                                           rank = ChartData.Ints(agg.ratios))
@@ -58,17 +58,17 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
                         sort: BSONDocument): Fu[Paginator[TourEntry]] =
     Paginator(
       adapter = new BSONAdapter[Entry](
-          collection = coll,
-          selector = BSONDocument("u" -> user.id),
-          projection = BSONDocument(),
-          sort = sort
-        ) mapFutureList withTournaments,
+        collection = coll,
+        selector = BSONDocument("u" -> user.id),
+        projection = BSONDocument(),
+        sort = sort
+      ).mapFutureList(withTournaments),
       currentPage = page,
       maxPerPage = maxPerPage
     )
 
   private def withTournaments(entries: Seq[Entry]): Fu[Seq[TourEntry]] =
-    TournamentRepo byIds entries.map(_.tourId) map { tours =>
+    (TournamentRepo byIds entries.map(_.tourId)).map { tours =>
       entries.flatMap { entry =>
         tours.find(_.id == entry.tourId).map { TourEntry(_, entry) }
       }
@@ -113,8 +113,8 @@ object LeaderboardApi {
   object ChartData {
 
     case class Ints(v: List[Int]) {
-      def mean = v.toNel map Maths.mean[Int]
-      def median = v.toNel map Maths.median[Int]
+      def mean = v.toNel.map(Maths.mean[Int])
+      def median = v.toNel.map(Maths.median[Int])
       def sum = v.sum
       def :::(i: Ints) = Ints(v ::: i.v)
     }
@@ -122,8 +122,8 @@ object LeaderboardApi {
     case class PerfResult(nb: Int, points: Ints, rank: Ints) {
       private def rankPercent(n: Double) =
         (n * 100 / rankRatioMultiplier).toInt
-      def rankPercentMean = rank.mean map rankPercent
-      def rankPercentMedian = rank.median map rankPercent
+      def rankPercentMean = rank.mean.map(rankPercent)
+      def rankPercentMedian = rank.median.map(rankPercent)
     }
 
     case class AggregationResult(_id: Int,

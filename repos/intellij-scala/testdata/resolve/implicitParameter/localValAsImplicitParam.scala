@@ -4,5 +4,5 @@ object A {
 
 object Client {
   implicit val a: Int = null
-  A.< ref > a
+  A.<.ref(>) a
 }

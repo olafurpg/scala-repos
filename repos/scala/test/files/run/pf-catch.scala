@@ -1,6 +1,6 @@
 import scala.language.{postfixOps}
 object Test {
-  def shortName(x: AnyRef) = x.getClass.getName split '.' last
+  def shortName(x: AnyRef) = x.getClass.getName.split('.') last
   type Handler[+T] = PartialFunction[Throwable, T]
 
   val standardHandler: Handler[String] = {
@@ -20,7 +20,7 @@ object Test {
   }
   def f2 = {
     implicit val myHandler: Handler[String] =
-      standardHandler orElse {
+      standardHandler.orElse {
         case x => "DEBUG: " + shortName(x)
       }
     println(fn(Nil.head))

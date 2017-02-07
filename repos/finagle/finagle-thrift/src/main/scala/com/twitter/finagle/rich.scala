@@ -78,7 +78,7 @@ private[twitter] object ThriftUtil {
       }
     }
 
-    f getOrElse Function.const(None)
+    f.getOrElse(Function.const(None))
   }
 
   /**
@@ -146,9 +146,14 @@ private[twitter] object ThriftUtil {
       }
 
     val iface =
-      tryThriftFinagleClient orElse tryScrooge3FinagleClient orElse tryScrooge3FinagledClientRepClassifier orElse tryScrooge3FinagledClient orElse tryScrooge2Client orElse trySwiftClient
+      tryThriftFinagleClient
+        .orElse(tryScrooge3FinagleClient)
+        .orElse(tryScrooge3FinagledClientRepClassifier)
+        .orElse(tryScrooge3FinagledClient)
+        .orElse(tryScrooge2Client)
+        .orElse(trySwiftClient)
 
-    iface getOrElse {
+    iface.getOrElse {
       throw new IllegalArgumentException(
         "Iface %s is not a valid thrift iface".format(clsName))
     }
@@ -174,10 +179,10 @@ private[twitter] object ThriftUtil {
 
     def tryScroogeFinagleService(iface: Class[_]): Option[BinaryService] =
       (for {
-        baseName <- findRootWithSuffix(iface.getName, "$FutureIface") orElse Some(
-          iface.getName)
-        serviceCls <- findClass[BinaryService](baseName + "$FinagleService") orElse findClass[
-          BinaryService](baseName + "$FinagledService")
+        baseName <- findRootWithSuffix(iface.getName, "$FutureIface").orElse(
+          Some(iface.getName))
+        serviceCls <- findClass[BinaryService](baseName + "$FinagleService")
+          .orElse(findClass[BinaryService](baseName + "$FinagledService"))
         baseClass <- findClass1(baseName)
       } yield {
         // The new constructor takes one more 'label' paramater than the old one, so we first try find
@@ -205,10 +210,10 @@ private[twitter] object ThriftUtil {
     def tryLegacyScroogeFinagleService(
         iface: Class[_]): Option[BinaryService] =
       for {
-        baseName <- findRootWithSuffix(iface.getName, "$FutureIface") orElse Some(
-          iface.getName)
-        serviceCls <- findClass[BinaryService](baseName + "$FinagleService") orElse findClass[
-          BinaryService](baseName + "$FinagledService")
+        baseName <- findRootWithSuffix(iface.getName, "$FutureIface")
+          .orElse(Some(iface.getName))
+        serviceCls <- findClass[BinaryService](baseName + "$FinagleService")
+          .orElse(findClass[BinaryService](baseName + "$FinagledService"))
         cons <- findConstructor(serviceCls, iface, classOf[TProtocolFactory])
       } yield cons.newInstance(impl, protocolFactory)
 
@@ -221,11 +226,14 @@ private[twitter] object ThriftUtil {
       } yield const.newInstance(impl).asInstanceOf[BinaryService]
 
     def tryClass(cls: Class[_]): Option[BinaryService] =
-      tryThriftFinagleService(cls) orElse tryScroogeFinagleService(cls) orElse tryLegacyScroogeFinagleService(
-        cls) orElse trySwiftService(cls) orElse
-        (Option(cls.getSuperclass) ++ cls.getInterfaces).view
-          .flatMap(tryClass)
-          .headOption
+      tryThriftFinagleService(cls)
+        .orElse(tryScroogeFinagleService(cls))
+        .orElse(tryLegacyScroogeFinagleService(cls))
+        .orElse(trySwiftService(cls))
+        .orElse(Option(cls.getSuperclass) ++ cls.getInterfaces)
+        .view
+        .flatMap(tryClass)
+        .headOption
 
     tryClass(impl.getClass).getOrElse {
       throw new IllegalArgumentException(

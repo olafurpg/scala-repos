@@ -20,17 +20,17 @@ trait WrappedProperties extends PropertiesTrait {
   protected def pickJarBasedOn = this.getClass
 
   override def propIsSet(name: String) =
-    wrap(super.propIsSet(name)) exists (x => x)
+    wrap(super.propIsSet(name)).exists(x => x)
   override def propOrElse(name: String, alt: String) =
-    wrap(super.propOrElse(name, alt)) getOrElse alt
+    wrap(super.propOrElse(name, alt)).getOrElse(alt)
   override def setProp(name: String, value: String) =
     wrap(super.setProp(name, value)).orNull
   override def clearProp(name: String) = wrap(super.clearProp(name)).orNull
   override def envOrElse(name: String, alt: String) =
-    wrap(super.envOrElse(name, alt)) getOrElse alt
+    wrap(super.envOrElse(name, alt)).getOrElse(alt)
   override def envOrNone(name: String) = wrap(super.envOrNone(name)).flatten
   override def envOrSome(name: String, alt: Option[String]) =
-    wrap(super.envOrNone(name)).flatten orElse alt
+    wrap(super.envOrNone(name)).flatten.orElse(alt)
 
   def systemProperties: List[(String, String)] = {
     import scala.collection.JavaConverters._
@@ -38,10 +38,14 @@ trait WrappedProperties extends PropertiesTrait {
       // SI-7269,7775 Avoid `ConcurrentModificationException` and nulls if another thread modifies properties
       val props = System.getProperties
       val it =
-        props.stringPropertyNames().asScala.iterator map
-          (k => (k, props getProperty k)) filter (_._2 ne null)
+        props
+          .stringPropertyNames()
+          .asScala
+          .iterator
+          .map(k => (k, props.getProperty(k)))
+          .filter(_._2 ne null)
       it.toList
-    } getOrElse Nil
+    }.getOrElse(Nil)
   }
 }
 

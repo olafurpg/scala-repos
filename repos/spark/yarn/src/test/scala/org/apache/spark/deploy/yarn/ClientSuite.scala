@@ -234,7 +234,7 @@ class ClientSuite
       .foreach { method =>
         val tags =
           method.invoke(appContext).asInstanceOf[java.util.Set[String]]
-        tags should contain allOf ("tag1", "dup", "tag2", "multi word")
+        (tags should contain).allOf("tag1", "dup", "tag2", "multi word")
         tags.asScala.count(_.nonEmpty) should be(4)
       }
     appContext.getMaxAppAttempts should be(42)

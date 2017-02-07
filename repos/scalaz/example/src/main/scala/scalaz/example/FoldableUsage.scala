@@ -48,7 +48,7 @@ object FoldableUsage extends App {
   assert(digits.minimum === Some(0))
 
   // Foldables can be composed:
-  val FoldListOfOptions = Foldable[List] compose Foldable[Option]
+  val FoldListOfOptions = Foldable[List].compose(Foldable[Option])
 
   val listOfOptions: List[Option[Int]] =
     List(1.some, 2.some, none[Int], 3.some, 4.some)
@@ -69,8 +69,10 @@ object FoldableUsage extends App {
 
   // we can go deeeeep:
   val deepFolder =
-    Foldable[List] compose Foldable[Vector] compose Foldable[Stream] compose Foldable[
-      Option]
+    Foldable[List]
+      .compose(Foldable[Vector])
+      .compose(Foldable[Stream])
+      .compose(Foldable[Option])
   val deep: List[Vector[Stream[Option[Int]]]] = List(
     Vector(Stream(1.some, none[Int]), Stream(2.some)),
     Vector(Stream(3.some)))

@@ -86,9 +86,11 @@ private[spire] trait Fuser[C <: Context, A] {
       }
 
     case q"$constr($apx, $mes, $ind, $exact)" =>
-      termify(apx, mes, ind, exact) map {
-        case (apx, mes, ind, exact) => Fused(Nil, apx, mes, ind, exact)
-      } getOrElse Approx(apx, mes, Left(ind), exact).fused(Nil)
+      termify(apx, mes, ind, exact)
+        .map {
+          case (apx, mes, ind, exact) => Fused(Nil, apx, mes, ind, exact)
+        }
+        .getOrElse(Approx(apx, mes, Left(ind), exact).fused(Nil))
 
     case _ if typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilterExact[A]] =>
       liftExact(tree)
@@ -136,7 +138,7 @@ private[spire] trait Fuser[C <: Context, A] {
       case _ => None
     }
 
-    val ind0 = t(ind).map(Left(_)) orElse l(ind).map(Right(_))
+    val ind0 = t(ind).map(Left(_)).orElse(l(ind).map(Right(_)))
 
     for (a <- t(apx); b <- t(mes); c <- ind0; d <- t(exact)) yield {
       (a, b, c, d)

@@ -22,7 +22,7 @@ class TlsFilterTest extends FunSuite {
     val tls = new TlsFilter(host)
     val req = Request(Http11, Get, "/")
     val p = new Promise[Request]
-    (tls andThen svc(p))(req)
+    (tls.andThen(svc(p)))(req)
     assert(Await.result(p).headerMap.get("Host") == Some(host))
   }
 

@@ -33,7 +33,7 @@ object Test extends StoreReporterDirectTest {
   """
 
   def show(): Unit = {
-    Seq(library1, library2) foreach compileCode
+    Seq(library1, library2).foreach(compileCode)
     assert(filteredInfos.isEmpty, filteredInfos)
 
     // blow away the entire package

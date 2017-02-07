@@ -67,7 +67,7 @@ class CachingAPIKeyManager[M[+ _]](manager: APIKeyManager[M],
 
   protected def add(r: APIKeyRecord) = IO {
     @inline def addChildren(k: APIKey, c: Set[APIKeyRecord]) =
-      childCache.put(k, childCache.get(k).getOrElse(Set()) union c)
+      childCache.put(k, childCache.get(k).getOrElse(Set()).union(c))
 
     apiKeyCache.put(r.apiKey, r)
     addChildren(r.issuerKey, Set(r))
@@ -79,7 +79,7 @@ class CachingAPIKeyManager[M[+ _]](manager: APIKeyManager[M],
 
   protected def remove(r: APIKeyRecord) = IO {
     @inline def removeChildren(k: APIKey, c: Set[APIKeyRecord]) =
-      childCache.put(k, childCache.get(k).getOrElse(Set()) diff c)
+      childCache.put(k, childCache.get(k).getOrElse(Set()).diff(c))
 
     apiKeyCache.remove(r.apiKey)
     removeChildren(r.issuerKey, Set(r))
@@ -96,8 +96,8 @@ class CachingAPIKeyManager[M[+ _]](manager: APIKeyManager[M],
                    description: Option[String],
                    issuerKey: APIKey,
                    grants: Set[GrantId]) =
-    manager.createAPIKey(name, description, issuerKey, grants) map {
-      _ tap add unsafePerformIO
+    manager.createAPIKey(name, description, issuerKey, grants).map {
+      _.tap(add) unsafePerformIO
     }
 
   def createGrant(name: Option[String],
@@ -106,19 +106,16 @@ class CachingAPIKeyManager[M[+ _]](manager: APIKeyManager[M],
                   parentIds: Set[GrantId],
                   perms: Set[Permission],
                   expiration: Option[DateTime]) =
-    manager.createGrant(name,
-                        description,
-                        issuerKey,
-                        parentIds,
-                        perms,
-                        expiration) map {
-      _ tap add unsafePerformIO
-    }
+    manager
+      .createGrant(name, description, issuerKey, parentIds, perms, expiration)
+      .map {
+        _.tap(add) unsafePerformIO
+      }
 
   def findAPIKey(tid: APIKey) = apiKeyCache.get(tid) match {
     case None =>
       logger.debug("Cache miss on api key " + tid)
-      manager.findAPIKey(tid) map { _.traverse(_ tap add).unsafePerformIO }
+      manager.findAPIKey(tid).map { _.traverse(_.tap(add)).unsafePerformIO }
 
     case t => M.point(t)
   }
@@ -126,7 +123,7 @@ class CachingAPIKeyManager[M[+ _]](manager: APIKeyManager[M],
   def findGrant(gid: GrantId) = grantCache.get(gid) match {
     case None =>
       logger.debug("Cache miss on grant " + gid)
-      manager.findGrant(gid) map { _.traverse(_ tap add).unsafePerformIO }
+      manager.findGrant(gid).map { _.traverse(_.tap(add)).unsafePerformIO }
 
     case s @ Some(_) => M.point(s)
   }
@@ -134,8 +131,8 @@ class CachingAPIKeyManager[M[+ _]](manager: APIKeyManager[M],
   def findAPIKeyChildren(apiKey: APIKey): M[Set[APIKeyRecord]] =
     childCache.get(apiKey) match {
       case None =>
-        manager.findAPIKeyChildren(apiKey) map {
-          _.toList.traverse(_ tap add).unsafePerformIO.toSet
+        manager.findAPIKeyChildren(apiKey).map {
+          _.toList.traverse(_.tap(add)).unsafePerformIO.toSet
         }
       case Some(s) => M.point(s)
     }
@@ -154,19 +151,19 @@ class CachingAPIKeyManager[M[+ _]](manager: APIKeyManager[M],
     manager.findDeletedGrantChildren(gid)
 
   def addGrants(tid: APIKey, grants: Set[GrantId]) =
-    manager.addGrants(tid, grants) map {
-      _.traverse(_ tap add).unsafePerformIO
+    manager.addGrants(tid, grants).map {
+      _.traverse(_.tap(add)).unsafePerformIO
     }
   def removeGrants(tid: APIKey, grants: Set[GrantId]) =
-    manager.removeGrants(tid, grants) map {
-      _.traverse(_ tap remove).unsafePerformIO
+    manager.removeGrants(tid, grants).map {
+      _.traverse(_.tap(remove)).unsafePerformIO
     }
 
   def deleteAPIKey(tid: APIKey) =
-    manager.deleteAPIKey(tid) map { _.traverse(_ tap remove).unsafePerformIO }
+    manager.deleteAPIKey(tid).map { _.traverse(_.tap(remove)).unsafePerformIO }
   def deleteGrant(gid: GrantId) =
-    manager.deleteGrant(gid) map {
-      _.toList.traverse(_ tap remove).unsafePerformIO.toSet
+    manager.deleteGrant(gid).map {
+      _.toList.traverse(_.tap(remove)).unsafePerformIO.toSet
     }
 }
 

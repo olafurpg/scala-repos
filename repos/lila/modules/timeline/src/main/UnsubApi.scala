@@ -14,20 +14,23 @@ private[timeline] final class UnsubApi(coll: Coll) {
   def set(channel: String, userId: String, v: Boolean): Funit = {
     if (v) coll.insert(select(channel, userId)).void
     else coll.remove(select(channel, userId)).void
-  } recover {
+  }.recover {
     case e: Exception => ()
   }
 
   def get(channel: String, userId: String): Fu[Boolean] =
-    coll.count(select(channel, userId).some) map (0 !=)
+    coll.count(select(channel, userId).some).map(0 !=)
 
   def filterUnsub(channel: String, userIds: List[String]): Fu[List[String]] =
-    coll.distinct("_id",
-                  BSONDocument(
-                    "_id" -> BSONDocument("$in" -> userIds.map {
-                      makeId(channel, _)
-                    })
-                  ).some) map lila.db.BSON.asStrings map { unsubs =>
-      userIds diff unsubs.map(_ takeWhile ('@' !=))
-    }
+    coll
+      .distinct("_id",
+                BSONDocument(
+                  "_id" -> BSONDocument("$in" -> userIds.map {
+                    makeId(channel, _)
+                  })
+                ).some)
+      .map(lila.db.BSON.asStrings)
+      .map { unsubs =>
+        userIds.diff(unsubs.map(_.takeWhile('@' !=)))
+      }
 }

@@ -51,20 +51,20 @@ case class ExpressionInMap(map: Map[String, Expression])
 
 class TreeNodeSuite extends SparkFunSuite {
   test("top node changed") {
-    val after = Literal(1) transform { case Literal(1, _) => Literal(2) }
+    val after = Literal(1).transform { case Literal(1, _) => Literal(2) }
     assert(after === Literal(2))
   }
 
   test("one child changed") {
     val before = Add(Literal(1), Literal(2))
-    val after = before transform { case Literal(2, _) => Literal(1) }
+    val after = before.transform { case Literal(2, _) => Literal(1) }
 
     assert(after === Add(Literal(1), Literal(1)))
   }
 
   test("no change") {
     val before = Add(Literal(1), Add(Literal(2), Add(Literal(3), Literal(4))))
-    val after = before transform { case Literal(5, _) => Literal(1) }
+    val after = before.transform { case Literal(5, _) => Literal(1) }
 
     assert(before === after)
     // Ensure that the objects after are the same objects before the transformation.
@@ -78,7 +78,7 @@ class TreeNodeSuite extends SparkFunSuite {
 
   test("collect") {
     val tree = Add(Literal(1), Add(Literal(2), Add(Literal(3), Literal(4))))
-    val literals = tree collect { case l: Literal => l }
+    val literals = tree.collect { case l: Literal => l }
 
     assert(literals.size === 4)
     (1 to 4).foreach(i => assert(literals contains Literal(i)))
@@ -89,7 +89,7 @@ class TreeNodeSuite extends SparkFunSuite {
     val expected = Seq("+", "1", "*", "2", "-", "3", "4")
     val expression =
       Add(Literal(1), Multiply(Literal(2), Subtract(Literal(3), Literal(4))))
-    expression transformDown {
+    expression.transformDown {
       case b: BinaryOperator => actual.append(b.symbol); b
       case l: Literal => actual.append(l.toString); l
     }
@@ -102,7 +102,7 @@ class TreeNodeSuite extends SparkFunSuite {
     val expected = Seq("1", "2", "3", "4", "-", "*", "+")
     val expression =
       Add(Literal(1), Multiply(Literal(2), Subtract(Literal(3), Literal(4))))
-    expression transformUp {
+    expression.transformUp {
       case b: BinaryOperator => actual.append(b.symbol); b
       case l: Literal => actual.append(l.toString); l
     }
@@ -117,13 +117,13 @@ class TreeNodeSuite extends SparkFunSuite {
       case Literal(_, _) => Literal(0)
     }
 
-    var actual = dummy1 transformDown toZero
+    var actual = dummy1.transformDown(toZero)
     assert(actual === Dummy(Some(Literal(0))))
 
-    actual = dummy1 transformUp toZero
+    actual = dummy1.transformUp(toZero)
     assert(actual === Dummy(Some(Literal(0))))
 
-    actual = dummy2 transform toZero
+    actual = dummy2.transform(toZero)
     assert(actual === Dummy(None))
   }
 
@@ -133,7 +133,7 @@ class TreeNodeSuite extends SparkFunSuite {
     CurrentOrigin.reset()
 
     val transformed =
-      add transform {
+      add.transform {
         case Literal(1, _) => Literal(2)
       }
 
@@ -146,7 +146,7 @@ class TreeNodeSuite extends SparkFunSuite {
     val expected = Seq("1", "2", "3", "4", "-", "*", "+")
     val expression =
       Add(Literal(1), Multiply(Literal(2), Subtract(Literal(3), Literal(4))))
-    expression foreachUp {
+    expression.foreachUp {
       case b: BinaryOperator => actual.append(b.symbol);
       case l: Literal => actual.append(l.toString);
     }

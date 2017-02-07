@@ -42,7 +42,7 @@ trait PathDirectives
     implicit val LIsTuple = pm.ev
     extract(ctx ⇒ pm(ctx.unmatchedPath)).flatMap {
       case Matched(rest, values) ⇒
-        tprovide(values) & mapRequestContext(_ withUnmatchedPath rest)
+        tprovide(values) & mapRequestContext(_.withUnmatchedPath(rest))
       case Unmatched ⇒ reject
     }
   }

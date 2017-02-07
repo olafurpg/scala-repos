@@ -332,10 +332,11 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
     import h._
 
     val underlyingService = mock[Service[String, String]]
-    when(underlyingService(Matchers.anyString)) thenReturn Future.value("polo")
+    when(underlyingService(Matchers.anyString))
+      .thenReturn(Future.value("polo"))
 
     val underlying = mock[ServiceFactory[String, String]]
-    when(underlying()) thenReturn Future.value(underlyingService)
+    when(underlying()).thenReturn(Future.value(underlyingService))
 
     val s: Stack[ServiceFactory[String, String]] = DeadlineFilter
       .module[String, String]

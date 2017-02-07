@@ -69,11 +69,13 @@ trait AtmosphereSupport
     JsonMessage(json)
 
   implicit def string2Outbound(text: String): OutboundMessage =
-    text.blankOption map { txt =>
-      if (txt.startsWith("{") || txt.startsWith("["))
-        parseOpt(txt) map JsonMessage.apply getOrElse TextMessage(txt)
-      else TextMessage(txt)
-    } getOrElse TextMessage("")
+    text.blankOption
+      .map { txt =>
+        if (txt.startsWith("{") || txt.startsWith("["))
+          parseOpt(txt).map(JsonMessage.apply).getOrElse(TextMessage(txt))
+        else TextMessage(txt)
+      }
+      .getOrElse(TextMessage(""))
 
   private[this] def isFilter = self match {
     case _: ScalatraFilter => true
@@ -85,14 +87,15 @@ trait AtmosphereSupport
   implicit protected def scalatraActorSystem: ActorSystem =
     servletContext
       .get(ActorSystemKey)
-      .map(_.asInstanceOf[ActorSystem]) getOrElse {
-      val msg =
-        "Scalatra Actor system not present. Creating a private actor system"
-      logger.info(msg)
-      val cfg = ConfigFactory.load
-      val defRef = ConfigFactory.defaultReference
-      ActorSystem("scalatra", cfg.getConfig("scalatra").withFallback(defRef))
-    }
+      .map(_.asInstanceOf[ActorSystem])
+      .getOrElse {
+        val msg =
+          "Scalatra Actor system not present. Creating a private actor system"
+        logger.info(msg)
+        val cfg = ConfigFactory.load
+        val defRef = ConfigFactory.defaultReference
+        ActorSystem("scalatra", cfg.getConfig("scalatra").withFallback(defRef))
+      }
 
   private[this] implicit def filterConfig2servletConfig(
       fc: FilterConfig): ServletConfig = {
@@ -155,8 +158,8 @@ trait AtmosphereSupport
   private[this] def setupAtmosphereHandlerMappings(cfg: ServletConfig) {
     // TODO: also support filters?
     val servletRegistration = ScalatraBase.getServletRegistration(this)
-    servletRegistration foreach { reg =>
-      reg.getMappings.asScala foreach { mapping =>
+    servletRegistration.foreach { reg =>
+      reg.getMappings.asScala.foreach { mapping =>
         atmosphereFramework
           .addAtmosphereHandler(mapping, new ScalatraAtmosphereHandler(this))
           .initAtmosphereHandler(cfg)

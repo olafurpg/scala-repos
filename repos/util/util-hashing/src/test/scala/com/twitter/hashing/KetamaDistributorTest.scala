@@ -72,7 +72,7 @@ class KetamaDistributorTest extends WordSpec {
         -9515121512312L -> 5
       )
 
-      knownGoodValues foreach {
+      knownGoodValues.foreach {
         case (key, node) =>
           val handle = ketamaDistributor.nodeForHash(key)
           assert(handle == node)

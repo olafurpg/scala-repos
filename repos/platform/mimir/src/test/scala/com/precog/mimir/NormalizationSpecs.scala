@@ -128,12 +128,12 @@ trait NormalizationSpecs[M[+ _]]
       result must haveSize(10)
 
       val resultValue =
-        result collect {
+        result.collect {
           case (ids, value) if ids.size == 1 => value
         }
 
       val expectedValue =
-        testEval(expected) collect {
+        testEval(expected).collect {
           case (ids, value) if ids.size == 1 => value
         }
 

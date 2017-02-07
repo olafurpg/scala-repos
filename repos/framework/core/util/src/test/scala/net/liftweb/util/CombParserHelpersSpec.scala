@@ -45,7 +45,7 @@ object CombParserHelpersSpec extends Specification with ScalaCheck {
       notNum('0') must beFalse
     }
     "provide an wsc function returning true iff a char is a space character" in {
-      List(' ', '\t', '\r', '\n') foreach { wsc(_) must beTrue }
+      List(' ', '\t', '\r', '\n').foreach { wsc(_) must beTrue }
       wsc('a') must beFalse
     }
     "provide a whitespace parser: white. Alias: wsc" in {
@@ -99,7 +99,7 @@ object CombParserHelpersSpec extends Specification with ScalaCheck {
       colon("x") must beLike { case Failure(_, _) => 1 must_== 1 }
     }
     "provide a EOL parser which parses the any and discards any end of line character" in {
-      List("\n", "\r") map { s =>
+      List("\n", "\r").map { s =>
         val result = EOL(s)
         result.get.toString must_== "()"
         result.next.atEnd must beTrue

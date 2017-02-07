@@ -28,10 +28,10 @@ object EmitHtml {
     def emitText(text: AbstractText) {
       text match {
         case seq: SeqText =>
-          seq.components foreach emitText
+          seq.components.foreach(emitText)
 
         case seq: SeqPara =>
-          seq.components foreach emitPara
+          seq.components.foreach(emitPara)
 
         case Text(text) =>
           out print escape(text)
@@ -142,7 +142,7 @@ object EmitHtml {
     out.println(
       "\n<h" + depth + " id=\"" + name + "\">" + section.title +
         "</h" + depth + ">")
-    section.paragraphs foreach emitParagraph
+    section.paragraphs.foreach(emitParagraph)
   }
 
   private def emit3columns(col1: String, col2: String, col3: String) {
@@ -199,7 +199,7 @@ object EmitHtml {
     val name = document.title + "(" + document.category.id + ")"
     emitHeader(name, "" + document.category, name)
 
-    document.sections foreach (s => emitSection(s, 3))
+    document.sections.foreach(s => emitSection(s, 3))
 
     emitFooter("version " + document.version, document.date, name)
 
@@ -215,11 +215,11 @@ object EmitHtml {
   }
 
   def emitHtml(classname: String, outStream: java.io.OutputStream = out.out) {
-    if (outStream != out.out) out setOut outStream
+    if (outStream != out.out) out.setOut(outStream)
     try {
       val cl = this.getClass.getClassLoader()
-      val clasz = cl loadClass classname
-      val meth = clasz getDeclaredMethod "manpage"
+      val clasz = cl.loadClass(classname)
+      val meth = clasz.getDeclaredMethod("manpage")
       val doc = meth.invoke(null).asInstanceOf[Document]
       emitDocument(doc)
     } catch {

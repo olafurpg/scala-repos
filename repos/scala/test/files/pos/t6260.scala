@@ -12,6 +12,6 @@ object Test {
     val g = (x: String) => x + x
 
     map2(new Box(42), f)
-    new Box("abc") map g
+    new Box("abc").map(g)
   }
 }

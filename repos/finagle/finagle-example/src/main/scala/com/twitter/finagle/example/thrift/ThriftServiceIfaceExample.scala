@@ -72,7 +72,9 @@ object ThriftServiceIfaceExample {
       new TimeoutFilter[Req, Rep](duration, exc, timer)
     }
     val filteredLog =
-      timeoutFilter(2.seconds) andThen uppercaseFilter andThen clientServiceIface.log
+      timeoutFilter(2.seconds)
+        .andThen(uppercaseFilter)
+        .andThen(clientServiceIface.log)
 
     filteredLog(Log.Args("hello", 2))
     // [2] Server received: 'HELLO'
@@ -84,8 +86,10 @@ object ThriftServiceIfaceExample {
     })
 
     val retriedGetLogSize =
-      new RetryExceptionsFilter(retryPolicy, DefaultTimer.twitter) andThen ThriftServiceIface
-        .resultFilter(GetLogSize) andThen clientServiceIface.getLogSize
+      new RetryExceptionsFilter(retryPolicy, DefaultTimer.twitter)
+        .andThen(ThriftServiceIface
+          .resultFilter(GetLogSize))
+        .andThen(clientServiceIface.getLogSize)
 
     retriedGetLogSize(GetLogSize.Args())
     //#thriftclientapi-retries
@@ -93,7 +97,7 @@ object ThriftServiceIfaceExample {
     //#thriftclientapi-methodiface
     val client: LoggerService.FutureIface =
       Thrift.newIface[LoggerService.FutureIface]("localhost:1234")
-    client.log("message", 4) onSuccess { response =>
+    client.log("message", 4).onSuccess { response =>
       println("Client received response: " + response)
     }
     //#thriftclientapi-methodiface

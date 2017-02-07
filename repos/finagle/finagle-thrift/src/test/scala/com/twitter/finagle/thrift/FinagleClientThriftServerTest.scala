@@ -181,7 +181,7 @@ class FinagleClientThriftServerTest extends FunSuite {
         val barrier = new CyclicBarrier(NumParties)
 
         val addrs =
-          0 until NumParties map { _ =>
+          (0 until NumParties).map { _ =>
             makeServer(transportFactory, somewayPromise) { (a, b) =>
               barrier.await(); a + b
             }
@@ -199,11 +199,11 @@ class FinagleClientThriftServerTest extends FunSuite {
 
         {
           val futures =
-            0 until NumParties map { _ =>
+            (0 until NumParties).map { _ =>
               client.multiply(1, 2)
             }
-          val resolved = futures map (Await.result(_, 5.seconds))
-          resolved foreach { r =>
+          val resolved = futures.map(Await.result(_, 5.seconds))
+          resolved.foreach { r =>
             assert(r == (3))
           }
         }

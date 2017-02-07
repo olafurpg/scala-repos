@@ -49,9 +49,9 @@ class ScenariosTask(settings: Settings)
           (analytics / "fs" / account.bareRootPath) <<? List(
             "apiKey" -> account.apiKey,
             "q" -> "count(//foo)")
-        val str = Http(res OK as.String)()
+        val str = Http(res.OK(as.String))()
         val json =
-          JParser.parseFromString(Http(res OK as.String)()).valueOr(throw _)
+          JParser.parseFromString(Http(res.OK(as.String))()).valueOr(throw _)
         val count = json(0).deserialize[Double]
         count must_== 2
       }
@@ -168,10 +168,15 @@ class ScenariosTask(settings: Settings)
 
       val req =
         (security / "").addQueryParameter("apiKey", account1.apiKey) <<
-          ("""{"grants":[{"permissions":[{"accessType":"write", "path":"%s", "ownerAccountIds":["%s"]}]}]}""" format
-            (account1.rootPath + "/foo", account1.accountId))
+          (
+            """{"grants":[{"permissions":[{"accessType":"write", "path":"%s", "ownerAccountIds":["%s"]}]}]}"""
+              .format(
+                account1.rootPath + "/foo",
+                account1.accountId
+              )
+            )
 
-      val result = Http(req OK as.String)
+      val result = Http(req.OK(as.String))
       val json = JParser.parseFromString(result()).valueOr(throw _)
 
       val delegateAPIKey = (json \ "apiKey").deserialize[String]

@@ -66,7 +66,7 @@ object IntroSpec {
           client ! SessionGranted(wrapper)
         case PostSessionMessage(screenName, message) ⇒
           val mp = MessagePosted(screenName, message)
-          sessions foreach (_ ! mp)
+          sessions.foreach(_ ! mp)
       }
     }.narrow // only expose GetSession to the outside
     //#chatroom-behavior

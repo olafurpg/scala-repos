@@ -44,9 +44,10 @@ trait ScalaClassLoader extends JClassLoader {
 
   private def tryClass[T <: AnyRef](path: String,
                                     initialize: Boolean): Option[Class[T]] =
-    catching(classOf[ClassNotFoundException], classOf[SecurityException]) opt Class
-      .forName(path, initialize, this)
-      .asInstanceOf[Class[T]]
+    catching(classOf[ClassNotFoundException], classOf[SecurityException]).opt(
+      Class
+        .forName(path, initialize, this)
+        .asInstanceOf[Class[T]])
 
   /** Create an instance of a class with this classloader */
   def create(path: String): AnyRef =
@@ -59,19 +60,19 @@ trait ScalaClassLoader extends JClassLoader {
     def error(msg: String, e: Throwable) = { errorFn(msg); throw e }
     try {
       val clazz = Class.forName(path, /*initialize =*/ true, /*loader =*/ this)
-      if (classTag[T].runtimeClass isAssignableFrom clazz) {
+      if (classTag[T].runtimeClass.isAssignableFrom(clazz)) {
         val ctor = {
           val maybes =
-            clazz.getConstructors filter
-              (c =>
-                 c.getParameterCount == args.size &&
-                   (c.getParameterTypes zip args).forall {
-                     case (k, a) => k isAssignableFrom a.getClass
-                   })
+            clazz.getConstructors.filter(
+              c =>
+                c.getParameterCount == args.size &&
+                  (c.getParameterTypes.zip(args)).forall {
+                    case (k, a) => k.isAssignableFrom(a.getClass)
+                })
           if (maybes.size == 1) maybes.head
           else
-            fail(s"Constructor must accept arg list (${args map
-              (_.getClass.getName) mkString ", "}): ${path}")
+            fail(s"Constructor must accept arg list (${args.map(
+              _.getClass.getName) mkString ", "}): ${path}")
         }
         (ctor.newInstance(args: _*)).asInstanceOf[T]
       } else {
@@ -97,15 +98,15 @@ trait ScalaClassLoader extends JClassLoader {
 
   /** An InputStream representing the given class name, or null if not found. */
   def classAsStream(className: String) = getResourceAsStream {
-    if (className endsWith ".class") className
+    if (className.endsWith(".class")) className
     else s"${className.replace('.', '/')}.class" // classNameToPath
   }
 
   /** Run the main method of a class to be loaded by this classloader */
   def run(objectName: String, arguments: Seq[String]) {
     val clsToRun =
-      tryToInitializeClass(objectName) getOrElse
-        (throw new ClassNotFoundException(objectName))
+      tryToInitializeClass(objectName).getOrElse(
+        throw new ClassNotFoundException(objectName))
     val method = clsToRun.getMethod("main", classOf[Array[String]])
     if (!Modifier.isStatic(method.getModifiers))
       throw new NoSuchMethodException(objectName + ".main is not static")
@@ -163,10 +164,10 @@ object ScalaClassLoader {
 
   /** True if supplied class exists in supplied path */
   def classExists(urls: Seq[URL], name: String): Boolean =
-    (fromURLs(urls) tryToLoadClass name).isDefined
+    (fromURLs(urls).tryToLoadClass(name)).isDefined
 
   /** Finding what jar a clazz or instance came from */
   def originOfClass(x: Class[_]): Option[URL] =
-    Option(x.getProtectionDomain.getCodeSource) flatMap
-      (x => Option(x.getLocation))
+    Option(x.getProtectionDomain.getCodeSource).flatMap(x =>
+      Option(x.getLocation))
 }

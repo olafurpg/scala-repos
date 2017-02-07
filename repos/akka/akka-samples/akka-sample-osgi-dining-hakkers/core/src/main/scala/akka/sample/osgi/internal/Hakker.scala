@@ -75,7 +75,7 @@ class Hakker(name: String, chair: Int) extends Actor {
   def thinking(left: ActorRef, right: ActorRef): Receive = {
     case Eat =>
       pubStateChange("thinking", "hungry")
-      become(hungry(left, right) orElse (managementEvents))
+      become(hungry(left, right).orElse(managementEvents))
       left ! Take(self)
       right ! Take(self)
     case Identify => identify("Thinking")
@@ -88,13 +88,13 @@ class Hakker(name: String, chair: Int) extends Actor {
   def hungry(left: ActorRef, right: ActorRef): Receive = {
     case Taken(`left`) =>
       pubStateChange("hungry", "waiting")
-      become(waiting_for(left, right, false) orElse (managementEvents))
+      become(waiting_for(left, right, false).orElse(managementEvents))
     case Taken(`right`) =>
       pubStateChange("hungry", "waiting")
-      become(waiting_for(left, right, true) orElse (managementEvents))
+      become(waiting_for(left, right, true).orElse(managementEvents))
     case Busy(chopstick) =>
       pubStateChange("hungry", "denied_a_chopstick")
-      become(denied_a_chopstick(left, right) orElse (managementEvents))
+      become(denied_a_chopstick(left, right).orElse(managementEvents))
     case Identify => identify("Hungry")
   }
 
@@ -109,18 +109,18 @@ class Hakker(name: String, chair: Int) extends Actor {
         "%s has picked up %s and %s and starts to eat"
           .format(name, left.path.name, right.path.name))
       pubStateChange("waiting", "eating")
-      become(eating(left, right) orElse (managementEvents))
+      become(eating(left, right).orElse(managementEvents))
       system.scheduler.scheduleOnce(5 seconds, self, Think)
     case Taken(`right`) if !waitingForLeft =>
       log.info(
         "%s has picked up %s and %s and starts to eat"
           .format(name, left.path.name, right.path.name))
       pubStateChange("waiting", "eating")
-      become(eating(left, right) orElse (managementEvents))
+      become(eating(left, right).orElse(managementEvents))
       system.scheduler.scheduleOnce(5 seconds, self, Think)
     case Busy(chopstick) =>
       pubStateChange("waiting", "thinking")
-      become(thinking(left, right) orElse (managementEvents))
+      become(thinking(left, right).orElse(managementEvents))
       if (waitingForLeft) {
         right ! Put(self)
       } else {
@@ -136,12 +136,12 @@ class Hakker(name: String, chair: Int) extends Actor {
   def denied_a_chopstick(left: ActorRef, right: ActorRef): Receive = {
     case Taken(chopstick) =>
       pubStateChange("denied_a_chopstick", "thinking")
-      become(thinking(left, right) orElse (managementEvents))
+      become(thinking(left, right).orElse(managementEvents))
       chopstick ! Put(self)
       self ! Eat
     case Busy(chopstick) =>
       pubStateChange("denied_a_chopstick", "thinking")
-      become(thinking(left, right) orElse (managementEvents))
+      become(thinking(left, right).orElse(managementEvents))
       self ! Eat
     case Identify => identify("Denied a Chopstick")
   }
@@ -151,7 +151,7 @@ class Hakker(name: String, chair: Int) extends Actor {
   def eating(left: ActorRef, right: ActorRef): Receive = {
     case Think =>
       pubStateChange("eating", "thinking")
-      become(thinking(left, right) orElse (managementEvents))
+      become(thinking(left, right).orElse(managementEvents))
       left ! Put(self)
       right ! Put(self)
       log.info("%s puts down his chopsticks and starts to think".format(name))
@@ -162,17 +162,17 @@ class Hakker(name: String, chair: Int) extends Actor {
   def waitForChopsticks: Receive = {
     case (left: ActorRef, right: ActorRef) =>
       pubStateChange("waiting", "thinking")
-      become(thinking(left, right) orElse managementEvents)
+      become(thinking(left, right).orElse(managementEvents))
       system.scheduler.scheduleOnce(5 seconds, self, Eat)
     case Identify => identify("Waiting")
   }
 
   def managementEvents: Receive = {
-    case state: CurrentClusterState => state.leader foreach updateTable
+    case state: CurrentClusterState => state.leader.foreach(updateTable)
     case LeaderChanged(Some(leaderAddress)) => updateTable(leaderAddress)
     case SubscribeToHakkerStateChanges =>
       subscribers += sender()
-      context watch sender()
+      context.watch(sender())
     case Terminated(subscriber) =>
       subscribers -= subscriber
   }
@@ -187,15 +187,15 @@ class Hakker(name: String, chair: Int) extends Actor {
 
   def updateTable(leaderAdress: Address): Unit = {
     pubStateChange("-", "waiting")
-    become(waitForChopsticks orElse managementEvents)
+    become(waitForChopsticks.orElse(managementEvents))
     context.actorSelection(RootActorPath(leaderAdress) / "user" / "table") ! chair
   }
 
   //All hakkers start in a non-eating state
-  def receive = initializing orElse managementEvents
+  def receive = initializing.orElse(managementEvents)
 
   def pubStateChange(from: String, to: String): Unit = {
     val chg = HakkerStateChange(name, from, to)
-    subscribers foreach { _ ! chg }
+    subscribers.foreach { _ ! chg }
   }
 }

@@ -116,7 +116,7 @@ object Sensible {
 
   val macroParadise = Seq(
     compilerPlugin(
-      "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+      ("org.scalamacros" % "paradise" % "2.0.1").cross(CrossVersion.full))
   )
   def shapeless(scalaVersion: String) = {
     if (scalaVersion.startsWith("2.10.")) macroParadise

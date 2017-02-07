@@ -51,14 +51,14 @@ trait StringLike[+Repr]
   /** Return element at index `n`
     *  @throws   IndexOutOfBoundsException if the index is not valid
     */
-  def apply(n: Int): Char = toString charAt n
+  def apply(n: Int): Char = toString.charAt(n)
 
   def length: Int = toString.length
 
   override def mkString = toString
 
   override def slice(from: Int, until: Int): Repr = {
-    val start = from max 0
+    val start = from.max(0)
     val end = until min length
 
     if (start >= end) newBuilder.result()
@@ -69,11 +69,11 @@ trait StringLike[+Repr]
     */
   def *(n: Int): String = {
     val buf = new StringBuilder
-    for (i <- 0 until n) buf append toString
+    for (i <- 0 until n) buf.append(toString)
     buf.toString
   }
 
-  override def compare(other: String) = toString compareTo other
+  override def compare(other: String) = toString.compareTo(other)
 
   private def isLineBreak(c: Char) = c == LF || c == FF
 
@@ -130,7 +130,7 @@ trait StringLike[+Repr]
     *  returned by `linesWithSeparators`.
     */
   def lines: Iterator[String] =
-    linesWithSeparators map (line => new WrappedString(line).stripLineEnd)
+    linesWithSeparators.map(line => new WrappedString(line).stripLineEnd)
 
   /** Return all lines in this string in an iterator, excluding trailing line
     *  end characters, i.e., apply `.stripLineEnd` to all lines
@@ -138,7 +138,7 @@ trait StringLike[+Repr]
     */
   @deprecated("Use `lines` instead.", "2.11.0")
   def linesIterator: Iterator[String] =
-    linesWithSeparators map (line => new WrappedString(line).stripLineEnd)
+    linesWithSeparators.map(line => new WrappedString(line).stripLineEnd)
 
   /** Returns this string with first character converted to upper case.
     * If the first character of the string is capitalized, it is returned unchanged.
@@ -194,10 +194,10 @@ trait StringLike[+Repr]
       val len = line.length
       var index = 0
       while (index < len && line.charAt(index) <= ' ') index += 1
-      buf append
-        (if (index < len && line.charAt(index) == marginChar)
-           line.substring(index + 1)
-         else line)
+      buf.append(
+        if (index < len && line.charAt(index) == marginChar)
+          line.substring(index + 1)
+        else line)
     }
     buf.toString
   }
@@ -356,7 +356,7 @@ trait StringLike[+Repr]
     *  @throws java.lang.IllegalArgumentException
     */
   def format(args: Any*): String =
-    java.lang.String.format(toString, args map unwrapArg: _*)
+    java.lang.String.format(toString, args.map(unwrapArg): _*)
 
   /** Like `format(args*)` but takes an initial `Locale` parameter
     *  which influences formatting as in `java.lang.String`'s format.
@@ -373,5 +373,5 @@ trait StringLike[+Repr]
     *  @throws java.lang.IllegalArgumentException
     */
   def formatLocal(l: java.util.Locale, args: Any*): String =
-    java.lang.String.format(l, toString, args map unwrapArg: _*)
+    java.lang.String.format(l, toString, args.map(unwrapArg): _*)
 }

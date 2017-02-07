@@ -76,11 +76,11 @@ object Diff {
         yleft find (_.name == x.name) match {
           case Some(y) =>
             val Diff(c1, a1, d1) = diff(x.value, y.value).toField(y.name)
-            val Diff(c2, a2, d2) = diffRec(xs, yleft filterNot (_ == y))
-            Diff(c1 merge c2, a1 merge a2, d1 merge d2)
+            val Diff(c2, a2, d2) = diffRec(xs, yleft.filterNot(_ == y))
+            Diff(c1.merge(c2), a1.merge(a2), d1.merge(d2))
           case None =>
             val Diff(c, a, d) = diffRec(xs, yleft)
-            Diff(c, a, JObject(x :: Nil) merge d)
+            Diff(c, a, JObject(x :: Nil).merge(d))
         }
     }
 

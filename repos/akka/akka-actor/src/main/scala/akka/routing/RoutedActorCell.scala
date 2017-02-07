@@ -60,7 +60,7 @@ private[akka] class RoutedActorCell(_system: ActorSystemImpl,
     * the old `Router` instance containing the old routees.
     */
   def addRoutees(routees: immutable.Iterable[Routee]): Unit = {
-    routees foreach watch
+    routees.foreach(watch)
     val r = _router
     _router = r.withRoutees(r.routees ++ routees)
   }
@@ -79,7 +79,7 @@ private[akka] class RoutedActorCell(_system: ActorSystemImpl,
       unwatch(x); xs.filterNot(_ == x)
     }
     _router = r.withRoutees(newRoutees)
-    if (stopChild) routees foreach stopIfChild
+    if (stopChild) routees.foreach(stopIfChild)
   }
 
   private def watch(routee: Routee): Unit = routee match {
@@ -223,5 +223,5 @@ private[akka] class RouterPoolActor(
           val abandon = currentRoutees.drop(currentRoutees.length + change)
           cell.removeRoutees(abandon, stopChild = true)
         }
-    }: Actor.Receive) orElse super.receive
+    }: Actor.Receive).orElse(super.receive)
 }

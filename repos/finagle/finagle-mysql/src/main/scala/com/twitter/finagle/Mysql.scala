@@ -52,7 +52,7 @@ object MySqlClientTracingFilter {
         label,
         Annotation.ClientSend(),
         Annotation.ClientRecv())
-      annotations andThen TracingFilter andThen next
+      annotations.andThen(TracingFilter).andThen(next)
     }
   }
 

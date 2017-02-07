@@ -30,8 +30,8 @@ trait StringFunctions {
     */
   def plural(s: String, n: Long): String =
     if (n == 1L) s
-    else if ((s endsWith "y") &&
-             (List("ay", "ey", "iy", "oy", "uy") forall (!s.endsWith(_))))
+    else if ((s.endsWith("y")) &&
+             (List("ay", "ey", "iy", "oy", "uy").forall(!s.endsWith(_))))
       s.take(s.length - 1) + "ies"
     else s + "s"
 
@@ -44,7 +44,7 @@ trait StringFunctions {
     * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
     */
   def charsNel(s: String, e: => NonEmptyList[Char]): NonEmptyList[Char] =
-    charsNel(s) getOrElse e
+    charsNel(s).getOrElse(e)
 
   // Parsing functions.
 

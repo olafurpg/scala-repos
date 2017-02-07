@@ -81,13 +81,13 @@ class EnsimeConfigSpec extends EnsimeSpec {
           val module1 = config.modules("module1")
           module1.name shouldBe "module1"
           module1.dependencies shouldBe empty
-          module1.targetDirs should have size 1
+          (module1.targetDirs should have).size(1)
         }
       )
   }
 
   it should "base class paths on source-mode value" in {
-    List(true, false) foreach { (sourceMode: Boolean) =>
+    List(true, false).foreach { (sourceMode: Boolean) =>
       withTempDir { dir =>
         val abc = dir / "abc"
         val cache = dir / ".ensime_cache"

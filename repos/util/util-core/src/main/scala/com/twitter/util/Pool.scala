@@ -10,7 +10,7 @@ trait Pool[A] {
 class SimplePool[A](items: mutable.Queue[Future[A]]) extends Pool[A] {
   def this(items: Seq[A]) = this {
     val queue = new mutable.Queue[Future[A]]
-    queue ++= items map { item =>
+    queue ++= items.map { item =>
       Future(item)
     }
     queue
@@ -34,9 +34,9 @@ class SimplePool[A](items: mutable.Queue[Future[A]]) extends Pool[A] {
       if (!requests.isEmpty && !items.isEmpty)
         Some((requests.dequeue(), items.dequeue()))
       else None
-    } map {
+    }.map {
       case (request, item) =>
-        item respond (request() = _)
+        item.respond(request() = _)
     }
   }
 }
@@ -61,7 +61,7 @@ private class HealthyQueue[A](makeItem: () => Future[A],
                               isHealthy: A => Boolean)
     extends mutable.QueueProxy[Future[A]] {
   val self = new mutable.Queue[Future[A]]
-  0.until(numItems) foreach { _ =>
+  0.until(numItems).foreach { _ =>
     self += makeItem()
   }
 
@@ -73,7 +73,7 @@ private class HealthyQueue[A](makeItem: () => Future[A],
   override def dequeue() = synchronized {
     if (isEmpty) throw new NoSuchElementException("queue empty")
 
-    self.dequeue() flatMap { item =>
+    self.dequeue().flatMap { item =>
       if (isHealthy(item)) {
         Future(item)
       } else {

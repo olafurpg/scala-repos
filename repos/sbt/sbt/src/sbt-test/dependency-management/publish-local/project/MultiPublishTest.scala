@@ -9,14 +9,14 @@ object MultiPublishTest extends Build {
       version := "1.0",
       ivyPaths <<=
         baseDirectory(dir => new IvyPaths(dir, Some(dir / "ivy" / "cache"))),
-      externalResolvers <<= baseDirectory map { base =>
+      externalResolvers <<= baseDirectory.map { base =>
         Resolver.file("local", base / "ivy" / "local" asFile)(
           Resolver.ivyStylePatterns) :: Nil
       }
     )
 
   lazy val root =
-    Project("root", file(".")) dependsOn (sub) aggregate (sub) settings
+    Project("root", file(".")).dependsOn(sub).aggregate(sub) settings
       (mavenStyle, interProject, name := "Publish Test")
 
   lazy val sub =
@@ -29,7 +29,7 @@ object MultiPublishTest extends Build {
 
   def interProject =
     projectDependencies <<=
-      (publishMavenStyle, publishMavenStyle in sub, projectDependencies) map {
+      (publishMavenStyle, publishMavenStyle in sub, projectDependencies).map {
         (style, subStyle, pd) =>
           if (style == subStyle) pd else Nil
       }

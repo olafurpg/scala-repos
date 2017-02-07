@@ -18,7 +18,7 @@ object P extends Build {
       configIvyScala)
 
   lazy val b =
-    Project("B", file("b")) dependsOn (a) settings
+    Project("B", file("b")).dependsOn(a) settings
       (libraryDependencies <<= declared(
         d =>
           if (d)

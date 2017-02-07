@@ -69,7 +69,7 @@ trait BitSetLike[+This <: BitSetLike[This] with SortedSet[Int]]
     s
   }
 
-  override def isEmpty: Boolean = 0 until nwords forall (i => word(i) == 0)
+  override def isEmpty: Boolean = (0 until nwords).forall(i => word(i) == 0)
 
   implicit def ordering: Ordering[Int] = Ordering.Int
 
@@ -140,7 +140,7 @@ trait BitSetLike[+This <: BitSetLike[This] with SortedSet[Int]]
     *           bitset or in the given bitset `other`.
     */
   def |(other: BitSet): This = {
-    val len = this.nwords max other.nwords
+    val len = this.nwords.max(other.nwords)
     val words = new Array[Long](len)
     for (idx <- 0 until len) words(idx) = this.word(idx) | other.word(idx)
     fromBitMaskNoCopy(words)
@@ -181,7 +181,7 @@ trait BitSetLike[+This <: BitSetLike[This] with SortedSet[Int]]
     *              bitset or the other bitset that are not contained in both bitsets.
     */
   def ^(other: BitSet): This = {
-    val len = this.nwords max other.nwords
+    val len = this.nwords.max(other.nwords)
     val words = new Array[Long](len)
     for (idx <- 0 until len) words(idx) = this.word(idx) ^ other.word(idx)
     fromBitMaskNoCopy(words)
@@ -197,7 +197,7 @@ trait BitSetLike[+This <: BitSetLike[This] with SortedSet[Int]]
     *              every bit of this set is also an element in `other`.
     */
   def subsetOf(other: BitSet): Boolean =
-    (0 until nwords) forall (idx => (this.word(idx) & ~other.word(idx)) == 0L)
+    ((0 until nwords)).forall(idx => (this.word(idx) & ~other.word(idx)) == 0L)
 
   override def head: Int = {
     val n = nwords
@@ -226,18 +226,18 @@ trait BitSetLike[+This <: BitSetLike[This] with SortedSet[Int]]
                          start: String,
                          sep: String,
                          end: String) = {
-    sb append start
+    sb.append(start)
     var pre = ""
     val max = nwords * WordLength
     var i = 0
     while (i != max) {
       if (contains(i)) {
-        sb append pre append i
+        sb.append(pre).append(i)
         pre = sep
       }
       i += 1
     }
-    sb append end
+    sb.append(end)
   }
 
   override def stringPrefix = "BitSet"

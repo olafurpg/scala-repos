@@ -38,7 +38,7 @@ object CPathUtils {
         addComponent(JPathIndex(i), cPathToJPaths(CPath(tail), value))
       case (CPathArray :: tail, es: CArray[_]) =>
         val CArrayType(elemType) = es.cType
-        es.value.toList.zipWithIndex flatMap {
+        es.value.toList.zipWithIndex.flatMap {
           case (e, i) =>
             addComponent(JPathIndex(i),
                          cPathToJPaths(CPath(tail), elemType(e)))
@@ -50,7 +50,7 @@ object CPathUtils {
 
   private def addComponent(c: JPathNode,
                            xs: List[(JPath, CValue)]): List[(JPath, CValue)] =
-    xs map {
+    xs.map {
       case (path, value) => (JPath(c :: path.nodes), value)
     }
 

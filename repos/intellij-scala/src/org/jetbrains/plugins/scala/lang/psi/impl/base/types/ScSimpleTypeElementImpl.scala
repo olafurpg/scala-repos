@@ -226,7 +226,7 @@ class ScSimpleTypeElementImpl(node: ASTNode)
             }
           case _ => (Seq.empty, ScSubstitutor.empty)
         }
-      val subst = _subst followed constrSubst
+      val subst = _subst.followed(constrSubst)
       val tp = parentElement match {
         case ta: ScTypeAliasDefinition =>
           ta.aliasedType.getOrElse(return types.Nothing)

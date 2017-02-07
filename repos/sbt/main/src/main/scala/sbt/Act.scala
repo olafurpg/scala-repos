@@ -53,7 +53,7 @@ object Act {
       defaultConfigs: Option[ResolvedReference] => Seq[String],
       keyMap: Map[String, AttributeKey[_]],
       data: Settings[Scope]): Parser[ParsedKey] =
-    scopedKeyFull(index, current, defaultConfigs, keyMap) flatMap { choices =>
+    scopedKeyFull(index, current, defaultConfigs, keyMap).flatMap { choices =>
       select(choices, data)(showRelativeKey(current, index.buildURIs.size > 1))
     }
 
@@ -81,7 +81,7 @@ object Act {
     for {
       rawProject <- optProjectRef(index, current)
       proj = resolveProject(rawProject, current)
-      confAmb <- config(index configs proj)
+      confAmb <- config(index.configs(proj))
       partialMask = ScopeMask(rawProject.isExplicit,
                               confAmb.isExplicit,
                               false,
@@ -94,19 +94,19 @@ object Act {
                     extra: ScopeAxis[AttributeMap],
                     key: AttributeKey[_]): ScopedKey[_] =
     ScopedKey(Scope(toAxis(proj, Global),
-                    toAxis(conf map ConfigKey.apply, Global),
+                    toAxis(conf.map(ConfigKey.apply), Global),
                     toAxis(task, Global),
                     extra),
               key)
 
   def select(allKeys: Seq[Parser[ParsedKey]], data: Settings[Scope])(
       implicit show: Show[ScopedKey[_]]): Parser[ParsedKey] =
-    seq(allKeys) flatMap { ss =>
+    seq(allKeys).flatMap { ss =>
       val default = ss.headOption match {
         case None => noValidKeys
         case Some(x) => success(x)
       }
-      selectFromValid(ss filter isValid(data), default)
+      selectFromValid(ss.filter(isValid(data)), default)
     }
   def selectFromValid(ss: Seq[ParsedKey], default: Parser[ParsedKey])(
       implicit show: Show[ScopedKey[_]]): Parser[ParsedKey] =
@@ -148,7 +148,7 @@ object Act {
   def examples(p: Parser[String],
                exs: Set[String],
                label: String): Parser[String] =
-    p !!! ("Expected " + label) examples exs
+    (p !!! ("Expected " + label)).examples(exs)
   def examplesStrict(p: Parser[String],
                      exs: Set[String],
                      label: String): Parser[String] =
@@ -156,7 +156,7 @@ object Act {
 
   def optionalAxis[T](p: Parser[T],
                       ifNone: ScopeAxis[T]): Parser[ScopeAxis[T]] =
-    p.? map { opt =>
+    p.?.map { opt =>
       toAxis(opt, ifNone)
     }
   def toAxis[T](opt: Option[T], ifNone: ScopeAxis[T]): ScopeAxis[T] =
@@ -184,7 +184,7 @@ object Act {
       proj: Option[ResolvedReference],
       index: KeyIndex,
       defaultConfigs: Option[ResolvedReference] => Seq[String]): Seq[String] =
-    if (index exists proj) defaultConfigs(proj) else Nil
+    if (index.exists(proj)) defaultConfigs(proj) else Nil
   def nonEmptyConfig(
       index: KeyIndex,
       proj: Option[ResolvedReference]): String => Seq[Option[String]] =
@@ -199,7 +199,7 @@ object Act {
     def dropHyphenated(keys: Set[String]): Set[String] =
       keys.filterNot(Util.hasHyphen)
     def keyParser(keys: Set[String]): Parser[AttributeKey[_]] =
-      token(ID !!! "Expected key" examples dropHyphenated(keys)) flatMap {
+      token((ID !!! "Expected key").examples(dropHyphenated(keys))).flatMap {
         keyString =>
           getKey(keyMap, keyString, idFun)
       }
@@ -237,7 +237,8 @@ object Act {
     val valid = allKnown ++ normKeys ++ taskKeys(_.rawLabel)
     val suggested = normKeys.map(_._1).toSet
     val keyP =
-      filterStrings(examples(ID, suggested, "key"), valid.keySet, "key") map valid
+      filterStrings(examples(ID, suggested, "key"), valid.keySet, "key")
+        .map(valid)
     (token(value(keyP) | GlobalString ^^^ ParsedGlobal) <~ token("::".id)) ?? Omitted
   }
   def resolveTask(task: ParsedAxis[AttributeKey[_]]): Option[AttributeKey[_]] =
@@ -255,11 +256,12 @@ object Act {
       knownKeys: Map[String, AttributeKey[_]],
       knownValues: IMap[AttributeKey, Set]): Parser[AttributeMap] = {
     val validKeys = knownKeys.filter {
-      case (_, key) => knownValues get key exists (_.nonEmpty)
+      case (_, key) => knownValues.get(key).exists(_.nonEmpty)
     }
     if (validKeys.isEmpty) failure("No valid extra keys.")
     else
-      rep1sep(extraParser(validKeys, knownValues), spacedComma) map AttributeMap.apply
+      rep1sep(extraParser(validKeys, knownValues), spacedComma)
+        .map(AttributeMap.apply)
   }
 
   def extraParser(
@@ -268,22 +270,23 @@ object Act {
     val keyp =
       knownIDParser(knownKeys, "Not a valid extra key") <~ token(
         ':' ~ OptSpace)
-    keyp flatMap {
+    keyp.flatMap {
       case key: AttributeKey[t] =>
         val valueMap: Map[String, t] =
           knownValues(key).map(v => (v.toString, v)).toMap
-        knownIDParser(valueMap, "extra value") map { value =>
+        knownIDParser(valueMap, "extra value").map { value =>
           AttributeEntry(key, value)
         }
     }
   }
   def knownIDParser[T](knownKeys: Map[String, T], label: String): Parser[T] =
-    token(examplesStrict(ID, knownKeys.keys.toSet, label)) map knownKeys
+    token(examplesStrict(ID, knownKeys.keys.toSet, label)).map(knownKeys)
 
   def knownPluginParser[T](knownPlugins: Map[String, T],
                            label: String): Parser[T] = {
     val pluginLabelParser = rep1sep(ID, '.').map(_.mkString("."))
-    token(examplesStrict(pluginLabelParser, knownPlugins.keys.toSet, label)) map knownPlugins
+    token(examplesStrict(pluginLabelParser, knownPlugins.keys.toSet, label))
+      .map(knownPlugins)
   }
 
   def projectRef(index: KeyIndex,
@@ -296,8 +299,8 @@ object Act {
                         currentBuild: URI,
                         trailing: Parser[_]): Parser[ResolvedReference] = {
     def projectID(uri: URI) =
-      token(examplesStrict(ID, index projects uri, "project ID") <~ trailing)
-    def projectRef(uri: URI) = projectID(uri) map { id =>
+      token(examplesStrict(ID, index.projects(uri), "project ID") <~ trailing)
+    def projectRef(uri: URI) = projectID(uri).map { id =>
       ProjectRef(uri, id)
     }
 
@@ -306,7 +309,7 @@ object Act {
       Uri(uris).map(uri => Scope.resolveBuild(currentBuild, uri))
     val buildRef = token('{' ~> resolvedURI <~ '}').?
 
-    buildRef flatMap {
+    buildRef.flatMap {
       case None => projectRef(currentBuild)
       case Some(uri) => projectRef(uri) | token(trailing ^^^ BuildRef(uri))
     }
@@ -327,7 +330,7 @@ object Act {
     requireSession(s, actParser0(s))
 
   private[this] def actParser0(state: State): Parser[() => State] = {
-    val extracted = Project extract state
+    val extracted = Project.extract(state)
     import extracted.{showKey, structure}
     import Aggregation.evaluatingParser
     actionParser.flatMap { action =>
@@ -336,7 +339,7 @@ object Act {
         val preparedPairs = anyKeyValues(structure, kvs)
         val showConfig =
           Aggregation.defaultShow(state, showTasks = action == ShowAction)
-        evaluatingParser(state, structure, showConfig)(preparedPairs) map {
+        evaluatingParser(state, structure, showConfig)(preparedPairs).map {
           evaluate => () =>
             {
               val keyStrings =
@@ -347,7 +350,7 @@ object Act {
         }
       }
       action match {
-        case SingleAction => akp flatMap evaluate
+        case SingleAction => akp.flatMap(evaluate)
         case ShowAction | MultiAction =>
           rep1sep(akp, token(Space)).flatMap(kvss => evaluate(kvss.flatten))
       }
@@ -366,7 +369,7 @@ object Act {
   def showParser = token((ShowCommand ~ Space) ^^^ true) ?? false
 
   def scopedKeyParser(state: State): Parser[ScopedKey[_]] =
-    scopedKeyParser(Project extract state)
+    scopedKeyParser(Project.extract(state))
   def scopedKeyParser(extracted: Extracted): Parser[ScopedKey[_]] =
     scopedKeyParser(extracted.structure, extracted.currentRef)
   def scopedKeyParser(structure: BuildStructure,
@@ -379,7 +382,7 @@ object Act {
 
   type KeysParser = Parser[Seq[ScopedKey[T]] forSome { type T }]
   def aggregatedKeyParser(state: State): KeysParser =
-    aggregatedKeyParser(Project extract state)
+    aggregatedKeyParser(Project.extract(state))
   def aggregatedKeyParser(extracted: Extracted): KeysParser =
     aggregatedKeyParser(extracted.structure, extracted.currentRef)
   def aggregatedKeyParser(structure: BuildStructure,
@@ -389,20 +392,20 @@ object Act {
                         structure)
 
   def keyValues[T](state: State)(keys: Seq[ScopedKey[T]]): Values[T] =
-    keyValues(Project extract state)(keys)
+    keyValues(Project.extract(state))(keys)
   def keyValues[T](extracted: Extracted)(keys: Seq[ScopedKey[T]]): Values[T] =
     keyValues(extracted.structure)(keys)
   def keyValues[T](structure: BuildStructure)(
       keys: Seq[ScopedKey[T]]): Values[T] =
     keys.flatMap { key =>
-      getValue(structure.data, key.scope, key.key) map { value =>
+      getValue(structure.data, key.scope, key.key).map { value =>
         KeyValue(key, value)
       }
     }
   private[this] def anyKeyValues(structure: BuildStructure,
                                  keys: Seq[ScopedKey[_]]): Seq[KeyValue[_]] =
     keys.flatMap { key =>
-      getValue(structure.data, key.scope, key.key) map { value =>
+      getValue(structure.data, key.scope, key.key).map { value =>
         KeyValue(key, value)
       }
     }
@@ -415,7 +418,7 @@ object Act {
     else data.get(scope, key)
 
   def requireSession[T](s: State, p: => Parser[T]): Parser[T] =
-    if (s get sessionSettings isEmpty) failure("No project loaded") else p
+    if (s.get(sessionSettings) isEmpty) failure("No project loaded") else p
 
   sealed trait ParsedAxis[+T] {
     final def isExplicit = this != Omitted
@@ -423,7 +426,7 @@ object Act {
   final object ParsedGlobal extends ParsedAxis[Nothing]
   final object Omitted extends ParsedAxis[Nothing]
   final class ParsedValue[T](val value: T) extends ParsedAxis[T]
-  def value[T](t: Parser[T]): Parser[ParsedAxis[T]] = t map { v =>
+  def value[T](t: Parser[T]): Parser[ParsedAxis[T]] = t.map { v =>
     new ParsedValue(v)
   }
 }

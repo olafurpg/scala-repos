@@ -17,11 +17,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.{Any, Nothing, ScType}
 trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
   //todo[CYCLIC]
   def lowerBound: TypeResult[ScType] =
-    wrapWith(lowerTypeElement, Nothing) flatMap
-      (_.getType(TypingContext.empty))
+    wrapWith(lowerTypeElement, Nothing).flatMap(_.getType(TypingContext.empty))
 
   def upperBound: TypeResult[ScType] =
-    wrapWith(upperTypeElement, Any) flatMap (_.getType(TypingContext.empty))
+    wrapWith(upperTypeElement, Any).flatMap(_.getType(TypingContext.empty))
 
   override def viewBound: Seq[ScType] =
     viewTypeElement.flatMap(_.getType(TypingContext.empty).toOption)

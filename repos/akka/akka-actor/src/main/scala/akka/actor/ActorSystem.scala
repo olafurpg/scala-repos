@@ -45,7 +45,7 @@ object ActorSystem {
     case value ⇒ Some(value)
   }
 
-  val GlobalHome: Option[String] = SystemHome orElse EnvHome
+  val GlobalHome: Option[String] = SystemHome.orElse(EnvHome)
 
   /**
     * Creates a new ActorSystem with the name "default",
@@ -272,7 +272,7 @@ object ActorSystem {
     */
   private[akka] def findClassLoader(): ClassLoader = {
     def findCaller(get: Int ⇒ Class[_]): ClassLoader =
-      Iterator.from(2 /*is the magic number, promise*/ ).map(get) dropWhile {
+      Iterator.from(2 /*is the magic number, promise*/ ).map(get).dropWhile {
         c ⇒
           c != null &&
           (c.getName.startsWith("akka.actor.ActorSystem") ||
@@ -284,8 +284,9 @@ object ActorSystem {
         case c ⇒ c.getClassLoader
       }
 
-    Option(Thread.currentThread.getContextClassLoader) orElse
-      (Reflect.getCallerClass map findCaller) getOrElse getClass.getClassLoader
+    Option(Thread.currentThread.getContextClassLoader)
+      .orElse(Reflect.getCallerClass.map(findCaller))
+      .getOrElse(getClass.getClassLoader)
   }
 }
 
@@ -740,7 +741,7 @@ private[akka] class ActorSystemImpl(
       override protected def resubmitOnBlock: Boolean =
         false // Since we execute inline, no gain in resubmitting
       override def reportFailure(t: Throwable): Unit =
-        dispatcher reportFailure t
+        dispatcher.reportFailure(t)
     })
 
   private[this] final val terminationCallbacks =
@@ -788,7 +789,7 @@ private[akka] class ActorSystemImpl(
 
   override def terminate(): Future[Terminated] = {
     if (!settings.LogDeadLettersDuringShutdown)
-      logDeadLetterListener foreach stop
+      logDeadLetterListener.foreach(stop)
     guardian.stop()
     whenTerminated
   }
@@ -902,9 +903,9 @@ private[akka] class ActorSystemImpl(
     findExtension(ext) != null
 
   private def loadExtensions() {
-    immutableSeq(settings.config.getStringList("akka.extensions")) foreach {
+    immutableSeq(settings.config.getStringList("akka.extensions")).foreach {
       fqcn ⇒
-        dynamicAccess.getObjectFor[AnyRef](fqcn) recoverWith {
+        dynamicAccess.getObjectFor[AnyRef](fqcn).recoverWith {
           case _ ⇒ dynamicAccess.createInstanceFor[AnyRef](fqcn, Nil)
         } match {
           case Success(p: ExtensionIdProvider) ⇒ registerExtension(p.lookup())
@@ -956,8 +957,8 @@ private[akka] class ActorSystemImpl(
             ({
               val children = cell.childrenRefs.children.toSeq.sorted
               val bulk =
-                children.dropRight(1) map (printNode(_, indent + "   |"))
-              bulk ++ (children.lastOption map (printNode(_, indent + "    ")))
+                children.dropRight(1).map(printNode(_, indent + "   |"))
+              bulk ++ (children.lastOption.map(printNode(_, indent + "    ")))
             } mkString ("\n"))
         case _ ⇒
           indent + node.path.name + " " + Logging.simpleName(node)
@@ -972,7 +973,7 @@ private[akka] class ActorSystemImpl(
     private[this] final val ref = new AtomicReference(done)
 
     // onComplete never fires twice so safe to avoid null check
-    upStreamTerminated onComplete { t ⇒
+    upStreamTerminated.onComplete { t ⇒
       ref.getAndSet(null).complete(t)
     }
 

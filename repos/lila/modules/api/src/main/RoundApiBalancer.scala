@@ -18,7 +18,7 @@ private[api] final class RoundApiBalancer(system: ActorSystem,
 
   private object implementation {
 
-    implicit val timeout = makeTimeout seconds 20
+    implicit val timeout = makeTimeout.seconds(20)
 
     case class Player(pov: Pov, apiVersion: Int, ctx: Context)
     case class Watcher(pov: Pov,
@@ -43,7 +43,7 @@ private[api] final class RoundApiBalancer(system: ActorSystem,
           val logger = RoundApiBalancer.this.logger
           def process = {
             case Player(pov, apiVersion, ctx) => {
-              api.player(pov, apiVersion)(ctx) addFailureEffect { e =>
+              api.player(pov, apiVersion)(ctx).addFailureEffect { e =>
                 logger.error(pov.toString, e)
               }
             }.chronometer
@@ -77,10 +77,11 @@ private[api] final class RoundApiBalancer(system: ActorSystem,
   import implementation._
 
   def player(pov: Pov, apiVersion: Int)(implicit ctx: Context): Fu[JsObject] = {
-    router ? Player(pov, apiVersion, ctx) mapTo manifest[JsObject] addFailureEffect {
-      e =>
+    (router ? Player(pov, apiVersion, ctx))
+      .mapTo(manifest[JsObject])
+      .addFailureEffect { e =>
         logger.error(pov.toString, e)
-    }
+      }
   }.chronometer
     .mon(_.round.api.player)
     .logIfSlow(500, logger) { _ =>
@@ -96,14 +97,14 @@ private[api] final class RoundApiBalancer(system: ActorSystem,
       initialFenO: Option[Option[String]] = None,
       withMoveTimes: Boolean = false,
       withOpening: Boolean = false)(implicit ctx: Context): Fu[JsObject] = {
-    router ? Watcher(pov,
-                     apiVersion,
-                     tv,
-                     analysis,
-                     initialFenO,
-                     withMoveTimes,
-                     withOpening,
-                     ctx) mapTo manifest[JsObject]
+    (router ? Watcher(pov,
+                      apiVersion,
+                      tv,
+                      analysis,
+                      initialFenO,
+                      withMoveTimes,
+                      withOpening,
+                      ctx)).mapTo(manifest[JsObject])
   }.mon(_.round.api.watcher)
 
   def userAnalysisJson(pov: Pov,
@@ -111,6 +112,6 @@ private[api] final class RoundApiBalancer(system: ActorSystem,
                        initialFen: Option[String],
                        orientation: chess.Color,
                        owner: Boolean): Fu[JsObject] =
-    router ? UserAnalysis(pov, pref, initialFen, orientation, owner) mapTo manifest[
-      JsObject]
+    (router ? UserAnalysis(pov, pref, initialFen, orientation, owner))
+      .mapTo(manifest[JsObject])
 }

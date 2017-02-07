@@ -70,14 +70,14 @@ class RecipeGlobalRateLimit extends RecipeSpec {
         val (toBeReleased, remainingQueue) = waitQueue.splitAt(permitTokens)
         waitQueue = remainingQueue
         permitTokens -= toBeReleased.size
-        toBeReleased foreach (_ ! MayPass)
+        toBeReleased.foreach(_ ! MayPass)
         if (permitTokens > 0) context.become(open)
       }
 
       override def postStop(): Unit = {
         replenishTimer.cancel()
-        waitQueue foreach
-          (_ ! Status.Failure(new IllegalStateException("limiter stopped")))
+        waitQueue.foreach(
+          _ ! Status.Failure(new IllegalStateException("limiter stopped")))
       }
     }
     //#global-limiter-actor

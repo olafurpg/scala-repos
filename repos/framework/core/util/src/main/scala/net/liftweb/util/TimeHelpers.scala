@@ -539,7 +539,7 @@ trait TimeHelpers { self: ControlHelpers =>
   def parseInternetDate(dateString: String): Date =
     tryo {
       internetDateFormatter.parse(dateString)
-    } openOr new Date(0L)
+    }.openOr(new Date(0L))
 
   /** @return a date formatted with the internet format */
   def toInternetDate(in: Date): String = internetDateFormatter.format(in)
@@ -564,7 +564,7 @@ trait TimeHelpers { self: ControlHelpers =>
         case Some(v) => toDate(v)
         case v :: vs => toDate(v)
         case s: String =>
-          tryo(internetDateFormatter.parse(s)) or tryo(dateFormatter.parse(s))
+          tryo(internetDateFormatter.parse(s)).or(tryo(dateFormatter.parse(s)))
         case o => toDate(o.toString)
       }
     } catch {

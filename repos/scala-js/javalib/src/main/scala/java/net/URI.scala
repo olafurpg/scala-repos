@@ -36,7 +36,7 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
   private val _scheme = fld(AbsScheme)
 
   private val _schemeSpecificPart = {
-    if (! _isAbsolute) fld(RelSchemeSpecificPart)
+    if (!_isAbsolute) fld(RelSchemeSpecificPart)
     else if (_isOpaque) fld(AbsOpaquePart)
     else fld(AbsHierPart)
   }.get
@@ -48,9 +48,9 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
 
   private val _path = {
     val useNetPath = fld(AbsAuthority, RelAuthority).isDefined
-    if (useNetPath) fld(AbsNetPath, RelNetPath) orElse ""
+    if (useNetPath) fld(AbsNetPath, RelNetPath).orElse("")
     else if (_isAbsolute) fld(AbsAbsPath)
-    else fld(RelAbsPath) orElse fld(RelRelPath)
+    else fld(RelAbsPath).orElse(fld(RelRelPath))
   }
 
   private val _query = fld(AbsQuery, RelQuery)

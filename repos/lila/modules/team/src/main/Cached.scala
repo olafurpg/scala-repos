@@ -11,7 +11,7 @@ private[team] final class Cached {
     default = _ => none,
     logger = logger)
 
-  def name(id: String) = nameCache get id
+  def name(id: String) = nameCache.get(id)
 
   private[team] val teamIdsCache = MixedCache[String, Set[String]](
     MemberRepo.teamIdsByUser,
@@ -19,10 +19,10 @@ private[team] final class Cached {
     default = _ => Set.empty,
     logger = logger)
 
-  def teamIds(userId: String) = teamIdsCache get userId
+  def teamIds(userId: String) = teamIdsCache.get(userId)
 
   val nbRequests = AsyncCache(
     (userId: String) =>
-      TeamRepo teamIdsByCreator userId flatMap RequestRepo.countByTeams,
+      (TeamRepo teamIdsByCreator userId).flatMap(RequestRepo.countByTeams),
     maxCapacity = 20000)
 }

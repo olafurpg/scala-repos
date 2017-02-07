@@ -186,7 +186,7 @@ class HttpServerExampleSpec
       .to(Sink.foreach { connection =>
         println("Accepted new connection from " + connection.remoteAddress)
 
-        connection handleWithSyncHandler requestHandler
+        connection.handleWithSyncHandler(requestHandler)
       // this is equivalent to
       // connection handleWith { Flow[HttpRequest] map requestHandler }
       })

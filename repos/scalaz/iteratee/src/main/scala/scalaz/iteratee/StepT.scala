@@ -33,7 +33,7 @@ sealed abstract class StepT[E, F[_], A] {
 
   def contOr(
       k: => Input[E] => IterateeT[E, F, A]): Input[E] => IterateeT[E, F, A] =
-    cont getOrElse k
+    cont.getOrElse(k)
 
   def mapContOr[Z](k: (Input[E] => IterateeT[E, F, A]) => Z, z: => Z): Z =
     fold(
@@ -52,7 +52,7 @@ sealed abstract class StepT[E, F[_], A] {
     )
 
   def doneValueOr(a: => A): A =
-    doneValue getOrElse a
+    doneValue.getOrElse(a)
 
   def mapDoneValueOr[Z](k: (=> A) => Z, z: => Z) =
     fold(
@@ -67,7 +67,7 @@ sealed abstract class StepT[E, F[_], A] {
     )
 
   def doneInputOr(a: => Input[E]): Input[E] =
-    doneInput getOrElse a
+    doneInput.getOrElse(a)
 
   def mapDoneInputOr[Z](k: (=> Input[E]) => Z, z: => Z) =
     fold(

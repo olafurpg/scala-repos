@@ -306,7 +306,7 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
         for (r <- ijfdzv; a <- ijd; b <- ijd)
           yield base + "2$mc" + r + a + b + "$sp" // Function2
       }
-    classNames map getRequiredClass
+    classNames.map(getRequiredClass)
   }
 
   lazy val srJFunctionRefs: Set[InternalName] =
@@ -316,15 +316,15 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
   lazy val typeOfArrayOp: Map[Int, BType] = {
     import scalaPrimitives._
     Map(
-      (List(ZARRAY_LENGTH, ZARRAY_GET, ZARRAY_SET) map (_ -> BOOL)) ++
-        (List(BARRAY_LENGTH, BARRAY_GET, BARRAY_SET) map (_ -> BYTE)) ++
-        (List(SARRAY_LENGTH, SARRAY_GET, SARRAY_SET) map (_ -> SHORT)) ++
-        (List(CARRAY_LENGTH, CARRAY_GET, CARRAY_SET) map (_ -> CHAR)) ++
-        (List(IARRAY_LENGTH, IARRAY_GET, IARRAY_SET) map (_ -> INT)) ++
-        (List(LARRAY_LENGTH, LARRAY_GET, LARRAY_SET) map (_ -> LONG)) ++
-        (List(FARRAY_LENGTH, FARRAY_GET, FARRAY_SET) map (_ -> FLOAT)) ++
-        (List(DARRAY_LENGTH, DARRAY_GET, DARRAY_SET) map (_ -> DOUBLE)) ++
-        (List(OARRAY_LENGTH, OARRAY_GET, OARRAY_SET) map (_ -> ObjectRef)): _*
+      (List(ZARRAY_LENGTH, ZARRAY_GET, ZARRAY_SET).map(_ -> BOOL)) ++
+        (List(BARRAY_LENGTH, BARRAY_GET, BARRAY_SET).map(_ -> BYTE)) ++
+        (List(SARRAY_LENGTH, SARRAY_GET, SARRAY_SET).map(_ -> SHORT)) ++
+        (List(CARRAY_LENGTH, CARRAY_GET, CARRAY_SET).map(_ -> CHAR)) ++
+        (List(IARRAY_LENGTH, IARRAY_GET, IARRAY_SET).map(_ -> INT)) ++
+        (List(LARRAY_LENGTH, LARRAY_GET, LARRAY_SET).map(_ -> LONG)) ++
+        (List(FARRAY_LENGTH, FARRAY_GET, FARRAY_SET).map(_ -> FLOAT)) ++
+        (List(DARRAY_LENGTH, DARRAY_GET, DARRAY_SET).map(_ -> DOUBLE)) ++
+        (List(OARRAY_LENGTH, OARRAY_GET, OARRAY_SET).map(_ -> ObjectRef)): _*
     )
   }
 
@@ -340,12 +340,11 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
 
   /* The Object => String overload. */
   lazy val String_valueOf: Symbol = {
-    getMember(StringModule, nme.valueOf) filter
-      (sym =>
-         sym.info.paramTypes match {
-           case List(pt) => pt.typeSymbol == ObjectClass
-           case _ => false
-         })
+    getMember(StringModule, nme.valueOf).filter(sym =>
+      sym.info.paramTypes match {
+        case List(pt) => pt.typeSymbol == ObjectClass
+        case _ => false
+    })
   }
 
   lazy val lambdaMetaFactoryBootstrapHandle = new asm.Handle(

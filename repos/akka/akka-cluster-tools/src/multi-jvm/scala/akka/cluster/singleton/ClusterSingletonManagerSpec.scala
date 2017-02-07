@@ -311,7 +311,7 @@ class ClusterSingletonManagerSpec
     runOn(controller) {
       queue ! Reset
       expectMsg(ResetOk)
-      roles foreach { r ⇒
+      roles.foreach { r ⇒
         log.info("Shutdown [{}]", node(r).address)
         testConductor.exit(r, 0).await
       }
@@ -392,7 +392,7 @@ class ClusterSingletonManagerSpec
       val newOldestRole = second
 
       runOn(leaveRole) {
-        Cluster(system) leave node(leaveRole).address
+        Cluster(system).leave(node(leaveRole).address)
       }
 
       verifyRegistration(second)

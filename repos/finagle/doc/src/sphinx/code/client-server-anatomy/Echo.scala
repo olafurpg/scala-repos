@@ -119,13 +119,13 @@ object BasicClient {
     StackClient.defaultParams)
 
   val bridge: Future[Service[String, String]] =
-    transporter(addr) map { transport =>
+    transporter(addr).map { transport =>
       new SerialClientDispatcher(transport)
     }
 
   val client = new Service[String, String] {
-    def apply(req: String) = bridge flatMap { svc =>
-      svc(req) ensure svc.close()
+    def apply(req: String) = bridge.flatMap { svc =>
+      svc(req).ensure(svc.close())
     }
   }
   //#explicitbridge
@@ -161,7 +161,7 @@ object RobustClientExample extends App {
   import Filters._
 
   //#robustclient
-  val newClient = retry andThen timeout andThen maskCancel andThen client
+  val newClient = retry.andThen(timeout).andThen(maskCancel).andThen(client)
 
   val result = newClient("hello")
   println(Await.result(result))

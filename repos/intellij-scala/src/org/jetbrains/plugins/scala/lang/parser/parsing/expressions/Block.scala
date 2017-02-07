@@ -40,7 +40,7 @@ object Block {
       while (!ResultExpr.parse(builder) && BlockStat.parse(builder)) {
         if (!hasSemicolon) {
           rollbackMarker.rollbackTo()
-          builder error ErrMsg("semi.expected")
+          builder.error(ErrMsg("semi.expected"))
           hasSemicolon = true
           rollbackMarker = builder.mark()
         } else {

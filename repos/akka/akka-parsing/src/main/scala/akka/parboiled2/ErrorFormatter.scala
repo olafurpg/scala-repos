@@ -86,7 +86,7 @@ class ErrorFormatter(showExpected: Boolean = true,
       val chars = mismatchLength(error)
       if (chars == 1)
         sb.append("Invalid input '")
-          .append(CharUtils.escape(input charAt ix))
+          .append(CharUtils.escape(input.charAt(ix)))
           .append(''')
       else
         sb.append("Invalid input \"")
@@ -109,9 +109,12 @@ class ErrorFormatter(showExpected: Boolean = true,
         import RuleTrace._
         trace.terminal match {
           case NotPredicate(_, x) ⇒
-            math.max(trace.prefix.collectFirst {
-              case NonTerminal(Atomic, off) ⇒ off + x
-            } getOrElse x, len)
+            math.max(trace.prefix
+                       .collectFirst {
+                         case NonTerminal(Atomic, off) ⇒ off + x
+                       }
+                       .getOrElse(x),
+                     len)
           case _ ⇒ len
         }
     }

@@ -180,7 +180,7 @@ trait ScriptedTest extends Matchers {
           true
         case _ ⇒ false // Ignore
       }
-      (u ++ d) exists (x ⇒ x)
+      ((u ++ d)).exists(x ⇒ x)
     }
 
     def run(): Unit = {

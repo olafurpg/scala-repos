@@ -31,12 +31,12 @@ object SigarLoader {
   /** Sigar agent command line option property. */
   val sigarFolderProperty = "kamon.sigar.folder"
 
-  def provideSigarOptions = (sigarArtifact, sigarFolder) map {
+  def provideSigarOptions = (sigarArtifact, sigarFolder).map {
     (artifact, folder) =>
       "-javaagent:" + artifact + "=" + sigarFolderProperty + "=" + folder
   }
 
-  def locateSigarArtifact = update map { report =>
+  def locateSigarArtifact = update.map { report =>
     val artifactList = report.matching(
       moduleFilter(organization = sigarLoader.organization,
                    name = sigarLoader.name)

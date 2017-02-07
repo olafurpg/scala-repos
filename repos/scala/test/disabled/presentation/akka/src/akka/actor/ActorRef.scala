@@ -194,7 +194,7 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * Java API. <p/>
     */
   @deprecated("Remoting will become fully transparent in the future", "1.1")
-  def getHomeAddress(): InetSocketAddress = homeAddress getOrElse null
+  def getHomeAddress(): InetSocketAddress = homeAddress.getOrElse(null)
 
   /**
     *   Holds the hot swapped partial function.
@@ -211,7 +211,7 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
   /**
     * Comparison only takes uuid into account.
     */
-  def compareTo(other: ActorRef) = this.uuid compareTo other.uuid
+  def compareTo(other: ActorRef) = this.uuid.compareTo(other.uuid)
 
   /**
     * Returns the uuid for the actor.
@@ -542,7 +542,7 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * Akka Java API. <p/>
     * Returns the supervisor, if there is one.
     */
-  def getSupervisor(): ActorRef = supervisor getOrElse null
+  def getSupervisor(): ActorRef = supervisor.getOrElse(null)
 
   /**
     * Returns an unmodifiable Java Map containing the linked actors,
@@ -564,7 +564,7 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     if (senderFuture.isDefined) {
       new Channel[Any] {
         val future = senderFuture.get
-        def !(msg: Any) = future completeWithResult msg
+        def !(msg: Any) = future.completeWithResult(msg)
       }
     } else if (sender.isDefined) {
       val someSelf = Some(this)
@@ -911,10 +911,8 @@ class LocalActorRef private[akka] (private[this] val actorFactory: () => Actor,
                              ActorType.ScalaActor,
                              None)
     } else
-      dispatcher dispatchMessage new MessageInvocation(this,
-                                                       message,
-                                                       senderOption,
-                                                       None)
+      dispatcher.dispatchMessage(
+        new MessageInvocation(this, message, senderOption, None))
 
   protected[akka] def postMessageToMailboxAndCreateFutureResultWithTimeout[T](
       message: Any,
@@ -940,11 +938,12 @@ class LocalActorRef private[akka] (private[this] val actorFactory: () => Actor,
       val future =
         if (senderFuture.isDefined) senderFuture
         else Some(new DefaultCompletableFuture[T](timeout))
-      dispatcher dispatchMessage new MessageInvocation(
-        this,
-        message,
-        senderOption,
-        future.asInstanceOf[Some[CompletableFuture[Any]]])
+      dispatcher.dispatchMessage(
+        new MessageInvocation(
+          this,
+          message,
+          senderOption,
+          future.asInstanceOf[Some[CompletableFuture[Any]]]))
       future.get
     }
   }
@@ -1592,7 +1591,7 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     */
   def reply_?(message: Any): Boolean = {
     if (senderFuture.isDefined) {
-      senderFuture.get completeWithResult message
+      senderFuture.get.completeWithResult(message)
       true
     } else if (sender.isDefined) {
       //TODO: optimize away this allocation, perhaps by having implicit self: Option[ActorRef] in signature

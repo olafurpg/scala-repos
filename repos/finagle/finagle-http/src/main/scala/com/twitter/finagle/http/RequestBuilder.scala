@@ -307,10 +307,12 @@ class RequestBuilder[HasUrl, HasForm] private[http] (
     */
   def proxied(credentials: Option[ProxyCredentials]): This = {
     val headers: Map[String, Seq[String]] =
-      credentials map { creds =>
-        config.headers.updated(HttpHeaders.Names.PROXY_AUTHORIZATION,
-                               Seq(creds.basicAuthorization))
-      } getOrElse config.headers
+      credentials
+        .map { creds =>
+          config.headers.updated(HttpHeaders.Names.PROXY_AUTHORIZATION,
+                                 Seq(creds.basicAuthorization))
+        }
+        .getOrElse(config.headers)
 
     new RequestBuilder(config.copy(headers = headers, proxied = true))
   }
@@ -443,9 +445,9 @@ class RequestBuilder[HasUrl, HasForm] private[http] (
 
   private[http] def withoutContent(method: Method): Request = {
     val req = Request(config.version, method, resource)
-    config.headers foreach {
+    config.headers.foreach {
       case (field, values) =>
-        values foreach { v =>
+        values.foreach { v =>
           req.headers.add(field, v)
         }
     }

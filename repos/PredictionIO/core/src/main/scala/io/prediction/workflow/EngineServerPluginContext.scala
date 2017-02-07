@@ -56,17 +56,20 @@ object EngineServerPluginContext extends Logging {
     (variantJson \ "plugins").extractOpt[JObject].foreach { pluginDefs =>
       pluginDefs.obj.foreach { pluginParams += _ }
     }
-    serviceLoader foreach { service =>
-      pluginParams.get(service.pluginName) map { params =>
-        if ((params \ "enabled").extractOrElse(false)) {
-          info(s"Plugin ${service.pluginName} is enabled.")
-          plugins(service.pluginType) += service.pluginName -> service
-        } else {
+    serviceLoader.foreach { service =>
+      pluginParams
+        .get(service.pluginName)
+        .map { params =>
+          if ((params \ "enabled").extractOrElse(false)) {
+            info(s"Plugin ${service.pluginName} is enabled.")
+            plugins(service.pluginType) += service.pluginName -> service
+          } else {
+            info(s"Plugin ${service.pluginName} is disabled.")
+          }
+        }
+        .getOrElse {
           info(s"Plugin ${service.pluginName} is disabled.")
         }
-      } getOrElse {
-        info(s"Plugin ${service.pluginName} is disabled.")
-      }
     }
     new EngineServerPluginContext(plugins, pluginParams, log)
   }

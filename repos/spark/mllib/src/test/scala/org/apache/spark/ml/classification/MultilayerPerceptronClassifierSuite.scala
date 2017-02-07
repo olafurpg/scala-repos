@@ -102,6 +102,7 @@ class MultilayerPerceptronClassifierSuite
     // MLP's predictions should not differ a lot from LR's.
     val lrMetrics = new MulticlassMetrics(lrPredictionAndLabels)
     val mlpMetrics = new MulticlassMetrics(mlpPredictionAndLabels)
-    assert(mlpMetrics.confusionMatrix ~== lrMetrics.confusionMatrix absTol 100)
+    assert(
+      mlpMetrics.confusionMatrix ~== lrMetrics.confusionMatrix.absTol(100))
   }
 }

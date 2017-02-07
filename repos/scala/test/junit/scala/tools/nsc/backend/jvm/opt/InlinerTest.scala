@@ -35,7 +35,7 @@ object InlinerTest extends ClearAfterClass.Clearable {
       compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
       compiler.genBCode.bTypes.callGraph.callsites
     )
-  notPerRun foreach compiler.perRunCaches.unrecordCache
+  notPerRun.foreach(compiler.perRunCaches.unrecordCache)
 
   def clear(): Unit = { compiler = null; inlineOnlyCompiler = null }
 }
@@ -96,7 +96,7 @@ class InlinerTest extends ClearAfterClass {
       code: String,
       mod: ClassNode => Unit = _ => ()): Option[OptimizerWarning] = {
     val cs = gMethAndFCallsite(code, mod)._2
-    inliner.earlyCanInlineCheck(cs) orElse inliner.canInlineBody(cs)
+    inliner.earlyCanInlineCheck(cs).orElse(inliner.canInlineBody(cs))
   }
 
   def inlineTest(code: String, mod: ClassNode => Unit = _ => ()): MethodNode = {
@@ -134,7 +134,7 @@ class InlinerTest extends ClearAfterClass {
     )
 
     // line numbers are kept, so there's a line 2 (from the inlined f)
-    assert(gConv.instructions exists {
+    assert(gConv.instructions.exists {
       case LineNumber(2, _) => true
       case _ => false
     }, gConv.instructions.filter(_.isInstanceOf[LineNumber]))
@@ -353,8 +353,9 @@ class InlinerTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compile(code)
     assert(
-      callGraph.callsites.valuesIterator.flatMap(_.valuesIterator) exists
-        (_.callsiteInstruction.name == "clone"))
+      callGraph.callsites.valuesIterator
+        .flatMap(_.valuesIterator)
+        .exists(_.callsiteInstruction.name == "clone"))
   }
 
   @Test
@@ -406,7 +407,7 @@ class InlinerTest extends ClearAfterClass {
     assertNoInvoke(ins)
 
     // no null check when inlining a static method
-    ins foreach {
+    ins.foreach {
       case Jump(IFNONNULL, _) => assert(false, ins.stringLines)
       case _ =>
     }
@@ -1035,7 +1036,7 @@ class InlinerTest extends ClearAfterClass {
     val List(c, _, _) = compile(code)
 
     val t1 = getSingleMethod(c, "t1")
-    assert(t1.instructions forall {
+    assert(t1.instructions.forall {
       // indy is eliminated by push-pop
       case _: InvokeDynamic => false
       case _ => true
@@ -1044,7 +1045,7 @@ class InlinerTest extends ClearAfterClass {
     assertInvoke(t1, "C", "C$$$anonfun$2")
 
     val t2 = getSingleMethod(c, "t2")
-    assert(t2.instructions forall {
+    assert(t2.instructions.forall {
       // indy is eliminated by push-pop
       case _: InvokeDynamic => false
       case _ => true
@@ -1450,7 +1451,7 @@ class InlinerTest extends ClearAfterClass {
     val List(c) = compile(code)
     assertSameCode(getSingleMethod(c, "t1"),
                    List(Op(ICONST_0), Op(ICONST_1), Op(IADD), Op(IRETURN)))
-    assertEquals(getSingleMethod(c, "t2").instructions collect {
+    assertEquals(getSingleMethod(c, "t2").instructions.collect {
       case i: Invoke => i.owner + "." + i.name
     }, List("scala/runtime/IntRef.create", "C.C$$$anonfun$1"))
   }
@@ -1524,7 +1525,7 @@ class InlinerTest extends ClearAfterClass {
         |class D extends C
       """.stripMargin
     val List(c, _) = compile(code)
-    def casts(m: String) = getSingleMethod(c, m).instructions collect {
+    def casts(m: String) = getSingleMethod(c, m).instructions.collect {
       case TypeOp(CHECKCAST, tp) => tp
     }
     assertSameCode(getSingleMethod(c, "t1"),

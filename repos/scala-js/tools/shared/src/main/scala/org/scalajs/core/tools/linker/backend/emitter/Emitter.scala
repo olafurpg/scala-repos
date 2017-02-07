@@ -277,7 +277,7 @@ final class Emitter private (semantics: Semantics,
       _staticCaches.retain((_, c) => c.cleanAfterRun())
       _methodCaches.retain((_, c) => c.cleanAfterRun())
 
-      if (! _cacheUsed) _cache = null
+      if (!_cacheUsed) _cache = null
 
       _staticCaches.nonEmpty || _methodCaches.nonEmpty || _cacheUsed
     }

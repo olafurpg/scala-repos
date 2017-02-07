@@ -42,7 +42,7 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
           case Restart ⇒
             val childRef = sender()
             become(
-              waitChildTerminatedBeforeBackoff(childRef) orElse handleBackoff)
+              waitChildTerminatedBeforeBackoff(childRef).orElse(handleBackoff))
             Stop
 
           case other ⇒ other
@@ -69,5 +69,5 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
       stop(self)
   }
 
-  def receive = onTerminated orElse handleBackoff
+  def receive = onTerminated.orElse(handleBackoff)
 }

@@ -47,13 +47,16 @@ object SerializationBugs extends Specification {
     val leftOp = plan.leftOperand.get
     val rightOp = plan.rightOperand.get
 
-    (g2.buy.size mustEqual 1) and (leftOp.functionName mustEqual "f1") and
-      (leftOp.symbol mustEqual "s") and (leftOp.inParams.toList mustEqual Nil) and
-      (leftOp.subOperand mustEqual None) and (plan.operator mustEqual Some(
-      "A")) and
-      (rightOp.functionName mustEqual "f2") and (rightOp.symbol mustEqual "s2") and
-      (rightOp.inParams.toList mustEqual List(0, 1, 2)) and
-      (rightOp.subOperand mustEqual None)
+    ((g2.buy.size mustEqual 1))
+      .and(leftOp.functionName mustEqual "f1")
+      .and(leftOp.symbol mustEqual "s")
+      .and(leftOp.inParams.toList mustEqual Nil)
+      .and(leftOp.subOperand mustEqual None)
+      .and(plan.operator mustEqual Some("A"))
+      .and(rightOp.functionName mustEqual "f2")
+      .and(rightOp.symbol mustEqual "s2")
+      .and(rightOp.inParams.toList mustEqual List(0, 1, 2))
+      .and(rightOp.subOperand mustEqual None)
   }
 
   "null serialization bug" in {
@@ -86,8 +89,8 @@ object SerializationBugs extends Specification {
     val o1 = OptionalUUID(None)
     val o2 = OptionalUUID(Some(UUID.randomUUID))
 
-    (read[OptionalUUID](swrite(o1)) mustEqual o1) and
-      (read[OptionalUUID](swrite(o2)) mustEqual o2)
+    ((read[OptionalUUID](swrite(o1)) mustEqual o1))
+      .and(read[OptionalUUID](swrite(o2)) mustEqual o2)
   }
 
   "TypeInfo is not correctly constructed for customer serializer -- 970" in {
@@ -175,9 +178,9 @@ object SerializationBugs extends Specification {
     val jsonA = """ { "data": { "foo": "string" }, "success": true } """
     val jsonB = """ { "data": { "bar": "string" }, "success": true } """
 
-    (read[SomeContainer[TypeA]](jsonA) mustEqual SomeContainer(
-      TypeA("string"))) and
-      (read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(
+    ((read[SomeContainer[TypeA]](jsonA) mustEqual SomeContainer(
+      TypeA("string")))).and(
+      read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(
         TypeB("string")))
   }
 }

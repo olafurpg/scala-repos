@@ -17,8 +17,8 @@ object Mappings {
     number.verifying(Config.variantsWithVariants contains _)
   val variantWithFenAndVariants =
     number.verifying(Config.variantsWithFenAndVariants contains _)
-  val time = of[Double].verifying(HookConfig validateTime _)
-  val increment = number.verifying(HookConfig validateIncrement _)
+  val time = of[Double].verifying(HookConfig.validateTime(_))
+  val increment = number.verifying(HookConfig.validateIncrement(_))
   val days = number(min = 1, max = 14)
   def timeMode = number.verifying(TimeMode.ids contains _)
   def mode(withRated: Boolean) = optional(rawMode(withRated))
@@ -26,7 +26,7 @@ object Mappings {
     number
       .verifying(HookConfig.modes contains _)
       .verifying(m => m == Mode.Casual.id || withRated)
-  val ratingRange = nonEmptyText.verifying(RatingRange valid _)
+  val ratingRange = nonEmptyText.verifying(RatingRange.valid(_))
   val color = nonEmptyText.verifying(Color.names contains _)
   val level = number.verifying(AiConfig.levels contains _)
   val speed = number.verifying(Config.speeds contains _)

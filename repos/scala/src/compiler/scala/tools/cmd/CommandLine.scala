@@ -45,7 +45,7 @@ class CommandLine(val spec: Reference, val originalArgs: List[String])
        */
       def expand(s1: String) = {
         if (isExpandOption(s1)) {
-          val s2 = spec expandArg s1
+          val s2 = spec.expandArg(s1)
           if (s2 == List(s1)) None
           else Some(s2)
         } else None
@@ -53,7 +53,7 @@ class CommandLine(val spec: Reference, val originalArgs: List[String])
 
       /* Assumes known options have all been ruled out already. */
       def isUnknown(opt: String) =
-        onlyKnownOptions && (opt startsWith "-") && {
+        onlyKnownOptions && (opt.startsWith("-")) && {
           errorFn("Option '%s' not recognized.".format(opt))
           true
         }
@@ -62,7 +62,7 @@ class CommandLine(val spec: Reference, val originalArgs: List[String])
         case Nil => Map()
         case Terminator :: xs => residual(xs)
         case x :: Nil =>
-          expand(x) foreach (exp => return loop(exp))
+          expand(x).foreach(exp => return loop(exp))
           if (isBinaryOption(x) && enforceArity)
             errorFn(
               "Option '%s' requires argument, found EOF instead.".format(x))
@@ -72,7 +72,7 @@ class CommandLine(val spec: Reference, val originalArgs: List[String])
           else residual(args)
 
         case x1 :: x2 :: xs =>
-          expand(x1) foreach (exp => return loop(exp ++ args.tail))
+          expand(x1).foreach(exp => return loop(exp ++ args.tail))
 
           if (x2 == Terminator) mapForUnary(x1) ++ residual(xs)
           else if (isUnaryOption(x1)) mapForUnary(x1) ++ loop(args.tail)
@@ -82,11 +82,11 @@ class CommandLine(val spec: Reference, val originalArgs: List[String])
       }
     }
 
-    (loop(originalArgs), residualBuffer map stripQuotes toList)
+    (loop(originalArgs), residualBuffer.map(stripQuotes) toList)
   }
 
   def apply(arg: String) = argMap(arg)
-  def get(arg: String) = argMap get arg
+  def get(arg: String) = argMap.get(arg)
   def isSet(arg: String) = argMap contains arg
 
   def getOrElse(arg: String, orElse: => String) =

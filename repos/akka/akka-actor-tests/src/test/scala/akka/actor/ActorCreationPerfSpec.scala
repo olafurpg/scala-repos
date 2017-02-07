@@ -176,7 +176,7 @@ class ActorCreationPerfSpec
     watch(driver)
     expectTerminated(driver, 15.seconds)
 
-    after diff before
+    after.diff(before)
   }
 
   def registerTests(name: String, propsCreator: () ⇒ Props) {

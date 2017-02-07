@@ -19,7 +19,7 @@ object EmailConfirmSkip extends EmailConfirm {
 
   def effective = false
 
-  def send(user: User, email: String) = UserRepo setEmailConfirmed user.id
+  def send(user: User, email: String) = UserRepo.setEmailConfirmed(user.id)
 
   def confirm(token: String): Fu[Option[User]] = fuccess(none)
 }
@@ -33,7 +33,7 @@ final class EmailConfirmMailGun(apiUrl: String,
 
   def effective = true
 
-  def send(user: User, email: String): Funit = tokener make user flatMap {
+  def send(user: User, email: String): Funit = tokener.make(user).flatMap {
     token =>
       lila.mon.email.confirmation()
       val url = s"$baseUrl/signup/confirm/$token"
@@ -58,8 +58,8 @@ Please do not reply to this message; it was sent from an unmonitored email addre
         .void
   }
 
-  def confirm(token: String): Fu[Option[User]] = tokener read token flatMap {
-    case u @ Some(user) => UserRepo setEmailConfirmed user.id inject u
+  def confirm(token: String): Fu[Option[User]] = tokener.read(token).flatMap {
+    case u @ Some(user) => UserRepo.setEmailConfirmed(user.id) inject u
     case _ => fuccess(none)
   }
 
@@ -67,27 +67,28 @@ Please do not reply to this message; it was sent from an unmonitored email addre
 
     private val separator = '|'
 
-    private def makeHash(msg: String) = Algo.hmac(secret).sha1(msg).hex take 14
-    private def getHashedEmail(userId: User.ID) = UserRepo email userId map {
+    private def makeHash(msg: String) =
+      Algo.hmac(secret).sha1(msg).hex.take(14)
+    private def getHashedEmail(userId: User.ID) = UserRepo.email(userId).map {
       p =>
-        makeHash(~p) take 6
+        makeHash(~p).take(6)
     }
     private def makePayload(userId: String, passwd: String) =
       s"$userId$separator$passwd"
 
-    def make(user: User) = getHashedEmail(user.id) map { hashedEmail =>
+    def make(user: User) = getHashedEmail(user.id).map { hashedEmail =>
       val payload = makePayload(user.id, hashedEmail)
       val hash = makeHash(payload)
       val token = s"$payload$separator$hash"
-      base64 encode token
+      base64.encode(token)
     }
 
-    def read(token: String): Fu[Option[User]] = (base64 decode token) ?? {
-      _ split separator match {
+    def read(token: String): Fu[Option[User]] = (base64.decode(token)) ?? {
+      _.split(separator) match {
         case Array(userId, userHashedEmail, hash)
             if makeHash(makePayload(userId, userHashedEmail)) == hash =>
-          getHashedEmail(userId) flatMap { hashedEmail =>
-            (userHashedEmail == hashedEmail) ?? (UserRepo enabledById userId)
+          getHashedEmail(userId).flatMap { hashedEmail =>
+            (userHashedEmail == hashedEmail) ?? (UserRepo.enabledById(userId))
           }
         case _ => fuccess(none)
       }
@@ -98,10 +99,10 @@ Please do not reply to this message; it was sent from an unmonitored email addre
     import java.util.Base64
     import java.nio.charset.StandardCharsets
     def encode(txt: String) =
-      Base64.getEncoder.encodeToString(txt getBytes StandardCharsets.UTF_8)
+      Base64.getEncoder.encodeToString(txt.getBytes(StandardCharsets.UTF_8))
     def decode(txt: String): Option[String] =
       try {
-        Some(new String(Base64.getDecoder decode txt))
+        Some(new String(Base64.getDecoder.decode(txt)))
       } catch {
         case _: java.lang.IllegalArgumentException => none
       }

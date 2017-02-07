@@ -15,13 +15,13 @@ object prodcons {
     val cDone = new SyncVar[Boolean];
 
     spawn {
-      while (p < n) { p = p + 1; buffer put (p); }
+      while (p < n) { p = p + 1; buffer.put(p); }
     }
 
     spawn {
       var v: Int = _;
       while (c < n) { c = c + 1; v = buffer.get; }
-      cDone set true;
+      cDone.set(true);
     }
 
     cDone.get;

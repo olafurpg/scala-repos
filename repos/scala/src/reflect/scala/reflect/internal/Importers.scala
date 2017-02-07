@@ -38,7 +38,7 @@ trait Importers { to: SymbolTable =>
     protected class Cache[K <: AnyRef, V <: AnyRef]
         extends WeakHashMap[K, WeakReference[V]] {
       def weakGet(key: K): Option[V] =
-        this get key flatMap WeakReference.unapply
+        this.get(key).flatMap(WeakReference.unapply)
       def weakUpdate(key: K, value: V) = this.update(key, WeakReference(value))
     }
 
@@ -51,7 +51,7 @@ trait Importers { to: SymbolTable =>
       if (pendingSyms == 0 && pendingTpes == 0) {
         val fixups = this.fixups.toList
         this.fixups.clear()
-        fixups foreach { _() }
+        fixups.foreach { _() }
       }
     }
 
@@ -77,21 +77,21 @@ trait Importers { to: SymbolTable =>
       // because otherwise type parameters are imported by looking into owner.typeParams
       // which is obviously unavailable while the completer is being created
       try {
-        my setFlag Flags.LOCKED
-        val mytypeParams = their.typeParams map importSymbol
+        my.setFlag(Flags.LOCKED)
+        val mytypeParams = their.typeParams.map(importSymbol)
         new LazyPolyType(mytypeParams) with FlagAgnosticCompleter {
           override def complete(my: to.Symbol): Unit = {
             val theirCore = their.info match {
               case from.PolyType(_, core) => core
               case core => core
             }
-            my setInfo GenPolyType(mytypeParams, importType(theirCore))
-            my setAnnotations (their.annotations map importAnnotationInfo)
+            my.setInfo(GenPolyType(mytypeParams, importType(theirCore)))
+            my.setAnnotations(their.annotations.map(importAnnotationInfo))
             markAllCompleted(my)
           }
         }
       } finally {
-        my resetFlag Flags.LOCKED
+        my.resetFlag(Flags.LOCKED)
       }
     }
 
@@ -123,7 +123,7 @@ trait Importers { to: SymbolTable =>
           newFreeTermSymbol(myname.toTermName,
                             their.value,
                             their.flags,
-                            their.origin) setInfo importType(their.info)
+                            their.origin).setInfo(importType(their.info))
         case their: from.FreeTypeSymbol =>
           newFreeTypeSymbol(myname.toTypeName, their.flags, their.origin)
         case their: from.TermSymbol =>
@@ -148,7 +148,7 @@ trait Importers { to: SymbolTable =>
           symMap.weakUpdate(their, my)
           if (their.thisSym != their) {
             my.typeOfThis = importType(their.typeOfThis)
-            my.thisSym setName importName(their.thisSym.name)
+            my.thisSym.setName(importName(their.thisSym.name))
           }
           my.associatedFile = their.associatedFile
           my
@@ -157,12 +157,12 @@ trait Importers { to: SymbolTable =>
       }
       symMap.weakUpdate(their, my)
       markFlagsCompleted(my)(mask = AllFlags)
-      my setInfo recreatedSymbolCompleter(my, their)
+      my.setInfo(recreatedSymbolCompleter(my, their))
     }
 
     def importSymbol(their0: from.Symbol): Symbol = {
       def cachedRecreateSymbol(their: from.Symbol): Symbol =
-        symMap weakGet their match {
+        symMap.weakGet(their) match {
           case Some(result) => result
           case _ => recreateSymbol(their)
         }
@@ -190,30 +190,30 @@ trait Importers { to: SymbolTable =>
           val myname = importName(their.name)
           val myowner = importSymbol(their.owner)
           val myscope =
-            if (theirscope != from.NoType && !(myowner hasFlag Flags.LOCKED))
+            if (theirscope != from.NoType && !(myowner.hasFlag(Flags.LOCKED)))
               myowner.info
             else NoType
           val myexisting = {
             if (isModuleClass) importSymbol(their.sourceModule).moduleClass
             else if (isTparam)
-              (if (myowner hasFlag Flags.LOCKED) NoSymbol
+              (if (myowner.hasFlag(Flags.LOCKED)) NoSymbol
                else myowner.typeParams(their.paramPos))
             else if (isOverloaded)
               myowner.newOverloaded(myowner.thisType,
-                                    their.alternatives map importSymbol)
+                                    their.alternatives.map(importSymbol))
             else {
               def disambiguate(my: Symbol) = {
                 val result =
                   if (their.isMethod) {
                     val localCopy = cachedRecreateSymbol(their)
-                    my filter (_.tpe matches localCopy.tpe)
+                    my.filter(_.tpe.matches(localCopy.tpe))
                   } else {
-                    my filter (!_.isMethod)
+                    my.filter(!_.isMethod)
                   }
                 assert(
                   !result.isOverloaded,
                   "import failure: cannot determine unique overloaded method alternative from\n " +
-                    (result.alternatives map (_.defString) mkString "\n") +
+                    (result.alternatives.map(_.defString) mkString "\n") +
                     "\n that matches " + their + ":" + their.tpe
                 )
                 result
@@ -231,7 +231,7 @@ trait Importers { to: SymbolTable =>
             if (myscope != NoType) {
               assert(myscope.decls.lookup(myname) == NoSymbol,
                      myname + " " + myscope.decl(myname) + " " + myexisting)
-              myscope.decls enter my
+              myscope.decls.enter(my)
             }
             my
           }
@@ -258,15 +258,15 @@ trait Importers { to: SymbolTable =>
 
     def recreateType(their: from.Type): Type = their match {
       case from.TypeRef(pre, sym, args) =>
-        TypeRef(importType(pre), importSymbol(sym), args map importType)
+        TypeRef(importType(pre), importSymbol(sym), args.map(importType))
       case from.ThisType(clazz) =>
         ThisType(importSymbol(clazz))
       case from.SingleType(pre, sym) =>
         SingleType(importType(pre), importSymbol(sym))
       case from.MethodType(params, result) =>
-        MethodType(params map importSymbol, importType(result))
+        MethodType(params.map(importSymbol), importType(result))
       case from.PolyType(tparams, result) =>
-        PolyType(tparams map importSymbol, importType(result))
+        PolyType(tparams.map(importSymbol), importType(result))
       case from.NullaryMethodType(result) =>
         NullaryMethodType(importType(result))
       case from.ConstantType(constant @ from.Constant(_)) =>
@@ -282,32 +282,34 @@ trait Importers { to: SymbolTable =>
         val myscope =
           if (myclazz.isPackageClass) newPackageScope(myclazz) else newScope
         val myclazzTpe =
-          ClassInfoType(parents map importType, myscope, myclazz)
-        myclazz setInfo GenPolyType(myclazz.typeParams, myclazzTpe) // needed so that newly created symbols find their scope
-        decls foreach importSymbol // will enter itself into myclazz
+          ClassInfoType(parents.map(importType), myscope, myclazz)
+        myclazz
+          .setInfo(GenPolyType(myclazz.typeParams, myclazzTpe)) // needed so that newly created symbols find their scope
+        decls.foreach(importSymbol) // will enter itself into myclazz
         myclazzTpe
       case from.RefinedType(parents, decls) =>
-        RefinedType(parents map importType,
+        RefinedType(parents.map(importType),
                     importScope(decls),
                     importSymbol(their.typeSymbol))
       case from.ExistentialType(tparams, result) =>
-        newExistentialType(tparams map importSymbol, importType(result))
+        newExistentialType(tparams.map(importSymbol), importType(result))
       case from.OverloadedType(pre, alts) =>
-        OverloadedType(importType(pre), alts map importSymbol)
+        OverloadedType(importType(pre), alts.map(importSymbol))
       case from.ImportType(qual) =>
         ImportType(importTree(qual))
       case from.AntiPolyType(pre, targs) =>
-        AntiPolyType(importType(pre), targs map importType)
+        AntiPolyType(importType(pre), targs.map(importType))
       case their: from.TypeVar =>
-        val myconstr = new TypeConstraint(their.constr.loBounds map importType,
-                                          their.constr.hiBounds map importType)
+        val myconstr = new TypeConstraint(
+          their.constr.loBounds.map(importType),
+          their.constr.hiBounds.map(importType))
         myconstr.inst = importType(their.constr.inst)
         TypeVar(importType(their.origin),
                 myconstr,
-                their.typeArgs map importType,
-                their.params map importSymbol)
+                their.typeArgs.map(importType),
+                their.params.map(importSymbol))
       case from.AnnotatedType(annots, result) =>
-        AnnotatedType(annots map importAnnotationInfo, importType(result))
+        AnnotatedType(annots.map(importAnnotationInfo), importType(result))
       case from.ErrorType =>
         ErrorType
       case from.WildcardType =>
@@ -356,10 +358,10 @@ trait Importers { to: SymbolTable =>
       case from.ClassDef(mods, name, tparams, impl) =>
         new ClassDef(importModifiers(mods),
                      importName(name).toTypeName,
-                     tparams map importTypeDef,
+                     tparams.map(importTypeDef),
                      importTemplate(impl))
       case from.PackageDef(pid, stats) =>
-        new PackageDef(importRefTree(pid), stats map importTree)
+        new PackageDef(importRefTree(pid), stats.map(importTree))
       case from.ModuleDef(mods, name, impl) =>
         new ModuleDef(importModifiers(mods),
                       importName(name).toTermName,
@@ -376,41 +378,41 @@ trait Importers { to: SymbolTable =>
       case from.DefDef(mods, name, tparams, vparamss, tpt, rhs) =>
         new DefDef(importModifiers(mods),
                    importName(name).toTermName,
-                   tparams map importTypeDef,
+                   tparams.map(importTypeDef),
                    mmap(vparamss)(importValDef),
                    importTree(tpt),
                    importTree(rhs))
       case from.TypeDef(mods, name, tparams, rhs) =>
         new TypeDef(importModifiers(mods),
                     importName(name).toTypeName,
-                    tparams map importTypeDef,
+                    tparams.map(importTypeDef),
                     importTree(rhs))
       case from.LabelDef(name, params, rhs) =>
         new LabelDef(importName(name).toTermName,
-                     params map importIdent,
+                     params.map(importIdent),
                      importTree(rhs))
       case from.Import(expr, selectors) =>
-        new Import(importTree(expr), selectors map importImportSelector)
+        new Import(importTree(expr), selectors.map(importImportSelector))
       case from.Template(parents, self, body) =>
-        new Template(parents map importTree,
+        new Template(parents.map(importTree),
                      importValDef(self),
-                     body map importTree)
+                     body.map(importTree))
       case from.Block(stats, expr) =>
-        new Block(stats map importTree, importTree(expr))
+        new Block(stats.map(importTree), importTree(expr))
       case from.CaseDef(pat, guard, body) =>
         new CaseDef(importTree(pat), importTree(guard), importTree(body))
       case from.Alternative(trees) =>
-        new Alternative(trees map importTree)
+        new Alternative(trees.map(importTree))
       case from.Star(elem) =>
         new Star(importTree(elem))
       case from.Bind(name, body) =>
         new Bind(importName(name), importTree(body))
       case from.UnApply(fun, args) =>
-        new UnApply(importTree(fun), args map importTree)
+        new UnApply(importTree(fun), args.map(importTree))
       case from.ArrayValue(elemtpt, elems) =>
-        new ArrayValue(importTree(elemtpt), elems map importTree)
+        new ArrayValue(importTree(elemtpt), elems.map(importTree))
       case from.Function(vparams, body) =>
-        new Function(vparams map importValDef, importTree(body))
+        new Function(vparams.map(importValDef), importTree(body))
       case from.Assign(lhs, rhs) =>
         new Assign(importTree(lhs), importTree(rhs))
       case from.AssignOrNamedArg(lhs, rhs) =>
@@ -418,12 +420,12 @@ trait Importers { to: SymbolTable =>
       case from.If(cond, thenp, elsep) =>
         new If(importTree(cond), importTree(thenp), importTree(elsep))
       case from.Match(selector, cases) =>
-        new Match(importTree(selector), cases map importCaseDef)
+        new Match(importTree(selector), cases.map(importCaseDef))
       case from.Return(expr) =>
         new Return(importTree(expr))
       case from.Try(block, catches, finalizer) =>
         new Try(importTree(block),
-                catches map importCaseDef,
+                catches.map(importCaseDef),
                 importTree(finalizer))
       case from.Throw(expr) =>
         new Throw(importTree(expr))
@@ -432,18 +434,18 @@ trait Importers { to: SymbolTable =>
       case from.Typed(expr, tpt) =>
         new Typed(importTree(expr), importTree(tpt))
       case from.TypeApply(fun, args) =>
-        new TypeApply(importTree(fun), args map importTree)
+        new TypeApply(importTree(fun), args.map(importTree))
       case from.Apply(fun, args) =>
         their match {
           case _: from.ApplyToImplicitArgs =>
-            new ApplyToImplicitArgs(importTree(fun), args map importTree)
+            new ApplyToImplicitArgs(importTree(fun), args.map(importTree))
           case _: from.ApplyImplicitView =>
-            new ApplyImplicitView(importTree(fun), args map importTree)
+            new ApplyImplicitView(importTree(fun), args.map(importTree))
           case _ =>
-            new Apply(importTree(fun), args map importTree)
+            new Apply(importTree(fun), args.map(importTree))
         }
       case from.ApplyDynamic(qual, args) =>
-        new ApplyDynamic(importTree(qual), args map importTree)
+        new ApplyDynamic(importTree(qual), args.map(importTree))
       case from.Super(qual, mix) =>
         new Super(importTree(qual), importName(mix).toTypeName)
       case from.This(qual) =>
@@ -472,12 +474,12 @@ trait Importers { to: SymbolTable =>
       case from.CompoundTypeTree(templ) =>
         new CompoundTypeTree(importTemplate(templ))
       case from.AppliedTypeTree(tpt, args) =>
-        new AppliedTypeTree(importTree(tpt), args map importTree)
+        new AppliedTypeTree(importTree(tpt), args.map(importTree))
       case from.TypeBoundsTree(lo, hi) =>
         new TypeBoundsTree(importTree(lo), importTree(hi))
       case from.ExistentialTypeTree(tpt, whereClauses) =>
         new ExistentialTypeTree(importTree(tpt),
-                                whereClauses map importMemberDef)
+                                whereClauses.map(importMemberDef))
       case from.EmptyTree =>
         EmptyTree
       case null =>
@@ -510,9 +512,9 @@ trait Importers { to: SymbolTable =>
 
     def importAnnotationInfo(ann: from.AnnotationInfo): AnnotationInfo = {
       val atp1 = importType(ann.atp)
-      val args1 = ann.args map importTree
+      val args1 = ann.args.map(importTree)
       val assocs1 =
-        ann.assocs map {
+        ann.assocs.map {
           case (name, arg) => (importName(name), importAnnotArg(arg))
         }
       val original1 = importTree(ann.original)
@@ -524,7 +526,7 @@ trait Importers { to: SymbolTable =>
         case from.LiteralAnnotArg(constant @ from.Constant(_)) =>
           LiteralAnnotArg(importConstant(constant))
         case from.ArrayAnnotArg(args) =>
-          ArrayAnnotArg(args map importAnnotArg)
+          ArrayAnnotArg(args.map(importAnnotArg))
         case from.ScalaSigBytes(bytes) =>
           ScalaSigBytes(bytes)
         case from.NestedAnnotArg(annInfo) =>
@@ -539,7 +541,7 @@ trait Importers { to: SymbolTable =>
 
     // !!! todo: override to cater for PackageScopes
     def importScope(decls: from.Scope): Scope =
-      newScopeWith(decls.toList map importSymbol: _*)
+      newScopeWith(decls.toList.map(importSymbol): _*)
 
     def importName(name: from.Name): Name =
       if (name.isTypeName) newTypeName(name.toString)
@@ -548,7 +550,7 @@ trait Importers { to: SymbolTable =>
     def importModifiers(mods: from.Modifiers): Modifiers =
       new Modifiers(mods.flags,
                     importName(mods.privateWithin),
-                    mods.annotations map importTree)
+                    mods.annotations.map(importTree))
 
     def importImportSelector(sel: from.ImportSelector): ImportSelector =
       new ImportSelector(

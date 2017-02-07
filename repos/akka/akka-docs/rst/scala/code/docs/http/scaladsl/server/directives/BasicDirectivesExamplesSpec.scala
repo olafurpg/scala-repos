@@ -326,13 +326,14 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
   "mapRouteResultFuture" in {
     //#mapRouteResultFuture
     val tryRecoverAddServer = mapRouteResultFuture { fr =>
-      fr recover {
-        case ex: IllegalArgumentException =>
-          Complete(HttpResponse(StatusCodes.InternalServerError))
-      } map {
-        case Complete(res) => Complete(res.addHeader(Server("MyServer 1.0")))
-        case rest => rest
-      }
+      fr.recover {
+          case ex: IllegalArgumentException =>
+            Complete(HttpResponse(StatusCodes.InternalServerError))
+        }
+        .map {
+          case Complete(res) => Complete(res.addHeader(Server("MyServer 1.0")))
+          case rest => rest
+        }
     }
 
     val route = tryRecoverAddServer {

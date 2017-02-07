@@ -114,7 +114,7 @@ trait ModelFactoryImplicitSupport {
         .map(_.hideImplicitConversions)
         .getOrElse(Nil)
 
-      conversions = conversions filterNot { conv: ImplicitConversionImpl =>
+      conversions = conversions.filterNot { conv: ImplicitConversionImpl =>
         hiddenConversions.contains(conv.conversionShortName) ||
         hiddenConversions.contains(conv.conversionQualifiedName)
       }
@@ -194,7 +194,7 @@ trait ModelFactoryImplicitSupport {
       val viewTree = result.tree.setType(viewSimplifiedType)
       val appliedTree = new ApplyImplicitView(
         viewTree,
-        List(Ident("<argument>") setType viewTree.tpe.paramTypes.head))
+        List(Ident("<argument>").setType(viewTree.tpe.paramTypes.head)))
       val appliedTreeTyped: Tree = {
         val newContext = context.makeImplicit(context.ambiguousErrors)
         newContext.macrosEnabled = false
@@ -321,7 +321,7 @@ trait ModelFactoryImplicitSupport {
 
   def makeSubstitutionConstraints(subst: TreeTypeSubstituter,
                                   inTpl: DocTemplateImpl): List[Constraint] =
-    (subst.from zip subst.to) map {
+    (subst.from.zip(subst.to)).map {
       case (from, to) =>
         new EqualTypeParamConstraint {
           error(
@@ -335,11 +335,11 @@ trait ModelFactoryImplicitSupport {
   def makeBoundedConstraints(tparams: List[Symbol],
                              constrs: List[TypeConstraint],
                              inTpl: DocTemplateImpl): List[Constraint] =
-    (tparams zip constrs) flatMap {
+    (tparams.zip(constrs)).flatMap {
       case (tparam, constr) => {
         uniteConstraints(constr) match {
           case (loBounds, upBounds) =>
-            (loBounds filter (_ != NothingTpe), upBounds filter (_ != AnyTpe)) match {
+            (loBounds.filter(_ != NothingTpe), upBounds.filter(_ != AnyTpe)) match {
               case (Nil, Nil) =>
                 Nil
               case (List(lo), List(up)) if (lo == up) =>
@@ -429,13 +429,13 @@ trait ModelFactoryImplicitSupport {
       debug("   -> full type: " + toType)
       if (constraints.length != 0) {
         debug("   -> constraints: ")
-        constraints foreach { constr =>
+        constraints.foreach { constr =>
           debug("      - " + constr)
         }
       }
       debug("   -> members:")
-      memberSyms foreach
-        (sym => debug("      - " + sym.decodedName + " : " + sym.info))
+      memberSyms.foreach(sym =>
+        debug("      - " + sym.decodedName + " : " + sym.info))
       debug("")
 
       memberSyms.flatMap({ aSym =>
@@ -482,8 +482,7 @@ trait ModelFactoryImplicitSupport {
 
     for (conv <- convs) {
       val otherConvMembers: Map[Name, List[MemberImpl]] =
-        convs filterNot (_ == conv) flatMap (_.memberImpls) groupBy
-          (_.sym.name)
+        convs.filterNot(_ == conv).flatMap(_.memberImpls).groupBy(_.sym.name)
 
       for (member <- conv.memberImpls) {
         val sym1 = member.sym
@@ -491,14 +490,14 @@ trait ModelFactoryImplicitSupport {
 
         // check if it's shadowed by a member in the original class.
         val shadowed =
-          membersByName.get(sym1.name).toList.flatten filter { other =>
+          membersByName.get(sym1.name).toList.flatten.filter { other =>
             !settings.docImplicitsSoundShadowing.value ||
             !isDistinguishableFrom(tpe1, inTpl.sym.info.memberInfo(other.sym))
           }
 
         // check if it's shadowed by another conversion.
         val ambiguous =
-          otherConvMembers.get(sym1.name).toList.flatten filter { other =>
+          otherConvMembers.get(sym1.name).toList.flatten.filter { other =>
             val tpe2 = convsByMember(other).toType.memberInfo(other.sym)
             !isDistinguishableFrom(tpe1, tpe2) ||
             !isDistinguishableFrom(tpe2, tpe1)
@@ -537,10 +536,10 @@ trait ModelFactoryImplicitSupport {
     try {
       (List(
          wildcardToNothing(
-           lub(constr.loBounds map typeVarToOriginOrWildcard))),
+           lub(constr.loBounds.map(typeVarToOriginOrWildcard)))),
        List(
          wildcardToNothing(
-           glb(constr.hiBounds map typeVarToOriginOrWildcard))))
+           glb(constr.hiBounds.map(typeVarToOriginOrWildcard)))))
     } catch {
       // does this actually ever happen? (probably when type vars occur in the bounds)
       case x: Throwable => (constr.loBounds.distinct, constr.hiBounds.distinct)
@@ -633,7 +632,7 @@ trait ModelFactoryImplicitSupport {
     // (p: AnyRef)AnyRef matches ((t: String)AnyRef returns false -- but we want that to be true
     // !(t1 matches t2)
     if (t1.paramss.map(_.length) == t2.paramss.map(_.length)) {
-      for ((t1p, t2p) <- t1.paramss.flatten zip t2.paramss.flatten)
+      for ((t1p, t2p) <- t1.paramss.flatten.zip(t2.paramss.flatten))
         if (!isSubType(t1 memberInfo t1p, t2 memberInfo t2p))
           return true // if on the corresponding parameter you give a type that is in t1 but not in t2
       // def foo(a: Either[Int, Double]): Int = 3

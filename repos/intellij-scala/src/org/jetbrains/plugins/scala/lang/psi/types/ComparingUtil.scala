@@ -82,7 +82,7 @@ object ComparingUtil {
           else 0
         case _ => 0
       }
-      tps1.zip(tps2).zip(tparams.map(getVariance)) exists {
+      tps1.zip(tps2).zip(tparams.map(getVariance)).exists {
         case ((t1, t2), vr) => isNeverSubArg(t1, t2, vr)
         case _ => false
       }

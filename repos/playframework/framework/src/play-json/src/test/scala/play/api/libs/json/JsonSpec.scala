@@ -17,14 +17,20 @@ object JsonSpec extends org.specs2.mutable.Specification {
 
   case class User(id: Long, name: String, friends: List[User])
 
-  implicit val UserFormat: Format[User] = ((__ \ 'id).format[Long] and
-    (__ \ 'name).format[String] and (__ \ 'friends).lazyFormat(
-    Reads.list(UserFormat),
-    Writes.list(UserFormat)))(User, unlift(User.unapply))
+  implicit val UserFormat: Format[User] = ((__ \ 'id)
+    .format[Long]
+    .and(__ \ 'name)
+    .format[String]
+    .and(__ \ 'friends)
+    .lazyFormat(Reads.list(UserFormat), Writes.list(UserFormat)))(
+    User,
+    unlift(User.unapply))
 
   case class Car(id: Long, models: Map[String, String])
 
-  implicit val CarFormat = ((__ \ 'id).format[Long] and (__ \ 'models)
+  implicit val CarFormat = ((__ \ 'id)
+    .format[Long]
+    .and(__ \ 'models)
     .format[Map[String, String]])(Car, unlift(Car.unapply))
 
   import java.text.SimpleDateFormat
@@ -34,20 +40,26 @@ object JsonSpec extends org.specs2.mutable.Specification {
 
   case class Post(body: String, created_at: Option[Date])
 
-  implicit val PostFormat: Format[Post] = ((__ \ 'body).format[String] and
-    (__ \ 'created_at)
+  implicit val PostFormat: Format[Post] = (
+    (__ \ 'body)
+      .format[String]
+      .and(__ \ 'created_at)
       .formatNullable[Option[Date]](
         Format(
           Reads.optionWithNull(Reads.dateReads(dateFormat)),
           Writes.optionWithNull(Writes.dateWrites(dateFormat))
         )
       )
-      .inmap(optopt => optopt.flatten, (opt: Option[Date]) => Some(opt)))(
-    Post,
-    unlift(Post.unapply))
+      .inmap(
+        optopt => optopt.flatten,
+        (opt: Option[Date]) => Some(opt)
+      )
+    )(Post, unlift(Post.unapply))
 
-  val LenientPostFormat: Format[Post] = ((__ \ 'body).format[String] and
-    (__ \ 'created_at).formatNullable[Date](
+  val LenientPostFormat: Format[Post] = ((__ \ 'body)
+    .format[String]
+    .and(__ \ 'created_at)
+    .formatNullable[Date](
       Format(
         Reads.IsoDateReads,
         Writes.dateWrites(dateFormat)
@@ -160,7 +172,7 @@ object JsonSpec extends org.specs2.mutable.Specification {
         """{"body": "foobar", "created_at": "2011-04-22T13:33:48Z"}"""
       val expectedPost = Post("foobar", Some(postDate))
 
-      Json.parse(postJson).as[Post] aka "parsed" must_== expectedPost
+      Json.parse(postJson).as[Post].aka("parsed") must_== expectedPost
     }
 
     "with default/lenient date format with millis and UTC zone" in {
@@ -255,31 +267,31 @@ object JsonSpec extends org.specs2.mutable.Specification {
       val t = 1330950829160L
       val m = Map("timestamp" -> t)
       val jsonM = toJson(m)
-      (jsonM \ "timestamp").as[Long] must_== t and
-        (jsonM.toString must_== """{"timestamp":1330950829160}""")
+      ((jsonM \ "timestamp").as[Long] must_== t)
+        .and(jsonM.toString must_== """{"timestamp":1330950829160}""")
     }
 
     "Serialize short integers correctly" in {
       val s: Short = 1234
       val m = Map("s" -> s)
       val jsonM = toJson(m)
-      (jsonM \ "s").as[Short] must_== s and
-        (jsonM.toString must_== """{"s":1234}""")
+      ((jsonM \ "s").as[Short] must_== s)
+        .and(jsonM.toString must_== """{"s":1234}""")
     }
 
     "Serialize bytes correctly" in {
       val b: Byte = 123
       val m = Map("b" -> b)
       val jsonM = toJson(m)
-      (jsonM \ "b").as[Byte] must_== b and
-        (jsonM.toString must_== """{"b":123}""")
+      ((jsonM \ "b").as[Byte] must_== b)
+        .and(jsonM.toString must_== """{"b":123}""")
     }
 
     "Serialize and deserialize BigDecimals" in {
       val n = BigDecimal("12345678901234567890.42")
       val json = toJson(n)
-      json must equalTo(JsNumber(n)) and
-        (fromJson[BigDecimal](json) must equalTo(JsSuccess(n)))
+      (json must equalTo(JsNumber(n)))
+        .and(fromJson[BigDecimal](json) must equalTo(JsSuccess(n)))
     }
 
     "Not lose precision when parsing BigDecimals" in {
@@ -299,24 +311,24 @@ object JsonSpec extends org.specs2.mutable.Specification {
       val xs: List[Int] = (1 to 5).toList
       val json = arr(1, 2, 3, 4, 5)
 
-      toJson(xs) must_== json and
-        (fromJson[List[Int]](json) must_== JsSuccess(xs))
+      (toJson(xs) must_== json)
+        .and(fromJson[List[Int]](json) must_== JsSuccess(xs))
     }
 
     "Serialize and deserialize Jackson ObjectNodes" in {
       val on = mapper.createObjectNode().put("foo", 1).put("bar", "two")
       val json = Json.obj("foo" -> 1, "bar" -> "two")
 
-      toJson(on) must_== json and
-        (fromJson[JsonNode](json).map(_.toString) must_== JsSuccess(
+      (toJson(on) must_== json).and(
+        fromJson[JsonNode](json).map(_.toString) must_== JsSuccess(
           on.toString))
     }
 
     "Serialize and deserialize Jackson ArrayNodes" in {
       val an = mapper.createArrayNode().add("one").add(2)
       val json = Json.arr("one", 2)
-      toJson(an) must equalTo(json) and
-        (fromJson[JsonNode](json).map(_.toString) must_== JsSuccess(
+      (toJson(an) must equalTo(json)).and(
+        fromJson[JsonNode](json).map(_.toString) must_== JsSuccess(
           an.toString))
     }
 
@@ -448,10 +460,15 @@ object JsonSpec extends org.specs2.mutable.Specification {
       Json.toJson(Map("key1" -> "value1", "key2" -> "value2")) must beEqualTo(
         Json.obj("key1" -> "value1", "key2" -> "value2"))
 
-      implicit val myWrites = ((__ \ 'key1).write(constraints.list[Int]) and
-        (__ \ 'key2).write(constraints.set[String]) and (__ \ 'key3).write(
-        constraints.seq[String]) and (__ \ 'key4).write(
-        constraints.map[String])).tupled
+      implicit val myWrites = ((__ \ 'key1)
+        .write(constraints.list[Int])
+        .and(__ \ 'key2)
+        .write(constraints.set[String])
+        .and(__ \ 'key3)
+        .write(constraints.seq[String])
+        .and(__ \ 'key4)
+        .write(constraints.map[String]))
+        .tupled
 
       Json.toJson(
         (
@@ -481,8 +498,11 @@ object JsonSpec extends org.specs2.mutable.Specification {
       )
 
       implicit val testCaseWrites: Writes[TestCase] = ((__ \ "id")
-        .write[String] and (__ \ "data" \ "attr1").write[String] and
-        (__ \ "data" \ "attr2").write[String])(unlift(TestCase.unapply))
+        .write[String]
+        .and(__ \ "data" \ "attr1")
+        .write[String]
+        .and(__ \ "data" \ "attr2")
+        .write[String])(unlift(TestCase.unapply))
 
       Json.toJson(TestCase("my-id", "foo", "bar")) must beEqualTo(js)
     }

@@ -34,7 +34,7 @@ object Member {
             playerIdOption: Option[String],
             ip: String,
             userTv: Option[String]): Member = {
-    val userId = user map (_.id)
+    val userId = user.map(_.id)
     val troll = user.??(_.troll)
     playerIdOption.fold[Member](
       Watcher(channel, userId, color, troll, ip, userTv)) { playerId =>

@@ -62,15 +62,15 @@ object Test {
       GR(5.0d),
       GR(2.toByte)
     )
-    val grs = _grs ::: (_grs map (_.negated))
-    grs foreach (_.check)
+    val grs = _grs ::: (_grs.map(_.negated))
+    grs.foreach(_.check)
 
-    assert(NumericRange(1, 10, 1) sameElements (1 until 10))
-    assert(NumericRange.inclusive(1, 10, 1) sameElements (1 to 10))
-    assert(NumericRange.inclusive(1, 100, 3) sameElements (1 to 100 by 3))
+    assert(NumericRange(1, 10, 1).sameElements(1 until 10))
+    assert(NumericRange.inclusive(1, 10, 1).sameElements(1 to 10))
+    assert(NumericRange.inclusive(1, 100, 3).sameElements(1 to 100 by 3))
 
     // #2518
-    assert((3L to 7 by 2) sameElements List(3L, 5L, 7L))
+    assert(((3L to 7 by 2)).sameElements(List(3L, 5L, 7L)))
 
     rangeForeach(1 to 10);
     rangeForeach(1 until 10);

@@ -87,11 +87,11 @@ object ActorPublisherSpec {
         if (totalDemand <= Int.MaxValue) {
           val (use, keep) = buf.splitAt(totalDemand.toInt)
           buf = keep
-          use foreach onNext
+          use.foreach(onNext)
         } else {
           val (use, keep) = buf.splitAt(Int.MaxValue)
           buf = keep
-          use foreach onNext
+          use.foreach(onNext)
           deliverBuf()
         }
       }
@@ -338,15 +338,15 @@ class ActorPublisherSpec
           .toMat(sink)(Keep.both)
           .run()
 
-        (1 to 3) foreach { snd ! _ }
+        ((1 to 3)).foreach { snd ! _ }
         probe.expectMsg("elem-2")
 
-        (4 to 500) foreach { n ⇒
+        ((4 to 500)).foreach { n ⇒
           if (n % 19 == 0) Thread.sleep(50) // simulate bursts
           snd ! n
         }
 
-        (4 to 500 by 2) foreach { n ⇒
+        ((4 to 500 by 2)).foreach { n ⇒
           probe.expectMsg("elem-" + n)
         }
 

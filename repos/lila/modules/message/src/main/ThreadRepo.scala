@@ -15,13 +15,13 @@ object ThreadRepo {
   type ID = String
 
   def byUser(user: ID): Fu[List[Thread]] =
-    $find($query(userQuery(user)) sort recentSort)
+    $find($query(userQuery(user)).sort(recentSort))
 
   def visibleByUser(user: ID): Fu[List[Thread]] =
-    $find($query(visibleByUserQuery(user)) sort recentSort)
+    $find($query(visibleByUserQuery(user)).sort(recentSort))
 
   def visibleByUser(user: ID, nb: Int): Fu[List[Thread]] =
-    $find($query(visibleByUserQuery(user)) sort recentSort, nb)
+    $find($query(visibleByUserQuery(user)).sort(recentSort), nb)
 
   def userUnreadIds(userId: String): Fu[List[String]] = {
     import reactivemongo.bson._
@@ -86,5 +86,5 @@ object ThreadRepo {
 
   def visibleByUserQuery(user: String) = Json.obj("visibleByUserIds" -> user)
 
-  val recentSort = $sort desc "updatedAt"
+  val recentSort = $sort.desc("updatedAt")
 }

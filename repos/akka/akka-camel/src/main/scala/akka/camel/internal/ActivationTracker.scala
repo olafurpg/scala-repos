@@ -55,10 +55,10 @@ private[camel] class ActivationTracker extends Actor with ActorLogging {
         case AwaitActivation(ref) ⇒ sender() ! EndpointActivated(ref)
         case AwaitDeActivation(ref) ⇒ awaitingDeActivation ::= sender()
         case msg @ EndpointDeActivated(ref) ⇒
-          awaitingDeActivation foreach (_ ! msg)
+          awaitingDeActivation.foreach(_ ! msg)
           receive = deactivated
         case msg @ EndpointFailedToDeActivate(ref, cause) ⇒
-          awaitingDeActivation foreach (_ ! msg)
+          awaitingDeActivation.foreach(_ ! msg)
           receive = failedToDeActivate(cause)
       }
     }
@@ -108,7 +108,8 @@ private[camel] class ActivationTracker extends Actor with ActorLogging {
     case msg @ ActivationMessage(ref) ⇒
       (activations
         .getOrElseUpdate(ref, new ActivationStateMachine)
-        .receive orElse logStateWarning(ref))(msg)
+        .receive
+        .orElse(logStateWarning(ref)))(msg)
   }
 
   private[this] def logStateWarning(actorRef: ActorRef): Receive = {

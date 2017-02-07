@@ -61,7 +61,7 @@ object IvyConsole {
                                  arg: String): Dependencies =
     if (arg contains " at ")
       acc.copy(resolvers = parseResolver(arg) +: acc.resolvers)
-    else if (arg endsWith ".jar")
+    else if (arg.endsWith(".jar"))
       acc.copy(unmanaged = new File(arg) +: acc.unmanaged)
     else acc.copy(managed = parseManaged(arg, log) ++ acc.managed)
 

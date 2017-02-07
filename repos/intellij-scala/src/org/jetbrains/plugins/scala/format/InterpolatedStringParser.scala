@@ -27,7 +27,7 @@ object InterpolatedStringParser extends StringParser {
           return StripMarginParser.parse(element)
         case _ =>
       }
-    Some(element) collect {
+    Some(element).collect {
       case literal: ScInterpolatedStringLiteral =>
         val formatted = literal.firstChild.exists(_.getText == "f")
 
@@ -78,13 +78,14 @@ object InterpolatedStringParser extends StringParser {
             val edgeLength = if (literal.isMultiLineString) 3 else 1
             Text(s.drop(edgeLength)) :: t
           case it => it
-        }) flatMap {
-          case t: Text => t.withEscapedPercent(element.getManager)
-          case part => List(part)
-        } filter {
-          case Text("") => false
-          case _ => true
-        }
+        }).flatMap {
+            case t: Text => t.withEscapedPercent(element.getManager)
+            case part => List(part)
+          }
+          .filter {
+            case Text("") => false
+            case _ => true
+          }
     }
   }
 

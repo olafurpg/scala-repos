@@ -50,14 +50,18 @@ private[opening] object Generated {
   private[opening] def toPgn(situation: chess.Situation,
                              uciMoves: List[String]): Try[List[String]] = {
     val game = chess.Game(board = situation.board, player = situation.color)
-    (uciMoves.foldLeft(Try(game)) {
-      case (game, moveStr) =>
-        game flatMap { g =>
-          (Uci.Move(moveStr) toValid s"Invalid UCI move $moveStr" flatMap {
-            case Uci.Move(orig, dest, prom) =>
-              g(orig, dest, prom) map (_._1)
-          }).fold(errs => Failure(new Exception(errs.shows)), Success.apply)
-        }
-    }) map (_.pgnMoves)
+    (uciMoves
+      .foldLeft(Try(game)) {
+        case (game, moveStr) =>
+          game.flatMap { g =>
+            ((Uci.Move(moveStr) toValid s"Invalid UCI move $moveStr")
+              .flatMap {
+                case Uci.Move(orig, dest, prom) =>
+                  g(orig, dest, prom).map(_._1)
+              })
+              .fold(errs => Failure(new Exception(errs.shows)), Success.apply)
+          }
+      })
+      .map(_.pgnMoves)
   }
 }

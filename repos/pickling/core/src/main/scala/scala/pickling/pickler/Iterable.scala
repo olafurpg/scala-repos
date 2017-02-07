@@ -126,7 +126,7 @@ object TravPickler {
 
         (coll: Traversable[_]).asInstanceOf[Traversable[T]].foreach {
           (elem: T) =>
-            builder putElement { b =>
+            builder.putElement { b =>
               elemPickler.pickle(elem, b)
             }
         }

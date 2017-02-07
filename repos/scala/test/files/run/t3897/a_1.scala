@@ -1,6 +1,6 @@
 class One {
   private val messages = new collection.mutable.MutableList[String]
-  List("a") foreach { messages += _ }
+  List("a").foreach { messages += _ }
 }
 
 class Two {

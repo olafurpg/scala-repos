@@ -32,7 +32,7 @@ class ServerDestTracingProxy[Req, Rep](self: ServiceFactory[Req, Rep])
       }
     }
 
-    self(conn) map { filter andThen _ }
+    self(conn).map { filter.andThen(_) }
   }
 }
 
@@ -49,7 +49,7 @@ private[finagle] object ClientDestTracingFilter {
       def make(_addr: Transporter.EndpointAddr,
                next: ServiceFactory[Req, Rep]) = {
         val Transporter.EndpointAddr(addr) = _addr
-        new ClientDestTracingFilter(addr) andThen next
+        new ClientDestTracingFilter(addr).andThen(next)
       }
     }
 }

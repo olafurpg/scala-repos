@@ -58,7 +58,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
 
   def compare(rhs: Factors): Int = {
     val n = lhs.signum - rhs.signum
-    if (n == 0) lhs.value compare rhs.value else java.lang.Integer.signum(n)
+    if (n == 0) lhs.value.compare(rhs.value) else java.lang.Integer.signum(n)
   }
 
   def compare(rhs: Int): Int =
@@ -69,7 +69,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
         while (it.hasNext && t <= rhs) {
           val (p, e) = it.next(); t *= (p ** e)
         }
-        t compare rhs
+        t.compare(rhs)
       case Zero =>
         rhs.signum
       case Negative =>
@@ -78,7 +78,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
         while (it.hasNext && t >= rhs) {
           val (p, e) = it.next(); t *= (p ** e)
         }
-        t compare rhs
+        t.compare(rhs)
     }
 
   def gcd(rhs: Factors): Factors =
@@ -90,7 +90,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
   def lcm(rhs: Factors): Factors =
     Factors(lhs.factors.foldLeft(rhs.factors) {
       case (fs, (p, e)) =>
-        fs.updated(p, fs.getOrElse(p, 0) max e)
+        fs.updated(p, fs.getOrElse(p, 0).max(e))
     }, Positive)
 
   def unary_-(): Factors = Factors(factors, -sign)

@@ -24,15 +24,16 @@ class QueueResourceTest
   test("return well formatted JSON") {
     //given
     val app = AppDefinition(id = "app".toRootPath)
-    queue.list returns Seq(
-      QueuedTaskInfo(
-        app,
-        tasksLeftToLaunch = 23,
-        taskLaunchesInFlight = 0,
-        tasksLaunched = 0,
-        clock.now() + 100.seconds
-      )
-    )
+    queue.list.returns(
+      Seq(
+        QueuedTaskInfo(
+          app,
+          tasksLeftToLaunch = 23,
+          taskLaunchesInFlight = 0,
+          tasksLaunched = 0,
+          clock.now() + 100.seconds
+        )
+      ))
 
     //when
     val response = queueResource.index(auth.request)
@@ -55,15 +56,16 @@ class QueueResourceTest
   test("the generated info from the queue contains 0 if there is no delay") {
     //given
     val app = AppDefinition(id = "app".toRootPath)
-    queue.list returns Seq(
-      QueuedTaskInfo(
-        app,
-        tasksLeftToLaunch = 23,
-        taskLaunchesInFlight = 0,
-        tasksLaunched = 0,
-        backOffUntil = clock.now() - 100.seconds
-      )
-    )
+    queue.list.returns(
+      Seq(
+        QueuedTaskInfo(
+          app,
+          tasksLeftToLaunch = 23,
+          taskLaunchesInFlight = 0,
+          tasksLaunched = 0,
+          backOffUntil = clock.now() - 100.seconds
+        )
+      ))
     //when
     val response = queueResource.index(auth.request)
 
@@ -83,7 +85,7 @@ class QueueResourceTest
 
   test("unknown application backoff can not be removed from the taskqueue") {
     //given
-    queue.list returns Seq.empty
+    queue.list.returns(Seq.empty)
 
     //when
     val response = queueResource.resetDelay("unknown", auth.request)
@@ -95,15 +97,16 @@ class QueueResourceTest
   test("application backoff can be removed from the taskqueue") {
     //given
     val app = AppDefinition(id = "app".toRootPath)
-    queue.list returns Seq(
-      QueuedTaskInfo(
-        app,
-        tasksLeftToLaunch = 23,
-        taskLaunchesInFlight = 0,
-        tasksLaunched = 0,
-        backOffUntil = clock.now() + 100.seconds
-      )
-    )
+    queue.list.returns(
+      Seq(
+        QueuedTaskInfo(
+          app,
+          tasksLeftToLaunch = 23,
+          taskLaunchesInFlight = 0,
+          tasksLaunched = 0,
+          backOffUntil = clock.now() + 100.seconds
+        )
+      ))
 
     //when
     val response = queueResource.resetDelay("app", auth.request)
@@ -139,7 +142,7 @@ class QueueResourceTest
     val appId = "appId".toRootPath
     val taskCount = LaunchQueue
       .QueuedTaskInfo(AppDefinition(appId), 0, 0, 0, Timestamp.now())
-    queue.list returns Seq(taskCount)
+    queue.list.returns(Seq(taskCount))
 
     val resetDelay = queueResource.resetDelay("appId", req)
     Then("we receive a not authorized response")
@@ -154,7 +157,7 @@ class QueueResourceTest
     val req = auth.request
 
     When(s"one delay is reset")
-    queue.list returns Seq.empty
+    queue.list.returns(Seq.empty)
 
     val resetDelay = queueResource.resetDelay("appId", req)
     Then("we receive a not authorized response")

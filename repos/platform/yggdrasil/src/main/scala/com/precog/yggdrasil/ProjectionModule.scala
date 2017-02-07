@@ -65,8 +65,8 @@ trait ProjectionLike[M[+ _], Block] {
   def getBlockStream(columns: Option[Set[ColumnRef]])(
       implicit M: Monad[M]): StreamT[M, Block] = {
     StreamT.unfoldM[M, Block, Option[Key]](None) { key =>
-      getBlockAfter(key, columns) map {
-        _ map {
+      getBlockAfter(key, columns).map {
+        _.map {
           case BlockProjectionData(_, maxKey, block) => (block, Some(maxKey))
         }
       }

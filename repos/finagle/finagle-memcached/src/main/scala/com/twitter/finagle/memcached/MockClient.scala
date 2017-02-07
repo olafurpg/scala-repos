@@ -17,19 +17,19 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
   def this(contents: Map[String, Array[Byte]]) =
     this(
       mutable.Map[String, Buf]() ++
-        (contents mapValues { v =>
+        (contents.mapValues { v =>
           Buf.ByteArray.Owned(v)
         }))
 
   def this(contents: Map[String, String])(implicit m: Manifest[String]) =
-    this(contents mapValues { _.getBytes })
+    this(contents.mapValues { _.getBytes })
 
   protected def _get(keys: Iterable[String]): GetResult = {
     val hits = mutable.Map[String, Value]()
     val misses = mutable.Set[String]()
 
     map.synchronized {
-      keys foreach { key =>
+      keys.foreach { key =>
         map.get(key) match {
           case Some(v: Buf) =>
             hits +=

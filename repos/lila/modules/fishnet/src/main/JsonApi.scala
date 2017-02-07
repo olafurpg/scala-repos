@@ -36,8 +36,8 @@ object JsonApi {
     case class FullEngine(name: String, options: EngineOptions) extends Engine
 
     case class EngineOptions(threads: Option[String], hash: Option[String]) {
-      def threadsInt = threads flatMap parseIntOption
-      def hashInt = hash flatMap parseIntOption
+      def threadsInt = threads.flatMap(parseIntOption)
+      def hashInt = hash.flatMap(parseIntOption)
     }
 
     case class Acquire(fishnet: Fishnet, engine: BaseEngine) extends Request
@@ -68,7 +68,7 @@ object JsonApi {
 
       val cappedNps = nps.map(_ min npsCeil)
 
-      val cappedPvList = pvList take lila.analyse.Info.LineMaxPlies
+      val cappedPvList = pvList.take(lila.analyse.Info.LineMaxPlies)
 
       def isCheckmate = score.mate contains 0
       def mateFound = score.mate.isDefined

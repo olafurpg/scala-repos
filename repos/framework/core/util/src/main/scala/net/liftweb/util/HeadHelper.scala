@@ -43,41 +43,43 @@ object HeadHelper {
     var hrefs: Set[String] = Set()
 
     Text("\n\t") ++
-      (in flatMap { e =>
-        val src = e.attributes("src") match {
-          case null => null
-          case x => x.text
-        }
+      (in
+        .flatMap { e =>
+          val src = e.attributes("src") match {
+            case null => null
+            case x => x.text
+          }
 
-        val href = e.attributes("href") match {
-          case null => null
-          case x => x.text
-        }
+          val href = e.attributes("href") match {
+            case null => null
+            case x => x.text
+          }
 
-        e match {
-          case e: Elem
-              if (e.label == "script") && (src != null) &&
-                (jsSources contains src) =>
-            NodeSeq.Empty
-          case e: Elem
-              if (e.label == "script") && (src != null) &&
-                (!(jsSources contains src)) =>
-            jsSources += src; e
+          e match {
+            case e: Elem
+                if (e.label == "script") && (src != null) &&
+                  (jsSources contains src) =>
+              NodeSeq.Empty
+            case e: Elem
+                if (e.label == "script") && (src != null) &&
+                  (!(jsSources contains src)) =>
+              jsSources += src; e
 
-          case e: Elem
-              if (e.label == "link") && (href != null) &&
-                (hrefs contains href) =>
-            NodeSeq.Empty
-          case e: Elem
-              if (e.label == "link") && (href != null) &&
-                !(hrefs contains href) =>
-            hrefs += href; e
+            case e: Elem
+                if (e.label == "link") && (href != null) &&
+                  (hrefs contains href) =>
+              NodeSeq.Empty
+            case e: Elem
+                if (e.label == "link") && (href != null) &&
+                  !(hrefs contains href) =>
+              hrefs += href; e
 
-          case e: Text if (e.text.trim.length == 0) => NodeSeq.Empty
+            case e: Text if (e.text.trim.length == 0) => NodeSeq.Empty
 
-          case e => e
-        }
-      }).flatMap(e => e ++ Text("\n\t"))
+            case e => e
+          }
+        })
+        .flatMap(e => e ++ Text("\n\t"))
   }
 
   /**
@@ -97,7 +99,7 @@ object HeadHelper {
     if (headInBody.isEmpty) {
       xhtml
     } else {
-      def xform(in: NodeSeq, inBody: Boolean): NodeSeq = in flatMap {
+      def xform(in: NodeSeq, inBody: Boolean): NodeSeq = in.flatMap {
         case e: Elem if !inBody && e.label == "body" =>
           Elem(e.prefix,
                e.label,

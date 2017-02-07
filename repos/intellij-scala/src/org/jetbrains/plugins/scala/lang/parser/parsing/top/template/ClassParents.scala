@@ -28,7 +28,7 @@ object ClassParents {
     while (builder.getTokenType == ScalaTokenTypes.kWITH) {
       builder.advanceLexer() //Ate with
       if (!AnnotType.parse(builder, isPattern = false)) {
-        builder error ScalaBundle.message("wrong.simple.type")
+        builder.error(ScalaBundle.message("wrong.simple.type"))
         classParentsMarker.done(ScalaElementTypes.CLASS_PARENTS)
         return true
       }

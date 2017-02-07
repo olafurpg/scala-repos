@@ -45,7 +45,7 @@ object FSMActorSpec {
             stay using CodeState(incomplete, code)
           case codeTry if (codeTry == code) ⇒ {
             doUnlock()
-            goto(Open) using CodeState("", code) forMax timeout
+            (goto(Open) using CodeState("", code)).forMax(timeout)
           }
           case wrong ⇒ {
             stay using CodeState("", code)
@@ -385,7 +385,7 @@ class FSMActorSpec
 
           case Event(OverrideTimeoutToInf, _) ⇒
             p.ref ! OverrideTimeoutToInf
-            stay() forMax Duration.Inf
+            stay().forMax(Duration.Inf)
         }
 
         initialize()

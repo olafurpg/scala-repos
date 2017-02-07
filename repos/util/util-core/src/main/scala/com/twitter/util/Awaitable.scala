@@ -132,7 +132,7 @@ object Await {
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
   def all(awaitables: Seq[Awaitable[_]], timeout: Duration): Unit =
-    awaitables foreach { _.ready(timeout) }
+    awaitables.foreach { _.ready(timeout) }
 
   /**
     * $all

@@ -61,9 +61,9 @@ class TestTransport(val localAddress: Address,
         remoteHandle.writable = false
 
         // Pass a non-writable handle to remote first
-        remoteListenerFuture flatMap {
+        remoteListenerFuture.flatMap {
           case listener ⇒
-            listener notify InboundAssociation(remoteHandle)
+            listener.notify(InboundAssociation(remoteHandle))
             val remoteHandlerFuture = remoteHandle.readHandlerPromise.future
 
             // Registration of reader at local finishes the registration and enables communication
@@ -144,7 +144,7 @@ class TestTransport(val localAddress: Address,
       params: (TestAssociationHandle, ByteString)): Future[Boolean] = {
     registry.getRemoteReadHandlerFor(params._1) match {
       case Some(listener) ⇒
-        listener notify InboundPayload(params._2)
+        listener.notify(InboundPayload(params._2))
         Future.successful(true)
       case None ⇒
         Future.failed(new IllegalStateException("No association present"))
@@ -154,8 +154,9 @@ class TestTransport(val localAddress: Address,
   private def defaultDisassociate(
       handle: TestAssociationHandle): Future[Unit] = {
     registry.deregisterAssociation(handle.key).foreach {
-      registry.remoteListenerRelativeTo(handle, _) notify Disassociated(
-        AssociationHandle.Unknown)
+      registry
+        .remoteListenerRelativeTo(handle, _)
+        .notify(Disassociated(AssociationHandle.Unknown))
     }
     Future.successful(())
   }
@@ -411,7 +412,7 @@ object TestTransport {
       *   True if all transports are successfully registered.
       */
     def transportsReady(addresses: Address*): Boolean = {
-      addresses forall {
+      addresses.forall {
         transportTable.containsKey(_)
       }
     }
@@ -464,7 +465,7 @@ object TestTransport {
       */
     def getRemoteReadHandlerFor(
         localHandle: TestAssociationHandle): Option[HandleEventListener] = {
-      Option(listenersTable.get(localHandle.key)) map {
+      Option(listenersTable.get(localHandle.key)).map {
         remoteListenerRelativeTo(localHandle, _)
       }
     }

@@ -408,7 +408,7 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertSameSummary(getSingleMethod(c, "t8"), List(ICONST_0, IRETURN))
     assertNoInvoke(getSingleMethod(c, "t9"))
     // t10: no invocation of unbox
-    assertEquals(getSingleMethod(c, "t10").instructions collect {
+    assertEquals(getSingleMethod(c, "t10").instructions.collect {
       case Invoke(_, owner, name, _, _) => (owner, name)
     }, List(("java/lang/Integer", "valueOf"), ("C", "escape")))
 
@@ -439,7 +439,7 @@ class MethodLevelOptsTest extends ClearAfterClass {
 
     // no unbox invocations
     assertEquals(
-      getSingleMethod(c, "t12").instructions collect {
+      getSingleMethod(c, "t12").instructions.collect {
         case Invoke(_, owner, name, _, _) => (owner, name)
       },
       List(("java/lang/Integer", "valueOf"),
@@ -499,11 +499,11 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertNoInvoke(getSingleMethod(c, "t2"))
     assertSameSummary(getSingleMethod(c, "t3"), List(LDC, LDC, LADD, LRETURN))
     assertNoInvoke(getSingleMethod(c, "t4"))
-    assertEquals(getSingleMethod(c, "t5").instructions collect {
+    assertEquals(getSingleMethod(c, "t5").instructions.collect {
       case Field(_, owner, name, _) => s"$owner.$name"
     }, List("scala/runtime/IntRef.elem"))
     assertEquals(
-      getSingleMethod(c, "t6").instructions collect {
+      getSingleMethod(c, "t6").instructions.collect {
         case Field(op, owner, name, _) => s"$op $owner.$name"
       },
       List(s"$PUTFIELD scala/runtime/IntRef.elem",
@@ -573,7 +573,7 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertSameSummary(getSingleMethod(c, "t4"),
                       List(ICONST_3, "boxToInteger", ARETURN))
     assertEquals(
-      getSingleMethod(c, "t5").instructions collect {
+      getSingleMethod(c, "t5").instructions.collect {
         case Invoke(_, owner, name, _, _) => (owner, name)
       },
       List(("scala/runtime/BoxesRunTime", "boxToInteger"),

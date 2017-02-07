@@ -296,12 +296,12 @@ final class ResponseDecodingSuite extends RedisResponseTest {
             b match {
               case MBulkReply(xs) =>
                 assert(ReplyFormat.toString(xs) == List("one", "three"))
-              case xs => fail("Expected MBulkReply, got: %s" format xs)
+              case xs => fail("Expected MBulkReply, got: %s".format(xs))
             }
             assert(c == IntegerReply(3))
-          case xs => fail("Expected 3-element MBulkReply, got: %s" format xs)
+          case xs => fail("Expected 3-element MBulkReply, got: %s".format(xs))
         }
-      case xs => fail("Expected one reply, got: %s" format xs)
+      case xs => fail("Expected one reply, got: %s".format(xs))
     }
   }
 
@@ -358,14 +358,14 @@ final class ResponseDecodingSuite extends RedisResponseTest {
                     assert(aaa == EmptyMBulkReply())
                     assert(aab == IntegerReply(100))
                   case xs =>
-                    fail("Expected 2-element MBulkReply, got: %s" format xs)
+                    fail("Expected 2-element MBulkReply, got: %s".format(xs))
                 }
-              case xs => fail("Expected 3-element, got: %s" format xs)
+              case xs => fail("Expected 3-element, got: %s".format(xs))
             }
             assert(d == IntegerReply(2))
-          case xs => fail("Expected 4-element MBulkReply, got: %s" format xs)
+          case xs => fail("Expected 4-element MBulkReply, got: %s".format(xs))
         }
-      case xs => fail("Expected one reply, got: %s" format xs)
+      case xs => fail("Expected one reply, got: %s".format(xs))
     }
   }
 

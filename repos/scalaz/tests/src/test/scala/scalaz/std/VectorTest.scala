@@ -10,7 +10,7 @@ import org.scalacheck.Prop.forAll
 
 object VectorTest extends SpecLite {
   implicit def vectorArb[A: Arbitrary] =
-    Arbitrary(implicitly[Arbitrary[List[A]]].arbitrary map (_.toVector))
+    Arbitrary(implicitly[Arbitrary[List[A]]].arbitrary.map(_.toVector))
 
   import std.vector._
   checkAll(equal.laws[Vector[Int]])
@@ -49,7 +49,7 @@ object VectorTest extends SpecLite {
   }
 
   "takeWhileM" ! forAll { (xs: Vector[Int]) =>
-    takeWhileM[Int, Id](xs)(evenp) must_=== (xs takeWhile evenp)
+    takeWhileM[Int, Id](xs)(evenp) must_=== (xs.takeWhile(evenp))
   }
 
   "groupWhen" ! forAll { (xs: Vector[Int]) =>
@@ -70,7 +70,7 @@ object VectorTest extends SpecLite {
     val wxs = findM[Int, W](xs)(x => WriterT.writer(Vector(x) -> evenp(x)))
     (wxs.written, wxs.value) must_=== {
       if (i < 0) (xs, None)
-      else (xs take (i + 1), Some(xs(i)))
+      else (xs.take(i + 1), Some(xs(i)))
     }
   }
 

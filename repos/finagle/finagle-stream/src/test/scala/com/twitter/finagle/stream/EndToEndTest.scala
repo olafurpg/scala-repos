@@ -72,7 +72,7 @@ class EndToEndTest extends FunSuite {
       val clientRes = Await.result(client(streamRequest), 1.second)
       var result = ""
       val latch = new CountDownLatch(1)
-      (clientRes.error ?) ensure {
+      (clientRes.error ?).ensure {
         Future { latch.countDown() }
       }
 
@@ -254,7 +254,7 @@ class EndToEndTest extends FunSuite {
       var result = ""
       val latch = new CountDownLatch(1)
 
-      (clientRes.error ?) ensure {
+      (clientRes.error ?).ensure {
         Future { latch.countDown() }
       }
 

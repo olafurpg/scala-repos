@@ -63,7 +63,7 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
 
     // SPARK-6766: batch info should be submitted
     val batchInfosSubmitted = collector.batchInfosSubmitted
-    batchInfosSubmitted should have size 4
+    (batchInfosSubmitted should have).size(4)
 
     batchInfosSubmitted.asScala.foreach(info => {
       info.schedulingDelay should be(None)
@@ -81,7 +81,7 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
 
     // SPARK-6766: processingStartTime of batch info should not be None when starting
     val batchInfosStarted = collector.batchInfosStarted
-    batchInfosStarted should have size 4
+    (batchInfosStarted should have).size(4)
 
     batchInfosStarted.asScala.foreach(info => {
       info.schedulingDelay should not be None
@@ -102,7 +102,7 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
 
     // test onBatchCompleted
     val batchInfosCompleted = collector.batchInfosCompleted
-    batchInfosCompleted should have size 4
+    (batchInfosCompleted should have).size(4)
 
     batchInfosCompleted.asScala.foreach(info => {
       info.schedulingDelay should not be None
@@ -142,7 +142,7 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
         collector.startedReceiverStreamIds.peek() should equal(0)
         collector.stoppedReceiverStreamIds.size should equal(1)
         collector.stoppedReceiverStreamIds.peek() should equal(0)
-        collector.receiverErrors should have size 1
+        (collector.receiverErrors should have).size(1)
         collector.receiverErrors.peek()._1 should equal(0)
         collector.receiverErrors.peek()._2 should include("report error")
         collector.receiverErrors.peek()._3 should include("report exception")

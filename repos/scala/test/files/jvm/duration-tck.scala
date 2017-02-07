@@ -89,13 +89,15 @@ object Test extends App {
   one / minf mustBe -0d
   -one / minf mustBe 0d
 
-  inputs filterNot (_.isFinite) foreach (x => x / zero mustBe x.toUnit(DAYS))
-  inputs filterNot (_.isFinite) foreach (_ * 0d mustBe undef)
-  inputs filterNot (_.isFinite) foreach (_ * -0d mustBe undef)
-  inputs filterNot (_.isFinite) foreach
-    (x => x * Double.PositiveInfinity mustBe x)
-  inputs filterNot (_.isFinite) foreach
-    (x => x * Double.NegativeInfinity mustBe -x)
+  inputs.filterNot(_.isFinite).foreach(x => x / zero mustBe x.toUnit(DAYS))
+  inputs.filterNot(_.isFinite).foreach(_ * 0d mustBe undef)
+  inputs.filterNot(_.isFinite).foreach(_ * -0d mustBe undef)
+  inputs
+    .filterNot(_.isFinite)
+    .foreach(x => x * Double.PositiveInfinity mustBe x)
+  inputs
+    .filterNot(_.isFinite)
+    .foreach(x => x * Double.NegativeInfinity mustBe -x)
 
   inf.toUnit(SECONDS) mustBe Double.PositiveInfinity
   minf.toUnit(MINUTES) mustBe Double.NegativeInfinity
@@ -109,27 +111,27 @@ object Test extends App {
   assert(undef != undef)
   assert(undef eq undef)
 
-  inputs foreach (_ + undef mustBe undef)
-  inputs foreach (_ - undef mustBe undef)
-  inputs foreach (_ / undef mustBe nan)
-  inputs foreach (_ / nan mustBe undef)
-  inputs foreach (_ * nan mustBe undef)
-  inputs foreach (undef + _ mustBe undef)
-  inputs foreach (undef - _ mustBe undef)
-  inputs foreach (undef / _ mustBe nan)
+  inputs.foreach(_ + undef mustBe undef)
+  inputs.foreach(_ - undef mustBe undef)
+  inputs.foreach(_ / undef mustBe nan)
+  inputs.foreach(_ / nan mustBe undef)
+  inputs.foreach(_ * nan mustBe undef)
+  inputs.foreach(undef + _ mustBe undef)
+  inputs.foreach(undef - _ mustBe undef)
+  inputs.foreach(undef / _ mustBe nan)
   undef / 1 mustBe undef
   undef / nan mustBe undef
   undef * 1 mustBe undef
   undef * nan mustBe undef
-  inputs foreach (x => x / zero mustBe x.toUnit(SECONDS) / 0d)
-  inputs foreach
-    (x => x / 0d mustBe Duration.fromNanos(x.toUnit(NANOSECONDS) / 0d))
-  inputs foreach
-    (x => x / -0d mustBe Duration.fromNanos(x.toUnit(NANOSECONDS) / -0d))
+  inputs.foreach(x => x / zero mustBe x.toUnit(SECONDS) / 0d)
+  inputs.foreach(x =>
+    x / 0d mustBe Duration.fromNanos(x.toUnit(NANOSECONDS) / 0d))
+  inputs.foreach(x =>
+    x / -0d mustBe Duration.fromNanos(x.toUnit(NANOSECONDS) / -0d))
 
-  inputs filterNot (_ eq undef) foreach (_ compareTo undef mustBe -1)
-  inputs filterNot (_ eq undef) foreach (undef compareTo _ mustBe 1)
-  undef compare undef mustBe 0
+  inputs.filterNot(_ eq undef).foreach(_.compareTo(undef) mustBe -1)
+  inputs.filterNot(_ eq undef).foreach(undef.compareTo(_) mustBe 1)
+  undef.compare(undef) mustBe 0
 
   undef.toUnit(DAYS) mustBe nan
   Duration.fromNanos(nan) mustBe undef
@@ -188,7 +190,7 @@ object Test extends App {
 
   // test Deadline
   val dead = 2.seconds.fromNow
-  val dead2 = 2 seconds fromNow
+  val dead2 = 2.seconds(fromNow)
 
   { val l = dead.timeLeft; assert(l > 1.second, s"$l <= 1.second") }
   { val l = dead2.timeLeft; assert(l > 1.second, s"$l <= 1.second") }
@@ -207,9 +209,12 @@ object Test extends App {
 
   // check statically retaining finite-ness
   val finiteDuration: FiniteDuration =
-    1.second * 2 / 3 mul 5 div 4 plus 3.seconds minus 1.millisecond min 1.second max 1.second
+    ((1.second * 2 / 3)
+      .mul(5)
+      .div(4)
+      .plus(3.seconds) minus 1.millisecond min 1.second).max(1.second)
   val finite2: FiniteDuration = 2 * 1.second + 3L * 2.seconds
   finite2 mustBe 8.seconds
-  ((2 seconds fromNow).timeLeft: FiniteDuration) < 4.seconds mustBe true
-  val finite3: FiniteDuration = 3.5 seconds span
+  ((2.seconds(fromNow)).timeLeft: FiniteDuration) < 4.seconds mustBe true
+  val finite3: FiniteDuration = 3.5.seconds(span)
 }

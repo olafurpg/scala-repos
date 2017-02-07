@@ -86,7 +86,7 @@ class PolyTests {
     implicit def caseString = at[String](_.length)
     implicit def caseList[T] = at[List[T]](_.length)
     implicit def caseOption[T](implicit st: Case.Aux[T, Int]) =
-      at[Option[T]](t => 1 + (t map size).getOrElse(0))
+      at[Option[T]](t => 1 + (t.map(size)).getOrElse(0))
     implicit def caseTuple[T, U](implicit st: Case.Aux[T, Int],
                                  su: Case.Aux[U, Int]) = at[(T, U)] {
       case (t, u) => size(t) + size(u)
@@ -119,11 +119,11 @@ class PolyTests {
     assertEquals(4, st)
 
     val ls = List("foo", "bar", "baz")
-    val lss = ls map size
+    val lss = ls.map(size)
     typed[List[Int]](lss)
     assertEquals(List(3, 3, 3), lss)
 
-    val lsi = ls map identity
+    val lsi = ls.map(identity)
     typed[List[String]](lsi)
     assertEquals(ls, lsi)
 
@@ -150,15 +150,15 @@ class PolyTests {
     assertEquals(List(23), al)
 
     // Implicit conversion to monomorphic function values
-    val l1 = List(1, 2, 3) map singleton
+    val l1 = List(1, 2, 3).map(singleton)
     typed[List[Set[Int]]](l1)
     assertEquals(List(Set(1), Set(2), Set(3)), l1)
 
-    val l2 = List("foo", "bar", "baz") map list
+    val l2 = List("foo", "bar", "baz").map(list)
     typed[List[List[String]]](l2)
     assertEquals(List(List("foo"), List("bar"), List("baz")), l2)
 
-    val l3 = List(List(1), List(2), List(4)) map headOption
+    val l3 = List(List(1), List(2), List(4)).map(headOption)
     typed[List[Option[Int]]](l3)
     assertEquals(List(Option(1), Option(2), Option(4)), l3)
 
@@ -190,7 +190,7 @@ class PolyTests {
     assertEquals((1, 3), a6)
 
     def pairMap[G[_]](f: Id ~> G) =
-      (List(1, 2, 3) map f, List("foo", "bar", "baz") map f)
+      (List(1, 2, 3).map(f), List("foo", "bar", "baz").map(f))
 
     val m1 = pairMap(singleton)
     typed[(List[Set[Int]], List[Set[String]])](m1)
@@ -205,28 +205,28 @@ class PolyTests {
                  m2)
 
     val l5 = List(1, 2, 3)
-    val l6 = l5 map option
+    val l6 = l5.map(option)
     typed[List[Option[Int]]](l6)
     assertEquals(List(Option(1), Option(2), Option(3)), l6)
 
-    val l7 = l6 map isDefined
+    val l7 = l6.map(isDefined)
     typed[List[Boolean]](l7)
     assertEquals(List(true, true, true), l7)
 
     val lsi2 = List(Set(1), Set(2), Set(3))
-    val loi2 = lsi2 map choose
+    val loi2 = lsi2.map(choose)
     typed[List[Option[Int]]](loi2)
     assertEquals(List(Option(1), Option(2), Option(3)), loi2)
 
     val l8 =
       23 :: "foo" :: List(1, 2, 3, 4) :: Option("bar") :: (23, "foo") :: 2.0 :: HNil
-    val l9 = l8 map size
+    val l9 = l8.map(size)
     typed[Int :: Int :: Int :: Int :: Int :: Int :: HNil](l9)
     assertEquals(1 :: 3 :: 4 :: 4 :: 4 :: 1 :: HNil, l9)
 
     def hlistMap(f: Poly)(
         implicit mapper: Mapper[f.type, Int :: String :: HNil]) =
-      (23 :: "foo" :: HNil) map f
+      ((23 :: "foo" :: HNil)).map(f)
 
     val hm1 = hlistMap(singleton)
     typed[Set[Int] :: Set[String] :: HNil](hm1)
@@ -239,7 +239,7 @@ class PolyTests {
 
   @Test
   def testCompose {
-    val so = singleton compose option
+    val so = singleton.compose(option)
 
     val sos = so("foo")
     typed[Set[Option[String]]](sos)
@@ -295,7 +295,7 @@ class PolyTests {
     assertEquals(23, bs)
 
     val lis = 1 :: "2" :: 3 :: "4" :: HNil
-    val blis = lis map bidi
+    val blis = lis.map(bidi)
     typed[String :: Int :: String :: Int :: HNil](blis)
     assertEquals("1" :: 2 :: "3" :: 4 :: HNil, blis)
   }

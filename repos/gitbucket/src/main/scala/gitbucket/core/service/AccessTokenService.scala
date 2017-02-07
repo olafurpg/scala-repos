@@ -58,10 +58,11 @@ trait AccessTokenService {
 
   def deleteAccessToken(userName: String, accessTokenId: Int)(
       implicit s: Session): Unit =
-    AccessTokens filter
-      (t =>
-         t.userName === userName.bind &&
-           t.accessTokenId === accessTokenId) delete
+    AccessTokens
+      .filter(
+        t =>
+          t.userName === userName.bind &&
+            t.accessTokenId === accessTokenId) delete
 }
 
 object AccessTokenService extends AccessTokenService

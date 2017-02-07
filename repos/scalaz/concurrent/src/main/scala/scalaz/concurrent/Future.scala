@@ -70,13 +70,13 @@ sealed abstract class Future[+A] {
     case Suspend(thunk) => BindSuspend(thunk, f)
     case Async(listen) => BindAsync(listen, f)
     case BindSuspend(thunk, g) =>
-      Suspend(() => BindSuspend(thunk, g andThen (_ flatMap f)))
+      Suspend(() => BindSuspend(thunk, g.andThen(_.flatMap(f))))
     case BindAsync(listen, g) =>
-      Suspend(() => BindAsync(listen, g andThen (_ flatMap f)))
+      Suspend(() => BindAsync(listen, g.andThen(_.flatMap(f))))
   }
 
   def map[B](f: A => B): Future[B] =
-    flatMap(f andThen (b => Future.now(b)))
+    flatMap(f.andThen(b => Future.now(b)))
 
   /**
     * Run this computation to obtain an `A`, then invoke the given callback.
@@ -87,7 +87,7 @@ sealed abstract class Future[+A] {
       case Now(a) => cb(a).run
       case Async(onFinish) => onFinish(cb)
       case BindAsync(onFinish, g) =>
-        onFinish(x => Trampoline.delay(g(x)) map (_ unsafePerformListen cb))
+        onFinish(x => Trampoline.delay(g(x)).map(_.unsafePerformListen(cb)))
     }
 
   @deprecated("use unsafePerformListen", "7.2")
@@ -113,8 +113,9 @@ sealed abstract class Future[+A] {
         onFinish(
           x =>
             if (!cancel.get)
-              Trampoline.delay(g(x)) map
-                (_ unsafePerformListenInterruptibly (cb, cancel))
+              Trampoline
+                .delay(g(x))
+                .map(_.unsafePerformListenInterruptibly(cb, cancel))
             else Trampoline.done(()))
       case _ if cancel.get => ()
     }
@@ -132,7 +133,7 @@ sealed abstract class Future[+A] {
   @annotation.tailrec
   final def step: Future[A] = this match {
     case Suspend(thunk) => thunk().step
-    case BindSuspend(thunk, f) => (thunk() flatMap f).step
+    case BindSuspend(thunk, f) => (thunk().flatMap(f)).step
     case _ => this
   }
 
@@ -143,7 +144,7 @@ sealed abstract class Future[+A] {
       this match {
         case Suspend(thunk) => thunk().stepInterruptibly(cancel)
         case BindSuspend(thunk, f) =>
-          (thunk() flatMap f).stepInterruptibly(cancel)
+          (thunk().flatMap(f)).stepInterruptibly(cancel)
         case _ => this
       } else this
 
@@ -334,7 +335,7 @@ object Future {
   implicit val futureInstance: Nondeterminism[Future] =
     new Nondeterminism[Future] {
       def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] =
-        fa flatMap f
+        fa.flatMap(f)
       def point[A](a: => A): Future[A] = delay(a)
 
       def chooseAny[A](h: Future[A],

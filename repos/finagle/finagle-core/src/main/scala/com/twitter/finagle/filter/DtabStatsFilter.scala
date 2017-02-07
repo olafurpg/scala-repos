@@ -16,7 +16,7 @@ object DtabStatsFilter {
       def make(_stats: param.Stats, next: ServiceFactory[Req, Rep]) = {
         val param.Stats(statsReceiver) = _stats
         if (statsReceiver.isNull) next
-        else new DtabStatsFilter[Req, Rep](statsReceiver) andThen next
+        else new DtabStatsFilter[Req, Rep](statsReceiver).andThen(next)
       }
     }
 }

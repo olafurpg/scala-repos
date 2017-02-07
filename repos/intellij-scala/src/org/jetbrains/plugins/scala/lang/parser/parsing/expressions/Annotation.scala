@@ -29,7 +29,7 @@ object Annotation {
         return false
     }
     if (!AnnotationExpr.parse(builder)) {
-      builder error ScalaBundle.message("wrong.annotation.expression")
+      builder.error(ScalaBundle.message("wrong.annotation.expression"))
       annotMarker.drop()
     } else {
       annotMarker.done(ScalaElementTypes.ANNOTATION)

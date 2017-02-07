@@ -348,7 +348,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
         val fttrFromDb = FieldTypeTestRecord.find(fttr.id.value)
         fttrFromDb.isDefined must_== true
-        fttrFromDb foreach { tr =>
+        fttrFromDb.foreach { tr =>
           tr mustEqual fttr
         }
 
@@ -378,7 +378,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val mfttrFromDb = MongoFieldTypeTestRecord.find(mfttr.id.value)
       mfttrFromDb.isDefined must_== true
-      mfttrFromDb foreach { tr =>
+      mfttrFromDb.foreach { tr =>
         tr mustEqual mfttr
       }
 
@@ -386,7 +386,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val pftrFromDb = PatternFieldTestRecord.find(pftr.id.value)
       pftrFromDb.isDefined must_== true
-      pftrFromDb foreach { tr =>
+      pftrFromDb.foreach { tr =>
         tr mustEqual pftr
       }
 
@@ -394,7 +394,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val ltrFromDb = ListTestRecord.find(ltr.id.value)
       ltrFromDb.isDefined must_== true
-      ltrFromDb foreach { tr =>
+      ltrFromDb.foreach { tr =>
         tr mustEqual ltr
       }
 
@@ -402,7 +402,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val mtrFromDb = MapTestRecord.find(mtr.id.value)
       mtrFromDb.isDefined must_== true
-      mtrFromDb foreach { tr =>
+      mtrFromDb.foreach { tr =>
         tr mustEqual mtr
       }
 
@@ -410,7 +410,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val srtrFromDb = SubRecordTestRecord.find(srtr.id.value)
       srtrFromDb.isDefined must_== true
-      srtrFromDb foreach { tr =>
+      srtrFromDb.foreach { tr =>
         tr mustEqual srtr
       }
 
@@ -418,7 +418,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val joftrFromDb = JObjectFieldTestRecord.find(joftr.id.get)
       joftrFromDb.isDefined must_== true
-      joftrFromDb foreach { tr =>
+      joftrFromDb.foreach { tr =>
         tr must_== joftr
       }
       success
@@ -430,7 +430,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val mfttrFromDb = MongoFieldTypeTestRecord.find(mfttrDef.id.value)
       mfttrFromDb.isDefined must_== true
-      mfttrFromDb foreach { tr =>
+      mfttrFromDb.foreach { tr =>
         tr mustEqual mfttrDef
       }
 
@@ -439,7 +439,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val pftrFromDb = PatternFieldTestRecord.find(pftrDef.id.value)
       pftrFromDb.isDefined must_== true
-      pftrFromDb foreach { tr =>
+      pftrFromDb.foreach { tr =>
         tr mustEqual pftrDef
       }
 
@@ -448,7 +448,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val ltrFromDb = ListTestRecord.find(ltrDef.id.value)
       ltrFromDb.isDefined must_== true
-      ltrFromDb foreach { tr =>
+      ltrFromDb.foreach { tr =>
         tr mustEqual ltrDef
       }
 
@@ -457,7 +457,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val mtrFromDb = MapTestRecord.find(mtrDef.id.value)
       mtrFromDb.isDefined must_== true
-      mtrFromDb foreach { tr =>
+      mtrFromDb.foreach { tr =>
         tr mustEqual mtrDef
       }
 
@@ -466,7 +466,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val srtrFromDb = SubRecordTestRecord.find(srtrDef.id.value)
       srtrFromDb.isDefined must_== true
-      srtrFromDb.toList map { tr =>
+      srtrFromDb.toList.map { tr =>
         tr mustEqual srtrDef
       }
 
@@ -475,7 +475,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val joftrFromDb = JObjectFieldTestRecord.find(joftrDef.id.value)
       joftrFromDb.isDefined must_== true
-      joftrFromDb foreach { tr =>
+      joftrFromDb.foreach { tr =>
         tr mustEqual joftrDef
       }
       success
@@ -514,26 +514,26 @@ class MongoRecordSpec extends Specification with MongoTestKit {
       val mfftrFromJson =
         MongoFieldTypeTestRecord.fromJsonString(compactRender(mfttrJson))
       mfftrFromJson.isDefined must_== true
-      mfftrFromJson foreach { tr =>
+      mfftrFromJson.foreach { tr =>
         tr mustEqual mfttr
       }
 
       val pftrFromJson =
         PatternFieldTestRecord.fromJsonString(compactRender(pftrJson))
       pftrFromJson.isDefined must_== true
-      pftrFromJson foreach { tr =>
+      pftrFromJson.foreach { tr =>
         tr mustEqual pftr
       }
 
       val ltrFromJson = ListTestRecord.fromJsonString(compactRender(ltrJson))
       ltrFromJson.isDefined must_== true
-      ltrFromJson foreach { tr =>
+      ltrFromJson.foreach { tr =>
         tr mustEqual ltr
       }
 
       val mtrFromJson = MapTestRecord.fromJsonString(compactRender(mtrJson))
       mtrFromJson.isDefined must_== true
-      mtrFromJson.toList map { tr =>
+      mtrFromJson.toList.map { tr =>
         tr mustEqual mtr
       }
 
@@ -759,7 +759,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
         val fromDb = FieldTypeTestRecord.find(fttr.id.get)
         fromDb.isDefined must_== true
-        fromDb foreach { rec =>
+        fromDb.foreach { rec =>
           rec must_== fttr
           rec.dirty_? must_== false
         }
@@ -818,7 +818,7 @@ class MongoRecordSpec extends Specification with MongoTestKit {
 
       val fromDb = MongoFieldTypeTestRecord.find(mfttr.id.get)
       fromDb.isDefined must_== true
-      fromDb foreach { rec =>
+      fromDb.foreach { rec =>
         rec must_== mfttr
         rec.dirty_? must_== false
       }

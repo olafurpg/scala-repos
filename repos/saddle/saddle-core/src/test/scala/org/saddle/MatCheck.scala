@@ -35,7 +35,7 @@ class MatCheck extends Specification with ScalaCheck {
 
     "equality works" in {
       forAll { (m: Mat[Double]) =>
-        (m must_== Mat(m.numRows, m.numCols, m.toArray)) and (m must_== m)
+        ((m must_== Mat(m.numRows, m.numCols, m.toArray))).and(m must_== m)
       }
     }
 
@@ -152,7 +152,7 @@ class MatCheck extends Specification with ScalaCheck {
     "rowsWithNA works (with NA)" in {
       implicit val arbMat = Arbitrary(MatArbitraries.matDoubleWithNA)
       forAll { (m: Mat[Double]) =>
-        val exp = (m.rows() zip Range(0, m.numRows)).flatMap {
+        val exp = (m.rows().zip(Range(0, m.numRows))).flatMap {
           case (a: Vec[_], b: Int) => if (a.hasNA) Some(b) else None
         }
         m.rowsWithNA must_== exp.toSet

@@ -63,9 +63,9 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
 
   final def swap: B Ior A = fold(Ior.right, Ior.left, (a, b) => Ior.both(b, a))
 
-  final def exists(p: B => Boolean): Boolean = right exists p
-  final def forall(p: B => Boolean): Boolean = right forall p
-  final def getOrElse[BB >: B](bb: => BB): BB = right getOrElse bb
+  final def exists(p: B => Boolean): Boolean = right.exists(p)
+  final def forall(p: B => Boolean): Boolean = right.forall(p)
+  final def getOrElse[BB >: B](bb: => BB): BB = right.getOrElse(bb)
   final def valueOr[BB >: B](f: A => BB)(implicit BB: Semigroup[BB]): BB =
     fold(f, identity, (a, b) => BB.combine(f(a), b))
 

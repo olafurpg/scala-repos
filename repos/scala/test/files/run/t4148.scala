@@ -10,6 +10,6 @@ object Test {
   }
 
   def main(args: Array[String]): Unit = {
-    List(x1, x2, x3) foreach println
+    List(x1, x2, x3).foreach(println)
   }
 }

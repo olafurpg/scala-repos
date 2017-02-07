@@ -79,14 +79,14 @@ class RemoteServerConnector(module: Module,
           val eventClient = new ClientEventProcessor(client)
 
           val encodedArgs =
-            arguments map {
-              case "" => Base64Converter.encode("#STUB#" getBytes "UTF-8")
-              case s => Base64Converter.encode(s getBytes "UTF-8")
+            arguments.map {
+              case "" => Base64Converter.encode("#STUB#".getBytes("UTF-8"))
+              case s => Base64Converter.encode(s.getBytes("UTF-8"))
             }
 
           val errorHandler = new ErrorHandler {
             override def error(message: String): Unit =
-              Notifications.Bus notify {
+              Notifications.Bus.notify {
                 new Notification(
                   "scala",
                   "Cannot run worksheet",
@@ -145,7 +145,7 @@ object RemoteServerConnector {
     }
 
     override def trace(exception: Throwable) {
-      consumer trace exception
+      consumer.trace(exception)
     }
 
     override def message(kind: Kind,
@@ -153,7 +153,7 @@ object RemoteServerConnector {
                          source: Option[File],
                          line: Option[Long],
                          column: Option[Long]) {
-      val lines = text split "\n"
+      val lines = text.split("\n")
       val linesLength = lines.length
 
       val differ =
@@ -169,13 +169,17 @@ object RemoteServerConnector {
           val buffer = new StringBuilder
 
           for (j <- 0 until (linesLength - 2))
-            buffer append lines(j) append "\n"
+            buffer.append(lines(j)).append("\n")
 
           val lines1 = lines(linesLength - 1)
 
-          buffer append lines(linesLength - 2)
-            .substring(differ) append "\n" append
-            (if (lines1.length > differ) lines1.substring(differ) else lines1) append "\n"
+          buffer
+            .append(lines(linesLength - 2)
+              .substring(differ))
+            .append("\n")
+            .append(
+              if (lines1.length > differ) lines1.substring(differ) else lines1)
+            .append("\n")
           buffer.toString()
         }
 
@@ -196,8 +200,8 @@ object RemoteServerConnector {
                                 category,
                                 finalText,
                                 worksheet,
-                                line1 getOrElse -1,
-                                column1 getOrElse -1,
+                                line1.getOrElse(-1),
+                                column1.getOrElse(-1),
                                 null)
       )
     }
@@ -229,14 +233,14 @@ object RemoteServerConnector {
       val taskIndicator = ProgressManager.getInstance().getProgressIndicator
 
       if (taskIndicator != null) {
-        taskIndicator setText text
-        done foreach (d => taskIndicator.setFraction(d.toDouble))
+        taskIndicator.setText(text)
+        done.foreach(d => taskIndicator.setFraction(d.toDouble))
       }
     }
 
     override def message(message: CompilerMessageImpl) {
       if (auto) return
-      task addMessage message
+      task.addMessage(message)
     }
 
     override def worksheetOutput(text: String) {

@@ -9,7 +9,7 @@ import org.scalatest.FunSuite
 class NRootTest extends FunSuite {
   def testIntegralNRoot[A: Ring: NRoot: ClassTag]: Unit = {
     val cls = implicitly[ClassTag[A]].runtimeClass.getSimpleName
-    test("Integral NRoot (%s)" format cls) {
+    test("Integral NRoot (%s)".format(cls)) {
       val one = Rig[A].one
       assert(NRoot[A].nroot(Rig[A].one, 2) === Rig[A].one)
       assert(NRoot[A].nroot(Ring[A].fromInt(1234), 2) === Ring[A].fromInt(35))
@@ -32,15 +32,15 @@ class NRootTest extends FunSuite {
   def checkNRoot(x: BigDecimal, n: Int): Unit = {
     import spire.implicits._
 
-    val y = x nroot n
+    val y = x.nroot(n)
     val e = eps(y)
 
     if (x > 0) {
-      assert(((y - e) ** n) < x, "expected %s ** %d < %s" format (y - e, n, x))
-      assert(((y + e) ** n) > x, "expected %s ** %d > %s" format (y + e, n, x))
+      assert(((y - e) ** n) < x, "expected %s ** %d < %s".format(y - e, n, x))
+      assert(((y + e) ** n) > x, "expected %s ** %d > %s".format(y + e, n, x))
     } else {
-      assert(((y + e) ** n) < x, "expected %s ** %d < %s" format (y + e, n, x))
-      assert(((y - e) ** n) > x, "expected %s ** %d > %s" format (y - e, n, x))
+      assert(((y + e) ** n) < x, "expected %s ** %d < %s".format(y + e, n, x))
+      assert(((y - e) ** n) > x, "expected %s ** %d > %s".format(y - e, n, x))
     }
   }
 
@@ -56,12 +56,12 @@ class NRootTest extends FunSuite {
   val roots = Seq(2, 3, 6, 9, 23, 53)
 
   test("BigDecimal NRoot") {
-    bases foreach { x =>
-      roots foreach (checkNRoot(x, _))
+    bases.foreach { x =>
+      roots.foreach(checkNRoot(x, _))
     }
 
-    bases map (-_) foreach { x =>
-      roots filter (_ % 2 == 1) foreach (checkNRoot(x, _))
+    bases.map(-_).foreach { x =>
+      roots.filter(_ % 2 == 1).foreach(checkNRoot(x, _))
     }
   }
 }

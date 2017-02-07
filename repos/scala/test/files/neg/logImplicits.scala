@@ -4,7 +4,7 @@ class A {
 }
 
 class B {
-  def f = "abc" map (_ + 1)
+  def f = "abc".map(_ + 1)
 }
 
 object C {

@@ -34,7 +34,8 @@ object TopStatSeq {
         //otherwise parse TopStat
         case _ =>
           def error = {
-            builder error ScalaBundle.message("wrong.top.statment.declaration")
+            builder.error(
+              ScalaBundle.message("wrong.top.statment.declaration"))
             builder.advanceLexer
           }
           (parseState, TopStat.parse(builder, parseState)) match {
@@ -49,7 +50,7 @@ object TopStatSeq {
                 case null => return parseState
                 case _ =>
                   if (!builder.newlineBeforeCurrentToken)
-                    builder error ScalaBundle.message("semi.expected")
+                    builder.error(ScalaBundle.message("semi.expected"))
               }
             }
             case _ => {
@@ -61,7 +62,7 @@ object TopStatSeq {
                 case null => return parseState
                 case _ =>
                   if (!builder.newlineBeforeCurrentToken)
-                    builder error ScalaBundle.message("semi.expected")
+                    builder.error(ScalaBundle.message("semi.expected"))
 
                 //else is ok
               }

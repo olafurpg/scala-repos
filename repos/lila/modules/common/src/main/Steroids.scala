@@ -40,7 +40,7 @@ trait JodaTimeSteroids {
     def getDate: java.util.Date = date.toDate
   }
   implicit val dateTimeOrdering: Ordering[DateTime] =
-    Ordering.fromLessThan(_ isBefore _)
+    Ordering.fromLessThan(_.isBefore(_))
 }
 
 trait ListSteroids {
@@ -50,8 +50,8 @@ trait ListSteroids {
   implicit final class LilaPimpedTryList[A](list: List[Try[A]]) {
     def sequence: Try[List[A]] =
       (Try(List[A]()) /: list) { (a, b) =>
-        a flatMap (c => b map (d => d :: c))
-      } map (_.reverse)
+        a.flatMap(c => b.map(d => d :: c))
+      }.map(_.reverse)
   }
   implicit final class LilaPimpedList[A](list: List[A]) {
     def sortLike[B](other: List[B], f: A => B): List[A] = list.sortWith {
@@ -95,9 +95,9 @@ trait OptionSteroids {
       case Some(a) => some(a)
     }
 
-    def |(a: => A): A = self getOrElse a
+    def |(a: => A): A = self.getOrElse(a)
 
-    def unary_~(implicit z: Zero[A]): A = self getOrElse z.zero
+    def unary_~(implicit z: Zero[A]): A = self.getOrElse(z.zero)
 
     def toSuccess[E](e: => E): scalaz.Validation[E, A] = o.toSuccess(self)(e)
 

@@ -40,14 +40,14 @@ class AsyncTest {
     steps += "prep-map"
 
     val f2 =
-      f1 map { x =>
+      f1.map { x =>
         steps += "map"
         x * 2
       }
 
     steps += "prep-foreach"
 
-    f2 foreach { _ =>
+    f2.foreach { _ =>
       steps += "foreach"
     }
 

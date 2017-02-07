@@ -6,7 +6,7 @@ import scala.util.control.NoStackTrace
 object Test {
   def main(args: Array[String]): Unit = {
     val ec = ExecutionContext.global.toString
-    if (ec startsWith "scala.concurrent.impl.ExecutionContextImpl")
+    if (ec.startsWith("scala.concurrent.impl.ExecutionContextImpl"))
       println(
         "ExecutionContext.global is a scala.concurrent.impl.ExecutionContextImpl.")
     else println(s"!! ExecutionContext.global == $ec")
@@ -19,7 +19,7 @@ object Test {
       }]
       .getUncaughtExceptionHandler
     println(s"should have non-null UncaughtExceptionHandler == ${u ne null}")
-    if (u.toString startsWith "scala.concurrent.impl.ExecutionContextImpl")
+    if (u.toString.startsWith("scala.concurrent.impl.ExecutionContextImpl"))
       println(
         "ExecutionContext.global.executor.getUncaughtExceptionHandler is a scala.concurrent.impl.ExecutionContextImpl.")
     else

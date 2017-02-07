@@ -24,10 +24,10 @@ trait CaptchedForm {
     (captcher ? GetCaptcha(id)).mapTo[Captcha]
 
   def withCaptcha[A](form: Form[A]): Fu[(Form[A], Captcha)] =
-    anyCaptcha map (form -> _)
+    anyCaptcha.map(form -> _)
 
   def validateCaptcha(data: CaptchedData) =
-    getCaptcha(data.gameId) awaitSeconds 2 valid data.move.trim.toLowerCase
+    getCaptcha(data.gameId).awaitSeconds(2).valid(data.move.trim.toLowerCase)
 
   val captchaFailMessage = "captcha.fail"
 }

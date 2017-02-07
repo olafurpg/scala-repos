@@ -58,16 +58,15 @@ object Reflector {
 
   private[this] val stringTypes = new Memo[String, Option[ScalaType]]
   def scalaTypeOf(name: String): Option[ScalaType] =
-    stringTypes(
-      name,
-      resolveClass[AnyRef](_, ClassLoaders) map (c => scalaTypeOf(c)))
+    stringTypes(name,
+                resolveClass[AnyRef](_, ClassLoaders).map(c => scalaTypeOf(c)))
 
   def describe[T](implicit mf: Manifest[T]): ObjectDescriptor =
     describe(scalaTypeOf[T])
   def describe(clazz: Class[_]): ObjectDescriptor =
     describe(scalaTypeOf(clazz))
   def describe(fqn: String): Option[ObjectDescriptor] =
-    scalaTypeOf(fqn) map (describe(_))
+    scalaTypeOf(fqn).map(describe(_))
   def describe(
       st: ScalaType,
       paranamer: ParameterNameReader = ParanamerReader): ObjectDescriptor =
@@ -114,8 +113,8 @@ object Reflector {
         else "%s$".format(tpe.rawFullName)
       val c = resolveClass(path, Vector(getClass.getClassLoader))
       val companion =
-        c flatMap { cl =>
-          allCatch opt {
+        c.flatMap { cl =>
+          allCatch.opt {
             SingletonDescriptor(cl.getSimpleName,
                                 cl.getName,
                                 scalaTypeOf(cl),
@@ -137,7 +136,7 @@ object Reflector {
                 f.getType,
                 f.getGenericType match {
                   case p: ParameterizedType =>
-                    p.getActualTypeArguments.toSeq.zipWithIndex map {
+                    p.getActualTypeArguments.toSeq.zipWithIndex.map {
                       case (cc, i) =>
                         if (cc == classOf[java.lang.Object])
                           Reflector.scalaTypeOf(
@@ -177,7 +176,7 @@ object Reflector {
           case v: ParameterizedType =>
             val st = scalaTypeOf(v)
             val actualArgs =
-              v.getActualTypeArguments.toList.zipWithIndex map {
+              v.getActualTypeArguments.toList.zipWithIndex.map {
                 case (ct, idx) =>
                   val prev = container.map(_._2).getOrElse(Nil)
                   ctorParamType(name,
@@ -198,26 +197,28 @@ object Reflector {
               scalaTypeOf(
                 ScalaSigReader.readConstructor(name,
                                                owner,
-                                               idxes getOrElse List(index),
+                                               idxes.getOrElse(List(index)),
                                                ctorParameterNames))
             } else st
         }
       }
 
       def constructors: Seq[ConstructorDescriptor] = {
-        tpe.erasure.getConstructors.toSeq map { ctor =>
+        tpe.erasure.getConstructors.toSeq.map { ctor =>
           val ctorParameterNames =
             if (Modifier.isPublic(ctor.getModifiers) &&
                 ctor.getParameterTypes.length > 0)
-              allCatch opt { paramNameReader.lookupParameterNames(ctor) } getOrElse Nil
+              allCatch
+                .opt { paramNameReader.lookupParameterNames(ctor) }
+                .getOrElse(Nil)
             else Nil
           val genParams = Vector(ctor.getGenericParameterTypes: _*)
           val ctorParams =
-            ctorParameterNames.zipWithIndex map {
+            ctorParameterNames.zipWithIndex.map {
               case (paramName, index) =>
                 val decoded = unmangleName(paramName)
                 val default =
-                  companion flatMap { comp =>
+                  companion.flatMap { comp =>
                     defaultValue(comp.erasure.erasure, comp.instance, index)
                   }
                 val theType = ctorParamType(paramName,
@@ -248,7 +249,7 @@ object Reflector {
     allCatch.withApply(_ => None) {
       Option(
         compClass
-          .getMethod("%s$%d".format(ConstructorDefault, argIndex + 1))) map {
+          .getMethod("%s$%d".format(ConstructorDefault, argIndex + 1))).map {
         meth => () =>
           meth.invoke(compObj)
       }

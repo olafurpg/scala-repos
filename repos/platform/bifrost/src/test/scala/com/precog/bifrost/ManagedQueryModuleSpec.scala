@@ -67,7 +67,7 @@ object ManagedQueryTestSupport {
   implicit def transformThroughFuture[M[+ _]](implicit t: M ~> Future) =
     new (M ~> TestFuture) {
       def apply[A](ma: M[A]): TestFuture[A] =
-        WriterT(t(ma) map (Tag(None) -> _))
+        WriterT(t(ma).map(Tag(None) -> _))
     }
 }
 
@@ -122,7 +122,7 @@ class ManagedQueryModuleSpec
   def execute(numTicks: Int, ticksToTimeout: Option[Int] = None)
     : Future[(JobId, AtomicInteger, Future[Int])] = {
     val timeout =
-      ticksToTimeout map { t =>
+      ticksToTimeout.map { t =>
         Duration(clock.duration * t, TimeUnit.MILLISECONDS)
       }
     val ctx =
@@ -130,19 +130,20 @@ class ManagedQueryModuleSpec
 
     val result = for {
       // TODO: No idea how to work with EitherT[TestFuture, so sys.error it is]
-      executor <- executorFor(apiKey) valueOr { err =>
+      executor <- executorFor(apiKey).valueOr { err =>
         sys.error(err.toString)
       }
       result0 <- executor
         .execute(numTicks.toString, ctx, QueryOptions(timeout = timeout))
-        .valueOr(err => sys.error(err.toString)) mapValue {
-        case (w, s) => (w, (w: Option[(JobId, AtomicInteger)], s))
-      }
+        .valueOr(err => sys.error(err.toString))
+        .mapValue {
+          case (w, s) => (w, (w: Option[(JobId, AtomicInteger)], s))
+        }
     } yield {
       val (Some((jobId, ticks)), result) = result0
 
       def count(n: Int, cs0: StreamT[Future, CharBuffer]): Future[Int] =
-        cs0.uncons flatMap {
+        cs0.uncons.flatMap {
           case Some((_, cs)) => count(n + 1, cs)
           case None => Future(n)
         }
@@ -314,7 +315,7 @@ trait TestManagedQueryModule
               WriterT {
                 createQueryJob(ctx.apiKey,
                                Some(userQuery.serialize),
-                               opts.timeout) map { implicit M0 =>
+                               opts.timeout).map { implicit M0 =>
                   val ticks = new AtomicInteger()
                   val result =
                     StreamT.unfoldM[JobQueryTF, CharBuffer, Int](0) {
@@ -328,7 +329,7 @@ trait TestManagedQueryModule
                         M0.point { None }
                     }
 
-                  (Tag(M0.jobId map (_ -> ticks)), completeJob(result))
+                  (Tag(M0.jobId.map(_ -> ticks)), completeJob(result))
                 }
               }
             }

@@ -18,7 +18,7 @@ object Main extends nsc.MainClass {
       val compiler = new interactive.Global(this.settings, this.reporter)
       import compiler.{reporter => _, _}
 
-      val sfs = command.files map getSourceFile
+      val sfs = command.files.map(getSourceFile)
       val reloaded = new interactive.Response[Unit]
       askReload(sfs, reloaded)
 

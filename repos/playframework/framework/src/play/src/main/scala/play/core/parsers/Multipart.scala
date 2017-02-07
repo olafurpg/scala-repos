@@ -106,7 +106,7 @@ object Multipart {
                 createBadResult(msg, REQUEST_ENTITY_TOO_LARGE)(request)
             }
 
-            parseError orElse bufferExceededError getOrElse {
+            parseError.orElse(bufferExceededError).getOrElse {
               Future.successful(Right(MultipartFormData(
                 parts
                   .collect {
@@ -162,7 +162,7 @@ object Multipart {
         buffer = new java.lang.StringBuilder
       }
 
-      str foreach {
+      str.foreach {
         case '\\' =>
           buffer.append('\\')
           escape = true

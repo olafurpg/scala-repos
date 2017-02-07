@@ -137,7 +137,7 @@ class ActorProducerTest
 
           "timeout after replyTimeout" taggedAs TimingTest in {
             val duration = process()
-            duration should (be >= (100 millis) and be < (2000 millis))
+            duration should ((be >= (100 millis)).and(be < (2000 millis)))
           }
 
           "never set the response on exchange" in {
@@ -358,13 +358,14 @@ private[camel] trait ActorProducerFixture
 
     val sys = mock[ExtendedActorSystem]
     val config = ConfigFactory.defaultReference()
-    when(sys.dispatcher) thenReturn system.dispatcher
-    when(sys.dynamicAccess) thenReturn system
-      .asInstanceOf[ExtendedActorSystem]
-      .dynamicAccess
-    when(sys.settings) thenReturn
-      (new Settings(this.getClass.getClassLoader, config, "mocksystem"))
-    when(sys.name) thenReturn ("mocksystem")
+    when(sys.dispatcher).thenReturn(system.dispatcher)
+    when(sys.dynamicAccess).thenReturn(
+      system
+        .asInstanceOf[ExtendedActorSystem]
+        .dynamicAccess)
+    when(sys.settings).thenReturn(
+      new Settings(this.getClass.getClassLoader, config, "mocksystem"))
+    when(sys.name).thenReturn("mocksystem")
 
     def camelWithMocks = new DefaultCamel(sys) {
       override val log = mock[LoggingAdapter]
@@ -425,7 +426,7 @@ private[camel] trait ActorProducerFixture
     val callbackValue = new AtomicBoolean()
 
     def done(doneSync: Boolean) {
-      callbackValue set doneSync
+      callbackValue.set(doneSync)
       callbackReceived.countDown()
     }
 
@@ -453,10 +454,10 @@ private[camel] trait ActorProducerFixture
   def prepareMocks(actor: ActorRef,
                    message: CamelMessage = message,
                    outCapable: Boolean) {
-    when(actorEndpointPath.findActorIn(any[ActorSystem])) thenReturn Option(
-      actor)
-    when(exchange.toRequestMessage(any[Map[String, Any]])) thenReturn message
-    when(exchange.isOutCapable) thenReturn outCapable
+    when(actorEndpointPath.findActorIn(any[ActorSystem]))
+      .thenReturn(Option(actor))
+    when(exchange.toRequestMessage(any[Map[String, Any]])).thenReturn(message)
+    when(exchange.isOutCapable).thenReturn(outCapable)
   }
 
   def echoActor =

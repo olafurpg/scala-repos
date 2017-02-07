@@ -50,13 +50,16 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
           case io: IOException => error("Can't download index", io)
         }
 
-        downloaded flatMap {
+        downloaded.flatMap {
           case str =>
-            str.split('\n').find {
-              case s => s.trim startsWith CACHE_HASH
-            } map {
-              case hashStr => hashStr.trim.stripPrefix(CACHE_HASH)
-            }
+            str
+              .split('\n')
+              .find {
+                case s => s.trim.startsWith(CACHE_HASH)
+              }
+              .map {
+                case hashStr => hashStr.trim.stripPrefix(CACHE_HASH)
+              }
         }
       }
 
@@ -68,7 +71,7 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
           .flatMap(a => indexFile.map(b => (a, b._1)))
           .exists(a => a._1 == a._2)) indexFile.map(_._2)
     else {
-      extractHash() flatMap {
+      extractHash().flatMap {
         case hash =>
           val tmpFile = FileUtil.createTempFile(s"index-$hash", ".zip", true)
           val downloaded = ActivatorRepoProcessor.downloadFile(
@@ -121,7 +124,7 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
         val searcher = new IndexSearcher(reader)
         val docs =
           searcher.search(new lucene.search.MatchAllDocsQuery, reader.maxDoc())
-        val data = docs.scoreDocs.map { case doc => reader document doc.doc }
+        val data = docs.scoreDocs.map { case doc => reader.document(doc.doc) }
 
         data.map {
           case docData => Keys.from(docData)

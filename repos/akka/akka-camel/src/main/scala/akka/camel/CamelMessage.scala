@@ -35,12 +35,12 @@ class CamelMessage(val body: Any,
     CamelMessage(body, headers, this.attachments)
 
   override def toString: String =
-    "CamelMessage(%s, %s, %s)" format (body, headers, attachments)
+    "CamelMessage(%s, %s, %s)".format(body, headers, attachments)
 
   /**
     * Returns those headers from this message whose name is contained in <code>names</code>.
     */
-  def headers(names: Set[String]): Map[String, Any] = headers filterKeys names
+  def headers(names: Set[String]): Map[String, Any] = headers.filterKeys(names)
 
   /**
     * Java API: Returns those headers from this message whose name is contained in <code>names</code>.
@@ -168,7 +168,7 @@ class CamelMessage(val body: Any,
     * Returns those attachments from this message whose name is contained in <code>names</code>.
     */
   def attachments(names: Set[String]): Map[String, DataHandler] =
-    attachments filterKeys names
+    attachments.filterKeys(names)
 
   /**
     * Java API: Returns those attachments from this message whose name is contained in <code>names</code>.

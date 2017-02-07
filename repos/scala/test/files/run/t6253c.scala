@@ -47,12 +47,12 @@ object Test extends App {
       require(as.size == j,
               s"Building HashSet of size $j failed. Key type $keyType.")
       val hashCount0 = hashCount
-      val u = a diff b
+      val u = a.diff(b)
       require(
         hashCount == hashCount0,
         s"key.hashCode should not be called, but has been called ${hashCount -
           hashCount0} times. Key type $keyType.")
-      require(u == (a diff scala.collection.mutable.HashSet(b.toSeq: _*)),
+      require(u == (a.diff(scala.collection.mutable.HashSet(b.toSeq: _*))),
               s"Operation must still work for other sets!")
       require(u.size == j,
               s"Expected size $j. Real size ${u.size}. Key type $keyType.")
@@ -61,8 +61,8 @@ object Test extends App {
           u.contains(mkKey(x)),
           s"Key type $keyType. Set (0 until ${i + j}) should contain $x but does not.")
       require((as intersect b).isEmpty)
-      val b_as = b diff as
-      val as_b = as diff b
+      val b_as = b.diff(as)
+      val as_b = as.diff(b)
       require(
         (b_as eq b) || (b_as eq as),
         s"No structural sharing in b diff as. Key type $keyType, b=($j until ${i +

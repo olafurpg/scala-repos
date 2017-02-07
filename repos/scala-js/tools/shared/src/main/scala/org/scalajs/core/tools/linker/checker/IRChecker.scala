@@ -531,7 +531,7 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
         reportError(
           s"Arity mismatch: ${methodParams.size} expected but " +
             s"${args.size} found")
-      for ((actual, formal) <- args zip methodParams) {
+      for ((actual, formal) <- args.zip(methodParams)) {
         typecheckExpect(actual, env, formal)
       }
       if (tpe != resultType)
@@ -628,7 +628,7 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
             if (!kind.isClass) {
               reportError(s"Cannot select $item of non-class $cls")
             } else {
-              maybeClass.right foreach {
+              maybeClass.right.foreach {
                 _.lookupField(item).fold[Unit] {
                   reportError(s"Class $cls does not have a field $item")
                 } { fieldDef =>
@@ -842,7 +842,8 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
             "Mismatched size for captures: " +
               s"${captureParams.size} params vs ${captureValues.size} values")
 
-        for ((ParamDef(name, ctpe, mutable, rest), value) <- captureParams zip captureValues) {
+        for ((ParamDef(name, ctpe, mutable, rest), value) <- captureParams.zip(
+               captureValues)) {
           if (mutable)
             reportError(s"Capture parameter $name cannot be mutable")
           if (rest)

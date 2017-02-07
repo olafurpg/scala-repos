@@ -231,7 +231,7 @@ object Tests {
                config: Execution): Task[Output] = {
     def fj(actions: Iterable[() => Unit]): Task[Unit] =
       nop.dependsOn(actions.toSeq.fork(_()): _*)
-    def partApp(actions: Iterable[ClassLoader => Unit]) = actions.toSeq map {
+    def partApp(actions: Iterable[ClassLoader => Unit]) = actions.toSeq.map {
       a => () =>
         a(loader)
     }
@@ -246,10 +246,10 @@ object Tests {
         makeParallel(loader, runnables, setupTasks, config.tags) //.toSeq.join
       else makeSerial(loader, runnables, setupTasks, config.tags)
     val taggedMainTasks = mainTasks.tagw(config.tags: _*)
-    taggedMainTasks map processResults flatMap { results =>
+    taggedMainTasks.map(processResults).flatMap { results =>
       val cleanupTasks =
         fj(partApp(userCleanup) :+ frameworkCleanup(results.overall))
-      cleanupTasks map { _ =>
+      cleanupTasks.map { _ =>
         results
       }
     }
@@ -260,7 +260,7 @@ object Tests {
       loader: ClassLoader,
       testFun: TestFunction,
       nestedTasks: Seq[TestTask]): Seq[(String, TestFunction)] =
-    nestedTasks.view.zipWithIndex map {
+    nestedTasks.view.zipWithIndex.map {
       case (nt, idx) =>
         val testFunDef = testFun.taskDef
         (testFunDef.fullyQualifiedName,
@@ -303,7 +303,7 @@ object Tests {
     val base = task { (name, fun.apply()) }
     val taggedBase =
       base.tagw(tags: _*).tag(fun.tags.map(ConcurrentRestrictions.Tag(_)): _*)
-    taggedBase flatMap {
+    taggedBase.flatMap {
       case (name, (result, nested)) =>
         val nestedRunnables = createNestedRunnables(loader, fun, nested)
         toTasks(loader, nestedRunnables, tags).map { currentResultMap =>
@@ -335,8 +335,8 @@ object Tests {
         case Nil => acc
       }
 
-    task { processRunnable(runnables.toList, List.empty) } dependsOn
-      (setupTasks)
+    task { processRunnable(runnables.toList, List.empty) }
+      .dependsOn(setupTasks)
   }
 
   def processResults(results: Iterable[(String, SuiteResult)]): Output =
@@ -354,15 +354,15 @@ object Tests {
         tasks match {
           case Nil => task(acc.reverse)
           case hd :: tl =>
-            hd flatMap { out =>
+            hd.flatMap { out =>
               sequence(tl, out :: acc)
             }
         }
-      sequence(results.toList, List()) map { ress =>
+      sequence(results.toList, List()).map { ress =>
         val (rs, ms) = ress.unzip { e =>
           (e.overall, e.events)
         }
-        Output(overall(rs), ms reduce (_ ++ _), Iterable.empty)
+        Output(overall(rs), ms.reduce(_ ++ _), Iterable.empty)
       }
     }
   def overall(results: Iterable[TestResult.Value]): TestResult.Value =
@@ -372,7 +372,7 @@ object Tests {
   def discover(frameworks: Seq[Framework],
                analysis: CompileAnalysis,
                log: Logger): (Seq[TestDefinition], Set[String]) =
-    discover(frameworks flatMap TestFramework.getFingerprints,
+    discover(frameworks.flatMap(TestFramework.getFingerprints),
              allDefs(analysis),
              log)
 
@@ -384,12 +384,12 @@ object Tests {
                definitions: Seq[Definition],
                log: Logger): (Seq[TestDefinition], Set[String]) = {
     val subclasses =
-      fingerprints collect {
+      fingerprints.collect {
         case sub: SubclassFingerprint =>
           (sub.superclassName, sub.isModule, sub)
       };
     val annotations =
-      fingerprints collect {
+      fingerprints.collect {
         case ann: AnnotatedFingerprint =>
           (ann.annotationName, ann.isModule, ann)
       };
@@ -400,7 +400,7 @@ object Tests {
     def defined(in: Seq[(String, Boolean, Fingerprint)],
                 names: Set[String],
                 IsModule: Boolean): Seq[Fingerprint] =
-      in collect { case (name, IsModule, print) if names(name) => print }
+      in.collect { case (name, IsModule, print) if names(name) => print }
 
     def toFingerprints(d: Discovered): Seq[Fingerprint] =
       defined(subclasses, d.baseClasses, d.isModule) ++ defined(annotations,
@@ -416,7 +416,7 @@ object Tests {
                            fingerprint,
                            false,
                            Array(new SuiteSelector))
-    val mains = discovered collect { case (df, di) if di.hasMain => df.name }
+    val mains = discovered.collect { case (df, di) if di.hasMain => df.name }
     (tests, mains.toSet)
   }
 

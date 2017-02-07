@@ -77,11 +77,13 @@ class ConversionsSpecs extends Specification {
       val currentMs = cal.get(Calendar.MILLISECOND)
       val converted: Option[Date] = dateConverter(currentMs.toString)
 
-      converted aka "The converted Date value" must beSome[Date]
+      converted.aka("The converted Date value") must beSome[Date]
 
       cal.setTime(converted.get)
 
-      cal.get(Calendar.MILLISECOND) aka "The extracted milliseconds from converted Date" must_== currentMs
+      cal
+        .get(Calendar.MILLISECOND)
+        .aka("The extracted milliseconds from converted Date") must_== currentMs
     }
 
     "provide DEF conversion for Seq" in {

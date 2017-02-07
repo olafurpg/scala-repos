@@ -62,7 +62,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -79,7 +79,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -96,7 +96,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -113,7 +113,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -130,7 +130,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -147,7 +147,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -163,7 +163,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -179,7 +179,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -195,7 +195,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -211,7 +211,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -227,7 +227,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -243,7 +243,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -259,7 +259,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -275,7 +275,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -294,7 +294,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -311,7 +311,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -328,7 +328,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -345,7 +345,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -362,7 +362,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -379,7 +379,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -395,7 +395,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -411,7 +411,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -427,7 +427,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -443,7 +443,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -459,7 +459,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -475,7 +475,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -491,7 +491,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -507,7 +507,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -527,7 +527,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -558,7 +558,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -576,7 +576,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -594,7 +594,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -612,7 +612,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -630,7 +630,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -648,7 +648,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -665,7 +665,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -683,7 +683,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -701,7 +701,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -718,7 +718,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -736,7 +736,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -754,7 +754,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -772,7 +772,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -793,7 +793,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -820,7 +820,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -838,7 +838,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -856,7 +856,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -874,7 +874,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -892,7 +892,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -909,7 +909,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -926,7 +926,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -943,7 +943,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -960,7 +960,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -977,7 +977,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -994,7 +994,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1011,7 +1011,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1028,7 +1028,7 @@ trait TimeExtractionSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 

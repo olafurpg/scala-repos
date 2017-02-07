@@ -43,13 +43,13 @@ object FriendConfig extends BaseHumanConfig {
          c: String,
          fen: Option[String]) =
     new FriendConfig(
-      variant = chess.variant.Variant(v) err "Invalid game variant " + v,
-      timeMode = TimeMode(tm) err s"Invalid time mode $tm",
+      variant = chess.variant.Variant(v).err("Invalid game variant " + v),
+      timeMode = TimeMode(tm).err(s"Invalid time mode $tm"),
       time = t,
       increment = i,
       days = d,
       mode = m.fold(Mode.default)(Mode.orDefault),
-      color = Color(c) err "Invalid color " + c,
+      color = Color(c).err("Invalid color " + c),
       fen = fen
     )
 
@@ -69,14 +69,14 @@ object FriendConfig extends BaseHumanConfig {
 
       def reads(r: BSON.Reader): FriendConfig =
         FriendConfig(
-          variant = chess.variant.Variant orDefault (r int "v"),
-          timeMode = TimeMode orDefault (r int "tm"),
-          time = r double "t",
+          variant = chess.variant.Variant.orDefault(r int "v"),
+          timeMode = TimeMode.orDefault(r int "tm"),
+          time = r.double("t"),
           increment = r int "i",
           days = r int "d",
-          mode = Mode orDefault (r int "m"),
+          mode = Mode.orDefault(r int "m"),
           color = Color.White,
-          fen = r strO "f" filter (_.nonEmpty)
+          fen = r.strO("f").filter(_.nonEmpty)
         )
 
       def writes(w: BSON.Writer, o: FriendConfig) =

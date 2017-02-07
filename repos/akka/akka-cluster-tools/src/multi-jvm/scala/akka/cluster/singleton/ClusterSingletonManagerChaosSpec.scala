@@ -101,7 +101,7 @@ class ClusterSingletonManagerChaosSpec
 
   def crash(roles: RoleName*): Unit = {
     runOn(controller) {
-      roles foreach { r ⇒
+      roles.foreach { r ⇒
         log.info("Shutdown [{}]", node(r).address)
         testConductor.exit(r, 0).await
       }

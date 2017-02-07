@@ -109,13 +109,13 @@ object TypeDefinitionMembers {
              !method.hasModifierProperty("static") &&
              method.getParameterList.getParametersCount == 0) {
         val phys = new PhysicalSignature(method, subst)
-        map addToMap (phys, new Node(phys, subst))
+        map.addToMap(phys, new Node(phys, subst))
       }
 
       for (field <- clazz.getFields if nonBridge(place, field) &&
              !field.hasModifierProperty("static")) {
         val sig = new Signature(field.getName, Seq.empty, 0, subst, field)
-        map addToMap (sig, new Node(sig, subst))
+        map.addToMap(sig, new Node(sig, subst))
       }
     }
 
@@ -125,7 +125,7 @@ object TypeDefinitionMembers {
                      place: Option[PsiElement],
                      base: Boolean) {
       def addSignature(s: Signature) {
-        map addToMap (s, new Node(s, subst))
+        map.addToMap(s, new Node(s, subst))
       }
 
       if (template.qualifiedName == "scala.AnyVal") {
@@ -278,7 +278,7 @@ object TypeDefinitionMembers {
               case m: PsiMember => nonBridge(place, m)
               case _ => false
             })) {
-          map addToMap (sign, new Node(sign, sign.substitutor))
+          map.addToMap(sign, new Node(sign, sign.substitutor))
         }
       }
     }
@@ -323,7 +323,7 @@ object TypeDefinitionMembers {
                     place: Option[PsiElement]) {
       for (inner <- clazz.getInnerClasses if nonBridge(place, inner) &&
              !inner.hasModifierProperty("static")) {
-        map addToMap (inner, new Node(inner, subst))
+        map.addToMap(inner, new Node(inner, subst))
       }
     }
 
@@ -335,16 +335,16 @@ object TypeDefinitionMembers {
       for (member <- template.members) {
         member match {
           case alias: ScTypeAlias if nonBridge(place, alias) =>
-            map addToMap (alias, new Node(alias, subst))
+            map.addToMap(alias, new Node(alias, subst))
           case _: ScObject =>
           case td: ScTypeDefinition if nonBridge(place, td) =>
-            map addToMap (td, new Node(td, subst))
+            map.addToMap(td, new Node(td, subst))
           case _ =>
         }
       }
 
       for (td <- template.syntheticTypeDefinitions if !td.isObject) {
-        map addToMap (td, new Node(td, subst))
+        map.addToMap(td, new Node(td, subst))
       }
     }
 
@@ -353,7 +353,7 @@ object TypeDefinitionMembers {
                           place: Option[PsiElement]) {
       for ((name, TypeAliasSignature(_, _, _, _, _, alias)) <- cp.typesMap
            if nonBridge(place, alias)) {
-        map addToMap (alias, new Node(alias, ScSubstitutor.empty))
+        map.addToMap(alias, new Node(alias, ScSubstitutor.empty))
       }
     }
   }
@@ -412,13 +412,13 @@ object TypeDefinitionMembers {
              !method.isConstructor &&
              !method.hasModifierProperty("static")) {
         val phys = new PhysicalSignature(method, subst)
-        map addToMap (phys, new Node(phys, subst))
+        map.addToMap(phys, new Node(phys, subst))
       }
 
       for (field <- clazz.getFields if nonBridge(place, field) &&
              !field.hasModifierProperty("static")) {
         val sig = new Signature(field.getName, Seq.empty, 0, subst, field)
-        map addToMap (sig, new Node(sig, subst))
+        map.addToMap(sig, new Node(sig, subst))
       }
     }
 
@@ -428,7 +428,7 @@ object TypeDefinitionMembers {
                      place: Option[PsiElement],
                      base: Boolean) {
       def addSignature(s: Signature) {
-        map addToMap (s, new Node(s, subst))
+        map.addToMap(s, new Node(s, subst))
       }
 
       if (template.qualifiedName == "scala.AnyVal") {
@@ -621,7 +621,7 @@ object TypeDefinitionMembers {
               case m: PsiMember => nonBridge(place, m)
               case _ => false
             }) {
-          map addToMap (sign, new Node(sign, sign.substitutor))
+          map.addToMap(sign, new Node(sign, sign.substitutor))
         }
       }
     }
@@ -1010,7 +1010,7 @@ object TypeDefinitionMembers {
                   if (!processor.execute(
                         elem,
                         state.put(ScSubstitutor.key,
-                                  n.substitutor followed subst)))
+                                  n.substitutor.followed(subst))))
                     return false
                 } else {
                   if (n.supers.nonEmpty && !processor.execute(
@@ -1021,7 +1021,7 @@ object TypeDefinitionMembers {
                           .namedElement,
                         state.put(
                           ScSubstitutor.key,
-                          n.supers.apply(0).substitutor followed subst)))
+                          n.supers.apply(0).substitutor.followed(subst))))
                     return false
                 }
               } else if (!tail) return false
@@ -1031,7 +1031,7 @@ object TypeDefinitionMembers {
             if (processValsForScala && checkName(elem.name) &&
                 !processor.execute(
                   elem,
-                  state.put(ScSubstitutor.key, n.substitutor followed subst)))
+                  state.put(ScSubstitutor.key, n.substitutor.followed(subst))))
               return false
 
             if (name == null || name.isEmpty || checkName(s"${elem.name}_=")) {
@@ -1041,7 +1041,7 @@ object TypeDefinitionMembers {
                   if (processValsForScala && !processor.execute(
                         t.getUnderEqualsMethod,
                         state.put(ScSubstitutor.key,
-                                  n.substitutor followed subst)))
+                                  n.substitutor.followed(subst))))
                     return false
                 case _ =>
               }
@@ -1054,7 +1054,7 @@ object TypeDefinitionMembers {
                     if (processValsForScala && !processor.execute(
                           method,
                           state.put(ScSubstitutor.key,
-                                    n.substitutor followed subst)))
+                                    n.substitutor.followed(subst))))
                       return false
                     true
                   }
@@ -1085,7 +1085,7 @@ object TypeDefinitionMembers {
           ProgressManager.checkCanceled()
           def addMethod(method: PsiNamedElement): Boolean = {
             if (checkName(method.name)) {
-              val substitutor = n.substitutor followed subst
+              val substitutor = n.substitutor.followed(subst)
               if (!processor.execute(
                     method,
                     state.put(ScSubstitutor.key, substitutor)))
@@ -1118,7 +1118,7 @@ object TypeDefinitionMembers {
               while (iterator.hasNext) {
                 val (_, n) = iterator.next()
                 def addMethod(method: PsiNamedElement): Boolean = {
-                  val substitutor = n.substitutor followed subst
+                  val substitutor = n.substitutor.followed(subst)
                   processor
                     .execute(method, state.put(ScSubstitutor.key, substitutor))
                 }
@@ -1174,7 +1174,7 @@ object TypeDefinitionMembers {
               case _ => null
             }
             if (method != null && checkName(method.name)) {
-              val substitutor = n.substitutor followed subst
+              val substitutor = n.substitutor.followed(subst)
               if (!processor.execute(
                     method,
                     state.put(ScSubstitutor.key, substitutor)))
@@ -1215,7 +1215,7 @@ object TypeDefinitionMembers {
           val (_, n) = iterator.next()
           if (!processor.execute(
                 n.info,
-                state.put(ScSubstitutor.key, n.substitutor followed subst)))
+                state.put(ScSubstitutor.key, n.substitutor.followed(subst))))
             return false
         }
       } else {
@@ -1230,7 +1230,7 @@ object TypeDefinitionMembers {
               ProgressManager.checkCanceled()
               if (!processor.execute(n.info,
                                      state.put(ScSubstitutor.key,
-                                               n.substitutor followed subst)))
+                                               n.substitutor.followed(subst))))
                 return false
             }
           }
@@ -1257,7 +1257,7 @@ object TypeDefinitionMembers {
           val (_, n) = iterator.next()
           if (n.info.isInstanceOf[ScTypeDefinition] && !processor.execute(
                 n.info,
-                state.put(ScSubstitutor.key, n.substitutor followed subst)))
+                state.put(ScSubstitutor.key, n.substitutor.followed(subst))))
             return false
         }
       } else {
@@ -1273,7 +1273,7 @@ object TypeDefinitionMembers {
               if (n.info.isInstanceOf[ScTypeDefinition] &&
                   !processor.execute(n.info,
                                      state.put(ScSubstitutor.key,
-                                               n.substitutor followed subst)))
+                                               n.substitutor.followed(subst))))
                 return false
             }
           }

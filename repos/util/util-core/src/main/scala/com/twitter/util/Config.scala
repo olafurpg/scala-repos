@@ -134,7 +134,7 @@ trait Config[T] extends (() => T) {
       if (!alreadyVisited.contains(config)) {
         alreadyVisited += config
         val nullaryMethods =
-          config.getClass.getMethods.toSeq filter {
+          config.getClass.getMethods.toSeq.filter {
             _.getParameterTypes.isEmpty
           }
         for (method <- nullaryMethods) {

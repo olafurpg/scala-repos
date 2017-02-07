@@ -16,7 +16,7 @@ object SAdd {
   def apply(args: Seq[Array[Byte]]): SAdd = args match {
     case head :: tail =>
       SAdd(ChannelBuffers.wrappedBuffer(head),
-           tail map ChannelBuffers.wrappedBuffer)
+           tail.map(ChannelBuffers.wrappedBuffer))
     case _ =>
       throw ClientError("Invalid use of SAdd")
   }
@@ -72,7 +72,7 @@ object SRem {
   def apply(args: Seq[Array[Byte]]): SRem = args match {
     case head :: tail =>
       SRem(ChannelBuffers.wrappedBuffer(head),
-           tail map ChannelBuffers.wrappedBuffer)
+           tail.map(ChannelBuffers.wrappedBuffer))
     case _ => throw ClientError("Invalid use of SRem")
   }
 }

@@ -18,11 +18,11 @@ case class Post(id: String,
                 lang: Option[String],
                 createdAt: DateTime) {
 
-  def showAuthor = (author map (_.trim) filter ("" !=)) | User.anonymous
+  def showAuthor = (author.map(_.trim).filter("" !=)) | User.anonymous
 
   def showUserIdOrAuthor = userId | showAuthor
 
-  def isTeam = categId startsWith teamSlug("")
+  def isTeam = categId.startsWith(teamSlug(""))
 
   def isStaff = categId == "staff"
 }
@@ -61,7 +61,7 @@ object Post {
   import play.api.libs.json._
 
   private[forum] lazy val tube = JsTube(
-    (__.json update readDate('createdAt)) andThen Json.reads[Post],
-    Json.writes[Post] andThen (__.json update writeDate('createdAt))
+    (__.json.update(readDate('createdAt))).andThen(Json.reads[Post]),
+    Json.writes[Post].andThen(__.json.update(writeDate('createdAt)))
   )
 }

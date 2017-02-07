@@ -43,12 +43,12 @@ class NodeJSTest extends TimeoutComTests {
     console.log(null);
     console.log({});
     console.log([1,2]);
-    """ hasOutput """|1
+    """.hasOutput("""|1
        |undefined
        |null
        |[object Object]
        |1,2
-       |""".stripMargin
+       |""".stripMargin)
   }
 
   @Test

@@ -71,8 +71,8 @@ class JFXAppParametersSpec
     val args = Array("arg1", "arg2")
     val parameters = getParameters(args)
 
-    parameters.raw should contain theSameElementsInOrderAs (args.toSeq)
-    parameters.unnamed should contain theSameElementsInOrderAs (args.toSeq)
+    (parameters.raw should contain).theSameElementsInOrderAs(args.toSeq)
+    (parameters.unnamed should contain).theSameElementsInOrderAs(args.toSeq)
     parameters.named shouldBe empty
   }
 
@@ -80,19 +80,20 @@ class JFXAppParametersSpec
     val args = Array("--arg1=value1", "--arg2=value2")
     val parameters = getParameters(args)
 
-    parameters.raw should contain theSameElementsInOrderAs (args.toSeq)
+    (parameters.raw should contain).theSameElementsInOrderAs(args.toSeq)
     parameters.unnamed shouldBe empty
-    parameters.named should contain theSameElementsAs
-      (Map("arg1" -> "value1", "arg2" -> "value2"))
+    (parameters.named should contain)
+      .theSameElementsAs(Map("arg1" -> "value1", "arg2" -> "value2"))
   }
 
   it should "allows mix raw and named arguments" in {
     val args = Array("arg1", "--arg2=value2", "-arg3=value3")
     val parameters = getParameters(args)
 
-    parameters.raw should contain theSameElementsInOrderAs (args.toSeq)
-    parameters.unnamed should contain theSameElementsInOrderAs
-      (Seq("arg1", "-arg3=value3"))
-    parameters.named should contain theSameElementsAs (Map("arg2" -> "value2"))
+    (parameters.raw should contain).theSameElementsInOrderAs(args.toSeq)
+    (parameters.unnamed should contain)
+      .theSameElementsInOrderAs(Seq("arg1", "-arg3=value3"))
+    (parameters.named should contain)
+      .theSameElementsAs(Map("arg2" -> "value2"))
   }
 }

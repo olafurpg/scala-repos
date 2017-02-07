@@ -22,9 +22,8 @@ object TimeStampede extends AutoPlugin {
   }
 
   def stamp(version: String): String = {
-    if (version endsWith Snapshot)
-      (version stripSuffix Snapshot) + "-" + timestamp(
-        System.currentTimeMillis)
+    if (version.endsWith(Snapshot))(version
+      .stripSuffix(Snapshot)) + "-" + timestamp(System.currentTimeMillis)
     else version
   }
 

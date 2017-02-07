@@ -101,12 +101,12 @@ class DistributedPubSubMediatorWithRandomRouterSpec
 
   "DistributedPubSubMediator when sending wrapped message" must {
     val msg = WrappedMessage("hello")
-    behave like nonUnwrappingPubSub(mediator, testActor, msg)
+    behave.like(nonUnwrappingPubSub(mediator, testActor, msg))
   }
 
   "DistributedPubSubMediator when sending unwrapped message" must {
     val msg = UnwrappedMessage("hello")
-    behave like nonUnwrappingPubSub(mediator, testActor, msg)
+    behave.like(nonUnwrappingPubSub(mediator, testActor, msg))
   }
 }
 

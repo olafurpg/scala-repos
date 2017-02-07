@@ -54,7 +54,7 @@ class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
         bottomUp = true
       )
       .infer()
-    state + (this -> (n2 ne state.tree)) withNode n2
+    (state + (this -> (n2 ne state.tree))).withNode(n2)
   }
 
   /** Transform a `zipWithIndex` operation of the form

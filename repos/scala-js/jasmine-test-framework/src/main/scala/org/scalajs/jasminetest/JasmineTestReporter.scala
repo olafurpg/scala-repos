@@ -50,14 +50,14 @@ class JasmineTestReporter(taskDef: TaskDef,
     if (results.passed) {
       eventHandler.handle(new JasmineEvent(taskDef, Status.Success, selector))
 
-      loggers foreach { log =>
+      loggers.foreach { log =>
         val success = color(log, SuccessColor, "+")
         log.info(s"  $success $description")
       }
     } else {
       eventHandler.handle(new JasmineEvent(taskDef, Status.Error, selector))
 
-      loggers foreach { log =>
+      loggers.foreach { log =>
         val failure = color(log, ErrorColor, "x")
         log.error(s" $failure $description")
         results.getItems.foreach(displayResult(log))
@@ -79,12 +79,12 @@ class JasmineTestReporter(taskDef: TaskDef,
     if (results.passedCount != results.totalCount) {
       eventHandler.handle(new JasmineEvent(taskDef, Status.Error, selector))
 
-      loggers foreach { log =>
+      loggers.foreach { log =>
         log.error(title)
         log.error(color(log, InfoColor, message))
       }
     } else {
-      loggers foreach { log =>
+      loggers.foreach { log =>
         log.info(title)
         log.info(color(log, InfoColor, message))
       }

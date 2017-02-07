@@ -7,7 +7,7 @@ object Test {
       tryBreakable {
         break
         2
-      } catchBreak {
+      }.catchBreak {
         3
       }
     assert(x == 3, x)
@@ -15,7 +15,7 @@ object Test {
     val y =
       tryBreakable {
         2
-      } catchBreak {
+      }.catchBreak {
         3
       }
     assert(y == 2, y)
@@ -24,7 +24,7 @@ object Test {
       tryBreakable {
         break
         1.0
-      } catchBreak {
+      }.catchBreak {
         2
       }
     assert(z == 2.0, z)

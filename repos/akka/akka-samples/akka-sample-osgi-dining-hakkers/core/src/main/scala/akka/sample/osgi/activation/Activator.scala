@@ -61,7 +61,7 @@ class Activator extends ActorSystemActivator {
   }
 
   def unregisterServices(context: BundleContext) {
-    diningHakkerService foreach (_.unregister())
+    diningHakkerService.foreach(_.unregister())
   }
 
   override def getActorSystemName(context: BundleContext): String =

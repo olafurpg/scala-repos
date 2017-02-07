@@ -33,9 +33,9 @@ class KeyValidationTest extends FunSuite {
         "anda\rcarraigereturn",
         "yo\u0000ihaveacontrolchar",
         "andheres\nanewline"
-      ) map { Buf.Utf8(_) }
+      ).map { Buf.Utf8(_) }
 
-    bads foreach { bad =>
+    bads.foreach { bad =>
       val x = intercept[IllegalArgumentException] {
         new BasicKeyValidation(Seq(bad))
       }

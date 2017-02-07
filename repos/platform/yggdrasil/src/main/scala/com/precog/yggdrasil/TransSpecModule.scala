@@ -213,7 +213,7 @@ trait TransSpecModule extends FNModule {
         }
 
         val result =
-          initialSpecs reduceOption { (t1, t2) =>
+          initialSpecs.reduceOption { (t1, t2) =>
             (t1, t2) match {
               case (t1: ObjectSpec[_], t2: ObjectSpec[_]) =>
                 trans.InnerObjectConcat(t1, t2)
@@ -223,7 +223,7 @@ trait TransSpecModule extends FNModule {
             }
           }
 
-        result getOrElse leaf
+        result.getOrElse(leaf)
       }
 
       def mapSources[A <: SourceType, B <: SourceType](spec: TransSpec[A])(

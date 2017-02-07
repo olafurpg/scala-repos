@@ -7,7 +7,7 @@ import metric.SubscriptionsDispatcher.TickMetricSnapshot
 private final class MoveMonitor(system: ActorSystem, channel: ActorRef) {
 
   def record(nanos: Option[Long]) = {
-    nanos foreach lila.mon.round.move.full.time
+    nanos.foreach(lila.mon.round.move.full.time)
     lila.mon.round.move.full.count()
   }
 
@@ -18,17 +18,20 @@ private final class MoveMonitor(system: ActorSystem, channel: ActorRef) {
       system.actorOf(Props(new Actor {
         def receive = {
           case tick: TickMetricSnapshot =>
-            tick.metrics.collectFirst {
-              case (entity, snapshot) if entity.category == "histogram" =>
-                snapshot
-            } flatMap (_ histogram "histogram") foreach { h =>
-              if (!h.isEmpty)
-                channel ! lila.socket.Channel.Publish(
-                  lila.socket.Socket.makeMessage(
-                    "mlat",
-                    (h.sum / h.numberOfMeasurements / 1000000).toInt)
-                )
-            }
+            tick.metrics
+              .collectFirst {
+                case (entity, snapshot) if entity.category == "histogram" =>
+                  snapshot
+              }
+              .flatMap(_ histogram "histogram")
+              .foreach { h =>
+                if (!h.isEmpty)
+                  channel ! lila.socket.Channel.Publish(
+                    lila.socket.Socket.makeMessage(
+                      "mlat",
+                      (h.sum / h.numberOfMeasurements / 1000000).toInt)
+                  )
+              }
         }
       }))
     )

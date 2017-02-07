@@ -69,7 +69,7 @@ object Osgi {
     val log = streams.log
     val builder = new Builder
     builder.setClasspath(fullClasspath.toArray)
-    headers foreach { case (k, v) => builder.setProperty(k, v) }
+    headers.foreach { case (k, v) => builder.setProperty(k, v) }
     val includeRes =
       resourceDirectories.filter(_.exists).map(_.getAbsolutePath).mkString(",")
     if (!includeRes.isEmpty) builder.setProperty(INCLUDERESOURCE, includeRes)

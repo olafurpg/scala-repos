@@ -92,10 +92,10 @@ private object TF extends ThreadFactory {
 
   def newThread(r: Runnable): Thread = {
     val d: Thread = threadFactory.newThread(r)
-    d setName "ActorPinger"
-    d setDaemon true
+    d.setName("ActorPinger")
+    d.setDaemon(true)
     if (ThreadPoolRules.nullContextClassLoader) {
-      d setContextClassLoader null
+      d.setContextClassLoader(null)
     }
     d
   }

@@ -55,15 +55,15 @@ object Duration {
     * @throws NumberFormatException if format is not parseable
     */
   def apply(s: String): Duration = {
-    val s1: String = s filterNot (_.isWhitespace)
+    val s1: String = s.filterNot(_.isWhitespace)
     s1 match {
       case "Inf" | "PlusInf" | "+Inf" => Inf
       case "MinusInf" | "-Inf" => MinusInf
       case _ =>
-        val unitName = s1.reverse takeWhile (_.isLetter) reverse;
-        timeUnit get unitName match {
+        val unitName = s1.reverse.takeWhile(_.isLetter) reverse;
+        timeUnit.get(unitName) match {
           case Some(unit) =>
-            val valueStr = s1 dropRight unitName.length
+            val valueStr = s1.dropRight(unitName.length)
             val valueD = JDouble.parseDouble(valueStr)
             if (valueD >= -maxPreciseDouble && valueD <= maxPreciseDouble)
               Duration(valueD, unit)
@@ -74,7 +74,7 @@ object Duration {
   }
 
   // "ms milli millisecond" -> List("ms", "milli", "millis", "millisecond", "milliseconds")
-  private[this] def words(s: String) = (s.trim split "\\s+").toList
+  private[this] def words(s: String) = (s.trim.split("\\s+")).toList
   private[this] def expandLabels(labels: String): List[String] = {
     val hd :: rest = words(labels)
     hd :: rest.flatMap(s => List(s, s + "s"))
@@ -91,12 +91,12 @@ object Duration {
 
   // TimeUnit => standard label
   protected[duration] val timeUnitName: Map[TimeUnit, String] =
-    timeUnitLabels.toMap mapValues (s => words(s).last) toMap
+    timeUnitLabels.toMap.mapValues(s => words(s).last) toMap
 
   // Label => TimeUnit
   protected[duration] val timeUnit: Map[String, TimeUnit] =
-    timeUnitLabels flatMap {
-      case (unit, names) => expandLabels(names) map (_ -> unit)
+    timeUnitLabels.flatMap {
+      case (unit, names) => expandLabels(names).map(_ -> unit)
     } toMap
 
   /**
@@ -105,7 +105,7 @@ object Duration {
     */
   def unapply(s: String): Option[(Long, TimeUnit)] =
     (try Some(apply(s))
-    catch { case _: RuntimeException => None }) flatMap unapply
+    catch { case _: RuntimeException => None }).flatMap(unapply)
 
   /**
     * Extract length and time unit out of a duration, if it is finite.
@@ -209,7 +209,7 @@ object Duration {
       else this
     def /(divisor: Double): Duration =
       if (divisor.isNaN || divisor.isInfinite) Undefined
-      else if ((divisor compare 0d) < 0) -this
+      else if ((divisor.compare(0d)) < 0) -this
       else this
     def /(divisor: Duration): Double = divisor match {
       case _: Infinite => Double.NaN
@@ -312,7 +312,7 @@ object Duration {
     * The natural ordering of durations matches the natural ordering for Double, including non-finite values.
     */
   implicit object DurationIsOrdered extends Ordering[Duration] {
-    def compare(a: Duration, b: Duration) = a compare b
+    def compare(a: Duration, b: Duration) = a.compare(b)
   }
 }
 
@@ -583,7 +583,7 @@ sealed abstract class Duration extends Serializable with Ordered[Duration] {
 object FiniteDuration {
 
   implicit object FiniteDurationIsOrdered extends Ordering[FiniteDuration] {
-    def compare(a: FiniteDuration, b: FiniteDuration) = a compare b
+    def compare(a: FiniteDuration, b: FiniteDuration) = a.compare(b)
   }
 
   def apply(length: Long, unit: TimeUnit) = new FiniteDuration(length, unit)
@@ -649,8 +649,8 @@ final class FiniteDuration(val length: Long, val unit: TimeUnit)
   override def toString = "" + length + " " + unitString
 
   def compare(other: Duration) = other match {
-    case x: FiniteDuration => toNanos compare x.toNanos
-    case _ => -(other compare this)
+    case x: FiniteDuration => toNanos.compare(x.toNanos)
+    case _ => -(other.compare(this))
   }
 
   // see https://www.securecoding.cert.org/confluence/display/java/NUM00-J.+Detect+or+prevent+integer+overflow

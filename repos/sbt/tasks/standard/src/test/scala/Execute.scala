@@ -36,7 +36,7 @@ object ExecuteSpec extends Properties("Execute") {
     forAllNoShrink(iGen, MaxTasksGen, MaxWorkersGen) {
       (i: Int, times: Int, workers: Int) =>
         ("Workers: " + workers) |: ("Value: " + i) |: ("Times: " + times) |: {
-          val initial = task(0) map (identity[Int])
+          val initial = task(0).map(identity[Int])
           def t = (initial /: (0 until times))((t, ignore) => t.map(_ + i))
           checkResult(tryRun(t, false, workers), i * times)
         }

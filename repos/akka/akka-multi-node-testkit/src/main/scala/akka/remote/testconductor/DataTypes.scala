@@ -113,7 +113,7 @@ private[akka] class MsgEncoder extends OneToOneEncoder {
             w.setHello(TCP.Hello.newBuilder.setName(name).setAddress(addr))
           case EnterBarrier(name, timeout) ⇒
             val barrier = TCP.EnterBarrier.newBuilder.setName(name)
-            timeout foreach (t ⇒ barrier.setTimeout(t.toNanos))
+            timeout.foreach(t ⇒ barrier.setTimeout(t.toNanos))
             barrier.setOp(BarrierOp.Enter)
             w.setBarrier(barrier)
           case BarrierResult(name, success) ⇒

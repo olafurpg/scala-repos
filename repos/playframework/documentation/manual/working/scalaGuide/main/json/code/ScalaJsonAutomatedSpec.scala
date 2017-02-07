@@ -42,8 +42,12 @@ class ScalaJsonAutomatedSpec extends Specification {
       import play.api.libs.json._
       import play.api.libs.functional.syntax._
 
-      implicit val residentReads = ((__ \ "name").read[String] and (__ \ "age")
-        .read[Int] and (__ \ "role").readNullable[String])(Resident)
+      implicit val residentReads = ((__ \ "name")
+        .read[String]
+        .and(__ \ "age")
+        .read[Int]
+        .and(__ \ "role")
+        .readNullable[String])(Resident)
       //#manual-reads
 
       sampleJson.as[Resident] must_=== sampleData

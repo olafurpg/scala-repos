@@ -20,9 +20,9 @@ object Test {
   def main(args: Array[String]) {
     var foo = new Foo
     foo. /* name: applyDynamic */ bar(5)
-    foo /* name: applyDynamic */ bar 5
+    foo /* name: applyDynamic */.bar(5)
     foo. /* name: applyDynamicNamed */ bar(x = 4, 6)
-    foo /* name: applyDynamicNamed */ bar (x = 5)
+    foo /* name: applyDynamicNamed */.bar(x = 5)
     foo. /* name: updateDynamic */ bar = 1
   }
 }

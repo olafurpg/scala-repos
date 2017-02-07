@@ -76,7 +76,7 @@ object Enumeratee2TTest extends SpecLite {
     val enum2 = enumStream[Int, Id](Stream(2, 3, 4))
 
     val consumer = consume[(Int, Int), Id, List]
-    val producer = enum1 cross enum2
+    val producer = enum1.cross(enum2)
     (consumer &= producer).run must_===
       (List(
         (1, 2),

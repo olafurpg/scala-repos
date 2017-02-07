@@ -20,16 +20,16 @@ class ChannelClosingHandlerTest extends FunSuite with MockitoSugar {
   class ChannelHelper {
     val channel = mock[Channel]
     val closeFuture = Channels.future(channel)
-    when(channel.close()) thenReturn closeFuture
+    when(channel.close()).thenReturn(closeFuture)
     val handler = new ChannelClosingHandler
     val ctx = mock[ChannelHandlerContext]
     val e = mock[ChannelStateEvent]
     val pipeline = mock[ChannelPipeline]
 
-    when(pipeline.isAttached) thenReturn true
+    when(pipeline.isAttached).thenReturn(true)
 
-    when(ctx.getPipeline) thenReturn pipeline
-    when(ctx.getChannel) thenReturn channel
+    when(ctx.getPipeline).thenReturn(pipeline)
+    when(ctx.getChannel).thenReturn(channel)
   }
 
   test(

@@ -13,7 +13,7 @@ object PomTest extends Build {
       (publishArtifact in Compile := false)
 
   def art(p: ProjectReference) = makePom in p
-  def checkPom = (art(subJar), art(subWar), art(subParent)) map {
+  def checkPom = (art(subJar), art(subWar), art(subParent)).map {
     (jar, war, pom) =>
       checkPackaging(jar, "jar")
       checkPackaging(war, "war")

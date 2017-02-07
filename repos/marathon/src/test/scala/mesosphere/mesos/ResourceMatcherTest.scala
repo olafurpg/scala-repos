@@ -42,7 +42,7 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
     res.scalarMatch(Resource.MEM).get.roles should be(Seq("*"))
     res.scalarMatch(Resource.DISK) should be(empty)
 
-    res.hostPorts should have size 2
+    (res.hostPorts should have).size(2)
   }
 
   test("match resources success") {
@@ -67,7 +67,7 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
     res.scalarMatch(Resource.MEM).get.roles should be(Seq("*"))
     res.scalarMatch(Resource.DISK) should be(empty)
 
-    res.hostPorts should have size 2
+    (res.hostPorts should have).size(2)
   }
 
   test("match resources success with preserved reservations") {
@@ -125,7 +125,7 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
     resOpt should not be empty
     val res = resOpt.get
 
-    res.scalarMatches should have size (3)
+    (res.scalarMatches should have).size(3)
     res.scalarMatch(Resource.CPUS).get.consumed.toSet should be(
       Set(
         ScalarMatch.Consumption(1.0,

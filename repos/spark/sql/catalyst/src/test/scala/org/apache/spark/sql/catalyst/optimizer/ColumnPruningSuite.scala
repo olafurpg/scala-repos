@@ -184,10 +184,10 @@ class ColumnPruningSuite extends PlanTest {
     val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
 
     val originalQuery =
-      testRelation.groupBy('a)('a as 'c, count('b)).select('c)
+      testRelation.groupBy('a)('a.as('c), count('b)).select('c)
 
     val optimized = Optimize.execute(originalQuery.analyze)
-    val correctAnswer = testRelation.select('a).groupBy('a)('a as 'c).analyze
+    val correctAnswer = testRelation.select('a).groupBy('a)('a.as('c)).analyze
 
     comparePlans(optimized, correctAnswer)
   }

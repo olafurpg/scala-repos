@@ -8,7 +8,7 @@ import scala.collection.mutable
   */
 class AtomicMap[A, B](maps: Seq[mutable.Map[A, B]]) {
   def this(concurrencyLevel: Int) = this {
-    (0 until concurrencyLevel) map { i =>
+    ((0 until concurrencyLevel)).map { i =>
       mutable.Map[A, B]()
     }
   }

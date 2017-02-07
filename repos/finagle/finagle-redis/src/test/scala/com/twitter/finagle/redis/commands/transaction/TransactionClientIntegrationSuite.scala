@@ -54,7 +54,8 @@ final class TransactionClientIntegrationSuite extends RedisClientTest {
         case Seq(IntegerReply(1), ErrorReply(message), IntegerReply(1)) =>
           // TODO: the exact error message varies in different versions of redis. fix this later
           assert(
-            message endsWith "Operation against a key holding the wrong kind of value")
+            message.endsWith(
+              "Operation against a key holding the wrong kind of value"))
       }
     }
   }

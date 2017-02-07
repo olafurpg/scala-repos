@@ -61,7 +61,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     // complete the links between model entities, everything that couldn't have been done before
     universe.rootPackage.completeModel()
 
-    Some(universe) filter (_.rootPackage != null)
+    Some(universe).filter(_.rootPackage != null)
   }
 
   // state:
@@ -129,14 +129,14 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       val documented = if (sym.hasAccessorFlag) sym.accessed else sym
       thisFactory.comment(documented, linkTarget, inTpl)
     }
-    def group = comment flatMap (_.group) getOrElse defaultGroup
+    def group = comment.flatMap(_.group).getOrElse(defaultGroup)
     override def inTemplate = inTpl
     override def toRoot: List[MemberImpl] = this :: inTpl.toRoot
     def inDefinitionTemplates =
       if (inTpl == null) docTemplatesCache(RootPackage) :: Nil
       else
         makeTemplate(sym.owner) ::
-          (sym.allOverriddenSymbols map { inhSym =>
+          (sym.allOverriddenSymbols.map { inhSym =>
             makeTemplate(inhSym.owner)
           })
     def visibility = {
@@ -147,7 +147,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
           if (sym.hasAccessBoundary) Some(makeTemplate(sym.privateWithin))
           else None
         if (sym.isPrivate) PrivateInTemplate(inTpl)
-        else if (sym.isProtected) ProtectedInTemplate(qual getOrElse inTpl)
+        else if (sym.isProtected) ProtectedInTemplate(qual.getOrElse(inTpl))
         else
           qual match {
             case Some(q) => PrivateInTemplate(q)
@@ -159,7 +159,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       val fgs = mutable.ListBuffer.empty[Paragraph]
       if (sym.isImplicit) fgs += Paragraph(Text("implicit"))
       if (sym.isSealed) fgs += Paragraph(Text("sealed"))
-      if (!sym.isTrait && (sym hasFlag Flags.ABSTRACT))
+      if (!sym.isTrait && (sym.hasFlag(Flags.ABSTRACT)))
         fgs += Paragraph(Text("abstract"))
       /* Resetting the DEFERRED flag is a little trick here for refined types: (example from scala.collections)
        * {{{
@@ -168,9 +168,9 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
        * }}}
        * the type the method returns is TraversableOps, which has all-abstract symbols. But in reality, it couldn't have
        * any abstract terms, otherwise it would fail compilation. So we reset the DEFERRED flag. */
-      if (!sym.isTrait && (sym hasFlag Flags.DEFERRED) &&
+      if (!sym.isTrait && (sym.hasFlag(Flags.DEFERRED)) &&
           (!isImplicitlyInherited)) fgs += Paragraph(Text("abstract"))
-      if (!sym.isModule && (sym hasFlag Flags.FINAL))
+      if (!sym.isModule && (sym.hasFlag(Flags.FINAL)))
         fgs += Paragraph(Text("final"))
       if (sym.isMacro) fgs += Paragraph(Text("macro"))
       fgs.toList
@@ -187,7 +187,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
             parseWiki("''(Since version " + ver + ")''", NoPosition, inTpl)
           case (None, None) => Body(Nil)
         })
-      else comment flatMap { _.deprecated }
+      else comment.flatMap { _.deprecated }
     def migration =
       if (sym.hasMigrationAnnotation)
         Some((sym.migrationMessage, sym.migrationVersion) match {
@@ -225,7 +225,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     def isAbstract =
       // for the explanation of conversion == null see comment on flags
       ((!sym.isTrait &&
-        ((sym hasFlag Flags.ABSTRACT) || (sym hasFlag Flags.DEFERRED)) &&
+        ((sym.hasFlag(Flags.ABSTRACT)) || (sym.hasFlag(Flags.DEFERRED))) &&
         (!isImplicitlyInherited)) || sym.isAbstractClass ||
         sym.isAbstractType) && !sym.isSynthetic
 
@@ -237,8 +237,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
           val paramLists: List[String] =
             if (d.valueParams.isEmpty) Nil
             else
-              d.valueParams map
-                (ps => ps map (_.resultType.name) mkString ("(", ",", ")"))
+              d.valueParams.map(ps =>
+                ps.map(_.resultType.name) mkString ("(", ",", ")"))
           paramLists.mkString
         case _ => ""
       }
@@ -318,7 +318,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
                 case _ => Nil
               }
             case _ => sym.tpe.parents
-          }) map { _.asSeenFrom(sym.thisType, sym) }
+          }).map { _.asSeenFrom(sym.thisType, sym) }
         makeParentTypes(RefinedType(tps, EmptyScope), Some(this), inTpl)
       }
   }
@@ -348,10 +348,10 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     def sourceUrl = {
       def fixPath(s: String) = s.replaceAll("\\" + java.io.File.separator, "/")
       val assumedSourceRoot =
-        fixPath(settings.sourcepath.value) stripSuffix "/"
+        fixPath(settings.sourcepath.value).stripSuffix("/")
 
       if (!settings.docsourceurl.isDefault)
-        inSource map {
+        inSource.map {
           case (file, _) =>
             val filePath = fixPath(file.path)
               .replaceFirst("^" + assumedSourceRoot, "")
@@ -377,7 +377,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       (makeTemplate(ancestor),
        makeType(reprSymbol.info.baseType(ancestor), this))
     lazy val (linearizationTemplates, linearizationTypes) =
-      (reprSymbol.ancestors map templateAndType).unzip
+      (reprSymbol.ancestors.map(templateAndType)).unzip
 
     /* Subclass cache */
     private lazy val subClassesCache =
@@ -426,13 +426,13 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     // all the members that are documentented PLUS the members inherited by implicit conversions
     var members: List[MemberImpl] = ownMembers
 
-    def templates = members collect {
+    def templates = members.collect {
       case c: TemplateEntity with MemberEntity => c
     }
-    def methods = members collect { case d: Def => d }
-    def values = members collect { case v: Val => v }
-    def abstractTypes = members collect { case t: AbstractType => t }
-    def aliasTypes = members collect { case t: AliasType => t }
+    def methods = members.collect { case d: Def => d }
+    def values = members.collect { case v: Val => v }
+    def abstractTypes = members.collect { case t: AbstractType => t }
+    def aliasTypes = members.collect { case t: AliasType => t }
 
     /**
       * This is the final point in the core model creation: no DocTemplates are created after the model has finished, but
@@ -454,7 +454,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
 
       for (pt <- sym.info.parents;
            parentTemplate <- findTemplateMaybe(pt.typeSymbol))
-        parentTemplate registerSubClass this
+        parentTemplate.registerSubClass(this)
 
       // the members generated by the symbols in memberSymsEager PLUS the members from the usecases
       val allMembers = ownMembers ::: ownMembers.flatMap(_.useCaseOf).distinct
@@ -467,18 +467,18 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
 
     lazy val outgoingImplicitlyConvertedClasses: List[
       (TemplateEntity, TypeEntity, ImplicitConversionImpl)] =
-      conversions flatMap
-        (conv =>
-           if (!implicitExcluded(conv.conversionQualifiedName))
-             conv.targetTypeComponents map {
-               case (template, tpe) =>
-                 template match {
-                   case d: DocTemplateImpl if (d != this) =>
-                     d.registerImplicitlyConvertibleClass(this, conv)
-                   case _ => // nothing
-                 }
-                 (template, tpe, conv)
-             } else List())
+      conversions.flatMap(
+        conv =>
+          if (!implicitExcluded(conv.conversionQualifiedName))
+            conv.targetTypeComponents.map {
+              case (template, tpe) =>
+                template match {
+                  case d: DocTemplateImpl if (d != this) =>
+                    d.registerImplicitlyConvertibleClass(this, conv)
+                  case _ => // nothing
+                }
+                (template, tpe, conv)
+            } else List())
 
     override def isDocTemplate = true
     private[this] lazy val companionSymbol =
@@ -510,7 +510,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       }
 
     def constructors: List[MemberImpl with Constructor] =
-      if (isClass) members collect { case d: Constructor => d } else Nil
+      if (isClass) members.collect { case d: Constructor => d } else Nil
     def primaryConstructor: Option[MemberImpl with Constructor] =
       if (isClass) constructors find { _.isPrimary } else None
     override def valueParams =
@@ -518,7 +518,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       if (isCaseClass)
         primaryConstructor match {
           case Some(const) =>
-            const.sym.paramss map (_ map (makeValueParam(_, this)))
+            const.sym.paramss.map(_.map(makeValueParam(_, this)))
           case None => List()
         } else List.empty
 
@@ -531,21 +531,21 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
         comment +: linearizationTemplates.collect {
           case dtpl: DocTemplateImpl => dtpl.comment
         }
-      comments.flatten.map(extractor).flatten.headOption orElse {
-        Option(inTpl) flatMap (_.groupSearch(extractor))
+      comments.flatten.map(extractor).flatten.headOption.orElse {
+        Option(inTpl).flatMap(_.groupSearch(extractor))
       }
     }
 
     def groupDescription(group: String): Option[Body] =
-      groupSearch(_.groupDesc.get(group)) orElse {
+      groupSearch(_.groupDesc.get(group)).orElse {
         if (group == defaultGroup) defaultGroupDesc else None
       }
     def groupPriority(group: String): Int =
-      groupSearch(_.groupPrio.get(group)) getOrElse {
+      groupSearch(_.groupPrio.get(group)).getOrElse {
         if (group == defaultGroup) defaultGroupPriority else 0
       }
     def groupName(group: String): String =
-      groupSearch(_.groupNames.get(group)) getOrElse {
+      groupSearch(_.groupNames.get(group)).getOrElse {
         if (group == defaultGroup) defaultGroupName else group
       }
   }
@@ -556,9 +556,9 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     override def inTemplate = inTpl
     override def toRoot: List[PackageImpl] = this :: inTpl.toRoot
     override def reprSymbol =
-      sym.info.members.find(_.isPackageObject) getOrElse sym
+      sym.info.members.find(_.isPackageObject).getOrElse(sym)
 
-    def packages = members collect {
+    def packages = members.collect {
       case p: PackageImpl if !(droppedPackages contains p) => p
     }
   }
@@ -583,10 +583,13 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
        * 3. the current template
        */
       val inRealTpl =
-        conversion.flatMap { conv =>
-          nonRootTemplate(conv.toType.typeSymbol)
-        } orElse nonRootTemplate(sym.owner) orElse Option(inTpl)
-      inRealTpl flatMap { tpl =>
+        conversion
+          .flatMap { conv =>
+            nonRootTemplate(conv.toType.typeSymbol)
+          }
+          .orElse(nonRootTemplate(sym.owner))
+          .orElse(Option(inTpl))
+      inRealTpl.flatMap { tpl =>
         thisFactory.comment(sym, tpl, tpl)
       }
     }
@@ -624,8 +627,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       extends NonTemplateMemberImpl(sym, conversion, useCaseOf, inTpl) {
     def valueParams = {
       val info = conversion.fold(sym.info)(_.toType memberInfo sym)
-      info.paramss map { ps =>
-        (ps.zipWithIndex) map {
+      info.paramss.map { ps =>
+        (ps.zipWithIndex).map {
           case (p, i) =>
             if (p.nameString contains "$")
               makeValueParam(p, inTpl, optimize("arg" + i))
@@ -652,7 +655,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     def lo = sym.info.bounds match {
       case TypeBounds(lo, hi) if lo.typeSymbol != NothingClass =>
         Some(
-          makeTypeInTemplateContext(appliedType(lo, sym.info.typeParams map {
+          makeTypeInTemplateContext(appliedType(lo, sym.info.typeParams.map {
             _.tpe
           }), inTpl, sym))
       case _ => None
@@ -660,7 +663,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     def hi = sym.info.bounds match {
       case TypeBounds(lo, hi) if hi.typeSymbol != AnyClass =>
         Some(
-          makeTypeInTemplateContext(appliedType(hi, sym.info.typeParams map {
+          makeTypeInTemplateContext(appliedType(hi, sym.info.typeParams.map {
             _.tpe
           }), inTpl, sym))
       case _ => None
@@ -671,7 +674,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     def sym: Symbol
     def inTpl: TemplateImpl
     def typeParams =
-      sym.typeParams map (makeTypeParam(_, inTpl))
+      sym.typeParams.map(makeTypeParam(_, inTpl))
   }
   /* ============== MAKER METHODS ============== */
 
@@ -795,7 +798,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
           override def qualifiedName = "_root_"
           override def isRootPackage = true
           override lazy val memberSyms =
-            (bSym.info.members ++ EmptyPackage.info.members).toList filter {
+            (bSym.info.members ++ EmptyPackage.info.members).toList.filter {
               s =>
                 s != EmptyPackage && s != RootPackage
             }
@@ -950,7 +953,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
         aSym.isPackageObject || aSym.isMixinConstructor) Nil
     else {
       val allSyms =
-        useCases(aSym, inTpl.sym) map {
+        useCases(aSym, inTpl.sym).map {
           case (bSym, bComment, bPos) =>
             docComments
               .put(bSym, DocComment(bComment, bPos)) // put the comment in the list, don't parse it yet, closes SI-4898
@@ -961,7 +964,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       if (allSyms.isEmpty) member.toList
       else
         // Use cases replace the original definitions - SI-5054
-        allSyms flatMap { makeMember0(_, member) }
+        allSyms.flatMap { makeMember0(_, member) }
     }
   }
 
@@ -982,11 +985,11 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
 
     def makeNoDocTemplate(aSym: Symbol,
                           inTpl: TemplateImpl): NoDocTemplateImpl =
-      noDocTemplatesCache getOrElse (aSym, new NoDocTemplateImpl(aSym, inTpl))
+      noDocTemplatesCache.getOrElse(aSym, new NoDocTemplateImpl(aSym, inTpl))
 
-    findTemplateMaybe(aSym) getOrElse {
+    findTemplateMaybe(aSym).getOrElse {
       val bSym = normalizeTemplate(aSym)
-      makeNoDocTemplate(bSym, inTpl getOrElse makeTemplate(bSym.owner))
+      makeNoDocTemplate(bSym, inTpl.getOrElse(makeTemplate(bSym.owner)))
     }
   }
 
@@ -1000,16 +1003,16 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
         val paramsOpt: Option[List[ValueParam]] = annotationClass match {
           case aClass: DocTemplateEntity with Class =>
             val constr =
-              aClass.constructors collectFirst {
+              aClass.constructors.collectFirst {
                 case c: MemberImpl if c.sym == annot.original.symbol => c
               }
-            constr flatMap (_.valueParams.headOption)
+            constr.flatMap(_.valueParams.headOption)
           case _ => None
         }
-        val argTrees = annot.args map makeTree
+        val argTrees = annot.args.map(makeTree)
         paramsOpt match {
           case Some(params) =>
-            params zip argTrees map {
+            params.zip(argTrees).map {
               case (param, tree) =>
                 new ValueArgument {
                   def parameter = Some(param)
@@ -1017,7 +1020,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
                 }
             }
           case None =>
-            argTrees map { tree =>
+            argTrees.map { tree =>
               new ValueArgument {
                 def parameter = None
                 def value = tree
@@ -1033,8 +1036,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
     new ParameterImpl(aSym, inTpl) with TypeBoundsImpl with HigherKindedImpl
     with TypeParam {
       def variance: String = {
-        if (sym hasFlag Flags.COVARIANT) "+"
-        else if (sym hasFlag Flags.CONTRAVARIANT) "-"
+        if (sym.hasFlag(Flags.COVARIANT)) "+"
+        else if (sym.hasFlag(Flags.CONTRAVARIANT)) "-"
         else ""
       }
     }
@@ -1053,7 +1056,9 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       def defaultValue =
         if (aSym.hasDefault) {
           // units.filter should return only one element
-          (currentRun.units filter (_.source.file == aSym.sourceFile)).toList match {
+          (currentRun.units
+            .filter(_.source.file == aSym.sourceFile))
+            .toList match {
             case List(unit) =>
               // SI-4922 `sym == aSym` is insufficent if `aSym` is a clone of symbol
               //         of the parameter in the tree, as can happen with type parametric methods.
@@ -1061,7 +1066,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
                 (sym != null &&
                   sym != NoSymbol && sym.owner == aSym.owner &&
                   sym.name == aSym.name && sym.isParamWithDefault)
-              unit.body find (t => isCorrespondingParam(t.symbol)) collect {
+              (unit.body find (t => isCorrespondingParam(t.symbol))).collect {
                 case ValDef(_, _, _, rhs) if rhs ne EmptyTree => makeTree(rhs)
               }
             case _ => None
@@ -1144,7 +1149,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
 
   def makeQualifiedName(sym: Symbol,
                         relativeTo: Option[Symbol] = None): String = {
-    val stop = relativeTo map (_.ownerChain.toSet) getOrElse Set[Symbol]()
+    val stop = relativeTo.map(_.ownerChain.toSet).getOrElse(Set[Symbol]())
     var sym1 = sym
     val path = new StringBuilder()
     // var path = List[Symbol]()

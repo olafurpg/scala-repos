@@ -37,8 +37,8 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
     new FieldFinder[MappedOneToManyBase[Rec]](
       getSingleton,
       net.liftweb.common.Logger(classOf[OneToMany[K, T]])
-    ).accessorMethods map
-      (_.invoke(this).asInstanceOf[MappedOneToManyBase[Rec]])
+    ).accessorMethods
+      .map(_.invoke(this).asInstanceOf[MappedOneToManyBase[Rec]])
   }
 
   /**
@@ -151,7 +151,7 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
     protected def unown(e: O) = {
       val f = foreign(e)
       f.set(f.defaultValue)
-      unlinked = unlinked filter { e.ne }
+      unlinked = unlinked.filter { e.ne }
       e
     }
 
@@ -193,7 +193,7 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
     // 2.8
     def insertAll(n: Int, iter: Traversable[O]) {
       val (before, after) = delegate.splitAt(n)
-      iter foreach own
+      iter.foreach(own)
       delegate = before ++ iter ++ after
     }
 
@@ -230,9 +230,11 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
       * Returns true if all children were saved successfully.
       */
     def save = {
-      unlinked foreach { u =>
+      unlinked.foreach { u =>
         val f = foreign(u)
-        if (f.obj.map(_ eq OneToMany.this) openOr true) // obj is Empty or this
+        if (f.obj
+              .map(_ eq OneToMany.this)
+              .openOr(true)) // obj is Empty or this
           f.apply(OneToMany.this)
       }
       unlinked = Nil
@@ -262,7 +264,7 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
       super.unown(e)
     }
     override def own(e: O) = {
-      removed = removed filter { e.ne }
+      removed = removed.filter { e.ne }
       super.own(e)
     }
     override def save = {
@@ -270,7 +272,7 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
         val f = foreign(e)
         f.get == f.defaultValue
       }
-      unowned foreach { _.delete_! }
+      unowned.foreach { _.delete_! }
       super.save
     }
   }

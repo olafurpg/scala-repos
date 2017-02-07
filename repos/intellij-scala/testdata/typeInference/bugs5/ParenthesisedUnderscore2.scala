@@ -6,6 +6,6 @@ object ParenthesisedUnderscore2 {
   val x: List[A] = List.empty
 
   /*start*/
-  x map (_.foo) /*end*/
+  x.map(_.foo) /*end*/
 }
 //List[Int]

@@ -62,7 +62,7 @@ class ObservableBufferSpec[T]
                                originalBuffer: ObservableBuffer[_],
                                shouldBeTheSame: Boolean) {
     if (shouldBeTheSame) {
-      generatedBuffer should be theSameInstanceAs originalBuffer
+      (generatedBuffer should be).theSameInstanceAs(originalBuffer)
     } else {
       generatedBuffer should not be theSameInstanceAs(originalBuffer)
       generatedBuffer.getClass should be(classOf[ObservableBuffer[_]])
@@ -87,7 +87,7 @@ class ObservableBufferSpec[T]
     val buffer = ObservableBuffer("a", "b", "c")
 
     // Verification
-    buffer should have length 3
+    (buffer should have).length(3)
   }
 
   it should "support unapply" in {
@@ -105,7 +105,7 @@ class ObservableBufferSpec[T]
     // Preparation
     val buffer = ObservableBuffer("a", "b", "c")
     var invalidateCount = 0
-    buffer onInvalidate {
+    buffer.onInvalidate {
       invalidateCount += 1
     }
 
@@ -120,7 +120,7 @@ class ObservableBufferSpec[T]
     // Preparation
     val buffer = ObservableBuffer("a", "b", "c")
     var changeCount = 0
-    buffer onChange {
+    buffer.onChange {
       changeCount += 1
     }
 
@@ -134,7 +134,7 @@ class ObservableBufferSpec[T]
   it should "return changed list" in {
     // Preparation
     val buffer = ObservableBuffer("a", "b", "c")
-    buffer onChange {
+    buffer.onChange {
       // Verification
       (list, changes) =>
         list should be(buffer.delegate)
@@ -150,13 +150,13 @@ class ObservableBufferSpec[T]
     var changeCount = 0
     var addedElement = ""
     var expectedPosition = -1
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       {
         changes.toList match {
           case (List(Add(position, elements))) =>
             changeCount += 1
             position should be(expectedPosition)
-            elements should have size 1
+            (elements should have).size(1)
             elements.toSeq(0) should equal(addedElement)
           case _ => fail("Unexpected changes: " + changes)
         }
@@ -190,7 +190,7 @@ class ObservableBufferSpec[T]
     // Preparation
     val buffer = ObservableBuffer("a", "b", "c")
     var changeCount = 0
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       for (change <- changes) change match {
         case Add(position, elements) =>
           changeCount += 1
@@ -227,13 +227,13 @@ class ObservableBufferSpec[T]
     var changeCount = 0
     var removedElement = ""
     var expectedPosition = -1
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       {
         changes.toList match {
           case (List(Remove(position, elements))) =>
             changeCount += 1
             position should be(expectedPosition)
-            elements should have size 1
+            (elements should have).size(1)
             elements.toSeq(0) should equal(removedElement)
           case _ => fail("Unexpected changes: " + changes)
         }
@@ -263,7 +263,7 @@ class ObservableBufferSpec[T]
     // Preparation
     val buffer = ObservableBuffer("a", "b", "c")
     var changeCount = 0
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       for (change <- changes) change match {
         case Remove(position, elements) =>
           changeCount += 1
@@ -314,7 +314,7 @@ class ObservableBufferSpec[T]
     // Preparation
     val buffer = ObservableBuffer("a", "b", "c", "d", "e")
     var changeCount = 0
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       for (change <- changes) change match {
         case Remove(position, elements) =>
           changeCount += 1
@@ -338,7 +338,7 @@ class ObservableBufferSpec[T]
     val buffer = ObservableBuffer("a", "b", "c", "d", "e", "f")
 
     var changeCount = 0
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       for (change <- changes) change match {
         case Add(position, elements) =>
           changeCount += 1
@@ -364,7 +364,7 @@ class ObservableBufferSpec[T]
     // Preparation
     val buffer = ObservableBuffer("a", "b", "c")
     var changeCount = 0
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       for (change <- changes) change match {
         case Add(position, elements) =>
           changeCount += 1
@@ -388,7 +388,7 @@ class ObservableBufferSpec[T]
   it should "notify on a sort order change with a reorder from the JavaFX collection sort" in {
     val buffer = ObservableBuffer("f", "e", "d", "c", "b", "a")
     var changeCount = 0
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       for (change <- changes) change match {
         case Reorder(start, end, permutation) =>
           changeCount += 1
@@ -412,7 +412,7 @@ class ObservableBufferSpec[T]
     // Preparation
     val buffer = ObservableBuffer("f", "e", "d", "c", "b", "a")
     var changeCount = 0
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       for (change <- changes) change match {
         case Reorder(start, end, permutation) =>
           changeCount += 1
@@ -447,7 +447,7 @@ class ObservableBufferSpec[T]
     // Preparation
     val buffer = ObservableBuffer("f", "e", "d", "c", "b", "a")
     var changeCount = 0
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       for (change <- changes) change match {
         case Reorder(start, end, permutation) =>
           changeCount += 1
@@ -472,7 +472,7 @@ class ObservableBufferSpec[T]
     val buffer = ObservableBuffer("a", "b", "c", "d", "e")
     var removeCount = 0
     var addCount = 0
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       for (change <- changes) change match {
         case Add(pos, addedBuffer) =>
           addCount += 1
@@ -499,7 +499,7 @@ class ObservableBufferSpec[T]
   it should "retain continous elements with 2 changes" in {
     // Preparation
     val buffer = ObservableBuffer("a", "b", "c", "d", "e")
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       {
         list.toList should equal(List("c", "d"))
         changes.toList should equal(
@@ -517,7 +517,7 @@ class ObservableBufferSpec[T]
   it should "retain non continous elements with 3 changes" in {
     // Preparation
     val buffer = ObservableBuffer("a", "b", "c", "d", "e")
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       {
         list.toList should equal(List("b", "d"))
         changes.toList should equal(
@@ -548,7 +548,7 @@ class ObservableBufferSpec[T]
     val buffer = ObservableBuffer(1, 2, 3, 4, 5)
     var changesDetected = 0
 
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       {
         changesDetected += 1
         list.toList should equal(List(5, 4, 3, 2, 1))
@@ -567,7 +567,7 @@ class ObservableBufferSpec[T]
     val buffer = ObservableBuffer(1, 2, 3, 1, 5)
     var changesDetected = 0
 
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       {
         changesDetected += 1
         list.toList should equal(List(0, 2, 3, 0, 5))
@@ -586,7 +586,7 @@ class ObservableBufferSpec[T]
     val buffer = ObservableBuffer(1, 2, 3, 4, 5)
     var changesDetected = 0
 
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       {
         changesDetected += 1
         list.toList should equal(List(-1, -1, -1, -1, -1))
@@ -607,7 +607,7 @@ class ObservableBufferSpec[T]
     val addedValues = Buffer.empty[Any]
     val removedValues = Buffer.empty[Any]
     val permutations = Buffer.empty[Buffer[(Int, Int)]]
-    buffer onChange { (list, changes) =>
+    buffer.onChange { (list, changes) =>
       {
         for (change <- changes) change match {
           case Add(pos, addedBuffer) =>
@@ -637,7 +637,7 @@ class ObservableBufferSpec[T]
     addedValues.toList should equal(
       List('e', 'a', 't', 'r', 'j', 'd', 'z', 'h'))
     removedValues.toList should equal(List('d', 'a'))
-    permutations should have size 1
+    (permutations should have).size(1)
     permutations(0).toList should equal(
       List((0, 3), (1, 2), (2, 5), (3, 0), (4, 1), (5, 4)))
   }

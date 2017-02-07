@@ -58,12 +58,14 @@ trait MemberLookupBase {
 
     // (2) Or recursively go into each containing template.
     val fromParents =
-      Stream.iterate(site)(_.owner) takeWhile (!isRoot(_)) map
-        (lookupInTemplate(pos, members, _))
+      Stream
+        .iterate(site)(_.owner)
+        .takeWhile(!isRoot(_))
+        .map(lookupInTemplate(pos, members, _))
 
-    val syms = (fromRoot +: fromParents) find (!_.isEmpty) getOrElse Nil
+    val syms = ((fromRoot +: fromParents) find (!_.isEmpty)).getOrElse(Nil)
 
-    val links = syms flatMap { case (sym, site) => internalLink(sym, site) } match {
+    val links = syms.flatMap { case (sym, site) => internalLink(sym, site) } match {
       case Nil =>
         // (3) Look at external links
         syms.flatMap {
@@ -145,16 +147,16 @@ trait MemberLookupBase {
       case Nil => Nil
       case mbrName :: Nil =>
         var syms =
-          lookupInTemplate(pos, mbrName, container, OnlyType) map
-            ((_, container))
+          lookupInTemplate(pos, mbrName, container, OnlyType).map(
+            (_, container))
         if (syms.isEmpty)
-          syms = lookupInTemplate(pos, mbrName, container, OnlyTerm) map
-              ((_, container))
+          syms = lookupInTemplate(pos, mbrName, container, OnlyTerm).map(
+            (_, container))
         syms
 
       case tplName :: rest =>
         def completeSearch(syms: List[Symbol]) =
-          syms flatMap (lookupInTemplate(pos, rest, _))
+          syms.flatMap(lookupInTemplate(pos, rest, _))
 
         completeSearch(lookupInTemplate(pos, tplName, container, OnlyTerm)) match {
           case Nil =>
@@ -190,7 +192,8 @@ trait MemberLookupBase {
       if (member.endsWith("$")) termSyms
       else if (member.endsWith("!")) typeSyms
       else if (member.endsWith("*"))
-        cleanupBogusClasses(container.info.nonPrivateDecls) filter signatureMatch
+        cleanupBogusClasses(container.info.nonPrivateDecls)
+          .filter(signatureMatch)
       else
         strategy match {
           case BothTypeAndTerm => termSyms ::: typeSyms

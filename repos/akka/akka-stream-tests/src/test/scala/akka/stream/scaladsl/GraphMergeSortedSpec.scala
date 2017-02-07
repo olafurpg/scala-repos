@@ -39,7 +39,7 @@ class GraphMergeSortedSpec
         val (left, right) = picks.zipWithIndex.partition(_._1)
         Source(left.map(_._2))
           .mergeSorted(Source(right.map(_._2)))
-          .grouped(N max 1)
+          .grouped(N.max(1))
           .concat(Source.single(Nil))
           .runWith(Sink.head)
           .futureValue should ===(0 until N)

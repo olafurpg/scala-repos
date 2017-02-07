@@ -22,7 +22,7 @@ class Encoder extends OneToOneEncoder {
     message match {
       case Tokens(tokens) =>
         val buffer = ChannelBuffers.dynamicBuffer(10 * tokens.size)
-        tokens foreach { token =>
+        tokens.foreach { token =>
           // Note that certain variants of writeBytes with a
           // ChannelBuffer *consume* the buffer and others *copy* it.
           // This encoder is not supposed to be destructive of the
@@ -40,13 +40,13 @@ class Encoder extends OneToOneEncoder {
         buffer
       case TokensWithData(tokens, data, casUnique) =>
         val buffer = ChannelBuffers.dynamicBuffer(50 + data.length)
-        tokens foreach { token =>
+        tokens.foreach { token =>
           buffer.writeBytes(BufChannelBuffer(token), 0, token.length)
           buffer.writeBytes(SPACE)
         }
 
         buffer.writeBytes(BufChannelBuffer(Buf.Utf8(data.length.toString)))
-        casUnique foreach { token =>
+        casUnique.foreach { token =>
           buffer.writeBytes(SPACE)
           buffer.writeBytes(BufChannelBuffer(token), 0, token.length)
         }
@@ -56,14 +56,14 @@ class Encoder extends OneToOneEncoder {
         buffer
       case ValueLines(lines) =>
         val buffer = ChannelBuffers.dynamicBuffer(100 * lines.size)
-        lines foreach {
+        lines.foreach {
           case TokensWithData(tokens, data, casUnique) =>
-            tokens foreach { token =>
+            tokens.foreach { token =>
               buffer.writeBytes(BufChannelBuffer(token), 0, token.length)
               buffer.writeBytes(SPACE)
             }
             buffer.writeBytes(BufChannelBuffer(Buf.Utf8(data.length.toString)))
-            casUnique foreach { token =>
+            casUnique.foreach { token =>
               buffer.writeBytes(SPACE)
               buffer.writeBytes(BufChannelBuffer(token), 0, token.length)
             }
@@ -76,9 +76,9 @@ class Encoder extends OneToOneEncoder {
         buffer
       case StatLines(lines) =>
         val buffer = ChannelBuffers.dynamicBuffer(100 * lines.size)
-        lines foreach {
+        lines.foreach {
           case Tokens(tokens) =>
-            tokens foreach { token =>
+            tokens.foreach { token =>
               buffer.writeBytes(BufChannelBuffer(token), 0, token.length)
               buffer.writeBytes(SPACE)
             }

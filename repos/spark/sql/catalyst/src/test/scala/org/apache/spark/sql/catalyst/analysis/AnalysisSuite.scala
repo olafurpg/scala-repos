@@ -195,11 +195,11 @@ class AnalysisSuite extends AnalysisTest {
 
   test("divide should be casted into fractional types") {
     val plan = caseInsensitiveAnalyzer.execute(
-      testRelation2.select('a / Literal(2) as 'div1,
-                           'a / 'b as 'div2,
-                           'a / 'c as 'div3,
-                           'a / 'd as 'div4,
-                           'e / 'e as 'div5))
+      testRelation2.select(('a / Literal(2)).as('div1),
+                           ('a / 'b).as('div2),
+                           ('a / 'c).as('div3),
+                           ('a / 'd).as('div4),
+                           ('e / 'e).as('div5)))
     val pl = plan.asInstanceOf[Project].projectList
 
     assert(pl(0).dataType == DoubleType)

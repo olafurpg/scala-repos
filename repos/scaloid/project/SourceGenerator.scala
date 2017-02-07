@@ -23,7 +23,7 @@ object SourceGenerator {
      extract in Scaloid,
      apiVersion in Scaloid,
      scalaVersion,
-     streams) map {
+     streams).map {
       (mName, baseDir, srcDir, androidClasses, androidApiVersion, scalaVersion,
        s) =>
         import NameFilter._

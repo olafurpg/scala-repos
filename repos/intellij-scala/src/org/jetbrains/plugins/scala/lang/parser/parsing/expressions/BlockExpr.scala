@@ -43,7 +43,7 @@ object BlockExpr {
               Block.parse(builder)
             case _ =>
               backMarker.rollbackTo()
-              CaseClauses parse builder
+              CaseClauses.parse(builder)
           }
         case _ =>
           Block.parse(builder)

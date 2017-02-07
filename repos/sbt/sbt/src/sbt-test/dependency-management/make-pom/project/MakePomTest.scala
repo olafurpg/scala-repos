@@ -6,7 +6,7 @@ import scala.xml._
 object MakePomTest extends Build {
   lazy val root =
     Project("root", file(".")) settings
-      (readPom <<= makePom map XML.loadFile,
+      (readPom <<= makePom.map(XML.loadFile),
       TaskKey[Unit]("check-pom") <<= checkPom,
       TaskKey[Unit]("check-extra") <<= checkExtra, TaskKey[Unit](
         "check-version-plus-mapping") <<= checkVersionPlusMapping,
@@ -18,7 +18,7 @@ object MakePomTest extends Build {
 
   val fakeName = "fake"
   val fakeURL = "http://example.org"
-  val fakeRepo = fakeName at fakeURL
+  val fakeRepo = fakeName.at(fakeURL)
   def extraTagName = "extra-tag"
 
   def checkProject(pom: Elem) =
@@ -32,7 +32,7 @@ object MakePomTest extends Build {
   }
 
   lazy val checkExtra =
-    readPom map { pomXML =>
+    readPom.map { pomXML =>
       checkProject(pomXML)
       val extra = pomXML \ extraTagName
       if (extra.isEmpty)
@@ -41,7 +41,7 @@ object MakePomTest extends Build {
     }
 
   lazy val checkVersionPlusMapping =
-    (readPom) map { (pomXml) =>
+    (readPom).map { (pomXml) =>
       var found = false
       for {
         dep <- pomXml \ "dependencies" \ "dependency"
@@ -53,7 +53,7 @@ object MakePomTest extends Build {
     }
 
   lazy val checkPom =
-    (readPom, fullResolvers) map { (pomXML, ivyRepositories) =>
+    (readPom, fullResolvers).map { (pomXML, ivyRepositories) =>
       checkProject(pomXML)
       withRepositories(pomXML) { repositoriesElement =>
         val repositories = repositoriesElement \ "repository"
@@ -76,7 +76,7 @@ object MakePomTest extends Build {
     }
 
   def read(repository: Node): MavenRepository =
-    (repository \ "name").text at normalize((repository \ "url").text)
+    (repository \ "name").text.at(normalize((repository \ "url").text))
 
   def normalize(url: String): String = {
     val base = uri(url).normalize.toString

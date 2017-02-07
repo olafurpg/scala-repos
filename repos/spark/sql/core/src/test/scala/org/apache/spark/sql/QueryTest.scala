@@ -194,7 +194,7 @@ abstract class QueryTest extends PlanTest {
   def assertCached(query: Queryable, numCachedTables: Int = 1): Unit = {
     val planWithCaching = query.queryExecution.withCachedData
     val cachedData =
-      planWithCaching collect {
+      planWithCaching.collect {
         case cached: InMemoryRelation => cached
       }
 
@@ -265,7 +265,7 @@ abstract class QueryTest extends PlanTest {
     }
 
     val normalized2 =
-      jsonBackPlan transformDown {
+      jsonBackPlan.transformDown {
         case l: LogicalRDD =>
           val origin = logicalRDDs.head
           logicalRDDs = logicalRDDs.drop(1)

@@ -64,7 +64,7 @@ class KillOverdueTasksActorTest
 
   test("no overdue tasks") {
     Given("no tasks")
-    taskTracker.tasksByAppSync returns TasksByApp.empty
+    taskTracker.tasksByAppSync.returns(TasksByApp.empty)
 
     When("a check is performed")
     val testProbe = TestProbe()
@@ -82,7 +82,7 @@ class KillOverdueTasksActorTest
     Given("one overdue task")
     val mockTask = MarathonTestHelper.stagedTaskProto("someId")
     val app = TaskTracker.AppTasks(PathId("/some"), Iterable(mockTask))
-    taskTracker.tasksByAppSync returns TasksByApp.of(app)
+    taskTracker.tasksByAppSync.returns(TasksByApp.of(app))
 
     When("the check is initiated")
     checkActor ! KillOverdueTasksActor.Check(maybeAck = None)
@@ -150,7 +150,7 @@ class KillOverdueTasksActorTest
         runningTask
       )
     )
-    taskTracker.tasksByAppSync returns TasksByApp.of(app)
+    taskTracker.tasksByAppSync.returns(TasksByApp.of(app))
 
     When(
       "We check which tasks should be killed because they're not yet staged or unconfirmed")

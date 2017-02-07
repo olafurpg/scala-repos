@@ -186,7 +186,7 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
                   case clDef: ClassDef if isTestClass(clDef) =>
                     // Get the module definition
                     val modDefOption =
-                      xs collectFirst {
+                      xs.collectFirst {
                         case clDef: ClassDef if isModule(clDef) => clDef
                       }
                     // Create a new module for the JUnit entry point.

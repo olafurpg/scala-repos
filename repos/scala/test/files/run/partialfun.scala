@@ -7,7 +7,7 @@ object Test {
       implicit bf: CanBuildFrom[Repr, B, That]): That = {
     val repr: Repr = _this.asInstanceOf[Repr]
     val b = bf(repr)
-    _this foreach { x =>
+    _this.foreach { x =>
       if (pf isDefinedAt x) b += pf(x)
     }
     b.result
@@ -18,8 +18,8 @@ object Test {
       implicit bf: CanBuildFrom[Repr, B, That]): That = {
     val repr: Repr = _this.asInstanceOf[Repr]
     val b = bf(repr)
-    val f = pf runWith { b += _ }
-    _this foreach f
+    val f = pf.runWith { b += _ }
+    _this.foreach(f)
     b.result
   }
 
@@ -56,7 +56,7 @@ object Test {
     val ysRW = collectRW(xs)(pf)
     val cntRW = resetCnt()
 
-    val ys = xs collect pf
+    val ys = xs.collect(pf)
 
     assert(ys == ysIDA)
     assert(ys == ysRW)
@@ -81,7 +81,7 @@ object Test {
       def isDefinedAt(u: Unit) = { println("2:isDefinedAt"); true }
     }
 
-    val chained = pf0 orElse pf1 orElse pf2
+    val chained = pf0.orElse(pf1).orElse(pf2)
     chained(())
   }
 

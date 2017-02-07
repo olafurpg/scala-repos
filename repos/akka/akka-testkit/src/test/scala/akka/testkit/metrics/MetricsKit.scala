@@ -98,7 +98,7 @@ private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
     * Schedule metric reports execution iterval. Should not be used multiple times
     */
   def scheduleMetricReports(every: FiniteDuration) {
-    reporters foreach { _.start(every.toMillis, TimeUnit.MILLISECONDS) }
+    reporters.foreach { _.start(every.toMillis, TimeUnit.MILLISECONDS) }
   }
 
   def registeredMetrics = registry.getMetrics.asScala
@@ -120,7 +120,7 @@ private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
     * HINT: this operation can be costy, run outside of your tested code, or rely on scheduled reporting.
     */
   def reportMetrics() {
-    reporters foreach { _.report() }
+    reporters.foreach { _.report() }
   }
 
   /**
@@ -131,7 +131,7 @@ private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
   def reportMemoryMetrics() {
     val gauges = registry.getGauges(MemMetricsFilter)
 
-    reporters foreach { _.report(gauges, empty, empty, empty, empty) }
+    reporters.foreach { _.report(gauges, empty, empty, empty, empty) }
   }
 
   /**
@@ -142,7 +142,7 @@ private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
   def reportGcMetrics() {
     val gauges = registry.getGauges(GcMetricsFilter)
 
-    reporters foreach { _.report(gauges, empty, empty, empty, empty) }
+    reporters.foreach { _.report(gauges, empty, empty, empty, empty) }
   }
 
   /**
@@ -153,7 +153,7 @@ private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
   def reportFileDescriptorMetrics() {
     val gauges = registry.getGauges(FileDescriptorMetricsFilter)
 
-    reporters foreach { _.report(gauges, empty, empty, empty, empty) }
+    reporters.foreach { _.report(gauges, empty, empty, empty, empty) }
   }
 
   /**
@@ -172,7 +172,7 @@ private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
     * MUST be called after all tests have finished.
     */
   def shutdownMetrics() {
-    reporters foreach { _.stop() }
+    reporters.foreach { _.stop() }
   }
 
   private[metrics] def getOrRegister[M <: Metric](key: String, metric: ⇒ M)(

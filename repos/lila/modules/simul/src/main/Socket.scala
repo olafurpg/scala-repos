@@ -28,11 +28,11 @@ private[simul] final class Socket(simulId: String,
 
   private def redirectPlayer(game: lila.game.Game,
                              colorOption: Option[chess.Color]) {
-    colorOption foreach { color =>
-      val player = game player color
-      player.userId foreach { userId =>
-        membersByUserId(userId) foreach { member =>
-          notifyMember("redirect", game fullIdOf player.color)(member)
+    colorOption.foreach { color =>
+      val player = game.player(color)
+      player.userId.foreach { userId =>
+        membersByUserId(userId).foreach { member =>
+          notifyMember("redirect", game.fullIdOf(player.color))(member)
         }
       }
     }
@@ -41,17 +41,17 @@ private[simul] final class Socket(simulId: String,
   def receiveSpecific = {
 
     case StartGame(game, hostId) =>
-      redirectPlayer(game, game.playerByUserId(hostId) map (!_.color))
+      redirectPlayer(game, game.playerByUserId(hostId).map(!_.color))
 
     case StartSimul(firstGame, hostId) =>
-      redirectPlayer(firstGame, firstGame.playerByUserId(hostId) map (_.color))
+      redirectPlayer(firstGame, firstGame.playerByUserId(hostId).map(_.color))
 
     case HostIsOn(gameId) => notifyVersion("hostGame", gameId, Messadata())
 
     case Reload =>
-      getSimul(simulId) foreach {
-        _ foreach { simul =>
-          jsonView(simul) foreach { obj =>
+      getSimul(simulId).foreach {
+        _.foreach { simul =>
+          jsonView(simul).foreach { obj =>
             notifyVersion("reload", obj, Messadata())
           }
         }
@@ -63,7 +63,7 @@ private[simul] final class Socket(simulId: String,
       ping(uid)
       timeBomb.delay
       withMember(uid) { m =>
-        history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+        history.since(v).fold(resync(m))(_.foreach(sendMessage(m)))
       }
     }
 

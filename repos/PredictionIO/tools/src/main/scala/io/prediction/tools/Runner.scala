@@ -74,7 +74,7 @@ object Runner extends Logging {
   def detectFilePaths(fileSystem: Option[FileSystem],
                       uri: Option[URI],
                       args: Seq[String]): Seq[String] = {
-    args map { arg =>
+    args.map { arg =>
       val f = try {
         new File(new URI(arg))
       } catch {
@@ -111,7 +111,7 @@ object Runner extends Logging {
 
     // Initialize HDFS API for scratch URI
     val fs =
-      ca.common.scratchUri map { uri =>
+      ca.common.scratchUri.map { uri =>
         FileSystem.get(uri, new Configuration())
       }
 
@@ -133,24 +133,25 @@ object Runner extends Logging {
 
     // Extra JARs that are needed by the driver
     val driverClassPathPrefix =
-      argumentValue(ca.common.sparkPassThrough, "--driver-class-path") map {
-        v =>
+      argumentValue(ca.common.sparkPassThrough, "--driver-class-path")
+        .map { v =>
           Seq(v)
-      } getOrElse {
-        Nil
-      }
+        }
+        .getOrElse {
+          Nil
+        }
 
     val extraClasspaths =
       driverClassPathPrefix ++ WorkflowUtils.thirdPartyClasspaths
 
     // Extra files that are needed to be passed to --files
     val extraFiles =
-      WorkflowUtils.thirdPartyConfFiles map { f =>
+      WorkflowUtils.thirdPartyConfFiles.map { f =>
         handleScratchFile(fs, ca.common.scratchUri, new File(f))
       }
 
     val deployedJars =
-      extraJars map { j =>
+      extraJars.map { j =>
         handleScratchFile(fs, ca.common.scratchUri, new File(j))
       }
 

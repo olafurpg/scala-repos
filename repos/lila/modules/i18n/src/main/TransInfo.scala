@@ -23,11 +23,11 @@ case class TransInfo(lang: Lang,
 
 private[i18n] case class TransInfos(all: List[TransInfo]) {
 
-  lazy val byCode = all map { info =>
+  lazy val byCode = all.map { info =>
     info.code -> info
   } toMap
 
-  def get(code: String): Option[TransInfo] = byCode get code
+  def get(code: String): Option[TransInfo] = byCode.get(code)
 
   def get(lang: Lang): Option[TransInfo] = get(lang.language)
 }
@@ -38,7 +38,7 @@ private[i18n] object TransInfos {
 
   def apply(messages: Messages, keys: I18nKeys): TransInfos = TransInfos {
     val nbMessages = keys.count
-    LangList.sortedList.filter(_._1 != defaultCode) map {
+    LangList.sortedList.filter(_._1 != defaultCode).map {
       case (code, name) =>
         TransInfo(
           lang = Lang(code),

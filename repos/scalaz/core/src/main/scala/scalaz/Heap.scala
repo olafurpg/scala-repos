@@ -112,8 +112,8 @@ sealed abstract class Heap[A] {
   def filter(p: A => Boolean): Heap[A] =
     fold(Empty[A],
          (_, leq, t) =>
-           t foldMap
-             (x => if (p(x.value)) singletonWith(leq, x.value) else Empty[A]))
+           t.foldMap(x =>
+             if (p(x.value)) singletonWith(leq, x.value) else Empty[A]))
 
   /**Partition the heap according to a predicate. The first heap contains all elements that
     * satisfy the predicate. The second contains all elements that fail the predicate. O(n)*/
@@ -135,7 +135,7 @@ sealed abstract class Heap[A] {
             if (leq(a, x)) (Empty[A], singletonWith(leq, x), Empty[A])
             else (singletonWith(leq, x), Empty[A], Empty[A])
           else (Empty[A], Empty[A], singletonWith(leq, x))
-        t foldMap (x => f(x.value))
+        t.foldMap(x => f(x.value))
       }
     )
   }
@@ -183,7 +183,7 @@ sealed abstract class Heap[A] {
 
   /**Construct heaps from each element in this heap and union them together into a new heap. O(n)*/
   def flatMap[B: Order](f: A => Heap[B]): Heap[B] =
-    fold(Empty[B], (_, _, t) => t foldMap (x => f(x.value)))
+    fold(Empty[B], (_, _, t) => t.foldMap(x => f(x.value)))
 
   /**Traverse the elements of the heap in sorted order and produce a new heap with applicative effects.
     * O(n log n)*/
@@ -273,13 +273,13 @@ object Heap extends HeapInstances {
   /**Create a heap consisting of multiple copies of the same value. O(log n) */
   def replicate[A: Order](a: A, i: Int): Heap[A] = {
     def f(x: Heap[A], y: Int): Heap[A] =
-      if (y % 2 == 0) f(x union x, y / 2)
+      if (y % 2 == 0) f(x.union(x), y / 2)
       else if (y == 1) x
-      else g(x union x, (y - 1) / 2, x)
+      else g(x.union(x), (y - 1) / 2, x)
     def g(x: Heap[A], y: Int, z: Heap[A]): Heap[A] =
-      if (y % 2 == 0) g(x union x, y / 2, z)
-      else if (y == 1) x union z
-      else g(x union x, (y - 1) / 2, x union z)
+      if (y % 2 == 0) g(x.union(x), y / 2, z)
+      else if (y == 1) x.union(z)
+      else g(x.union(x), (y - 1) / 2, x.union(z))
     if (i < 0) sys.error("Heap.replicate: negative length")
     else if (i == 0) Empty[A]
     else f(singleton(a), i)
@@ -453,7 +453,7 @@ sealed abstract class HeapInstances {
   }
 
   implicit def heapMonoid[A]: Monoid[Heap[A]] = new Monoid[Heap[A]] {
-    def append(f1: Heap[A], f2: => Heap[A]) = f1 union f2
+    def append(f1: Heap[A], f2: => Heap[A]) = f1.union(f2)
     def zero = Heap.Empty.apply
   }
 

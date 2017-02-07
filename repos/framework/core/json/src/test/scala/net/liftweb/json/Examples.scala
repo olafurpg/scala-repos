@@ -39,9 +39,10 @@ trait AbstractExamples extends Specification {
   "Person example" in {
     val json = parse(person)
     val renderedPerson = prettyRender(json)
-    (json mustEqual parse(renderedPerson)) and
-      (print(json \\ "name") mustEqual """{"name":"Joe","name":"Marilyn"}""") and
-      (print(json \ "person" \ "name") mustEqual "\"Joe\"")
+    ((json mustEqual parse(renderedPerson)))
+      .and(
+        print(json \\ "name") mustEqual """{"name":"Joe","name":"Marilyn"}""")
+      .and(print(json \ "person" \ "name") mustEqual "\"Joe\"")
   }
 
   "Transformation example" in {
@@ -53,14 +54,14 @@ trait AbstractExamples extends Specification {
   }
 
   "Remove example" in {
-    val json = parse(person) removeField { _ == JField("name", "Marilyn") }
+    val json = parse(person).removeField { _ == JField("name", "Marilyn") }
     compactRender(json \\ "name") mustEqual """{"name":"Joe"}"""
   }
 
   "Queries on person example" in {
     val json = parse(person)
     val filtered =
-      json filterField {
+      json.filterField {
         case JField("name", _) => true
         case _ => false
       }
@@ -77,19 +78,20 @@ trait AbstractExamples extends Specification {
 
   "Object array example" in {
     val json = parse(objArray)
-    (print(json \ "children" \ "name") mustEqual """["Mary","Mazy"]""") and
-      (print((json \ "children")(0) \ "name") mustEqual "\"Mary\"") and
-      (print((json \ "children")(1) \ "name") mustEqual "\"Mazy\"") and
-      ((for { JObject(o) <- json; JField("name", JString(y)) <- o } yield
+    ((print(json \ "children" \ "name") mustEqual """["Mary","Mazy"]"""))
+      .and(print((json \ "children")(0) \ "name") mustEqual "\"Mary\"")
+      .and(print((json \ "children")(1) \ "name") mustEqual "\"Mazy\"")
+      .and((for { JObject(o) <- json; JField("name", JString(y)) <- o } yield
         y) mustEqual List("joe", "Mary", "Mazy"))
   }
 
   "Unbox values using XPath-like type expression" in {
-    (parse(objArray) \ "children" \\ classOf[JInt] mustEqual List(5, 3)) and
-      (parse(lotto) \ "lotto" \ "winning-numbers" \ classOf[JInt] mustEqual List(
-          2, 45, 34, 23, 7, 5, 3)) and
-      (parse(lotto) \\ "winning-numbers" \ classOf[JInt] mustEqual List(2, 45,
-        34, 23, 7, 5, 3))
+    ((parse(objArray) \ "children" \\ classOf[JInt] mustEqual List(5, 3)))
+      .and(
+        parse(lotto) \ "lotto" \ "winning-numbers" \ classOf[JInt] mustEqual List(
+            2, 45, 34, 23, 7, 5, 3))
+      .and(parse(lotto) \\ "winning-numbers" \ classOf[JInt] mustEqual List(2,
+        45, 34, 23, 7, 5, 3))
   }
 
   "Quoted example" in {
@@ -115,13 +117,13 @@ trait AbstractExamples extends Specification {
   }
 
   "Exponent example" in {
-    (parse("""{"num": 2e5 }""") mustEqual JObject(
-      List(JField("num", JDouble(200000.0))))) and
-      (parse("""{"num": -2E5 }""") mustEqual JObject(
-        List(JField("num", JDouble(-200000.0))))) and
-      (parse("""{"num": 2.5e5 }""") mustEqual JObject(
-        List(JField("num", JDouble(250000.0))))) and
-      (parse("""{"num": 2.5e-5 }""") mustEqual JObject(
+    ((parse("""{"num": 2e5 }""") mustEqual JObject(
+      List(JField("num", JDouble(200000.0))))))
+      .and(parse("""{"num": -2E5 }""") mustEqual JObject(
+        List(JField("num", JDouble(-200000.0)))))
+      .and(parse("""{"num": 2.5e5 }""") mustEqual JObject(
+        List(JField("num", JDouble(250000.0)))))
+      .and(parse("""{"num": 2.5e-5 }""") mustEqual JObject(
         List(JField("num", JDouble(2.5e-5)))))
   }
 

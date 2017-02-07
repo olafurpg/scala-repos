@@ -102,7 +102,7 @@ private[mux] object TagMap {
     private[this] def inRange(tag: Int): Boolean =
       tag >= set.range.start && tag <= set.range.end
 
-    def iterator: Iterator[(Int, T)] = set.iterator flatMap { tag =>
+    def iterator: Iterator[(Int, T)] = set.iterator.flatMap { tag =>
       synchronized {
         val el = if (inFast(tag)) getFast(tag) else fallback.get(tag)
         if (el == null) Iterable.empty

@@ -103,7 +103,7 @@ private[reconcile] class OffersWantedForReconciliationActor(
                                        nextCheck: Cancellable): Receive =
     LoggingReceive.withLabel("subscribedToOffers") {
 
-      handleRequestOfferIndicators orElse {
+      handleRequestOfferIndicators.orElse {
         case OffersWantedForReconciliationActor.RecheckInterest
             if clock.now() > until =>
           nextCheck.cancel()
@@ -120,7 +120,7 @@ private[reconcile] class OffersWantedForReconciliationActor(
       offersWanted.onNext(false)
       log.info("no interest in offers for reservation reconciliation anymore.")
 
-      handleRequestOfferIndicators orElse {
+      handleRequestOfferIndicators.orElse {
         case OffersWantedForReconciliationActor.RecheckInterest => //ignore
         case OffersWantedForReconciliationActor.RequestOffers(reason) =>
           context.become(switchToSubscribedToOffers(reason))

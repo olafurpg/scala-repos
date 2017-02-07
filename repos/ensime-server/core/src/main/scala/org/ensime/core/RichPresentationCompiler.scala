@@ -517,10 +517,12 @@ class RichPresentationCompiler(
           selectors
             .filter(_.namePos <= pos.point)
             .sortBy(_.namePos)
-            .lastOption map { sel =>
-            val tpe = stabilizedType(expr)
-            List(tpe.member(sel.name), tpe.member(sel.name.toTypeName))
-          } getOrElse Nil
+            .lastOption
+            .map { sel =>
+              val tpe = stabilizedType(expr)
+              List(tpe.member(sel.name), tpe.member(sel.name.toTypeName))
+            }
+            .getOrElse(Nil)
         }
       case Annotated(atp, _) =>
         List(atp.symbol)

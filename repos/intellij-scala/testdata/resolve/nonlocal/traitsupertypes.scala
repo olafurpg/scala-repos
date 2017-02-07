@@ -7,7 +7,7 @@ trait ScValueDeclaration extends ScDeclaration
 class ValueDeclarationUser {
   {
     0 match {
-      case d: ScValueDeclaration => d.< ref > declaredElements
+      case d: ScValueDeclaration => d.<.ref(>) declaredElements
     }
   }
 }

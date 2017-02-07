@@ -55,7 +55,7 @@ class InRule[In, +Out, +A, +X](rule: Rule[In, Out, A, X]) {
 class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
   import rule.factory._
 
-  def ? = rule mapRule {
+  def ? = rule.mapRule {
     case Success(out, a) =>
       in: S =>
         Success(out, Some(a))
@@ -69,7 +69,7 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
 
   /** Creates a rule that always succeeds with a Boolean value.
     *  Value is 'true' if this rule succeeds, 'false' otherwise */
-  def -? = ? map { _ isDefined }
+  def -? = ?.map { _ isDefined }
 
   def * = from[S] {
     // tail-recursive function with reverse list accumulator

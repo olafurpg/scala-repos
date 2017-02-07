@@ -61,9 +61,11 @@ object PathResolver {
     */
   object Environment {
     private def searchForBootClasspath =
-      systemProperties collectFirst {
-        case (k, v) if k endsWith ".boot.class.path" => v
-      } getOrElse ""
+      systemProperties
+        .collectFirst {
+          case (k, v) if k.endsWith(".boot.class.path") => v
+        }
+        .getOrElse("")
 
     /** Environment variables which java pays attention to so it
       *  seems we do as well.
@@ -168,11 +170,14 @@ object PathResolver {
       def deeply(dir: Directory) = dir.deepFiles find (_.name == jarName)
 
       val home =
-        envOrSome("JDK_HOME", envOrNone("JAVA_HOME")) map (p => Path(p))
+        envOrSome("JDK_HOME", envOrNone("JAVA_HOME")).map(p => Path(p))
       val install = Some(Path(javaHome))
 
-      (home flatMap jarAt) orElse (install flatMap jarAt) orElse
-        (install map (_.parent) flatMap jarAt) orElse (jdkDir flatMap deeply)
+      (home
+        .flatMap(jarAt))
+        .orElse(install.flatMap(jarAt))
+        .orElse(install.map(_.parent).flatMap(jarAt))
+        .orElse(jdkDir.flatMap(deeply))
     }
     override def toString = s"""
       |object SupplementalLocations {
@@ -234,7 +239,7 @@ abstract class PathResolverBase[BaseClassPathType <: ClassFileLookup[
     (commandLineFor(name) match {
       case Some("") => None
       case x => x
-    }) getOrElse alt
+    }).getOrElse(alt)
   }
 
   private def commandLineFor(s: String): Option[String] = condOpt(s) {
@@ -320,7 +325,7 @@ abstract class PathResolverBase[BaseClassPathType <: ClassFileLookup[
       Console print s"Defaults: ${PathResolver.Defaults}"
       Console print s"Calculated: $Calculated"
 
-      val xs = (Calculated.basis drop 2).flatten.distinct
+      val xs = (Calculated.basis.drop(2)).flatten.distinct
       Console print
         (xs mkLines
           (s"After java boot/extdirs classpath has ${xs.size} entries:",

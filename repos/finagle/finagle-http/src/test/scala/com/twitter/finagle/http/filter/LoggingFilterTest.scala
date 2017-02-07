@@ -34,7 +34,7 @@ class LoggingFilterTest extends FunSuite {
         Future.value(response)
       }
     }
-    val filter = (new LoggingFilter(logger, formatter)) andThen service
+    val filter = (new LoggingFilter(logger, formatter)).andThen(service)
 
     Time.withTimeAt(Time.fromSeconds(1302121932)) { _ =>
       Await.result(filter(request))

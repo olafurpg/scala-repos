@@ -20,11 +20,11 @@ class MonitorTest extends WordSpec with MockitoSugar {
   "Monitor#orElse" should {
     class MonitorOrElseHelper {
       val m0, m1, m2 = spy(new MockMonitor)
-      Seq(m0, m1, m2) foreach { m =>
+      Seq(m0, m1, m2).foreach { m =>
         when(m.handle(any[Throwable])).thenReturn(true)
       }
       val exc = new Exception
-      val m = m0 orElse m1 orElse m2
+      val m = m0.orElse(m1).orElse(m2)
     }
 
     "stop at first successful handle" in {
@@ -49,11 +49,11 @@ class MonitorTest extends WordSpec with MockitoSugar {
       val h = new MonitorOrElseHelper
       import h._
 
-      Seq(m0, m1, m2) foreach { m =>
-        when(m.handle(any[Throwable])) thenReturn (false)
+      Seq(m0, m1, m2).foreach { m =>
+        when(m.handle(any[Throwable])).thenReturn(false)
       }
       assert(m.handle(exc) == false)
-      Seq(m0, m1, m2) foreach { m =>
+      Seq(m0, m1, m2).foreach { m =>
         verify(m).handle(exc)
       }
     }
@@ -76,7 +76,7 @@ class MonitorTest extends WordSpec with MockitoSugar {
       val m0, m1 = spy(new MockMonitor)
       when(m0.handle(any[Throwable])).thenReturn(true)
       when(m1.handle(any[Throwable])).thenReturn(true)
-      val m = m0 andThen m1
+      val m = m0.andThen(m1)
       val exc = new Exception
     }
 

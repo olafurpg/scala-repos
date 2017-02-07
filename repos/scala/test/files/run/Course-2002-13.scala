@@ -57,7 +57,7 @@ object Terms {
   case class Var(a: String) extends Term {
     override def toString() = a;
     def map(s: Subst): Term = lookup(s, a) match {
-      case Some(b) => b map s
+      case Some(b) => b.map(s)
       case None => this;
     }
     def tyvars = List(a);
@@ -66,8 +66,8 @@ object Terms {
   case class Con(a: String, ts: List[Term]) extends Term {
     override def toString() =
       a + (if (ts.isEmpty) "" else ts.mkString("(", ",", ")"));
-    def map(s: Subst): Term = Con(a, ts map (t => t map s));
-    def tyvars = (ts flatMap (t => t.tyvars)).distinct;
+    def map(s: Subst): Term = Con(a, ts.map(t => t.map(s)));
+    def tyvars = (ts.flatMap(t => t.tyvars)).distinct;
   }
 
   private var count = 0;
@@ -119,11 +119,11 @@ object Programs {
 
   case class Clause(lhs: Term, rhs: List[Term]) {
     def tyvars =
-      (lhs.tyvars ::: (rhs flatMap (t => t.tyvars))).distinct;
+      (lhs.tyvars ::: (rhs.flatMap(t => t.tyvars))).distinct;
     def newInstance = {
       var s: Subst = List();
       for (a <- tyvars) { s = Binding(a, newVar(a)) :: s }
-      Clause(lhs map s, rhs map (t => t map s))
+      Clause(lhs.map(s), rhs.map(t => t.map(s)))
     }
     override def toString() =
       lhs.toString() + " :- " + rhs.mkString("", ",", "") + ".";
@@ -230,7 +230,7 @@ object Prolog {
     var solutions: Stream[Subst] = Stream.empty;
     var tvs: List[String] = List();
     { input =>
-      new Parser(input).all foreach { c =>
+      new Parser(input).all.foreach { c =>
         if (c.lhs == NoTerm) {
           c.rhs match {
             case List(Con("more", List())) =>
@@ -244,7 +244,7 @@ object Prolog {
           } else {
             val s: Subst = solutions.head
               .filter(b => tvs contains b.name)
-              .map(b => Binding(b.name, b.term map solutions.head))
+              .map(b => Binding(b.name, b.term.map(solutions.head)))
               .reverse;
             if (s.isEmpty) Console.println("yes")
             else Console.println(s);

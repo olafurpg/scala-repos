@@ -18,7 +18,7 @@ trait PredefinedToResponseMarshallers
   def fromToEntityMarshaller[T](status: StatusCode = StatusCodes.OK,
                                 headers: immutable.Seq[HttpHeader] = Nil)(
       implicit m: ToEntityMarshaller[T]): ToResponseMarshaller[T] =
-    fromStatusCodeAndHeadersAndValue compose (t ⇒ (status, headers, t))
+    fromStatusCodeAndHeadersAndValue.compose(t ⇒ (status, headers, t))
 
   implicit val fromResponse: TRM[HttpResponse] =
     Marshaller.opaque(ConstantFun.scalaIdentityFunction)
@@ -33,14 +33,14 @@ trait PredefinedToResponseMarshallers
   implicit def fromStatusCodeAndValue[S, T](
       implicit sConv: S ⇒ StatusCode,
       mt: ToEntityMarshaller[T]): TRM[(S, T)] =
-    fromStatusCodeAndHeadersAndValue[T] compose {
+    fromStatusCodeAndHeadersAndValue[T].compose {
       case (status, value) ⇒ (sConv(status), Nil, value)
     }
 
   implicit def fromStatusCodeConvertibleAndHeadersAndT[S, T](
       implicit sConv: S ⇒ StatusCode,
       mt: ToEntityMarshaller[T]): TRM[(S, immutable.Seq[HttpHeader], T)] =
-    fromStatusCodeAndHeadersAndValue[T] compose {
+    fromStatusCodeAndHeadersAndValue[T].compose {
       case (status, headers, value) ⇒ (sConv(status), headers, value)
     }
 
@@ -49,7 +49,7 @@ trait PredefinedToResponseMarshallers
     : TRM[(StatusCode, immutable.Seq[HttpHeader], T)] =
     Marshaller(implicit ec ⇒ {
       case (status, headers, value) ⇒
-        mt(value).fast map (_ map (_ map (HttpResponse(status, headers, _))))
+        mt(value).fast.map(_.map(_.map(HttpResponse(status, headers, _))))
     })
 }
 

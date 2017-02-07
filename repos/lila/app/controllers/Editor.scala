@@ -12,7 +12,7 @@ object Editor extends LilaController {
 
   private lazy val positionsJson: String =
     Json stringify {
-      JsArray(chess.StartingPosition.all map { p =>
+      JsArray(chess.StartingPosition.all.map { p =>
         Json.obj("eco" -> p.eco, "name" -> p.name, "fen" -> p.fen)
       })
     }
@@ -21,7 +21,7 @@ object Editor extends LilaController {
 
   def load(urlFen: String) = Open { implicit ctx =>
     val fenStr =
-      Some(urlFen.trim.replace("_", " ")).filter(_.nonEmpty) orElse get("fen")
+      Some(urlFen.trim.replace("_", " ")).filter(_.nonEmpty).orElse(get("fen"))
     fuccess {
       val decodedFen = fenStr
         .map {
@@ -29,7 +29,7 @@ object Editor extends LilaController {
         }
         .filter(_.nonEmpty)
       val situation =
-        (decodedFen flatMap Forsyth.<<< map (_.situation)) | Situation(
+        (decodedFen.flatMap(Forsyth.<<<).map(_.situation)) | Situation(
           chess.variant.Standard)
       val fen = Forsyth >> situation
       Ok(
@@ -41,7 +41,7 @@ object Editor extends LilaController {
   }
 
   def game(id: String) = Open { implicit ctx =>
-    OptionResult(GameRepo game id) { game =>
+    OptionResult(GameRepo.game(id)) { game =>
       Redirect {
         if (game.playable) routes.Round.watcher(game.id, "white")
         else

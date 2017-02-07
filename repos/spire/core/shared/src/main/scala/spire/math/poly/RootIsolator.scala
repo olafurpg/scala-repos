@@ -114,7 +114,7 @@ object RootIsolator {
               val lb = Roots.lowerBound(p)
               if (lb < 0) {
                 val more = split1(p, a, b, c, d)
-                rec(more reverse_::: rest, acc)
+                rec(more.reverse_:::(rest), acc)
               } else {
                 val flr = BigInt(1) << lb
                 val more = split1(p.compose(x + Polynomial.constant(flr)),
@@ -122,7 +122,7 @@ object RootIsolator {
                                   b + a * flr,
                                   c,
                                   d + c * flr)
-                rec(more reverse_::: rest, acc)
+                rec(more.reverse_:::(rest), acc)
               }
           }
         }

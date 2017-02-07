@@ -121,7 +121,7 @@ private[util] class BatchExecutor[In, Out](
     buf.copyToBuffer(prevBatch)
     buf.clear()
 
-    scheduled foreach { _.cancel() }
+    scheduled.foreach { _.cancel() }
     scheduled = scala.None
     currentBufThreshold = newBufThreshold // set the next batch's size
 
@@ -139,7 +139,7 @@ private[util] class BatchExecutor[In, Out](
 
   def executeBatch(batch: Seq[(In, Promise[Out])]) {
     val uncancelled =
-      batch filter {
+      batch.filter {
         case (in, p) =>
           p.isInterrupted match {
             case Some(_cause) =>
@@ -150,22 +150,22 @@ private[util] class BatchExecutor[In, Out](
           }
       }
 
-    val ins = uncancelled map { case (in, _) => in }
+    val ins = uncancelled.map { case (in, _) => in }
     // N.B. intentionally not linking cancellation of these promises to the execution of the batch
     // because it seems that in most cases you would be canceling mostly uncanceled work for an
     // outlier.
-    val promises = uncancelled map { case (_, promise) => promise }
+    val promises = uncancelled.map { case (_, promise) => promise }
 
-    f(ins) respond {
+    f(ins).respond {
       case Return(outs) =>
-        (outs zip promises) foreach {
+        (outs.zip(promises)).foreach {
           case (out, p) =>
             p() = Return(out)
         }
 
       case Throw(e) =>
         val t = Throw(e)
-        promises foreach { _() = t }
+        promises.foreach { _() = t }
     }
   }
 }

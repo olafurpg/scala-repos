@@ -123,7 +123,7 @@ object Member {
     */
   implicit val ordering: Ordering[Member] = new Ordering[Member] {
     def compare(a: Member, b: Member): Int = {
-      a.uniqueAddress compare b.uniqueAddress
+      a.uniqueAddress.compare(b.uniqueAddress)
     }
   }
 

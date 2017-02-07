@@ -21,36 +21,36 @@ class TabulatorTest {
   @Test def oneliner() = {
     val sut = Tabby()
     val items = List("a", "b", "c")
-    val res = sut tabulate items
+    val res = sut.tabulate(items)
     assert(res.size == 1)
     assert(res(0).size == 1)
-    assert(res(0)(0) startsWith "a")
-    assert(res(0)(0) endsWith "c")
+    assert(res(0)(0).startsWith("a"))
+    assert(res(0)(0).endsWith("c"))
   }
   @Test def twoliner() = {
     val sut = Tabby(width = 40)
     val items = List("a" * 15, "b" * 15, "c" * 15)
-    val res = sut tabulate items
+    val res = sut.tabulate(items)
     assert(res.size == 2)
     assert(res(0).size == 2)
     assert(res(1).size == 2) // trailing empty strings
-    assert(res(1)(0) startsWith "b")
+    assert(res(1)(0).startsWith("b"))
   }
   @Test def twolinerx() = {
     val sut = Tabby(width = 40, isAcross = true)
     val items = List("a" * 15, "b" * 15, "c" * 15)
-    val res = sut tabulate items
+    val res = sut.tabulate(items)
     assert(res.size == 2)
     assert(res(0).size == 2)
     assert(res(1).size == 1) // no trailing empty strings
-    assert(res(1)(0) startsWith "c")
+    assert(res(1)(0).startsWith("c"))
   }
   // before, two 9-width cols don't fit in 20
   // but now, 5-col and 9-col do fit.
   @Test def twolinerVariable() = {
     val sut = VTabby(width = 20)
-    val items = (1 to 9) map (i => i.toString * i)
-    val rows = sut tabulate items
+    val items = ((1 to 9)).map(i => i.toString * i)
+    val rows = sut.tabulate(items)
     assert(rows.size == 5)
     assert(rows(0).size == 2)
     assert(rows(0)(0).size == 8) // width is 55555 plus margin of 3
@@ -74,7 +74,7 @@ class TabulatorTest {
       "package",
       "runtime"
     )
-    val rows = sut tabulate items
+    val rows = sut.tabulate(items)
     assert(rows.size == 8)
     assert(rows(0).size == 2)
     assert(rows(0)(0).size == "ShutdownHookThread".length + sut.marginSize) // 21
@@ -98,7 +98,7 @@ class TabulatorTest {
       "package",
       "runtime"
     )
-    val rows = sut tabulate items
+    val rows = sut.tabulate(items)
     assert(rows.size == 2)
     assert(rows(0).size == 8)
     assert(rows(0)(0).size == "BooleanProp".length + sut.marginSize) // 14
@@ -108,7 +108,7 @@ class TabulatorTest {
     // each of two lines would fit, but layout is two cols of width six > 10
     // therefore, should choose ncols = 1
     val items = List("a", "bcd", "efg", "h")
-    val rows = sut tabulate items
+    val rows = sut.tabulate(items)
     assert(rows.size == 4)
     assert(rows(0).size == 1)
     assert(rows(0)(0).size == "efg".length + sut.marginSize) // 6
@@ -116,7 +116,7 @@ class TabulatorTest {
   @Test def badFit() = {
     val sut = VTabby(isAcross = true)
     val items = ('a' until 'z').map(_.toString).toList
-    val rows = sut tabulate items
+    val rows = sut.tabulate(items)
     assert(rows.size == 2)
     assert(rows(0).size == 20) // 20 * 4 = 80
     assert(rows(1)(0).dropRight(sut.marginSize) == "u")
@@ -150,7 +150,7 @@ class TabulatorTest {
       "unary_~",
       "|"
     )
-    val rows = sut tabulate items
+    val rows = sut.tabulate(items)
     assert(rows.size == 4)
     assert(rows(3).size == 4) // 7 cols
     assert(rows(3)(0).dropRight(sut.marginSize) == "unary_+")

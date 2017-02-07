@@ -176,7 +176,7 @@ trait Pattern {
         case Add3(a, b, c) => Add(a :: b :: c :: Nil)
         case Sub(a, b) => Add(a :: Neg(b) :: Nil)
         case Add(x) =>
-          Add(x flatMap {
+          Add(x.flatMap {
             case Neg(Add(y)) => y.map(Neg(_))
             case Add(y) => y
             case y => y :: Nil
@@ -381,7 +381,7 @@ trait Pattern {
       extends ManyArg[T] {
     def eval(f: Any => Any) = num.sum(for (i <- args.iterator) yield i.eval(f))
     def derivative(v: Var[T]) = Add(args.map(_.derivative(v)))
-    def mapArgs(f: EndoFunction[Expr[_]]) = Add(args map (x => f(x)))
+    def mapArgs(f: EndoFunction[Expr[_]]) = Add(args.map(x => f(x)))
     override def toString = "(" + args.mkString(" + ") + ")"
     override lazy val hashCode = ScalaRunTime._hashCode(this);
   }

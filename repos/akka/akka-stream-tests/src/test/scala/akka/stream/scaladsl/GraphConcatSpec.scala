@@ -14,7 +14,7 @@ class GraphConcatSpec extends TwoStreamsSetup {
   override type Outputs = Int
 
   override def fixture(b: GraphDSL.Builder[_]): Fixture = new Fixture(b) {
-    val concat = b add Concat[Outputs]()
+    val concat = b.add(Concat[Outputs]())
 
     override def left: Inlet[Outputs] = concat.in(0)
     override def right: Inlet[Outputs] = concat.in(1)
@@ -29,8 +29,8 @@ class GraphConcatSpec extends TwoStreamsSetup {
 
       RunnableGraph
         .fromGraph(GraphDSL.create() { implicit b ⇒
-          val concat1 = b add Concat[Int]()
-          val concat2 = b add Concat[Int]()
+          val concat1 = b.add(Concat[Int]())
+          val concat2 = b.add(Concat[Int]())
 
           Source(List.empty[Int]) ~> concat1.in(0)
           Source(1 to 4) ~> concat1.in(1)
@@ -151,7 +151,7 @@ class GraphConcatSpec extends TwoStreamsSetup {
 
       RunnableGraph
         .fromGraph(GraphDSL.create() { implicit b ⇒
-          val concat = b add Concat[Int]()
+          val concat = b.add(Concat[Int]())
           Source(List(1, 2, 3)) ~> concat.in(0)
           Source.fromFuture(promise.future) ~> concat.in(1)
           concat.out ~> Sink.fromSubscriber(subscriber)

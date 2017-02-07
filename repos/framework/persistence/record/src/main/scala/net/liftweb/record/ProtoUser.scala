@@ -260,7 +260,7 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
       * Does the supplied password match the actual password?
       */
     def testPassword(toTest: Box[String]): Boolean =
-      toTest.map(in.password.match_?) openOr false
+      toTest.map(in.password.match_?).openOr(false)
 
     /**
       * Set the validation flag on the user and return the user

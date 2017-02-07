@@ -79,12 +79,14 @@ trait Monitor { self =>
     * wrap it in a [[MonitorException]].
     */
   protected def tryHandle(exc: Throwable): Try[Unit] =
-    Try { self.handle(exc) } rescue {
-      case monitorExc => Throw(MonitorException(exc, monitorExc))
-    } flatMap { ok =>
-      if (ok) Return.Unit
-      else Throw(exc): Try[Unit]
-    }
+    Try { self.handle(exc) }
+      .rescue {
+        case monitorExc => Throw(MonitorException(exc, monitorExc))
+      }
+      .flatMap { ok =>
+        if (ok) Return.Unit
+        else Throw(exc): Try[Unit]
+      }
 }
 
 /**
@@ -147,7 +149,7 @@ object Monitor extends Monitor {
     * the [[RootMonitor]].
     */
   def handle(exc: Throwable): Boolean =
-    (get orElse RootMonitor).handle(exc)
+    (get.orElse(RootMonitor)).handle(exc)
 
   private[this] val AlwaysFalse = scala.Function.const(false) _
 

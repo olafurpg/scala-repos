@@ -527,17 +527,17 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
 
     val maxf = (a: Int, b: String) => math.max(a, b.length)
 
-    if (length == 0) buf append "Empty Vec"
+    if (length == 0) buf.append("Empty Vec")
     else {
-      buf.append("[%d x 1]\n" format (length))
-      val vlen = { head(half) concat tail(half) }
+      buf.append("[%d x 1]\n".format(length))
+      val vlen = { head(half).concat(tail(half)) }
         .map(scalarTag.show(_))
         .foldLeft(0)(maxf)
 
       def createRow(r: Int): String =
         ("%" + { if (vlen > 0) vlen else 1 } + "s\n")
           .format(scalarTag.show(apply(r)))
-      buf append util.buildStr(len, length, createRow, " ... \n")
+      buf.append(util.buildStr(len, length, createRow, " ... \n"))
     }
 
     buf.toString()

@@ -20,17 +20,17 @@ private[setup] final class Processor(lobby: ActorSelection,
                                      onStart: String => Unit) {
 
   def filter(config: FilterConfig)(implicit ctx: UserContext): Funit =
-    saveConfig(_ withFilter config)
+    saveConfig(_.withFilter(config))
 
   def ai(config: AiConfig)(implicit ctx: UserContext): Fu[Pov] = {
     val pov = blamePov(config.pov, ctx.me)
-    saveConfig(_ withAi config) >> (GameRepo insertDenormalized pov.game) >>- onStart(
+    saveConfig(_.withAi(config)) >> (GameRepo insertDenormalized pov.game) >>- onStart(
       pov.game.id) >> {
       pov.game.player.isAi ?? fishnetPlayer(pov.game)
     } inject pov
   }
 
-  private def blamePov(pov: Pov, user: Option[User]): Pov = pov withGame {
+  private def blamePov(pov: Pov, user: Option[User]): Pov = pov.withGame {
     user.fold(pov.game) { u =>
       pov.game.updatePlayer(
         pov.color,
@@ -43,7 +43,7 @@ private[setup] final class Processor(lobby: ActorSelection,
            sid: Option[String],
            blocking: Set[String])(implicit ctx: UserContext): Fu[String] = {
     val config = configBase.fixColor
-    saveConfig(_ withHook config) >> {
+    saveConfig(_.withHook(config)) >> {
       config.hook(uid, ctx.me, sid, blocking) match {
         case Left(hook) =>
           fuccess {
@@ -63,7 +63,7 @@ private[setup] final class Processor(lobby: ActorSelection,
   }
 
   def saveFriendConfig(config: FriendConfig)(implicit ctx: UserContext) =
-    saveConfig(_ withFriend config)
+    saveConfig(_.withFriend(config))
 
   private def saveConfig(map: UserConfig => UserConfig)(
       implicit ctx: UserContext): Funit =

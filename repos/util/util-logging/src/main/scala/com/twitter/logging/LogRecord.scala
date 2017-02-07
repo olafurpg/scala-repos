@@ -63,7 +63,7 @@ class LogRecord(level: javalog.Level, msg: String)
       elt.getClassName != LogRecord.twitterString
 
     // Find the first non-Logger StackTraceElement after the first occurrence of Logger.
-    val elt = stack dropWhile notTwitterString find notTwitterString
+    val elt = stack.dropWhile(notTwitterString) find notTwitterString
 
     val (cName, mName) = elt match {
       case Some(element) => (element.getClassName, element.getMethodName)

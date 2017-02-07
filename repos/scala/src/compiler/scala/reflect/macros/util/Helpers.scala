@@ -50,7 +50,7 @@ trait Helpers { self: Analyzer =>
     ContextParam match {
       case NoSymbol => paramss
       case _ =>
-        paramss.last map transformTag filter (_.exists) match {
+        paramss.last.map(transformTag).filter(_.exists) match {
           case Nil => paramss.init
           case transformed => paramss.init :+ transformed
         }

@@ -40,7 +40,7 @@ object RawBitSet {
     if (pos < bits.length) {
       bits(pos) |= (1 << (i & 0x1F))
     } else {
-      throw new IndexOutOfBoundsException("Bit %d is out of range." format i)
+      throw new IndexOutOfBoundsException("Bit %d is out of range.".format(i))
     }
   }
 

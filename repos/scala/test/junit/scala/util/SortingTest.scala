@@ -76,20 +76,20 @@ class SortingTest {
     assertTrue("Stable sorting by proxy should produce sorted stable list",
                isStable(sys.map(i => xs(i))))
     assertTrue("Quicksort should produce canonical ordering",
-               (qxs zip zs).forall {
+               (qxs.zip(zs)).forall {
                  case (a, b) => a.i == b.i
                })
     assertTrue("Reverse quicksort should produce canonical ordering",
-               (pxs.reverse zip zs).forall { case (a, b) => a.i == b.i })
+               (pxs.reverse.zip(zs)).forall { case (a, b) => a.i == b.i })
     assertTrue("Stable sort should produce exact ordering",
-               (sxs zip zs).forall {
+               (sxs.zip(zs)).forall {
                  case (a, b) => a == b
                })
     assertTrue("Reverse stable sort should produce canonical ordering",
-               (rxs.reverse zip zs).forall { case (a, b) => a.i == b.i })
+               (rxs.reverse.zip(zs)).forall { case (a, b) => a.i == b.i })
     assertTrue(
       "Proxy sort and direct sort should produce exactly the same thing",
-      (sxs zip sys.map(i => xs(i))).forall { case (a, b) => a == b })
+      (sxs.zip(sys.map(i => xs(i)))).forall { case (a, b) => a == b })
   }
 
   @Test def testSortConsistency: Unit = {

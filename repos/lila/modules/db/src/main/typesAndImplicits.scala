@@ -37,7 +37,7 @@ trait Implicits extends Types {
     def sort(sorters: (String, api.SortOrder)*): QueryBuilder =
       if (sorters.size == 0) b
       else
-        b sort {
+        b.sort {
           BSONDocument(
             (for (sorter ← sorters)
               yield
@@ -47,9 +47,9 @@ trait Implicits extends Types {
                 })).toStream)
         }
 
-    def skip(nb: Int): QueryBuilder = b.options(b.options skip nb)
+    def skip(nb: Int): QueryBuilder = b.options(b.options.skip(nb))
 
-    def batch(nb: Int): QueryBuilder = b.options(b.options batchSize nb)
+    def batch(nb: Int): QueryBuilder = b.options(b.options.batchSize(nb))
 
     def toList[A: BSONDocumentReader](limit: Option[Int],
                                       readPreference: ReadPreference =
@@ -60,6 +60,6 @@ trait Implicits extends Types {
       }
 
     def toListFlatten[A: Tube](limit: Option[Int]): Fu[List[A]] =
-      toList[Option[A]](limit) map (_.flatten)
+      toList[Option[A]](limit).map(_.flatten)
   }
 }

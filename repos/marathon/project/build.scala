@@ -40,8 +40,8 @@ object MarathonBuild extends Build {
   ).configs(IntegrationTest)
     .dependsOn(pluginInterface)
     // run mesos-simulation/test:test when running test
-    .settings((test in Test) <<= (test in Test) dependsOn
-      (test in Test in LocalProject("mesos-simulation")))
+    .settings((test in Test) <<= ((test in Test)).dependsOn(
+      test in Test in LocalProject("mesos-simulation")))
 
   lazy val mesosSimulation: Project = Project(
     id = "mesos-simulation",
@@ -89,10 +89,10 @@ object MarathonBuild extends Build {
           .toTask("")
           .value
       },
-      (test in Test) <<= (test in Test) dependsOn testScalaStyle
+      (test in Test) <<= ((test in Test)).dependsOn(testScalaStyle)
     )
 
-  lazy val IntegrationTest = config("integration") extend Test
+  lazy val IntegrationTest = config("integration").extend(Test)
 
   lazy val baseSettings =
     Defaults.defaultSettings ++ Seq(
@@ -122,9 +122,9 @@ object MarathonBuild extends Build {
                                       "-Xlint:unchecked",
                                       "-Xlint:deprecation"),
       resolvers ++= Seq(
-        "Mesosphere Public Repo" at "http://downloads.mesosphere.com/maven",
-        "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
-        "Spray Maven Repository" at "http://repo.spray.io/"
+        "Mesosphere Public Repo".at("http://downloads.mesosphere.com/maven"),
+        "Typesafe Releases".at("http://repo.typesafe.com/typesafe/releases/"),
+        "Spray Maven Repository".at("http://repo.spray.io/")
       ),
       fork in Test := true
     )
@@ -144,7 +144,7 @@ object MarathonBuild extends Build {
           case x => old(x)
         }
       },
-      excludedJars in assembly <<= (fullClasspath in assembly) map { cp =>
+      excludedJars in assembly <<= ((fullClasspath in assembly)).map { cp =>
         val exclude = Set(
           "commons-beanutils-1.7.0.jar",
           "stax-api-1.0.1.jar",
@@ -152,7 +152,7 @@ object MarathonBuild extends Build {
           "servlet-api-2.5.jar",
           "jsp-api-2.1.jar"
         )
-        cp filter { x =>
+        cp.filter { x =>
           exclude(x.data.getName)
         }
       }
@@ -333,7 +333,8 @@ object Dependency {
   val sprayHttpx = "io.spray" %% "spray-httpx" % V.Spray
   val playJson = "com.typesafe.play" %% "play-json" % V.PlayJson
   val chaos =
-    "mesosphere" %% "chaos" % V.Chaos exclude ("org.glassfish.web", "javax.el")
+    ("mesosphere" %% "chaos" % V.Chaos)
+      .exclude("org.glassfish.web", "javax.el")
   val guava = "com.google.guava" % "guava" % V.Guava
   val mesosUtils = "mesosphere" %% "mesos-utils" % V.MesosUtils
   val jacksonCaseClass =
@@ -351,11 +352,11 @@ object Dependency {
     "com.fasterxml.uuid" % "java-uuid-generator" % V.UUIDGenerator
   val jGraphT = "org.javabits.jgrapht" % "jgrapht-core" % V.JGraphT
   val hadoopHdfs =
-    "org.apache.hadoop" % "hadoop-hdfs" % V.Hadoop excludeAll
-      (excludeMortbayJetty, excludeJavaxServlet)
+    ("org.apache.hadoop" % "hadoop-hdfs" % V.Hadoop)
+      .excludeAll(excludeMortbayJetty, excludeJavaxServlet)
   val hadoopCommon =
-    "org.apache.hadoop" % "hadoop-common" % V.Hadoop excludeAll
-      (excludeMortbayJetty, excludeJavaxServlet)
+    ("org.apache.hadoop" % "hadoop-common" % V.Hadoop)
+      .excludeAll(excludeMortbayJetty, excludeJavaxServlet)
   val beanUtils = "commons-beanutils" % "commons-beanutils" % "1.9.2"
   val scallop = "org.rogach" %% "scallop" % V.Scallop
   val jsonSchemaValidator =
@@ -367,8 +368,8 @@ object Dependency {
     "mesosphere.marathon" % "api-console" % V.MarathonApiConsole
   val graphite = "io.dropwizard.metrics" % "metrics-graphite" % V.Graphite
   val datadog =
-    "org.coursera" % "dropwizard-metrics-datadog" % V.DataDog exclude
-      ("ch.qos.logback", "logback-classic")
+    ("org.coursera" % "dropwizard-metrics-datadog" % V.DataDog)
+      .exclude("ch.qos.logback", "logback-classic")
   val wixAccord = "com.wix" %% "accord-core" % V.WixAccord
 
   object Test {

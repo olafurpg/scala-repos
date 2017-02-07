@@ -92,10 +92,10 @@ class RemoteRouterSpec
         probe.expectMsgType[ActorRef].path
       }
       val children = replies.toSet
-      children should have size 2
-      children.map(_.parent) should have size 1
-      children foreach
-        (_.address.toString should ===(
+      (children should have).size(2)
+      (children.map(_.parent) should have).size(1)
+      children.foreach(
+        _.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
@@ -113,10 +113,10 @@ class RemoteRouterSpec
         probe.expectMsgType[ActorRef].path
       }
       val children = replies.toSet
-      children should have size 2
-      children.map(_.parent) should have size 1
-      children foreach
-        (_.address.toString should ===(
+      (children should have).size(2)
+      (children.map(_.parent) should have).size(1)
+      children.foreach(
+        _.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
@@ -131,9 +131,9 @@ class RemoteRouterSpec
       }
       val children = replies.toSet
       children.size should be >= 2
-      children.map(_.parent) should have size 1
-      children foreach
-        (_.address.toString should ===(
+      (children.map(_.parent) should have).size(1)
+      children.foreach(
+        _.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
@@ -149,12 +149,12 @@ class RemoteRouterSpec
         probe.expectMsgType[ActorRef].path
       }
       val children = replies.toSet
-      children should have size 2
+      (children should have).size(2)
       val parents = children.map(_.parent)
-      parents should have size 1
+      (parents should have).size(1)
       parents.head should ===(router.path)
-      children foreach
-        (_.address.toString should ===(
+      children.foreach(
+        _.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
@@ -175,12 +175,12 @@ class RemoteRouterSpec
         probe.expectMsgType[ActorRef].path
       }
       val children = replies.toSet
-      children should have size 2
+      (children should have).size(2)
       val parents = children.map(_.parent)
-      parents should have size 1
+      (parents should have).size(1)
       parents.head should ===(router.path)
-      children foreach
-        (_.address.toString should ===(
+      children.foreach(
+        _.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
@@ -200,13 +200,13 @@ class RemoteRouterSpec
         probe.expectMsgType[ActorRef].path
       }
       val children = replies.toSet
-      children should have size 2
+      (children should have).size(2)
       val parents = children.map(_.parent)
-      parents should have size 1
+      (parents should have).size(1)
       parents.head.address should ===(
         Address("akka.tcp", sysName, "localhost", port))
-      children foreach
-        (_.address.toString should ===(
+      children.foreach(
+        _.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
@@ -227,12 +227,12 @@ class RemoteRouterSpec
         probe.expectMsgType[ActorRef].path
       }
       val children = replies.toSet
-      children should have size 4
+      (children should have).size(4)
       val parents = children.map(_.parent)
-      parents should have size 1
+      (parents should have).size(1)
       parents.head should ===(router.path)
-      children foreach
-        (_.address.toString should ===(
+      children.foreach(
+        _.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
@@ -253,12 +253,12 @@ class RemoteRouterSpec
         probe.expectMsgType[ActorRef].path
       }
       val children = replies.toSet
-      children should have size 4
+      (children should have).size(4)
       val parents = children.map(_.parent)
-      parents should have size 1
+      (parents should have).size(1)
       parents.head should ===(router.path)
-      children foreach
-        (_.address.toString should ===(
+      children.foreach(
+        _.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }

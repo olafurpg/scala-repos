@@ -144,7 +144,7 @@ object ZooKeeperReader {
     val iter = children.iterator()
     while (iter.hasNext()) {
       val el = iter.next()
-      if (el startsWith prefix) seq += path + "/" + el
+      if (el.startsWith(prefix)) seq += path + "/" + el
     }
     seq.result
   }

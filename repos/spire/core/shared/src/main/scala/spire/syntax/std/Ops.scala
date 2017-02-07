@@ -138,7 +138,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result = arr(0)
     cfor(1)(_ < arr.length, _ + 1) { i =>
-      result = result max arr(i)
+      result = result.max(arr(i))
     }
     result
   }

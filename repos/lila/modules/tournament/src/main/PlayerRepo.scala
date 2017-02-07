@@ -61,13 +61,15 @@ object PlayerRepo {
     coll.remove(selectTourUser(tourId, userId)).void
 
   def exists(tourId: String, userId: String) =
-    coll.count(selectTourUser(tourId, userId).some) map (0 !=)
+    coll.count(selectTourUser(tourId, userId).some).map(0 !=)
 
   def existsActive(tourId: String, userId: String) =
-    coll.count(
-      Some(
-        selectTourUser(tourId, userId) ++ selectActive
-      )) map (0 !=)
+    coll
+      .count(
+        Some(
+          selectTourUser(tourId, userId) ++ selectActive
+        ))
+      .map(0 !=)
 
   def unWithdraw(tourId: String) =
     coll
@@ -80,24 +82,27 @@ object PlayerRepo {
     coll.find(selectTourUser(tourId, userId)).one[Player]
 
   def update(tourId: String, userId: String)(f: Player => Fu[Player]) =
-    find(tourId, userId) flatten s"No such player: $tourId/$userId" flatMap f flatMap {
-      player =>
+    find(tourId, userId)
+      .flatten(s"No such player: $tourId/$userId")
+      .flatMap(f)
+      .flatMap { player =>
         coll.update(selectId(player._id), player).void
-    }
+      }
 
   def playerInfo(tourId: String, userId: String): Fu[Option[PlayerInfo]] =
-    find(tourId, userId) flatMap {
+    find(tourId, userId).flatMap {
       _ ?? { player =>
-        coll.count(
-          Some(selectTour(tourId) ++ BSONDocument(
-            "m" -> BSONDocument("$gt" -> player.magicScore)))) map { n =>
-          PlayerInfo((n + 1), player.withdraw).some
-        }
+        coll
+          .count(Some(selectTour(tourId) ++ BSONDocument(
+            "m" -> BSONDocument("$gt" -> player.magicScore))))
+          .map { n =>
+            PlayerInfo((n + 1), player.withdraw).some
+          }
       }
     }
 
   def join(tourId: String, user: User, perfLens: Perfs => Perf) =
-    find(tourId, user.id) flatMap {
+    find(tourId, user.id).flatMap {
       case Some(p) if p.withdraw =>
         coll.update(selectId(p._id),
                     BSONDocument("$unset" -> BSONDocument("w" -> true)))
@@ -120,7 +125,7 @@ object PlayerRepo {
       .collect[List]()
 
   private def aggregationUserIdList(res: Stream[BSONDocument]): List[String] =
-    res.headOption flatMap { _.getAs[List[String]]("uids") } getOrElse Nil
+    res.headOption.flatMap { _.getAs[List[String]]("uids") }.getOrElse(Nil)
 
   import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework.{
     Descending,
@@ -131,35 +136,38 @@ object PlayerRepo {
   }
 
   def userIds(tourId: String): Fu[List[String]] =
-    coll.distinct("uid", selectTour(tourId).some) map lila.db.BSON.asStrings
+    coll.distinct("uid", selectTour(tourId).some).map(lila.db.BSON.asStrings)
 
   def activeUserIds(tourId: String): Fu[List[String]] =
     coll
-      .distinct("uid", (selectTour(tourId) ++ selectActive).some) map lila.db.BSON.asStrings
+      .distinct("uid", (selectTour(tourId) ++ selectActive).some)
+      .map(lila.db.BSON.asStrings)
 
   def winner(tourId: String): Fu[Option[Player]] =
     coll.find(selectTour(tourId)).sort(bestSort).one[Player]
 
   // freaking expensive (marathons)
   private[tournament] def computeRanking(tourId: String): Fu[Ranking] =
-    coll.aggregate(Match(selectTour(tourId)),
-                   List(Sort(Descending("m")),
-                        Group(BSONNull)("uids" -> Push("uid")))) map {
-      _.documents.headOption.fold(Map.empty: Ranking) {
-        _ get "uids" match {
-          case Some(BSONArray(uids)) =>
-            // mutable optimized implementation
-            val b = Map.newBuilder[String, Int]
-            var r = 0
-            for (u <- uids) {
-              b += (u.get.asInstanceOf[BSONString].value -> r)
-              r = r + 1
-            }
-            b.result
-          case _ => Map.empty
+    coll
+      .aggregate(
+        Match(selectTour(tourId)),
+        List(Sort(Descending("m")), Group(BSONNull)("uids" -> Push("uid"))))
+      .map {
+        _.documents.headOption.fold(Map.empty: Ranking) {
+          _.get("uids") match {
+            case Some(BSONArray(uids)) =>
+              // mutable optimized implementation
+              val b = Map.newBuilder[String, Int]
+              var r = 0
+              for (u <- uids) {
+                b += (u.get.asInstanceOf[BSONString].value -> r)
+                r = r + 1
+              }
+              b.result
+            case _ => Map.empty
+          }
         }
       }
-    }
 
   def byTourAndUserIds(tourId: String,
                        userIds: Iterable[String]): Fu[List[Player]] =
@@ -179,7 +187,7 @@ object PlayerRepo {
   def pairByTourAndUserIds(tourId: String,
                            id1: String,
                            id2: String): Fu[Option[(Player, Player)]] =
-    byTourAndUserIds(tourId, List(id1, id2)) map {
+    byTourAndUserIds(tourId, List(id1, id2)).map {
       case List(p1, p2) if p1.is(id1) && p2.is(id2) => Some(p1 -> p2)
       case List(p1, p2) if p1.is(id2) && p2.is(id1) => Some(p2 -> p1)
       case _ => none
@@ -195,7 +203,7 @@ object PlayerRepo {
                           ranking: Ranking): RankedPlayers =
     players
       .flatMap { p =>
-        ranking get p.userId map { RankedPlayer(_, p) }
+        ranking.get(p.userId).map { RankedPlayer(_, p) }
       }
       .sortBy(_.rank)
 

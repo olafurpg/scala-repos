@@ -47,7 +47,7 @@ case class BoundedMailbox(val capacity: Int = {
 trait UnboundedMessageQueueSemantics extends MessageQueue {
   self: BlockingQueue[MessageInvocation] =>
   @inline
-  final def enqueue(handle: MessageInvocation): Unit = this add handle
+  final def enqueue(handle: MessageInvocation): Unit = this.add(handle)
   @inline
   final def dequeue(): MessageInvocation = this.poll()
 }
@@ -62,7 +62,7 @@ trait BoundedMessageQueueSemantics extends MessageQueue {
         throw new MessageQueueAppendFailedException(
           "Couldn't enqueue message " + handle + " to " + toString)
       }
-    } else this put handle
+    } else this.put(handle)
   }
 
   @inline

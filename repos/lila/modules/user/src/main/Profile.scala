@@ -13,13 +13,13 @@ case class Profile(country: Option[String] = None,
     case names => (names mkString " ").some
   }
 
-  def countryInfo = country flatMap Countries.info
+  def countryInfo = country.flatMap(Countries.info)
 
   def nonEmptyLocation = ne(location)
 
   def nonEmptyBio = ne(bio)
 
-  private def ne(str: Option[String]) = str filter (_.nonEmpty)
+  private def ne(str: Option[String]) = str.filter(_.nonEmpty)
 }
 
 object Profile {

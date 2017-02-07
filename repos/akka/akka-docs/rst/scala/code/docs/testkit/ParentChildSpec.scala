@@ -91,7 +91,7 @@ class ParentChildSpec extends WordSpec with Matchers with TestKitBase {
       val parent = TestActorRef(new DependentParent(Props[MockedChild]))
       probe.send(parent, "pingit")
       // test some parent state change
-      parent.underlyingActor.ponged should (be(true) or be(false))
+      parent.underlyingActor.ponged should (be(true).or(be(false)))
     }
   }
 
@@ -123,8 +123,8 @@ class ParentChildSpec extends WordSpec with Matchers with TestKitBase {
       val parent = system.actorOf(Props(new Actor {
         val child = context.actorOf(Props[Child], "child")
         def receive = {
-          case x if sender == child => proxy.ref forward x
-          case x => child forward x
+          case x if sender == child => proxy.ref.forward(x)
+          case x => child.forward(x)
         }
       }))
 

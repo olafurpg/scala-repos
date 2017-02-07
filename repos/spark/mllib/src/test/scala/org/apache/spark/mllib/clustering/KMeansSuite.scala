@@ -51,33 +51,33 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     // centered at the mean of the points
 
     var model = KMeans.train(data, k = 1, maxIterations = 1)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 2)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 5)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 1, runs = 5)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 1, runs = 5)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data,
                          k = 1,
                          maxIterations = 1,
                          runs = 1,
                          initializationMode = RANDOM)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data,
                          k = 1,
                          maxIterations = 1,
                          runs = 1,
                          initializationMode = K_MEANS_PARALLEL)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
   }
 
   test("no distinct points") {
@@ -127,7 +127,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
       centers1.zip(centers2).foreach {
         case (c1, c2) =>
-          assert(c1 ~== c2 absTol 1E-14)
+          assert(c1 ~== c2.absTol(1E-14))
       }
     }
   }
@@ -147,33 +147,33 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     var model = KMeans.train(data, k = 1, maxIterations = 1)
     assert(model.clusterCenters.size === 1)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 2)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 5)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 1, runs = 5)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 1, runs = 5)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data,
                          k = 1,
                          maxIterations = 1,
                          runs = 1,
                          initializationMode = RANDOM)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data,
                          k = 1,
                          maxIterations = 1,
                          runs = 1,
                          initializationMode = K_MEANS_PARALLEL)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
   }
 
   test("single cluster with sparse data") {
@@ -202,33 +202,33 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     val center = Vectors.sparse(n, Seq((0, 1.0), (1, 3.0), (2, 4.0)))
 
     var model = KMeans.train(data, k = 1, maxIterations = 1)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 2)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 5)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 1, runs = 5)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data, k = 1, maxIterations = 1, runs = 5)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data,
                          k = 1,
                          maxIterations = 1,
                          runs = 1,
                          initializationMode = RANDOM)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     model = KMeans.train(data,
                          k = 1,
                          maxIterations = 1,
                          runs = 1,
                          initializationMode = K_MEANS_PARALLEL)
-    assert(model.clusterCenters.head ~== center absTol 1E-5)
+    assert(model.clusterCenters.head ~== center.absTol(1E-5))
 
     data.unpersist()
   }
@@ -266,7 +266,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
       model.clusterCenters
         .sortBy(VectorWithCompare(_))
         .zip(points.sortBy(VectorWithCompare(_)))
-        .forall(x => x._1 ~== (x._2) absTol 1E-5))
+        .forall(x => x._1 ~== (x._2).absTol(1E-5)))
 
     // Iterations of Lloyd's should not change the answer either
     model = KMeans.train(rdd, k = 5, maxIterations = 10)
@@ -274,7 +274,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
       model.clusterCenters
         .sortBy(VectorWithCompare(_))
         .zip(points.sortBy(VectorWithCompare(_)))
-        .forall(x => x._1 ~== (x._2) absTol 1E-5))
+        .forall(x => x._1 ~== (x._2).absTol(1E-5)))
 
     // Neither should more runs
     model = KMeans.train(rdd, k = 5, maxIterations = 10, runs = 5)
@@ -282,7 +282,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
       model.clusterCenters
         .sortBy(VectorWithCompare(_))
         .zip(points.sortBy(VectorWithCompare(_)))
-        .forall(x => x._1 ~== (x._2) absTol 1E-5))
+        .forall(x => x._1 ~== (x._2).absTol(1E-5)))
   }
 
   test("two clusters") {

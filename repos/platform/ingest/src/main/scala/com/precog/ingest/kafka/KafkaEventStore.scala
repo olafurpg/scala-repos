@@ -64,8 +64,8 @@ object KafkaEventStore {
         centralConfig.get[String]("zk.connect")))
     centralConfig
       .get[String]("zk.connect")
-      .toSuccess(NEL("central.zk.connect configuration parameter is required")) map {
-      centralZookeeperHosts =>
+      .toSuccess(NEL("central.zk.connect configuration parameter is required"))
+      .map { centralZookeeperHosts =>
         val serviceUID = ZookeeperSystemCoordination.extractServiceUID(config)
         val coordination = ZookeeperSystemCoordination(centralZookeeperHosts,
                                                        serviceUID,
@@ -86,7 +86,7 @@ object KafkaEventStore {
           } else esStop
 
         (eventStore, stoppables)
-    }
+      }
   }
 }
 
@@ -137,9 +137,9 @@ class LocalKafkaEventStore(
       storeFile => encodeAll(List(event), Vector.empty)
     )
 
-    toSend traverse { kafkaMessages =>
+    toSend.traverse { kafkaMessages =>
       Future {
-        producer send {
+        producer.send {
           new ProducerData[String, Message](topic, kafkaMessages)
         }
         PrecogUnit

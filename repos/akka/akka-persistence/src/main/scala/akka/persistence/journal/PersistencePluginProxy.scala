@@ -196,7 +196,7 @@ final class PersistencePluginProxy(config: Config)
     case Terminated(_) ⇒
     case InitTimeout ⇒
     case msg ⇒
-      targetJournal forward msg
+      targetJournal.forward(msg)
   }
 
   def initTimedOut: Receive = {

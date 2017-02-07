@@ -24,8 +24,8 @@ final class Env(config: Config,
     val CollectionModlog = config getString "collection.modlog"
     val CollectionGamingHistory = config getString "collection.gaming_history"
     val ActorName = config getString "actor.name"
-    val NbGamesToMark = config getInt "boosting.nb_games_to_mark"
-    val RatioGamesToMark = config getDouble "boosting.ratio_games_to_mark"
+    val NbGamesToMark = config.getInt("boosting.nb_games_to_mark")
+    val RatioGamesToMark = config.getDouble("boosting.ratio_games_to_mark")
   }
   import settings._
 
@@ -74,7 +74,7 @@ final class Env(config: Config,
           assessApi.onAnalysisReady(game, analysis)
         case lila.game.actorApi
               .FinishGame(game, whiteUserOption, blackUserOption) =>
-          (whiteUserOption |@| blackUserOption) apply {
+          ((whiteUserOption |@| blackUserOption)).apply {
             case (whiteUser, blackUser) =>
               boosting.check(game, whiteUser, blackUser) >> assessApi
                 .onGameReady(game, whiteUser, blackUser)
@@ -88,16 +88,17 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "mod" boot new Env(
-      config = lila.common.PlayApp loadConfig "mod",
-      db = lila.db.Env.current,
-      hub = lila.hub.Env.current,
-      system = lila.common.PlayApp.system,
-      firewall = lila.security.Env.current.firewall,
-      reportColl = lila.report.Env.current.reportColl,
-      userSpy = lila.security.Env.current.userSpy,
-      lightUserApi = lila.user.Env.current.lightUserApi,
-      securityApi = lila.security.Env.current.api,
-      emailAddress = lila.security.Env.current.emailAddress
-    )
+    "mod".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("mod"),
+        db = lila.db.Env.current,
+        hub = lila.hub.Env.current,
+        system = lila.common.PlayApp.system,
+        firewall = lila.security.Env.current.firewall,
+        reportColl = lila.report.Env.current.reportColl,
+        userSpy = lila.security.Env.current.userSpy,
+        lightUserApi = lila.user.Env.current.lightUserApi,
+        securityApi = lila.security.Env.current.api,
+        emailAddress = lila.security.Env.current.emailAddress
+      ))
 }

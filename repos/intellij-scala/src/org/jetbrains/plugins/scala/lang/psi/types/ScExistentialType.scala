@@ -662,7 +662,7 @@ case class ScExistentialArgument(name: String,
                  uSubst: ScUndefinedSubstitutor,
                  falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
     var undefinedSubst = uSubst
-    val s = (exist.args zip args).foldLeft(ScSubstitutor.empty) { (s, p) =>
+    val s = (exist.args.zip(args)).foldLeft(ScSubstitutor.empty) { (s, p) =>
       s bindT ((p._1.name, null), p._2)
     }
     val t = Equivalence.equivInner(lowerBound,
@@ -681,8 +681,8 @@ case class ScExistentialArgument(name: String,
     ScExistentialArgument(
       name,
       args.map(t => substitutor.subst(t).asInstanceOf[ScTypeParameterType]),
-      substitutor subst lowerBound,
-      substitutor subst upperBound)
+      substitutor.subst(lowerBound),
+      substitutor.subst(upperBound))
   }
 }
 
@@ -740,7 +740,7 @@ case class ScSkolemizedType(name: String,
     r match {
       case ScSkolemizedType(rname, rargs, rlower, rupper) =>
         if (args.length != rargs.length) return (false, uSubst)
-        args.zip(rargs) foreach {
+        args.zip(rargs).foreach {
           case (tpt1, tpt2) =>
             val t = Equivalence.equivInner(tpt1, tpt2, u, falseUndef)
             if (!t._1) return (false, u)

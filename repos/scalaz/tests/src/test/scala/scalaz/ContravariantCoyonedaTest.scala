@@ -42,7 +42,7 @@ object ContravariantCoyonedaGens {
   }
 
   val probablePrime = CtCoOrder { x: Int =>
-    ((x - 1: BigInt) isProbablePrime 5, x)
+    ((x - 1: BigInt).isProbablePrime(5), x)
   }
 
   val intOrders: Gen[CtCoOrder[Int]] = Gen

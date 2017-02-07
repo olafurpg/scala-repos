@@ -237,7 +237,7 @@ class FlowDocSpec extends AkkaSpec {
 
     Source
       .fromIterator { () =>
-        Iterator from 0
+        Iterator.from(0)
       }
       .via(fused)
       .take(1000)

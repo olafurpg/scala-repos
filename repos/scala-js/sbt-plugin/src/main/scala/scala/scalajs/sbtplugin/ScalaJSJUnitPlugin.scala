@@ -23,7 +23,8 @@ object ScalaJSJUnitPlugin extends AutoPlugin {
      */
     ivyConfigurations += config("scala-js-test-plugin").hide,
     libraryDependencies ++= Seq(
-      "org.scala-js" % "scalajs-junit-test-plugin" % scalaJSVersion % "scala-js-test-plugin" cross CrossVersion.full,
+      ("org.scala-js" % "scalajs-junit-test-plugin" % scalaJSVersion % "scala-js-test-plugin")
+        .cross(CrossVersion.full),
       "org.scala-js" %% "scalajs-junit-test-runtime" % scalaJSVersion % "test"
     ),
     scalacOptions in Test ++= {

@@ -22,8 +22,8 @@ object DeathWatchSpec {
     Props(new Actor {
       context.watch(target)
       def receive = {
-        case t: Terminated ⇒ testActor forward WrappedTerminated(t)
-        case x ⇒ testActor forward x
+        case t: Terminated ⇒ testActor.forward(WrappedTerminated(t))
+        case x ⇒ testActor.forward(x)
       }
     })
 
@@ -194,7 +194,7 @@ trait DeathWatchSpec { this: AkkaSpec with ImplicitSender with DefaultTimeout �
             val currentKid = context.watch(context.actorOf(Props(new Actor {
               def receive = { case "NKOTB" ⇒ context stop self }
             }), "kid"))
-            currentKid forward "NKOTB"
+            currentKid.forward("NKOTB")
             context become {
               case Terminated(`currentKid`) ⇒
                 testActor ! "GREEN"
@@ -227,8 +227,8 @@ trait DeathWatchSpec { this: AkkaSpec with ImplicitSender with DefaultTimeout �
     "discard Terminated when unwatched between sysmsg and processing" in {
       class Watcher extends Actor {
         def receive = {
-          case W(ref) ⇒ context watch ref
-          case U(ref) ⇒ context unwatch ref
+          case W(ref) ⇒ context.watch(ref)
+          case U(ref) ⇒ context.unwatch(ref)
           case Latches(t1: TestLatch, t2: TestLatch) ⇒
             t1.countDown()
             Await.ready(t2, 3.seconds)

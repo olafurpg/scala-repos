@@ -25,15 +25,15 @@ private final class ExplorerIndexer(endpoint: String,
   private val maxPlies = 50
   private val separator = "\n\n\n"
   private val datePattern = "yyyy-MM-dd"
-  private val dateFormatter = DateTimeFormat forPattern datePattern
+  private val dateFormatter = DateTimeFormat.forPattern(datePattern)
   private val dateTimeFormatter =
-    DateTimeFormat forPattern s"$datePattern HH:mm"
-  private val pgnDateFormat = DateTimeFormat forPattern "yyyy.MM.dd";
+    DateTimeFormat.forPattern(s"$datePattern HH:mm")
+  private val pgnDateFormat = DateTimeFormat.forPattern("yyyy.MM.dd");
   private val endPointUrl = s"$endpoint/import/lichess"
   private val massImportEndPointUrl = s"$massImportEndpoint/import/lichess"
 
   private def parseDate(str: String): Option[DateTime] =
-    Try(dateFormatter parseDateTime str).toOption
+    Try(dateFormatter.parseDateTime(str)).toOption
 
   type GamePGN = (Game, String)
 
@@ -53,11 +53,11 @@ private final class ExplorerIndexer(endpoint: String,
           .enumerate(maxGames, stopOnError = true) &> Enumeratee
           .mapM[Game]
           .apply[Option[GamePGN]] { game =>
-            makeFastPgn(game) map {
-              _ map { game -> _ }
+            makeFastPgn(game).map {
+              _.map { game -> _ }
             }
           } &> Enumeratee.collect { case Some(el) => el } &> Enumeratee
-          .grouped(Iteratee takeUpTo batchSize) |>>> Iteratee
+          .grouped(Iteratee.takeUpTo(batchSize)) |>>> Iteratee
           .foldM[Seq[GamePGN], Long](nowMillis) {
             case (millis, pairs) =>
               WS.url(massImportEndPointUrl)
@@ -86,8 +86,8 @@ private final class ExplorerIndexer(endpoint: String,
           } void
     }
 
-  def apply(game: Game): Funit = makeFastPgn(game) map {
-    _ foreach flowBuffer.apply
+  def apply(game: Game): Funit = makeFastPgn(game).map {
+    _.foreach(flowBuffer.apply)
   }
 
   private object flowBuffer {
@@ -97,7 +97,7 @@ private final class ExplorerIndexer(endpoint: String,
       buf += pgn
       val startAt = nowMillis
       if (buf.size >= max) {
-        WS.url(endPointUrl).put(buf mkString separator) andThen {
+        WS.url(endPointUrl).put(buf mkString separator).andThen {
           case Success(res) if res.status == 200 =>
             lila.mon.explorer.index.time(((nowMillis - startAt) / max).toInt)
             lila.mon.explorer.index.success(max)
@@ -120,7 +120,7 @@ private final class ExplorerIndexer(endpoint: String,
         game.createdAt.isAfter(Query.hordeWhitePawnsSince))
 
   private def stableRating(player: Player) =
-    player.rating ifFalse player.provisional
+    player.rating.ifFalse(player.provisional)
 
   // probability of the game being indexed, between 0 and 1
   private def probability(game: Game, rating: Int) = {
@@ -155,12 +155,17 @@ private final class ExplorerIndexer(endpoint: String,
       if probability(game, averageRating) > nextFloat
       if valid(game)
     } yield
-      GameRepo initialFen game flatMap { initialFen =>
-        UserRepo.usernamesByIds(game.userIds) map { usernames =>
+      (GameRepo initialFen game).flatMap { initialFen =>
+        UserRepo.usernamesByIds(game.userIds).map { usernames =>
           def username(color: chess.Color) =
-            game.player(color).userId flatMap { id =>
-              usernames.find(_.toLowerCase == id)
-            } orElse game.player(color).userId getOrElse "?"
+            game
+              .player(color)
+              .userId
+              .flatMap { id =>
+                usernames.find(_.toLowerCase == id)
+              }
+              .orElse(game.player(color).userId)
+              .getOrElse("?")
           val fenTags = initialFen.?? { fen =>
             List(s"[FEN $fen]")
           }

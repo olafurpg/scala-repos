@@ -193,10 +193,10 @@ class ReadOnlyObjectWrapperSpec
     var invalidateCount = 0
     var changeCount = 0
     val binding = objectProperty === objectProperty2
-    binding onInvalidate {
+    binding.onInvalidate {
       invalidateCount += 1
     }
-    binding onChange {
+    binding.onChange {
       changeCount += 1
     }
     objectProperty() = "new value"
@@ -207,7 +207,7 @@ class ReadOnlyObjectWrapperSpec
     changeCount should equal(2)
   }
 
-  it should "support implicit conversion to a String Binding" is (pending)
+  (it should "support implicit conversion to a String Binding").is(pending)
 
   it should "support implicit conversion from a ScalaFX ReadOnlyObjectWrapper with a SFXDelegate of a type T to a JavaFX ReadOnlyObjectWrapper of type T" in {
     val scalaObjProperty: ReadOnlyObjectWrapper[Button] =

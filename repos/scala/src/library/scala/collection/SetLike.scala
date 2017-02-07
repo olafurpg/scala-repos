@@ -232,7 +232,7 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
       if (!hasNext) Iterator.empty.next()
 
       val buf = self.newBuilder
-      idxs.slice(0, len) foreach (idx => buf += elms(idx))
+      idxs.slice(0, len).foreach(idx => buf += elms(idx))
       val result = buf.result()
 
       var i = len - 1

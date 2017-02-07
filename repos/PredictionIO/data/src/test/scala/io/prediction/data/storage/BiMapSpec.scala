@@ -122,8 +122,8 @@ class BiMapSpec extends Specification {
       val valuesInt: Seq[Int] = values.map(_.toInt)
       val biIntValues = keys.map(k => biInt(k))
 
-      biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biValues must containTheSameElementsAs(values))
+        .and(biIntValues must containTheSameElementsAs(valuesInt))
     }
 
     "create BiMap from Array of unique string" in {
@@ -137,8 +137,8 @@ class BiMapSpec extends Specification {
       val valuesInt: Seq[Int] = values.map(_.toInt)
       val biIntValues = keys.toSeq.map(k => biInt(k))
 
-      biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biValues must containTheSameElementsAs(values))
+        .and(biIntValues must containTheSameElementsAs(valuesInt))
     }
 
     "not guarantee sequential index for Array with duplicated string" in {
@@ -153,8 +153,8 @@ class BiMapSpec extends Specification {
       val valuesInt: Seq[Int] = values.map(_.toInt)
       val biIntValues = keys.toSet[String].map(k => biInt(k))
 
-      biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biValues must containTheSameElementsAs(values))
+        .and(biIntValues must containTheSameElementsAs(valuesInt))
     }
 
     "create BiMap from RDD[String]" in {
@@ -170,8 +170,8 @@ class BiMapSpec extends Specification {
       val valuesInt: Seq[Int] = values.map(_.toInt)
       val biIntValues = keys.map(k => biInt(k))
 
-      biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biValues must containTheSameElementsAs(values))
+        .and(biIntValues must containTheSameElementsAs(valuesInt))
     }
 
     "create BiMap from RDD[String] with duplicated string" in {
@@ -187,8 +187,8 @@ class BiMapSpec extends Specification {
       val valuesInt: Seq[Int] = values.map(_.toInt)
       val biIntValues = keys.distinct.map(k => biInt(k))
 
-      biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biValues must containTheSameElementsAs(values))
+        .and(biIntValues must containTheSameElementsAs(valuesInt))
     }
   }
 

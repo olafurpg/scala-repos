@@ -98,7 +98,7 @@ class MigrationTo0_11Test
     f.appRepo.allPathIds().futureValue should be(Seq(PathId("/test")))
     f.appRepo.currentVersion(PathId("/test")).futureValue should be(
       Some(appWithFullVersion))
-    f.appRepo.listVersions(PathId("/test")).futureValue should have size (1)
+    (f.appRepo.listVersions(PathId("/test")).futureValue should have).size(1)
   }
 
   private[this] def onlyVersion(ts: Long) =
@@ -153,7 +153,7 @@ class MigrationTo0_11Test
     f.appRepo.allPathIds().futureValue should be(Seq(PathId("/test")))
     f.appRepo.currentVersion(PathId("/test")).futureValue should be(
       Some(correctedAppV3))
-    f.appRepo.listVersions(PathId("/test")).futureValue should have size (3)
+    (f.appRepo.listVersions(PathId("/test")).futureValue should have).size(3)
     f.appRepo
       .app(PathId("/test"), correctedAppV1.version)
       .futureValue should be(Some(correctedAppV1))
@@ -216,7 +216,7 @@ class MigrationTo0_11Test
     f.appRepo.allPathIds().futureValue should be(Seq(PathId("/test")))
     f.appRepo.currentVersion(PathId("/test")).futureValue should be(
       Some(correctedAppV3))
-    f.appRepo.listVersions(PathId("/test")).futureValue should have size (3)
+    (f.appRepo.listVersions(PathId("/test")).futureValue should have).size(3)
     f.appRepo
       .app(PathId("/test"), correctedAppV1.version)
       .futureValue should be(Some(correctedAppV1))

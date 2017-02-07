@@ -45,7 +45,7 @@ package object serialization {
   implicit val mimeTypeExtractor: Extractor[MimeType] =
     new Extractor[MimeType] {
       def validated(jv: JValue) =
-        jv.validated[String] map (MimeTypes.parseMimeTypes(_).toList) flatMap {
+        jv.validated[String].map(MimeTypes.parseMimeTypes(_).toList).flatMap {
           case Nil =>
             Failure(
               Extractor.Error.invalid(

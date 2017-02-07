@@ -30,16 +30,16 @@ object TypeDcl {
       case ScalaTokenTypes.tIDENTIFIER =>
         builder.advanceLexer() //Ate identifier
       case _ =>
-        builder error ScalaBundle.message("identifier.expected")
+        builder.error(ScalaBundle.message("identifier.expected"))
         returnMarker.drop()
         return false
     }
-    TypeParamClause parse builder
+    TypeParamClause.parse(builder)
     builder.getTokenText match {
       case ">:" =>
         builder.advanceLexer()
         if (!Type.parse(builder)) {
-          builder error ScalaBundle.message("wrong.type")
+          builder.error(ScalaBundle.message("wrong.type"))
         }
       case _ => //nothing
     }
@@ -47,7 +47,7 @@ object TypeDcl {
       case "<:" =>
         builder.advanceLexer()
         if (!Type.parse(builder)) {
-          builder error ScalaBundle.message("wrong.type")
+          builder.error(ScalaBundle.message("wrong.type"))
         }
       case _ => //nothing
     }
@@ -55,7 +55,7 @@ object TypeDcl {
     builder.getTokenType match {
       case ScalaTokenTypes.tASSIGN =>
         builder.advanceLexer()
-        builder error ScalaBundle.message("wrong.type")
+        builder.error(ScalaBundle.message("wrong.type"))
         true
       case _ => true
     }

@@ -34,7 +34,7 @@ private[forum] final class Recent(postApi: PostApi,
       (user.??(_.troll) ?? List("[troll]")) :::
         (user ?? MasterGranter(Permission.StaffForum)).fold(staffCategIds,
                                                             publicCategIds) :::
-          ((user.map(_.id) ?? getTeams) map teamSlug).toList
+          (((user.map(_.id) ?? getTeams)).map(teamSlug)).toList
     } mkString ";"
 
   private lazy val staffCategIds = "staff" :: publicCategIds
@@ -42,7 +42,7 @@ private[forum] final class Recent(postApi: PostApi,
   private val cache: Cache[List[MiniForumPost]] = LruCache(timeToLive = ttl)
 
   private def parseLangs(langStr: String) =
-    langStr.split(",").toList filter (_.nonEmpty)
+    langStr.split(",").toList.filter(_.nonEmpty)
 
   private def fetch(key: String): Fu[List[MiniForumPost]] =
     (key.split(";").toList match {
@@ -51,5 +51,5 @@ private[forum] final class Recent(postApi: PostApi,
       case langs :: categs =>
         PostRepo.recentInCategs(nb)(categs, parseLangs(langs))
       case categs => PostRepo.recentInCategs(nb)(categs, parseLangs("en"))
-    }) flatMap postApi.miniPosts
+    }).flatMap(postApi.miniPosts)
 }

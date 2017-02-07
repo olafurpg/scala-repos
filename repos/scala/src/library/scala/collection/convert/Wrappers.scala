@@ -98,8 +98,8 @@ private[collection] trait Wrappers {
     override def set(i: Int, elem: A) = {
       val p = underlying(i); underlying(i) = elem; p
     }
-    override def add(elem: A) = { underlying append elem; true }
-    override def remove(i: Int) = underlying remove i
+    override def add(elem: A) = { underlying.append(elem); true }
+    override def remove(i: Int) = underlying.remove(i)
   }
 
   case class JListWrapper[A](underlying: ju.List[A])
@@ -110,8 +110,8 @@ private[collection] trait Wrappers {
     override def iterator: Iterator[A] = underlying.iterator
     def apply(i: Int) = underlying.get(i)
     def update(i: Int, elem: A) = underlying.set(i, elem)
-    def +=:(elem: A) = { underlying.subList(0, 0) add elem; this }
-    def +=(elem: A): this.type = { underlying add elem; this }
+    def +=:(elem: A) = { underlying.subList(0, 0).add(elem); this }
+    def +=(elem: A): this.type = { underlying.add(elem); this }
     def insertAll(i: Int, elems: Traversable[A]) = {
       val ins = underlying.subList(0, i)
       elems.seq.foreach(ins.add(_))
@@ -146,7 +146,7 @@ private[collection] trait Wrappers {
         case Some(e) =>
           underlying match {
             case ms: mutable.Set[a] =>
-              ms remove e
+              ms.remove(e)
               prev = None
             case _ =>
               throw new UnsupportedOperationException("remove")
@@ -166,7 +166,7 @@ private[collection] trait Wrappers {
       sz < underlying.size
     }
     override def remove(elem: AnyRef) =
-      try underlying remove elem.asInstanceOf[A]
+      try underlying.remove(elem.asInstanceOf[A])
       catch {
         case ex: ClassCastException => false
       }
@@ -184,11 +184,11 @@ private[collection] trait Wrappers {
 
     def contains(elem: A): Boolean = underlying.contains(elem)
 
-    def +=(elem: A): this.type = { underlying add elem; this }
-    def -=(elem: A): this.type = { underlying remove elem; this }
+    def +=(elem: A): this.type = { underlying.add(elem); this }
+    def -=(elem: A): this.type = { underlying.remove(elem); this }
 
-    override def add(elem: A): Boolean = underlying add elem
-    override def remove(elem: A): Boolean = underlying remove elem
+    override def add(elem: A): Boolean = underlying.add(elem)
+    override def remove(elem: A): Boolean = underlying.remove(elem)
     override def clear() = underlying.clear()
 
     override def empty = JSetWrapper(new ju.HashSet[A])
@@ -206,7 +206,7 @@ private[collection] trait Wrappers {
 
     override def get(key: AnyRef): B =
       try {
-        underlying get key.asInstanceOf[A] match {
+        underlying.get(key.asInstanceOf[A]) match {
           case None => null.asInstanceOf[B]
           case Some(v) => v
         }
@@ -246,7 +246,7 @@ private[collection] trait Wrappers {
               case Some(k) =>
                 underlying match {
                   case mm: mutable.Map[a, _] =>
-                    mm remove k
+                    mm.remove(k)
                     prev = None
                   case _ =>
                     throw new UnsupportedOperationException("remove")
@@ -279,7 +279,7 @@ private[collection] trait Wrappers {
 
     override def remove(k: AnyRef): B =
       try {
-        underlying remove k.asInstanceOf[A] match {
+        underlying.remove(k.asInstanceOf[A]) match {
           case None => null.asInstanceOf[B]
           case Some(v) => v
         }
@@ -299,20 +299,20 @@ private[collection] trait Wrappers {
     override def size = underlying.size
 
     def get(k: A) = {
-      val v = underlying get k
+      val v = underlying.get(k)
       if (v != null) Some(v)
       else if (underlying containsKey k) Some(null.asInstanceOf[B])
       else None
     }
 
     def +=(kv: (A, B)): this.type = { underlying.put(kv._1, kv._2); this }
-    def -=(key: A): this.type = { underlying remove key; this }
+    def -=(key: A): this.type = { underlying.remove(key); this }
 
     override def put(k: A, v: B): Option[B] = Option(underlying.put(k, v))
 
     override def update(k: A, v: B) { underlying.put(k, v) }
 
-    override def remove(k: A): Option[B] = Option(underlying remove k)
+    override def remove(k: A): Option[B] = Option(underlying.remove(k))
 
     def iterator: Iterator[(A, B)] = new AbstractIterator[(A, B)] {
       val ui = underlying.entrySet.iterator
@@ -373,7 +373,7 @@ private[collection] trait Wrappers {
       extends mutable.AbstractMap[A, B]
       with JMapWrapperLike[A, B, JConcurrentMapWrapper[A, B]]
       with concurrent.Map[A, B] {
-    override def get(k: A) = Option(underlying get k)
+    override def get(k: A) = Option(underlying.get(k))
 
     override def empty =
       new JConcurrentMapWrapper(new juc.ConcurrentHashMap[A, B])
@@ -398,7 +398,7 @@ private[collection] trait Wrappers {
       asJavaEnumeration(underlying.valuesIterator)
     def get(key: AnyRef) =
       try {
-        underlying get key.asInstanceOf[A] match {
+        underlying.get(key.asInstanceOf[A]) match {
           case None => null.asInstanceOf[B]
           case Some(v) => v
         }
@@ -411,7 +411,7 @@ private[collection] trait Wrappers {
     }
     override def remove(key: AnyRef) =
       try {
-        underlying remove key.asInstanceOf[A] match {
+        underlying.remove(key.asInstanceOf[A]) match {
           case None => null.asInstanceOf[B]
           case Some(v) => v
         }
@@ -425,20 +425,20 @@ private[collection] trait Wrappers {
       with mutable.Map[A, B] {
     override def size: Int = underlying.size
 
-    def get(k: A) = Option(underlying get k)
+    def get(k: A) = Option(underlying.get(k))
 
     def +=(kv: (A, B)): this.type = { underlying.put(kv._1, kv._2); this }
-    def -=(key: A): this.type = { underlying remove key; this }
+    def -=(key: A): this.type = { underlying.remove(key); this }
 
     override def put(k: A, v: B): Option[B] = Option(underlying.put(k, v))
 
     override def update(k: A, v: B) { underlying.put(k, v) }
 
-    override def remove(k: A): Option[B] = Option(underlying remove k)
+    override def remove(k: A): Option[B] = Option(underlying.remove(k))
 
     def iterator =
-      enumerationAsScalaIterator(underlying.keys) map
-        (k => (k, underlying get k))
+      enumerationAsScalaIterator(underlying.keys).map(k =>
+        (k, underlying.get(k)))
 
     override def clear() = underlying.clear()
   }
@@ -451,14 +451,14 @@ private[collection] trait Wrappers {
     override def size = underlying.size
 
     def get(k: String) = {
-      val v = underlying get k
+      val v = underlying.get(k)
       if (v != null) Some(v.asInstanceOf[String]) else None
     }
 
     def +=(kv: (String, String)): this.type = {
       underlying.put(kv._1, kv._2); this
     }
-    def -=(key: String): this.type = { underlying remove key; this }
+    def -=(key: String): this.type = { underlying.remove(key); this }
 
     override def put(k: String, v: String): Option[String] = {
       val r = underlying.put(k, v)
@@ -468,7 +468,7 @@ private[collection] trait Wrappers {
     override def update(k: String, v: String) { underlying.put(k, v) }
 
     override def remove(k: String): Option[String] = {
-      val r = underlying remove k
+      val r = underlying.remove(k)
       if (r != null) Some(r.asInstanceOf[String]) else None
     }
 

@@ -107,7 +107,7 @@ class SbtModuleBuilder
           sbtVersion = sbtVersionComboBox.getSelectedItem
           scalaVersion = scalaVersionComboBox.getSelectedItem
 
-          settingsStep.getContext setProjectJdk myJdkComboBox.getSelectedJdk
+          settingsStep.getContext.setProjectJdk(myJdkComboBox.getSelectedJdk)
 
           getExternalProjectSettings.setResolveClassifiers(
             resolveClassifiersCheckBox.isSelected)

@@ -497,27 +497,27 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     val buf = new StringBuilder()
 
     val maxf = (a: List[Int], b: List[String]) =>
-      (a zip b).map(v => v._1.max(v._2.length))
+      (a.zip(b)).map(v => v._1.max(v._2.length))
 
     val varr = toArray
     val sm = scalarTag
 
-    if (varr.length == 0) buf append "Empty Index"
+    if (varr.length == 0) buf.append("Empty Index")
     else {
       val vlens = util
         .grab(varr, half)
         .map(sm.strList(_))
         .foldLeft(sm.strList(varr(0)).map(_.length))(maxf)
 
-      buf.append("[Index %d x 1]\n" format (length))
+      buf.append("[Index %d x 1]\n".format(length))
 
       def createRow(r: Int) = {
-        val lst = for ((l, v) <- (vlens zip sm.strList(raw(r))))
+        val lst = for ((l, v) <- (vlens.zip(sm.strList(raw(r)))))
           yield v.formatted("%" + l + "s")
         lst.mkString(" ") + "\n"
       }
 
-      buf append util.buildStr(len, length, createRow, " ... \n")
+      buf.append(util.buildStr(len, length, createRow, " ... \n"))
     }
 
     buf.toString()
@@ -598,7 +598,7 @@ object Index {
     */
   def make(rrule: RRule, start: DateTime, end: DateTime): Index[DateTime] = {
     import time._
-    Index((rrule.copy(count = None) withUntil end from start).toSeq: _*)
+    Index((rrule.copy(count = None).withUntil(end).from(start)).toSeq: _*)
   }
 
   /**

@@ -200,8 +200,10 @@ object CSRF {
     // Try to get the re-signed token first, then get the "new" token.
     for {
       name <- request.tags.get(Token.NameRequestTag)
-      value <- request.tags.get(Token.ReSignedRequestTag) orElse request.tags
-        .get(Token.RequestTag)
+      value <- request.tags
+        .get(Token.ReSignedRequestTag)
+        .orElse(request.tags
+          .get(Token.RequestTag))
     } yield Token(name, value)
   }
 

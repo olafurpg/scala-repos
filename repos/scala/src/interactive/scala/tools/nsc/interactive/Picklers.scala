@@ -28,7 +28,7 @@ trait Picklers { self: Global =>
   lazy val shutdownReq = singletonPickler(ShutdownReq)
 
   def defaultThrowable[T <: Throwable]: CondPickler[T] =
-    javaInstancePickler[T] cond { _ =>
+    javaInstancePickler[T].cond { _ =>
       true
     }
 
@@ -113,7 +113,7 @@ trait Picklers { self: Global =>
 
   implicit lazy val namePickler: Pickler[Name] = pkl[String].wrapped[Name] {
     str =>
-      if ((str.length > 1) && (str endsWith "!")) newTypeName(str.init)
+      if ((str.length > 1) && (str.endsWith("!"))) newTypeName(str.init)
       else newTermName(str)
   } { name =>
     if (name.isTypeName) name.toString + "!" else name.toString

@@ -63,7 +63,7 @@ object SupervisorSpec {
       OneForOneStrategy(maxNrOfRetries = 0)(List(classOf[Exception]))
 
     def receive = {
-      case Die ⇒ temp forward Die
+      case Die ⇒ temp.forward(Die)
       case Terminated(`temp`) ⇒ sendTo ! "terminated"
       case Status.Failure(_) ⇒ /*Ignore*/
     }
@@ -264,7 +264,7 @@ class SupervisorSpec
           maxNrOfRetries = restarts)(List(classOf[Exception]))
         val child = context.actorOf(Props(childInstance))
         def receive = {
-          case msg ⇒ child forward msg
+          case msg ⇒ child.forward(msg)
         }
       }))
 
@@ -275,7 +275,7 @@ class SupervisorSpec
 
       filterEvents(EventFilter[RuntimeException]("Expected",
                                                  occurrences = restarts + 1)) {
-        (1 to restarts) foreach { i ⇒
+        ((1 to restarts)).foreach { i ⇒
           master ! "crash"
           expectMsg("crashed")
 
@@ -494,7 +494,7 @@ class SupervisorSpec
 
         // Overriding to disable auto-unwatch
         override def preRestart(reason: Throwable, msg: Option[Any]): Unit = {
-          context.children foreach context.stop
+          context.children.foreach(context.stop)
           postStop()
         }
 
@@ -503,8 +503,8 @@ class SupervisorSpec
             testActor ! "child terminated"
           case l: TestLatch ⇒ child ! l
           case "test" ⇒ sender() ! "green"
-          case "testchild" ⇒ child forward "test"
-          case "testchildAndAck" ⇒ child forward "test"; sender() ! "ack"
+          case "testchild" ⇒ child.forward("test")
+          case "testchildAndAck" ⇒ child.forward("test"); sender() ! "ack"
         }
       }))
 

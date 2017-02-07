@@ -428,28 +428,44 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
     sym match {
       case Library.== => args(0)._2 == args(1)._2
       case Library.< =>
-        args(0)._1.asInstanceOf[ScalaBaseType[Any]].ordering
+        args(0)._1
+          .asInstanceOf[ScalaBaseType[Any]]
+          .ordering
           .lt(args(0)._2, args(1)._2)
       case Library.<= =>
-        args(0)._1.asInstanceOf[ScalaBaseType[Any]].ordering
+        args(0)._1
+          .asInstanceOf[ScalaBaseType[Any]]
+          .ordering
           .lteq(args(0)._2, args(1)._2)
       case Library.> =>
-        args(0)._1.asInstanceOf[ScalaBaseType[Any]].ordering
+        args(0)._1
+          .asInstanceOf[ScalaBaseType[Any]]
+          .ordering
           .gt(args(0)._2, args(1)._2)
       case Library.>= =>
-        args(0)._1.asInstanceOf[ScalaBaseType[Any]].ordering
+        args(0)._1
+          .asInstanceOf[ScalaBaseType[Any]]
+          .ordering
           .gteq(args(0)._2, args(1)._2)
       case Library.+ =>
-        args(0)._1.asInstanceOf[ScalaNumericType[Any]].numeric
+        args(0)._1
+          .asInstanceOf[ScalaNumericType[Any]]
+          .numeric
           .plus(args(0)._2, args(1)._2)
       case Library.- =>
-        args(0)._1.asInstanceOf[ScalaNumericType[Any]].numeric
+        args(0)._1
+          .asInstanceOf[ScalaNumericType[Any]]
+          .numeric
           .minus(args(0)._2, args(1)._2)
       case Library.* =>
-        args(0)._1.asInstanceOf[ScalaNumericType[Any]].numeric
+        args(0)._1
+          .asInstanceOf[ScalaNumericType[Any]]
+          .numeric
           .times(args(0)._2, args(1)._2)
       case Library.% =>
-        args(0)._1.asInstanceOf[ScalaNumericType[Any]].numeric
+        args(0)._1
+          .asInstanceOf[ScalaNumericType[Any]]
+          .numeric
           .asInstanceOf[Integral[Any]]
           .rem(args(0)._2, args(1)._2)
       case Library.Abs =>
@@ -515,7 +531,9 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
         while (len > 0 && s.charAt(len - 1) == ' ') len -= 1
         if (len == s.length) s else s.substring(0, len)
       case Library.Sign =>
-        args(0)._1.asInstanceOf[ScalaNumericType[Any]].numeric
+        args(0)._1
+          .asInstanceOf[ScalaNumericType[Any]]
+          .numeric
           .signum(args(0)._2)
       case Library.Trim => args(0)._2.asInstanceOf[String].trim
       case Library.UCase => args(0)._2.asInstanceOf[String].toUpperCase
@@ -525,22 +543,27 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
       case Library.Repeat if args.size == 2 =>
         args(0)._2.asInstanceOf[String] * args(1)._2.asInstanceOf[Int]
       case Library.Substring if args.size == 3 =>
-        args(0)._2.asInstanceOf[String]
+        args(0)._2
+          .asInstanceOf[String]
           .substring(args(1)._2.asInstanceOf[Int],
                      args(2)._2.asInstanceOf[Int])
       case Library.Replace =>
-        args(0)._2.asInstanceOf[String]
+        args(0)._2
+          .asInstanceOf[String]
           .replace(args(1)._2.asInstanceOf[String],
                    args(2)._2.asInstanceOf[String])
       case Library.Reverse => args(0)._2.asInstanceOf[String].reverse
       case Library.IndexOf =>
-        args(0)._2.asInstanceOf[String]
+        args(0)._2
+          .asInstanceOf[String]
           .indexOf(args(1)._2.asInstanceOf[String])
       case Library.StartsWith =>
-        args(0)._2.asInstanceOf[String]
+        args(0)._2
+          .asInstanceOf[String]
           .startsWith(args(1)._2.asInstanceOf[String])
       case Library.EndsWith =>
-        args(0)._2.asInstanceOf[String]
+        args(0)._2
+          .asInstanceOf[String]
           .endsWith(args(1)._2.asInstanceOf[String])
     }
 
@@ -591,7 +614,7 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
   }
 
   def compileLikePattern(s: String, escape: Option[Char]): Pattern = {
-    val b = new StringBuilder append '^'
+    val b = new StringBuilder.append('^')
     val len = s.length
     val esc = escape.getOrElse('\u0000')
     var i = 0

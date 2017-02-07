@@ -94,8 +94,8 @@ case class Assessible(analysed: Analysed) {
     listAverage(Accuracy.diffsList(Pov(game, color), analysis)).toInt
   def sfSd(color: Color): Int =
     listDeviation(Accuracy.diffsList(Pov(game, color), analysis)).toInt
-  def mtAvg(color: Color): Int = listAverage(game moveTimes color).toInt
-  def mtSd(color: Color): Int = listDeviation(game moveTimes color).toInt
+  def mtAvg(color: Color): Int = listAverage(game.moveTimes(color)).toInt
+  def mtSd(color: Color): Int = listDeviation(game.moveTimes(color)).toInt
   def blurs(color: Color): Int = game.playerBlurPercent(color)
   def hold(color: Color): Boolean = game.player(color).hasSuspiciousHoldAlert
 

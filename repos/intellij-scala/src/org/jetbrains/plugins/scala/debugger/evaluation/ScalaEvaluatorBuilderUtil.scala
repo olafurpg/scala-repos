@@ -1168,8 +1168,8 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
                   _methodName = m.methodName + "_$eq",
                   argumentEvaluators = Seq(rightEvaluator))) //todo: signature?
               case ScalaDuplexEvaluator(first, second) =>
-                createAssignEvaluator(first) orElse createAssignEvaluator(
-                  second)
+                createAssignEvaluator(first).orElse(
+                  createAssignEvaluator(second))
               case _ => None
             }
           }

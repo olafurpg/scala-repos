@@ -61,7 +61,7 @@ object Templates {
     what match {
       case Nil => Empty
       case x :: xs =>
-        (checkForLiftView(part, last, x) or checkForFunc(whole, x)) match {
+        (checkForLiftView(part, last, x).or(checkForFunc(whole, x))) match {
           case Full(ret) => Full(ret)
           case _ => findInViews(whole, part, last, xs)
         }
@@ -118,35 +118,39 @@ object Templates {
       .flatMap { md =>
         Helpers.findId(in, md.value.text)
       }
-      .headOption orElse in
-      .flatMap {
-        case e: Elem if e.label == "html" =>
-          e.child.flatMap {
-            case e: Elem if e.label == "body" => {
-              e.attribute("data-lift-content-id")
-                .headOption
-                .map(_.text) orElse e
-                .attribute("class")
-                .flatMap { ns =>
-                  {
-                    val clz = ns.text.charSplit(' ')
-                    clz.flatMap {
-                      case s if s.startsWith("lift:content_id=") =>
-                        Some(urlDecode(s.substring("lift:content_id=".length)))
-                      case _ => None
-                    }.headOption
-                  }
-                }
-            }
+      .headOption
+      .orElse(in
+        .flatMap {
+          case e: Elem if e.label == "html" =>
+            e.child.flatMap {
+              case e: Elem if e.label == "body" => {
+                e.attribute("data-lift-content-id")
+                  .headOption
+                  .map(_.text)
+                  .orElse(e
+                    .attribute("class")
+                    .flatMap { ns =>
+                      {
+                        val clz = ns.text.charSplit(' ')
+                        clz.flatMap {
+                          case s if s.startsWith("lift:content_id=") =>
+                            Some(urlDecode(
+                              s.substring("lift:content_id=".length)))
+                          case _ => None
+                        }.headOption
+                      }
+                    })
+              }
 
-            case _ => None
-          }
-        case _ => None
-      }
-      .flatMap { id =>
-        Helpers.findId(in, id)
-      }
-      .headOption getOrElse in
+              case _ => None
+            }
+          case _ => None
+        }
+        .flatMap { id =>
+          Helpers.findId(in, id)
+        }
+        .headOption)
+      .getOrElse(in)
   }
 
   /**

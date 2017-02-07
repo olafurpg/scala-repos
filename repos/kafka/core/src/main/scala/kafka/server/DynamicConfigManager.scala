@@ -85,7 +85,7 @@ class DynamicConfigManager(
         case None => // There are no config overrides.
         // Ignore non-json notifications because they can be from the deprecated TopicConfigManager
         case Some(mapAnon: Map[_, _]) =>
-          val map = mapAnon collect { case (k: String, v: Any) => k -> v }
+          val map = mapAnon.collect { case (k: String, v: Any) => k -> v }
           require(map("version") == 1)
 
           val entityType = map.get("entity_type") match {

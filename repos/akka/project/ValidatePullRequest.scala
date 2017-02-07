@@ -51,7 +51,7 @@ object ValidatePullRequest extends AutoPlugin {
         s"GitHub PR comment [ ${c.getUrl} ] contains [$phrase], forcing BUILD ALL mode!")
   }
 
-  val ValidatePR = config("pr-validation") extend Test
+  val ValidatePR = config("pr-validation").extend(Test)
 
   override lazy val projectConfigurations = Seq(ValidatePR)
 
@@ -101,7 +101,7 @@ object ValidatePullRequest extends AutoPlugin {
       log: Logger): Boolean = {
     val dirsOrExperimental =
       changedDirs.flatMap(dir => Set(dir, s"$dir-experimental"))
-    graphsToTest exists {
+    graphsToTest.exists {
       case (ivyScope, deps) =>
         log.debug(s"Analysing [$ivyScope] scoped dependencies...")
 
@@ -129,9 +129,12 @@ object ValidatePullRequest extends AutoPlugin {
 
   override lazy val buildSettings = Seq(
     sourceBranch in Global in ValidatePR := {
-      sys.env.get(SourceBranchEnvVarName) orElse sys.env
-        .get(SourcePullIdJenkinsEnvVarName)
-        .map("pullreq/" + _) getOrElse // Set by "GitHub pull request builder plugin"
+      sys.env
+        .get(SourceBranchEnvVarName)
+        .orElse(
+          sys.env
+            .get(SourcePullIdJenkinsEnvVarName)
+            .map("pullreq/" + _)) getOrElse // Set by "GitHub pull request builder plugin"
         "HEAD"
     },
     targetBranch in Global in ValidatePR := {
@@ -145,7 +148,7 @@ object ValidatePullRequest extends AutoPlugin {
     },
     buildAllKeyword in Global in ValidatePR := """PLS BUILD ALL""".r,
     githubEnforcedBuildAll in Global in ValidatePR := {
-      sys.env.get(PullIdEnvVarName).map(_.toInt) flatMap {
+      sys.env.get(PullIdEnvVarName).map(_.toInt).flatMap {
         prId =>
           val log = streams.value.log
           val buildAllMagicPhrase = (buildAllKeyword in ValidatePR).value
@@ -162,7 +165,7 @@ object ValidatePullRequest extends AutoPlugin {
 
             def triggersBuildAll(c: GHIssueComment): Boolean =
               buildAllMagicPhrase.findFirstIn(c.getBody).isDefined
-            comments collectFirst {
+            comments.collectFirst {
               case c if triggersBuildAll(c) =>
                 BuildCommentForcedAll(buildAllMagicPhrase.toString(), c)
             }
@@ -288,11 +291,12 @@ object ValidatePullRequest extends AutoPlugin {
               case (taskSeq, task) =>
                 taskSeq :+ task.asInstanceOf[Task[Any]]
             }
-          } apply { tasks: Seq[Task[Any]] =>
-          tasks.join map { seq =>
-            () /* Ignore the sequence of unit returned */
           }
-        }
+          .apply { tasks: Seq[Task[Any]] =>
+            tasks.join.map { seq =>
+              () /* Ignore the sequence of unit returned */
+            }
+          }
       }.value
     )
 }

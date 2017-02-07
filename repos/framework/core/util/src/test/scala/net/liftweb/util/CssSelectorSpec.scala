@@ -363,7 +363,7 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
     }
 
     "substitute a String by id" in {
-      ("#foo" replaceWith "hello").apply(<b><span id="foo"/></b>) must ==/(
+      ("#foo".replaceWith("hello")).apply(<b><span id="foo"/></b>) must ==/(
         <b>hello</b>)
     }
 
@@ -661,7 +661,7 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
     }
 
     "substitute multiple Strings by id" in {
-      (("#foo" replaceWith "hello") & ("#baz" replaceWith "bye"))(
+      (("#foo".replaceWith("hello")) & ("#baz".replaceWith("bye")))(
         <b><div id="baz">Hello</div><span id="foo"/></b>
       ) must_== (NodeSeq fromSeq <b>{Text("bye")}{Text("hello")}</b>)
     }
@@ -673,7 +673,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
     }
 
     "substitute multiple Strings with a List by id" in {
-      (("#foo" replaceWith "hello") & ("#baz" replaceWith List("bye", "bye")))(
+      (("#foo".replaceWith("hello")) & ("#baz"
+        .replaceWith(List("bye", "bye"))))(
         <b><div id="baz">Hello</div><span id="foo"/></b>) must_==
         (NodeSeq fromSeq <b>{Text("bye")}{Text("bye")}{Text("hello")}</b>)
     }
@@ -689,8 +690,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
     }
 
     "substitute multiple Strings with a List of XML by id" in {
-      val answer = (("#foo" replaceWith "hello") &
-        ("#baz" replaceWith List[NodeSeq](<i/>, <i>Meow</i>)))(
+      val answer = (("#foo".replaceWith("hello")) &
+        ("#baz".replaceWith(List[NodeSeq](<i/>, <i>Meow</i>))))(
         <b><div frog="dog" id="baz">Hello</div><span id="foo"/></b>)
 
       (answer \ "i").length must_== 2
@@ -717,7 +718,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
     }
 
     "substitute by name" in {
-      val answer = ("name=moose" replaceWith <input name="goof"/>)
+      val answer = ("name=moose"
+        .replaceWith(<input name="goof"/>))
         .apply(<div><input name="moose" value="start" id="79"/></div>)
 
       (answer \ "input")(0) must ==/(
@@ -733,7 +735,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "substitute by name with attrs" in {
       val answer =
-        ("name=moose" replaceWith <input name="goof" value="8" id="88"/>)
+        ("name=moose"
+          .replaceWith(<input name="goof" value="8" id="88"/>))
           .apply(<div><input name="moose" value="start" id="79"/></div>)
 
       (answer \ "input")(0) must ==/(<input name="goof" value="8" id="88"/>)
@@ -750,7 +753,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "substitute by a selector with attrs" in {
       val answer =
-        ("cute=moose" replaceWith <input name="goof" value="8" id="88"/>)
+        ("cute=moose"
+          .replaceWith(<input name="goof" value="8" id="88"/>))
           .apply(
             <div><input name="meow" cute="moose" value="start" id="79"/></div>)
 
@@ -793,7 +797,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "merge classes" in {
       val answer =
-        ("cute=moose" replaceWith <input class="a" name="goof" value="8" id="88"/>)
+        ("cute=moose"
+          .replaceWith(<input class="a" name="goof" value="8" id="88"/>))
           .apply(
             <div><input name="meow" class="b" cute="moose" value="start" id="79"/></div>)
 
@@ -854,7 +859,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "list of strings" in {
       val answer =
-        (("#moose *" replaceWith List("a", "b", "c", "woof")) & ClearClearable)
+        (("#moose *"
+          .replaceWith(List("a", "b", "c", "woof"))) & ClearClearable)
           .apply(<ul>
           <li id="moose">first</li>
           <li class="clearable">second</li>
@@ -886,10 +892,10 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "list of Nodes" in {
       val answer =
-        (("#moose *" replaceWith List[NodeSeq](<i>"a"</i>,
+        (("#moose *".replaceWith(List[NodeSeq](<i>"a"</i>,
                                                Text("b"),
                                                Text("c"),
-                                               <b>woof</b>)) & ClearClearable)
+                                               <b>woof</b>))) & ClearClearable)
           .apply(<ul>
           <li id="moose">first</li>
           <li class="clearable">second</li>
@@ -905,16 +911,18 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
     }
 
     "set href" in {
-      val answer = (("#moose [href]" replaceWith "Hi") & ClearClearable).apply(
-        <ul><a id="moose" href="meow">first</a><li class="clearable">second</li><li class="clearable">Third</li></ul>)
+      val answer =
+        (("#moose [href]".replaceWith("Hi")) & ClearClearable).apply(
+          <ul><a id="moose" href="meow">first</a><li class="clearable">second</li><li class="clearable">Third</li></ul>)
 
       (answer \ "a" \ "@href").text must_== "Hi"
       (answer \ "li").length must_== 0
     }
 
     "set href and subnodes" in {
-      val answer = (("#moose [href]" replaceWith "Hi") & ClearClearable).apply(
-        <ul><a id="moose" href="meow">first<li class="clearable">second</li><li class="clearable">Third</li></a></ul>)
+      val answer =
+        (("#moose [href]".replaceWith("Hi")) & ClearClearable).apply(
+          <ul><a id="moose" href="meow">first<li class="clearable">second</li><li class="clearable">Third</li></a></ul>)
 
       (answer \ "a" \ "@href").text must_== "Hi"
       (answer \\ "li").length must_== 0

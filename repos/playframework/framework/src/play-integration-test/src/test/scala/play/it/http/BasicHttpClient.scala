@@ -118,19 +118,23 @@ class BasicHttpClient(port: Int) {
     }
 
     if (waitForResponses) {
-      request.headers.get("Expect").filter(_ == "100-continue").map { _ =>
-        out.flush()
-        val response = readResponse(requestDesc + " continue")
-        if (response.status == 100) {
-          writeBody()
-          Seq(response, readResponse(requestDesc))
-        } else {
-          Seq(response)
+      request.headers
+        .get("Expect")
+        .filter(_ == "100-continue")
+        .map { _ =>
+          out.flush()
+          val response = readResponse(requestDesc + " continue")
+          if (response.status == 100) {
+            writeBody()
+            Seq(response, readResponse(requestDesc))
+          } else {
+            Seq(response)
+          }
         }
-      } getOrElse {
-        writeBody()
-        Seq(readResponse(requestDesc))
-      }
+        .getOrElse {
+          writeBody()
+          Seq(readResponse(requestDesc))
+        }
     } else {
       writeBody()
       Nil
@@ -205,16 +209,19 @@ class BasicHttpClient(port: Int) {
           }
           (readChunks.toSeq, readHeaders.toMap)
         } toRight {
-          headers.get(CONTENT_LENGTH).map { length =>
-            readCompletely(length.toInt)
-          } getOrElse {
-            if (status != CONTINUE && status != NOT_MODIFIED &&
-                status != NO_CONTENT) {
-              consumeRemaining(reader)
-            } else {
-              ""
+          headers
+            .get(CONTENT_LENGTH)
+            .map { length =>
+              readCompletely(length.toInt)
             }
-          }
+            .getOrElse {
+              if (status != CONTINUE && status != NOT_MODIFIED &&
+                  status != NO_CONTENT) {
+                consumeRemaining(reader)
+              } else {
+                ""
+              }
+            }
         }
 
       BasicResponse(version, status, reasonPhrase, headers, body)

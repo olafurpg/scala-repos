@@ -18,5 +18,5 @@ object Test {
     println(w)
     println(go)
   }
-  def go = v zip v
+  def go = v.zip(v)
 }

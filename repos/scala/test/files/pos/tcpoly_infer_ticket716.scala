@@ -3,7 +3,7 @@ trait Functor[F[_]] {
 }
 object Functor {
   implicit val ListFunctor: Functor[List] = new Functor[List] {
-    def fmap[A, B](f: A => B, arg: List[A]): List[B] = arg map f
+    def fmap[A, B](f: A => B, arg: List[A]): List[B] = arg.map(f)
   }
 
   final class OOFunctor[F[_], A](arg: F[A])(implicit ftr: Functor[F]) {
@@ -21,6 +21,6 @@ object Functor {
 object GeneralLiftingDemo extends App {
   import Functor._
   val l = List(1, 2, 3)
-  val res = l fmap (1 +) // TODO: should not need explicit call to lifttoOO
+  val res = l.fmap(1 +) // TODO: should not need explicit call to lifttoOO
   println("OO : " + res)
 }

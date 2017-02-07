@@ -62,22 +62,24 @@ object RegisterEngine extends Logging {
     val engineManifest =
       engineManifests.get(fileEngineManifest.id, fileEngineManifest.version)
 
-    engineManifest map { em =>
-      val conf = new Configuration
-      val fs = FileSystem.get(conf)
+    engineManifest
+      .map { em =>
+        val conf = new Configuration
+        val fs = FileSystem.get(conf)
 
-      em.files foreach { f =>
-        val path = new Path(f)
-        info(s"Removing ${f}")
-        fs.delete(path, false)
+        em.files.foreach { f =>
+          val path = new Path(f)
+          info(s"Removing ${f}")
+          fs.delete(path, false)
+        }
+
+        engineManifests.delete(em.id, em.version)
+        info(s"Unregistered engine ${em.id} ${em.version}")
       }
-
-      engineManifests.delete(em.id, em.version)
-      info(s"Unregistered engine ${em.id} ${em.version}")
-    } getOrElse {
-      error(
-        s"${fileEngineManifest.id} ${fileEngineManifest.version} is not " +
-          "registered.")
-    }
+      .getOrElse {
+        error(
+          s"${fileEngineManifest.id} ${fileEngineManifest.version} is not " +
+            "registered.")
+      }
   }
 }

@@ -49,7 +49,7 @@ object currenttype2 {
       extends AgentSimulation {
     lazy val step: LearningSimulation = {
       val updatedAgents: List[G#Agent] =
-        agents map { agent =>
+        agents.map { agent =>
           val (s, a, s2) = (state, actions(agent), nextState)
           val r = rewards(agent).r(s, a, s2)
           agent.learn(s, a, s2, r): G#Agent

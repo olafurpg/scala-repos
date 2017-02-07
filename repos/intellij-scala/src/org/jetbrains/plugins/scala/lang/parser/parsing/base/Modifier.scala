@@ -23,7 +23,8 @@ object Modifier {
       case ScalaTokenTypes.kOVERRIDE =>
         builder.advanceLexer //Ate override
         return true
-      case _ => (LocalModifier parse builder) || (AccessModifier parse builder)
+      case _ =>
+        (LocalModifier.parse(builder)) || (AccessModifier.parse(builder))
     }
   }
 }

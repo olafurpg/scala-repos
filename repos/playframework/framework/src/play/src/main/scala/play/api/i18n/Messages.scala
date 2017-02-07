@@ -167,13 +167,16 @@ class DefaultLangs @Inject()(configuration: Configuration) extends Langs {
 
   val availables: Seq[Lang] = {
     val langs =
-      configuration.getString("application.langs") map { langsStr =>
-        Logger.warn(
-          "application.langs is deprecated, use play.i18n.langs instead")
-        langsStr.split(",").map(_.trim).toSeq
-      } getOrElse {
-        config.get[Seq[String]]("play.i18n.langs")
-      }
+      configuration
+        .getString("application.langs")
+        .map { langsStr =>
+          Logger.warn(
+            "application.langs is deprecated, use play.i18n.langs instead")
+          langsStr.split(",").map(_.trim).toSeq
+        }
+        .getOrElse {
+          config.get[Seq[String]]("play.i18n.langs")
+        }
 
     langs.map { lang =>
       try { Lang(lang) } catch {

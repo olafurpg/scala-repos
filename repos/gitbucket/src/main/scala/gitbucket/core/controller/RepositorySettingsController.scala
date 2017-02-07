@@ -111,9 +111,11 @@ trait RepositorySettingsControllerBase extends ControllerBase {
         repository.owner,
         repository.name,
         form.description,
-        repository.repository.parentUserName.map { _ =>
-          repository.repository.isPrivate
-        } getOrElse form.isPrivate
+        repository.repository.parentUserName
+          .map { _ =>
+            repository.repository.isPrivate
+          }
+          .getOrElse(form.isPrivate)
       )
       // Change repository name
       if (repository.name != form.repositoryName) {
@@ -372,10 +374,12 @@ trait RepositorySettingsControllerBase extends ControllerBase {
     * Display the web hook edit page.
     */
   get("/:owner/:repository/settings/hooks/edit")(ownerOnly { repository =>
-    getWebHook(repository.owner, repository.name, params("url")).map {
-      case (webhook, events) =>
-        html.edithooks(webhook, events, repository, flash.get("info"), false)
-    } getOrElse NotFound
+    getWebHook(repository.owner, repository.name, params("url"))
+      .map {
+        case (webhook, events) =>
+          html.edithooks(webhook, events, repository, flash.get("info"), false)
+      }
+      .getOrElse(NotFound)
   })
 
   /**

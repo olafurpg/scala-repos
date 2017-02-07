@@ -27,10 +27,10 @@ final class Api(firewall: Firewall,
 
   def saveAuthentication(userId: String, apiVersion: Option[Int])(
       implicit req: RequestHeader): Fu[String] =
-    if (tor isExitNode req.remoteAddress) fufail(Api.AuthFromTorExitNode)
+    if (tor.isExitNode(req.remoteAddress)) fufail(Api.AuthFromTorExitNode)
     else
-      UserRepo mustConfirmEmail userId flatMap {
-        case true => fufail(Api MustConfirmEmail userId)
+      (UserRepo mustConfirmEmail userId).flatMap {
+        case true => fufail(Api.MustConfirmEmail(userId))
         case false =>
           val sessionId = Random nextStringUppercase 12
           Store.save(sessionId, userId, req, apiVersion) inject sessionId
@@ -42,17 +42,17 @@ final class Api(firewall: Firewall,
     (emailAddress.validate(usernameOrEmail) match {
       case Some(email) => UserRepo.authenticateByEmail(email, password)
       case None =>
-        UserRepo.authenticateById(User normalize usernameOrEmail, password)
-    }) awaitSeconds 2
+        UserRepo.authenticateById(User.normalize(usernameOrEmail), password)
+    }).awaitSeconds(2)
 
   def restoreUser(req: RequestHeader): Fu[Option[FingerprintedUser]] =
-    firewall accepts req flatMap {
+    firewall.accepts(req).flatMap {
       _ ?? {
         reqSessionId(req) ?? { sessionId =>
-          Store userIdAndFingerprint sessionId flatMap {
+          (Store userIdAndFingerprint sessionId).flatMap {
             _ ?? { d =>
-              UserRepo.byId(d.user) map {
-                _ map {
+              UserRepo.byId(d.user).map {
+                _.map {
                   FingerprintedUser(_, d.fp.isDefined)
                 }
               }
@@ -63,7 +63,7 @@ final class Api(firewall: Firewall,
     }
 
   def locatedOpenSessions(userId: String, nb: Int): Fu[List[LocatedSession]] =
-    Store.openSessions(userId, nb) map {
+    Store.openSessions(userId, nb).map {
       _.map { session =>
         LocatedSession(session, geoIP(session.ip))
       }
@@ -74,9 +74,9 @@ final class Api(firewall: Firewall,
 
   def setFingerprint(req: RequestHeader,
                      fingerprint: String): Fu[Option[String]] =
-    reqSessionId(req) ?? { Store.setFingerprint(_, fingerprint) map some }
+    reqSessionId(req) ?? { Store.setFingerprint(_, fingerprint).map(some) }
 
-  def reqSessionId(req: RequestHeader) = req.session get "sessionId"
+  def reqSessionId(req: RequestHeader) = req.session.get("sessionId")
 
   def userIdsSharingIp = userIdsSharingField("ip") _
 
@@ -93,13 +93,15 @@ final class Api(firewall: Firewall,
       .flatMap {
         case Nil => fuccess(Nil)
         case values =>
-          tube.storeColl.distinct(
-            "user",
-            BSONDocument(
-              field -> BSONDocument("$in" -> values),
-              "user" -> BSONDocument("$ne" -> userId)
-            ).some
-          ) map lila.db.BSON.asStrings
+          tube.storeColl
+            .distinct(
+              "user",
+              BSONDocument(
+                field -> BSONDocument("$in" -> values),
+                "user" -> BSONDocument("$ne" -> userId)
+              ).some
+            )
+            .map(lila.db.BSON.asStrings)
       }
 
   def recentUserIdsByFingerprint = recentUserIdsByField("fp") _
@@ -108,13 +110,15 @@ final class Api(firewall: Firewall,
 
   private def recentUserIdsByField(field: String)(
       value: String): Fu[List[String]] =
-    tube.storeColl.distinct(
-      "user",
-      BSONDocument(
-        field -> value,
-        "date" -> BSONDocument("$gt" -> DateTime.now.minusYears(1))
-      ).some
-    ) map lila.db.BSON.asStrings
+    tube.storeColl
+      .distinct(
+        "user",
+        BSONDocument(
+          field -> value,
+          "date" -> BSONDocument("$gt" -> DateTime.now.minusYears(1))
+        ).some
+      )
+      .map(lila.db.BSON.asStrings)
 }
 
 object Api {

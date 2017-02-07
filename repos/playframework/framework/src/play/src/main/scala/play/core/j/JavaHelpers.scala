@@ -30,7 +30,7 @@ trait JavaHelpers {
 
   def cookiesToScalaCookies(
       cookies: java.lang.Iterable[play.mvc.Http.Cookie]): Seq[Cookie] = {
-    cookies.asScala.toSeq map { c =>
+    cookies.asScala.toSeq.map { c =>
       Cookie(c.name,
              c.value,
              if (c.maxAge == null) None else Some(c.maxAge),

@@ -60,8 +60,8 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
     */
   protected def bbAlpha(s: T, y: T): Double = {
     var alpha =
-      if (bbType == 1) (s dot s) / (s dot y)
-      else (s dot y) / (y dot y)
+      if (bbType == 1)(s.dot(s)) / (s.dot(y))
+      else (s.dot(y)) / (y.dot(y))
     if (alpha <= alphaMin || alpha > alphaMax) alpha = 1.0
     if (alpha.isNaN) alpha = 1.0
     alpha
@@ -94,8 +94,8 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
                                            direction: T): Double = {
     val fb =
       if (state.history.fvals.isEmpty) state.value
-      else state.value max state.history.fvals.max
-    val normGradInDir = state.grad dot direction
+      else state.value.max(state.history.fvals.max)
+    val normGradInDir = state.grad.dot(direction)
 
     var gamma =
       if (state.iter == 0) scala.math.min(1.0, 1.0 / norm(state.grad))
@@ -133,12 +133,12 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
 
       /** calculates the gradient at a point */
       override def gradientAt(alpha: Double): Double =
-        f.gradientAt(project(x + direction * alpha)) dot direction
+        f.gradientAt(project(x + direction * alpha)).dot(direction)
 
       /** Calculates both the value and the gradient at a point */
       def calculate(alpha: Double): (Double, Double) = {
         val (ff, grad) = f.calculate(x + direction * alpha)
-        ff -> (grad dot direction)
+        ff -> (grad.dot(direction))
       }
     }
 }

@@ -173,7 +173,7 @@ object Serializers {
           writeByte(TagMatch)
           writeTree(selector)
           writeInt(cases.size)
-          cases foreach { caze =>
+          cases.foreach { caze =>
             writeTrees(caze._1); writeTree(caze._2)
           }
           writeTree(default)
@@ -333,7 +333,7 @@ object Serializers {
         case JSObjectConstr(fields) =>
           writeByte(TagJSObjectConstr)
           writeInt(fields.size)
-          fields foreach { field =>
+          fields.foreach { field =>
             writePropertyName(field._1); writeTree(field._2)
           }
 

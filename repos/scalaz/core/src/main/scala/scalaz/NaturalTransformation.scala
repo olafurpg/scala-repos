@@ -19,7 +19,7 @@ trait NaturalTransformation[-F[_], +G[_]] { self =>
   }
 
   def andThen[H[_]](f: G ~> H): F ~> H =
-    f compose self
+    f.compose(self)
 }
 
 trait NaturalTransformations {

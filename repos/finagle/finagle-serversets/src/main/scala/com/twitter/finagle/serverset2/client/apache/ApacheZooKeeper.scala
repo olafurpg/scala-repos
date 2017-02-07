@@ -70,7 +70,7 @@ private[serverset2] class ApacheZooKeeper private[apache] (
     try {
       zk.create(path,
                 zkData(data),
-                (acl map ApacheData.ACL.zk).asJava,
+                (acl.map(ApacheData.ACL.zk)).asJava,
                 ApacheCreateMode.zk(createMode),
                 cb,
                 null)
@@ -91,7 +91,7 @@ private[serverset2] class ApacheZooKeeper private[apache] (
         }
     }
     try {
-      zk.delete(path, version getOrElse -1, cb, null)
+      zk.delete(path, version.getOrElse(-1), cb, null)
     } catch {
       case t: Throwable =>
         rv.setException(t)
@@ -210,7 +210,7 @@ private[serverset2] class ApacheZooKeeper private[apache] (
         }
     }
     try {
-      zk.setData(path, zkData(data), version getOrElse -1, cb, null)
+      zk.setData(path, zkData(data), version.getOrElse(-1), cb, null)
     } catch {
       case t: Throwable =>
         rv.setException(t)
@@ -229,7 +229,7 @@ private[serverset2] class ApacheZooKeeper private[apache] (
         ApacheKeeperException(ret, Option(path)) match {
           case None =>
             rv.setValue(
-              Node.ACL(acl.asScala.toList map (ApacheData.ACL(_)),
+              Node.ACL(acl.asScala.toList.map(ApacheData.ACL(_)),
                        ApacheData.Stat(stat)))
           case Some(e) => rv.setException(e)
         }
@@ -259,8 +259,8 @@ private[serverset2] class ApacheZooKeeper private[apache] (
     }
     try {
       zk.setACL(path,
-                (acl map ApacheData.ACL.zk).asJava,
-                version getOrElse -1,
+                (acl.map(ApacheData.ACL.zk)).asJava,
+                version.getOrElse(-1),
                 cb,
                 null)
     } catch {

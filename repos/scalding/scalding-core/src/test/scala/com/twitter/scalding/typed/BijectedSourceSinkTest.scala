@@ -51,7 +51,7 @@ class MutatedSourceTest extends WordSpec with Matchers {
         .typedSink(TypedTsv[Long]("output")) { outBuf =>
           val unordered = outBuf.toSet
           // Size should be unchanged
-          unordered should have size 3
+          (unordered should have).size(3)
 
           // Simple case, 2*8L won't run into the packer logic
           unordered should contain(16L)
@@ -88,7 +88,7 @@ class ContraMappedAndThenSourceTest extends WordSpec with Matchers {
         .typedSink(TypedTsv[Long]("output")) { outBuf =>
           val unordered = outBuf.toSet
           // Size should be unchanged
-          unordered should have size 3
+          (unordered should have).size(3)
 
           // Simple case, 2*8L won't run into the packer logic
           unordered should contain(16L)

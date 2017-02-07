@@ -38,8 +38,11 @@ trait Notifier
           issue.repositoryName,
           issue.issueId).map(_.commentedUserName)).distinct
       .withFilter(_ != context.loginAccount.get.userName) // the operation in person is excluded
-      .foreach(getAccountByUserName(_) filterNot (_.isGroupAccount) filterNot
-        (LDAPUtil.isDummyMailAddress(_)) foreach (x => notify(x.mailAddress)))
+      .foreach(
+        getAccountByUserName(_)
+          .filterNot(_.isGroupAccount)
+          .filterNot(LDAPUtil.isDummyMailAddress(_))
+          .foreach(x => notify(x.mailAddress)))
 }
 
 object Notifier {
@@ -70,7 +73,7 @@ object Notifier {
     """.stripMargin
 
   def msgStatus(url: String) = (content: String) => s"""
-    |${content} <a href="${url}">#${url split ('/') last}</a>
+    |${content} <a href="${url}">#${url.split('/') last}</a>
     """.stripMargin
 }
 
@@ -84,7 +87,7 @@ class Mailer(private val smtp: Smtp) extends Notifier {
     val database = Database()
 
     val f = Future {
-      database withSession { implicit session =>
+      database.withSession { implicit session =>
         defining(
           s"[${r.name}] ${issue.title} (#${issue.issueId})" -> msg(
             Markdown.toHtml(
@@ -126,10 +129,10 @@ class Mailer(private val smtp: Smtp) extends Notifier {
       }
       "Notifications Successful."
     }
-    f onSuccess {
+    f.onSuccess {
       case s => logger.debug(s)
     }
-    f onFailure {
+    f.onFailure {
       case t => logger.error("Notifications Failed.", t)
     }
   }

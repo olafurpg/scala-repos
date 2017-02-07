@@ -14,7 +14,7 @@ object Report extends LilaController {
   private def api = Env.report.api
 
   def list = Secure(_.SeeReport) { implicit ctx => _ =>
-    api unprocessedAndRecent 50 map { reports =>
+    api.unprocessedAndRecent(50).map { reports =>
       html.report.list(reports)
     }
   }
@@ -25,8 +25,8 @@ object Report extends LilaController {
 
   def form = Auth { implicit ctx => implicit me =>
     NotForKids {
-      get("username") ?? UserRepo.named flatMap { user =>
-        forms.createWithCaptcha map {
+      (get("username") ?? UserRepo.named).flatMap { user =>
+        forms.createWithCaptcha.map {
           case (form, captcha) => Ok(html.report.form(form, user, captcha))
         }
       }
@@ -37,20 +37,20 @@ object Report extends LilaController {
     implicit val req = ctx.body
     forms.create.bindFromRequest.fold(
       err =>
-        get("username") ?? UserRepo.named flatMap { user =>
-          forms.anyCaptcha map { captcha =>
+        (get("username") ?? UserRepo.named).flatMap { user =>
+          forms.anyCaptcha.map { captcha =>
             BadRequest(html.report.form(err, user, captcha))
           }
       },
       data =>
-        api.create(data, me) map { report =>
+        api.create(data, me).map { report =>
           Redirect(routes.Report.thanks(data.user.username))
       }
     )
   }
 
   def thanks(reported: String) = Auth { implicit ctx => implicit me =>
-    Env.relation.api.fetchBlocks(me.id, reported) map { blocked =>
+    Env.relation.api.fetchBlocks(me.id, reported).map { blocked =>
       html.report.thanks(reported, blocked)
     }
   }

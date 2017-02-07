@@ -195,7 +195,7 @@ trait RawJsonColumnarTableStorageModule[M[+ _]]
       val pathsM = this.reduce {
         new CReducer[Set[Path]] {
           def reduce(schema: CSchema, range: Range): Set[Path] = {
-            schema.columns(JObjectFixedT(Map("value" -> JTextT))) flatMap {
+            schema.columns(JObjectFixedT(Map("value" -> JTextT))).flatMap {
               case s: StrColumn =>
                 range.filter(s.isDefinedAt).map(i => Path(s(i)))
               case _ => Set()

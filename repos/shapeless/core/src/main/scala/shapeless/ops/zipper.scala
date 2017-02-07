@@ -65,7 +65,7 @@ object zipper {
       new First[Zipper[C, L, R, P]] {
         type Out = Zipper[C, HNil, RP, P]
         def apply(z: Zipper[C, L, R, P]) =
-          Zipper(HNil, z.prefix reverse_::: z.suffix, z.parent)
+          Zipper(HNil, z.prefix.reverse_:::(z.suffix), z.parent)
       }
   }
 
@@ -82,7 +82,7 @@ object zipper {
       new Last[Zipper[C, L, R, P]] {
         type Out = Zipper[C, RP, HNil, P]
         def apply(z: Zipper[C, L, R, P]) =
-          Zipper(z.suffix reverse_::: z.prefix, HNil, z.parent)
+          Zipper(z.suffix.reverse_:::(z.prefix), HNil, z.parent)
       }
   }
 
@@ -107,7 +107,7 @@ object zipper {
         type Out = Zipper[C, reverse.Out, RS, P]
         def apply(z: Zipper[C, L, R, P]) = {
           val p :: s :: HNil = z.suffix.splitP[N]
-          Zipper(p reverse_::: z.prefix, s, z.parent)
+          Zipper(p.reverse_:::(z.prefix), s, z.parent)
         }
       }
   }
@@ -133,7 +133,7 @@ object zipper {
         type Out = Zipper[C, LS, reverse.Out, P]
         def apply(z: Zipper[C, L, R, P]) = {
           val p :: s :: HNil = z.prefix.splitP[N]
-          Zipper(s, p reverse_::: z.suffix, z.parent)
+          Zipper(s, p.reverse_:::(z.suffix), z.parent)
         }
       }
   }
@@ -160,7 +160,7 @@ object zipper {
         type Out = Zipper[C, reverse.Out, RS, P]
         def apply(z: Zipper[C, L, R, P]) = {
           val p :: s :: HNil = z.suffix.splitLeftP[T]
-          Zipper(p reverse_::: z.prefix, s, z.parent)
+          Zipper(p.reverse_:::(z.prefix), s, z.parent)
         }
       }
   }
@@ -189,7 +189,7 @@ object zipper {
         type Out = Zipper[C, cons.T, cons.H :: reverse.Out, P]
         def apply(z: Zipper[C, L, R, P]) = {
           val p :: s :: HNil = z.prefix.splitLeftP[T]
-          Zipper(s.tail, s.head :: (p reverse_::: z.suffix), z.parent)
+          Zipper(s.tail, s.head :: (p.reverse_:::(z.suffix)), z.parent)
         }
       }
   }
@@ -387,7 +387,7 @@ object zipper {
       : Aux[Zipper[LR, L, R, P], LR] =
       new Reify[Zipper[LR, L, R, P]] {
         type Out = LR
-        def apply(z: Zipper[LR, L, R, P]) = z.prefix reverse_::: z.suffix
+        def apply(z: Zipper[LR, L, R, P]) = z.prefix.reverse_:::(z.suffix)
       }
 
     implicit def genericReify[C, L <: HList, R <: HList, P, CL <: HList](
@@ -396,7 +396,7 @@ object zipper {
       new Reify[Zipper[C, L, R, P]] {
         type Out = C
         def apply(z: Zipper[C, L, R, P]) =
-          gen.from(z.prefix reverse_::: z.suffix)
+          gen.from(z.prefix.reverse_:::(z.suffix))
       }
   }
 }

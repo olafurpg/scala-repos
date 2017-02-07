@@ -164,7 +164,7 @@ class HttpHeaderParserSpec
       }
       ixA shouldEqual ixB
       headerA shouldEqual RawHeader("Fancy-Pants", "foo")
-      headerA should be theSameInstanceAs headerB
+      (headerA should be).theSameInstanceAs(headerB)
     }
 
     "parse and cache a modelled header with line-folding" in new TestSetup() {
@@ -191,23 +191,30 @@ class HttpHeaderParserSpec
     }
 
     "produce an error message for lines with an illegal header name" in new TestSetup() {
-      the[ParsingException] thrownBy parseLine(" Connection: close\r\nx") should have message "Illegal character ' ' in header name"
-      the[ParsingException] thrownBy parseLine("Connection : close\r\nx") should have message "Illegal character ' ' in header name"
-      the[ParsingException] thrownBy parseLine("Connec/tion: close\r\nx") should have message "Illegal character '/' in header name"
+      (the[ParsingException] thrownBy parseLine(" Connection: close\r\nx") should have)
+        .message("Illegal character ' ' in header name")
+      (the[ParsingException] thrownBy parseLine("Connection : close\r\nx") should have)
+        .message("Illegal character ' ' in header name")
+      (the[ParsingException] thrownBy parseLine("Connec/tion: close\r\nx") should have)
+        .message("Illegal character '/' in header name")
     }
 
     "produce an error message for lines with a too-long header name" in new TestSetup() {
       noException should be thrownBy parseLine(
         "123456789012345678901234567890123456789012345678901234567890: foo\r\nx")
-      the[ParsingException] thrownBy parseLine(
-        "1234567890123456789012345678901234567890123456789012345678901: foo\r\nx") should have message "HTTP header name exceeds the configured limit of 60 characters"
+      (the[ParsingException] thrownBy parseLine(
+        "1234567890123456789012345678901234567890123456789012345678901: foo\r\nx") should have)
+        .message(
+          "HTTP header name exceeds the configured limit of 60 characters")
     }
 
     "produce an error message for lines with a too-long header value" in new TestSetup() {
       noException should be thrownBy parseLine(
         s"foo: ${nextRandomString(nextRandomAlphaNumChar, 1000)}\r\nx")
-      the[ParsingException] thrownBy parseLine(
-        s"foo: ${nextRandomString(nextRandomAlphaNumChar, 1001)}\r\nx") should have message "HTTP header value exceeds the configured limit of 1000 characters"
+      (the[ParsingException] thrownBy parseLine(
+        s"foo: ${nextRandomString(nextRandomAlphaNumChar, 1001)}\r\nx") should have)
+        .message(
+          "HTTP header value exceeds the configured limit of 1000 characters")
     }
 
     "continue parsing raw headers even if the overall cache value capacity is reached" in new TestSetup() {
@@ -298,7 +305,7 @@ class HttpHeaderParserSpec
       val (ixA, headerA) = parseLine(lineA)
       val (ixB, headerB) = parseLine(lineB)
       ixA shouldEqual ixB
-      headerA should be theSameInstanceAs headerB
+      (headerA should be).theSameInstanceAs(headerB)
       headerA
     }
 

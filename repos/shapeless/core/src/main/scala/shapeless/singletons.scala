@@ -212,7 +212,7 @@ trait SingletonTypeUtils extends ReprTypes {
     } yield checked.tpe
 
   def parseType(typeStr: String): Option[Type] =
-    parseStandardType(typeStr) orElse parseLiteralType(typeStr)
+    parseStandardType(typeStr).orElse(parseLiteralType(typeStr))
 
   def typeCarrier(tpe: Type) =
     mkTypeCarrier(tq"{ type T = $tpe }")

@@ -63,7 +63,7 @@ object LoadedReporterFactory extends ReporterFactory {
 
   def apply(name: String, addr: Option[SocketAddress]): Monitor =
     factories.map(_(name, addr)).foldLeft(NullMonitor: Monitor) { (a, m) =>
-      a andThen m
+      a.andThen(m)
     }
 
   val get = this

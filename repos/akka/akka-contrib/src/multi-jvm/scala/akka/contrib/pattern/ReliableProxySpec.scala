@@ -74,8 +74,8 @@ class ReliableProxySpec
   def expectTransition(max: FiniteDuration, s1: State, s2: State) =
     expectMsg(max, FSM.Transition(proxy, s1, s2))
 
-  def sendN(n: Int) = (1 to n) foreach (proxy ! _)
-  def expectN(n: Int) = (1 to n) foreach { n ⇒
+  def sendN(n: Int) = ((1 to n)).foreach(proxy ! _)
+  def expectN(n: Int) = ((1 to n)).foreach { n ⇒
     expectMsg(n); lastSender should ===(target)
   }
 
@@ -380,10 +380,10 @@ class ReliableProxySpec
           val proxyTerm = expectMsgType[ProxyTerminated]
           // Validate that the unsent messages are 50 ints
           val unsentInts =
-            proxyTerm.outstanding.queue collect {
+            proxyTerm.outstanding.queue.collect {
               case Message(i: Int, _, _) if i > 0 && i <= 50 ⇒ i
             }
-          unsentInts should have size 50
+          (unsentInts should have).size(50)
           expectTerminated(proxy)
         }
       }

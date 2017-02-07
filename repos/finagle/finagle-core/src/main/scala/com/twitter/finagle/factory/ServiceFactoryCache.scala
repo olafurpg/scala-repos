@@ -35,7 +35,7 @@ private class IdlingFactory[Req, Rep](self: ServiceFactory[Req, Rep])
   override def apply(conn: ClientConnection): Future[Service[Req, Rep]] = {
     n.getAndIncrement()
 
-    self(conn) transform {
+    self(conn).transform {
       case Throw(exc) =>
         decr()
         Future.exception(exc)
@@ -91,7 +91,7 @@ private[finagle] class ServiceFactoryCache[Key, Req, Rep](
   private[this] val nevict = statsReceiver.counter("evicts")
   private[this] val noneshot = statsReceiver.counter("oneshots")
   private[this] val nidle = statsReceiver.addGauge("idle") {
-    cache count { case (_, f) => f.idleFor > Duration.Zero }
+    cache.count { case (_, f) => f.idleFor > Duration.Zero }
   }
 
   /*
@@ -157,10 +157,10 @@ private[finagle] class ServiceFactoryCache[Key, Req, Rep](
   private[this] def oneshot(
       factory: ServiceFactory[Req, Rep],
       conn: ClientConnection): Future[Service[Req, Rep]] =
-    factory(conn) map { service =>
+    factory(conn).map { service =>
       new ServiceProxy(service) {
         override def close(deadline: Time) =
-          super.close(deadline) transform {
+          super.close(deadline).transform {
             case _ =>
               factory.close(deadline)
           }
@@ -169,7 +169,7 @@ private[finagle] class ServiceFactoryCache[Key, Req, Rep](
 
   private[this] def findEvictee(): Option[Key] = {
     val (evictNamer, evictFactory) =
-      cache maxBy { case (_, fac) => fac.idleFor }
+      cache.maxBy { case (_, fac) => fac.idleFor }
     if (evictFactory.idleFor > Duration.Zero) Some(evictNamer)
     else None
   }

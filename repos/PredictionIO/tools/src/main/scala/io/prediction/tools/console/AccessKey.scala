@@ -23,24 +23,29 @@ case class AccessKeyArgs(accessKey: String = "", events: Seq[String] = Seq())
 object AccessKey extends Logging {
   def create(ca: ConsoleArgs): Int = {
     val apps = storage.Storage.getMetaDataApps
-    apps.getByName(ca.app.name) map { app =>
-      val accessKeys = storage.Storage.getMetaDataAccessKeys
-      val accessKey =
-        accessKeys.insert(
-          storage.AccessKey(key = ca.accessKey.accessKey,
-                            appid = app.id,
-                            events = ca.accessKey.events))
-      accessKey map { k =>
-        info(s"Created new access key: ${k}")
-        0
-      } getOrElse {
-        error(s"Unable to create new access key.")
+    apps
+      .getByName(ca.app.name)
+      .map { app =>
+        val accessKeys = storage.Storage.getMetaDataAccessKeys
+        val accessKey =
+          accessKeys.insert(
+            storage.AccessKey(key = ca.accessKey.accessKey,
+                              appid = app.id,
+                              events = ca.accessKey.events))
+        accessKey
+          .map { k =>
+            info(s"Created new access key: ${k}")
+            0
+          }
+          .getOrElse {
+            error(s"Unable to create new access key.")
+            1
+          }
+      }
+      .getOrElse {
+        error(s"App ${ca.app.name} does not exist. Aborting.")
         1
       }
-    } getOrElse {
-      error(s"App ${ca.app.name} does not exist. Aborting.")
-      1
-    }
   }
 
   def list(ca: ConsoleArgs): Int = {
@@ -49,16 +54,19 @@ object AccessKey extends Logging {
         storage.Storage.getMetaDataAccessKeys.getAll
       } else {
         val apps = storage.Storage.getMetaDataApps
-        apps.getByName(ca.app.name) map { app =>
-          storage.Storage.getMetaDataAccessKeys.getByAppid(app.id)
-        } getOrElse {
-          error(s"App ${ca.app.name} does not exist. Aborting.")
-          return 1
-        }
+        apps
+          .getByName(ca.app.name)
+          .map { app =>
+            storage.Storage.getMetaDataAccessKeys.getByAppid(app.id)
+          }
+          .getOrElse {
+            error(s"App ${ca.app.name} does not exist. Aborting.")
+            return 1
+          }
       }
     val title = "Access Key(s)"
     info(f"$title%64s | App ID | Allowed Event(s)")
-    keys.sortBy(k => k.appid) foreach { k =>
+    keys.sortBy(k => k.appid).foreach { k =>
       val events =
         if (k.events.size > 0) k.events.sorted.mkString(",") else "(all)"
       info(f"${k.key}%64s | ${k.appid}%6d | $events%s")

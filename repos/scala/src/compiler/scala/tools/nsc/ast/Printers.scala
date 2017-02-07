@@ -14,7 +14,7 @@ trait Printers extends scala.reflect.internal.Printers { this: Global =>
 
   class TreePrinter(out: PrintWriter) extends super.TreePrinter(out) {
 
-    override def print(args: Any*): Unit = args foreach {
+    override def print(args: Any*): Unit = args.foreach {
       case tree: Tree =>
         printPosition(tree)
         printTree(
@@ -78,7 +78,7 @@ trait Printers extends scala.reflect.internal.Printers { this: Global =>
 
     // drill down through Blocks and pull out the real statements.
     def allStatements(t: Tree): List[Tree] = t match {
-      case Block(stmts, expr) => (stmts flatMap allStatements) ::: List(expr)
+      case Block(stmts, expr) => (stmts.flatMap(allStatements)) ::: List(expr)
       case _ => List(t)
     }
 
@@ -91,7 +91,7 @@ trait Printers extends scala.reflect.internal.Printers { this: Global =>
     def printLogicalOp(t1: (Tree, Boolean), t2: (Tree, Boolean), op: String) = {
       def maybenot(tvalue: Boolean) = if (tvalue) "" else "!"
 
-      print("%s(" format maybenot(t1._2))
+      print("%s(".format(maybenot(t1._2)))
       printTree(t1._1)
       print(") %s %s(".format(op, maybenot(t2._2)))
       printTree(t2._1)
@@ -129,8 +129,8 @@ trait Printers extends scala.reflect.internal.Printers { this: Global =>
             }
 
         // target.unary_! ==> !target
-        case Select(qualifier, name) if (name.decode startsWith "unary_") =>
-          print(name.decode drop 6)
+        case Select(qualifier, name) if (name.decode.startsWith("unary_")) =>
+          print(name.decode.drop(6))
           printTree(qualifier)
 
         case Select(qualifier, name) =>
@@ -167,7 +167,8 @@ trait Printers extends scala.reflect.internal.Printers { this: Global =>
             indent(); println(); printTree(x); undent()
           }
 
-          val List(thenStmts, elseStmts) = List(thenp, elsep) map allStatements
+          val List(thenStmts, elseStmts) =
+            List(thenp, elsep).map(allStatements)
           print("if ("); print(cond); print(") ")
 
           thenStmts match {

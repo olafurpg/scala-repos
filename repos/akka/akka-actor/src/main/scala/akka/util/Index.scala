@@ -38,7 +38,7 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
     def spinPut(k: K, v: V): Boolean = {
       var retry = false
       var added = false
-      val set = container get k
+      val set = container.get(k)
 
       if (set ne null) {
         set.synchronized {
@@ -46,13 +46,13 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
             retry = true //IF the set is empty then it has been removed, so signal retry
           else {
             //Else add the value to the set and signal that retry is not needed
-            added = set add v
+            added = set.add(v)
             retry = false
           }
         }
       } else {
         val newSet = new ConcurrentSkipListSet[V](valueComparator)
-        newSet add v
+        newSet.add(v)
 
         // Parry for two simultaneous putIfAbsent(id,newSet)
         val oldSet = container.putIfAbsent(k, newSet)
@@ -62,7 +62,7 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
               retry = true //IF the set is empty then it has been removed, so signal retry
             else {
               //Else try to add the value to the set and signal that retry is not needed
-              added = oldSet add v
+              added = oldSet.add(v)
               retry = false
             }
           }
@@ -81,7 +81,7 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
     * if no matches it returns None
     */
   def findValue(key: K)(f: (V) ⇒ Boolean): Option[V] =
-    container get key match {
+    container.get(key) match {
       case null ⇒ None
       case set ⇒ set.iterator.asScala find f
     }
@@ -100,7 +100,7 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
     * Applies the supplied function to all keys and their values
     */
   def foreach(fun: (K, V) ⇒ Unit): Unit =
-    container.entrySet.iterator.asScala foreach { e ⇒
+    container.entrySet.iterator.asScala.foreach { e ⇒
       e.getValue.iterator.asScala.foreach(fun(e.getKey, _))
     }
 
@@ -126,7 +126,7 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
     * @return true if the value was disassociated from the key and false if it wasn't previously associated with the key
     */
   def remove(key: K, value: V): Boolean = {
-    val set = container get key
+    val set = container.get(key)
 
     if (set ne null) {
       set.synchronized {
@@ -147,7 +147,7 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
     * @return None if the key wasn't associated at all, or Some(scala.Iterable[V]) if it was associated
     */
   def remove(key: K): Option[Iterable[V]] = {
-    val set = container get key
+    val set = container.get(key)
 
     if (set ne null) {
       set.synchronized {

@@ -85,7 +85,7 @@ object PersistentActorFailureSpec {
   class OnRecoveryFailurePersistentActor(name: String, probe: ActorRef)
       extends ExamplePersistentActor(name) {
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case c @ Cmd(txt) ⇒ persist(Evt(txt))(updateState)
       }
 
@@ -122,7 +122,7 @@ object PersistentActorFailureSpec {
     def this(name: String) = this(name, None)
 
     override val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒ persist(Evt(s"${data}"))(updateState)
       }
 
@@ -137,7 +137,7 @@ object PersistentActorFailureSpec {
 
   class ThrowingActor1(name: String) extends ExamplePersistentActor(name) {
     override val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           persist(Evt(s"${data}"))(updateState)
           if (data == "err")
@@ -147,7 +147,7 @@ object PersistentActorFailureSpec {
 
   class ThrowingActor2(name: String) extends ExamplePersistentActor(name) {
     override val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           persist(Evt(s"${data}")) { evt ⇒
             if (data == "err")

@@ -227,7 +227,7 @@ object JsonAST {
       * This method does require that whatever type you're searching for is subtype of `JValue`.
       */
     def \[A <: JValue](clazz: Class[A]): List[A#Values] =
-      findDirect(children, typePredicate(clazz) _).asInstanceOf[List[A]] map {
+      findDirect(children, typePredicate(clazz) _).asInstanceOf[List[A]].map {
         _.values
       }
 
@@ -265,7 +265,7 @@ object JsonAST {
       * }}}
       */
     def \\[A <: JValue](clazz: Class[A]): List[A#Values] =
-      (this filter typePredicate(clazz) _).asInstanceOf[List[A]] map {
+      (this.filter(typePredicate(clazz) _)).asInstanceOf[List[A]].map {
         _.values
       }
 
@@ -322,7 +322,7 @@ object JsonAST {
       * `[[JArray]]`, or `[[JNothing]]` otherwise.
       */
     def children: List[JValue] = this match {
-      case JObject(l) => l map (_.value)
+      case JObject(l) => l.map(_.value)
       case JArray(l) => l
       case _ => Nil
     }
@@ -643,11 +643,11 @@ object JsonAST {
     def withFilter(p: JValue => Boolean) = new WithFilter(this, p)
 
     final class WithFilter(self: JValue, p: JValue => Boolean) {
-      def map[A](f: JValue => A): List[A] = self filter p map f
-      def flatMap[A](f: JValue => List[A]) = self filter p flatMap f
+      def map[A](f: JValue => A): List[A] = self.filter(p).map(f)
+      def flatMap[A](f: JValue => List[A]) = self.filter(p).flatMap(f)
       def withFilter(q: JValue => Boolean): WithFilter =
         new WithFilter(self, x => p(x) && q(x))
-      def foreach[U](f: JValue => U): Unit = self filter p foreach f
+      def foreach[U](f: JValue => U): Unit = self.filter(p).foreach(f)
     }
 
     /**
@@ -685,7 +685,7 @@ object JsonAST {
       * }
       * }}}
       */
-    def removeField(p: JField => Boolean): JValue = this mapField {
+    def removeField(p: JField => Boolean): JValue = this.mapField {
       case x if p(x) => JField(x.name, JNothing)
       case x => x
     }
@@ -700,7 +700,7 @@ object JsonAST {
       * res0: net.liftweb.json.JsonAST.JValue = JArray(List(JInt(1), JInt(2), JNothing))
       * }}}
       */
-    def remove(p: JValue => Boolean): JValue = this map {
+    def remove(p: JValue => Boolean): JValue = this.map {
       case x if p(x) => JNothing
       case x => x
     }

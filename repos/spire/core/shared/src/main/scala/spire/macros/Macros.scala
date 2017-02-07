@@ -27,10 +27,10 @@ object Macros {
                   upper: BigInt): Either[String, BigInt] =
     try {
       val n = BigInt(s)
-      if (n < lower || n > upper) Left("illegal constant: %s" format s)
+      if (n < lower || n > upper) Left("illegal constant: %s".format(s))
       else Right(n)
     } catch {
-      case _: Exception => Left("illegal constant: %s" format s)
+      case _: Exception => Left("illegal constant: %s".format(s))
     }
 
   def byte(c: Context)(): c.Expr[Byte] = {
@@ -97,7 +97,7 @@ object Macros {
   }
 
   def formatWhole(c: Context, sep: String): String = {
-    val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*" format sep
+    val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*".format(sep)
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) =
       c.prefix.tree
@@ -106,7 +106,7 @@ object Macros {
   }
 
   def formatDecimal(c: Context, sep: String, dec: String): String = {
-    val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*(%s[0-9]+)?" format (sep, dec)
+    val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*(%s[0-9]+)?".format(sep, dec)
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) =
       c.prefix.tree
@@ -121,7 +121,7 @@ object Macros {
       c.Expr[Int](Literal(Constant(formatWhole(c, sep).toInt)))
     } catch {
       case e: Exception =>
-        throw new NumberFormatException("illegal %s Int constant" format name)
+        throw new NumberFormatException("illegal %s Int constant".format(name))
     }
   }
 
@@ -131,7 +131,8 @@ object Macros {
       c.Expr[Long](Literal(Constant(formatWhole(c, sep).toLong)))
     } catch {
       case e: Exception =>
-        throw new NumberFormatException("illegal %s Long constant" format name)
+        throw new NumberFormatException(
+          "illegal %s Long constant".format(name))
     }
   }
 
@@ -145,7 +146,7 @@ object Macros {
     } catch {
       case e: Exception =>
         throw new NumberFormatException(
-          "illegal %s BigInt constant" format name)
+          "illegal %s BigInt constant".format(name))
     }
   }
 
@@ -162,7 +163,7 @@ object Macros {
     } catch {
       case e: Exception =>
         throw new NumberFormatException(
-          "illegal %s BigInt constant" format name)
+          "illegal %s BigInt constant".format(name))
     }
   }
 
@@ -192,7 +193,7 @@ object Macros {
     val name = c.macroApplication.symbol.name.toString
     val base = name.substring(1).toInt
     if (base < 2 || 36 < base)
-      throw new NumberFormatException("invalid radix: %s" format base)
+      throw new NumberFormatException("invalid radix: %s".format(base))
 
     val n = java.lang.Integer.parseInt(s, base)
 

@@ -41,7 +41,7 @@ object Test extends App {
   def benchScalaPar(values: Iterable[(Int, Int)]) = {
     bench("Scala ParMap") {
       val m =
-        new scala.collection.parallel.mutable.ParHashMap[Int, Int] map { x =>
+        new scala.collection.parallel.mutable.ParHashMap[Int, Int].map { x =>
           x
         }
 
@@ -50,7 +50,7 @@ object Test extends App {
   }
 
   val total = 50000
-  val values = (0 until total) zip (0 until total)
+  val values = ((0 until total)).zip(0 until total)
   val map = scala.collection.mutable.HashMap.empty[Int, Int]
 
   map ++= values

@@ -50,17 +50,17 @@ object Attempt {
 
     def reads(r: BSON.Reader): Attempt =
       Attempt(
-        id = r str id,
+        id = r.str(id),
         puzzleId = r int puzzleId,
-        userId = r str userId,
+        userId = r.str(userId),
         date = r.get[DateTime](date),
-        win = r bool win,
+        win = r.bool(win),
         time = r int time,
         puzzleRating = r int puzzleRating,
         puzzleRatingDiff = r int puzzleRatingDiff,
         userRating = r int userRating,
         userRatingDiff = r int userRatingDiff,
-        vote = r boolO vote
+        vote = r.boolO(vote)
       )
 
     def writes(w: BSON.Writer, o: Attempt) =

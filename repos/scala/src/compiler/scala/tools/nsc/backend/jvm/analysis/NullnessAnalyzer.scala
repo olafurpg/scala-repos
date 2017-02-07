@@ -151,7 +151,7 @@ final class NullnessInterpreter(bTypes: BTypes)
                       value: NullnessValue,
                       expected: NullnessValue): Unit = ()
 
-  def merge(a: NullnessValue, b: NullnessValue): NullnessValue = a merge b
+  def merge(a: NullnessValue, b: NullnessValue): NullnessValue = a.merge(b)
 }
 
 class NullnessFrame(nLocals: Int, nStack: Int)

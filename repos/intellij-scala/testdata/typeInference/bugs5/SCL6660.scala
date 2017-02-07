@@ -1,11 +1,11 @@
 object SCL6660 {
   sealed trait JValue
   case class JInt(amount: BigInt) extends JValue {
-    override def toString = "JInt(%s)" format amount
+    override def toString = "JInt(%s)".format(amount)
   }
 
   case class JDouble(amount: Double) extends JValue {
-    override def toString = "JDouble(%s)" format amount
+    override def toString = "JDouble(%s)".format(amount)
   }
 
   trait Implicits {

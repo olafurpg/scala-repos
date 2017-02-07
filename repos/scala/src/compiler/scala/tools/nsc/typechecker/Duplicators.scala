@@ -83,14 +83,17 @@ abstract class Duplicators extends Analyzer {
       override def mapOver(tpe: Type): Type = tpe match {
         case TypeRef(NoPrefix, sym, args) if sym.isTypeParameterOrSkolem =>
           val sym1 =
-            (context.scope lookup sym.name orElse {
-              // try harder (look in outer scopes)
-              // with virtpatmat, this can happen when the sym is referenced in the scope of a LabelDef but
-              // is defined in the scope of an outer DefDef (e.g., in AbstractPartialFunction's andThen)
-              BodyDuplicator.super
-                .silent(_ typedType Ident(sym.name))
-                .fold(NoSymbol: Symbol)(_.symbol)
-            } filter (_ ne sym))
+            (context.scope
+              .lookup(sym.name)
+              .orElse {
+                // try harder (look in outer scopes)
+                // with virtpatmat, this can happen when the sym is referenced in the scope of a LabelDef but
+                // is defined in the scope of an outer DefDef (e.g., in AbstractPartialFunction's andThen)
+                BodyDuplicator.super
+                  .silent(_.typedType(Ident(sym.name)))
+                  .fold(NoSymbol: Symbol)(_.symbol)
+              }
+              .filter(_ ne sym))
           if (sym1.exists) {
             debuglog(s"fixing $sym -> $sym1")
             typeRef(NoPrefix, sym1, mapOverArgs(args, sym1.typeParams))
@@ -158,14 +161,14 @@ abstract class Duplicators extends Analyzer {
           case vdef @ ValDef(mods, name, _, rhs) if mods.hasFlag(Flags.LAZY) =>
             debuglog("ValDef " + name + " sym.info: " + vdef.symbol.info)
             invalidSyms(vdef.symbol) = vdef
-            val newowner = owner orElse context.owner
+            val newowner = owner.orElse(context.owner)
             val newsym = vdef.symbol.cloneSymbol(newowner)
             newsym.setInfo(fixType(vdef.symbol.info))
             vdef.symbol = newsym
             debuglog(
               "newsym: " + newsym + " info: " + newsym.info + ", owner: " +
                 newsym.owner + ", " + newsym.owner.isClass)
-            if (newsym.owner.isClass) newsym.owner.info.decls enter newsym
+            if (newsym.owner.isClass) newsym.owner.info.decls.enter(newsym)
 
           case DefDef(_, name, tparams, vparamss, _, rhs) =>
             // invalidate parameters
@@ -219,7 +222,7 @@ abstract class Duplicators extends Analyzer {
       tree match {
         case ttree @ TypeTree() =>
           // log("fixing tpe: " + tree.tpe + " with sym: " + tree.tpe.typeSymbol)
-          ttree modifyType fixType
+          ttree.modifyType(fixType)
 
         case Block(stats, res) =>
           debuglog("invalidating block")
@@ -234,7 +237,7 @@ abstract class Duplicators extends Analyzer {
           super.typed(tree.clearType(), mode, pt)
 
         case ddef @ DefDef(_, _, _, _, tpt, rhs) =>
-          ddef.tpt modifyType fixType
+          ddef.tpt.modifyType(fixType)
           super.typed(ddef.clearType(), mode, pt)
 
         case fun: Function =>
@@ -244,7 +247,7 @@ abstract class Duplicators extends Analyzer {
         case vdef @ ValDef(mods, name, tpt, rhs) =>
           // log("vdef fixing tpe: " + tree.tpe + " with sym: " + tree.tpe.typeSymbol + " and " + invalidSyms)
           //if (mods.hasFlag(Flags.LAZY)) vdef.symbol.resetFlag(Flags.MUTABLE) // Martin to Iulian: lazy vars can now appear because they are no longer boxed; Please check that deleting this statement is OK.
-          vdef.tpt modifyType fixType
+          vdef.tpt.modifyType(fixType)
           super.typed(vdef.clearType(), mode, pt)
 
         case ldef @ LabelDef(name, params, rhs) =>
@@ -268,9 +271,10 @@ abstract class Duplicators extends Analyzer {
               Ident(newsym.setInfo(fixType(p.symbol.info)))
             }
 
-          val params1 = params map newParam
+          val params1 = params.map(newParam)
           val rhs1 =
-            (new TreeSubstituter(params map (_.symbol), params1) transform rhs) // TODO: duplicate?
+            (new TreeSubstituter(params.map(_.symbol), params1)
+              .transform(rhs)) // TODO: duplicate?
 
           super.typed(treeCopy.LabelDef(tree, name, params1, rhs1.clearType()),
                       mode,
@@ -309,19 +313,19 @@ abstract class Duplicators extends Analyzer {
                val typeInNewClass =
                  fixType(oldClassOwner.info memberType tree.symbol)
                val alts = memberByName.alternatives
-               val memberTypes = alts map (newClassOwner.info memberType _)
+               val memberTypes = alts.map(newClassOwner.info memberType _)
                val memberString = memberByName.defString
-               alts zip memberTypes filter (_._2 =:= typeInNewClass) match {
+               alts.zip(memberTypes).filter(_._2 =:= typeInNewClass) match {
                  case ((alt, tpe)) :: Nil =>
                    log(
                      s"Arrested overloaded type in Duplicators, narrowing to ${alt
                        .defStringSeenAs(tpe)}\n  Overload was: $memberString")
                    Select(This(newClassOwner), alt)
                  case xs =>
-                   alts filter
-                     (alt =>
-                        (alt.paramss corresponds tree.symbol.paramss)(
-                          _.size == _.size)) match {
+                   alts.filter(
+                     alt =>
+                       (alt.paramss.corresponds(tree.symbol.paramss))(
+                         _.size == _.size)) match {
                      case alt :: Nil =>
                        log(
                          s"Resorted to parameter list arity to disambiguate to $alt\n  Overload was: $memberString")
@@ -362,20 +366,20 @@ abstract class Duplicators extends Analyzer {
           val scrutTpe = scrut1.tpe.widen
           val cases1 = {
             if (scrutTpe.isFinalType)
-              cases filter {
+              cases.filter {
                 case CaseDef(Bind(_, pat @ Typed(_, tpt)), EmptyTree, body) =>
                   // the typed pattern is not incompatible with the scrutinee type
-                  scrutTpe matchesPattern fixType(tpt.tpe)
+                  scrutTpe.matchesPattern(fixType(tpt.tpe))
                 case CaseDef(Typed(_, tpt), EmptyTree, body) =>
                   // the typed pattern is not incompatible with the scrutinee type
-                  scrutTpe matchesPattern fixType(tpt.tpe)
+                  scrutTpe.matchesPattern(fixType(tpt.tpe))
                 case _ => true
               }
             // Without this, AnyRef specializations crash on patterns like
             //   case _: Boolean => ...
             // Not at all sure this is safe.
             else if (scrutTpe <:< AnyRefTpe)
-              cases filterNot (_.pat.tpe <:< AnyValTpe)
+              cases.filterNot(_.pat.tpe <:< AnyValTpe)
             else cases
           }
 

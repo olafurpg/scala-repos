@@ -34,7 +34,7 @@ trait MethodOverride extends Handler with ServletApiImplicits {
       case Post =>
         new HttpServletRequestWrapper(req) {
           override def getMethod(): String =
-            methodOverride(req) getOrElse req.getMethod
+            methodOverride(req).getOrElse(req.getMethod)
         }
       case _ => req
     }
@@ -43,13 +43,13 @@ trait MethodOverride extends Handler with ServletApiImplicits {
 
   private[this] def methodOverride(req: HttpServletRequest) = {
     import org.scalatra.MethodOverride._
-    val methodOpt = req.parameters get ParamName
-    methodOpt orElse {
+    val methodOpt = req.parameters.get(ParamName)
+    methodOpt.orElse {
       val headers = req.headers
       val headerKeyOpt = headers.keys.find {
         HeaderName contains _.toUpperCase()
       }
-      headerKeyOpt.flatMap { req.headers get _ }
+      headerKeyOpt.flatMap { req.headers.get(_) }
     }
   }
 }

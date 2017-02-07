@@ -8,8 +8,8 @@ object Test {
   def main(args: Array[String]): Unit = {
 
     /** Just a little sanity check, not to be confused with a unit test. */
-    List(5, 5.5f, "abc", new AnyRef, ()) foreach confirmSame
-    List(5.0f, 1.0d, -(5.0f), (-1.0d)) foreach confirmDifferent
+    List(5, 5.5f, "abc", new AnyRef, ()).foreach(confirmSame)
+    List(5.0f, 1.0d, -(5.0f), (-1.0d)).foreach(confirmDifferent)
 
     val x = (BigInt(1) << 64).toDouble
     val y: Any = x

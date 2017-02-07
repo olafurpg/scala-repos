@@ -34,7 +34,7 @@ object Resolve {
     else {
       val (resolvedRef, proj) = scope.project match {
         case Select(ref) =>
-          val r = index resolveRef ref
+          val r = index.resolveRef(ref)
           (Some(r), index.projectFor(r))
         case Global | This =>
           (None, index.rootProject(index.root))
@@ -46,7 +46,7 @@ object Resolve {
           .keys(resolvedRef, c.toOption.map(_.name), task) contains key.label
       val projectConfigs = index.configurations(proj).map(ck => Select(ck))
       val config: ScopeAxis[ConfigKey] =
-        (Global +: projectConfigs) find definesKey getOrElse Global
+        ((Global +: projectConfigs) find definesKey).getOrElse(Global)
       scope.copy(config = config)
     }
 }

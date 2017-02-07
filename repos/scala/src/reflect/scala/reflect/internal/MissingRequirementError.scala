@@ -10,7 +10,7 @@ package internal
 class MissingRequirementError private (msg: String) extends FatalError(msg) {
   import MissingRequirementError.suffix
   def req: String =
-    if (msg endsWith suffix) msg dropRight suffix.length else msg
+    if (msg.endsWith(suffix)) msg.dropRight(suffix.length) else msg
 }
 
 object MissingRequirementError {

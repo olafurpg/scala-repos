@@ -61,7 +61,7 @@ private[concurrent] trait BatchingExecutor extends Executor {
             batch match {
               case Nil => ()
               case head :: tail =>
-                _tasksLocal set tail
+                _tasksLocal.set(tail)
                 try {
                   head.run()
                 } catch {
@@ -71,7 +71,7 @@ private[concurrent] trait BatchingExecutor extends Executor {
                     // so we can throw the exception
                     // up to the invoking executor
                     val remaining = _tasksLocal.get
-                    _tasksLocal set Nil
+                    _tasksLocal.set(Nil)
                     unbatchedExecute(new Batch(remaining)) //TODO what if this submission fails?
                     throw t // rethrow
                 }
@@ -90,7 +90,7 @@ private[concurrent] trait BatchingExecutor extends Executor {
       // if we know there will be blocking, we don't want to keep tasks queued up because it could deadlock.
       {
         val tasks = _tasksLocal.get
-        _tasksLocal set Nil
+        _tasksLocal.set(Nil)
         if ((tasks ne null) && tasks.nonEmpty)
           unbatchedExecute(new Batch(tasks))
       }

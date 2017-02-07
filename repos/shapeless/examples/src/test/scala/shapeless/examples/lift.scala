@@ -50,14 +50,14 @@ class LiftTests {
     val l3 = Option(2) :: Option(3) :: HNil
     val isDef3 = l3.foldMap(true)(isDefined)(_ & _)
     assertTrue(isDef3)
-    val l3a = l3 map get
+    val l3a = l3.map(get)
     val s2a = hlsum(l3a)
     assertEquals(5, s2a)
 
     val l4 = Option(2) :: Option(3) :: Option(4) :: HNil
     val isDef4 = l4.foldMap(true)(isDefined)(_ & _)
     assertTrue(isDef4)
-    val l4a = l4 map get
+    val l4a = l4.map(get)
     val p2a = hlprd(l4a)
     assertEquals(24, p2a)
 

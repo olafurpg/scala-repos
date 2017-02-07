@@ -22,8 +22,8 @@ trait MatchTranslation { self: PatternMatching =>
 
   // Always map repeated params to sequences
   private def setVarInfo(sym: Symbol, info: Type) =
-    sym setInfo debug.patmatResult(s"changing ${sym.defString} to")(
-      repeatedToSeq(info))
+    sym.setInfo(
+      debug.patmatResult(s"changing ${sym.defString} to")(repeatedToSeq(info)))
 
   private def hasSym(t: Tree) = t.symbol != null && t.symbol != NoSymbol
 
@@ -39,7 +39,7 @@ trait MatchTranslation { self: PatternMatching =>
           true // don't skip when binding an interesting symbol!
         case Star(WildcardPattern()) => true
         case x: Ident => treeInfo.isVarPattern(x)
-        case Alternative(ps) => ps forall unapply
+        case Alternative(ps) => ps.forall(unapply)
         case EmptyTree => true
         case _ => false
       }
@@ -50,7 +50,7 @@ trait MatchTranslation { self: PatternMatching =>
         case Bind(nme.WILDCARD, _) =>
           true // don't skip when binding an interesting symbol!
         case Ident(nme.WILDCARD) => true
-        case Alternative(ps) => ps forall unapply
+        case Alternative(ps) => ps.forall(unapply)
         case Typed(PatternBoundToUnderscore(), _) => true
         case _ => false
       }
@@ -76,7 +76,7 @@ trait MatchTranslation { self: PatternMatching =>
       def tpe =
         binder.info.dealiasWiden // the type of the variable bound to the pattern
       def pt = unbound match {
-        case Star(tpt) => this glbWith seqType(tpt.tpe)
+        case Star(tpt) => this.glbWith(seqType(tpt.tpe))
         case TypeBound(tpe) => tpe
         case tree => tree.tpe
       }
@@ -112,7 +112,7 @@ trait MatchTranslation { self: PatternMatching =>
         step(
           AlternativesTreeMaker(binder, translatedAlts(alts), alts.head.pos))()
       private def translatedAlts(alts: List[Tree]) =
-        alts map (alt => rebindTo(alt).translate())
+        alts.map(alt => rebindTo(alt).translate())
       private def noStep() = step()()
 
       private def unsupportedPatternMsg = sm"""
@@ -143,7 +143,7 @@ trait MatchTranslation { self: PatternMatching =>
         // TODO: paramType may contain unbound type params (run/t2800, run/t3530)
         val makers =
           (// Statically conforms to paramType
-          if (this ensureConformsTo paramType)
+          if (this.ensureConformsTo(paramType))
             treeMaker(binder, false, pos) :: Nil
           else typeTest :: extraction :: Nil)
         step(makers: _*)(extractor.subBoundTrees: _*)
@@ -174,7 +174,7 @@ trait MatchTranslation { self: PatternMatching =>
         case Alternative(alts) => alternativesStep(alts)
         case _ => reporter.error(pos, unsupportedPatternMsg); noStep()
       }
-      def translate(): List[TreeMaker] = nextStep() merge (_.translate())
+      def translate(): List[TreeMaker] = nextStep().merge(_.translate())
 
       private def setInfo(paramType: Type): Boolean = {
         devWarning(s"resetting info of $this to $paramType")
@@ -206,7 +206,7 @@ trait MatchTranslation { self: PatternMatching =>
     final case class TranslationStep(makers: List[TreeMaker],
                                      subpatterns: List[BoundTree]) {
       def merge(f: BoundTree => List[TreeMaker]): List[TreeMaker] =
-        makers ::: (subpatterns flatMap f)
+        makers ::: (subpatterns.flatMap(f))
       override def toString =
         if (subpatterns.isEmpty) "" else subpatterns.mkString("(", ", ", ")")
     }
@@ -225,7 +225,7 @@ trait MatchTranslation { self: PatternMatching =>
       val Match(selector, cases) = match_
 
       val (nonSyntheticCases, defaultOverride) = cases match {
-        case init :+ last if treeInfo isSyntheticDefaultCase last =>
+        case init :+ last if treeInfo.isSyntheticDefaultCase(last) =>
           (init, Some(((scrut: Tree) => last.body)))
         case _ => (cases, None)
       }
@@ -256,13 +256,14 @@ trait MatchTranslation { self: PatternMatching =>
 
       // val packedPt = repeatedToSeq(typer.packedType(match_, context.owner))
       val selectorSym =
-        freshSym(selector.pos, pureType(selectorTp)) setFlag treeInfo.SYNTH_CASE_FLAGS
+        freshSym(selector.pos, pureType(selectorTp))
+          .setFlag(treeInfo.SYNTH_CASE_FLAGS)
 
       // pt = Any* occurs when compiling test/files/pos/annotDepMethType.scala  with -Xexperimental
       val combined = combineCases(
         selector,
         selectorSym,
-        nonSyntheticCases map translateCase(selectorSym, pt),
+        nonSyntheticCases.map(translateCase(selectorSym, pt)),
         pt,
         matchOwner,
         defaultOverride)
@@ -280,7 +281,7 @@ trait MatchTranslation { self: PatternMatching =>
                      pt: Type,
                      pos: Position): List[CaseDef] =
       // if they're already simple enough to be handled by the back-end, we're done
-      if (caseDefs forall treeInfo.isCatchCase) caseDefs
+      if (caseDefs.forall(treeInfo.isCatchCase)) caseDefs
       else {
         val swatches = {
           // switch-catches
@@ -288,7 +289,7 @@ trait MatchTranslation { self: PatternMatching =>
           //         if we can ends up mutating `caseDefs` down in the use of `substituteSymbols` in
           //         `TypedSubstitution#Substitution`. That is called indirectly by `emitTypeSwitch`.
           val bindersAndCases =
-            caseDefs.map(_.duplicate) map { caseDef =>
+            caseDefs.map(_.duplicate).map { caseDef =>
               // generate a fresh symbol for each case, hoping we'll end up emitting a type-switch (we don't have a global scrut there)
               // if we fail to emit a fine-grained switch, have to do translateCase again with a single scrutSym (TODO: uniformize substitution on treemakers so we can avoid this)
               val caseScrutSym = freshSym(pos, pureType(ThrowableTpe))
@@ -298,7 +299,7 @@ trait MatchTranslation { self: PatternMatching =>
             }
 
           for (cases <- emitTypeSwitch(bindersAndCases, pt).toList
-               if cases forall treeInfo.isCatchCase; // must check again, since it's not guaranteed -- TODO: can we eliminate this? e.g., a type test could test for a trait or a non-trivial prefix, which are not handled by the back-end
+               if cases.forall(treeInfo.isCatchCase); // must check again, since it's not guaranteed -- TODO: can we eliminate this? e.g., a type test could test for a trait or a non-trivial prefix, which are not handled by the back-end
                cse <- cases)
             yield fixerUpper(matchOwner, pos)(cse).asInstanceOf[CaseDef]
         }
@@ -308,7 +309,7 @@ trait MatchTranslation { self: PatternMatching =>
           else {
             val scrutSym = freshSym(pos, pureType(ThrowableTpe))
             val casesNoSubstOnly =
-              caseDefs map { caseDef =>
+              caseDefs.map { caseDef =>
                 (propagateSubstitution(translateCase(scrutSym, pt)(caseDef),
                                        EmptySubstitution))
               }
@@ -465,19 +466,19 @@ trait MatchTranslation { self: PatternMatching =>
       // as b.info may be based on a Typed type ascription, which has not been taken into account yet by the translation
       // (it will later result in a type test when `tp` is not a subtype of `b.info`)
       // TODO: can we simplify this, together with the Bound case?
-      def subPatBinders = subBoundTrees map (_.binder)
-      lazy val subBoundTrees = (args, subPatTypes).zipped map newBoundTree
+      def subPatBinders = subBoundTrees.map(_.binder)
+      lazy val subBoundTrees = (args, subPatTypes).zipped.map(newBoundTree)
 
       // never store these in local variables (for PreserveSubPatBinders)
       lazy val ignoredSubPatBinders: Set[Symbol] =
-        subPatBinders zip args collect {
+        subPatBinders.zip(args).collect {
           case (b, PatternBoundToUnderscore()) => b
         } toSet
 
       // do repeated-parameter expansion to match up with the expected number of arguments (in casu, subpatterns)
-      private def nonStarSubPatTypes = aligner.typedNonStarPatterns map (_.tpe)
+      private def nonStarSubPatTypes = aligner.typedNonStarPatterns.map(_.tpe)
 
-      def subPatTypes: List[Type] = typedPatterns map (_.tpe)
+      def subPatTypes: List[Type] = typedPatterns.map(_.tpe)
 
       // there are `productArity` non-seq elements in the tuple.
       protected def firstIndexingBinder = productArity
@@ -485,9 +486,9 @@ trait MatchTranslation { self: PatternMatching =>
       protected def lastIndexingBinder = totalArity - starArity - 1
 
       private def productElemsToN(binder: Symbol, n: Int): List[Tree] =
-        1 to n map tupleSel(binder) toList
+        (1 to n).map(tupleSel(binder)) toList
       private def genTake(binder: Symbol, n: Int): List[Tree] =
-        (0 until n).toList map (codegen index seqTree(binder))
+        (0 until n).toList.map(codegen index seqTree(binder))
       private def genDrop(binder: Symbol, n: Int): List[Tree] =
         codegen.drop(seqTree(binder))(expectedLength) :: Nil
 
@@ -527,11 +528,11 @@ trait MatchTranslation { self: PatternMatching =>
         gen.mkMethodCall(termMember(ScalaPackage, "math"),
                          TermName("signum"),
                          Nil,
-                         (t1 INT_- t2) :: Nil)
+                         (t1.INT_-(t2)) :: Nil)
 
       protected def lengthGuard(binder: Symbol): Option[Tree] =
         // no need to check unless it's an unapplySeq and the minimal length is non-trivially satisfied
-        checkedLength map { expectedLength =>
+        checkedLength.map { expectedLength =>
           // `binder.lengthCompare(expectedLength)`
           // ...if binder has a lengthCompare method, otherwise
           // `scala.math.signum(binder.length - expectedLength)`
@@ -540,19 +541,20 @@ trait MatchTranslation { self: PatternMatching =>
               case NoSymbol =>
                 compareInts(Select(seqTree(binder), nme.length),
                             LIT(expectedLength))
-              case lencmp => (seqTree(binder) DOT lencmp)(LIT(expectedLength))
+              case lencmp => (seqTree(binder).DOT(lencmp))(LIT(expectedLength))
             }
 
           // the comparison to perform
           // when the last subpattern is a wildcard-star the expectedLength is but a lower bound
           // (otherwise equality is required)
           def compareOp: (Tree, Tree) => Tree =
-            if (aligner.isStar) _ INT_>= _
-            else _ INT_== _
+            if (aligner.isStar) _.INT_>=(_)
+            else _.INT_==(_)
 
           // `if (binder != null && $checkExpectedLength [== | >=] 0) then else zero`
-          (seqTree(binder) ANY_!= NULL) AND compareOp(checkExpectedLength,
-                                                      ZERO)
+          (seqTree(binder)
+            .ANY_!=(NULL))
+            .AND(compareOp(checkExpectedLength, ZERO))
         }
 
       def checkedLength: Option[Int] =
@@ -591,8 +593,8 @@ trait MatchTranslation { self: PatternMatching =>
         }
         val mutableBinders =
           (if (!binder.info.typeSymbol.hasTransOwner(ScalaPackageClass) &&
-               (paramAccessors exists
-                 (x => x.isMutable || definitions.isRepeated(x)))) {
+               (paramAccessors.exists(
+                 x => x.isMutable || definitions.isRepeated(x)))) {
 
              subPatBinders.zipWithIndex.flatMap {
                case (binder, idx) =>
@@ -617,7 +619,7 @@ trait MatchTranslation { self: PatternMatching =>
       override protected def tupleSel(binder: Symbol)(i: Int): Tree = {
         val accessors = binder.caseFieldAccessors
         if (accessors isDefinedAt (i - 1))
-          gen.mkAttributedStableRef(binder) DOT accessors(i - 1)
+          gen.mkAttributedStableRef(binder).DOT(accessors(i - 1))
         else
           codegen.tupleSel(binder)(i) // this won't type check for case classes, as they do not inherit ProductN
       }
@@ -680,7 +682,7 @@ trait MatchTranslation { self: PatternMatching =>
       protected def spliceApply(binder: Symbol): Tree = {
         object splice extends Transformer {
           def binderRef(pos: Position): Tree =
-            REF(binder) setPos pos
+            REF(binder).setPos(pos)
           override def transform(t: Tree) = t match {
             // duplicated with the extractor Unapplied
             case Apply(x, List(i @ Ident(nme.SELECTOR_DUMMY))) =>
@@ -697,7 +699,7 @@ trait MatchTranslation { self: PatternMatching =>
               super.transform(t)
           }
         }
-        splice transform extractorCallIncludingDummy
+        splice.transform(extractorCallIncludingDummy)
       }
 
       override def rawSubPatTypes = aligner.extractor.varargsTypes

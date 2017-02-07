@@ -267,7 +267,7 @@ object ActorModelSpec {
           Error(
             e,
             Option(dispatcher).toString,
-            (Option(dispatcher) getOrElse this).getClass,
+            (Option(dispatcher).getOrElse(this)).getClass,
             "actual: " + stats + ", required: InterceptorStats(susp=" +
               suspensions + ",res=" + resumes + ",reg=" + registers +
               ",unreg=" + unregisters + ",recv=" + msgsReceived +
@@ -480,24 +480,29 @@ abstract class ActorModelSpec(config: String)
                   System.err.println(
                     "Teammates left: " + team.size + " stopLatch: " +
                       stopLatch.getCount + " inhab:" + dispatcher.inhabitants)
-                  team.toArray sorted new Ordering[AnyRef] {
-                    def compare(l: AnyRef, r: AnyRef) = (l, r) match {
-                      case (ll: ActorCell, rr: ActorCell) ⇒
-                        ll.self.path compareTo rr.self.path
+                  team.toArray
+                    .sorted(new Ordering[AnyRef] {
+                      def compare(l: AnyRef, r: AnyRef) = (l, r) match {
+                        case (ll: ActorCell, rr: ActorCell) ⇒
+                          ll.self.path.compareTo(rr.self.path)
+                      }
+                    })
+                    .foreach {
+                      case cell: ActorCell ⇒
+                        System.err.println(
+                          " - " + cell.self.path + " " + cell.isTerminated +
+                            " " + cell.mailbox.currentStatus + " " +
+                            cell.mailbox.numberOfMessages + " " + cell.mailbox
+                            .systemDrain(SystemMessageList.LNil)
+                            .size)
                     }
-                  } foreach {
-                    case cell: ActorCell ⇒
-                      System.err.println(
-                        " - " + cell.self.path + " " + cell.isTerminated +
-                          " " + cell.mailbox.currentStatus + " " +
-                          cell.mailbox.numberOfMessages + " " + cell.mailbox
-                          .systemDrain(SystemMessageList.LNil)
-                          .size)
-                  }
 
                   System.err.println(
                     "Mailbox: " + mq.numberOfMessages + " " + mq.hasMessages)
-                  Iterator.continually(mq.dequeue) takeWhile (_ ne null) foreach System.err.println
+                  Iterator
+                    .continually(mq.dequeue)
+                    .takeWhile(_ ne null)
+                    .foreach(System.err.println)
                 case _ ⇒
               }
 
@@ -532,10 +537,10 @@ abstract class ActorModelSpec(config: String)
 
         val c = system.scheduler.scheduleOnce(2.seconds) {
           import collection.JavaConverters._
-          Thread.getAllStackTraces().asScala foreach {
+          Thread.getAllStackTraces().asScala.foreach {
             case (thread, stack) ⇒
               println(s"$thread:")
-              stack foreach (s ⇒ println(s"\t$s"))
+              stack.foreach(s ⇒ println(s"\t$s"))
           }
         }
         assert(Await.result(f1, timeout.duration) === "foo")

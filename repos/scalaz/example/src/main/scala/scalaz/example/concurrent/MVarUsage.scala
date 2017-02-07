@@ -47,9 +47,9 @@ object MVarUsage extends App {
   def pingpong() {
     def pong(c: MVar[String], p: MVar[String]) =
       for {
-        _ <- c.take flatMap (s => putStrLn("c: " + s))
+        _ <- c.take.flatMap(s => putStrLn("c: " + s))
         _ <- p.put("pong")
-        _ <- c.take flatMap (s => putStrLn("c: " + s))
+        _ <- c.take.flatMap(s => putStrLn("c: " + s))
         _ <- p.put("pong")
       } yield ()
 
@@ -58,9 +58,9 @@ object MVarUsage extends App {
         c <- newMVar("ping")
         p <- newEmptyMVar[String]
         _ <- forkIO(pong(c, p))
-        _ <- p.take flatMap (s => putStrLn("p: " + s))
+        _ <- p.take.flatMap(s => putStrLn("p: " + s))
         _ <- c.put("ping")
-        _ <- p.take flatMap (s => putStrLn("p: " + s))
+        _ <- p.take.flatMap(s => putStrLn("p: " + s))
       } yield ()
     io.unsafePerformIO
   }

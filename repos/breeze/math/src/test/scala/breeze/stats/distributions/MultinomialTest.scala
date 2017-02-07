@@ -33,7 +33,7 @@ class MultinomialTest extends FunSuite with Checkers with Matchers {
   test("multinomial with naive sampling") {
     val mult = new Multinomial[DenseVector[Double], Int](TestParams)
     val accumNaive = DenseVector.zeros[Double](3)
-    (0 until NSamples) foreach { i =>
+    ((0 until NSamples)).foreach { i =>
       accumNaive(mult.drawNaive()) += 1
     }
     accumNaive /= NSamples.toDouble
@@ -43,7 +43,7 @@ class MultinomialTest extends FunSuite with Checkers with Matchers {
   test("multinomial with alias sampling") {
     val mult = new Multinomial[DenseVector[Double], Int](TestParams)
     val accumAlias = DenseVector.zeros[Double](3)
-    (0 until NSamples) foreach { i =>
+    ((0 until NSamples)).foreach { i =>
       accumAlias(mult.draw()) += 1
     }
     accumAlias /= NSamples.toDouble

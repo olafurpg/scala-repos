@@ -146,7 +146,7 @@ case class HandshakeResponse(
     md.update(hash2)
 
     val digest = md.digest()
-    (0 until digest.length) foreach { i =>
+    ((0 until digest.length)).foreach { i =>
       digest(i) = (digest(i) ^ hash1(i)).toByte
     }
     digest
@@ -170,7 +170,7 @@ class ExecuteRequest(
       parameters: IndexedSeq[Parameter]): Array[Byte] = {
     val bitmap = new Array[Byte]((parameters.size + 7) / 8)
     val ps = parameters.zipWithIndex
-    ps foreach {
+    ps.foreach {
       case (Parameter.NullParameter, idx) =>
         val bytePos = idx / 8
         val bitPos = idx % 8
@@ -224,7 +224,7 @@ class ExecuteRequest(
     // convert parameters to binary representation.
     val sizeOfParams = sizeOfParameters(params)
     val values = BufferWriter(new Array[Byte](sizeOfParams))
-    params foreach { writeParam(_, values) }
+    params.foreach { writeParam(_, values) }
 
     // encode null values in bitmap
     val nullBitmap = makeNullBitmap(params)
@@ -234,7 +234,7 @@ class ExecuteRequest(
     val composite =
       if (hasNewParams) {
         val types = BufferWriter(new Array[Byte](params.size * 2))
-        params foreach { writeTypeCode(_, types) }
+        params.foreach { writeTypeCode(_, types) }
         Buffer(bw,
                Buffer(nullBitmap),
                Buffer(Array(newParamsBound)),

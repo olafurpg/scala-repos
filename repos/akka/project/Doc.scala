@@ -34,7 +34,7 @@ object Scaladoc extends AutoPlugin {
     inTask(doc)(
       Seq(
         scalacOptions in Compile <++=
-          (version, baseDirectory in ThisBuild) map scaladocOptions,
+          (version, baseDirectory in ThisBuild).map(scaladocOptions),
         autoAPIMappings := CliOptions.scaladocAutoAPI.get
       )) ++ Seq(validateDiagrams in Compile := true) ++ CliOptions.scaladocDiagramsEnabled
       .ifTrue(doc in Compile := {
@@ -63,7 +63,7 @@ object Scaladoc extends AutoPlugin {
         val (newDirs, files) = curr.listFiles.partition(_.isDirectory)
         val rest = dirs.tail ++ newDirs
         val hasDiagram =
-          files exists { f =>
+          files.exists { f =>
             val name = f.getName
             if (name.endsWith(".html") && !name.startsWith("index-") &&
                 !name.equals("index.html") && !name.equals("package.html")) {

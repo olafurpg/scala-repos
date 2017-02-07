@@ -54,7 +54,7 @@ object Test extends DirectTest {
 
     object annotChecker extends AnnotationChecker {
       def hasTestAnn(tps: Type*) = {
-        tps exists (_.annotations.map(_.toString) contains "testAnn")
+        tps.exists(_.annotations.map(_.toString) contains "testAnn")
       }
 
       def annotationsConform(tpe1: Type, tpe2: Type): Boolean = {

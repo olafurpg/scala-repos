@@ -23,13 +23,13 @@ case class Thread(id: String,
   def isUnReadBy(user: User) = !isReadBy(user)
 
   def nbUnreadBy(user: User): Int =
-    isCreator(user).fold(posts count { post =>
+    isCreator(user).fold(posts.count { post =>
       post.isByInvited && post.isUnRead
-    }, posts count { post =>
+    }, posts.count { post =>
       post.isByCreator && post.isUnRead
     })
 
-  def nbUnread: Int = posts count (_.isUnRead)
+  def nbUnread: Int = posts.count(_.isUnRead)
 
   def firstPostUnreadBy(user: User): Option[Post] = posts find { post =>
     post.isUnRead && post.isByCreator != isCreator(user)
@@ -47,14 +47,14 @@ case class Thread(id: String,
 
   def isWrittenBy(post: Post, user: User) = post.isByCreator == isCreator(user)
 
-  def nonEmptyName = (name.trim.some filter (_.nonEmpty)) | "No subject"
+  def nonEmptyName = (name.trim.some.filter(_.nonEmpty)) | "No subject"
 
   def deleteFor(user: User) = copy(
-    visibleByUserIds = visibleByUserIds filter (user.id !=)
+    visibleByUserIds = visibleByUserIds.filter(user.id !=)
   )
 
   def hasPostsWrittenBy(userId: String) =
-    posts exists (_.isByCreator == (creatorId == userId))
+    posts.exists(_.isByCreator == (creatorId == userId))
 
   def endsWith(post: Post) = posts.lastOption ?? post.similar
 }
@@ -89,11 +89,14 @@ object Thread {
   private[message] lazy val tube =
     Post.tube |> { implicit pt =>
       JsTube(
-        (__.json update (readDate('createdAt) andThen readDate('updatedAt))) andThen Json
-          .reads[Thread],
-        Json.writes[Thread] andThen
-          (__.json update (writeDate('createdAt) andThen writeDate(
-            'updatedAt)))
+        (__.json
+          .update(readDate('createdAt).andThen(readDate('updatedAt))))
+          .andThen(Json
+            .reads[Thread]),
+        Json
+          .writes[Thread]
+          .andThen(__.json.update(
+            writeDate('createdAt).andThen(writeDate('updatedAt))))
       )
     }
 }

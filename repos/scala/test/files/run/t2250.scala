@@ -8,6 +8,6 @@ object Test {
     // we'll say rather unlikely a.sameElements(b) unless
     // they are pointing to the same array
     import scala.collection.JavaConversions._
-    assert(a sameElements b)
+    assert(a.sameElements(b))
   }
 }

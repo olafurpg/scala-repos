@@ -33,7 +33,7 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
     shadowAlert.getMessage shouldBe "MESSAGE"
 
     alert.getButton(DialogInterface.BUTTON_POSITIVE).performClick()
-    alert shouldNot be a 'showing
+    (alert shouldNot be).a('showing)
   }
 
   @Test
@@ -74,7 +74,7 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
 
     val registered =
       Robolectric.getShadowApplication.getRegisteredReceivers.asScala
-    registered shouldNot be a 'empty
+    (registered shouldNot be).a('empty)
     registered.foreach { r =>
       r.getIntentFilter.getAction(0) shouldBe Intent.ACTION_VIEW
     }
@@ -121,6 +121,6 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
     //shadowDialog.getMessage shouldBe "MESSAGE"
 
     dialog.cancel()
-    dialog shouldNot be a 'showing
+    (dialog shouldNot be).a('showing)
   }
 }

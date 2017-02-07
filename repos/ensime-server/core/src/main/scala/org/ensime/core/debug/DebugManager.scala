@@ -164,7 +164,7 @@ class DebugManager(
   }
 
   // the JVM should have its own actor
-  def receive: Receive = LoggingReceive { fromJvm orElse fromUser }
+  def receive: Receive = LoggingReceive { fromJvm.orElse(fromUser) }
 
   def fromJvm: Receive = {
     case DebuggerShutdownEvent =>
@@ -200,7 +200,7 @@ class DebugManager(
                                      e.thread().name,
                                      pos.file,
                                      pos.line)
-      }) getOrElse {
+      }).getOrElse {
         val loc = e.location()
         log.warning(
           s"Step position not found: ${loc.sourceName()} : ${loc.lineNumber()}")
@@ -211,7 +211,7 @@ class DebugManager(
                                       e.thread().name,
                                       pos.file,
                                       pos.line)
-      }) getOrElse {
+      }).getOrElse {
         val loc = e.location()
         log.warning(
           s"Break position not found: ${loc.sourceName()} : ${loc.lineNumber()}")

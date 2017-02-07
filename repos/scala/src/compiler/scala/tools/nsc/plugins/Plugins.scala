@@ -25,31 +25,29 @@ trait Plugins { global: Global =>
     *  filtered from the final list of plugins.
     */
   protected def loadRoughPluginsList(): List[Plugin] = {
-    def asPath(p: String) = ClassPath split p
+    def asPath(p: String) = ClassPath.split(p)
     val paths =
-      settings.plugin.value filter (_ != "") map
-        (s => asPath(s) map Path.apply)
+      settings.plugin.value.filter(_ != "").map(s => asPath(s).map(Path.apply))
     val dirs = {
       def injectDefault(s: String) =
         if (s.isEmpty) Defaults.scalaPluginPath else s
-      asPath(settings.pluginsDir.value) map injectDefault map Path.apply
+      asPath(settings.pluginsDir.value).map(injectDefault).map(Path.apply)
     }
     val maybes = Plugin.loadAllFrom(paths, dirs, settings.disable.value)
-    val (goods, errors) = maybes partition (_.isSuccess)
+    val (goods, errors) = maybes.partition(_.isSuccess)
     // Explicit parameterization of recover to avoid -Xlint warning about inferred Any
-    errors foreach
-      (_.recover[Any] {
-        // legacy behavior ignores altogether, so at least warn devs
-        case e: MissingPluginException =>
-          if (global.isDeveloper) warning(e.getMessage)
-        case e: Exception => inform(e.getMessage)
-      })
-    val classes = goods map (_.get) // flatten
+    errors.foreach(_.recover[Any] {
+      // legacy behavior ignores altogether, so at least warn devs
+      case e: MissingPluginException =>
+        if (global.isDeveloper) warning(e.getMessage)
+      case e: Exception => inform(e.getMessage)
+    })
+    val classes = goods.map(_.get) // flatten
 
     // Each plugin must only be instantiated once. A common pattern
     // is to register annotation checkers during object construction, so
     // creating multiple plugin instances will leave behind stale checkers.
-    classes map (Plugin.instantiate(_, this))
+    classes.map(Plugin.instantiate(_, this))
   }
 
   protected lazy val roughPluginsList: List[Plugin] = loadRoughPluginsList()
@@ -66,14 +64,14 @@ trait Plugins { global: Global =>
       if (plugins.isEmpty) return Nil // early return
 
       val plug :: tail = plugins
-      val plugPhaseNames = Set(plug.components map (_.phaseName): _*)
+      val plugPhaseNames = Set(plug.components.map(_.phaseName): _*)
       def withoutPlug = pick(tail, plugNames, plugPhaseNames)
       def withPlug =
         plug :: pick(tail, plugNames + plug.name, phaseNames ++ plugPhaseNames)
       lazy val commonPhases = phaseNames intersect plugPhaseNames
 
       def note(msg: String): Unit =
-        if (settings.verbose) inform(msg format plug.name)
+        if (settings.verbose) inform(msg.format(plug.name))
       def fail(msg: String) = { note(msg); withoutPlug }
 
       if (plugNames contains plug.name)
@@ -91,31 +89,31 @@ trait Plugins { global: Global =>
     }
 
     val plugs =
-      pick(roughPluginsList, Set(), (phasesSet map (_.phaseName)).toSet)
+      pick(roughPluginsList, Set(), (phasesSet.map(_.phaseName)).toSet)
 
     // Verify required plugins are present.
-    for (req <- settings.require.value; if !(plugs exists (_.name == req)))
+    for (req <- settings.require.value; if !(plugs.exists(_.name == req)))
       globalError("Missing required plugin: " + req)
 
     // Verify no non-existent plugin given with -P
     for {
-      opt <- settings.pluginOptions.value if !(plugs exists
-        (opt startsWith _.name + ":"))
+      opt <- settings.pluginOptions.value
+      if !(plugs.exists(opt.startsWith(_.name + ":")))
     } globalError("bad option: -P:" + opt)
 
     // Plugins may opt out, unless we just want to show info
-    plugs filter
-      (p =>
-         p.init(p.options, globalError) || (settings.debug && settings.isInfo))
+    plugs.filter(p =>
+      p.init(p.options, globalError) || (settings.debug && settings.isInfo))
   }
 
   lazy val plugins: List[Plugin] = loadPlugins()
 
   /** A description of all the plugins that are loaded */
   def pluginDescriptions: String =
-    roughPluginsList map (x =>
-                            "%s - %s"
-                              .format(x.name, x.description)) mkString "\n"
+    roughPluginsList.map(
+      x =>
+        "%s - %s"
+          .format(x.name, x.description)) mkString "\n"
 
   /**
     * Extract all phases supplied by plugins and add them to the phasesSet.

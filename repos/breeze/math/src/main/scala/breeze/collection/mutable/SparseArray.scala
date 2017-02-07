@@ -431,11 +431,18 @@ final class SparseArray[@specialized(Double, Int, Float, Long) V](
     if (this.default != that.default)
       throw new IllegalArgumentException("default values should be equal")
     new SparseArray(
-      (this.index.slice(0, this.used) union that.index
-        .slice(0, that.used)
-        .map(_ + this.size)).toArray,
-      (this.data.slice(0, this.used) union that.data
-        .slice(0, that.used)).toArray,
+      (this.index
+        .slice(0, this.used)
+        .union(
+          that.index
+            .slice(0, that.used)
+            .map(_ + this.size)))
+        .toArray,
+      (this.data
+        .slice(0, this.used)
+        .union(that.data
+          .slice(0, that.used)))
+        .toArray,
       this.used + that.used,
       this.size + that.size,
       this.default

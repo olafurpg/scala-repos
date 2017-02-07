@@ -16,7 +16,7 @@ final class Env(config: Config,
                 saveAnalysis: lila.analyse.Analysis => Funit) {
 
   private val ActorName = config getString "actor.name"
-  private val OfflineMode = config getBoolean "offline_mode"
+  private val OfflineMode = config.getBoolean("offline_mode")
 
   private val analysisColl = db(config getString "collection.analysis")
   private val clientColl = db(config getString "collection.client")
@@ -76,7 +76,7 @@ final class Env(config: Config,
   def cli = new lila.common.Cli {
     def process = {
       case "fishnet" :: "client" :: "create" :: userId :: skill :: Nil =>
-        api.createClient(Client.UserId(userId), skill) map (_.key.value)
+        api.createClient(Client.UserId(userId), skill).map(_.key.value)
       case "fishnet" :: "client" :: "delete" :: key :: Nil =>
         repo.deleteClient(Client.Key(key)) inject "done!"
       case "fishnet" :: "client" :: "enable" :: key :: Nil =>
@@ -92,14 +92,15 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "fishnet" boot new Env(
-      system = lila.common.PlayApp.system,
-      uciMemo = lila.game.Env.current.uciMemo,
-      hub = lila.hub.Env.current,
-      db = lila.db.Env.current,
-      config = lila.common.PlayApp loadConfig "fishnet",
-      scheduler = lila.common.PlayApp.scheduler,
-      bus = lila.common.PlayApp.system.lilaBus,
-      saveAnalysis = lila.analyse.Env.current.analyser.save _
-    )
+    "fishnet".boot(
+      new Env(
+        system = lila.common.PlayApp.system,
+        uciMemo = lila.game.Env.current.uciMemo,
+        hub = lila.hub.Env.current,
+        db = lila.db.Env.current,
+        config = lila.common.PlayApp.loadConfig("fishnet"),
+        scheduler = lila.common.PlayApp.scheduler,
+        bus = lila.common.PlayApp.system.lilaBus,
+        saveAnalysis = lila.analyse.Env.current.analyser.save _
+      ))
 }

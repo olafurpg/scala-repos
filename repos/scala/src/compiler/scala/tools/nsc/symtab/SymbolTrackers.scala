@@ -45,15 +45,18 @@ trait SymbolTrackers {
 
     // This is noise reduction only.
     def dropSymbol(sym: Symbol) =
-      sym.ownerChain exists (_ hasFlag Flags.SPECIALIZED)
+      sym.ownerChain.exists(_.hasFlag(Flags.SPECIALIZED))
 
     def symbolSnapshot(unit: CompilationUnit): Map[Symbol, Set[Tree]] = {
       if (unit.body == null) Map()
       else
-        unit.body filter containsSymbol groupBy (_.symbol) mapValues (_.toSet) toMap
+        unit.body
+          .filter(containsSymbol)
+          .groupBy(_.symbol)
+          .mapValues(_.toSet) toMap
     }
     def apply(unit: CompilationUnit) = new SymbolTracker(
-      () => symbolSnapshot(unit) filterNot { case (k, _) => dropSymbol(k) }
+      () => symbolSnapshot(unit).filterNot { case (k, _) => dropSymbol(k) }
     )
   }
 
@@ -71,7 +74,7 @@ trait SymbolTrackers {
     private var prevOwners = Map[Symbol, Symbol]()
 
     private def changed = history.head
-    private def isAdded(sym: Symbol) = changed added sym
+    private def isAdded(sym: Symbol) = changed.added(sym)
     private def isOwnerChange(sym: Symbol) = changed.owners contains sym
     private def isFlagsChange(sym: Symbol) = changed.flags contains sym
 
@@ -79,14 +82,14 @@ trait SymbolTrackers {
 
     object Node {
       def nodes(syms: Set[Symbol]): List[Node] = {
-        def descendents(s: Symbol) = (syms - s) filter (_ hasTransOwner s)
+        def descendents(s: Symbol) = ((syms - s)).filter(_ hasTransOwner s)
         def rooted(root: Symbol) = new Node(root, nodes(descendents(root)))
 
-        val roots = syms filterNot (_.ownerChain drop 1 exists syms)
-        val deep = roots map rooted
-        val deepSyms = deep flatMap (_.flatten)
+        val roots = syms.filterNot(_.ownerChain.drop(1).exists(syms))
+        val deep = roots.map(rooted)
+        val deepSyms = deep.flatMap(_.flatten)
 
-        deep ++ (syms filterNot deepSyms map (x => Node(x)))
+        deep ++ (syms.filterNot(deepSyms).map(x => Node(x)))
       }
 
       def apply(sym: Symbol): Node = new Node(sym, Nil)
@@ -105,19 +108,19 @@ trait SymbolTrackers {
             if (isFlagsChange(root)) "F" else "",
             if (isOwnerChange(root)) "O" else "",
             "  "
-          ).mkString take 2
+          ).mkString.take(2)
 
-      def changedOwnerString = changed.owners get root match {
+      def changedOwnerString = changed.owners.get(root) match {
         case Some(prev) => " [Owner was " + prev + ", now " + root.owner + "]"
         case _ => ""
       }
-      def flagSummaryString = changed.flags get root match {
+      def flagSummaryString = changed.flags.get(root) match {
         case Some(oldFlags) =>
           val added = masked & ~oldFlags
           val removed = oldFlags & ~masked
           val all = masked | oldFlags
           val strs =
-            0 to 63 map { bit =>
+            (0 to 63).map { bit =>
               val flag = 1L << bit
               val prefix =
                 (if ((added & flag) != 0L) "+"
@@ -134,19 +137,19 @@ trait SymbolTrackers {
       }
       def symString(sym: Symbol) =
         (if (settings.debug && sym.hasCompleteInfo) {
-           val s = sym.defString take 240
+           val s = sym.defString.take(240)
            if (s.length == 240) s + "..." else s
          } else sym + changedOwnerString + flagSummaryString)
 
       def flatten = children.foldLeft(Set(root))(_ ++ _.flatten)
       def indentString(indent: String): String = {
         if (root == NoSymbol)
-          children map (c => c.indentString(indent)) mkString "\n"
+          children.map(c => c.indentString(indent)) mkString "\n"
         else {
           indicatorString + indent + symString(root) +
             (if (children.isEmpty) ""
              else
-               children map (c => c.indentString(indent + "    ")) mkString
+               children.map(c => c.indentString(indent + "    ")) mkString
                  ("\n", "\n", ""))
         }
       }
@@ -155,14 +158,14 @@ trait SymbolTrackers {
     def snapshot(): Unit = {
       currentMap = snapshotFn()
 
-      val added = current filterNot prev
-      val removed = prev filterNot current
+      val added = current.filterNot(prev)
+      val removed = prev.filterNot(current)
       val steady = prev intersect current
 
       def changedOwner(sym: Symbol) =
-        prevOwners get sym filter (_ != sym.owner)
+        prevOwners.get(sym).filter(_ != sym.owner)
       def changedFlags(sym: Symbol) =
-        prevFlags get sym filter (_ != (sym.flags & flagsMask))
+        prevFlags.get(sym).filter(_ != (sym.flags & flagsMask))
 
       val owners = ({
         for (sym <- steady; old <- changedOwner(sym)) yield (sym, old)
@@ -174,28 +177,28 @@ trait SymbolTrackers {
       val change = Change(added, removed, prevMap, owners, flags)
 
       prevMap = currentMap
-      prevOwners = current map (s => (s, s.owner)) toMap;
-      prevFlags = current map (s => (s, (s.flags & flagsMask))) toMap;
+      prevOwners = current.map(s => (s, s.owner)) toMap;
+      prevFlags = current.map(s => (s, (s.flags & flagsMask))) toMap;
       history = change :: history
     }
     def show(label: String): String = {
       val hierarchy = Node(current)
       val Change(_, removed, symMap, _, _) = history.head
       def detailString(sym: Symbol) = {
-        val ownerString = sym.ownerChain splitAt 3 match {
+        val ownerString = sym.ownerChain.splitAt(3) match {
           case (front, back) =>
             val xs = if (back.isEmpty) front else front :+ "..."
             xs mkString " -> "
         }
         val treeStrings =
-          symMap(sym) map { t =>
+          symMap(sym).map { t =>
             "%10s: %s".format(t.shortClass, t)
           }
 
         ownerString :: treeStrings mkString "\n"
       }
       def removedString =
-        (removed: List[Symbol]).zipWithIndex map {
+        (removed: List[Symbol]).zipWithIndex.map {
           case (t, i) => "(%2s) ".format(i + 1) + detailString(t)
         } mkString "\n"
 

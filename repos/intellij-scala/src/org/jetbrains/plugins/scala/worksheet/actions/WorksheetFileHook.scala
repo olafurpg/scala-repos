@@ -65,13 +65,14 @@ class WorksheetFileHook(private val project: Project)
 
             val file =
               PsiDocumentManager
-                .getInstance(project) getPsiFile editor.getDocument
+                .getInstance(project)
+                .getPsiFile(editor.getDocument)
             if (file == null) return
 
             val vFile = file.getVirtualFile
             if (vFile == null) return
 
-            WorksheetFileHook getPanel vFile foreach {
+            (WorksheetFileHook getPanel vFile).foreach {
               case ref =>
                 val panel = ref.get()
                 if (panel != null) {
@@ -97,7 +98,7 @@ class WorksheetFileHook(private val project: Project)
     val editors = myFileEditorManager.getAllEditors(file)
 
     for (editor <- editors) {
-      WorksheetFileHook.getAndRemovePanel(file) foreach {
+      WorksheetFileHook.getAndRemovePanel(file).foreach {
         case ref =>
           val p = ref.get()
 
@@ -120,7 +121,7 @@ class WorksheetFileHook(private val project: Project)
   }
 
   def disableRun(file: VirtualFile, exec: Option[CompilationProcess]) {
-    cleanAndAdd(file, exec map (new StopWorksheetAction(_)))
+    cleanAndAdd(file, exec.map(new StopWorksheetAction(_)))
     statusDisplay.foreach(_.onStartCompiling())
   }
 
@@ -134,13 +135,13 @@ class WorksheetFileHook(private val project: Project)
 
   private def cleanAndAdd(file: VirtualFile,
                           action: Option[TopComponentDisplayable]) {
-    WorksheetFileHook getPanel file foreach {
+    (WorksheetFileHook getPanel file).foreach {
       case panelRef =>
         val panel = panelRef.get()
         if (panel != null) {
           val c = panel getComponent 0
-          if (c != null) panel remove c
-          action foreach (_.init(panel))
+          if (c != null) panel.remove(c)
+          action.foreach(_.init(panel))
         }
     }
   }
@@ -195,35 +196,39 @@ class WorksheetFileHook(private val project: Project)
         case txt: TextEditor =>
           txt.getEditor match {
             case ext: EditorEx =>
-              PsiDocumentManager getInstance project getPsiFile ext.getDocument match {
+              PsiDocumentManager
+                .getInstance(project)
+                .getPsiFile(ext.getDocument) match {
                 case scalaFile: ScalaFile =>
-                  WorksheetEditorPrinter.loadWorksheetEvaluation(scalaFile) foreach {
-                    case (result, ratio) if !result.isEmpty =>
-                      val viewer =
-                        WorksheetEditorPrinter.createRightSideViewer(
-                          ext,
-                          file,
-                          WorksheetEditorPrinter.createWorksheetEditor(ext),
-                          modelSync = true)
-                      val document = viewer.getDocument
+                  WorksheetEditorPrinter
+                    .loadWorksheetEvaluation(scalaFile)
+                    .foreach {
+                      case (result, ratio) if !result.isEmpty =>
+                        val viewer =
+                          WorksheetEditorPrinter.createRightSideViewer(
+                            ext,
+                            file,
+                            WorksheetEditorPrinter.createWorksheetEditor(ext),
+                            modelSync = true)
+                        val document = viewer.getDocument
 
-                      val splitter =
-                        WorksheetEditorPrinter.DIFF_SPLITTER_KEY.get(viewer)
+                        val splitter =
+                          WorksheetEditorPrinter.DIFF_SPLITTER_KEY.get(viewer)
 
-                      extensions.inWriteAction {
-                        document setText result
-                        PsiDocumentManager
-                          .getInstance(project)
-                          .commitDocument(document)
+                        extensions.inWriteAction {
+                          document.setText(result)
+                          PsiDocumentManager
+                            .getInstance(project)
+                            .commitDocument(document)
 
-                        if (splitter != null) {
-                          splitter setProportion ratio
-                          WorksheetFoldGroup
-                            .load(viewer, ext, project, splitter, scalaFile)
+                          if (splitter != null) {
+                            splitter.setProportion(ratio)
+                            WorksheetFoldGroup
+                              .load(viewer, ext, project, splitter, scalaFile)
+                          }
                         }
-                      }
-                    case _ =>
-                  }
+                      case _ =>
+                    }
                 case _ =>
               }
             case _ =>
@@ -252,7 +257,7 @@ object WorksheetFileHook {
     Option(file2panel.remove(file))
 
   private def getPanel(file: VirtualFile): Option[WeakReference[MyPanel]] =
-    Option(file2panel get file)
+    Option(file2panel.get(file))
 
   def instance(project: Project) =
     project.getComponent(classOf[WorksheetFileHook])

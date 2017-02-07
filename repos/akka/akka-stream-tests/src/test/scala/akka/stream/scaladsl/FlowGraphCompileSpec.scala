@@ -300,12 +300,12 @@ class FlowGraphCompileSpec extends AkkaSpec {
         def fruitSource =
           b.add(Source.fromPublisher(TestPublisher.manualProbe[Fruit]()))
         val outA =
-          b add Sink.fromSubscriber(TestSubscriber.manualProbe[Fruit]())
+          b.add(Sink.fromSubscriber(TestSubscriber.manualProbe[Fruit]()))
         val outB =
-          b add Sink.fromSubscriber(TestSubscriber.manualProbe[Fruit]())
-        val merge = b add Merge[Fruit](11)
-        val unzip = b add Unzip[Int, String]()
-        val whatever = b add Sink.asPublisher[Any](false)
+          b.add(Sink.fromSubscriber(TestSubscriber.manualProbe[Fruit]()))
+        val merge = b.add(Merge[Fruit](11))
+        val unzip = b.add(Unzip[Int, String]())
+        val whatever = b.add(Sink.asPublisher[Any](false))
         import GraphDSL.Implicits._
         b.add(Source.fromIterator[Fruit](apples)) ~> merge.in(0)
         appleSource ~> merge.in(1)
@@ -353,7 +353,7 @@ class FlowGraphCompileSpec extends AkkaSpec {
         .run()
       RunnableGraph
         .fromGraph(GraphDSL.create() { implicit b ⇒
-          (in1 via f1) ~> f2 ~> out1
+          (in1.via(f1)) ~> f2 ~> out1
           ClosedShape
         })
         .run()
@@ -371,13 +371,13 @@ class FlowGraphCompileSpec extends AkkaSpec {
         .run()
       RunnableGraph
         .fromGraph(GraphDSL.create() { implicit b ⇒
-          (in1 via f1) ~> out1
+          (in1.via(f1)) ~> out1
           ClosedShape
         })
         .run()
       RunnableGraph
         .fromGraph(GraphDSL.create() { implicit b ⇒
-          (in1 via f1) ~> (f2 to out1)
+          (in1.via(f1)) ~> (f2 to out1)
           ClosedShape
         })
         .run()

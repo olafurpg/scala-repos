@@ -240,10 +240,10 @@ trait PostgresProfile extends JdbcProfile {
   class ColumnDDLBuilder(column: FieldSymbol)
       extends super.ColumnDDLBuilder(column) {
     override def appendColumn(sb: StringBuilder) {
-      sb append quoteIdentifier(column.name) append ' '
+      sb.append(quoteIdentifier(column.name)).append(' ')
       if (autoIncrement && !customSqlType) {
-        sb append
-          (if (sqlType.toUpperCase == "BIGINT") "BIGSERIAL" else "SERIAL")
+        sb.append(
+          if (sqlType.toUpperCase == "BIGINT") "BIGSERIAL" else "SERIAL")
       } else appendType(sb)
       autoIncrement = false
       appendOptions(sb)

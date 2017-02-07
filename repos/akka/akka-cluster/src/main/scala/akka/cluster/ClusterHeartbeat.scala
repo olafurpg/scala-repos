@@ -91,7 +91,7 @@ private[cluster] final class ClusterHeartbeatSender
 
   // start periodic heartbeat to other nodes in cluster
   val heartbeatTask = scheduler.schedule(
-    PeriodicTasksInitialDelay max HeartbeatInterval,
+    PeriodicTasksInitialDelay.max(HeartbeatInterval),
     HeartbeatInterval,
     self,
     HeartbeatTick)
@@ -160,7 +160,7 @@ private[cluster] final class ClusterHeartbeatSender
     state = state.reachableMember(m.uniqueAddress)
 
   def heartbeat(): Unit = {
-    state.activeReceivers foreach { to ⇒
+    state.activeReceivers.foreach { to ⇒
       if (cluster.failureDetector.isMonitoring(to.address)) {
         if (verboseHeartbeat)
           log.debug("Cluster Node [{}] - Heartbeat to [{}]",
@@ -212,7 +212,7 @@ private[cluster] final case class ClusterHeartbeatSenderState(
     failureDetector: FailureDetectorRegistry[Address]) {
 
   val activeReceivers: Set[UniqueAddress] =
-    ring.myReceivers union oldReceiversNowUnreachable
+    ring.myReceivers.union(oldReceiversNowUnreachable)
 
   def selfAddress = ring.selfAddress
 
@@ -229,7 +229,7 @@ private[cluster] final case class ClusterHeartbeatSenderState(
   def removeMember(node: UniqueAddress): ClusterHeartbeatSenderState = {
     val newState = membershipChange(ring :- node)
 
-    failureDetector remove node.address
+    failureDetector.remove(node.address)
     if (newState.oldReceiversNowUnreachable(node))
       newState.copy(
         oldReceiversNowUnreachable = newState.oldReceiversNowUnreachable -
@@ -246,11 +246,11 @@ private[cluster] final case class ClusterHeartbeatSenderState(
   private def membershipChange(
       newRing: HeartbeatNodeRing): ClusterHeartbeatSenderState = {
     val oldReceivers = ring.myReceivers
-    val removedReceivers = oldReceivers diff newRing.myReceivers
+    val removedReceivers = oldReceivers.diff(newRing.myReceivers)
     var adjustedOldReceiversNowUnreachable = oldReceiversNowUnreachable
-    removedReceivers foreach { a ⇒
+    removedReceivers.foreach { a ⇒
       if (failureDetector.isAvailable(a.address))
-        failureDetector remove a.address
+        failureDetector.remove(a.address)
       else adjustedOldReceiversNowUnreachable += a
     }
     copy(newRing, adjustedOldReceiversNowUnreachable)
@@ -261,7 +261,7 @@ private[cluster] final case class ClusterHeartbeatSenderState(
       failureDetector heartbeat from.address
       if (oldReceiversNowUnreachable(from)) {
         // back from unreachable, ok to stop heartbeating to it
-        if (!ring.myReceivers(from)) failureDetector remove from.address
+        if (!ring.myReceivers(from)) failureDetector.remove(from.address)
         copy(oldReceiversNowUnreachable = oldReceiversNowUnreachable - from)
       } else this
     } else this
@@ -295,7 +295,7 @@ private[cluster] final case class HeartbeatNodeRing(
         (ha == hb && Member.addressOrdering.compare(a.address, b.address) < 0)
       }
 
-    immutable.SortedSet() union nodes
+    immutable.SortedSet().union(nodes)
   }
 
   /**

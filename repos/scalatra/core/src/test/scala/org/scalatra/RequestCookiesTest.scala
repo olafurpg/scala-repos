@@ -8,13 +8,13 @@ class RequestCookiesTest extends ScalatraFunSuite {
   addServlet(
     new ScalatraServlet {
       get("/multi-cookies") {
-        Seq("one", "two", "three") map { key =>
+        Seq("one", "two", "three").map { key =>
           response.setHeader(key, request.multiCookies(key).mkString(":"))
         }
       }
 
       get("/cookies") {
-        Seq("one", "two", "three") map { key =>
+        Seq("one", "two", "three").map { key =>
           response.setHeader(key, request.cookies.getOrElse(key, "NONE"))
         }
       }

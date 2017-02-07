@@ -11,7 +11,7 @@ object B extends Build {
     TaskKey[Unit]("check-second") <<= checkTask("Second")
   )
   private def checkTask(className: String) =
-    fullClasspath in Configurations.Runtime map { runClasspath =>
+    (fullClasspath in Configurations.Runtime).map { runClasspath =>
       val cp = runClasspath.map(_.data.toURI.toURL).toArray
       Class.forName(className, false, new URLClassLoader(cp))
       ()

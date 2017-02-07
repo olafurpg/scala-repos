@@ -34,7 +34,7 @@ trait Timer[T] {
   implicit def TimeOrdering: Ordering[T]
 
   implicit def TimeSpanSemigroup: Semigroup[(T, T)] = new Semigroup[(T, T)] {
-    def append(a: (T, T), b: => (T, T)) = (a._1 min b._1, a._2 max b._2)
+    def append(a: (T, T), b: => (T, T)) = (a._1 min b._1, a._2.max(b._2))
   }
 }
 

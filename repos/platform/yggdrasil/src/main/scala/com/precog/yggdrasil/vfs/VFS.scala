@@ -74,7 +74,7 @@ object VFSModule {
     def loop(stream: StreamT[M, CharBuffer],
              buf: ByteBuffer,
              arr: Array[Byte]): StreamT[M, Array[Byte]] = {
-      StreamT(stream.uncons map {
+      StreamT(stream.uncons.map {
         case Some((cbuf, tail)) =>
           val result = encoder.encode(cbuf, buf, false)
           if (result == CoderResult.OVERFLOW) {

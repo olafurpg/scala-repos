@@ -50,7 +50,7 @@ object QuirrelCacheSpecs
           case e => e.children
         }
 
-        cs.iterator map loop collectFirst {
+        cs.iterator.map(loop).collectFirst {
           case Some(a) => a
         }
       }

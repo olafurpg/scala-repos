@@ -272,7 +272,7 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
       *  Format strings are as for `String.format`
       *  (@see java.lang.String.format).
       */
-    @inline def formatted(fmtstr: String): String = fmtstr format self
+    @inline def formatted(fmtstr: String): String = fmtstr.format(self)
   }
 
   // SI-8229 retaining the pre 2.11 name for source compatibility in shadowing this implicit

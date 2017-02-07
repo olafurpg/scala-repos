@@ -94,7 +94,7 @@ class ScalaFindUsagesProvider extends FindUsagesProvider {
       case c: PsiClass if !c.isInstanceOf[PsiClassFake] => c.qualifiedName
       case _ => element.getText
     }
-    Option(name) getOrElse "anonymous"
+    Option(name).getOrElse("anonymous")
   }
 
   @NotNull
@@ -114,6 +114,6 @@ class ScalaFindUsagesProvider extends FindUsagesProvider {
         if (useFullName) c.qualifiedName else c.name
       case _ => element.getText
     }
-    Option(name) getOrElse "anonymous"
+    Option(name).getOrElse("anonymous")
   }
 }

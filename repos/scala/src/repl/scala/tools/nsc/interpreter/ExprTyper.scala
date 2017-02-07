@@ -25,7 +25,7 @@ trait ExprTyper {
         case IR.Success =>
           val sym0 = symbolOfTerm(name)
           // drop NullaryMethodType
-          sym0.cloneSymbol setInfo exitingTyper(sym0.tpe_*.finalResultType)
+          sym0.cloneSymbol.setInfo(exitingTyper(sym0.tpe_*.finalResultType))
         case _ => NoSymbol
       }
     }
@@ -34,7 +34,7 @@ trait ExprTyper {
 
       interpretSynthetic(code) match {
         case IR.Success =>
-          repl.definedSymbolList filterNot old match {
+          repl.definedSymbolList.filterNot(old) match {
             case Nil => NoSymbol
             case sym :: Nil => sym
             case syms => NoSymbol.newOverloaded(NoPrefix, syms)
@@ -46,7 +46,7 @@ trait ExprTyper {
       interpretSynthetic(code)
       NoSymbol
     }
-    beSilentDuring(asExpr()) orElse beSilentDuring(asDefn()) orElse asError()
+    beSilentDuring(asExpr()).orElse(beSilentDuring(asDefn())).orElse(asError())
   }
 
   private var typeOfExpressionDepth = 0
@@ -70,7 +70,7 @@ trait ExprTyper {
   def typeOfTypeString(typeString: String): Type = {
     def asProperType(): Option[Type] = {
       val name = freshInternalVarName()
-      val line = "def %s: %s = ???" format (name, typeString)
+      val line = "def %s: %s = ???".format(name, typeString)
       interpretSynthetic(line) match {
         case IR.Success =>
           val sym0 = symbolOfTerm(name)
@@ -78,6 +78,6 @@ trait ExprTyper {
         case _ => None
       }
     }
-    beSilentDuring(asProperType()) getOrElse NoType
+    beSilentDuring(asProperType()).getOrElse(NoType)
   }
 }

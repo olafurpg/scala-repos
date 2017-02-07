@@ -25,7 +25,7 @@ object ScalaXmlTokenTypes {
   def getByName(name: String) = allTypes.get(name)
 
   def substitute(tpe: IElementType) =
-    if (tpe == null) null else getByName(tpe.toString) getOrElse tpe
+    if (tpe == null) null else getByName(tpe.toString).getOrElse(tpe)
 
   def isSubstituted(name: String) = allTypes.get(name).isDefined
 

@@ -108,10 +108,10 @@ trait Managed[+T] { selfT =>
       def get = u.get
 
       def dispose(deadline: Time) = {
-        u.dispose(deadline) transform {
+        u.dispose(deadline).transform {
           case Return(_) => t.dispose(deadline)
           case Throw(outer) =>
-            t.dispose transform {
+            t.dispose.transform {
               case Throw(inner) =>
                 Future.exception(new DoubleTrouble(outer, inner))
               case Return(_) => Future.exception(outer)

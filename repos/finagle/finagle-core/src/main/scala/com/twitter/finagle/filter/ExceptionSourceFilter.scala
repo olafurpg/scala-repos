@@ -25,7 +25,7 @@ private[finagle] object ExceptionSourceFilter {
       val description = "Source exceptions to the service name"
       def make(_label: param.Label, next: ServiceFactory[Req, Rep]) = {
         val param.Label(label) = _label
-        new ExceptionSourceFilter(label) andThen next
+        new ExceptionSourceFilter(label).andThen(next)
       }
     }
 }

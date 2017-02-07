@@ -65,7 +65,7 @@ trait ScaladocAnalyzer extends Analyzer {
       def stringParser(str: String): syntaxAnalyzer.Parser = {
         val file = new BatchSourceFile(context.unit.source.file, str) {
           override def positionInUltimateSource(pos: Position) = {
-            pos withSource context.unit.source withShift useCase.pos.start
+            pos.withSource(context.unit.source).withShift(useCase.pos.start)
           }
         }
         newUnitParser(new CompilationUnit(file))
@@ -76,9 +76,9 @@ trait ScaladocAnalyzer extends Analyzer {
 
       def defineAlias(name: Name) =
         (if (context.scope.lookup(name) == NoSymbol) {
-           lookupVariable(name.toString.substring(1), enclClass) foreach {
+           lookupVariable(name.toString.substring(1), enclClass).foreach {
              repl =>
-               silent(_.typedTypeConstructor(stringParser(repl).typ())) map {
+               silent(_.typedTypeConstructor(stringParser(repl).typ())).map {
                  tpt =>
                    val alias =
                      enclClass.newAliasType(name.toTypeName, useCase.pos)
@@ -86,27 +86,27 @@ trait ScaladocAnalyzer extends Analyzer {
                      cloneSymbolsAtOwner(tpt.tpe.typeSymbol.typeParams, alias)
                    val newInfo =
                      genPolyType(tparams,
-                                 appliedType(tpt.tpe, tparams map (_.tpe)))
-                   alias setInfo newInfo
+                                 appliedType(tpt.tpe, tparams.map(_.tpe)))
+                   alias.setInfo(newInfo)
                    context.scope.enter(alias)
                }
            }
          })
 
       for (tree <- trees; t <- tree) t match {
-        case Ident(name) if name startsWith '$' => defineAlias(name)
+        case Ident(name) if name.startsWith('$') => defineAlias(name)
         case _ =>
       }
 
       useCase.aliases = context.scope.toList
       namer.enterSyms(trees)
       typedStats(trees, NoSymbol)
-      useCase.defined = context.scope.toList filterNot
-          (useCase.aliases contains _)
+      useCase.defined =
+        context.scope.toList.filterNot(useCase.aliases contains _)
 
       if (settings.debug)
-        useCase.defined foreach
-          (sym => println("defined use cases: %s:%s".format(sym, sym.tpe)))
+        useCase.defined.foreach(sym =>
+          println("defined use cases: %s:%s".format(sym, sym.tpe)))
 
       useCase.defined
     }
@@ -215,7 +215,7 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
         valueParams.nonEmpty || typeParams.nonEmpty || version.nonEmpty ||
         since.nonEmpty
       }
-      def isDirty = unclean(unmooredParser parseComment doc)
+      def isDirty = unclean(unmooredParser.parseComment(doc))
       if ((doc ne null) && (settings.warnDocDetached || isDirty))
         reporter.warning(doc.pos, "discarding unmoored doc comment")
     }
@@ -225,7 +225,7 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       finally lastDoc = null)
 
     override protected def putCommentChar() {
-      if (inDocComment) docBuffer append ch
+      if (inDocComment) docBuffer.append(ch)
 
       nextChar()
     }
@@ -269,8 +269,8 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       if ((doc ne null) && doc.raw.length > 0) {
         log(s"joinComment(doc=$doc)")
         val joined =
-          trees map { t =>
-            DocDef(doc, t) setPos {
+          trees.map { t =>
+            DocDef(doc, t).setPos {
               if (t.pos.isDefined) {
                 val pos = doc.pos.withEnd(t.pos.end)
                 // always make the position transparent
@@ -280,9 +280,9 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
               }
             }
           }
-        joined.find(_.pos.isOpaqueRange) foreach { main =>
+        joined.find(_.pos.isOpaqueRange).foreach { main =>
           val mains = List(main)
-          joined foreach { t =>
+          joined.foreach { t =>
             if (t ne main) ensureNonOverlapping(t, mains)
           }
         }

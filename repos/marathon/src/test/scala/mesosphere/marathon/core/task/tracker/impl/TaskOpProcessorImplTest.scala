@@ -83,7 +83,7 @@ class TaskOpProcessorImplTest
     Given("a taskRepository")
     val taskState = MarathonTestHelper.mininimalTask(appId)
     val task = taskState.marathonTask
-    f.taskRepository.store(task) returns Future.successful(task)
+    f.taskRepository.store(task).returns(Future.successful(task))
 
     When("the processor processes an update")
     val result = f.processor.process(
@@ -116,9 +116,10 @@ class TaskOpProcessorImplTest
     Given("a taskRepository and existing task")
     val taskState = MarathonTestHelper.stagedTaskForApp(appId)
     val task = taskState.marathonTask
-    f.taskRepository.store(task) returns Future.failed(
-      new RuntimeException("fail"))
-    f.taskRepository.task(task.getId) returns Future.successful(Some(task))
+    f.taskRepository
+      .store(task)
+      .returns(Future.failed(new RuntimeException("fail")))
+    f.taskRepository.task(task.getId).returns(Future.successful(Some(task)))
 
     When("the processor processes an update")
 
@@ -167,8 +168,8 @@ class TaskOpProcessorImplTest
     val taskState = MarathonTestHelper.mininimalTask(appId)
     val task = taskState.marathonTask
     val storeFail: RuntimeException = new scala.RuntimeException("fail")
-    f.taskRepository.store(task) returns Future.failed(storeFail)
-    f.taskRepository.task(task.getId) returns Future.successful(None)
+    f.taskRepository.store(task).returns(Future.failed(storeFail))
+    f.taskRepository.task(task.getId).returns(Future.successful(None))
 
     When("the processor processes an update")
 
@@ -220,9 +221,10 @@ class TaskOpProcessorImplTest
     val task = taskState.marathonTask
     val storeFailed: RuntimeException =
       new scala.RuntimeException("store failed")
-    f.taskRepository.store(task) returns Future.failed(storeFailed)
-    f.taskRepository.task(task.getId) returns Future.failed(
-      new RuntimeException("task failed"))
+    f.taskRepository.store(task).returns(Future.failed(storeFailed))
+    f.taskRepository
+      .task(task.getId)
+      .returns(Future.failed(new RuntimeException("task failed")))
 
     When("the processor processes an update")
     var result: Try[Unit] =
@@ -264,7 +266,7 @@ class TaskOpProcessorImplTest
 
     Given("a taskRepository")
     val taskId = "task1"
-    f.taskRepository.expunge(taskId) returns Future.successful(Iterable(true))
+    f.taskRepository.expunge(taskId).returns(Future.successful(Iterable(true)))
 
     When("the processor processes an update")
     val result = f.processor.process(
@@ -296,9 +298,10 @@ class TaskOpProcessorImplTest
 
     Given("a taskRepository")
     val taskId = Task.Id.forApp(appId)
-    f.taskRepository.expunge(taskId.idString) returns Future.failed(
-      new RuntimeException("expunge fails"))
-    f.taskRepository.task(taskId.idString) returns Future.successful(None)
+    f.taskRepository
+      .expunge(taskId.idString)
+      .returns(Future.failed(new RuntimeException("expunge fails")))
+    f.taskRepository.task(taskId.idString).returns(Future.successful(None))
 
     When("the processor processes an update")
     val result = f.processor.process(
@@ -335,8 +338,8 @@ class TaskOpProcessorImplTest
     val taskId = task.getId
     val expungeFails: RuntimeException =
       new scala.RuntimeException("expunge fails")
-    f.taskRepository.expunge(taskId) returns Future.failed(expungeFails)
-    f.taskRepository.task(taskId) returns Future.successful(Some(task))
+    f.taskRepository.expunge(taskId).returns(Future.failed(expungeFails))
+    f.taskRepository.task(taskId).returns(Future.successful(Some(task)))
 
     When("the processor processes an update")
     val result = f.processor.process(
@@ -374,8 +377,10 @@ class TaskOpProcessorImplTest
     Given("a statusUpdateResolver and an update")
     val update: TaskStatus = TaskStatus.getDefaultInstance
     val taskId = "task1"
-    f.statusUpdateResolver.resolve(Task.Id(taskId), update) returns Future
-      .successful(TaskOpProcessor.Action.Noop)
+    f.statusUpdateResolver
+      .resolve(Task.Id(taskId), update)
+      .returns(Future
+        .successful(TaskOpProcessor.Action.Noop))
 
     When("the processor processes an update")
     val result = f.processor.process(
@@ -411,10 +416,13 @@ class TaskOpProcessorImplTest
     val taskId = launched.taskId.mesosTaskId.getValue
     val killed: TaskStatus =
       MarathonTestHelper.statusForState(taskId, TaskState.TASK_KILLED)
-    f.taskRepository.store(marathonTask) returns Future.successful(
-      marathonTask)
-    f.statusUpdateResolver.resolve(Task.Id(taskId), killed) returns Future
-      .successful(TaskOpProcessor.Action.Update(unlaunched))
+    f.taskRepository
+      .store(marathonTask)
+      .returns(Future.successful(marathonTask))
+    f.statusUpdateResolver
+      .resolve(Task.Id(taskId), killed)
+      .returns(Future
+        .successful(TaskOpProcessor.Action.Update(unlaunched)))
 
     When("the processor processes an update")
     val result = f.processor.process(

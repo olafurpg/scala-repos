@@ -30,7 +30,7 @@ import com.precog.util._
 object RawHandler {
   // file doesn't exist -> create new file
   def empty(id: Long, f: File): RawHandler = {
-    if (f.exists) sys.error("rawlog %s already exists!" format f)
+    if (f.exists) sys.error("rawlog %s already exists!".format(f))
     val os = new BufferedOutputStream(new FileOutputStream(f, true))
     RawLoader.writeHeader(os, id)
     new RawHandler(id, f, Nil, os)

@@ -47,7 +47,7 @@ object SbtWatcherMain {
           msg.trim.endsWith(IT_COMPLETED_MESSAGE) || msgCount > MESSAGE_LIMIT
       }
 
-    val decoded = arguments map Base64Converter.decode
+    val decoded = arguments.map(Base64Converter.decode)
 
     decoded.head match {
       case cm @ (START | LOOP) =>
@@ -78,7 +78,7 @@ object SbtWatcherMain {
                                None,
                                None,
                                None).toBytes)
-                out write encoded.getBytes
+                out.write(encoded.getBytes)
               }
             }
 
@@ -116,9 +116,12 @@ object SbtWatcherMain {
         }
       case STOP => currentExec.foreach(a => a._1.endSbtExec())
       case IS_RUNNING =>
-        write2source(currentExec.map { a =>
-          toMessage(a._1.isRunning)
-        } getOrElse FALSE)
+        write2source(
+          currentExec
+            .map { a =>
+              toMessage(a._1.isRunning)
+            }
+            .getOrElse(FALSE))
       case _ =>
     }
   }

@@ -81,7 +81,7 @@ object Tracing {
                                  methodName: String,
                                  args: AnyRef*) {
     try {
-      val argTypes = args map (_.getClass())
+      val argTypes = args.map(_.getClass())
       Class
         .forName(clazz)
         .getMethod(methodName, argTypes: _*)

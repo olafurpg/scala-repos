@@ -19,15 +19,15 @@ final class Env(config: Config,
 
   private val settings = new {
     val CollectionSecurity = config getString "collection.security"
-    val FirewallEnabled = config getBoolean "firewall.enabled"
+    val FirewallEnabled = config.getBoolean("firewall.enabled")
     val FirewallCookieName = config getString "firewall.cookie.name"
-    val FirewallCookieEnabled = config getBoolean "firewall.cookie.enabled"
+    val FirewallCookieEnabled = config.getBoolean("firewall.cookie.enabled")
     val FirewallCollectionFirewall =
       config getString "firewall.collection.firewall"
-    val FirewallCachedIpsTtl = config duration "firewall.cached.ips.ttl"
-    val FloodDuration = config duration "flood.duration"
+    val FirewallCachedIpsTtl = config.duration("firewall.cached.ips.ttl")
+    val FloodDuration = config.duration("flood.duration")
     val GeoIPFile = config getString "geoip.file"
-    val GeoIPCacheTtl = config duration "geoip.cache_ttl"
+    val GeoIPCacheTtl = config.duration("geoip.cache_ttl")
     val EmailConfirmMailgunApiUrl =
       config getString "email_confirm.mailgun.api.url"
     val EmailConfirmMailgunApiKey =
@@ -37,7 +37,7 @@ final class Env(config: Config,
     val EmailConfirmMailgunBaseUrl =
       config getString "email_confirm.mailgun.base_url"
     val EmailConfirmSecret = config getString "email_confirm.secret"
-    val EmailConfirmEnabled = config getBoolean "email_confirm.enabled"
+    val EmailConfirmEnabled = config.getBoolean("email_confirm.enabled")
     val PasswordResetMailgunApiUrl =
       config getString "password_reset.mailgun.api.url"
     val PasswordResetMailgunApiKey =
@@ -48,21 +48,21 @@ final class Env(config: Config,
       config getString "password_reset.mailgun.base_url"
     val PasswordResetSecret = config getString "password_reset.secret"
     val TorProviderUrl = config getString "tor.provider_url"
-    val TorRefreshDelay = config duration "tor.refresh_delay"
+    val TorRefreshDelay = config.duration("tor.refresh_delay")
     val DisposableEmailProviderUrl =
       config getString "disposable_email.provider_url"
     val DisposableEmailRefreshDelay =
-      config duration "disposable_email.refresh_delay"
+      config.duration("disposable_email.refresh_delay")
     val RecaptchaPrivateKey = config getString "recaptcha.private_key"
     val RecaptchaEndpoint = config getString "recaptcha.endpoint"
-    val RecaptchaEnabled = config getBoolean "recaptcha.enabled"
+    val RecaptchaEnabled = config.getBoolean("recaptcha.enabled")
   }
   import settings._
 
   val RecaptchaPublicKey = config getString "recaptcha.public_key"
 
   lazy val firewall = new Firewall(
-    cookieName = FirewallCookieName.some filter (_ => FirewallCookieEnabled),
+    cookieName = FirewallCookieName.some.filter(_ => FirewallCookieEnabled),
     enabled = FirewallEnabled,
     cachedIpsTtl = FirewallCachedIpsTtl)
 
@@ -131,12 +131,13 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "security" boot new Env(
-      config = lila.common.PlayApp loadConfig "security",
-      db = lila.db.Env.current,
-      system = lila.common.PlayApp.system,
-      scheduler = lila.common.PlayApp.scheduler,
-      captcher = lila.hub.Env.current.actor.captcher,
-      messenger = lila.hub.Env.current.actor.messenger
-    )
+    "security".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("security"),
+        db = lila.db.Env.current,
+        system = lila.common.PlayApp.system,
+        scheduler = lila.common.PlayApp.scheduler,
+        captcher = lila.hub.Env.current.actor.captcher,
+        messenger = lila.hub.Env.current.actor.messenger
+      ))
 }

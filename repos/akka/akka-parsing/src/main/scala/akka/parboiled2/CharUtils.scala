@@ -194,7 +194,7 @@ object CharUtils {
     case '\r' ⇒ "\\r"
     case '\n' ⇒ "\\n"
     case EOI ⇒ "EOI"
-    case x if Character.isISOControl(x) ⇒ "\\u%04x" format c.toInt
+    case x if Character.isISOControl(x) ⇒ "\\u%04x".format(c.toInt)
     case x ⇒ x.toString
   }
 

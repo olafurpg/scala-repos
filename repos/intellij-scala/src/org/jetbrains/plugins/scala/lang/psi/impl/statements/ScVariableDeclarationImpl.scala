@@ -33,7 +33,7 @@ class ScVariableDeclarationImpl private (stub: StubElement[ScVariable],
   override def toString: String =
     "ScVariableDeclaration: " + declaredElements.map(_.name).mkString(", ")
 
-  def getType(ctx: TypingContext) = wrap(typeElement) flatMap {
+  def getType(ctx: TypingContext) = wrap(typeElement).flatMap {
     _.getType(TypingContext.empty)
   }
 

@@ -392,7 +392,7 @@ private[transport] class ProtocolStateActor(
 
   initialData match {
     case d: OutboundUnassociated ⇒
-      d.transport.associate(d.remoteAddress).map(Handle(_)) pipeTo self
+      d.transport.associate(d.remoteAddress).map(Handle(_)).pipeTo(self)
       startWith(Closed, d)
 
     case d: InboundUnassociated ⇒
@@ -558,7 +558,7 @@ private[transport] class ProtocolStateActor(
                                                  wrappedHandle,
                                                  queue :+ payload)
             case ListenerReady(listener, _) ⇒
-              listener notify InboundPayload(payload)
+              listener.notify(InboundPayload(payload))
               stay()
             case msg ⇒
               throw new AkkaProtocolException(
@@ -586,7 +586,7 @@ private[transport] class ProtocolStateActor(
 
     case Event(HandleListenerRegistered(listener),
                AssociatedWaitHandler(_, wrappedHandle, queue)) ⇒
-      queue.foreach { listener notify InboundPayload(_) }
+      queue.foreach { listener.notify(InboundPayload(_)) }
       stay() using ListenerReady(listener, wrappedHandle)
   }
 
@@ -666,7 +666,7 @@ private[transport] class ProtocolStateActor(
         case FSM.Failure(info: DisassociateInfo) ⇒ Disassociated(info)
         case _ ⇒ Disassociated(Unknown)
       }
-      handlerFuture foreach { _ notify disassociateNotification }
+      handlerFuture.foreach { _.notify(disassociateNotification) }
       wrappedHandle.disassociate()
 
     case StopEvent(reason, _, ListenerReady(handler, wrappedHandle)) ⇒
@@ -674,7 +674,7 @@ private[transport] class ProtocolStateActor(
         case FSM.Failure(info: DisassociateInfo) ⇒ Disassociated(info)
         case _ ⇒ Disassociated(Unknown)
       }
-      handler notify disassociateNotification
+      handler.notify(disassociateNotification)
       wrappedHandle.disassociate()
 
     case StopEvent(_, _, InboundUnassociated(_, wrappedHandle)) ⇒
@@ -706,7 +706,7 @@ private[transport] class ProtocolStateActor(
 
   private def listenForListenerRegistration(
       readHandlerPromise: Promise[HandleEventListener]): Unit =
-    readHandlerPromise.future.map { HandleListenerRegistered(_) } pipeTo self
+    readHandlerPromise.future.map { HandleListenerRegistered(_) }.pipeTo(self)
 
   private def notifyOutboundHandler(wrappedHandle: AssociationHandle,
                                     handshakeInfo: HandshakeInfo,
@@ -734,14 +734,15 @@ private[transport] class ProtocolStateActor(
     val readHandlerPromise = Promise[HandleEventListener]()
     listenForListenerRegistration(readHandlerPromise)
 
-    associationListener notify InboundAssociation(
-      new AkkaProtocolHandle(localAddress,
-                             handshakeInfo.origin,
-                             readHandlerPromise,
-                             wrappedHandle,
-                             handshakeInfo,
-                             self,
-                             codec))
+    associationListener.notify(
+      InboundAssociation(
+        new AkkaProtocolHandle(localAddress,
+                               handshakeInfo.origin,
+                               readHandlerPromise,
+                               wrappedHandle,
+                               handshakeInfo,
+                               self,
+                               codec)))
     readHandlerPromise.future
   }
 

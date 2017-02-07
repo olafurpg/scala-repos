@@ -28,7 +28,7 @@ object ArraySupport {
   def compare[@sp A: Order](x: Array[A], y: Array[A]): Int = {
     var i = 0
     while (i < x.length && i < y.length) {
-      val cmp = x(i) compare y(i)
+      val cmp = x(i).compare(y(i))
       if (cmp != 0) return cmp
       i += 1
     }
@@ -40,7 +40,7 @@ object ArraySupport {
       sc: AdditiveMonoid[A]): Int = {
     var i = 0
     while (i < x.length && i < y.length) {
-      val cmp = x(i) compare y(i)
+      val cmp = x(i).compare(y(i))
       if (cmp != 0) return cmp
       i += 1
     }

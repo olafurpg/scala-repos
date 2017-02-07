@@ -177,12 +177,12 @@ final class ListBuffer[A]
   }
 
   override def ++=(xs: TraversableOnce[A]): this.type = xs match {
-    case x: AnyRef if x eq this => this ++= (this take size)
+    case x: AnyRef if x eq this => this ++= (this.take(size))
     case _ => super.++=(xs)
   }
 
   override def ++=:(xs: TraversableOnce[A]): this.type =
-    if (xs.asInstanceOf[AnyRef] eq this) ++=:(this take size)
+    if (xs.asInstanceOf[AnyRef] eq this) ++=:(this.take(size))
     else super.++=:(xs)
 
   /** Clears the buffer contents.
@@ -273,7 +273,7 @@ final class ListBuffer[A]
       throw new IndexOutOfBoundsException(
         "at " + n.toString + " deleting " + count.toString)
     if (exported) copy()
-    val n1 = n max 0
+    val n1 = n.max(0)
     val count1 = count min (len - n1)
     if (n1 == 0) {
       var c = count1

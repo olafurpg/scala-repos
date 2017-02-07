@@ -174,7 +174,7 @@ trait ColumnarTableModuleSpec[M[+ _]]
       .foldLeft("")(_ + _.toString)
       .map(JParser.parseUnsafe)
 
-    val minimized = minimize(expected) getOrElse JArray(Nil)
+    val minimized = minimize(expected).getOrElse(JArray(Nil))
     arrayM.copoint mustEqual minimized
   }
 
@@ -721,7 +721,7 @@ object ColumnarTableModuleSpec
       override def point[A](a: => A) = freeMonad[Function0].point(a)
       override def bind[A, B](m: Free.Trampoline[A])(
           f: A => Free.Trampoline[B]) = freeMonad[Function0].bind(m)(f)
-      override def copoint[A](m: Free.Trampoline[A]) = m go { f =>
+      override def copoint[A](m: Free.Trampoline[A]) = m.go { f =>
         f()
       }
       override def cojoin[A](m: Free.Trampoline[A]) = point(m)

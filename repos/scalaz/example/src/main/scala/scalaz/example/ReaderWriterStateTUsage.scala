@@ -126,11 +126,11 @@ object CABRunLengthEncoder {
     have we exhausted the input?
     */
   def done: RunLength[Boolean] =
-    get flatMap { state =>
+    get.flatMap { state =>
       if (state.input.isEmpty)
         // we have, better emit whatever tokens are stored in the
         // current state
-        emit as true
+        emit.as(true)
       else point(false)
     }
 
@@ -161,7 +161,7 @@ object CABRunLengthEncoder {
       state <- get
       next <- readToken
       _ <- {
-        if (state.lastToken.map(_ == next) getOrElse (false))
+        if (state.lastToken.map(_ == next).getOrElse(false))
           // Same token as last, so we just increment our counter
           modify(_.incLength)
         else

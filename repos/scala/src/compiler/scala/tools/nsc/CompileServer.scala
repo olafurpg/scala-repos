@@ -68,16 +68,17 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
   def unequalSettings(s1: Settings, s2: Settings): Set[Settings#Setting] = {
     val ignoreSettings = Set("-d", "-encoding", "-currentDir")
     def trim(s: Settings): Set[Settings#Setting] =
-      (s.userSetSettings.toSet[Settings#Setting] filterNot
-        (ss => ignoreSettings exists (ss respondsTo _)))
+      (s.userSetSettings
+        .toSet[Settings#Setting]
+        .filterNot(ss => ignoreSettings.exists(ss.respondsTo(_))))
     val ss1 = trim(s1)
     val ss2 = trim(s2)
 
-    (ss1 union ss2) -- (ss1 intersect ss2)
+    (ss1.union(ss2)) -- (ss1 intersect ss2)
   }
 
   def session() {
-    val password = compileSocket getPassword port
+    val password = compileSocket.getPassword(port)
     val guessedPassword = in.readLine()
     val input = in.readLine()
 
@@ -147,7 +148,7 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
         compiler = newGlobal(newSettings, reporter)
       }
       val c = compiler
-      try new c.Run() compile command.files
+      try new c.Run().compile(command.files)
       catch {
         case ex @ FatalError(msg) =>
           reporter.error(null, "fatal error: " + msg)
@@ -217,11 +218,11 @@ object CompileServer {
         Console.err.println(
           "...starting server on socket " + server.port + "...")
         Console.err.flush()
-        server.compileSocket setPort server.port
+        server.compileSocket.setPort(server.port)
         startupCallback()
         server.run()
 
-        server.compileSocket deletePort server.port
+        server.compileSocket.deletePort(server.port)
       }
     }
   }

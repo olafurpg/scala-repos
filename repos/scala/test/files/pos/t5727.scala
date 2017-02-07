@@ -22,7 +22,7 @@ object Test {
 
   // bug
   //def Sample: Base[Any] = ( rep("foo" | "bar") | "sth")
-  def Sample: Base[Any] = (rep("foo" bar "bar") bar "sth")
+  def Sample: Base[Any] = (rep("foo".bar("bar")).bar("sth"))
 
   def rep[T](p: => Base[T]): Base[T] = null // whatever
 

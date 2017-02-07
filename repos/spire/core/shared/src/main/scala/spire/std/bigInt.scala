@@ -15,7 +15,7 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   def negate(a: BigInt): BigInt = -a
   val one: BigInt = BigInt(1)
   def plus(a: BigInt, b: BigInt): BigInt = a + b
-  override def pow(a: BigInt, b: Int): BigInt = a pow b
+  override def pow(a: BigInt, b: Int): BigInt = a.pow(b)
   override def times(a: BigInt, b: BigInt): BigInt = a * b
   val zero: BigInt = BigInt(0)
 
@@ -34,15 +34,15 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
       -nroot(-a, k)
     } else if (a < 0) {
       throw new ArithmeticException(
-        "Cannot find %d-root of negative number." format k)
+        "Cannot find %d-root of negative number.".format(k))
     } else {
       def findNroot(b: BigInt, i: Int): BigInt =
         if (i < 0) {
           b
         } else {
-          val c = b setBit i
+          val c = b.setBit(i)
 
-          if ((c pow k) <= a) findNroot(c, i - 1)
+          if ((c.pow(k)) <= a) findNroot(c, i - 1)
           else findNroot(b, i - 1)
         }
 

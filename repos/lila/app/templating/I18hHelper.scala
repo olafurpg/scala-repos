@@ -19,7 +19,7 @@ trait I18nHelper {
   lazy val trans = i18nEnv.keys
   lazy val protocol = i18nEnv.RequestHandlerProtocol
 
-  implicit def lang(implicit ctx: UserContext) = pool lang ctx.req
+  implicit def lang(implicit ctx: UserContext) = pool.lang(ctx.req)
 
   def transKey(key: String, args: Seq[Any] = Nil)(
       implicit lang: Lang): String =
@@ -29,17 +29,17 @@ trait I18nHelper {
     i18nEnv.jsDump.keysToObject(keys, lang)
 
   def langName(lang: Lang): Option[String] = langName(lang.language)
-  def langName(lang: String): Option[String] = LangList name lang
+  def langName(lang: String): Option[String] = LangList.name(lang)
 
   def shortLangName(lang: Lang): Option[String] = shortLangName(lang.language)
   def shortLangName(lang: String): Option[String] =
-    langName(lang) map (_ takeWhile (',' !=))
+    langName(lang).map(_.takeWhile(',' !=))
 
   def translationCall(implicit ctx: UserContext) =
     i18nEnv.call(ctx.me, ctx.req)
 
   def transValidationPattern(trans: String) =
-    (trans contains "%s") option ".*%s.*"
+    ((trans contains "%s")).option(".*%s.*")
 
   def langFallbackLinks(implicit ctx: UserContext) = Html {
     pool
@@ -56,7 +56,7 @@ trait I18nHelper {
   }
 
   private lazy val langAnnotationsBase: String =
-    pool.names.keySet diff Set("fp", "kb", "le", "tp", "pi", "io") map {
+    pool.names.keySet.diff(Set("fp", "kb", "le", "tp", "pi", "io")).map {
       code =>
         s"""<link rel="alternate" hreflang="$code" href="http://$code.lichess.org%"/>"""
     } mkString ""
@@ -72,10 +72,10 @@ trait I18nHelper {
     ctx.req.acceptLanguages.map(_.language.toString).toList.distinct
 
   def acceptsLanguage(lang: Lang)(implicit ctx: UserContext): Boolean =
-    ctx.req.acceptLanguages exists (_.language == lang.language)
+    ctx.req.acceptLanguages.exists(_.language == lang.language)
 
   private val uriPlaceholder = "[URI]"
 
   private def langUrl(lang: Lang)(i18nDomain: I18nDomain) =
-    protocol + (i18nDomain withLang lang).domain + uriPlaceholder
+    protocol + (i18nDomain.withLang(lang)).domain + uriPlaceholder
 }

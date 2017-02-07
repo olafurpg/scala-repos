@@ -254,17 +254,17 @@ trait JavaScanners extends ast.parser.ScannersCommon {
       if (next.token == EMPTY) {
         fetchToken()
       } else {
-        this copyFrom next
+        this.copyFrom(next)
         next.token = EMPTY
       }
     }
 
     def lookaheadToken: Int = {
-      prev copyFrom this
+      prev.copyFrom(this)
       nextToken()
       val t = token
-      next copyFrom this
-      this copyFrom prev
+      next.copyFrom(this)
+      this.copyFrom(prev)
       t
     }
 

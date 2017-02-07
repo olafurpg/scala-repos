@@ -22,7 +22,7 @@ trait MultiMapHeadView[A, B] extends Map[A, B] {
 
   protected def multiMap: Map[A, Seq[B]]
 
-  override def get(key: A): Option[B] = multiMap.get(key) flatMap {
+  override def get(key: A): Option[B] = multiMap.get(key).flatMap {
     _.headOption
   }
 

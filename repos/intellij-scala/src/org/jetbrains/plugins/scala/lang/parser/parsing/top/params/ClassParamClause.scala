@@ -36,11 +36,11 @@ object ClassParamClause {
           case _ => {}
         }
         //ok, let's parse parameters
-        if (ClassParam parse builder) {
+        if (ClassParam.parse(builder)) {
           while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
             builder.advanceLexer //Ate ,
-            if (!(ClassParam parse builder)) {
-              builder error ErrMsg("wrong.parameter")
+            if (!(ClassParam.parse(builder))) {
+              builder.error(ErrMsg("wrong.parameter"))
             }
           }
         }
@@ -57,7 +57,7 @@ object ClassParamClause {
         return true
       case _ =>
         classParamMarker.done(ScalaElementTypes.PARAM_CLAUSE)
-        builder error ErrMsg("rparenthesis.expected")
+        builder.error(ErrMsg("rparenthesis.expected"))
         builder.restoreNewlinesState
         return true
     }

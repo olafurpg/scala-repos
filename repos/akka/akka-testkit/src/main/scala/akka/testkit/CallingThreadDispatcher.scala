@@ -75,7 +75,7 @@ private[testkit] class CallingThreadDispatcherQueues extends Extension {
     queues = (Map.newBuilder[CallingThreadMailbox,
                              Set[WeakReference[MessageQueue]]] /: queues) {
       case (m, (k, v)) ⇒
-        val nv = v filter (_.get ne null)
+        val nv = v.filter(_.get ne null)
         if (nv.isEmpty) m else m += (k -> nv)
     }.result
   }
@@ -194,7 +194,7 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
       case _ ⇒ None
     }
     super.unregister(actor)
-    mbox foreach CallingThreadDispatcherQueues(actor.system).unregisterQueues
+    mbox.foreach(CallingThreadDispatcherQueues(actor.system).unregisterQueues)
   }
 
   protected[akka] override def suspend(actor: ActorCell) {

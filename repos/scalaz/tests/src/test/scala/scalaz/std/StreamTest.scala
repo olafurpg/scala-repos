@@ -97,7 +97,7 @@ object StreamTest extends SpecLite {
     F.zipL(infinite, infinite)
     F.zipL(finite, infinite).length must_=== (size)
     F.zipL(finite, infinite) must_===
-      ((finite zip infinite).map { x =>
+      ((finite.zip(infinite)).map { x =>
         (x._1, Option(x._2))
       })
     F.zipL(infinite, finite).take(1000).length must_=== (1000)

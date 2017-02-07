@@ -61,48 +61,54 @@ class CSRFAction(next: EssentialAction,
       } else {
 
         // Only proceed with checks if there is an incoming token in the header, otherwise there's no point
-        getTokenToValidate(request, config, tokenSigner).map { headerToken =>
-          // First check if there's a token in the query string or header, if we find one, don't bother handling the body
-          getHeaderToken(request, config).map { queryStringToken =>
-            if (tokenProvider.compareTokens(headerToken, queryStringToken)) {
-              filterLogger.trace("[CSRF] Valid token found in query string")
-              continue
-            } else {
-              filterLogger.trace(
-                "[CSRF] Check failed because invalid token found in query string: " +
-                  queryStringToken)
-              checkFailed(request, "Bad CSRF token found in query String")
-            }
-          } getOrElse {
+        getTokenToValidate(request, config, tokenSigner)
+          .map { headerToken =>
+            // First check if there's a token in the query string or header, if we find one, don't bother handling the body
+            getHeaderToken(request, config)
+              .map { queryStringToken =>
+                if (tokenProvider.compareTokens(headerToken, queryStringToken)) {
+                  filterLogger.trace(
+                    "[CSRF] Valid token found in query string")
+                  continue
+                } else {
+                  filterLogger.trace(
+                    "[CSRF] Check failed because invalid token found in query string: " +
+                      queryStringToken)
+                  checkFailed(request, "Bad CSRF token found in query String")
+                }
+              }
+              .getOrElse {
 
-            // Check the body
-            request.contentType match {
-              case Some("application/x-www-form-urlencoded") =>
-                checkFormBody(request, next, headerToken, config.tokenName)
-              case Some("multipart/form-data") =>
-                checkMultipartBody(request,
-                                   next,
-                                   headerToken,
-                                   config.tokenName)
-              // No way to extract token from other content types
-              case Some(content) =>
-                filterLogger.trace(
-                  s"[CSRF] Check failed because $content request")
-                checkFailed(request, s"No CSRF token found for $content body")
-              case None =>
-                filterLogger.trace(
-                  s"[CSRF] Check failed because request without content type")
-                checkFailed(
-                  request,
-                  s"No CSRF token found for body without content type")
-            }
+                // Check the body
+                request.contentType match {
+                  case Some("application/x-www-form-urlencoded") =>
+                    checkFormBody(request, next, headerToken, config.tokenName)
+                  case Some("multipart/form-data") =>
+                    checkMultipartBody(request,
+                                       next,
+                                       headerToken,
+                                       config.tokenName)
+                  // No way to extract token from other content types
+                  case Some(content) =>
+                    filterLogger.trace(
+                      s"[CSRF] Check failed because $content request")
+                    checkFailed(request,
+                                s"No CSRF token found for $content body")
+                  case None =>
+                    filterLogger.trace(
+                      s"[CSRF] Check failed because request without content type")
+                    checkFailed(
+                      request,
+                      s"No CSRF token found for body without content type")
+                }
+              }
           }
-        } getOrElse {
+          .getOrElse {
 
-          filterLogger.trace(
-            "[CSRF] Check failed because no token found in headers")
-          checkFailed(request, "No CSRF token found in headers")
-        }
+            filterLogger.trace(
+              "[CSRF] Check failed because no token found in headers")
+            checkFailed(request, "No CSRF token found in headers")
+          }
       }
     } else if (getTokenToValidate(request, config, tokenSigner).isEmpty &&
                config.createIfNotFound(request)) {
@@ -424,7 +430,7 @@ object CSRFAction {
     val cookieToken = config.cookieName.flatMap(cookie =>
       request.cookies.get(cookie).map(_.value))
     val sessionToken = request.session.get(config.tokenName)
-    cookieToken orElse sessionToken orElse tagToken filter { token =>
+    cookieToken.orElse(sessionToken).orElse(tagToken).filter { token =>
       // return None if the token is invalid
       !config.signTokens || tokenSigner.extractSignedToken(token).isDefined
     }
@@ -482,7 +488,7 @@ object CSRFAction {
     val queryStringToken = request.getQueryString(config.tokenName)
     val headerToken = request.headers.get(config.headerName)
 
-    queryStringToken orElse headerToken
+    queryStringToken.orElse(headerToken)
   }
 
   private[csrf] def requiresCsrfCheck(request: RequestHeader,
@@ -507,22 +513,24 @@ object CSRFAction {
     } else {
       filterLogger.trace("[CSRF] Adding token to result: " + result)
 
-      config.cookieName.map {
-        // cookie
-        name =>
-          result.withCookies(
-            Cookie(name,
-                   newToken,
-                   path = Session.path,
-                   domain = Session.domain,
-                   secure = config.secureCookie,
-                   httpOnly = config.httpOnlyCookie))
-      } getOrElse {
+      config.cookieName
+        .map {
+          // cookie
+          name =>
+            result.withCookies(
+              Cookie(name,
+                     newToken,
+                     path = Session.path,
+                     domain = Session.domain,
+                     secure = config.secureCookie,
+                     httpOnly = config.httpOnlyCookie))
+        }
+        .getOrElse {
 
-        val newSession =
-          result.session(request) + (config.tokenName -> newToken)
-        result.withSession(newSession)
-      }
+          val newSession =
+            result.session(request) + (config.tokenName -> newToken)
+          result.withSession(newSession)
+        }
     }
   }
 
@@ -537,7 +545,7 @@ object CSRFAction {
                                         msg: String): Future[Result] = {
     import play.api.libs.iteratee.Execution.Implicits.trampoline
 
-    errorHandler.handle(request, msg) map { result =>
+    errorHandler.handle(request, msg).map { result =>
       CSRF
         .getToken(request)
         .fold(

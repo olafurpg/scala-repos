@@ -45,7 +45,7 @@ trait PropertyComparator extends AbstractComparator {
   private def assertProperties(javaFxProperties: Set[String],
                                scalaFxClass: Class[_],
                                complement: String) {
-    val diff = javaFxProperties diff getScalaFXProperties(scalaFxClass)
+    val diff = javaFxProperties.diff(getScalaFXProperties(scalaFxClass))
     assert(
       diff.isEmpty,
       "Missing %s: ".format(complement) + diff.toList.sorted.mkString(", "))

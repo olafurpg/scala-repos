@@ -38,7 +38,7 @@ object Test1_scala {
 
   private def arrayEquals[A, B](a1: Array[A], a2: Array[B]): Boolean =
     (a1.length == a2.length) &&
-      (Iterator.range(0, a1.length) forall { i =>
+      (Iterator.range(0, a1.length).forall { i =>
         a1(i) == a2(i)
       })
 
@@ -447,13 +447,13 @@ object Test3_mutable {
 
     // Stack
     val s1 = new Stack[Int]
-    s1 pushAll q1
+    s1.pushAll(q1)
     val _s1: Stack[Int] = read(write(s1))
     check(s1, _s1)
 
     // StringBuilder
     val sb1 = new StringBuilder
-    sb1 append "abc"
+    sb1.append("abc")
     val _sb1: StringBuilder = read(write(sb1))
     check(sb1, _sb1)
 

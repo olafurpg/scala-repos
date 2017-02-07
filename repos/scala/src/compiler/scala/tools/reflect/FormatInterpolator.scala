@@ -73,8 +73,8 @@ abstract class FormatInterpolator {
       val freshName = TermName(c.freshName("arg$"))
       evals += ValDef(Modifiers(),
                       freshName,
-                      TypeTree(tpe) setPos value.pos.focus,
-                      value) setPos value.pos
+                      TypeTree(tpe).setPos(value.pos.focus),
+                      value).setPos(value.pos)
       ids += Ident(freshName)
     }
     // Append the nth part to the string builder, possibly prepending an omitted %s first.
@@ -104,11 +104,11 @@ abstract class FormatInterpolator {
                   " or a triple-quoted literal \"\"\"with embedded \" or \\u0022\"\"\"" // $" in future
               case '\'' => "'"
               case '\\' => """\\"""
-              case x => "\\u%04x" format x
+              case x => "\\u%04x".format(x)
             }
             val suggest = {
               val r = "([0-7]{1,3}).*".r
-              (s0 drop e.index + 1) match {
+              (s0.drop(e.index + 1)) match {
                 case r(n) =>
                   altOf { (0 /: n) { case (a, o) => (8 * a) + (o - '0') } }
                 case _ => ""
@@ -155,7 +155,7 @@ abstract class FormatInterpolator {
       if (!first) {
         val arg = argStack.pop()
         def s_%() = {
-          fstring append "%s"
+          fstring.append("%s")
           defval(arg, AnyTpe)
         }
         def accept(op: Conversion) = {
@@ -169,7 +169,7 @@ abstract class FormatInterpolator {
           Conversion(ms.next, part.pos, args.size) match {
             case Some(op) if op.isLiteral => s_%()
             case Some(op) if op.indexed =>
-              if (op.index map (_ == n) getOrElse true) accept(op)
+              if (op.index.map(_ == n).getOrElse(true)) accept(op)
               else {
                 // either some other arg num, or '<'
                 c.warning(op.groupPos(Index), "Index is not this arg")
@@ -190,10 +190,10 @@ abstract class FormatInterpolator {
           case None =>
         }
       }
-      fstring append s
+      fstring.append(s)
     }
 
-    parts.zipWithIndex foreach {
+    parts.zipWithIndex.foreach {
       case (part, n) => copyPart(part, n)
     }
 
@@ -215,7 +215,7 @@ abstract class FormatInterpolator {
         ids.toList
       )
       val p = c.macroApplication.pos
-      Block(evals.toList, atPos(p.focus)(expr)) setPos p.makeTransparent
+      Block(evals.toList, atPos(p.focus)(expr)).setPos(p.makeTransparent)
     }
   }
 
@@ -238,13 +238,13 @@ abstract class FormatInterpolator {
     def argc: Int
 
     import SpecifierGroups.{Value => SpecGroup, _}
-    private def maybeStr(g: SpecGroup) = Option(m group g.id)
-    private def maybeInt(g: SpecGroup) = maybeStr(g) map (_.toInt)
+    private def maybeStr(g: SpecGroup) = Option(m.group(g.id))
+    private def maybeInt(g: SpecGroup) = maybeStr(g).map(_.toInt)
     val index: Option[Int] = maybeInt(Index)
     val flags: Option[String] = maybeStr(Flags)
     val width: Option[Int] = maybeInt(Width)
-    val precision: Option[Int] = maybeStr(Precision) map (_.drop(1).toInt)
-    val op: String = maybeStr(CC) getOrElse ""
+    val precision: Option[Int] = maybeStr(Precision).map(_.drop(1).toInt)
+    val op: String = maybeStr(CC).getOrElse("")
 
     def cc: Char = if ("tT" contains op(0)) op(1) else op(0)
 
@@ -255,11 +255,11 @@ abstract class FormatInterpolator {
     def accepts(arg: Tree): Option[Type]
 
     val allFlags = "-#+ 0,(<"
-    def hasFlag(f: Char) = (flags getOrElse "") contains f
-    def hasAnyFlag(fs: String) = fs exists (hasFlag)
+    def hasFlag(f: Char) = (flags.getOrElse("")) contains f
+    def hasAnyFlag(fs: String) = fs.exists(hasFlag)
 
     def badFlag(f: Char, msg: String) = {
-      val i = flags map (_.indexOf(f)) filter (_ >= 0) getOrElse 0
+      val i = flags.map(_.indexOf(f)).filter(_ >= 0).getOrElse(0)
       errorAtOffset(Flags, i, msg)
     }
     def groupPos(g: SpecGroup) = groupPosAt(g, 0)
@@ -280,7 +280,7 @@ abstract class FormatInterpolator {
     }
     def only_-(msg: String) = {
       val badFlags =
-        (flags getOrElse "") filterNot {
+        (flags.getOrElse("")).filterNot {
           case '-' | '<' => true
           case _ => false
         }
@@ -290,7 +290,7 @@ abstract class FormatInterpolator {
     }
     protected def okFlags: String = allFlags
     def goodFlags = {
-      val badFlags = flags map (_ filterNot (okFlags contains _))
+      val badFlags = flags.map(_.filterNot(okFlags contains _))
       for (bf <- badFlags; f <- bf) badFlag(f, s"Illegal flag '$f'")
       badFlags.getOrElse("").isEmpty
     }
@@ -298,7 +298,7 @@ abstract class FormatInterpolator {
       if (index.nonEmpty && hasFlag('<'))
         c.warning(groupPos(Index),
                   "Argument index ignored if '<' flag is present")
-      val okRange = index map (i => i > 0 && i <= argc) getOrElse true
+      val okRange = index.map(i => i > 0 && i <= argc).getOrElse(true)
       okRange || hasFlag('<') || falsely {
         errorAt(Index, "Argument index out of range")
       }
@@ -310,10 +310,10 @@ abstract class FormatInterpolator {
       *  A more complete message would be nice.
       */
     def pickAcceptable(arg: Tree, variants: Type*): Option[Type] =
-      variants find (arg.tpe <:< _) orElse
-        (variants find (c
-          .inferImplicitView(arg, arg.tpe, _) != EmptyTree)) orElse Some(
-        variants(0))
+      (variants find (arg.tpe <:< _))
+        .orElse(variants find (c
+          .inferImplicitView(arg, arg.tpe, _) != EmptyTree))
+        .orElse(Some(variants(0)))
   }
   object Conversion {
     import SpecifierGroups.{Spec, CC}
@@ -340,8 +340,8 @@ abstract class FormatInterpolator {
           badCC(s"illegal conversion character '$cc'")
           null
       }
-      Option(m group CC.id) map (cc => cv(cc(0))) match {
-        case Some(x) => Option(x) filter (_.verify)
+      Option(m.group(CC.id)).map(cc => cv(cc(0))) match {
+        case Some(x) => Option(x).filter(_.verify)
         case None =>
           badCC(s"Missing conversion operator in '${m.matched}'; $literalHelp")
           None
@@ -369,9 +369,8 @@ abstract class FormatInterpolator {
     override val isLiteral = true
     override def verify = op match {
       case "%" =>
-        super.verify && noPrecision && truly(
-          width foreach
-            (_ => c.warning(groupPos(Width), "width ignored on literal")))
+        super.verify && noPrecision && truly(width.foreach(_ =>
+          c.warning(groupPos(Width), "width ignored on literal")))
       case "n" => noFlags && noWidth && noPrecision
     }
     override protected val okFlags = "-"
@@ -401,10 +400,11 @@ abstract class FormatInterpolator {
       val maybeOK = "+ ("
       def bad_+ = cond(cc) {
         case 'o' | 'x' | 'X' if hasAnyFlag(maybeOK) && !isBigInt =>
-          maybeOK filter hasFlag foreach
-            (badf =>
-               badFlag(badf,
-                       s"only use '$badf' for BigInt conversions to o, x, X"))
+          maybeOK
+            .filter(hasFlag)
+            .foreach(badf =>
+              badFlag(badf,
+                      s"only use '$badf' for BigInt conversions to o, x, X"))
           true
       }
       if (bad_+) None
@@ -423,10 +423,10 @@ abstract class FormatInterpolator {
       super.verify &&
         (cc match {
           case 'a' | 'A' =>
-            val badFlags = ",(" filter hasFlag
+            val badFlags = ",(".filter(hasFlag)
             noPrecision && badFlags.isEmpty || falsely {
-              badFlags foreach
-                (badf => badFlag(badf, s"'$badf' not allowed for a, A"))
+              badFlags.foreach(badf =>
+                badFlag(badf, s"'$badf' not allowed for a, A"))
             }
           case _ => true
         })

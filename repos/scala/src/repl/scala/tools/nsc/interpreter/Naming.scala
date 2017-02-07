@@ -21,11 +21,11 @@ trait Naming {
     // let through the subset of it we need, like whitespace and also
     // <ESC> for ansi codes.
     val binaryChars =
-      cleaned count (ch => ch < 32 && !ch.isWhitespace && ch != ESC)
+      cleaned.count(ch => ch < 32 && !ch.isWhitespace && ch != ESC)
     // Lots of binary chars - translate all supposed whitespace into spaces
     // except supposed line endings, otherwise scrubbed lines run together
     if (binaryChars > 5) // more than one can count while holding a hamburger
-      cleaned map {
+      cleaned.map {
         case c if lineSeparator contains c => c
         case c if c.isWhitespace => ' '
         case c if c < 32 => '?'
@@ -33,9 +33,8 @@ trait Naming {
       }
     // Not lots - preserve whitespace and ESC
     else
-      cleaned map
-        (ch =>
-           if (ch.isWhitespace || ch == ESC) ch else if (ch < 32) '?' else ch)
+      cleaned.map(ch =>
+        if (ch.isWhitespace || ch == ESC) ch else if (ch < 32) '?' else ch)
   }
 
   // The two name forms this is catching are the two sides of this assignment:
@@ -45,7 +44,7 @@ trait Naming {
   lazy val lineRegex = {
     val sn = sessionNames
     val members =
-      List(sn.read, sn.eval, sn.print) map Regex.quote mkString
+      List(sn.read, sn.eval, sn.print).map(Regex.quote) mkString
         ("(?:", "|", ")")
     debugging("lineRegex")(
       Regex.quote(sn.line) + """\d+[./]""" + members + """[$.]""")
@@ -86,7 +85,7 @@ trait Naming {
     }
     def reset(): Unit = x = -1
     def didGenerate(name: String) =
-      (name startsWith pre) && ((name drop pre.length) forall (_.isDigit))
+      (name.startsWith(pre)) && ((name.drop(pre.length)).forall(_.isDigit))
   }
 
   private lazy val userVar =

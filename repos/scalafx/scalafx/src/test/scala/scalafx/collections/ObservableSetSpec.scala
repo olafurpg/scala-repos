@@ -61,7 +61,7 @@ class ObservableSetSpec[T]
                                originalSet: ObservableSet[Int],
                                shouldBeTheSame: Boolean) {
     if (shouldBeTheSame) {
-      generatedSet should be theSameInstanceAs (originalSet)
+      (generatedSet should be).theSameInstanceAs(originalSet)
     } else {
       generatedSet should not be theSameInstanceAs(originalSet)
       generatedSet.getClass.getInterfaces
@@ -77,7 +77,7 @@ class ObservableSetSpec[T]
   it should "generate new instances using Companion's apply" in {
 
     def assertGeneratedSet(set: ObservableSet[Int]) {
-      set should have size (2)
+      (set should have).size(2)
       set should contain(1)
       set should contain(2)
     }
@@ -95,7 +95,7 @@ class ObservableSetSpec[T]
     // Preparation
     val set = ObservableSet(1, 2)
     var invalidateCount = 0
-    set onInvalidate {
+    set.onInvalidate {
       invalidateCount += 1
     }
 
@@ -114,7 +114,7 @@ class ObservableSetSpec[T]
     // Preparation
     val set = ObservableSet(1, 2)
     var changeCount = 0
-    set onChange {
+    set.onChange {
       changeCount += 1
     }
 
@@ -130,7 +130,7 @@ class ObservableSetSpec[T]
   it should "return changed set" in {
     // Preparation
     val set = ObservableSet(1, 2)
-    set onChange { (sourceSet, change) =>
+    set.onChange { (sourceSet, change) =>
       sourceSet should be(set)
     }
 
@@ -142,7 +142,7 @@ class ObservableSetSpec[T]
     // Preparation
     val set = ObservableSet.empty[Int]
     val addedValues = Buffer.empty[Int]
-    set onChange { (sourceSet, change) =>
+    set.onChange { (sourceSet, change) =>
       change match {
         case Add(value) => addedValues += value
         case _ => fail("Unexpected change: " + change)
@@ -155,14 +155,14 @@ class ObservableSetSpec[T]
     compareInstances(set += (1, 2), set, true)
     compareInstances(set ++= List(3), set, true)
     compareInstances(set ++= List(4, 5), set, true)
-    (set add 6) should be(true)
+    (set.add(6)) should be(true)
     set(7) = true
     // Operations that not change this set
     compareInstances(set + 100, set, false)
     compareInstances(set + (101, 102), set, false)
     compareInstances(set ++ List(103), set, false)
     compareInstances(set ++ List(104, 105), set, false)
-    (set add 1) should be(false)
+    (set.add(1)) should be(false)
     set(2) = true
 
     // Verification
@@ -173,7 +173,7 @@ class ObservableSetSpec[T]
     // Preparation
     val set = ObservableSet((0 to 15))
     val removedValues = Buffer.empty[Int]
-    set onChange { (sourceSet, change) =>
+    set.onChange { (sourceSet, change) =>
       change match {
         case Remove(value) => removedValues += value
         case _ => fail("Unexpected change: " + change)
@@ -186,14 +186,14 @@ class ObservableSetSpec[T]
     compareInstances(set -= (1, 2), set, true)
     compareInstances(set --= List(3), set, true)
     compareInstances(set --= List(4, 5), set, true)
-    (set remove 6) should be(true)
+    (set.remove(6)) should be(true)
     set(7) = false
     // Operations that not change this set
     compareInstances(set - 100, set, false)
     compareInstances(set - (101, 102), set, false)
     compareInstances(set -- List(103), set, false)
     compareInstances(set -- List(104, 105), set, false)
-    (set remove 1) should be(false)
+    (set.remove(1)) should be(false)
     set(2) = false
 
     // First Verification
@@ -218,7 +218,7 @@ class ObservableSetSpec[T]
     val set = ObservableSet(new LinkedHashSet[Int])
     val addedValues = Buffer.empty[Int]
     val removedValues = Buffer.empty[Int]
-    set onChange { (sourceSet, change) =>
+    set.onChange { (sourceSet, change) =>
       change match {
         case Add(value) => addedValues += value
         case Remove(value) => removedValues += value

@@ -27,14 +27,16 @@ class ServerBuilderTest
   trait ServerBuilderHelper {
     val preparedFactory = mock[ServiceFactory[String, String]]
     val preparedServicePromise = new Promise[Service[String, String]]
-    when(preparedFactory.status) thenReturn Status.Open
-    when(preparedFactory()) thenReturn preparedServicePromise
-    when(preparedFactory.close(any[Time])) thenReturn Future.Done
-    when(preparedFactory.map(Matchers.any())) thenReturn preparedFactory
-      .asInstanceOf[ServiceFactory[Any, Nothing]]
+    when(preparedFactory.status).thenReturn(Status.Open)
+    when(preparedFactory()).thenReturn(preparedServicePromise)
+    when(preparedFactory.close(any[Time])).thenReturn(Future.Done)
+    when(preparedFactory.map(Matchers.any())).thenReturn(
+      preparedFactory
+        .asInstanceOf[ServiceFactory[Any, Nothing]])
 
     val m = new MockChannel
-    when(m.codec.prepareConnFactory(any[ServiceFactory[String, String]])) thenReturn preparedFactory
+    when(m.codec.prepareConnFactory(any[ServiceFactory[String, String]]))
+      .thenReturn(preparedFactory)
   }
 
   val svc: Service[String, String] = Service.const(Future.value("hi"))

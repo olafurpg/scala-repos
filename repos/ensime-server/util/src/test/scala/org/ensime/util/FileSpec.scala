@@ -16,7 +16,7 @@ class FileSpec extends FlatSpec with Matchers {
   "file._" should "provide scoped temp directories" in {
     var scoped: File = null
     withTempDir { dir =>
-      dir should be a 'directory
+      (dir should be).a('directory)
       assert(dir.exists())
       dir.getPath shouldBe dir.getCanonicalPath
 
@@ -30,7 +30,7 @@ class FileSpec extends FlatSpec with Matchers {
   it should "provide scoped temp files" in {
     var scoped: File = null
     withTempFile { file =>
-      file should be a 'file
+      (file should be).a('file)
       assert(file.exists())
       scoped = file
     }
@@ -121,7 +121,7 @@ class FileSpec extends FlatSpec with Matchers {
   }
 
   it should "calculate children" in withTempDir { dir =>
-    dir.children should be an 'empty
+    (dir.children should be).an('empty)
 
     val foo = (dir / "foo")
     val bar = (foo / "bar")
@@ -130,7 +130,7 @@ class FileSpec extends FlatSpec with Matchers {
     bar.createWithParents()
     baz.createWithParents()
 
-    dir.children should contain only (foo, baz)
+    (dir.children should contain).only(foo, baz)
   }
 
   // don't know how to test .canon, no way to systematically create

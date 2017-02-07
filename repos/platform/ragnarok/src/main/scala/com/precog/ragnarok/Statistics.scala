@@ -48,15 +48,15 @@ case class Statistics private[ragnarok] (tails: Int,
   def *(x: Double): Statistics =
     if (x >= 0.0) {
       Statistics(tails,
-                 allMin map (_ * x),
-                 allMax map (_ * x),
+                 allMin.map(_ * x),
+                 allMax.map(_ * x),
                  m * x,
                  vn * x * x,
                  n)
     } else {
       Statistics(tails,
-                 allMax map (_ * x),
-                 allMin map (_ * x),
+                 allMax.map(_ * x),
+                 allMin.map(_ * x),
                  m * x,
                  vn * math.abs(x) * math.abs(x),
                  n)
@@ -124,8 +124,8 @@ object Statistics {
       val z_tails = x.tails min y.tails
 
       Statistics(z_tails,
-                 (x.allMin ++ y.allMin).sorted take (z_tails + 1),
-                 (x.allMax ++ y.allMax).sorted takeRight (z_tails + 1),
+                 (x.allMin ++ y.allMin).sorted.take(z_tails + 1),
+                 (x.allMax ++ y.allMax).sorted.takeRight(z_tails + 1),
                  z_m,
                  z_vn,
                  x.n + y.n)

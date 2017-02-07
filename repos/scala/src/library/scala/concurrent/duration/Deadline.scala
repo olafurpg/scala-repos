@@ -67,7 +67,7 @@ case class Deadline private (time: FiniteDuration) extends Ordered[Deadline] {
   /**
     * The natural ordering for deadline is determined by the natural order of the underlying (finite) duration.
     */
-  def compare(other: Deadline) = time compare other.time
+  def compare(other: Deadline) = time.compare(other.time)
 }
 
 object Deadline {
@@ -83,6 +83,6 @@ object Deadline {
     * The natural ordering for deadline is determined by the natural order of the underlying (finite) duration.
     */
   implicit object DeadlineIsOrdered extends Ordering[Deadline] {
-    def compare(a: Deadline, b: Deadline) = a compare b
+    def compare(a: Deadline, b: Deadline) = a.compare(b)
   }
 }

@@ -34,7 +34,7 @@ class ContentionSnapshot {
       .filter(_ != null)
       .collect { case Blocked(info) => info }
 
-    val ownerIds = blocked map (_.getLockOwnerId) filter (_ != -1)
+    val ownerIds = blocked.map(_.getLockOwnerId).filter(_ != -1)
     val owners =
       if (ownerIds.length == 0) Seq[String]()
       else

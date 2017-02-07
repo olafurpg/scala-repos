@@ -132,12 +132,12 @@ object Foo2 {
           return
         }
         val run = new compiler.Run
-        run compile command.files
+        run.compile(command.files)
         object generator extends DefaultDocDriver {
           lazy val global: compiler.type = compiler
           lazy val settings = docSettings
         }
-        generator process run.units
+        generator.process(run.units)
         reporter.printSummary()
       } catch {
         case ex @ FatalError(msg) =>

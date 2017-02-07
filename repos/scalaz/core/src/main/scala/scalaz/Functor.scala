@@ -108,7 +108,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
       */
     def composite[A, B, C](fa: F[A], f1: A => B, f2: B => C)(
         implicit FC: Equal[F[C]]): Boolean =
-      FC.equal(map(map(fa)(f1))(f2), map(fa)(f2 compose f1))
+      FC.equal(map(map(fa)(f1))(f2), map(fa)(f2.compose(f1)))
   }
   def functorLaw = new FunctorLaw {}
   ////

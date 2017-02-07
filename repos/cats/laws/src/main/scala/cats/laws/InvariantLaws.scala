@@ -18,7 +18,7 @@ trait InvariantLaws[F[_]] {
                                     f2: B => A,
                                     g1: B => C,
                                     g2: C => B): IsEq[F[C]] =
-    fa.imap(f1)(f2).imap(g1)(g2) <-> fa.imap(g1 compose f1)(f2 compose g2)
+    fa.imap(f1)(f2).imap(g1)(g2) <-> fa.imap(g1.compose(f1))(f2.compose(g2))
 }
 
 object InvariantLaws {
