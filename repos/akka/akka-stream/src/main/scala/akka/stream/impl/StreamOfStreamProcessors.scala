@@ -191,11 +191,11 @@ private[akka] trait MultiStreamOutputProcessorLike
   }
 
   protected def failOutputs(e: Throwable): Unit = {
-    substreamOutputs.values foreach (_.error(e))
+    substreamOutputs.values.foreach(_.error(e))
   }
 
   protected def finishOutputs(): Unit = {
-    substreamOutputs.values foreach (_.complete())
+    substreamOutputs.values.foreach(_.complete())
   }
 
   val outputSubstreamManagement: Receive = {
@@ -256,5 +256,7 @@ private[akka] abstract class MultiStreamOutputProcessor(
   }
 
   override def activeReceive: Receive =
-    primaryInputs.subreceive orElse primaryOutputs.subreceive orElse outputSubstreamManagement
+    primaryInputs.subreceive
+      .orElse(primaryOutputs.subreceive)
+      .orElse(outputSubstreamManagement)
 }

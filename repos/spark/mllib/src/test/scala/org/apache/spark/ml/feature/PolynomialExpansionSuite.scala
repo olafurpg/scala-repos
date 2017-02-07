@@ -84,9 +84,9 @@ class PolynomialExpansionSuite
       .collect()
       .foreach {
         case Row(expanded: DenseVector, expected: DenseVector) =>
-          assert(expanded ~== expected absTol 1e-1)
+          assert(expanded ~== expected.absTol(1e-1))
         case Row(expanded: SparseVector, expected: SparseVector) =>
-          assert(expanded ~== expected absTol 1e-1)
+          assert(expanded ~== expected.absTol(1e-1))
         case _ =>
           throw new TestFailedException(
             "Unmatched data types after polynomial expansion",
@@ -110,9 +110,9 @@ class PolynomialExpansionSuite
       .collect()
       .foreach {
         case Row(expanded: DenseVector, expected: DenseVector) =>
-          assert(expanded ~== expected absTol 1e-1)
+          assert(expanded ~== expected.absTol(1e-1))
         case Row(expanded: SparseVector, expected: SparseVector) =>
-          assert(expanded ~== expected absTol 1e-1)
+          assert(expanded ~== expected.absTol(1e-1))
         case _ =>
           throw new TestFailedException(
             "Unmatched data types after polynomial expansion",
@@ -135,7 +135,7 @@ class PolynomialExpansionSuite
       .collect()
       .foreach {
         case Row(expanded: Vector, expected: Vector) =>
-          assert(expanded ~== expected absTol 1e-1)
+          assert(expanded ~== expected.absTol(1e-1))
         case _ =>
           throw new TestFailedException(
             "Unmatched data types after polynomial expansion",

@@ -54,7 +54,7 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
   def checkFieldsWithComparators(actual: Fields, expected: Fields) {
     // sometimes one or the other is actually a RichFields, so rather than test for
     // actual.equals(expected), we just check that all the field names and comparators line up
-    actual should have size (expected.size)
+    (actual should have).size(expected.size)
     asList(actual) shouldBe asList(expected)
     actual.getComparators.toSeq shouldBe (expected.getComparators.toSeq)
   }
@@ -70,7 +70,7 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       val f2 = Field[String]('bar)
       val rf = RichFields(f1, f2)
       val fields: Fields = rf
-      fields should have size 2
+      (fields should have).size(2)
       f1.id shouldBe (fields.get(0))
       f2.id shouldBe (fields.get(1))
       f1.ord shouldBe (fields.getComparators()(0))

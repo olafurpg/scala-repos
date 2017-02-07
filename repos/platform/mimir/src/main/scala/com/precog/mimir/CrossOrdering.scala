@@ -149,7 +149,7 @@ trait CrossOrdering extends DAG {
         case Memoize(parent, priority) => Memoize(memoized(parent), priority)
       }
 
-      memotable.get(new DepGraphWrapper(node)) getOrElse {
+      memotable.get(new DepGraphWrapper(node)).getOrElse {
         val result = inner(node)
         memotable += (new DepGraphWrapper(node) -> result)
         result

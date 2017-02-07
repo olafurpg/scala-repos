@@ -98,7 +98,7 @@ class ReaderTest
       val bos = new ByteArrayOutputStream
 
       val w = Writer.fromOutputStream(bos, 31)
-      val f = Reader.copy(rw, w) ensure w.close()
+      val f = Reader.copy(rw, w).ensure(w.close())
       val g =
         rw.write(Buf.ByteArray.Owned(p)) before rw.write(Buf.ByteArray.Owned(
           q)) before rw.write(Buf.ByteArray.Owned(r)) before rw.close()
@@ -479,7 +479,7 @@ class ReaderTest
   test("Reader.concat") {
     forAll { (ss: List[String]) =>
       val readers =
-        ss map { s =>
+        ss.map { s =>
           BufReader(Buf.Utf8(s))
         }
       val buf = Reader.readAll(Reader.concat(AsyncStream.fromSeq(readers)))

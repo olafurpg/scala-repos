@@ -37,7 +37,7 @@ final class DataForm(val captcher: akka.actor.ActorSelection,
       nonEmptyText
         .verifying(
           Constraints minLength 2,
-          Constraints maxLength 20,
+          Constraints.maxLength(20),
           Constraints.pattern(
             regex = """^[\w-]+$""".r,
             error =
@@ -47,7 +47,7 @@ final class DataForm(val captcher: akka.actor.ActorSelection,
                                 "The username must not start with a number")
         )
         .verifying("This user already exists",
-                   u => ! $count.exists(u.toLowerCase) awaitSeconds 2)
+                   u => ! $count.exists(u.toLowerCase).awaitSeconds(2))
         .verifying("This username is not acceptable", u => !LameName(u))
 
     val website = Form(

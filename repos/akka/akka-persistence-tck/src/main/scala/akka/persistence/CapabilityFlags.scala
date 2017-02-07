@@ -15,7 +15,9 @@ sealed abstract class CapabilityFlag {
         clazz
           .getDeclaredMethod(el.getMethodName)
           .getReturnType == classOf[CapabilityFlag]
-      } map { _.getMethodName } getOrElse "[unknown]"
+      }
+      .map { _.getMethodName }
+      .getOrElse("[unknown]")
 
   def name: String = capturedStack
   def value: Boolean

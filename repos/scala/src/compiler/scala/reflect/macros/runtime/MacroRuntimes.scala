@@ -75,7 +75,7 @@ trait MacroRuntimes extends JavaReflectionRuntimes {
         } catch {
           case ex: Exception =>
             macroLogVerbose(s"macro runtime failed to load: ${ex.toString}")
-            macroDef setFlag IS_ERROR
+            macroDef.setFlag(IS_ERROR)
             null
         }
       }

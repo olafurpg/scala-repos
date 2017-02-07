@@ -9,7 +9,7 @@ import lila.common.PimpedJson._
 private[api] final class AnalysisApi {
 
   def game(analysis: Analysis, pgn: Pgn) =
-    JsArray(analysis.infoAdvices zip pgn.moves map {
+    JsArray(analysis.infoAdvices.zip(pgn.moves).map {
       case ((info, adviceOption), move) =>
         Json
           .obj(
@@ -27,7 +27,7 @@ private[api] final class AnalysisApi {
       .find(_._1 == color)
       .map(_._2)
       .map(s =>
-        JsObject(s map {
+        JsObject(s.map {
           case (nag, nb) => nag.toString.toLowerCase -> JsNumber(nb)
         }))
 }

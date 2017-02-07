@@ -126,7 +126,7 @@ class ImplicitAnalyzerSpec
 
       val pos = new OffsetPosition(file, implicitPos)
       val dets = new ImplicitAnalyzer(cc).implicitDetails(pos)
-      dets should have length 1
+      (dets should have).length(1)
 
       val pos1 = new OffsetPosition(file, implicitPos + 1)
       val dets1 = new ImplicitAnalyzer(cc).implicitDetails(pos1)

@@ -174,7 +174,7 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv, val maxRetries: Int)
       case Start =>
         import ExecutionContext.Implicits.global
         val runner = curRunner
-        runner.start(_logger, _console) onComplete { result =>
+        runner.start(_logger, _console).onComplete { result =>
           // access to curRunner and promise must be synchronized
           synchronized {
             if (curRunner eq runner) promise.complete(result)

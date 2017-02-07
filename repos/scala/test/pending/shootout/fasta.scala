@@ -46,7 +46,7 @@ object fasta {
 
     val HomoSapiens = makeCumulative(_HomoSapiens)
 
-    val n = Integer parseInt (args(0))
+    val n = Integer.parseInt(args(0))
     val s = new FastaOutputStream(System.out)
 
     s.writeDescription("ONE Homo sapiens alu")
@@ -63,12 +63,11 @@ object fasta {
 
   def makeCumulative(a: Array[Tuple2[Char, Double]]) = {
     var cp = 0.0
-    a map
-      (frequency =>
-         frequency match {
-           case (code, percent) =>
-             cp = cp + percent; new Frequency(code.toByte, cp)
-         })
+    a.map(frequency =>
+      frequency match {
+        case (code, percent) =>
+          cp = cp + percent; new Frequency(code.toByte, cp)
+    })
   }
 }
 
@@ -134,7 +133,7 @@ class FastaOutputStream(out: OutputStream) extends BufferedOutputStream(out) {
 
   private def selectRandom(distribution: Array[Frequency]): Byte = {
     val n = distribution.length
-    val r = RandomNumber scaledTo (1.0)
+    val r = RandomNumber.scaledTo(1.0)
 
     var i = 0
     while (i < n) {

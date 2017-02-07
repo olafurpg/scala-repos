@@ -20,30 +20,33 @@ trait DateHelper { self: I18nHelper =>
   private val dateFormatters = mutable.Map[String, DateTimeFormatter]()
   private val periodFormatters = mutable.Map[String, PeriodFormatter]()
   private val periodType =
-    PeriodType forFields Array(DurationFieldType.days,
-                               DurationFieldType.hours,
-                               DurationFieldType.minutes)
+    PeriodType.forFields(
+      Array(DurationFieldType.days,
+            DurationFieldType.hours,
+            DurationFieldType.minutes))
 
   private val isoFormatter = ISODateTimeFormat.dateTime
 
-  private val englishDateFormatter = DateTimeFormat forStyle dateStyle
+  private val englishDateFormatter = DateTimeFormat.forStyle(dateStyle)
 
   private def dateTimeFormatter(ctx: Context): DateTimeFormatter =
     dateTimeFormatters.getOrElseUpdate(
       lang(ctx).language,
-      DateTimeFormat forStyle dateTimeStyle withLocale new Locale(
-        lang(ctx).language))
+      DateTimeFormat
+        .forStyle(dateTimeStyle)
+        .withLocale(new Locale(lang(ctx).language)))
 
   private def dateFormatter(ctx: Context): DateTimeFormatter =
     dateFormatters.getOrElseUpdate(
       lang(ctx).language,
-      DateTimeFormat forStyle dateStyle withLocale new Locale(
-        lang(ctx).language))
+      DateTimeFormat
+        .forStyle(dateStyle)
+        .withLocale(new Locale(lang(ctx).language)))
 
   private def periodFormatter(ctx: Context): PeriodFormatter =
     periodFormatters.getOrElseUpdate(lang(ctx).language, {
-      Locale setDefault Locale.ENGLISH
-      PeriodFormat wordBased new Locale(lang(ctx).language)
+      Locale.setDefault(Locale.ENGLISH)
+      PeriodFormat.wordBased(new Locale(lang(ctx).language))
     })
 
   def showDateTime(date: DateTime)(implicit ctx: Context): String =
@@ -81,10 +84,10 @@ trait DateHelper { self: I18nHelper =>
   }
 
   def secondsFromNow(seconds: Int)(implicit ctx: Context) =
-    momentFromNow(DateTime.now plusSeconds seconds)
+    momentFromNow(DateTime.now.plusSeconds(seconds))
 
   private val atomDateFormatter = ISODateTimeFormat.dateTime
   def atomDate(date: DateTime): String = atomDateFormatter print date
   def atomDate(field: String)(doc: io.prismic.Document): Option[String] =
-    doc getDate field map (_.value.toDateTimeAtStartOfDay) map atomDate
+    doc.getDate(field).map(_.value.toDateTimeAtStartOfDay).map(atomDate)
 }

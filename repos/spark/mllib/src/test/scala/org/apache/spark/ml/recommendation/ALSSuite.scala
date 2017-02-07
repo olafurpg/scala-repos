@@ -84,8 +84,8 @@ class ALSSuite
     // ata = A.transpose() * C * A
     // atb = A.transpose() * C * b
     assert(
-      Vectors.dense(ne0.ata) ~== Vectors.dense(33.0, 42.0, 54.0) relTol 1e-8)
-    assert(Vectors.dense(ne0.atb) ~== Vectors.dense(51.0, 66.0) relTol 1e-8)
+      Vectors.dense(ne0.ata) ~== Vectors.dense(33.0, 42.0, 54.0).relTol(1e-8))
+    assert(Vectors.dense(ne0.atb) ~== Vectors.dense(51.0, 66.0).relTol(1e-8))
 
     val ne1 = new NormalEquation(2).add(Array(7.0f, 8.0f), 9.0)
     ne0.merge(ne1)
@@ -97,8 +97,8 @@ class ALSSuite
     // atb = A.transpose() * C * b
     assert(
       Vectors.dense(ne0.ata) ~==
-        Vectors.dense(82.0, 98.0, 118.0) relTol 1e-8)
-    assert(Vectors.dense(ne0.atb) ~== Vectors.dense(114.0, 138.0) relTol 1e-8)
+        Vectors.dense(82.0, 98.0, 118.0).relTol(1e-8))
+    assert(Vectors.dense(ne0.atb) ~== Vectors.dense(114.0, 138.0).relTol(1e-8))
 
     intercept[IllegalArgumentException] {
       ne0.add(Array(1.0f), 2.0)
@@ -133,7 +133,7 @@ class ALSSuite
     // A = np.matrix("1 2; 1 3; 1 4")
     // b = b = np.matrix("3; 6")
     // x0 = np.linalg.lstsq(A, b)[0]
-    assert(Vectors.dense(x0) ~== Vectors.dense(-8.333333, 6.0) relTol 1e-6)
+    assert(Vectors.dense(x0) ~== Vectors.dense(-8.333333, 6.0).relTol(1e-6))
 
     assert(ne0.ata.forall(_ == 0.0))
     assert(ne0.atb.forall(_ == 0.0))
@@ -141,7 +141,7 @@ class ALSSuite
     val x1 = chol.solve(ne1, 1.5).map(_.toDouble)
     // NumPy code that computes the expected solution, where lambda is scaled by n:
     // x0 = np.linalg.solve(A.transpose() * A + 1.5 * np.eye(2), A.transpose() * b)
-    assert(Vectors.dense(x1) ~== Vectors.dense(-0.1155556, 3.28) relTol 1e-6)
+    assert(Vectors.dense(x1) ~== Vectors.dense(-0.1155556, 3.28).relTol(1e-6))
   }
 
   test("RatingBlockBuilder") {

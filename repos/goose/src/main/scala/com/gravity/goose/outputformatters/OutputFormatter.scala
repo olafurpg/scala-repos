@@ -167,7 +167,7 @@ trait OutputFormatter {
       case _ =>
     }
 
-    val text = tagReplace replaceAllIn (sb.toString(), "")
+    val text = tagReplace.replaceAllIn(sb.toString(), "")
     text
   }
 

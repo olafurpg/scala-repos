@@ -146,7 +146,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
           case _ =>
         }
       val cloned = ins.clone(javaLabelMap)
-      result add cloned
+      result.add(cloned)
       map += ((ins, cloned))
     }
     (result, map, hasSerializableClosureInstantiation)
@@ -363,12 +363,12 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
           if (desc.charAt(i) == 'L') {
             val start = i + 1 // skip the L
             while (desc.charAt(i) != ';') i += 1
-            internalNames append desc.substring(start, i)
+            internalNames.append(desc.substring(start, i))
           }
           // skips over '[', ')', primitives
           i += 1
         }
-        internalNames foreach visitInternalName
+        internalNames.foreach(visitInternalName)
 
       case 'L' =>
         visitInternalName(desc.substring(1, desc.length - 1))
@@ -390,13 +390,13 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
     // large comment in class BTypes.
     def visitAnnotation(annot: AnnotationNode): Unit = {
       visitDescriptor(annot.desc)
-      if (annot.values != null) annot.values.asScala foreach visitConstant
+      if (annot.values != null) annot.values.asScala.foreach(visitConstant)
     }
 
     def visitAnnotations(annots: java.util.List[_ <: AnnotationNode]) =
-      if (annots != null) annots.asScala foreach visitAnnotation
+      if (annots != null) annots.asScala.foreach(visitAnnotation)
     def visitAnnotationss(annotss: Array[java.util.List[AnnotationNode]]) =
-      if (annotss != null) annotss foreach visitAnnotations
+      if (annotss != null) annotss.foreach(visitAnnotations)
 
     def visitHandle(handle: Handle): Unit = {
       visitInternalNameOrArrayReference(handle.getOwner)
@@ -408,7 +408,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
       classBTypeFromParsedClassfile(classNode.name).info.get.nestedClasses
 
     visitInternalName(classNode.superName)
-    classNode.interfaces.asScala foreach visitInternalName
+    classNode.interfaces.asScala.foreach(visitInternalName)
     visitInternalName(classNode.outerClass)
 
     visitAnnotations(classNode.visibleAnnotations)
@@ -436,7 +436,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
       visitAnnotations(m.visibleLocalVariableAnnotations)
       visitAnnotations(m.invisibleLocalVariableAnnotations)
 
-      m.exceptions.asScala foreach visitInternalName
+      m.exceptions.asScala.foreach(visitInternalName)
       for (tcb <- m.tryCatchBlocks.asScala) visitInternalName(tcb.`type`)
 
       val iter = m.instructions.iterator()
@@ -448,7 +448,7 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
           visitInternalNameOrArrayReference(mi.owner); visitDescriptor(mi.desc)
         case id: InvokeDynamicInsnNode =>
           visitDescriptor(id.desc); visitHandle(id.bsm);
-          id.bsmArgs foreach visitConstant
+          id.bsmArgs.foreach(visitConstant)
         case ci: LdcInsnNode => visitConstant(ci.cst)
         case ma: MultiANewArrayInsnNode => visitDescriptor(ma.desc)
         case _ =>

@@ -58,7 +58,7 @@ trait Rule[-In, +Out, +A, +X] extends (In => Result[Out, A, X]) {
       lazy val choices = Rule.this :: other :: Nil
     }
 
-  def orError[In2 <: In] = this orElse error[Any]
+  def orError[In2 <: In] = this.orElse(error[Any])
 
   def |[In2 <: In, Out2 >: Out, A2 >: A, X2 >: X](
       other: => Rule[In2, Out2, A2, X2]) = orElse(other)
@@ -89,11 +89,11 @@ trait Rule[-In, +Out, +A, +X] extends (In => Result[Out, A, X]) {
   }
 
   def >>?[Out2, B, X2 >: X](pf: PartialFunction[A, Rule[Out, Out2, B, X2]]) =
-    filter(pf isDefinedAt _) flatMap pf
+    filter(pf isDefinedAt _).flatMap(pf)
 
   def >>&[B, X2 >: X](fa2ruleb: A => Out => Result[Any, B, X2]) = flatMap {
     a => out =>
-      fa2ruleb(a)(out) mapOut { any =>
+      fa2ruleb(a)(out).mapOut { any =>
         out
       }
   }

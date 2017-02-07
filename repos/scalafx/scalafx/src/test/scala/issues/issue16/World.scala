@@ -53,7 +53,7 @@ object World extends JFXApp {
         height = 100
         fill = Color.Blue
         // Problem with incorrect behaviour of the binding was here.
-        fill <== when(hover) choose Color.Green otherwise Color.Red
+        fill <== when(hover).choose(Color.Green).otherwise(Color.Red)
       }
     }
   }

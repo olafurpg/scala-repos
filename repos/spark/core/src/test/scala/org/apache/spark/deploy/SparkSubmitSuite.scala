@@ -109,7 +109,7 @@ class SparkSubmitSuite
   test("handles arguments with --key=val") {
     val clArgs = Seq("--jars=one.jar,two.jar,three.jar", "--name=myApp")
     val appArgs = new SparkSubmitArguments(clArgs)
-    appArgs.jars should include regex (".*one.jar,.*two.jar,.*three.jar")
+    (appArgs.jars should include).regex(".*one.jar,.*two.jar,.*three.jar")
     appArgs.name should be("myApp")
   }
 
@@ -234,14 +234,14 @@ class SparkSubmitSuite
     childArgsStr should include("--executor-cores 5")
     childArgsStr should include("--arg arg1 --arg arg2")
     childArgsStr should include("--queue thequeue")
-    childArgsStr should include regex ("--jar .*thejar.jar")
-    childArgsStr should include regex
-      ("--addJars .*one.jar,.*two.jar,.*three.jar")
-    childArgsStr should include regex ("--files .*file1.txt,.*file2.txt")
-    childArgsStr should include regex
-      ("--archives .*archive1.txt,.*archive2.txt")
+    (childArgsStr should include).regex("--jar .*thejar.jar")
+    (childArgsStr should include).regex(
+      "--addJars .*one.jar,.*two.jar,.*three.jar")
+    (childArgsStr should include).regex("--files .*file1.txt,.*file2.txt")
+    (childArgsStr should include).regex(
+      "--archives .*archive1.txt,.*archive2.txt")
     mainClass should be("org.apache.spark.deploy.yarn.Client")
-    classpath should have length (0)
+    (classpath should have).length(0)
     sysProps("spark.app.name") should be("beauty")
     sysProps("spark.ui.enabled") should be("false")
     sysProps("SPARK_SUBMIT") should be("true")
@@ -285,7 +285,7 @@ class SparkSubmitSuite
       prepareSubmitEnvironment(appArgs)
     childArgs.mkString(" ") should be("arg1 arg2")
     mainClass should be("org.SomeClass")
-    classpath should have length (4)
+    (classpath should have).length(4)
     classpath(0) should endWith("thejar.jar")
     classpath(1) should endWith("one.jar")
     classpath(2) should endWith("two.jar")
@@ -295,12 +295,12 @@ class SparkSubmitSuite
     sysProps("spark.executor.cores") should be("5")
     sysProps("spark.yarn.queue") should be("thequeue")
     sysProps("spark.executor.instances") should be("6")
-    sysProps("spark.yarn.dist.files") should include regex
-      (".*file1.txt,.*file2.txt")
-    sysProps("spark.yarn.dist.archives") should include regex
-      (".*archive1.txt,.*archive2.txt")
-    sysProps("spark.jars") should include regex
-      (".*one.jar,.*two.jar,.*three.jar,.*thejar.jar")
+    (sysProps("spark.yarn.dist.files") should include)
+      .regex(".*file1.txt,.*file2.txt")
+    (sysProps("spark.yarn.dist.archives") should include)
+      .regex(".*archive1.txt,.*archive2.txt")
+    (sysProps("spark.jars") should include)
+      .regex(".*one.jar,.*two.jar,.*three.jar,.*thejar.jar")
     sysProps("SPARK_SUBMIT") should be("true")
     sysProps("spark.ui.enabled") should be("false")
   }
@@ -346,11 +346,12 @@ class SparkSubmitSuite
       mainClass should be("org.apache.spark.deploy.rest.RestSubmissionClient")
     } else {
       childArgsStr should startWith("--supervise --memory 4g --cores 5")
-      childArgsStr should include regex "launch spark://h:p .*thejar.jar org.SomeClass arg1 arg2"
+      (childArgsStr should include).regex(
+        "launch spark://h:p .*thejar.jar org.SomeClass arg1 arg2")
       mainClass should be("org.apache.spark.deploy.Client")
     }
-    classpath should have size 0
-    sysProps should have size 9
+    (classpath should have).size(0)
+    (sysProps should have).size(9)
     sysProps.keys should contain("SPARK_SUBMIT")
     sysProps.keys should contain("spark.master")
     sysProps.keys should contain("spark.app.name")
@@ -388,7 +389,7 @@ class SparkSubmitSuite
       prepareSubmitEnvironment(appArgs)
     childArgs.mkString(" ") should be("arg1 arg2")
     mainClass should be("org.SomeClass")
-    classpath should have length (1)
+    (classpath should have).length(1)
     classpath(0) should endWith("thejar.jar")
     sysProps("spark.executor.memory") should be("5g")
     sysProps("spark.cores.max") should be("5")
@@ -420,7 +421,7 @@ class SparkSubmitSuite
       prepareSubmitEnvironment(appArgs)
     childArgs.mkString(" ") should be("arg1 arg2")
     mainClass should be("org.SomeClass")
-    classpath should have length (1)
+    (classpath should have).length(1)
     classpath(0) should endWith("thejar.jar")
     sysProps("spark.executor.memory") should be("5g")
     sysProps("spark.cores.max") should be("5")

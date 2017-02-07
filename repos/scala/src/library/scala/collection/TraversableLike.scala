@@ -633,7 +633,7 @@ trait TraversableLike[+A, +Repr]
     */
   def view = new TraversableView[A, Repr] {
     protected lazy val underlying = self.repr
-    override def foreach[U](f: A => U) = self foreach f
+    override def foreach[U](f: A => U) = self.foreach(f)
   }
 
   /** Creates a non-strict view of a slice of this $coll.
@@ -760,7 +760,7 @@ trait TraversableLike[+A, +Repr]
   // A helper for tails and inits.
   private def iterateUntilEmpty(
       f: Traversable[A @uV] => Traversable[A @uV]): Iterator[Repr] = {
-    val it = Iterator.iterate(thisCollection)(f) takeWhile (x => !x.isEmpty)
-    it ++ Iterator(Nil) map (x => (newBuilder ++= x).result)
+    val it = Iterator.iterate(thisCollection)(f).takeWhile(x => !x.isEmpty)
+    (it ++ Iterator(Nil)).map(x => (newBuilder ++= x).result)
   }
 }

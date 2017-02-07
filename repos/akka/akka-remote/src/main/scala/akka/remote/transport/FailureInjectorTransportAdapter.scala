@@ -131,7 +131,7 @@ private[remote] class FailureInjectorTransportAdapter(
         if shouldDropInbound(handle.remoteAddress, ev, "notify") ⇒ //Ignore
     case _ ⇒
       upstreamListener match {
-        case Some(listener) ⇒ listener notify interceptInboundAssociation(ev)
+        case Some(listener) ⇒ listener.notify(interceptInboundAssociation(ev))
         case None ⇒
       }
   }
@@ -215,5 +215,5 @@ private[remote] final case class FailureInjectorHandle(
     if (!gremlinAdapter.shouldDropInbound(wrappedHandle.remoteAddress,
                                           ev,
                                           "handler.notify"))
-      upstreamListener notify ev
+      upstreamListener.notify(ev)
 }

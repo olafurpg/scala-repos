@@ -10,7 +10,7 @@ trait CapturedVariables { self: SymbolTable =>
 
   /** Mark a variable as captured; i.e. force boxing in a *Ref type.
     */
-  def captureVariable(vble: Symbol): Unit = vble setFlag CAPTURED
+  def captureVariable(vble: Symbol): Unit = vble.setFlag(CAPTURED)
 
   /** Mark given identifier as a reference to a captured variable itself
     *  suppressing dereferencing with the `elem` field.

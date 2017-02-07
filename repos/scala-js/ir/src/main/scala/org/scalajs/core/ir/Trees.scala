@@ -169,7 +169,7 @@ object Trees {
   object Block {
     def apply(stats: List[Tree])(implicit pos: Position): Tree = {
       val flattenedStats =
-        stats flatMap {
+        stats.flatMap {
           case Skip() => Nil
           case Block(subStats) => subStats
           case other => other :: Nil

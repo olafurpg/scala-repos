@@ -34,7 +34,8 @@ class SecurityTask(settings: Settings)
 
       val req =
         (security / "").addQueryParameter("apiKey", apiKey) <<
-          ("""
+          (
+            """
 {"name":"MH Test Write",
  "description":"Foo",
  "grants":[
@@ -44,9 +45,13 @@ class SecurityTask(settings: Settings)
     {"accessType":"write",
      "path":"%sfoo/",
      "ownerAccountIds":["%s"]}]}]}
-""" format (rootPath, accountId))
+""".format(
+              rootPath,
+              accountId
+            )
+          )
 
-      val result = Http(req OK as.String)
+      val result = Http(req.OK(as.String))
       val json = JParser.parseFromString(result()).valueOr(throw _)
 
       (json \ "name").deserialize[String] must_== "MH Test Write"
@@ -55,7 +60,7 @@ class SecurityTask(settings: Settings)
       val perms =
         (json \ "grants").children.flatMap(o => (o \ "permissions").children)
       perms.map(_ \ "accessType") must_== List(JString("write"))
-      perms.map(_ \ "path") must_== List(JString("%sfoo/" format rootPath))
+      perms.map(_ \ "path") must_== List(JString("%sfoo/".format(rootPath)))
     }
 
     "list API keys" in {
@@ -64,10 +69,10 @@ class SecurityTask(settings: Settings)
       val k2 = deriveAPIKey(account)
       val k3 = deriveAPIKey(account)
       val req = (security / "").addQueryParameter("apiKey", account.apiKey)
-      val res = Http(req OK as.String)
+      val res = Http(req.OK(as.String))
       val json = JParser.parseFromString(res()).valueOr(throw _)
       val apiKeys =
-        json.children map { obj =>
+        json.children.map { obj =>
           (obj \ "apiKey").deserialize[String]
         }
       apiKeys must haveTheSameElementsAs(List(k1, k2, k3))
@@ -89,10 +94,10 @@ class SecurityTask(settings: Settings)
       deleteAPIKey(k2)
 
       val req = (security / "").addQueryParameter("apiKey", account.apiKey)
-      val res = Http(req OK as.String)
+      val res = Http(req.OK(as.String))
       val json = JParser.parseFromString(res()).valueOr(throw _)
       val apiKeys =
-        json.children map { obj =>
+        json.children.map { obj =>
           (obj \ "apiKey").deserialize[String]
         }
       apiKeys must haveTheSameElementsAs(List(k1, k3))

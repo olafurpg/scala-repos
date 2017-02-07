@@ -50,7 +50,7 @@ object SbtWatcherMain {
           }
         }
 
-        currentExec foreach {
+        currentExec.foreach {
           case ((watcher, args)) if args == argsTail =>
           case ((watcher, _)) =>
             watcher.endSbtExec()
@@ -59,9 +59,12 @@ object SbtWatcherMain {
         }
       case STOP => currentExec.foreach(a => a._1.endSbtExec())
       case IS_RUNNING =>
-        messageConsumer.consume(currentExec.map { a =>
-          toMessage(a._1.isRunning)
-        } getOrElse FALSE)
+        messageConsumer.consume(
+          currentExec
+            .map { a =>
+              toMessage(a._1.isRunning)
+            }
+            .getOrElse(FALSE))
       case _ =>
     }
   }

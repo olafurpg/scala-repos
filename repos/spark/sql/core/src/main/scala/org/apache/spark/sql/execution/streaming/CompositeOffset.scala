@@ -32,7 +32,7 @@ case class CompositeOffset(offsets: Seq[Option[Offset]]) extends Offset {
     case otherComposite: CompositeOffset
         if otherComposite.offsets.size == offsets.size =>
       val comparisons = offsets.zip(otherComposite.offsets).map {
-        case (Some(a), Some(b)) => a compareTo b
+        case (Some(a), Some(b)) => a.compareTo(b)
         case (None, None) => 0
         case (None, _) => -1
         case (_, None) => 1

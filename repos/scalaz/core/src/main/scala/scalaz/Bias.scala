@@ -26,7 +26,7 @@ private trait LeftFoldable[F[_, _], X] extends Foldable[F[?, X]] {
 
   override def foldMap[A, B](fa: F[A, X])(f: A => B)(
       implicit B: Monoid[B]): B =
-    F.bifoldMap(fa)(f)(Function const B.zero)
+    F.bifoldMap(fa)(f)(Function.const(B.zero))
 
   override def foldRight[A, B](fa: F[A, X], z: => B)(f: (A, => B) => B): B =
     F.bifoldRight(fa, z)(f)((_, b) => b)
@@ -40,7 +40,7 @@ private trait RightFoldable[F[_, _], X] extends Foldable[F[X, ?]] {
 
   override def foldMap[A, B](fa: F[X, A])(f: A => B)(
       implicit B: Monoid[B]): B =
-    F.bifoldMap(fa)(Function const B.zero)(f)
+    F.bifoldMap(fa)(Function.const(B.zero))(f)
 
   override def foldRight[A, B](fa: F[X, A], z: => B)(f: (A, => B) => B): B =
     F.bifoldRight(fa, z)((_, b) => b)(f)

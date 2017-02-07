@@ -29,7 +29,7 @@ class LeaderIntegrationTest
     results.foreach(_.code should be(200))
 
     And("they should all be the same")
-    results.map(_.value).distinct should have length 1
+    (results.map(_.value).distinct should have).length(1)
   }
 
   test("all nodes return a redirect on GET /") {

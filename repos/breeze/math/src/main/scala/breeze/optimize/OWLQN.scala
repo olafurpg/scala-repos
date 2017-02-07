@@ -61,7 +61,7 @@ class OWLQN[K, T](maxIter: Int, m: Int, l1reg: K => Double, tolerance: Double)(
     val iter = state.iter
 
     val normGradInDir = {
-      val possibleNorm = dir dot state.grad
+      val possibleNorm = dir.dot(state.grad)
 //      if (possibleNorm > 0) { // hill climbing is not what we want. Bad LBFGS.
 //        logger.warn("Direction of positive gradient chosen!")
 //        logger.warn("Direction is:" + possibleNorm)
@@ -84,7 +84,7 @@ class OWLQN[K, T](maxIter: Int, m: Int, l1reg: K => Double, tolerance: Double)(
         // dir should be (newX - state.x) according to the paper and the author.
         // However, in practice, this seems fine.
         // And interestingly the MSR reference implementation does the same thing (but they don't do wolfe condition checks.).
-        adjv -> (adjgrad dot dir)
+        adjv -> (adjgrad.dot(dir))
       }
     }
     val search = new BacktrackingLineSearch(state.value,

@@ -50,7 +50,7 @@ abstract class SymbolPairs {
     def isSameErasure(sym1: Symbol, sym2: Symbol): Boolean =
       erasureOf(sym1) =:= erasureOf(sym2)
     def matches(sym1: Symbol, sym2: Symbol): Boolean =
-      (sym1: Type) matches (sym2: Type)
+      (sym1: Type).matches(sym2: Type)
 
     override def toString = s"RelativeTo($prefix)"
   }
@@ -60,7 +60,7 @@ abstract class SymbolPairs {
     *  when viewed from IterableClass.
     */
   def sameInBaseClass(baseClass: Symbol)(tp1: Type, tp2: Type) =
-    (tp1 baseType baseClass) =:= (tp2 baseType baseClass)
+    (tp1.baseType(baseClass)) =:= (tp2.baseType(baseClass))
 
   case class SymbolPair(base: Symbol, low: Symbol, high: Symbol) {
     def pos =
@@ -195,7 +195,7 @@ abstract class SymbolPairs {
           var e = bcs.head.info.decls.elems
           while (e ne null) {
             if (e.sym.initialize.isDeferred == deferred && !exclude(e.sym))
-              decls enter e.sym
+              decls.enter(e.sym)
             e = e.next
           }
         }
@@ -258,11 +258,11 @@ abstract class SymbolPairs {
 
     @tailrec private def advanceNextEntry() {
       if (nextEntry ne null) {
-        nextEntry = decls lookupNextEntry nextEntry
+        nextEntry = decls.lookupNextEntry(nextEntry)
         if (nextEntry ne null) {
           val high = nextEntry.sym
           val isMatch =
-            matches(lowSymbol, high) && { visited addEntry nextEntry; true } // side-effect visited on all matches
+            matches(lowSymbol, high) && { visited.addEntry(nextEntry); true } // side-effect visited on all matches
 
           // skip nextEntry if a class in `parents` is a subclass of the
           // owners of both low and high.

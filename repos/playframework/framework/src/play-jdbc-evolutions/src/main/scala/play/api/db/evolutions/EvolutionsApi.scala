@@ -159,8 +159,8 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
             Some(
               (rs,
                Evolution(rs.getInt(1),
-                         Option(rs.getString(3)) getOrElse "",
-                         Option(rs.getString(4)) getOrElse "")))
+                         Option(rs.getString(3)).getOrElse(""),
+                         Option(rs.getString(4)).getOrElse(""))))
           }
         }
       }

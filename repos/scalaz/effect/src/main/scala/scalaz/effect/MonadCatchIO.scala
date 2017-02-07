@@ -41,7 +41,7 @@ sealed abstract class MonadCatchIOFunctions {
   /** Like "catchLeft" but takes a predicate to select which exceptions are caught. */
   def catchSomeLeft[M[_]: MonadCatchIO, A, B](ma: M[A])(
       p: Throwable => Option[B]): M[B \/ A] =
-    catchLeft(ma) map (_.leftMap(e => p(e).getOrElse(throw e)))
+    catchLeft(ma).map(_.leftMap(e => p(e).getOrElse(throw e)))
 
   /**Like "finally", but only performs the final action if there was an exception. */
   def onException[M[_]: MonadCatchIO, A, B](ma: M[A], action: M[B]): M[A] =

@@ -14,7 +14,7 @@ final class Env(config: Config,
 
   private val CollectionEntry = config getString "collection.entry"
   private val CollectionUnsub = config getString "collection.unsub"
-  private val UserDisplayMax = config getInt "user.display_max"
+  private val UserDisplayMax = config.getInt("user.display_max")
   private val UserActorName = config getString "user.actor.name"
 
   lazy val entryRepo =
@@ -39,10 +39,10 @@ final class Env(config: Config,
     unsubApi.get(channel, userId)
 
   def status(channel: String)(userId: String): Fu[Option[Boolean]] =
-    unsubApi.get(channel, userId) flatMap {
+    unsubApi.get(channel, userId).flatMap {
       case true => fuccess(Some(true)) // unsubed
       case false =>
-        entryRepo.channelUserIdRecentExists(channel, userId) map {
+        entryRepo.channelUserIdRecentExists(channel, userId).map {
           case true => Some(false) // subed
           case false => None // not applicable
         }
@@ -55,14 +55,15 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "timeline" boot new Env(
-      config = lila.common.PlayApp loadConfig "timeline",
-      db = lila.db.Env.current,
-      hub = lila.hub.Env.current,
-      getFriendIds = lila.relation.Env.current.api.fetchFriends,
-      getFollowerIds = lila.relation.Env.current.api.fetchFollowers,
-      lobbySocket = lila.hub.Env.current.socket.lobby,
-      renderer = lila.hub.Env.current.actor.renderer,
-      system = lila.common.PlayApp.system
-    )
+    "timeline".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("timeline"),
+        db = lila.db.Env.current,
+        hub = lila.hub.Env.current,
+        getFriendIds = lila.relation.Env.current.api.fetchFriends,
+        getFollowerIds = lila.relation.Env.current.api.fetchFollowers,
+        lobbySocket = lila.hub.Env.current.socket.lobby,
+        renderer = lila.hub.Env.current.actor.renderer,
+        system = lila.common.PlayApp.system
+      ))
 }

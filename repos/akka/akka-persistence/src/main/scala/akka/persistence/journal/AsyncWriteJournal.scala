@@ -214,14 +214,19 @@ trait AsyncWriteJournal
           }
 
       case d @ DeleteMessagesTo(persistenceId, toSequenceNr, persistentActor) ⇒
-        breaker.withCircuitBreaker(
-          asyncDeleteMessagesTo(persistenceId, toSequenceNr)) map {
-          case _ ⇒ DeleteMessagesSuccess(toSequenceNr)
-        } recover {
-          case e ⇒ DeleteMessagesFailure(e, toSequenceNr)
-        } pipeTo persistentActor onComplete {
-          case _ ⇒ if (publish) context.system.eventStream.publish(d)
-        }
+        breaker
+          .withCircuitBreaker(
+            asyncDeleteMessagesTo(persistenceId, toSequenceNr))
+          .map {
+            case _ ⇒ DeleteMessagesSuccess(toSequenceNr)
+          }
+          .recover {
+            case e ⇒ DeleteMessagesFailure(e, toSequenceNr)
+          }
+          .pipeTo(persistentActor)
+          .onComplete {
+            case _ ⇒ if (publish) context.system.eventStream.publish(d)
+          }
     }
   }
 

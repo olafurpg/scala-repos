@@ -29,7 +29,7 @@ object Team extends LilaController {
 
   def all(page: Int) = Open { implicit ctx =>
     NotForKids {
-      paginator popularTeams page map { html.team.all(_) }
+      paginator.popularTeams(page).map { html.team.all(_) }
     }
   }
 
@@ -42,7 +42,7 @@ object Team extends LilaController {
 
   def show(id: String, page: Int) = Open { implicit ctx =>
     NotForKids {
-      OptionFuOk(api team id) { team =>
+      OptionFuOk(api.team(id)) { team =>
         renderTeam(team, page)
       }
     }
@@ -51,26 +51,26 @@ object Team extends LilaController {
   def search(text: String, page: Int) = OpenBody { implicit ctx =>
     NotForKids {
       text.trim.isEmpty.fold(
-        paginator popularTeams page map { html.team.all(_) },
-        Env.teamSearch(text, page) map { html.team.search(text, _) }
+        paginator.popularTeams(page).map { html.team.all(_) },
+        Env.teamSearch(text, page).map { html.team.search(text, _) }
       )
     }
   }
 
   private def renderTeam(team: TeamModel, page: Int = 1)(
       implicit ctx: Context) =
-    teamInfo(team, ctx.me) zip paginator.teamMembers(team, page) map {
+    teamInfo(team, ctx.me).zip(paginator.teamMembers(team, page)).map {
       case (info, pag) => html.team.show(team, pag, info)
     }
 
   def edit(id: String) = Auth { implicit ctx => me =>
-    OptionFuResult(api team id) { team =>
-      Owner(team) { fuccess(html.team.edit(team, forms edit team)) }
+    OptionFuResult(api.team(id)) { team =>
+      Owner(team) { fuccess(html.team.edit(team, forms.edit(team))) }
     }
   }
 
   def update(id: String) = AuthBody { implicit ctx => implicit me =>
-    OptionFuResult(api team id) { team =>
+    OptionFuResult(api.team(id)) { team =>
       Owner(team) {
         implicit val req = ctx.body
         forms
@@ -87,9 +87,9 @@ object Team extends LilaController {
   }
 
   def kickForm(id: String) = Auth { implicit ctx => me =>
-    OptionFuResult(api team id) { team =>
+    OptionFuResult(api.team(id)) { team =>
       Owner(team) {
-        MemberRepo userIdsByTeam team.id map { userIds =>
+        MemberRepo.userIdsByTeam(team.id).map { userIds =>
           html.team.kick(team, userIds.filterNot(me.id ==).toList.sorted)
         }
       }
@@ -97,7 +97,7 @@ object Team extends LilaController {
   }
 
   def kick(id: String) = AuthBody { implicit ctx => implicit me =>
-    OptionFuResult(api team id) { team =>
+    OptionFuResult(api.team(id)) { team =>
       Owner(team) {
         implicit val req = ctx.body
         forms.kick.bindFromRequest.value ?? { api.kick(team, _) } inject Redirect(
@@ -107,17 +107,17 @@ object Team extends LilaController {
   }
 
   def close(id: String) = Secure(_.CloseTeam) { implicit ctx => me =>
-    OptionFuResult(api team id) { team =>
-      (api delete team) >> Env.mod.logApi
+    OptionFuResult(api.team(id)) { team =>
+      (api.delete(team)) >> Env.mod.logApi
         .deleteTeam(me.id, team.name, team.description) inject Redirect(
-        routes.Team all 1)
+        routes.Team.all(1))
     }
   }
 
   def form = Auth { implicit ctx => me =>
     NotForKids {
       OnePerWeek(me) {
-        forms.anyCaptcha map { captcha =>
+        forms.anyCaptcha.map { captcha =>
           Ok(html.team.form(forms.create, captcha))
         }
       }
@@ -129,12 +129,12 @@ object Team extends LilaController {
       implicit val req = ctx.body
       forms.create.bindFromRequest.fold(
         err =>
-          forms.anyCaptcha map { captcha =>
+          forms.anyCaptcha.map { captcha =>
             BadRequest(html.team.form(err, captcha))
         },
         data =>
           api.create(data, me) ?? {
-            _ map { team =>
+            _.map { team =>
               Redirect(routes.Team.show(team.id)): Result
             }
         }
@@ -143,7 +143,7 @@ object Team extends LilaController {
   }
 
   def mine = Auth { implicit ctx => me =>
-    api mine me map { html.team.mine(_) }
+    (api mine me).map { html.team.mine(_) }
   }
 
   def joinPage(id: String) = Auth { implicit ctx => me =>
@@ -158,7 +158,7 @@ object Team extends LilaController {
   }
 
   def join(id: String) = Auth { implicit ctx => implicit me =>
-    api join id flatMap {
+    (api join id).flatMap {
       case Some(Joined(team)) => Redirect(routes.Team.show(team.id)).fuccess
       case Some(Motivate(team)) =>
         Redirect(routes.Team.requestForm(team.id)).fuccess
@@ -167,12 +167,12 @@ object Team extends LilaController {
   }
 
   def requests = Auth { implicit ctx => me =>
-    api requestsWithUsers me map { html.team.allRequests(_) }
+    (api requestsWithUsers me).map { html.team.allRequests(_) }
   }
 
   def requestForm(id: String) = Auth { implicit ctx => me =>
     OptionFuOk(api.requestable(id, me)) { team =>
-      forms.anyCaptcha map { html.team.requestForm(team, forms.request, _) }
+      forms.anyCaptcha.map { html.team.requestForm(team, forms.request, _) }
     }
   }
 
@@ -181,7 +181,7 @@ object Team extends LilaController {
       implicit val req = ctx.body
       forms.request.bindFromRequest.fold(
         err =>
-          forms.anyCaptcha map { captcha =>
+          forms.anyCaptcha.map { captcha =>
             BadRequest(html.team.requestForm(team, err, captcha))
         },
         setup =>
@@ -209,20 +209,20 @@ object Team extends LilaController {
   }
 
   def quit(id: String) = Auth { implicit ctx => implicit me =>
-    OptionResult(api quit id) { team =>
+    OptionResult(api.quit(id)) { team =>
       Redirect(routes.Team.show(team.id))
     }
   }
 
   private def OnePerWeek[A <: Result](me: UserModel)(a: => Fu[A])(
       implicit ctx: Context): Fu[Result] =
-    api.hasCreatedRecently(me) flatMap { did =>
-      (did && !Granter.superAdmin(me)) fold
-        (Forbidden(views.html.team.createLimit()).fuccess, a)
+    api.hasCreatedRecently(me).flatMap { did =>
+      ((did && !Granter.superAdmin(me)))
+        .fold(Forbidden(views.html.team.createLimit()).fuccess, a)
     }
 
   private def Owner(team: TeamModel)(a: => Fu[Result])(
       implicit ctx: Context): Fu[Result] = {
     ctx.me.??(me => team.isCreator(me.id) || Granter.superAdmin(me))
-  }.fold(a, renderTeam(team) map { Forbidden(_) })
+  }.fold(a, renderTeam(team).map { Forbidden(_) })
 }

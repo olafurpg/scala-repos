@@ -10,10 +10,10 @@ object Test {
   val e2 = () => (5 until 5).last
 
   def main(args: Array[String]): Unit = {
-    List(r1, r2, r3, r4) foreach (x => assert(x.length == Int.MaxValue))
+    List(r1, r2, r3, r4).foreach(x => assert(x.length == Int.MaxValue))
 
     // exception required
-    List(e1, e2) foreach { f =>
+    List(e1, e2).foreach { f =>
       try { f(); assert(false) } catch { case _: Throwable => () }
     }
   }

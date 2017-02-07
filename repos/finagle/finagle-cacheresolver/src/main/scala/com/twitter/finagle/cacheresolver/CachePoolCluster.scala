@@ -105,7 +105,7 @@ object CacheNodeGroup {
 
   def apply(group: Group[SocketAddress],
             useOnlyResolvedAddress: Boolean = false) =
-    group collect {
+    group.collect {
       case node: CacheNode => node
       // Note: we ignore weights here
       case ia: InetSocketAddress
@@ -134,7 +134,7 @@ object CacheNodeGroup {
                                    useOnlyResolvedAddress: Boolean = false) =
     new Group[CacheNode] {
       protected[finagle] val set: Var[Set[CacheNode]] =
-        va map {
+        va.map {
           case Addr.Bound(addrs, _) =>
             addrs.collect {
               case Address.Inet(ia, CacheNodeMetadata(weight, key)) =>
@@ -203,7 +203,7 @@ object CachePoolCluster {
       ServerSets.create(zkClient,
                         ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
                         zkPath)
-    ) map {
+    ).map {
       case addr: InetSocketAddress =>
         CacheNode(addr.getHostName, addr.getPort, 1)
     }
@@ -238,11 +238,11 @@ trait CachePoolCluster extends Cluster[CacheNode] {
       val removed = cachePool &~ newSet
 
       // modify cachePool and cachePoolChanges
-      removed foreach { node =>
+      removed.foreach { node =>
         cachePool -= node
         appendUpdate(Cluster.Rem(node))
       }
-      added foreach { node =>
+      added.foreach { node =>
         cachePool += node
         appendUpdate(Cluster.Add(node))
       }
@@ -321,7 +321,7 @@ class ZookeeperCachePoolCluster private[cacheresolver] (
     new ZookeeperServerSetCluster(
       ServerSets.create(zkClient,
                         ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
-                        zkPath)) map {
+                        zkPath)).map {
       case addr: InetSocketAddress =>
         CacheNode(addr.getHostName, addr.getPort, 1)
     }
@@ -330,8 +330,8 @@ class ZookeeperCachePoolCluster private[cacheresolver] (
   zkServerSetCluster.snap match {
     case (current, changes) =>
       underlyingSize = current.size
-      changes foreach { spool =>
-        spool foreach {
+      changes.foreach { spool =>
+        spool.foreach {
           case Cluster.Add(node) => underlyingSize += 1
           case Cluster.Rem(node) => underlyingSize -= 1
         }
@@ -350,12 +350,12 @@ class ZookeeperCachePoolCluster private[cacheresolver] (
   // will overwrite the backup pool.
   // This backup pool is mainly provided in case of long time zookeeper outage during which
   // cache client needs to be restarted.
-  backupPool foreach { pool =>
+  backupPool.foreach { pool =>
     if (!pool.isEmpty) {
-      ready within (CachePoolCluster.timer, BackupPoolFallBackTimeout) onFailure {
-        _ =>
+      (ready within (CachePoolCluster.timer, BackupPoolFallBackTimeout))
+        .onFailure { _ =>
           updatePool(pool)
-      }
+        }
     }
   }
 
@@ -398,7 +398,7 @@ class ZookeeperCachePoolCluster private[cacheresolver] (
     if (expectedSize == currentSet.size) {
       Future.value(currentSet)
     } else
-      spoolChanges flatMap { spool =>
+      spoolChanges.flatMap { spool =>
         spool match {
           case Cluster.Add(node) *:: tail =>
             waitForClusterComplete(currentSet + node, expectedSize, tail)
@@ -433,7 +433,7 @@ class ZookeeperCacheNodeGroup(
   @volatile private var detectKeyRemapping = false
 
   private val zkGroup =
-    new ZkGroup(new ServerSetImpl(zkClient, zkPath), zkPath) collect {
+    new ZkGroup(new ServerSetImpl(zkClient, zkPath), zkPath).collect {
       case inst if inst.getStatus == ALIVE =>
         val ep = inst.getServiceEndpoint
         val shardInfo =

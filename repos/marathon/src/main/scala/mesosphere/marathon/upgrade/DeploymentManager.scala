@@ -60,7 +60,7 @@ class DeploymentManager(appRepository: AppRepository,
           new DeploymentCanceledException("The upgrade has been cancelled"))
       }
 
-      Future.sequence(cancellations) onComplete {
+      Future.sequence(cancellations).onComplete {
         case _ =>
           log.info(
             s"Conflicting deployments for deployment ${plan.id} have been canceled")

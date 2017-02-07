@@ -51,7 +51,7 @@ class FscSettings(error: String => Unit) extends Settings(error) { outer =>
     preferIPv4,
     idleMins
   )
-  val isFscSpecific: String => Boolean = fscSpecific map (_.name)
+  val isFscSpecific: String => Boolean = fscSpecific.map(_.name)
 
   /** If a setting (other than a PathSetting) represents a path or paths.
     *  For use in absolutization.
@@ -63,7 +63,7 @@ class FscSettings(error: String => Unit) extends Settings(error) { outer =>
       processAll: Boolean): (Boolean, List[String]) = {
     val (r, args) = super.processArguments(arguments, processAll)
     // we need to ensure the files specified with relative locations are absolutized based on the currentDir
-    (r, args map { a =>
+    (r, args.map { a =>
       absolutizePath(a)
     })
   }
@@ -73,11 +73,11 @@ class FscSettings(error: String => Unit) extends Settings(error) { outer =>
     * If it's already absolute then it's left alone.
     */
   private[this] def absolutizePath(p: String) =
-    (Path(currentDir.value) resolve Path(p)).normalize.path
+    (Path(currentDir.value).resolve(Path(p))).normalize.path
 
   /** All user set settings rewritten with absolute paths based on currentDir */
   def absolutize() {
-    userSetSettings foreach {
+    userSetSettings.foreach {
       case p: OutputSetting =>
         p.outputDirs setSingleOutput AbstractFile.getDirectory(
           absolutizePath(p.value))

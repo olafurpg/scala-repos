@@ -51,7 +51,7 @@ class JavapClass(
 
   def apply(args: Seq[String]): List[JpResult] = {
     val (options0, targets) =
-      args partition (s => (s startsWith "-") && s.length > 1)
+      args.partition(s => (s.startsWith("-")) && s.length > 1)
     val (options, filter) = {
       val (opts, flag) = toolArgs(options0)
       (if (opts.isEmpty) DefaultOptions else opts, flag)
@@ -59,7 +59,7 @@ class JavapClass(
 
     if ((options contains "-help") || targets.isEmpty)
       List(JpResult(helper(printWriter)))
-    else tool(options, filter)(targets map targeted)
+    else tool(options, filter)(targets.map(targeted))
   }
 
   /** Associate the requested path with a possibly failed or empty array of bytes. */
@@ -88,12 +88,15 @@ class JavapClass(
   }
 
   def findBytes(path: String): Array[Byte] =
-    tryFile(path) getOrElse tryClass(path)
+    tryFile(path).getOrElse(tryClass(path))
 
   /** Assume the string is a path and try to find the classfile it represents.
     */
   def tryFile(path: String): Option[Array[Byte]] =
-    (Try(File(path.asClassResource)) filter (_.exists) map (_.toByteArray())).toOption
+    (Try(File(path.asClassResource))
+      .filter(_.exists)
+      .map(_.toByteArray()))
+      .toOption
 
   /** Assume the string is a fully qualified class name and try to
     *  find the class object it represents.
@@ -102,8 +105,8 @@ class JavapClass(
     *  - a synthetic that is not in scope but its associated class is
     */
   def tryClass(path: String): Array[Byte] = {
-    def load(name: String) = loader classBytes name
-    def loadable(name: String) = loader resourceable name
+    def load(name: String) = loader.classBytes(name)
+    def loadable(name: String) = loader.resourceable(name)
     // if path has an interior dollar, take it as a synthetic
     // if the prefix up to the dollar is a symbol in scope,
     // result is the translated prefix + suffix
@@ -112,11 +115,11 @@ class JavapClass(
       if (0 until s.length - 1 contains i) {
         val name = s substring (0, i)
         val sufx = s substring i
-        val tran = intp translatePath name
+        val tran = intp.translatePath(name)
         def loadableOrNone(strip: Boolean) = {
           def suffix(strip: Boolean)(x: String) =
-            (if (strip && (x endsWith "$")) x.init else x) + sufx
-          val res = tran map (suffix(strip) _)
+            (if (strip && (x.endsWith("$"))) x.init else x) + sufx
+          val res = tran.map(suffix(strip) _)
           if (res.isDefined && loadable(res.get)) res else None
         }
         // try loading translated+suffix
@@ -132,15 +135,16 @@ class JavapClass(
     // instead of translatePath and then asking did I get a class back)
     val q =
       (// only simple names get the scope treatment
-      Some(p) filter (_ contains '.')
-      // take path as a Name in scope
-        orElse (intp translatePath p filter loadable)
-      // take path as a Name in scope and find its enclosing class
-        orElse (intp translateEnclosingClass p filter loadable)
-      // take path as a synthetic derived from some Name in scope
-        orElse desynthesize(p)
-      // just try it plain
-        getOrElse p)
+      Some(p)
+        .filter(_ contains '.')
+        // take path as a Name in scope
+        .orElse(intp.translatePath(p).filter(loadable))
+        // take path as a Name in scope and find its enclosing class
+        .orElse((intp translateEnclosingClass p).filter(loadable))
+        // take path as a synthetic derived from some Name in scope
+        .orElse(desynthesize(p))
+        // just try it plain
+        .getOrElse(p))
     load(q)
   }
 
@@ -167,23 +171,23 @@ class JavapClass(
     def filterLines(target: String, text: String): String = {
       // take Foo# as Foo#apply for purposes of filtering.
       val filterOn =
-        target.splitHashMember._2 map { s =>
+        target.splitHashMember._2.map { s =>
           if (s.isEmpty) "apply" else s
         }
       var filtering = false // true if in region matching filter
       // turn filtering on/off given the pattern of interest
       def filterStatus(line: String, pattern: String) = {
         def isSpecialized(method: String) =
-          (method startsWith pattern + "$") && (method endsWith "$sp")
+          (method.startsWith(pattern + "$")) && (method.endsWith("$sp"))
         def isAnonymized(method: String) =
-          (pattern == "$anonfun") && (method startsWith "$anonfun$")
+          (pattern == "$anonfun") && (method.startsWith("$anonfun$"))
         // cheap heuristic, todo maybe parse for the java sig.
         // method sigs end in paren semi
-        def isAnyMethod = line endsWith ");"
+        def isAnyMethod = line.endsWith(");")
         // take the method name between the space char and left paren.
         // accept exact match or something that looks like what we might be asking for.
         def isOurMethod = {
-          val lparen = line lastIndexOf '('
+          val lparen = line.lastIndexOf('(')
           val blank = line.lastIndexOf(' ', lparen)
           if (blank < 0) false
           else {
@@ -203,7 +207,7 @@ class JavapClass(
       }
       // do we output this line?
       def checkFilter(line: String) =
-        filterOn map (filterStatus(line, _)) getOrElse true
+        filterOn.map(filterStatus(line, _)).getOrElse(true)
       val sw = new StringWriter
       val pw = new PrintWriter(sw)
       for {
@@ -228,13 +232,15 @@ class JavapClass(
     protected def failed = TaskClass eq null
 
     val TaskCtor =
-      TaskClass.getConstructor(
-        classOf[Writer],
-        classOf[JavaFileManager],
-        classOf[DiagnosticListener[_]],
-        classOf[JIterable[String]],
-        classOf[JIterable[String]]
-      ) orFailed null
+      TaskClass
+        .getConstructor(
+          classOf[Writer],
+          classOf[JavaFileManager],
+          classOf[DiagnosticListener[_]],
+          classOf[JIterable[String]],
+          classOf[JIterable[String]]
+        )
+        .orFailed(null)
 
     class JavaReporter
         extends DiagnosticListener[JavaFileObject]
@@ -242,7 +248,7 @@ class JavapClass(
       type D = Diagnostic[_ <: JavaFileObject]
       val diagnostics = new ConcurrentLinkedQueue[D]
       override def report(d: Diagnostic[_ <: JavaFileObject]) {
-        diagnostics add d
+        diagnostics.add(d)
       }
       override def clear() = diagnostics.clear()
 
@@ -250,7 +256,7 @@ class JavapClass(
         *  @param locale Locale for diagnostic messages, null by default.
         */
       def messages(implicit locale: Locale = null) =
-        diagnostics.asScala.map(_ getMessage locale).toList
+        diagnostics.asScala.map(_.getMessage(locale)).toList
 
       def reportable(): String = {
         clear()
@@ -264,11 +270,13 @@ class JavapClass(
       (loader
         .tryToLoadClass[JavaFileManager](
           "com.sun.tools.javap.JavapFileManager")
-        .get getMethod
-        ("create", classOf[DiagnosticListener[_]],
-        classOf[PrintWriter]) invoke
+        .get
+        .getMethod("create",
+                   classOf[DiagnosticListener[_]],
+                   classOf[PrintWriter]) invoke
         (null, reporter, new PrintWriter(System.err, true)))
-        .asInstanceOf[JavaFileManager] orFailed null
+        .asInstanceOf[JavaFileManager]
+        .orFailed(null)
 
     // manages named arrays of bytes, which might have failed to load
     class JavapFileManager(val managed: Seq[Input])(delegate: JavaFileManager =
@@ -338,7 +346,7 @@ class JavapClass(
              inputs: Seq[Input]): Task = {
       //ServiceLoader.load(classOf[javax.tools.DisassemblerTool]).
       //getTask(writer, fileManager, reporter, options.asJava, classes.asJava)
-      val toolopts = options filter (_ != "-filter")
+      val toolopts = options.filter(_ != "-filter")
       TaskCtor
         .newInstance(writer,
                      fileManager(inputs),
@@ -354,28 +362,33 @@ class JavapClass(
                          inputs: Seq[Input]): Try[JpResult] =
       Try {
         task(options, Seq(klass), inputs).call()
-      } map {
-        case true => JpResult(showable(klass, filter))
-        case _ => JpResult(reporter.reportable())
-      } recoverWith {
-        case e: java.lang.reflect.InvocationTargetException =>
-          e.getCause match {
-            case t: IllegalArgumentException =>
-              Success(JpResult(t.getMessage)) // bad option
-            case x => Failure(x)
-          }
-      } lastly {
-        reporter.clear()
-      }
+      }.map {
+          case true => JpResult(showable(klass, filter))
+          case _ => JpResult(reporter.reportable())
+        }
+        .recoverWith {
+          case e: java.lang.reflect.InvocationTargetException =>
+            e.getCause match {
+              case t: IllegalArgumentException =>
+                Success(JpResult(t.getMessage)) // bad option
+              case x => Failure(x)
+            }
+        }
+        .lastly {
+          reporter.clear()
+        }
 
     /** Run the tool. */
     def apply(options: Seq[String], filter: Boolean)(
         inputs: Seq[Input]): List[JpResult] =
-      (inputs map {
-        case (klass, Success(_)) =>
-          applyOne(options, filter, klass, inputs).get
-        case (_, Failure(e)) => JpResult(e.toString)
-      }).toList orFailed List(noToolError)
+      (inputs
+        .map {
+          case (klass, Success(_)) =>
+            applyOne(options, filter, klass, inputs).get
+          case (_, Failure(e)) => JpResult(e.toString)
+        })
+        .toList
+        .orFailed(List(noToolError))
   }
 
   object JavapTool {
@@ -411,19 +424,19 @@ object JavapClass {
   implicit class MaybeClassLike(val s: String) extends AnyVal {
     /* private[this] final val suffix = ".class" */
     private def suffix = ".class"
-    def asClassName = (s stripSuffix suffix).replace('/', '.')
+    def asClassName = (s.stripSuffix(suffix)).replace('/', '.')
     def asClassResource =
-      if (s endsWith suffix) s else s.replace('.', '/') + suffix
+      if (s.endsWith(suffix)) s else s.replace('.', '/') + suffix
     def splitSuffix: (String, String) =
-      if (s endsWith suffix) (s dropRight suffix.length, suffix) else (s, "")
+      if (s.endsWith(suffix)) (s.dropRight(suffix.length), suffix) else (s, "")
     def strippingSuffix(f: String => String): String =
-      if (s endsWith suffix) f(s dropRight suffix.length) else s
+      if (s.endsWith(suffix)) f(s.dropRight(suffix.length)) else s
     // e.g. Foo#bar. Foo# yields zero-length member part.
     def splitHashMember: (String, Option[String]) = {
-      val i = s lastIndexOf '#'
+      val i = s.lastIndexOf('#')
       if (i < 0) (s, None)
       //else if (i >= s.length - 1) (s.init, None)
-      else (s take i, Some(s drop i + 1))
+      else (s.take(i), Some(s.drop(i + 1)))
     }
   }
   implicit class ClassLoaderOps(val loader: ScalaClassLoader) extends AnyVal {
@@ -453,7 +466,7 @@ object Javap {
 
   def apply(path: String): Unit = apply(Seq(path))
   def apply(args: Seq[String]): Unit =
-    JavapClass(intp = null) apply args foreach (_.show())
+    JavapClass(intp = null).apply(args).foreach(_.show())
 
   private[interpreter] trait Showable {
     def show(): Unit
@@ -487,7 +500,7 @@ object Javap {
   }
 
   def toolArgs(args: Seq[String]): (Seq[String], Boolean) = {
-    val (opts, rest) = args flatMap massage partition (_ != "-filter")
+    val (opts, rest) = args.flatMap(massage).partition(_ != "-filter")
     (opts, rest.nonEmpty)
   }
 
@@ -509,39 +522,39 @@ object Javap {
 
   // match prefixes and unpack opts, or -help on failure
   private def massage(arg: String): Seq[String] = {
-    require(arg startsWith "-")
+    require(arg.startsWith("-"))
     // arg matches opt "-foo/-f" if prefix of -foo or exactly -f
     val r = """(-[^/]*)(?:/(-.))?""".r
     def maybe(opt: String, s: String): Option[String] = opt match {
       // disambiguate by preferring short form
       case r(lf, sf) if s == sf => Some(sf)
-      case r(lf, sf) if lf startsWith s => Some(lf)
+      case r(lf, sf) if lf.startsWith(s) => Some(lf)
       case _ => None
     }
-    def candidates(s: String) = (helps map (h => maybe(h._1, s))).flatten
+    def candidates(s: String) = (helps.map(h => maybe(h._1, s))).flatten
     // one candidate or one single-char candidate
     def uniqueOf(maybes: Seq[String]) = {
       def single(s: String) = s.length == 2
       if (maybes.length == 1) maybes
-      else if ((maybes count single) == 1) maybes filter single
+      else if ((maybes.count(single)) == 1) maybes.filter(single)
       else Nil
     }
     // each optchar must decode to exactly one option
     def unpacked(s: String): Try[Seq[String]] = {
       val ones =
-        (s drop 1) map { c =>
+        (s.drop(1)).map { c =>
           val maybes = uniqueOf(candidates(s"-$c"))
           if (maybes.length == 1) Some(maybes.head) else None
         }
-      Try(ones) filter (_ forall (_.isDefined)) map (_.flatten)
+      Try(ones).filter(_.forall(_.isDefined)).map(_.flatten)
     }
     val res = uniqueOf(candidates(arg))
     if (res.nonEmpty) res
-    else (unpacked(arg) getOrElse (Seq("-help"))) // or else someone needs help
+    else (unpacked(arg).getOrElse(Seq("-help"))) // or else someone needs help
   }
 
   def helpText: String =
-    (helps map { case (name, help) => f"$name%-12.12s$help%n" }).mkString
+    (helps.map { case (name, help) => f"$name%-12.12s$help%n" }).mkString
 
   def helper(pw: PrintWriter) = new Showable {
     def show() = pw print helpText

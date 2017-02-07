@@ -6,7 +6,7 @@ object Test extends App {
   val ps = new PrintStream(baos)
 
   // first test with the default classpath
-  (scala.Console withOut ps) {
+  (scala.Console.withOut(ps)) {
     scala.tools.scalap.Main.main(Array("-verbose", "java.lang.Object"))
   }
 
@@ -21,7 +21,7 @@ object Test extends App {
   // then test again with a user specified classpath
   baos.reset
 
-  (scala.Console withOut ps) {
+  (scala.Console.withOut(ps)) {
     scala.tools.scalap.Main
       .main(Array("-verbose", "-cp", "whatever", "java.lang.Object"))
   }

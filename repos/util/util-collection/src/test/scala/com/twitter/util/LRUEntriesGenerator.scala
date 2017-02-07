@@ -15,6 +15,6 @@ object LRUEntriesGenerator {
       uniqueKeys <- Gen.listOfN(size, Gen.identifier).map(_.toSet)
       vals <- Gen.listOfN(uniqueKeys.size, arbitrary[V])
     } yield uniqueKeys.toList.zip(vals)
-    gen suchThat (_.nonEmpty)
+    gen.suchThat(_.nonEmpty)
   }
 }

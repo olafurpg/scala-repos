@@ -116,9 +116,11 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
 
   def registerProducerId(preferredProducerId: Option[Int] = None) = {
     val producerId =
-      preferredProducerId filter { prodId =>
-        !producerIdInUse(prodId)
-      } getOrElse acquireProducerId
+      preferredProducerId
+        .filter { prodId =>
+          !producerIdInUse(prodId)
+        }
+        .getOrElse(acquireProducerId)
     zkc.createEphemeral(producerActivePath(producerId))
     producerId
   }
@@ -198,7 +200,7 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
       blockSize: Int): Validation[Error, EventRelayState] = {
     val agentPath = relayAgentPath(agent)
 
-    acquireActivePath(agentPath) flatMap { _ =>
+    acquireActivePath(agentPath).flatMap { _ =>
       val bytes = zkc.readData(agentPath).asInstanceOf[Array[Byte]]
       if (bytes != null && bytes.length != 0) {
         val state = fromNodeData(bytes).validated[EventRelayState]
@@ -266,7 +268,7 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
       val checkpointPath = shardCheckpointPath(bifrost)
 
       Some(
-        acquireActivePath(checkpointPath) flatMap { _ =>
+        acquireActivePath(checkpointPath).flatMap { _ =>
           val bytes = zkc.readData(checkpointPath).asInstanceOf[Array[Byte]]
           if (bytes != null && bytes.length != 0) {
             val checkpoint = fromNodeData(bytes).validated[YggCheckpoint]

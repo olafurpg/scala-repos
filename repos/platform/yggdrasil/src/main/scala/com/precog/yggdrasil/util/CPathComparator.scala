@@ -228,14 +228,14 @@ object CPathComparator {
 private[yggdrasil] trait ArrayCPathComparatorSupport {
   final def makeMask(path: CPath): Array[Boolean] = {
     val indexNodes =
-      path.nodes filter {
+      path.nodes.filter {
         case CPathIndex(_) => true
         case CPathArray => true
         case _ => false
       }
 
     val mask = new Array[Boolean](indexNodes.size)
-    indexNodes.zipWithIndex foreach {
+    indexNodes.zipWithIndex.foreach {
       case (CPathArray, i) => mask(i) = true
       case _ =>
     }

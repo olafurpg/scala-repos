@@ -225,7 +225,7 @@ class MarathonSchedulerService @Inject()(
         scala.concurrent.blocking {
           driver.foreach(_.run())
         }
-      } onComplete {
+      }.onComplete {
         case Success(_) =>
           log.info(
             "Driver future completed. Executing optional abdication command.")

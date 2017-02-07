@@ -57,8 +57,8 @@ object BasicIO {
           else Stream.empty
         case Right(s) => Stream.cons(s, next())
       }
-      new Streamed((s: T) => q put Right(s),
-                   code => q put Left(code),
+      new Streamed((s: T) => q.put(Right(s)),
+                   code => q.put(Left(code)),
                    () => next())
     }
   }
@@ -150,8 +150,8 @@ object BasicIO {
     case None => toStdErr
   }
 
-  private def processErrFully(log: ProcessLogger) = processFully(log err _)
-  private def processOutFully(log: ProcessLogger) = processFully(log out _)
+  private def processErrFully(log: ProcessLogger) = processFully(log.err(_))
+  private def processOutFully(log: ProcessLogger) = processFully(log.out(_))
 
   /** Closes a `Closeable` without throwing an exception */
   def close(c: Closeable) =
@@ -211,7 +211,7 @@ object BasicIO {
 
   /** Copy contents of stdin to the `OutputStream`. */
   def connectToIn(o: OutputStream): Unit =
-    transferFully(Uncloseable protect stdin, o)
+    transferFully(Uncloseable.protect(stdin), o)
 
   /** Returns a function `OutputStream => Unit` that either reads the content
     * from stdin or does nothing. This function can be used by
@@ -249,8 +249,8 @@ object BasicIO {
 
   private[this] def appendLine(buffer: Appendable): String => Unit =
     line => {
-      buffer append line
-      buffer append Newline
+      buffer.append(line)
+      buffer.append(Newline)
     }
 
   private[this] def transferFullyImpl(in: InputStream, out: OutputStream) {

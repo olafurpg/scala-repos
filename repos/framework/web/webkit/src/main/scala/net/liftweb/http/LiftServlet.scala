@@ -205,14 +205,16 @@ class LiftServlet extends Loggable {
 
     val role =
       NamedPF.applyBox(req, LiftRules.httpAuthProtectedResource.toList)
-    role.map(_ match {
-      case Full(r) =>
-        LiftRules.authentication.verified_?(req) match {
-          case true => checkRoles(r, userRoles.get)
-          case _ => false
-        }
-      case _ => LiftRules.authentication.verified_?(req)
-    }) openOr true
+    role
+      .map(_ match {
+        case Full(r) =>
+          LiftRules.authentication.verified_?(req) match {
+            case true => checkRoles(r, userRoles.get)
+            case _ => false
+          }
+        case _ => LiftRules.authentication.verified_?(req)
+      })
+      .openOr(true)
   }
 
   private val recent: LRUMap[String, Int] = new LRUMap(2000)
@@ -270,14 +272,16 @@ class LiftServlet extends Loggable {
 
       val role =
         NamedPF.applyBox(req, LiftRules.httpAuthProtectedResource.toList)
-      role.map(_ match {
-        case Full(r) =>
-          LiftRules.authentication.verified_?(req) match {
-            case true => checkRoles(r, userRoles.get)
-            case _ => false
-          }
-        case _ => LiftRules.authentication.verified_?(req)
-      }) openOr true
+      role
+        .map(_ match {
+          case Full(r) =>
+            LiftRules.authentication.verified_?(req) match {
+              case true => checkRoles(r, userRoles.get)
+              case _ => false
+            }
+          case _ => LiftRules.authentication.verified_?(req)
+        })
+        .openOr(true)
     }
 
     def process(req: Req) =
@@ -800,7 +804,7 @@ class LiftServlet extends Loggable {
 
       val ret: Box[LiftResponse] = nextAction match {
         case Left(future) =>
-          val result = runAjax(liftSession, requestState) map CachedResponse
+          val result = runAjax(liftSession, requestState).map(CachedResponse)
 
           if (result.exists(_.failed_?)) {
             // The request failed. The client will retry it, so
@@ -817,8 +821,10 @@ class LiftServlet extends Loggable {
 
         case Right(future) =>
           val ret =
-            future.get(ajaxPostTimeout) openOr net.liftweb.common
-              .Failure("AJAX retry timeout.")
+            future
+              .get(ajaxPostTimeout)
+              .openOr(net.liftweb.common
+                .Failure("AJAX retry timeout."))
 
           ret
       }
@@ -872,7 +878,7 @@ class LiftServlet extends Loggable {
   private object BeginContinuation
 
   private lazy val cometTimeout: Long =
-    (LiftRules.cometRequestTimeout openOr 120) * 1000L
+    (LiftRules.cometRequestTimeout.openOr(120)) * 1000L
 
   private def setupContinuation(request: Req,
                                 session: LiftSession,
@@ -958,7 +964,7 @@ class LiftServlet extends Loggable {
       }
     }
 
-    actors foreach (_._1 ! ClearNotices)
+    actors.foreach(_._1 ! ClearNotices)
 
     val jsCommands = new JsCommands(JsCmds.Run(jsUpdateTime) :: jsUpdateStuff)
 
@@ -996,7 +1002,7 @@ class LiftServlet extends Loggable {
 
         LAPinger.schedule(cont, BreakOut(), TimeSpan(cometTimeout))
 
-        val ret2 = f.get(cometTimeout) openOr Nil
+        val ret2 = f.get(cometTimeout).openOr(Nil)
 
         Full(S.init(Box !! originalRequest, session) {
           convertAnswersToCometResponse(session, ret2, actors)
@@ -1029,21 +1035,19 @@ class LiftServlet extends Loggable {
                                  response: HTTPResponse,
                                  request: Req) {
     def fixHeaders(headers: List[(String, String)]) =
-      headers map
-        ((v) =>
-           v match {
-             case ("Location", uri) =>
-               val u = request
-               (v._1,
-                ((for (updated <- Full(
-                         (if (!LiftRules.excludePathFromContextPathRewriting
-                                .vend(uri)) u.contextPath
-                          else "") + uri).filter(ignore =>
-                         uri.startsWith("/"));
-                       rwf <- URLRewriter.rewriteFunc)
-                  yield rwf(updated)) openOr uri))
-             case _ => v
-           })
+      headers.map((v) =>
+        v match {
+          case ("Location", uri) =>
+            val u = request
+            (v._1,
+             ((for (updated <- Full(
+                      (if (!LiftRules.excludePathFromContextPathRewriting
+                             .vend(uri)) u.contextPath
+                       else "") + uri).filter(ignore => uri.startsWith("/"));
+                    rwf <- URLRewriter.rewriteFunc)
+               yield rwf(updated)).openOr(uri)))
+          case _ => v
+      })
 
     def pairFromRequest(req: Req): (Box[Req], Box[String]) = {
       val acceptHeader = for (innerReq <- Box.legacyNullTest(req.request);
@@ -1100,8 +1104,8 @@ class LiftServlet extends Loggable {
 
     liftResp match {
       case ResponseWithReason(_, reason) =>
-        response setStatusWithReason (resp.code, reason)
-      case _ => response setStatus resp.code
+        response.setStatusWithReason(resp.code, reason)
+      case _ => response.setStatus(resp.code)
     }
 
     try {

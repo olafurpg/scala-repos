@@ -113,7 +113,8 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
       //#modifier-syntax
       when(SomeState) {
         case Event(msg, _) =>
-          goto(Processing) using (newData) forMax (5 seconds) replying (WillDo)
+          (goto(Processing) using (newData))
+            .forMax(5 seconds) replying (WillDo)
       }
       //#modifier-syntax
 

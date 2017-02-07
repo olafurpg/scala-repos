@@ -149,8 +149,8 @@ trait QuirrelCache extends AST { parser: Parser =>
             else if (s.startsWith("false")) ("b", 5)
             else {
               sys.error(
-                "error recovering boolean literal from %s (%s at %s)" format
-                  (s, original, i))
+                "error recovering boolean literal from %s (%s at %s)"
+                  .format(s, original, i))
             }
           case _: NumLit =>
             parser.numLiteralRegex
@@ -158,8 +158,8 @@ trait QuirrelCache extends AST { parser: Parser =>
               .map(x => ("n", x.length))
               .getOrElse {
                 sys.error(
-                  "error recovering number literal from %s (%s at %s)" format
-                    (s, original, i))
+                  "error recovering number literal from %s (%s at %s)"
+                    .format(s, original, i))
               }
           case _: StrLit =>
             parser.pathLiteralRegex
@@ -177,8 +177,8 @@ trait QuirrelCache extends AST { parser: Parser =>
               }
               .getOrElse {
                 sys.error(
-                  "error recovering string literal from %s (%s at %s)" format
-                    (s, original, i))
+                  "error recovering string literal from %s (%s at %s)"
+                    .format(s, original, i))
               }
         }
       }
@@ -272,9 +272,13 @@ trait QuirrelCache extends AST { parser: Parser =>
 
     { (loc: LineStream) =>
       val colNum =
-        deltas get loc.lineNum map { ds =>
-          ds.takeWhile(_._1 < loc.colNum).map(_._2).sum
-        } map (_ + loc.colNum) getOrElse loc.colNum
+        deltas
+          .get(loc.lineNum)
+          .map { ds =>
+            ds.takeWhile(_._1 < loc.colNum).map(_._2).sum
+          }
+          .map(_ + loc.colNum)
+          .getOrElse(loc.colNum)
 
       loc match {
         case ln: LazyLineCons =>
@@ -305,17 +309,17 @@ trait QuirrelCache extends AST { parser: Parser =>
 
     def repl(expr: Expr): BindingS[Expr] = expr match {
       case lit @ BoolLit(loc, _) =>
-        pop map { b =>
+        pop.map { b =>
           BoolLit(updateLoc(loc), b.value == "true")
         }
 
       case lit @ NumLit(loc, _) =>
-        pop map { b =>
+        pop.map { b =>
           NumLit(updateLoc(loc), b.value)
         }
 
       case lit @ StrLit(loc, _) =>
-        pop map { b =>
+        pop.map { b =>
           StrLit(updateLoc(loc), b.value)
         }
 
@@ -326,11 +330,11 @@ trait QuirrelCache extends AST { parser: Parser =>
       case Solve(loc, constraints0, child0) =>
         for {
           child <- repl(child0)
-          constraints <- (constraints0 map repl).sequence
+          constraints <- (constraints0.map(repl)).sequence
         } yield Solve(updateLoc(loc), constraints, child)
 
       case Import(loc, spec, child) =>
-        repl(child) map (Import(updateLoc(loc), spec, _))
+        repl(child).map(Import(updateLoc(loc), spec, _))
 
       case Assert(loc, pred0, child0) =>
         for (pred <- repl(pred0); child <- repl(child0))
@@ -341,7 +345,7 @@ trait QuirrelCache extends AST { parser: Parser =>
           yield Observe(updateLoc(loc), data, samples)
 
       case New(loc, child0) =>
-        repl(child0) map (New(updateLoc(loc), _))
+        repl(child0).map(New(updateLoc(loc), _))
 
       case Relate(loc, from0, to0, in0) =>
         for {
@@ -361,27 +365,27 @@ trait QuirrelCache extends AST { parser: Parser =>
 
       case ObjectDef(loc, props0) =>
         for {
-          props <- (props0 map {
+          props <- (props0.map {
             case (prop, expr) =>
-              repl(expr) map (prop -> _)
+              repl(expr).map(prop -> _)
           }: Vector[BindingS[(String, Expr)]]).sequence
         } yield ObjectDef(updateLoc(loc), props)
 
       case ArrayDef(loc, values0) =>
-        (values0 map repl).sequence map (ArrayDef(updateLoc(loc), _))
+        (values0.map(repl)).sequence.map(ArrayDef(updateLoc(loc), _))
 
       case Descent(loc, child0, property) =>
-        repl(child0) map (Descent(updateLoc(loc), _, property))
+        repl(child0).map(Descent(updateLoc(loc), _, property))
 
       case MetaDescent(loc, child0, property) =>
-        repl(child0) map (MetaDescent(updateLoc(loc), _, property))
+        repl(child0).map(MetaDescent(updateLoc(loc), _, property))
 
       case Deref(loc, lchild0, rchild0) =>
         for (lchild <- repl(lchild0); rchild <- repl(rchild0))
           yield Deref(updateLoc(loc), lchild, rchild)
 
       case Dispatch(loc, name, actuals) =>
-        (actuals map repl).sequence map (Dispatch(updateLoc(loc), name, _))
+        (actuals.map(repl)).sequence.map(Dispatch(updateLoc(loc), name, _))
 
       case Cond(loc, pred0, left0, right0) =>
         for {
@@ -467,13 +471,13 @@ trait QuirrelCache extends AST { parser: Parser =>
           yield Or(updateLoc(loc), left, right)
 
       case Comp(loc, expr) =>
-        repl(expr) map (Comp(updateLoc(loc), _))
+        repl(expr).map(Comp(updateLoc(loc), _))
 
       case Neg(loc, expr) =>
-        repl(expr) map (Neg(updateLoc(loc), _))
+        repl(expr).map(Neg(updateLoc(loc), _))
 
       case Paren(loc, expr) =>
-        repl(expr) map (Paren(updateLoc(loc), _))
+        repl(expr).map(Paren(updateLoc(loc), _))
     }
 
     val result = for {
@@ -494,23 +498,27 @@ trait QuirrelCache extends AST { parser: Parser =>
         f: LineStream => Set[Expr]): Set[Expr] = {
       val s = query.toString
       val (key, bindings) = CacheKey.fromString(s)
-      cache.get(key).flatMap {
-        case (expr, slots) =>
-          resolveBindings(expr, bindings, slots) map { root =>
-            bindRoot(root, root)
-            root
-          }
-      } map { expr =>
-        Set(expr)
-      } getOrElse {
-        val exprs = f(query)
-        if (exprs.size == 1) {
-          val value = exprs.head
-          val (key2, slots) = CacheKey.fromExpr(s, value)
-          cache(key2) = (value, slots)
+      cache
+        .get(key)
+        .flatMap {
+          case (expr, slots) =>
+            resolveBindings(expr, bindings, slots).map { root =>
+              bindRoot(root, root)
+              root
+            }
         }
-        exprs
-      }
+        .map { expr =>
+          Set(expr)
+        }
+        .getOrElse {
+          val exprs = f(query)
+          if (exprs.size == 1) {
+            val value = exprs.head
+            val (key2, slots) = CacheKey.fromExpr(s, value)
+            cache(key2) = (value, slots)
+          }
+          exprs
+        }
     }
   }
 }

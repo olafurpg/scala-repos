@@ -18,7 +18,7 @@ object Account extends LilaController {
   private def forms = lila.user.DataForm
 
   def profile = Auth { implicit ctx => me =>
-    Ok(html.account.profile(me, forms profileOf me)).fuccess
+    Ok(html.account.profile(me, forms.profileOf(me))).fuccess
   }
 
   def profileApply = AuthBody { implicit ctx => me =>
@@ -27,7 +27,7 @@ object Account extends LilaController {
       fuccess(html.account.profile(me, err))
     } { profile =>
       UserRepo.setProfile(me.id, profile) inject Redirect(
-        routes.User show me.username)
+        routes.User.show(me.username))
     }
   }
 
@@ -38,24 +38,30 @@ object Account extends LilaController {
         ctx.me match {
           case None => fuccess(unauthorizedApiResult)
           case Some(me) =>
-            relationEnv.api.countFollowers(me.id) zip relationEnv.api
-              .countFollowing(me.id) zip Env.pref.api
-              .getPref(me) zip lila.game.GameRepo.urgentGames(me) map {
-              case (((nbFollowers, nbFollowing), prefs), povs) =>
-                Env.current.bus.publish(lila.user.User.Active(me), 'userActive)
-                Ok {
-                  import play.api.libs.json._
-                  import lila.pref.JsonView._
-                  Env.user.jsonView(me) ++ Json.obj(
-                    "prefs" -> prefs,
-                    "nowPlaying" -> JsArray(
-                      povs take 20 map Env.api.lobbyApi.nowPlaying),
-                    "nbFollowing" -> nbFollowing,
-                    "nbFollowers" -> nbFollowers)
-                }
-            }
+            relationEnv.api
+              .countFollowers(me.id)
+              .zip(relationEnv.api
+                .countFollowing(me.id))
+              .zip(Env.pref.api
+                .getPref(me))
+              .zip(lila.game.GameRepo.urgentGames(me))
+              .map {
+                case (((nbFollowers, nbFollowing), prefs), povs) =>
+                  Env.current.bus.publish(lila.user.User.Active(me),
+                                          'userActive)
+                  Ok {
+                    import play.api.libs.json._
+                    import lila.pref.JsonView._
+                    Env.user.jsonView(me) ++ Json.obj(
+                      "prefs" -> prefs,
+                      "nowPlaying" -> JsArray(
+                        povs.take(20).map(Env.api.lobbyApi.nowPlaying)),
+                      "nbFollowing" -> nbFollowing,
+                      "nbFollowers" -> nbFollowers)
+                  }
+              }
       }
-    ) map ensureSessionId(ctx.req)
+    ).map(ensureSessionId(ctx.req))
   }
 
   def passwd = Auth { implicit ctx => me =>
@@ -77,7 +83,7 @@ object Account extends LilaController {
     }
   }
 
-  private def emailForm(user: UserModel) = UserRepo email user.id map {
+  private def emailForm(user: UserModel) = UserRepo.email(user.id).map {
     email =>
       Env.security.forms
         .changeEmail(user)
@@ -85,13 +91,13 @@ object Account extends LilaController {
   }
 
   def email = Auth { implicit ctx => me =>
-    emailForm(me) map { form =>
+    emailForm(me).map { form =>
       Ok(html.account.email(me, form))
     }
   }
 
   def emailApply = AuthBody { implicit ctx => me =>
-    UserRepo hasEmail me.id flatMap {
+    UserRepo.hasEmail(me.id).flatMap {
       case true => notFound
       case false =>
         implicit val req = ctx.body
@@ -100,7 +106,8 @@ object Account extends LilaController {
         } { data =>
           val email =
             Env.security.emailAddress
-              .validate(data.email) err s"Invalid email ${data.email}"
+              .validate(data.email)
+              .err(s"Invalid email ${data.email}")
           for {
             ok ← UserRepo.checkPasswordById(me.id, data.passwd)
             _ ← ok ?? UserRepo.email(me.id, email)
@@ -122,19 +129,21 @@ object Account extends LilaController {
     FormFuResult(Env.security.forms.closeAccount) { err =>
       fuccess(html.account.close(me, err))
     } { password =>
-      UserRepo.checkPasswordById(me.id, password) flatMap {
+      UserRepo.checkPasswordById(me.id, password).flatMap {
         case false =>
           BadRequest(html.account.close(me, Env.security.forms.closeAccount)).fuccess
         case true =>
           doClose(me) inject {
-            Redirect(routes.User show me.username) withCookies LilaCookie.newSession
+            Redirect(routes.User.show(me.username))
+              .withCookies(LilaCookie.newSession)
           }
       }
     }
   }
 
   private[controllers] def doClose(user: UserModel) =
-    (UserRepo disable user) >>- env.onlineUserIdMemo.remove(user.id) >> relationEnv.api
+    (UserRepo
+      .disable(user)) >>- env.onlineUserIdMemo.remove(user.id) >> relationEnv.api
       .unfollowAll(user.id) >> Env.team.api
       .quitAll(user.id) >>- Env.challenge.api
       .removeByUserId(user.id) >>- Env.tournament.api.withdrawAll(user) >>
@@ -153,8 +162,8 @@ object Account extends LilaController {
     ~Env.security.api.reqSessionId(ctx.req)
 
   def security = Auth { implicit ctx => me =>
-    Env.security.api.dedup(me.id, ctx.req) >> Env.security.api
-      .locatedOpenSessions(me.id, 50) map { sessions =>
+    (Env.security.api.dedup(me.id, ctx.req) >> Env.security.api
+      .locatedOpenSessions(me.id, 50)).map { sessions =>
       Ok(html.account.security(me, sessions, currentSessionId))
     }
   }

@@ -10,11 +10,11 @@ final class SQLBuilder { self =>
   private val setters = new ArrayBuffer[Setter]
   private var currentIndentLevel: Int = 0
 
-  def +=(s: String) = { sb append s; this }
+  def +=(s: String) = { sb.append(s); this }
 
-  def +=(c: Char) = { sb append c; this }
+  def +=(c: Char) = { sb.append(c); this }
 
-  def +?=(f: Setter) = { setters append f; sb append '?'; this }
+  def +?=(f: Setter) = { setters.append(f); sb.append('?'); this }
 
   def sep[T](sequence: Traversable[T], separator: String)(f: T => Unit) {
     var first = true

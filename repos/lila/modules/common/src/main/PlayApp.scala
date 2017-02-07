@@ -20,17 +20,17 @@ object PlayApp {
 
   def loadConfig: Config = withApp(_.configuration.underlying)
 
-  def loadConfig(prefix: String): Config = loadConfig getConfig prefix
+  def loadConfig(prefix: String): Config = loadConfig.getConfig(prefix)
 
   def withApp[A](op: Application => A): A =
-    Play.maybeApplication map op err "Play application is not started!"
+    Play.maybeApplication.map(op).err("Play application is not started!")
 
   def system = withApp { implicit app =>
     play.api.libs.concurrent.Akka.system
   }
 
   lazy val langs =
-    loadConfig.getStringList("play.i18n.langs").toList map Lang.apply
+    loadConfig.getStringList("play.i18n.langs").toList.map(Lang.apply)
 
   protected def loadMessages(file: String): Map[String, String] = withApp {
     app =>
@@ -61,12 +61,12 @@ object PlayApp {
     .+("default.play" -> loadMessages("messages.default"))
 
   private def enableScheduler =
-    !(loadConfig getBoolean "app.scheduler.disabled")
+    !(loadConfig.getBoolean("app.scheduler.disabled"))
 
   def scheduler =
     new Scheduler(system.scheduler,
                   enabled = enableScheduler && isServer,
-                  debug = loadConfig getBoolean "app.scheduler.debug")
+                  debug = loadConfig.getBoolean("app.scheduler.debug"))
 
   def lifecycle =
     withApp(_.injector.instanceOf[play.api.inject.ApplicationLifecycle])

@@ -22,7 +22,7 @@ class TypeAwareHighlightingApplicationState
 
   def suggest() = myState.getSUGGEST_TYPE_AWARE_HIGHLIGHTING_ENABLED
   def setSuggest(b: Boolean) {
-    myState setSUGGEST_TYPE_AWARE_HIGHLIGHTING_ENABLED b
+    myState.setSUGGEST_TYPE_AWARE_HIGHLIGHTING_ENABLED(b)
   }
 
   def getState: TypeAwareHighlightingApplicationSettings = myState

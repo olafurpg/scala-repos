@@ -17,7 +17,7 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
   } yield Dentry(Path.read(prefix), NameTree.read(dest))
 
   val okDtabs =
-    Dtab.empty +: (okDentries.permutations map (ds => Dtab(ds))).toIndexedSeq
+    Dtab.empty +: (okDentries.permutations.map(ds => Dtab(ds))).toIndexedSeq
 
   def newMsg(): Message = Request(Version.Http11, Method.Get, "/")
 

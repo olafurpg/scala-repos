@@ -126,7 +126,7 @@ object ApplyUsage extends App {
 
   // log that we are adding, and return the results of adding x and y
   def compute(x: Int, y: Int): Logged[Int] =
-    log("adding " + x + " and " + y) as (x + y)
+    log("adding " + x + " and " + y).as(x + y)
 
   // we log a message "begin", we add two numbers, we log "end",
   // neither calls to "log" compute a value, they are only evaluated
@@ -147,7 +147,7 @@ object ApplyUsage extends App {
   // Apply instances can be composed, which allows us to lift a
   // function into a computation in multiple nested contexts, while
   // applying the effects of all contexts:
-  val applyVLO = Apply[Vector] compose Apply[List] compose Apply[Option]
+  val applyVLO = Apply[Vector].compose(Apply[List]).compose(Apply[Option])
 
   val deepResult =
     applyVLO.apply2(Vector(List(1.some, none[Int]), List(2.some, 3.some)),

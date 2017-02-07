@@ -32,7 +32,7 @@ import scalaz.std.list._
 
 class StatisticsSpec extends Specification with ScalaCheck {
   def stats(xs: List[Double]): List[Option[Statistics]] =
-    xs map (x => somez(Statistics(x)))
+    xs.map(x => somez(Statistics(x)))
 
   private def beRelativelyCloseTo(n: Double)(err: Double) =
     beCloseTo(n, math.abs(n * err))
@@ -40,9 +40,9 @@ class StatisticsSpec extends Specification with ScalaCheck {
   private def statsAreEqual(a: Option[Statistics], b: Option[Statistics]) =
     (a, b) match {
       case (Some(a), Some(b)) =>
-        a.mean must (beEqualTo(b.mean) or beRelativelyCloseTo(b.mean)(1e-10))
+        a.mean must (beEqualTo(b.mean).or(beRelativelyCloseTo(b.mean)(1e-10)))
         a.variance must
-          (beEqualTo(b.variance) or beRelativelyCloseTo(b.variance)(1e-10))
+          (beEqualTo(b.variance).or(beRelativelyCloseTo(b.variance)(1e-10)))
         a.count must_== b.count
         a.min must_== b.min
         a.max must_== b.max
@@ -75,7 +75,7 @@ class StatisticsSpec extends Specification with ScalaCheck {
     }
 
     "exclude outliers from statistics" in {
-      val s = (1 to 9).toList map (Statistics(_, tails = 2)) reduce (_ |+| _)
+      val s = (1 to 9).toList.map(Statistics(_, tails = 2)).reduce(_ |+| _)
       s.mean must_== 5.0
       s.variance must beCloseTo(2.5, 1e-10)
       s.count must_== 5
@@ -91,8 +91,8 @@ class StatisticsSpec extends Specification with ScalaCheck {
     }
 
     "be scalable" ! check { (xs: List[Double]) =>
-      statsAreEqual(stats(xs).suml map (_ * 0.0001),
-                    stats(xs map (_ * 0.0001)).suml)
+      statsAreEqual(stats(xs).suml.map(_ * 0.0001),
+                    stats(xs.map(_ * 0.0001)).suml)
     }
   }
 }

@@ -55,7 +55,7 @@ object SimplePattern extends ParserNode {
             return true
           case _ =>
         }
-        if (Patterns parse builder) {
+        if (Patterns.parse(builder)) {
           builder.getTokenType match {
             case ScalaTokenTypes.tRPARENTHESIS =>
               builder.advanceLexer() //Ate )
@@ -63,18 +63,18 @@ object SimplePattern extends ParserNode {
               simplePatternMarker.done(ScalaElementTypes.TUPLE_PATTERN)
               return true
             case _ =>
-              builder error ScalaBundle.message("rparenthesis.expected")
+              builder.error(ScalaBundle.message("rparenthesis.expected"))
               builder.restoreNewlinesState
               simplePatternMarker.done(ScalaElementTypes.TUPLE_PATTERN)
               return true
           }
         }
-        if (Pattern parse builder) {
+        if (Pattern.parse(builder)) {
           builder.getTokenType match {
             case ScalaTokenTypes.tRPARENTHESIS =>
               builder.advanceLexer() //Ate )
             case _ =>
-              builder error ScalaBundle.message("rparenthesis.expected")
+              builder.error(ScalaBundle.message("rparenthesis.expected"))
           }
           builder.restoreNewlinesState
           simplePatternMarker.done(ScalaElementTypes.PATTERN_IN_PARENTHESIS)
@@ -82,12 +82,12 @@ object SimplePattern extends ParserNode {
         }
       case _ =>
     }
-    if (InterpolationPattern parse builder) {
+    if (InterpolationPattern.parse(builder)) {
       simplePatternMarker.done(ScalaElementTypes.INTERPOLATION_PATTERN)
       return true
     }
 
-    if (Literal parse builder) {
+    if (Literal.parse(builder)) {
       simplePatternMarker.done(ScalaElementTypes.LITERAL_PATTERN)
       return true
     }
@@ -112,11 +112,11 @@ object SimplePattern extends ParserNode {
     }
 
     val rb1 = builder.mark
-    if (StableId parse (builder, ScalaElementTypes.REFERENCE_EXPRESSION)) {
+    if (StableId.parse(builder, ScalaElementTypes.REFERENCE_EXPRESSION)) {
       builder.getTokenType match {
         case ScalaTokenTypes.tLPARENTHESIS =>
           rb1.rollbackTo()
-          StableId parse (builder, ScalaElementTypes.REFERENCE)
+          StableId.parse(builder, ScalaElementTypes.REFERENCE)
           val args = builder.mark
           builder.advanceLexer() //Ate (
           builder.disableNewlines
@@ -211,7 +211,7 @@ object SimplePattern extends ParserNode {
             case ScalaTokenTypes.tRPARENTHESIS =>
               builder.advanceLexer() //Ate )
             case _ =>
-              builder error ErrMsg("rparenthesis.expected")
+              builder.error(ErrMsg("rparenthesis.expected"))
           }
           builder.restoreNewlinesState
           args.done(ScalaElementTypes.PATTERN_ARGS)

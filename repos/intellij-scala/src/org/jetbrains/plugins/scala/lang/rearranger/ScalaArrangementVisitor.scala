@@ -254,7 +254,7 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
     }
     import scala.collection.JavaConversions._
     if (scalaAccessModifiersValues.intersect(entry.getModifiers).isEmpty) {
-      entry addModifier PUBLIC
+      entry.addModifier(PUBLIC)
     }
   }
 

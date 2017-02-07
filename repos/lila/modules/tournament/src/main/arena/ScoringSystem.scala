@@ -37,10 +37,10 @@ object ScoringSystem extends AbstractScoringSystem {
 
   def sheet(tour: Tournament, userId: String, pairings: Pairings): Sheet =
     Sheet {
-      val nexts = (pairings drop 1 map Some.apply) :+ None
+      val nexts = (pairings.drop(1).map(Some.apply)) :+ None
       pairings.zip(nexts).foldLeft(List[Score]()) {
         case (scores, (p, n)) =>
-          val berserkValue = p validBerserkOf userId
+          val berserkValue = p.validBerserkOf(userId)
           (p.winner match {
             case None if p.quickDraw =>
               Score(Some(false), Normal, berserkValue)
@@ -67,5 +67,5 @@ object ScoringSystem extends AbstractScoringSystem {
     }
 
   private def firstTwoAreWins(scores: List[Score]) =
-    (scores.size >= 2) && (scores take 2 forall (~_.win))
+    (scores.size >= 2) && (scores.take(2).forall(~_.win))
 }

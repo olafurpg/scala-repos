@@ -67,7 +67,7 @@ private[akkahttp] class ModelConversion(
       // Note: Akka HTTP doesn't provide a direct way to get the raw URI
       // This will only work properly if
       override def uri =
-        request.header[`Raw-Request-URI`].map(_.value) getOrElse {
+        request.header[`Raw-Request-URI`].map(_.value).getOrElse {
           logger.warn(
             "Can't get raw request URI. Please set akka.http.server.raw-request-uri-header = true")
           request.uri.toString

@@ -18,10 +18,10 @@ class RateLimitingFilterTest extends FunSuite with MockitoSugar {
     val strategy = new LocalRateLimitingStrategy[Int](categorize, 1.second, 5)
     val filter = new RateLimitingFilter[Int, Int](strategy)
     val service = mock[Service[Int, Int]]
-    when(service.close(any)) thenReturn Future.Done
-    when(service(Matchers.anyInt)) thenReturn Future.value(1)
+    when(service.close(any)).thenReturn(Future.Done)
+    when(service(Matchers.anyInt)).thenReturn(Future.value(1))
 
-    val rateLimitedService = filter andThen service
+    val rateLimitedService = filter.andThen(service)
   }
 
   test("RateLimitingFilter should Execute requests below rate limit") {
@@ -30,7 +30,7 @@ class RateLimitingFilterTest extends FunSuite with MockitoSugar {
 
     var t = Time.now
     Time.withTimeFunction(t) { _ =>
-      (1 to 5) foreach { _ =>
+      ((1 to 5)).foreach { _ =>
         assert(Await.result(rateLimitedService(1)) == 1)
         t += 100.milliseconds
       }
@@ -43,7 +43,7 @@ class RateLimitingFilterTest extends FunSuite with MockitoSugar {
 
     var t = Time.now
     Time.withTimeFunction(t) { _ =>
-      (1 to 5) foreach { _ =>
+      ((1 to 5)).foreach { _ =>
         Await.result(rateLimitedService(1)) == 1
         t += 100.milliseconds
       }
@@ -61,8 +61,8 @@ class RateLimitingFilterTest extends FunSuite with MockitoSugar {
 
     var t = Time.now
     Time.withTimeFunction(t) { _ =>
-      (1 to 5) foreach { _ =>
-        (1 to 5) foreach { i =>
+      ((1 to 5)).foreach { _ =>
+        ((1 to 5)).foreach { i =>
           assert(Await.result(rateLimitedService(i)) == 1)
         }
         t += 100.milliseconds

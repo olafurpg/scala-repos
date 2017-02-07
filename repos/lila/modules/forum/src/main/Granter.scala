@@ -14,7 +14,7 @@ trait Granter {
 
   def isGrantedRead(categSlug: String)(implicit ctx: UserContext): Boolean =
     (categSlug == StaffSlug)
-      .fold(ctx.me exists Master(Permission.StaffForum), true)
+      .fold(ctx.me.exists(Master(Permission.StaffForum)), true)
 
   def isGrantedWrite(categSlug: String)(implicit ctx: UserContext): Boolean =
     isOldEnoughToForum && {
@@ -31,7 +31,7 @@ trait Granter {
 
   def isOldEnoughToForum(implicit ctx: UserContext) =
     ctx.me ?? { u =>
-      u.count.game > 0 && (u.createdAt isBefore DateTime.now.minusDays(2))
+      u.count.game > 0 && (u.createdAt.isBefore(DateTime.now.minusDays(2)))
     }
 
   def isGrantedMod(categSlug: String)(implicit ctx: UserContext): Fu[Boolean] =

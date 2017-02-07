@@ -127,7 +127,7 @@ private[data] sealed trait OneAndInstances extends OneAndLowPriority2 {
       implicit monad: MonadCombine[F]): Monad[OneAnd[F, ?]] =
     new Monad[OneAnd[F, ?]] {
       override def map[A, B](fa: OneAnd[F, A])(f: A => B): OneAnd[F, B] =
-        fa map f
+        fa.map(f)
 
       def pure[A](x: A): OneAnd[F, A] =
         OneAnd(x, monad.empty)
@@ -160,7 +160,7 @@ trait OneAndLowPriority0 {
         fa.head
 
       def map[A, B](fa: OneAnd[List, A])(f: A => B): OneAnd[List, B] =
-        fa map f
+        fa.map(f)
     }
 }
 
@@ -169,7 +169,7 @@ trait OneAndLowPriority1 extends OneAndLowPriority0 {
       implicit F: Functor[F]): Functor[OneAnd[F, ?]] =
     new Functor[OneAnd[F, ?]] {
       def map[A, B](fa: OneAnd[F, A])(f: A => B): OneAnd[F, B] =
-        fa map f
+        fa.map(f)
     }
 }
 

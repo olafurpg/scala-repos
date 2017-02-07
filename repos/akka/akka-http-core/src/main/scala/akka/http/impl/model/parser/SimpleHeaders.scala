@@ -91,8 +91,10 @@ private[parser] trait SimpleHeaders {
     oneOrMore(
       token ~>
         (x ⇒
-           HttpEncodings.getForKeyCaseInsensitive(x) getOrElse HttpEncoding
-             .custom(x))).separatedBy(listSep) ~ EOI ~>
+           HttpEncodings
+             .getForKeyCaseInsensitive(x)
+             .getOrElse(HttpEncoding
+               .custom(x)))).separatedBy(listSep) ~ EOI ~>
       (`Content-Encoding`(_))
   }
 

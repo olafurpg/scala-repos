@@ -66,7 +66,7 @@ trait CompilerControl { self: Global =>
     *  from consideration for recompilation.
     */
   def removeUnitOf(s: SourceFile): Option[RichCompilationUnit] = {
-    toBeRemoved += s.file; unitOfFile get s.file
+    toBeRemoved += s.file; unitOfFile.get(s.file)
   }
 
   /** Returns the top level classes and objects that were deleted
@@ -82,7 +82,7 @@ trait CompilerControl { self: Global =>
     *  @pre Position must be loaded
     */
   def locateTree(pos: Position): Tree = onUnitOf(pos.source) { unit =>
-    new Locator(pos) locateIn unit.body
+    new Locator(pos).locateIn(unit.body)
   }
 
   /** Locates smallest context that encloses position as an optional value.
@@ -93,7 +93,7 @@ trait CompilerControl { self: Global =>
 
   /** Returns the smallest context that contains given `pos`, throws FatalError if none exists.
     */
-  def doLocateContext(pos: Position): Context = locateContext(pos) getOrElse {
+  def doLocateContext(pos: Position): Context = locateContext(pos).getOrElse {
     throw new FatalError("no context found for " + pos)
   }
 
@@ -250,10 +250,10 @@ trait CompilerControl { self: Global =>
   /** Cancels current compiler run and start a fresh one where everything will be re-typechecked
     *  (but not re-loaded).
     */
-  def askReset() = scheduler raise (new FreshRunReq)
+  def askReset() = scheduler.raise(new FreshRunReq)
 
   /** Tells the compile server to shutdown, and not to restart again */
-  def askShutdown() = scheduler raise ShutdownReq
+  def askShutdown() = scheduler.raise(ShutdownReq)
 
   /** Returns parse tree for source `source`. No symbols are entered. Syntax errors are reported.
     *
@@ -266,7 +266,7 @@ trait CompilerControl { self: Global =>
 
   /** Asks for a computation to be done quickly on the presentation compiler thread */
   def ask[A](op: () => A): A =
-    if (self.onCompilerThread) op() else scheduler doQuickly op
+    if (self.onCompilerThread) op() else scheduler.doQuickly(op)
 
   /** Asks for a computation to be done on presentation compiler thread, returning
     *  a response with the result or an exception
@@ -274,13 +274,13 @@ trait CompilerControl { self: Global =>
   def askForResponse[A](op: () => A): Response[A] = {
     val r = new Response[A]
     if (self.onCompilerThread) {
-      try { r set op() } catch { case exc: Throwable => r raise exc }
+      try { r.set(op()) } catch { case exc: Throwable => r.raise(exc) }
       r
     } else {
-      val ir = scheduler askDoQuickly op
-      ir onComplete {
-        case Left(result) => r set result
-        case Right(exc) => r raise exc
+      val ir = scheduler.askDoQuickly(op)
+      ir.onComplete {
+        case Left(result) => r.set(result)
+        case Right(exc) => r.raise(exc)
       }
       r
     }
@@ -342,7 +342,7 @@ trait CompilerControl { self: Global =>
     override def toString = "reload " + sources
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   case class FilesDeletedItem(sources: List[SourceFile],
@@ -352,7 +352,7 @@ trait CompilerControl { self: Global =>
     override def toString = "files deleted " + sources
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   case class AskTypeAtItem(pos: Position, response: Response[Tree])
@@ -361,7 +361,7 @@ trait CompilerControl { self: Global =>
     override def toString = "typeat " + pos.source + " " + pos.show
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   case class AskTypeItem(source: SourceFile,
@@ -372,7 +372,7 @@ trait CompilerControl { self: Global =>
     override def toString = "typecheck"
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   case class AskTypeCompletionItem(pos: Position,
@@ -382,7 +382,7 @@ trait CompilerControl { self: Global =>
     override def toString = "type completion " + pos.source + " " + pos.show
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   case class AskScopeCompletionItem(pos: Position,
@@ -392,7 +392,7 @@ trait CompilerControl { self: Global =>
     override def toString = "scope completion " + pos.source + " " + pos.show
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   class AskToDoFirstItem(val source: SourceFile) extends WorkItem {
@@ -413,7 +413,7 @@ trait CompilerControl { self: Global =>
     override def toString = "linkpos " + sym + " in " + source
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   case class AskDocCommentItem(sym: Symbol,
@@ -428,7 +428,7 @@ trait CompilerControl { self: Global =>
         fragments.mkString("(", ",", ")")
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   case class AskLoadedTypedItem(source: SourceFile,
@@ -440,7 +440,7 @@ trait CompilerControl { self: Global =>
     override def toString = "wait loaded & typed " + source
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   case class AskParsedEnteredItem(source: SourceFile,
@@ -454,7 +454,7 @@ trait CompilerControl { self: Global =>
       "getParsedEntered " + source + ", keepLoaded = " + keepLoaded
 
     def raiseMissing() =
-      response raise new MissingResponse
+      response.raise(new MissingResponse)
   }
 
   /** A do-nothing work scheduler that responds immediately with MissingResponse.

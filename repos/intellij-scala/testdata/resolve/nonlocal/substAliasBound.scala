@@ -4,6 +4,6 @@ abstract class Q[T] {
 
 class User(q: Q[String]) {
   def r(v: q.t) = {
-    v.< ref > toLowerCase
+    v.<.ref(>) toLowerCase
   }
 }

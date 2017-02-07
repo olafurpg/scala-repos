@@ -54,5 +54,5 @@ abstract class EnumWithDescription {
 
   def valueOf(name: String) = values find (_.name == name)
 
-  def nameDescriptionList = values map (x => (x.name, x.description))
+  def nameDescriptionList = values.map(x => (x.name, x.description))
 }

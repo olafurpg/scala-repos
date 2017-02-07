@@ -438,7 +438,7 @@ private[spark] object UIUtils extends Logging {
       // Verify that this has only anchors and span (we are wrapping in span)
       val allowedNodeLabels = Set("a", "span")
       val illegalNodes =
-        xml \\ "_" filterNot {
+        (xml \\ "_").filterNot {
           case node: Node =>
             allowedNodeLabels.contains(node.label)
         }
@@ -454,7 +454,7 @@ private[spark] object UIUtils extends Logging {
 
       // Verify that all links are relative links starting with "/"
       val allLinks =
-        xml \\ "a" flatMap { _.attributes } filter { _.key == "href" } map {
+        (xml \\ "a").flatMap { _.attributes }.filter { _.key == "href" }.map {
           _.value.toString
         }
       if (allLinks.exists { !_.startsWith("/") }) {

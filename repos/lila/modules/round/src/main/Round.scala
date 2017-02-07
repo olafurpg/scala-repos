@@ -29,7 +29,7 @@ private[round] final class Round(gameId: String,
                                  activeTtl: Duration)
     extends SequentialActor {
 
-  context setReceiveTimeout activeTtl
+  context.setReceiveTimeout(activeTtl)
 
   override def preStart() {
     context.system.lilaBus.subscribe(self, 'deploy)
@@ -99,7 +99,7 @@ private[round] final class Round(gameId: String,
     case ResignForce(playerId) =>
       handle(playerId) { pov =>
         (pov.game.resignable && !pov.game.hasAi && pov.game.hasClock) ?? {
-          socketHub ? Ask(pov.gameId, IsGone(!pov.color)) flatMap {
+          (socketHub ? Ask(pov.gameId, IsGone(!pov.color))).flatMap {
             case true => finisher.rageQuit(pov.game, Some(pov.color))
             case _ => fuccess(List(Event.Reload))
           }
@@ -114,7 +114,7 @@ private[round] final class Round(gameId: String,
     case DrawForce(playerId) =>
       handle(playerId) { pov =>
         (pov.game.drawable && !pov.game.hasAi && pov.game.hasClock) ?? {
-          socketHub ? Ask(pov.gameId, IsGone(!pov.color)) flatMap {
+          (socketHub ? Ask(pov.gameId, IsGone(!pov.color))).flatMap {
             case true => finisher.rageQuit(pov.game, None)
             case _ => fuccess(List(Event.Reload))
           }
@@ -131,8 +131,8 @@ private[round] final class Round(gameId: String,
     // we can also terminate this actor
     case Abandon =>
       fuccess {
-        GameRepo game gameId foreach { gameOption =>
-          gameOption filter (_.abandoned) foreach { game =>
+        GameRepo.game(gameId).foreach { gameOption =>
+          gameOption.filter(_.abandoned).foreach { game =>
             if (game.abortable) finisher.other(game, _.Aborted)
             else finisher.other(game, _.Resign, Some(!game.player.color))
             self ! PoisonPill
@@ -143,7 +143,7 @@ private[round] final class Round(gameId: String,
     case DrawYes(playerRef) => handle(playerRef)(drawer.yes)
     case DrawNo(playerRef) => handle(playerRef)(drawer.no)
     case DrawClaim(playerId) => handle(playerId)(drawer.claim)
-    case DrawForce => handle(drawer force _)
+    case DrawForce => handle(drawer.force(_))
     case Cheat(color) =>
       handle { game =>
         (game.playable && !game.imported) ?? {
@@ -152,9 +152,9 @@ private[round] final class Round(gameId: String,
       }
 
     case Threefold =>
-      GameRepo game gameId flatMap {
-        _ ?? drawer.autoThreefold map {
-          _ foreach { pov =>
+      GameRepo.game(gameId).flatMap {
+        (_ ?? drawer.autoThreefold).map {
+          _.foreach { pov =>
             self ! DrawClaim(pov.player.id)
           }
         }
@@ -180,22 +180,22 @@ private[round] final class Round(gameId: String,
 
     case Moretime(playerRef) =>
       handle(playerRef) { pov =>
-        pov.game.clock.ifTrue(pov.game moretimeable !pov.color) ?? { clock =>
+        pov.game.clock.ifTrue(pov.game.moretimeable(!pov.color)) ?? { clock =>
           val newClock = clock.giveTime(!pov.color, moretimeDuration.toSeconds)
-          val progress = (pov.game withClock newClock) + Event.Clock(newClock)
+          val progress = (pov.game.withClock(newClock)) + Event.Clock(newClock)
           messenger.system(
             pov.game,
             (_.untranslated(
               "%s + %d seconds".format(!pov.color, moretimeDuration.toSeconds)
             )))
-          GameRepo save progress inject progress.events
+          GameRepo.save(progress) inject progress.events
         }
       }
 
     case ForecastPlay(lastMove) =>
       handle { game =>
-        forecastApi.nextMove(game, lastMove) map { mOpt =>
-          mOpt foreach { move =>
+        forecastApi.nextMove(game, lastMove).map { mOpt =>
+          mOpt.foreach { move =>
             self ! HumanPlay(game.player.id, move, false, 0.seconds)
           }
           Nil
@@ -209,7 +209,7 @@ private[round] final class Round(gameId: String,
           val newClock = clock
             .giveTime(Color.White, freeSeconds)
             .giveTime(Color.Black, freeSeconds)
-          val progress = (game withClock newClock) + Event.Clock(newClock)
+          val progress = (game.withClock(newClock)) + Event.Clock(newClock)
           messenger.system(game, (_.untranslated("Lichess has been updated")))
           messenger.system(game,
                            (_.untranslated("Sorry for the inconvenience!")))
@@ -217,7 +217,7 @@ private[round] final class Round(gameId: String,
             messenger.system(game,
                              (_.untranslated(s"$c + $freeSeconds seconds")))
           }
-          GameRepo save progress inject progress.events
+          GameRepo.save(progress) inject progress.events
         }
       }
 
@@ -239,44 +239,50 @@ private[round] final class Round(gameId: String,
       }
 
   private def outOfTime(game: Game) =
-    finisher.other(game, _.Outoftime, Some(!game.player.color) filterNot {
-      color =>
+    finisher.other(
+      game,
+      _.Outoftime,
+      Some(!game.player.color).filterNot { color =>
         game.toChess.board.variant
           .insufficientWinningMaterial(game.toChess.situation.board, color)
-    })
+      }
+    )
 
   protected def handle[A](op: Game => Fu[Events]): Funit =
-    handleGame(GameRepo game gameId)(op)
+    handleGame(GameRepo.game(gameId))(op)
 
   protected def handle(playerId: String)(op: Pov => Fu[Events]): Funit =
     handlePov(
-      (GameRepo pov PlayerRef(gameId, playerId))
+      (GameRepo
+        .pov(PlayerRef(gameId, playerId)))
         .mon(_.round.move.segment.fetch))(op)
 
   protected def handle(color: Color)(op: Pov => Fu[Events]): Funit =
-    handlePov(GameRepo pov PovRef(gameId, color))(op)
+    handlePov(GameRepo.pov(PovRef(gameId, color)))(op)
 
   private def handlePov(pov: Fu[Option[Pov]])(op: Pov => Fu[Events]): Funit =
     publish {
-      pov flatten "pov not found" flatMap { p =>
+      pov.flatten("pov not found").flatMap { p =>
         if (p.player.isAi) fufail("player can't play AI") else op(p)
       }
-    } recover errorHandler("handlePov")
+    }.recover(errorHandler("handlePov"))
 
   private def handleGame(game: Fu[Option[Game]])(
       op: Game => Fu[Events]): Funit =
     publish {
-      game flatten "game not found" flatMap op
-    } recover errorHandler("handleGame")
+      game.flatten("game not found").flatMap(op)
+    }.recover(errorHandler("handleGame"))
 
   private def publish[A](op: Fu[Events]): Funit =
     op.addEffect { events =>
-      if (events.nonEmpty) socketHub ! Tell(gameId, EventList(events))
-      if (events exists {
-            case e: Event.Move => e.threefold
-            case _ => false
-          }) self ! Threefold
-    }.void recover errorHandler("publish")
+        if (events.nonEmpty) socketHub ! Tell(gameId, EventList(events))
+        if (events.exists {
+              case e: Event.Move => e.threefold
+              case _ => false
+            }) self ! Threefold
+      }
+      .void
+      .recover(errorHandler("publish"))
 
   private def errorHandler(name: String): PartialFunction[Throwable, Unit] = {
     case e: ClientError => lila.mon.round.error.client()

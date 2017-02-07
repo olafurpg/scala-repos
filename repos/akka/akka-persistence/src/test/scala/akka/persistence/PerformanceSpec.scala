@@ -54,7 +54,7 @@ object PerformanceSpec {
       extends PerformanceTestPersistentActor(name) {
 
     override val receiveCommand: Receive =
-      controlBehavior orElse {
+      controlBehavior.orElse {
         case cmd ⇒
           persistAsync(cmd) { _ ⇒
             if (lastSequenceNr % 1000 == 0) print(".")
@@ -67,7 +67,7 @@ object PerformanceSpec {
       extends PerformanceTestPersistentActor(name) {
 
     override val receiveCommand: Receive =
-      controlBehavior orElse {
+      controlBehavior.orElse {
         case cmd ⇒
           persist(cmd) { _ ⇒
             if (lastSequenceNr % 1000 == 0) print(".")
@@ -89,7 +89,7 @@ object PerformanceSpec {
     }
 
     val receiveCommand: Receive =
-      controlBehavior orElse {
+      controlBehavior.orElse {
         case cmd ⇒
           counter += 1
           if (counter % 10 == 0) persist(cmd)(handler)
@@ -105,14 +105,13 @@ object PerformanceSpec {
     }
 
     val receiveCommand: Receive =
-      printProgress andThen
-        (controlBehavior orElse {
-          case "a" ⇒ persist("a")(_ ⇒ context.become(processC))
-          case "b" ⇒ persist("b")(_ ⇒ ())
-        })
+      printProgress.andThen(controlBehavior.orElse {
+        case "a" ⇒ persist("a")(_ ⇒ context.become(processC))
+        case "b" ⇒ persist("b")(_ ⇒ ())
+      })
 
     val processC: Receive =
-      printProgress andThen {
+      printProgress.andThen {
         case "c" ⇒
           persist("c")(_ ⇒ context.unbecome())
           unstashAll()
@@ -135,10 +134,10 @@ class PerformanceSpec
   def stressPersistentActor(persistentActor: ActorRef,
                             failAt: Option[Long],
                             description: String): Unit = {
-    failAt foreach { persistentActor ! FailAt(_) }
+    failAt.foreach { persistentActor ! FailAt(_) }
     val m = new Measure(loadCycles)
     m.startMeasure()
-    1 to loadCycles foreach { i ⇒
+    (1 to loadCycles).foreach { i ⇒
       persistentActor ! s"msg${i}"
     }
     persistentActor ! StopMeasure
@@ -169,8 +168,8 @@ class PerformanceSpec
       namedPersistentActor[StashingEventsourcedTestPersistentActor]
     val m = new Measure(loadCycles)
     m.startMeasure()
-    val cmds = 1 to (loadCycles / 3) flatMap (_ ⇒ List("a", "b", "c"))
-    cmds foreach (persistentActor ! _)
+    val cmds = (1 to (loadCycles / 3)).flatMap(_ ⇒ List("a", "b", "c"))
+    cmds.foreach(persistentActor ! _)
     persistentActor ! StopMeasure
     expectMsg(100.seconds, StopMeasure)
     println(

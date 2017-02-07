@@ -124,9 +124,9 @@ private[http] class HttpRequestRendererFactory(
                             transferEncodingSeen)
 
             case x: RawHeader
-                if (x is "content-type") || (x is "content-length") ||
-                  (x is "transfer-encoding") || (x is "host") ||
-                  (x is "user-agent") ⇒
+                if (x.is("content-type")) || (x.is("content-length")) ||
+                  (x.is("transfer-encoding")) || (x.is("host")) ||
+                  (x.is("user-agent")) ⇒
               suppressionWarning(log, x, "illegal RawHeader")
               renderHeaders(tail,
                             hostHeaderSeen,

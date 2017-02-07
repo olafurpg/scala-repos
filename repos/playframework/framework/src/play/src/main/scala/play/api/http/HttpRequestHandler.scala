@@ -149,29 +149,31 @@ class DefaultHttpRequestHandler(router: Router,
         errorHandler.onClientError(req, NOT_FOUND))
 
     val (routedRequest, handler) =
-      routeRequest(request) map {
-        case handler: RequestTaggingHandler =>
-          (handler.tagRequest(request), handler)
-        case otherHandler => (request, otherHandler)
-      } getOrElse {
-
-        // We automatically permit HEAD requests against any GETs without the need to
-        // add an explicit mapping in Routes
-        request.method match {
-          case HttpVerbs.HEAD =>
-            routeRequest(request.copy(method = HttpVerbs.GET)) match {
-              case Some(action: EssentialAction) =>
-                action match {
-                  case handler: RequestTaggingHandler =>
-                    (handler.tagRequest(request), action)
-                  case _ => (request, action)
-                }
-              case None => (request, notFoundHandler)
-            }
-          case _ =>
-            (request, notFoundHandler)
+      routeRequest(request)
+        .map {
+          case handler: RequestTaggingHandler =>
+            (handler.tagRequest(request), handler)
+          case otherHandler => (request, otherHandler)
         }
-      }
+        .getOrElse {
+
+          // We automatically permit HEAD requests against any GETs without the need to
+          // add an explicit mapping in Routes
+          request.method match {
+            case HttpVerbs.HEAD =>
+              routeRequest(request.copy(method = HttpVerbs.GET)) match {
+                case Some(action: EssentialAction) =>
+                  action match {
+                    case handler: RequestTaggingHandler =>
+                      (handler.tagRequest(request), action)
+                    case _ => (request, action)
+                  }
+                case None => (request, notFoundHandler)
+              }
+            case _ =>
+              (request, notFoundHandler)
+          }
+        }
 
     (routedRequest, filterHandler(rh => handler)(routedRequest))
   }
@@ -193,7 +195,7 @@ class DefaultHttpRequestHandler(router: Router,
     * Apply filters to the given action.
     */
   protected def filterAction(next: EssentialAction): EssentialAction = {
-    filters.foldRight(next)(_ apply _)
+    filters.foldRight(next)(_.apply(_))
   }
 
   /**

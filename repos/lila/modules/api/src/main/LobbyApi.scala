@@ -21,28 +21,31 @@ final class LobbyApi(lobby: ActorRef,
   import makeTimeout.large
 
   def apply(implicit ctx: Context): Fu[JsObject] =
-    (lobby ? HooksFor(ctx.me)).mapTo[Vector[Hook]] zip ctx.me.fold(
-      seekApi.forAnon)(seekApi.forUser) zip
-      (ctx.me ?? GameRepo.urgentGames) zip getFilter(ctx) map {
-      case (((hooks, seeks), povs), filter) =>
-        Json.obj(
-          "me" -> ctx.me.map { u =>
-            Json.obj("username" -> u.username)
-          },
-          "version" -> lobbyVersion(),
-          "hooks" -> JsArray(hooks map (_.render)),
-          "seeks" -> JsArray(seeks map (_.render)),
-          "nowPlaying" -> JsArray(povs take 9 map nowPlaying),
-          "nbNowPlaying" -> povs.size,
-          "filter" -> filter.render
-        )
-    }
+    (lobby ? HooksFor(ctx.me))
+      .mapTo[Vector[Hook]]
+      .zip(ctx.me.fold(seekApi.forAnon)(seekApi.forUser))
+      .zip(ctx.me ?? GameRepo.urgentGames)
+      .zip(getFilter(ctx))
+      .map {
+        case (((hooks, seeks), povs), filter) =>
+          Json.obj(
+            "me" -> ctx.me.map { u =>
+              Json.obj("username" -> u.username)
+            },
+            "version" -> lobbyVersion(),
+            "hooks" -> JsArray(hooks.map(_.render)),
+            "seeks" -> JsArray(seeks.map(_.render)),
+            "nowPlaying" -> JsArray(povs.take(9).map(nowPlaying)),
+            "nbNowPlaying" -> povs.size,
+            "filter" -> filter.render
+          )
+      }
 
   def nowPlaying(pov: Pov) =
     Json.obj(
       "fullId" -> pov.fullId,
       "gameId" -> pov.gameId,
-      "fen" -> (chess.format.Forsyth exportBoard pov.game.toChess.board),
+      "fen" -> (chess.format.Forsyth.exportBoard(pov.game.toChess.board)),
       "color" -> pov.color.name,
       "lastMove" -> ~pov.game.castleLastMoveTime.lastMoveString,
       "variant" -> Json.obj("key" -> pov.game.variant.key,

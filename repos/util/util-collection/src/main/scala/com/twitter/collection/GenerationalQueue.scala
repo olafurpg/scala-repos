@@ -44,7 +44,7 @@ class ExactGenerationalQueue[A] extends GenerationalQueue[A] {
   }
 
   def collectAll(age: Duration): Iterable[A] = synchronized {
-    (container filter { case (_, t) => t.untilNow > age }).keys
+    (container.filter { case (_, t) => t.untilNow > age }).keys
   }
 }
 
@@ -111,7 +111,7 @@ class BucketGenerationalQueue[A](timeout: Duration)
     if (olds.isEmpty) news
     else {
       val tailBucket = olds.head
-      olds drop 1 foreach { tailBucket ++= _ }
+      olds.drop(1).foreach { tailBucket ++= _ }
       if (tailBucket.isEmpty) news
       else news ::: List(tailBucket)
     }
@@ -122,7 +122,7 @@ class BucketGenerationalQueue[A](timeout: Duration)
   }
 
   def touch(a: A) = synchronized {
-    buckets drop 1 foreach { _.remove(a) }
+    buckets.drop(1).foreach { _.remove(a) }
     add(a)
   }
 
@@ -132,7 +132,7 @@ class BucketGenerationalQueue[A](timeout: Duration)
   }
 
   def remove(a: A) = synchronized {
-    buckets foreach { _.remove(a) }
+    buckets.foreach { _.remove(a) }
     buckets = compactChain()
   }
 
@@ -149,6 +149,6 @@ class BucketGenerationalQueue[A](timeout: Duration)
   }
 
   def collectAll(d: Duration): Iterable[A] = synchronized {
-    (buckets dropWhile (_.age() < d)).flatten
+    (buckets.dropWhile(_.age() < d)).flatten
   }
 }

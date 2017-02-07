@@ -39,7 +39,7 @@ trait IntTypedField extends NumericTypedField[Int] {
   def defaultValue = 0
 
   def asJValue: JValue =
-    valueBox.map(i => JInt(BigInt(i))) openOr (JNothing: JValue)
+    valueBox.map(i => JInt(BigInt(i))).openOr(JNothing: JValue)
 
   def setFromJValue(jvalue: JValue): Box[Int] = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)

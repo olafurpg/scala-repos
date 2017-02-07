@@ -36,10 +36,11 @@ class AppTasksResourceTest
     val host = "host"
     val toKill = Set(MarathonTestHelper.stagedTaskForApp(PathId(appId)))
 
-    config.zkTimeoutDuration returns 5.seconds
-    taskKiller.kill(any, any)(any) returns Future.successful(toKill)
-    groupManager.app(appId.toRootPath) returns Future.successful(
-      Some(AppDefinition(appId.toRootPath)))
+    config.zkTimeoutDuration.returns(5.seconds)
+    taskKiller.kill(any, any)(any).returns(Future.successful(toKill))
+    groupManager
+      .app(appId.toRootPath)
+      .returns(Future.successful(Some(AppDefinition(appId.toRootPath))))
 
     val response = appsTaskResource
       .deleteMany(appId, host, scale = false, force = false, auth.request)
@@ -61,11 +62,12 @@ class AppTasksResourceTest
       .withAgentInfo(_.copy(agentId = Some(slaveId.value)))
     val toKill = Set(task1)
 
-    config.zkTimeoutDuration returns 5.seconds
-    taskTracker.appTasksSync(appId) returns Set(task1, task2)
-    taskKiller.kill(any, any)(any) returns Future.successful(toKill)
-    groupManager.app(appId) returns Future.successful(
-      Some(AppDefinition(appId)))
+    config.zkTimeoutDuration.returns(5.seconds)
+    taskTracker.appTasksSync(appId).returns(Set(task1, task2))
+    taskKiller.kill(any, any)(any).returns(Future.successful(toKill))
+    groupManager
+      .app(appId)
+      .returns(Future.successful(Some(AppDefinition(appId))))
 
     val response = appsTaskResource.deleteOne(
       appId.toString,
@@ -88,13 +90,16 @@ class AppTasksResourceTest
     val task1 = MarathonTestHelper.mininimalTask("task1")
     val task2 = MarathonTestHelper.mininimalTask("task2")
 
-    config.zkTimeoutDuration returns 5.seconds
-    taskTracker.tasksByAppSync returns TaskTracker.TasksByApp.of(
-      TaskTracker.AppTasks.forTasks(appId, Iterable(task1, task2)))
-    healthCheckManager.statuses(appId) returns Future.successful(
-      collection.immutable.Map.empty)
-    groupManager.app(appId) returns Future.successful(
-      Some(AppDefinition(appId)))
+    config.zkTimeoutDuration.returns(5.seconds)
+    taskTracker.tasksByAppSync.returns(
+      TaskTracker.TasksByApp.of(
+        TaskTracker.AppTasks.forTasks(appId, Iterable(task1, task2))))
+    healthCheckManager
+      .statuses(appId)
+      .returns(Future.successful(collection.immutable.Map.empty))
+    groupManager
+      .app(appId)
+      .returns(Future.successful(Some(AppDefinition(appId))))
 
     val response = appsTaskResource.indexJson("/my/app", auth.request)
     response.getStatus shouldEqual 200
@@ -116,7 +121,7 @@ class AppTasksResourceTest
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
-    groupManager.rootGroup() returns Future.successful(Group.empty)
+    groupManager.rootGroup().returns(Future.successful(Group.empty))
 
     When(s"the indexJson is fetched")
     val indexJson = appsTaskResource.indexJson("", req)
@@ -149,7 +154,7 @@ class AppTasksResourceTest
     val req = auth.request
 
     Given("the app does not exist")
-    groupManager.app("/app".toRootPath) returns Future.successful(None)
+    groupManager.app("/app".toRootPath).returns(Future.successful(None))
 
     When(s"the indexJson is fetched")
     val indexJson = appsTaskResource.indexJson("/app", req)
@@ -165,8 +170,9 @@ class AppTasksResourceTest
     val req = auth.request
 
     Given("the app exists")
-    groupManager.app("/app".toRootPath) returns Future.successful(
-      Some(AppDefinition("/app".toRootPath)))
+    groupManager
+      .app("/app".toRootPath)
+      .returns(Future.successful(Some(AppDefinition("/app".toRootPath))))
 
     When(s"the indexJson is fetched")
     val indexJson = appsTaskResource.indexJson("/app", req)
@@ -182,7 +188,7 @@ class AppTasksResourceTest
     val req = auth.request
 
     Given("the group does not exist")
-    groupManager.group("/group".toRootPath) returns Future.successful(None)
+    groupManager.group("/group".toRootPath).returns(Future.successful(None))
 
     When(s"the indexJson is fetched")
     val indexJson = appsTaskResource.indexJson("/group/*", req)
@@ -199,8 +205,9 @@ class AppTasksResourceTest
 
     Given("the group exists")
     val groupPath = "/group".toRootPath
-    groupManager.group(groupPath) returns Future.successful(
-      Some(Group(groupPath)))
+    groupManager
+      .group(groupPath)
+      .returns(Future.successful(Some(Group(groupPath))))
 
     When(s"the indexJson is fetched")
     val indexJson = appsTaskResource.indexJson("/group/*", req)
@@ -216,8 +223,9 @@ class AppTasksResourceTest
     val req = auth.request
 
     Given("The app exists")
-    groupManager.app("/app".toRootPath) returns Future.successful(
-      Some(AppDefinition("/app".toRootPath)))
+    groupManager
+      .app("/app".toRootPath)
+      .returns(Future.successful(Some(AppDefinition("/app".toRootPath))))
 
     When(s"the index as txt is fetched")
     val indexTxt = appsTaskResource.indexTxt("/app", req)
@@ -233,7 +241,7 @@ class AppTasksResourceTest
     val req = auth.request
 
     Given("The app exists")
-    groupManager.app("/app".toRootPath) returns Future.successful(None)
+    groupManager.app("/app".toRootPath).returns(Future.successful(None))
 
     When(s"the index as txt is fetched")
     val indexTxt = appsTaskResource.indexTxt("/app", req)
@@ -250,8 +258,9 @@ class AppTasksResourceTest
     useRealTaskKiller()
 
     Given("The app exists")
-    groupManager.app("/app".toRootPath) returns Future.successful(
-      Some(AppDefinition("/app".toRootPath)))
+    groupManager
+      .app("/app".toRootPath)
+      .returns(Future.successful(Some(AppDefinition("/app".toRootPath))))
 
     When(s"deleteOne is called")
     val deleteOne =
@@ -269,7 +278,7 @@ class AppTasksResourceTest
     useRealTaskKiller()
 
     Given("The app exists")
-    groupManager.app("/app".toRootPath) returns Future.successful(None)
+    groupManager.app("/app".toRootPath).returns(Future.successful(None))
 
     When(s"deleteOne is called")
     val deleteOne =
@@ -287,8 +296,9 @@ class AppTasksResourceTest
     useRealTaskKiller()
 
     Given("The app exists")
-    groupManager.app("/app".toRootPath) returns Future.successful(
-      Some(AppDefinition("/app".toRootPath)))
+    groupManager
+      .app("/app".toRootPath)
+      .returns(Future.successful(Some(AppDefinition("/app".toRootPath))))
 
     When(s"deleteMany is called")
     val deleteMany =
@@ -306,7 +316,7 @@ class AppTasksResourceTest
     useRealTaskKiller()
 
     Given("The app exists")
-    groupManager.app("/app".toRootPath) returns Future.successful(None)
+    groupManager.app("/app".toRootPath).returns(Future.successful(None))
 
     When(s"deleteMany is called")
     val deleteMany =
@@ -345,7 +355,7 @@ class AppTasksResourceTest
       auth.auth
     )
 
-    config.zkTimeoutDuration returns 1.second
+    config.zkTimeoutDuration.returns(1.second)
   }
 
   private[this] def useRealTaskKiller(): Unit = {

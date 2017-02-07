@@ -65,7 +65,7 @@ class LogbackLoggerConfigurator extends LoggerConfigurator {
           ))
 
     val configUrl =
-      explicitResourceUrl orElse explicitFileUrl orElse resourceUrl
+      explicitResourceUrl.orElse(explicitFileUrl).orElse(resourceUrl)
 
     configure(properties, configUrl)
   }

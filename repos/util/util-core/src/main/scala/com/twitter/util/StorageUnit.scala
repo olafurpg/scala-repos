@@ -24,7 +24,7 @@ object StorageUnit {
 
   private def factor(s: String) = {
     var lower = s.toLowerCase
-    if (lower endsWith "s") lower = lower dropRight 1
+    if (lower.endsWith("s")) lower = lower.dropRight(1)
 
     lower match {
       case "byte" => 1L

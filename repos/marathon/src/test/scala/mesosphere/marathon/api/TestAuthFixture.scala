@@ -50,8 +50,8 @@ class TestAuthFixture extends Mockito {
 
   var request: HttpServletRequest = {
     val req = mock[HttpServletRequest]
-    req.getHeaderNames returns Collections.emptyEnumeration()
-    req.getHeaders(any) returns Collections.emptyEnumeration()
+    req.getHeaderNames.returns(Collections.emptyEnumeration())
+    req.getHeaders(any).returns(Collections.emptyEnumeration())
     req
   }
   var response: HttpServletResponse = mock[HttpServletResponse]

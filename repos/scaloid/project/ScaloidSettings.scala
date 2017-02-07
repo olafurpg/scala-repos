@@ -7,7 +7,7 @@ object ScaloidSettings {
   import AndroidClassExtractor._
   import Dependencies._
 
-  val Scaloid = config("scaloid") extend Compile
+  val Scaloid = config("scaloid").extend(Compile)
 
   lazy val generate =
     taskKey[Seq[File]]("Generate Scaloid source code from templates")

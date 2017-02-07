@@ -22,7 +22,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{
 object StripMarginParser extends StringParser {
 
   override def parse(element: PsiElement): Option[Seq[StringPart]] =
-    Some(element) collect {
+    Some(element).collect {
       case Both(lit: ScInterpolatedStringLiteral,
                 WithStrippedMargin(_, marginChar)) =>
         val parts = InterpolatedStringParser

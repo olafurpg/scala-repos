@@ -23,7 +23,7 @@ trait LoggingFilter[Req, Rep] extends SimpleFilter[Req, Rep] {
   def apply(request: Req, service: Service[Req, Rep]): Future[Rep] = {
     val elapsed = Stopwatch.start()
     val future = service(request)
-    future respond {
+    future.respond {
       case Return(reply) =>
         log(elapsed(), request, reply)
       case Throw(throwable) =>

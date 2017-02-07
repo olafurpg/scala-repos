@@ -23,18 +23,18 @@ object ArgumentExprs {
       case ScalaTokenTypes.tLPARENTHESIS =>
         builder.advanceLexer() //Ate (
         builder.disableNewlines
-        Expr parse builder
+        Expr.parse(builder)
         while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
           builder.advanceLexer()
           if (!Expr.parse(builder)) {
-            builder error ErrMsg("wrong.expression")
+            builder.error(ErrMsg("wrong.expression"))
           }
         }
         builder.getTokenType match {
           case ScalaTokenTypes.tRPARENTHESIS =>
             builder.advanceLexer() //Ate )
           case _ =>
-            builder error ScalaBundle.message("rparenthesis.expected")
+            builder.error(ScalaBundle.message("rparenthesis.expected"))
         }
         builder.restoreNewlinesState
         argMarker.done(ScalaElementTypes.ARG_EXPRS)
@@ -44,7 +44,7 @@ object ArgumentExprs {
           argMarker.rollbackTo()
           return false
         }
-        BlockExpr parse builder
+        BlockExpr.parse(builder)
         argMarker.done(ScalaElementTypes.ARG_EXPRS)
         true
       case _ =>

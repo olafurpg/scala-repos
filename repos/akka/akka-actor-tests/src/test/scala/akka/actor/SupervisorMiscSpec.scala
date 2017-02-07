@@ -76,12 +76,14 @@ class SupervisorMiscSpec
         Seq("actor1" -> actor1,
             "actor2" -> actor2,
             "actor3" -> actor3,
-            "actor4" -> actor4) map {
-          case (id, ref) ⇒ (id, ref ? "status")
-        } foreach {
-          case (id, f) ⇒
-            (id, Await.result(f, timeout.duration)) should ===((id, "OK"))
-        }
+            "actor4" -> actor4)
+          .map {
+            case (id, ref) ⇒ (id, ref ? "status")
+          }
+          .foreach {
+            case (id, f) ⇒
+              (id, Await.result(f, timeout.duration)) should ===((id, "OK"))
+          }
       }
     }
 

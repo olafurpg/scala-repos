@@ -43,7 +43,7 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     println(mutableBippy)
-    make('a' to 'z': _*).toList.sorted foreach println
+    make('a' to 'z': _*).toList.sorted.foreach(println)
     assert(n0 == n1)
   }
 }

@@ -255,8 +255,8 @@ object InferUtil {
         def updateExpr() {
           exprs +=
             new Expression(
-              polymorphicSubst subst extractImplicitParameterType(
-                results.head))
+              polymorphicSubst.subst(
+                extractImplicitParameterType(results.head)))
         }
         val evaluator = ScalaMacroEvaluator.getInstance(place.getProject)
         evaluator.isMacro(results.head.getElement) match {
@@ -264,7 +264,7 @@ object InferUtil {
             evaluator
               .checkMacro(m, MacroContext(place, Some(paramType))) match {
               case Some(tp) =>
-                exprs += new Expression(polymorphicSubst subst tp)
+                exprs += new Expression(polymorphicSubst.subst(tp))
               case None => updateExpr()
             }
           case _ => updateExpr()
@@ -585,7 +585,7 @@ object InferUtil {
                       val substedLowerType = unSubst.subst(lower)
                       val addLower =
                         if (tp.typeParams.nonEmpty &&
-                            ! _addLower.isInstanceOf[ScParameterizedType] &&
+                            !_addLower.isInstanceOf[ScParameterizedType] &&
                             !tp.typeParams.exists(_.name == "_"))
                           ScParameterizedType(
                             _addLower,
@@ -604,7 +604,7 @@ object InferUtil {
                       val substedUpperType = unSubst.subst(upper)
                       val addUpper =
                         if (tp.typeParams.nonEmpty &&
-                            ! _addUpper.isInstanceOf[ScParameterizedType] &&
+                            !_addUpper.isInstanceOf[ScParameterizedType] &&
                             !tp.typeParams.exists(_.name == "_"))
                           ScParameterizedType(
                             _addUpper,

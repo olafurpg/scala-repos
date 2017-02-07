@@ -16,11 +16,11 @@ import tube._
 private[wiki] final class Fetch(gitUrl: String, markdownPath: String)(
     implicit coll: Coll) {
 
-  def apply: Funit = getFiles flatMap { files =>
+  def apply: Funit = getFiles.flatMap { files =>
     val (defaultPages, langPages) =
-      files.map(filePage).flatten partition (_.isDefaultLang)
-    val newLangPages = (langPages map { page =>
-      defaultPages find (_.number == page.number) map { default =>
+      files.map(filePage).flatten.partition(_.isDefaultLang)
+    val newLangPages = (langPages.map { page =>
+      (defaultPages find (_.number == page.number)).map { default =>
         page.copy(slug = default.slug)
       }
     }).flatten
@@ -31,7 +31,7 @@ private[wiki] final class Fetch(gitUrl: String, markdownPath: String)(
   }
 
   private def filePage(file: File): Option[Page] = {
-    val name = """^(.+)\.md$""".r.replaceAllIn(file.getName, _ group 1)
+    val name = """^(.+)\.md$""".r.replaceAllIn(file.getName, _.group(1))
     if (name == "Home") None
     else Page.make(name, toHtml(file))
   }
@@ -40,7 +40,7 @@ private[wiki] final class Fetch(gitUrl: String, markdownPath: String)(
     val dir = Files.createTempDir
     dir.deleteOnExit
     Git.cloneRepository.setURI(gitUrl).setDirectory(dir).setBare(false).call
-    dir.listFiles.toList filter (_.isFile) sortBy (_.getName)
+    dir.listFiles.toList.filter(_.isFile).sortBy(_.getName)
   }
 
   private def toHtml(file: File): String = {

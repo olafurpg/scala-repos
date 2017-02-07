@@ -44,7 +44,7 @@ private[data] sealed abstract class ConstInstances extends ConstInstances0 {
   implicit def constOrder[A: Order, B]: Order[Const[A, B]] =
     new Order[Const[A, B]] {
       def compare(x: Const[A, B], y: Const[A, B]): Int =
-        x compare y
+        x.compare(y)
     }
 
   implicit def constShow[A: Show, B]: Show[Const[A, B]] =
@@ -101,7 +101,7 @@ private[data] sealed abstract class ConstInstances0 extends ConstInstances1 {
   implicit def constPartialOrder[A: PartialOrder, B]
     : PartialOrder[Const[A, B]] = new PartialOrder[Const[A, B]] {
     def partialCompare(x: Const[A, B], y: Const[A, B]): Double =
-      x partialCompare y
+      x.partialCompare(y)
   }
 
   implicit def constApplicative[C: Monoid]: Applicative[Const[C, ?]] =

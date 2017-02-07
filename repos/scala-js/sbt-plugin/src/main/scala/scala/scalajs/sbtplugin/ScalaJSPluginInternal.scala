@@ -139,9 +139,9 @@ object ScalaJSPluginInternal {
         private[this] val inherited = inheritedNewClassfileManager()
 
         def delete(classes: Iterable[File]): Unit = {
-          inherited.delete(classes flatMap { classFile =>
+          inherited.delete(classes.flatMap { classFile =>
             val scalaJSFiles =
-              if (classFile.getPath endsWith ".class") {
+              if (classFile.getPath.endsWith(".class")) {
                 val f =
                   FileVirtualFile.withExtension(classFile, ".class", ".sjsir")
                 if (f.exists) List(f)
@@ -254,32 +254,34 @@ object ScalaJSPluginInternal {
       val ir = irInfo.data
       val output = (artifactPath in key).value
 
-      Def.task {
-        FileFunction.cached(s.cacheDirectory,
-                            FilesInfo.lastModified,
-                            FilesInfo.exists) {
-          _ =>
-            // We don't need the files
+      Def
+        .task {
+          FileFunction.cached(s.cacheDirectory,
+                              FilesInfo.lastModified,
+                              FilesInfo.exists) {
+            _ =>
+              // We don't need the files
 
-            val stageName = stage match {
-              case Stage.FastOpt => "Fast"
-              case Stage.FullOpt => "Full"
-            }
+              val stageName = stage match {
+                case Stage.FastOpt => "Fast"
+                case Stage.FullOpt => "Full"
+              }
 
-            log.info(s"$stageName optimizing $output")
+              log.info(s"$stageName optimizing $output")
 
-            IO.createDirectory(output.getParentFile)
+              IO.createDirectory(output.getParentFile)
 
-            val linker = (scalaJSLinker in key).value
-            linker.link(ir, AtomicWritableFileVirtualJSFile(output), log)
+              val linker = (scalaJSLinker in key).value
+              linker.link(ir, AtomicWritableFileVirtualJSFile(output), log)
 
-            logIRCacheStats(log)
+              logIRCacheStats(log)
 
-            Set(output)
-        }(realFiles.toSet)
+              Set(output)
+          }(realFiles.toSet)
 
-        Attributed.blank(output)
-      } tag ((usesScalaJSLinkerTag in key).value)
+          Attributed.blank(output)
+        }
+        .tag((usesScalaJSLinkerTag in key).value)
     },
     key <<= key.dependsOn(packageJSDependencies, packageScalaJSLauncher),
     scalaJSLinkedFile in key := new FileVirtualJSFile(key.value.data)
@@ -308,7 +310,7 @@ object ScalaJSPluginInternal {
       token(
         OptSpace ~>
           ((literal("-i") | "--infos") ^^^ ((_: Options)
-            .copy(infos = true)))).* map { fns =>
+            .copy(infos = true)))).*.map { fns =>
         Function.chain(fns)(Options())
       }
     }
@@ -326,9 +328,9 @@ object ScalaJSPluginInternal {
     }
 
     Seq(
-      sjsirFilesOnClasspath <<= Def.task {
+      sjsirFilesOnClasspath <<= (Def.task {
         scalaJSIR.value.data.map(_.relativePath).toSeq
-      } storeAs (sjsirFilesOnClasspath) triggeredBy (scalaJSIR),
+      } storeAs (sjsirFilesOnClasspath)).triggeredBy(scalaJSIR),
       scalajsp := {
         val (options, relPath) = parser.parsed
 
@@ -441,19 +443,21 @@ object ScalaJSPluginInternal {
             Attributed.blank((artifactPath in packageScalaJSLauncher).value))
         else
           Def.task {
-            mainClass.value map {
-              mainCl =>
-                val file = (artifactPath in packageScalaJSLauncher).value
-                IO.write(file,
-                         launcherContent(mainCl),
-                         Charset.forName("UTF-8"))
+            mainClass.value
+              .map {
+                mainCl =>
+                  val file = (artifactPath in packageScalaJSLauncher).value
+                  IO.write(file,
+                           launcherContent(mainCl),
+                           Charset.forName("UTF-8"))
 
-                // Attach the name of the main class used, (ab?)using the name key
-                Attributed(file)(AttributeMap.empty.put(name.key, mainCl))
-            } getOrElse {
-              sys.error(
-                "Cannot write launcher file, since there is no or multiple mainClasses")
-            }
+                  // Attach the name of the main class used, (ab?)using the name key
+                  Attributed(file)(AttributeMap.empty.put(name.key, mainCl))
+              }
+              .getOrElse {
+                sys.error(
+                  "Cannot write launcher file, since there is no or multiple mainClasses")
+              }
           }
       },
       artifactPath in packageJSDependencies :=
@@ -509,7 +513,7 @@ object ScalaJSPluginInternal {
             Try {
               val readManifest = JSDependencyManifest.read(vfile)
               readManifest != manifest
-            } getOrElse true
+            }.getOrElse(true)
           }
 
         if (needWrite) JSDependencyManifest.write(manifest, vfile)
@@ -645,14 +649,16 @@ object ScalaJSPluginInternal {
         resolvedJSEnv.value match {
           case env: LinkingUnitJSEnv =>
             log.debug(s"Generating LinkingUnit for JSEnv ${env.name}")
-            Def.task {
-              val linker = scalaJSLinker.value
-              val ir = scalaJSIR.value.data
-              val unit = linker.linkUnit(ir, env.symbolRequirements, log)
+            Def
+              .task {
+                val linker = scalaJSLinker.value
+                val ir = scalaJSIR.value.data
+                val unit = linker.linkUnit(ir, env.symbolRequirements, log)
 
-              log.debug("Loading JSEnv with LinkingUnit")
-              env.loadLibs(libs).loadLinkingUnit(unit)
-            } tag (usesScalaJSLinkerTag.value)
+                log.debug("Loading JSEnv with LinkingUnit")
+                env.loadLibs(libs).loadLinkingUnit(unit)
+              }
+              .tag(usesScalaJSLinkerTag.value)
           case env =>
             Def.task {
               val file = scalaJSLinkedFile.value
@@ -695,7 +701,7 @@ object ScalaJSPluginInternal {
     def isJSApp(discovered: Discovered) =
       discovered.isModule && discovered.baseClasses.contains(jsApp)
 
-    Discovery(Set(jsApp), Set.empty)(Tests.allDefs(analysis)) collect {
+    Discovery(Set(jsApp), Set.empty)(Tests.allDefs(analysis)).collect {
       case (definition, discovered) if isJSApp(discovered) =>
         definition.name
     }
@@ -704,7 +710,7 @@ object ScalaJSPluginInternal {
   private val runMainParser = {
     Defaults.loadForParser(discoveredMainClasses) { (_, names) =>
       val mainClasses = names.getOrElse(Nil).toSet
-      Space ~> token(NotSpace examples mainClasses)
+      Space ~> token(NotSpace.examples(mainClasses))
     }
   }
 
@@ -716,13 +722,15 @@ object ScalaJSPluginInternal {
         Def.task(packageScalaJSLauncher.value.map(FileVirtualJSFile))
       else
         Def.task {
-          (mainClass in scalaJSLauncher).value map { mainClass =>
-            val memLaunch = memLauncher(mainClass)
-            Attributed[VirtualJSFile](memLaunch)(
-              AttributeMap.empty.put(name.key, mainClass))
-          } getOrElse {
-            sys.error("No main class detected.")
-          }
+          (mainClass in scalaJSLauncher).value
+            .map { mainClass =>
+              val memLaunch = memLauncher(mainClass)
+              Attributed[VirtualJSFile](memLaunch)(
+                AttributeMap.empty.put(name.key, mainClass))
+            }
+            .getOrElse {
+              sys.error("No main class detected.")
+            }
         }
     },
     discoveredMainClasses <<= compile
@@ -774,7 +782,7 @@ object ScalaJSPluginInternal {
 
       val detector = new FrameworkDetector(jsEnv)
 
-      detector.detect(frameworks) map {
+      detector.detect(frameworks).map {
         case (tf, name) =>
           (tf, new ScalaJSFramework(name, jsEnv, logger, console))
       }
@@ -782,15 +790,16 @@ object ScalaJSPluginInternal {
     // Override default to avoid triggering a test:fastOptJS in a test:compile
     // without loosing autocompletion.
     definedTestNames <<=
-      definedTests map (_.map(_.name).distinct) storeAs definedTestNames triggeredBy loadedJSEnv
+      (definedTests.map(_.map(_.name).distinct) storeAs definedTestNames)
+        .triggeredBy(loadedJSEnv)
   )
 
   val scalaJSTestBuildSettings =
     (scalaJSConfigSettings) ++
-      (Seq(fastOptJS, fullOptJS, packageScalaJSLauncher, packageJSDependencies) map {
-        packageJSTask =>
+      (Seq(fastOptJS, fullOptJS, packageScalaJSLauncher, packageJSDependencies)
+        .map { packageJSTask =>
           moduleName in packageJSTask := moduleName.value + "-test"
-      })
+        })
 
   val scalaJSTestSettings =
     (scalaJSTestBuildSettings ++ scalaJSRunSettings ++ scalaJSTestFrameworkSettings)
@@ -866,7 +875,8 @@ object ScalaJSPluginInternal {
     // you will need the Scala.js compiler plugin
     autoCompilerPlugins := true,
     addCompilerPlugin(
-      "org.scala-js" % "scalajs-compiler" % scalaJSVersion cross CrossVersion.full),
+      ("org.scala-js" % "scalajs-compiler" % scalaJSVersion)
+        .cross(CrossVersion.full)),
     // and of course the Scala.js library
     libraryDependencies +=
       "org.scala-js" %% "scalajs-library" % scalaJSVersion,

@@ -30,8 +30,8 @@ object Boilerplate {
   implicit class BlockHelper(val sc: StringContext) extends AnyVal {
     def block(args: Any*): String = {
       val interpolated = sc.standardInterpolator(treatEscapes, args)
-      val rawLines = interpolated split '\n'
-      val trimmedLines = rawLines map { _ dropWhile (_.isWhitespace) }
+      val rawLines = interpolated.split('\n')
+      val trimmedLines = rawLines.map { _.dropWhile(_.isWhitespace) }
       trimmedLines mkString "\n"
     }
   }
@@ -81,10 +81,10 @@ object Boilerplate {
   """.stripMargin
 
   class TemplateVals(val arity: Int) {
-    val synTypes = (0 until arity) map (n => (n + 'A').toChar)
-    val synVals = (0 until arity) map (n => (n + 'a').toChar)
+    val synTypes = ((0 until arity)).map(n => (n + 'A').toChar)
+    val synVals = ((0 until arity)).map(n => (n + 'a').toChar)
     val synTypedVals =
-      (synVals zip synTypes) map { case (v, t) => v + ":" + t }
+      (synVals.zip(synTypes)).map { case (v, t) => v + ":" + t }
 
     val `A..N` = synTypes.mkString(", ")
     val `A..N,Res` = (synTypes :+ "Res") mkString ", "
@@ -107,17 +107,19 @@ object Boilerplate {
     def content(tv: TemplateVals): String
     def range = 1 to 22
     def body: String = {
-      val headerLines = header split '\n'
+      val headerLines = header.split('\n')
       val rawContents =
-        range map { n =>
-          content(new TemplateVals(n)) split '\n' filterNot (_.isEmpty)
+        range.map { n =>
+          content(new TemplateVals(n)).split('\n').filterNot(_.isEmpty)
         }
-      val preBody = rawContents.head takeWhile (_ startsWith "|") map (_.tail)
+      val preBody = rawContents.head.takeWhile(_.startsWith("|")).map(_.tail)
       val instances =
-        rawContents flatMap { _ filter (_ startsWith "-") map (_.tail) }
+        rawContents.flatMap { _.filter(_.startsWith("-")).map(_.tail) }
       val postBody =
-        rawContents.head dropWhile (_ startsWith "|") dropWhile
-          (_ startsWith "-") map (_.tail)
+        rawContents.head
+          .dropWhile(_.startsWith("|"))
+          .dropWhile(_.startsWith("-"))
+          .map(_.tail)
       (headerLines ++ preBody ++ instances ++ postBody) mkString "\n"
     }
   }
@@ -398,13 +400,13 @@ object Boilerplate {
     def content(tv: TemplateVals) = {
       import tv._
       val implicitArgs =
-        (synTypes map (a => s"cast${a}:Typeable[${a}]")) mkString ", "
+        (synTypes.map(a => s"cast${a}:Typeable[${a}]")) mkString ", "
       val enumerators =
-        synTypes.zipWithIndex map {
+        synTypes.zipWithIndex.map {
           case (a, idx) => s"_ <- p._${idx + 1}.cast[${a}]"
         } mkString "; "
       val castVals =
-        (synTypes map (a => s"$${cast${a}.describe}")) mkString ", "
+        (synTypes.map(a => s"$${cast${a}.describe}")) mkString ", "
 
       block"""
         |
@@ -436,7 +438,7 @@ object Boilerplate {
 
     def content(tv: TemplateVals) = {
       import tv._
-      val `a:T..n:T` = synVals map (_ + ":T") mkString ", "
+      val `a:T..n:T` = synVals.map(_ + ":T") mkString ", "
 
       block"""
         |
@@ -459,12 +461,12 @@ object Boilerplate {
 
     def content(tv: TemplateVals) = {
       import tv._
-      val typeArgs = (0 until arity) map (n => s"K${n}, V${n}") mkString ", "
+      val typeArgs = ((0 until arity)).map(n => s"K${n}, V${n}") mkString ", "
       val args =
-        (0 until arity) map (n => s"e${n}: (K${n}, V${n})") mkString ", "
+        ((0 until arity)).map(n => s"e${n}: (K${n}, V${n})") mkString ", "
       val witnesses =
-        (0 until arity) map (n => s"ev${n}: R[K${n}, V${n}]") mkString ", "
-      val mapArgs = (0 until arity) map (n => "e" + n) mkString ", "
+        ((0 until arity)).map(n => s"ev${n}: R[K${n}, V${n}]") mkString ", "
+      val mapArgs = ((0 until arity)).map(n => "e" + n) mkString ", "
 
       block"""
         |

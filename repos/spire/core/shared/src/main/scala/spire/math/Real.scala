@@ -59,13 +59,13 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   }
 
   def ===(y: Real): Boolean =
-    (x compare y) == 0
+    (x.compare(y)) == 0
 
   def =!=(y: Real): Boolean =
     !(this === y)
 
   def compare(y: Real): Int = (x, y) match {
-    case (Exact(nx), Exact(ny)) => nx compare ny
+    case (Exact(nx), Exact(ny)) => nx.compare(ny)
     case _ => (x - y).signum
   }
 
@@ -75,8 +75,8 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   }
 
   def max(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx max ny)
-    case _ => Real(p => x(p) max y(p))
+    case (Exact(nx), Exact(ny)) => Exact(nx.max(ny))
+    case _ => Real(p => x(p).max(y(p)))
   }
 
   def abs(): Real = this match {
@@ -183,10 +183,10 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   }
 
   def gcd(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx gcd ny)
+    case (Exact(nx), Exact(ny)) => Exact(nx.gcd(ny))
     case _ =>
       Real({ p =>
-        val g = x.toRational(p) gcd y.toRational(p)
+        val g = x.toRational(p).gcd(y.toRational(p))
         roundUp(g * SafeLong.two.pow(p))
       })
   }
@@ -577,7 +577,7 @@ trait RealIsFractional
   def signum(x: Real): Int = x.signum
 
   override def eqv(x: Real, y: Real): Boolean = x === y
-  def compare(x: Real, y: Real): Int = x compare y
+  def compare(x: Real, y: Real): Int = x.compare(y)
 
   def zero: Real = Real.zero
   def one: Real = Real.one
@@ -586,7 +586,7 @@ trait RealIsFractional
   override def minus(x: Real, y: Real): Real = x - y
   def times(x: Real, y: Real): Real = x * y
 
-  def gcd(x: Real, y: Real): Real = x gcd y
+  def gcd(x: Real, y: Real): Real = x.gcd(y)
   def quot(x: Real, y: Real): Real = x /~ y
   def mod(x: Real, y: Real): Real = x % y
 
@@ -595,7 +595,7 @@ trait RealIsFractional
 
   override def sqrt(x: Real): Real = x.sqrt
   def nroot(x: Real, k: Int): Real = x.nroot(k)
-  def fpow(x: Real, y: Real): Real = x fpow y
+  def fpow(x: Real, y: Real): Real = x.fpow(y)
 
   def acos(a: Real): Real = Real.acos(a)
   def asin(a: Real): Real = Real.asin(a)

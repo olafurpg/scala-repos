@@ -184,7 +184,7 @@ trait TypedField[ThisType] extends BaseField {
     * @param encode function to transform the field value into a String
     */
   protected def asJString(encode: MyType => String): JValue =
-    valueBox.map(v => JString(encode(v))) openOr (JNothing: JValue)
+    valueBox.map(v => JString(encode(v))).openOr(JNothing: JValue)
 
   /** Decode the JValue and set the field to the decoded value. Returns Empty or Failure if the value could not be set */
   def setFromJValue(jvalue: JValue): Box[MyType]
@@ -379,12 +379,12 @@ trait MandatoryTypedField[ThisType]
     * Note: Because setting a field can fail (return non-Full), this method will
     * return defaultValue if the field could not be set.
     */
-  def set(in: MyType): MyType = setBox(Full(in)) openOr defaultValue
+  def set(in: MyType): MyType = setBox(Full(in)).openOr(defaultValue)
 
-  def toValueType(in: Box[MyType]) = in openOr defaultValue
+  def toValueType(in: Box[MyType]) = in.openOr(defaultValue)
   def toBoxMyType(in: ValueType) = Full(in)
 
-  def value: MyType = valueBox openOr defaultValue
+  def value: MyType = valueBox.openOr(defaultValue)
 
   def get: MyType = value
 
@@ -403,7 +403,9 @@ trait MandatoryTypedField[ThisType]
     case Full(null) | null => "null"
     case Full(v) => v.toString
     case _ =>
-      defaultValueBox.map(v => if (v != null) v.toString else "null") openOr ""
+      defaultValueBox
+        .map(v => if (v != null) v.toString else "null")
+        .openOr("")
   }
 }
 
@@ -429,7 +431,7 @@ trait OptionalTypedField[ThisType]
     * Note: Because setting a field can fail (return non-Full), this method will
     * return defaultValueBox if the field could not be set.
     */
-  def set(in: Option[MyType]): Option[MyType] = setBox(in) or defaultValueBox
+  def set(in: Option[MyType]): Option[MyType] = setBox(in).or(defaultValueBox)
 
   def toValueType(in: Box[MyType]) = in
 
@@ -454,7 +456,9 @@ trait OptionalTypedField[ThisType]
     case Full(null) | null => "null"
     case Full(v) => v.toString
     case _ =>
-      defaultValueBox.map(v => if (v != null) v.toString else "null") openOr ""
+      defaultValueBox
+        .map(v => if (v != null) v.toString else "null")
+        .openOr("")
   }
 }
 

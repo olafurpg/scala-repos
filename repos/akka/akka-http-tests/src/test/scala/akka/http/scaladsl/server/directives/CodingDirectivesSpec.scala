@@ -422,7 +422,7 @@ class CodingDirectivesSpec extends RoutingSpec with Inside {
       }
 
       Get("/") ~> `Accept-Encoding`(HttpEncodingRange.`*`,
-                                    deflate withQValue 0.2) ~> {
+                                    deflate.withQValue(0.2)) ~> {
         encodeResponseWith(Deflate, Gzip) { yeah }
       } ~> check {
         response should haveContentEncoding(gzip)
@@ -538,22 +538,22 @@ class CodingDirectivesSpec extends RoutingSpec with Inside {
     compressor.compressAndFlush(ByteString(input)) ++ compressor.finish()
   }
 
-  def hexDump(bytes: Array[Byte]) = bytes.map("%02x" format _).mkString
+  def hexDump(bytes: Array[Byte]) = bytes.map("%02x".format(_)).mkString
   def fromHexDump(dump: String) =
     dump
       .grouped(2)
       .toArray
       .map(chars ⇒ Integer.parseInt(new String(chars), 16).toByte)
 
-  def haveNoContentEncoding: Matcher[HttpResponse] = be(None) compose {
+  def haveNoContentEncoding: Matcher[HttpResponse] = be(None).compose {
     (_: HttpResponse).header[`Content-Encoding`]
   }
   def haveContentEncoding(encoding: HttpEncoding): Matcher[HttpResponse] =
-    be(Some(`Content-Encoding`(encoding))) compose {
+    be(Some(`Content-Encoding`(encoding))).compose {
       (_: HttpResponse).header[`Content-Encoding`]
     }
 
-  def readAs(string: String, charset: String = "UTF8") = be(string) compose {
+  def readAs(string: String, charset: String = "UTF8") = be(string).compose {
     (_: ByteString).decodeString(charset)
   }
 

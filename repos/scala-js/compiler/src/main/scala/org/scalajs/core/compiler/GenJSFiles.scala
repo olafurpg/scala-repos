@@ -46,6 +46,6 @@ trait GenJSFiles extends SubComponent { self: GenJSCode =>
     if (sym.isModuleClass && !sym.isImplClass)
       filename = filename + nme.MODULE_SUFFIX_STRING
 
-    dir fileNamed (filename + suffix)
+    dir.fileNamed(filename + suffix)
   }
 }

@@ -129,7 +129,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def bifoldRight[A, B, C](fa: F[A, B], z: => C)(f: (A, => C) => C)(
       g: (B, => C) => C): C =
     bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))((b: B) =>
-      (Endo.endo(g(b, _: C)))) apply z
+      (Endo.endo(g(b, _: C)))).apply(z)
 
   /** Embed a Traverse on each side of this Bitraverse . */
   def embed[G[_], H[_]](

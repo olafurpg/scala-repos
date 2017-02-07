@@ -160,7 +160,7 @@ trait AnyVarTrait[T, MyType <: AnyVarTrait[T, MyType]]
     */
   private val settingDefault = new ThreadGlobal[Boolean]
 
-  protected def settingDefault_? : Boolean = settingDefault.box openOr false
+  protected def settingDefault_? : Boolean = settingDefault.box.openOr(false)
 
   type CleanUpParam
 

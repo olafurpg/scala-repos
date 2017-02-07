@@ -12,7 +12,7 @@ trait GenericUnmarshallers extends LowerPriorityGenericUnmarshallers {
     targetOptionUnmarshaller(um)
   implicit def targetOptionUnmarshaller[A, B](
       implicit um: Unmarshaller[A, B]): Unmarshaller[A, Option[B]] =
-    um map (Some(_)) withDefaultValue None
+    um.map(Some(_)).withDefaultValue(None)
 }
 
 sealed trait LowerPriorityGenericUnmarshallers {

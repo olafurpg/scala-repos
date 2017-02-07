@@ -63,7 +63,7 @@ case class WebAuthService(protocol: String,
   final def isValid(apiKey: APIKey): Response[Boolean] = withJsonClient {
     client =>
       eitherT(
-        client.query("apiKey", apiKey).get[JValue]("apikeys/" + apiKey) map {
+        client.query("apiKey", apiKey).get[JValue]("apikeys/" + apiKey).map {
           case HttpResponse(HttpStatus(OK, _), _, _, _) => \/.right(true)
           case HttpResponse(HttpStatus(NotFound, _), _, _, _) =>
             \/.right(false)

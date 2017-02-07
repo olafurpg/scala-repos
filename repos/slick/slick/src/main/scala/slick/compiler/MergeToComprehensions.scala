@@ -157,7 +157,7 @@ class MergeToComprehensions extends Phase {
                     "Leaked paths to GroupBy keys: " + leakedPaths
                       .map(l => ("_" :: l).mkString("."))
                       .mkString(", "))
-                  val targets = leakedPaths.map(_.foldLeft(b2)(_ select _))
+                  val targets = leakedPaths.map(_.foldLeft(b2)(_.select(_)))
                   targets.indexWhere(_.findNode {
                     case _: QueryParameter => true
                     case n: LiteralNode => n.volatileHint

@@ -698,7 +698,7 @@ class JDBCSuite
   test("compile filters") {
     val compileFilter = PrivateMethod[Option[String]]('compileFilter)
     def doCompileFilter(f: Filter): String =
-      JDBCRDD invokePrivate compileFilter(f) getOrElse ("")
+      (JDBCRDD invokePrivate compileFilter(f)).getOrElse("")
     assert(doCompileFilter(EqualTo("col0", 3)) === "col0 = 3")
     assert(
       doCompileFilter(Not(EqualTo("col1", "abc"))) === "(NOT (col1 = 'abc'))")

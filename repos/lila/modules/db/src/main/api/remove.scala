@@ -8,7 +8,7 @@ object $remove {
   import play.modules.reactivemongo.json._
 
   def apply[A: InColl](selector: JsObject): Funit =
-    implicitly[InColl[A]].coll remove selector void
+    implicitly[InColl[A]].coll.remove(selector) void
 
   def byId[ID: Writes, A: InColl](id: ID): Funit =
     apply($select(id))

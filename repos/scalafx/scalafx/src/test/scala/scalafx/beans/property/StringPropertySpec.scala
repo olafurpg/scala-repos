@@ -480,6 +480,6 @@ class StringPropertySpec extends FlatSpec with BeforeAndAfterEach {
     stringProperty() should equal("HellonullWorld15")
   }
 
-  it should "support concatenation starting with nulls/primitives/strings" is
-    (pending)
+  (it should "support concatenation starting with nulls/primitives/strings")
+    .is(pending)
 }

@@ -64,10 +64,9 @@ class MetadataTask(settings: Settings)
         val json =
           metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
         (json \ "size").deserialize[Long] must_== 5
-        (json \ "children").children map (_.deserialize[String]) must_== Nil
+        (json \ "children").children.map(_.deserialize[String]) must_== Nil
         val cPathChildren =
-          (json \ "structure" \ "children").children map
-            (_.deserialize[String])
+          (json \ "structure" \ "children").children.map(_.deserialize[String])
         cPathChildren must haveTheSameElementsAs(List(".a", ".b", ".c"))
         (json \ "strucutre" \ "types").children must_== Nil
       }
@@ -123,25 +122,25 @@ class MetadataTask(settings: Settings)
 
       EventuallyResults.eventually(10, 1.second) {
         val json = metadataFor(account.apiKey)(_ / "")
-        val subpaths = (json \ "children").children map (_.deserialize[String])
+        val subpaths = (json \ "children").children.map(_.deserialize[String])
         subpaths must haveTheSameElementsAs(List(account.bareRootPath + "/"))
 
         val json2 = metadataFor(account2.apiKey)(_ / "")
         val subpaths2 =
-          (json2 \ "children").children map (_.deserialize[String])
+          (json2 \ "children").children.map(_.deserialize[String])
         subpaths2 must haveTheSameElementsAs(List(account2.bareRootPath + "/"))
       }
 
       EventuallyResults.eventually(10, 1.second) {
         val json = metadataFor(account.apiKey)(_ / account.bareRootPath / "")
-        val subpaths = (json \ "children").children map (_.deserialize[String])
+        val subpaths = (json \ "children").children.map(_.deserialize[String])
         subpaths must haveTheSameElementsAs(List("foo/", "bar/"))
       }
 
       EventuallyResults.eventually(10, 1.second) {
         val json =
           metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
-        val subpaths = (json \ "children").children map (_.deserialize[String])
+        val subpaths = (json \ "children").children.map(_.deserialize[String])
         subpaths must haveTheSameElementsAs(List("bar/"))
       }
     }

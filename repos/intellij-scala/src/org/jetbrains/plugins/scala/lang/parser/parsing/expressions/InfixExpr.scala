@@ -43,9 +43,9 @@ object InfixExpr {
       var exit = false
       while (!exit) {
         if (opStack.isEmpty) {
-          opStack push s
+          opStack.push(s)
           val newMarker = backupMarker.precede
-          markerStack push newMarker
+          markerStack.push(newMarker)
           exit = true
         } else if (!compar(s, opStack.top, builder)) {
           opStack.pop()
@@ -53,9 +53,9 @@ object InfixExpr {
           backupMarker = markerStack.top.precede
           markerStack.pop().done(ScalaElementTypes.INFIX_EXPR)
         } else {
-          opStack push s
+          opStack.push(s)
           val newMarker = backupMarker.precede
-          markerStack push newMarker
+          markerStack.push(newMarker)
           exit = true
         }
       }
@@ -108,7 +108,7 @@ object InfixExpr {
       if (associate(id1) == -1) true
       else false
     else {
-      builder error ErrMsg("wrong.type.associativity")
+      builder.error(ErrMsg("wrong.type.associativity"))
       false
     }
   }

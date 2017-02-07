@@ -13,8 +13,8 @@ object Prismic {
 
   val prismicLogger = (level: Symbol, message: String) =>
     level match {
-      case 'DEBUG => logger debug message
-      case 'ERROR => logger error message
+      case 'DEBUG => logger.debug(message)
+      case 'ERROR => logger.error(message)
       case _ => logger info message
   }
 
@@ -32,36 +32,40 @@ object Prismic {
       case _ => routes.Lobby.home.url
     }
 
-  def getDocument(id: String): Fu[Option[Document]] = prismicApi flatMap {
+  def getDocument(id: String): Fu[Option[Document]] = prismicApi.flatMap {
     api =>
       api
         .forms("everything")
         .query(s"""[[:d = at(document.id, "$id")]]""")
         .ref(api.master.ref)
-        .submit() map {
-        _.results.headOption
-      }
+        .submit()
+        .map {
+          _.results.headOption
+        }
   }
 
   def getBookmark(name: String) =
-    fetchPrismicApi(true) flatMap { api =>
-      api.bookmarks.get(name) ?? getDocument map2 {
-        (doc: io.prismic.Document) =>
-          doc -> makeLinkResolver(api)
+    fetchPrismicApi(true)
+      .flatMap { api =>
+        (api.bookmarks.get(name) ?? getDocument).map2 {
+          (doc: io.prismic.Document) =>
+            doc -> makeLinkResolver(api)
+        }
       }
-    } recover {
-      case e: Exception =>
-        logger.error(s"bookmark:$name $e")
-        none
-    }
+      .recover {
+        case e: Exception =>
+          logger.error(s"bookmark:$name $e")
+          none
+      }
 
-  def getVariant(variant: chess.variant.Variant) = prismicApi flatMap { api =>
+  def getVariant(variant: chess.variant.Variant) = prismicApi.flatMap { api =>
     api
       .forms("variant")
       .query(s"""[[:d = at(my.variant.key, "${variant.key}")]]""")
       .ref(api.master.ref)
-      .submit() map {
-      _.results.headOption map (_ -> makeLinkResolver(api))
-    }
+      .submit()
+      .map {
+        _.results.headOption.map(_ -> makeLinkResolver(api))
+      }
   }
 }

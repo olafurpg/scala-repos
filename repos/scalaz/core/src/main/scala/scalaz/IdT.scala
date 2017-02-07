@@ -5,7 +5,7 @@ final case class IdT[F[_], A](run: F[A]) {
     new IdT[F, B](F.map(run)(f))
 
   def flatMap[B](f: A => IdT[F, B])(implicit F: Bind[F]) =
-    new IdT[F, B](F.bind(run)(f andThen ((_: IdT[F, B]).run)))
+    new IdT[F, B](F.bind(run)(f.andThen((_: IdT[F, B]).run)))
 
   def flatMapF[B](f: A => F[B])(implicit F: Bind[F]) =
     new IdT[F, B](F.bind(run)(f))
@@ -87,14 +87,14 @@ object IdT extends IdTInstances
 private trait IdTFunctor[F[_]] extends Functor[IdT[F, ?]] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: IdT[F, A])(f: A => B) = fa map f
+  override def map[A, B](fa: IdT[F, A])(f: A => B) = fa.map(f)
 }
 
 private trait IdTApply[F[_]] extends Apply[IdT[F, ?]] with IdTFunctor[F] {
   implicit def F: Apply[F]
 
   override def ap[A, B](fa: => IdT[F, A])(f: => IdT[F, A => B]): IdT[F, B] =
-    fa ap f
+    fa.ap(f)
 }
 
 private trait IdTApplicative[F[_]]
@@ -108,7 +108,7 @@ private trait IdTApplicative[F[_]]
 private trait IdTBind[F[_]] extends Bind[IdT[F, ?]] with IdTApply[F] {
   implicit def F: Bind[F]
 
-  final def bind[A, B](fa: IdT[F, A])(f: A => IdT[F, B]) = fa flatMap f
+  final def bind[A, B](fa: IdT[F, A])(f: A => IdT[F, B]) = fa.flatMap(f)
 }
 
 private trait IdTBindRec[F[_]] extends BindRec[IdT[F, ?]] with IdTBind[F] {
@@ -139,7 +139,7 @@ private trait IdTTraverse[F[_]]
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: IdT[F, A])(
-      f: A => G[B]): G[IdT[F, B]] = fa traverse f
+      f: A => G[B]): G[IdT[F, B]] = fa.traverse(f)
 }
 
 private object IdTHoist extends Hoist[IdT] {

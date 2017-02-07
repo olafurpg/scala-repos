@@ -165,11 +165,11 @@ class WatermarkPool[Req, Rep](factory: ServiceFactory[Req, Rep],
     isOpen = false
 
     // Drain the pool.
-    queue.asScala foreach { _.close() }
+    queue.asScala.foreach { _.close() }
     queue.clear()
 
     // Kill the existing waiters.
-    waiters.asScala foreach { _() = Throw(new ServiceClosedException) }
+    waiters.asScala.foreach { _() = Throw(new ServiceClosedException) }
     waiters.clear()
 
     // Close the underlying factory.

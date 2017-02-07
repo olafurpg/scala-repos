@@ -31,7 +31,7 @@ private[i18n] final class Context(gitUrl: String,
         case (cs, Array(key, _)) =>
           // logwarn("i18n context skipped key " + key)
           cs
-        case (cs, line) if line startsWith "//" => cs
+        case (cs, line) if line.startsWith("//") => cs
         case (cs, line) =>
           // logwarn("i18n context skipped line " + line.mkString("="))
           cs
@@ -39,7 +39,7 @@ private[i18n] final class Context(gitUrl: String,
 
   private lazy val keySet: Set[String] = keys.keys.map(_.en()).toSet
 
-  private def fetch: Fu[Contexts] = gitClone map { dir =>
+  private def fetch: Fu[Contexts] = gitClone.map { dir =>
     val filePath = s"${dir.getAbsolutePath}/$gitFile"
     val content = fileContent(new File(filePath))
     dir.delete

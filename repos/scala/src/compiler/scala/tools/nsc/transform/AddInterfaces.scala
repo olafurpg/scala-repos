@@ -29,7 +29,7 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
           else parents
       }
       if (clazz.isTrait) {
-        decls foreach { sym =>
+        decls.foreach { sym =>
           if (!sym.isType)
             sym.info // initialize to set lateMETHOD flag if necessary
         }
@@ -78,14 +78,14 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
         // jvm doesn't throw a VerifyError. But we can't add the
         // body until now, because the typer knows that Any has no
         // constructor and won't accept a call to super.init.
-        assert((clazz isSubClass AnyValClass) || clazz.info.parents.isEmpty,
+        assert((clazz.isSubClass(AnyValClass)) || clazz.info.parents.isEmpty,
                clazz)
         Block(List(Apply(gen.mkSuperInitCall, Nil)), expr)
 
       case Block(stats, expr) =>
         // needs `hasSymbolField` check because `supercall` could be a block (named / default args)
         val (presuper, supercall :: rest) =
-          stats span (t => t.hasSymbolWhich(_ hasFlag PRESUPER))
+          stats.span(t => t.hasSymbolWhich(_.hasFlag(PRESUPER)))
         treeCopy.Block(
           tree,
           presuper ::: (supercall :: mixinConstructorCalls ::: rest),
@@ -103,7 +103,7 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
           deriveDefDef(tree)(addMixinConstructorCalls(_, sym.owner)) // (3)
         case Template(parents, self, body) =>
           val parents1 =
-            sym.owner.info.parents map (t => TypeTree(t) setPos tree.pos)
+            sym.owner.info.parents.map(t => TypeTree(t).setPos(tree.pos))
           treeCopy.Template(tree, parents1, noSelfType, body)
         case _ =>
           tree

@@ -17,7 +17,7 @@ private final class CallApi(minGames: Int,
       else if (user.count.game < minGames) None
       else
         shuffle {
-          (req.acceptLanguages map transInfos.get).flatten filterNot { i =>
+          (req.acceptLanguages.map(transInfos.get)).flatten.filterNot { i =>
             i.complete || submitted.contains(i.code)
           }
         }.headOption

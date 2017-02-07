@@ -13,7 +13,7 @@ private[app] final class Renderer extends Actor {
   def receive = {
 
     case lila.tv.actorApi.RenderFeaturedJs(game) =>
-      sender ! V.game.featuredJs(Pov first game)
+      sender ! V.game.featuredJs(Pov.first(game))
 
     case lila.notification.actorApi.RenderNotification(id, from, body) =>
       sender ! V.notification.view(id, from)(Html(body))

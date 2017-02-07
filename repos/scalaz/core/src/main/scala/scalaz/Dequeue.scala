@@ -108,7 +108,7 @@ sealed abstract class Dequeue[A] {
     case SingletonDequeue(a) => ICons(a, INil())
     case FullDequeue(front, fs, back, bs) =>
       front.head +:
-        (front.tail ++ (back.tail reverse_::: ICons(back.head, INil())))
+        (front.tail ++ (back.tail.reverse_:::(ICons(back.head, INil()))))
   }
 
   /**
@@ -136,7 +136,7 @@ sealed abstract class Dequeue[A] {
             OneAnd(
               f.head,
               (f.tail ++
-                ((b.head +: b.tail) reverse_::: ICons(of.head, of.tail)))),
+                (((b.head +: b.tail)).reverse_:::(ICons(of.head, of.tail))))),
             fs + bs + ofs,
             ob,
             obs)
@@ -269,7 +269,7 @@ sealed abstract class DequeueInstances {
     override def plus[A](a: Dequeue[A], b: => Dequeue[A]): Dequeue[A] = a ++ b
     override def isEmpty[A](fa: Dequeue[A]) = fa.isEmpty
     override def length[A](fa: Dequeue[A]) = fa.size
-    override def map[A, B](fa: Dequeue[A])(f: A => B): Dequeue[B] = fa map f
+    override def map[A, B](fa: Dequeue[A])(f: A => B): Dequeue[B] = fa.map(f)
   }
 }
 

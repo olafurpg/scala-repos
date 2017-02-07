@@ -54,7 +54,7 @@ object CalendarBatcher {
         def next(v: Long): Long = {
           if (v < 0) {
             // max is towards zero
-            Int.MinValue.toLong max v
+            Int.MinValue.toLong.max(v)
           } else {
             Int.MaxValue.toLong min v
           }

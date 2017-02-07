@@ -98,19 +98,19 @@ object V1SegmentFormat extends SegmentFormat {
         header <- readSegmentId(channel)
         segment <- header match {
           case SegmentId(blockid, cpath, CBoolean) =>
-            readBoolean() map {
+            readBoolean().map {
               case (defined, length, values) =>
                 BooleanSegment(blockid, cpath, defined, values, length)
             }
 
           case SegmentId(blockid, cpath, ctype: CValueType[a]) =>
-            readArray(ctype) map {
+            readArray(ctype).map {
               case (defined, values) =>
                 ArraySegment(blockid, cpath, ctype, defined, values)
             }
 
           case SegmentId(blockid, cpath, ctype: CNullType) =>
-            readNull(ctype) map {
+            readNull(ctype).map {
               case (defined, length) =>
                 NullSegment(blockid, cpath, ctype, defined, length)
             }

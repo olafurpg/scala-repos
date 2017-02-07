@@ -35,7 +35,7 @@ class ScalaForStatementFixer extends ScalaFixer {
           doc.getLineEndOffset(doc.getLineNumber(forStartOffset))
 
         doc.replaceString(forStartOffset, stopOffset, "for () {\n}")
-        editor.getCaretModel moveToOffset forStartOffset
+        editor.getCaretModel.moveToOffset(forStartOffset)
 
         WithReformat(5)
       case None if leftParenthesis != null && rightParenthesis == null =>

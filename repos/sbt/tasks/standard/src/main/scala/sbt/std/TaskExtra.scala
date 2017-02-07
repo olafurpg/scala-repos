@@ -97,7 +97,7 @@ trait TaskExtra {
   final def inlineTask[T](value: T): Task[T] =
     Task(Info(), new Pure(() => value, true))
 
-  final implicit def upcastTask[A >: B, B](t: Task[B]): Task[A] = t map { x =>
+  final implicit def upcastTask[A >: B, B](t: Task[B]): Task[A] = t.map { x =>
     x: A
   }
   final implicit def toTasks[S](in: Seq[() => S]): Seq[Task[S]] =
@@ -130,16 +130,16 @@ trait TaskExtra {
     def flatMapR[T](f: K[Result] => Task[T]): Task[T] =
       Task(Info(), new FlatMapped[T, K](tasks, f, a))
     def flatMap[T](f: K[Id] => Task[T]): Task[T] =
-      Task(Info(), new FlatMapped[T, K](tasks, f compose allM, a))
+      Task(Info(), new FlatMapped[T, K](tasks, f.compose(allM), a))
     def flatFailure[T](f: Seq[Incomplete] => Task[T]): Task[T] =
-      Task(Info(), new FlatMapped[T, K](tasks, f compose anyFailM, a))
+      Task(Info(), new FlatMapped[T, K](tasks, f.compose(anyFailM), a))
 
     def mapR[T](f: K[Result] => T): Task[T] =
       Task(Info(), new Mapped[T, K](tasks, f, a))
     def map[T](f: K[Id] => T): Task[T] =
-      Task(Info(), new Mapped[T, K](tasks, f compose allM, a))
+      Task(Info(), new Mapped[T, K](tasks, f.compose(allM), a))
     def mapFailure[T](f: Seq[Incomplete] => T): Task[T] =
-      Task(Info(), new Mapped[T, K](tasks, f compose anyFailM, a))
+      Task(Info(), new Mapped[T, K](tasks, f.compose(anyFailM), a))
   }
 
   final implicit def singleInputTask[S](in: Task[S]): SingleInTask[S] =
@@ -157,12 +157,12 @@ trait TaskExtra {
       def dependsOn(tasks: Task[_]*): Task[S] =
         Task(Info(), new DependsOn(in, tasks))
 
-      def flatMap[T](f: S => Task[T]): Task[T] = flatMapR(f compose successM)
+      def flatMap[T](f: S => Task[T]): Task[T] = flatMapR(f.compose(successM))
       def flatFailure[T](f: Incomplete => Task[T]): Task[T] =
-        flatMapR(f compose failM)
+        flatMapR(f.compose(failM))
 
-      def map[T](f: S => T): Task[T] = mapR(f compose successM)
-      def mapFailure[T](f: Incomplete => T): Task[T] = mapR(f compose failM)
+      def map[T](f: S => T): Task[T] = mapR(f.compose(successM))
+      def mapFailure[T](f: Incomplete => T): Task[T] = mapR(f.compose(failM))
 
       def andFinally(fin: => Unit): Task[S] =
         mapR(x => Result.tryValue[S]({ fin; x }))
@@ -195,7 +195,7 @@ trait TaskExtra {
         val pio = TaskExtra
           .processIO(s)
           .withInput(out => { BasicIO.transferFully(in, out); out.close() })
-        (p run pio).exitValue
+        (p.run(pio)).exitValue
       }
   }
 
@@ -211,7 +211,7 @@ trait TaskExtra {
 
     private def pipe0[T](sid: Option[String],
                          f: BufferedInputStream => T): Task[T] =
-      streams map { s =>
+      streams.map { s =>
         f(s.readBinary(key(in), sid))
       }
 
@@ -226,7 +226,7 @@ trait TaskExtra {
 
     private def pipe0[T](sid: Option[String],
                          f: BufferedReader => T): Task[T] =
-      streams map { s =>
+      streams.map { s =>
         f(s.readText(key(in), sid))
       }
   }
@@ -237,14 +237,14 @@ trait TaskExtra {
     def lines(sid: String): Task[List[String]] = lines0(Some(sid))
 
     private def lines0[T](sid: Option[String]): Task[List[String]] =
-      streams map { s =>
+      streams.map { s =>
         IO.readLines(s.readText(key(in), sid))
       }
   }
   implicit def processToTask(p: ProcessBuilder)(
-      implicit streams: Task[TaskStreams[_]]): Task[Int] = streams map { s =>
+      implicit streams: Task[TaskStreams[_]]): Task[Int] = streams.map { s =>
     val pio = TaskExtra.processIO(s)
-    (p run pio).exitValue
+    (p.run(pio)).exitValue
   }
 }
 object TaskExtra extends TaskExtra {
@@ -265,7 +265,7 @@ object TaskExtra extends TaskExtra {
 
   def reducePair[S](a: Task[S], b: Task[S], f: (S, S) => S): Task[S] =
     multInputTask[({ type l[L[x]] = (L[S], L[S]) })#l]((a, b))(
-      AList.tuple2[S, S]) map f.tupled
+      AList.tuple2[S, S]).map(f.tupled)
 
   def anyFailM[K[L[x]]](implicit a: AList[K]): K[Result] => Seq[Incomplete] =
     in => {

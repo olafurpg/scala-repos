@@ -41,7 +41,7 @@ class FactorialFrontend(upToN: Int, repeat: Boolean)
 
   def sendJobs(): Unit = {
     log.info("Starting batch of factorials up to [{}]", upToN)
-    1 to upToN foreach { backend ! _ }
+    (1 to upToN).foreach { backend ! _ }
   }
 }
 //#frontend

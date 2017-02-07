@@ -54,17 +54,17 @@ class VirtualDirectory(val name: String,
   def iterator = files.values.toList.iterator
 
   override def lookupName(name: String, directory: Boolean): AbstractFile =
-    (files get name filter (_.isDirectory == directory)).orNull
+    (files.get(name).filter(_.isDirectory == directory)).orNull
 
   override def fileNamed(name: String): AbstractFile =
-    Option(lookupName(name, directory = false)) getOrElse {
+    Option(lookupName(name, directory = false)).getOrElse {
       val newFile = new VirtualFile(name, path + '/' + name)
       files(name) = newFile
       newFile
     }
 
   override def subdirectoryNamed(name: String): AbstractFile =
-    Option(lookupName(name, directory = true)) getOrElse {
+    Option(lookupName(name, directory = true)).getOrElse {
       val dir = new VirtualDirectory(name, Some(this))
       files(name) = dir
       dir

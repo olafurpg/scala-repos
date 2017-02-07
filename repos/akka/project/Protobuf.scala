@@ -41,7 +41,7 @@ object Protobuf {
         sys.error(
           s"Unbalanced number of paths and destination paths!\nPaths: $sourceDirs\nDestination Paths: $targetDirs")
 
-      if (sourceDirs exists (_.exists)) {
+      if (sourceDirs.exists(_.exists)) {
         val cmd = protoc.value
         val log = streams.value.log
         checkProtocVersion(cmd, protocVersion.value, log)
@@ -51,7 +51,7 @@ object Protobuf {
         val targets = target.value
         val cache = targets / "protoc" / "cache"
 
-        (sourceDirs zip targetDirs) map {
+        (sourceDirs.zip(targetDirs)).map {
           case (src, dst) =>
             val relative = src
               .relativeTo(sources)
@@ -82,10 +82,9 @@ object Protobuf {
       thunk(proc, log)
     } catch {
       case e: Exception =>
-        throw new RuntimeException(
-          "error while executing '%s' with args: %s" format
-            (protoc, args.mkString(" ")),
-          e)
+        throw new RuntimeException("error while executing '%s' with args: %s"
+                                     .format(protoc, args.mkString(" ")),
+                                   e)
     }
 
   private def checkProtocVersion(protoc: String,
@@ -97,8 +96,8 @@ object Protobuf {
     val version = res.split(" ").last.trim
     if (version != protocVersion) {
       sys.error(
-        "Wrong protoc version! Expected %s but got %s" format
-          (protocVersion, version))
+        "Wrong protoc version! Expected %s but got %s".format(protocVersion,
+                                                              version))
     }
   }
 
@@ -109,7 +108,7 @@ object Protobuf {
     val protoFiles = (srcDir ** "*.proto").get
     if (srcDir.exists)
       if (protoFiles.isEmpty)
-        log.info("Skipping empty source directory %s" format srcDir)
+        log.info("Skipping empty source directory %s".format(srcDir))
       else {
         targetDir.mkdirs()
 
@@ -117,19 +116,19 @@ object Protobuf {
           "Generating %d protobuf files from %s to %s"
             .format(protoFiles.size, srcDir, targetDir))
         protoFiles.foreach { proto =>
-          log.info("Compiling %s" format proto)
+          log.info("Compiling %s".format(proto))
         }
 
         val exitCode = callProtoc(
           protoc,
           Seq("-I" + srcDir.absolutePath,
-              "--java_out=%s" format targetDir.absolutePath) ++ protoFiles.map(
-            _.absolutePath),
+              "--java_out=%s".format(targetDir.absolutePath)) ++ protoFiles
+            .map(_.absolutePath),
           log, { (p, l) =>
             p ! l
           })
         if (exitCode != 0)
-          sys.error("protoc returned exit code: %d" format exitCode)
+          sys.error("protoc returned exit code: %d".format(exitCode))
       }
   }
 }

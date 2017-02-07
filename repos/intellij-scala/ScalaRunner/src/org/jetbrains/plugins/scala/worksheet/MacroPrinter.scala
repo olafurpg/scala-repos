@@ -53,7 +53,7 @@ object MacroPrinter {
 
     val e = toPrint.tree match {
       case c.universe.Block(imp, _) =>
-        Option(imp.apply(1)) flatMap {
+        Option(imp.apply(1)).flatMap {
           case defdef: c.universe.DefDef =>
             val a = s"${u.show(defdef.name)}${defdef.tparams
               .map {
@@ -78,7 +78,7 @@ object MacroPrinter {
       case _ => None
     }
 
-    q"${e getOrElse ""}"
+    q"${e.getOrElse("")}"
   }
 }
 

@@ -12,7 +12,7 @@ object Test {
       case x => assert(false, x)
     }
 
-    0 until chars.length foreach { i =>
+    (0 until chars.length).foreach { i =>
       println(
         "sub(%s, %s) == '%s'"
           .format(i, chars.length, chars.subSequence(i, chars.length)))

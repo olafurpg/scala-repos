@@ -87,7 +87,7 @@ object Digit extends DigitInstances {
 
   def digitsOr[F[_]](chars: F[Char], d: => Digit)(
       implicit F: Functor[F]): F[Digit] =
-    F.map(chars)(a => digitFromChar(a) getOrElse d)
+    F.map(chars)(a => digitFromChar(a).getOrElse(d))
 
   def digitsCollapse[F[_]](chars: F[Char])(
       implicit F: MonadPlus[F]): F[Digit] =
@@ -105,7 +105,7 @@ object Digit extends DigitInstances {
 
   def traverseDigitsOr[F[_]](chars: F[Char], d: => F[Digit])(
       implicit F: Traverse[F]): F[Digit] =
-    traverseDigits(chars) getOrElse d
+    traverseDigits(chars).getOrElse(d)
 }
 
 sealed abstract class DigitInstances {

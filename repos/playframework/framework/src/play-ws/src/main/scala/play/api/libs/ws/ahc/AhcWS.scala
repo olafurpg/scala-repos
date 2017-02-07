@@ -183,7 +183,7 @@ case class AhcWSRequest(
 
   protected def filterWSRequestExecutor(
       next: WSRequestExecutor): WSRequestExecutor = {
-    filters.foldRight(next)(_ apply _)
+    filters.foldRight(next)(_.apply(_))
   }
 
   def stream(): Future[StreamedResponse] =

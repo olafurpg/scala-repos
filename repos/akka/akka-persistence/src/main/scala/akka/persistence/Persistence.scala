@@ -223,7 +223,7 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
     */
   private[akka] final def adaptersFor(
       journalPluginActor: ActorRef): EventAdapters = {
-    pluginExtensionId.get().values collectFirst {
+    pluginExtensionId.get().values.collectFirst {
       case ext if ext(system).actor == journalPluginActor ⇒
         ext(system).adapters
     } match {

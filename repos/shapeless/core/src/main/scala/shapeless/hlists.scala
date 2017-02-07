@@ -234,7 +234,9 @@ class ProductMacros(val c: whitebox.Context)
 
     val meth = lhsTpe.member(methodName).asMethod
 
-    if (!meth.paramLists.isEmpty && (meth.paramLists(0) forall (_.isImplicit))) {
+    if (!meth.paramLists.isEmpty && (meth
+          .paramLists(0)
+          .forall(_.isImplicit))) {
       val typeParamsTree = mkProductNatTypeParamsImpl(args)
       q""" $lhs.$methodName[${typeParamsTree}] """
     } else {

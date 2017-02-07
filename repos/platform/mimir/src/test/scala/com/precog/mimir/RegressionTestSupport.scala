@@ -50,23 +50,23 @@ trait RegressionTestSupport[M[+ _]] {
 
   def jvalues(samples: Seq[(Array[Double], Double)],
               cpaths: Seq[CPath],
-              mod: Int = 1): Seq[JValue] = samples.zipWithIndex map {
+              mod: Int = 1): Seq[JValue] = samples.zipWithIndex.map {
     case ((xs, y), idx) =>
       val cvalues =
         xs.map { x =>
           CDouble(x).asInstanceOf[CValue]
         } :+ CDouble(y.toDouble).asInstanceOf[CValue]
       val withCPath = {
-        if (idx % mod == 0) cpaths zip cvalues.toSeq
-        else if (idx % mod == 1) cpaths.tail zip cvalues.tail.toSeq
-        else cpaths.tail.tail zip cvalues.tail.tail.toSeq
+        if (idx % mod == 0) cpaths.zip(cvalues.toSeq)
+        else if (idx % mod == 1) cpaths.tail.zip(cvalues.tail.toSeq)
+        else cpaths.tail.tail.zip(cvalues.tail.tail.toSeq)
       }
       val withJPath =
-        withCPath map {
+        withCPath.map {
           case (cpath, cvalue) => cPathToJPaths(cpath, cvalue) head
         } // `head` is only okay if we don't have any homogeneous arrays
       val withJValue =
-        withJPath map { case (jpath, cvalue) => (jpath, cvalue.toJValue) }
+        withJPath.map { case (jpath, cvalue) => (jpath, cvalue.toJValue) }
       withJValue.foldLeft(JArray(Nil).asInstanceOf[JValue]) {
         case (target, (jpath, jvalue)) => target.unsafeInsert(jpath, jvalue)
       }
@@ -75,7 +75,7 @@ trait RegressionTestSupport[M[+ _]] {
   def stdDevMean(values: List[Double]): (Double, Double) = {
     val count = values.size
     val sum = values.sum
-    val sumsq = values map { x =>
+    val sumsq = values.map { x =>
       math.pow(x, 2)
     } sum
 
@@ -106,7 +106,7 @@ trait RegressionTestSupport[M[+ _]] {
     val median = computeMedian(values)
 
     val diffs =
-      values map { v =>
+      values.map { v =>
         math.abs(v - median)
       }
     val mad = computeMedian(diffs) / constant

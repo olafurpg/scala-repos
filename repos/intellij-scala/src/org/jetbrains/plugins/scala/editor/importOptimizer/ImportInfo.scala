@@ -353,5 +353,5 @@ object ImportInfo {
   }
 
   def merge(infos: Seq[ImportInfo]): Option[ImportInfo] =
-    infos.reduceOption(_ merge _)
+    infos.reduceOption(_.merge(_))
 }

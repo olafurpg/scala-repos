@@ -35,7 +35,7 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File])
   def this() = this(None)
 
   private val indexesDir =
-    testIndexesDir getOrElse SbtResolverIndexesManager.DEFAULT_INDEXES_DIR
+    testIndexesDir.getOrElse(SbtResolverIndexesManager.DEFAULT_INDEXES_DIR)
   private val indexes: mutable.Set[SbtResolverIndex] = mutable.Set.empty
   private val updatingIndexes: mutable.Set[SbtResolverIndex] =
     mutable.Set.empty
@@ -55,7 +55,7 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File])
     indexes find { _.root == resolver.root }
 
   def dispose() =
-    indexes foreach { _.close() }
+    indexes.foreach { _.close() }
 
   def update(resolvers: Seq[SbtResolver]) {
 
@@ -106,7 +106,7 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File])
 
     val indices = indexesDir.listFiles()
     if (indices == null) return
-    indices foreach { indexDir =>
+    indices.foreach { indexDir =>
       if (indexDir.isDirectory) {
         try {
           val index = SbtResolverIndex.load(indexDir)

@@ -42,17 +42,17 @@ trait ArrayLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
       def apply(table: Table, ctx: MorphContext) = M point {
         val derefed =
-          table transform trans.DerefObjectStatic(Leaf(Source), paths.Value)
+          table.transform(trans.DerefObjectStatic(Leaf(Source), paths.Value))
         val keys =
-          table transform trans.DerefObjectStatic(Leaf(Source), paths.Key)
+          table.transform(trans.DerefObjectStatic(Leaf(Source), paths.Key))
 
         val flattenedSlices =
-          table.slices map { slice =>
+          table.slices.map { slice =>
             val keys = slice.deref(paths.Key)
             val values = slice.deref(paths.Value)
 
             val indices =
-              values.columns.keys collect {
+              values.columns.keys.collect {
                 case ColumnRef(CPath(CPathIndex(i), _ @_ *), _) => i
               }
 
@@ -71,8 +71,7 @@ trait ArrayLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
                     val finalRef = ColumnRef(CPath(ptail: _*), tpe)
                     val colTable =
-                      acc get finalRef getOrElse
-                        (new Array[Column](maxLength))
+                      acc.get(finalRef).getOrElse(new Array[Column](maxLength))
 
                     colTable(idx) = col
 
@@ -83,7 +82,7 @@ trait ArrayLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
                 }
 
               val valueCols =
-                columnTables map {
+                columnTables.map {
                   case (ref @ ColumnRef(_, CUndefined), _) =>
                     ref -> UndefinedColumn.raw
 
@@ -191,7 +190,7 @@ trait ArrayLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
               val sliceSize = maxLength * slice.size
               val keySlice = Slice(keyCols, sliceSize).wrap(paths.Key)
               val valueSlice = Slice(valueCols, sliceSize).wrap(paths.Value)
-              keySlice zip valueSlice
+              keySlice.zip(valueSlice)
             }
           }
 
@@ -212,7 +211,7 @@ trait ArrayLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
                      paths.Value.name)
         )
 
-        finalTable transform spec
+        finalTable.transform(spec)
       }
     }
   }

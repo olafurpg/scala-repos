@@ -110,80 +110,85 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
         val permissionsFinder = new PermissionsFinder[Future](apiKeyFinder,
                                                               accountFinder,
                                                               clock.instant)
-        request.content map {
-          contentFuture =>
-            val responseVF =
-              for {
-                sreq <- EitherT {
-                  contentFuture map { jv =>
-                    jv.validated[AddScheduledQueryRequest]
-                      .disjunction leftMap { err =>
-                      badRequest(
-                        "Request body %s is not a valid scheduling query request: %s"
-                          .format(jv.renderCompact, err.message))
+        request.content
+          .map {
+            contentFuture =>
+              val responseVF =
+                for {
+                  sreq <- EitherT {
+                    contentFuture.map { jv =>
+                      jv.validated[AddScheduledQueryRequest]
+                        .disjunction
+                        .leftMap { err =>
+                          badRequest(
+                            "Request body %s is not a valid scheduling query request: %s"
+                              .format(jv.renderCompact, err.message))
+                        }
                     }
                   }
-                }
 
-                authorities <- EitherT {
-                  M point {
-                    (Authorities.ifPresent(sreq.owners) \/> badRequest(
-                      "You must provide an owner account for the task results!"))
+                  authorities <- EitherT {
+                    M point {
+                      (Authorities.ifPresent(sreq.owners) \/> badRequest(
+                        "You must provide an owner account for the task results!"))
+                    }
                   }
-                }
 
-                okToReads <- EitherT.right {
-                  authorities.accountIds.toStream traverse { acctId =>
-                    permissionsFinder.apiKeyFinder.hasCapability(
-                      apiKey,
-                      Set(ExecutePermission(sreq.source, WrittenBy(acctId))),
-                      None)
+                  okToReads <- EitherT.right {
+                    authorities.accountIds.toStream.traverse { acctId =>
+                      permissionsFinder.apiKeyFinder.hasCapability(
+                        apiKey,
+                        Set(ExecutePermission(sreq.source, WrittenBy(acctId))),
+                        None)
+                    }
                   }
-                }
-                okToRead = okToReads.exists(_ == true)
-                okToWrite <- EitherT.right(
-                  permissionsFinder.checkWriteAuthorities(authorities,
-                                                          apiKey,
-                                                          sreq.sink,
-                                                          clock.instant))
+                  okToRead = okToReads.exists(_ == true)
+                  okToWrite <- EitherT.right(
+                    permissionsFinder.checkWriteAuthorities(authorities,
+                                                            apiKey,
+                                                            sreq.sink,
+                                                            clock.instant))
 
-                readError = (!okToRead).option(
-                  nels("The API Key does not have permission to execute %s"
-                    .format(sreq.source.path)))
-                writeError = (!okToWrite).option(
-                  nels(
+                  readError = (!okToRead).option(
+                    nels("The API Key does not have permission to execute %s"
+                      .format(sreq.source.path)))
+                  writeError = (!okToWrite).option(nels(
                     "The API Key does not have permission to write to %s as %s"
                       .format(sreq.sink.path, authorities.render)))
 
-                taskId <- (readError |+| writeError) match {
-                  case None =>
-                    scheduler.addTask(Some(sreq.schedule),
-                                      apiKey,
-                                      authorities,
-                                      sreq.context,
-                                      sreq.source,
-                                      sreq.sink,
-                                      sreq.timeout) leftMap { error =>
-                      logger.error(
-                        "Failure adding scheduled execution: " + error)
-                      HttpResponse(
-                        status = HttpStatus(InternalServerError),
-                        content = Some(
-                          "An error occurred scheduling your query".serialize))
-                    }
+                  taskId <- (readError |+| writeError) match {
+                    case None =>
+                      scheduler
+                        .addTask(Some(sreq.schedule),
+                                 apiKey,
+                                 authorities,
+                                 sreq.context,
+                                 sreq.source,
+                                 sreq.sink,
+                                 sreq.timeout)
+                        .leftMap { error =>
+                          logger.error(
+                            "Failure adding scheduled execution: " + error)
+                          HttpResponse(
+                            status = HttpStatus(InternalServerError),
+                            content = Some(
+                              "An error occurred scheduling your query".serialize))
+                        }
 
-                  case Some(errors) =>
-                    EitherT.left(M point forbidden(errors.list.mkString(", ")))
+                    case Some(errors) =>
+                      EitherT.left(
+                        M point forbidden(errors.list.mkString(", ")))
+                  }
+                } yield {
+                  HttpResponse(content = Some(taskId.serialize))
                 }
-              } yield {
-                HttpResponse(content = Some(taskId.serialize))
-              }
 
-            responseVF.fold(a => a, a => a)
-        } getOrElse {
-          Promise successful badRequest(
-            "Missing body for scheduled query submission")
-        }
+              responseVF.fold(a => a, a => a)
+          }
+          .getOrElse {
+            Promise.successful(
+              badRequest("Missing body for scheduled query submission"))
+          }
       })
 
   val metadata = DescriptionMetadata("Add a new scheduled query")
@@ -200,17 +205,20 @@ class DeleteScheduledQueryServiceHandler[A](scheduler: Scheduler[Future])(
       idStr <- request.parameters
         .get('scheduleId)
         .toSuccess(DispatchError(BadRequest, "scheduleId parameter required"))
-      id <- Validation.fromTryCatch { UUID.fromString(idStr) } leftMap {
+      id <- Validation.fromTryCatch { UUID.fromString(idStr) }.leftMap {
         error =>
           DispatchError(BadRequest, "Invalid schedule Id \"%s\"".format(idStr))
       }
     } yield {
-      scheduler.deleteTask(id) map { _ =>
-        ok[String](None)
-      } valueOr { error =>
-        sys.error("todo")
-      //serverError("An error occurred deleting your query", Some(error))
-      }
+      scheduler
+        .deleteTask(id)
+        .map { _ =>
+          ok[String](None)
+        }
+        .valueOr { error =>
+          sys.error("todo")
+        //serverError("An error occurred deleting your query", Some(error))
+        }
     }
   }
 
@@ -229,44 +237,51 @@ class ScheduledQueryStatusServiceHandler[A](scheduler: Scheduler[Future])(
         .get('scheduleId)
         .toSuccess(
           DispatchError(BadRequest, "Missing schedule Id for status."))
-      id <- Validation.fromTryCatch { UUID.fromString(idStr) } leftMap { ex =>
+      id <- Validation.fromTryCatch { UUID.fromString(idStr) }.leftMap { ex =>
         DispatchError(BadRequest,
                       "Invalid schedule Id \"%s\"".format(idStr),
                       Some(ex.getMessage))
       }
-      limit <- Validation.fromTryCatch {
-        request.parameters.get('last) map (_.toInt)
-      } leftMap {
-        case ex: NumberFormatException =>
-          DispatchError(BadRequest, "Invalid last limit: " + ex.getMessage)
-      }
+      limit <- Validation
+        .fromTryCatch {
+          request.parameters.get('last).map(_.toInt)
+        }
+        .leftMap {
+          case ex: NumberFormatException =>
+            DispatchError(BadRequest, "Invalid last limit: " + ex.getMessage)
+        }
     } yield {
-      scheduler.statusForTask(id, limit) map {
-        case Some((task, reports)) =>
-          val nextTime: Option[DateTime] =
-            task.repeat.flatMap { sched: CronExpression =>
-              Option(sched.getNextValidTimeAfter(new java.util.Date))
-            } map { d =>
-              new DateTime(d)
-            }
+      scheduler
+        .statusForTask(id, limit)
+        .map {
+          case Some((task, reports)) =>
+            val nextTime: Option[DateTime] =
+              task.repeat
+                .flatMap { sched: CronExpression =>
+                  Option(sched.getNextValidTimeAfter(new java.util.Date))
+                }
+                .map { d =>
+                  new DateTime(d)
+                }
 
-          val body: JValue = JObject(
-            "task" -> task.serialize,
-            "nextRun" ->
-              (nextTime.map(_.serialize) getOrElse { JString("never") }),
-            "history" -> reports.toList.serialize
-          )
+            val body: JValue = JObject(
+              "task" -> task.serialize,
+              "nextRun" ->
+                (nextTime.map(_.serialize).getOrElse { JString("never") }),
+              "history" -> reports.toList.serialize
+            )
 
-          ok(Some(body))
+            ok(Some(body))
 
-        case None =>
-          notFound("No status found for id " + idStr)
-      } valueOr { error =>
-        HttpResponse(
-          status = HttpStatus(InternalServerError),
-          content =
-            Some("An error occurred getting status for your query".serialize))
-      }
+          case None =>
+            notFound("No status found for id " + idStr)
+        }
+        .valueOr { error =>
+          HttpResponse(
+            status = HttpStatus(InternalServerError),
+            content = Some(
+              "An error occurred getting status for your query".serialize))
+        }
     }
   }
 

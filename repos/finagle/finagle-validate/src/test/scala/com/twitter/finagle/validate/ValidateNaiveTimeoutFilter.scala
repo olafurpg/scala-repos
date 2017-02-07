@@ -24,12 +24,12 @@ class ValidateNaiveTimeoutFilter extends FunSuite {
     new Iterator[String] {
       def hasNext = true
       def next(): String = {
-        Option(reader.readLine()) getOrElse {
+        Option(reader.readLine()).getOrElse {
           reader.reset()
           reader.readLine()
         }
       }
-    } filter (_.nonEmpty) map (opt => (1000 * opt.toDouble).toLong) take (n)
+    }.filter(_.nonEmpty).map(opt => (1000 * opt.toDouble).toLong).take(n)
   }
 
   test("Timeout kills everything over timeout") {
@@ -51,13 +51,15 @@ class ValidateNaiveTimeoutFilter extends FunSuite {
         })
       }, {
         case (duration: Duration, f: Future[Boolean]) =>
-          f onSuccess { _ =>
-            assert(duration <= timeout)
-          } onFailure { _ =>
-            assert(duration > timeout)
-          } ensure {
-            num += 1
-          }
+          f.onSuccess { _ =>
+              assert(duration <= timeout)
+            }
+            .onFailure { _ =>
+              assert(duration > timeout)
+            }
+            .ensure {
+              num += 1
+            }
       }: (Duration, Future[Boolean]) => Unit,
       filter,
       timer

@@ -55,7 +55,7 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
       batchable {
         val lock, callingThreadLock, count = new AtomicInteger(0)
         callingThreadLock.compareAndSet(0, 1) // Enable the lock
-        (1 to 100) foreach { i ⇒
+        ((1 to 100)).foreach { i ⇒
           batchable {
             if (callingThreadLock.get != 0)
               p.tryFailure(
@@ -86,7 +86,7 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
 
       val latch = TestLatch(101)
       batchable {
-        (1 to 100) foreach { i ⇒
+        ((1 to 100)).foreach { i ⇒
           batchable {
             val deadlock = TestLatch(1)
             batchable { deadlock.open() }
@@ -168,7 +168,7 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
       }))
       val b = TestActorRef(Props(new Actor {
         def receive = {
-          case msg ⇒ a forward msg
+          case msg ⇒ a.forward(msg)
         }
       }))
       val p = TestProbe()
@@ -205,9 +205,10 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
       val sec =
         SerializedSuspendableExecutionContext(1)(ExecutionContext.global)
       val counter = new AtomicInteger(0)
-      def perform(f: Int ⇒ Int) = sec execute new Runnable {
-        def run = counter.set(f(counter.get))
-      }
+      def perform(f: Int ⇒ Int) =
+        sec.execute(new Runnable {
+          def run = counter.set(f(counter.get))
+        })
       perform(_ + 1)
       perform(x ⇒ { sec.suspend(); x * 2 })
       awaitCond(counter.get == 2)
@@ -238,12 +239,13 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
       val throughput = 25
       val sec = SerializedSuspendableExecutionContext(throughput)(underlying)
       sec.suspend()
-      def perform(f: Int ⇒ Int) = sec execute new Runnable {
-        def run = counter.set(f(counter.get))
-      }
+      def perform(f: Int ⇒ Int) =
+        sec.execute(new Runnable {
+          def run = counter.set(f(counter.get))
+        })
 
       val total = 1000
-      1 to total foreach { _ ⇒
+      (1 to total).foreach { _ ⇒
         perform(_ + 1)
       }
       sec.size() should ===(total)
@@ -258,11 +260,12 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
         SerializedSuspendableExecutionContext(1)(ExecutionContext.global)
       val total = 10000
       val counter = new AtomicInteger(0)
-      def perform(f: Int ⇒ Int) = sec execute new Runnable {
-        def run = counter.set(f(counter.get))
-      }
+      def perform(f: Int ⇒ Int) =
+        sec.execute(new Runnable {
+          def run = counter.set(f(counter.get))
+        })
 
-      1 to total foreach { i ⇒
+      (1 to total).foreach { i ⇒
         perform(c ⇒ if (c == (i - 1)) c + 1 else c)
       }
       awaitCond(counter.get == total)
@@ -283,11 +286,12 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
       val throughput = 25
       val sec = SerializedSuspendableExecutionContext(throughput)(underlying)
       sec.suspend()
-      def perform(f: Int ⇒ Int) = sec execute new Runnable {
-        def run = counter.set(f(counter.get))
-      }
+      def perform(f: Int ⇒ Int) =
+        sec.execute(new Runnable {
+          def run = counter.set(f(counter.get))
+        })
       perform(_ + 1)
-      1 to 10 foreach { _ ⇒
+      (1 to 10).foreach { _ ⇒
         perform(identity)
       }
       perform(x ⇒ { sec.suspend(); x * 2 })

@@ -27,7 +27,7 @@ class ExceptionFilter[REQUEST <: Request]
       // apply() threw an exception - convert to Future
       case NonFatal(e) => Future.exception(e)
     }
-  } rescue {
+  }.rescue {
     case e: CancelledRequestException =>
       // This only happens when ChannelService cancels a reply.
       log.warning("cancelled request: uri:%s", request.uri)

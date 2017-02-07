@@ -39,7 +39,7 @@ object ManyToManySpec extends Specification {
     val person = new Person
     person.save
     val companies =
-      (1 to 10).toList map { i =>
+      (1 to 10).toList.map { i =>
         val c = new Company
         c.name() = i.toString
         c.save

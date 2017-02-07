@@ -13,11 +13,11 @@ case class ByteArray(value: Array[Byte]) {
 
   def isEmpty = value.isEmpty
 
-  def toHexStr = Converters hex2Str value
+  def toHexStr = Converters.hex2Str(value)
 
   def showBytes: String =
-    value map { b =>
-      "%08d" format { b & 0xff }.toBinaryString.toInt
+    value.map { b =>
+      "%08d".format { b & 0xff }.toBinaryString.toInt
     } mkString ","
 
   override def toString = toHexStr
@@ -28,7 +28,7 @@ object ByteArray {
   val empty = ByteArray(Array())
 
   def fromHexStr(hexStr: String): Try[ByteArray] =
-    Try(ByteArray(Converters str2Hex hexStr))
+    Try(ByteArray(Converters.str2Hex(hexStr)))
 
   implicit object ByteArrayBSONHandler
       extends BSONHandler[BSONBinary, ByteArray] {
@@ -42,7 +42,7 @@ object ByteArray {
 
     def reads(json: JsValue) =
       (for {
-        hexStr ← json str "$binary"
+        hexStr ← json.str("$binary")
         bytes ← fromHexStr(hexStr).toOption
       } yield bytes) match {
         case None => JsError(s"error reading ByteArray from $json")
@@ -61,7 +61,7 @@ object ByteArray {
       s.charAt(i) match {
         case '1' => sum += mult
         case '0' =>
-        case x => sys error s"invalid binary literal: $x in $s"
+        case x => sys.error(s"invalid binary literal: $x in $s")
       }
       mult *= 2
       i -= 1
@@ -69,9 +69,9 @@ object ByteArray {
     sum.toByte
   }
 
-  def parseBytes(s: List[String]) = ByteArray(s map parseByte toArray)
+  def parseBytes(s: List[String]) = ByteArray(s.map(parseByte) toArray)
 
   def subtype = Subtype.GenericBinarySubtype
 
-  private val binarySubType = Converters hex2Str Array(subtype.value)
+  private val binarySubType = Converters.hex2Str(Array(subtype.value))
 }

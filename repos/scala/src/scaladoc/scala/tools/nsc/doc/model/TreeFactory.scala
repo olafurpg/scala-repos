@@ -55,7 +55,7 @@ trait TreeFactory { thisTreeFactory: ModelFactory with TreeFactory =>
                 makeTemplate(asym.owner) match {
                   case docTmpl: DocTemplateImpl =>
                     val mbrs: Option[MemberImpl] = findMember(asym, docTmpl)
-                    mbrs foreach { mbr =>
+                    mbrs.foreach { mbr =>
                       refs += ((start, (mbr, end)))
                     }
                   case _ =>

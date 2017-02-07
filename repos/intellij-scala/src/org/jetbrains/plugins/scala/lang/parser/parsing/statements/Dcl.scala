@@ -50,7 +50,7 @@ object Dcl {
     //Look for val,var,def or type
     builder.getTokenType match {
       case ScalaTokenTypes.kVAL =>
-        if (ValDcl parse builder) {
+        if (ValDcl.parse(builder)) {
           dclMarker.done(ScalaElementTypes.VALUE_DECLARATION)
           true
         } else {
@@ -58,7 +58,7 @@ object Dcl {
           false
         }
       case ScalaTokenTypes.kVAR =>
-        if (VarDcl parse builder) {
+        if (VarDcl.parse(builder)) {
           dclMarker.done(ScalaElementTypes.VARIABLE_DECLARATION)
           true
         } else {
@@ -66,7 +66,7 @@ object Dcl {
           false
         }
       case ScalaTokenTypes.kDEF =>
-        if (FunDcl parse builder) {
+        if (FunDcl.parse(builder)) {
           dclMarker.done(ScalaElementTypes.FUNCTION_DECLARATION)
           true
         } else {
@@ -74,7 +74,7 @@ object Dcl {
           false
         }
       case ScalaTokenTypes.kTYPE =>
-        if (TypeDcl parse builder) {
+        if (TypeDcl.parse(builder)) {
           dclMarker.done(ScalaElementTypes.TYPE_DECLARATION)
           true
         } else {

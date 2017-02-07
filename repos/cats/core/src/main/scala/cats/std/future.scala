@@ -29,7 +29,7 @@ trait FutureInstances extends FutureInstances1 {
           f: Throwable => A): Future[A] = fea.recover { case t => f(t) }
 
       override def attempt[A](fa: Future[A]): Future[Throwable Xor A] =
-        (fa map Xor.right) recover { case NonFatal(t) => Xor.left(t) }
+        (fa.map(Xor.right)).recover { case NonFatal(t) => Xor.left(t) }
 
       override def recover[A](fa: Future[A])(
           pf: PartialFunction[Throwable, A]): Future[A] = fa.recover(pf)
@@ -69,7 +69,7 @@ private[cats] class FutureSemigroup[A: Semigroup](
     implicit ec: ExecutionContext)
     extends Semigroup[Future[A]] {
   def combine(fx: Future[A], fy: Future[A]): Future[A] =
-    (fx zip fy).map { case (x, y) => x |+| y }
+    (fx.zip(fy)).map { case (x, y) => x |+| y }
 }
 
 private[cats] class FutureMonoid[A](implicit A: Monoid[A],
@@ -86,5 +86,5 @@ private[cats] class FutureGroup[A](implicit A: Group[A], ec: ExecutionContext)
   def inverse(fx: Future[A]): Future[A] =
     fx.map(_.inverse)
   override def remove(fx: Future[A], fy: Future[A]): Future[A] =
-    (fx zip fy).map { case (x, y) => x |-| y }
+    (fx.zip(fy)).map { case (x, y) => x |-| y }
 }

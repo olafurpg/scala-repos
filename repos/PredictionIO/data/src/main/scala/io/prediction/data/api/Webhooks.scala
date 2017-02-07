@@ -58,7 +58,7 @@ private[prediction] object Webhooks {
 
     eventFuture.flatMap { eventOpt =>
       if (eventOpt.isEmpty) {
-        Future successful {
+        Future.successful {
           val message = s"webhooks connection for ${web} is not supported."
           (StatusCodes.NotFound, Map("message" -> message))
         }

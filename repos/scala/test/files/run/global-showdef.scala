@@ -43,12 +43,12 @@ object Bippy {
     val objects = List("Bippy", "Bippy#Boppity#Boo")
 
     def interesting(line: String) =
-      (line contains "def showdefTestMember") || (line startsWith "<<-- ")
+      (line contains "def showdefTestMember") || (line.startsWith("<<-- "))
 
     def run(args: String*) =
-      slurp(args: _*).lines filter interesting foreach println
+      slurp(args: _*).lines.filter(interesting).foreach(println)
 
-    classes.zipAll(objects, "", "") foreach {
+    classes.zipAll(objects, "", "").foreach {
       case (c, "") => run("-Xshow-class", c)
       case (c, o) => run("-Xshow-class", c, "-Xshow-object", o)
     }

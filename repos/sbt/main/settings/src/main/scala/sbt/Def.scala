@@ -63,13 +63,16 @@ object Def extends Init[Scope] with TaskMacroExtra {
 
   override def deriveAllowed[T](s: Setting[T],
                                 allowDynamic: Boolean): Option[String] =
-    super.deriveAllowed(s, allowDynamic) orElse
-      (if (s.key.scope != ThisScope)
-         Some(s"Scope cannot be defined for ${definedSettingString(s)}")
-       else None) orElse s.dependencies
-      .find(k => k.scope != ThisScope)
-      .map(k =>
-        s"Scope cannot be defined for dependency ${k.key.label} of ${definedSettingString(s)}")
+    super
+      .deriveAllowed(s, allowDynamic)
+      .orElse(
+        if (s.key.scope != ThisScope)
+          Some(s"Scope cannot be defined for ${definedSettingString(s)}")
+        else None)
+      .orElse(s.dependencies
+        .find(k => k.scope != ThisScope)
+        .map(k =>
+          s"Scope cannot be defined for dependency ${k.key.label} of ${definedSettingString(s)}"))
 
   override def intersect(s1: Scope, s2: Scope)(
       implicit delegates: Scope => Seq[Scope]): Option[Scope] =
@@ -165,11 +168,11 @@ object Def extends Init[Scope] with TaskMacroExtra {
     val base: Task[T] =
       newTask(
         sys.error("Dummy task '" + name +
-          "' did not get converted to a full task.")) named name
+          "' did not get converted to a full task.")).named(name)
     base.copy(info = base.info.set(isDummyTask, true))
   }
   private[sbt] def isDummy(t: Task[_]): Boolean =
-    t.info.attributes.get(isDummyTask) getOrElse false
+    t.info.attributes.get(isDummyTask).getOrElse(false)
   private[sbt] val isDummyTask = AttributeKey[Boolean](
     "is-dummy-task",
     "Internal: used to identify dummy tasks.  sbt injects values for these tasks at the start of task execution.",

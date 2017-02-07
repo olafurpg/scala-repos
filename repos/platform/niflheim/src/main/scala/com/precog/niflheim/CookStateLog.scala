@@ -92,11 +92,11 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
           TXLogEntry(r) match {
             case StartCook(blockId) =>
               pendingCookIds0 += (blockId -> r.key)
-              currentBlockId0 = currentBlockId0 max blockId
+              currentBlockId0 = currentBlockId0.max(blockId)
 
             case CompleteCook(blockId) =>
               pendingCookIds0 -= blockId
-              currentBlockId0 = currentBlockId0 max blockId
+              currentBlockId0 = currentBlockId0.max(blockId)
           }
 
         case other =>
@@ -112,7 +112,7 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
     pendingCookIds0 += (blockId -> txKey)
 
     // Redundant, but consistent
-    currentBlockId0 = currentBlockId0 max (blockId + 1)
+    currentBlockId0 = currentBlockId0.max(blockId + 1)
   }
 
   def completeCook(blockId: Long) = {

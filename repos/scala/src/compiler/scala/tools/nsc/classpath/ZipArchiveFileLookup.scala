@@ -43,17 +43,19 @@ trait ZipArchiveFileLookup[FileEntryType <: ClassRepClassPathEntry]
   override private[nsc] def list(inPackage: String): FlatClassPathEntries = {
     val foundDirEntry = findDirEntry(inPackage)
 
-    foundDirEntry map { dirEntry =>
-      val pkgBuf = collection.mutable.ArrayBuffer.empty[PackageEntry]
-      val fileBuf = collection.mutable.ArrayBuffer.empty[FileEntryType]
-      val prefix = PackageNameUtils.packagePrefix(inPackage)
+    foundDirEntry
+      .map { dirEntry =>
+        val pkgBuf = collection.mutable.ArrayBuffer.empty[PackageEntry]
+        val fileBuf = collection.mutable.ArrayBuffer.empty[FileEntryType]
+        val prefix = PackageNameUtils.packagePrefix(inPackage)
 
-      for (entry <- dirEntry.iterator) {
-        if (entry.isPackage) pkgBuf += PackageEntryImpl(prefix + entry.name)
-        else if (isRequiredFileType(entry)) fileBuf += createFileEntry(entry)
+        for (entry <- dirEntry.iterator) {
+          if (entry.isPackage) pkgBuf += PackageEntryImpl(prefix + entry.name)
+          else if (isRequiredFileType(entry)) fileBuf += createFileEntry(entry)
+        }
+        FlatClassPathEntries(pkgBuf, fileBuf)
       }
-      FlatClassPathEntries(pkgBuf, fileBuf)
-    } getOrElse FlatClassPathEntries(Seq.empty, Seq.empty)
+      .getOrElse(FlatClassPathEntries(Seq.empty, Seq.empty))
   }
 
   private def findDirEntry(pkg: String) = {

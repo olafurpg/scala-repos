@@ -11,7 +11,7 @@ object Test extends DirectTest {
       |class BigEnoughToFail {
       |  def a(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int): Unit = {}
       |  def tooLong: Unit = {
-      |    ${(1 to 5958) map (_ => "a(1,2,3,4,5,6)") mkString (";")}
+      |    ${((1 to 5958)).map(_ => "a(1,2,3,4,5,6)") mkString (";")}
       |  }
       |}""".stripMargin.trim
 

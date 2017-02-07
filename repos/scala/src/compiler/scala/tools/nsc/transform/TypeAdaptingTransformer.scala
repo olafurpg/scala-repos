@@ -52,7 +52,7 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
     private def box1(tree: Tree): Tree = tree match {
       case LabelDef(_, _, _) =>
         val ldef = deriveLabelDef(tree)(box1)
-        ldef setType ldef.rhs.tpe
+        ldef.setType(ldef.rhs.tpe)
       case _ =>
         val tree1 = tree.tpe match {
           case ErasedValueType(clazz, _) =>
@@ -78,8 +78,10 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
                     log(s"boxing an unbox: ${tree.symbol} -> ${arg.tpe}")
                     arg
                   case _ =>
-                    (REF(currentRun.runDefinitions.boxMethod(x)) APPLY tree) setPos
-                      (tree.pos) setType ObjectTpe
+                    (REF(currentRun.runDefinitions.boxMethod(x))
+                      .APPLY(tree))
+                      .setPos(tree.pos)
+                      .setType(ObjectTpe)
                 }
             }
         }
@@ -106,7 +108,7 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
        */
       case LabelDef(_, _, _) =>
         val ldef = deriveLabelDef(tree)(unbox(_, pt))
-        ldef setType ldef.rhs.tpe
+        ldef.setType(ldef.rhs.tpe)
       case _ =>
         val tree1 = pt match {
           case ErasedValueType(clazz, underlying) =>
@@ -144,15 +146,15 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
         def word =
           (if (tree.tpe <:< pt) "upcast"
            else if (pt <:< tree.tpe) "downcast"
-           else if (pt weak_<:< tree.tpe) "coerce"
-           else if (tree.tpe weak_<:< pt) "widen"
+           else if (pt.weak_<:<(tree.tpe)) "coerce"
+           else if (tree.tpe.weak_<:<(pt)) "widen"
            else "cast")
         log(s"erasure ${word}s from ${tree.tpe} to $pt")
       }
       if (pt =:= UnitTpe) {
         // See SI-4731 for one example of how this occurs.
         log("Attempted to cast to Unit: " + tree)
-        tree.duplicate setType pt
+        tree.duplicate.setType(pt)
       } else if (tree.tpe != null && tree.tpe.typeSymbol == ArrayClass &&
                  pt.typeSymbol == ArrayClass) {
         // See SI-2386 for one example of when this might be necessary.
@@ -188,7 +190,7 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
         // [H] this assert fails when trying to typecheck tree !(SomeClass.this.bitmap) for single lazy val
         //assert(tree.symbol.isStable, "adapt "+tree+":"+tree.tpe+" to "+pt)
         adaptToType(
-          Apply(tree, List()) setPos tree.pos setType tree.tpe.resultType,
+          Apply(tree, List()).setPos(tree.pos).setType(tree.tpe.resultType),
           pt)
 //      } else if (pt <:< tree.tpe)
 //        cast(tree, pt)

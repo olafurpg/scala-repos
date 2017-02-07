@@ -58,7 +58,7 @@ object RecoverJson {
     def increment(balanced: Balanced) = BalancedStackState(
       bufferIndex,
       offset + 1,
-      stack push balanced
+      stack.push(balanced)
     )
     def decrement = BalancedStackState(
       bufferIndex,
@@ -89,7 +89,7 @@ object RecoverJson {
         char match {
           case '{' =>
             val next = accum increment Brace
-            buildState(next.copy(stack = next.stack push Colon(NullValue)))
+            buildState(next.copy(stack = next.stack.push(Colon(NullValue))))
           case '[' =>
             buildState(accum increment Bracket)
 
@@ -103,38 +103,40 @@ object RecoverJson {
             buildState(accum increment Key(Colon(NullValue)))
           case ':' =>
             val next = accum.decrement
-            buildState(next.copy(stack = next.stack push NullValue))
+            buildState(next.copy(stack = next.stack.push(NullValue)))
 
           case '"' =>
             val next = accum.stack.headOption match {
               case Some(NullValue) => accum.decrement
               case Some(Key(Colon(value))) =>
                 val decremented = accum.decrement
-                decremented.copy(stack = decremented.stack push Colon(value))
+                decremented.copy(stack = decremented.stack.push(Colon(value)))
               case _ => accum
             }
 
             buildState(
-              findEndString(buffers, next.bufferIndex, next.offset + 1) map {
-                case (bufferIndex, offset) =>
-                  // Jump over the string
+              findEndString(buffers, next.bufferIndex, next.offset + 1)
+                .map {
+                  case (bufferIndex, offset) =>
+                    // Jump over the string
+                    BalancedStackState(
+                      bufferIndex,
+                      offset + 1,
+                      next.stack
+                    )
+                }
+                .getOrElse {
+                  // String didn't end
+                  val lastBuffer = buffers(buffers.length - 1)
+                  val lastCharacter = lastBuffer.get(lastBuffer.length - 1)
+                  val quoted = next.stack.push(Quote)
                   BalancedStackState(
-                    bufferIndex,
-                    offset + 1,
-                    next.stack
+                    buffers.length,
+                    0,
+                    if (lastCharacter == '\\') quoted.push(EscapeChar)
+                    else quoted
                   )
-              } getOrElse {
-                // String didn't end
-                val lastBuffer = buffers(buffers.length - 1)
-                val lastCharacter = lastBuffer.get(lastBuffer.length - 1)
-                val quoted = next.stack push Quote
-                BalancedStackState(
-                  buffers.length,
-                  0,
-                  if (lastCharacter == '\\') quoted push EscapeChar
-                  else quoted
-                )
-              })
+                })
 
           case _ => buildState(accum.skip)
         }

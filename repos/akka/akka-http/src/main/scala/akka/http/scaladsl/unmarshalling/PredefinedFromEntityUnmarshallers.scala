@@ -20,7 +20,7 @@ trait PredefinedFromEntityUnmarshallers extends MultipartUnmarshallers {
     byteStringUnmarshaller.map(_.toArray[Byte])
 
   implicit def charArrayUnmarshaller: FromEntityUnmarshaller[Array[Char]] =
-    byteStringUnmarshaller mapWithInput { (entity, bytes) ⇒
+    byteStringUnmarshaller.mapWithInput { (entity, bytes) ⇒
       if (entity.isKnownEmpty) Array.emptyCharArray
       else {
         val charBuffer = Unmarshaller
@@ -34,7 +34,7 @@ trait PredefinedFromEntityUnmarshallers extends MultipartUnmarshallers {
     }
 
   implicit def stringUnmarshaller: FromEntityUnmarshaller[String] =
-    byteStringUnmarshaller mapWithInput { (entity, bytes) ⇒
+    byteStringUnmarshaller.mapWithInput { (entity, bytes) ⇒
       if (entity.isKnownEmpty) ""
       else
         bytes.decodeString(

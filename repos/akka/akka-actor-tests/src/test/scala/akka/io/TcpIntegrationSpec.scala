@@ -227,7 +227,7 @@ class TcpIntegrationSpec extends AkkaSpec("""
                rounds: Int = 100) = {
 
     val testData = ByteString(0)
-    (1 to rounds) foreach { _ ⇒
+    ((1 to rounds)).foreach { _ ⇒
       clientHandler.send(clientConnection, Write(testData))
       serverHandler.expectMsg(Received(testData))
       serverHandler.send(serverConnection, Write(testData))

@@ -22,7 +22,7 @@ private[std] sealed trait FutureInstances0 extends FutureInstances1 {
       implicit ec: E): Order[Future[A]] =
     new Order[Future[A]] {
       def compare(x: Future[A], y: Future[A]): Int =
-        Await.result((x zip y).map { case (x, y) => x compare y }, atMost)
+        Await.result((x.zip(y)).map { case (x, y) => x.compare(y) }, atMost)
     }
 }
 
@@ -32,7 +32,8 @@ private[std] sealed trait FutureInstances1 extends FutureInstances2 {
     new PartialOrder[Future[A]] {
       def partialCompare(x: Future[A], y: Future[A]): Double =
         Await
-          .result((x zip y).map { case (x, y) => x partialCompare y }, atMost)
+          .result((x.zip(y)).map { case (x, y) => x.partialCompare(y) },
+                  atMost)
     }
 }
 
@@ -40,6 +41,6 @@ private[std] sealed trait FutureInstances2 {
   def futureEq[A: Eq](atMost: FiniteDuration)(implicit ec: E): Eq[Future[A]] =
     new Eq[Future[A]] {
       def eqv(x: Future[A], y: Future[A]): Boolean =
-        Await.result((x zip y).map { case (x, y) => x === y }, atMost)
+        Await.result((x.zip(y)).map { case (x, y) => x === y }, atMost)
     }
 }

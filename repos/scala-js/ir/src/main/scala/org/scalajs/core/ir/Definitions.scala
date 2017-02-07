@@ -70,14 +70,18 @@ object Definitions {
   /** Encodes a class name. */
   def encodeClassName(fullName: String): String = {
     val base = fullName.replace("_", "$und").replace(".", "_")
-    val encoded = compressedClasses.getOrElse(base, {
-      compressedPrefixes collectFirst {
-        case (prefix, compressed) if base.startsWith(prefix) =>
-          compressed + base.substring(prefix.length)
-      } getOrElse {
-        "L" + base
+    val encoded = compressedClasses.getOrElse(
+      base, {
+        compressedPrefixes
+          .collectFirst {
+            case (prefix, compressed) if base.startsWith(prefix) =>
+              compressed + base.substring(prefix.length)
+          }
+          .getOrElse {
+            "L" + base
+          }
       }
-    })
+    )
     if (Trees.isKeyword(encoded) || encoded.charAt(0).isDigit ||
         encoded.charAt(0) == '$') {
       "$" + encoded
@@ -93,14 +97,16 @@ object Definitions {
       else encodedName
     val base = decompressedClasses.getOrElse(
       encoded, {
-        decompressedPrefixes collectFirst {
-          case (prefix, decompressed) if encoded.startsWith(prefix) =>
-            decompressed + encoded.substring(prefix.length)
-        } getOrElse {
-          assert(!encoded.isEmpty && encoded.charAt(0) == 'L',
-                 s"Cannot decode invalid encoded name '$encodedName'")
-          encoded.substring(1)
-        }
+        decompressedPrefixes
+          .collectFirst {
+            case (prefix, decompressed) if encoded.startsWith(prefix) =>
+              decompressed + encoded.substring(prefix.length)
+          }
+          .getOrElse {
+            assert(!encoded.isEmpty && encoded.charAt(0) == 'L',
+                   s"Cannot decode invalid encoded name '$encodedName'")
+            encoded.substring(1)
+          }
       }
     )
     base.replace("_", ".").replace("$und", "_")
@@ -124,7 +130,7 @@ object Definitions {
       (for (index <- 0 to 22) yield s"scala_Function$index" -> ("F" + index))
 
   private val decompressedClasses: Map[String, String] =
-    compressedClasses map { case (a, b) => (b, a) }
+    compressedClasses.map { case (a, b) => (b, a) }
 
   private val compressedPrefixes = Seq(
     "scala_scalajs_runtime_" -> "sjsr_",
@@ -140,7 +146,7 @@ object Definitions {
   )
 
   private val decompressedPrefixes: Seq[(String, String)] =
-    compressedPrefixes map { case (a, b) => (b, a) }
+    compressedPrefixes.map { case (a, b) => (b, a) }
 
   /** Decodes a method name into its full signature.
     *

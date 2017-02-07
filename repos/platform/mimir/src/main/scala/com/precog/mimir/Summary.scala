@@ -45,13 +45,13 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
     val coalesced: Reduction = coalesce(reductions.map(_ -> None))
 
     val reductionSpecs: List[TransSpec1] =
-      reductions.reverse.zipWithIndex map {
+      reductions.reverse.zipWithIndex.map {
         case (red, idx) =>
           trans.WrapObject(
             trans.DerefArrayStatic(TransSpec1.Id, CPathIndex(idx)),
             red.name)
       }
-    val reductionSpec = reductionSpecs reduce { trans.OuterObjectConcat(_, _) }
+    val reductionSpec = reductionSpecs.reduce { trans.OuterObjectConcat(_, _) }
 
     object SingleSummary extends Reduction(Vector(), "singleSummary") {
       val tpe = coalesced.tpe
@@ -80,7 +80,7 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
           val grouped =
             Schema.flatten(jtpe, List.empty[ColumnRef]).groupBy(_.selector)
           val numerics =
-            grouped filter {
+            grouped.filter {
               case (cpath, refs) =>
                 refs.map(_.ctype).exists(_.isNumeric)
             }
@@ -91,16 +91,16 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
           }
           val sortedNumerics = singleNumerics.distinct.sortBy(_._1).reverse
 
-          sortedNumerics map {
+          sortedNumerics.map {
             case (cpath, ctype) =>
               Schema.mkType(Seq(ColumnRef(cpath, ctype)))
           }
         }
 
         val functions: List[Option[JType => JType]] =
-          jtypes.distinct map (_ map { Schema.replaceLeaf })
+          jtypes.distinct.map(_.map { Schema.replaceLeaf })
 
-        coalesce(functions map { SingleSummary -> _ })
+        coalesce(functions.map { SingleSummary -> _ })
       }
 
       def reduceTable(table: Table,
@@ -121,18 +121,18 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
           reduction.extract(result).transform(spec)
         }
 
-        values map { extract(_, jtype) }
+        values.map { extract(_, jtype) }
       }
 
       def apply(table: Table, ctx: MorphContext) = {
         val jtypes0: M[Seq[Option[JType]]] = for {
           schemas <- table.schemas
         } yield {
-          schemas.toSeq map { jtype =>
+          schemas.toSeq.map { jtype =>
             val flattened = Schema.flatten(jtype, List.empty[ColumnRef])
 
             val values =
-              flattened filter {
+              flattened.filter {
                 case ref =>
                   ref.selector.hasPrefix(paths.Value) && ref.ctype.isNumeric
               }
@@ -143,41 +143,39 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
 
         // one JType-with-numeric-leaves per schema
         val jtypes: M[Seq[JType]] =
-          jtypes0 map
-            (_ collect {
-              case opt if opt.isDefined => opt.get
-            })
+          jtypes0.map(_.collect {
+            case opt if opt.isDefined => opt.get
+          })
 
         val specs: M[Seq[TransSpec1]] =
-          jtypes map {
-            _ map { trans.Typed(TransSpec1.Id, _) }
+          jtypes.map {
+            _.map { trans.Typed(TransSpec1.Id, _) }
           }
 
         // one table per schema
         val tables: M[Seq[Table]] =
-          specs map
-            (_ map { spec =>
-              table.transform(spec).compact(TransSpec1.Id, AllDefined)
-            })
+          specs.map(_.map { spec =>
+            table.transform(spec).compact(TransSpec1.Id, AllDefined)
+          })
 
         val tablesWithType: M[Seq[(Table, JType)]] = for {
           tbls <- tables
           schemas <- jtypes
         } yield {
-          tbls zip schemas
+          tbls.zip(schemas)
         }
 
         val resultTables: M[Seq[Table]] =
-          tablesWithType flatMap {
+          tablesWithType.flatMap {
             _.map {
               case (table, jtype) =>
                 reduceTable(table, jtype, ctx)
-            }.toStream.sequence map (_.toSeq)
+            }.toStream.sequence.map(_.toSeq)
           }
 
         val objectTables: M[Seq[Table]] =
-          resultTables map {
-            _.zipWithIndex map {
+          resultTables.map {
+            _.zipWithIndex.map {
               case (tbl, idx) =>
                 val modelId = "model" + (idx + 1)
                 tbl.transform(
@@ -190,13 +188,13 @@ trait SummaryLibModule[M[+ _]] extends ReductionLibModule[M] {
         val spec = OuterObjectConcat(Leaf(SourceLeft), Leaf(SourceRight))
 
         val res =
-          objectTables map {
+          objectTables.map {
             _.reduceOption { (tl, tr) =>
               tl.cross(tr)(spec)
-            } getOrElse Table.empty
+            }.getOrElse(Table.empty)
           }
 
-        res map { _.transform(buildConstantWrapSpec(TransSpec1.Id)) }
+        res.map { _.transform(buildConstantWrapSpec(TransSpec1.Id)) }
       }
     }
   }

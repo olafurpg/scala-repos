@@ -86,7 +86,7 @@ class Main {
     }
     // Print classes
     val printer = new ScalaSigPrinter(stream, printPrivates)
-    syms foreach (printer printSymbol _)
+    syms.foreach(printer printSymbol _)
     baos.toString
   }
 
@@ -183,12 +183,15 @@ object Main extends Main {
       printPrivates = arguments contains opts.showPrivateDefs
       // construct a custom class path
       val cpArg =
-        List(opts.classpath, opts.cp) map arguments.getArgument reduceLeft
-          (_ orElse _)
+        List(opts.classpath, opts.cp)
+          .map(arguments.getArgument)
+          .reduceLeft(_.orElse(_))
 
       val settings = new Settings()
 
-      arguments getArgument opts.classPathImplType foreach settings.YclasspathImpl.tryToSetFromPropertyValue
+      arguments
+        .getArgument(opts.classPathImplType)
+        .foreach(settings.YclasspathImpl.tryToSetFromPropertyValue)
       settings.YdisableFlatCpCaching.value = arguments contains opts.disableFlatClassPathCaching
       settings.Ylogcp.value = arguments contains opts.logClassPath
 
@@ -201,7 +204,7 @@ object Main extends Main {
             path.asClassPathString)
 
       // process all given classes
-      arguments.getOthers foreach process(arguments, path)
+      arguments.getOthers.foreach(process(arguments, path))
     }
 
   private def parseArguments(args: Array[String]) =

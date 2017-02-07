@@ -23,7 +23,7 @@ class AbstractOrMissingHandler[T](onError: String => Unit, value: T)
         |This is most often remedied by a full clean and recompile.
         |Otherwise, your classpath may continue bytecode compiled by
         |different and incompatible versions of scala.
-        |""".stripMargin.format(x.getClass.getName split '.' last))
+        |""".stripMargin.format(x.getClass.getName.split('.') last))
       x.printStackTrace()
       value
     case x: MissingRequirementError =>

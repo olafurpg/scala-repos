@@ -37,10 +37,10 @@ trait DemoSpec extends Spec with Meta.StdOpts with Interpolation {
   heading("Binary options:")
   val optopt = "str" / "an optional String" --|
   val optoptInt = ("int" / "an optional Int").--^[Int]
-  val optEnv = "defenv" / "an optional String" defaultToEnv "PATH"
-  val optDefault = "defstr" / "an optional String" defaultTo "default"
-  val optDefaultInt = "defint" / "an optional Int" defaultTo -1
-  val optExpand = "alias" / "an option which expands" expandTo ("--int", "15")
+  val optEnv = ("defenv" / "an optional String").defaultToEnv("PATH")
+  val optDefault = ("defstr" / "an optional String").defaultTo("default")
+  val optDefaultInt = ("defint" / "an optional Int").defaultTo(-1)
+  val optExpand = ("alias" / "an option which expands").expandTo("--int", "15")
 }
 
 object DemoSpec extends DemoSpec with Property {
@@ -63,18 +63,18 @@ class Demo(args: List[String]) extends {
   def helpMsg = DemoSpec.helpMsg
   def demoSpecMethods = this.getClass.getMethods.toList
   private def isDemo(m: Method) =
-    (m.getName startsWith "opt") && !(m.getName contains "$") &&
+    (m.getName.startsWith("opt")) && !(m.getName contains "$") &&
       (m.getParameterTypes.isEmpty)
 
   def demoString(ms: List[Method]) = {
-    val longest = ms map (_.getName.length) max
+    val longest = ms.map(_.getName.length) max
     val formatStr = "    %-" + longest + "s: %s"
-    val xs = ms map (m => formatStr.format(m.getName, m.invoke(this)))
+    val xs = ms.map(m => formatStr.format(m.getName, m.invoke(this)))
 
     xs mkString ("Demo(\n  ", "\n  ", "\n)\n")
   }
 
-  override def toString = demoString(demoSpecMethods filter isDemo)
+  override def toString = demoString(demoSpecMethods.filter(isDemo))
 }
 
 object Demo {

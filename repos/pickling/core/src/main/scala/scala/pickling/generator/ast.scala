@@ -48,13 +48,13 @@ private[pickling] object IrAst {
           SubclassUnpicklerDelegation(
             subs,
             parent,
-            (bOpt map chain).asInstanceOf[Option[UnpicklerAst]],
+            (bOpt.map(chain)).asInstanceOf[Option[UnpicklerAst]],
             runtime))
       case SubclassDispatch(subs, parent, bOpt, runtime) =>
         f(
           SubclassDispatch(subs,
                            parent,
-                           (bOpt map chain).asInstanceOf[Option[PicklerAst]],
+                           (bOpt.map(chain)).asInstanceOf[Option[PicklerAst]],
                            runtime))
       case PickleUnpickleImplementation(p, u) =>
         f(
@@ -146,7 +146,7 @@ private[pickling] case class SubclassUnpicklerDelegation(
 /** A set of behaviors used to implement unpickling. */
 private[pickling] case class UnpickleBehavior(operations: Seq[UnpicklerAst])
     extends UnpicklerAst {
-  def requiresReflection = operations exists (_.requiresReflection)
+  def requiresReflection = operations.exists(_.requiresReflection)
   override def toString =
     s"unpickle behavior {${operations.mkString("\n", "\n", "\n")}}"
 }
@@ -229,7 +229,7 @@ private[pickling] case class UnpickleExternalizable(tpe: IrClass)
 /** Ensure that beginEntry/hintOid (sharing/ref)/endEntry are called around the nested operations. */
 private[pickling] case class PickleEntry(ops: Seq[PicklerAst])
     extends PicklerAst {
-  def requiresReflection: Boolean = ops exists (_.requiresReflection)
+  def requiresReflection: Boolean = ops.exists(_.requiresReflection)
   override def toString = s"  entry {${ops.mkString("\n", "\n", "\n")}}"
 }
 

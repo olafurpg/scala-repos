@@ -18,13 +18,13 @@ object InvariantFunctorTest extends SpecLite {
       def to = (_: Int) + 1
       def from = (_: Int) - 1
     }
-    some(1) xmapi succI must_=== (some(2))
+    some(1).xmapi(succI) must_=== (some(2))
   }
 
   "xmap bijection" in {
     val succB: Bijection[Int, Int] =
       liftBijection[Id, Id, Int, Int](_ + 1, _ - 1)
-    some(1) xmapb succB must_=== (some(2))
+    some(1).xmapb(succB) must_=== (some(2))
   }
 
   case class Num(x: Int)

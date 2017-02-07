@@ -147,7 +147,7 @@ object Numeric {
   }
   trait FloatAsIfIntegral extends FloatIsConflicted with Integral[Float] {
     def quot(x: Float, y: Float): Float =
-      (BigDecimal(x) quot BigDecimal(y)).floatValue
+      (BigDecimal(x).quot(BigDecimal(y))).floatValue
     def rem(x: Float, y: Float): Float =
       (BigDecimal(x) remainder BigDecimal(y)).floatValue
   }
@@ -176,7 +176,7 @@ object Numeric {
   }
   trait DoubleAsIfIntegral extends DoubleIsConflicted with Integral[Double] {
     def quot(x: Double, y: Double): Double =
-      (BigDecimal(x) quot BigDecimal(y)).doubleValue
+      (BigDecimal(x).quot(BigDecimal(y))).doubleValue
     def rem(x: Double, y: Double): Double =
       (BigDecimal(x) remainder BigDecimal(y)).doubleValue
   }
@@ -201,7 +201,7 @@ object Numeric {
   trait BigDecimalAsIfIntegral
       extends BigDecimalIsConflicted
       with Integral[BigDecimal] {
-    def quot(x: BigDecimal, y: BigDecimal): BigDecimal = x quot y
+    def quot(x: BigDecimal, y: BigDecimal): BigDecimal = x.quot(y)
     def rem(x: BigDecimal, y: BigDecimal): BigDecimal = x remainder y
   }
 

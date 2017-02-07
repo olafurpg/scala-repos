@@ -23,7 +23,7 @@ final class DummyTask(
     } catch {
       case t: Throwable =>
         eventHandler.handle(new DummyEvent(taskDef, Some(t)))
-        loggers foreach { l =>
+        loggers.foreach { l =>
           l.error(s"Failed: ${taskDef.fullyQualifiedName}")
           l.trace(t)
         }

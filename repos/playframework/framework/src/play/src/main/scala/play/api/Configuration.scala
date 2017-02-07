@@ -68,15 +68,16 @@ object Configuration {
         {
           setting("config.resource").map(resource =>
             ConfigFactory.parseResources(classLoader, resource.toString))
-        } orElse {
-          setting("config.file").map(fileName =>
-            ConfigFactory.parseFileAnySyntax(new File(fileName.toString)))
-        } getOrElse {
-          val parseOptions = ConfigParseOptions.defaults
-            .setClassLoader(classLoader)
-            .setAllowMissing(allowMissingApplicationConf)
-          ConfigFactory.defaultApplication(parseOptions)
-        }
+        }.orElse {
+            setting("config.file").map(fileName =>
+              ConfigFactory.parseFileAnySyntax(new File(fileName.toString)))
+          }
+          .getOrElse {
+            val parseOptions = ConfigParseOptions.defaults
+              .setClassLoader(classLoader)
+              .setAllowMissing(allowMissingApplicationConf)
+            ConfigFactory.defaultApplication(parseOptions)
+          }
       }
 
       // Resolve another .conf file so that we can override values in Akka's
@@ -97,7 +98,7 @@ object Configuration {
         applicationConfig,
         playOverridesConfig,
         referenceConfig
-      ).reduceLeft(_ withFallback _)
+      ).reduceLeft(_.withFallback(_))
 
       // Resolve settings. Among other things, the `play.server.dir` setting defined in directConfig will
       // be substituted into the default settings in referenceConfig.

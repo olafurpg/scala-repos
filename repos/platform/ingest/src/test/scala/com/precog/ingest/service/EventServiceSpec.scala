@@ -195,7 +195,7 @@ class EventServiceSpec
       result.copoint must beLike {
         case (HttpResponse(HttpStatus(OK, _), _, Some(_), _), events) =>
           // render then parseUnsafe so that we get the same numeric representations
-          events flatMap {
+          events.flatMap {
             _.data.map(v => JParser.parseUnsafe(v.renderCompact))
           } must_==
             List(
@@ -224,7 +224,7 @@ class EventServiceSpec
 
       result.copoint must beLike {
         case (HttpResponse(HttpStatus(OK, _), _, Some(_), _), events) =>
-          events flatMap {
+          events.flatMap {
             _.data.map(v => JParser.parseUnsafe(v.renderCompact))
           } must contain(
             JParser.parseUnsafe(

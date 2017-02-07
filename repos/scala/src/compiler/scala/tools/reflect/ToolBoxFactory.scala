@@ -82,16 +82,15 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         // That's why we cannot allow inputs of toolboxes to be typechecked,
         // at least not until the aforementioned issue is closed.
         val typed =
-          expr filter
-            (t =>
-               t.tpe != null && t.tpe != NoType && !t.isInstanceOf[TypeTree])
+          expr.filter(t =>
+            t.tpe != null && t.tpe != NoType && !t.isInstanceOf[TypeTree])
         if (!typed.isEmpty)
           throw ToolBoxError(
             "reflective toolbox has failed: cannot operate on trees that are already typed")
 
         if (expr.freeTypes.nonEmpty) {
           val ft_s =
-            expr.freeTypes map (ft => s"  ${ft.name} ${ft.origin}") mkString "\n  "
+            expr.freeTypes.map(ft => s"  ${ft.name} ${ft.origin}") mkString "\n  "
           throw ToolBoxError(s"""
             |reflective toolbox failed due to unresolved free type variables:
             |$ft_s
@@ -112,17 +111,17 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         val freeTerms = expr0.freeTerms
         val freeTermNames =
           scala.collection.mutable.LinkedHashMap[FreeTermSymbol, TermName]()
-        freeTerms foreach
-          (ft => {
-             var name = ft.name.toString
-             val namesakes =
-               freeTerms takeWhile (_ != ft) filter
-                 (ft2 => ft != ft2 && ft.name == ft2.name)
-             if (namesakes.length > 0)
-               name += ("$" + (namesakes.length + 1))
-             freeTermNames +=
-               (ft -> newTermName(name + nme.REIFY_FREE_VALUE_SUFFIX))
-           })
+        freeTerms.foreach(ft => {
+          var name = ft.name.toString
+          val namesakes =
+            freeTerms
+              .takeWhile(_ != ft)
+              .filter(ft2 => ft != ft2 && ft.name == ft2.name)
+          if (namesakes.length > 0)
+            name += ("$" + (namesakes.length + 1))
+          freeTermNames +=
+            (ft -> newTermName(name + nme.REIFY_FREE_VALUE_SUFFIX))
+        })
         val expr = new Transformer {
           override def transform(tree: Tree): Tree =
             if (tree.hasSymbolField && tree.symbol.isFreeTerm) {
@@ -204,22 +203,22 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
             case Block(dummies, result) => ((dummies, result))
             case result => ((Nil, result))
           }
-          val invertedIndex = freeTerms map (_.swap)
+          val invertedIndex = freeTerms.map(_.swap)
           result = new Transformer {
             override def transform(tree: Tree): Tree =
               tree match {
                 case Ident(name: TermName) if invertedIndex contains name =>
-                  Ident(invertedIndex(name)) setType tree.tpe
+                  Ident(invertedIndex(name)).setType(tree.tpe)
                 case _ =>
                   super.transform(tree)
               }
           }.transform(result)
           new TreeTypeSubstituter(
-            dummies1 map (_.symbol),
-            dummies1 map
-              (dummy =>
-                 SingleType(NoPrefix,
-                            invertedIndex(dummy.symbol.name.toTermName))))
+            dummies1.map(_.symbol),
+            dummies1.map(
+              dummy =>
+                SingleType(NoPrefix,
+                           invertedIndex(dummy.symbol.name.toTermName))))
             .traverse(result)
           result
         })
@@ -314,7 +313,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         val freeTerms =
           expr.freeTerms // need to calculate them here, because later on they will be erased
         val thunks =
-          freeTerms map (fte => () => fte.value) // need to be lazy in order not to distort evaluation order
+          freeTerms.map(fte => () => fte.value) // need to be lazy in order not to distort evaluation order
         verify(expr)
 
         def wrapInModule(expr0: Tree): ModuleDef = {
@@ -327,24 +326,25 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
             NoFlags)
 
           val minfo = ClassInfoType(List(ObjectTpe), newScope, obj.moduleClass)
-          obj.moduleClass setInfo minfo
-          obj setInfo obj.moduleClass.tpe
+          obj.moduleClass.setInfo(minfo)
+          obj.setInfo(obj.moduleClass.tpe)
 
           val meth = obj.moduleClass.newMethod(newTermName(wrapperMethodName))
           def makeParam(schema: (FreeTermSymbol, TermName)) = {
             // see a detailed explanation of the STABLE trick in `GenSymbols.reifyFreeTerm`
             val (fv, name) = schema
-            meth.newValueParameter(name,
-                                   newFlags =
-                                     if (fv.hasStableFlag) STABLE
-                                     else 0) setInfo appliedType(
-              definitions.FunctionClass(0).tpe,
-              List(fv.tpe.resultType))
+            meth
+              .newValueParameter(name,
+                                 newFlags =
+                                   if (fv.hasStableFlag) STABLE
+                                   else 0)
+              .setInfo(appliedType(definitions.FunctionClass(0).tpe,
+                                   List(fv.tpe.resultType)))
           }
-          meth setInfo MethodType(freeTerms.map(makeParam).toList, AnyTpe)
-          minfo.decls enter meth
+          meth.setInfo(MethodType(freeTerms.map(makeParam).toList, AnyTpe))
+          minfo.decls.enter(meth)
           def defOwner(tree: Tree): Symbol =
-            tree find (_.isDef) map (_.symbol) match {
+            (tree find (_.isDef)).map(_.symbol) match {
               case Some(sym) if sym != null && sym != NoSymbol => sym.owner
               case _ => NoSymbol
             }
@@ -405,7 +405,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         () =>
           {
             val result =
-              jmeth.invoke(singleton, thunks map (_.asInstanceOf[AnyRef]): _*)
+              jmeth.invoke(singleton, thunks.map(_.asInstanceOf[AnyRef]): _*)
             if (jmeth.getReturnType == java.lang.Void.TYPE) ()
             else result
           }
@@ -456,7 +456,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         if (frontEnd.hasErrors)
           throw ToolBoxError(
             "reflective compilation has failed:" + EOL + EOL +
-              (frontEnd.infos map (_.msg) mkString EOL)
+              (frontEnd.infos.map(_.msg) mkString EOL)
           )
       }
     }
@@ -483,7 +483,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
             if (frontEnd.hasErrors) {
               throw ToolBoxError(
                 "reflective compilation has failed: cannot initialize the compiler:" +
-                  EOL + EOL + (frontEnd.infos map (_.msg) mkString EOL)
+                  EOL + EOL + (frontEnd.infos.map(_.msg) mkString EOL)
               )
             }
             instance

@@ -16,14 +16,14 @@ private[twitter] class StreamServerDispatcher[Req: RequestType](
 ) extends GenSerialServerDispatcher[Req, StreamResponse, Any, Any](trans) {
   import Bijections._
 
-  trans.onClose ensure {
+  trans.onClose.ensure {
     service.close()
   }
 
   private[this] val RT = implicitly[RequestType[Req]]
 
   private[this] def writeChunks(rep: StreamResponse): Future[Unit] = {
-    (rep.messages or rep.error).sync() flatMap {
+    (rep.messages.or(rep.error)).sync().flatMap {
       case Left(buf) =>
         val bytes = BufChannelBuffer(buf)
         trans.write(new DefaultHttpChunk(bytes)) before writeChunks(rep)
@@ -34,7 +34,7 @@ private[twitter] class StreamServerDispatcher[Req: RequestType](
 
   protected def dispatch(req: Any, eos: Promise[Unit]) = req match {
     case httpReq: HttpRequest =>
-      service(RT.specialize(from(httpReq))) ensure eos.setDone()
+      service(RT.specialize(from(httpReq))).ensure(eos.setDone())
     case invalid =>
       eos.setDone()
       Future.exception(

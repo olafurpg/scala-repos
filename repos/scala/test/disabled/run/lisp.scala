@@ -15,8 +15,8 @@ class LispTokenizer(s: String) extends Iterator[String] {
   def next: String =
     if (hasNext) {
       val start = i
-      if (isDelimiter(s charAt i)) i += 1
-      else do i = i + 1 while (!isDelimiter(s charAt i))
+      if (isDelimiter(s.charAt(i))) i += 1
+      else do i = i + 1 while (!isDelimiter(s.charAt(i)))
       s.substring(start, i)
     } else sys.error("premature end of string")
 }
@@ -189,7 +189,7 @@ object LispCaseClasses extends Lisp {
 
   def eval1(x: Data, env: Environment): Data = x match {
     case SYM(name) =>
-      env lookup name
+      env.lookup(name)
     case CONS(SYM("def"), CONS(SYM(name), CONS(y, CONS(z, NIL())))) =>
       eval(z, env.extendRec(name, (env1 => eval(y, env1))))
     case CONS(SYM("val"), CONS(SYM(name), CONS(y, CONS(z, NIL())))) =>
@@ -201,7 +201,7 @@ object LispCaseClasses extends Lisp {
     case CONS(SYM("quote"), CONS(x, NIL())) =>
       x
     case CONS(y, xs) =>
-      apply(eval(y, env), toList(xs) map (x => eval(x, env)))
+      apply(eval(y, env), toList(xs).map(x => eval(x, env)))
     case NUM(_) => x
     case STR(_) => x
     case FUN(_) => x
@@ -229,7 +229,7 @@ object LispCaseClasses extends Lisp {
       }
 
     val ps: List[String] =
-      toList(params) map {
+      toList(params).map {
         case SYM(name) => name
         case _ => sys.error("illegal parameter list");
       }
@@ -382,7 +382,7 @@ object LispAny extends Lisp {
 
   def eval1(x: Data, env: Environment): Data = x match {
     case Symbol(name) =>
-      env lookup name
+      env.lookup(name)
     case 'def :: Symbol(name) :: y :: z :: Nil =>
       eval(z, env.extendRec(name, (env1 => eval(y, env1))))
     case 'val :: Symbol(name) :: y :: z :: Nil =>
@@ -394,7 +394,7 @@ object LispAny extends Lisp {
     case 'quote :: y :: Nil =>
       y
     case y :: z =>
-      apply(eval(y, env), z map (x => eval(x, env)))
+      apply(eval(y, env), z.map(x => eval(x, env)))
     case Lambda(_) => x
     case y: String => x
     case y: Int => x
@@ -433,7 +433,7 @@ object LispAny extends Lisp {
       }
 
     val ps: List[String] =
-      asList(params) map {
+      asList(params).map {
         case Symbol(name) => name
         case _ => sys.error("illegal parameter list");
       }

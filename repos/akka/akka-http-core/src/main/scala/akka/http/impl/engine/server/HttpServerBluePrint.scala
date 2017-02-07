@@ -171,7 +171,8 @@ private[http] object HttpServerBluePrint {
               else hdrs
 
             val entity =
-              createEntity(entityCreator) withSizeLimit settings.parserSettings.maxContentLength
+              createEntity(entityCreator).withSizeLimit(
+                settings.parserSettings.maxContentLength)
             push(out,
                  HttpRequest(effectiveMethod,
                              uri,
@@ -267,7 +268,7 @@ private[http] object HttpServerBluePrint {
       rawRequestUriHeader,
       HttpHeaderParser(parserSettings) { info ⇒
         if (parserSettings.illegalHeaderWarnings)
-          logParsingError(info withSummaryPrepended "Illegal request header",
+          logParsingError(info.withSummaryPrepended("Illegal request header"),
                           log,
                           parserSettings.errorLoggingVerbosity)
       }
@@ -619,7 +620,8 @@ private[http] object HttpServerBluePrint {
         def finishWithIllegalRequestError(status: StatusCode,
                                           info: ErrorInfo): Unit = {
           logParsingError(
-            info withSummaryPrepended s"Illegal request, responding with status '$status'",
+            info.withSummaryPrepended(
+              s"Illegal request, responding with status '$status'"),
             log,
             settings.parserSettings.errorLoggingVerbosity)
           val msg =

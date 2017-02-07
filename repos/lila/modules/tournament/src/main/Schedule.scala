@@ -38,7 +38,7 @@ object Schedule {
 
     val name = toString.toLowerCase
 
-    def compare(other: Freq) = importance compare other.importance
+    def compare(other: Freq) = importance.compare(other.importance)
   }
   object Freq {
     case object Hourly extends Freq(10, 10)
@@ -126,7 +126,7 @@ object Schedule {
       case (ExperimentalMarathon, _, _) => 60 * 4
 
       case (Unique, _, _) => 0
-    }) filter (0 !=)
+    }).filter(0 !=)
   }
 
   private val blitzIncHours = Set(1, 7, 13, 19)

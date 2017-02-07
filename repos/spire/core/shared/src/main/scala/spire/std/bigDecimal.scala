@@ -59,7 +59,7 @@ trait BigDecimalIsField extends Field[BigDecimal] {
       val sharedTwo = spire.math.min(shiftTwo0, shiftTwo1 + exp1 - exp0)
       val sharedFive = spire.math.min(shiftFive0, shiftFive1 + exp1 - exp0)
       val reshift = Two.pow(sharedTwo).multiply(Five.pow(sharedFive))
-      val n = (shifted0 gcd shifted1).multiply(reshift)
+      val n = (shifted0.gcd(shifted1)).multiply(reshift)
       BigDecimal(new java.math.BigDecimal(n, -exp0))
     }
 

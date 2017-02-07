@@ -138,7 +138,7 @@ class MarathonHealthCheckManager @Inject()(
     }
 
   override def removeAll(): Unit =
-    appHealthChecks.writeLock { _.keys foreach removeAllFor }
+    appHealthChecks.writeLock { _.keys.foreach(removeAllFor) }
 
   override def removeAllFor(appId: PathId): Unit =
     appHealthChecks.writeLock { ahcs =>
@@ -151,7 +151,7 @@ class MarathonHealthCheckManager @Inject()(
     }
 
   override def reconcileWith(appId: PathId): Future[Unit] =
-    appRepository.currentVersion(appId) flatMap {
+    appRepository.currentVersion(appId).flatMap {
       case None => Future(())
       case Some(app) =>
         log.info(s"reconcile [$appId] with latest version [${app.version}]")
@@ -180,8 +180,8 @@ class MarathonHealthCheckManager @Inject()(
         val appVersionsWithoutHealthChecks: Set[Timestamp] =
           activeAppVersions -- healthCheckAppVersions
         val res: Iterator[Future[Unit]] =
-          appVersionsWithoutHealthChecks.iterator map { version =>
-            appRepository.app(app.id, version) map {
+          appVersionsWithoutHealthChecks.iterator.map { version =>
+            appRepository.app(app.id, version).map {
               case None =>
                 // FIXME: If the app version of the task is not available anymore, no health check is started.
                 // We generated a new app version for every scale change. If maxVersions is configured, we
@@ -195,7 +195,7 @@ class MarathonHealthCheckManager @Inject()(
                 addAllFor(appVersion)
             }
           }
-        Future.sequence(res) map { _ =>
+        Future.sequence(res).map { _ =>
           ()
         }
     }
@@ -267,7 +267,7 @@ class MarathonHealthCheckManager @Inject()(
         ActiveHealthCheck(_, actor) <- ahcs(appId).values.iterator.flatten.toVector
       } yield (actor ? GetAppHealth).mapTo[AppHealth]
 
-      Future.sequence(futureHealths) flatMap { healths =>
+      Future.sequence(futureHealths).flatMap { healths =>
         val groupedHealth = healths.flatMap(_.health).groupBy(_.taskId)
 
         taskTracker.appTasks(appId).map { appTasks =>

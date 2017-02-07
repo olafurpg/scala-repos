@@ -60,7 +60,7 @@ class PriorityDispatcherSpec
 
         val acc = scala.collection.mutable.ListBuffer[Int]()
 
-        scala.util.Random.shuffle(msgs) foreach { m ⇒
+        scala.util.Random.shuffle(msgs).foreach { m ⇒
           self ! m
         }
 

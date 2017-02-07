@@ -69,7 +69,7 @@ case class ScheduledTask(id: UUID,
                          sink: Path,
                          timeoutMillis: Option[Long]) {
   def taskName = "Scheduled %s -> %s".format(source, sink)
-  def timeout = timeoutMillis map { to =>
+  def timeout = timeoutMillis.map { to =>
     Duration(to, TimeUnit.MILLISECONDS)
   }
 }

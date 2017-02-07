@@ -26,13 +26,13 @@ trait OptionInstances extends OptionInstances0 {
           }
         case None => None
       }
-      def bind[A, B](fa: Option[A])(f: A => Option[B]) = fa flatMap f
-      override def map[A, B](fa: Option[A])(f: A => B) = fa map f
+      def bind[A, B](fa: Option[A])(f: A => Option[B]) = fa.flatMap(f)
+      override def map[A, B](fa: Option[A])(f: A => B) = fa.map(f)
       def traverseImpl[F[_], A, B](fa: Option[A])(f: A => F[B])(
           implicit F: Applicative[F]) =
-        fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
+        fa.map(a => F.map(f(a))(Some(_): Option[B])).getOrElse(F.point(None))
       def empty[A]: Option[A] = None
-      def plus[A](a: Option[A], b: => Option[A]) = a orElse b
+      def plus[A](a: Option[A], b: => Option[A]) = a.orElse(b)
       override def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) =
         fa match {
           case Some(a) => f(a, z)
@@ -70,16 +70,16 @@ trait OptionInstances extends OptionInstances0 {
       }
 
       def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
-        fa map (a => f(Some(a)))
+        fa.map(a => f(Some(a)))
 
       override def cojoin[A](a: Option[A]) =
-        a map (Some(_))
+        a.map(Some(_))
 
       def pextract[B, A](fa: Option[A]): Option[B] \/ A =
-        fa map \/.right getOrElse -\/(None)
+        fa.map(\/.right).getOrElse(-\/(None))
       override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
       override def toOption[A](fa: Option[A]): Option[A] = fa
-      override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d
+      override def getOrElse[A](o: Option[A])(d: => A) = o.getOrElse(d)
 
       @scala.annotation.tailrec
       def tailrecM[A, B](f: A => Option[A \/ B])(a: A): Option[B] =
@@ -151,7 +151,7 @@ trait OptionInstances extends OptionInstances0 {
     def zero: MinOption[A] = Tag(None)
 
     def append(f1: MinOption[A], f2: => MinOption[A]) =
-      Tag((Tag unwrap f1, Tag unwrap f2) match {
+      Tag((Tag.unwrap(f1), Tag.unwrap(f2)) match {
         case (Some(v1), Some(v2)) => Some(Order[A].min(v1, v2))
         case (_f1 @ Some(_), None) => _f1
         case (None, _f2 @ Some(_)) => _f2
@@ -172,7 +172,7 @@ trait OptionInstances extends OptionInstances0 {
     def zero: MaxOption[A] = Tag(None)
 
     def append(f1: MaxOption[A], f2: => MaxOption[A]) =
-      Tag((Tag unwrap f1, Tag unwrap f2) match {
+      Tag((Tag.unwrap(f1), Tag.unwrap(f2)) match {
         case (Some(v1), Some(v2)) => Some(Order[A].max(v1, v2))
         case (_f1 @ Some(_), None) => _f1
         case (None, _f2 @ Some(_)) => _f2

@@ -107,7 +107,7 @@ object ClassPathImplComparator {
           s"The end of the test case. All expected classes found = $result \n")
       }
 
-      (1 to oldCpSettings.requiredIterations.value) foreach { iteration =>
+      ((1 to oldCpSettings.requiredIterations.value)).foreach { iteration =>
         if (oldCpSettings.requiredIterations.value > 1)
           println(s"Iteration no $iteration")
 

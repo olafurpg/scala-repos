@@ -126,7 +126,7 @@ case class PolySparse[@sp(Double) C] private[spire] (
     if (isZero) {
       ring.zero
     } else if (exp.length == 1) {
-      if (exp(0) != 0) coeff(0) * (x pow exp(0)) else coeff(0)
+      if (exp(0) != 0) coeff(0) * (x.pow(exp(0))) else coeff(0)
     } else {
       // TODO: Rewrite this to be more like PolyDense.
       val bits = expBits(x)

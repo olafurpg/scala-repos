@@ -407,7 +407,7 @@ private[sql] abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
                 // differ cosmetically. Instead, we use semanticEquals.
                 groupExpressionMap
                   .collectFirst {
-                    case (expr, ne) if expr semanticEquals expression =>
+                    case (expr, ne) if expr.semanticEquals(expression) =>
                       ne.toAttribute
                   }
                   .getOrElse(expression)

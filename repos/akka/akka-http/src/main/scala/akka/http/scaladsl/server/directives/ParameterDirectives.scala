@@ -114,7 +114,7 @@ object ParameterDirectives extends ParameterDirectives {
     //////////////////// "regular" parameter extraction //////////////////////
 
     private def filter[T](paramName: String, fsou: FSOU[T]): Directive1[T] =
-      extractRequestContext flatMap { ctx ⇒
+      extractRequestContext.flatMap { ctx ⇒
         import ctx.executionContext
         import ctx.materializer
         handleParamResult(paramName,
@@ -148,7 +148,7 @@ object ParameterDirectives extends ParameterDirectives {
     implicit def forNDR[T](implicit fsou: FSOU[T])
       : ParamDefAux[NameDefaultReceptacle[T], Directive1[T]] =
       extractParameter[NameDefaultReceptacle[T], T] { nr ⇒
-        filter[T](nr.name, fsou withDefaultValue nr.default)
+        filter[T](nr.name, fsou.withDefaultValue(nr.default))
       }
     implicit def forNOUR[T]: ParamDefAux[NameOptionUnmarshallerReceptacle[T],
                                          Directive1[Option[T]]] =
@@ -158,7 +158,7 @@ object ParameterDirectives extends ParameterDirectives {
     implicit def forNDUR[T]
       : ParamDefAux[NameDefaultUnmarshallerReceptacle[T], Directive1[T]] =
       extractParameter[NameDefaultUnmarshallerReceptacle[T], T] { nr ⇒
-        filter[T](nr.name, (nr.um: FSOU[T]) withDefaultValue nr.default)
+        filter[T](nr.name, (nr.um: FSOU[T]).withDefaultValue(nr.default))
       }
 
     //////////////////// required parameter support ////////////////////
@@ -166,10 +166,10 @@ object ParameterDirectives extends ParameterDirectives {
     private def requiredFilter[T](paramName: String,
                                   fsou: FSOU[T],
                                   requiredValue: Any): Directive0 =
-      extractRequestContext flatMap { ctx ⇒
+      extractRequestContext.flatMap { ctx ⇒
         import ctx.executionContext
         import ctx.materializer
-        onComplete(fsou(ctx.request.uri.query().get(paramName))) flatMap {
+        onComplete(fsou(ctx.request.uri.query().get(paramName))).flatMap {
           case Success(value) if value == requiredValue ⇒ pass
           case _ ⇒ reject
         }
@@ -189,7 +189,7 @@ object ParameterDirectives extends ParameterDirectives {
 
     private def repeatedFilter[T](paramName: String,
                                   fsu: FSU[T]): Directive1[Iterable[T]] =
-      extractRequestContext flatMap { ctx ⇒
+      extractRequestContext.flatMap { ctx ⇒
         import ctx.executionContext
         import ctx.materializer
         handleParamResult(

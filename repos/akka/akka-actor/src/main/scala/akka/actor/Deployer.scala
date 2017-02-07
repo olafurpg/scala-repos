@@ -150,11 +150,13 @@ private[akka] class Deployer(val settings: ActorSystem.Settings,
     }
     .toMap
 
-  config.root.asScala flatMap {
-    case ("default", _) ⇒ None
-    case (key, value: ConfigObject) ⇒ parseConfig(key, value.toConfig)
-    case _ ⇒ None
-  } foreach deploy
+  config.root.asScala
+    .flatMap {
+      case ("default", _) ⇒ None
+      case (key, value: ConfigObject) ⇒ parseConfig(key, value.toConfig)
+      case _ ⇒ None
+    }
+    .foreach(deploy)
 
   def lookup(path: ActorPath): Option[Deploy] =
     lookup(path.elements.drop(1).iterator)

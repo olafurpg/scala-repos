@@ -84,17 +84,17 @@ object Query {
   val winnerColors = List(1 -> "White", 2 -> "Black", 3 -> "None")
 
   val perfs =
-    lila.rating.PerfType.nonPuzzle map { v =>
+    lila.rating.PerfType.nonPuzzle.map { v =>
       v.id -> v.name
     }
 
   val sources =
-    lila.game.Source.searchable map { v =>
+    lila.game.Source.searchable.map { v =>
       v.id -> v.name.capitalize
     }
 
   val modes =
-    Mode.all map { mode =>
+    Mode.all.map { mode =>
       mode.id -> mode.name.capitalize
     }
 
@@ -103,14 +103,14 @@ object Query {
     "%d move{s}")
 
   val averageRatings =
-    (RatingRange.min to RatingRange.max by 100).toList map { e =>
+    (RatingRange.min to RatingRange.max by 100).toList.map { e =>
       e -> (e + " Rating")
     }
 
   val hasAis = List(0 -> "Human opponent", 1 -> "Computer opponent")
 
   val aiLevels =
-    (1 to 8) map { l =>
+    ((1 to 8)).map { l =>
       l -> ("level " + l)
     }
 

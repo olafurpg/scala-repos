@@ -24,12 +24,13 @@ class DefaultCamelTest
   import org.mockito.Mockito.{when, verify}
   val sys = mock[ExtendedActorSystem]
   val config = ConfigFactory.defaultReference()
-  when(sys.dynamicAccess) thenReturn system
-    .asInstanceOf[ExtendedActorSystem]
-    .dynamicAccess
-  when(sys.settings) thenReturn
-    (new Settings(this.getClass.getClassLoader, config, "mocksystem"))
-  when(sys.name) thenReturn ("mocksystem")
+  when(sys.dynamicAccess).thenReturn(
+    system
+      .asInstanceOf[ExtendedActorSystem]
+      .dynamicAccess)
+  when(sys.settings).thenReturn(
+    new Settings(this.getClass.getClassLoader, config, "mocksystem"))
+  when(sys.name).thenReturn("mocksystem")
 
   def camelWithMocks = new DefaultCamel(sys) {
     override val log = mock[LoggingAdapter]
@@ -41,8 +42,8 @@ class DefaultCamelTest
   "during shutdown, when both context and template fail to shutdown" when {
     val camel = camelWithMocks
 
-    when(camel.context.stop()) thenThrow new RuntimeException("context")
-    when(camel.template.stop()) thenThrow new RuntimeException("template")
+    when(camel.context.stop()).thenThrow(new RuntimeException("context"))
+    when(camel.template.stop()).thenThrow(new RuntimeException("template"))
     val exception = intercept[RuntimeException] {
       camel.shutdown()
     }
@@ -60,7 +61,7 @@ class DefaultCamelTest
   "during start, if template fails to start, it will stop the context" in {
     val camel = camelWithMocks
 
-    when(camel.template.start()) thenThrow new RuntimeException
+    when(camel.template.start()).thenThrow(new RuntimeException)
 
     intercept[RuntimeException] {
       camel.start

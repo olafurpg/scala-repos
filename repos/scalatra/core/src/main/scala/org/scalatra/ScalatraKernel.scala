@@ -9,10 +9,10 @@ object ScalatraKernel {
   type Action = () => Any
 
   @deprecated("Use HttpMethod.methods", "2.0.0")
-  val httpMethods = HttpMethod.methods map { _.toString }
+  val httpMethods = HttpMethod.methods.map { _.toString }
 
   @deprecated("Use HttpMethod.methods filter { !_.isSafe }", "2.0.0")
-  val writeMethods = HttpMethod.methods filter { !_.isSafe } map { _.toString }
+  val writeMethods = HttpMethod.methods.filter { !_.isSafe }.map { _.toString }
 
   @deprecated("Use CsrfTokenSupport.DefaultKey", "2.0.0")
   val csrfKey = CsrfTokenSupport.DefaultKey

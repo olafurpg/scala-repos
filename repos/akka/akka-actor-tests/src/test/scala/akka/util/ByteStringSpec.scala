@@ -36,7 +36,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     Gen.sized { s ⇒
       for {
         chunks ← Gen.choose(0, s)
-        bytes ← Gen.listOfN(chunks, genSimpleByteString(1, s / (chunks max 1)))
+        bytes ← Gen.listOfN(chunks,
+                            genSimpleByteString(1, s / (chunks.max(1))))
       } yield (ByteString.empty /: bytes)(_ ++ _)
     }
   }
@@ -77,7 +78,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     val os = new ByteArrayOutputStream
     val bos = new ObjectOutputStream(os)
     bos.writeObject(obj)
-    String valueOf encodeHex(os.toByteArray)
+    String.valueOf(encodeHex(os.toByteArray))
   }
 
   val arbitraryByteArray: Arbitrary[Array[Byte]] = Arbitrary {
@@ -240,8 +241,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     for (i ← 0 until a) decoded(i) = input.getFloat(byteOrder)
     input.getFloats(decoded, a, b - a)(byteOrder)
     for (i ← b until n) decoded(i) = input.getFloat(byteOrder)
-    ((decoded.toSeq map floatToRawIntBits) ==
-      (reference.toSeq map floatToRawIntBits)) &&
+    ((decoded.toSeq.map(floatToRawIntBits)) ==
+      (reference.toSeq.map(floatToRawIntBits))) &&
     (input.toSeq == bytes.drop(n * elemSize))
   }
 
@@ -258,8 +259,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
     for (i ← 0 until a) decoded(i) = input.getDouble(byteOrder)
     input.getDoubles(decoded, a, b - a)(byteOrder)
     for (i ← b until n) decoded(i) = input.getDouble(byteOrder)
-    ((decoded.toSeq map doubleToRawLongBits) ==
-      (reference.toSeq map doubleToRawLongBits)) &&
+    ((decoded.toSeq.map(doubleToRawLongBits)) ==
+      (reference.toSeq.map(doubleToRawLongBits))) &&
     (input.toSeq == bytes.drop(n * elemSize))
   }
 
@@ -500,7 +501,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
       "calling foreach" in {
         check { a: ByteString ⇒
           likeVector(a) { it ⇒
-            var acc = 0; it foreach { acc += _ }; acc
+            var acc = 0; it.foreach { acc += _ }; acc
           }
         }
       }
@@ -646,7 +647,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
       "calling foreach" in {
         check { a: ByteString ⇒
           likeVecIt(a) { it ⇒
-            var acc = 0; it foreach { acc += _ }; acc
+            var acc = 0; it.foreach { acc += _ }; acc
           }
         }
       }
@@ -731,8 +732,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
         // combining skip and both read methods here for more rigorous testing
         check { slice: ByteStringSlice ⇒
           val (bytes, from, to) = slice
-          val a = (0 max from) min bytes.length
-          val b = (a max to) min bytes.length
+          val a = (0.max(from)) min bytes.length
+          val b = (a.max(to)) min bytes.length
           val input = bytes.iterator
           val output = Array.ofDim[Byte](bytes.length)
 
@@ -832,11 +833,11 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
            bs2: ByteString, bs3: ByteString) ⇒
             likeVecBld { builder ⇒
               builder ++= array1
-              bs1 foreach { b ⇒
+              bs1.foreach { b ⇒
                 builder += b
               }
               builder ++= bs2
-              bs3 foreach { b ⇒
+              bs3.foreach { b ⇒
                 builder += b
               }
               builder ++= Vector(array2: _*)

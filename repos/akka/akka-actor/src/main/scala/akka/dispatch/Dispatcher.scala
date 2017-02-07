@@ -75,11 +75,11 @@ class Dispatcher(
     */
   protected[akka] def executeTask(invocation: TaskInvocation) {
     try {
-      executorService execute invocation
+      executorService.execute(invocation)
     } catch {
       case e: RejectedExecutionException ⇒
         try {
-          executorService execute invocation
+          executorService.execute(invocation)
         } catch {
           case e2: RejectedExecutionException ⇒
             eventStream.publish(
@@ -129,12 +129,12 @@ class Dispatcher(
       //This needs to be here to ensure thread safety and no races
       if (mbox.setAsScheduled()) {
         try {
-          executorService execute mbox
+          executorService.execute(mbox)
           true
         } catch {
           case e: RejectedExecutionException ⇒
             try {
-              executorService execute mbox
+              executorService.execute(mbox)
               true
             } catch {
               //Retry once

@@ -14,25 +14,25 @@ object Test extends App {
     println(ten.tail.size + ": " + ten.tail)
     assert(ten == empty ++ (1 to 10))
     assert(ten.size == 10)
-    assert(ten forall (_ <= 10))
-    assert(ten exists (_ == 5))
-    assert((ten count (_ % 2 == 0)) == 5)
+    assert(ten.forall(_ <= 10))
+    assert(ten.exists(_ == 5))
+    assert((ten.count(_ % 2 == 0)) == 5)
     assert((ten find (_ % 2 == 0)) == Some(2))
     assert((0 /: ten)(_ + _) == 55)
     assert((ten :\ 0)(_ + _) == 55)
     println(ten.head)
-    val x = ten reduceLeft (_ + _)
+    val x = ten.reduceLeft(_ + _)
     assert(x == 55, x)
-    assert((ten reduceRight (_ + _)) == 55)
+    assert((ten.reduceRight(_ + _)) == 55)
     val firstFive = empty ++ (1 to 5)
     val secondFive = empty ++ (6 to 10)
     assert(firstFive ++ secondFive == ten, firstFive ++ secondFive)
-    val odds = ten filter (_ % 2 != 0)
-    val evens = ten filterNot (_ % 2 != 0)
+    val odds = ten.filter(_ % 2 != 0)
+    val evens = ten.filterNot(_ % 2 != 0)
     assert(odds.size == evens.size)
     val (o, e) = ten.partition(_ % 2 == 0)
     assert(o.size == e.size)
-    val gs = ten groupBy (x => x / 4)
+    val gs = ten.groupBy(x => x / 4)
     val vs1 = (for (k <- gs.keysIterator; v <- gs(k).toIterable.iterator)
       yield v).toList.sorted
     val vs2 = gs.values.toList.flatten.sorted
@@ -46,17 +46,17 @@ object Test extends App {
     assert(ten.init ++ List(ten.last) == ten, ten.init)
     assert(vs1 == vs2, vs1 + "!=" + vs2)
     assert(vs1 == ten)
-    assert((ten take 5) == firstFive)
-    assert((ten drop 5) == secondFive)
-    assert(ten slice (3, 3) isEmpty)
-    assert((ten slice (3, 6)) == List(4, 5, 6), ten slice (3, 6))
-    assert((ten takeWhile (_ <= 5)) == firstFive)
-    assert((ten dropWhile (_ <= 5)) == secondFive)
-    assert((ten span (_ <= 5)) == (firstFive, secondFive))
-    assert((ten splitAt 5) == (firstFive, secondFive), ten splitAt 5)
+    assert((ten.take(5)) == firstFive)
+    assert((ten.drop(5)) == secondFive)
+    assert(ten.slice(3, 3) isEmpty)
+    assert((ten.slice(3, 6)) == List(4, 5, 6), ten.slice(3, 6))
+    assert((ten.takeWhile(_ <= 5)) == firstFive)
+    assert((ten.dropWhile(_ <= 5)) == secondFive)
+    assert((ten.span(_ <= 5)) == (firstFive, secondFive))
+    assert((ten.splitAt(5)) == (firstFive, secondFive), ten.splitAt(5))
     val buf = new mutable.ArrayBuffer[Int]
-    firstFive copyToBuffer buf
-    secondFive copyToBuffer buf
+    firstFive.copyToBuffer(buf)
+    secondFive.copyToBuffer(buf)
     assert(buf.result == ten, buf.result)
     assert(ten.toArray.size == 10)
     assert(ten.toArray.toSeq == ten, ten.toArray.toSeq)
@@ -64,9 +64,9 @@ object Test extends App {
     assert(ten.toList == ten)
     assert(ten.toSeq == ten)
     assert(ten.toStream == ten)
-    assert(ten.toString endsWith "(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)")
+    assert(ten.toString.endsWith("(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)"))
     assert(
-      ten.mkString("[", "; ", "]") endsWith "[1; 2; 3; 4; 5; 6; 7; 8; 9; 10]")
+      ten.mkString("[", "; ", "]").endsWith("[1; 2; 3; 4; 5; 6; 7; 8; 9; 10]"))
   }
 
   def orderedIterableTest(empty: Iterable[Int]) {
@@ -75,29 +75,29 @@ object Test extends App {
     assert(six.iterator.toStream == six)
     assert(six.takeRight(4) == List(3, 4, 5, 6), six.takeRight(4))
     assert(six.dropRight(3) == List(1, 2, 3))
-    assert(six sameElements (1 to 6))
+    assert(six.sameElements(1 to 6))
   }
 
   def sequenceTest(empty: Seq[Int]) {
     orderedIterableTest(empty)
     val ten = empty ++ (1 to 10)
     println(ten)
-    val tenPlus = ten map (_ + 1)
-    assert((ten zip tenPlus) forall { case (x, y) => x + 1 == y })
-    val dble = ten flatMap (x => List(x, x))
+    val tenPlus = ten.map(_ + 1)
+    assert((ten.zip(tenPlus)).forall { case (x, y) => x + 1 == y })
+    val dble = ten.flatMap(x => List(x, x))
     assert(dble.distinct == ten)
     assert(ten.length == 10)
     assert(ten(0) == 1 && ten(9) == 10)
     assert(
-      (ten lengthCompare 10) == 0 && (ten lengthCompare 1) > 0 &&
-        (ten lengthCompare 11) < 0)
+      (ten.lengthCompare(10)) == 0 && (ten.lengthCompare(1)) > 0 &&
+        (ten.lengthCompare(11)) < 0)
     assert((ten isDefinedAt 0) && (ten isDefinedAt 9))
     assert(!(ten isDefinedAt -1));
     assert(!(ten isDefinedAt 10))
-    val tenten = ten zip ten
-    assert((tenten map (_._1)) == ten)
-    assert((tenten map (_._2)) == ten)
-    assert(ten.zipWithIndex forall { case (x, y) => x == y + 1 })
+    val tenten = ten.zip(ten)
+    assert((tenten.map(_._1)) == ten)
+    assert((tenten.map(_._2)) == ten)
+    assert(ten.zipWithIndex.forall { case (x, y) => x == y + 1 })
     assert(ten.segmentLength(_ <= 8, 4) == 4, ten.segmentLength(_ <= 8, 4))
     assert(ten.prefixLength(_ <= 8) == 8)
     assert(ten.indexWhere(_ >= 8, 4) == 7, ten.indexWhere(_ >= 8, 4))
@@ -111,7 +111,7 @@ object Test extends App {
     assert(ten.lastIndexWhere(_ <= 8) == 7)
     assert(ten.lastIndexWhere(_ <= 8, 6) == 6)
     assert(ten.lastIndexWhere(_ <= 8, 8) == 7)
-    assert(ten.reverse startsWith List(10, 9, 8), ten.reverse.take(10).toList)
+    assert(ten.reverse.startsWith(List(10, 9, 8)), ten.reverse.take(10).toList)
     assert(ten.reverse.length == 10)
     assert(ten.reverse.reverse == ten)
     assert(ten.reverseIterator.toList.reverse == ten,
@@ -129,19 +129,18 @@ object Test extends App {
     assert(ten contains 10)
     assert(!(ten contains 0))
     assert(
-      (empty ++ (1 to 7) union empty ++ (3 to 10)) == List(1, 2, 3, 4, 5, 6, 7,
-        3, 4, 5, 6, 7, 8, 9, 10))
-    assert((ten diff ten).isEmpty)
-    assert((ten diff List()) == ten)
-    assert(
-      (ten diff (ten filter (_ % 2 == 0))) == (ten filterNot (_ % 2 == 0)))
+      ((empty ++ (1 to 7)).union(empty ++ (3 to 10))) == List(1, 2, 3, 4, 5, 6,
+        7, 3, 4, 5, 6, 7, 8, 9, 10))
+    assert((ten.diff(ten)).isEmpty)
+    assert((ten.diff(List())) == ten)
+    assert((ten.diff(ten.filter(_ % 2 == 0))) == (ten.filterNot(_ % 2 == 0)))
     assert((ten intersect ten) == ten)
     assert((ten intersect List(5)) == List(5))
     assert((ten ++ ten).distinct == ten)
     assert(ten.patch(3, List(4, 5, 6, 7), 4) == ten)
     assert(ten.patch(0, List(1, 2, 3), 9) == List(1, 2, 3, 10))
     assert(empty.padTo(10, 7) == Array.fill(10)(7).toSeq)
-    assert((ten zip ten.indices) == ten.zipWithIndex)
+    assert((ten.zip(ten.indices)) == ten.zipWithIndex)
     assert(ten.sortWith(_ < _) == ten)
     assert(ten.sortWith(_ > _) == ten.reverse)
   }
@@ -150,8 +149,8 @@ object Test extends App {
     var s = empty + "A" + "B" + "C"
     s += ("D", "E", "F")
     s ++= List("G", "H", "I")
-    s ++= ('J' to 'Z') map (_.toString)
-    assert(s forall (s contains))
+    s ++= (('J' to 'Z')).map(_.toString)
+    assert(s.forall(s contains))
     assert(s contains "X")
     assert(!(s contains "0"))
     s = s + "0"
@@ -167,29 +166,29 @@ object Test extends App {
     assert(s1 == empty, s1)
     def abc = empty + ("a", "b", "c")
     def bc = empty + ("b", "c")
-    assert(bc subsetOf abc)
+    assert(bc.subsetOf(abc))
   }
 
   def rangeTest(r: Range) {
     val ten = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     assert(r == ten)
     assert(r.toList == ten)
-    assert((r filter (_ % 2 == 0)) == (ten filter (_ % 2 == 0)))
-    println((r map (_ + 1)) == (ten map (_ + 1)))
-    println((r map (_ * 2)) == (ten map (_ + 1)))
-    println((r flatMap (i => 0 until i)) == (ten flatMap (i => 0 until i)))
+    assert((r.filter(_ % 2 == 0)) == (ten.filter(_ % 2 == 0)))
+    println((r.map(_ + 1)) == (ten.map(_ + 1)))
+    println((r.map(_ * 2)) == (ten.map(_ + 1)))
+    println((r.flatMap(i => 0 until i)) == (ten.flatMap(i => 0 until i)))
   }
 
   def mapTest(empty: => Map[String, String]) = {
     var m = empty + ("A" -> "A") + ("B" -> "B") + ("C" -> "C")
     m += (("D" -> "D"), ("E" -> "E"), ("F" -> "F"))
     m ++= List(("G" -> "G"), ("H" -> "H"), ("I" -> "I"))
-    m ++= ('J' to 'Z') map (x => (x.toString -> x.toString))
+    m ++= (('J' to 'Z')).map(x => (x.toString -> x.toString))
     println(m.toList.sorted)
     assert(!m.isEmpty)
-    assert(m.keySet forall (k => (m get k) == Some(k)))
-    assert(m.keySet forall (k => (m apply k) == k))
-    assert(m.keySet forall (m contains))
+    assert(m.keySet.forall(k => (m.get(k)) == Some(k)))
+    assert(m.keySet.forall(k => (m.apply(k)) == k))
+    assert(m.keySet.forall(m contains))
     assert(m.getOrElse("7", "@") == "@")
     assert(m.keySet.size == 26)
     assert(m.size == 26)
@@ -202,13 +201,13 @@ object Test extends App {
     def m3 = empty ++ m1
     assert(m1 == m3)
     println(m3.toList.sorted)
-    val m4 = m3 filterNot { case (k, v) => k != "A" }
+    val m4 = m3.filterNot { case (k, v) => k != "A" }
     assert(m4.size == 1, m4)
   }
 
   def mutableMapTest(empty: => mutable.Map[String, String]) = {
     mapTest(empty)
-    val m1 = empty ++ (('A' to 'Z') map (_.toString) map (x => (x, x)))
+    val m1 = empty ++ ((('A' to 'Z')).map(_.toString).map(x => (x, x)))
     val m2 = m1 retain ((k, v) => k == "N")
     assert(m2.size == 1, m2)
   }

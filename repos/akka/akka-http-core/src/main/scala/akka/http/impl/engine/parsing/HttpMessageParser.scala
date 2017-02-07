@@ -254,7 +254,7 @@ private[http] abstract class HttpMessageParser[
                                ch,
                                clh,
                                cth,
-                               Some(x append h.encodings),
+                               Some(x.append(h.encodings)),
                                e100c,
                                hh)
           }
@@ -276,7 +276,7 @@ private[http] abstract class HttpMessageParser[
                                lineEnd,
                                headers,
                                headerCount,
-                               Some(x append h.tokens),
+                               Some(x.append(h.tokens)),
                                clh,
                                cth,
                                teh,

@@ -15,7 +15,7 @@ private[finagle] object TraceInitializerFilter {
       val param.Tracer(tracer) = _tracer
       val traceInitializer =
         new TraceInitializerFilter[Req, Rep](tracer, newId)
-      traceInitializer andThen next
+      traceInitializer.andThen(next)
     }
   }
 
@@ -155,7 +155,7 @@ object ServerTracingFilter {
         "Report finagle information and server recv/send events"
       def make(_label: param.Label, next: ServiceFactory[Req, Rep]) = {
         val param.Label(label) = _label
-        TracingFilter[Req, Rep](label) andThen next
+        TracingFilter[Req, Rep](label).andThen(next)
       }
     }
 }
@@ -183,7 +183,7 @@ object ClientTracingFilter {
         "Report finagle information and client send/recv events"
       def make(_label: param.Label, next: ServiceFactory[Req, Rep]) = {
         val param.Label(label) = _label
-        TracingFilter[Req, Rep](label) andThen next
+        TracingFilter[Req, Rep](label).andThen(next)
       }
     }
 }
@@ -211,7 +211,7 @@ private[finagle] object WireTracingFilter {
       val description = "Report finagle information and wire send/recv events"
       def make(_label: param.Label, next: ServiceFactory[Req, Rep]) = {
         val param.Label(label) = _label
-        TracingFilter[Req, Rep](label) andThen next
+        TracingFilter[Req, Rep](label).andThen(next)
       }
     }
 }

@@ -35,5 +35,5 @@ trait Graph[+S <: Shape, +M] {
   def async: Graph[S, M] = addAttributes(Attributes.asyncBoundary)
 
   def addAttributes(attr: Attributes): Graph[S, M] =
-    withAttributes(module.attributes and attr)
+    withAttributes(module.attributes.and(attr))
 }

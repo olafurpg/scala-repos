@@ -33,7 +33,7 @@ object UserInfo {
 
   def apply(queryString: Map[String, Seq[String]]): UserInfo = {
     val extractor = new UserInfoExtractor(queryString)
-    val id = extractor.id getOrElse (throw Errors.BAD_RESPONSE)
+    val id = extractor.id.getOrElse(throw Errors.BAD_RESPONSE)
     new UserInfo(id, extractor.axAttributes)
   }
 
@@ -51,8 +51,10 @@ object UserInfo {
     }
 
     private lazy val signedFields =
-      params.get("openid.signed") flatMap { _.headOption map { _.split(",") } } getOrElse
-        (Array())
+      params
+        .get("openid.signed")
+        .flatMap { _.headOption.map { _.split(",") } }
+        .getOrElse(Array())
 
     def id =
       params
@@ -62,13 +64,17 @@ object UserInfo {
 
     def axAttributes = params.foldLeft(Map[String, String]()) {
       case (result, (key, values)) =>
-        extractAxAttribute.lift(key) flatMap {
-          case (fullKey, shortKey) if signedFields.contains(fullKey) =>
-            values.headOption map { value =>
-              Map(shortKey -> value)
-            }
-          case _ => None
-        } map (result ++ _) getOrElse result
+        extractAxAttribute
+          .lift(key)
+          .flatMap {
+            case (fullKey, shortKey) if signedFields.contains(fullKey) =>
+              values.headOption.map { value =>
+                Map(shortKey -> value)
+              }
+            case _ => None
+          }
+          .map(result ++ _)
+          .getOrElse(result)
     }
   }
 }
@@ -261,35 +267,36 @@ class WsDiscovery @Inject()(ws: WSClient) extends Discovery {
 
   case class UrlIdentifier(url: String) {
     def normalize =
-      catching(classOf[MalformedURLException], classOf[URISyntaxException]) opt {
-        def port(p: Int) = p match {
-          case 80 | 443 => -1
-          case port => port
-        }
-        def schemeForPort(p: Int) = p match {
-          case 443 => "https"
-          case _ => "http"
-        }
-        def scheme(uri: URI) =
-          Option(uri.getScheme) getOrElse schemeForPort(uri.getPort)
-        def path(path: String) =
-          if (null == path || path.isEmpty) "/" else path
+      catching(classOf[MalformedURLException], classOf[URISyntaxException])
+        .opt {
+          def port(p: Int) = p match {
+            case 80 | 443 => -1
+            case port => port
+          }
+          def schemeForPort(p: Int) = p match {
+            case 443 => "https"
+            case _ => "http"
+          }
+          def scheme(uri: URI) =
+            Option(uri.getScheme).getOrElse(schemeForPort(uri.getPort))
+          def path(path: String) =
+            if (null == path || path.isEmpty) "/" else path
 
-        val uri = (if (url.matches("^(http|HTTP)(s|S)?:.*")) new URI(url)
-                   else new URI("http://" + url)).normalize()
-        new URI(scheme(uri),
-                uri.getUserInfo,
-                uri.getHost.toLowerCase(java.util.Locale.ENGLISH),
-                port(uri.getPort),
-                path(uri.getPath),
-                uri.getQuery,
-                null).toURL.toExternalForm
-      }
+          val uri = (if (url.matches("^(http|HTTP)(s|S)?:.*")) new URI(url)
+                     else new URI("http://" + url)).normalize()
+          new URI(scheme(uri),
+                  uri.getUserInfo,
+                  uri.getHost.toLowerCase(java.util.Locale.ENGLISH),
+                  port(uri.getPort),
+                  path(uri.getPath),
+                  uri.getQuery,
+                  null).toURL.toExternalForm
+        }
   }
 
   def normalizeIdentifier(openID: String) = {
     val trimmed = openID.trim
-    UrlIdentifier(trimmed).normalize getOrElse trimmed
+    UrlIdentifier(trimmed).normalize.getOrElse(trimmed)
   }
 
   /**
@@ -301,8 +308,10 @@ class WsDiscovery @Inject()(ws: WSClient) extends Discovery {
       .get()
       .map(response => {
         val maybeOpenIdServer =
-          new XrdsResolver().resolve(response) orElse new HtmlResolver()
+          new XrdsResolver()
             .resolve(response)
+            .orElse(new HtmlResolver()
+              .resolve(response))
         maybeOpenIdServer.getOrElse(throw Errors.NETWORK_ERROR)
       })
   }

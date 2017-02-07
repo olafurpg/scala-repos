@@ -320,12 +320,12 @@ final case class OldHtmlProperties(userAgent: Box[String])
     }
 
   val html5FormsSupport: Boolean = {
-    val r = S.request openOr Req.nil
+    val r = S.request.openOr(Req.nil)
     r.isSafari5 || r.isFirefox36 || r.isFirefox40 || r.isChrome5 || r.isChrome6
   }
 
   val maxOpenRequests: Int =
-    LiftRules.maxConcurrentRequests.vend(S.request openOr Req.nil)
+    LiftRules.maxConcurrentRequests.vend(S.request.openOr(Req.nil))
 }
 
 /**
@@ -349,12 +349,12 @@ final case class Html5Properties(userAgent: Box[String])
   def htmlOutputHeader: Box[String] = docType.map(_.trim + "\n")
 
   val html5FormsSupport: Boolean = {
-    val r = S.request openOr Req.nil
+    val r = S.request.openOr(Req.nil)
     r.isSafari5 || r.isFirefox36 || r.isFirefox40 || r.isChrome5 || r.isChrome6
   }
 
   val maxOpenRequests: Int =
-    LiftRules.maxConcurrentRequests.vend(S.request openOr Req.nil)
+    LiftRules.maxConcurrentRequests.vend(S.request.openOr(Req.nil))
 }
 
 /**
@@ -381,10 +381,10 @@ final case class XHtmlInHtml5OutProperties(userAgent: Box[String])
   def htmlOutputHeader: Box[String] = docType.map(_ + "\n")
 
   val html5FormsSupport: Boolean = {
-    val r = S.request openOr Req.nil
+    val r = S.request.openOr(Req.nil)
     r.isSafari5 || r.isFirefox36 || r.isFirefox40 || r.isChrome5 || r.isChrome6
   }
 
   val maxOpenRequests: Int =
-    LiftRules.maxConcurrentRequests.vend(S.request openOr Req.nil)
+    LiftRules.maxConcurrentRequests.vend(S.request.openOr(Req.nil))
 }

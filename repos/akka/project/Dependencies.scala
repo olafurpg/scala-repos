@@ -34,8 +34,8 @@ object Dependencies {
     // Compile
 
     val camelCore =
-      "org.apache.camel" % "camel-core" % "2.13.4" exclude
-        ("org.slf4j", "slf4j-api") // ApacheV2
+      ("org.apache.camel" % "camel-core" % "2.13.4")
+        .exclude("org.slf4j", "slf4j-api") // ApacheV2
 
     // when updating config version, update links ActorSystem ScalaDoc to link to the updated version
     val config = "com.typesafe" % "config" % "1.3.0" // ApacheV2
@@ -53,8 +53,9 @@ object Dependencies {
 
     // mirrored in OSGi sample
     val uncommonsMath =
-      "org.uncommons.maths" % "uncommons-maths" % "1.2.2a" exclude
-        ("jfree", "jcommon") exclude ("jfree", "jfreechart") // ApacheV2
+      ("org.uncommons.maths" % "uncommons-maths" % "1.2.2a")
+        .exclude("jfree", "jcommon")
+        .exclude("jfree", "jfreechart") // ApacheV2
     val osgiCore = "org.osgi" % "org.osgi.core" % "4.3.1" // ApacheV2
     val osgiCompendium =
       "org.osgi" % "org.osgi.compendium" % "4.3.1" // ApacheV2
@@ -264,8 +265,8 @@ object Dependencies {
       Dependencies.Compile.scalaReflect % "provided"
     ),
     addCompilerPlugin(
-      "org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.fullMapped(
-        nominalScalaVersion))
+      ("org.scalamacros" % "paradise" % "2.1.0")
+        .cross(CrossVersion.fullMapped(nominalScalaVersion)))
   )
 
   lazy val httpTestkit =

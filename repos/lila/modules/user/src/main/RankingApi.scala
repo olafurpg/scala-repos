@@ -47,7 +47,7 @@ final class RankingApi(coll: lila.db.Types.Coll,
       )
       .void
 
-  def remove(userId: User.ID): Funit = UserRepo byId userId flatMap {
+  def remove(userId: User.ID): Funit = (UserRepo byId userId).flatMap {
     _ ?? { user =>
       coll
         .remove(
@@ -70,16 +70,17 @@ final class RankingApi(coll: lila.db.Types.Coll,
         .find(BSONDocument("perf" -> perfId, "stable" -> true))
         .sort(BSONDocument("rating" -> -1))
         .cursor[Ranking]()
-        .collect[List](nb) map {
-        _.flatMap { r =>
-          lightUser(r.user).map { light =>
-            User.LightPerf(user = light,
-                           perfKey = perfKey,
-                           rating = r.rating,
-                           progress = ~r.prog)
+        .collect[List](nb)
+        .map {
+          _.flatMap { r =>
+            lightUser(r.user).map { light =>
+              User.LightPerf(user = light,
+                             perfKey = perfKey,
+                             rating = r.rating,
+                             progress = ~r.prog)
+            }
           }
         }
-      }
     }
 
   object weeklyStableRanking {
@@ -87,10 +88,11 @@ final class RankingApi(coll: lila.db.Types.Coll,
     private type Rank = Int
 
     def of(userId: User.ID): Fu[Map[Perf.Key, Int]] =
-      lila.common.Future.traverseSequentially(PerfType.leaderboardable) {
-        perf =>
-          cache(perf.id) map { _ get userId map (perf.key -> _) }
-      } map (_.flatten.toMap)
+      lila.common.Future
+        .traverseSequentially(PerfType.leaderboardable) { perf =>
+          cache(perf.id).map { _.get(userId).map(perf.key -> _) }
+        }
+        .map(_.flatten.toMap)
 
     private val cache = AsyncCache[Perf.ID, Map[User.ID, Rank]](f = compute,
                                                                 timeToLive =
@@ -108,7 +110,7 @@ final class RankingApi(coll: lila.db.Types.Coll,
       var rank = 1
       val b = Map.newBuilder[User.ID, Rank]
       val mapBuilder: Iteratee[BSONDocument, Unit] = Iteratee.foreach { doc =>
-        doc.getAs[User.ID]("user") foreach { user =>
+        doc.getAs[User.ID]("user").foreach { user =>
           b += (user -> rank)
           rank = rank + 1
         }

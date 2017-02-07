@@ -34,13 +34,13 @@ class MinMaxLattice[
     @sp(Boolean, Byte, Short, Int, Long, Float, Double) A: Order]
     extends Lattice[A] {
   def meet(lhs: A, rhs: A): A = lhs min rhs
-  def join(lhs: A, rhs: A): A = lhs max rhs
+  def join(lhs: A, rhs: A): A = lhs.max(rhs)
 }
 
 class GcdLcmLattice[@sp(Byte, Short, Int, Long) A: EuclideanRing]
     extends Lattice[A] {
-  def meet(lhs: A, rhs: A): A = lhs gcd rhs
-  def join(lhs: A, rhs: A): A = lhs lcm rhs
+  def meet(lhs: A, rhs: A): A = lhs.gcd(rhs)
+  def join(lhs: A, rhs: A): A = lhs.lcm(rhs)
 }
 
 trait BoundedJoinSemilattice[

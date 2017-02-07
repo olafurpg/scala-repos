@@ -371,7 +371,7 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     // unique index on name
     val ixName = ixs.find(dbo => dbo.get("name") == "name_1")
     ixName.isDefined must_== true
-    ixName foreach { ix =>
+    ixName.foreach { ix =>
       ix.containsField("unique") must beTrue
       ix.get("unique").asInstanceOf[Boolean] must beTrue
     }
@@ -379,7 +379,7 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     // non-unique index on dbtype
     val ixDbtype = ixs.find(dbo => dbo.get("name") == "dbtype_1")
     ixDbtype.isDefined must_== true
-    ixDbtype foreach { ix =>
+    ixDbtype.foreach { ix =>
       ix.containsField("unique") must beFalse
     }
 

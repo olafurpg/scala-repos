@@ -51,7 +51,7 @@ object Position {
       case s if shortenFile => s.file.name + ":"
       case s => s.file.path + ":"
     }
-    prefix + (pos showError msg)
+    prefix + (pos.showError(msg))
   }
 
   def offset(source: SourceFile, point: Int): Position =
@@ -134,7 +134,7 @@ private[util] trait InternalPositionImpl { self: Position =>
   /** Map this position to its position in the original source file
     *  (which may be this position unchanged.)
     */
-  def finalPosition: Pos = source positionInUltimateSource this
+  def finalPosition: Pos = source.positionInUltimateSource(this)
 
   def isTransparent = false
   def isOffset = isDefined && !isRange
@@ -170,7 +170,7 @@ private[util] trait InternalPositionImpl { self: Position =>
     */
   def |(that: Position, poses: Position*): Position =
     poses.foldLeft(this | that)(_ | _)
-  def |(that: Position): Position = this union that
+  def |(that: Position): Position = this.union(that)
   def ^(point: Int): Position = this withPoint point
   def |^(that: Position): Position = (this | that) ^ that.point
   def ^|(that: Position): Position = (this | that) ^ this.point
@@ -178,7 +178,7 @@ private[util] trait InternalPositionImpl { self: Position =>
   def union(pos: Position): Position =
     (if (!pos.isRange) this
      else if (this.isRange)
-       copyRange(start = start min pos.start, end = end max pos.end)
+       copyRange(start = start min pos.start, end = end.max(pos.end))
      else pos)
 
   def includes(pos: Position): Boolean =
@@ -208,9 +208,9 @@ private[util] trait InternalPositionImpl { self: Position =>
     def escaped(s: String) = {
       def u(c: Int) = f"\\u$c%04x"
       def uable(c: Int) = (c < 0x20 && c != '\t') || c == 0x7F
-      if (s exists (c => uable(c))) {
+      if (s.exists(c => uable(c))) {
         val sb = new StringBuilder
-        s foreach (c => sb append (if (uable(c)) u(c) else c))
+        s.foreach(c => sb.append(if (uable(c)) u(c) else c))
         sb.toString
       } else s
     }
@@ -274,14 +274,14 @@ private[util] trait DeprecatedPosition { self: Position =>
 
   @deprecated("use `finalPosition`", "2.11.0")
   def inUltimateSource(source: SourceFile): Position =
-    source positionInUltimateSource this
+    source.positionInUltimateSource(this)
 
   @deprecated("use `lineCaret`", since = "2.11.0")
   def lineWithCarat(maxWidth: Int): (String, String) = ("", "")
 
   @deprecated("Use `withSource(source)` and `withShift`", "2.11.0")
   def withSource(source: SourceFile, shift: Int): Position =
-    this withSource source withShift shift
+    this.withSource(source).withShift(shift)
 
   @deprecated("Use `start` instead", "2.11.0")
   def startOrPoint: Int = if (isRange) start else point

@@ -58,18 +58,22 @@ trait ApiControllerBase extends ControllerBase {
     * https://developer.github.com/v3/users/#get-a-single-user
     */
   get("/api/v3/users/:userName") {
-    getAccountByUserName(params("userName")).map { account =>
-      JsonFormat(ApiUser(account))
-    } getOrElse NotFound
+    getAccountByUserName(params("userName"))
+      .map { account =>
+        JsonFormat(ApiUser(account))
+      }
+      .getOrElse(NotFound)
   }
 
   /**
     * https://developer.github.com/v3/users/#get-the-authenticated-user
     */
   get("/api/v3/user") {
-    context.loginAccount.map { account =>
-      JsonFormat(ApiUser(account))
-    } getOrElse Unauthorized
+    context.loginAccount
+      .map { account =>
+        JsonFormat(ApiUser(account))
+      }
+      .getOrElse(Unauthorized)
   }
 
   /**
@@ -100,7 +104,7 @@ trait ApiControllerBase extends ControllerBase {
           )
         }
       }
-    }) getOrElse NotFound
+    }).getOrElse(NotFound)
   })
 
   /**
@@ -131,7 +135,7 @@ trait ApiControllerBase extends ControllerBase {
           )
         }
       }
-    }) getOrElse NotFound
+    }).getOrElse(NotFound)
   })
 
   /** https://developer.github.com/v3/repos/#enabling-and-disabling-branch-protection */
@@ -154,7 +158,7 @@ trait ApiControllerBase extends ControllerBase {
         disableBranchProtection(repository.owner, repository.name, branch)
       }
       JsonFormat(ApiBranch(branch, protection)(RepositoryName(repository)))
-    }) getOrElse NotFound
+    }).getOrElse(NotFound)
   })
 
   /**
@@ -217,7 +221,7 @@ trait ApiControllerBase extends ControllerBase {
                      issueId,
                      ApiUser(context.loginAccount.get),
                      issue.isPullRequest))
-      }) getOrElse NotFound
+      }).getOrElse(NotFound)
     })
 
   /**
@@ -236,10 +240,11 @@ trait ApiControllerBase extends ControllerBase {
     */
   get("/api/v3/repos/:owner/:repository/labels/:labelName")(referrersOnly {
     repository =>
-      getLabel(repository.owner, repository.name, params("labelName")).map {
-        label =>
+      getLabel(repository.owner, repository.name, params("labelName"))
+        .map { label =>
           JsonFormat(ApiLabel(label, RepositoryName(repository)))
-      } getOrElse NotFound()
+        }
+        .getOrElse(NotFound())
   })
 
   /**
@@ -257,9 +262,12 @@ trait ApiControllerBase extends ControllerBase {
                                       repository.name,
                                       data.name,
                                       data.color)
-            getLabel(repository.owner, repository.name, labelId).map { label =>
-              Created(JsonFormat(ApiLabel(label, RepositoryName(repository))))
-            } getOrElse NotFound()
+            getLabel(repository.owner, repository.name, labelId)
+              .map { label =>
+                Created(
+                  JsonFormat(ApiLabel(label, RepositoryName(repository))))
+              }
+              .getOrElse(NotFound())
           } else {
             // TODO ApiError should support errors field to enhance compatibility of GitHub API
             UnprocessableEntity(ApiError(
@@ -269,7 +277,7 @@ trait ApiControllerBase extends ControllerBase {
             ))
           }
         }
-      }) getOrElse NotFound()
+      }).getOrElse(NotFound())
   })
 
   /**
@@ -302,9 +310,10 @@ trait ApiControllerBase extends ControllerBase {
                     "Validation Failed",
                     Some("https://developer.github.com/v3/issues/labels/#create-a-label")))
                 }
-            } getOrElse NotFound()
+            }
+            .getOrElse(NotFound())
         }
-      }) getOrElse NotFound()
+      }).getOrElse(NotFound())
     })
 
   /**
@@ -314,11 +323,12 @@ trait ApiControllerBase extends ControllerBase {
   delete("/api/v3/repos/:owner/:repository/labels/:labelName")(
     collaboratorsOnly { repository =>
       LockUtil.lock(RepositoryName(repository).fullName) {
-        getLabel(repository.owner, repository.name, params("labelName")).map {
-          label =>
+        getLabel(repository.owner, repository.name, params("labelName"))
+          .map { label =>
             deleteLabel(repository.owner, repository.name, label.labelId)
             NoContent()
-        } getOrElse NotFound()
+          }
+          .getOrElse(NotFound())
       }
     })
 
@@ -386,9 +396,9 @@ trait ApiControllerBase extends ControllerBase {
     repository =>
       val owner = repository.owner
       val name = repository.name
-      params("id").toIntOpt.flatMap {
-        issueId =>
-          getPullRequest(owner, name, issueId) map {
+      params("id").toIntOpt
+        .flatMap { issueId =>
+          getPullRequest(owner, name, issueId).map {
             case (issue, pullreq) =>
               using(Git.open(getRepositoryDir(owner, name))) {
                 git =>
@@ -406,7 +416,8 @@ trait ApiControllerBase extends ControllerBase {
                   JsonFormat(commits)
               }
           }
-      } getOrElse NotFound
+        }
+        .getOrElse(NotFound)
   })
 
   /**
@@ -441,7 +452,7 @@ trait ApiControllerBase extends ControllerBase {
         status <- getCommitStatus(repository.owner, repository.name, statusId)
       } yield {
         JsonFormat(ApiCommitStatus(status, ApiUser(creator)))
-      }) getOrElse NotFound
+      }).getOrElse(NotFound)
   })
 
   /**
@@ -462,7 +473,7 @@ trait ApiControllerBase extends ControllerBase {
                 case (status, creator) =>
                   ApiCommitStatus(status, ApiUser(creator))
               })
-        }) getOrElse NotFound
+        }).getOrElse(NotFound)
     })
 
   /**
@@ -492,7 +503,7 @@ trait ApiControllerBase extends ControllerBase {
           ApiCombinedCommitStatus(sha,
                                   statuses,
                                   ApiRepository(repository, owner)))
-      }) getOrElse NotFound
+      }).getOrElse(NotFound)
   })
 
   private def isEditable(owner: String, repository: String, author: String)(

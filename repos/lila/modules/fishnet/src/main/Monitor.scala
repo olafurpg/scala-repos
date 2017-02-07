@@ -31,12 +31,12 @@ private final class Monitor(moveDb: MoveDB,
 
     val monitor = lila.mon.fishnet.analysis by client.userId.value
 
-    result.engine.options.hashInt foreach { monitor.hash(_) }
-    result.engine.options.threadsInt foreach { monitor.threads(_) }
+    result.engine.options.hashInt.foreach { monitor.hash(_) }
+    result.engine.options.threadsInt.foreach { monitor.threads(_) }
 
     monitor.totalSecond(sumOf(result.analysis)(_.time) / 1000)
     monitor.totalMeganode(sumOf(result.analysis) { eval =>
-      eval.nodes ifFalse eval.mateFound
+      eval.nodes.ifFalse(eval.mateFound)
     } / 1000000)
     monitor.totalPosition(result.analysis.size)
 
@@ -49,26 +49,26 @@ private final class Monitor(moveDb: MoveDB,
             (sum + v, nb + 1)
           }
       }
-      (nb > 0) option (sum / nb)
+      ((nb > 0)).option(sum / nb)
     }
-    avgOf(_.time) foreach { monitor.movetime(_) }
-    avgOf(_.nodes) foreach { monitor.node(_) }
-    avgOf(_.cappedNps) foreach { monitor.nps(_) }
-    avgOf(_.depth) foreach { monitor.depth(_) }
-    avgOf(_.pvList.size.some) foreach { monitor.pvSize(_) }
+    avgOf(_.time).foreach { monitor.movetime(_) }
+    avgOf(_.nodes).foreach { monitor.node(_) }
+    avgOf(_.cappedNps).foreach { monitor.nps(_) }
+    avgOf(_.depth).foreach { monitor.depth(_) }
+    avgOf(_.pvList.size.some).foreach { monitor.pvSize(_) }
   }
 
   private[fishnet] def move(work: Work.Move, client: Client) = {
     success(work, client)
     if (work.level == 8)
-      work.acquiredAt foreach { acquiredAt =>
+      work.acquiredAt.foreach { acquiredAt =>
         lila.mon.fishnet.move
           .time(client.userId.value)(nowMillis - acquiredAt.getMillis)
       }
   }
 
   private def sample[A](elems: List[A], n: Int) =
-    if (elems.size <= n) elems else scala.util.Random shuffle elems take n
+    if (elems.size <= n) elems else scala.util.Random.shuffle(elems).take(n)
 
   private def success(work: Work, client: Client) = {
 
@@ -76,7 +76,7 @@ private final class Monitor(moveDb: MoveDB,
       .result(client.userId.value, work.skill.key)
       .success()
 
-    work.acquiredAt foreach { acquiredAt =>
+    work.acquiredAt.foreach { acquiredAt =>
       lila.mon.fishnet.queue.db(work.skill.key) {
         acquiredAt.getMillis - work.createdAt.getMillis
       }
@@ -114,31 +114,35 @@ private final class Monitor(moveDb: MoveDB,
   }
 
   private def monitorClients: Unit =
-    repo.allRecentClients map { clients =>
-      import lila.mon.fishnet.client._
+    repo.allRecentClients
+      .map { clients =>
+        import lila.mon.fishnet.client._
 
-      status enabled clients.count(_.enabled)
-      status disabled clients.count(_.disabled)
+        status.enabled(clients.count(_.enabled))
+        status.disabled(clients.count(_.disabled))
 
-      Client.Skill.all foreach { s =>
-        skill(s.key)(clients.count(_.skill == s))
-      }
+        Client.Skill.all.foreach { s =>
+          skill(s.key)(clients.count(_.skill == s))
+        }
 
-      clients
-        .flatMap(_.instance)
-        .map(_.version.value)
-        .groupBy(identity)
-        .mapValues(_.size) foreach {
-        case (v, nb) => version(v)(nb)
+        clients
+          .flatMap(_.instance)
+          .map(_.version.value)
+          .groupBy(identity)
+          .mapValues(_.size)
+          .foreach {
+            case (v, nb) => version(v)(nb)
+          }
+        clients
+          .flatMap(_.instance)
+          .map(_.engine.name)
+          .groupBy(identity)
+          .mapValues(_.size)
+          .foreach {
+            case (s, nb) => engine(s)(nb)
+          }
       }
-      clients
-        .flatMap(_.instance)
-        .map(_.engine.name)
-        .groupBy(identity)
-        .mapValues(_.size) foreach {
-        case (s, nb) => engine(s)(nb)
-      }
-    } andThenAnyway scheduleClients
+      .andThenAnyway(scheduleClients)
 
   private def monitorWork: Unit = {
 
@@ -153,7 +157,7 @@ private final class Monitor(moveDb: MoveDB,
     repo.countAnalysis(acquired = false).map { queued(Analysis.key)(_) } >> repo
       .countAnalysis(acquired = true)
       .map { acquired(Analysis.key)(_) }
-  } andThenAnyway scheduleWork
+  }.andThenAnyway(scheduleWork)
 
   private def scheduleClients = scheduler.once(1 minute)(monitorClients)
   private def scheduleWork = scheduler.once(10 seconds)(monitorWork)

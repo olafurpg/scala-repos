@@ -27,7 +27,7 @@ trait EtaExpansion { self: Analyzer =>
     def unapply(tree: Tree): Option[(List[ValDef], Tree, List[Tree])] =
       tree match {
         case Function(vparams, Apply(fn, args))
-            if (vparams corresponds args)(isMatch) =>
+            if (vparams.corresponds(args))(isMatch) =>
           Some((vparams, fn, args))
         case _ =>
           None
@@ -71,7 +71,8 @@ trait EtaExpansion { self: Analyzer =>
             val rhs =
               if (byName) {
                 val res = typer.typed(Function(List(), tree))
-                new ChangeOwnerTraverser(typer.context.owner, res.symbol) traverse tree // SI-6274
+                new ChangeOwnerTraverser(typer.context.owner, res.symbol)
+                  .traverse(tree) // SI-6274
                 res
               } else tree
             ValDef(Modifiers(SYNTHETIC), vname.toTermName, TypeTree(), rhs)
@@ -105,11 +106,12 @@ trait EtaExpansion { self: Analyzer =>
           val name = tree.symbol.name // account for renamed imports, SI-7233
           treeCopy
             .Select(tree, liftout(qual, byName = false), name)
-            .clearType() setSymbol NoSymbol
+            .clearType()
+            .setSymbol(NoSymbol)
         case Ident(name) =>
           tree
       }
-      if (tree1 ne tree) tree1 setPos tree1.pos.makeTransparent
+      if (tree1 ne tree) tree1.setPos(tree1.pos.makeTransparent)
       tree1
     }
 

@@ -23,15 +23,17 @@ case class Route(routeMatchers: Seq[RouteMatcher] = Seq.empty,
     * returned.
     */
   def apply(requestPath: String): Option[MatchedRoute] = {
-    routeMatchers.foldLeft(Option(MultiMap())) {
-      (acc: Option[MultiParams], routeMatcher: RouteMatcher) =>
-        for {
-          routeParams <- acc
-          matcherParams <- routeMatcher(requestPath)
-        } yield routeParams ++ matcherParams
-    } map { routeParams =>
-      MatchedRoute(action, routeParams)
-    }
+    routeMatchers
+      .foldLeft(Option(MultiMap())) {
+        (acc: Option[MultiParams], routeMatcher: RouteMatcher) =>
+          for {
+            routeParams <- acc
+            matcherParams <- routeMatcher(requestPath)
+          } yield routeParams ++ matcherParams
+      }
+      .map { routeParams =>
+        MatchedRoute(action, routeParams)
+      }
   }
 
   /**

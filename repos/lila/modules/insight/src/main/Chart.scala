@@ -29,7 +29,7 @@ object Chart {
     import answer._, question._
 
     def gameUserJson(player: lila.game.Player): JsObject = {
-      val light = player.userId flatMap getLightUser
+      val light = player.userId.flatMap(getLightUser)
       Json
         .obj(
           "name" -> light.map(_.name),
@@ -43,7 +43,7 @@ object Chart {
       Json.obj(
         "id" -> pov.game.id,
         "fen" ->
-          (chess.format.Forsyth exportBoard pov.game.toChess.board),
+          (chess.format.Forsyth.exportBoard(pov.game.toChess.board)),
         "color" -> pov.player.color.name,
         "lastMove" -> ~pov.game.castleLastMoveTime.lastMoveString,
         "user1" -> gameUserJson(pov.player),
@@ -111,7 +111,7 @@ object Chart {
     }
 
     Chart(
-      question = JsonQuestion fromQuestion question,
+      question = JsonQuestion.fromQuestion(question),
       xAxis = xAxis,
       valueYaxis = Yaxis(metric.name, metric.dataType.name),
       sizeYaxis = Yaxis(metric.per.tellNumber, Metric.DataType.Count.name),

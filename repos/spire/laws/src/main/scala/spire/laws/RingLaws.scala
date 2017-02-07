@@ -16,7 +16,7 @@ object RingLaws {
       def Arb = implicitly[Arbitrary[A]]
       def pred = _pred
       val nonZeroLaws = new GroupLaws[A] {
-        def Arb = Arbitrary(arbitrary[A] filter _pred)
+        def Arb = Arbitrary(arbitrary[A].filter(_pred))
         def Equ = Eq[A]
       }
     }
@@ -90,8 +90,8 @@ trait RingLaws[A] extends GroupLaws[A] {
           (((x + y) * z) === (x * z + y * z))),
     "pow" → forAll(
       (x: A) =>
-        ((x pow 1) === x) && ((x pow 2) === x * x) &&
-          ((x pow 3) === x * x * x))
+        ((x.pow(1)) === x) && ((x.pow(2)) === x * x) &&
+          ((x.pow(3)) === x * x * x))
   )
 
   def rng(implicit A: Rng[A]) = new RingProperties(

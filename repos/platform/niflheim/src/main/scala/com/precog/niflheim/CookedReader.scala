@@ -71,7 +71,7 @@ final class CookedReader(baseDir: File,
   private def loadFromDisk(): Validation[IOException, CookedBlockMetadata] = {
     read(metadataFile) { channel =>
       val segsV = blockFormat.readCookedBlock(channel)
-      segsV foreach { segs0 =>
+      segsV.foreach { segs0 =>
         block = new SoftReference(segs0)
       }
       segsV
@@ -87,14 +87,17 @@ final class CookedReader(baseDir: File,
     }
 
     val refConstraints =
-      pathConstraints map {
+      pathConstraints.map {
         _.flatMap { path =>
           val tpes =
-            groupedPaths.get(path) map {
-              _.map { case (segId, _) => segId.ctype }
-            } getOrElse {
-              Array.empty[CType]
-            }
+            groupedPaths
+              .get(path)
+              .map {
+                _.map { case (segId, _) => segId.ctype }
+              }
+              .getOrElse {
+                Array.empty[CType]
+              }
 
           tpes.map { tpe =>
             ColumnRef(path, tpe)
@@ -107,29 +110,32 @@ final class CookedReader(baseDir: File,
 
   def snapshotRef(refConstraints: Option[Set[ColumnRef]]): Block = {
     val segments: Seq[Segment] =
-      refConstraints map { refs =>
-        load(refs.toList)
-          .map({ segs =>
-            segs flatMap (_._2)
-          })
-          .valueOr { nel =>
-            throw nel.head
-          }
-      } getOrElse {
-        metadata.valueOr(throw _).segments map {
-          case (segId, file0) =>
-            val file =
-              if (file0.isAbsolute) file0 else new File(baseDir, file0.getPath)
-            read(file) { channel =>
-              segmentFormat.reader.readSegment(channel)
-            }.valueOr(throw _)
+      refConstraints
+        .map { refs =>
+          load(refs.toList)
+            .map({ segs =>
+              segs.flatMap(_._2)
+            })
+            .valueOr { nel =>
+              throw nel.head
+            }
         }
-      }
+        .getOrElse {
+          metadata.valueOr(throw _).segments.map {
+            case (segId, file0) =>
+              val file =
+                if (file0.isAbsolute) file0
+                else new File(baseDir, file0.getPath)
+              read(file) { channel =>
+                segmentFormat.reader.readSegment(channel)
+              }.valueOr(throw _)
+          }
+        }
 
     Block(id, segments, isStable)
   }
 
-  def structure: Iterable[ColumnRef] = metadata.valueOr(throw _).segments map {
+  def structure: Iterable[ColumnRef] = metadata.valueOr(throw _).segments.map {
     case (segId, _) => ColumnRef(segId.cpath, segId.ctype)
   }
 
@@ -151,7 +157,7 @@ final class CookedReader(baseDir: File,
 
   private def segmentsByRef: Validation[IOException,
                                         Map[ColumnRef, List[File]]] =
-    metadata map { md =>
+    metadata.map { md =>
       md.segments
         .groupBy(s => (s._1.cpath, s._1.ctype))
         .map {
@@ -163,7 +169,7 @@ final class CookedReader(baseDir: File,
 
   def load(paths: List[ColumnRef])
     : ValidationNel[IOException, List[(ColumnRef, List[Segment])]] = {
-    segmentsByRef.toValidationNel flatMap {
+    segmentsByRef.toValidationNel.flatMap {
       (segsByRef: Map[ColumnRef, List[File]]) =>
         paths
           .map { path =>
@@ -179,7 +185,7 @@ final class CookedReader(baseDir: File,
               }
               .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
                         Segment]
-            v map (path -> _)
+            v.map(path -> _)
           }
           .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
                     (ColumnRef, List[Segment])]

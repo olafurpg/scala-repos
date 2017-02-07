@@ -251,10 +251,10 @@ class LDASuite
       assert(model.vocabSize === model2.vocabSize)
       assert(
         Vectors.dense(model.topicsMatrix.toArray) ~==
-          Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
+          Vectors.dense(model2.topicsMatrix.toArray).absTol(1e-6))
       assert(
         Vectors.dense(model.getDocConcentration) ~==
-          Vectors.dense(model2.getDocConcentration) absTol 1e-6)
+          Vectors.dense(model2.getDocConcentration).absTol(1e-6))
     }
     val lda = new LDA()
     testEstimatorAndModelReadWrite(lda,
@@ -268,10 +268,10 @@ class LDASuite
       assert(model.vocabSize === model2.vocabSize)
       assert(
         Vectors.dense(model.topicsMatrix.toArray) ~==
-          Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
+          Vectors.dense(model2.topicsMatrix.toArray).absTol(1e-6))
       assert(
         Vectors.dense(model.getDocConcentration) ~==
-          Vectors.dense(model2.getDocConcentration) absTol 1e-6)
+          Vectors.dense(model2.getDocConcentration).absTol(1e-6))
     }
     val lda = new LDA()
     testEstimatorAndModelReadWrite(

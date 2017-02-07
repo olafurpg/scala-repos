@@ -44,7 +44,7 @@ class History[Evt, Pub]
 
   override def size: Int = log.length
   def iterator: Iterator[(Pub, Evt)] = log.iterator
-  def events: Iterator[Evt] = log.iterator map (_._2)
+  def events: Iterator[Evt] = log.iterator.map(_._2)
 
   def clear() { log.clear() }
 

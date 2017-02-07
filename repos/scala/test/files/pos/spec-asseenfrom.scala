@@ -26,5 +26,5 @@ abstract class Automaton2[@specialized T1, T2] {
   def finalWeight(s: T2): T1
   def allStates: Set[T2]
 
-  def f = allStates map finalWeight
+  def f = allStates.map(finalWeight)
 }

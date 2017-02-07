@@ -139,7 +139,7 @@ trait App extends Closable with CloseAwaitably {
     * Returns a Future that is satisfied when the App has been torn down or errors at the deadline.
     */
   final def close(deadline: Time): Future[Unit] = closeAwaitably {
-    closeDeadline = deadline max (Time.now + MinGrace)
+    closeDeadline = deadline.max(Time.now + MinGrace)
     Closable.all(exits.asScala.toSeq: _*).close(closeDeadline)
   }
 
@@ -180,7 +180,7 @@ trait App extends Closable with CloseAwaitably {
     }
 
     // Invoke main() if it exists.
-    mainMethod foreach { method =>
+    mainMethod.foreach { method =>
       try method.invoke(this)
       catch {
         case e: InvocationTargetException => throw e.getCause

@@ -2,7 +2,7 @@ package lila.analyse
 
 case class Score(centipawns: Int) extends AnyVal {
   def pawns: Float = centipawns / 100f
-  def showPawns: String = "%.2f" format pawns
+  def showPawns: String = "%.2f".format(pawns)
 
   def ceiled =
     if (centipawns > Score.CEILING) copy(Score.CEILING)
@@ -18,5 +18,5 @@ object Score {
 
   val initial = Score(15)
 
-  def apply(str: String): Option[Score] = parseIntOption(str) map Score.apply
+  def apply(str: String): Option[Score] = parseIntOption(str).map(Score.apply)
 }

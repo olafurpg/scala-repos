@@ -22,7 +22,7 @@ trait TwemcacheClient extends Client {
     getv(Seq(key)).map { _.values.headOption }
 
   def getv(keys: Iterable[String]): Future[Map[String, (Buf, Buf)]] = {
-    getvResult(keys) flatMap { result =>
+    getvResult(keys).flatMap { result =>
       if (result.failures.nonEmpty) {
         Future.exception(result.failures.values.head)
       } else {

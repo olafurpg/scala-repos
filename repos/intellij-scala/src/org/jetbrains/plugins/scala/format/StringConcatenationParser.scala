@@ -23,7 +23,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.{
   */
 object StringConcatenationParser extends StringParser {
   def parse(element: PsiElement): Option[Seq[StringPart]] = {
-    Some(element) collect {
+    Some(element).collect {
       case exp @ ScInfixExpr(left, op, right)
           if op.getText == "+" && isString(exp) =>
         val prefix = parse(left).getOrElse(parseOperand(left))

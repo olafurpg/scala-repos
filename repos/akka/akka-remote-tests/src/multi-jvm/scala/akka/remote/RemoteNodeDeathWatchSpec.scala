@@ -46,14 +46,14 @@ object RemoteNodeDeathWatchMultiJvmSpec extends MultiNodeConfig {
   class ProbeActor(testActor: ActorRef) extends Actor {
     def receive = {
       case WatchIt(watchee) ⇒
-        context watch watchee
+        context.watch(watchee)
         sender() ! Ack
       case UnwatchIt(watchee) ⇒
-        context unwatch watchee
+        context.unwatch(watchee)
         sender() ! Ack
       case t: Terminated ⇒
-        testActor forward WrappedTerminated(t)
-      case msg ⇒ testActor forward msg
+        testActor.forward(WrappedTerminated(t))
+      case msg ⇒ testActor.forward(msg)
     }
   }
 }

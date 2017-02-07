@@ -36,7 +36,7 @@ trait FileBackedHistory extends JLineHistory with PersistentHistory {
 
   /** Overwrites the history file with the current memory. */
   protected def sync(): Unit = {
-    val lines = asStrings map (_ + "\n")
+    val lines = asStrings.map(_ + "\n")
     historyFile.writeAll(lines: _*)
   }
 
@@ -65,7 +65,7 @@ trait FileBackedHistory extends JLineHistory with PersistentHistory {
     interpreter.repldbg("Loading " + lines.size + " into history.")
 
     // avoid writing to the history file
-    withoutSaving(lines takeRight maxSize foreach add)
+    withoutSaving(lines.takeRight(maxSize).foreach(add))
     // truncate the history file if it's too big.
     if (lines.size > maxSize) {
       interpreter.repldbg(
@@ -87,7 +87,8 @@ object FileBackedHistory {
   final val defaultFileName = ".scala_history"
 
   def defaultFile: File = File(
-    propOrNone("scala.shell.histfile") map (Path.apply) getOrElse
-      (Path(userHome) / defaultFileName)
+    propOrNone("scala.shell.histfile")
+      .map(Path.apply)
+      .getOrElse(Path(userHome) / defaultFileName)
   )
 }

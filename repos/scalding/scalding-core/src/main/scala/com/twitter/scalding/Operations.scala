@@ -513,7 +513,7 @@ package com.twitter.scalding {
                          functionCall: FunctionCall[C]) {
       val context = functionCall.getContext
       val s = conv(functionCall.getArguments)
-      lockedFn.get(context, s) foreach { t =>
+      lockedFn.get(context, s).foreach { t =>
         functionCall.getOutputCollector.add(set(t))
       }
     }

@@ -73,7 +73,7 @@ class ChannelBufferSnooper(val name: String) extends ChannelSnooper {
       .toString(buf.readerIndex, buf.readableBytes, Charset.forName("UTF-8"))
     val str = rawStr.replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n")
     val asciiStr =
-      str map { c =>
+      str.map { c =>
         if (c >= 32 && c < 128) c
         else '?'
       }

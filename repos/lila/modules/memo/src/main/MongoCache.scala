@@ -18,18 +18,19 @@ final class MongoCache[K, V: MongoCache.Handler] private (
     keyToString: K => String) {
 
   def apply(k: K): Fu[V] = cache(k) {
-    coll.find(select(k)).one[Entry] flatMap {
+    coll.find(select(k)).one[Entry].flatMap {
       case None =>
-        f(k) flatMap { v =>
-          coll.insert(makeEntry(k, v)) recover lila.db.recoverDuplicateKey(_ =>
-            ()) inject v
+        f(k).flatMap { v =>
+          coll
+            .insert(makeEntry(k, v))
+            .recover(lila.db.recoverDuplicateKey(_ => ())) inject v
         }
       case Some(entry) => fuccess(entry.v)
     }
   }
 
   def remove(k: K): Funit =
-    coll.remove(select(k)).void >>- (cache remove k)
+    coll.remove(select(k)).void >>- (cache.remove(k))
 
   private case class Entry(_id: String, v: V, e: DateTime)
 
@@ -47,7 +48,7 @@ object MongoCache {
   private type Handler[T] = BSONHandler[_ <: BSONValue, T]
 
   private def expiresAt(ttl: Duration)(): DateTime =
-    DateTime.now plusSeconds ttl.toSeconds.toInt
+    DateTime.now.plusSeconds(ttl.toSeconds.toInt)
 
   final class Builder(coll: Coll) {
 

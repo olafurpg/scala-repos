@@ -42,7 +42,7 @@ object Slf4jLoggingFilterSpec {
         ref ! ("OK")
       case event: LogEvent ⇒
         println("# event: " + event)
-        target foreach { _ ! event }
+        target.foreach { _ ! event }
     }
   }
 

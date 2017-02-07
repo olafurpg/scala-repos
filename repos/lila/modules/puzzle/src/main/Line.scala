@@ -30,11 +30,13 @@ object Line {
     def getIn(lines: Lines, path: List[String]): Lines = path match {
       case Nil => lines
       case head :: rest =>
-        lines collectFirst {
-          case Node(move, lines) if move == head => getIn(lines, rest)
-          case w @ Win(move) if move == head => List(w)
-          case r @ Retry(move) if move == head => List(r)
-        } getOrElse Nil
+        lines
+          .collectFirst {
+            case Node(move, lines) if move == head => getIn(lines, rest)
+            case w @ Win(move) if move == head => List(w)
+            case r @ Retry(move) if move == head => List(r)
+          }
+          .getOrElse(Nil)
     }
 
     def loop(paths: List[List[String]]): List[String] = paths match {
@@ -44,19 +46,19 @@ object Line {
           case List(Win(m)) => path :+ m
           case List(Retry(_)) => loop(siblings)
           case ahead =>
-            val children = ahead collect { case Node(m, ls) => path :+ m }
+            val children = ahead.collect { case Node(m, ls) => path :+ m }
             loop(siblings ::: children)
         }
     }
 
-    loop(lines collect {
+    loop(lines.collect {
       case Node(move, _) => List(move)
     })
   }
 
   def toString(lines: Lines, level: Int = 0): String = {
     val indent = ". " * level
-    lines map {
+    lines.map {
       case Win(move) => s"$indent$move win"
       case Retry(move) => s"$indent$move retry"
       case Node(move, more) => s"$indent$move\n${toString(more, level + 1)}"
@@ -64,7 +66,7 @@ object Line {
   }
 
   def toJson(lines: Lines): JsObject =
-    JsObject(lines map {
+    JsObject(lines.map {
       case Win(move) => move -> JsString("win")
       case Retry(move) => move -> JsString("retry")
       case Node(move, more) => move -> toJson(more)

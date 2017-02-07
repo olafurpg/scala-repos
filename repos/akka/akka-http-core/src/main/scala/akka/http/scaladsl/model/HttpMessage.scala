@@ -56,7 +56,7 @@ sealed trait HttpMessage extends jm.HttpMessage {
       if (headers.isEmpty) defaultHeaders
       else
         defaultHeaders.foldLeft(headers) { (acc, h) ⇒
-          if (headers.exists(_ is h.lowercaseName)) acc else h +: acc
+          if (headers.exists(_.is(h.lowercaseName))) acc else h +: acc
         }
     }
 
@@ -325,7 +325,7 @@ object HttpRequest {
     if (uri.isEmpty)
       throw new IllegalArgumentException("`uri` must not be empty")
     else {
-      def c(i: Int) = CharUtils.toLowerCase(uri.scheme charAt i)
+      def c(i: Int) = CharUtils.toLowerCase(uri.scheme.charAt(i))
       uri.scheme.length match {
         case 0 ⇒ // ok
         case 4 if c(0) == 'h' && c(1) == 't' && c(2) == 't' && c(3) == 'p' ⇒

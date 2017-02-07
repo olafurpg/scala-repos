@@ -31,7 +31,9 @@ class DeploymentsResourceTest
       DeploymentStepInfo(DeploymentPlan(Group.empty, targetGroup),
                          DeploymentStep(Seq.empty),
                          1)
-    service.listRunningDeployments() returns Future.successful(Seq(deployment))
+    service
+      .listRunningDeployments()
+      .returns(Future.successful(Seq(deployment)))
 
     When(s"the index is fetched")
     val running = deploymentsResource.running(req)
@@ -55,7 +57,9 @@ class DeploymentsResourceTest
       DeploymentStepInfo(DeploymentPlan(Group.empty, targetGroup),
                          DeploymentStep(Seq.empty),
                          1)
-    service.listRunningDeployments() returns Future.successful(Seq(deployment))
+    service
+      .listRunningDeployments()
+      .returns(Future.successful(Seq(deployment)))
 
     When(s"one app version is fetched")
     val cancel = deploymentsResource.cancel(deployment.plan.id, false, req)

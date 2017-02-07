@@ -138,7 +138,8 @@ class AggregateFlatClassPathTest {
         packagesInPackage
           .find(_.inPackage == inPackage)
           .map(_.names)
-          .getOrElse(Nil) map PackageEntryImpl
+          .getOrElse(Nil)
+          .map(PackageEntryImpl)
     }
 
     val partialClassPaths = Seq(

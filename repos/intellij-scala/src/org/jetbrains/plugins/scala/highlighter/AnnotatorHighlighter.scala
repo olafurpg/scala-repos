@@ -483,7 +483,7 @@ object AnnotatorHighlighter {
 
   private def referenceIsToCompanionObjectOfClass(
       r: ScReferenceElement): Boolean = {
-    Option(r.getContext) exists {
+    Option(r.getContext).exists {
       case _: ScMethodCall | _: ScReferenceExpression =>
         true // These references to 'Foo' should be 'object' references: case class Foo(a: Int); Foo(1); Foo.apply(1).
       case _ => false

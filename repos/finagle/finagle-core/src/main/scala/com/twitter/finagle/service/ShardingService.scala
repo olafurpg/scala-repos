@@ -29,12 +29,14 @@ class ShardingService[Req, Rep](
 ) extends Service[Req, Rep] {
 
   def apply(request: Req): Future[Rep] = {
-    hash(request) map { hash =>
-      val shard = distributor.nodeForHash(hash)
-      // TODO: a sharding service may consider fine-grained statuses.
-      if (shard.status != Status.Closed) shard(request)
-      else Future.exception(ShardingService.ShardNotAvailableException)
-    } getOrElse (Future.exception(ShardingService.NotShardableException))
+    hash(request)
+      .map { hash =>
+        val shard = distributor.nodeForHash(hash)
+        // TODO: a sharding service may consider fine-grained statuses.
+        if (shard.status != Status.Closed) shard(request)
+        else Future.exception(ShardingService.ShardNotAvailableException)
+      }
+      .getOrElse(Future.exception(ShardingService.NotShardableException))
   }
 
   override def status: Status =
@@ -55,11 +57,11 @@ case class KetamaShardingServiceBuilder[Req, Rep](
 ) {
 
   def nodesAndWeights(nodes: Seq[(String, Int, Service[Req, Rep])]) = {
-    copy(_nodes = Some(nodes map Function.tupled { KetamaNode(_, _, _) }))
+    copy(_nodes = Some(nodes.map(Function.tupled { KetamaNode(_, _, _) })))
   }
 
   def nodes(services: Seq[(String, Service[Req, Rep])]) = {
-    nodesAndWeights(services map Function.tupled { (_, 1, _) })
+    nodesAndWeights(services.map(Function.tupled { (_, 1, _) }))
   }
 
   def numReps(numReps: Int) = {

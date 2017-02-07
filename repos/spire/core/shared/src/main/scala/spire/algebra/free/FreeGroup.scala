@@ -22,7 +22,7 @@ final class FreeGroup[A] private (val terms: Vector[Either[A, A]])
 
   def inverse: FreeGroup[A] = {
     val bldr = Vector.newBuilder[Either[A, A]]
-    terms.reverseIterator foreach { term =>
+    terms.reverseIterator.foreach { term =>
       bldr += term.swap
     }
     new FreeGroup(bldr.result())

@@ -49,7 +49,7 @@ class ArbTest extends FunSuite {
                        "long/long",
                        "big/long",
                        "big/big")
-    val missing = expected diff kinds
+    val missing = expected.diff(kinds)
     assert(missing.isEmpty)
   }
 

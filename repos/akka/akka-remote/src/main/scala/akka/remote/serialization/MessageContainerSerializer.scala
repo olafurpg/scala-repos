@@ -76,7 +76,7 @@ class MessageContainerSerializer(val system: ExtendedActorSystem)
                            tpe: ContainerFormats.PatternType)
     : ContainerFormats.Selection.Builder = {
     val builder = ContainerFormats.Selection.newBuilder().setType(tpe)
-    matcher foreach builder.setMatcher
+    matcher.foreach(builder.setMatcher)
     builder
   }
 

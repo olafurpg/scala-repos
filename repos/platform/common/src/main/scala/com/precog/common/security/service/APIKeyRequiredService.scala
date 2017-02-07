@@ -56,7 +56,8 @@ trait APIKeyServiceCombinators extends HttpRequestHandlerCombinators {
                        M: Monad[Future]): String => Future[HttpResponse[A]] = {
     (msg: String) =>
       M.point(
-        (forbidden(msg) map convert)
+        (forbidden(msg)
+          .map(convert))
           .copy(headers = HttpHeaders(`Content-Type`(application / json))))
   }
 
@@ -88,7 +89,7 @@ class APIKeyValidService[A, B](
                               A,
                               APIKey => Future[B]] {
   val service = { (request: HttpRequest[A]) =>
-    delegate.service(request) map { (f: APIKey => Future[B]) =>
+    delegate.service(request).map { (f: APIKey => Future[B]) =>
       { (apiKeyV: Validation[String, APIKey]) =>
         apiKeyV.fold(error, f)
       }
@@ -111,21 +112,25 @@ class APIKeyRequiredService[A, B](
                               Validation[String, APIKey] => Future[B]]
     with Logging {
   val service = (request: HttpRequest[A]) => {
-    request.parameters.get('apiKey).toSuccess[NotServed] {
-      DispatchError(BadRequest,
-                    "An apiKey query parameter is required to access this URL")
-    } flatMap { apiKey =>
-      delegate.service(request) map { (f: Validation[String, APIKey] => Future[
-        B]) =>
-        keyFinder(apiKey) flatMap { maybeApiKey =>
-          logger.info("Found API key: " + maybeApiKey)
-          f(maybeApiKey.toSuccess[String] {
-            logger.warn("Could not locate API key " + apiKey)
-            "The specified API key does not exist: " + apiKey
-          })
+    request.parameters
+      .get('apiKey)
+      .toSuccess[NotServed] {
+        DispatchError(
+          BadRequest,
+          "An apiKey query parameter is required to access this URL")
+      }
+      .flatMap { apiKey =>
+        delegate.service(request).map { (f: Validation[String, APIKey] => Future[
+          B]) =>
+          keyFinder(apiKey).flatMap { maybeApiKey =>
+            logger.info("Found API key: " + maybeApiKey)
+            f(maybeApiKey.toSuccess[String] {
+              logger.warn("Could not locate API key " + apiKey)
+              "The specified API key does not exist: " + apiKey
+            })
+          }
         }
       }
-    }
   }
 
   val metadata = AboutMetadata(

@@ -30,7 +30,7 @@ class InputStreamReader private[io] (inputStream: InputStream,
     if (discarded) return Future.exception(new Reader.ReaderDiscarded())
     if (n == 0) return Future.value(Some(Buf.Empty))
 
-    mutex.acquire() flatMap { permit =>
+    mutex.acquire().flatMap { permit =>
       pool {
         try {
           if (discarded) throw new Reader.ReaderDiscarded()
@@ -44,7 +44,7 @@ class InputStreamReader private[io] (inputStream: InputStream,
             discarded = true
             throw exc
         }
-      } ensure {
+      }.ensure {
         permit.release()
       }
     }

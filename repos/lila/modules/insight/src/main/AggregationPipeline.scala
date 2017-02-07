@@ -92,7 +92,7 @@ private final class AggregationPipeline {
     def matchMoves(extraMatcher: BSONDocument = BSONDocument()) =
       combineDocs(extraMatcher :: question.filters.collect {
         case f if f.dimension.isInMove => f.matcher
-      }).some.filterNot(_.isEmpty) map Match
+      }).some.filterNot(_.isEmpty).map(Match)
     def projectForMove =
       Project(BSONDocument({
         metric.dbKey :: dimension.dbKey :: filters.collect {

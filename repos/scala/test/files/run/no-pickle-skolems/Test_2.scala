@@ -22,13 +22,13 @@ object Test {
     def loop(t: Type) {
       t match {
         case TypeRef(pre, sym, args) =>
-          loop(pre); check(sym); args foreach loop
+          loop(pre); check(sym); args.foreach(loop)
         case PolyType(tparams, restpe) =>
-          tparams foreach { tp =>
+          tparams.foreach { tp =>
             check(tp); check(tp.owner); loop(tp.info)
           }; loop(restpe)
         case MethodType(params, restpe) =>
-          params foreach { p =>
+          params.foreach { p =>
             check(p); loop(p.info)
           }; loop(restpe)
         case _ =>
@@ -36,7 +36,7 @@ object Test {
     }
     loop(m)
 
-    buf.reverse.distinct map (s => s.name + "#" + id(s))
+    buf.reverse.distinct.map(s => s.name + "#" + id(s))
   }
 
   def main(args: Array[String]): Unit = {

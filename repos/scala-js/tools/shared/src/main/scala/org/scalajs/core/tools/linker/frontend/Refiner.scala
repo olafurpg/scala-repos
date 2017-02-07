@@ -74,17 +74,17 @@ final class Refiner {
       else Nil
 
     val staticMethods =
-      classDef.staticMethods filter { m =>
+      classDef.staticMethods.filter { m =>
         info.staticMethodInfos(m.info.encodedName).isReachable
       }
 
     val memberMethods =
-      classDef.memberMethods filter { m =>
+      classDef.memberMethods.filter { m =>
         info.methodInfos(m.info.encodedName).isReachable
       }
 
     val abstractMethods =
-      classDef.abstractMethods filter { m =>
+      classDef.abstractMethods.filter { m =>
         info.methodInfos(m.info.encodedName).isReachable
       }
 

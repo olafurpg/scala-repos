@@ -323,7 +323,7 @@ private[json] object Meta {
         try {
           val names = nameReader.lookupParameterNames(c).map(clean)
           val types =
-            c.getGenericParameterTypes.toList.zipWithIndex map {
+            c.getGenericParameterTypes.toList.zipWithIndex.map {
               case (v: TypeVariable[_], idx) =>
                 val arg = typeArgs.getOrElse(v, v)
                 if (arg == classOf[java.lang.Object])

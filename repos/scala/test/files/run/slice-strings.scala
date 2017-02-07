@@ -2,7 +2,7 @@ object Test {
   def cmp(x1: String) = {
     val x2 = x1.toList
 
-    -10 to 10 foreach { i =>
+    (-10 to 10).foreach { i =>
       assert(x1.take(i) == x2.take(i).mkString)
       assert(x1.drop(i) == x2.drop(i).mkString)
       assert(x1.takeRight(i) == x2.takeRight(i).mkString)

@@ -31,7 +31,7 @@ class NumericTypeTest extends FunSuite with IntegrationClient {
         `bigint`, `float`, `double`, `decimal`, `bit`)
         VALUES (1, 2, 3, 4, 5, 1.61, 1.618, 1.61803398875, 1);"""))
 
-    val textEncoded = Await.result(c.query("SELECT * FROM `numeric`") map {
+    val textEncoded = Await.result(c.query("SELECT * FROM `numeric`").map {
       case rs: ResultSet if rs.rows.size > 0 => rs.rows(0)
       case v =>
         fail("expected a ResultSet with 1 row but received: %s".format(v))
@@ -145,7 +145,7 @@ class BlobTypeTest extends FunSuite with IntegrationClient {
         VALUES (1, 'a', 'b', 'c', 'd', 'e', X'66',
         X'67', X'68', X'6970', X'6A', 'small', '1');"""))
 
-    val textEncoded = Await.result(c.query("SELECT * FROM `blobs`") map {
+    val textEncoded = Await.result(c.query("SELECT * FROM `blobs`").map {
       case rs: ResultSet if rs.rows.size > 0 => rs.rows(0)
       case v =>
         fail("expected a ResultSet with 1 row but received: %s".format(v))
@@ -272,7 +272,7 @@ class DateTimeTypeTest extends FunSuite with IntegrationClient {
         VALUES (1, '2013-11-02', '2013-11-02 19:56:24',
         '2013-11-02 19:56:36', '19:56:32', '2013');"""))
 
-    val textEncoded = Await.result(c.query("SELECT * FROM `datetime`") map {
+    val textEncoded = Await.result(c.query("SELECT * FROM `datetime`").map {
       case rs: ResultSet if rs.rows.size > 0 => rs.rows(0)
       case v =>
         fail("expected a ResultSet with 1 row but received: %s".format(v))

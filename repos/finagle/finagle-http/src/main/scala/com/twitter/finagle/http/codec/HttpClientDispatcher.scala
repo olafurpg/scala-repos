@@ -75,7 +75,7 @@ class HttpClientDispatcher(trans: Transport[Any, Any],
             if (req.isChunked) streamChunks(trans, req.reader)
             else Future.Done,
             // 2. Drain the Transport into Response body.
-            trans.read() flatMap {
+            trans.read().flatMap {
               case res: HttpResponse if HttpNackFilter.isNack(res) =>
                 p.updateIfEmpty(Throw(NackFailure))
                 Future.Done
@@ -99,12 +99,13 @@ class HttpClientDispatcher(trans: Transport[Any, Any],
             }
           )
           .unit
-      } onFailure { _ =>
-      // This Future represents the totality of the exchange;
-      // thus failure represents *any* failure that can happen
-      // during the exchange.
-      req.reader.discard()
-      trans.close()
-    }
+      }
+      .onFailure { _ =>
+        // This Future represents the totality of the exchange;
+        // thus failure represents *any* failure that can happen
+        // during the exchange.
+        req.reader.discard()
+        trans.close()
+      }
   }
 }

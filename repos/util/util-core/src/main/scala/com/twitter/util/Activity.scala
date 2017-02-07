@@ -55,7 +55,7 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * The activity which behaves as `f` applied to Ok values.
     */
   def flatMap[U](f: T => Activity[U]): Activity[U] =
-    Activity(run flatMap {
+    Activity(run.flatMap {
       case Ok(v) =>
         val a = try f(v)
         catch {
@@ -72,7 +72,7 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * of this activity.
     */
   def transform[U](f: Activity.State[T] => Activity[U]): Activity[U] =
-    Activity(run flatMap { act =>
+    Activity(run.flatMap { act =>
       val a = try f(act)
       catch {
         case NonFatal(exc) => Activity.exception(exc)
@@ -100,7 +100,7 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * An [[com.twitter.util.Event Event]] containing only nonpending
     * values.
     */
-  def values: Event[Try[T]] = states collect {
+  def values: Event[Try[T]] = states.collect {
     case Ok(v) => Return(v)
     case Failed(exc) => Throw(exc)
   }
@@ -124,7 +124,7 @@ object Activity {
   def apply[T](): (Activity[T], Witness[Try[T]]) = {
     val v = Var(Pending: State[T])
     val w: Witness[Try[T]] =
-      Witness(v) comap {
+      Witness(v).comap {
         case Return(v) => Ok(v)
         case Throw(exc) => Failed(exc)
       }
@@ -168,7 +168,7 @@ object Activity {
       }
 
       val ts = newBuilder()
-      states foreach {
+      states.foreach {
         case Ok(t) => ts += t
         case _ => assert(false)
       }
@@ -176,7 +176,7 @@ object Activity {
       Ok(ts.result)
     }
 
-    Activity(stateVar map flip)
+    Activity(stateVar.map(flip))
   }
 
   /**
@@ -185,7 +185,7 @@ object Activity {
     * do.
     */
   def join[A, B](a: Activity[A], b: Activity[B]): Activity[(A, B)] =
-    collect(Seq(a, b)) map { ss =>
+    collect(Seq(a, b)).map { ss =>
       (ss(0).asInstanceOf[A], ss(1).asInstanceOf[B])
     }
 
@@ -197,7 +197,7 @@ object Activity {
   def join[A, B, C](a: Activity[A],
                     b: Activity[B],
                     c: Activity[C]): Activity[(A, B, C)] =
-    collect(Seq(a, b, c)) map { ss =>
+    collect(Seq(a, b, c)).map { ss =>
       (ss(0).asInstanceOf[A], ss(1).asInstanceOf[B], ss(2).asInstanceOf[C])
     }
 
@@ -210,7 +210,7 @@ object Activity {
                        b: Activity[B],
                        c: Activity[C],
                        d: Activity[D]): Activity[(A, B, C, D)] =
-    collect(Seq(a, b, c, d)) map { ss =>
+    collect(Seq(a, b, c, d)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -227,7 +227,7 @@ object Activity {
                           c: Activity[C],
                           d: Activity[D],
                           e: Activity[E]): Activity[(A, B, C, D, E)] =
-    collect(Seq(a, b, c, d, e)) map { ss =>
+    collect(Seq(a, b, c, d, e)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -246,7 +246,7 @@ object Activity {
                              d: Activity[D],
                              e: Activity[E],
                              f: Activity[F]): Activity[(A, B, C, D, E, F)] =
-    collect(Seq(a, b, c, d, e, f)) map { ss =>
+    collect(Seq(a, b, c, d, e, f)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -268,7 +268,7 @@ object Activity {
       e: Activity[E],
       f: Activity[F],
       g: Activity[G]): Activity[(A, B, C, D, E, F, G)] =
-    collect(Seq(a, b, c, d, e, f, g)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -292,7 +292,7 @@ object Activity {
       f: Activity[F],
       g: Activity[G],
       h: Activity[H]): Activity[(A, B, C, D, E, F, G, H)] =
-    collect(Seq(a, b, c, d, e, f, g, h)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -318,7 +318,7 @@ object Activity {
       g: Activity[G],
       h: Activity[H],
       i: Activity[I]): Activity[(A, B, C, D, E, F, G, H, I)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -346,7 +346,7 @@ object Activity {
       h: Activity[H],
       i: Activity[I],
       j: Activity[J]): Activity[(A, B, C, D, E, F, G, H, I, J)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -376,7 +376,7 @@ object Activity {
       i: Activity[I],
       j: Activity[J],
       k: Activity[K]): Activity[(A, B, C, D, E, F, G, H, I, J, K)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -408,7 +408,7 @@ object Activity {
       j: Activity[J],
       k: Activity[K],
       l: Activity[L]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -442,7 +442,7 @@ object Activity {
       k: Activity[K],
       l: Activity[L],
       m: Activity[M]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -478,7 +478,7 @@ object Activity {
       l: Activity[L],
       m: Activity[M],
       n: Activity[N]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -516,7 +516,7 @@ object Activity {
                                                         n: Activity[N],
                                                         o: Activity[O])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -556,7 +556,7 @@ object Activity {
                                                            o: Activity[O],
                                                            p: Activity[P])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -598,7 +598,7 @@ object Activity {
                                                               p: Activity[P],
                                                               q: Activity[Q])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)).map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -643,7 +643,7 @@ object Activity {
       q: Activity[Q],
       r: Activity[R])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)) map {
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)).map {
       ss =>
         (ss(0).asInstanceOf[A],
          ss(1).asInstanceOf[B],
@@ -691,7 +691,7 @@ object Activity {
       r: Activity[R],
       s: Activity[S])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)) map {
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)).map {
       ss =>
         (ss(0).asInstanceOf[A],
          ss(1).asInstanceOf[B],
@@ -741,8 +741,8 @@ object Activity {
       s: Activity[S],
       t: Activity[T])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)) map {
-      ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t))
+      .map { ss =>
         (ss(0).asInstanceOf[A],
          ss(1).asInstanceOf[B],
          ss(2).asInstanceOf[C],
@@ -763,7 +763,7 @@ object Activity {
          ss(17).asInstanceOf[R],
          ss(18).asInstanceOf[S],
          ss(19).asInstanceOf[T])
-    }
+      }
 
   /**
     * Join 21 Activities. The returned Activity is complete when all
@@ -793,8 +793,8 @@ object Activity {
       t: Activity[T],
       u: Activity[U]): Activity[
     (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)) map {
-      ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u))
+      .map { ss =>
         (ss(0).asInstanceOf[A],
          ss(1).asInstanceOf[B],
          ss(2).asInstanceOf[C],
@@ -816,7 +816,7 @@ object Activity {
          ss(18).asInstanceOf[S],
          ss(19).asInstanceOf[T],
          ss(20).asInstanceOf[U])
-    }
+      }
 
   /**
     * Join 22 Activities. The returned Activity is complete when all
@@ -847,51 +847,32 @@ object Activity {
       u: Activity[U],
       v: Activity[V]): Activity[
     (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    collect(Seq(a,
-                b,
-                c,
-                d,
-                e,
-                f,
-                g,
-                h,
-                i,
-                j,
-                k,
-                l,
-                m,
-                n,
-                o,
-                p,
-                q,
-                r,
-                s,
-                t,
-                u,
-                v)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J],
-       ss(10).asInstanceOf[K],
-       ss(11).asInstanceOf[L],
-       ss(12).asInstanceOf[M],
-       ss(13).asInstanceOf[N],
-       ss(14).asInstanceOf[O],
-       ss(15).asInstanceOf[P],
-       ss(16).asInstanceOf[Q],
-       ss(17).asInstanceOf[R],
-       ss(18).asInstanceOf[S],
-       ss(19).asInstanceOf[T],
-       ss(20).asInstanceOf[U],
-       ss(21).asInstanceOf[V])
-    }
+    collect(
+      Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v))
+      .map { ss =>
+        (ss(0).asInstanceOf[A],
+         ss(1).asInstanceOf[B],
+         ss(2).asInstanceOf[C],
+         ss(3).asInstanceOf[D],
+         ss(4).asInstanceOf[E],
+         ss(5).asInstanceOf[F],
+         ss(6).asInstanceOf[G],
+         ss(7).asInstanceOf[H],
+         ss(8).asInstanceOf[I],
+         ss(9).asInstanceOf[J],
+         ss(10).asInstanceOf[K],
+         ss(11).asInstanceOf[L],
+         ss(12).asInstanceOf[M],
+         ss(13).asInstanceOf[N],
+         ss(14).asInstanceOf[O],
+         ss(15).asInstanceOf[P],
+         ss(16).asInstanceOf[Q],
+         ss(17).asInstanceOf[R],
+         ss(18).asInstanceOf[S],
+         ss(19).asInstanceOf[T],
+         ss(20).asInstanceOf[U],
+         ss(21).asInstanceOf[V])
+      }
 
   /**
     * A Java friendly method for `Activity.collect()`.
@@ -931,7 +912,7 @@ object Activity {
     */
   def future[T](f: Future[T]): Activity[T] = {
     val run = Var(Pending: State[T])
-    f respond {
+    f.respond {
       case Return(v) => run() = Ok(v)
       case Throw(e) => run() = Failed(e)
     }

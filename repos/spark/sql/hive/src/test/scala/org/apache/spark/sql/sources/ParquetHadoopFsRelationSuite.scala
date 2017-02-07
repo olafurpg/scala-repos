@@ -154,7 +154,7 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
 
       sqlContext
         .range(2)
-        .select('id as 'a, 'id as 'b)
+        .select('id.as('a), 'id.as('b))
         .write
         .partitionBy("b")
         .parquet(path)

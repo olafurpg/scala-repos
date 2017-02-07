@@ -11733,7 +11733,7 @@ abstract class TextViewCompanion[T <: TextView: ClassTag] {
       implicit context: Context,
       defaultLayoutParam: T => LP): T = {
     val v = create()
-    v text txt
+    v.text(txt)
     v.<<.parent.+=(v)
     v
   }

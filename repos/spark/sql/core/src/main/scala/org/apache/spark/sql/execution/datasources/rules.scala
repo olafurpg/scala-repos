@@ -62,7 +62,7 @@ private[sql] class ResolveDataSource(sqlContext: SQLContext)
   * the columns to be inserted have the correct data type and fields have the correct names.
   */
 private[sql] object PreInsertCastAndRename extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+  def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
     // Wait until children are resolved.
     case p: LogicalPlan if !p.childrenResolved => p
 

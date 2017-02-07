@@ -70,11 +70,12 @@ private[metrics] object MetricsCollector {
 
     val collector =
       if (useCustom) create(collectorCustom)
-      else if (useInternal) create(collectorSigar) orElse create(collectorJMX)
+      else if (useInternal) create(collectorSigar).orElse(create(collectorJMX))
       else
         // Use complete fall back chain.
-        create(collectorCustom) orElse create(collectorSigar) orElse create(
-          collectorJMX)
+        create(collectorCustom)
+          .orElse(create(collectorSigar))
+          .orElse(create(collectorJMX))
 
     collector.recover {
       case e ⇒
@@ -237,7 +238,7 @@ class SigarMetricsCollector(address: Address,
   override def metrics(): Set[Metric] = {
     // Must obtain cpuPerc in one shot. See https://github.com/akka/akka/issues/16121
     val cpuPerc = sigar.getCpuPerc
-    super.metrics union Set(cpuCombined(cpuPerc), cpuStolen(cpuPerc)).flatten
+    super.metrics.union(Set(cpuCombined(cpuPerc), cpuStolen(cpuPerc)).flatten)
   }
 
   /**

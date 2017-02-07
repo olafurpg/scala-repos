@@ -85,7 +85,7 @@ trait HashVector_DenseVector_Ops extends DenseVector_HashVector_Ops {
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.InPlaceImpl2[HashVector[T], DenseVector[T]] =
     new Op.InPlaceImpl2[HashVector[T], DenseVector[T]] {
       def apply(a: HashVector[T], b: DenseVector[T]): Unit = {
@@ -112,7 +112,7 @@ trait HashVector_DenseVector_Ops extends DenseVector_HashVector_Ops {
         _ + _
       }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[HashVector[T], DenseVector[T], DenseVector[T]] = {
     new Op.Impl2[HashVector[T], DenseVector[T], DenseVector[T]] {
       def apply(a: HashVector[T], b: DenseVector[T]) = {
@@ -140,7 +140,7 @@ trait HashVector_DenseVector_Ops extends DenseVector_HashVector_Ops {
                                                  T] {
       def apply(a: HashVector[T], b: DenseVector[T]) = {
         require(b.length == a.length, "Vectors must be the same length!")
-        b dot a
+        b.dot(a)
       }
     }
     //      Vector.canDotProductV_T.register(this)
@@ -189,7 +189,7 @@ trait HashVectorOps extends HashVector_GenericOps { this: HashVector.type =>
                         @expand.args(OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[HashVector[T], HashVector[T], HashVector[T]] =
     new Op.Impl2[HashVector[T], HashVector[T], HashVector[T]] {
       def apply(a: HashVector[T], b: HashVector[T]): HashVector[T] = {
@@ -217,7 +217,7 @@ trait HashVectorOps extends HashVector_GenericOps { this: HashVector.type =>
         _ + _
       }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[HashVector[T], Vector[T], HashVector[T]] =
     new Op.Impl2[HashVector[T], Vector[T], HashVector[T]] {
       def apply(a: HashVector[T], b: Vector[T]): HashVector[T] = {
@@ -249,7 +249,7 @@ trait HashVectorOps extends HashVector_GenericOps { this: HashVector.type =>
           _ / _
         }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T],
       @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : Op.Impl2[HashVector[T], T, HashVector[T]] =
     new Op.Impl2[HashVector[T], T, HashVector[T]] {
@@ -274,7 +274,7 @@ trait HashVectorOps extends HashVector_GenericOps { this: HashVector.type =>
                                            OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ * _ }, { _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.InPlaceImpl2[HashVector[T], HashVector[T]] =
     new Op.InPlaceImpl2[HashVector[T], HashVector[T]] {
       def apply(a: HashVector[T], b: HashVector[T]): Unit = {
@@ -360,22 +360,25 @@ trait HashVectorOps extends HashVector_GenericOps { this: HashVector.type =>
         import v._
         if (n == 1) {
           var sum = 0.0
-          activeValuesIterator foreach (v => sum += v.abs.toDouble)
+          activeValuesIterator.foreach(v => sum += v.abs.toDouble)
           sum
         } else if (n == 2) {
           var sum = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = v.abs.toDouble; sum += nn * nn })
+          activeValuesIterator.foreach(v => {
+            val nn = v.abs.toDouble; sum += nn * nn
+          })
           math.sqrt(sum)
         } else if (n == Double.PositiveInfinity) {
           var max = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = v.abs.toDouble; if (nn > max) max = nn })
+          activeValuesIterator.foreach(v => {
+            val nn = v.abs.toDouble; if (nn > max) max = nn
+          })
           max
         } else {
           var sum = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = v.abs.toDouble; sum += math.pow(nn, n) })
+          activeValuesIterator.foreach(v => {
+            val nn = v.abs.toDouble; sum += math.pow(nn, n)
+          })
           math.pow(sum, 1.0 / n)
         }
       }
@@ -391,22 +394,25 @@ trait HashVectorOps extends HashVector_GenericOps { this: HashVector.type =>
         import v._
         if (n == 1) {
           var sum = 0.0
-          activeValuesIterator foreach (v => sum += f.sNorm(v))
+          activeValuesIterator.foreach(v => sum += f.sNorm(v))
           sum
         } else if (n == 2) {
           var sum = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = f.sNorm(v); sum += nn * nn })
+          activeValuesIterator.foreach(v => {
+            val nn = f.sNorm(v); sum += nn * nn
+          })
           math.sqrt(sum)
         } else if (n == Double.PositiveInfinity) {
           var max = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = f.sNorm(v); if (nn > max) max = nn })
+          activeValuesIterator.foreach(v => {
+            val nn = f.sNorm(v); if (nn > max) max = nn
+          })
           max
         } else {
           var sum = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = f.sNorm(v); sum += math.pow(nn, n) })
+          activeValuesIterator.foreach(v => {
+            val nn = f.sNorm(v); sum += math.pow(nn, n)
+          })
           math.pow(sum, 1.0 / n)
         }
       }
@@ -423,7 +429,7 @@ trait HashVector_SparseVector_Ops extends HashVectorOps {
                         @expand.args(OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T],
       @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : Op.Impl2[HashVector[T], SparseVector[T], HashVector[T]] =
     new Op.Impl2[HashVector[T], SparseVector[T], HashVector[T]] {
@@ -536,7 +542,7 @@ trait SparseVector_HashVector_Ops
                         @expand.args(OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T],
       @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : Op.Impl2[SparseVector[T], HashVector[T], SparseVector[T]] =
     new Op.Impl2[SparseVector[T], HashVector[T], SparseVector[T]] {
@@ -603,7 +609,7 @@ trait SparseVector_HashVector_Ops
                                                  HashVector[T],
                                                  T] {
       def apply(a: SparseVector[T], b: HashVector[T]) = {
-        b dot a
+        b.dot(a)
       }
     }
   }
@@ -951,22 +957,25 @@ trait HashVector_GenericOps { this: HashVector.type =>
         import v._
         if (n == 1) {
           var sum = 0.0
-          activeValuesIterator foreach (v => sum += canNormS(v))
+          activeValuesIterator.foreach(v => sum += canNormS(v))
           sum
         } else if (n == 2) {
           var sum = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = canNormS(v); sum += nn * nn })
+          activeValuesIterator.foreach(v => {
+            val nn = canNormS(v); sum += nn * nn
+          })
           math.sqrt(sum)
         } else if (n == Double.PositiveInfinity) {
           var max = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = canNormS(v); if (nn > max) max = nn })
+          activeValuesIterator.foreach(v => {
+            val nn = canNormS(v); if (nn > max) max = nn
+          })
           max
         } else {
           var sum = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = canNormS(v); sum += math.pow(nn, n) })
+          activeValuesIterator.foreach(v => {
+            val nn = canNormS(v); sum += math.pow(nn, n)
+          })
           math.pow(sum, 1.0 / n)
         }
       }

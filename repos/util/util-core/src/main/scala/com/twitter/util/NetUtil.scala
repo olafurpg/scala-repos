@@ -23,7 +23,7 @@ object NetUtil {
     }
 
   def ipToInt(ip: String): Int = {
-    ipToOptionInt(ip) getOrElse {
+    ipToOptionInt(ip).getOrElse {
       throw new IllegalArgumentException("invalid IPv4 address: " + ip)
     }
   }
@@ -130,7 +130,7 @@ object NetUtil {
     isIpInBlock(inetAddressToInt(inetAddress), ipBlock)
 
   def isIpInBlocks(ip: Int, ipBlocks: Iterable[(Int, Int)]): Boolean = {
-    ipBlocks exists { ipBlock =>
+    ipBlocks.exists { ipBlock =>
       isIpInBlock(ip, ipBlock)
     }
   }

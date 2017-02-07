@@ -63,16 +63,16 @@ object MultiNode extends AutoPlugin {
       SbtScalariform.configScalariformSettings) ++ Seq(
       jvmOptions in MultiJvm := defaultMultiJvmOptions,
       compileInputs in (MultiJvm, compile) <<=
-        (compileInputs in (MultiJvm, compile)) dependsOn
-          (ScalariformKeys.format in MultiJvm),
+        ((compileInputs in (MultiJvm, compile))).dependsOn(
+          ScalariformKeys.format in MultiJvm),
       scalacOptions in MultiJvm <<= scalacOptions in Test,
-      compile in MultiJvm <<= (compile in MultiJvm) triggeredBy
-        (compile in Test)
+      compile in MultiJvm <<= ((compile in MultiJvm)).triggeredBy(
+        compile in Test)
     ) ++ CliOptions.hostsFileName.map(multiNodeHostsFileName in MultiJvm := _) ++ CliOptions.javaName
       .map(multiNodeJavaName in MultiJvm := _) ++ CliOptions.targetDirName.map(
       multiNodeTargetDirName in MultiJvm := _) ++ // make sure that MultiJvm tests are executed by the default test target,
       // and combine the results from ordinary test and multi-jvm tests
-      (executeTests in Test <<= (executeTests in Test, multiExecuteTests) map {
+      (executeTests in Test <<= (executeTests in Test, multiExecuteTests).map {
         case (testResults, multiNodeResults) =>
           val overall =
             if (testResults.overall.id < multiNodeResults.overall.id)

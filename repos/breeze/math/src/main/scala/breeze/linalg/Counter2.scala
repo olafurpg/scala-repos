@@ -59,7 +59,7 @@ trait Counter2Like[
 
   def apply(i: (K1, K2)) = apply(i._1, i._2)
 
-  def apply(k: K1, k2: K2) = data.get(k).map(t => t(k2)) getOrElse default
+  def apply(k: K1, k2: K2) = data.get(k).map(t => t(k2)).getOrElse(default)
 
   def contains(k: K1) = data.contains(k)
 

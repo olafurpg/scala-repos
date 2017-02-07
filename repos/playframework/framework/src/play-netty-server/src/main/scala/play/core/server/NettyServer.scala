@@ -277,16 +277,18 @@ class NettyServer(
   }
 
   override lazy val mainAddress = {
-    (httpChannel orElse httpsChannel).get
+    (httpChannel
+      .orElse(httpsChannel))
+      .get
       .localAddress()
       .asInstanceOf[InetSocketAddress]
   }
 
   def httpPort =
-    httpChannel map (_.localAddress().asInstanceOf[InetSocketAddress].getPort)
+    httpChannel.map(_.localAddress().asInstanceOf[InetSocketAddress].getPort)
 
   def httpsPort =
-    httpsChannel map (_.localAddress().asInstanceOf[InetSocketAddress].getPort)
+    httpsChannel.map(_.localAddress().asInstanceOf[InetSocketAddress].getPort)
 }
 
 /**

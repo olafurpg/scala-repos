@@ -17,8 +17,8 @@ class MkJvmFilter(jvm: Jvm) {
     def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
       val begin = Time.now
       if (Trace.isActivelyTracing) {
-        service(req) ensure {
-          buffer(begin) foreach { gc =>
+        service(req).ensure {
+          buffer(begin).foreach { gc =>
             Trace.record {
               Record(Trace.id,
                      gc.timestamp,

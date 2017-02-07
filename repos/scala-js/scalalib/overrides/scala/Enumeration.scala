@@ -128,7 +128,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     */
   final def withName(s: String): Value = {
     val (unnamed, named) =
-      values partition {
+      values.partition {
         _.toString().startsWith("<Unknown name for enum field ")
       }
 
@@ -231,7 +231,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
 
   /** An ordering by id for values of this set */
   object ValueOrdering extends Ordering[Value] {
-    def compare(x: Value, y: Value): Int = x compare y
+    def compare(x: Value, y: Value): Int = x.compare(y)
   }
 
   /** A class for sets of values.
@@ -255,7 +255,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     def contains(v: Value) = nnIds contains (v.id - bottomId)
     def +(value: Value) = new ValueSet(nnIds + (value.id - bottomId))
     def -(value: Value) = new ValueSet(nnIds - (value.id - bottomId))
-    def iterator = nnIds.iterator map (id => thisenum.apply(bottomId + id))
+    def iterator = nnIds.iterator.map(id => thisenum.apply(bottomId + id))
     // This is only defined in 2.11. We change its implementation so it also
     // compiles on 2.10.
     def keysIteratorFrom(start: Value) = from(start).keySet.toIterator

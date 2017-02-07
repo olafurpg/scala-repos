@@ -10,7 +10,7 @@ final class Env(config: Config,
                 makeClient: Index => ESClient) {
 
   private val IndexName = config getString "index"
-  private val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
+  private val PaginatorMaxPerPage = config.getInt("paginator.max_per_page")
   private val ActorName = config getString "actor.name"
 
   private lazy val client = makeClient(Index(IndexName))
@@ -53,8 +53,8 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "gameSearch" boot new Env(
-      config = lila.common.PlayApp loadConfig "gameSearch",
-      system = lila.common.PlayApp.system,
-      makeClient = lila.search.Env.current.makeClient)
+    "gameSearch".boot(
+      new Env(config = lila.common.PlayApp.loadConfig("gameSearch"),
+              system = lila.common.PlayApp.system,
+              makeClient = lila.search.Env.current.makeClient))
 }

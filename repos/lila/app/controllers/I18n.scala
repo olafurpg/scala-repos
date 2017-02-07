@@ -48,14 +48,14 @@ object I18n extends LilaController {
 
   def contribute = Open { implicit ctx =>
     val mines =
-      (ctx.req.acceptLanguages map env.transInfos.get).toList.flatten.distinct
+      (ctx.req.acceptLanguages.map(env.transInfos.get)).toList.flatten.distinct
     Ok(html.i18n.contribute(env.transInfos.all, mines)).fuccess
   }
 
   def translationForm(lang: String) = Auth { implicit ctx => me =>
     OptionFuOk(infoAndContext(lang)) {
       case (info, context) =>
-        env.forms.translationWithCaptcha map {
+        env.forms.translationWithCaptcha.map {
           case (form, captcha) =>
             renderTranslationForm(form, info, captcha, context = context)
         }
@@ -68,7 +68,7 @@ object I18n extends LilaController {
         implicit val req = ctx.body
         val data = env.forms.decodeTranslationBody
         FormFuResult(env.forms.translation) { form =>
-          env.forms.anyCaptcha map { captcha =>
+          env.forms.anyCaptcha.map { captcha =>
             renderTranslationForm(form,
                                   info,
                                   captcha,
@@ -78,15 +78,16 @@ object I18n extends LilaController {
         } { metadata =>
           env.forms.process(lang, metadata, data, me.username) inject {
             Redirect(routes.I18n.contribute)
-              .flashing("success" -> "1") withCookies LilaCookie
-              .cookie(env.hideCallsCookieName, "1", maxAge = Some(60 * 24))
+              .flashing("success" -> "1")
+              .withCookies(LilaCookie
+                .cookie(env.hideCallsCookieName, "1", maxAge = Some(60 * 24)))
           }
         }
     }
   }
 
   private def infoAndContext(lang: String) = env.transInfos.get(lang) ?? { i =>
-    env.context.get map (i -> _) map (_.some)
+    env.context.get.map(i -> _).map(_.some)
   }
 
   private def renderTranslationForm(
@@ -105,7 +106,7 @@ object I18n extends LilaController {
                               context = context)
 
   def fetch(from: Int) = Open { implicit ctx =>
-    JsonOk(env jsonFromVersion from)
+    JsonOk(env.jsonFromVersion(from))
   }
 
   def hideCalls = Open { implicit ctx =>
@@ -113,6 +114,6 @@ object I18n extends LilaController {
     val cookie = LilaCookie.cookie(env.hideCallsCookieName,
                                    "1",
                                    maxAge = env.hideCallsCookieMaxAge.some)
-    fuccess(Redirect(routes.Lobby.home()) withCookies cookie)
+    fuccess(Redirect(routes.Lobby.home()).withCookies(cookie))
   }
 }

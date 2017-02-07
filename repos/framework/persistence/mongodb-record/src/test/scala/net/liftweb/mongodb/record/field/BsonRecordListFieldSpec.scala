@@ -54,7 +54,7 @@ class BsonRecordListFieldSpec extends Specification {
       liftBook.title.setBox(Failure("Bad format"))
       val shelf = BookShelf.createRecord.books(scalaBook :: liftBook :: Nil)
 
-      shelf.validate must have size (1)
+      (shelf.validate must have).size(1)
     }
 
     "pass validation if all of its elements pass validation" in {

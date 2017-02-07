@@ -143,22 +143,24 @@ object SbtExternalSystemManager {
     val customVmFile = new File(settings.getCustomVMPath) / "bin" / "java"
     val customVmExecutable = settings.customVMEnabled.option(customVmFile)
 
-    customVmExecutable.orElse {
-      val projectSdk = projectJdkName.flatMap(name =>
-        Option(ProjectJdkTable.getInstance().findJdk(name)))
-      projectSdk.map { sdk =>
-        sdk.getSdkType match {
-          case sdkType: JavaSdkType =>
-            new File(sdkType.getVMExecutablePath(sdk))
-          case _ =>
-            throw new ExternalSystemException(
-              SbtBundle("sbt.import.noProjectJvmFound"))
+    customVmExecutable
+      .orElse {
+        val projectSdk = projectJdkName.flatMap(name =>
+          Option(ProjectJdkTable.getInstance().findJdk(name)))
+        projectSdk.map { sdk =>
+          sdk.getSdkType match {
+            case sdkType: JavaSdkType =>
+              new File(sdkType.getVMExecutablePath(sdk))
+            case _ =>
+              throw new ExternalSystemException(
+                SbtBundle("sbt.import.noProjectJvmFound"))
+          }
         }
       }
-    } getOrElse {
-      throw new ExternalSystemException(
-        SbtBundle("sbt.import.noCustomJvmFound"))
-    }
+      .getOrElse {
+        throw new ExternalSystemException(
+          SbtBundle("sbt.import.noCustomJvmFound"))
+      }
   }
 
   private def getAndroidEnvironmentVariables(

@@ -256,7 +256,7 @@ class ReviveOffersActorTest
     Then("reviveOffers is called and we schedule more revives")
     Mockito.verify(f.driver, Mockito.timeout(1000)).reviveOffers()
     And("we scheduled the first of many revives")
-    f.actorRef.underlyingActor.scheduled should have size (1)
+    (f.actorRef.underlyingActor.scheduled should have).size(1)
     f.actorRef.underlyingActor.revivesNeeded should be(f.repetitions - 1)
 
     Mockito.reset(f.driver)
@@ -278,7 +278,7 @@ class ReviveOffersActorTest
       Mockito.reset(f.actorRef.underlyingActor.cancellable)
 
       And("we have scheduled the next revive")
-      f.actorRef.underlyingActor.scheduled should have size i
+      (f.actorRef.underlyingActor.scheduled should have).size(i)
       f.actorRef.underlyingActor.revivesNeeded should be(f.repetitions - i)
     }
 
@@ -298,8 +298,8 @@ class ReviveOffersActorTest
     Mockito.reset(f.actorRef.underlyingActor.cancellable)
 
     And("we have NOT scheduled the next revive")
-    f.actorRef.underlyingActor.scheduled should have size
-      (f.repetitions.toLong - 1)
+    (f.actorRef.underlyingActor.scheduled should have)
+      .size(f.repetitions.toLong - 1)
     f.actorRef.underlyingActor.revivesNeeded should be(0)
 
     f.verifyNoMoreInteractions()

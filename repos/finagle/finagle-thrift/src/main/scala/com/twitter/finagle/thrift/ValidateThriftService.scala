@@ -43,7 +43,7 @@ class ValidateThriftService(
     if (!isValid)
       Future.exception(WriteException(InvalidThriftConnectionException()))
     else
-      self(req) onSuccess { bytes =>
+      self(req).onSuccess { bytes =>
         if (!req.oneway && !isResponseValid(bytes)) {
           isValid = false
           Logger

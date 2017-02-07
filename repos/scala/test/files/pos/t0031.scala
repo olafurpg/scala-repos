@@ -17,7 +17,7 @@ object Main {
   def arb[a](s: List[a]) =
     require(!s.isEmpty) {
       s.head
-    } ensure (result => s contains result);
+    }.ensure(result => s contains result);
 
   def main(args: Array[String]) = {
     val s = List(1, 2);

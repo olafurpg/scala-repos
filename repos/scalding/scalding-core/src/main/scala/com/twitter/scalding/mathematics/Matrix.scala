@@ -1105,7 +1105,7 @@ class RowVector[ColT, ValT](val colS: Symbol,
 
   def hProd(that: RowVector[ColT, ValT])(
       implicit ring: Ring[ValT]): RowVector[ColT, ValT] =
-    (this.transpose hProd that.transpose).transpose
+    (this.transpose.hProd(that.transpose)).transpose
 
   def transpose: ColVector[ColT, ValT] = {
     new ColVector[ColT, ValT](colS, valS, inPipe, sizeH.transpose)
@@ -1269,7 +1269,7 @@ class ColVector[RowT, ValT](val rowS: Symbol,
 
   def hProd(that: ColVector[RowT, ValT])(
       implicit ring: Ring[ValT]): ColVector[RowT, ValT] =
-    (this.toMatrix(true) hProd that.toMatrix(true)).getCol(true)
+    (this.toMatrix(true).hProd(that.toMatrix(true))).getCol(true)
 
   def transpose: RowVector[RowT, ValT] = {
     new RowVector[RowT, ValT](rowS, valS, inPipe, sizeH.transpose)

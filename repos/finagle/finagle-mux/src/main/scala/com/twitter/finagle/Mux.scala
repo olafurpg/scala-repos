@@ -45,7 +45,7 @@ object Mux
       }
 
     def make(next: ServiceFactory[mux.Request, mux.Response]) =
-      tracingFilter andThen next
+      tracingFilter.andThen(next)
   }
 
   private[finagle] class ClientProtoTracing

@@ -14,9 +14,9 @@ class IterableViewLikeTest {
     val iter = Iterable(1, 2, 3)
 
     import scala.language.postfixOps
-    assertEquals(Iterable.empty[Int], iter.view take Int.MinValue force)
-    assertEquals(Iterable.empty[Int], iter.view takeRight Int.MinValue force)
-    assertEquals(iter, iter.view drop Int.MinValue force)
-    assertEquals(iter, iter.view dropRight Int.MinValue force)
+    assertEquals(Iterable.empty[Int], iter.view.take(Int.MinValue) force)
+    assertEquals(Iterable.empty[Int], iter.view.takeRight(Int.MinValue) force)
+    assertEquals(iter, iter.view.drop(Int.MinValue) force)
+    assertEquals(iter, iter.view.dropRight(Int.MinValue) force)
   }
 }

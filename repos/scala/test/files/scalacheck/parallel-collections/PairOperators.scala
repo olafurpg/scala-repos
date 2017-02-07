@@ -10,7 +10,7 @@ trait PairOperators[K, V] extends Operators[(K, V)] {
       kps: List[K => Boolean],
       vps: List[V => Boolean]): List[((K, V)) => Boolean] =
     for {
-      (kp, vp) <- koperators.countPredicates zip voperators.countPredicates
+      (kp, vp) <- koperators.countPredicates.zip(voperators.countPredicates)
     } yield
       new Function1[(K, V), Boolean] {
         def apply(kv: (K, V)) = kp(kv._1) && vp(kv._2)
@@ -20,7 +20,7 @@ trait PairOperators[K, V] extends Operators[(K, V)] {
 
   def reduceOperators =
     for {
-      (kop, vop) <- koperators.reduceOperators zip voperators.reduceOperators
+      (kop, vop) <- koperators.reduceOperators.zip(voperators.reduceOperators)
     } yield
       new Function2[(K, V), (K, V), (K, V)] {
         def apply(kv1: (K, V), kv2: (K, V)) =
@@ -41,7 +41,7 @@ trait PairOperators[K, V] extends Operators[(K, V)] {
 
   def mapFunctions =
     for {
-      (km, vm) <- koperators.mapFunctions zip voperators.mapFunctions
+      (km, vm) <- koperators.mapFunctions.zip(voperators.mapFunctions)
     } yield
       new Function1[(K, V), (K, V)] {
         def apply(kv: (K, V)) = (km(kv._1), vm(kv._2))
@@ -49,7 +49,8 @@ trait PairOperators[K, V] extends Operators[(K, V)] {
 
   def partialMapFunctions =
     for {
-      (kpm, vpm) <- koperators.partialMapFunctions zip voperators.partialMapFunctions
+      (kpm, vpm) <- koperators.partialMapFunctions.zip(
+        voperators.partialMapFunctions)
     } yield
       new PartialFunction[(K, V), (K, V)] {
         def isDefinedAt(kv: (K, V)) =
@@ -59,10 +60,12 @@ trait PairOperators[K, V] extends Operators[(K, V)] {
 
   def flatMapFunctions =
     for {
-      (kfm, vfm) <- koperators.flatMapFunctions zip voperators.flatMapFunctions
+      (kfm, vfm) <- koperators.flatMapFunctions.zip(
+        voperators.flatMapFunctions)
     } yield
       new Function1[(K, V), Traversable[(K, V)]] {
-        def apply(kv: (K, V)) = kfm(kv._1).toIterable zip vfm(kv._2).toIterable
+        def apply(kv: (K, V)) =
+          kfm(kv._1).toIterable.zip(vfm(kv._2).toIterable)
       }
 
   def filterPredicates =
@@ -82,7 +85,8 @@ trait PairOperators[K, V] extends Operators[(K, V)] {
 
   def foldArguments =
     for {
-      ((kinit, kop), (vinit, vop)) <- koperators.foldArguments zip voperators.foldArguments
+      ((kinit, kop), (vinit, vop)) <- koperators.foldArguments.zip(
+        voperators.foldArguments)
     } yield
       ((kinit, vinit), new Function2[(K, V), (K, V), (K, V)] {
         def apply(kv1: (K, V), kv2: (K, V)) =
@@ -91,13 +95,14 @@ trait PairOperators[K, V] extends Operators[(K, V)] {
 
   def addAllTraversables =
     for {
-      (kt, vt) <- koperators.addAllTraversables zip voperators.addAllTraversables
-    } yield kt.toIterable zip vt.toIterable
+      (kt, vt) <- koperators.addAllTraversables.zip(
+        voperators.addAllTraversables)
+    } yield kt.toIterable.zip(vt.toIterable)
 
   def newArray(sz: Int) = new Array[(K, V)](sz)
 
   def groupByFunctions =
-    (koperators.groupByFunctions zip voperators.groupByFunctions) map { opt =>
+    (koperators.groupByFunctions.zip(voperators.groupByFunctions)).map { opt =>
       { (p: (K, V)) =>
         (opt._1(p._1), opt._2(p._2))
       }

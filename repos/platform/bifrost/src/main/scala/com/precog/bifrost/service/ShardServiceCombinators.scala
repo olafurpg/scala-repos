@@ -75,7 +75,7 @@ object ShardServiceCombinators extends Logging {
 
   private object Limit extends NonNegativeLong {
     override def unapply(str: String): Option[Long] =
-      super.unapply(str) filter (_ > 0)
+      super.unapply(str).filter(_ > 0)
   }
   private object Offset extends NonNegativeLong
   private object Millis extends NonNegativeLong
@@ -131,37 +131,47 @@ object ShardServiceCombinators extends Logging {
         other.message
     }
 
-    request.parameters.get('sortOn).filter(_ != null) map { paths =>
-      val parsed: Validation[Error, List[CPath]] =
-        ((Thrown(_: Throwable)) <-: JParser.parseFromString(paths)) flatMap {
-          case JArray(elems) =>
-            Validation.success(elems collect {
-              case JString(path) => CPath(path)
-            })
-          case JString(path) =>
-            Validation.success(CPath(path) :: Nil)
-          case badJVal =>
-            Validation.failure(
-              Invalid(
-                "The sortOn query parameter was expected to be JSON string or array, but found " +
-                  badJVal))
-        }
+    request.parameters
+      .get('sortOn)
+      .filter(_ != null)
+      .map { paths =>
+        val parsed: Validation[Error, List[CPath]] =
+          (((Thrown(_: Throwable)) <-: JParser.parseFromString(paths)))
+            .flatMap {
+              case JArray(elems) =>
+                Validation.success(elems.collect {
+                  case JString(path) => CPath(path)
+                })
+              case JString(path) =>
+                Validation.success(CPath(path) :: Nil)
+              case badJVal =>
+                Validation.failure(
+                  Invalid(
+                    "The sortOn query parameter was expected to be JSON string or array, but found " +
+                      badJVal))
+            }
 
-      onError <-: parsed
-    } getOrElse {
-      Validation.success[String, List[CPath]](Nil)
-    }
+        onError <-: parsed
+      }
+      .getOrElse {
+        Validation.success[String, List[CPath]](Nil)
+      }
   }
 
   private def getSortOrder(
       request: HttpRequest[_]): Validation[String, DesiredSortOrder] = {
-    request.parameters.get('sortOrder) filter (_ != null) map (_.toLowerCase) map {
-      case "asc" | "\"asc\"" | "ascending" | "\"ascending\"" =>
-        success(TableModule.SortAscending)
-      case "desc" | "\"desc\"" | "descending" | "\"descending\"" =>
-        success(TableModule.SortDescending)
-      case badOrder => failure("Unknown sort ordering: %s." format badOrder)
-    } getOrElse success(TableModule.SortAscending)
+    request.parameters
+      .get('sortOrder)
+      .filter(_ != null)
+      .map(_.toLowerCase)
+      .map {
+        case "asc" | "\"asc\"" | "ascending" | "\"ascending\"" =>
+          success(TableModule.SortAscending)
+        case "desc" | "\"desc\"" | "descending" | "\"descending\"" =>
+          success(TableModule.SortDescending)
+        case badOrder => failure("Unknown sort ordering: %s.".format(badOrder))
+      }
+      .getOrElse(success(TableModule.SortAscending))
   }
 
   private def getOffsetAndLimit(
@@ -193,7 +203,7 @@ object ShardServiceCombinators extends Logging {
       .sequence[({ type λ[α] = Validation[String, α] })#λ, Long]
 
     (offset.toValidationNel |@| limit.toValidationNel) { (offset, limit) =>
-      limit map ((offset getOrElse 0, _))
+      limit.map((offset.getOrElse(0), _))
     }
   }
 
@@ -211,7 +221,7 @@ object ShardServiceCombinators extends Logging {
                      sortOrder,
                      timeout.map(Duration(_, TimeUnit.MILLISECONDS)),
                      output)
-    } leftMap { errors =>
+    }.leftMap { errors =>
       DispatchError(
         BadRequest,
         "Errors were encountered decoding query configuration parameters.",
@@ -249,12 +259,12 @@ trait ShardServiceCombinators
         NotServed,
         ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] =
         (request: HttpRequest[ByteChunk]) => {
-          queryOpts(request) flatMap { opts =>
+          queryOpts(request).flatMap { opts =>
             def quirrelContent(
                 request: HttpRequest[ByteChunk]): Option[ByteChunk] =
               for {
                 header <- request.headers.header[`Content-Type`]
-                if header.mimeTypes exists { t =>
+                if header.mimeTypes.exists { t =>
                   t == text / plain ||
                   (t.maintype == "text" &&
                   t.subtype == "x-quirrel-script")
@@ -262,7 +272,7 @@ trait ShardServiceCombinators
                 content <- request.content
               } yield content
 
-            next.service(request) map { f =>
+            next.service(request).map { f =>
               val serv: ((APIKey, AccountDetails), Path) => Future[
                 HttpResponse[B]] = {
                 case ((apiKey, account), path) =>
@@ -275,13 +285,15 @@ trait ShardServiceCombinators
                       .map(new String(_: Array[Byte], "UTF-8"))))
 
                   val result: Future[HttpResponse[B]] =
-                    query map { q =>
-                      q flatMap { f(apiKey, account, path, _: String, opts) }
-                    } getOrElse {
-                      Promise.successful(HttpResponse(HttpStatus(
-                        BadRequest,
-                        "Neither the query string nor request body contained an identifiable quirrel query.")))
-                    }
+                    query
+                      .map { q =>
+                        q.flatMap { f(apiKey, account, path, _: String, opts) }
+                      }
+                      .getOrElse {
+                        Promise.successful(HttpResponse(HttpStatus(
+                          BadRequest,
+                          "Neither the query string nor request body contained an identifiable quirrel query.")))
+                      }
                   result
               }
               serv
@@ -307,14 +319,15 @@ trait ShardServiceCombinators
       val service = { (request: HttpRequest[ByteChunk]) =>
         val path =
           request.parameters.get('prefixPath).filter(_ != null).getOrElse("")
-        delegate.service(
-          request
-            .copy(parameters = request.parameters + ('sync -> "async"))) map {
-          f =>
+        delegate
+          .service(
+            request
+              .copy(parameters = request.parameters + ('sync -> "async")))
+          .map { f =>
             { (cred: (APIKey, AccountDetails)) =>
               f(cred, Path(path))
             }
-        }
+          }
       }
 
       def metadata = delegate.metadata
@@ -328,10 +341,10 @@ trait ShardServiceCombinators
       implicit inj: JValue => B,
       M: Monad[Future]): HttpService[A, APIKey => Future[HttpResponse[B]]] = {
     val service0 =
-      service map { (f: ((APIKey, AccountDetails)) => Future[
+      service.map { (f: ((APIKey, AccountDetails)) => Future[
         HttpResponse[B]]) =>
         { (v: Validation[String, (APIKey, AccountDetails)]) =>
-          v.fold(msg => M.point(forbidden(msg) map inj), f)
+          v.fold(msg => M.point(forbidden(msg).map(inj)), f)
         }
       }
     new FindAccountService(accountFinder)(service0)
@@ -351,18 +364,18 @@ final class FindAccountService[A, B](accountFinder: AccountFinder[Future])(
 
   val service: HttpRequest[A] => Validation[NotServed, APIKey => Future[B]] = {
     (request: HttpRequest[A]) =>
-      delegate.service(request) map {
+      delegate.service(request).map {
         (f: Validation[String, (APIKey, AccountDetails)] => Future[B]) =>
           { (apiKey: APIKey) =>
             val details =
-              OptionT(accountFinder.findAccountByAPIKey(apiKey)) flatMap {
+              OptionT(accountFinder.findAccountByAPIKey(apiKey)).flatMap {
                 accountId =>
                   OptionT(accountFinder.findAccountDetailsById(accountId))
               }
             val result = details.fold(
               account => Success((apiKey, account)),
               Failure("Cannot find account for API key: " + apiKey))
-            result flatMap f
+            result.flatMap(f)
           }
       }
   }

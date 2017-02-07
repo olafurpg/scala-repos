@@ -66,7 +66,7 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
         case _ =>
           Set.empty[Expression]
       }
-      .foldLeft(Set.empty[Expression])(_ union _.toSet)
+      .foldLeft(Set.empty[Expression])(_.union(_.toSet))
   }
 
   /**
@@ -79,10 +79,10 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     var inferredConstraints = Set.empty[Expression]
     constraints.foreach {
       case eq @ EqualTo(l: Attribute, r: Attribute) =>
-        inferredConstraints ++= (constraints - eq).map(_ transform {
+        inferredConstraints ++= (constraints - eq).map(_.transform {
           case a: Attribute if a.semanticEquals(l) => r
         })
-        inferredConstraints ++= (constraints - eq).map(_ transform {
+        inferredConstraints ++= (constraints - eq).map(_.transform {
           case a: Attribute if a.semanticEquals(r) => l
         })
       case _ => // No inference
@@ -302,7 +302,7 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     left.getClass == right.getClass &&
     left.children.size == right.children.size &&
     left.cleanArgs == right.cleanArgs &&
-    (left.children, right.children).zipped.forall(_ sameResult _)
+    (left.children, right.children).zipped.forall(_.sameResult(_))
   }
 
   /**

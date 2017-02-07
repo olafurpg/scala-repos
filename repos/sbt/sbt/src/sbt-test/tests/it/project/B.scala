@@ -3,7 +3,7 @@ import Keys._
 import Import._
 
 object B extends Build {
-  lazy val IntegrationTest = config("it") extend (Test)
+  lazy val IntegrationTest = config("it").extend(Test)
   lazy val root = Project("root", file("."))
     .configs(IntegrationTest)
     .settings(Defaults.itSettings: _*)

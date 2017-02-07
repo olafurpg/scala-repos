@@ -216,14 +216,16 @@ private[controllers] class AssetInfo(val name: String,
   }
 
   val etag: Option[String] =
-    digest orElse {
-      lastModified map (m => Codecs.sha1(m + " -> " + url.toExternalForm))
-    } map ("\"" + _ + "\"")
+    digest
+      .orElse {
+        lastModified.map(m => Codecs.sha1(m + " -> " + url.toExternalForm))
+      }
+      .map("\"" + _ + "\"")
 
   val mimeType: String =
     MimeTypes.forFileName(name).fold(ContentTypes.BINARY)(addCharsetIfNeeded)
 
-  val parsedLastModified = lastModified flatMap parseModifiedDate
+  val parsedLastModified = lastModified.flatMap(parseModifiedDate)
 
   def url(gzipAvailable: Boolean): URL = {
     gzipUrl match {
@@ -516,9 +518,11 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
     import Implicits.trampoline
     val assetName: Option[String] = resourceNameAt(path, file)
     val assetInfoFuture: Future[Option[(AssetInfo, Boolean)]] =
-      assetName.map { name =>
-        assetInfoForRequest(request, name)
-      } getOrElse Future.successful(None)
+      assetName
+        .map { name =>
+          assetInfoForRequest(request, name)
+        }
+        .getOrElse(Future.successful(None))
 
     def notFound =
       errorHandler.onClientError(request,

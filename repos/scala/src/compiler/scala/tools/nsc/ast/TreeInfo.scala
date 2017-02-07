@@ -28,7 +28,7 @@ abstract class TreeInfo extends scala.reflect.internal.TreeInfo {
   object TypeApplyOp {
     def unapply(t: Tree): Option[(Tree, Symbol, List[Type])] = t match {
       case TypeApply(sel @ Select(recv, _), targs) =>
-        Some((recv, sel.symbol, targs map (_.tpe)))
+        Some((recv, sel.symbol, targs.map(_.tpe)))
       case _ => None
     }
   }

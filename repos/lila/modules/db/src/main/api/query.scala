@@ -10,9 +10,9 @@ object $query {
 
   def all[A: InColl] = builder
 
-  def apply[A: InColl](q: JsObject) = builder query q
+  def apply[A: InColl](q: JsObject) = builder.query(q)
 
-  def apply[A: InColl](q: BSONDocument) = builder query q
+  def apply[A: InColl](q: BSONDocument) = builder.query(q)
 
   def byId[A: InColl, B: Writes](id: B) = apply($select byId id)
 

@@ -374,7 +374,7 @@ class ClientServerSpec
       }
     }
 
-    "log materialization errors in `bindAndHandle`" which {
+    "log materialization errors in `bindAndHandle`".which {
 
       "are triggered in `transform`" in Utils.assertAllStagesStopped {
         // FIXME racy feature, needs https://github.com/akka/akka/issues/17849 to be fixed
@@ -472,7 +472,7 @@ class ClientServerSpec
           val chunks =
             List(Chunk("abc"), Chunk("defg"), Chunk("hijkl"), LastChunk)
           val chunkedContentType: ContentType =
-            MediaTypes.`application/base64` withCharset HttpCharsets.`UTF-8`
+            MediaTypes.`application/base64`.withCharset(HttpCharsets.`UTF-8`)
           val chunkedEntity =
             HttpEntity.Chunked(chunkedContentType, Source(chunks))
 

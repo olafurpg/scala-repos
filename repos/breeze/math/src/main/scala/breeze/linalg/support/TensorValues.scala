@@ -31,7 +31,7 @@ class TensorValues[K, V, +This](private val tensor: This,
     if (active) tensor.activeValuesIterator else tensor.valuesIterator
   }.filter(f)
 
-  def foreach[U](fn: V => U) = iterator foreach fn
+  def foreach[U](fn: V => U) = iterator.foreach(fn)
 
 //  def filter(p: V => Boolean) = withFilter(p)
 //
@@ -53,6 +53,6 @@ class TensorValues[K, V, +This](private val tensor: This,
       bf.asInstanceOf[CanMapValues[Tensor[K, V], V, O, That]])
   }
 
-  def exists(f: V => Boolean) = iterator exists f
-  def forall(f: V => Boolean) = iterator forall f
+  def exists(f: V => Boolean) = iterator.exists(f)
+  def forall(f: V => Boolean) = iterator.forall(f)
 }

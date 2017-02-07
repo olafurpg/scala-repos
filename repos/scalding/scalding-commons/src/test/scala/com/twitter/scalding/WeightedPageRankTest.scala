@@ -48,7 +48,7 @@ class WeightedPageRankSpec extends WordSpec with Matchers {
             _ * 0.9
           }
           val expected =
-            (userMass zip massNext) map { a: (Double, Double) =>
+            (userMass.zip(massNext)).map { a: (Double, Double) =>
               a._1 + a._2 + deadMass
             }
 

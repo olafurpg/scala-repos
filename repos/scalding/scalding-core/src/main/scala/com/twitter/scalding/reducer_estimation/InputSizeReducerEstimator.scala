@@ -49,7 +49,7 @@ class InputSizeReducerEstimator extends ReducerEstimator {
 
         val totalBytes = inputSizes.map(_._2).sum
         val nReducers =
-          (totalBytes.toDouble / bytesPerReducer).ceil.toInt max 1
+          (totalBytes.toDouble / bytesPerReducer).ceil.toInt.max(1)
 
         lazy val logStr = inputSizes
           .map {

@@ -395,7 +395,7 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     if (path.address.host.isDefined) {
       path
     } else {
-      path.root.copy(selfAddress) / path.elements withUid path.uid
+      (path.root.copy(selfAddress) / path.elements).withUid(path.uid)
     }
   }
 
@@ -422,7 +422,7 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
 
       closeScheduler()
 
-      clusterJmx foreach { _.unregisterMBean() }
+      clusterJmx.foreach { _.unregisterMBean() }
 
       logInfo("Successfully shut down")
     }

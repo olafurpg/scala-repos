@@ -98,7 +98,7 @@ class WorksheetCompiler {
             override def run() {
               //todo smth with exit code
               try {
-                val module = RunWorksheetAction getModuleFor worksheetFile
+                val module = RunWorksheetAction.getModuleFor(worksheetFile)
 
                 if (module == null) onError("Can't find Scala module to run")
                 else
@@ -140,11 +140,11 @@ class WorksheetCompiler {
 
             val errorContent = ContentFactory.SERVICE.getInstance
               .createContent(treeError.getComponent, ERROR_CONTENT_NAME, true)
-            contentManager addContent errorContent
-            contentManager setSelectedContent errorContent
+            contentManager.addContent(errorContent)
+            contentManager.setSelectedContent(errorContent)
 
             openMessageView(project, errorContent, treeError)
-            editor.getCaretModel moveToLogicalPosition pos
+            editor.getCaretModel.moveToLogicalPosition(pos)
           }
         })
 
@@ -163,10 +163,11 @@ class WorksheetCompiler {
           Disposer.register(content, treeView, null)
           val messageView =
             ServiceManager.getService(project, classOf[MessageView])
-          messageView.getContentManager setSelectedContent content
+          messageView.getContentManager.setSelectedContent(content)
 
           val toolWindow =
-            ToolWindowManager getInstance project getToolWindow ToolWindowId.MESSAGES_WINDOW
+            ToolWindowManager
+              .getInstance(project) getToolWindow ToolWindowId.MESSAGES_WINDOW
           if (toolWindow != null) toolWindow.show(null)
         }
       },

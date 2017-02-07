@@ -32,7 +32,7 @@ class ServerSet(val underlying: ServerSetImpl,
     pool {
       underlying
         .join(serviceEndpoint, additionalEndpoints.asJava, status) // blocks
-    } map { new EndpointStatus(_, pool) } // wrap for async updates
+    }.map { new EndpointStatus(_, pool) } // wrap for async updates
 
   /**
     * Monitor the ServerSet

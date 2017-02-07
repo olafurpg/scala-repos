@@ -24,8 +24,9 @@ object Transform {
     conscriptConfigs <<= (managedResources in launch in Compile,
                           sourceDirectory in Compile).map { (res, src) =>
       val source =
-        res.find(_.getName == "sbt.boot.properties") getOrElse sys.error(
-          "No managed boot.properties file.")
+        res
+          .find(_.getName == "sbt.boot.properties")
+          .getOrElse(sys.error("No managed boot.properties file."))
       copyConscriptProperties(source, src / "conscript")
       ()
     }
@@ -46,7 +47,7 @@ object Transform {
   def copyPropertiesFile(source: File, newMain: String, target: File): Unit = {
     def subMain(line: String): String =
       if (line.trim.startsWith("class:")) "  class: " + newMain else line
-    IO.writeLines(target, IO.readLines(source) map subMain)
+    IO.writeLines(target, IO.readLines(source).map(subMain))
   }
 
   def crossGenSettings = transSourceSettings ++ Seq(
@@ -60,19 +61,19 @@ object Transform {
       inputSourceDirectories.map(dirs => (dirs ** (-DirectoryFilter)).get),
     fileMappings in transformSources <<= transformSourceMappings,
     transformSources <<=
-      (fileMappings in transformSources, sourceProperties) map { (rs, props) =>
-        rs map { case (in, out) => transform(in, out, props) }
+      (fileMappings in transformSources, sourceProperties).map { (rs, props) =>
+        rs.map { case (in, out) => transform(in, out, props) }
       },
     sourceGenerators <+= transformSources
   )
   def transformSourceMappings =
-    (inputSources, inputSourceDirectories, sourceManaged) map {
+    (inputSources, inputSourceDirectories, sourceManaged).map {
       (ss, sdirs, sm) =>
-        ((ss --- sdirs) pair (rebase(sdirs, sm) | flat(sm))).toSeq
+        (((ss --- sdirs)).pair(rebase(sdirs, sm) | flat(sm))).toSeq
     }
   def configSettings = transResourceSettings ++ Seq(
     resourceProperties <<=
-      (organization, version, scalaVersion, isSnapshot) map {
+      (organization, version, scalaVersion, isSnapshot).map {
         (org, v, sv, isSnapshot) =>
           Map("org" -> org, "sbt.version" -> v, "scala.version" -> sv)
       }
@@ -84,16 +85,16 @@ object Transform {
       inputResourceDirectories.map(dirs => (dirs ** (-DirectoryFilter)).get),
     fileMappings in transformResources <<= transformResourceMappings,
     transformResources <<=
-      (fileMappings in transformResources, resourceProperties) map {
+      (fileMappings in transformResources, resourceProperties).map {
         (rs, props) =>
-          rs map { case (in, out) => transform(in, out, props) }
+          rs.map { case (in, out) => transform(in, out, props) }
       },
     resourceGenerators <+= transformResources
   )
   def transformResourceMappings =
-    (inputResources, inputResourceDirectories, resourceManaged) map {
+    (inputResources, inputResourceDirectories, resourceManaged).map {
       (rs, rdirs, rm) =>
-        ((rs --- rdirs) pair (rebase(rdirs, rm) | flat(rm))).toSeq
+        (((rs --- rdirs)).pair(rebase(rdirs, rm) | flat(rm))).toSeq
     }
 
   def transform(in: File, out: File, map: Map[String, String]): File = {

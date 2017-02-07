@@ -34,9 +34,9 @@ object View {
     import BSONFields._
 
     def reads(r: BSON.Reader): View =
-      View(id = r str id,
-           videoId = r str videoId,
-           userId = r str userId,
+      View(id = r.str(id),
+           videoId = r.str(videoId),
+           userId = r.str(userId),
            date = r.get[DateTime](date))
 
     def writes(w: BSON.Writer, o: View) =

@@ -102,7 +102,7 @@ trait ManyToMany extends BaseKeyedMapper { this: KeyedMapper[_, _] =>
             otherField.actualField(_).get == e.primaryKeyField
           } match {
             case Some(removedJoin) =>
-              removedJoins = removedJoins filter removedJoin.ne
+              removedJoins = removedJoins.filter(removedJoin.ne)
               removedJoin // well, noLongerRemovedJoin...
             case None =>
               val newJoin = joinMeta.create
@@ -124,7 +124,7 @@ trait ManyToMany extends BaseKeyedMapper { this: KeyedMapper[_, _] =>
           val o = otherField.actualField(join)
           o.set(o.defaultValue)
           thisField.actualField(join) match {
-            case mfk => mfk set mfk.defaultValue
+            case mfk => mfk.set(mfk.defaultValue)
           }
           Some(join)
         case None =>
@@ -147,7 +147,7 @@ trait ManyToMany extends BaseKeyedMapper { this: KeyedMapper[_, _] =>
       children.indexWhere(e.eq)
 
     def insertAll(n: Int, traversable: Traversable[T2]) {
-      val ownedJoins = traversable map own
+      val ownedJoins = traversable.map(own)
       val n2 = joins.indexWhere(isJoinForChild(children(n)))
       val before = joins.take(n2)
       val after = joins.drop(n2)
@@ -179,14 +179,14 @@ trait ManyToMany extends BaseKeyedMapper { this: KeyedMapper[_, _] =>
       val child = childAt(n)
       unown(child) match {
         case Some(join) =>
-          _joins = joins filterNot join.eq
+          _joins = joins.filterNot(join.eq)
         case None =>
       }
       child
     }
 
     def clear() {
-      children foreach unown
+      children.foreach(unown)
       _joins = Nil
     }
 
@@ -219,12 +219,13 @@ trait ManyToMany extends BaseKeyedMapper { this: KeyedMapper[_, _] =>
       _joins = joins.filter { join =>
         otherFK(join)(f => f.get != f.defaultValue)
       }
-      _joins foreach {
+      _joins.foreach {
         thisField
           .actualField(_)
           .asInstanceOf[MappedForeignKey[K, O, X] forSome {
             type X <: KeyedMapper[K, X]
-          }] set ManyToMany.this.primaryKeyField.get.asInstanceOf[K]
+          }]
+          .set(ManyToMany.this.primaryKeyField.get.asInstanceOf[K])
       }
 
       removedJoins.forall { _.delete_! } &

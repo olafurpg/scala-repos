@@ -22,11 +22,13 @@ object ScalatraServlet {
         r.getServletPath.blankOption.map(_.length).getOrElse(0)
     def getRequestPath(r: HttpServletRequest) = {
       val u =
-        (catching(classOf[NullPointerException]) opt { r.getRequestURI } getOrElse "/")
+        (catching(classOf[NullPointerException])
+          .opt { r.getRequestURI }
+          .getOrElse("/"))
       requestPath(u, startIndex(r))
     }
 
-    request.get(RequestPathKey) map (_.toString) getOrElse {
+    request.get(RequestPathKey).map(_.toString).getOrElse {
       val rp = getRequestPath(request)
       request(RequestPathKey) = rp
       rp
@@ -36,7 +38,10 @@ object ScalatraServlet {
   def requestPath(uri: String, idx: Int): String = {
     val u1 = UriDecoder.firstStep(uri)
     val u2 =
-      (u1.blankOption map { _.substring(idx) } flatMap (_.blankOption) getOrElse "/")
+      (u1.blankOption
+        .map { _.substring(idx) }
+        .flatMap(_.blankOption)
+        .getOrElse("/"))
     val pos = u2.indexOf(';')
     if (pos > -1) u2.substring(0, pos) else u2
   }
@@ -92,7 +97,7 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
     * This action can be overridden by a notFound block.
     */
   protected var doNotFound: Action = () => {
-    serveStaticResource() getOrElse resourceNotFound()
+    serveStaticResource().getOrElse(resourceNotFound())
   }
 
   /**
@@ -102,7 +107,7 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
   protected def serveStaticResource(
       )(implicit request: HttpServletRequest,
         response: HttpServletResponse): Option[Any] = {
-    servletContext.resource(request) map { _ =>
+    servletContext.resource(request).map { _ =>
       servletContext.getNamedDispatcher("default").forward(request, response)
     }
   }
@@ -118,7 +123,7 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
       val error = "Requesting \"%s %s\" on servlet \"%s\" but only have: %s"
       response.getWriter println error.format(
         request.getMethod,
-        Option(request.getPathInfo) getOrElse "/",
+        Option(request.getPathInfo).getOrElse("/"),
         request.getServletPath,
         routes.entryPoints.mkString("<ul><li>", "</li><li>", "</li></ul>"))
     }

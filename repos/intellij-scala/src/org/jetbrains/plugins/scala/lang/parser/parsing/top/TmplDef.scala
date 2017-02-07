@@ -46,7 +46,7 @@ object TmplDef {
         caseMarker.drop()
         modifierMarker.done(ScalaElementTypes.MODIFIERS)
         builder.advanceLexer() //Ate class
-        if (ClassDef parse builder) {
+        if (ClassDef.parse(builder)) {
           templateMarker.done(ScalaElementTypes.CLASS_DEF)
         } else {
           templateMarker.drop()
@@ -56,7 +56,7 @@ object TmplDef {
         caseMarker.drop()
         modifierMarker.done(ScalaElementTypes.MODIFIERS)
         builder.advanceLexer() //Ate object
-        if (ObjectDef parse builder) {
+        if (ObjectDef.parse(builder)) {
           templateMarker.done(ScalaElementTypes.OBJECT_DEF)
         } else {
           templateMarker.drop()
@@ -77,7 +77,7 @@ object TmplDef {
           }
           // In this way wrong case modifier
           case _ => {
-            builder error ErrMsg("wrong.case.modifier")
+            builder.error(ErrMsg("wrong.case.modifier"))
             builder.advanceLexer() //Ate case
             builder.getTokenText
             builder.advanceLexer() //Ate trait

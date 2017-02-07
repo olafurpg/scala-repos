@@ -30,7 +30,7 @@ class StateTracker(
     val now = Time.now
     val delta = now - lastSample
     lastSample = now
-    currState foreach { state =>
+    currState.foreach { state =>
       statsReceiver
         .counter(s"${state.name}_duration_ms")
         .incr(delta.inMilliseconds.toInt)

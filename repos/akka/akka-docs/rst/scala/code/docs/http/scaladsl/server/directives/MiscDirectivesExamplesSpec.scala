@@ -64,9 +64,9 @@ class MiscDirectivesExamplesSpec extends RoutingSpec {
   "selectPreferredLanguage-example" in {
     val request =
       Get() ~> `Accept-Language`(Language("en-US"),
-                                 Language("en") withQValue 0.7f,
-                                 LanguageRange.`*` withQValue 0.1f,
-                                 Language("de") withQValue 0.5f)
+                                 Language("en").withQValue(0.7f),
+                                 LanguageRange.`*`.withQValue(0.1f),
+                                 Language("de").withQValue(0.5f))
 
     request ~> {
       selectPreferredLanguage("en", "en-US") { lang ⇒

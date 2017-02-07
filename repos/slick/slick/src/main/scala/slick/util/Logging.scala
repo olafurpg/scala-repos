@@ -85,7 +85,7 @@ object SlickLogger {
 trait Logging {
   protected[this] lazy val logger = {
     val n = getClass.getName
-    val cln = if (n endsWith "$") n.substring(0, n.length - 1) else n
+    val cln = if (n.endsWith("$")) n.substring(0, n.length - 1) else n
     new SlickLogger(LoggerFactory.getLogger(cln))
   }
 }

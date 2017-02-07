@@ -43,16 +43,15 @@ final case class FutureInvocation[T](future: CompletableFuture[T],
                                      cleanup: () => Unit)
     extends Runnable {
   def run = {
-    future complete
-      (try {
-        Right(function())
-      } catch {
-        case e =>
-          EventHandler.error(e, this, e.getMessage)
-          Left(e)
-      } finally {
-        cleanup()
-      })
+    future.complete(try {
+      Right(function())
+    } catch {
+      case e =>
+        EventHandler.error(e, this, e.getMessage)
+        Left(e)
+    } finally {
+      cleanup()
+    })
   }
 }
 
@@ -86,14 +85,14 @@ trait MessageDispatcher {
   /**
     * Attaches the specified actorRef to this dispatcher
     */
-  final def attach(actorRef: ActorRef): Unit = guard withGuard {
+  final def attach(actorRef: ActorRef): Unit = guard.withGuard {
     register(actorRef)
   }
 
   /**
     * Detaches the specified actorRef from this dispatcher
     */
-  final def detach(actorRef: ActorRef): Unit = guard withGuard {
+  final def detach(actorRef: ActorRef): Unit = guard.withGuard {
     unregister(actorRef)
   }
 
@@ -106,7 +105,7 @@ trait MessageDispatcher {
     try {
       val future = new DefaultCompletableFuture[T](timeout)
 
-      if (active.isOff) guard withGuard { active.switchOn { start } }
+      if (active.isOff) guard.withGuard { active.switchOn { start } }
 
       executeFuture(FutureInvocation[T](future, block, futureCleanup))
       future
@@ -119,7 +118,7 @@ trait MessageDispatcher {
 
   private val futureCleanup: () => Unit = () =>
     if (futures.decrementAndGet() == 0) {
-      guard withGuard {
+      guard.withGuard {
         if (futures.get == 0 && uuids.isEmpty) {
           shutdownSchedule match {
             case UNSCHEDULED =>
@@ -138,7 +137,7 @@ trait MessageDispatcher {
   private[akka] def register(actorRef: ActorRef) {
     if (actorRef.mailbox eq null) actorRef.mailbox = createMailbox(actorRef)
 
-    uuids add actorRef.uuid
+    uuids.add(actorRef.uuid)
     if (active.isOff) {
       active.switchOn {
         start
@@ -147,7 +146,7 @@ trait MessageDispatcher {
   }
 
   private[akka] def unregister(actorRef: ActorRef) = {
-    if (uuids remove actorRef.uuid) {
+    if (uuids.remove(actorRef.uuid)) {
       actorRef.mailbox = null
       if (uuids.isEmpty && futures.get == 0) {
         shutdownSchedule match {
@@ -179,14 +178,14 @@ trait MessageDispatcher {
   }
 
   private val shutdownAction = new Runnable {
-    def run = guard withGuard {
+    def run = guard.withGuard {
       shutdownSchedule match {
         case RESCHEDULED =>
           shutdownSchedule = SCHEDULED
           Scheduler.scheduleOnce(this, timeoutMs, TimeUnit.MILLISECONDS)
         case SCHEDULED =>
           if (uuids.isEmpty && futures.get == 0) {
-            active switchOff {
+            active.switchOff {
               shutdown // shut down in the dispatcher's references is zero
             }
           }
@@ -273,24 +272,24 @@ abstract class MessageDispatcherConfigurator {
     //Apply the following options to the config if they are present in the config
     ThreadPoolConfigDispatcherBuilder(createDispatcher, ThreadPoolConfig())
       .configure(
-        conf_?(config getInt "keep-alive-time")(time =>
+        conf_?(config.getInt("keep-alive-time"))(time =>
           _.setKeepAliveTime(Duration(time, TIME_UNIT))),
-        conf_?(config getDouble "core-pool-size-factor")(factor =>
+        conf_?(config.getDouble("core-pool-size-factor"))(factor =>
           _.setCorePoolSizeFromFactor(factor)),
-        conf_?(config getDouble "max-pool-size-factor")(factor =>
+        conf_?(config.getDouble("max-pool-size-factor"))(factor =>
           _.setMaxPoolSizeFromFactor(factor)),
-        conf_?(config getInt "executor-bounds")(bounds =>
+        conf_?(config.getInt("executor-bounds"))(bounds =>
           _.setExecutorBounds(bounds)),
-        conf_?(config getBool "allow-core-timeout")(allow =>
+        conf_?(config.getBool("allow-core-timeout"))(allow =>
           _.setAllowCoreThreadTimeout(allow)),
-        conf_?(config getString "rejection-policy" map {
+        conf_?((config getString "rejection-policy").map {
           case "abort" => new AbortPolicy()
           case "caller-runs" => new CallerRunsPolicy()
           case "discard-oldest" => new DiscardOldestPolicy()
           case "discard" => new DiscardPolicy()
           case x =>
             throw new IllegalArgumentException(
-              "[%s] is not a valid rejectionPolicy!" format x)
+              "[%s] is not a valid rejectionPolicy!".format(x))
         })(policy => _.setRejectionPolicy(policy))
       )
   }

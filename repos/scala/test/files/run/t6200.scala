@@ -3,7 +3,7 @@ import scala.collection.immutable.HashMap
 object Test extends App {
 
   case class Collision(value: Int) extends Ordered[Collision] {
-    def compare(that: Collision) = value compare that.value
+    def compare(that: Collision) = value.compare(that.value)
 
     override def hashCode = value / 5
   }
@@ -34,7 +34,7 @@ object Test extends App {
     var hashCount = 0
     var equalsCount = 0
     case class HashCounter(value: Int) extends Ordered[HashCounter] {
-      def compare(that: HashCounter) = value compare that.value
+      def compare(that: HashCounter) = value.compare(that.value)
 
       override def hashCode = {
         hashCount += 1

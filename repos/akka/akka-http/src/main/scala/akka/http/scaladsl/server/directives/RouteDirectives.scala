@@ -35,7 +35,7 @@ trait RouteDirectives {
           entity = redirectionType.htmlTemplate match {
             case "" ⇒ HttpEntity.Empty
             case template ⇒
-              HttpEntity(ContentTypes.`text/html(UTF-8)`, template format uri)
+              HttpEntity(ContentTypes.`text/html(UTF-8)`, template.format(uri))
           }
         )
       }

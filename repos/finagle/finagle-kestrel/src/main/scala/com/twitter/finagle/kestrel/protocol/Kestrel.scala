@@ -52,7 +52,7 @@ class Kestrel(failFast: Boolean) extends CodecFactory[Command, Response] {
       override def prepareConnFactory(
           underlying: ServiceFactory[Command, Response],
           params: Stack.Params) =
-        new KestrelTracingFilter() andThen underlying
+        new KestrelTracingFilter().andThen(underlying)
 
       override def failFastOk = failFast
     }

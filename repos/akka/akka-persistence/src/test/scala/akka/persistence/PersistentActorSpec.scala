@@ -49,7 +49,7 @@ object PersistentActorSpec {
   class Behavior1PersistentActor(name: String)
       extends ExamplePersistentActor(name) {
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           persistAll(Seq(Evt(s"${data}-1"), Evt(s"${data}-2")))(updateState)
         case d: DeleteMessagesSuccess ⇒
@@ -77,7 +77,7 @@ object PersistentActorSpec {
   class Behavior2PersistentActor(name: String)
       extends ExamplePersistentActor(name) {
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           persistAll(Seq(Evt(s"${data}-1"), Evt(s"${data}-2")))(updateState)
           persistAll(Seq(Evt(s"${data}-3"), Evt(s"${data}-4")))(updateState)
@@ -87,7 +87,7 @@ object PersistentActorSpec {
   class Behavior3PersistentActor(name: String)
       extends ExamplePersistentActor(name) {
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           persistAll(Seq(Evt(s"${data}-11"), Evt(s"${data}-12")))(updateState)
           updateState(Evt(s"${data}-10"))
@@ -106,7 +106,7 @@ object PersistentActorSpec {
     }
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           persist(Evt(s"${data}-0")) { event ⇒
             updateState(event)
@@ -127,7 +127,7 @@ object PersistentActorSpec {
     }
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           persist(Evt(s"${data}-0")) { event ⇒
             updateState(event)
@@ -146,7 +146,7 @@ object PersistentActorSpec {
     }
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           context.become(newBehavior)
           persist(Evt(s"${data}-0"))(updateState)
@@ -163,7 +163,7 @@ object PersistentActorSpec {
     }
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           persist(Evt(s"${data}-0"))(updateState)
           context.become(newBehavior)
@@ -172,7 +172,7 @@ object PersistentActorSpec {
 
   class SnapshottingPersistentActor(name: String, probe: ActorRef)
       extends ExamplePersistentActor(name) {
-    override def receiveRecover = super.receiveRecover orElse {
+    override def receiveRecover = super.receiveRecover.orElse {
       case SnapshotOffer(_, events: List[_]) ⇒
         probe ! "offered"
         this.events = events
@@ -183,7 +183,7 @@ object PersistentActorSpec {
         updateState)
     }
 
-    def receiveCommand: Receive = commonBehavior orElse {
+    def receiveCommand: Receive = commonBehavior.orElse {
       case c: Cmd ⇒ handleCmd(c)
       case SaveSnapshotSuccess(_) ⇒ probe ! "saved"
       case "snap" ⇒ saveSnapshot(events)
@@ -204,7 +204,7 @@ object PersistentActorSpec {
     override def receiveRecover = becomingRecover.orElse(super.receiveRecover)
 
     val becomingCommand: Receive =
-      receiveCommand orElse {
+      receiveCommand.orElse {
         case "It's changing me" ⇒ probe ! "I am becoming"
       }
   }
@@ -221,7 +221,7 @@ object PersistentActorSpec {
     var counter = 0
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           sender() ! data
           persistAsync(Evt(s"$data-${incCounter()}")) { evt ⇒
@@ -247,11 +247,11 @@ object PersistentActorSpec {
     var counter = 0
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           sender() ! data
 
-          1 to 3 foreach { i ⇒
+          (1 to 3).foreach { i ⇒
             persistAsync(Evt(s"$data-${incCounter()}")) { evt ⇒
               sender() ! ("a" + evt.data.toString
                 .drop(1)) // c-1 => a-1, as in "ack"
@@ -271,7 +271,7 @@ object PersistentActorSpec {
     val sendMsgCounter = new AtomicInteger()
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           sender() ! data
           val event = Evt(data)
@@ -290,7 +290,7 @@ object PersistentActorSpec {
       extends ExamplePersistentActor(name) {
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data: String) if data contains "defer" ⇒
           deferAsync("before-nil")(sender() ! _)
           persistAll(Nil)(_ ⇒ sender() ! "Nil")
@@ -310,7 +310,7 @@ object PersistentActorSpec {
     var counter = 0
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           sender() ! data
 
@@ -339,7 +339,7 @@ object PersistentActorSpec {
     var sendMsgCounter = 0
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           sender() ! data
 
@@ -363,7 +363,7 @@ object PersistentActorSpec {
     var counter = 0
 
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           persistAsync(Evt(data)) { evt ⇒
             if (data != evt.data)
@@ -402,7 +402,7 @@ object PersistentActorSpec {
 
     override def receiveRecover = sendingRecover.orElse(super.receiveRecover)
 
-    override def receiveCommand: Receive = super.receiveCommand orElse {
+    override def receiveCommand: Receive = super.receiveCommand.orElse {
       case s: String ⇒ probe ! s
     }
   }
@@ -872,11 +872,11 @@ abstract class PersistentActorSpec(config: Config)
       val persistentActor =
         namedPersistentActor[AsyncPersistThreeTimesPersistentActor]
       val commands =
-        1 to 10 map { i ⇒
+        (1 to 10).map { i ⇒
           Cmd(s"c-$i")
         }
 
-      commands foreach { i ⇒
+      commands.foreach { i ⇒
         Thread.sleep(Random.nextInt(10))
         persistentActor ! i
       }
@@ -890,7 +890,7 @@ abstract class PersistentActorSpec(config: Config)
       replies should equal(commands.map(_.data))
 
       val expectedAcks =
-        (3 to 32) map { i ⇒
+        ((3 to 32)).map { i ⇒
           s"a-${i / 3}-${i - 2}"
         }
       val acks = all.filter(r ⇒ r.count(_ == '-') == 2)
@@ -903,19 +903,19 @@ abstract class PersistentActorSpec(config: Config)
         namedPersistentActor[AsyncPersistThreeTimesPersistentActor]
 
       val commands =
-        1 to 10 map { i ⇒
+        (1 to 10).map { i ⇒
           Cmd(s"c-$i")
         }
       val probes = Vector.fill(10)(TestProbe())
 
-      (probes zip commands) foreach {
+      (probes.zip(commands)).foreach {
         case (p, c) ⇒
           persistentActor.tell(c, p.ref)
       }
 
       val ackClass = classOf[String]
       within(3.seconds) {
-        probes foreach { _.expectMsgAllClassOf(ackClass, ackClass, ackClass) }
+        probes.foreach { _.expectMsgAllClassOf(ackClass, ackClass, ackClass) }
       }
     }
     "support the same event being asyncPersist'ed multiple times" in {
@@ -1150,8 +1150,8 @@ abstract class PersistentActorSpec(config: Config)
       persistentActor ! "b"
 
       val msgs = receiveN(10).map(_.toString)
-      val as = msgs.filter(_ startsWith "a")
-      val bs = msgs.filter(_ startsWith "b")
+      val as = msgs.filter(_.startsWith("a"))
+      val bs = msgs.filter(_.startsWith("b"))
       as should equal(
         List("a", "a-outer-1", "a-outer-2", "a-inner-1", "a-inner-2"))
       bs should equal(

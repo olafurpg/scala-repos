@@ -14,10 +14,10 @@ class CloseOnReleaseServiceTest extends FunSuite with MockitoSugar {
 
   class Helper {
     val service = mock[Service[Any, Any]]
-    when(service.close(any)) thenReturn Future.Done
+    when(service.close(any)).thenReturn(Future.Done)
     val promise = new Promise[Any]
-    when(service(any)) thenReturn promise
-    when(service.status) thenReturn Status.Open
+    when(service(any)).thenReturn(promise)
+    when(service.status).thenReturn(Status.Open)
     val wrapper = new CloseOnReleaseService(service)
   }
 

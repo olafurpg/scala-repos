@@ -29,7 +29,7 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
   abstract override def handle(req: HttpServletRequest,
                                res: HttpServletResponse) {
     val realMultiParams =
-      req.getParameterMap.asScala.toMap transform { (k, v) ⇒
+      req.getParameterMap.asScala.toMap.transform { (k, v) ⇒
         v: Seq[String]
       }
     withRequest(req) {
@@ -64,24 +64,27 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
     MDC.clear()
     MDC.put(RequestPath, requestPath)
     MDC.put(RequestApp, getClass.getSimpleName)
-    MDC.put(RequestParams, multiParams map {
+    MDC.put(RequestParams, multiParams.map {
       case (k, vl) ⇒ vl.map(v ⇒ "%s=%s".format(%-(k), %-(v)))
     } mkString "&")
     this match {
       case a: SessionSupport =>
-        MDC.put(SessionParams, a.session map {
+        MDC.put(SessionParams, a.session.map {
           case (k, v) ⇒ "%s=%s".format(%-(k), %-(v.toString))
         } mkString "&")
       case _ =>
     }
 
-    MDC.put(CgiParams, cgiParams map {
+    MDC.put(CgiParams, cgiParams.map {
       case (k, v) ⇒ "%s=%s".format(%-(k), %-(v))
     } mkString "&")
   }
 
   private[this] def cgiParams =
-    request get CgiParamsKey map (_.asInstanceOf[Map[String, String]]) getOrElse Map.empty
+    request
+      .get(CgiParamsKey)
+      .map(_.asInstanceOf[Map[String, String]])
+      .getOrElse(Map.empty)
 
   private[this] def readCgiParams(req: HttpServletRequest) =
     Map(
@@ -104,7 +107,7 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
       "SERVER_SOFTWARE" -> servletContext.getServerInfo
     )
 
-  private def %-(s: String) = s.blankOption map (_.urlEncode) getOrElse ""
+  private def %-(s: String) = s.blankOption.map(_.urlEncode).getOrElse("")
 
   /**
     * Prepends a new route for the given HTTP method.

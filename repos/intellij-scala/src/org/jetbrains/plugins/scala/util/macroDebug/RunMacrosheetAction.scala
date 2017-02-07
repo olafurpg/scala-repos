@@ -34,7 +34,7 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
             .getInstance(project)
             .createFileFromText("dummy", lang, defaultText)),
       project)
-    editor setBorder null
+    editor.setBorder(null)
     editor
   }
 

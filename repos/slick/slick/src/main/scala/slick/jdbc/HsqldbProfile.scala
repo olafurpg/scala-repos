@@ -159,11 +159,14 @@ trait HsqldbProfile extends JdbcProfile {
          * reference columns which have a UNIQUE INDEX but not a nominal UNIQUE
          * CONSTRAINT. */
         val sb =
-          new StringBuilder append "ALTER TABLE " append quoteIdentifier(
-            table.tableName) append " ADD "
-        sb append "CONSTRAINT " append quoteIdentifier(idx.name) append " UNIQUE("
+          new StringBuilder.append("ALTER TABLE ")
+            .append(quoteIdentifier(table.tableName))
+            .append(" ADD ")
+        sb.append("CONSTRAINT ")
+          .append(quoteIdentifier(idx.name))
+          .append(" UNIQUE(")
         addIndexColumnList(idx.on, sb, idx.table.tableName)
-        sb append ")"
+        sb.append(")")
         sb.toString
       } else super.createIndex(idx)
     }
@@ -177,15 +180,15 @@ trait HsqldbProfile extends JdbcProfile {
       val desc = increment < zero
       val start = seq._start.getOrElse(if (desc) -1 else 1)
       val b =
-        new StringBuilder append "CREATE SEQUENCE " append quoteIdentifier(
-          seq.name)
-      seq._increment.foreach { b append " INCREMENT BY " append _ }
-      seq._minValue.foreach { b append " MINVALUE " append _ }
-      seq._maxValue.foreach { b append " MAXVALUE " append _ }
+        new StringBuilder.append("CREATE SEQUENCE ")
+          .append(quoteIdentifier(seq.name))
+      seq._increment.foreach { b.append(" INCREMENT BY ").append(_) }
+      seq._minValue.foreach { b.append(" MINVALUE ").append(_) }
+      seq._maxValue.foreach { b.append(" MAXVALUE ").append(_) }
       /* The START value in Hsqldb defaults to 0 instead of the more
        * conventional 1/-1 so we rewrite it to make 1/-1 the default. */
-      if (start != 0) b append " START WITH " append start
-      if (seq._cycle) b append " CYCLE"
+      if (start != 0) b.append(" START WITH ").append(start)
+      if (seq._cycle) b.append(" CYCLE")
       DDL(b.toString, "DROP SEQUENCE " + quoteIdentifier(seq.name))
     }
   }

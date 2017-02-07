@@ -53,7 +53,7 @@ class AnalyticsTask(settings: Settings)
         "prefixPath" -> prefixPath
       )
     val json =
-      JParser.parseFromString(Http(req OK as.String)()).valueOr(throw _)
+      JParser.parseFromString(Http(req.OK(as.String))()).valueOr(throw _)
     (json \ "jobId").deserialize[String]
   }
 
@@ -80,10 +80,10 @@ class AnalyticsTask(settings: Settings)
       EventuallyResults.eventually(10, 1.second) {
         val res =
           (analytics / "queries" / jobId) <<? List("apiKey" -> account.apiKey)
-        val str = Http(res OK as.String)()
+        val str = Http(res.OK(as.String))()
         if (str != "") {
           val json =
-            JParser.parseFromString(Http(res OK as.String)()).valueOr(throw _)
+            JParser.parseFromString(Http(res.OK(as.String))()).valueOr(throw _)
           val mean = (json \ "data")(0).deserialize[Double]
           mean must_== 3.0
         } else {

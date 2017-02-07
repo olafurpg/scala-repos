@@ -82,7 +82,7 @@ object RunConfig {
     case "--baseline" :: file :: args =>
       val f = new File(file)
       if (f.isFile && f.canRead) {
-        fromCommandLine(args, config map (_.copy(baseline = Some(f))))
+        fromCommandLine(args, config.map(_.copy(baseline = Some(f))))
       } else {
         fromCommandLine(
           args,
@@ -92,7 +92,7 @@ object RunConfig {
     case "--output" :: file :: args =>
       val f = new File(file)
       if (f.canWrite || !f.exists) {
-        fromCommandLine(args, config map (_.copy(output = Some(f))))
+        fromCommandLine(args, config.map(_.copy(output = Some(f))))
       } else {
         fromCommandLine(
           args,
@@ -100,13 +100,13 @@ object RunConfig {
       }
 
     case "--json" :: args =>
-      fromCommandLine(args, config map (_.copy(format = OutputFormat.Json)))
+      fromCommandLine(args, config.map(_.copy(format = OutputFormat.Json)))
 
     case "--no-optimize" :: args =>
-      fromCommandLine(args, config map (_.copy(optimize = false)))
+      fromCommandLine(args, config.map(_.copy(optimize = false)))
 
     case "--dry-runs" :: NonNegativeInt(runs) :: args =>
-      fromCommandLine(args, config map (_.copy(dryRuns = runs.toInt)))
+      fromCommandLine(args, config.map(_.copy(dryRuns = runs.toInt)))
 
     case "--dry-runs" :: _ :: args =>
       fromCommandLine(
@@ -114,7 +114,7 @@ object RunConfig {
         config *> "The argument to --runs must be a positive integer".failureNel)
 
     case "--runs" :: PositiveInt(runs) :: args =>
-      fromCommandLine(args, config map (_.copy(runs = runs.toInt)))
+      fromCommandLine(args, config.map(_.copy(runs = runs.toInt)))
 
     case "--runs" :: _ :: args =>
       fromCommandLine(
@@ -122,7 +122,7 @@ object RunConfig {
         config *> "The argument to --runs must be a positive integer".failureNel)
 
     case "--outliers" :: OutlierPercentage(outliers) :: args =>
-      fromCommandLine(args, config map (_.copy(outliers = outliers)))
+      fromCommandLine(args, config.map(_.copy(outliers = outliers)))
 
     case "--outliers" :: _ :: args =>
       fromCommandLine(
@@ -131,15 +131,15 @@ object RunConfig {
 
     case "--root-dir" :: rootDir :: args =>
       fromCommandLine(args,
-                      config map (_.copy(rootDir = Some(new File(rootDir)))))
+                      config.map(_.copy(rootDir = Some(new File(rootDir)))))
 
     case "--ingest" :: db :: file :: args =>
-      fromCommandLine(args, config map { cfg =>
+      fromCommandLine(args, config.map { cfg =>
         cfg.copy(ingest = cfg.ingest :+ (db -> new File(file)))
       })
 
     case "--timeout" :: NonNegativeInt(to) :: args =>
-      fromCommandLine(args, config map (_.copy(queryTimeout = to.toInt)))
+      fromCommandLine(args, config.map(_.copy(queryTimeout = to.toInt)))
 
     case "--timeout" :: _ :: args =>
       fromCommandLine(
@@ -149,14 +149,16 @@ object RunConfig {
     case test :: args =>
       fromCommandLine(
         args,
-        config map { config =>
+        config.map { config =>
           val g = { (path: List[String], _: Any) =>
             path contains test
           }
           val select =
-            config.select map { f => (path: List[String], test: PerfTest) =>
-              (f(path, test) || g(path, test))
-            } orElse Some(g)
+            config.select
+              .map { f => (path: List[String], test: PerfTest) =>
+                (f(path, test) || g(path, test))
+              }
+              .orElse(Some(g))
 
           config.copy(select = select)
         }

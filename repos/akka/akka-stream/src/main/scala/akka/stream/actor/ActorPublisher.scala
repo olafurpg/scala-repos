@@ -376,7 +376,7 @@ trait ActorPublisher[T] extends Actor {
     * INTERNAL API
     */
   protected[akka] override def aroundPostRestart(reason: Throwable): Unit = {
-    state.get(self) foreach { s ⇒
+    state.get(self).foreach { s ⇒
       // restore previous state
       subscriber = s.subscriber.orNull
       demand = s.demand

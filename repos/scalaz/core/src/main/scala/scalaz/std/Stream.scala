@@ -60,9 +60,9 @@ trait StreamInstances {
       zipWithL(fb, fa)((b, a) => f(a, b))
 
     override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] =
-      fa filter p
+      fa.filter(p)
 
-    def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
+    def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa.flatMap(f)
     def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
     def isEmpty[A](s: Stream[A]) = s.isEmpty
@@ -70,7 +70,7 @@ trait StreamInstances {
     def zip[A, B](a: => Stream[A], b: => Stream[B]) = {
       val _a = a
       if (_a.isEmpty) Stream.Empty
-      else _a zip b
+      else _a.zip(b)
     }
     def unzip[A, B](a: Stream[(A, B)]) = a.unzip
 
@@ -260,5 +260,5 @@ object stream extends StreamInstances with StreamFunctions {
 private trait StreamEqual[A] extends Equal[Stream[A]] {
   def A: Equal[A]
   override final def equal(a1: Stream[A], a2: Stream[A]) =
-    (a1 corresponds a2)(A.equal)
+    (a1.corresponds(a2))(A.equal)
 }

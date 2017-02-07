@@ -109,9 +109,9 @@ object REPL {
     }
 
     loop { line =>
-      (line split " ").toList match {
+      (line.split(" ")).toList match {
         case "reload" :: args =>
-          comp.askReload(args map toSourceFile, reloadResult)
+          comp.askReload(args.map(toSourceFile), reloadResult)
           show(reloadResult)
         case "reloadAndAskType" :: file :: millis :: Nil =>
           comp.askReload(List(toSourceFile(file)), reloadResult)

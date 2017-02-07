@@ -41,7 +41,7 @@ final class PhantomJettyClassLoader(jettyLoader: ClassLoader,
       // jetty classes
 
       // First check if we have loaded it already
-      Option(findLoadedClass(name)) getOrElse {
+      Option(findLoadedClass(name)).getOrElse {
         val wsManager =
           parent.getResourceAsStream(name.replace('.', '/') + ".class")
 

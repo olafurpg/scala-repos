@@ -345,7 +345,7 @@ private[precog] case class VectorN[+A](vector: Vector[A])
                   vector(vector.length - 3),
                   vector(vector.length - 2),
                   vector(vector.length - 1))
-        case _ => VectorN(vector drop n)
+        case _ => VectorN(vector.drop(n))
       }
     }
   }
@@ -360,7 +360,7 @@ private[precog] case class VectorN[+A](vector: Vector[A])
         case 2 => Vector2(vector(0), vector(1))
         case 3 => Vector3(vector(0), vector(1), vector(2))
         case 4 => Vector4(vector(0), vector(1), vector(2), vector(3))
-        case _ => VectorN(vector dropRight n)
+        case _ => VectorN(vector.dropRight(n))
       }
     }
   }
@@ -397,7 +397,7 @@ private[precog] case class VectorN[+A](vector: Vector[A])
         case 2 => Vector2(vector(0), vector(1))
         case 3 => Vector3(vector(0), vector(1), vector(2))
         case 4 => Vector4(vector(0), vector(1), vector(2), vector(3))
-        case _ => VectorN(vector take n)
+        case _ => VectorN(vector.take(n))
       }
     }
   }
@@ -419,7 +419,7 @@ private[precog] case class VectorN[+A](vector: Vector[A])
                   vector(vector.length - 3),
                   vector(vector.length - 2),
                   vector(vector.length - 1))
-        case _ => VectorN(vector takeRight n)
+        case _ => VectorN(vector.takeRight(n))
       }
     }
   }

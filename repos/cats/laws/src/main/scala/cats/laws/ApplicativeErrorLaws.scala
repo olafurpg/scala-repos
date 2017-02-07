@@ -35,7 +35,7 @@ trait ApplicativeErrorLaws[F[_], E] extends ApplicativeLaws[F] {
   def recoverConsistentWithRecoverWith[A](
       fa: F[A],
       pf: PartialFunction[E, A]): IsEq[F[A]] =
-    F.recover(fa)(pf) <-> F.recoverWith(fa)(pf andThen F.pure)
+    F.recover(fa)(pf) <-> F.recoverWith(fa)(pf.andThen(F.pure))
 
   def attemptConsistentWithAttemptT[A](fa: F[A]): IsEq[XorT[F, E, A]] =
     XorT(F.attempt(fa)) <-> F.attemptT(fa)

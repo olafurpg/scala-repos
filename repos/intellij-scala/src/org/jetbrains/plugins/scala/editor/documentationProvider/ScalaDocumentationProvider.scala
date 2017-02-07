@@ -302,7 +302,7 @@ class ScalaDocumentationProvider extends CodeDocumentationProvider {
   def generateDocumentationContentStub(contextComment: PsiComment): String =
     contextComment match {
       case scalaDocComment: ScDocComment =>
-        ScalaDocumentationProvider createScalaDocStub scalaDocComment.getOwner
+        ScalaDocumentationProvider.createScalaDocStub(scalaDocComment.getOwner)
       case _ => ""
     }
 
@@ -337,7 +337,7 @@ object ScalaDocumentationProvider {
       } else
         s"[Element: ${elem.getNode} ${elem.getClass.getName}] [File: ${elem.getContainingFile.getName}] [Language: ${elem.getContainingFile.getLanguage}]"
 
-    LOG debug s"[ScalaDocProvider] [ $msg ] $footer"
+    LOG.debug(s"[ScalaDocProvider] [ $msg ] $footer")
   }
 
   val replaceWikiScheme = Map("__" -> "u>",
@@ -368,25 +368,28 @@ object ScalaDocumentationProvider {
 
     def getMacroBody(name: String): Option[String] = {
       if (!init) fillQueue()
-      if (myCache contains name) return myCache get name
+      if (myCache contains name) return myCache.get(name)
 
       var commentToProcess = selectComment2()
 
       while (commentToProcess.isDefined) {
-        commentToProcess foreach {
+        commentToProcess.foreach {
           case c =>
-            c.getTags.filter(_.getName == MyScaladocParsing.DEFINE_TAG) map {
-              case tag: ScDocTag =>
-                val vEl = tag.getValueElement
-                val a = (if (vEl != null) vEl.getText else "",
-                         tag.getAllText(handler).trim)
+            c.getTags
+              .filter(_.getName == MyScaladocParsing.DEFINE_TAG)
+              .map {
+                case tag: ScDocTag =>
+                  val vEl = tag.getValueElement
+                  val a = (if (vEl != null) vEl.getText else "",
+                           tag.getAllText(handler).trim)
 
-                if (a._1 != "") myCache += a
-                a
-            } foreach {
-              case (tName, v) if tName == name => return Option(v)
-              case _ =>
-            }
+                  if (a._1 != "") myCache += a
+                  a
+              }
+              .foreach {
+                case (tName, v) if tName == name => return Option(v)
+                case _ =>
+              }
         }
 
         lastProcessedComment = commentToProcess
@@ -401,26 +404,28 @@ object ScalaDocumentationProvider {
         if (from.isEmpty) return
         val tc = mutable.ArrayBuffer.apply[ScDocCommentOwner]()
 
-        from foreach {
+        from.foreach {
           case clazz: ScTemplateDefinition =>
-            processingQueue enqueue clazz
+            processingQueue.enqueue(clazz)
 
-            clazz.supers foreach {
+            clazz.supers.foreach {
               case cz: ScDocCommentOwner => tc += cz
               case _ =>
             }
           case member: ScMember if member.hasModifierProperty("override") =>
-            processingQueue enqueue member
+            processingQueue.enqueue(member)
 
             member match {
               case named: ScNamedElement =>
                 ScalaPsiUtil
-                  .superValsSignatures(named, withSelfType = false) map {
-                  case sig => sig.namedElement
-                } foreach {
-                  case od: ScDocCommentOwner => tc += od
-                  case _ =>
-                }
+                  .superValsSignatures(named, withSelfType = false)
+                  .map {
+                    case sig => sig.namedElement
+                  }
+                  .foreach {
+                    case od: ScDocCommentOwner => tc += od
+                    case _ =>
+                  }
               case _ =>
             }
 
@@ -429,7 +434,7 @@ object ScalaDocumentationProvider {
               case _ =>
             }
           case member: ScMember if member.getContainingClass != null =>
-            processingQueue enqueue member
+            processingQueue.enqueue(member)
 
             member.containingClass match {
               case od: ScDocCommentOwner => tc += od
@@ -527,7 +532,7 @@ object ScalaDocumentationProvider {
           }
         case javaComment: PsiDocComment =>
           for (paramTag <- javaComment findTagsByName "param") {
-            if (paramTag.getValueElement.getText startsWith "<") {
+            if (paramTag.getValueElement.getText.startsWith("<")) {
               registerInheritedParam(inheritedTParams, paramTag)
             } else {
               registerInheritedParam(inheritedParams, paramTag)
@@ -541,10 +546,18 @@ object ScalaDocumentationProvider {
       for (param <- owner.parameters) {
         if (inheritedParams contains param.name) {
           val paramText = inheritedParams.get(param.name).get.getText
-          buffer append leadingAsterisks append paramText
-            .substring(0, paramText.lastIndexOf("\n") + 1)
+          buffer
+            .append(leadingAsterisks)
+            .append(
+              paramText
+                .substring(0, paramText.lastIndexOf("\n") + 1))
         } else {
-          buffer append leadingAsterisks append PARAM_TAG append " " append param.name append "\n"
+          buffer
+            .append(leadingAsterisks)
+            .append(PARAM_TAG)
+            .append(" ")
+            .append(param.name)
+            .append("\n")
         }
       }
     }
@@ -641,7 +654,7 @@ object ScalaDocumentationProvider {
                               a.get,
                               Option(function.getProject)) match {
                               case Some(clazz) =>
-                                buffer append clazz.qualifiedName
+                                buffer.append(clazz.qualifiedName)
                               case _ =>
                             }
                           case _ =>
@@ -739,8 +752,9 @@ object ScalaDocumentationProvider {
           ScType.urlText(seq.head.getType(TypingContext.empty).getOrAny) +
             "\n")
         for (i <- 1 until seq.length)
-          buffer append " with " +
-            ScType.urlText(seq(i).getType(TypingContext.empty).getOrAny)
+          buffer.append(
+            " with " +
+              ScType.urlText(seq(i).getType(TypingContext.empty).getOrAny))
       case None =>
         buffer.append(
           "<a href=\"psi_element://scala.ScalaObject\"><code>ScalaObject</code></a>")
@@ -809,7 +823,7 @@ object ScalaDocumentationProvider {
 
       val attrs = elem.annotationExpr.getAnnotationParameters
       if (attrs.nonEmpty)
-        res append attrs.map(_.getText).mkString("(", ", ", ")")
+        res.append(attrs.map(_.getText).mkString("(", ", ", ")"))
 
       res.toString()
     }
@@ -979,19 +993,20 @@ object ScalaDocumentationProvider {
               case MyScaladocParsing.INHERITDOC_TAG =>
                 val inherited = element.getParent.getParent.getParent match {
                   case fun: ScFunction =>
-                    (fun.superMethod map (_.getDocComment)).orNull
+                    (fun.superMethod.map(_.getDocComment)).orNull
                   case clazz: ScTemplateDefinition =>
-                    (clazz.supers.headOption map (_.getDocComment)).orNull
+                    (clazz.supers.headOption.map(_.getDocComment)).orNull
                   case _ => null
                 }
 
                 if (inherited != null) {
                   val (inheritedBody, _) =
                     getWikiTextRepresentation(macroFinder)(inherited)
-                  result append inheritedBody
-                    .toString()
-                    .stripPrefix("/**")
-                    .stripSuffix("*/")
+                  result.append(
+                    inheritedBody
+                      .toString()
+                      .stripPrefix("/**")
+                      .stripSuffix("*/"))
                 }
               case _ => result.append(element.getText)
             }
@@ -1073,9 +1088,9 @@ object ScalaDocumentationProvider {
             try {
               macroFinder
                 .getMacroBody(element.getText.stripPrefix("$"))
-                .map(a => result append a)
+                .map(a => result.append(a))
                 .getOrElse(
-                  result append s"[Cannot find macro: ${element.getText}]")
+                  result.append(s"[Cannot find macro: ${element.getText}]"))
             } catch {
               case ee: Exception =>
             }

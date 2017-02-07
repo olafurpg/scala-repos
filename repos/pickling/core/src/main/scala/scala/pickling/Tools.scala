@@ -31,7 +31,7 @@ object Tools {
   }
 
   def subclassCache(key: AnyRef, valueThunk: => AnyRef): AnyRef = {
-    subclassCaches get key match {
+    subclassCaches.get(key) match {
       case SomeRef(value) =>
         value
       case _ =>
@@ -57,15 +57,16 @@ class Tools[C <: Context](val c: C) {
               if annotation.tpe == typeOf[scala.pickling.directSubclasses] =>
             annotation
         })
-        .headOption map { annotation =>
-        annotation.javaArgs(newTermName("value")) match {
-          case ArrayArgument(klasses) =>
-            klasses.toList map {
-              case LiteralArgument(constant) =>
-                constant.value.asInstanceOf[Type].typeSymbol.asType
-            }
+        .headOption
+        .map { annotation =>
+          annotation.javaArgs(newTermName("value")) match {
+            case ArrayArgument(klasses) =>
+              klasses.toList.map {
+                case LiteralArgument(constant) =>
+                  constant.value.asInstanceOf[Type].typeSymbol.asType
+              }
+          }
         }
-      }
 
     annotatedSubclasses
   }
@@ -182,18 +183,16 @@ class Tools[C <: Context](val c: C) {
             def loop(pkg: Symbol): Unit = {
               // NOTE: only looking for top-level classes!
               val pkgMembers = pkg.typeSignature.members
-              pkgMembers foreach
-                (m => {
-                   def analyze(m: Symbol): Unit = {
-                     if (m.name.decoded.contains("$")) () // SI-7251
-                     else if (m.isClass)
-                       m.asClass.baseClasses foreach
-                         (bc => updateCache(bc, m))
-                     else if (m.isModule) analyze(m.asModule.moduleClass)
-                     else ()
-                   }
-                   analyze(m)
-                 })
+              pkgMembers.foreach(m => {
+                def analyze(m: Symbol): Unit = {
+                  if (m.name.decoded.contains("$")) () // SI-7251
+                  else if (m.isClass)
+                    m.asClass.baseClasses.foreach(bc => updateCache(bc, m))
+                  else if (m.isModule) analyze(m.asModule.moduleClass)
+                  else ()
+                }
+                analyze(m)
+              })
               def recurIntoPackage(pkg: Symbol) = {
                 pkg.name.toString != "_root_" &&
                 pkg.name.toString != "quicktime" &&
@@ -205,8 +204,8 @@ class Tools[C <: Context](val c: C) {
                 pkg.name.toString != "jsoup" // TODO: SI-3809
               }
               val subpackages =
-                pkgMembers filter (m => m.isPackage && recurIntoPackage(m))
-              subpackages foreach loop
+                pkgMembers.filter(m => m.isPackage && recurIntoPackage(m))
+              subpackages.foreach(loop)
             }
             loop(mirror.RootClass)
             cache // NOTE: 126873 cache entries for my classpath

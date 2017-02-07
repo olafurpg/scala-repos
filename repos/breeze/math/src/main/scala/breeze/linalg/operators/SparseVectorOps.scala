@@ -25,7 +25,7 @@ trait SparseVector_DenseVector_Ops { this: SparseVector.type =>
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.InPlaceImpl2[SparseVector[T], DenseVector[T]] =
     new Op.InPlaceImpl2[SparseVector[T], DenseVector[T]] {
 
@@ -115,7 +115,7 @@ trait SparseVector_DenseVector_Ops { this: SparseVector.type =>
                                                    OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ + _ }, { _ - _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[SparseVector[T], DenseVector[T], DenseVector[T]] =
     new Op.Impl2[SparseVector[T], DenseVector[T], DenseVector[T]] {
 
@@ -174,7 +174,7 @@ trait SparseVector_DenseVector_Ops { this: SparseVector.type =>
                                                  T] {
       def apply(a: SparseVector[T], b: DenseVector[T]): T = {
         require(b.length == a.length, "Vectors must be the same length!")
-        b dot a
+        b.dot(a)
       }
       implicitly[BinaryRegistry[Vector[T], Vector[T], OpMulInner.type, T]]
         .register(this)
@@ -191,7 +191,7 @@ trait DenseVector_SparseVector_Ops { this: SparseVector.type =>
       @expand.args(OpMulScalar, OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ * _ }, { _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.InPlaceImpl2[DenseVector[T], SparseVector[T]] =
     new Op.InPlaceImpl2[DenseVector[T], SparseVector[T]] {
       def apply(a: DenseVector[T], b: SparseVector[T]): Unit = {
@@ -718,7 +718,7 @@ trait SparseVectorOps { this: SparseVector.type =>
       @expand.args(OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[SparseVector[T], SparseVector[T], SparseVector[T]] =
     new Op.Impl2[SparseVector[T], SparseVector[T], SparseVector[T]] {
       def apply(a: SparseVector[T], b: SparseVector[T]): SparseVector[T] = {
@@ -742,7 +742,7 @@ trait SparseVectorOps { this: SparseVector.type =>
       @expand.args(OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[SparseVector[T], Vector[T], SparseVector[T]] =
     new Op.Impl2[SparseVector[T], Vector[T], SparseVector[T]] {
       def apply(a: SparseVector[T], b: Vector[T]): SparseVector[T] = {
@@ -814,7 +814,7 @@ trait SparseVectorOps { this: SparseVector.type =>
       @expand.args(OpAdd, OpSub, OpSet, OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ + _ }, { _ - _ }, { (a, b) =>
         b
-      }, { _ pow _ }) op: Op.Impl2[T, T, T],
+      }, { _.pow(_) }) op: Op.Impl2[T, T, T],
       @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : Op.Impl2[SparseVector[T], T, SparseVector[T]] =
     new Op.Impl2[SparseVector[T], T, SparseVector[T]] {
@@ -1267,22 +1267,25 @@ trait SparseVectorOps { this: SparseVector.type =>
         import v._
         if (n == 1) {
           var sum: Double = 0.0
-          activeValuesIterator foreach (v => sum += f.sNorm(v))
+          activeValuesIterator.foreach(v => sum += f.sNorm(v))
           sum
         } else if (n == 2) {
           var sum: Double = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = f.sNorm(v); sum += nn * nn })
+          activeValuesIterator.foreach(v => {
+            val nn = f.sNorm(v); sum += nn * nn
+          })
           math.sqrt(sum)
         } else if (n == Double.PositiveInfinity) {
           var max: Double = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = f.sNorm(v); if (nn > max) max = nn })
+          activeValuesIterator.foreach(v => {
+            val nn = f.sNorm(v); if (nn > max) max = nn
+          })
           max
         } else {
           var sum: Double = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = f.sNorm(v); sum += math.pow(nn, n) })
+          activeValuesIterator.foreach(v => {
+            val nn = f.sNorm(v); sum += math.pow(nn, n)
+          })
           math.pow(sum, 1.0 / n)
         }
       }
@@ -1297,22 +1300,25 @@ trait SparseVectorOps { this: SparseVector.type =>
         import v._
         if (n == 1) {
           var sum: Double = 0.0
-          activeValuesIterator foreach (v => sum += v.abs.toDouble)
+          activeValuesIterator.foreach(v => sum += v.abs.toDouble)
           sum
         } else if (n == 2) {
           var sum: Double = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = v.abs.toDouble; sum += nn * nn })
+          activeValuesIterator.foreach(v => {
+            val nn = v.abs.toDouble; sum += nn * nn
+          })
           math.sqrt(sum)
         } else if (n == Double.PositiveInfinity) {
           var max: Double = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = v.abs.toDouble; if (nn > max) max = nn })
+          activeValuesIterator.foreach(v => {
+            val nn = v.abs.toDouble; if (nn > max) max = nn
+          })
           max
         } else {
           var sum: Double = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = v.abs.toDouble; sum += math.pow(nn, n) })
+          activeValuesIterator.foreach(v => {
+            val nn = v.abs.toDouble; sum += math.pow(nn, n)
+          })
           math.pow(sum, 1.0 / n)
         }
       }

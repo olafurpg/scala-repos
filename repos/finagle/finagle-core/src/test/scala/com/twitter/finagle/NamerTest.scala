@@ -13,7 +13,7 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
   trait Ctx {
     case class OrElse(fst: Namer, snd: Namer) extends Namer {
       def lookup(path: Path): Activity[NameTree[Name]] =
-        (fst.lookup(path) join snd.lookup(path)) map {
+        ((fst.lookup(path) join snd.lookup(path))).map {
           case (left, right) => NameTree.Alt(left, right)
         }
     }
@@ -53,12 +53,12 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
           case p @ Path.Utf8(elems @ _ *) =>
             acts.get(p) match {
               case Some((a, _)) =>
-                a map { tree =>
+                a.map { tree =>
                   tree.map(Name(_))
                 }
               case None =>
                 val (act, _) = addPath(p)
-                act map { tree =>
+                act.map { tree =>
                   tree.map(Name(_))
                 }
             }

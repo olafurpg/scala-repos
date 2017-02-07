@@ -111,14 +111,14 @@ class StressTest {
 
       def timeit(s: String) {
         val tt = System.currentTimeMillis()
-        println("%s in %.3fs" format (s, (tt - t) * 0.001))
+        println("%s in %.3fs".format(s, (tt - t) * 0.001))
         t = tt
       }
 
       def timeit2(s: String) {
         val tt = System.currentTimeMillis()
         val d = (tt - t) * 0.001
-        println("%s in %.3fs (%.3fs/M)" format (s, d, d / i))
+        println("%s in %.3fs (%.3fs/M)".format(s, d, d / i))
         t = tt
       }
 
@@ -136,7 +136,7 @@ class StressTest {
 
         val input = if (n >= 0) More(bb) else Done
         val (AsyncParse(errors, results), parser) = p(input)
-        if (!errors.isEmpty) sys.error("errors: %s" format errors)
+        if (!errors.isEmpty) sys.error("errors: %s".format(errors))
         //projection.insert(Array(eventid), results)
         val eventidobj = EventId.fromLong(eventid)
         nihdb.insert(Seq(NIHDB.Batch(eventid, results)))
@@ -186,12 +186,11 @@ class StressTest {
     try {
       try {
         for (i <- 1 to 100) {
-          println("iteration %d" format i)
+          println("iteration %d".format(i))
           eventid = ctxt.runNihAsync(i, f, 8 * 1024 * 1024, eventid)
           val t = System.currentTimeMillis()
           println(
-            "total rows: %dM, total time: %.3fs" format
-              (i, (t - t0) / 1000.0))
+            "total rows: %dM, total time: %.3fs".format(i, (t - t0) / 1000.0))
         }
       } finally {
         ctxt.finish()

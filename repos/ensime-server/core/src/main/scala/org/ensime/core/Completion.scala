@@ -376,7 +376,7 @@ object Keywords {
   )
 
   val keywordCompletions =
-    keywords map {
+    keywords.map {
       CompletionInfo(_,
                      CompletionSignature(List(), "", hasImplicit = false),
                      false,

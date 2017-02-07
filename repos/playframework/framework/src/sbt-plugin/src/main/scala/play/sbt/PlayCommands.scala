@@ -24,7 +24,8 @@ object PlayCommands {
     val extracted = Project.extract(state)
     import extracted._
 
-    (name in currentRef get structure.data)
+    ((name in currentRef)
+      .get(structure.data))
       .map { name =>
         "[" + Colors.cyan(name) + "] $ "
       }

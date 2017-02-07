@@ -35,7 +35,7 @@ class ClientTest extends FunSuite with MockitoSugar {
     def buf(i: Int) = Buf.Utf8(i.toString)
     def msg(i: Int) = {
       val m = mock[ReadMessage]
-      when(m.bytes) thenReturn buf(i)
+      when(m.bytes).thenReturn(buf(i))
       m
     }
   }
@@ -45,9 +45,9 @@ class ClientTest extends FunSuite with MockitoSugar {
     val error = new Broker[Throwable]
     val client = Mockito.spy(new MockClient)
     val rh = mock[ReadHandle]
-    when(rh.messages) thenReturn messages.recv
-    when(rh.error) thenReturn error.recv
-    when(client.read("foo")) thenReturn rh
+    when(rh.messages).thenReturn(messages.recv)
+    when(rh.error).thenReturn(error.recv)
+    when(client.read("foo")).thenReturn(rh)
   }
 
   test("Client.readReliably should proxy messages") {
@@ -79,9 +79,9 @@ class ClientTest extends FunSuite with MockitoSugar {
       val messages2 = new Broker[ReadMessage]
       val error2 = new Broker[Throwable]
       val rh2 = mock[ReadHandle]
-      when(rh2.messages) thenReturn messages2.recv
-      when(rh2.error) thenReturn error2.recv
-      when(client.read("foo")) thenReturn rh2
+      when(rh2.messages).thenReturn(messages2.recv)
+      when(rh2.error).thenReturn(error2.recv)
+      when(client.read("foo")).thenReturn(rh2)
 
       error ! new Exception("wtf")
       verify(client, times(2)).read("foo")
@@ -110,7 +110,7 @@ class ClientTest extends FunSuite with MockitoSugar {
 
         val errf = (h.error ?)
 
-        delays.zipWithIndex foreach {
+        delays.zipWithIndex.foreach {
           case (delay, i) =>
             verify(client, times(i + 1)).read("foo")
             error ! new Exception("sad panda")
@@ -148,16 +148,16 @@ class ClientTest extends FunSuite with MockitoSugar {
       val closeAndOpen = CloseAndOpen(queueNameBuf, Some(Duration.Top))
       val abort = Abort(queueNameBuf)
 
-      when(factory.apply()) thenReturn Future(service)
+      when(factory.apply()).thenReturn(Future(service))
       val promise = new Promise[Response]()
       @volatile var wasInterrupted = false
       promise.setInterruptHandler {
         case _cause =>
           wasInterrupted = true
       }
-      when(service(open)) thenReturn promise
-      when(service(closeAndOpen)) thenReturn promise
-      when(service(abort)) thenReturn Future(Values(Seq()))
+      when(service(open)).thenReturn(promise)
+      when(service(closeAndOpen)).thenReturn(promise)
+      when(service(abort)).thenReturn(Future(Values(Seq())))
 
       val rh = client.read(queueName)
 
@@ -174,7 +174,7 @@ class ClientTest extends FunSuite with MockitoSugar {
     val finagledClient = mock[FinagledClosableClient]
     val client = new ThriftConnectedClient(clientFactory, Duration.Top)
 
-    when(clientFactory.apply()) thenReturn Future(finagledClient)
+    when(clientFactory.apply()).thenReturn(Future(finagledClient))
     val promise = new Promise[Seq[Item]]()
 
     @volatile var wasInterrupted = false
@@ -183,7 +183,8 @@ class ClientTest extends FunSuite with MockitoSugar {
         wasInterrupted = true
     }
 
-    when(finagledClient.get(queueName, 1, Int.MaxValue, Int.MaxValue)) thenReturn promise
+    when(finagledClient.get(queueName, 1, Int.MaxValue, Int.MaxValue))
+      .thenReturn(promise)
 
     val rh = client.read(queueName)
 

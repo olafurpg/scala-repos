@@ -43,7 +43,7 @@ case class Perfs(standard: Perf,
 
   def bestPerf: Option[(PerfType, Perf)] = {
     val ps =
-      PerfType.nonPuzzle map { pt =>
+      PerfType.nonPuzzle.map { pt =>
         pt -> apply(pt)
       }
     val minNb = math.max(1, ps.foldLeft(0)(_ + _._2.nb) / 10)
@@ -61,7 +61,7 @@ case class Perfs(standard: Perf,
   def bestRating: Int = bestRatingIn(PerfType.leaderboardable)
 
   def bestRatingIn(types: List[PerfType]): Int = {
-    val ps = types map apply match {
+    val ps = types.map(apply) match {
       case Nil => List(standard)
       case x => x
     }
@@ -77,7 +77,7 @@ case class Perfs(standard: Perf,
 
   def bestProgress: Int = bestProgressIn(PerfType.leaderboardable)
 
-  def bestProgressIn(types: List[PerfType]): Int = types map apply match {
+  def bestProgressIn(types: List[PerfType]): Int = types.map(apply) match {
     case Nil => 0
     case perfs => perfs.map(_.progress).max
   }
@@ -99,11 +99,11 @@ case class Perfs(standard: Perf,
     "opening" -> opening
   )
 
-  def ratingMap: Map[String, Int] = perfsMap mapValues (_.intRating)
+  def ratingMap: Map[String, Int] = perfsMap.mapValues(_.intRating)
 
-  def ratingOf(pt: String): Option[Int] = perfsMap get pt map (_.intRating)
+  def ratingOf(pt: String): Option[Int] = perfsMap.get(pt).map(_.intRating)
 
-  def apply(key: String): Option[Perf] = perfsMap get key
+  def apply(key: String): Option[Perf] = perfsMap.get(key)
 
   def apply(perfType: PerfType): Perf = perfType match {
     case PerfType.Standard => standard
@@ -124,7 +124,7 @@ case class Perfs(standard: Perf,
   }
 
   def inShort =
-    perfs map {
+    perfs.map {
       case (name, perf) => s"$name:${perf.intRating}"
     } mkString ", "
 
@@ -191,7 +191,7 @@ case object Perfs {
     import BSON.MapDocument._
 
     def reads(r: BSON.Reader): Perfs = {
-      def perf(key: String) = r.getO[Perf](key) getOrElse Perf.default
+      def perf(key: String) = r.getO[Perf](key).getOrElse(Perf.default)
       Perfs(
         standard = perf("standard"),
         chess960 = perf("chess960"),
@@ -211,7 +211,7 @@ case object Perfs {
       )
     }
 
-    private def notNew(p: Perf): Option[Perf] = p.nb > 0 option p
+    private def notNew(p: Perf): Option[Perf] = (p.nb > 0).option(p)
 
     def writes(w: BSON.Writer, o: Perfs) =
       BSONDocument(

@@ -87,7 +87,7 @@ sealed abstract class Validated[+E, +A] extends Product with Serializable {
     * given functions.
     */
   def bimap[EE, AA](fe: E => EE, fa: A => AA): Validated[EE, AA] =
-    fold(fe andThen Invalid.apply, fa andThen Valid.apply)
+    fold(fe.andThen(Invalid.apply), fa.andThen(Valid.apply))
 
   def compare[EE >: E, AA >: A](
       that: Validated[EE, AA])(implicit EE: Order[EE], AA: Order[AA]): Int =
@@ -231,10 +231,10 @@ private[data] sealed abstract class ValidatedInstances
 
   implicit def validatedOrder[A: Order, B: Order]: Order[Validated[A, B]] =
     new Order[Validated[A, B]] {
-      def compare(x: Validated[A, B], y: Validated[A, B]): Int = x compare y
+      def compare(x: Validated[A, B], y: Validated[A, B]): Int = x.compare(y)
       override def partialCompare(x: Validated[A, B],
                                   y: Validated[A, B]): Double =
-        x partialCompare y
+        x.partialCompare(y)
       override def eqv(x: Validated[A, B], y: Validated[A, B]): Boolean =
         x === y
     }
@@ -307,7 +307,7 @@ private[data] sealed abstract class ValidatedInstances1
     : PartialOrder[Validated[A, B]] =
     new PartialOrder[Validated[A, B]] {
       def partialCompare(x: Validated[A, B], y: Validated[A, B]): Double =
-        x partialCompare y
+        x.partialCompare(y)
       override def eqv(x: Validated[A, B], y: Validated[A, B]): Boolean =
         x === y
     }

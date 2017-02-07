@@ -66,7 +66,7 @@ object BigIntConvertor {
   private def fromBitMask(bitmask: Array[Long]): BigInt = {
     val bytes = Array.ofDim[Byte](bitmask.length * 8)
     val bb = java.nio.ByteBuffer.wrap(bytes)
-    bitmask.reverse foreach bb.putLong
+    bitmask.reverse.foreach(bb.putLong)
     BigInt(bytes)
   }
 

@@ -65,7 +65,7 @@ trait CodingDirectives {
     def applyDecoder =
       if (decoder == NoCoding) pass
       else
-        extractSettings flatMap { settings ⇒
+        extractSettings.flatMap { settings ⇒
           val effectiveDecoder =
             decoder.withMaxBytesPerChunk(settings.decodeMaxBytesPerChunk)
           mapRequest { request ⇒

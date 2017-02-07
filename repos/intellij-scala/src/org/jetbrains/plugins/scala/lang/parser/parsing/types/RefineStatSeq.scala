@@ -22,7 +22,8 @@ object RefineStatSeq {
         //otherwise parse TopStat
         case _ =>
           if (!RefineStat.parse(builder)) {
-            builder error ScalaBundle.message("wrong.top.statment.declaration")
+            builder.error(
+              ScalaBundle.message("wrong.top.statment.declaration"))
             return
           } else {
             builder.getTokenType match {
@@ -30,7 +31,7 @@ object RefineStatSeq {
                 builder.advanceLexer //it is good
               case null | ScalaTokenTypes.tRBRACE => return
               case _ if !builder.newlineBeforeCurrentToken =>
-                builder error ScalaBundle.message("semi.expected")
+                builder.error(ScalaBundle.message("semi.expected"))
               case _ =>
             }
           }

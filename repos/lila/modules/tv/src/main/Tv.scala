@@ -16,22 +16,28 @@ final class Tv(actor: ActorRef) {
   implicit private def timeout = makeTimeout(200 millis)
 
   def getGame(channel: Tv.Channel): Fu[Option[Game]] =
-    (actor ? TvActor.GetGameId(channel) mapTo manifest[Option[String]]) recover {
-      case e: Exception =>
-        logger.warn("[TV]" + e.getMessage)
-        none
-    } flatMap { _ ?? GameRepo.game }
+    ((actor ? TvActor.GetGameId(channel))
+      .mapTo(manifest[Option[String]]))
+      .recover {
+        case e: Exception =>
+          logger.warn("[TV]" + e.getMessage)
+          none
+      }
+      .flatMap { _ ?? GameRepo.game }
 
   def getGames(channel: Tv.Channel, max: Int): Fu[List[Game]] =
-    (actor ? TvActor
-      .GetGameIds(channel, max) mapTo manifest[List[String]]) recover {
-      case e: Exception => Nil
-    } flatMap GameRepo.games
+    ((actor ? TvActor
+      .GetGameIds(channel, max))
+      .mapTo(manifest[List[String]]))
+      .recover {
+        case e: Exception => Nil
+      }
+      .flatMap(GameRepo.games)
 
   def getBest = getGame(Tv.Channel.Best)
 
   def getChampions: Fu[Champions] =
-    actor ? TvActor.GetChampions mapTo manifest[Champions]
+    (actor ? TvActor.GetChampions).mapTo(manifest[Champions])
 }
 
 object Tv {
@@ -46,7 +52,7 @@ object Tv {
   sealed abstract class Channel(val name: String,
                                 val icon: String,
                                 filters: Seq[Game => Boolean]) {
-    def filter(g: Game) = filters forall { _(g) }
+    def filter(g: Game) = filters.forall { _(g) }
     val key = toString.head.toLower + toString.drop(1)
   }
   object Channel {

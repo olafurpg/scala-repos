@@ -29,9 +29,9 @@ private[process] trait ProcessImpl { self: Process.type =>
     def apply[T](f: => T): (Thread, () => T) = {
       val result = new SyncVar[Either[Throwable, T]]
       def run(): Unit =
-        try result set Right(f)
+        try result.set(Right(f))
         catch {
-          case e: Exception => result set Left(e)
+          case e: Exception => result.set(Left(e))
         }
 
       val t = Spawn(run())
@@ -72,7 +72,7 @@ private[process] trait ProcessImpl { self: Process.type =>
 
     protected[this] override def runAndExitValue() = {
       val first = a.run(io)
-      runInterruptible(first.exitValue())(first.destroy()) flatMap { codeA =>
+      runInterruptible(first.exitValue())(first.destroy()).flatMap { codeA =>
         if (evaluateSecondProcess(codeA)) {
           val second = b.run(io)
           runInterruptible(second.exitValue())(second.destroy())
@@ -89,14 +89,15 @@ private[process] trait ProcessImpl { self: Process.type =>
     def isAlive() = processThread.isAlive()
     def destroy() = destroyer()
     def exitValue() =
-      getExitValue._2() getOrElse scala.sys.error(
-        "No exit code: process destroyed.")
+      getExitValue
+        ._2()
+        .getOrElse(scala.sys.error("No exit code: process destroyed."))
     def start() = getExitValue
 
     protected lazy val (processThread, getExitValue, destroyer) = {
       val code = new SyncVar[Option[Int]]()
-      code set None
-      val thread = Spawn(code set runAndExitValue())
+      code.set(None)
+      val thread = Spawn(code.set(runAndExitValue()))
 
       (
         thread,
@@ -134,7 +135,7 @@ private[process] trait ProcessImpl { self: Process.type =>
       def releaseResources(so: PipeSource, sk: PipeSink, p: Process*) = {
         so.release()
         sk.release()
-        p foreach (_.destroy())
+        p.foreach(_.destroy())
       }
 
       val firstIO =
@@ -172,7 +173,7 @@ private[process] trait ProcessImpl { self: Process.type =>
     private[process] def runloop(src: InputStream, dst: OutputStream): Unit = {
       try BasicIO.transferFully(src, dst)
       catch ioFailure(ioHandler)
-      finally BasicIO close {
+      finally BasicIO.close {
         if (isSink) dst else src
       }
     }
@@ -193,13 +194,13 @@ private[process] trait ProcessImpl { self: Process.type =>
           case None =>
         }
       } catch onInterrupt(())
-      finally BasicIO close pipe
+      finally BasicIO.close(pipe)
     }
-    def connectIn(in: InputStream): Unit = source add Some(in)
+    def connectIn(in: InputStream): Unit = source.add(Some(in))
     def connectOut(sink: PipeSink): Unit = sink connectIn pipe
     def release(): Unit = {
       interrupt()
-      source add None
+      source.add(None)
       join()
     }
   }
@@ -214,13 +215,13 @@ private[process] trait ProcessImpl { self: Process.type =>
           case None =>
         }
       } catch onInterrupt(())
-      finally BasicIO close pipe
+      finally BasicIO.close(pipe)
     }
-    def connectOut(out: OutputStream): Unit = sink add Some(out)
+    def connectOut(out: OutputStream): Unit = sink.add(Some(out))
     def connectIn(pipeOut: PipedOutputStream): Unit = pipe connect pipeOut
     def release(): Unit = {
       interrupt()
-      sink add None
+      sink.add(None)
       join()
     }
   }
@@ -248,13 +249,13 @@ private[process] trait ProcessImpl { self: Process.type =>
       try p.waitFor() // wait for the process to terminate
       finally inputThread
         .interrupt() // we interrupt the input thread to notify it that it can terminate
-      outputThreads foreach (_.join()) // this ensures that all output is complete before returning (waitFor does not ensure this)
+      outputThreads.foreach(_.join()) // this ensures that all output is complete before returning (waitFor does not ensure this)
 
       p.exitValue()
     }
     override def destroy() = {
       try {
-        outputThreads foreach (_.interrupt()) // on destroy, don't bother consuming any more output
+        outputThreads.foreach(_.interrupt()) // on destroy, don't bother consuming any more output
         p.destroy()
       } finally inputThread.interrupt()
     }

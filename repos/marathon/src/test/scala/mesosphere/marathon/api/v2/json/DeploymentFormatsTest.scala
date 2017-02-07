@@ -30,10 +30,10 @@ class DeploymentFormatsTest extends MarathonSpec {
     val update = Json.parse(json).as[GroupUpdate]
     update.id should be(Some("a".toPath))
     update.apps should be('defined)
-    update.apps.get should have size 1
+    (update.apps.get should have).size(1)
     update.apps.get.head.id should be("b".toPath)
     update.groups should be('defined)
-    update.groups.get should have size 1
+    (update.groups.get should have).size(1)
     update.groups.get.head.id should be(Some("c".toPath))
     update.dependencies should be('defined)
     update.dependencies.get.head should be("d".toPath)
@@ -77,9 +77,9 @@ class DeploymentFormatsTest extends MarathonSpec {
       """.stripMargin
     val group = Json.parse(json).as[Group]
     group.id should be("a".toPath)
-    group.apps should have size 1
+    (group.apps should have).size(1)
     group.apps.head.id should be("b".toPath)
-    group.groups should have size 1
+    (group.groups should have).size(1)
     group.groups.head.id should be("c".toPath)
     group.dependencies.head should be("d".toPath)
     group.version should be(Timestamp("2015-06-03T13:18:25.640Z"))

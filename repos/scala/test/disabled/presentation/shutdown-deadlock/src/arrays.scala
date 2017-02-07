@@ -344,14 +344,14 @@ object Test {
   def checkZip {
     val zipped = Array("a", "b", "c").zip(Array(1, 2))
     val expected = Array(("a", 1), ("b", 2))
-    check(zipped sameElements expected, zipped.toList, expected.toList)
+    check(zipped.sameElements(expected), zipped.toList, expected.toList)
   }
 
   def checkConcat {
     // ticket #713
     val x1 = Array.concat(Array(1, 2), Array(3, 4))
     val y1 = Array(1, 2, 3, 4)
-    check(x1 sameElements y1, x1.toList, y1.toList)
+    check(x1.sameElements(y1), x1.toList, y1.toList)
   }
 
   //##########################################################################

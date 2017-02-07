@@ -6,7 +6,7 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     val set: HashSet[Bop] = HashSet("Bop", 16)
-    (1 to runs).toList foreach (_ => set addEntry new Bop)
+    (1 to runs).toList.foreach(_ => set.addEntry(new Bop))
 
     assert(runs == set.size && set.size == set.iterator.length)
   }

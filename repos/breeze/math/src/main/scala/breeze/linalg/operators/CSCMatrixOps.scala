@@ -150,7 +150,7 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring { this: CSCMatrix.type =>
   @expand.valify
   implicit def csc_csc_BadOps[@expand.args(Int, Double, Float, Long) T,
                               @expand.args(OpPow, OpDiv, OpMod) Op <: OpType](
-      implicit @expand.sequence[Op]({ _ pow _ }, { _ / _ }, { _ % _ }) op: Op.Impl2[
+      implicit @expand.sequence[Op]({ _.pow(_) }, { _ / _ }, { _ % _ }) op: Op.Impl2[
         T,
         T,
         T],

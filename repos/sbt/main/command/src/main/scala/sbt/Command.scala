@@ -21,7 +21,7 @@ private[sbt] final class SimpleCommand(
     val parser: State => Parser[() => State],
     val tags: AttributeMap)
     extends Command {
-  assert(Command validID name, "'" + name + "' is not a valid command name.")
+  assert(Command.validID(name), "'" + name + "' is not a valid command name.")
   def tag[T](key: AttributeKey[T], value: T): SimpleCommand =
     new SimpleCommand(name, help0, parser, tags.put(key, value))
   def help = const(help0)
@@ -68,7 +68,7 @@ object Command {
 
   def args(name: String, display: String, help: Help = Help.empty)(
       f: (State, Seq[String]) => State): Command =
-    make(name, help)(state => spaceDelimited(display) map apply1(f, state))
+    make(name, help)(state => spaceDelimited(display).map(apply1(f, state)))
 
   def single(name: String, briefHelp: (String, String), detail: String)(
       f: (State, String) => State): Command =
@@ -76,7 +76,7 @@ object Command {
   def single(name: String, help: Help = Help.empty)(
       f: (State, String) => State): Command =
     make(name, help)(state =>
-      token(trimmed(spacedAny(name)) map apply1(f, state)))
+      token(trimmed(spacedAny(name)).map(apply1(f, state))))
 
   def custom(parser: State => Parser[() => State],
              help: Help = Help.empty): Command =
@@ -94,14 +94,14 @@ object Command {
       effect: (State, T) => State): State => Parser[() => State] =
     s => applyEffect(parser(s))(t => effect(s, t))
   def applyEffect[T](p: Parser[T])(f: T => State): Parser[() => State] =
-    p map { t => () =>
+    p.map { t => () =>
       f(t)
     }
 
   def combine(cmds: Seq[Command]): State => Parser[() => State] = {
     val (simple, arbs) = separateCommands(cmds)
     state =>
-      (simpleParser(simple)(state) /: arbs.map(_ parser state)) { _ | _ }
+      (simpleParser(simple)(state) /: arbs.map(_.parser(state))) { _ | _ }
   }
   private[this] def separateCommands(
       cmds: Seq[Command]): (Seq[SimpleCommand], Seq[ArbitraryCommand]) =
@@ -125,8 +125,8 @@ object Command {
   def simpleParser(commandMap: Map[String, State => Parser[() => State]])
     : State => Parser[() => State] =
     (state: State) =>
-      token(OpOrID examples commandMap.keys.toSet) flatMap { id =>
-        (commandMap get id) match {
+      token(OpOrID.examples(commandMap.keys.toSet)).flatMap { id =>
+        (commandMap.get(id)) match {
           case None => failure(invalidValue("command", commandMap.keys)(id))
           case Some(c) => c(state)
         }
@@ -154,9 +154,12 @@ object Command {
                   maxDistance: Int = 3,
                   maxSuggestions: Int = 3): Seq[String] =
     bs.map { b =>
-      (b, distance(a, b))
-    } filter (_._2 <= maxDistance) sortBy (_._2) take (maxSuggestions) map
-      (_._1)
+        (b, distance(a, b))
+      }
+      .filter(_._2 <= maxDistance)
+      .sortBy(_._2)
+      .take(maxSuggestions)
+      .map(_._1)
   def distance(a: String, b: String): Int =
     EditDistance.levenshtein(a,
                              b,
@@ -170,7 +173,7 @@ object Command {
 
   def spacedAny(name: String): Parser[String] = spacedC(name, any)
   def spacedC(name: String, c: Parser[Char]): Parser[String] =
-    ((c & opOrIDSpaced(name)) ~ c.+) map {
+    (((c & opOrIDSpaced(name)) ~ c.+)).map {
       case (f, rem) => (f +: rem).mkString
     }
 }

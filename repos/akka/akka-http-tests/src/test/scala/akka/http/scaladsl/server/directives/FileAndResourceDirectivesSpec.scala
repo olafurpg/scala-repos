@@ -93,9 +93,8 @@ class FileAndResourceDirectivesSpec
             .toStrict(1.second)
             .awaitResult(3.seconds)
             .strictParts
-          parts.map(_.entity.data.utf8String) should contain theSameElementsAs List(
-            "BCDEFGHIJK",
-            "QRSTUVWXYZ")
+          (parts.map(_.entity.data.utf8String) should contain)
+            .theSameElementsAs(List("BCDEFGHIJK", "QRSTUVWXYZ"))
         }
       } finally file.delete
     }

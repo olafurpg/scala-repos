@@ -131,11 +131,11 @@ object ScalaCollectionRenderer {
     * @return decoded nonqualified part (:: in example)
     */
   def transformName(name: String) =
-    getNonQualifiedName(NameTransformer decode name)
+    getNonQualifiedName(NameTransformer.decode(name))
 
   private def getNonQualifiedName(fullName: String): String = {
     val index =
-      if (fullName endsWith "`")
+      if (fullName.endsWith("`"))
         fullName.substring(0, fullName.length - 1).lastIndexOf('`')
       else fullName.lastIndexOf('.')
     "\"" + fullName.substring(index + 1) + "\""

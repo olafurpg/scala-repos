@@ -214,29 +214,30 @@ private[http] final object HtmlNormalizer {
       }
 
     id.map { foundId =>
-      NodeAndEventJs(
-        element.copy(attributes = attributesIncludingEventsAsData),
-        jsForEventAttributes(foundId, eventAttributes)
-      )
-    } getOrElse {
-      if (eventAttributes.nonEmpty) {
-        val generatedId = s"lift-event-js-${nextFuncName}"
-
-        NodeAndEventJs(
-          element.copy(
-            attributes =
-              new UnprefixedAttribute("id",
-                                      generatedId,
-                                      attributesIncludingEventsAsData)),
-          jsForEventAttributes(generatedId, eventAttributes)
-        )
-      } else {
         NodeAndEventJs(
           element.copy(attributes = attributesIncludingEventsAsData),
-          Noop
+          jsForEventAttributes(foundId, eventAttributes)
         )
       }
-    }
+      .getOrElse {
+        if (eventAttributes.nonEmpty) {
+          val generatedId = s"lift-event-js-${nextFuncName}"
+
+          NodeAndEventJs(
+            element.copy(
+              attributes =
+                new UnprefixedAttribute("id",
+                                        generatedId,
+                                        attributesIncludingEventsAsData)),
+            jsForEventAttributes(generatedId, eventAttributes)
+          )
+        } else {
+          NodeAndEventJs(
+            element.copy(attributes = attributesIncludingEventsAsData),
+            Noop
+          )
+        }
+      }
   }
 
   private[http] def normalizeNode(
@@ -296,25 +297,27 @@ private[http] final object HtmlNormalizer {
   ): NodesAndEventJs = {
     nodes.foldLeft(NodesAndEventJs(Vector[Node](), Noop)) {
       (soFar, nodeToNormalize) =>
-        normalizeNode(nodeToNormalize, contextPath, stripComments).map {
-          case NodeAndEventJs(normalizedElement: Elem, js: JsCmd) =>
-            val NodesAndEventJs(normalizedChildren, childJs) =
-              normalizeHtmlAndEventHandlers(
-                normalizedElement.child,
-                contextPath,
-                stripComments
-              )
+        normalizeNode(nodeToNormalize, contextPath, stripComments)
+          .map {
+            case NodeAndEventJs(normalizedElement: Elem, js: JsCmd) =>
+              val NodesAndEventJs(normalizedChildren, childJs) =
+                normalizeHtmlAndEventHandlers(
+                  normalizedElement.child,
+                  contextPath,
+                  stripComments
+                )
 
+              soFar
+                .append(js)
+                .append(normalizedElement.copy(child = normalizedChildren),
+                        childJs)
+
+            case node =>
+              soFar.append(node)
+          }
+          .getOrElse {
             soFar
-              .append(js)
-              .append(normalizedElement.copy(child = normalizedChildren),
-                      childJs)
-
-          case node =>
-            soFar.append(node)
-        } getOrElse {
-          soFar
-        }
+          }
     }
   }
 }

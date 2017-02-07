@@ -21,11 +21,11 @@ object ObjectDef {
       case ScalaTokenTypes.tIDENTIFIER =>
         builder.advanceLexer() //Ate identifier
       case _ =>
-        builder error ScalaBundle.message("identifier.expected")
+        builder.error(ScalaBundle.message("identifier.expected"))
         return false
     }
     //parse extends block
-    ClassTemplateOpt parse builder
+    ClassTemplateOpt.parse(builder)
     return true
   }
 }

@@ -37,7 +37,7 @@ class JavaLoggerStatsReceiver(logger: Logger, timer: Timer)
     }
 
   protected[this] def deregisterGauge(name: Seq[String]): Unit = synchronized {
-    timerTasks.remove(name) foreach { _.cancel() }
+    timerTasks.remove(name).foreach { _.cancel() }
   }
 
   private[this] def formatName(description: Seq[String]) = {

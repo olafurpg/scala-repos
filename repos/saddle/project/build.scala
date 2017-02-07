@@ -37,7 +37,7 @@ object SaddleBuild extends sbt.Build {
         }
       ),
       base = file(".")
-    ) aggregate (core, hdf5, test_framework)
+    ).aggregate(core, hdf5, test_framework)
 
   lazy val core = project(
     id = "saddle-core",
@@ -82,7 +82,7 @@ object SaddleBuild extends sbt.Build {
             ) ++ Shared.testDeps(v)),
         testOptions in Test += Tests.Argument("console", "junitxml")
       )
-    ) dependsOn (core)
+    ).dependsOn(core)
 
   lazy val test_framework =
     project(
@@ -92,7 +92,7 @@ object SaddleBuild extends sbt.Build {
         libraryDependencies <++=
           scalaVersion(v => Shared.testDeps(v, "compile"))
       )
-    ) dependsOn (core)
+    ).dependsOn(core)
 
   def project(id: String,
               base: File,
@@ -162,19 +162,21 @@ object Shared {
     crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6"),
     scalacOptions := Seq("-deprecation", "-unchecked"), // , "-Xexperimental"),
     shellPrompt := { (state: State) =>
-      "[%s]$ " format (Project.extract(state).currentProject.id)
+      "[%s]$ ".format(Project.extract(state).currentProject.id)
     },
     resolvers ++= Seq(
-      "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
-      "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
+      "Sonatype OSS Releases".at(
+        "http://oss.sonatype.org/content/repositories/releases/"),
+      "Sonatype OSS Snapshots".at(
+        "http://oss.sonatype.org/content/repositories/snapshots/")
     ),
     publishTo <<= (version) { version: String =>
       val nexus = "https://oss.sonatype.org/"
       if (version.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+        Some("snapshots".at(nexus + "content/repositories/snapshots"))
+      else Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
     },
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
-    compile <<= (compile in Compile) dependsOn (compile in Test)
+    compile <<= ((compile in Compile)).dependsOn(compile in Test)
   )
 }

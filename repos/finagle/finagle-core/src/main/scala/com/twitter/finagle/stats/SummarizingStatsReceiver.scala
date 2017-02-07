@@ -55,11 +55,11 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
   def summary(includeTails: Boolean): String = synchronized {
     val counterValues = counters.asMap.asScala
     val gaugeValues =
-      gauges.toSeq map {
+      gauges.toSeq.map {
         case (names, gauge) => variableName(names) -> gauge().toString
       }
     val statValues =
-      stats.asMap.asScala collect {
+      stats.asMap.asScala.collect {
         case (k, buf) if buf.nonEmpty =>
           val n = buf.size
           val values = new Array[Float](n)
@@ -68,10 +68,10 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
           (k, xs)
       }
 
-    val counterLines = (counterValues map {
+    val counterLines = (counterValues.map {
       case (k, v) => (variableName(k), v.toString)
     }).toSeq
-    val statLines = (statValues map {
+    val statLines = (statValues.map {
       case (k, xs) =>
         val n = xs.length
         def idx(ptile: Double) =
@@ -89,7 +89,7 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
                    xs(n - 1)))
     }).toSeq
 
-    lazy val tailValues = (statValues map {
+    lazy val tailValues = (statValues.map {
       case (k, xs) =>
         val n = xs.length
         def slice(ptile: Double) = {

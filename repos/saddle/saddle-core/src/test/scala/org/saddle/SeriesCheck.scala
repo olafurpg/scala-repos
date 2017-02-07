@@ -31,7 +31,7 @@ class SeriesCheck extends Specification with ScalaCheck {
 
     "series equality" in {
       forAll { (s: Series[Int, Double]) =>
-        (s must_== Series(s.toVec)) and (s must_== s)
+        ((s must_== Series(s.toVec))).and(s must_== s)
       }
     }
 
@@ -40,7 +40,7 @@ class SeriesCheck extends Specification with ScalaCheck {
         val idx = Gen.listOfN(3, Gen.choose(0, s.length - 1))
         forAll(idx) { i =>
           val res = s.take(i.toArray)
-          val exp = s(i(0)) concat s(i(1)) concat s(i(2))
+          val exp = s(i(0)).concat(s(i(1))).concat(s(i(2)))
           res must_== exp
         }
       }
@@ -52,7 +52,7 @@ class SeriesCheck extends Specification with ScalaCheck {
         if (s.length == 1) {
           s.head(1) must_== s(0)
         } else {
-          val exp = s(0) concat s(1)
+          val exp = s(0).concat(s(1))
           s.head(2) must_== exp
         }
       }
@@ -64,7 +64,7 @@ class SeriesCheck extends Specification with ScalaCheck {
         if (s.length == 1) {
           s.tail(1) must_== s(0)
         } else {
-          val exp = s(s.length - 2) concat s(s.length - 1)
+          val exp = s(s.length - 2).concat(s(s.length - 1))
           s.tail(2) must_== exp
         }
       }
@@ -75,14 +75,14 @@ class SeriesCheck extends Specification with ScalaCheck {
         s.shift(1).index must_== s.index
 
         if (!s.isEmpty) {
-          val exp = Vec(na.to[Double]) concat s.values.slice(0, s.length - 1)
+          val exp = Vec(na.to[Double]).concat(s.values.slice(0, s.length - 1))
           s.shift(1).values must_== exp
         } else s.shift(1).isEmpty must beTrue
 
         s.shift(-1).index must_== s.index
 
         if (!s.isEmpty) {
-          val exp = s.values.slice(1, s.length) concat Vec(na.to[Double])
+          val exp = s.values.slice(1, s.length).concat(Vec(na.to[Double]))
           s.shift(-1).values must_== exp
         } else s.shift(1).isEmpty must beTrue
       }
@@ -158,10 +158,10 @@ class SeriesCheck extends Specification with ScalaCheck {
         val idx = Gen.listOfN(3, Gen.choose(0, s.length - 1))
 
         forAll(idx) { i =>
-          (i.length must be_<=(2)) or {
+          ((i.length must be_<=(2))).or {
             val locs = i.toArray
             val keys = s.index.take(locs).toArray
-            val exp = s(keys(0)) concat s(keys(1)) concat s(keys(2))
+            val exp = s(keys(0)).concat(s(keys(1))).concat(s(keys(2)))
 
             s(keys) must_== exp
             s(keys: _*) must_== exp
@@ -189,7 +189,7 @@ class SeriesCheck extends Specification with ScalaCheck {
           val (res1, res2) = s.splitAt(i)
           res1.length must_== i
           res2.length must_== (s.length - i)
-          (res1 concat res2) must_== s
+          (res1.concat(res2)) must_== s
         }
       }
     }
@@ -250,7 +250,7 @@ class SeriesCheck extends Specification with ScalaCheck {
       val a = Series(v1, x1)
       val b = Series(v3, x2)
 
-      val c = a concat b
+      val c = a.concat(b)
 
       val dat1 = v1.toDoubleArray
       val dat2 =
@@ -281,7 +281,7 @@ class SeriesCheck extends Specification with ScalaCheck {
 
     "series equality" in {
       forAll { (s: Series[DateTime, Double]) =>
-        (s must_== Series(s.toVec, s.index)) and (s must_== s)
+        ((s must_== Series(s.toVec, s.index))).and(s must_== s)
       }
     }
 
@@ -291,8 +291,10 @@ class SeriesCheck extends Specification with ScalaCheck {
         forAll(idx) { i =>
           val res = s.take(i.toArray)
           val exp =
-            s.slice(i(0), i(0) + 1) concat s.slice(i(1), i(1) + 1) concat s
-              .slice(i(2), i(2) + 1)
+            s.slice(i(0), i(0) + 1)
+              .concat(s.slice(i(1), i(1) + 1))
+              .concat(s
+                .slice(i(2), i(2) + 1))
           res must_== exp
         }
       }
@@ -323,10 +325,10 @@ class SeriesCheck extends Specification with ScalaCheck {
         val idx = Gen.listOfN(3, Gen.choose(0, s.length - 1))
 
         forAll(idx) { i =>
-          (i.length must be_<=(2)) or {
+          ((i.length must be_<=(2))).or {
             val locs = i.toArray
             val keys = s.index.take(locs).toArray
-            val exp = s(keys(0)) concat s(keys(1)) concat s(keys(2))
+            val exp = s(keys(0)).concat(s(keys(1))).concat(s(keys(2)))
 
             s(keys) must_== exp
             s(keys: _*) must_== exp

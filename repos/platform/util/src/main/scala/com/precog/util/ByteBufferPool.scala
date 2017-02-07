@@ -91,8 +91,8 @@ final class ByteBufferPool(val capacity: Int = 16 * 1024,
     * should.
     */
   def release(buffer: ByteBuffer): Unit = {
-    if (!(fixedBufferQueue offer buffer)) {
-      flexBufferQueue offer (new SoftReference(buffer))
+    if (!(fixedBufferQueue.offer(buffer))) {
+      flexBufferQueue.offer(new SoftReference(buffer))
     }
   }
 
@@ -151,7 +151,7 @@ object ByteBufferPool {
     */
   def release: ByteBufferPoolS[Unit] = State {
     case (pool, buffers) =>
-      buffers foreach (pool.release(_))
+      buffers.foreach(pool.release(_))
       ((pool, Nil), ())
   }
 

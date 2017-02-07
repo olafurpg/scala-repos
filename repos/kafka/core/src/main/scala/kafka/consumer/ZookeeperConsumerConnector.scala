@@ -1235,7 +1235,7 @@ private[kafka] class ZookeeperConsumerConnector(
       val updatedTopics = allTopics.filter(topic =>
         topicFilter.isTopicAllowed(topic, config.excludeInternalTopics))
 
-      val addedTopics = updatedTopics filterNot (wildcardTopics contains)
+      val addedTopics = updatedTopics.filterNot(wildcardTopics contains)
       if (addedTopics.nonEmpty)
         info("Topic event: added topics = %s".format(addedTopics))
 
@@ -1244,7 +1244,7 @@ private[kafka] class ZookeeperConsumerConnector(
        * 0.8 release). We may need to remove these topics from the rebalance
        * listener's map in reinitializeConsumer.
        */
-      val deletedTopics = wildcardTopics filterNot (updatedTopics contains)
+      val deletedTopics = wildcardTopics.filterNot(updatedTopics contains)
       if (deletedTopics.nonEmpty)
         info("Topic event: deleted topics = %s".format(deletedTopics))
 

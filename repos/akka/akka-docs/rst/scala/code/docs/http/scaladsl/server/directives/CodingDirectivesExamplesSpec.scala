@@ -124,7 +124,7 @@ class CodingDirectivesExamplesSpec extends RoutingSpec {
   }
 
   def haveContentEncoding(encoding: HttpEncoding): Matcher[HttpResponse] =
-    be(encoding) compose {
+    be(encoding).compose {
       (_: HttpResponse)
         .header[`Content-Encoding`]
         .map(_.encodings.head)

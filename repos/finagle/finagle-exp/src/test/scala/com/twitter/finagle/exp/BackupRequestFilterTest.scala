@@ -36,7 +36,7 @@ class BackupRequestFilterTest
                                                          Stopwatch.timeMillis,
                                                          1,
                                                          0.05)
-    val service = filter andThen underlying
+    val service = filter.andThen(underlying)
 
     def cutoff() =
       Duration.fromMilliseconds(filter.cutoffMs())
@@ -61,7 +61,7 @@ class BackupRequestFilterTest
         tc.advance(l)
         p.setValue("ok")
         assert(f.poll == Some(Return("ok")))
-        val ideal = quantile(latencies take i + 1, 95)
+        val ideal = quantile(latencies.take(i + 1), 95)
         val actual = cutoff()
         BackupRequestFilter.defaultError(maxDuration) match {
           case 0.0 =>

@@ -26,7 +26,7 @@ trait ClusterMetricsCommonConfig extends MultiNodeConfig {
   def nodeList = Seq(node1, node2, node3, node4, node5)
 
   // Extract individual sigar library for every node.
-  nodeList foreach { role ⇒
+  nodeList.foreach { role ⇒
     nodeConfig(role) {
       parseString(
         "akka.cluster.metrics.native-library-extract-folder=${user.dir}/target/native/" +
@@ -68,7 +68,7 @@ object ClusterMetricsDisabledConfig extends ClusterMetricsCommonConfig {
         disableMetricsExtension,
         debugConfig(on = false),
         MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
-      .reduceLeft(_ withFallback _)
+      .reduceLeft(_.withFallback(_))
   }
 }
 
@@ -81,7 +81,7 @@ object ClusterMetricsEnabledConfig extends ClusterMetricsCommonConfig {
         enableMetricsExtension,
         debugConfig(on = false),
         MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
-      .reduceLeft(_ withFallback _)
+      .reduceLeft(_.withFallback(_))
   }
 }
 
@@ -106,7 +106,7 @@ abstract class ClusterMetricsEnabledSpec
     val conf = cluster.system.settings.config
     val text = conf.root.render
     val file = new File(s"target/${myself.name}_application.conf")
-    Some(new PrintWriter(file)) map { p ⇒
+    Some(new PrintWriter(file)).map { p ⇒
       p.write(text); p.close
     }
   }

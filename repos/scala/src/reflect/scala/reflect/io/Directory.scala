@@ -53,14 +53,14 @@ class Directory(jfile: JFile) extends Path(jfile) {
   def list: Iterator[Path] =
     jfile.listFiles match {
       case null => Iterator.empty
-      case xs => xs.iterator map Path.apply
+      case xs => xs.iterator.map(Path.apply)
     }
 
-  def dirs: Iterator[Directory] = list collect { case x: Directory => x }
-  def files: Iterator[File] = list collect { case x: File => x }
+  def dirs: Iterator[Directory] = list.collect { case x: Directory => x }
+  def files: Iterator[File] = list.collect { case x: File => x }
 
   override def walkFilter(cond: Path => Boolean): Iterator[Path] =
-    list filter cond flatMap (_ walkFilter cond)
+    list.filter(cond).flatMap(_.walkFilter(cond))
 
   def deepFiles: Iterator[File] = Path.onlyFiles(deepList())
 
@@ -68,7 +68,7 @@ class Directory(jfile: JFile) extends Path(jfile) {
     *  until it runs out of contents.
     */
   def deepList(depth: Int = -1): Iterator[Path] =
-    if (depth < 0) list ++ (dirs flatMap (_ deepList (depth)))
+    if (depth < 0) list ++ (dirs.flatMap(_.deepList(depth)))
     else if (depth == 0) Iterator.empty
-    else list ++ (dirs flatMap (_ deepList (depth - 1)))
+    else list ++ (dirs.flatMap(_.deepList(depth - 1)))
 }

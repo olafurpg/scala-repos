@@ -34,13 +34,13 @@ object BytesToString {
 
   def fromTuples(args: Seq[(Array[Byte], Array[Byte])],
                  charset: Charset = Charsets.Utf8) =
-    args map { arg =>
+    args.map { arg =>
       (BytesToString(arg._1), BytesToString(arg._2))
     }
 
   def fromTuplesWithDoubles(args: Seq[(Array[Byte], Double)],
                             charset: Charset = Charsets.Utf8) =
-    args map { arg =>
+    args.map { arg =>
       (BytesToString(arg._1, charset), arg._2)
     }
 }
@@ -74,13 +74,13 @@ object CBToString {
 
   def fromTuples(args: Seq[(ChannelBuffer, ChannelBuffer)],
                  charset: Charset = Charsets.Utf8) =
-    args map { arg =>
+    args.map { arg =>
       (CBToString(arg._1), CBToString(arg._2))
     }
 
   def fromTuplesWithDoubles(args: Seq[(ChannelBuffer, Double)],
                             charset: Charset = Charsets.Utf8) =
-    args map { arg =>
+    args.map { arg =>
       (CBToString(arg._1, charset), arg._2)
     }
 }
@@ -121,7 +121,7 @@ object NumberFormat {
 }
 object ReplyFormat {
   def toString(items: List[Reply]): List[String] = {
-    items flatMap {
+    items.flatMap {
       case BulkReply(message) => List(BytesToString(message.array))
       case EmptyBulkReply() => EmptyBulkReplyString
       case IntegerReply(id) => List(id.toString)
@@ -134,7 +134,7 @@ object ReplyFormat {
   }
 
   def toChannelBuffers(items: List[Reply]): List[ChannelBuffer] = {
-    items flatMap {
+    items.flatMap {
       case BulkReply(message) => List(message)
       case EmptyBulkReply() => EmptyBulkReplyChannelBuffer
       case IntegerReply(id) =>

@@ -164,7 +164,7 @@ object FormFieldDirectives extends FormFieldDirectives {
                                fu: Unmarshaller[Option[StrictForm.Field], T])(
         implicit sfu: SFU): RequestContext ⇒ Future[T] = { ctx ⇒
       import ctx.{executionContext, materializer}
-      sfu(ctx.request.entity).fast.flatMap(form ⇒ fu(form field fieldName))
+      sfu(ctx.request.entity).fast.flatMap(form ⇒ fu(form.field(fieldName)))
     }
     private def filter[T](fieldName: String, fu: FSFFOU[T])(
         implicit sfu: SFU): Directive1[T] =
@@ -202,7 +202,7 @@ object FormFieldDirectives extends FormFieldDirectives {
         implicit sfu: SFU,
         fu: FSFFOU[T]): FieldDefAux[NameDefaultReceptacle[T], Directive1[T]] =
       extractField[NameDefaultReceptacle[T], T] { nr ⇒
-        filter(nr.name, fu withDefaultValue nr.default)
+        filter(nr.name, fu.withDefaultValue(nr.default))
       }
     implicit def forNOUR[T](
         implicit sfu: SFU): FieldDefAux[NameOptionUnmarshallerReceptacle[T],
@@ -215,10 +215,10 @@ object FormFieldDirectives extends FormFieldDirectives {
     implicit def forNDUR[T](implicit sfu: SFU)
       : FieldDefAux[NameDefaultUnmarshallerReceptacle[T], Directive1[T]] =
       extractField[NameDefaultUnmarshallerReceptacle[T], T] { nr ⇒
-        filter(
-          nr.name,
-          (StrictForm.Field
-            .unmarshallerFromFSU(nr.um): FSFFOU[T]) withDefaultValue nr.default)
+        filter(nr.name,
+               (StrictForm.Field
+                 .unmarshallerFromFSU(nr.um): FSFFOU[T])
+                 .withDefaultValue(nr.default))
       }
 
     //////////////////// required formField support ////////////////////

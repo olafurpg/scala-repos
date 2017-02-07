@@ -46,7 +46,7 @@ sealed abstract class ContravariantCoyoneda[F[_], A] {
   /** Simple function composition. Allows map fusion without touching
     * the underlying `F`.
     */
-  final def contramap[B](f: B => A): Aux[F, B, I] = apply(fi)(k compose f)
+  final def contramap[B](f: B => A): Aux[F, B, I] = apply(fi)(k.compose(f))
 
   /** Natural transformation. */
   final def trans[G[_]](f: F ~> G): Aux[G, A, I] = apply(f(fi))(k)
@@ -61,7 +61,7 @@ sealed abstract class ContravariantCoyonedaInstances {
     : Contravariant[ContravariantCoyoneda[F, ?]] =
     new Contravariant[ContravariantCoyoneda[F, ?]] {
       def contramap[A, B](fa: ContravariantCoyoneda[F, A])(f: B => A) =
-        fa contramap f
+        fa.contramap(f)
     }
 }
 

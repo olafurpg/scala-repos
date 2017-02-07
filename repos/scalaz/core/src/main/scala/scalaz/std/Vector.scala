@@ -19,18 +19,18 @@ trait VectorInstances extends VectorInstances0 {
     override def index[A](fa: Vector[A], i: Int) = fa.lift.apply(i)
     override def length[A](fa: Vector[A]) = fa.length
     def point[A](a: => A) = empty :+ a
-    def bind[A, B](fa: Vector[A])(f: A => Vector[B]) = fa flatMap f
+    def bind[A, B](fa: Vector[A])(f: A => Vector[B]) = fa.flatMap(f)
     def empty[A] = Vector.empty[A]
     def plus[A](a: Vector[A], b: => Vector[A]) = a ++ b
     def isEmpty[A](a: Vector[A]) = a.isEmpty
-    override def map[A, B](v: Vector[A])(f: A => B) = v map f
+    override def map[A, B](v: Vector[A])(f: A => B) = v.map(f)
     override def filter[A](fa: Vector[A])(p: A => Boolean): Vector[A] =
-      fa filter p
+      fa.filter(p)
 
     def zip[A, B](a: => Vector[A], b: => Vector[B]): Vector[(A, B)] = {
       val _a = a
       if (_a.isEmpty) empty
-      else _a zip b
+      else _a.zip(b)
     }
     def unzip[A, B](a: Vector[(A, B)]) = a.unzip
 
@@ -93,10 +93,10 @@ trait VectorInstances extends VectorInstances0 {
     }
 
     override def all[A](fa: Vector[A])(f: A => Boolean) =
-      fa forall f
+      fa.forall(f)
 
     override def any[A](fa: Vector[A])(f: A => Boolean) =
-      fa exists f
+      fa.exists(f)
   }
 
   implicit def vectorMonoid[A]: Monoid[Vector[A]] = new Monoid[Vector[A]] {
@@ -202,7 +202,7 @@ trait VectorFunctions {
     * the remainder. */
   final def spanM[A, M[_]: Monad](as: Vector[A])(
       p: A => M[Boolean]): M[(Vector[A], Vector[A])] =
-    Monad[M].map(takeWhileM(as)(p))(ys => (ys, as drop (ys.length)))
+    Monad[M].map(takeWhileM(as)(p))(ys => (ys, as.drop(ys.length)))
 
   /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_]: Monad](as: Vector[A])(
@@ -285,11 +285,11 @@ trait VectorFunctions {
 
   /** Combinations of `as` and `as`, excluding same-element pairs. */
   final def allPairs[A](as: Vector[A]): Vector[(A, A)] =
-    tailz(as).tail flatMap (as zip _)
+    tailz(as).tail.flatMap(as.zip(_))
 
   /** `[(as(0), as(1)), (as(1), as(2)), ... (as(size-2), as(size-1))]` */
   final def adjacentPairs[A](as: Vector[A]): Vector[(A, A)] =
-    if (as.isEmpty) empty else as zip as.tail
+    if (as.isEmpty) empty else as.zip(as.tail)
 }
 
 private trait VectorEqual[A] extends Equal[Vector[A]] {
@@ -298,7 +298,7 @@ private trait VectorEqual[A] extends Equal[Vector[A]] {
   override def equalIsNatural: Boolean = A.equalIsNatural
 
   override def equal(a1: Vector[A], a2: Vector[A]) =
-    (a1 corresponds a2)(Equal[A].equal)
+    (a1.corresponds(a2))(Equal[A].equal)
 }
 
 private trait VectorOrder[A] extends Order[Vector[A]] with VectorEqual[A] {

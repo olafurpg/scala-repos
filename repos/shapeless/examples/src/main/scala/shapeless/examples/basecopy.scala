@@ -65,19 +65,19 @@ object OpenBaseCopyDemo extends App {
   }
 
   case class Foo(i: Int, b: Boolean) extends Base {
-    def baseCopy(base: BaseFields) = this merge base
+    def baseCopy(base: BaseFields) = this.merge(base)
   }
 
   case class Bar(i: Int, s: String, b: Boolean) extends Base {
-    def baseCopy(base: BaseFields) = this merge base
+    def baseCopy(base: BaseFields) = this.merge(base)
   }
 
   case class Baz(i: Int, b: Boolean, d: Double) extends Base {
-    def baseCopy(base: BaseFields) = this merge base
+    def baseCopy(base: BaseFields) = this.merge(base)
   }
 
   case class Quux(c: Char, i: Int, b: Boolean) extends Base {
-    def baseCopy(base: BaseFields) = this merge base
+    def baseCopy(base: BaseFields) = this.merge(base)
   }
 
   // case class copy style functional update through the common super-type ...

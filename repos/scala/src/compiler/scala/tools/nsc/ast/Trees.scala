@@ -70,7 +70,7 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
 
     ClassDef(
       sym,
-      gen.mkTemplate(sym.info.parents map TypeTree,
+      gen.mkTemplate(sym.info.parents.map(TypeTree),
                      if (sym.thisSym == sym || phase.erasedTypes)
                        noSelfType
                      else ValDef(sym.thisSym),
@@ -255,8 +255,8 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
     val orderedLocals = scala.collection.mutable.ListBuffer[Symbol]()
     def registerLocal(sym: Symbol) {
       if (sym != null && sym != NoSymbol) {
-        if (debug && !(locals contains sym)) orderedLocals append sym
-        locals addEntry sym
+        if (debug && !(locals contains sym)) orderedLocals.append(sym)
+        locals.addEntry(sym)
       }
     }
 
@@ -302,7 +302,7 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
                 else {
                   val refersToLocalSymbols =
                     tpt.tpe != null &&
-                      (tpt.tpe exists (tp => locals contains tp.typeSymbol))
+                      (tpt.tpe.exists(tp => locals contains tp.typeSymbol))
                   val isInferred = tpt.wasEmpty
                   if (refersToLocalSymbols || isInferred) {
                     tpt.duplicate.clearType()
@@ -320,7 +320,7 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
               // These symbols will be erased, because we can't leave alive a type referring to them.
               // Here we can only hope that everything will work fine afterwards.
               case TypeApply(fn, args)
-                  if args map transform exists (_.isEmpty) =>
+                  if args.map(transform).exists(_.isEmpty) =>
                 transform(fn)
               case EmptyTree =>
                 tree
@@ -358,7 +358,7 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
       if (debug) {
         assert(locals.size == orderedLocals.size)
         val msg =
-          orderedLocals.toList filter { _ != NoSymbol } map { "  " + _ } mkString EOL
+          orderedLocals.toList.filter { _ != NoSymbol }.map { "  " + _ } mkString EOL
         trace("locals (%d total): %n".format(orderedLocals.size))(msg)
       }
 

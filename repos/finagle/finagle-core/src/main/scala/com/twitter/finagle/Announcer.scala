@@ -30,7 +30,7 @@ class MultipleAnnouncersPerSchemeException(
     extends NoStacktrace {
   override def getMessage = {
     val msgs =
-      announcers map {
+      announcers.map {
         case (scheme, rs) =>
           "%s=(%s)".format(scheme, rs.map(_.getClass.getName).mkString(", "))
       } mkString (" ")
@@ -67,7 +67,7 @@ object Announcer {
     val log = Logger.getLogger(getClass.getName)
 
     val dups =
-      announcers groupBy (_.scheme) filter { case (_, rs) => rs.size > 1 }
+      announcers.groupBy(_.scheme).filter { case (_, rs) => rs.size > 1 }
     if (dups.size > 0) throw new MultipleAnnouncersPerSchemeException(dups)
 
     for (r <- announcers)
@@ -77,7 +77,7 @@ object Announcer {
   }
 
   def get[T <: Announcer](clazz: Class[T]): Option[T] =
-    announcers find { _.getClass isAssignableFrom clazz } map {
+    (announcers find { _.getClass.isAssignableFrom(clazz) }).map {
       _.asInstanceOf[T]
     }
 
@@ -97,7 +97,7 @@ object Announcer {
         Future.exception(new AnnouncerForumInvalid(forum))
     }
 
-    announcement map { ann =>
+    announcement.map { ann =>
       val lastForums = ann match {
         case a: ProxyAnnouncement => a.forums
         case _ => Nil

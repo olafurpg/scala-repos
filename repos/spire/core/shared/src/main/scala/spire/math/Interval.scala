@@ -169,13 +169,13 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   }
 
   def isProperSupersetOf(rhs: Interval[A]): Boolean =
-    lhs != rhs && (lhs isSupersetOf rhs)
+    lhs != rhs && (lhs.isSupersetOf(rhs))
 
   def isSubsetOf(rhs: Interval[A]): Boolean =
-    rhs isSupersetOf lhs
+    rhs.isSupersetOf(lhs)
 
   def isProperSubsetOf(rhs: Interval[A]): Boolean =
-    rhs isProperSupersetOf lhs
+    rhs.isProperSupersetOf(lhs)
 
   // Does this interval contain any points above t ?
   def hasAbove(t: A): Boolean = this match {
@@ -274,7 +274,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     }
 
   def |(rhs: Interval[A]): Interval[A] =
-    lhs union rhs
+    lhs.union(rhs)
 
   def union(rhs: Interval[A]): Interval[A] =
     Interval.fromBounds(minLower(lhs.lowerBound, rhs.lowerBound, false),
@@ -715,14 +715,14 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def ∉:(a: A): Boolean = !(lhs contains a)
 
   def ∩(rhs: Interval[A]): Interval[A] = lhs intersect rhs
-  def ∪(rhs: Interval[A]): Interval[A] = lhs union rhs
+  def ∪(rhs: Interval[A]): Interval[A] = lhs.union(rhs)
   def \(rhs: Interval[A]): List[Interval[A]] = lhs -- rhs
 
-  def ⊂(rhs: Interval[A]): Boolean = lhs isProperSubsetOf rhs
-  def ⊃(rhs: Interval[A]): Boolean = lhs isProperSupersetOf rhs
+  def ⊂(rhs: Interval[A]): Boolean = lhs.isProperSubsetOf(rhs)
+  def ⊃(rhs: Interval[A]): Boolean = lhs.isProperSupersetOf(rhs)
 
-  def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
-  def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
+  def ⊆(rhs: Interval[A]): Boolean = lhs.isSubsetOf(rhs)
+  def ⊇(rhs: Interval[A]): Boolean = lhs.isSupersetOf(rhs)
 
   // xyz
 
@@ -997,7 +997,7 @@ object Interval {
     }
 
   def closed[A: Order](lower: A, upper: A): Interval[A] = {
-    val c = lower compare upper
+    val c = lower.compare(upper)
     if (c < 0) Bounded(lower, upper, 0)
     else if (c == 0) Point(lower)
     else Interval.empty[A]

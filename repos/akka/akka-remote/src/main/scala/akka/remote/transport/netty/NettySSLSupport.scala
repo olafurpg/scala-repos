@@ -69,7 +69,7 @@ private[akka] class SSLSettings(config: Config) {
   */
 private[akka] object NettySSLSupport {
 
-  Security addProvider AkkaProvider
+  Security.addProvider(AkkaProvider)
 
   /**
     * Construct a SSLHandler which can be inserted into a Netty server/client pipeline
@@ -135,7 +135,7 @@ private[akka] object NettySSLSupport {
           })
           trustManagerFactory.getTrustManagers
         }
-        Option(SSLContext.getInstance(protocol)) map { ctx ⇒
+        Option(SSLContext.getInstance(protocol)).map { ctx ⇒
           ctx.init(null, trustManagers, rng); ctx
         }
       } catch {
@@ -210,7 +210,7 @@ private[akka] object NettySSLSupport {
         )
 
         val trustManagers: Option[Array[TrustManager]] =
-          settings.SSLTrustStore map { path ⇒
+          settings.SSLTrustStore.map { path ⇒
             val pwd = settings.SSLTrustStorePassword.map(_.toCharArray).orNull
             val trustManagerFactory = TrustManagerFactory.getInstance(
               TrustManagerFactory.getDefaultAlgorithm)
@@ -223,7 +223,7 @@ private[akka] object NettySSLSupport {
             })
             trustManagerFactory.getTrustManagers
           }
-        Option(SSLContext.getInstance(protocol)) map { ctx ⇒
+        Option(SSLContext.getInstance(protocol)).map { ctx ⇒
           ctx.init(factory.getKeyManagers, trustManagers.orNull, rng); ctx
         }
       } catch {

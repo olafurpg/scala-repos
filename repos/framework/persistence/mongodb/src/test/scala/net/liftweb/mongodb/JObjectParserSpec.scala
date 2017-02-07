@@ -40,7 +40,7 @@ object JObjectParserSpec extends Specification {
       val (oid, dbo) = buildTestData
       val xval = tryo(dbo.get("x").asInstanceOf[ObjectId])
 
-      xval.toList map { x =>
+      xval.toList.map { x =>
         x must_== oid
       }
 
@@ -51,7 +51,7 @@ object JObjectParserSpec extends Specification {
         val (oid, dbo) = buildTestData
         val xval = tryo(dbo.get("x").asInstanceOf[String])
 
-        xval.toList map { x =>
+        xval.toList.map { x =>
           x must_== oid.toString
         }
 

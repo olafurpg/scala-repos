@@ -38,11 +38,11 @@ abstract class BrowsingLoaders extends GlobalSymbolLoaders {
     val decls = owner.info.decls
     val existing = decls.lookup(member.name)
     if (existing == NoSymbol) {
-      decls enter member
+      decls.enter(member)
       member
     } else if (existing.sourceFile == null) {
       decls unlink existing
-      decls enter member
+      decls.enter(member)
       member
     } else {
       if (member.sourceFile != null) {
@@ -88,7 +88,7 @@ abstract class BrowsingLoaders extends GlobalSymbolLoaders {
 
       override def traverse(tree: Tree): Unit = tree match {
         case PackageDef(pkg, body) =>
-          inPackagePrefix(pkg) { body foreach traverse }
+          inPackagePrefix(pkg) { body.foreach(traverse) }
 
         case ClassDef(_, name, _, _) =>
           if (packagePrefix == root.fullName) {

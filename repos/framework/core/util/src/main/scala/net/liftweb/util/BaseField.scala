@@ -57,7 +57,7 @@ trait ReadableField extends FieldIdentifier with ValueHolder with Bindable {
 
   def displayNameHtml: Box[NodeSeq] = Empty
 
-  def displayHtml: NodeSeq = displayNameHtml openOr Text(displayName)
+  def displayHtml: NodeSeq = displayNameHtml.openOr(Text(displayName))
 
   /**
     * The display name of this field (e.g., "First Name")

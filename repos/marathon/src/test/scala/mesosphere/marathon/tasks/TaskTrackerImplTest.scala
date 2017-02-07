@@ -115,12 +115,12 @@ class TaskTrackerImplTest
       TEST_APP_NAME / "a")
     testAppTasks.appTasksMap(TEST_APP_NAME / "b").appId should equal(
       TEST_APP_NAME / "b")
-    testAppTasks
+    (testAppTasks
       .appTasksMap(TEST_APP_NAME / "a")
-      .marathonTasks should have size 1
-    testAppTasks
+      .marathonTasks should have).size(1)
+    (testAppTasks
       .appTasksMap(TEST_APP_NAME / "b")
-      .marathonTasks should have size 2
+      .marathonTasks should have).size(2)
     testAppTasks.appTasksMap(TEST_APP_NAME / "a").taskMap.keySet should equal(
       Set(task1.taskId))
     testAppTasks.appTasksMap(TEST_APP_NAME / "b").taskMap.keySet should equal(

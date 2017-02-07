@@ -62,10 +62,10 @@ class TimeoutFactory[Req, Rep](self: ServiceFactory[Req, Rep],
 
   override def apply(conn: ClientConnection) = {
     val res = super.apply(conn)
-    res.within(timer, timeout) rescue {
+    res.within(timer, timeout).rescue {
       case exc: java.util.concurrent.TimeoutException =>
         res.raise(exc)
-        res onSuccess { _.close() }
+        res.onSuccess { _.close() }
         failure
     }
   }

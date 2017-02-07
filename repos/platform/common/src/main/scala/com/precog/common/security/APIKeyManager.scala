@@ -100,10 +100,10 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
   def findAPIKey(apiKey: APIKey): M[Option[APIKeyRecord]]
   def findAPIKeyChildren(apiKey: APIKey): M[Set[APIKeyRecord]]
   def findAPIKeyAncestry(apiKey: APIKey): M[List[APIKeyRecord]] = {
-    findAPIKey(apiKey) flatMap {
+    findAPIKey(apiKey).flatMap {
       case Some(keyRecord) =>
         if (keyRecord.issuerKey == apiKey) M.point(List(keyRecord))
-        else findAPIKeyAncestry(keyRecord.issuerKey) map { keyRecord :: _ }
+        else findAPIKeyAncestry(keyRecord.issuerKey).map { keyRecord :: _ }
 
       case None =>
         M.point(List.empty[APIKeyRecord])
@@ -130,31 +130,33 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
 
   def findValidGrant(grantId: GrantId,
                      at: Option[DateTime] = None): M[Option[Grant]] =
-    findGrant(grantId) flatMap { grantOpt =>
-      grantOpt map { (grant: Grant) =>
-        if (grant.isExpired(at)) None.point[M]
-        else
-          grant.parentIds.foldLeft(some(grant).point[M]) {
-            case (accM, parentId) =>
-              accM flatMap {
-                _ traverse { grant =>
-                  findValidGrant(parentId, at).map(_ => grant)
+    findGrant(grantId).flatMap { grantOpt =>
+      grantOpt
+        .map { (grant: Grant) =>
+          if (grant.isExpired(at)) None.point[M]
+          else
+            grant.parentIds.foldLeft(some(grant).point[M]) {
+              case (accM, parentId) =>
+                accM.flatMap {
+                  _.traverse { grant =>
+                    findValidGrant(parentId, at).map(_ => grant)
+                  }
                 }
-              }
-          }
-      } getOrElse {
-        None.point[M]
-      }
+            }
+        }
+        .getOrElse {
+          None.point[M]
+        }
     }
 
   def validGrants(apiKey: APIKey, at: Option[DateTime] = None): M[Set[Grant]] = {
     logger.trace("Checking grant validity for apiKey " + apiKey)
-    findAPIKey(apiKey) flatMap {
-      _ map {
-        _.grants.toList.traverse(findValidGrant(_, at)) map {
+    findAPIKey(apiKey).flatMap {
+      _.map {
+        _.grants.toList.traverse(findValidGrant(_, at)).map {
           _.flatMap(_.toSet)(collection.breakOut): Set[Grant]
         }
-      } getOrElse {
+      }.getOrElse {
         Set.empty.point[M]
       }
     }
@@ -178,7 +180,7 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
                       issuerKey,
                       minimized,
                       perms,
-                      expiration) map {
+                      expiration).map {
             some
           }
         }
@@ -201,7 +203,7 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
                       issuerKey,
                       Set(parentId),
                       perms,
-                      expiration) map { some }
+                      expiration).map { some }
         case _ => none[Grant].point[M]
       }
     }
@@ -214,10 +216,10 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
       perms: Set[Permission],
       recipientKey: APIKey,
       expiration: Option[DateTime] = None): M[Option[Grant]] = {
-    deriveGrant(name, description, issuerKey, perms, expiration) flatMap {
+    deriveGrant(name, description, issuerKey, perms, expiration).flatMap {
       case Some(grant) =>
-        addGrants(recipientKey, Set(grant.grantId)) map {
-          _ map { _ =>
+        addGrants(recipientKey, Set(grant.grantId)).map {
+          _.map { _ =>
             grant
           }
         }
@@ -231,12 +233,13 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
       issuerKey: APIKey,
       grants: Set[v1.NewGrantRequest]): M[Option[APIKeyRecord]] = {
     val grantList = grants.toList
-    grantList.traverse(grant =>
-      hasCapability(issuerKey, grant.permissions, grant.expirationDate)) flatMap {
-      checks =>
+    grantList
+      .traverse(grant =>
+        hasCapability(issuerKey, grant.permissions, grant.expirationDate))
+      .flatMap { checks =>
         if (checks.forall(_ == true)) {
           for {
-            newGrants <- grantList traverse { g =>
+            newGrants <- grantList.traverse { g =>
               deriveGrant(g.name,
                           g.description,
                           issuerKey,
@@ -252,7 +255,7 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
         } else {
           none[APIKeyRecord].point[M]
         }
-    }
+      }
   }
 
   def hasCapability(apiKey: APIKey,

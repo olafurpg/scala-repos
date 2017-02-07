@@ -25,8 +25,8 @@ object UpgradeStrategy {
 
   implicit val updateStrategyValidator = validator[UpgradeStrategy] {
     strategy =>
-      strategy.minimumHealthCapacity is between(0.0, 1.0)
-      strategy.maximumOverCapacity is between(0.0, 1.0)
+      strategy.minimumHealthCapacity.is(between(0.0, 1.0))
+      strategy.maximumOverCapacity.is(between(0.0, 1.0))
   }
 
   lazy val validForResidentTasks: Validator[UpgradeStrategy] =

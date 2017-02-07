@@ -59,7 +59,7 @@ trait ModelLibModule[M[+ _]] {
         def idRes(cols: Map[ColumnRef, Column],
                   modelSet: ModelSet): Map[ColumnRef, Column] = {
           val keyCols =
-            cols filter {
+            cols.filter {
               case (ColumnRef(CPath(paths.Key, CPathIndex(_), _ @_ *), _),
                     _) =>
                 true
@@ -71,7 +71,7 @@ trait ModelLibModule[M[+ _]] {
           val modelCols: Map[ColumnRef, Column] =
             modelSet.identity.zipWithIndex.flatMap({
               case (id, idx) =>
-                id map {
+                id.map {
                   case (ColumnRef(cpath, ctype), cvalue) =>
                     val cpath0 = CPath(
                       paths.Key :: CPathIndex(idx + shift) :: cpath.nodes)
@@ -112,8 +112,8 @@ trait ModelLibModule[M[+ _]] {
             .map(_._2)
 
           { (row: Int) =>
-            keys map { cols =>
-              cols map {
+            keys.map { cols =>
+              cols.map {
                 case (ref, col) =>
                   (ref,
                    if (col.isDefinedAt(row)) col.cValue(row) else CUndefined)
@@ -139,19 +139,19 @@ trait ModelLibModule[M[+ _]] {
           val featurePaths = model.featureValues.keySet
 
           val res =
-            cols filter {
+            cols.filter {
               case (ColumnRef(cpath, ctype), col) =>
                 featurePaths.contains(cpath)
             }
 
-          val resPaths = res map { case (ColumnRef(cpath, _), _) => cpath } toSet
+          val resPaths = res.map { case (ColumnRef(cpath, _), _) => cpath } toSet
 
           if (resPaths == featurePaths) res
           else Map.empty[ColumnRef, Column]
         }
 
         def defined(cols: Map[ColumnRef, Column], range: Range): BitSet = {
-          val columns = cols map { case (_, col) => col }
+          val columns = cols.map { case (_, col) => col }
 
           BitSetUtil.filteredRange(range) { i =>
             if (columns.isEmpty) false
@@ -180,7 +180,7 @@ trait ModelLibModule[M[+ _]] {
               case (ColumnRef(cpath, _), _) => cpath
             }
             .toSeq sorted
-          val modelDoubles = cpaths map { model.featureValues(_) }
+          val modelDoubles = cpaths.map { model.featureValues(_) }
 
           val includedCols = includedModel.collect {
             case (ColumnRef(cpath, _), col: DoubleColumn) => (cpath, col)
@@ -189,7 +189,7 @@ trait ModelLibModule[M[+ _]] {
           val resultArray = filteredRange(includedModel, range).foldLeft(
             new Array[Double](range.end)) {
             case (arr, i) =>
-              val includedDoubles = cpaths map { includedCols(_).apply(i) }
+              val includedDoubles = cpaths.map { includedCols(_).apply(i) }
 
               if (modelDoubles.length == includedDoubles.length) {
                 val res =
@@ -218,7 +218,7 @@ trait ModelLibModule[M[+ _]] {
           val jtpe = Schema.mkType(Seq(ColumnRef(cpath, CDouble)))
 
           val col =
-            jtpe flatMap { tpe =>
+            jtpe.flatMap { tpe =>
               val res = schema.columns(tpe)
 
               if (res.length == 1)
@@ -243,7 +243,7 @@ trait ModelLibModule[M[+ _]] {
     def alignWithModels(schema: CSchema,
                         modelWithPaths: Map[String, Set[CPath]])
       : Map[String, Map[CPath, DoubleColumn]] = {
-      modelWithPaths map {
+      modelWithPaths.map {
         case (modelName, cpaths) =>
           (modelName, determineColumns(schema, cpaths))
       }
@@ -308,10 +308,11 @@ trait ModelLibModule[M[+ _]] {
                                _) =>
                   (modelName, path)
               }
-              .groupBy(_._1) map {
-              case (modelName, paths) =>
-                (modelName, paths.map(_._2))
-            }
+              .groupBy(_._1)
+              .map {
+                case (modelName, paths) =>
+                  (modelName, paths.map(_._2))
+              }
 
           val featuresPaths =
             schema.columnRefs
@@ -326,10 +327,11 @@ trait ModelLibModule[M[+ _]] {
                       `estimate`) =>
                   (modelName, path)
               }
-              .groupBy(_._1) map {
-              case (modelName, paths) =>
-                (modelName, paths.map(_._2))
-            }
+              .groupBy(_._1)
+              .map {
+                case (modelName, paths) =>
+                  (modelName, paths.map(_._2))
+              }
 
           val interceptCols = alignWithModels(schema, interceptPaths)
           val stdErrCols = alignWithModels(schema, stdErrPaths)
@@ -341,7 +343,7 @@ trait ModelLibModule[M[+ _]] {
           val commonKeys =
             interceptCols.keySet & stdErrCols.keySet & dofCols.keySet & covarCols.keySet & featuresCols.keySet
 
-          val joined0 = commonKeys map {
+          val joined0 = commonKeys.map {
             case field =>
               (field,
                List(interceptCols(field),
@@ -353,11 +355,11 @@ trait ModelLibModule[M[+ _]] {
 
           val rowModels: Int => Set[Model] = (i: Int) => {
             val joined =
-              joined0 filterNot {
+              joined0.filterNot {
                 case (_, cols) =>
                   val definedCols =
-                    cols map {
-                      _ filter { case (_, col) => col.isDefinedAt(i) }
+                    cols.map {
+                      _.filter { case (_, col) => col.isDefinedAt(i) }
                     }
                   definedCols.exists(_.isEmpty)
               }
@@ -367,29 +369,38 @@ trait ModelLibModule[M[+ _]] {
                   field,
                   cols @ List(constant, resStdErr, degs, varCovar, values)) =>
                 val cnst =
-                  constant.map {
-                    case (_, col) =>
-                      col.apply(i)
-                  }.headOption getOrElse {
-                    sys.error("Constant term must exist")
-                  }
+                  constant
+                    .map {
+                      case (_, col) =>
+                        col.apply(i)
+                    }
+                    .headOption
+                    .getOrElse {
+                      sys.error("Constant term must exist")
+                    }
 
                 val rse =
-                  resStdErr.map {
-                    case (_, col) =>
-                      col.apply(i)
-                  }.headOption getOrElse {
-                    sys.error("Error term must exist")
-                  }
+                  resStdErr
+                    .map {
+                      case (_, col) =>
+                        col.apply(i)
+                    }
+                    .headOption
+                    .getOrElse {
+                      sys.error("Error term must exist")
+                    }
 
                 val dof =
-                  degs.map {
-                    case (_, col) =>
-                      col.apply(i).toInt
-                  }.headOption getOrElse { sys.error("DOF term must exist") }
+                  degs
+                    .map {
+                      case (_, col) =>
+                        col.apply(i).toInt
+                    }
+                    .headOption
+                    .getOrElse { sys.error("DOF term must exist") }
 
                 val fts =
-                  values map {
+                  values.map {
                     case (CPath(paths.Value,
                                 CPathField(_),
                                 CPathField(`coefficients`),
@@ -401,7 +412,7 @@ trait ModelLibModule[M[+ _]] {
                   }
 
                 val vc: Map[CPath, Double] =
-                  varCovar map {
+                  varCovar.map {
                     case (CPath(paths.Value,
                                 CPathField(_),
                                 CPathField(`varianceCovariance`),
@@ -412,7 +423,7 @@ trait ModelLibModule[M[+ _]] {
                 val size = fts.size + 1
                 val acc = Array.fill(size)(new Array[Double](size))
 
-                vc foreach {
+                vc.foreach {
                   case (CPath(CPathIndex(i), CPathIndex(j)), value)
                       if (i < size) && (j < size) =>
                     acc(i)(j) = value
@@ -423,7 +434,7 @@ trait ModelLibModule[M[+ _]] {
             }.toSet
           }
 
-          range.toList flatMap { i =>
+          range.toList.flatMap { i =>
             val models = rowModels(i)
             if (models.isEmpty) None
             else Some(ModelSet(rowIdentities(i), models))
@@ -473,10 +484,11 @@ trait ModelLibModule[M[+ _]] {
                       `estimate`) =>
                   (modelName, path)
               }
-              .groupBy(_._1) map {
-              case (modelName, paths) =>
-                (modelName, paths.map(_._2))
-            }
+              .groupBy(_._1)
+              .map {
+                case (modelName, paths) =>
+                  (modelName, paths.map(_._2))
+              }
 
           val interceptCols = alignWithModels(schema, interceptPaths)
           val featuresCols = alignWithModels(schema, featuresPaths)
@@ -484,18 +496,18 @@ trait ModelLibModule[M[+ _]] {
           //error prone; ideally determine common keys earlier
           val commonKeys = interceptCols.keySet & featuresCols.keySet
 
-          val joined0 = commonKeys map {
+          val joined0 = commonKeys.map {
             case field =>
               (field, List(interceptCols(field), featuresCols(field)))
           } toMap
 
           val rowModels: Int => Set[Model] = (i: Int) => {
             val joined =
-              joined0 filterNot {
+              joined0.filterNot {
                 case (_, cols) =>
                   val definedCols =
-                    cols map {
-                      _ filter { case (_, col) => col.isDefinedAt(i) }
+                    cols.map {
+                      _.filter { case (_, col) => col.isDefinedAt(i) }
                     }
                   definedCols.exists(_.isEmpty)
               }
@@ -503,15 +515,18 @@ trait ModelLibModule[M[+ _]] {
             joined.collect {
               case (field, cols @ List(constant, values)) =>
                 val cnst =
-                  constant.map {
-                    case (_, col) =>
-                      col.apply(i)
-                  }.headOption getOrElse {
-                    sys.error("Constant term must exist")
-                  }
+                  constant
+                    .map {
+                      case (_, col) =>
+                        col.apply(i)
+                    }
+                    .headOption
+                    .getOrElse {
+                      sys.error("Constant term must exist")
+                    }
 
                 val fts =
-                  values collect {
+                  values.collect {
                     case (CPath(paths.Value,
                                 CPathField(_),
                                 CPathField(`coefficients`),
@@ -526,7 +541,7 @@ trait ModelLibModule[M[+ _]] {
             }.toSet
           }
 
-          range.toList flatMap { i =>
+          range.toList.flatMap { i =>
             val models = rowModels(i)
             if (models.isEmpty) None
             else Some(ModelSet(rowIdentities(i), models))

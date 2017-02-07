@@ -36,10 +36,11 @@ trait PostErasure
        * is from java.lang.Integer.
        */
       def binop(lhs: Tree, op: Symbol, rhs: Tree) =
-        finish(localTyper typed
-          (Apply(Select(lhs, op.name) setPos tree.pos, rhs :: Nil) setPos tree.pos))
+        finish(
+          localTyper.typed(Apply(Select(lhs, op.name).setPos(tree.pos),
+                                 rhs :: Nil).setPos(tree.pos)))
 
-      super.transform(tree) setType elimErasedValueType(tree.tpe) match {
+      super.transform(tree).setType(elimErasedValueType(tree.tpe)) match {
         case AsInstanceOf(v, tpe) if v.tpe <:< tpe =>
           finish(v) // x.asInstanceOf[X]       ==> x
         case ValueClass.BoxAndUnbox(v) =>

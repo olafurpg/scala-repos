@@ -103,7 +103,7 @@ final class MethodCall[T <: AnyRef] private[reflect] (targetRef: T,
     (rt eq classOf[Unit]) || (rt eq classOf[Null]) ||
     (rt eq java.lang.Void.TYPE)
   }
-  def returnsFuture = classOf[Future[_]] isAssignableFrom method.getReturnType
+  def returnsFuture = classOf[Future[_]].isAssignableFrom(method.getReturnType)
 
   private def getTarget =
     if (targetRef ne null) targetRef else throw new NonexistentTargetException

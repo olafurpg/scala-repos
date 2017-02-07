@@ -90,7 +90,7 @@ object LineNumbers {
     def apply(idx: Int): String = _fwd(idx)
     def apply(str: String): Int = _rev(str)
 
-    def resolve(): Unit = _xref foreach (p ⇒ put(p._1, apply(p._2)))
+    def resolve(): Unit = _xref.foreach(p ⇒ put(p._1, apply(p._2)))
     def contains(str: String): Boolean = _rev contains str
 
     private def put(idx: Int, str: String): Unit = {

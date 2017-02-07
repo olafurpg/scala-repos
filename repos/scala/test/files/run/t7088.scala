@@ -4,7 +4,7 @@ object Test {
 
   def method[T: scala.reflect.ClassTag](a: TaggedArray[T], value: T) {
     a.update(0, value)
-    a foreach println
+    a.foreach(println)
   }
 
   def main(args: Array[String]): Unit = {

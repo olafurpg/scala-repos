@@ -72,7 +72,7 @@ object RatingFest {
         val query = $query(lila.game.Query.rated)
         // val query = $query.all
         // .batch(100)
-          .sort($sort asc G.createdAt)
+          .sort($sort.asc(G.createdAt))
         var started = nowMillis
         $enumerate.bulk[Game](query, bulkSize, limit) { games =>
           nb = nb + bulkSize
@@ -96,7 +96,7 @@ object RatingFest {
             }
             .sequenceFu
             .void
-        } andThen { case _ => log(nb) }
+        }.andThen { case _ => log(nb) }
       }
     } yield ()
   }

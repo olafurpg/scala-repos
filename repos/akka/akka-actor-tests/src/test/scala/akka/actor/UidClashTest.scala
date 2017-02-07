@@ -57,7 +57,7 @@ object UidClashTest {
     }
 
     override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-      context.children foreach { child ⇒
+      context.children.foreach { child ⇒
         oldActor = child
         context.unwatch(child)
         context.stop(child)

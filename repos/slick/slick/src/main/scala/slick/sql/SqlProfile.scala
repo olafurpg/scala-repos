@@ -126,9 +126,9 @@ trait SqlUtilsComponent { self: SqlProfile =>
 
   /** quotes identifiers to avoid collisions with SQL keywords and other syntax issues */
   def quoteIdentifier(id: String): String = {
-    val s = new StringBuilder(id.length + 4) append '"'
-    for (c <- id) if (c == '"') s append "\"\"" else s append c
-    (s append '"').toString
+    val s = new StringBuilder(id.length + 4).append('"')
+    for (c <- id) if (c == '"') s.append("\"\"") else s.append(c)
+    (s.append('"')).toString
   }
 
   def quoteTableName(t: TableNode): String = t.schemaName match {
@@ -139,8 +139,8 @@ trait SqlUtilsComponent { self: SqlProfile =>
   def likeEncode(s: String) = {
     val b = new StringBuilder
     for (c <- s) c match {
-      case '%' | '_' | '^' => b append '^' append c
-      case _ => b append c
+      case '%' | '_' | '^' => b.append('^').append(c)
+      case _ => b.append(c)
     }
     b.toString
   }

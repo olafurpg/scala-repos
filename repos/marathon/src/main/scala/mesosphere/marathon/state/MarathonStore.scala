@@ -91,7 +91,7 @@ class MarathonStore[S <: MarathonState[_, S]](
       .allIds()
       .map {
         _.collect {
-          case name: String if name startsWith prefix =>
+          case name: String if name.startsWith(prefix) =>
             name.replaceFirst(prefix, "")
         }
       }

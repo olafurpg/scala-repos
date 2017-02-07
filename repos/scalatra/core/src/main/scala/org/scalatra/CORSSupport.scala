@@ -121,17 +121,18 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
       .asInstanceOf[CORSConfig]
     import corsCfg._
     if (enabled) {
-      logger debug "Enabled CORS Support with:\nallowedOrigins:\n\t%s\nallowedMethods:\n\t%s\nallowedHeaders:\n\t%s"
-        .format(allowedOrigins mkString ", ",
-                allowedMethods mkString ", ",
-                allowedHeaders mkString ", ")
+      logger.debug(
+        "Enabled CORS Support with:\nallowedOrigins:\n\t%s\nallowedMethods:\n\t%s\nallowedHeaders:\n\t%s"
+          .format(allowedOrigins mkString ", ",
+                  allowedMethods mkString ", ",
+                  allowedHeaders mkString ", "))
     } else {
-      logger debug "Cors support is disabled"
+      logger.debug("Cors support is disabled")
     }
   }
 
   protected def handlePreflightRequest(): Unit = {
-    logger debug "handling preflight request"
+    logger.debug("handling preflight request")
     // 5.2.7
     augmentSimpleRequest()
     // 5.2.8
@@ -145,7 +146,7 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
       corsConfig.allowedHeaders ++ request
         .getHeaders(AccessControlRequestHeadersHeader)
         .asScala
-        .flatMap(_ split (","))
+        .flatMap(_.split(","))
     response.headers(AccessControlAllowHeadersHeader) = rh mkString ","
     response.end()
   }
@@ -208,7 +209,7 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
   private[this] def isSimpleHeader(header: String): Boolean = {
     val ho = header.blankOption
     ho.isDefined &&
-    (ho forall { h ⇒
+    (ho.forall { h ⇒
       val hu = h.toUpperCase(ENGLISH)
       SimpleHeaders.contains(hu) ||
       (hu == "CONTENT-TYPE" &&

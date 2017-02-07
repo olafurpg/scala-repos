@@ -137,7 +137,7 @@ abstract class Message extends HttpMessageProxy {
   def charset: Option[String] = {
     contentType.foreach { contentType =>
       val parts = StringUtils.split(contentType, ';')
-      1.to(parts.length - 1) foreach { i =>
+      1.to(parts.length - 1).foreach { i =>
         val part = parts(i).trim
         if (part.startsWith("charset=")) {
           val equalsIndex = part.indexOf('=')
@@ -164,13 +164,13 @@ abstract class Message extends HttpMessageProxy {
       builder.append(";charset=")
       builder.append(value)
       // Copy other parameters
-      1.to(parts.length - 1) foreach { i =>
+      1.to(parts.length - 1).foreach { i =>
         builder.append(";")
         builder.append(parts(i))
       }
     } else {
       // Replace charset= parameter(s)
-      1.to(parts.length - 1) foreach { i =>
+      1.to(parts.length - 1).foreach { i =>
         val part = parts(i)
         if (part.trim.startsWith("charset=")) {
           builder.append(";charset=")
@@ -330,7 +330,7 @@ abstract class Message extends HttpMessageProxy {
     * instead HTML if it's an XmlHttpRequest.  (Tip: don't do this - it's gross.)
     */
   def isXmlHttpRequest = {
-    Option(headers.get("X-Requested-With")) exists {
+    Option(headers.get("X-Requested-With")).exists {
       _.toLowerCase.contains("xmlhttprequest")
     }
   }
@@ -342,7 +342,7 @@ abstract class Message extends HttpMessageProxy {
   /** Get the content as a string. */
   def contentString: String = {
     val encoding = try {
-      Charset.forName(charset getOrElse "UTF-8")
+      Charset.forName(charset.getOrElse("UTF-8"))
     } catch {
       case _: Throwable => Message.Utf8
     }

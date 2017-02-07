@@ -8,7 +8,7 @@ import Chars._
 final class Precedence private (val level: Int)
     extends AnyVal
     with Ordered[Precedence] {
-  def compare(that: Precedence): Int = level compare that.level
+  def compare(that: Precedence): Int = level.compare(that.level)
   override def toString = s"Precedence($level)"
 }
 
@@ -35,6 +35,6 @@ object Precedence extends (Int => Precedence) {
   def apply(name: String): Precedence = name match {
     case "" | ErrorName => this(-1)
     case _ if isAssignmentOp(name) => this(0)
-    case _ => firstChar(name charAt 0)
+    case _ => firstChar(name.charAt(0))
   }
 }

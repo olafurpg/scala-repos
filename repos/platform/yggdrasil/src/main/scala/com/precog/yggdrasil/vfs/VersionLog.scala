@@ -78,7 +78,7 @@ object VersionLog {
                     "No current data for the path %s exists; it has been archived."
                       .format(dir)))
               case other =>
-                other.validated[VersionEntry].disjunction leftMap { err =>
+                other.validated[VersionEntry].disjunction.leftMap { err =>
                   Corrupt(err.message)
                 }
             }
@@ -177,51 +177,61 @@ class VersionLog(logFiles: VersionLog.LogFiles,
   }
 
   def addVersion(entry: VersionEntry): IO[PrecogUnit] =
-    allVersions.find(_ == entry) map { _ =>
-      IO(PrecogUnit)
-    } getOrElse {
-      logger.debug("Adding version entry: " + entry)
-      IOUtils
-        .writeToFile(entry.serialize.renderCompact + "\n", logFile, true) map {
-        _ =>
-          allVersions = allVersions :+ entry
-          PrecogUnit
+    allVersions
+      .find(_ == entry)
+      .map { _ =>
+        IO(PrecogUnit)
       }
-    }
+      .getOrElse {
+        logger.debug("Adding version entry: " + entry)
+        IOUtils
+          .writeToFile(entry.serialize.renderCompact + "\n", logFile, true)
+          .map { _ =>
+            allVersions = allVersions :+ entry
+            PrecogUnit
+          }
+      }
 
   def completeVersion(version: UUID): IO[PrecogUnit] = {
     if (allVersions.exists(_.id == version)) {
-      !isCompleted(version) whenM {
+      (!isCompleted(version) whenM {
         logger.debug("Completing version " + version)
         IOUtils.writeToFile(version.serialize.renderCompact + "\n",
                             completedFile)
-      } map { _ =>
+      }).map { _ =>
         PrecogUnit
       }
     } else {
       IO.throwIO(
         new IllegalStateException(
-          "Cannot make nonexistent version %s current" format version))
+          "Cannot make nonexistent version %s current".format(version)))
     }
   }
 
   def setHead(newHead: UUID): IO[PrecogUnit] = {
-    currentVersion.exists(_.id == newHead) unlessM {
-      allVersions.find(_.id == newHead) traverse { entry =>
-        logger.debug("Setting HEAD to " + newHead)
-        IOUtils
-          .writeToFile(entry.serialize.renderCompact + "\n", headFile) map {
-          _ =>
-            currentVersion = Some(entry);
-        }
-      } flatMap {
-        _.isEmpty.whenM(
-          IO.throwIO(new IllegalStateException(
-            "Attempt to set head to nonexistent version %s" format newHead)))
+    currentVersion
+      .exists(_.id == newHead)
+      .unlessM {
+        allVersions
+          .find(_.id == newHead)
+          .traverse { entry =>
+            logger.debug("Setting HEAD to " + newHead)
+            IOUtils
+              .writeToFile(entry.serialize.renderCompact + "\n", headFile)
+              .map { _ =>
+                currentVersion = Some(entry);
+              }
+          }
+          .flatMap {
+            _.isEmpty.whenM(
+              IO.throwIO(new IllegalStateException(
+                "Attempt to set head to nonexistent version %s".format(
+                  newHead))))
+          }
       }
-    } map { _ =>
-      PrecogUnit
-    }
+      .map { _ =>
+        PrecogUnit
+      }
   }
 
   def clearHead = IOUtils.writeToFile(unsetSentinelJV, headFile).map { _ =>

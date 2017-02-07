@@ -144,11 +144,14 @@ class AppTasksResource @Inject()(service: MarathonSchedulerService,
 
     import scala.concurrent.ExecutionContext.Implicits.global
     val response =
-      future.map { tasks =>
-        toResponse(tasks)
-      } recover {
-        case UnknownAppException(appId, version) => unknownApp(appId, version)
-      }
+      future
+        .map { tasks =>
+          toResponse(tasks)
+        }
+        .recover {
+          case UnknownAppException(appId, version) =>
+            unknownApp(appId, version)
+        }
     result(response)
   }
 }

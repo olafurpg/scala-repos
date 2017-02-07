@@ -141,7 +141,7 @@ abstract class Broadcast[T: ClassTag](val id: Long)
 
   /** Check if this broadcast is valid. If not valid, exception is thrown. */
   protected def assertValid() {
-    if (! _isValid) {
+    if (!_isValid) {
       throw new SparkException(
         "Attempted to use %s after it was destroyed (%s) "
           .format(toString, _destroySite))

@@ -45,7 +45,7 @@ object PrinterHelper {
       |  class foo3[Af, Bf](a: scala.Int)(b: scala.Float, c: PrintersContext.this.foo1[Af, Bf]) extends scala.annotation.Annotation with scala.annotation.StaticAnnotation;
       |  trait A1;
       |  trait B1;
-      |${source.trim.lines map { "  " + _ } mkString s"$LF"}
+      |${source.trim.lines.map { "  " + _ } mkString s"$LF"}
       |}"""
 
       if (wrap) context.trim() else source.trim

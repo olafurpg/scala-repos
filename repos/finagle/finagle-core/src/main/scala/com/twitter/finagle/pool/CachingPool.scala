@@ -59,7 +59,7 @@ private[finagle] class CachingPool[Req, Rep](factory: ServiceFactory[Req, Rep],
         case Some(service) =>
           Future.value(new WrappedService(service))
         case None =>
-          factory(conn) map { new WrappedService(_) }
+          factory(conn).map { new WrappedService(_) }
       }
     }
   }

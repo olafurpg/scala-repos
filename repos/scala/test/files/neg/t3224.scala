@@ -23,21 +23,21 @@ object Test extends App {
       array.toList
     }
 
-    println(Texts textL List())
-    println(Texts textL List(1))
-    println(Texts textL List(1, 1));
+    println(Texts.textL(List()))
+    println(Texts.textL(List(1)))
+    println(Texts.textL(List(1, 1)));
 
-    println(Texts textL Array())
-    println(Texts textL Array(1))
-    println(Texts textL Array(1, 1))
+    println(Texts.textL(Array()))
+    println(Texts.textL(Array(1)))
+    println(Texts.textL(Array(1, 1)))
 
-    println(Texts textA List())
-    println(Texts textA List(1))
-    println(Texts textA List(1, 1));
+    println(Texts.textA(List()))
+    println(Texts.textA(List(1)))
+    println(Texts.textA(List(1, 1)));
 
-    println(Texts textA Array())
-    println(Texts textA Array(1))
-    println(Texts textA Array(1, 1))
+    println(Texts.textA(Array()))
+    println(Texts.textA(Array(1)))
+    println(Texts.textA(Array(1, 1)))
   }
 
   {

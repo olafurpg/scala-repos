@@ -29,7 +29,7 @@ object EmptyElemTag {
     builder.getTokenType match {
       case ScalaXmlTokenTypes.XML_NAME =>
         builder.advanceLexer()
-      case _ => builder error ErrMsg("xml.name.expected")
+      case _ => builder.error(ErrMsg("xml.name.expected"))
     }
     while (Attribute.parse(builder)) {}
     builder.getTokenType match {

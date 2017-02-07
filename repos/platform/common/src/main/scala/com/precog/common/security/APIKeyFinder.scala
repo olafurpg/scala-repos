@@ -88,7 +88,7 @@ class DirectAPIKeyFinder[M[+ _]](underlying: APIKeyManager[M])(
           ancestors
             .drop(1)
             .map(_.apiKey) // The first element of ancestors is the key itself, so we drop it
-        grantIds.map(underlying.findGrant).toList.sequence map { grants =>
+        grantIds.map(underlying.findGrant).toList.sequence.map { grants =>
           val divulgedIssuers = rootKey
             .map { rk =>
               ancestorKeys.reverse.dropWhile(_ != rk).reverse
@@ -117,16 +117,16 @@ class DirectAPIKeyFinder[M[+ _]](underlying: APIKeyManager[M])(
   }
 
   def findAPIKey(apiKey: APIKey, rootKey: Option[APIKey]) = {
-    underlying.findAPIKey(apiKey) flatMap {
+    underlying.findAPIKey(apiKey).flatMap {
       _.collect(recordDetails(rootKey)).sequence
     }
   }
 
   def findAllAPIKeys(fromRoot: APIKey): M[Set[v1.APIKeyDetails]] = {
-    underlying.findAPIKey(fromRoot) flatMap {
+    underlying.findAPIKey(fromRoot).flatMap {
       case Some(record) =>
-        underlying.findAPIKeyChildren(record.apiKey) flatMap { recs =>
-          (recs collect recordDetails).toList.sequence.map(_.toSet)
+        underlying.findAPIKeyChildren(record.apiKey).flatMap { recs =>
+          (recs.collect(recordDetails)).toList.sequence.map(_.toSet)
         }
 
       case None =>
@@ -138,10 +138,11 @@ class DirectAPIKeyFinder[M[+ _]](underlying: APIKeyManager[M])(
                    keyName: Option[String] = None,
                    keyDesc: Option[String] = None): M[v1.APIKeyDetails] = {
     underlying
-      .newStandardAPIKeyRecord(accountId, keyName, keyDesc) flatMap recordDetails
+      .newStandardAPIKeyRecord(accountId, keyName, keyDesc)
+      .flatMap(recordDetails)
   }
 
   def addGrant(accountKey: APIKey, grantId: GrantId): M[Boolean] = {
-    underlying.addGrants(accountKey, Set(grantId)) map { _.isDefined }
+    underlying.addGrants(accountKey, Set(grantId)).map { _.isDefined }
   }
 }

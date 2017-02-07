@@ -13,7 +13,7 @@ class IvyCacheTest extends IndexingTestCase with UsefulTestCaseHelper {
     val testIndex = createAndUpdateIndex(
       new SbtResolver(SbtResolver.Kind.Ivy,
                       "Test repo",
-                      "/%s/sbt/resolvers/testIvyCache" format rootPath))
+                      "/%s/sbt/resolvers/testIvyCache".format(rootPath)))
     assertIndexContentsEquals(testIndex,
                               Set("org.jetbrains"),
                               Set("test-one", "test-two"),

@@ -30,7 +30,7 @@ object ValDcl {
     //Look for identifier
     builder.getTokenType match {
       case ScalaTokenTypes.tIDENTIFIER =>
-        Ids parse builder
+        Ids.parse(builder)
         //Look for :
         builder.getTokenType match {
           case ScalaTokenTypes.tCOLON => {
@@ -38,12 +38,12 @@ object ValDcl {
             if (Type.parse(builder)) {
               returnMarker.drop
             } else {
-              builder error ErrMsg("wrong.type")
+              builder.error(ErrMsg("wrong.type"))
               returnMarker.drop
             }
           }
           case _ => {
-            builder error ErrMsg("wrong.val.declaration")
+            builder.error(ErrMsg("wrong.val.declaration"))
             returnMarker.drop
           }
         }
@@ -59,7 +59,7 @@ object ValDcl {
           }
         }
       case _ =>
-        builder error ErrMsg("identifier.expected")
+        builder.error(ErrMsg("identifier.expected"))
         returnMarker.drop
         return false
     }

@@ -23,7 +23,7 @@ class CancellationTest
     val f = cli("123")
     assert(!f.isDefined)
     m.connectFuture.setSuccess()
-    when(m.channel.isOpen) thenReturn true
+    when(m.channel.isOpen).thenReturn(true)
 
     assert(!f.isDefined)
 

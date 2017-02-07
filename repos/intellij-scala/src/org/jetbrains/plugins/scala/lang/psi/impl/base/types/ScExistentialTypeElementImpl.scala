@@ -69,7 +69,7 @@ class ScExistentialTypeElementImpl(node: ASTNode)
       }
       buff.toList
     }
-    q flatMap { t =>
+    q.flatMap { t =>
       val failures = for (f @ Failure(_, _) <- problems) yield f
       failures.foldLeft(Success(ScExistentialType(t, wildcards), Some(this)))(
         _.apply(_))

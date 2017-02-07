@@ -38,7 +38,7 @@ class InterpreterServiceTest extends FunSuite with BeforeAndAfter {
     val value = Buf.Utf8("value")
     val zero = Buf.Utf8("0")
     val start = System.currentTimeMillis
-    (0 until 100) map { i =>
+    ((0 until 100)).map { i =>
       val key = _key + i
       Await.result(client(Delete(Buf.Utf8(key))))
       Await.result(client(Set(Buf.Utf8(key), 0, Time.epoch, value)))

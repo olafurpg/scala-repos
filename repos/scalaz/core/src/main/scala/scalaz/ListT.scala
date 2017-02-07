@@ -62,7 +62,7 @@ final case class ListT[M[_], A](run: M[List[A]]) {
     })
 
   def flatMapF[B](f: A => M[List[B]])(implicit M: Monad[M]): ListT[M, B] =
-    flatMap(f andThen ListT.apply)
+    flatMap(f.andThen(ListT.apply))
 
   def map[B](f: A => B)(implicit M: Functor[M]): ListT[M, B] =
     new ListT(M.map(run)(_.map(f)))
@@ -150,7 +150,7 @@ object ListT extends ListTInstances {
 
 private trait ListTFunctor[F[_]] extends Functor[ListT[F, ?]] {
   implicit def F: Functor[F]
-  override def map[A, B](fa: ListT[F, A])(f: A => B): ListT[F, B] = fa map f
+  override def map[A, B](fa: ListT[F, A])(f: A => B): ListT[F, B] = fa.map(f)
 }
 
 private trait ListTSemigroup[F[_], A] extends Semigroup[ListT[F, A]] {
@@ -172,7 +172,7 @@ private trait ListTMonadPlus[F[_]]
   implicit def F: Monad[F]
 
   def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] =
-    fa flatMap f
+    fa.flatMap(f)
 
   def point[A](a: => A): ListT[F, A] = a :: ListT.empty[F, A]
 

@@ -153,7 +153,7 @@ trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : BinaryUpdateRegistry[Matrix[T], Matrix[T], Op.type] =
     new BinaryUpdateRegistry[Matrix[T], Matrix[T], Op.type] {
       override def bindingMissing(a: Matrix[T], b: Matrix[T]): Unit = {
@@ -225,7 +225,7 @@ trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
           _ / _
         }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : BinaryUpdateRegistry[Matrix[T], T, Op.type] =
     new BinaryUpdateRegistry[Matrix[T], T, Op.type] {
       override def bindingMissing(a: Matrix[T], b: T): Unit = {
@@ -325,7 +325,7 @@ trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ * _ }, {
           _ / _
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : BinaryRegistry[T, Matrix[T], Op.type, Matrix[T]] = {
     new BinaryRegistry[T, Matrix[T], Op.type, Matrix[T]] {
       override def bindingMissing(b: T, a: Matrix[T]) = {

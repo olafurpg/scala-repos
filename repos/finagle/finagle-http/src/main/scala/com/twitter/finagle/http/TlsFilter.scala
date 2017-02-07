@@ -32,7 +32,7 @@ object TlsFilter {
                next: ServiceFactory[Request, Response]) =
         tlsHostname match {
           case Transporter.TLSHostname(Some(host)) =>
-            new TlsFilter(host) andThen next
+            new TlsFilter(host).andThen(next)
           case Transporter.TLSHostname(None) => next
         }
     }

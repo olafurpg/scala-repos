@@ -30,13 +30,13 @@ object ScatterGatherFirstCompletedSpec {
           case Stop(Some(_id)) if (_id == id) ⇒ context.stop(self)
           case _id: Int if (_id == id) ⇒
           case x ⇒ {
-            Thread sleep 100 * id
+            Thread.sleep(100 * id)
             sender() ! id
           }
         }
 
         override def postStop = {
-          shudownLatch foreach (_.countDown())
+          shudownLatch.foreach(_.countDown())
         }
       }),
       "Actor:" + id

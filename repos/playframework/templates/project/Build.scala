@@ -62,7 +62,7 @@ object Templates {
         val syncTemplateDirValue: File = syncTemplateDir.value
         val mappings: Seq[(File, File)] = preparedTemplates.flatMap {
           template =>
-            (template.***.filter(!_.isDirectory) x relativeTo(template)).map {
+            (template.***.filter(!_.isDirectory).x(relativeTo(template))).map {
               f =>
                 (f._1, syncTemplateDirValue / template.getName / f._2)
             }
@@ -100,7 +100,7 @@ object Templates {
           case templateSources: TemplateSources =>
             val relativeMappings: Seq[(File, String)] =
               templateSources.sourceDirs.flatMap(dir =>
-                dir.***.filter(fileFilter(_)) x relativeTo(dir))
+                dir.***.filter(fileFilter(_)).x(relativeTo(dir)))
             // Rebase the files onto the target directory, also filtering out ignored files
             relativeMappings.collect {
               case (orig, targ) if !ignore.contains(orig.getName) =>
@@ -122,8 +122,10 @@ object Templates {
                 val parent: java.io.File = f.getParentFile
                 if (f.getParent == null) f else topDir(parent)
               }
-              val rebasedFile = (file relativeTo outDir).getOrElse(sys.error(
-                s"Can't rebase prepared template $file to dir $outDir"))
+              val rebasedFile = (file
+                .relativeTo(outDir))
+                .getOrElse(sys.error(
+                  s"Can't rebase prepared template $file to dir $outDir"))
               val templateName: String = topDir(rebasedFile).getName
               val templateSources: TemplateSources = templateSourcesList
                 .find(_.name == templateName)
@@ -176,7 +178,7 @@ object Templates {
         preparedTemplates.map { template =>
           val zipFile = distDir / (template.getName + ".zip")
           val files =
-            template.***.filter(!_.isDirectory) x relativeTo(template)
+            template.***.filter(!_.isDirectory).x(relativeTo(template))
           IO.zip(files, zipFile)
           zipFile
         }
@@ -372,7 +374,9 @@ object Templates {
 
       val setCommand = createSetCommand(templateDirs)
       val setBack =
-        templates in extracted.currentRef get extracted.structure.data map createSetCommand toList
+        (templates in extracted.currentRef)
+          .get(extracted.structure.data)
+          .map(createSetCommand) toList
 
       if (command == "") setCommand :: state
       else setCommand :: command :: setBack ::: state

@@ -92,7 +92,7 @@ class BundleDelegatingClassLoader(bundle: Bundle,
                 .asScala
                 .toList
               requiredWires.flatMap { wire ⇒
-                Option(wire.getProviderWiring) map { _.getBundle }
+                Option(wire.getProviderWiring).map { _.getBundle }
               }.toSet
             }
           process(processed + b, rest ++ (direct -- processed))

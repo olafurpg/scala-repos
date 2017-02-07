@@ -92,16 +92,16 @@ private object RenderSupport {
                         ctx: Context[ByteString]): SyncDirective = {
       sent += elem.length
       if (sent > length)
-        ctx fail InvalidContentLengthException(
-          s"HTTP message had declared Content-Length $length but entity data stream amounts to more bytes")
+        ctx.fail(InvalidContentLengthException(
+          s"HTTP message had declared Content-Length $length but entity data stream amounts to more bytes"))
       ctx.push(elem)
     }
 
     override def onUpstreamFinish(
         ctx: Context[ByteString]): TerminationDirective = {
       if (sent < length)
-        ctx fail InvalidContentLengthException(
-          s"HTTP message had declared Content-Length $length but entity data stream amounts to ${length - sent} bytes less")
+        ctx.fail(InvalidContentLengthException(
+          s"HTTP message had declared Content-Length $length but entity data stream amounts to ${length - sent} bytes less"))
       ctx.finish()
     }
   }

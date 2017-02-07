@@ -17,13 +17,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
 object ScalaActionUtil {
   def enablePresentation(presentation: Presentation): Unit = {
-    presentation setEnabled true
-    presentation setVisible true
+    presentation.setEnabled(true)
+    presentation.setVisible(true)
   }
 
   def disablePresentation(presentation: Presentation): Unit = {
-    presentation setEnabled false
-    presentation setVisible false
+    presentation.setEnabled(false)
+    presentation.setVisible(false)
   }
 
   def enableAndShowIfInScalaFile(e: AnActionEvent) {

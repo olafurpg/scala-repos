@@ -19,12 +19,12 @@ final class Paginator[A] private[paginator] (val currentPage: Int,
   /**
     * Returns the previous page.
     */
-  def previousPage: Option[Int] = (currentPage > 1) option (currentPage - 1)
+  def previousPage: Option[Int] = ((currentPage > 1)).option(currentPage - 1)
 
   /**
     * Returns the next page.
     */
-  def nextPage: Option[Int] = (currentPage < nbPages) option (currentPage + 1)
+  def nextPage: Option[Int] = ((currentPage < nbPages)).option(currentPage + 1)
 
   /**
     * Returns the number of pages.
@@ -54,7 +54,7 @@ final class Paginator[A] private[paginator] (val currentPage: Int,
                   nbResults = nbResults)
 
   def mapResults[B](f: A => B): Paginator[B] =
-    withCurrentPageResults(currentPageResults map f)
+    withCurrentPageResults(currentPageResults.map(f))
 }
 
 object Paginator {

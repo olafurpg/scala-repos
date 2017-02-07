@@ -13,7 +13,7 @@ import scala.math.Ordered
 abstract case class Timestamp private (private val utcDateTime: DateTime)
     extends Ordered[Timestamp] {
   def compare(that: Timestamp): Int =
-    this.utcDateTime compareTo that.utcDateTime
+    this.utcDateTime.compareTo(that.utcDateTime)
 
   override def toString: String = utcDateTime.toString
 

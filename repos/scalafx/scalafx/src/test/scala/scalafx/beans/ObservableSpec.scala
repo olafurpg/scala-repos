@@ -52,7 +52,7 @@ class ObservableSpec extends FlatSpec with BeforeAndAfterEach {
 
   "Observable" should "support anonymous invalidation listeners" in {
     var invalidateCalled = false
-    property onInvalidate {
+    property.onInvalidate {
       invalidateCalled = true
     }
     invalidateCalled should be(false)
@@ -62,7 +62,7 @@ class ObservableSpec extends FlatSpec with BeforeAndAfterEach {
 
   it should "support anonymous invalidation listeners with parameters" in {
     var invalidateCalled = false
-    property onInvalidate { obs =>
+    property.onInvalidate { obs =>
       invalidateCalled = true
       obs should equal(property)
     }

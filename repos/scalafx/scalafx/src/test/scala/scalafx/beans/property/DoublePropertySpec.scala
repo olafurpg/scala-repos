@@ -292,10 +292,10 @@ class DoublePropertySpec extends FlatSpec with BeforeAndAfterEach {
     var invalidateCount = 0
     var changeCount = 0
     val binding = doubleProperty * doubleProperty2
-    binding onInvalidate {
+    binding.onInvalidate {
       invalidateCount += 1
     }
-    binding onChange {
+    binding.onChange {
       changeCount += 1
     }
     doubleProperty() = 1

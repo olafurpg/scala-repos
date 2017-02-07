@@ -243,7 +243,7 @@ trait ExecutorScheduler { self: Scheduler =>
     // don't try too hard.
     val threads = new Array[Thread](threadGroup.activeCount * 2)
     val n = threadGroup.enumerate(threads)
-    threads take n
+    threads.take(n)
   }
 
   protected[this] val executor = executorFactory(threadFactory)

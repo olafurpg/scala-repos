@@ -165,7 +165,7 @@ private[twitter] object ServerDispatcher {
       statsReceiver: StatsReceiver
   ): ServerDispatcher =
     new ServerDispatcher(trans,
-                         Processor andThen service,
+                         Processor.andThen(service),
                          lessor,
                          tracer,
                          statsReceiver)
@@ -290,11 +290,13 @@ private[twitter] class ServerDispatcher(
   }
 
   private[this] def loop(): Unit =
-    Future.each(trans.read) { msg =>
-      val save = Local.save()
-      process(msg)
-      Local.restore(save)
-    } ensure { hangup(Time.now) }
+    Future
+      .each(trans.read) { msg =>
+        val save = Local.save()
+        process(msg)
+        Local.restore(save)
+      }
+      .ensure { hangup(Time.now) }
 
   Local.letClear {
     Trace.letTracer(tracer) {
@@ -310,7 +312,7 @@ private[twitter] class ServerDispatcher(
     }
   }
 
-  trans.onClose respond { res =>
+  trans.onClose.respond { res =>
     val exc = res match {
       case Return(exc) => exc
       case Throw(exc) => exc

@@ -37,7 +37,7 @@ object ServiceHandlerUtil {
                  details: Option[String] = None): HttpResponse[JValue] =
     HttpResponse[JValue](
       HttpStatus(BadRequest, message),
-      content = Some(jobject(jfield("error", details getOrElse message))))
+      content = Some(jobject(jfield("error", details.getOrElse(message)))))
 
   def notFound(message: String): HttpResponse[JValue] =
     HttpResponse[JValue](HttpStatus(NotFound),
@@ -56,7 +56,7 @@ object ServiceHandlerUtil {
                   details: Option[String] = None): HttpResponse[JValue] =
     HttpResponse(HttpStatus(InternalServerError, message),
                  content =
-                   Some(jobject(jfield("error", details getOrElse message))))
+                   Some(jobject(jfield("error", details.getOrElse(message)))))
 }
 
 // vim: set ts=4 sw=4 et:

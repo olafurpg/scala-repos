@@ -90,7 +90,7 @@ class BigDecimalTest {
     val d: Double = 100000
     assert(
       d.## == l.## && l.## == bd.## &&
-        bd.## == bi.## && (bd pow 4).hashCode == (bi pow 4).hashCode &&
+        bd.## == bi.## && (bd.pow(4)).hashCode == (bi.pow(4)).hashCode &&
         BigDecimal("1e150000").hashCode != BigDecimal("1e150000").toBigInt.hashCode
     )
   }

@@ -43,31 +43,40 @@ final class Preload(tv: Tv,
   def apply(posts: Fu[List[MiniForumPost]],
             tours: Fu[List[Tournament]],
             simuls: Fu[List[Simul]])(implicit ctx: Context): Fu[Response] =
-    lobbyApi(ctx) zip posts zip tours zip simuls zip tv.getBest zip
-      (ctx.userId ?? timelineEntries) zip leaderboard(true) zip tourneyWinners(
-      10) zip dailyPuzzle() zip streamsOnAir() zip (ctx.userId ?? getPlayban) zip
-      (ctx.me ?? Preload.currentGame(lightUser)) map {
-      case (((((((((((data, posts), tours), simuls), feat), entries), lead),
-                tWinners),
-               puzzle),
-              streams),
-             playban),
-            currentGame) =>
-        (data,
-         entries,
-         posts,
-         tours,
-         simuls,
-         feat,
-         lead,
-         tWinners,
-         puzzle,
-         streams,
-         Env.blog.lastPostCache.apply,
-         playban,
-         currentGame,
-         countRounds())
-    }
+    lobbyApi(ctx)
+      .zip(posts)
+      .zip(tours)
+      .zip(simuls)
+      .zip(tv.getBest)
+      .zip(ctx.userId ?? timelineEntries)
+      .zip(leaderboard(true))
+      .zip(tourneyWinners(10))
+      .zip(dailyPuzzle())
+      .zip(streamsOnAir())
+      .zip(ctx.userId ?? getPlayban)
+      .zip(ctx.me ?? Preload.currentGame(lightUser))
+      .map {
+        case (((((((((((data, posts), tours), simuls), feat), entries), lead),
+                  tWinners),
+                 puzzle),
+                streams),
+               playban),
+              currentGame) =>
+          (data,
+           entries,
+           posts,
+           tours,
+           simuls,
+           feat,
+           lead,
+           tWinners,
+           puzzle,
+           streams,
+           Env.blog.lastPostCache.apply,
+           playban,
+           currentGame,
+           countRounds())
+      }
 }
 
 object Preload {
@@ -75,16 +84,18 @@ object Preload {
   case class CurrentGame(pov: Pov, json: JsObject, opponent: String)
 
   def currentGame(lightUser: String => Option[LightUser])(user: User) =
-    GameRepo.urgentGames(user) map { povs =>
-      povs.find { p =>
-        p.game.nonAi && p.game.hasClock && p.isMyTurn
-      } map { pov =>
-        val opponent = lila.game.Namer.playerString(pov.opponent)(lightUser)
-        CurrentGame(pov = pov,
-                    opponent = opponent,
-                    json = Json.obj("id" -> pov.game.id,
-                                    "color" -> pov.color.name,
-                                    "opponent" -> opponent))
-      }
+    GameRepo.urgentGames(user).map { povs =>
+      povs
+        .find { p =>
+          p.game.nonAi && p.game.hasClock && p.isMyTurn
+        }
+        .map { pov =>
+          val opponent = lila.game.Namer.playerString(pov.opponent)(lightUser)
+          CurrentGame(pov = pov,
+                      opponent = opponent,
+                      json = Json.obj("id" -> pov.game.id,
+                                      "color" -> pov.color.name,
+                                      "opponent" -> opponent))
+        }
     }
 }

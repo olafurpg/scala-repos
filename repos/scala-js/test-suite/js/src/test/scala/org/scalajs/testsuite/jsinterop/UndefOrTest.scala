@@ -51,7 +51,7 @@ class UndefOrTest {
     assertEquals("ok", none[String].getOrElse("ok"))
 
     var defaultComputed = false
-    assertEquals("test", some("test") getOrElse {
+    assertEquals("test", some("test").getOrElse {
       defaultComputed = true
       "ko"
     })
@@ -124,13 +124,13 @@ class UndefOrTest {
   }
 
   @Test def collect(): Unit = {
-    assertEquals("ok", some("hello") collect {
+    assertEquals("ok", some("hello").collect {
       case "hello" => "ok"
     })
-    assertTrue(js.isUndefined(some("hello") collect {
+    assertTrue(js.isUndefined(some("hello").collect {
       case "notthis" => "ko"
     }))
-    assertTrue(js.isUndefined(none[String] collect {
+    assertTrue(js.isUndefined(none[String].collect {
       case "hello" => "ko"
     }))
   }
@@ -141,21 +141,21 @@ class UndefOrTest {
       witness += 1
       true
     }
-    assertEquals("ok", some("hello") collect {
+    assertEquals("ok", some("hello").collect {
       case x @ "hello" if guard(x) => "ok"
     })
     assertEquals(1, witness)
   }
 
   @Test def orElse(): Unit = {
-    assertTrue((some(true) orElse some(false)).get)
-    assertEquals("ok", some("ok") orElse none)
-    assertEquals("yes", none orElse some("yes"))
-    assertJSUndefined(none orElse none)
+    assertTrue((some(true).orElse(some(false))).get)
+    assertEquals("ok", some("ok").orElse(none))
+    assertEquals("yes", none.orElse(some("yes")))
+    assertJSUndefined(none.orElse(none))
 
     // #2095
-    assertEquals("ok", some("ok") orElse "yes")
-    assertEquals("yes", none orElse "yes")
+    assertEquals("ok", some("ok").orElse("yes"))
+    assertEquals("yes", none.orElse("yes"))
   }
 
   @Test def toList(): Unit = {

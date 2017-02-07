@@ -279,7 +279,7 @@ private[mutable] abstract class ParHashSetCombiner[T](
         insertAll(blockStart(block), beforePos, leftovers)
 
       // return the no. of stored elements tupled with leftovers
-      (elemsIn + leftoversIn, elemsLeft concat leftoversLeft)
+      (elemsIn + leftoversIn, elemsLeft.concat(leftoversLeft))
     }
     private def insertAll(
         atPos: Int,
@@ -332,7 +332,7 @@ private[mutable] abstract class ParHashSetCombiner[T](
       // and a new leftovers set is produced in this way
       // the total number of successfully inserted elements is adjusted accordingly
       result = (this.result._1 + that.result._1 + inserted,
-                remainingLeftovers concat that.result._2)
+                remainingLeftovers.concat(that.result._2))
     }
     def shouldSplitFurther =
       howmany > scala.collection.parallel.thresholdFromSize(

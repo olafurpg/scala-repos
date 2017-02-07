@@ -4,7 +4,7 @@ sealed abstract class Permission(val name: String,
                                  val children: List[Permission] = Nil) {
 
   final def is(p: Permission): Boolean =
-    this == p || (children exists (_ is p))
+    this == p || (children.exists(_.is(p)))
 }
 
 object Permission {
@@ -93,13 +93,13 @@ object Permission {
     TerminateTournament
   )
 
-  private lazy val allByName: Map[String, Permission] = all map { p =>
+  private lazy val allByName: Map[String, Permission] = all.map { p =>
     (p.name, p)
   } toMap
 
-  def apply(name: String): Option[Permission] = allByName get name
+  def apply(name: String): Option[Permission] = allByName.get(name)
 
-  def apply(names: List[String]): List[Permission] = (names map apply).flatten
+  def apply(names: List[String]): List[Permission] = (names.map(apply)).flatten
 
   def exists(name: String) = allByName contains name
 }

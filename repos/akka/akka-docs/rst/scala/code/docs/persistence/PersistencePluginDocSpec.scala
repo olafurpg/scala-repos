@@ -233,11 +233,11 @@ object PersistenceTCKDoc {
 
       override def beforeAll() {
         super.beforeAll()
-        storageLocations foreach FileUtils.deleteRecursively
+        storageLocations.foreach(FileUtils.deleteRecursively)
       }
 
       override def afterAll() {
-        storageLocations foreach FileUtils.deleteRecursively
+        storageLocations.foreach(FileUtils.deleteRecursively)
         super.afterAll()
       }
     }

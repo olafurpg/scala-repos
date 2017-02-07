@@ -45,8 +45,7 @@ trait SegmentFormatSupport {
   import Arbitrary.arbitrary
 
   implicit lazy val arbBigDecimal: Arbitrary[BigDecimal] = Arbitrary(
-    Gen.chooseNum(Double.MinValue / 2, Double.MaxValue / 2) map
-      (BigDecimal(_)))
+    Gen.chooseNum(Double.MinValue / 2, Double.MaxValue / 2).map(BigDecimal(_)))
 
   def genCPath: Gen[CPath] =
     for {
@@ -69,10 +68,10 @@ trait SegmentFormatSupport {
     case CLong => arbitrary[Long]
     case CDouble => arbitrary[Double]
     case CNum => arbitrary[BigDecimal]
-    case CDate => arbitrary[Long] map (new DateTime(_))
+    case CDate => arbitrary[Long].map(new DateTime(_))
     case CArrayType(elemType: CValueType[a]) =>
       val list: Gen[List[a]] = listOf(genForCType(elemType))
-      val array: Gen[Array[a]] = list map (_.toArray(elemType.manifest))
+      val array: Gen[Array[a]] = list.map(_.toArray(elemType.manifest))
       array
   }
 
@@ -81,7 +80,7 @@ trait SegmentFormatSupport {
       Seq(CBoolean, CString, CLong, CDouble, CNum, CDate))
     if (maxDepth > 0) {
       frequency(6 -> basic,
-                1 -> (genCValueType(maxDepth - 1) map (CArrayType(_))))
+                1 -> (genCValueType(maxDepth - 1).map(CArrayType(_))))
     } else {
       basic
     }
@@ -92,7 +91,7 @@ trait SegmentFormatSupport {
       values <- listOfN(length, g)
     } yield {
       val array = manifest[A].newArray(length)
-      values.zipWithIndex foreach {
+      values.zipWithIndex.foreach {
         case (v, i) =>
           array(i) = v
       }
@@ -112,7 +111,7 @@ trait SegmentFormatSupport {
 
   def genArraySegment(length: Int): Gen[ArraySegment[_]] =
     for {
-      ctype <- genCValueType(2) filter (_ != CBoolean) // Note: CArrayType(CBoolean) is OK!
+      ctype <- genCValueType(2).filter(_ != CBoolean) // Note: CArrayType(CBoolean) is OK!
       segment <- genArraySegmentForCType(ctype, length)
     } yield segment
 
@@ -142,7 +141,7 @@ trait SegmentFormatSupport {
           genBooleanSegment(length),
           genNullSegment(length))
 
-  def genSegmentId: Gen[SegmentId] = genSegment(0) map (_.id)
+  def genSegmentId: Gen[SegmentId] = genSegment(0).map(_.id)
 }
 
 trait SegmentFormatMatchers { self: Specification with ScalaCheck =>
@@ -151,11 +150,11 @@ trait SegmentFormatMatchers { self: Specification with ScalaCheck =>
     x0.defined must_== y0.defined
     x0.length must_== y0.length
 
-    val definedAt = (0 until x0.length) map x0.defined.apply
+    val definedAt = ((0 until x0.length)).map(x0.defined.apply)
     (x0, y0) must beLike {
       case (x: ArraySegment[_], y: ArraySegment[_]) =>
-        val xs = x.values.deep zip definedAt filter (_._2) map (_._1)
-        val ys = y.values.deep zip definedAt filter (_._2) map (_._1)
+        val xs = x.values.deep.zip(definedAt).filter(_._2).map(_._1)
+        val ys = y.values.deep.zip(definedAt).filter(_._2).map(_._1)
         xs must_== ys
       case (x: BooleanSegment, y: BooleanSegment) =>
         (x.values & x0.defined) must_== (y.values & x0.defined)

@@ -40,13 +40,13 @@ object ScaldingPoC extends App {
   )
 
   val fasterBirds = birds.map(b => b + ("doubleSpeed" ->> b("speed") * 2))
-  fasterBirds foreach println
+  fasterBirds.foreach(println)
 
   val britishBirds = birds.map(
     b =>
       b + ("weightKg" ->> b("weightLb") * 0.454) +
         ("heightM" ->> b("heightFt") * 0.305))
-  britishBirds foreach println
+  britishBirds.foreach(println)
 
   val items = List(
     "author" ->> "Benjamin Pierce" :: "title" ->> "Types and Programming Languages" :: "price" ->> 49.35 :: HNil,
@@ -54,7 +54,7 @@ object ScaldingPoC extends App {
   )
 
   val pricierItems = items.map(i => i + ("price" ->> i("price") * 1.1))
-  pricierItems foreach println
+  pricierItems.foreach(println)
 
   val books = List(
     "text" ->> "Not everyone knows how I killed old Phillip Mathers" :: HNil,
@@ -63,5 +63,5 @@ object ScaldingPoC extends App {
 
   val lines = books.flatMap(book =>
     for (word <- book("text").split("\\s+")) yield book + ("word" ->> word))
-  lines foreach println
+  lines.foreach(println)
 }

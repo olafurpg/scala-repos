@@ -81,7 +81,7 @@ class FlowOnCompleteSpec extends AkkaSpec with ScriptedTest {
           x
         }
         .runWith(foreachSink)
-      future onComplete { onCompleteProbe.ref ! _ }
+      future.onComplete { onCompleteProbe.ref ! _ }
       val proc = p.expectSubscription
       proc.expectRequest()
       proc.sendNext(42)

@@ -3,7 +3,7 @@ object Test extends App {
   println(a)
 
 // inferred type should be Map[String, Int]
-  val res = a collect { case (p, Some(a)) => (p, a) }
+  val res = a.collect { case (p, Some(a)) => (p, a) }
 
 // variations: const target -> switch, non-const -> normal match, char target --> scrut needs toInt,
 // eta-expanded --> work is done by typedFunction, non-eta-expanded --> typedMatch

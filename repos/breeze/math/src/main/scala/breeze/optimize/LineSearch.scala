@@ -41,12 +41,12 @@ object LineSearch {
 
       /** calculates the gradient at a point */
       override def gradientAt(alpha: Double): Double =
-        f.gradientAt(x + direction * alpha) dot direction
+        f.gradientAt(x + direction * alpha).dot(direction)
 
       /** Calculates both the value and the gradient at a point */
       def calculate(alpha: Double): (Double, Double) = {
         val (ff, grad) = f.calculate(x + direction * alpha)
-        ff -> (grad dot direction)
+        ff -> (grad.dot(direction))
       }
     }
 }

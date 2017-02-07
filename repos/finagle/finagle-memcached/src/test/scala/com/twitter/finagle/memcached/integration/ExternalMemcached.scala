@@ -84,7 +84,7 @@ private[memcached] object ExternalMemcached { self =>
       builder.start()
     }
 
-    (address orElse findAddress()) flatMap { addr =>
+    (address.orElse(findAddress())).flatMap { addr =>
       try {
         val proc = exec(addr)
         processes :+= proc
@@ -139,7 +139,7 @@ private[memcached] object ExternalMemcached { self =>
     .getRuntime()
     .addShutdownHook(new Thread {
       override def run() {
-        processes foreach { p =>
+        processes.foreach { p =>
           p.destroy()
           p.waitFor()
         }

@@ -180,8 +180,8 @@ object ResultsSpec extends Specification {
     "support sending a file with Ok status" in withFile { (file, fileName) =>
       val rh = Ok.sendFile(file).header
 
-      (rh.status aka "status" must_== OK) and
-        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+      ((rh.status.aka("status") must_== OK)).and(
+        rh.headers.get(CONTENT_DISPOSITION).aka("disposition") must beSome(
           s"""attachment; filename="${fileName}""""))
     }
 
@@ -189,8 +189,8 @@ object ResultsSpec extends Specification {
       (file, fileName) =>
         val rh = Unauthorized.sendFile(file).header
 
-        (rh.status aka "status" must_== UNAUTHORIZED) and
-          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+        ((rh.status.aka("status") must_== UNAUTHORIZED)).and(
+          rh.headers.get(CONTENT_DISPOSITION).aka("disposition") must beSome(
             s"""attachment; filename="${fileName}""""))
     }
 
@@ -198,8 +198,8 @@ object ResultsSpec extends Specification {
       (file, fileName) =>
         val rh = Unauthorized.sendFile(file, inline = true).header
 
-        (rh.status aka "status" must_== UNAUTHORIZED) and
-          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+        ((rh.status.aka("status") must_== UNAUTHORIZED)).and(
+          rh.headers.get(CONTENT_DISPOSITION).aka("disposition") must beSome(
             s"""inline; filename="${fileName}""""))
     }
 
@@ -207,8 +207,8 @@ object ResultsSpec extends Specification {
       (file, fileName) =>
         val rh = PaymentRequired.sendFile(file).header
 
-        (rh.status aka "status" must_== PAYMENT_REQUIRED) and
-          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+        ((rh.status.aka("status") must_== PAYMENT_REQUIRED)).and(
+          rh.headers.get(CONTENT_DISPOSITION).aka("disposition") must beSome(
             s"""attachment; filename="${fileName}""""))
     }
 
@@ -216,16 +216,16 @@ object ResultsSpec extends Specification {
       (file, fileName) =>
         val rh = PaymentRequired.sendFile(file, inline = true).header
 
-        (rh.status aka "status" must_== PAYMENT_REQUIRED) and
-          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+        ((rh.status.aka("status") must_== PAYMENT_REQUIRED)).and(
+          rh.headers.get(CONTENT_DISPOSITION).aka("disposition") must beSome(
             s"""inline; filename="${fileName}""""))
     }
 
     "support sending a path with Ok status" in withPath { (file, fileName) =>
       val rh = Ok.sendPath(file).header
 
-      (rh.status aka "status" must_== OK) and
-        (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+      ((rh.status.aka("status") must_== OK)).and(
+        rh.headers.get(CONTENT_DISPOSITION).aka("disposition") must beSome(
           s"""attachment; filename="${fileName}""""))
     }
 
@@ -233,8 +233,8 @@ object ResultsSpec extends Specification {
       (file, fileName) =>
         val rh = Unauthorized.sendPath(file).header
 
-        (rh.status aka "status" must_== UNAUTHORIZED) and
-          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+        ((rh.status.aka("status") must_== UNAUTHORIZED)).and(
+          rh.headers.get(CONTENT_DISPOSITION).aka("disposition") must beSome(
             s"""attachment; filename="${fileName}""""))
     }
 
@@ -242,8 +242,8 @@ object ResultsSpec extends Specification {
       (file, fileName) =>
         val rh = Unauthorized.sendPath(file, inline = true).header
 
-        (rh.status aka "status" must_== UNAUTHORIZED) and
-          (rh.headers.get(CONTENT_DISPOSITION) aka "disposition" must beSome(
+        ((rh.status.aka("status") must_== UNAUTHORIZED)).and(
+          rh.headers.get(CONTENT_DISPOSITION).aka("disposition") must beSome(
             s"""inline; filename="${fileName}""""))
     }
 

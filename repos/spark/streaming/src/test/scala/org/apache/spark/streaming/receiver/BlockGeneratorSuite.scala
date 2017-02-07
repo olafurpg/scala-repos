@@ -93,8 +93,8 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
         assert(listener.onPushBlockCalled === true)
       }
     }
-    listener.pushedData.asScala.toSeq should contain theSameElementsInOrderAs
-      (data1)
+    (listener.pushedData.asScala.toSeq should contain)
+      .theSameElementsInOrderAs(data1)
     assert(listener.onAddDataCalled === false) // should be called only with addDataWithCallback()
 
     // Verify addDataWithCallback() add data+metadata and and callbacks are called correctly
@@ -104,14 +104,15 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
       case (d, m) => blockGenerator.addDataWithCallback(d, m)
     }
     assert(listener.onAddDataCalled === true)
-    listener.addedData.asScala.toSeq should contain theSameElementsInOrderAs
-      (data2)
-    listener.addedMetadata.asScala.toSeq should contain theSameElementsInOrderAs
-      (metadata2)
+    (listener.addedData.asScala.toSeq should contain)
+      .theSameElementsInOrderAs(data2)
+    (listener.addedMetadata.asScala.toSeq should contain)
+      .theSameElementsInOrderAs(metadata2)
     clock.advance(blockIntervalMs) // advance clock to generate blocks
     eventually(timeout(1 second)) {
       val combined = data1 ++ data2
-      listener.pushedData.asScala.toSeq should contain theSameElementsInOrderAs combined
+      (listener.pushedData.asScala.toSeq should contain)
+        .theSameElementsInOrderAs(combined)
     }
 
     // Verify addMultipleDataWithCallback() add data+metadata and and callbacks are called correctly
@@ -119,13 +120,13 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
     val metadata3 = "metadata"
     blockGenerator.addMultipleDataWithCallback(data3.iterator, metadata3)
     val combinedMetadata = metadata2 :+ metadata3
-    listener.addedMetadata.asScala.toSeq should contain theSameElementsInOrderAs
-      (combinedMetadata)
+    (listener.addedMetadata.asScala.toSeq should contain)
+      .theSameElementsInOrderAs(combinedMetadata)
     clock.advance(blockIntervalMs) // advance clock to generate blocks
     eventually(timeout(1 second)) {
       val combinedData = data1 ++ data2 ++ data3
-      listener.pushedData.asScala.toSeq should contain theSameElementsInOrderAs
-        (combinedData)
+      (listener.pushedData.asScala.toSeq should contain)
+        .theSameElementsInOrderAs(combinedData)
     }
 
     // Stop the block generator by starting the stop on a different thread and

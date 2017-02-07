@@ -58,7 +58,7 @@ object ReflectionUtils {
       case null =>
         val loadBootCp = (flavor: String) =>
           scala.util.Properties.propOrNone(flavor + ".boot.class.path")
-        loadBootCp("sun") orElse loadBootCp("java") getOrElse "<unknown>"
+        loadBootCp("sun").orElse(loadBootCp("java")).getOrElse("<unknown>")
       case _ =>
         "<unknown>"
     }
@@ -73,32 +73,32 @@ object ReflectionUtils {
   }
 
   def staticSingletonInstance(cl: ClassLoader, className: String): AnyRef = {
-    val name = if (className endsWith "$") className else className + "$"
+    val name = if (className.endsWith("$")) className else className + "$"
     val clazz = java.lang.Class.forName(name, true, cl)
     staticSingletonInstance(clazz)
   }
 
   def staticSingletonInstance(clazz: Class[_]): AnyRef =
-    clazz getField "MODULE$" get null
+    clazz.getField("MODULE$").get(null)
 
   def innerSingletonInstance(outer: AnyRef, className: String): AnyRef = {
     val accessorName =
-      if (className endsWith "$") className.substring(0, className.length - 1)
+      if (className.endsWith("$")) className.substring(0, className.length - 1)
       else className
     def singletonAccessor(clazz: Class[_]): Option[Method] =
       if (clazz == null) None
       else {
         val declaredAccessor =
           clazz.getDeclaredMethods.find(_.getName == accessorName)
-        declaredAccessor orElse singletonAccessor(clazz.getSuperclass)
+        declaredAccessor.orElse(singletonAccessor(clazz.getSuperclass))
       }
 
     val accessor =
-      singletonAccessor(outer.getClass) getOrElse {
+      singletonAccessor(outer.getClass).getOrElse {
         throw new NoSuchMethodException(
           s"${outer.getClass.getName}.$accessorName")
       }
-    accessor setAccessible true
+    accessor.setAccessible(true)
     accessor invoke outer
   }
 

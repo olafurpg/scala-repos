@@ -32,7 +32,7 @@ private[twitter] class StreamClientDispatcher[Req: RequestType](
   private[this] val RT = implicitly[RequestType[Req]]
 
   private[this] def readChunks(out: Broker[Buf]): Future[Unit] =
-    trans.read() flatMap {
+    trans.read().flatMap {
       case chunk: HttpChunk if chunk.isLast =>
         Future.Done
 
@@ -52,7 +52,7 @@ private[twitter] class StreamClientDispatcher[Req: RequestType](
       .write(from(RT.canonize(req)): HttpRequest)
       .rescue(wrapWriteException)
       .before {
-        trans.read() flatMap {
+        trans.read().flatMap {
           case httpRes: HttpResponse =>
             val out = new Broker[Buf]
             val err = new Broker[Throwable]
@@ -63,12 +63,14 @@ private[twitter] class StreamClientDispatcher[Req: RequestType](
               if (content.readable) out ! ChannelBufferBuf.Owned(content)
               done.setDone()
             } else {
-              readChunks(out) respond {
-                case Return(_) | Throw(_: ChannelClosedException) =>
-                  err ! EOF
-                case Throw(exc) =>
-                  err ! exc
-              } ensure done.setDone()
+              readChunks(out)
+                .respond {
+                  case Return(_) | Throw(_: ChannelClosedException) =>
+                    err ! EOF
+                  case Throw(exc) =>
+                    err ! exc
+                }
+                .ensure(done.setDone())
             }
 
             val res = new StreamResponse {
@@ -79,14 +81,13 @@ private[twitter] class StreamClientDispatcher[Req: RequestType](
             }
             p.updateIfEmpty(Return(res))
 
-            done ensure {
+            done.ensure {
               trans.close()
             }
 
           case invalid =>
-            Future.exception(
-              new IllegalArgumentException(
-                "invalid message \"%s\"".format(invalid)))
+            Future.exception(new IllegalArgumentException(
+              "invalid message \"%s\"".format(invalid)))
         }
       }
 }

@@ -244,7 +244,7 @@ trait DistNormedVectorSpace[V, K]
     with NormedVectorSpace[Dist[V], Dist[K]] {
   implicit def alg: NormedVectorSpace[V, K]
 
-  def norm(v: Dist[V]): Dist[K] = v map alg.norm
+  def norm(v: Dist[V]): Dist[K] = v.map(alg.norm)
 }
 
 trait DistInnerProductSpace[V, K]
@@ -253,7 +253,7 @@ trait DistInnerProductSpace[V, K]
   implicit def alg: InnerProductSpace[V, K]
 
   def dot(v: Dist[V], w: Dist[V]): Dist[K] =
-    new DistFromGen(g => v(g) dot w(g))
+    new DistFromGen(g => v(g).dot(w(g)))
 }
 
 object Dist extends DistInstances8 {
@@ -368,7 +368,7 @@ object Dist extends DistInstances8 {
   def safelong(maxBytes: Int): Dist[SafeLong] =
     if (maxBytes <= 0) {
       throw new IllegalArgumentException(
-        "need positive maxBytes, got %s" format maxBytes)
+        "need positive maxBytes, got %s".format(maxBytes))
     } else if (maxBytes < 8) {
       val n = (8 - maxBytes) * 8
       new DistFromGen(g => SafeLong(g.nextLong >>> n))

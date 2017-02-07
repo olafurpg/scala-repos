@@ -36,7 +36,7 @@ private[repl] trait SparkExprTyper extends Logging {
       result
     }
 
-    def defns(code: String) = stmts(code) collect { case x: DefTree => x }
+    def defns(code: String) = stmts(code).collect { case x: DefTree => x }
     def expr(code: String) = applyRule(code, _.expr())
     def stmts(code: String) = applyRule(code, _.templateStats())
     def stmt(code: String) = stmts(code).last // guaranteed nonempty
@@ -75,7 +75,7 @@ private[repl] trait SparkExprTyper extends Logging {
           val sym0 = symbolOfTerm(name)
           // drop NullaryMethodType
           val sym =
-            sym0.cloneSymbol setInfo afterTyper(sym0.info.finalResultType)
+            sym0.cloneSymbol.setInfo(afterTyper(sym0.info.finalResultType))
           if (sym.info.typeSymbol eq UnitClass) NoSymbol else sym
         case _ => NoSymbol
       }
@@ -85,7 +85,7 @@ private[repl] trait SparkExprTyper extends Logging {
 
       interpretSynthetic(code) match {
         case IR.Success =>
-          repl.definedSymbolList filterNot old match {
+          repl.definedSymbolList.filterNot(old) match {
             case Nil => NoSymbol
             case sym :: Nil => sym
             case syms => NoSymbol.newOverloaded(NoPrefix, syms)
@@ -93,7 +93,7 @@ private[repl] trait SparkExprTyper extends Logging {
         case _ => NoSymbol
       }
     }
-    beQuietDuring(asExpr()) orElse beQuietDuring(asDefn())
+    beQuietDuring(asExpr()).orElse(beQuietDuring(asDefn()))
   }
 
   private var typeOfExpressionDepth = 0

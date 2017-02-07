@@ -36,7 +36,7 @@ object CustomRouteExample {
       // example: transform message body "foo" to "- foo -" and forward result
       // to producer
       case msg: CamelMessage =>
-        producer.forward(msg.mapBody((body: String) => "- %s -" format body))
+        producer.forward(msg.mapBody((body: String) => "- %s -".format(body)))
     }
   }
 
@@ -49,7 +49,7 @@ object CustomRouteExample {
       from("direct:welcome").process(new Processor() {
         def process(exchange: Exchange) {
           // Create a 'welcome' message from the input message
-          exchange.getOut.setBody("Welcome %s" format exchange.getIn.getBody)
+          exchange.getOut.setBody("Welcome %s".format(exchange.getIn.getBody))
         }
       })
     }

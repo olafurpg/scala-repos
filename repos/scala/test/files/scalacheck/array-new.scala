@@ -13,7 +13,7 @@ object Test extends Properties("Array") {
     */
   implicit def arbArray[T](implicit a: Arbitrary[T],
                            m: ClassTag[T]): Arbitrary[Array[T]] =
-    Arbitrary(containerOf[List, T](arbitrary[T]) map (_.toArray))
+    Arbitrary(containerOf[List, T](arbitrary[T]).map(_.toArray))
 
   val arrGen: Gen[Array[_]] = oneOf(
     arbitrary[Array[Int]],
@@ -33,7 +33,7 @@ object Test extends Properties("Array") {
   def smallInt = choose(1, 10)
   property("ofDim") = forAll(smallInt, smallInt, smallInt) { (i1, i2, i3) =>
     val arr = Array.ofDim[String](i1, i2, i3)
-    val flattened = arr flatMap (x => x) flatMap (x => x)
+    val flattened = arr.flatMap(x => x).flatMap(x => x)
     flattened.length == i1 * i2 * i3
   }
 }

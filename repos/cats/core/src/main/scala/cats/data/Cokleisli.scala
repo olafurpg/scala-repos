@@ -18,10 +18,10 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
     Cokleisli(fc => run(F.map(fc)(f)))
 
   def map[C](f: B => C): Cokleisli[F, A, C] =
-    Cokleisli(f compose run)
+    Cokleisli(f.compose(run))
 
   def contramapValue[C](f: F[C] => F[A]): Cokleisli[F, C, B] =
-    Cokleisli(run compose f)
+    Cokleisli(run.compose(f))
 
   def flatMap[C](f: B => Cokleisli[F, A, C]): Cokleisli[F, A, C] =
     Cokleisli(fa => f(self.run(fa)).run(fa))
@@ -32,7 +32,7 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
 
   def andThen[C](c: Cokleisli[F, B, C])(
       implicit F: CoflatMap[F]): Cokleisli[F, A, C] =
-    c compose this
+    c.compose(this)
 
   def first[C](implicit F: Comonad[F]): Cokleisli[F, (A, C), (B, C)] =
     Cokleisli(fac => run(F.map(fac)(_._1)) -> F.extract(F.map(fac)(_._2)))
@@ -149,7 +149,7 @@ private trait CokleisliSemigroupK[F[_]]
 
   def combineK[A](a: Cokleisli[F, A, A],
                   b: Cokleisli[F, A, A]): Cokleisli[F, A, A] =
-    a compose b
+    a.compose(b)
 }
 
 private trait CokleisliMonoidK[F[_]]

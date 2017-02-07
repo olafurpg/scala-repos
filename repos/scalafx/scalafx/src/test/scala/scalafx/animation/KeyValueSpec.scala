@@ -176,7 +176,7 @@ class KeyValueSpec
     val endValue = 50
     evaluateFromSfx(property,
                     endValue,
-                    (property -> endValue tween Interpolator.EASE_BOTH),
+                    ((property -> endValue).tween(Interpolator.EASE_BOTH)),
                     true)
   }
 }

@@ -46,7 +46,7 @@ object ActorMaterializer {
     val system = actorSystemOf(context)
 
     val settings =
-      materializerSettings getOrElse ActorMaterializerSettings(system)
+      materializerSettings.getOrElse(ActorMaterializerSettings(system))
     apply(settings, namePrefix.getOrElse("flow"))(context)
   }
 

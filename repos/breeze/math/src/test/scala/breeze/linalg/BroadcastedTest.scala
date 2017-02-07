@@ -79,7 +79,7 @@ class BroadcastedTest extends FunSuite {
     val dm = DenseMatrix((-1.0, -2.0, -3.0), (1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
 
     import breeze.features._
-    val r = dm(*, ::) dot new FeatureVector(Array(1, 2))
+    val r = dm(*, ::).dot(new FeatureVector(Array(1, 2)))
     assert(r === DenseVector(-5.0, 5.0, 11.0))
   }
 

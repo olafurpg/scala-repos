@@ -60,7 +60,7 @@ trait TimeParsingSpecs[M[+ _]]
                        Const(CString("MMM d, yyyy h:mm:ss a"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -76,7 +76,7 @@ trait TimeParsingSpecs[M[+ _]]
                        Const(CString("MMM d, yyyy h:mm:ss a Z"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -95,7 +95,7 @@ trait TimeParsingSpecs[M[+ _]]
         )(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -114,7 +114,7 @@ trait TimeParsingSpecs[M[+ _]]
       )(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -136,7 +136,7 @@ trait TimeParsingSpecs[M[+ _]]
         )(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -155,7 +155,7 @@ trait TimeParsingSpecs[M[+ _]]
                        Const(CString("-10:00"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -171,7 +171,7 @@ trait TimeParsingSpecs[M[+ _]]
                        Const(CString("-10:00"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -187,7 +187,7 @@ trait TimeParsingSpecs[M[+ _]]
                        Const(CLong(10))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -203,7 +203,7 @@ trait TimeParsingSpecs[M[+ _]]
                        Const(CLong(10))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -219,7 +219,7 @@ trait TimeParsingSpecs[M[+ _]]
                        Const(CLong(10))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -234,7 +234,7 @@ trait TimeParsingSpecs[M[+ _]]
                        Const(CString("2010-06-04T07:04:01+00:00"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
         }
 
@@ -250,7 +250,7 @@ trait TimeParsingSpecs[M[+ _]]
                        Const(CString("2010-06-04T05:04:01+01:00"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
         }
 
@@ -264,7 +264,7 @@ trait TimeParsingSpecs[M[+ _]]
                           Const(CString("2010-06-04T05"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d.toLong
         }
 
@@ -278,7 +278,7 @@ trait TimeParsingSpecs[M[+ _]]
                           Const(CString("2010-06-04T03-02:00"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d.toLong
         }
 
@@ -292,7 +292,7 @@ trait TimeParsingSpecs[M[+ _]]
                           Const(CString("2010-06-04T05"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -306,7 +306,7 @@ trait TimeParsingSpecs[M[+ _]]
                           Const(CString("2010-06-04T03-02:00"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -320,7 +320,7 @@ trait TimeParsingSpecs[M[+ _]]
                           Const(CString("2010-01-04"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -334,7 +334,7 @@ trait TimeParsingSpecs[M[+ _]]
                           Const(CString("2010-01-04T-02:00"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
 
@@ -348,7 +348,7 @@ trait TimeParsingSpecs[M[+ _]]
                           Const(CString("2010-01-04"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
         }
 
@@ -362,7 +362,7 @@ trait TimeParsingSpecs[M[+ _]]
                           Const(CString("2010-01-04T03-02:00"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
         }
 
@@ -377,7 +377,7 @@ trait TimeParsingSpecs[M[+ _]]
       val input = Operate(BuiltInFunction1Op(ParseDateTimeFuzzy),
                           Const(CString(s))(line))(line)
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 0 => d.toString
         }
       result must haveSize(1)

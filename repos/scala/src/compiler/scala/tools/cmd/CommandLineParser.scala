@@ -19,17 +19,17 @@ object CommandLineParser {
   private class QuotedExtractor(quote: Char) {
     def unapply(in: String): Option[(String, String)] = {
       val del = quote.toString
-      if (in startsWith del) {
+      if (in.startsWith(del)) {
         var escaped = false
         val (quoted, next) =
-          (in substring 1) span {
+          ((in substring 1)).span {
             case `quote` if !escaped => false
             case '\\' if !escaped => escaped = true; true
             case _ => escaped = false; true
           }
         // the only way to get out of the above loop is with an empty next or !escaped
         // require(next.isEmpty || !escaped)
-        if (next startsWith del) Some((quoted, next substring 1))
+        if (next.startsWith(del)) Some((quoted, next substring 1))
         else None
       } else None
     }
@@ -57,7 +57,7 @@ object CommandLineParser {
     else
       argument(trimmed) match {
         case Right((arg, next)) =>
-          (next span Character.isWhitespace) match {
+          (next.span(Character.isWhitespace)) match {
             case ("", rest) if rest.nonEmpty =>
               Left("Arguments should be separated by whitespace.") // TODO: can this happen?
             case (ws, rest) => commandLine(rest, arg :: accum)

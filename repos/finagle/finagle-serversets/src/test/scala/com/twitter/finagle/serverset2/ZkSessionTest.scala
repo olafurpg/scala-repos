@@ -72,7 +72,7 @@ private class OpqueueZkReader(val sessionId: Long,
   @volatile var opq: immutable.Queue[ZkOp] = immutable.Queue.empty
 
   private def enqueue(op: ZkOp): Future[op.Res] = synchronized {
-    opq = opq enqueue op
+    opq = opq.enqueue(op)
     op.res
   }
 

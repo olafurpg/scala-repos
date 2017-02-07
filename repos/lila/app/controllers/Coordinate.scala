@@ -10,9 +10,9 @@ object Coordinate extends LilaController {
   private def env = Env.coordinate
 
   def home = Open { implicit ctx =>
-    ctx.userId ?? { userId =>
-      env.api getScore userId map (_.some)
-    } map { score =>
+    (ctx.userId ?? { userId =>
+      env.api.getScore(userId).map(_.some)
+    }).map { score =>
       views.html.coordinate.home(score)
     }
   }
@@ -23,7 +23,7 @@ object Coordinate extends LilaController {
       err => fuccess(BadRequest),
       data => env.api.addScore(me.id, data.isWhite, data.score)
     ) >> {
-      env.api getScore me.id map { s =>
+      env.api.getScore(me.id).map { s =>
         Ok(views.html.coordinate.scoreCharts(s))
       }
     }

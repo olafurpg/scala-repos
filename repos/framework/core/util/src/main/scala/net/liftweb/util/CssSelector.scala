@@ -142,7 +142,7 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
     // this method is synchronized because the Parser combinator is not
     // thread safe, so we'll only parse one at a time, but given that most
     // of the selectors will be cached, it's not really a performance hit
-    cache.get(toParse) or {
+    cache.get(toParse).or {
       internalParse(toParse).map { sel =>
         {
           // cache the result

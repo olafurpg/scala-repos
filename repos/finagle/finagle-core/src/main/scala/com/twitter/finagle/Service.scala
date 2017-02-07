@@ -151,8 +151,8 @@ abstract class ServiceFactory[-Req, +Rep]
     : ServiceFactory[Req1, Rep1] =
     new ServiceFactory[Req1, Rep1] {
       def apply(conn: ClientConnection): Future[Service[Req1, Rep1]] =
-        self(conn) flatMap { service =>
-          f(service) onFailure { _ =>
+        self(conn).flatMap { service =>
+          f(service).onFailure { _ =>
             service.close()
           }
         }

@@ -529,7 +529,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
   private def findElementByReferenceTypeInner(
       refType: ReferenceType): Option[PsiElement] = {
 
-    val byName = findByQualName(refType) orElse findByShortName(refType)
+    val byName = findByQualName(refType).orElse(findByShortName(refType))
     if (byName.isDefined) return byName
 
     val project = debugProcess.getProject

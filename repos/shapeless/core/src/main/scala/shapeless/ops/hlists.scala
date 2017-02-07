@@ -722,7 +722,7 @@ object hlist {
                          b: mutable.Builder[LLub, M[LLub]],
                          f: Lub0 => LLub): Unit = {
           b += f(u.left(l.head));
-          tttvs.append[LLub](l.tail, b, f compose u.right)
+          tttvs.append[LLub](l.tail, b, f.compose(u.right))
         }
       }
   }
@@ -2561,7 +2561,7 @@ object hlist {
         mapper: Mapper[tupled.type, OutT]): Aux[L, mapper.Out] =
       new Zip[L] {
         type Out = mapper.Out
-        def apply(l: L): Out = l.transpose map tupled
+        def apply(l: L): Out = l.transpose.map(tupled)
       }
   }
 
@@ -2583,7 +2583,7 @@ object hlist {
         tupler: Tupler[OutT]): Aux[L, tupler.Out] =
       new Unzip[L] {
         type Out = tupler.Out
-        def apply(l: L): Out = (l map productElements).transpose.tupled
+        def apply(l: L): Out = (l.map(productElements)).transpose.tupled
       }
   }
 

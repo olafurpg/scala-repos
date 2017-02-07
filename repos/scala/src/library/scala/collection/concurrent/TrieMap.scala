@@ -671,7 +671,7 @@ private[collection] final class CNode[K, V](val bitmap: Int,
     "CNode %x\n%s".format(bitmap, array.map(_.string(lev + 1)).mkString("\n"))
 
   /* quiescently consistent - don't call concurrently to anything involving a GCAS!! */
-  private def collectElems: Seq[(K, V)] = array flatMap {
+  private def collectElems: Seq[(K, V)] = array.flatMap {
     case sn: SNode[K, V] => Some(sn.kvPair)
     case in: INode[K, V] =>
       in.mainnode match {
@@ -681,7 +681,7 @@ private[collection] final class CNode[K, V](val bitmap: Int,
       }
   }
 
-  private def collectLocalElems: Seq[String] = array flatMap {
+  private def collectLocalElems: Seq[String] = array.flatMap {
     case sn: SNode[K, V] => Some(sn.kvPair._2.toString)
     case in: INode[K, V] => Some(in.toString.drop(14) + "(" + in.gen + ")")
   }

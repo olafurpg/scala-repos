@@ -257,7 +257,7 @@ class ScalaGenerateEqualsHandler extends LanguageCodeInsightActionHandler {
                                       signature: Signature): Boolean = {
     val methodsToOverride =
       ScalaOIUtil.methodSignaturesToOverride(aClass, withSelfType = false)
-    methodsToOverride exists {
+    methodsToOverride.exists {
       case sign: PhysicalSignature if sign.equiv(signature) =>
         //used only for equals and hashcode methods
         sign.isJava && sign.method.findSuperMethods(false).isEmpty

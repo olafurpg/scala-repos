@@ -15,9 +15,9 @@ import UidNb.UidNbBSONHandler
 
 final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration) {
 
-  def nbImportedBy(userId: String): Fu[Int] = count(Query imported userId)
+  def nbImportedBy(userId: String): Fu[Int] = count(Query.imported(userId))
   def clearNbImportedByCache(userId: String) =
-    count.remove(Query imported userId)
+    count.remove(Query.imported(userId))
 
   def nbPlaying(userId: String): Fu[Int] =
     countShortTtl(Query nowPlaying userId)
@@ -50,7 +50,7 @@ final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration) {
       if (!Variant.divisionSensibleVariants.contains(game.variant))
         chess.Division.empty
       else
-        Option(cache getIfPresent game.id) | {
+        Option(cache.getIfPresent(game.id)) | {
           val div = chess.Replay
             .boards(
               moveStrs = game.pgnMoves,

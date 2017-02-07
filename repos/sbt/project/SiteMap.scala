@@ -12,11 +12,11 @@ object SiteMap {
                entry: (File, String) => Option[Entry],
                log: Logger): (File, Seq[File]) = {
     def relativize(files: PathFinder): Seq[(File, String)] =
-      files pair relativeTo(repoBase)
+      files.pair(relativeTo(repoBase))
     def entries(files: PathFinder) =
-      relativize(files) flatMap {
+      relativize(files).flatMap {
         case (f, path) =>
-          entry(f, path).toList map { e =>
+          entry(f, path).toList.map { e =>
             entryXML(e, f, path)
           }
       }
@@ -56,7 +56,7 @@ object SiteMap {
           { entries }
         </sitemapindex>
     def indexEntries(subs: Seq[File]) =
-      relativize(subs) map { case (f, path) => indexEntryXML(f, path) }
+      relativize(subs).map { case (f, path) => indexEntryXML(f, path) }
     def siteMapIndex(dir: File, subs: Seq[File]): File = {
       val xml = indexEntriesXML(indexEntries(subs))
       writeXMLgz(dir / "sitemap_index.xml",

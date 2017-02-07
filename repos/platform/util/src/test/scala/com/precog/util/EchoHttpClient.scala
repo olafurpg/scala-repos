@@ -30,11 +30,11 @@ trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
     val response = Response(
       200,
       "OK",
-      request.body map (_.data) map { data =>
+      request.body.map(_.data).map { data =>
         val json = JParser.parseUnsafe(data)
         val JString(field) = json \ "field"
         val JArray(elems) = json \ "data"
-        val out = jobject("data" -> JArray(elems map { e =>
+        val out = jobject("data" -> JArray(elems.map { e =>
           jobject(jfield(field, e))
         }))
         out.renderCompact
@@ -48,7 +48,7 @@ trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
     val response = Response(
       200,
       "OK",
-      request.body map (_.data) map { data =>
+      request.body.map(_.data).map { data =>
         val json = JParser.parseUnsafe(data).asInstanceOf[JObject]
         val JArray(elems) = json \ "data"
         val options = List.fill(elems.size)(json - "data")
@@ -60,7 +60,7 @@ trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
 
   private def echo(request: Request[String])
     : EitherT[M, HttpClientError, Response[String]] = {
-    val response = Response(200, "OK", request.body map (_.data))
+    val response = Response(200, "OK", request.body.map(_.data))
     EitherT(M point \/-(response))
   }
 
@@ -97,11 +97,10 @@ trait EchoHttpClientModule[M[+ _]] extends HttpClientModule[M] {
   final class HttpClient(baseUrl: String) extends HttpClientLike {
     def execute(request: Request[String])
       : EitherT[M, HttpClientError, Response[String]] =
-      urlMap get baseUrl map (_(request)) getOrElse {
+      urlMap.get(baseUrl).map(_(request)).getOrElse {
         EitherT(
-          M.point(
-            -\/(HttpClientError.ConnectionError(Some(baseUrl),
-                                                new java.io.IOException))))
+          M.point(-\/(HttpClientError
+            .ConnectionError(Some(baseUrl), new java.io.IOException))))
       }
   }
 

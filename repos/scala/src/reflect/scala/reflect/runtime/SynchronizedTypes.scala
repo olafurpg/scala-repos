@@ -29,7 +29,7 @@ private[reflect] trait SynchronizedTypes extends internal.Types {
     // i.e. they have their caches cleaned up automatically on per-run basis,
     // therefore they should use vanilla uniques, which are faster
     if (!isCompilerUniverse) {
-      val inCache = uniques get tp
+      val inCache = uniques.get(tp)
       val result = if (inCache.isDefined) inCache.get.get else null
       if (result ne null) result.asInstanceOf[T]
       else {

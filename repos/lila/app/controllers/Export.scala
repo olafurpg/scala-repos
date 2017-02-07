@@ -16,7 +16,7 @@ object Export extends LilaController {
 
   def pgn(id: String) = Open { implicit ctx =>
     OnlyHumans {
-      OptionFuResult(GameRepo game id) { game =>
+      OptionFuResult(GameRepo.game(id)) { game =>
         (game.pgnImport.ifTrue(~get("as") == "imported") match {
           case Some(i) => fuccess(i.pgn)
           case None =>
@@ -24,7 +24,7 @@ object Export extends LilaController {
               initialFen <- GameRepo initialFen game
               pgn = Env.api.pgnDump(game, initialFen)
               analysis ← !get("as").contains("raw") ??
-                (Env.analyse.analyser get game.id)
+                (Env.analyse.analyser.get(game.id))
             } yield
               Env.analyse
                 .annotator(pgn,
@@ -34,11 +34,11 @@ object Export extends LilaController {
                            game.status,
                            game.clock)
                 .toString
-        }) map { content =>
+        }).map { content =>
           Ok(content).withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
                                   CONTENT_DISPOSITION ->
                                     ("attachment; filename=" +
-                                      (Env.api.pgnDump filename game)))
+                                      (Env.api.pgnDump.filename(game))))
         }
       }
     }
@@ -46,7 +46,7 @@ object Export extends LilaController {
 
   def pdf(id: String) = Open { implicit ctx =>
     OnlyHumans {
-      OptionResult(GameRepo game id) { game =>
+      OptionResult(GameRepo.game(id)) { game =>
         Ok.chunked(Enumerator.outputStream(env.pdfExport(game.id)))
           .withHeaders(CONTENT_TYPE -> "application/pdf",
                        CACHE_CONTROL -> "max-age=7200")
@@ -56,7 +56,7 @@ object Export extends LilaController {
 
   def png(id: String) = Open { implicit ctx =>
     OnlyHumansAndFacebook {
-      OptionResult(GameRepo game id) { game =>
+      OptionResult(GameRepo.game(id)) { game =>
         Ok.chunked(Enumerator.outputStream(env.pngExport(game)))
           .withHeaders(CONTENT_TYPE -> "image/png",
                        CACHE_CONTROL -> "max-age=7200")
@@ -76,12 +76,12 @@ object Export extends LilaController {
 
   private def OnlyHumans(result: => Fu[Result])(
       implicit ctx: lila.api.Context) =
-    if (HTTPRequest isBot ctx.req) fuccess(NotFound)
+    if (HTTPRequest.isBot(ctx.req)) fuccess(NotFound)
     else result
 
   private def OnlyHumansAndFacebook(result: => Fu[Result])(
       implicit ctx: lila.api.Context) =
-    if (HTTPRequest isFacebookBot ctx.req) result
-    else if (HTTPRequest isBot ctx.req) fuccess(NotFound)
+    if (HTTPRequest.isFacebookBot(ctx.req)) result
+    else if (HTTPRequest.isBot(ctx.req)) fuccess(NotFound)
     else result
 }

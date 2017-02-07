@@ -161,13 +161,15 @@ class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
             case _ => null
           }
       }
-    Option(resolvedMethod) orElse Option(currentFunction) getOrElse primaryConstr
+    Option(resolvedMethod)
+      .orElse(Option(currentFunction))
+      .getOrElse(primaryConstr)
   }
 
   override def findTargetMember(file: PsiFile, editor: Editor): PsiElement = {
     val offset = editor.getCaretModel.getOffset
     val element = file.findElementAt(offset)
-    Option(findTargetMember(element)) getOrElse {
+    Option(findTargetMember(element)).getOrElse {
       file.findReferenceAt(offset) match {
         case ResolvesTo(m: PsiMethod) => m
         case _ => null

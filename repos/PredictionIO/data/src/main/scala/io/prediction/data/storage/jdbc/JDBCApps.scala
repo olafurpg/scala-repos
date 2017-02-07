@@ -35,7 +35,7 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
       description text)""".execute.apply()
   }
 
-  def insert(app: App): Option[Int] = DB localTx { implicit session =>
+  def insert(app: App): Option[Int] = DB.localTx { implicit session =>
     val q =
       if (app.id == 0) {
         sql"""
@@ -49,7 +49,7 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
     Some(q.updateAndReturnGeneratedKey().apply().toInt)
   }
 
-  def get(id: Int): Option[App] = DB readOnly { implicit session =>
+  def get(id: Int): Option[App] = DB.readOnly { implicit session =>
     sql"SELECT id, name, description FROM $tableName WHERE id = ${id}"
       .map(
         rs =>
@@ -60,7 +60,7 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
       .apply()
   }
 
-  def getByName(name: String): Option[App] = DB readOnly { implicit session =>
+  def getByName(name: String): Option[App] = DB.readOnly { implicit session =>
     sql"SELECT id, name, description FROM $tableName WHERE name = ${name}"
       .map(
         rs =>
@@ -71,7 +71,7 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
       .apply()
   }
 
-  def getAll(): Seq[App] = DB readOnly { implicit session =>
+  def getAll(): Seq[App] = DB.readOnly { implicit session =>
     sql"SELECT id, name, description FROM $tableName"
       .map(
         rs =>
@@ -82,13 +82,13 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
       .apply()
   }
 
-  def update(app: App): Unit = DB localTx { implicit session =>
+  def update(app: App): Unit = DB.localTx { implicit session =>
     sql"""
     update $tableName set name = ${app.name}, description = ${app.description}
     where id = ${app.id}""".update().apply()
   }
 
-  def delete(id: Int): Unit = DB localTx { implicit session =>
+  def delete(id: Int): Unit = DB.localTx { implicit session =>
     sql"DELETE FROM $tableName WHERE id = $id".update().apply()
   }
 }

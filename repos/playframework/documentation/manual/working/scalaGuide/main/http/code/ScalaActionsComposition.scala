@@ -132,11 +132,14 @@ package scalaguide.http.scalaactionscomposition {
         def xForwardedFor[A](action: Action[A]) = Action.async(action.parser) {
           request =>
             val newRequest =
-              request.headers.get("X-Forwarded-For").map { xff =>
-                new WrappedRequest[A](request) {
-                  override def remoteAddress = xff
+              request.headers
+                .get("X-Forwarded-For")
+                .map { xff =>
+                  new WrappedRequest[A](request) {
+                    override def remoteAddress = xff
+                  }
                 }
-              } getOrElse request
+                .getOrElse(request)
             action(newRequest)
         }
         //#modify-request
@@ -150,11 +153,14 @@ package scalaguide.http.scalaactionscomposition {
 
         def onlyHttps[A](action: Action[A]) = Action.async(action.parser) {
           request =>
-            request.headers.get("X-Forwarded-Proto").collect {
-              case "https" => action(request)
-            } getOrElse {
-              Future.successful(Forbidden("Only HTTPS requests allowed"))
-            }
+            request.headers
+              .get("X-Forwarded-Proto")
+              .collect {
+                case "https" => action(request)
+              }
+              .getOrElse {
+                Future.successful(Forbidden("Only HTTPS requests allowed"))
+              }
         }
         //#block-request
 
@@ -243,10 +249,11 @@ package scalaguide.http.scalaactionscomposition {
 
         //#item-action-use
         def tagItem(itemId: String, tag: String) =
-          (UserAction andThen ItemAction(itemId) andThen PermissionCheckAction) {
-            request =>
-              request.item.addTag(tag)
-              Ok("User " + request.username + " tagged " + request.item.id)
+          (UserAction
+            .andThen(ItemAction(itemId))
+            .andThen(PermissionCheckAction)) { request =>
+            request.item.addTag(tag)
+            Ok("User " + request.username + " tagged " + request.item.id)
           }
         //#item-action-use
 

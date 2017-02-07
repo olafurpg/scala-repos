@@ -84,7 +84,7 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
       val t1: MN[F[C]] =
         M.map(traverse1[M, A, B](fa)(amb))(fb => traverse1[N, B, C](fb)(bnc))
       val t2: MN[F[C]] =
-        traverse1[MN, A, C](fa)(a => M.map(amb(a))(bnc))(M compose N)
+        traverse1[MN, A, C](fa)(a => M.map(amb(a))(bnc))(M.compose(N))
       MN.equal(t1, t2)
     }
 
@@ -111,7 +111,7 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
       val t1: MN[F[B]] =
         (traverse1[M, A, B](fa)(amb), traverse1[N, A, B](fa)(anb))
       val t2: MN[F[B]] =
-        traverse1[MN, A, B](fa)(a => (amb(a), anb(a)))(M product N)
+        traverse1[MN, A, B](fa)(a => (amb(a), anb(a)))(M.product(N))
       MN.equal(t1, t2)
     }
   }

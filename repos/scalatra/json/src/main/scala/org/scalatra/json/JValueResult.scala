@@ -15,7 +15,7 @@ trait JValueResult extends ScalatraBase { self: JsonSupport[_] =>
   implicit protected def jsonFormats: Formats
 
   override protected def renderPipeline: RenderPipeline =
-    renderToJson orElse super.renderPipeline
+    renderToJson.orElse(super.renderPipeline)
 
   private[this] def isJValueResponse = format == "json" || format == "xml"
 

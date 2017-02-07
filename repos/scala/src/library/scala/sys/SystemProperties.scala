@@ -37,18 +37,18 @@ class SystemProperties
   def iterator: Iterator[(String, String)] =
     wrapAccess {
       val ps = System.getProperties()
-      names map (k => (k, ps getProperty k)) filter (_._2 ne null)
-    } getOrElse Iterator.empty
+      names.map(k => (k, ps.getProperty(k))).filter(_._2 ne null)
+    }.getOrElse(Iterator.empty)
 
   def names: Iterator[String] =
     wrapAccess(
       System.getProperties().stringPropertyNames().asScala.iterator
-    ) getOrElse Iterator.empty
+    ).getOrElse(Iterator.empty)
 
   def get(key: String) =
-    wrapAccess(Option(System.getProperty(key))) flatMap (x => x)
+    wrapAccess(Option(System.getProperty(key))).flatMap(x => x)
   override def contains(key: String) =
-    wrapAccess(super.contains(key)) exists (x => x)
+    wrapAccess(super.contains(key)).exists(x => x)
 
   def -=(key: String): this.type = {
     wrapAccess(System.clearProperty(key)); this

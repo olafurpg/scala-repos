@@ -101,15 +101,15 @@ class StringExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(c2 contains "b", null, row)
     checkEvaluation(c1 contains Literal.create(null, StringType), null, row)
 
-    checkEvaluation(c1 startsWith "a", true, row)
-    checkEvaluation(c1 startsWith "b", false, row)
-    checkEvaluation(c2 startsWith "a", null, row)
-    checkEvaluation(c1 startsWith Literal.create(null, StringType), null, row)
+    checkEvaluation(c1.startsWith("a"), true, row)
+    checkEvaluation(c1.startsWith("b"), false, row)
+    checkEvaluation(c2.startsWith("a"), null, row)
+    checkEvaluation(c1.startsWith(Literal.create(null, StringType)), null, row)
 
-    checkEvaluation(c1 endsWith "c", true, row)
-    checkEvaluation(c1 endsWith "b", false, row)
-    checkEvaluation(c2 endsWith "b", null, row)
-    checkEvaluation(c1 endsWith Literal.create(null, StringType), null, row)
+    checkEvaluation(c1.endsWith("c"), true, row)
+    checkEvaluation(c1.endsWith("b"), false, row)
+    checkEvaluation(c2.endsWith("b"), null, row)
+    checkEvaluation(c1.endsWith(Literal.create(null, StringType)), null, row)
   }
 
   test("Substring") {
@@ -334,95 +334,99 @@ class StringExpressionsSuite extends SparkFunSuite with ExpressionEvalHelper {
                       .like(NonFoldableLiteral.create(null, StringType)),
                     null)
 
-    checkEvaluation("abdef" like "abdef", true)
-    checkEvaluation("a_%b" like "a\\__b", true)
-    checkEvaluation("addb" like "a_%b", true)
-    checkEvaluation("addb" like "a\\__b", false)
-    checkEvaluation("addb" like "a%\\%b", false)
-    checkEvaluation("a_%b" like "a%\\%b", true)
-    checkEvaluation("addb" like "a%", true)
-    checkEvaluation("addb" like "**", false)
-    checkEvaluation("abc" like "a%", true)
-    checkEvaluation("abc" like "b%", false)
-    checkEvaluation("abc" like "bc%", false)
-    checkEvaluation("a\nb" like "a_b", true)
-    checkEvaluation("ab" like "a%b", true)
-    checkEvaluation("a\nb" like "a%b", true)
+    checkEvaluation("abdef".like("abdef"), true)
+    checkEvaluation("a_%b".like("a\\__b"), true)
+    checkEvaluation("addb".like("a_%b"), true)
+    checkEvaluation("addb".like("a\\__b"), false)
+    checkEvaluation("addb".like("a%\\%b"), false)
+    checkEvaluation("a_%b".like("a%\\%b"), true)
+    checkEvaluation("addb".like("a%"), true)
+    checkEvaluation("addb".like("**"), false)
+    checkEvaluation("abc".like("a%"), true)
+    checkEvaluation("abc".like("b%"), false)
+    checkEvaluation("abc".like("bc%"), false)
+    checkEvaluation("a\nb".like("a_b"), true)
+    checkEvaluation("ab".like("a%b"), true)
+    checkEvaluation("a\nb".like("a%b"), true)
   }
 
   test("LIKE Non-literal Regular Expression") {
     val regEx = 'a.string.at(0)
-    checkEvaluation("abcd" like regEx, null, create_row(null))
-    checkEvaluation("abdef" like regEx, true, create_row("abdef"))
-    checkEvaluation("a_%b" like regEx, true, create_row("a\\__b"))
-    checkEvaluation("addb" like regEx, true, create_row("a_%b"))
-    checkEvaluation("addb" like regEx, false, create_row("a\\__b"))
-    checkEvaluation("addb" like regEx, false, create_row("a%\\%b"))
-    checkEvaluation("a_%b" like regEx, true, create_row("a%\\%b"))
-    checkEvaluation("addb" like regEx, true, create_row("a%"))
-    checkEvaluation("addb" like regEx, false, create_row("**"))
-    checkEvaluation("abc" like regEx, true, create_row("a%"))
-    checkEvaluation("abc" like regEx, false, create_row("b%"))
-    checkEvaluation("abc" like regEx, false, create_row("bc%"))
-    checkEvaluation("a\nb" like regEx, true, create_row("a_b"))
-    checkEvaluation("ab" like regEx, true, create_row("a%b"))
-    checkEvaluation("a\nb" like regEx, true, create_row("a%b"))
+    checkEvaluation("abcd".like(regEx), null, create_row(null))
+    checkEvaluation("abdef".like(regEx), true, create_row("abdef"))
+    checkEvaluation("a_%b".like(regEx), true, create_row("a\\__b"))
+    checkEvaluation("addb".like(regEx), true, create_row("a_%b"))
+    checkEvaluation("addb".like(regEx), false, create_row("a\\__b"))
+    checkEvaluation("addb".like(regEx), false, create_row("a%\\%b"))
+    checkEvaluation("a_%b".like(regEx), true, create_row("a%\\%b"))
+    checkEvaluation("addb".like(regEx), true, create_row("a%"))
+    checkEvaluation("addb".like(regEx), false, create_row("**"))
+    checkEvaluation("abc".like(regEx), true, create_row("a%"))
+    checkEvaluation("abc".like(regEx), false, create_row("b%"))
+    checkEvaluation("abc".like(regEx), false, create_row("bc%"))
+    checkEvaluation("a\nb".like(regEx), true, create_row("a_b"))
+    checkEvaluation("ab".like(regEx), true, create_row("a%b"))
+    checkEvaluation("a\nb".like(regEx), true, create_row("a%b"))
 
-    checkEvaluation(Literal.create(null, StringType) like regEx,
+    checkEvaluation(Literal.create(null, StringType).like(regEx),
                     null,
                     create_row("bc%"))
   }
 
   test("RLIKE literal Regular Expression") {
-    checkEvaluation(Literal.create(null, StringType) rlike "abdef", null)
-    checkEvaluation("abdef" rlike Literal.create(null, StringType), null)
+    checkEvaluation(Literal.create(null, StringType).rlike("abdef"), null)
+    checkEvaluation("abdef".rlike(Literal.create(null, StringType)), null)
     checkEvaluation(
-      Literal.create(null, StringType) rlike Literal.create(null, StringType),
+      Literal.create(null, StringType).rlike(Literal.create(null, StringType)),
       null)
     checkEvaluation(
-      "abdef" rlike NonFoldableLiteral.create("abdef", StringType),
+      "abdef".rlike(NonFoldableLiteral.create("abdef", StringType)),
       true)
-    checkEvaluation("abdef" rlike NonFoldableLiteral.create(null, StringType),
+    checkEvaluation("abdef".rlike(NonFoldableLiteral.create(null, StringType)),
                     null)
-    checkEvaluation(Literal.create(null, StringType) rlike NonFoldableLiteral
-                      .create("abdef", StringType),
+    checkEvaluation(Literal
+                      .create(null, StringType)
+                      .rlike(NonFoldableLiteral
+                        .create("abdef", StringType)),
                     null)
-    checkEvaluation(Literal.create(null, StringType) rlike NonFoldableLiteral
-                      .create(null, StringType),
+    checkEvaluation(Literal
+                      .create(null, StringType)
+                      .rlike(NonFoldableLiteral
+                        .create(null, StringType)),
                     null)
 
-    checkEvaluation("abdef" rlike "abdef", true)
-    checkEvaluation("abbbbc" rlike "a.*c", true)
+    checkEvaluation("abdef".rlike("abdef"), true)
+    checkEvaluation("abbbbc".rlike("a.*c"), true)
 
-    checkEvaluation("fofo" rlike "^fo", true)
-    checkEvaluation("fo\no" rlike "^fo\no$", true)
-    checkEvaluation("Bn" rlike "^Ba*n", true)
-    checkEvaluation("afofo" rlike "fo", true)
-    checkEvaluation("afofo" rlike "^fo", false)
-    checkEvaluation("Baan" rlike "^Ba?n", false)
-    checkEvaluation("axe" rlike "pi|apa", false)
-    checkEvaluation("pip" rlike "^(pi)*$", false)
+    checkEvaluation("fofo".rlike("^fo"), true)
+    checkEvaluation("fo\no".rlike("^fo\no$"), true)
+    checkEvaluation("Bn".rlike("^Ba*n"), true)
+    checkEvaluation("afofo".rlike("fo"), true)
+    checkEvaluation("afofo".rlike("^fo"), false)
+    checkEvaluation("Baan".rlike("^Ba?n"), false)
+    checkEvaluation("axe".rlike("pi|apa"), false)
+    checkEvaluation("pip".rlike("^(pi)*$"), false)
 
-    checkEvaluation("abc" rlike "^ab", true)
-    checkEvaluation("abc" rlike "^bc", false)
-    checkEvaluation("abc" rlike "^ab", true)
-    checkEvaluation("abc" rlike "^bc", false)
+    checkEvaluation("abc".rlike("^ab"), true)
+    checkEvaluation("abc".rlike("^bc"), false)
+    checkEvaluation("abc".rlike("^ab"), true)
+    checkEvaluation("abc".rlike("^bc"), false)
 
     intercept[java.util.regex.PatternSyntaxException] {
-      evaluate("abbbbc" rlike "**")
+      evaluate("abbbbc".rlike("**"))
     }
   }
 
   test("RLIKE Non-literal Regular Expression") {
     val regEx = 'a.string.at(0)
-    checkEvaluation("abdef" rlike regEx, true, create_row("abdef"))
-    checkEvaluation("abbbbc" rlike regEx, true, create_row("a.*c"))
-    checkEvaluation("fofo" rlike regEx, true, create_row("^fo"))
-    checkEvaluation("fo\no" rlike regEx, true, create_row("^fo\no$"))
-    checkEvaluation("Bn" rlike regEx, true, create_row("^Ba*n"))
+    checkEvaluation("abdef".rlike(regEx), true, create_row("abdef"))
+    checkEvaluation("abbbbc".rlike(regEx), true, create_row("a.*c"))
+    checkEvaluation("fofo".rlike(regEx), true, create_row("^fo"))
+    checkEvaluation("fo\no".rlike(regEx), true, create_row("^fo\no$"))
+    checkEvaluation("Bn".rlike(regEx), true, create_row("^Ba*n"))
 
     intercept[java.util.regex.PatternSyntaxException] {
-      evaluate("abbbbc" rlike regEx, create_row("**"))
+      evaluate("abbbbc".rlike(regEx), create_row("**"))
     }
   }
 

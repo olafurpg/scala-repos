@@ -282,7 +282,7 @@ abstract class KafkaShardIngestActor(
         // reset failures count here since this state means that we've made forward progress
         totalConsecutiveFailures = 0
 
-        pendingCompletes = pendingCompletes flatMap {
+        pendingCompletes = pendingCompletes.flatMap {
           // FIXME: Carefully review this logic; previously, the comparison here was being done using "<="
           // by the serialized JSON representation of the vector clocks (a silent side effect of
           // the silent implicit conversions to JValue in BlueEyes)
@@ -497,7 +497,7 @@ abstract class KafkaShardIngestActor(
               .format(rawMessages.size, t))
         }) {
           rawMessages.par.map { msgAndOffset =>
-            EventMessageEncoding.read(msgAndOffset.message.payload) map {
+            EventMessageEncoding.read(msgAndOffset.message.payload).map {
               (msgAndOffset.offset, _)
             }
           }.toList
@@ -508,14 +508,13 @@ abstract class KafkaShardIngestActor(
                                       YggCheckpoint)]] =
         eventMessages
           .sequence[({ type λ[α] = Validation[Error, α] })#λ,
-                    (Long, EventMessage.EventMessageExtraction)] map {
-          messageSet =>
+                    (Long, EventMessage.EventMessageExtraction)]
+          .map { messageSet =>
             val apiKeys: List[(APIKey, Path)] = msTime({ t =>
-              logger.debug(
-                "Collected api keys from %d messages in %d ms"
-                  .format(messageSet.size, t))
+              logger.debug("Collected api keys from %d messages in %d ms"
+                .format(messageSet.size, t))
             }) {
-              messageSet collect {
+              messageSet.collect {
                 case (_, \/-(IngestMessage(apiKey, path, _, _, _, _, _))) =>
                   (apiKey, path)
                 case (_, -\/((apiKey, path, _))) => (apiKey, path)
@@ -527,19 +526,19 @@ abstract class KafkaShardIngestActor(
             val distinctKeys = apiKeys.distinct
 
             val authorityCacheFutures =
-              distinctKeys map {
+              distinctKeys.map {
                 case k @ (apiKey, path) =>
                   // infer write authorities without a timestamp here, because we'll only use this for legacy events
                   //val inferStart = System.currentTimeMillis
                   permissionsFinder
-                    .inferWriteAuthorities(apiKey, path, None) map {
-                    inferred =>
+                    .inferWriteAuthorities(apiKey, path, None)
+                    .map { inferred =>
                       //logger.trace("Write authorities inferred on %s in %d ms".format(k, System.currentTimeMillis - inferStart))
                       k -> inferred
-                  }
+                    }
               }
 
-            authorityCacheFutures.sequence map { cached =>
+            authorityCacheFutures.sequence.map { cached =>
               logger.debug(
                 "Computed authorities from %d apiKeys in %d ms".format(
                   distinctKeys.size,
@@ -556,14 +555,17 @@ abstract class KafkaShardIngestActor(
                     Some((offset, message))
 
                   case (offset, -\/((apiKey, path, genMessage))) =>
-                    authorityCache.get((apiKey, path)) map { authorities =>
-                      Some((offset, genMessage(authorities)))
-                    } getOrElse {
-                      logger.warn(
-                        "Discarding event at offset %d with apiKey %s for path %s because we could not determine the account"
-                          .format(offset, apiKey, path))
-                      None
-                    }
+                    authorityCache
+                      .get((apiKey, path))
+                      .map { authorities =>
+                        Some((offset, genMessage(authorities)))
+                      }
+                      .getOrElse {
+                        logger.warn(
+                          "Discarding event at offset %d with apiKey %s for path %s because we could not determine the account"
+                            .format(offset, apiKey, path))
+                        None
+                      }
                 }
 
               msTime({ t =>
@@ -572,7 +574,7 @@ abstract class KafkaShardIngestActor(
                 buildBatch(updatedMessages, Vector.empty, fromCheckpoint)
               }
             }
-        }
+          }
 
       batched.sequence[Future, (Vector[(Long, EventMessage)], YggCheckpoint)]
     }

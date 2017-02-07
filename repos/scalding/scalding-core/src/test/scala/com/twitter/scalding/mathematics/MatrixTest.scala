@@ -50,7 +50,7 @@ class MatrixBlockProd(args: Args) extends Job(args) {
     .toMatrix[String, Int, Double]('x1, 'y1, 'v1)
     .toBlockMatrix(s => (s(0), s))
 
-  val gram = mat1 dotProd mat2.transpose
+  val gram = mat1.dotProd(mat2.transpose)
   gram.pipe.write(Tsv("product"))
 }
 
@@ -253,7 +253,7 @@ class RowRowHad(args: Args) extends Job(args) {
   val mat1 = new Matrix[Int, Int, Double]('x1, 'y1, 'v1, p1)
 
   val row1 = mat1.getRow(1)
-  val rowSum = row1 hProd row1
+  val rowSum = row1.hProd(row1)
   rowSum.pipe.write(Tsv("rowRowHad"))
 }
 

@@ -105,7 +105,7 @@ private[io] abstract class TcpConnection(val tcp: TcpExt,
 
   /** normal connected state */
   def connected(info: ConnectionInfo): Receive =
-    handleWriteMessages(info) orElse {
+    handleWriteMessages(info).orElse {
       case SuspendReading ⇒ suspendReading(info)
       case ResumeReading ⇒ resumeReading(info)
       case ChannelReadable ⇒ doRead(info, None)
@@ -114,7 +114,7 @@ private[io] abstract class TcpConnection(val tcp: TcpExt,
 
   /** the peer sent EOF first, but we may still want to send */
   def peerSentEOF(info: ConnectionInfo): Receive =
-    handleWriteMessages(info) orElse {
+    handleWriteMessages(info).orElse {
       case cmd: CloseCommand ⇒ handleClose(info, Some(sender()), cmd.event)
     }
 
@@ -450,7 +450,7 @@ private[io] abstract class TcpConnection(val tcp: TcpExt,
           buffer.clear()
           val copied = data.copyToBuffer(buffer)
           buffer.flip()
-          writeToChannel(data drop copied)
+          writeToChannel(data.drop(copied))
         } else {
           if (!ack.isInstanceOf[NoAck]) commander ! ack
           release()

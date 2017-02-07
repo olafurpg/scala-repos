@@ -16,10 +16,10 @@ import java.util.BitSet
 case class Path(elems: Buf*) {
   require(elems.forall(Path.nonemptyBuf))
 
-  def startsWith(other: Path) = elems startsWith other.elems
+  def startsWith(other: Path) = elems.startsWith(other.elems)
 
-  def take(n: Int) = Path((elems take n): _*)
-  def drop(n: Int) = Path((elems drop n): _*)
+  def take(n: Int) = Path((elems.take(n)): _*)
+  def drop(n: Int) = Path((elems.drop(n)): _*)
   def ++(that: Path) =
     if (that.isEmpty) this
     else Path((elems ++ that.elems): _*)
@@ -27,7 +27,7 @@ case class Path(elems: Buf*) {
   def isEmpty = elems.isEmpty
 
   lazy val showElems =
-    elems map { buf =>
+    elems.map { buf =>
       // We're extra careful with allocation here because any time
       // there are nonbase delegations, we need to serialize the paths
       // to strings
@@ -139,7 +139,7 @@ object Path {
   object Utf8 {
     def apply(elems: String*): Path = {
       val elems8 =
-        elems map { el =>
+        elems.map { el =>
           Buf.Utf8(el)
         }
       Path(elems8: _*)

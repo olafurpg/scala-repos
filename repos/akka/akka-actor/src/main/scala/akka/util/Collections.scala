@@ -30,7 +30,7 @@ private[akka] object Collections {
         private[this] var _hasNext = false
 
         @tailrec override final def hasNext: Boolean =
-          if (! _hasNext && superIterator.hasNext) {
+          if (!_hasNext && superIterator.hasNext) {
             // If we need and are able to look for the next value
             val potentiallyNext = superIterator.next()
             if (isDefinedAt(potentiallyNext)) {
@@ -51,6 +51,6 @@ private[akka] object Collections {
     }
 
     override lazy val size: Int = iterator.size
-    override def foreach[C](f: To ⇒ C) = iterator foreach f
+    override def foreach[C](f: To ⇒ C) = iterator.foreach(f)
   }
 }

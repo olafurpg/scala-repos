@@ -47,7 +47,7 @@ object ~ {
     path match {
       case Root => None
       case parent / last =>
-        unapply(last) map {
+        unapply(last).map {
           case (base, ext) => (parent / base, ext)
         }
     }
@@ -90,7 +90,7 @@ case class /(parent: Path, child: String) extends Path {
   override def toString = asString
   def startsWith(other: Path) = {
     val components = other.toList
-    (toList take components.length) == components
+    (toList.take(components.length)) == components
   }
 }
 
@@ -179,7 +179,7 @@ abstract class ParamMatcher(name: String) {
   */
 abstract class IntParamMatcher(name: String) {
   def unapply(params: ParamMap): Option[Int] =
-    params.get(name) flatMap { value =>
+    params.get(name).flatMap { value =>
       try {
         Some(value.toInt)
       } catch {
@@ -197,7 +197,7 @@ abstract class IntParamMatcher(name: String) {
   */
 abstract class LongParamMatcher(name: String) {
   def unapply(params: ParamMap): Option[Long] =
-    params.get(name) flatMap { value =>
+    params.get(name).flatMap { value =>
       try {
         Some(value.toLong)
       } catch {
@@ -215,7 +215,7 @@ abstract class LongParamMatcher(name: String) {
   */
 abstract class DoubleParamMatcher(name: String) {
   def unapply(params: ParamMap): Option[Double] =
-    params.get(name) flatMap { value =>
+    params.get(name).flatMap { value =>
       try {
         Some(value.toDouble)
       } catch {

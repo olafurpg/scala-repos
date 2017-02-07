@@ -87,14 +87,17 @@ object Metadata {
         obj match {
           case metadata @ JObject(entries) if entries.size == 1 => {
             val (key, value) = entries.head
-            MetadataType.fromName(key).map {
-              case BooleanValueStats => value.validated[BooleanValueStats]
-              case LongValueStats => value.validated[LongValueStats]
-              case DoubleValueStats => value.validated[DoubleValueStats]
-              case BigDecimalValueStats =>
-                value.validated[BigDecimalValueStats]
-              case StringValueStats => value.validated[StringValueStats]
-            } getOrElse { Failure(Invalid("Unknown metadata type: " + key)) }
+            MetadataType
+              .fromName(key)
+              .map {
+                case BooleanValueStats => value.validated[BooleanValueStats]
+                case LongValueStats => value.validated[LongValueStats]
+                case DoubleValueStats => value.validated[DoubleValueStats]
+                case BigDecimalValueStats =>
+                  value.validated[BigDecimalValueStats]
+                case StringValueStats => value.validated[StringValueStats]
+              }
+              .getOrElse { Failure(Invalid("Unknown metadata type: " + key)) }
           }
 
           case _ => Failure(Invalid("Invalid metadata entry: " + obj))
@@ -204,7 +207,7 @@ case class DoubleValueStats(count: Long, min: Double, max: Double)
       Some(
         DoubleValueStats(this.count + count,
                          this.min min min,
-                         this.max max max))
+                         this.max.max(max)))
     case _ => None
   }
 }
@@ -234,7 +237,7 @@ case class BigDecimalValueStats(count: Long, min: BigDecimal, max: BigDecimal)
       Some(
         BigDecimalValueStats(this.count + count,
                              this.min min min,
-                             this.max max max))
+                             this.max.max(max)))
     case _ => None
   }
 }

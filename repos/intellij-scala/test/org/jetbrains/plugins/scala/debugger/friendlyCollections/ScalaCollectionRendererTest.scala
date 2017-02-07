@@ -74,7 +74,7 @@ class ScalaCollectionRendererTest
     }
 
     managed {
-      testVariableChildren map (_.getDescriptor) foreach {
+      testVariableChildren.map(_.getDescriptor).foreach {
         case impl: NodeDescriptorImpl =>
           impl.updateRepresentation(evaluationContext(),
                                     DescriptorLabelListener.DUMMY_LISTENER)
@@ -87,7 +87,7 @@ class ScalaCollectionRendererTest
     //</magic>
 
     managed {
-      (testVariable.getLabel, (testVariableChildren map {
+      (testVariable.getLabel, (testVariableChildren.map {
         _.getDescriptor.getLabel
       }).toList)
     }
@@ -100,8 +100,8 @@ class ScalaCollectionRendererTest
       val frameProxy = evaluationContext.getFrameProxy
       val local = frameTree.getNodeFactory.getLocalVariableDescriptor(
         null,
-        frameProxy visibleVariableByName name)
-      local setContext evaluationContext
+        frameProxy.visibleVariableByName(name))
+      local.setContext(evaluationContext)
       local
     } catch {
       case e: EvaluateException => null
@@ -127,7 +127,7 @@ class ScalaCollectionRendererTest
       val intLabel = s"{$intType@$UNIQUE_ID}"
 
       var testIndex = 0
-      children foreach { childLabel =>
+      children.foreach { childLabel =>
         val expectedChildLabel = s"$testIndex = $intLabel${testIndex + 1}"
 
         assertEquals(childLabel, expectedChildLabel)

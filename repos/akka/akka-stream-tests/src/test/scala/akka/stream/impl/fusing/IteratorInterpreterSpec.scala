@@ -112,7 +112,7 @@ class IteratorInterpreterSpec extends AkkaSpec {
 
       val itr3 = newItr(5)
       itr3.next() should be(ByteString(1, 2, 3, 4, 5))
-      (6 to 10) foreach { i ⇒
+      ((6 to 10)).foreach { i ⇒
         itr3.hasNext should be(true)
         itr3.next() should be(ByteString(i))
       }

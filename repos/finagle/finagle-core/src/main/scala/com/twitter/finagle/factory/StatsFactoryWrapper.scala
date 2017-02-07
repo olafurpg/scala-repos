@@ -40,7 +40,7 @@ class StatsFactoryWrapper[Req, Rep](self: ServiceFactory[Req, Rep],
 
   override def apply(conn: ClientConnection): Future[Service[Req, Rep]] = {
     val elapsed = Stopwatch.start()
-    super.apply(conn) respond {
+    super.apply(conn).respond {
       case Throw(t) =>
         failureStats.counter(Throwables.mkString(t): _*).incr()
         latencyStat.add(elapsed().inMilliseconds)

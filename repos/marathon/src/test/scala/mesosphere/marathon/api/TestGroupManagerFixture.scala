@@ -38,8 +38,8 @@ class TestGroupManagerFixture extends Mockito with MarathonActorSupport {
     maxQueued = 10
   )
 
-  config.zkTimeoutDuration returns 1.seconds
-  groupRepository.zkRootName returns GroupRepository.zkRootName
+  config.zkTimeoutDuration.returns(1.seconds)
+  groupRepository.zkRootName.returns(GroupRepository.zkRootName)
 
   val groupManager = new GroupManager(
     serializeUpdates = serializeExecutions(),

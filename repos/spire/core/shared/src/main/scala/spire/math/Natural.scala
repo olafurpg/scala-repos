@@ -137,7 +137,7 @@ sealed abstract class Natural
         case Digit(d, tail) =>
           val (q, r) = next /% Natural.denom
           if (q.isZero) r.digit.toLong.toString + s
-          else recur(q, "%09d%s" format (r.digit.toLong, s))
+          else recur(q, "%09d%s".format(r.digit.toLong, s))
       }
     }
     recur(this, "")
@@ -223,7 +223,7 @@ sealed abstract class Natural
 
   final override def equals(rhs: Any): Boolean = rhs match {
     case rhs: Natural => this === rhs
-    case rhs: UInt => (lhs compare rhs) == 0
+    case rhs: UInt => (lhs.compare(rhs)) == 0
     case rhs: BigInt => lhs.toBigInt == rhs
     case rhs: SafeLong => SafeLong(lhs.toBigInt) == rhs
     case rhs: BigDecimal => rhs.isWhole && lhs.toBigInt == rhs
@@ -237,24 +237,24 @@ sealed abstract class Natural
   }
 
   def ===(rhs: Natural): Boolean =
-    (lhs compare rhs) == 0
+    (lhs.compare(rhs)) == 0
 
   def =!=(rhs: Natural): Boolean =
     !(this === rhs)
 
-  def <(rhs: Natural): Boolean = (lhs compare rhs) < 0
-  def <=(rhs: Natural): Boolean = (lhs compare rhs) <= 0
-  def >(rhs: Natural): Boolean = (lhs compare rhs) > 0
-  def >=(rhs: Natural): Boolean = (lhs compare rhs) >= 0
+  def <(rhs: Natural): Boolean = (lhs.compare(rhs)) < 0
+  def <=(rhs: Natural): Boolean = (lhs.compare(rhs)) <= 0
+  def >(rhs: Natural): Boolean = (lhs.compare(rhs)) > 0
+  def >=(rhs: Natural): Boolean = (lhs.compare(rhs)) >= 0
 
-  def <(r: UInt): Boolean = (lhs compare r) < 0
-  def <=(r: UInt): Boolean = (lhs compare r) <= 0
-  def >(r: UInt): Boolean = (lhs compare r) > 0
-  def >=(r: UInt): Boolean = (lhs compare r) >= 0
-  def <(r: BigInt): Boolean = (lhs.toBigInt compare r) < 0
-  def <=(r: BigInt): Boolean = (lhs.toBigInt compare r) <= 0
-  def >(r: BigInt): Boolean = (lhs.toBigInt compare r) > 0
-  def >=(r: BigInt): Boolean = (lhs.toBigInt compare r) >= 0
+  def <(r: UInt): Boolean = (lhs.compare(r)) < 0
+  def <=(r: UInt): Boolean = (lhs.compare(r)) <= 0
+  def >(r: UInt): Boolean = (lhs.compare(r)) > 0
+  def >=(r: UInt): Boolean = (lhs.compare(r)) >= 0
+  def <(r: BigInt): Boolean = (lhs.toBigInt.compare(r)) < 0
+  def <=(r: BigInt): Boolean = (lhs.toBigInt.compare(r)) <= 0
+  def >(r: BigInt): Boolean = (lhs.toBigInt.compare(r)) > 0
+  def >=(r: BigInt): Boolean = (lhs.toBigInt.compare(r)) >= 0
 
   // implemented in Digit and End
   def +(rd: UInt): Natural
@@ -332,7 +332,7 @@ sealed abstract class Natural
       }
     if (lhs < rhs)
       throw new ArithmeticException(
-        "negative subtraction: %s - %s" format (lhs, rhs))
+        "negative subtraction: %s - %s".format(lhs, rhs))
     else recur(lhs, rhs, 0L)
   }
 
@@ -580,7 +580,7 @@ object Natural extends NaturalInstances {
   def apply(n: BigInt): Natural =
     if (n < 0)
       throw new IllegalArgumentException(
-        "negative numbers not allowed: %s" format n)
+        "negative numbers not allowed: %s".format(n))
     else if (n < 0xffffffffL) End(UInt(n.toLong))
     else Digit(UInt((n & 0xffffffffL).toLong), apply(n >> 32))
 
@@ -683,7 +683,7 @@ object Natural extends NaturalInstances {
         if (t >= 0L) End(UInt(t.toInt))
         else
           throw new IllegalArgumentException(
-            "illegal subtraction: %s %s" format (this, n))
+            "illegal subtraction: %s %s".format(this, n))
       }
 
     def *(n: UInt): Natural =
@@ -719,8 +719,8 @@ private[math] trait NaturalIsRig extends Rig[Natural] {
   def plus(a: Natural, b: Natural): Natural = a + b
   override def pow(a: Natural, b: Int): Natural = {
     if (b < 0)
-      throw new IllegalArgumentException("negative exponent: %s" format b)
-    a pow UInt(b)
+      throw new IllegalArgumentException("negative exponent: %s".format(b))
+    a.pow(UInt(b))
   }
   override def times(a: Natural, b: Natural): Natural = a * b
   def zero: Natural = Natural(0L)

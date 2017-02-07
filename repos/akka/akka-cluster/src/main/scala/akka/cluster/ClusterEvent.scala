@@ -330,19 +330,19 @@ object ClusterEvent {
       newGossip: Gossip): immutable.Seq[MemberEvent] =
     if (newGossip eq oldGossip) Nil
     else {
-      val newMembers = newGossip.members diff oldGossip.members
+      val newMembers = newGossip.members.diff(oldGossip.members)
       val membersGroupedByAddress =
         List(newGossip.members, oldGossip.members).flatten
           .groupBy(_.uniqueAddress)
       val changedMembers =
-        membersGroupedByAddress collect {
+        membersGroupedByAddress.collect {
           case (_, newMember :: oldMember :: Nil)
               if newMember.status != oldMember.status ||
                 newMember.upNumber != oldMember.upNumber ⇒
             newMember
         }
       val memberEvents =
-        (newMembers ++ changedMembers) collect {
+        ((newMembers ++ changedMembers)).collect {
           case m if m.status == Joining ⇒ MemberJoined(m)
           case m if m.status == WeaklyUp ⇒ MemberWeaklyUp(m)
           case m if m.status == Up ⇒ MemberUp(m)
@@ -351,7 +351,7 @@ object ClusterEvent {
           // no events for other transitions
         }
 
-      val removedMembers = oldGossip.members diff newGossip.members
+      val removedMembers = oldGossip.members.diff(newGossip.members)
       val removedEvents = removedMembers.map(m ⇒
         MemberRemoved(m.copy(status = Removed), m.status))
 
@@ -380,7 +380,7 @@ object ClusterEvent {
       newGossip: Gossip,
       selfUniqueAddress: UniqueAddress): Set[RoleLeaderChanged] = {
     for {
-      role ← (oldGossip.allRoles union newGossip.allRoles)
+      role ← (oldGossip.allRoles.union(newGossip.allRoles))
       newLeader = newGossip.roleLeader(role, selfUniqueAddress)
       if newLeader != oldGossip.roleLeader(role, selfUniqueAddress)
     } yield RoleLeaderChanged(role, newLeader.map(_.address))
@@ -484,7 +484,7 @@ private[cluster] final class ClusterDomainEventPublisher
         sendCurrentClusterState(subscriber)
     }
 
-    to foreach { eventStream.subscribe(subscriber, _) }
+    to.foreach { eventStream.subscribe(subscriber, _) }
   }
 
   def unsubscribe(subscriber: ActorRef, to: Option[Class[_]]): Unit =
@@ -503,20 +503,20 @@ private[cluster] final class ClusterDomainEventPublisher
   def publishDiff(oldGossip: Gossip,
                   newGossip: Gossip,
                   pub: AnyRef ⇒ Unit): Unit = {
-    diffMemberEvents(oldGossip, newGossip) foreach pub
-    diffUnreachable(oldGossip, newGossip, selfUniqueAddress) foreach pub
-    diffReachable(oldGossip, newGossip, selfUniqueAddress) foreach pub
-    diffLeader(oldGossip, newGossip, selfUniqueAddress) foreach pub
-    diffRolesLeader(oldGossip, newGossip, selfUniqueAddress) foreach pub
+    diffMemberEvents(oldGossip, newGossip).foreach(pub)
+    diffUnreachable(oldGossip, newGossip, selfUniqueAddress).foreach(pub)
+    diffReachable(oldGossip, newGossip, selfUniqueAddress).foreach(pub)
+    diffLeader(oldGossip, newGossip, selfUniqueAddress).foreach(pub)
+    diffRolesLeader(oldGossip, newGossip, selfUniqueAddress).foreach(pub)
     // publish internal SeenState for testing purposes
-    diffSeen(oldGossip, newGossip, selfUniqueAddress) foreach pub
-    diffReachability(oldGossip, newGossip) foreach pub
+    diffSeen(oldGossip, newGossip, selfUniqueAddress).foreach(pub)
+    diffReachability(oldGossip, newGossip).foreach(pub)
   }
 
   def publishInternalStats(currentStats: CurrentInternalStats): Unit =
     publish(currentStats)
 
-  def publish(event: AnyRef): Unit = eventStream publish event
+  def publish(event: AnyRef): Unit = eventStream.publish(event)
 
   def clearState(): Unit = {
     latestGossip = Gossip.empty

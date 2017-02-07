@@ -218,7 +218,8 @@ class StorageStatus(val blockManagerId: BlockManagerId, val maxMem: Long) {
     // Compute new info from old info
     val (oldMem, oldDisk) = blockId match {
       case RDDBlockId(rddId, _) =>
-        _rddStorageInfo.get(rddId)
+        _rddStorageInfo
+          .get(rddId)
           .map { case (mem, disk, _) => (mem, disk) }
           .getOrElse((0L, 0L))
       case _ =>

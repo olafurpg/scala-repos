@@ -143,17 +143,17 @@ class CachingPoolTest
 
       verify(underlying, times(3))()
 
-      ss foreach { s =>
+      ss.foreach { s =>
         when(s.status).thenReturn(Status.Open)
       }
 
-      fs foreach { f =>
+      fs.foreach { f =>
         timeControl.advance(5.second)
         f.close()
       }
 
       assert(timer.tasks.size == 1)
-      ss foreach { s =>
+      ss.foreach { s =>
         verify(s, never()).close(any[Time])
       }
 

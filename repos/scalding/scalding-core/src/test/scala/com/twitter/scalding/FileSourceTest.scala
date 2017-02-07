@@ -58,7 +58,7 @@ class FileSourceTest extends WordSpec with Matchers {
               List(("foobar", 1), ("helloworld", 2)))
       .sink[(String, Int)](Tsv("output0")) { outBuf =>
         "take multiple Tsv files as input sources" in {
-          outBuf should have length 2
+          (outBuf should have).length(2)
           outBuf.toList shouldBe List(("foobar", 1), ("helloworld", 2))
         }
       }
@@ -73,7 +73,7 @@ class FileSourceTest extends WordSpec with Matchers {
               List(("foobar1", 1), ("helloworld1", 2)))
       .sink[(String, Int)](SequenceFile("output0")) { outBuf =>
         "sequence file input" in {
-          outBuf should have length 2
+          (outBuf should have).length(2)
           outBuf.toList shouldBe List(("foobar0", 1), ("helloworld0", 2))
         }
       }
@@ -81,7 +81,7 @@ class FileSourceTest extends WordSpec with Matchers {
                                                 ('query, 'queryStats))) {
         outBuf =>
           "writable sequence file input" in {
-            outBuf should have length 2
+            (outBuf should have).length(2)
             outBuf.toList shouldBe List(("foobar1", 1), ("helloworld1", 2))
           }
       }
@@ -96,7 +96,7 @@ class FileSourceTest extends WordSpec with Matchers {
               List("foobar", "helloworld"))
       .sink[String](Tsv("output0")) { outBuf =>
         "take multiple text files as input sources" in {
-          outBuf should have length 2
+          (outBuf should have).length(2)
           outBuf.toList shouldBe List("foobar", "helloworld")
         }
       }

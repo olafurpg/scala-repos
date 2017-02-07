@@ -17,15 +17,15 @@ final class Env(config: Config,
                 scheduler: lila.common.Scheduler) {
 
   private val settings = new {
-    val CachedNbTtl = config duration "cached.nb.ttl"
-    val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
+    val CachedNbTtl = config.duration("cached.nb.ttl")
+    val PaginatorMaxPerPage = config.getInt("paginator.max_per_page")
     val CaptcherName = config getString "captcher.name"
-    val CaptcherDuration = config duration "captcher.duration"
+    val CaptcherDuration = config.duration("captcher.duration")
     val CollectionGame = config getString "collection.game"
     val CollectionCrosstable = config getString "collection.crosstable"
     val JsPathRaw = config getString "js_path.raw"
     val JsPathCompiled = config getString "js_path.compiled"
-    val UciMemoTtl = config duration "uci_memo.ttl"
+    val UciMemoTtl = config.duration("uci_memo.ttl")
     val netBaseUrl = config getString "net.base_url"
     val PdfExecPath = config getString "pdf.exec_path"
     val PngExecPath = config getString "png.exec_path"
@@ -65,10 +65,10 @@ final class Env(config: Config,
 
   def cli = new Cli(db, system = system)
 
-  def onStart(gameId: String) = GameRepo game gameId foreach {
-    _ foreach { game =>
+  def onStart(gameId: String) = GameRepo.game(gameId).foreach {
+    _.foreach { game =>
       system.lilaBus.publish(actorApi.StartGame(game), 'startGame)
-      game.userIds foreach { userId =>
+      game.userIds.foreach { userId =>
         system.lilaBus.publish(actorApi.UserStartGame(userId, game),
                                Symbol(s"userStartGame:$userId"))
       }
@@ -82,15 +82,16 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "game" boot new Env(
-      config = lila.common.PlayApp loadConfig "game",
-      db = lila.db.Env.current,
-      mongoCache = lila.memo.Env.current.mongoCache,
-      system = lila.common.PlayApp.system,
-      hub = lila.hub.Env.current,
-      getLightUser = lila.user.Env.current.lightUser,
-      appPath = play.api.Play.current.path.getCanonicalPath,
-      isProd = lila.common.PlayApp.isProd,
-      scheduler = lila.common.PlayApp.scheduler
-    )
+    "game".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("game"),
+        db = lila.db.Env.current,
+        mongoCache = lila.memo.Env.current.mongoCache,
+        system = lila.common.PlayApp.system,
+        hub = lila.hub.Env.current,
+        getLightUser = lila.user.Env.current.lightUser,
+        appPath = play.api.Play.current.path.getCanonicalPath,
+        isProd = lila.common.PlayApp.isProd,
+        scheduler = lila.common.PlayApp.scheduler
+      ))
 }

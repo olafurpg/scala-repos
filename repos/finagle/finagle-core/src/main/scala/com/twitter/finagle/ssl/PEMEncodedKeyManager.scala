@@ -30,7 +30,7 @@ object PEMEncodedKeyManager {
     makeKeystore(
       Files.readBytes(new File(certificatePath)),
       Files.readBytes(new File(keyPath)),
-      caCertPath map { filename =>
+      caCertPath.map { filename =>
         Files.readBytes(new File(filename))
       }
     )

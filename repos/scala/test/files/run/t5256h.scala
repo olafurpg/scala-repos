@@ -8,5 +8,6 @@ object Test extends App {
   println(c.fullName)
   // under -Xcheckinit there's an additional $init$ field
   c.info.toString.lines
-    .filter(_ != "  private var bitmap$init$0: Boolean") foreach println
+    .filter(_ != "  private var bitmap$init$0: Boolean")
+    .foreach(println)
 }

@@ -19,7 +19,7 @@ object ForkTestsTest extends Build {
     file("."),
     settings = defaultSettings ++ Seq(
         scalaVersion := "2.9.2",
-        testGrouping in Test <<= definedTests in Test map { tests =>
+        testGrouping in Test <<= (definedTests in Test).map { tests =>
         assert(tests.size == 3)
         for (idx <- 0 until groups)
           yield

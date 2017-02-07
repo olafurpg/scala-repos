@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
 
 object ZookeeperStateMonitor {
   val DefaultZkConnectionRetryBackoff =
-    (Backoff.exponential(1.second, 2) take 6) ++ Backoff.const(60.seconds)
+    (Backoff.exponential(1.second, 2).take(6)) ++ Backoff.const(60.seconds)
   val DefaultFuturePool = FuturePool.unboundedPool
   val DefaultTimer = new JavaTimer(isDaemon = true)
   val DefaultZKWaitTimeout = 10.seconds
@@ -97,22 +97,23 @@ trait ZookeeperStateMonitor {
     ): Unit = {
       DefaultFuturePool {
         op()
-      } onFailure { ex =>
-        zkWorkFailedCounter.incr()
-        backoff match {
-          case wait #:: rest =>
-            DefaultTimer.doLater(wait) {
-              scheduleReadCachePoolConfig(op, rest)
-            }
+      }.onFailure { ex =>
+          zkWorkFailedCounter.incr()
+          backoff match {
+            case wait #:: rest =>
+              DefaultTimer.doLater(wait) {
+                scheduleReadCachePoolConfig(op, rest)
+              }
+          }
         }
-      } onSuccess { _ =>
-        zkWorkSucceededCounter.incr()
-        loopZookeeperWork
-      }
+        .onSuccess { _ =>
+          zkWorkSucceededCounter.incr()
+          loopZookeeperWork
+        }
     }
 
     // get one work item off the broker and schedule it into the future pool
-    zookeeperWorkQueue.recv.sync() onSuccess {
+    zookeeperWorkQueue.recv.sync().onSuccess {
       case op: (() => Unit) => {
         scheduleReadCachePoolConfig(op)
       }

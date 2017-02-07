@@ -28,16 +28,16 @@ class UnionTest extends AsyncTest[RelationalTestDB] {
   lazy val employees = TableQuery[Employees]
 
   def testBasicUnions = {
-    val q1 = for (m <- managers filter { _.department === "IT" })
+    val q1 = for (m <- managers.filter { _.department === "IT" })
       yield (m.id, m.name)
-    val q2 = for (e <- employees filter { _.departmentIs("IT") })
+    val q2 = for (e <- employees.filter { _.departmentIs("IT") })
       yield (e.id, e.name)
-    val q3 = (q1 union q2).sortBy(_._2.asc)
+    val q3 = (q1.union(q2)).sortBy(_._2.asc)
     val q4 = managers.map(_.id)
-    val q4b = q4 union q4
-    val q4c = q4 union q4 union q4
+    val q4b = q4.union(q4)
+    val q4c = q4.union(q4).union(q4)
     val q5 =
-      managers.map(m => (m.id, 0)) union employees.map(e => (e.id, e.id))
+      managers.map(m => (m.id, 0)).union(employees.map(e => (e.id, e.id)))
 
     (for {
       _ <- (managers.schema ++ employees.schema).create
@@ -79,8 +79,8 @@ class UnionTest extends AsyncTest[RelationalTestDB] {
   }
 
   def testUnionWithoutProjection = {
-    def f(s: String) = managers filter { _.name === s }
-    val q = f("Peter") union f("Amy")
+    def f(s: String) = managers.filter { _.name === s }
+    val q = f("Peter").union(f("Amy"))
 
     seq(
       managers.schema.create,
@@ -112,7 +112,7 @@ class UnionTest extends AsyncTest[RelationalTestDB] {
       coffee <- coffees
       tea <- teas if coffee.pkCup === tea.pkCup
     } yield (tea.pk, tea.pkCup)
-    val q3 = q1 union q2
+    val q3 = q1.union(q2)
 
     seq(
       (coffees.schema ++ teas.schema).create,

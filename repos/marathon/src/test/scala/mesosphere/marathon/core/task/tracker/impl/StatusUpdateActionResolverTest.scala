@@ -30,7 +30,7 @@ class StatusUpdateActionResolverTest
     Given("a taskID without task")
     val appId = PathId("/app")
     val taskId = Task.Id.forApp(appId)
-    f.taskTracker.task(taskId) returns Future.successful(None)
+    f.taskTracker.task(taskId).returns(Future.successful(None))
     And("a status update")
     val update = TaskStatus.getDefaultInstance
 

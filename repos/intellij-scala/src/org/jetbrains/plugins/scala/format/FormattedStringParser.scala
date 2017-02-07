@@ -26,7 +26,7 @@ object FormattedStringParser extends StringParser {
 
   def extractFormatCall(
       element: PsiElement): Option[(ScLiteral, Seq[ScExpression])] =
-    Some(element) collect {
+    Some(element).collect {
       // "%d".format(1)
       case ScMethodCall(
           ScReferenceExpression
@@ -108,12 +108,15 @@ object FormattedStringParser extends StringParser {
         val positional = it.group(1) != null
         if (positional) {
           val position = it.group(1).dropRight(1).toInt
-          arguments.lift(position - 1).map { argument =>
-            refferredArguments ::= argument
-            Injection(argument, Some(specifier))
-          } getOrElse {
-            UnboundPositionalSpecifier(specifier, position)
-          }
+          arguments
+            .lift(position - 1)
+            .map { argument =>
+              refferredArguments ::= argument
+              Injection(argument, Some(specifier))
+            }
+            .getOrElse {
+              UnboundPositionalSpecifier(specifier, position)
+            }
         } else {
           if (it.toString().equals("%n"))
             Injection(ScalaPsiElementFactory.createExpressionFromText(

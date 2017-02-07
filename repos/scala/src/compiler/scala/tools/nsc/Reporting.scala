@@ -85,7 +85,7 @@ trait Reporting extends scala.reflect.internal.Reporting {
     def featureWarnings = _featureWarnings.warnings.toList
     def inlinerWarnings = _inlinerWarnings.warnings.toList
 
-    def allConditionalWarnings = _allConditionalWarnings flatMap (_.warnings)
+    def allConditionalWarnings = _allConditionalWarnings.flatMap(_.warnings)
 
     // behold! the symbol that caused the deprecation warning (may not be deprecated itself)
     def deprecationWarning(pos: Position, sym: Symbol, msg: String): Unit =
@@ -117,8 +117,8 @@ trait Reporting extends scala.reflect.internal.Reporting {
       reportedFeature += featureTrait
 
       val msg =
-        s"$featureDesc $req be enabled\nby making the implicit value $fqname visible.$explain" replace
-          ("#", construct)
+        s"$featureDesc $req be enabled\nby making the implicit value $fqname visible.$explain"
+          .replace("#", construct)
       if (required) reporter.error(pos, msg)
       else featureWarning(pos, msg)
     }
@@ -127,7 +127,7 @@ trait Reporting extends scala.reflect.internal.Reporting {
     var seenMacroExpansionsFallingBack = false
 
     def summarizeErrors(): Unit = if (!reporter.hasErrors) {
-      _allConditionalWarnings foreach (_.summarize())
+      _allConditionalWarnings.foreach(_.summarize())
 
       if (seenMacroExpansionsFallingBack)
         reporter.warning(

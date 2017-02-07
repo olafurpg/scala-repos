@@ -228,7 +228,7 @@ private[server] class NettyModelConversion(
       ServerResultUtils.splitSetCookieHeaders(result.header.headers)
 
     try {
-      headers foreach {
+      headers.foreach {
         case (name, value) => response.headers().add(name, value)
       }
 

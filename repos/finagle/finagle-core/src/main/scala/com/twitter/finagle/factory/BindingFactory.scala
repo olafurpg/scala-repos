@@ -41,7 +41,7 @@ private class DynNameFactory[Req, Rep](
   @volatile private[this] var state: State = Pending(immutable.Queue.empty)
 
   private[this] val sub =
-    name.run.changes respond {
+    name.run.changes.respond {
       case Activity.Ok(name) =>
         synchronized {
           state match {
@@ -104,19 +104,19 @@ private class DynNameFactory[Req, Rep](
         val p = new Promise[Service[Req, Rep]]
         val elapsed = Stopwatch.start()
         val el = (conn, p, elapsed)
-        p setInterruptHandler {
+        p.setInterruptHandler {
           case exc =>
             synchronized {
               state match {
                 case Pending(q) if q contains el =>
-                  state = Pending(q filter (_ != el))
+                  state = Pending(q.filter(_ != el))
                   latencyStat.add(elapsed().inMicroseconds)
                   p.setException(new CancelledConnectionException(exc))
                 case _ =>
               }
             }
         }
-        state = Pending(q enqueue el)
+        state = Pending(q.enqueue(el))
         p
 
       case other => apply(conn)
@@ -293,7 +293,7 @@ private[finagle] class BindingFactory[Req, Rep](
             Trace.recordBinary("namer.dtab.base", baseDtabShow)
             // dtab.local is annotated on the client & server tracers.
 
-            super.apply(conn) rescue {
+            super.apply(conn).rescue {
               // we don't have the dtabs handy at the point we throw
               // the exception; fill them in on the way out
               case e: NoBrokersAvailableException =>
@@ -390,7 +390,7 @@ object BindingFactory {
             Dest(bound) + LoadBalancerFactory.Dest(bound.addr) +
             LoadBalancerFactory.ErrorLabel(errorLabel))
 
-        boundPathFilter(bound.path) andThen client
+        boundPathFilter(bound.path).andThen(client)
       }
 
       val factory = dest match {

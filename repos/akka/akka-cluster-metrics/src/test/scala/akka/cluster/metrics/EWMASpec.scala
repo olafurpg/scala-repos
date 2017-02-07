@@ -77,7 +77,7 @@ class EWMASpec
     "calculate the ewma for multiple, variable, data streams" taggedAs LongRunningTest in {
       var streamingDataSet = Map.empty[String, Metric]
       var usedMemory = Array.empty[Byte]
-      (1 to 50) foreach { _ ⇒
+      ((1 to 50)).foreach { _ ⇒
         // wait a while between each message to give the metrics a chance to change
         Thread.sleep(100)
         usedMemory = usedMemory ++ Array.fill(1024)(

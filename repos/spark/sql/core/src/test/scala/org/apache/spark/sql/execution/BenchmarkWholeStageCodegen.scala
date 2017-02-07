@@ -153,7 +153,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     runBenchmark("Join w long", N) {
       sqlContext
         .range(N)
-        .join(dim, (col("id") bitwiseAND M) === col("k"))
+        .join(dim, (col("id").bitwiseAND(M)) === col("k"))
         .count()
     }
 
@@ -176,8 +176,8 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       sqlContext
         .range(N)
         .join(dim2,
-              (col("id") bitwiseAND M).cast(IntegerType) === col("k1") &&
-                (col("id") bitwiseAND M).cast(IntegerType) === col("k2"))
+              (col("id").bitwiseAND(M)).cast(IntegerType) === col("k1") &&
+                (col("id").bitwiseAND(M)).cast(IntegerType) === col("k2"))
         .count()
     }
 
@@ -197,8 +197,8 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       sqlContext
         .range(N)
         .join(dim3,
-              (col("id") bitwiseAND M) === col("k1") &&
-                (col("id") bitwiseAND M) === col("k2"))
+              (col("id").bitwiseAND(M)) === col("k1") &&
+                (col("id").bitwiseAND(M)) === col("k2"))
         .count()
     }
 
@@ -212,7 +212,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     runBenchmark("outer join w long", N) {
       sqlContext
         .range(N)
-        .join(dim, (col("id") bitwiseAND M) === col("k"), "left")
+        .join(dim, (col("id").bitwiseAND(M)) === col("k"), "left")
         .count()
     }
 
@@ -226,7 +226,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     runBenchmark("semi join w long", N) {
       sqlContext
         .range(N)
-        .join(dim, (col("id") bitwiseAND M) === col("k"), "leftsemi")
+        .join(dim, (col("id").bitwiseAND(M)) === col("k"), "leftsemi")
         .count()
     }
 

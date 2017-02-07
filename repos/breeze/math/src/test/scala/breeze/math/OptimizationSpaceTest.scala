@@ -228,15 +228,15 @@ trait OptimizationSpaceTest[M, V, S] extends TensorSpaceTestBase[V, Int, S] {
     check(Prop.forAll { (trip: (M, M, M)) =>
       val (a, b, c) = trip
       val res =
-        scalars.close(scalars.+(a dot b, a dot c), (a dot (b + c)), 1E-3)
-      if (!res) println(scalars.+(a dot b, a dot c) + " " + (a dot (b + c)))
+        scalars.close(scalars.+(a.dot(b), a.dot(c)), (a.dot(b + c)), 1E-3)
+      if (!res) println(scalars.+(a.dot(b), a.dot(c)) + " " + (a.dot(b + c)))
       res
     })
 
     check(Prop.forAll { (trip: (M, M, M), s: S) =>
       val (a, b, c) = trip
-      scalars.close(scalars.*(a dot b, s), (a dot (b :* s)))
-      scalars.close(scalars.*(s, a dot b), ((a :* s) dot (b)))
+      scalars.close(scalars.*(a.dot(b), s), (a.dot(b :* s)))
+      scalars.close(scalars.*(s, a.dot(b)), (((a :* s)).dot(b)))
     })
   }
 
@@ -350,12 +350,9 @@ class SparseOptimizationSpaceTest_Double
     arbRowIndex,
     arbColIndex,
     Arbitrary(Arbitrary.arbitrary[Double].map(_ % 1E100)))
-  implicit val arbVals = Arbitrary(
-    genAS flatMap
-      (activeSize =>
-         Gen.listOfN[(Int, Int, Double)](
-           activeSize,
-           Arbitrary.arbitrary[(Int, Int, Double)])))
+  implicit val arbVals = Arbitrary(genAS.flatMap(activeSize =>
+    Gen.listOfN[(Int, Int, Double)](activeSize,
+                                    Arbitrary.arbitrary[(Int, Int, Double)])))
   def addToBuilder(bldr: CSCMatrix.Builder[Double], v: (Int, Int, Double)) =
     bldr.add(v._1, v._2, v._3)
   override implicit def genTripleM: Arbitrary[

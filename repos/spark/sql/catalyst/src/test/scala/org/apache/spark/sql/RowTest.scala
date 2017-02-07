@@ -125,11 +125,11 @@ class RowTest extends FunSpec with Matchers {
     }
 
     it("copy should return same ref for external rows") {
-      externalRow should be theSameInstanceAs externalRow.copy()
+      (externalRow should be).theSameInstanceAs(externalRow.copy())
     }
 
     it("copy should return same ref for interal rows") {
-      internalRow should be theSameInstanceAs internalRow.copy()
+      (internalRow should be).theSameInstanceAs(internalRow.copy())
     }
 
     it("toSeq should not expose internal state for external rows") {

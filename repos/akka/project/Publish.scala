@@ -44,17 +44,18 @@ object Publish extends AutoPlugin {
   }
 
   private def akkaPublishTo = Def.setting {
-    sonatypeRepo(version.value) orElse localRepo(defaultPublishTo.value)
+    sonatypeRepo(version.value).orElse(localRepo(defaultPublishTo.value))
   }
 
   private def sonatypeRepo(version: String): Option[Resolver] =
-    Option(sys.props("publish.maven.central")) filter (_.toLowerCase == "true") map {
-      _ =>
+    Option(sys.props("publish.maven.central"))
+      .filter(_.toLowerCase == "true")
+      .map { _ =>
         val nexus = "https://oss.sonatype.org/"
-        if (version endsWith "-SNAPSHOT")
-          "snapshots" at nexus + "content/repositories/snapshots"
-        else "releases" at nexus + "service/local/staging/deploy/maven2"
-    }
+        if (version.endsWith("-SNAPSHOT"))
+          "snapshots".at(nexus + "content/repositories/snapshots")
+        else "releases".at(nexus + "service/local/staging/deploy/maven2")
+      }
 
   private def localRepo(repository: File) =
     Some(Resolver.file("Default Local Repository", repository))

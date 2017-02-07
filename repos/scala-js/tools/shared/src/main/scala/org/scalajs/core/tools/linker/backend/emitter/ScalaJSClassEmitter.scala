@@ -275,13 +275,20 @@ private[scalajs] final class ScalaJSClassEmitter(
 
     require(tree.kind.isJSClass)
 
-    tree.exportedMembers.map(_.tree) collectFirst {
-      case MethodDef(false, StringLiteral("constructor"), params, _, body) =>
-        desugarToFunction(this, tree.encodedName, params, body, isStat = true)
-    } getOrElse {
-      throw new IllegalArgumentException(
-        s"${tree.encodedName} does not have an exported constructor")
-    }
+    tree.exportedMembers
+      .map(_.tree)
+      .collectFirst {
+        case MethodDef(false, StringLiteral("constructor"), params, _, body) =>
+          desugarToFunction(this,
+                            tree.encodedName,
+                            params,
+                            body,
+                            isStat = true)
+      }
+      .getOrElse {
+        throw new IllegalArgumentException(
+          s"${tree.encodedName} does not have an exported constructor")
+      }
   }
 
   /** Generates the creation of fields for a class. */
@@ -537,7 +544,7 @@ private[scalajs] final class ScalaJSClassEmitter(
                 var test = {
                   genIsScalaJSObject(obj) && genIsClassNameInAncestors(
                     className,
-                    obj DOT "$classData" DOT "ancestors")
+                    obj.DOT("$classData").DOT("ancestors"))
                 }
 
                 if (isAncestorOfString)
@@ -624,7 +631,7 @@ private[scalajs] final class ScalaJSClassEmitter(
           className match {
             case Definitions.ObjectClass =>
               val dataVarDef = genLet(Ident("data"), mutable = false, {
-                obj && (obj DOT "$classData")
+                obj && (obj.DOT("$classData"))
               })
               val data = dataVarDef.ref
               js.Block(
@@ -635,7 +642,7 @@ private[scalajs] final class ScalaJSClassEmitter(
                   }, {
                     val arrayDepthVarDef =
                       genLet(Ident("arrayDepth"), mutable = false, {
-                        (data DOT "arrayDepth") || js.IntLiteral(0)
+                        (data.DOT("arrayDepth")) || js.IntLiteral(0)
                       })
                     val arrayDepth = arrayDepthVarDef.ref
                     js.Block(
@@ -646,7 +653,7 @@ private[scalajs] final class ScalaJSClassEmitter(
                         (// Array[Array[A]] <: Array[Object]
                         js.BinaryOp(JSBinaryOp.>, arrayDepth, depth) ||
                         // Array[Int] </: Array[Object]
-                        !genIdentBracketSelect(data DOT "arrayBase",
+                        !genIdentBracketSelect(data.DOT("arrayBase"),
                                                "isPrimitive"))
                       }
                     )
@@ -657,10 +664,10 @@ private[scalajs] final class ScalaJSClassEmitter(
             case _ =>
               js.Return(!(!({
                 genIsScalaJSObject(obj) &&
-                ((obj DOT "$classData" DOT "arrayDepth") === depth) &&
+                ((obj.DOT("$classData").DOT("arrayDepth")) === depth) &&
                 genIsClassNameInAncestors(
                   className,
-                  obj DOT "$classData" DOT "arrayBase" DOT "ancestors")
+                  obj.DOT("$classData").DOT("arrayBase").DOT("ancestors"))
               })))
           }
         )
@@ -699,13 +706,13 @@ private[scalajs] final class ScalaJSClassEmitter(
   private def genIsScalaJSObject(obj: js.Tree)(
       implicit pos: Position): js.Tree = {
     import TreeDSL._
-    obj && (obj DOT "$classData")
+    obj && (obj.DOT("$classData"))
   }
 
   private def genIsClassNameInAncestors(className: String, ancestors: js.Tree)(
       implicit pos: Position): js.Tree = {
     import TreeDSL._
-    ancestors DOT className
+    ancestors.DOT(className)
   }
 
   def genTypeData(tree: LinkedClass): js.Tree = {
@@ -792,7 +799,8 @@ private[scalajs] final class ScalaJSClassEmitter(
       allParams.reverse.dropWhile(_.isInstanceOf[js.Undefined]).reverse
 
     val typeData =
-      js.Apply(js.New(envField("TypeData"), Nil) DOT "initClass", prunedParams)
+      js.Apply(js.New(envField("TypeData"), Nil).DOT("initClass"),
+               prunedParams)
 
     envFieldDef("d", className, typeData)
   }
@@ -804,7 +812,7 @@ private[scalajs] final class ScalaJSClassEmitter(
 
     assert(tree.kind.isClass)
 
-    encodeClassVar(tree.name.name).prototype DOT "$classData" :=
+    encodeClassVar(tree.name.name).prototype.DOT("$classData") :=
       envField("d", tree.name.name)
   }
 
@@ -830,7 +838,7 @@ private[scalajs] final class ScalaJSClassEmitter(
         val jsNew = js.New(encodeClassVar(className), Nil)
         val instantiateModule =
           if (tree.kind == ClassKind.JSModuleClass) jsNew
-          else js.Apply(jsNew DOT js.Ident("init___"), Nil)
+          else js.Apply(jsNew.DOT(js.Ident("init___")), Nil)
         moduleInstanceVar := instantiateModule
       }
 
@@ -864,7 +872,7 @@ private[scalajs] final class ScalaJSClassEmitter(
                     "of its super constructor"
                 val obj =
                   js.New(encodeClassVar("sjsr_UndefinedBehaviorError"), Nil)
-                val ctor = obj DOT js.Ident("init___T")
+                val ctor = obj.DOT(js.Ident("init___T"))
                 js.Throw(js.Apply(ctor, js.StringLiteral(msg) :: Nil))
               },
               js.Skip()
@@ -882,7 +890,7 @@ private[scalajs] final class ScalaJSClassEmitter(
 
   def genExportedMembers(tree: LinkedClass): js.Tree = {
     val exports =
-      tree.exportedMembers map { member =>
+      tree.exportedMembers.map { member =>
         member.tree match {
           case MethodDef(false, StringLiteral("constructor"), _, _, _)
               if tree.kind.isJSClass =>
@@ -902,7 +910,7 @@ private[scalajs] final class ScalaJSClassEmitter(
 
   def genClassExports(tree: LinkedClass): js.Tree = {
     val exports =
-      tree.classExports collect {
+      tree.classExports.collect {
         case e: ConstructorExportDef =>
           genConstructorExportDef(tree, e)
         case e: JSClassExportDef =>
@@ -946,7 +954,7 @@ private[scalajs] final class ScalaJSClassEmitter(
       createNamespace,
       js.DocComment("@constructor"),
       expCtorVar := exportedCtor,
-      expCtorVar DOT "prototype" := baseCtor DOT "prototype"
+      expCtorVar.DOT("prototype") := baseCtor.DOT("prototype")
     )
   }
 

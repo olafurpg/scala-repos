@@ -228,7 +228,7 @@ case class JsPath(path: List[PathNode] = List()) {
   def toJsonString = path.foldLeft("obj")((acc, p) => acc + p.toJsonString)
 
   def compose(other: JsPath) = JsPath(path ++ other.path)
-  def ++(other: JsPath) = this compose other
+  def ++(other: JsPath) = this.compose(other)
 
   /**
     * Simple Prune for simple path and only JsObject

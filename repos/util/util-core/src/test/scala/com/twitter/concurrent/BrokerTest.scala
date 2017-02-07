@@ -91,7 +91,7 @@ class BrokerTest extends WordSpec {
       "works with orElse" in {
         val b0, b1 = new Broker[Int]
 
-        val o = b0.recv orElse b1.recv
+        val o = b0.recv.orElse(b1.recv)
         val f = o.sync()
         assert(f.isDefined == false)
 

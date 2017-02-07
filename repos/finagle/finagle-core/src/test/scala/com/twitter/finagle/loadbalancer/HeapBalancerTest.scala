@@ -44,7 +44,7 @@ class HeapBalancerTest
     val N = 10
     val statsReceiver = new InMemoryStatsReceiver
     val half1, half2 =
-      0 until N / 2 map { i =>
+      (0 until N / 2).map { i =>
         new LoadedFactory(i.toString)
       }
     val factories = half1 ++ half2
@@ -58,7 +58,7 @@ class HeapBalancerTest
     val exc = new NoBrokersAvailableException
 
     val b = new HeapBalancer[Unit, LoadedFactory](
-      Activity(group.set map (Activity.Ok(_))),
+      Activity(group.set.map(Activity.Ok(_))),
       statsReceiver,
       exc,
       nonRng)
@@ -89,7 +89,7 @@ class HeapBalancerTest
       val cluster = Group.mutable[ServiceFactory[Unit, LoadedFactory]](node)
 
       val b = new HeapBalancer[Unit, LoadedFactory](
-        Activity(cluster.set map (Activity.Ok(_))),
+        Activity(cluster.set.map(Activity.Ok(_))),
         NullStatsReceiver,
         new NoBrokersAvailableException,
         new Random
@@ -131,7 +131,7 @@ class HeapBalancerTest
     assert(factories(0).load == 1)
     assert(factories(1).load == 1)
 
-    for (f <- factories drop 2) assert(f.load == 3)
+    for (f <- factories.drop(2)) assert(f.load == 3)
   }
 
   test("handle dynamic groups") {
@@ -278,7 +278,7 @@ class HeapBalancerTest
       assert(Await.result(Await.result(b()).apply(())) == f0)
 
     assert(f0.load == 201)
-    for (f <- factories drop 1) assert(f.load == 101)
+    for (f <- factories.drop(1)) assert(f.load == 101)
   }
 
   test("properly remove a nonhealthy service") {
@@ -330,7 +330,7 @@ class HeapBalancerTest
       Group.mutable[ServiceFactory[Unit, LoadedFactory]](factories: _*)
 
     val b = new HeapBalancer[Unit, LoadedFactory](
-      Activity(group.set map (Activity.Ok(_))),
+      Activity(group.set.map(Activity.Ok(_))),
       statsReceiver,
       new NoBrokersAvailableException,
       new Random

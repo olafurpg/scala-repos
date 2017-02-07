@@ -26,7 +26,7 @@ object FunDcl {
         //returnMarker.drop
         return false
     }
-    if (!(FunSig parse builder)) {
+    if (!(FunSig.parse(builder))) {
       //returnMarker.drop
       return false
     }
@@ -37,7 +37,7 @@ object FunDcl {
           //returnMarker.drop
           return true
         } else {
-          builder error ScalaBundle.message("wrong.type")
+          builder.error(ScalaBundle.message("wrong.type"))
           //returnMarker.drop
           return true
         }

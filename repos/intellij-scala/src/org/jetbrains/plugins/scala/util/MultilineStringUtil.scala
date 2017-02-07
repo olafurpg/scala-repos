@@ -67,7 +67,7 @@ object MultilineStringUtil {
         case call: ScMethodCall =>
           if (Option(call.getEffectiveInvokedExpr).forall {
                 case expr: ScExpression =>
-                  expr.getText endsWith "." + methodName
+                  expr.getText.endsWith("." + methodName)
                 case _ => false
               }) return false
         case _: ScParenthesisedExpr =>
@@ -319,10 +319,10 @@ class MultilineStringSettings(project: Project) {
 
   def prefixLength(line: String) =
     if (useTabs) {
-      val tabsCount = line prefixLength (_ == '\t')
+      val tabsCount = line.prefixLength(_ == '\t')
       tabsCount * tabSize + line.substring(tabsCount).prefixLength(_ == ' ')
     } else {
-      line prefixLength (_ == ' ')
+      line.prefixLength(_ == ' ')
     }
 
   def getPrefix(line: String) = getSmartSpaces(prefixLength(line))

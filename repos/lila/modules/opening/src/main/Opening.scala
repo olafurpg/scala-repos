@@ -68,7 +68,7 @@ object Opening {
 
     def reads(r: BSON.Reader): Move =
       Move(
-        first = r str "first",
+        first = r.str("first"),
         cp = r int "cp",
         line =
           chess.format.pgn.Binary.readMoves(r.bytes("line").value.toList).get)
@@ -101,10 +101,10 @@ object Opening {
     def reads(r: BSON.Reader): Opening =
       Opening(
         id = r int id,
-        fen = r str fen,
+        fen = r.str(fen),
         moves = r.get[List[Move]](moves),
-        color = Color(r bool white),
-        date = r date date,
+        color = Color(r.bool(white)),
+        date = r.date(date),
         perf = r.get[Perf](perf),
         attempts = r int attempts,
         wins = r int wins

@@ -107,7 +107,7 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
   // called once after init condition is signalled
   protected def postInitialization() {
     try {
-      postInitThunks foreach (f => addThunk(f()))
+      postInitThunks.foreach(f => addThunk(f()))
       runThunks()
     } catch {
       case ex: Throwable =>

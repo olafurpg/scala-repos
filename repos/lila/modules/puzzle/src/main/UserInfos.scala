@@ -17,22 +17,24 @@ object UserInfos {
   import Attempt.attemptBSONHandler
 
   lazy val defaultChart = JsArray {
-    List.fill(chartSize)(Glicko.default.intRating) map { JsNumber(_) }
+    List.fill(chartSize)(Glicko.default.intRating).map { JsNumber(_) }
   }
 
   def apply(attemptColl: Coll) = new {
 
     def apply(user: User): Fu[UserInfos] =
-      fetchAttempts(user.id) map { attempts =>
-        new UserInfos(user, makeHistory(attempts), makeChart(attempts))
-      } recover {
-        case e: Exception =>
-          logger.error("user infos", e)
-          new UserInfos(user, Nil, JsArray())
-      }
+      fetchAttempts(user.id)
+        .map { attempts =>
+          new UserInfos(user, makeHistory(attempts), makeChart(attempts))
+        }
+        .recover {
+          case e: Exception =>
+            logger.error("user infos", e)
+            new UserInfos(user, Nil, JsArray())
+        }
 
     def apply(user: Option[User]): Fu[Option[UserInfos]] =
-      user ?? { apply(_) map (_.some) }
+      user ?? { apply(_).map(_.some) }
 
     private def fetchAttempts(userId: String): Fu[List[Attempt]] =
       attemptColl
@@ -51,9 +53,9 @@ object UserInfos {
   private def makeHistory(attempts: List[Attempt]) = attempts.take(historySize)
 
   private def makeChart(attempts: List[Attempt]) = JsArray {
-    val ratings = attempts.take(chartSize).reverse map (_.userPostRating)
+    val ratings = attempts.take(chartSize).reverse.map(_.userPostRating)
     val filled =
       List.fill(chartSize - ratings.size)(Glicko.default.intRating) ::: ratings
-    filled map { JsNumber(_) }
+    filled.map { JsNumber(_) }
   }
 }

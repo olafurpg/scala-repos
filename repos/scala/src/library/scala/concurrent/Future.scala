@@ -210,7 +210,7 @@ trait Future[+T] extends Awaitable[T] {
     *               the return value of `f` will be discarded.
     */
   def foreach[U](f: T => U)(implicit executor: ExecutionContext): Unit =
-    onComplete { _ foreach f }
+    onComplete { _.foreach(f) }
 
   /** Creates a new future by applying the 's' function to the successful result of
     *  this future, or the 'f' function to the failed result. If there is any non-fatal
@@ -384,7 +384,7 @@ trait Future[+T] extends Awaitable[T] {
     */
   def recover[U >: T](pf: PartialFunction[Throwable, U])(
       implicit executor: ExecutionContext): Future[U] =
-    transform { _ recover pf }
+    transform { _.recover(pf) }
 
   /** Creates a new future that will handle any matching throwable that this
     *  future might contain by assigning it a value of another future.
@@ -471,7 +471,7 @@ trait Future[+T] extends Awaitable[T] {
     if (this eq that) this
     else {
       implicit val ec = internalExecutor
-      recoverWith { case _ => that } recoverWith { case _ => this }
+      recoverWith { case _ => that }.recoverWith { case _ => this }
     }
 
   /** Creates a new `Future[S]` which is completed with this `Future`'s result if
@@ -523,7 +523,7 @@ trait Future[+T] extends Awaitable[T] {
     transform { result =>
       try pf.applyOrElse[Try[T], Any](result, Predef.conforms[Try[T]])
       catch {
-        case NonFatal(t) => executor reportFailure t
+        case NonFatal(t) => executor.reportFailure(t)
       }
 
       result
@@ -689,8 +689,8 @@ object Future {
   def firstCompletedOf[T](futures: TraversableOnce[Future[T]])(
       implicit executor: ExecutionContext): Future[T] = {
     val p = Promise[T]()
-    val completeFirst: Try[T] => Unit = p tryComplete _
-    futures foreach { _ onComplete completeFirst }
+    val completeFirst: Try[T] => Unit = p.tryComplete(_)
+    futures.foreach { _.onComplete(completeFirst) }
     p.future
   }
 
@@ -717,16 +717,16 @@ object Future {
       val search: Try[T] => Unit = v =>
         try {
           v match {
-            case Success(r) if p(r) => result tryComplete Success(Some(r))
+            case Success(r) if p(r) => result.tryComplete(Success(Some(r)))
             case _ =>
           }
         } finally {
           if (ref.decrementAndGet == 0) {
-            result tryComplete Success(None)
+            result.tryComplete(Success(None))
           }
       }
 
-      futuresBuffer.foreach(_ onComplete search)
+      futuresBuffer.foreach(_.onComplete(search))
 
       result.future
     }
@@ -831,7 +831,7 @@ object Future {
     if (futures.isEmpty)
       failed(
         new NoSuchElementException("reduce attempted on empty collection"))
-    else sequence(futures).map(_ reduceLeft op)
+    else sequence(futures).map(_.reduceLeft(op))
   }
 
   /** Initiates a non-blocking, asynchronous, left reduction over the supplied futures
@@ -855,7 +855,7 @@ object Future {
       failed(
         new NoSuchElementException("reduceLeft attempted on empty collection"))
     else
-      i.next() flatMap { v =>
+      i.next().flatMap { v =>
         foldNext(i, v, op)
       }
   }

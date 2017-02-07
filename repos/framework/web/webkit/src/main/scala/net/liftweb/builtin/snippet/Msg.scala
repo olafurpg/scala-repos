@@ -74,12 +74,15 @@ object Msg extends DispatchSnippet {
     attr("id") match {
       case Full(id) => {
         // Extract the currently set CSS
-        (attr("errorClass") or attr("errorclass")).map(cls =>
-          MsgErrorMeta += (id -> cls))
-        (attr("warningClass") or attr("warningclass")).map(cls =>
-          MsgWarningMeta += (id -> cls))
-        (attr("noticeClass") or attr("noticeclass")).map(cls =>
-          MsgNoticeMeta += (id -> cls))
+        (attr("errorClass")
+          .or(attr("errorclass")))
+          .map(cls => MsgErrorMeta += (id -> cls))
+        (attr("warningClass")
+          .or(attr("warningclass")))
+          .map(cls => MsgWarningMeta += (id -> cls))
+        (attr("noticeClass")
+          .or(attr("noticeclass")))
+          .map(cls => MsgNoticeMeta += (id -> cls))
 
         <span id={id}>{renderIdMsgs(id)}</span> ++ effects(id)
       }
@@ -108,7 +111,7 @@ object Msg extends DispatchSnippet {
             style match {
               case Some(s) =>
                 msgList.flatMap(t => <span>{t}</span> % ("class" -> s))
-              case _ => msgList flatMap (n => n)
+              case _ => msgList.flatMap(n => n)
             }
         }
     }

@@ -15,7 +15,7 @@ sealed abstract class Marshaller[-A, +B] {
       implicit ec: ExecutionContext): Future[List[Marshalling[B]]]
 
   def map[C](f: B ⇒ C): Marshaller[A, C] =
-    Marshaller(implicit ec ⇒ value ⇒ this(value).fast map (_ map (_ map f)))
+    Marshaller(implicit ec ⇒ value ⇒ this(value).fast.map(_.map(_.map(f))))
 
   /**
     * Reuses this Marshaller's logic to produce a new Marshaller from another type `C` which overrides
@@ -40,8 +40,8 @@ sealed abstract class Marshaller[-A, +B] {
       implicit cto: ContentTypeOverrider[D]): Marshaller[C, D] =
     Marshaller { implicit ec ⇒ value ⇒
       import Marshalling._
-      this(f(ec)(value)).fast map {
-        _ map {
+      this(f(ec)(value)).fast.map {
+        _.map {
           (_, newMediaType) match {
             case (WithFixedContentType(_, marshal), newMT: MediaType.Binary) ⇒
               WithFixedContentType(newMT, () ⇒ cto(marshal(), newMT))
@@ -54,13 +54,13 @@ sealed abstract class Marshaller[-A, +B] {
               WithFixedContentType(newMT, () ⇒ cto(marshal(), newMT))
             case (WithFixedContentType(oldCT: ContentType.NonBinary, marshal),
                   newMT: MediaType.WithOpenCharset) ⇒
-              val newCT = newMT withCharset oldCT.charset
+              val newCT = newMT.withCharset(oldCT.charset)
               WithFixedContentType(newCT, () ⇒ cto(marshal(), newCT))
 
             case (WithOpenCharset(oldMT, marshal),
                   newMT: MediaType.WithOpenCharset) ⇒
               WithOpenCharset(newMT,
-                              cs ⇒ cto(marshal(cs), newMT withCharset cs))
+                              cs ⇒ cto(marshal(cs), newMT.withCharset(cs)))
             case (WithOpenCharset(oldMT, marshal),
                   newMT: MediaType.WithFixedCharset) ⇒
               WithFixedContentType(newMT,
@@ -126,7 +126,7 @@ object Marshaller
     * from these values. Content-negotiation determines, which "sub-marshaller" eventually gets to do the job.
     */
   def oneOf[T, A, B](values: T*)(f: T ⇒ Marshaller[A, B]): Marshaller[A, B] =
-    oneOf(values map f: _*)
+    oneOf(values.map(f): _*)
 
   /**
     * Helper for creating a synchronous [[Marshaller]] to content with a fixed charset from the given function.

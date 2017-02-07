@@ -27,20 +27,20 @@ class GoToExpandedMacroCallProviderExt extends LineMarkerProvider {
     ScalaMacroDebuggingUtil.allMacroCalls.clear()
 
     if (!ScalaMacroDebuggingUtil.isEnabled || elements.isEmpty) return
-    val first = elements get 0
+    val first = elements.get(0)
     val file = first.getContainingFile
 
     val synFile = file match {
       case scalaFile: ScalaFile
-          if ScalaMacroDebuggingUtil tryToLoad scalaFile =>
+          if ScalaMacroDebuggingUtil.tryToLoad(scalaFile) =>
         Some(scalaFile)
       case _ => None
     }
 
-    val macrosFound = elements filter ScalaMacroDebuggingUtil.isMacroCall
+    val macrosFound = elements.filter(ScalaMacroDebuggingUtil.isMacroCall)
     if (macrosFound.isEmpty) return
 
-    macrosFound foreach {
+    macrosFound.foreach {
       case macroCall =>
         val markerInfo =
           new RelatedItemLineMarkerInfo[PsiElement](
@@ -72,7 +72,7 @@ class GoToExpandedMacroCallProviderExt extends LineMarkerProvider {
             util.Arrays.asList[GotoRelatedItem]()
           )
 
-        result add markerInfo
+        result.add(markerInfo)
         ScalaMacroDebuggingUtil.allMacroCalls.add(macroCall)
     }
   }

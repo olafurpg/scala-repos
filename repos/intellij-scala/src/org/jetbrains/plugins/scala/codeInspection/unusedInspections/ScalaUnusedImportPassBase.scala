@@ -39,7 +39,7 @@ trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
   def collectAnnotations(
       unusedImports: Array[ImportUsed],
       annotationHolder: AnnotationHolder): Array[Annotation] =
-    unusedImports flatMap { imp: ImportUsed =>
+    unusedImports.flatMap { imp: ImportUsed =>
       {
         val psiOption: Option[PsiElement] = imp match {
           case ImportExprUsed(expr)
@@ -78,7 +78,8 @@ trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
           case Some(psi) =>
             val annotation = annotationHolder
               .createWarningAnnotation(psi, "Unused import statement")
-            annotation setHighlightType ProblemHighlightType.LIKE_UNUSED_SYMBOL
+            annotation.setHighlightType(
+              ProblemHighlightType.LIKE_UNUSED_SYMBOL)
             getFixes.foreach(annotation.registerFix)
             qName.foreach(name =>
               annotation.registerFix(new MarkImportAsAlwaysUsed(name)))

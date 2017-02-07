@@ -80,7 +80,7 @@ abstract class BlockingExecutor[T <: Command, S](
       }
     } else {
       val f =
-        cmd.errors.map(_.validation) collect {
+        cmd.errors.map(_.validation).collect {
           case Failure(e) ⇒ e
         }
       def failures = if (f.size == 1) "failure" else "failures"
@@ -129,7 +129,7 @@ abstract class AsyncExecutor[T <: Command, S](
     if (cmd.isValid) {
       val res = handle(cmd)
 
-      res onSuccess {
+      res.onSuccess {
         case r ⇒
           def plur(count: Int) = if (count == 1) "failure" else "failures"
           val resultLog = r.fold({ failures ⇒
@@ -141,7 +141,7 @@ abstract class AsyncExecutor[T <: Command, S](
             s"Command [${cmd.getClass.getName}] executed $resultLog")
       }
 
-      res recover {
+      res.recover {
         case t: Throwable =>
           logger.error(s"Command [${cmd.getClass.getName}] failed.", t)
           ValidationError(
@@ -150,7 +150,7 @@ abstract class AsyncExecutor[T <: Command, S](
       }
     } else {
       val f =
-        cmd.errors.map(_.validation) collect {
+        cmd.errors.map(_.validation).collect {
           case Failure(e) ⇒ e
         }
       def failures = if (f.size == 1) "failure" else "failures"

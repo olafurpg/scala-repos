@@ -55,8 +55,10 @@ trait Foldable[F[_]] { self =>
   /**Left-associative fold of a structure. */
   def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B = {
     import Dual._, Endo._, syntax.std.all._
-    Tag.unwrap(foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(
-      dualMonoid)) apply (z)
+    Tag
+      .unwrap(
+        foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(dualMonoid))
+      .apply(z)
   }
 
   /**Right-associative, monadic fold of a structure. */
@@ -115,24 +117,24 @@ trait Foldable[F[_]] { self =>
   def foldMapRight1Opt[A, B](fa: F[A])(z: A => B)(
       f: (A, => B) => B): Option[B] =
     foldRight(fa, None: Option[B])((a, optB) =>
-      optB map (f(a, _)) orElse Some(z(a)))
+      optB.map(f(a, _)).orElse(Some(z(a))))
   def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] =
     foldMapRight1Opt(fa)(identity)(f)
   def foldr1Opt[A](fa: F[A])(f: A => (=> A) => A): Option[A] =
     foldRight(fa, None: Option[A])((a, optA) =>
-      optA map (aa => f(a)(aa)) orElse Some(a))
+      optA.map(aa => f(a)(aa)).orElse(Some(a)))
 
   /**Curried version of `foldLeft` */
   final def foldl[A, B](fa: F[A], z: B)(f: B => A => B) =
     foldLeft(fa, z)((b, a) => f(b)(a))
   def foldMapLeft1Opt[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Option[B] =
     foldLeft(fa, None: Option[B])((optB, a) =>
-      optB map (f(_, a)) orElse Some(z(a)))
+      optB.map(f(_, a)).orElse(Some(z(a))))
   def foldLeft1Opt[A](fa: F[A])(f: (A, A) => A): Option[A] =
     foldMapLeft1Opt(fa)(identity)(f)
   def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] =
     foldLeft(fa, None: Option[A])((optA, a) =>
-      optA map (aa => f(aa)(a)) orElse Some(a))
+      optA.map(aa => f(aa)(a)).orElse(Some(a)))
 
   /**Curried version of `foldRightM` */
   final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => (=> B) => G[B])(
@@ -169,14 +171,14 @@ trait Foldable[F[_]] { self =>
   def index[A](fa: F[A], i: Int): Option[A] =
     foldLeft[A, (Int, Option[A])](fa, (0, None)) {
       case ((idx, elem), curr) =>
-        (idx + 1, elem orElse { if (idx == i) Some(curr) else None })
+        (idx + 1, elem.orElse { if (idx == i) Some(curr) else None })
     }._2
 
   /**
     * @return the element at index `i`, or `default` if the given index falls outside of the range
     */
   def indexOr[A](fa: F[A], default: => A, i: Int): A =
-    index(fa, i) getOrElse default
+    index(fa, i).getOrElse(default)
 
   def toList[A](fa: F[A]): List[A] =
     foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
@@ -241,7 +243,7 @@ trait Foldable[F[_]] { self =>
       case (None, a) => some(a -> f(a))
       case (Some(x @ (a, b)), aa) =>
         val bb = f(aa); some(if (Order[B].order(b, bb) == GT) x else aa -> bb)
-    } map (_._1)
+    }.map(_._1)
 
   /** The smallest element of `fa`, or None if `fa` is empty. */
   def minimum[A: Order](fa: F[A]): Option[A] =
@@ -264,7 +266,7 @@ trait Foldable[F[_]] { self =>
       case (None, a) => some(a -> f(a))
       case (Some(x @ (a, b)), aa) =>
         val bb = f(aa); some(if (Order[B].order(b, bb) == LT) x else aa -> bb)
-    } map (_._1)
+    }.map(_._1)
 
   def sumr[A](fa: F[A])(implicit A: Monoid[A]): A =
     foldRight(fa, A.zero)(A.append)
@@ -294,7 +296,7 @@ trait Foldable[F[_]] { self =>
   /** Insert an `A` between every A, yielding the sum. */
   def intercalate[A](fa: F[A], a: A)(implicit A: Monoid[A]): A =
     (foldRight(fa, none[A]) { (l, oa) =>
-      some(A.append(l, oa map (A.append(a, _)) getOrElse A.zero))
+      some(A.append(l, oa.map(A.append(a, _)).getOrElse(A.zero)))
     }).getOrElse(A.zero)
 
   /**
@@ -383,7 +385,7 @@ object Foldable {
     */
   trait FromFoldMap[F[_]] extends Foldable[F] {
     override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
-      foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
+      foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))).apply(z)
   }
 
   /**

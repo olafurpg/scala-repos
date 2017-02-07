@@ -25,7 +25,7 @@ final class Messenger(socketHub: akka.actor.ActorRef,
   }
 
   def watcher(gameId: String, member: Member, text: String, socket: ActorRef) =
-    member.userId foreach { userId =>
+    member.userId.foreach { userId =>
       chat ! UserTalk(gameId + "/w", userId, text, socket)
     }
 

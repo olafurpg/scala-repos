@@ -12,9 +12,11 @@ private[game] final class Cli(db: lila.db.Env, system: akka.actor.ActorSystem)
   def process = {
 
     case "game" :: "per" :: "day" :: days =>
-      GameRepo nbPerDay {
-        (days.headOption flatMap parseIntOption) | 30
-      } map (_ mkString " ")
+      GameRepo
+        .nbPerDay {
+          (days.headOption.flatMap(parseIntOption)) | 30
+        }
+        .map(_ mkString " ")
 
     case "game" :: "typecheck" :: Nil =>
       logger.info("Counting games...")

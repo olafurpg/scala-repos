@@ -35,7 +35,7 @@ object CallGraphTest extends ClearAfterClass.Clearable {
     compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
     compiler.genBCode.bTypes.callGraph.callsites
   )
-  notPerRun foreach compiler.perRunCaches.unrecordCache
+  notPerRun.foreach(compiler.perRunCaches.unrecordCache)
 }
 
 @RunWith(classOf[JUnit4])
@@ -127,7 +127,7 @@ class CallGraphTest extends ClearAfterClass {
     var msgCount = 0
     val checkMsg = (m: StoreReporter#Info) => {
       msgCount += 1
-      ok exists (m.msg contains _)
+      ok.exists(m.msg contains _)
     }
     val List(cCls, cMod, dCls, testCls) = compile(code, checkMsg)
     assert(msgCount == 6, msgCount)

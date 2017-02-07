@@ -26,17 +26,17 @@ object M0 {
 object M1 {
 
   def scale(x: Double, s: Stream[Double]): Stream[Double] =
-    s map { e: Double =>
+    s.map { e: Double =>
       e * x
     }
 
   def partialSums(s: Stream[Double]): Stream[Double] =
-    Stream.cons(s.head, partialSums(s.tail) map (x => x + s.head));
+    Stream.cons(s.head, partialSums(s.tail).map(x => x + s.head));
 
   def euler(s: Stream[Double]): Stream[Double] = {
-    val nm1 = s apply 0;
-    val n = s apply 1;
-    val np1 = s apply 2;
+    val nm1 = s.apply(0);
+    val n = s.apply(1);
+    val np1 = s.apply(2);
     Stream
       .cons(np1 - ((np1 - n) * (np1 - n) / (nm1 - 2 * n + np1)), euler(s.tail))
   };
@@ -48,10 +48,10 @@ object M1 {
 
   def veryGood(s: Stream[Double],
                transform: Stream[Double] => Stream[Double]): Stream[Double] =
-    better(s, transform) map (x => x.head);
+    better(s, transform).map(x => x.head);
 
   def lnSummands(n: Double): Stream[Double] =
-    Stream.cons(1.0 / n, lnSummands(n + 1.0) map { x: Double =>
+    Stream.cons(1.0 / n, lnSummands(n + 1.0).map { x: Double =>
       -x
     })
 
@@ -60,7 +60,7 @@ object M1 {
   var ln2 = veryGood(ln0, euler);
 
   def piSummands(n: Double): Stream[Double] =
-    Stream.cons(1.0 / n, piSummands(n + 2.0) map { x: Double =>
+    Stream.cons(1.0 / n, piSummands(n + 2.0).map { x: Double =>
       -x
     })
 
@@ -118,7 +118,7 @@ object M2 {
     def hasNext = true;
     def next = {
       val p = current.next;
-      current = current filter { x =>
+      current = current.filter { x =>
         !((x % p) == 0)
       };
       p

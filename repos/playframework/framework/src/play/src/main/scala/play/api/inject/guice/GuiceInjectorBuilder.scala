@@ -314,7 +314,7 @@ object GuiceableModule extends GuiceableModuleConversions {
 
   def loadModules(environment: Environment,
                   configuration: Configuration): Seq[GuiceableModule] = {
-    Modules.locate(environment, configuration) map guiceable
+    Modules.locate(environment, configuration).map(guiceable)
   }
 
   /**
@@ -337,7 +337,7 @@ object GuiceableModule extends GuiceableModuleConversions {
              conf: Configuration,
              binderOptions: Set[BinderOption])(
       builders: Seq[GuiceableModule]): Seq[GuiceModule] =
-    builders flatMap { module =>
+    builders.flatMap { module =>
       module.guiced(env, conf, binderOptions)
     }
 }

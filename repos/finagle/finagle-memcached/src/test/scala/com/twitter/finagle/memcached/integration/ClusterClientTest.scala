@@ -80,7 +80,7 @@ class ClusterClientTest
     // start five memcached server and join the cluster
     Await.result(
       Future.collect(
-        (0 to 4) map { _ =>
+        ((0 to 4)).map { _ =>
           TestMemcachedServer.start() match {
             case Some(server) =>
               testServers :+= server
@@ -119,7 +119,7 @@ class ClusterClientTest
 
     if (!testServers.isEmpty) {
       // shutdown memcached server
-      testServers foreach { _.stop() }
+      testServers.foreach { _.stop() }
       testServers = List()
     }
   }
@@ -142,12 +142,12 @@ class ClusterClientTest
     val client = Client(mycluster)
 
     val count = 100
-    Await.result(Future.collect((0 until count) map { n =>
+    Await.result(Future.collect(((0 until count)).map { n =>
       client.set("foo" + n, Buf.Utf8("bar" + n))
     }), TimeOut)
 
     val tmpClients =
-      testServers map {
+      testServers.map {
         case (server) =>
           Client(
             ClientBuilder()
@@ -161,7 +161,7 @@ class ClusterClientTest
     (0 until count).foreach { n =>
       {
         var found = false
-        tmpClients foreach { c =>
+        tmpClients.foreach { c =>
           if (Await.result(c.get("foo" + n), TimeOut) != None) {
             assert(!found)
             found = true
@@ -377,7 +377,7 @@ class ClusterClientTest
 
       val count = 100
       Await.result(Future.collect(
-                     (0 until count) map { n =>
+                     ((0 until count)).map { n =>
                        client.set("foo" + n, Buf.Utf8("bar" + n))
                      }
                    ),
@@ -402,7 +402,7 @@ class ClusterClientTest
     val customKey = "key-"
     var shardId = -1
     val myClusterWithCustomKey =
-      mycluster map {
+      mycluster.map {
         case node: CacheNode => {
           shardId += 1
           CacheNode(node.host,
@@ -655,7 +655,7 @@ class ClusterClientTest
               (expectedRem == -1 || remSeen == expectedRem) &&
               (expectedPoolSize == -1 || poolSeen.size == expectedPoolSize))
             Future.Done
-          else tail flatMap expectMore
+          else tail.flatMap(expectMore)
       }
     }
 
@@ -663,7 +663,7 @@ class ClusterClientTest
       case (cachePool, changes) =>
         assert(cachePool.size == currentSize)
         poolSeen ++= cachePool
-        val retFuture = changes flatMap expectMore
+        val retFuture = changes.flatMap(expectMore)
         ops // invoke the function now
         retFuture
     }

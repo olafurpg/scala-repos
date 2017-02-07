@@ -268,7 +268,7 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
     val allAddresses: Vector[UniqueAddress] = allMembers.map(_.uniqueAddress)
     val addressMapping = allAddresses.zipWithIndex.toMap
     val allRoles = allMembers
-      .foldLeft(Set.empty[String])((acc, m) ⇒ acc union m.roles)
+      .foldLeft(Set.empty[String])((acc, m) ⇒ acc.union(m.roles))
       .to[Vector]
     val roleMapping = allRoles.zipWithIndex.toMap
     val allHashes = gossip.version.versions.keys.to[Vector]

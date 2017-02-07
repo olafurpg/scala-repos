@@ -86,7 +86,7 @@ case class Dtab(dentries0: IndexedSeq[Dentry]) extends IndexedSeq[Dentry] {
     }
 
     if (i == size) Dtab.empty
-    else Dtab(this drop prefix.size)
+    else Dtab(this.drop(prefix.size))
   }
 
   /**
@@ -109,7 +109,7 @@ case class Dtab(dentries0: IndexedSeq[Dentry]) extends IndexedSeq[Dentry] {
   def simplified: Dtab =
     Dtab({
       val simple =
-        this map {
+        this.map {
           case Dentry(prefix, dst) => Dentry(prefix, dst.simplified)
         }
 
@@ -117,7 +117,7 @@ case class Dtab(dentries0: IndexedSeq[Dentry]) extends IndexedSeq[Dentry] {
       simple.filter(_.dst != NameTree.Neg)
     })
 
-  def show: String = dentries0 map (_.show) mkString ";"
+  def show: String = dentries0.map(_.show) mkString ";"
   override def toString = "Dtab(" + show + ")"
 }
 

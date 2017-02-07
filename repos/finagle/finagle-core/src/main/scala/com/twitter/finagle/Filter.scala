@@ -181,7 +181,7 @@ object Filter {
         new Stack.Module0[Service[Req, Rep]] {
           val role = _role
           val description = role.name
-          def make(next: Service[Req, Rep]) = filter andThen next
+          def make(next: Service[Req, Rep]) = filter.andThen(next)
         }
     }
 
@@ -192,7 +192,7 @@ object Filter {
         new Stack.Module0[ServiceFactory[Req, Rep]] {
           val role = _role
           val description = role.name
-          def make(next: ServiceFactory[Req, Rep]) = filter andThen next
+          def make(next: ServiceFactory[Req, Rep]) = filter.andThen(next)
         }
     }
 

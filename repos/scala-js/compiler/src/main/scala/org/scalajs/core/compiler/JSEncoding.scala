@@ -222,7 +222,7 @@ trait JSEncoding extends SubComponent { self: GenJSCode =>
                                inRTClass: Boolean): String = {
     val tpe = sym.tpe
 
-    val paramTypeNames0 = tpe.params map (p => internalName(p.tpe))
+    val paramTypeNames0 = tpe.params.map(p => internalName(p.tpe))
 
     val hasExplicitThisParameter =
       inRTClass || isScalaJSDefinedJSClass(sym.owner)

@@ -31,8 +31,8 @@ object AssertUtil {
   }
   private implicit class `field helper`(val f: Field) extends AnyVal {
     def follow(o: AnyRef): AnyRef = {
-      f setAccessible true
-      f get o
+      f.setAccessible(true)
+      f.get(o)
     }
   }
 
@@ -49,7 +49,7 @@ object AssertUtil {
       fail("Expression did not throw!")
     } catch {
       case e: Throwable
-          if (manifest.runtimeClass isAssignableFrom e.getClass) &&
+          if (manifest.runtimeClass.isAssignableFrom(e.getClass)) &&
             checkMessage(e.getMessage) =>
     }
   }
@@ -59,7 +59,7 @@ object AssertUtil {
   def assertSameElements[A, B >: A](expected: IterableLike[A, _],
                                     actual: GenIterable[B],
                                     message: String = ""): Unit =
-    if (!(expected sameElements actual))
+    if (!(expected.sameElements(actual)))
       fail(
         f"${if (message.nonEmpty) s"$message " else ""}expected:<${stringOf(
           expected)}> but was:<${stringOf(actual)}>"
@@ -85,7 +85,7 @@ object AssertUtil {
             f <- o.getClass.allFields if !Modifier.isStatic(f.getModifiers)
             if !f.getType.isPrimitive
             if !classOf[Reference[_]].isAssignableFrom(f.getType)
-          } loop(f follow o)
+          } loop(f.follow(o))
         }
       loop(root)
       seen.keySet.asScala

@@ -71,7 +71,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d
         }
 
@@ -90,7 +90,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d
         }
 
@@ -107,7 +107,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d
         }
 
@@ -126,7 +126,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -143,7 +143,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -162,7 +162,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -186,7 +186,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 1 => d
         }
 
@@ -234,7 +234,7 @@ trait StatsLibSpecs[M[+ _]]
         .toSet
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 1 => d
         }
 
@@ -253,7 +253,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -470,7 +470,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -495,7 +495,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(3)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -518,7 +518,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(10)
 
       val (tr, fls) =
-        result partition {
+        result.partition {
           case (ids, STrue) if ids.length == 1 => true
           case (ids, SFalse) if ids.length == 1 => false
           case _ => false
@@ -544,7 +544,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -563,7 +563,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -589,7 +589,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(3)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -612,7 +612,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -641,7 +641,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 =>
             (d.toDouble ~= 0.9998746737089123)
         }
@@ -669,7 +669,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => (d.toDouble ~= 400.08)
         }
 
@@ -696,7 +696,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -729,7 +729,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -756,7 +756,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d
         }
 
@@ -775,7 +775,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -794,7 +794,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -813,7 +813,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(18)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -832,7 +832,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(18)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -899,7 +899,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(2)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -925,7 +925,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(2)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -951,7 +951,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(12)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -974,7 +974,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(18)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -994,7 +994,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(18)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1020,7 +1020,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(2)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1046,7 +1046,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(13)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1069,7 +1069,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(18)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1096,7 +1096,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 =>
             (d.toDouble ~= 0.9998746737089123)
         }
@@ -1124,7 +1124,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => (d.toDouble ~= 400.08)
         }
 
@@ -1151,7 +1151,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -1184,7 +1184,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -1219,7 +1219,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 =>
             (d.toDouble ~= 0.9998746737089123)
         }
@@ -1247,7 +1247,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => (d.toDouble ~= 400.08)
         }
 
@@ -1274,7 +1274,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -1307,7 +1307,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -1342,7 +1342,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => (d.toDouble ~= 1)
         }
 
@@ -1369,7 +1369,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => (d.toDouble ~= 582.96)
         }
 
@@ -1396,7 +1396,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -1429,7 +1429,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -1501,7 +1501,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => (d.toDouble ~= 0)
         }
 
@@ -1525,7 +1525,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -1558,7 +1558,7 @@ trait StatsLibSpecs[M[+ _]]
         result must haveSize(1)
 
         val result2 =
-          result collect {
+          result.collect {
             case (ids, SObject(fields)) if ids.length == 0 => {
               val SDecimal(slope) = fields("slope")
               val SDecimal(yint) = fields("intercept")
@@ -1618,7 +1618,7 @@ trait StatsLibSpecs[M[+ _]]
         result must haveSize(1)
 
         val result2 =
-          result collect {
+          result.collect {
             case (ids, SObject(fields)) if ids.length == 0 => {
               val SDecimal(slope) = fields("slope")
               val SDecimal(yint) = fields("intercept")
@@ -1647,7 +1647,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d
         }
 
@@ -1667,7 +1667,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d
         }
 
@@ -1684,7 +1684,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d
         }
 
@@ -1704,7 +1704,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -1721,7 +1721,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -1741,7 +1741,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -1766,7 +1766,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1792,7 +1792,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1816,7 +1816,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(22)
 
       val (tr, fls) =
-        result partition {
+        result.partition {
           case (ids, STrue) if ids.length == 1 => true
           case (ids, SFalse) if ids.length == 1 => false
           case _ => false
@@ -1843,7 +1843,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1864,7 +1864,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1894,7 +1894,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1918,7 +1918,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -1948,7 +1948,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => (d.toDouble ~= 301.5)
         }
 
@@ -1977,7 +1977,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 =>
             (d.toDouble ~= 0.2832061115667535364)
         }
@@ -2007,7 +2007,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -2042,7 +2042,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -2086,7 +2086,7 @@ trait StatsLibSpecs[M[+ _]]
 
       result must haveSize(22)
 
-      val values = result collect { case (_, SDecimal(x)) => x }
+      val values = result.collect { case (_, SDecimal(x)) => x }
       values must contain(BigDecimal(88), BigDecimal(104), BigDecimal(131.5))
     }
 
@@ -2128,7 +2128,7 @@ trait StatsLibSpecs[M[+ _]]
 
       result must haveSize(22)
 
-      val values = result collect { case (_, SDecimal(x)) => x }
+      val values = result.collect { case (_, SDecimal(x)) => x }
       values must contain(BigDecimal(88), BigDecimal(120), BigDecimal(156.9))
     }
   }
@@ -2147,7 +2147,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 => d
         }
 
@@ -2167,7 +2167,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -2187,7 +2187,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SArray(d)) if ids.length == 0 => d
         }
 
@@ -2207,7 +2207,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -2237,7 +2237,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -2266,7 +2266,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -2295,7 +2295,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(11)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -2319,7 +2319,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -2340,7 +2340,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -2370,7 +2370,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -2399,7 +2399,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(13)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -2423,7 +2423,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
         }
 
@@ -2453,7 +2453,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 =>
             (d.toDouble ~= 874.2741666666666)
         }
@@ -2507,7 +2507,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 0 =>
             (d.toDouble ~= 0.7835742008825)
         }
@@ -2537,7 +2537,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -2572,7 +2572,7 @@ trait StatsLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SObject(fields)) if ids.length == 0 => {
             val SDecimal(slope) = fields("slope")
             val SDecimal(yint) = fields("intercept")
@@ -2616,7 +2616,7 @@ trait StatsLibSpecs[M[+ _]]
         case _ => ko
       }
 
-      val values = result collect { case (_, SDecimal(x)) => x }
+      val values = result.collect { case (_, SDecimal(x)) => x }
       values must contain(BigDecimal(131),
                           BigDecimal("40.0777"),
                           BigDecimal("103.72331"))
@@ -2660,7 +2660,7 @@ trait StatsLibSpecs[M[+ _]]
         case _ => ko
       }
 
-      val values = result collect { case (_, SDecimal(x)) => x }
+      val values = result.collect { case (_, SDecimal(x)) => x }
       values must contain(BigDecimal(131),
                           BigDecimal("1.111"),
                           BigDecimal("53.06660"))

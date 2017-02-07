@@ -53,7 +53,7 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
     zkServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
     // start five memcached server and join the cluster
-    (0 to 4) foreach { _ =>
+    ((0 to 4)).foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
           testServers :+= server
@@ -79,7 +79,7 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
 
     if (!testServers.isEmpty) {
       // shutdown memcached server
-      testServers foreach { _.stop() }
+      testServers.foreach { _.stop() }
       testServers = List()
     }
   }

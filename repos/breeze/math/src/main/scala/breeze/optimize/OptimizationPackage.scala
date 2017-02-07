@@ -37,7 +37,7 @@ object OptimizationPackage {
         init: Vector,
         options: OptimizationOption*): Iterator[LBFGS[Vector]#State] = {
       options
-        .foldLeft(OptParams())((a, b) => b apply a)
+        .foldLeft(OptParams())((a, b) => b.apply(a))
         .iterations(new CachedDiffFunction(fn)(space.copy), init)
     }
   }
@@ -66,7 +66,7 @@ object OptimizationPackage {
                             init: Vector,
                             options: OptimizationOption*)
       : Iterator[TruncatedNewtonMinimizer[Vector, Hessian]#State] = {
-      val params = options.foldLeft(OptParams())((a, b) => b apply a)
+      val params = options.foldLeft(OptParams())((a, b) => b.apply(a))
       if (params.useL1)
         throw new UnsupportedOperationException(
           "Can't use L1 with second order optimizer right now")
@@ -99,7 +99,7 @@ object OptimizationPackage {
                             init: Vector,
                             options: OptimizationOption*): Iterator[
       FirstOrderMinimizer[Vector, StochasticDiffFunction[Vector]]#State] = {
-      options.foldLeft(OptParams())((a, b) => b apply a).iterations(fn, init)
+      options.foldLeft(OptParams())((a, b) => b.apply(a)).iterations(fn, init)
     }
   }
 
@@ -124,7 +124,7 @@ object OptimizationPackage {
                             options: OptimizationOption*): Iterator[
       FirstOrderMinimizer[Vector, BatchDiffFunction[Vector]]#State] = {
       options
-        .foldLeft(OptParams())((a, b) => b apply a)
+        .foldLeft(OptParams())((a, b) => b.apply(a))
         .iterations(new CachedBatchDiffFunction(fn)(space.copy), init)
     }
   }
@@ -150,7 +150,7 @@ trait OptimizationPackageLowPriority {
       val wrapped = fn.throughLens[Wrapper]
 
       val params: OptParams =
-        options.foldLeft(OptParams())((a, b) => b apply a)
+        options.foldLeft(OptParams())((a, b) => b.apply(a))
       require(!params.useL1,
               "Sorry, we can't use L1 with immutable objects right now...")
       val lbfgs: LBFGS[Wrapper] = new LBFGS[Wrapper](

@@ -41,12 +41,12 @@ object ASMConverters {
         self.filter(_.isInstanceOf[Label]).toSet
       val usedLabels: Set[Instruction] =
         self.flatMap(referencedLabels)(collection.breakOut)
-      self.filterNot(definedLabels diff usedLabels)
+      self.filterNot(definedLabels.diff(usedLabels))
     }
 
     def dropNonOp = dropLinesFrames.dropStaleLabels
 
-    def summary: List[Any] = dropNonOp map {
+    def summary: List[Any] = dropNonOp.map {
       case i: Invoke => i.name
       case i => i.opcode
     }
@@ -144,7 +144,7 @@ object ASMConverters {
   class AsmToScala(asmMethod: t.MethodNode) {
 
     def instructions: List[Instruction] =
-      asmMethod.instructions.iterator.asScala.toList map apply
+      asmMethod.instructions.iterator.asScala.toList.map(apply)
 
     def method: Method =
       Method(instructions,
@@ -163,7 +163,7 @@ object ASMConverters {
     // are stored in a List[Any] (Integer, String or LabelNode), see Javadoc of MethodNode#visitFrame.
     // Opcodes (eg Opcodes.INTEGER) and Reference types (eg "java/lang/Object") are returned unchanged,
     // LabelNodes are mapped to their LabelEntry.
-    private def mapOverFrameTypes(is: List[Any]): List[Any] = is map {
+    private def mapOverFrameTypes(is: List[Any]): List[Any] = is.map {
       case i: t.LabelNode => applyLabel(i)
       case x => x
     }
@@ -182,14 +182,14 @@ object ASMConverters {
       case i: t.LookupSwitchInsnNode =>
         LookupSwitch(op(i),
                      applyLabel(i.dflt),
-                     lst(i.keys) map (x => x: Int),
-                     lst(i.labels) map applyLabel)
+                     lst(i.keys).map(x => x: Int),
+                     lst(i.labels).map(applyLabel))
       case i: t.TableSwitchInsnNode =>
         TableSwitch(op(i),
                     i.min,
                     i.max,
                     applyLabel(i.dflt),
-                    lst(i.labels) map applyLabel)
+                    lst(i.labels).map(applyLabel))
       case i: t.MethodInsnNode => Invoke(op(i), i.owner, i.name, i.desc, i.itf)
       case i: t.InvokeDynamicInsnNode =>
         InvokeDynamic(op(i),
@@ -256,10 +256,10 @@ object ASMConverters {
     def sameVar(v1: Int, v2: Int) = same(v1, v2, varMap)
     def sameLabel(l1: Label, l2: Label) = same(l1.offset, l2.offset, labelMap)
     def sameLabels(ls1: List[Label], ls2: List[Label]) =
-      (ls1 corresponds ls2)(sameLabel)
+      (ls1.corresponds(ls2))(sameLabel)
 
     def sameFrameTypes(ts1: List[Any], ts2: List[Any]) =
-      (ts1 corresponds ts2) {
+      (ts1.corresponds(ts2)) {
         case (t1: Label, t2: Label) => sameLabel(t1, t2)
         case (x, y) => x == y
       }
@@ -327,7 +327,7 @@ object ASMConverters {
   private def createLabelNodes(
       instructions: List[Instruction]): Map[Label, asm.Label] = {
     val labels =
-      instructions collect {
+      instructions.collect {
         case l: Label => l
       }
     assert(labels.distinct == labels, s"Duplicate labels in: $labels")
@@ -336,7 +336,7 @@ object ASMConverters {
 
   private def frameTypesToAsm(l: List[Any],
                               asmLabel: Map[Label, asm.Label]): List[Object] =
-    l map {
+    l.map {
       case l: Label => asmLabel(l)
       case x => x.asInstanceOf[Object]
     }
@@ -363,12 +363,12 @@ object ASMConverters {
       case LookupSwitch(op, dflt, keys, labels) =>
         method.visitLookupSwitchInsn(asmLabel(dflt),
                                      keys.toArray,
-                                     (labels map asmLabel).toArray)
+                                     (labels.map(asmLabel)).toArray)
       case TableSwitch(op, min, max, dflt, labels) =>
         method.visitTableSwitchInsn(min,
                                     max,
                                     asmLabel(dflt),
-                                    (labels map asmLabel).toArray: _*)
+                                    (labels.map(asmLabel)).toArray: _*)
       case Invoke(op, owner, name, desc, itf) =>
         method.visitMethodInsn(op, owner, name, desc, itf)
       case InvokeDynamic(op, name, desc, bsm, bsmArgs) =>

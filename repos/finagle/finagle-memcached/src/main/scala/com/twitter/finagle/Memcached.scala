@@ -67,7 +67,7 @@ private[finagle] object MemcachedTraceInitializer {
     def make(_tracer: param.Tracer, next: ServiceFactory[Command, Response]) = {
       val param.Tracer(tracer) = _tracer
       val filter = new Filter(tracer)
-      filter andThen next
+      filter.andThen(next)
     }
   }
 
@@ -79,17 +79,17 @@ private[finagle] object MemcachedTraceInitializer {
         Trace.recordRpc(command.name)
         command match {
           case command: RetrievalCommand if Trace.isActivelyTracing =>
-            response onSuccess {
+            response.onSuccess {
               case Values(vals) =>
                 val cmd = command.asInstanceOf[RetrievalCommand]
                 val misses = mutable.Set.empty[String]
-                cmd.keys foreach { case Buf.Utf8(key) => misses += key }
-                vals foreach { value =>
+                cmd.keys.foreach { case Buf.Utf8(key) => misses += key }
+                vals.foreach { value =>
                   val Buf.Utf8(key) = value.key
                   Trace.recordBinary(key, "Hit")
                   misses.remove(key)
                 }
-                misses foreach { Trace.recordBinary(_, "Miss") }
+                misses.foreach { Trace.recordBinary(_, "Miss") }
               case _ =>
             }
           case _ =>

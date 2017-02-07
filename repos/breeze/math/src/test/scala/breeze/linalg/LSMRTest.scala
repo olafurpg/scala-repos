@@ -67,7 +67,7 @@ class LSMRTest extends FunSuite {
       override def calculate(
           x: DenseVector[Double]): (Double, DenseVector[Double]) = {
         val y = target - mat * x
-        ((y dot y) + (x dot x * reg), -mat.t * y * 2.0 + (x * (2 * reg)))
+        ((y.dot(y)) + (x.dot(x * reg)), -mat.t * y * 2.0 + (x * (2 * reg)))
       }
     }
     GradientTester.test[Int, DenseVector[Double]](

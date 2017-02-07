@@ -39,7 +39,7 @@ class BufferingPool[Req, Rep](underlying: ServiceFactory[Req, Rep], size: Int)
   private[this] def get(): Future[Service[Req, Rep]] =
     buffer.tryGet() match {
       case None =>
-        underlying() map (new Wrapped(_))
+        underlying().map(new Wrapped(_))
       case Some(service) if service.status != Status.Closed =>
         Future.value(service)
       case Some(service) =>

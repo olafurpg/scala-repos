@@ -77,13 +77,13 @@ case class Time(private val millis: Long) {
   def max(that: Time): Time = if (this > that) this else that
 
   def until(that: Time, interval: Duration): Seq[Time] = {
-    (this.milliseconds) until (that.milliseconds) by (interval.milliseconds) map
-      (new Time(_))
+    ((this.milliseconds) until (that.milliseconds) by (interval.milliseconds))
+      .map(new Time(_))
   }
 
   def to(that: Time, interval: Duration): Seq[Time] = {
-    (this.milliseconds) to (that.milliseconds) by (interval.milliseconds) map
-      (new Time(_))
+    ((this.milliseconds) to (that.milliseconds) by (interval.milliseconds))
+      .map(new Time(_))
   }
 
   override def toString: String = (millis.toString + " ms")

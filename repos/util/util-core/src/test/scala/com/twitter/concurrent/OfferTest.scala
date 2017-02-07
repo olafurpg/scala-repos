@@ -37,12 +37,12 @@ class OfferTest extends WordSpec with MockitoSugar {
       val offer = spy(new SimpleOffer(tx))
 
       val mapped =
-        offer map { i =>
+        offer.map { i =>
           (i - 100).toString
         }
 
       val f =
-        mapped.prepare() flatMap { tx =>
+        mapped.prepare().flatMap { tx =>
           tx.ack()
         }
       f match {
@@ -54,11 +54,11 @@ class OfferTest extends WordSpec with MockitoSugar {
   "Offer.choose" should {
     class OfferSpecHelper {
       val pendingTxs =
-        0 until 3 map { _ =>
+        (0 until 3).map { _ =>
           new Promise[Tx[Int]]
         }
       val offers =
-        pendingTxs map { tx =>
+        pendingTxs.map { tx =>
           spy(new SimpleOffer(tx))
         }
       val offer = Offer.choose(offers: _*)
@@ -74,11 +74,11 @@ class OfferTest extends WordSpec with MockitoSugar {
         val h = new TxReadyHelper
         import h._
 
-        offers foreach { of =>
+        offers.foreach { of =>
           verify(of, never()).prepare()
         }
         assert(offer.prepare().isDefined == true)
-        offers foreach { of =>
+        offers.foreach { of =>
           verify(of).prepare()
         }
       }
@@ -277,7 +277,7 @@ class OfferTest extends WordSpec with MockitoSugar {
         import h._
 
         val e1 = Offer.const(123)
-        val offer = e0 orElse e1
+        val offer = e0.orElse(e1)
         assert(offer.sync().poll == Some(Return(123)))
         verify(e0).prepare()
         val tx = mock[Tx[Int]]
@@ -291,7 +291,7 @@ class OfferTest extends WordSpec with MockitoSugar {
         import h._
 
         val e1 = spy(new SimpleOffer(Stream.empty))
-        val offer = e0 orElse e1
+        val offer = e0.orElse(e1)
         val tx = mock[Tx[Int]]
         val result = Future.value(Commit(321))
         when(tx.ack()).thenReturn(result)
@@ -312,7 +312,7 @@ class OfferTest extends WordSpec with MockitoSugar {
         val e0 = spy(
           new SimpleOffer(Future.value(Tx.aborted: Tx[Int]) #:: (tx2: Future[
             Tx[Int]]) #:: Stream.empty))
-        val offer = e0 orElse Offer.const(123)
+        val offer = e0.orElse(Offer.const(123))
       }
 
       "select first again if tx2 is ready" in {
@@ -350,7 +350,7 @@ class OfferTest extends WordSpec with MockitoSugar {
     "synchronize on offers forever" in {
       val b = new Broker[Int]
       var count = 0
-      b.recv foreach { _ =>
+      b.recv.foreach { _ =>
         count += 1
       }
       assert(count == 0)
@@ -378,11 +378,11 @@ class OfferTest extends WordSpec with MockitoSugar {
     "cancel timer tasks when losing" in Time.withTimeAt(Time.epoch) { tc =>
       implicit val timer = new MockTimer
       val e10 =
-        Offer.timeout(10.seconds) map { _ =>
+        Offer.timeout(10.seconds).map { _ =>
           10
         }
       val e5 =
-        Offer.timeout(5.seconds) map { _ =>
+        Offer.timeout(5.seconds).map { _ =>
           5
         }
 
@@ -403,7 +403,7 @@ class OfferTest extends WordSpec with MockitoSugar {
   "Offer.prioritize" should {
     "prioritize high priority offer" in {
       val offers =
-        0 until 10 map { i =>
+        (0 until 10).map { i =>
           val tx = mock[Tx[Int]]
           val result = Future.value(Commit(i))
           when(tx.ack()).thenReturn(result)
@@ -422,7 +422,7 @@ class OfferTest extends WordSpec with MockitoSugar {
       val b1 = new Broker[String]
 
       val o = Offer.choose(
-        b0.send(123) const { "put!" },
+        b0.send(123).const { "put!" },
         b1.recv
       )
 

@@ -7,7 +7,7 @@ object Test extends App {
   //val oldErr = Console.err;
   val baos = new java.io.ByteArrayOutputStream()
   val errs = new java.io.PrintStream(baos)
-  (Console withErr errs) {
+  (Console.withErr(errs)) {
     val toolbox =
       cm.mkToolBox(frontEnd = mkConsoleFrontEnd(), options = "-deprecation")
     toolbox.eval(reify {

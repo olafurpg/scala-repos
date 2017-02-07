@@ -35,10 +35,14 @@ object Scope {
   def resolveScope(thisScope: Scope,
                    current: URI,
                    rootProject: URI => String): Scope => Scope =
-    resolveProject(current, rootProject) compose replaceThis(thisScope) compose subThisProject
+    resolveProject(current, rootProject)
+      .compose(replaceThis(thisScope))
+      .compose(subThisProject)
 
   def resolveBuildScope(thisScope: Scope, current: URI): Scope => Scope =
-    buildResolve(current) compose replaceThis(thisScope) compose subThisProject
+    buildResolve(current)
+      .compose(replaceThis(thisScope))
+      .compose(subThisProject)
 
   def replaceThis(thisScope: Scope): Scope => Scope =
     (scope: Scope) =>
@@ -98,7 +102,7 @@ object Scope {
     if (!uri.isAbsolute && current.isOpaque &&
         uri.getSchemeSpecificPart == ".")
       current // this handles the shortcut of referring to the current build using "."
-    else IO.directoryURI(current resolve uri)
+    else IO.directoryURI(current.resolve(uri))
 
   def resolveReference(current: URI,
                        rootProject: URI => String,
@@ -173,7 +177,7 @@ object Scope {
                         inTaskOrNull,
                         key) =
       command
-    val uriOpt = Option(uriOrNull) map { new URI(_) }
+    val uriOpt = Option(uriOrNull).map { new URI(_) }
     val projectIdOpt = Option(projectIdOrNull)
     val configOpt = Option(configOrNull)
     val inTaskOpt = Option(inTaskOrNull)
@@ -190,11 +194,15 @@ object Scope {
           case _ => This
         }
         val configScope =
-          configOpt map { case c if c != GlobalStr => Select(ConfigKey(c)) } getOrElse This
+          configOpt
+            .map { case c if c != GlobalStr => Select(ConfigKey(c)) }
+            .getOrElse(This)
         val inTaskScope =
-          inTaskOpt map { t =>
-            Select(AttributeKey(t))
-          } getOrElse This
+          inTaskOpt
+            .map { t =>
+              Select(AttributeKey(t))
+            }
+            .getOrElse(This)
         Scope(projScope, configScope, inTaskScope, This)
     }
     (scope, transformTaskName(key))
@@ -235,7 +243,7 @@ object Scope {
 
     def nonProjectScopes(resolvedProj: ResolvedReference)(
         px: ScopeAxis[ResolvedReference]) = {
-      val p = px.toOption getOrElse resolvedProj
+      val p = px.toOption.getOrElse(resolvedProj)
       val configProj = p match {
         case pr: ProjectRef => pr;
         case br: BuildRef => ProjectRef(br.build, rootProject(br.build))
@@ -259,7 +267,7 @@ object Scope {
           case pr: ProjectRef => index.project(pr)
           case br: BuildRef => Select(br) :: Global :: Nil
         }
-        projAxes flatMap nonProjectScopes(resolvedProj)
+        projAxes.flatMap(nonProjectScopes(resolvedProj))
     }
   }
 
@@ -269,7 +277,7 @@ object Scope {
     if (base == GlobalScope) GlobalScope :: Nil else base :: GlobalScope :: Nil
   def withRawBuilds(
       ps: Seq[ScopeAxis[ProjectRef]]): Seq[ScopeAxis[ResolvedReference]] =
-    ps ++ (ps flatMap rawBuild).distinct :+ Global
+    ps ++ (ps.flatMap(rawBuild)).distinct :+ Global
 
   def rawBuild(ps: ScopeAxis[ProjectRef]): Seq[ScopeAxis[BuildRef]] =
     ps match {
@@ -282,7 +290,7 @@ object Scope {
       projectInherit: ProjectRef => Seq[ProjectRef],
       configInherit: (ResolvedReference, ConfigKey) => Seq[ConfigKey])
     : DelegateIndex = {
-    val pDelegates = refs map {
+    val pDelegates = refs.map {
       case (ref, project) =>
         (ref,
          delegateIndex(ref, configurations(project))(projectInherit,
@@ -297,7 +305,7 @@ object Scope {
     val refDelegates = withRawBuilds(
       linearize(Select(ref), false)(projectInherit))
     val configs =
-      confs map { c =>
+      confs.map { c =>
         axisDelegates(configInherit, ref, c)
       }
     new ProjectDelegates(ref, refDelegates, configs.toMap)

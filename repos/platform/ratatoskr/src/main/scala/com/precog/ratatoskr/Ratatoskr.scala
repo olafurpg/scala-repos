@@ -793,7 +793,7 @@ object ZookeeperTools extends Command {
     if (children == null) {
       ListBuffer[(String, String)]()
     } else {
-      children.asScala map { child =>
+      children.asScala.map { child =>
         val bytes =
           client.readData(path + "/" + child).asInstanceOf[Array[Byte]]
         (child, new String(bytes))
@@ -1075,29 +1075,27 @@ object ImportTools extends Command with Logging {
       for {
         rootKey <- apiKeyManager.rootAPIKey
         rootGrantId <- apiKeyManager.rootGrantId
-        _ <- apiKeyManager.populateAPIKey(None,
-                                          None,
-                                          rootKey,
-                                          key,
-                                          Set(rootGrantId)) onComplete {
-          case Left(error) =>
-            logger.error(
-              "Could not add grant " + rootGrantId + " to apiKey " + key,
-              error)
-          case Right(success) =>
-            logger.info("Updated API key record: " + success)
-        }
+        _ <- apiKeyManager
+          .populateAPIKey(None, None, rootKey, key, Set(rootGrantId))
+          .onComplete {
+            case Left(error) =>
+              logger.error(
+                "Could not add grant " + rootGrantId + " to apiKey " + key,
+                error)
+            case Right(success) =>
+              logger.info("Updated API key record: " + success)
+          }
       } yield key
 
     def logGrants(key: APIKey) =
-      apiKeyManager.validGrants(key, None) onComplete {
+      apiKeyManager.validGrants(key, None).onComplete {
         case Left(error) =>
           logger.error("Could not retrieve grants for api key " + key, error)
         case Right(success) =>
           logger.info("Grants for " + key + ": " + success)
       }
 
-    def runIngest(apiKey: APIKey) = config.input.toStream traverse {
+    def runIngest(apiKey: APIKey) = config.input.toStream.traverse {
       case (db, input) =>
         val path = Path(db)
         logger.info("Inserting batch: %s:%s".format(db, input))
@@ -1116,12 +1114,12 @@ object ImportTools extends Command with Logging {
 
           if (!errors.isEmpty) {
             sys.error(
-              "found %d parse errors.\nfirst 5 were: %s" format
-                (errors.length, errors.take(5)))
+              "found %d parse errors.\nfirst 5 were: %s"
+                .format(errors.length, errors.take(5)))
           } else if (results.size > 0) {
             val eventidobj = EventId(pid, sid.getAndIncrement)
             logger.info("Sending %d events".format(results.size))
-            val records = results map { IngestRecord(eventidobj, _) }
+            val records = results.map { IngestRecord(eventidobj, _) }
             val update = IngestData(
               Seq(
                 (offset,
@@ -1134,7 +1132,7 @@ object ImportTools extends Command with Logging {
                                StreamRef.Append)))
             )
 
-            (vfsModule.projectionsActor ? update) flatMap { _ =>
+            ((vfsModule.projectionsActor ? update)).flatMap { _ =>
               logger.info("Batch saved")
               bb.flip()
               if (n >= 0) loop(offset + 1, parser) else Future(())
@@ -1144,7 +1142,7 @@ object ImportTools extends Command with Logging {
           }
         }
 
-        loop(0L, AsyncParser.stream()) onComplete {
+        loop(0L, AsyncParser.stream()).onComplete {
           case _ => ch.close()
         }
     }
@@ -1284,10 +1282,10 @@ object APIKeyTools extends Command with AkkaDefaults with Logging {
     val database = mongo.database(config.database)
 
     val dbStop =
-      Stoppable.fromFuture(database.disconnect.fallbackTo(Future(())) flatMap {
-        _ =>
+      Stoppable.fromFuture(
+        database.disconnect.fallbackTo(Future(())).flatMap { _ =>
           mongo.close
-      })
+        })
 
     val rootKey: Future[APIKeyRecord] =
       if (config.createRoot) {
@@ -1303,7 +1301,7 @@ object APIKeyTools extends Command with AkkaDefaults with Logging {
         )
       }
 
-    rootKey map { k =>
+    rootKey.map { k =>
       (new MongoAPIKeyManager(mongo,
                               database,
                               config.mongoSettings.copy(rootKeyId = k.apiKey)),
@@ -1425,7 +1423,7 @@ object CSVToJSONConverter {
     """^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}\.\d{3})\d{0,3}$""".r
 
   def parse(s: String, ts: Boolean = false, verbose: Boolean = false): JValue = {
-    JParser.parseFromString(s) getOrElse {
+    JParser.parseFromString(s).getOrElse {
       s match {
         case Timestamp(d, t) if (ts) => JString("%sT%sZ".format(d, t))
         case s => JString(s)

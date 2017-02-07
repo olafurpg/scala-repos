@@ -43,7 +43,7 @@ class TaskOpFactoryHelperTest
     launch.newTask shouldEqual task
     launch.taskInfo shouldEqual taskInfo
     launch.oldTask shouldBe empty
-    launch.offerOperations should have size 1
+    (launch.offerOperations should have).size(1)
     launch.offerOperations.head.getType shouldEqual Mesos.Offer.Operation.Type.LAUNCH
   }
 

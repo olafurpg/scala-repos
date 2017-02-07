@@ -11,7 +11,7 @@ trait NotificationHelper {
 
   def notifications(user: User): Html = {
     val notifs =
-      notificationEnv.api get user.id take 2 map { notif =>
+      notificationEnv.api.get(user.id).take(2).map { notif =>
         views.html.notification.view(notif.id, notif.from)(Html(notif.html))
       }
     Html(notifs.foldLeft("")(_ + _.body))

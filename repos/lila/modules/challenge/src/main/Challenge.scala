@@ -111,8 +111,8 @@ object Challenge {
         case _ => none
       })
       .orElse {
-        (variant == FromPosition) option perfTypeOf(chess.variant.Standard,
-                                                    timeControl)
+        ((variant == FromPosition)).option(
+          perfTypeOf(chess.variant.Standard, timeControl))
       }
       .|(PerfType.Correspondence)
 
@@ -154,7 +154,7 @@ object Challenge {
         sid => Left(Anonymous(sid)),
         u => Right(toRegistered(variant, timeControl)(u))
       ),
-      destUser = destUser map toRegistered(variant, timeControl),
+      destUser = destUser.map(toRegistered(variant, timeControl)),
       rematchOf = rematchOf,
       createdAt = DateTime.now,
       seenAt = DateTime.now,

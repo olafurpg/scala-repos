@@ -36,7 +36,7 @@ object Test {
   }
 
   def testMap(initialSize: Int, numThreads: Int, passes: Int) {
-    val orig = Map.empty ++ ((1 to initialSize) map ((_, "v")))
+    val orig = Map.empty ++ (((1 to initialSize)).map((_, "v")))
     parallel(numThreads) {
       for (pass <- 0 until passes) {
         var m = orig

@@ -111,7 +111,7 @@ class FlatClassPathResolverTest {
       )
     }
 
-    packagesToTest foreach compareEntriesInPackage
+    packagesToTest.foreach(compareEntriesInPackage)
   }
 
   @Test
@@ -173,13 +173,13 @@ class FlatClassPathResolverTest {
         flatCpClasses)
     }
 
-    packagesToTest foreach compareEntriesInPackage
+    packagesToTest.foreach(compareEntriesInPackage)
   }
 
   @Test
   def testFindClassFile: Unit = {
     val classPath = createFlatClassPath(settings)
-    classFilesToFind foreach { className =>
+    classFilesToFind.foreach { className =>
       assertTrue(s"File for $className should be found",
                  classPath.findClassFile(className).isDefined)
     }
@@ -188,7 +188,7 @@ class FlatClassPathResolverTest {
   @Test
   def testFindClass: Unit = {
     val classPath = createFlatClassPath(settings)
-    classesToFind foreach { className =>
+    classesToFind.foreach { className =>
       assertTrue(s"File for $className should be found",
                  classPath.findClass(className).isDefined)
     }

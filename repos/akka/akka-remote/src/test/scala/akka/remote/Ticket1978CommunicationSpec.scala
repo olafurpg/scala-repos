@@ -86,16 +86,16 @@ object Configuration {
         NoLogging)
 
       rng.nextInt() // Has to work
-      settings.SSLRandomNumberGenerator foreach { sRng ⇒
+      settings.SSLRandomNumberGenerator.foreach { sRng ⇒
         rng.getAlgorithm == sRng || (throw new NoSuchAlgorithmException(sRng))
       }
 
       val engine =
         NettySSLSupport.initializeClientSSL(settings, NoLogging).getEngine
       val gotAllSupported =
-        enabled.toSet diff engine.getSupportedCipherSuites.toSet
+        enabled.toSet.diff(engine.getSupportedCipherSuites.toSet)
       val gotAllEnabled =
-        enabled.toSet diff engine.getEnabledCipherSuites.toSet
+        enabled.toSet.diff(engine.getEnabledCipherSuites.toSet)
       gotAllSupported.isEmpty ||
       (throw new IllegalArgumentException(
         "Cipher Suite not supported: " + gotAllSupported))
@@ -236,7 +236,8 @@ abstract class Ticket1978CommunicationSpec(val cipherConfig: CipherConfig)
         }
 
         val f = for (i ← 1 to 1000)
-          yield here ? (("ping", i)) mapTo classTag[((String, Int), ActorRef)]
+          yield
+            (here ? (("ping", i))).mapTo(classTag[((String, Int), ActorRef)])
         Await
           .result(Future.sequence(f), remaining)
           .map(_._1._1)

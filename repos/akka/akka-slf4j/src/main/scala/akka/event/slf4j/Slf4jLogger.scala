@@ -31,7 +31,7 @@ object Logger {
     * @param logger - which logger
     * @return a Logger that corresponds for the given logger name
     */
-  def apply(logger: String): SLFLogger = SLFLoggerFactory getLogger logger
+  def apply(logger: String): SLFLogger = SLFLoggerFactory.getLogger(logger)
 
   /**
     * @param logClass - the class to log for
@@ -41,7 +41,7 @@ object Logger {
   def apply(logClass: Class[_], logSource: String): SLFLogger =
     logClass match {
       case c if c == classOf[DummyClassForStringSources] ⇒ apply(logSource)
-      case _ ⇒ SLFLoggerFactory getLogger logClass
+      case _ ⇒ SLFLoggerFactory.getLogger(logClass)
     }
 
   /**
@@ -109,7 +109,7 @@ class Slf4jLogger
     MDC.put(mdcThreadAttributeName, logEvent.thread.getName)
     MDC.put(mdcAkkaTimestamp, formatTimestamp(logEvent.timestamp))
     MDC.put(mdcActorSystemAttributeName, actorSystemName)
-    logEvent.mdc foreach { case (k, v) ⇒ MDC.put(k, String.valueOf(v)) }
+    logEvent.mdc.foreach { case (k, v) ⇒ MDC.put(k, String.valueOf(v)) }
     try logStatement
     finally {
       MDC.remove(mdcAkkaSourceAttributeName)

@@ -55,7 +55,7 @@ class ConversionTests {
     assertEquals((23, "foo", false, 3.0), t7)
 
     val t8 = (Set(2), Set("foo"))
-    val t8b = (t8.productElements map choose).tupled
+    val t8b = (t8.productElements.map(choose)).tupled
     typed[(Option[Int], Option[String])](t8b)
     assertEquals((Option(2), Option("foo")), t8b)
   }
@@ -98,7 +98,8 @@ class ConversionTests {
       new HListSyntax[A, F](a)
 
     val res =
-      (2 :: "a" :: 1.3 :: HNil) applied ((i, s, d) => (s * i, d * i)) // Function argument types inferred
+      ((2 :: "a" :: 1.3 :: HNil))
+        .applied((i, s, d) => (s * i, d * i)) // Function argument types inferred
 
     assert((res: (String, Double)) == ("aa", 2.6))
   }

@@ -67,8 +67,8 @@ class WorksheetInProcessRunnerFactory {
           val copy = buffer.array().clone()
           capacity *= 2
           buffer = ByteBuffer.allocate(capacity)
-          buffer put copy
-          buffer put b.toByte
+          buffer.put(copy)
+          buffer.put(b.toByte)
         }
 
         if (b == '\n') flush()
@@ -97,10 +97,13 @@ class WorksheetInProcessRunnerFactory {
           def toUrlSpec(p: String) = new File(p).toURI.toURL
 
           val compilerUrls =
-            arguments.compilerData.compilerJars map {
-              case CompilerJars(lib, compiler, extra) =>
-                Seq(lib, compiler) ++ extra
-            } map (a => a.map(_.getCanonicalPath)) getOrElse Seq.empty
+            arguments.compilerData.compilerJars
+              .map {
+                case CompilerJars(lib, compiler, extra) =>
+                  Seq(lib, compiler) ++ extra
+              }
+              .map(a => a.map(_.getCanonicalPath))
+              .getOrElse(Seq.empty)
 
           val worksheetUrls = arguments.worksheetFiles.tail.map(toUrlSpec)
           val compilerUrlSeq = compilerUrls.map(toUrlSpec)
@@ -111,22 +114,24 @@ class WorksheetInProcessRunnerFactory {
             worksheetUrls.toArray,
             getClassLoader(
               compilerUrlSeq,
-              classpathUrls diff worksheetUrls.map(_.toURI.toURL)))
+              classpathUrls.diff(worksheetUrls.map(_.toURI.toURL))))
 
           try {
             val cl = Class.forName(className, true, classLoader)
 
-            cl.getDeclaredMethods.find {
-              case m => m.getName == "main"
-            } map {
-              case method =>
-                System.out match {
-                  case threadLocal: ThreadLocalPrintStream =>
-                    threadLocal.init(new PrintStream(myOut))
-                  case _ => System.setOut(new PrintStream(myOut))
-                }
-                method.invoke(null, null)
-            }
+            cl.getDeclaredMethods
+              .find {
+                case m => m.getName == "main"
+              }
+              .map {
+                case method =>
+                  System.out match {
+                    case threadLocal: ThreadLocalPrintStream =>
+                      threadLocal.init(new PrintStream(myOut))
+                    case _ => System.setOut(new PrintStream(myOut))
+                  }
+                  method.invoke(null, null)
+              }
           } catch {
             case userEx: InvocationTargetException =>
               myOut.flush()
@@ -138,7 +143,7 @@ class WorksheetInProcessRunnerFactory {
                 className + "$" + className
               ).printStackTrace(new PrintStream(myOut, false))
             case e: Exception =>
-              client trace e
+              client.trace(e)
           } finally {
             myOut.flush()
           }
@@ -182,7 +187,7 @@ class WorksheetInProcessRunnerFactory {
         i += 1
       }
 
-      e setStackTrace newTrace
+      e.setStackTrace(newTrace)
       e
     }
   }

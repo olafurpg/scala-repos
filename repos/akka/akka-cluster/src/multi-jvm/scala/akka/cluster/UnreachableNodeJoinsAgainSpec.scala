@@ -102,7 +102,7 @@ abstract class UnreachableNodeJoinsAgainSpec
             clusterView.unreachableMembers.size should ===(roles.size - 1)
           }
           clusterView.unreachableMembers.map(_.address) should ===(
-            (allButVictim map address).toSet)
+            (allButVictim.map(address)).toSet)
         }
       }
 
@@ -114,7 +114,7 @@ abstract class UnreachableNodeJoinsAgainSpec
             val members = clusterView.members
             clusterView.unreachableMembers.size should ===(1)
           }
-          awaitSeenSameState(allButVictim map address: _*)
+          awaitSeenSameState(allButVictim.map(address): _*)
           // still one unreachable
           clusterView.unreachableMembers.size should ===(1)
           clusterView.unreachableMembers.head.address should ===(
@@ -129,7 +129,7 @@ abstract class UnreachableNodeJoinsAgainSpec
 
     "mark the node as DOWN" taggedAs LongRunningTest in {
       runOn(master) {
-        cluster down victim
+        cluster.down(victim)
       }
 
       val allButVictim = allBut(victim, roles)
@@ -140,7 +140,7 @@ abstract class UnreachableNodeJoinsAgainSpec
                     15 seconds)
         awaitAssert(
           clusterView.members.map(_.address) should ===(
-            (allButVictim map address).toSet))
+            (allButVictim.map(address)).toSet))
       }
 
       endBarrier()

@@ -26,9 +26,9 @@ object TemplateBody {
     builder.getTokenType match {
       case ScalaTokenTypes.tLBRACE =>
         builder.advanceLexer() //Ate {
-      case _ => builder error ScalaBundle.message("lbrace.expected")
+      case _ => builder.error(ScalaBundle.message("lbrace.expected"))
     }
-    SelfType parse builder
+    SelfType.parse(builder)
     //this metod parse recursively TemplateStat {semi TemplateStat}
     @tailrec
     def subparse(): Boolean = {
@@ -37,10 +37,10 @@ object TemplateBody {
           builder.advanceLexer() //Ate }
           true
         case null =>
-          builder error ScalaBundle.message("rbrace.expected")
+          builder.error(ScalaBundle.message("rbrace.expected"))
           true
         case _ =>
-          if (TemplateStat parse builder) {
+          if (TemplateStat.parse(builder)) {
             builder.getTokenType match {
               case ScalaTokenTypes.tRBRACE => {
                 builder.advanceLexer() //Ate }
@@ -54,14 +54,14 @@ object TemplateBody {
               case _ => {
                 if (builder.newlineBeforeCurrentToken) subparse()
                 else {
-                  builder error ScalaBundle.message("semi.expected")
+                  builder.error(ScalaBundle.message("semi.expected"))
                   builder.advanceLexer() //Ate something
                   subparse()
                 }
               }
             }
           } else {
-            builder error ScalaBundle.message("def.dcl.expected")
+            builder.error(ScalaBundle.message("def.dcl.expected"))
             builder.advanceLexer() //Ate something
             subparse()
           }

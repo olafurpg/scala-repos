@@ -147,7 +147,7 @@ object Statistics {
       else 0
     override def equals(that: Any): Boolean =
       that match {
-        case that: Counter => (this compare that) == 0
+        case that: Counter => (this.compare(that)) == 0
         case _ => false
       }
     override def hashCode = value
@@ -214,7 +214,7 @@ object Statistics {
       else 0
     override def equals(that: Any): Boolean =
       that match {
-        case that: StackableTimer => (this compare that) == 0
+        case that: StackableTimer => (this.compare(that)) == 0
         case _ => false
       }
     override def hashCode = specificNanos.##
@@ -301,7 +301,7 @@ object Statistics {
 
   def enabled = _enabled
   def enabled_=(cond: Boolean) = {
-    if (cond && ! _enabled) {
+    if (cond && !_enabled) {
       val start = System.nanoTime()
       var total = 0L
       for (i <- 1 to 10000) {

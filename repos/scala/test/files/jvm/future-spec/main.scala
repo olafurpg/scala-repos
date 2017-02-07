@@ -96,7 +96,7 @@ class TestLatch(count: Int = 1) extends Awaitable[Unit] {
   def ready(atMost: Duration)(implicit permit: CanAwait) = {
     val opened = latch.await(atMost.toNanos, TimeUnit.NANOSECONDS)
     if (!opened)
-      throw new TimeoutException("Timeout of %s." format (atMost.toString))
+      throw new TimeoutException("Timeout of %s.".format(atMost.toString))
     this
   }
 

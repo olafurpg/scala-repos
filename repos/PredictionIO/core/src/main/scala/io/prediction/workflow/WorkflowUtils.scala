@@ -171,42 +171,43 @@ object WorkflowUtils extends Logging {
       classMap: Map[String, Class[_]],
       engineLanguage: EngineLanguage.Value,
       jsonExtractor: JsonExtractorOption): (String, Params) = {
-    variantJson findField {
+    (variantJson findField {
       case JField(f, _) => f == field
       case _ => false
-    } map { jv =>
-      implicit lazy val formats =
-        Utils.json4sDefaultFormats + new NameParamsSerializer
-      val np: NameParams = try {
-        jv._2.extract[NameParams]
-      } catch {
-        case e: Exception =>
-          error(s"Unable to extract $field name and params $jv")
-          throw e
-      }
-      val extractedParams = np.params
-        .map { p =>
-          try {
-            if (!classMap.contains(np.name)) {
-              error(s"Unable to find $field class with name '${np.name}'" +
-                " defined in Engine.")
-              sys.exit(1)
-            }
-            WorkflowUtils.extractParams(engineLanguage,
-                                        compact(render(p)),
-                                        classMap(np.name),
-                                        jsonExtractor,
-                                        formats)
-          } catch {
-            case e: Exception =>
-              error(s"Unable to extract $field params $p")
-              throw e
-          }
+    }).map { jv =>
+        implicit lazy val formats =
+          Utils.json4sDefaultFormats + new NameParamsSerializer
+        val np: NameParams = try {
+          jv._2.extract[NameParams]
+        } catch {
+          case e: Exception =>
+            error(s"Unable to extract $field name and params $jv")
+            throw e
         }
-        .getOrElse(EmptyParams())
+        val extractedParams = np.params
+          .map { p =>
+            try {
+              if (!classMap.contains(np.name)) {
+                error(s"Unable to find $field class with name '${np.name}'" +
+                  " defined in Engine.")
+                sys.exit(1)
+              }
+              WorkflowUtils.extractParams(engineLanguage,
+                                          compact(render(p)),
+                                          classMap(np.name),
+                                          jsonExtractor,
+                                          formats)
+            } catch {
+              case e: Exception =>
+                error(s"Unable to extract $field params $p")
+                throw e
+            }
+          }
+          .getOrElse(EmptyParams())
 
-      (np.name, extractedParams)
-    } getOrElse ("", EmptyParams())
+        (np.name, extractedParams)
+      }
+      .getOrElse("", EmptyParams())
   }
 
   /** Grab environmental variables that starts with 'PIO_'. */
@@ -256,10 +257,13 @@ object WorkflowUtils extends Logging {
                               "HBASE_CONF_DIR" -> "hbase-site.xml")
 
     thirdPartyFiles.keys.toSeq.map { k: String =>
-      sys.env.get(k) map { x =>
-        val p = Seq(x, thirdPartyFiles(k)).mkString(File.separator)
-        if (new File(p).exists) Seq(p) else Seq[String]()
-      } getOrElse Seq[String]()
+      sys.env
+        .get(k)
+        .map { x =>
+          val p = Seq(x, thirdPartyFiles(k)).mkString(File.separator)
+          if (new File(p).exists) Seq(p) else Seq[String]()
+        }
+        .getOrElse(Seq[String]())
     }.flatten
   }
 

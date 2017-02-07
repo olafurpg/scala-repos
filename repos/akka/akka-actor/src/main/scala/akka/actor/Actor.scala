@@ -589,7 +589,7 @@ trait Actor {
   @throws(classOf[Exception]) // when changing this you MUST also change UntypedActorDocTest
   //#lifecycle-hooks
   def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    context.children foreach { child ⇒
+    context.children.foreach { child ⇒
       context.unwatch(child)
       context.stop(child)
     }

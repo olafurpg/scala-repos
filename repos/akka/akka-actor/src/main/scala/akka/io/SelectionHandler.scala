@@ -341,7 +341,7 @@ private[io] class SelectionHandler(settings: SelectionHandlerSettings)
         log.debug("Rejecting [{}] with [{}] retries left, retrying...",
                   cmd,
                   retriesLeft)
-        context.parent forward Retry(cmd, retriesLeft - 1)
+        context.parent.forward(Retry(cmd, retriesLeft - 1))
       } else {
         log.warning("Rejecting [{}] with no retries left, aborting...", cmd)
         cmd.commander ! cmd.apiCommand.failureMessage // I can't do it, Captain!

@@ -69,7 +69,7 @@ trait GenTrees { self: Reifier =>
     case Literal(const @ Constant(_)) =>
       mirrorCall(nme.Literal, reifyProduct(const))
     case Import(expr, selectors) =>
-      mirrorCall(nme.Import, reify(expr), mkList(selectors map reifyProduct))
+      mirrorCall(nme.Import, reify(expr), mkList(selectors.map(reifyProduct)))
     case _ => reifyProduct(tree)
   }
 
@@ -93,13 +93,12 @@ trait GenTrees { self: Reifier =>
         // see `Metalevels` for more info about metalevel breaches
         // and about how we deal with splices that contain them
         val isMetalevelBreach =
-          splicee exists
-            (sub =>
-               sub.hasSymbolField && sub.symbol != NoSymbol &&
-                 sub.symbol.metalevel > 0)
+          splicee.exists(
+            sub =>
+              sub.hasSymbolField && sub.symbol != NoSymbol &&
+                sub.symbol.metalevel > 0)
         val isRuntimeEval =
-          splicee exists
-            (sub => sub.hasSymbolField && sub.symbol == ExprSplice)
+          splicee.exists(sub => sub.hasSymbolField && sub.symbol == ExprSplice)
         if (isMetalevelBreach || isRuntimeEval) {
           // we used to convert dynamic splices into runtime evals transparently, but we no longer do that
           // why? see comments in `Metalevels`

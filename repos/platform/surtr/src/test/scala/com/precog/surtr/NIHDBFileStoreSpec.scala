@@ -54,7 +54,7 @@ class NIHDBFileStoreSpec
   class YggConfig extends NIHDBTestActorsConfig {
     val tmpDir = IOUtils.createTmpDir("filestorespec").unsafePerformIO
     val config =
-      Configuration parse { "precog.storage.root = %s".format(tmpDir) }
+      Configuration.parse { "precog.storage.root = %s".format(tmpDir) }
     val clock = blueeyes.util.Clock.System
     val maxSliceSize = 10
 

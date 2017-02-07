@@ -271,12 +271,13 @@ final case class RootActorPath(address: Address, name: String = "/")
     extends ActorPath {
   require(
     name.length == 1 || name.indexOf('/', 1) == -1,
-    "/ may only exist at the beginning of the root actors name, " +
-      "it is a path separator and is not legal in ActorPath names: [%s]" format name
+    ("/ may only exist at the beginning of the root actors name, " +
+      "it is a path separator and is not legal in ActorPath names: [%s]")
+      .format(name)
   )
-  require(
-    name.indexOf('#') == -1,
-    "# is a fragment separator and is not legal in ActorPath names: [%s]" format name)
+  require(name.indexOf('#') == -1,
+          "# is a fragment separator and is not legal in ActorPath names: [%s]"
+            .format(name))
 
   override def parent: ActorPath = this
 
@@ -302,7 +303,8 @@ final case class RootActorPath(address: Address, name: String = "/")
 
   override def compareTo(other: ActorPath): Int = other match {
     case r: RootActorPath ⇒
-      toString compareTo r.toString // FIXME make this cheaper by comparing address and name in isolation
+      toString
+        .compareTo(r.toString) // FIXME make this cheaper by comparing address and name in isolation
     case c: ChildActorPath ⇒ 1
   }
 
@@ -328,10 +330,12 @@ final class ChildActorPath private[akka] (val parent: ActorPath,
     extends ActorPath {
   if (name.indexOf('/') != -1)
     throw new IllegalArgumentException(
-      "/ is a path separator and is not legal in ActorPath names: [%s]" format name)
+      "/ is a path separator and is not legal in ActorPath names: [%s]".format(
+        name))
   if (name.indexOf('#') != -1)
     throw new IllegalArgumentException(
-      "# is a fragment separator and is not legal in ActorPath names: [%s]" format name)
+      "# is a fragment separator and is not legal in ActorPath names: [%s]"
+        .format(name))
 
   def this(parent: ActorPath, name: String) =
     this(parent, name, ActorCell.undefinedUid)
@@ -485,10 +489,10 @@ final class ChildActorPath private[akka] (val parent: ActorPath,
     @tailrec
     def rec(left: ActorPath, right: ActorPath): Int =
       if (left eq right) 0
-      else if (left.isInstanceOf[RootActorPath]) left compareTo right
-      else if (right.isInstanceOf[RootActorPath]) -(right compareTo left)
+      else if (left.isInstanceOf[RootActorPath]) left.compareTo(right)
+      else if (right.isInstanceOf[RootActorPath]) -(right.compareTo(left))
       else {
-        val x = left.name compareTo right.name
+        val x = left.name.compareTo(right.name)
         if (x == 0) rec(left.parent, right.parent)
         else x
       }

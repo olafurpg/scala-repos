@@ -19,10 +19,10 @@ object Test extends App {
       CompileServer.execute(() => startupLatch.countDown(), Array[String]())
     }
   })
-  t setDaemon true
+  t.setDaemon(true)
   t.start()
   if (!startupLatch.await(2, TimeUnit.MINUTES))
-    sys error "Timeout waiting for server to start"
+    sys.error("Timeout waiting for server to start")
 
   val baos = new ByteArrayOutputStream()
   val ps = new PrintStream(baos)
@@ -30,13 +30,13 @@ object Test extends App {
   val outdir = scala.reflect.io.Directory(sys.props("partest.output"))
 
   val dirNameAndPath =
-    (1 to 2).toList map { number =>
+    (1 to 2).toList.map { number =>
       val name = s"Hello${number}"
       val dir = outdir / number.toString
       (dir, name, dir / s"${name}.scala")
     }
 
-  dirNameAndPath foreach {
+  dirNameAndPath.foreach {
     case (dir, name, path) =>
       dir.createDirectory()
       val file = path.jfile
@@ -45,8 +45,8 @@ object Test extends App {
       finally out.close
   }
 
-  val success = (scala.Console withOut ps) {
-    dirNameAndPath foreach {
+  val success = (scala.Console.withOut(ps)) {
+    dirNameAndPath.foreach {
       case (path, name, _) =>
         CompileClient.process(
           Array("-verbose", "-current-dir", path.toString, s"${name}.scala"))
@@ -59,7 +59,7 @@ object Test extends App {
   val msg = baos.toString()
 
   assert(success, s"got a failure. Full results were: \n${msg}")
-  dirNameAndPath foreach {
+  dirNameAndPath.foreach {
     case (_, _, path) =>
       val expected = s"Input files after normalizing paths: ${path}"
       assert(

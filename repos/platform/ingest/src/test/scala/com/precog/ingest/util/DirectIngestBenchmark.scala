@@ -61,7 +61,7 @@ object DirectKafkaConsumer extends App {
 
     // get the message set from the consumer and print them out
     val messages = simpleConsumer.fetch(fetchRequest)
-    messages foreach { msg =>
+    messages.foreach { msg =>
       // advance the offset after consuming each message
       offset = msg.offset
       msgs += 1

@@ -42,6 +42,6 @@ object Test {
         with SyncIterator
         with LoggedIterator
     val iter = new Iter
-    iter foreach Console.println
+    iter.foreach(Console.println)
   }
 }

@@ -21,13 +21,13 @@ object Sessions {
       extends Session {
     type Dual = Out[A, BDual]
 
-    def run(dp: Dual): Unit = recv(dp.data) run dp.cont
+    def run(dp: Dual): Unit = recv(dp.data).run(dp.cont)
   }
 
   sealed case class Out[A, B <: Session](data: A, cont: B) extends Session {
     type Dual = In[A, cont.Dual, cont.Dual#Dual]
 
-    def run(dp: Dual): Unit = cont run dp.recv(data)
+    def run(dp: Dual): Unit = cont.run(dp.recv(data))
   }
 
   def addServer =
@@ -47,5 +47,5 @@ object Sessions {
       }
     }))
 
-  def myRun = addServer run addClient
+  def myRun = addServer.run(addClient)
 }

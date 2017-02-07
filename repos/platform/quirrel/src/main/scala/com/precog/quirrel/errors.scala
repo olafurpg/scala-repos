@@ -46,7 +46,7 @@ trait LineErrors extends Errors with Phases with parser.AST {
   private val ErrorPattern = "error:%%d: %s%n    %%s%n    %%s"
 
   def showError(error: Error) =
-    error.loc.formatError(ErrorPattern format error.tp)
+    error.loc.formatError(ErrorPattern.format(error.tp))
 
   override val Error: ErrorCompanion = new ErrorCompanion {
     def apply(expr: Expr, tp: ErrorType): Error = new Error(expr.loc, tp)

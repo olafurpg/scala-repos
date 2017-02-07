@@ -14,7 +14,7 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
   import Gamify._
 
   def history(orCompute: Boolean = true): Fu[List[HistoryMonth]] = {
-    val until = DateTime.now minusMonths 1 withDayOfMonth 1
+    val until = (DateTime.now minusMonths 1).withDayOfMonth(1)
     val lastId = HistoryMonth.makeId(until.getYear, until.getMonthOfYear)
     historyColl
       .find(BSONDocument())
@@ -76,25 +76,30 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
   private val leaderboardsCache =
     AsyncCache
       .single[Leaderboards](
-        f = mixedLeaderboard(DateTime.now minusDays 1, none) zip mixedLeaderboard(
-            DateTime.now minusWeeks 1,
-            none) zip mixedLeaderboard(DateTime.now minusMonths 1, none) map {
-          case ((daily, weekly), monthly) =>
-            Leaderboards(daily, weekly, monthly)
-        },
+        f = mixedLeaderboard(DateTime.now minusDays 1, none)
+          .zip(mixedLeaderboard(DateTime.now minusWeeks 1, none))
+          .zip(mixedLeaderboard(DateTime.now minusMonths 1, none))
+          .map {
+            case ((daily, weekly), monthly) =>
+              Leaderboards(daily, weekly, monthly)
+          },
         timeToLive = 10 seconds
       )
 
   private def mixedLeaderboard(after: DateTime,
                                before: Option[DateTime]): Fu[List[ModMixed]] =
-    actionLeaderboard(after, before) zip reportLeaderboard(after, before) map {
-      case (actions, reports) =>
-        actions.map(_.modId) intersect reports.map(_.modId) map { modId =>
-          ModMixed(modId,
-                   action = actions.find(_.modId == modId) ?? (_.count),
-                   report = reports.find(_.modId == modId) ?? (_.count))
-        } sortBy (-_.score)
-    }
+    actionLeaderboard(after, before)
+      .zip(reportLeaderboard(after, before))
+      .map {
+        case (actions, reports) =>
+          (actions.map(_.modId) intersect reports.map(_.modId))
+            .map { modId =>
+              ModMixed(modId,
+                       action = actions.find(_.modId == modId) ?? (_.count),
+                       report = reports.find(_.modId == modId) ?? (_.count))
+            }
+            .sortBy(-_.score)
+      }
 
   private def dateRange(from: DateTime, toOption: Option[DateTime]) =
     BSONDocument("$gte" -> from) ++ toOption.?? { to =>
@@ -115,7 +120,8 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
         List(GroupField("mod")("nb" -> SumValue(1)), Sort(Descending("nb"))))
       .map {
         _.documents.flatMap { obj =>
-          obj.getAs[String]("_id") |@| obj.getAs[Int]("nb") apply ModCount.apply
+          (obj.getAs[String]("_id") |@| obj.getAs[Int]("nb"))
+            .apply(ModCount.apply)
         }
       }
 
@@ -133,7 +139,8 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
       )
       .map {
         _.documents.flatMap { obj =>
-          obj.getAs[String]("_id") |@| obj.getAs[Int]("nb") apply ModCount.apply
+          (obj.getAs[String]("_id") |@| obj.getAs[Int]("nb"))
+            .apply(ModCount.apply)
         }
       }
 }

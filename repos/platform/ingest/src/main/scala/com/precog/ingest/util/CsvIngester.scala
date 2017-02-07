@@ -44,8 +44,8 @@ case object CsvType {
   }
 
   def inferTypes(rows: Iterator[Array[String]]): Array[CsvType] = {
-    val types: Array[CsvType] = rows.next() map (_ => CsvNothing)
-    rows foreach { row =>
+    val types: Array[CsvType] = rows.next().map(_ => CsvNothing)
+    rows.foreach { row =>
       var len = row.length min types.length
       var i = 0
       while (i < len) {

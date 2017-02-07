@@ -6,20 +6,20 @@ import play.api.libs.json._
 
 object Form {
 
-  def options(it: Iterable[Int], pattern: String) = it map { d =>
-    d -> (pluralize(pattern, d) format d)
+  def options(it: Iterable[Int], pattern: String) = it.map { d =>
+    d -> (pluralize(pattern, d).format(d))
   }
 
   def options(it: Iterable[Int], transformer: Int => Int, pattern: String) =
-    it map { d =>
-      d -> (pluralize(pattern, transformer(d)) format transformer(d))
+    it.map { d =>
+      d -> (pluralize(pattern, transformer(d)).format(transformer(d)))
     }
 
-  def options(it: Iterable[Int], code: String, pattern: String) = it map { d =>
-    (d + code) -> (pluralize(pattern, d) format d)
+  def options(it: Iterable[Int], code: String, pattern: String) = it.map { d =>
+    (d + code) -> (pluralize(pattern, d).format(d))
   }
 
-  def optionsDouble(it: Iterable[Double], format: Double => String) = it map {
+  def optionsDouble(it: Iterable[Double], format: Double => String) = it.map {
     d =>
       d -> format(d)
   }
@@ -43,10 +43,15 @@ object Form {
     pattern.replace("{s}", (nb < 1).fold("s", ""))
 
   private val jsonGlobalErrorRenamer =
-    __.json update ((__ \ "global").json copyFrom (__ \ "").json.pick) andThen
-      (__ \ "").json.prune
+    __.json
+      .update((__ \ "global").json.copyFrom(__ \ "").json.pick)
+      .andThen(__ \ "")
+      .json
+      .prune
 
   def errorsAsJson(form: play.api.data.Form[_])(
       implicit lang: play.api.i18n.Messages) =
-    form.errorsAsJson validate jsonGlobalErrorRenamer getOrElse form.errorsAsJson
+    form.errorsAsJson
+      .validate(jsonGlobalErrorRenamer)
+      .getOrElse(form.errorsAsJson)
 }

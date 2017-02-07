@@ -33,25 +33,26 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
   /** Returns unapply or unapplySeq if available, without further checks.
     */
   def directUnapplyMember(tp: Type): Symbol =
-    (tp member nme.unapply) orElse (tp member nme.unapplySeq)
+    ((tp member nme.unapply)).orElse(tp member nme.unapplySeq)
 
   /** Filters out unapplies with multiple (non-implicit) parameter lists,
     *  as they cannot be used as extractors
     */
   def unapplyMember(tp: Type): Symbol =
-    directUnapplyMember(tp) filter
-      (sym => !hasMultipleNonImplicitParamLists(sym))
+    directUnapplyMember(tp).filter(sym =>
+      !hasMultipleNonImplicitParamLists(sym))
 
   object HasUnapply {
     def unapply(tp: Type): Option[Symbol] = unapplyMember(tp).toOption
   }
 
-  private def toIdent(x: DefTree) = Ident(x.name) setPos x.pos.focus
+  private def toIdent(x: DefTree) = Ident(x.name).setPos(x.pos.focus)
 
   private def classType(cdef: ClassDef, tparams: List[TypeDef]): Tree = {
     // SI-7033 Unattributed to avoid forcing `cdef.symbol.info`.
     val tycon = Ident(cdef.symbol)
-    if (tparams.isEmpty) tycon else AppliedTypeTree(tycon, tparams map toIdent)
+    if (tparams.isEmpty) tycon
+    else AppliedTypeTree(tycon, tparams.map(toIdent))
   }
 
   private def constrParamss(cdef: ClassDef): List[List[ValDef]] = {
@@ -76,7 +77,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
       // Selecting by name seems to be the most straight forward way here to
       // avoid forcing the symbol of the case class in order to list the accessors.
       def selectByName =
-        Ident(param) DOT caseAccessorName(caseclazz.symbol, selector.name)
+        Ident(param).DOT(caseAccessorName(caseclazz.symbol, selector.name))
       // But, that gives a misleading error message in neg/t1422.scala, where a case
       // class has an illegal private[this] parameter. We can detect this by checking
       // the modifiers on the param accessors.
@@ -86,13 +87,13 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
         case t @ ValOrDefDef(mods, selector.name, _, _) => mods.isPrivateLocal
         case _ => false
       }
-      localAccessor.fold(selectByName)(Ident(param) DOT _.symbol)
+      localAccessor.fold(selectByName)(Ident(param).DOT(_.symbol))
     }
 
     // Working with trees, rather than symbols, to avoid cycles like SI-5082
     constrParamss(caseclazz).take(1).flatten match {
       case Nil => TRUE
-      case xs => SOME(xs map caseFieldAccessorValue: _*)
+      case xs => SOME(xs.map(caseFieldAccessorValue): _*)
     }
   }
 
@@ -107,7 +108,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
           case _ => false
         })
     def createFun = {
-      def primaries = params.head map (_.tpt)
+      def primaries = params.head.map(_.tpt)
       gen.scalaFunctionConstr(primaries, toIdent(cdef), abstractFun = true)
     }
 

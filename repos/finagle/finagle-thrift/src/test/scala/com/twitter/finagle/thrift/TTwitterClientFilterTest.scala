@@ -41,7 +41,7 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
     val _request = ArgumentCaptor.forClass(classOf[ThriftClientRequest])
     when(service(_request.capture)).thenReturn(Future(Array[Byte]()))
 
-    val stack = tracing andThen filter
+    val stack = tracing.andThen(filter)
     stack(new ThriftClientRequest(buffer.toArray, false), service)
 
     val header = new thrift.RequestHeader
@@ -108,7 +108,7 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
 
     assert(header.getContexts != null)
     val clientIdContextWasSet =
-      header.getContexts.asScala exists { c =>
+      header.getContexts.asScala.exists { c =>
         (Buf.ByteArray.Owned(c.getKey()) == ClientId.clientIdCtx.marshalId) &&
         (Buf.ByteArray.Owned(c.getValue()) == Buf.Utf8(clientId.name))
       }
@@ -144,7 +144,7 @@ class TTwitterClientFilterTest extends FunSuite with MockitoSugar {
     InputBuffer.peelMessage(_request.getValue.message, header, protocolFactory)
 
     val clientIdContextWasSet =
-      header.getContexts.asScala exists { c =>
+      header.getContexts.asScala.exists { c =>
         (Buf.ByteArray.Owned(c.getKey()) == ClientId.clientIdCtx.marshalId) &&
         (Buf.ByteArray.Owned(c.getValue()) == Buf.Utf8(clientId.name))
       }

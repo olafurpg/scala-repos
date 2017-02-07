@@ -83,8 +83,8 @@ sealed trait RValue { self =>
 object RValue {
   def fromJValue(jv: JValue): RValue = jv match {
     case JObject(fields) =>
-      RObject(fields map { case (k, v) => (k, fromJValue(v)) })
-    case JArray(elements) => RArray(elements map fromJValue)
+      RObject(fields.map { case (k, v) => (k, fromJValue(v)) })
+    case JArray(elements) => RArray(elements.map(fromJValue))
     case other => CType.toCValue(other)
   }
 
@@ -168,7 +168,7 @@ object RValue {
 }
 
 case class RObject(fields: Map[String, RValue]) extends RValue {
-  def toJValue = JObject(fields map { case (k, v) => (k, v.toJValue) })
+  def toJValue = JObject(fields.map { case (k, v) => (k, v.toJValue) })
   def \(fieldName: String): RValue = fields(fieldName)
 }
 
@@ -178,7 +178,7 @@ object RObject {
 }
 
 case class RArray(elements: List[RValue]) extends RValue {
-  def toJValue = JArray(elements map { _.toJValue })
+  def toJValue = JArray(elements.map { _.toJValue })
   def \(fieldName: String): RValue = CUndefined
 }
 
@@ -219,10 +219,10 @@ object CValue {
       (ad.toStandardDuration).compareTo(bd.toStandardDuration)
     case (CArray(as, CArrayType(atpe)), CArray(bs, CArrayType(btpe)))
         if atpe == btpe =>
-      (as.view zip bs.view) map {
+      ((as.view.zip(bs.view)).map {
         case (a, b) =>
           compareValues(atpe(a), btpe(b))
-      } find (_ != 0) getOrElse (as.size - bs.size)
+      } find (_ != 0)).getOrElse(as.size - bs.size)
     case (a: CNumericValue[_], b: CNumericValue[_]) =>
       compareValues(a.toCNum, b.toCNum) // The only safe way to compare any mix of the 3 types.
     case (a: CNullValue, b: CNullValue) if a.cType == b.cType => 0
@@ -294,7 +294,7 @@ object CType {
     case CNull => "Null"
     case CEmptyObject => "EmptyObject"
     case CEmptyArray => "EmptyArray"
-    case CArrayType(elemType) => "Array[%s]" format nameOf(elemType)
+    case CArrayType(elemType) => "Array[%s]".format(nameOf(elemType))
     case CDate => "Timestamp"
     case CPeriod => "Period"
     case CUndefined => sys.error("CUndefined cannot be serialized")
@@ -312,7 +312,7 @@ object CType {
     case "EmptyObject" => Some(CEmptyObject)
     case "EmptyArray" => Some(CEmptyArray)
     case ArrayName(elemName) =>
-      fromName(elemName) flatMap {
+      fromName(elemName).flatMap {
         case elemType: CValueType[_] => Some(CArrayType(elemType))
         case _ => None
       }
@@ -359,7 +359,7 @@ object CType {
       case (CPeriod, CPeriod) => Some(CPeriod)
 
       case (CArrayType(et1), CArrayType(et2)) =>
-        unify(et1, et2) flatMap {
+        unify(et1, et2).flatMap {
           case t: CValueType[_] => Some(CArrayType(t))
           case _ => None
         }
@@ -526,10 +526,10 @@ case class CArrayType[@spec(Boolean, Long, Double) A](elemType: CValueType[A])
   def apply(value: Array[A]) = CArray(value, this)
 
   def order(as: Array[A], bs: Array[A]) =
-    (as zip bs) map {
+    ((as.zip(bs)).map {
       case (a, b) =>
         elemType.order(a, b)
-    } find (_ != EQ) getOrElse Ordering.fromInt(as.size - bs.size)
+    } find (_ != EQ)).getOrElse(Ordering.fromInt(as.size - bs.size))
 
   def jValueFor(as: Array[A]) =
     sys.error("HOMOGENEOUS ARRAY ESCAPING! ALERT! ALERT!")

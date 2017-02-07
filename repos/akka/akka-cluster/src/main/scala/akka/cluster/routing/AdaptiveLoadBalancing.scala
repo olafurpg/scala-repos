@@ -489,7 +489,7 @@ abstract class CapacityMetricsSelector extends MetricsSelector {
       val (_, min) = capacity.minBy { case (_, c) ⇒ c }
       // lowest usable capacity is 1% (>= 0.5% will be rounded to weight 1), also avoids div by zero
       val divisor = math.max(0.01, min)
-      capacity map {
+      capacity.map {
         case (addr, c) ⇒ (addr -> math.round((c) / divisor).toInt)
       }
     }
@@ -533,7 +533,7 @@ private[cluster] class WeightedRoutees(routees: immutable.IndexedSeq[Routee],
       weights.withDefaultValue(meanWeight) // we don’t necessarily have metrics for all addresses
     var i = 0
     var sum = 0
-    routees foreach { r ⇒
+    routees.foreach { r ⇒
       sum += w(fullAddress(r))
       buckets(i) = sum
       i += 1
@@ -554,7 +554,7 @@ private[cluster] class WeightedRoutees(routees: immutable.IndexedSeq[Routee],
     */
   def apply(value: Int): Routee = {
     require(1 <= value && value <= total,
-            "value must be between [1 - %s]" format total)
+            "value must be between [1 - %s]".format(total))
     routees(idx(Arrays.binarySearch(buckets, value)))
   }
 

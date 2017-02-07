@@ -387,7 +387,7 @@ class Range(val start: Int, val end: Int, val step: Int)
   override def equals(other: Any) = other match {
     case x: Range =>
       // Note: this must succeed for overfull ranges (length > Int.MaxValue)
-      (x canEqual this) && {
+      (x.canEqual(this)) && {
         if (isEmpty) x.isEmpty // empty sequences are equal
         else
           // this is non-empty...
@@ -530,14 +530,15 @@ object Range {
   object Double {
     implicit val bigDecAsIntegral = scala.math.Numeric.BigDecimalAsIfIntegral
     implicit val doubleAsIntegral = scala.math.Numeric.DoubleAsIfIntegral
-    def toBD(x: Double): BigDecimal = scala.math.BigDecimal valueOf x
+    def toBD(x: Double): BigDecimal = scala.math.BigDecimal.valueOf(x)
 
     def apply(start: Double, end: Double, step: Double) =
-      BigDecimal(toBD(start), toBD(end), toBD(step)) mapRange (_.doubleValue)
+      BigDecimal(toBD(start), toBD(end), toBD(step)).mapRange(_.doubleValue)
 
     def inclusive(start: Double, end: Double, step: Double) =
-      BigDecimal.inclusive(toBD(start), toBD(end), toBD(step)) mapRange
-        (_.doubleValue)
+      BigDecimal
+        .inclusive(toBD(start), toBD(end), toBD(step))
+        .mapRange(_.doubleValue)
   }
 
   // As there is no appealing default step size for not-really-integral ranges,

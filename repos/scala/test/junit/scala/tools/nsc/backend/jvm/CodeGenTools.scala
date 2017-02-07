@@ -275,7 +275,7 @@ object CodeGenTools {
                            expected: List[String]): Unit = {
     def quote(l: List[String]) =
       l.map(s => s""""$s"""").mkString("List(", ", ", ")")
-    val actual = l collect { case i: Invoke => i.owner + "." + i.name }
+    val actual = l.collect { case i: Invoke => i.owner + "." + i.name }
     assert(actual == expected,
            s"\nFound   : ${quote(actual)}\nExpected: ${quote(expected)}")
   }

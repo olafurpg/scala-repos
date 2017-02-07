@@ -35,7 +35,7 @@ object Expr {
 
             builder.advanceLexer() //Ate =>
             if (!Expr.parse(builder))
-              builder error ErrMsg("wrong.expression")
+              builder.error(ErrMsg("wrong.expression"))
             exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
             return true
           }
@@ -51,7 +51,7 @@ object Expr {
             case ScalaTokenTypes.tFUNTYPE => {
               builder.advanceLexer() //Ate =>
               if (!Expr.parse(builder))
-                builder error ErrMsg("wrong.expression")
+                builder.error(ErrMsg("wrong.expression"))
               exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
               return true
             }

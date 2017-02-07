@@ -16,18 +16,18 @@ protected[zk] object LiftableFuture {
 protected[zk] class LiftableFuture[T](f: Future[T]) {
 
   /** Lift a value to a Return. */
-  def liftSuccess = f map { Return(_) }
+  def liftSuccess = f.map { Return(_) }
 
   /** Lift all errors to a Throw */
-  def liftFailure = liftSuccess handle { case e => Throw(e) }
+  def liftFailure = liftSuccess.handle { case e => Throw(e) }
 
   /** Lift all KeeperExceptions to a Throw */
-  def liftKeeperException = liftSuccess handle {
+  def liftKeeperException = liftSuccess.handle {
     case e: KeeperException => Throw(e)
   }
 
   /** Lift failures when a watch would have been successfully installed */
-  def liftNoNode = liftSuccess handle {
+  def liftNoNode = liftSuccess.handle {
     case e: KeeperException.NoNodeException => Throw(e)
   }
 }

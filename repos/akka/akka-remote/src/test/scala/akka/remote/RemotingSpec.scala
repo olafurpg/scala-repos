@@ -274,7 +274,7 @@ class RemotingSpec
         .withFallback(remoteSystem.settings.config)
       val moreSystems =
         Vector.fill(5)(ActorSystem(remoteSystem.name, tcpOnlyConfig))
-      moreSystems foreach { sys ⇒
+      moreSystems.foreach { sys ⇒
         sys.eventStream.publish(
           TestEvent.Mute(
             EventFilter[EndpointDisassociatedException](),
@@ -282,39 +282,39 @@ class RemotingSpec
         sys.actorOf(Props[Echo2], name = "echo")
       }
       val moreRefs =
-        moreSystems map
-          (sys ⇒
-             system.actorSelection(
-               RootActorPath(addr(sys, "tcp")) / "user" / "echo"))
+        moreSystems.map(
+          sys ⇒
+            system.actorSelection(
+              RootActorPath(addr(sys, "tcp")) / "user" / "echo"))
       val aliveEcho = system.actorSelection(
         RootActorPath(addr(remoteSystem, "tcp")) / "user" / "echo")
       val n = 100
 
       // first everything is up and running
-      1 to n foreach { x ⇒
+      (1 to n).foreach { x ⇒
         aliveEcho ! "ping"
         moreRefs(x % moreSystems.size) ! "ping"
       }
 
       within(5.seconds) {
-        receiveN(n * 2) foreach { reply ⇒
+        receiveN(n * 2).foreach { reply ⇒
           reply should ===(("pong", testActor))
         }
       }
 
       // then we shutdown all but one system to simulate broken connections
-      moreSystems foreach { sys ⇒
+      moreSystems.foreach { sys ⇒
         shutdown(sys)
       }
 
-      1 to n foreach { x ⇒
+      (1 to n).foreach { x ⇒
         aliveEcho ! "ping"
         moreRefs(x % moreSystems.size) ! "ping"
       }
 
       // ping messages to aliveEcho should go through even though we use many different broken connections
       within(5.seconds) {
-        receiveN(n) foreach { reply ⇒
+        receiveN(n).foreach { reply ⇒
           reply should ===(("pong", testActor))
         }
       }
@@ -388,17 +388,18 @@ class RemotingSpec
       myref ! 44
       expectMsg(44)
       lastSender should ===(grandchild)
-      lastSender should be theSameInstanceAs grandchild
+      (lastSender should be).theSameInstanceAs(grandchild)
       child.asInstanceOf[RemoteActorRef].getParent should ===(l)
-      system.actorFor("/user/looker1/child") should be theSameInstanceAs child
-      Await
+      (system.actorFor("/user/looker1/child") should be)
+        .theSameInstanceAs(child)
+      (Await
         .result(l ? ActorForReq("child/.."), timeout.duration)
-        .asInstanceOf[AnyRef] should be theSameInstanceAs l
-      Await
+        .asInstanceOf[AnyRef] should be).theSameInstanceAs(l)
+      (Await
         .result(
           system.actorFor(system / "looker1" / "child") ? ActorForReq(".."),
           timeout.duration)
-        .asInstanceOf[AnyRef] should be theSameInstanceAs l
+        .asInstanceOf[AnyRef] should be).theSameInstanceAs(l)
 
       watch(child)
       child ! PoisonPill
@@ -437,7 +438,7 @@ class RemotingSpec
       mysel ! 54
       expectMsg(54)
       lastSender should ===(grandchild)
-      lastSender should be theSameInstanceAs grandchild
+      (lastSender should be).theSameInstanceAs(grandchild)
       mysel ! Identify(mysel)
       val grandchild2 = expectMsgType[ActorIdentity].ref
       grandchild2 should ===(Some(grandchild))
@@ -445,10 +446,10 @@ class RemotingSpec
       expectMsgType[ActorIdentity].ref should ===(Some(child))
       l ! ActorSelReq("child/..")
       expectMsgType[ActorSelection] ! Identify(None)
-      expectMsgType[ActorIdentity].ref.get should be theSameInstanceAs l
+      (expectMsgType[ActorIdentity].ref.get should be).theSameInstanceAs(l)
       system.actorSelection(system / "looker2" / "child") ! ActorSelReq("..")
       expectMsgType[ActorSelection] ! Identify(None)
-      expectMsgType[ActorIdentity].ref.get should be theSameInstanceAs l
+      (expectMsgType[ActorIdentity].ref.get should be).theSameInstanceAs(l)
 
       grandchild ! ((Props[Echo1], "grandgrandchild"))
       val grandgrandchild = expectMsgType[ActorRef]
@@ -520,7 +521,7 @@ class RemotingSpec
     "not fail ask across node boundaries" in within(5.seconds) {
       import system.dispatcher
       val f = for (_ ← 1 to 1000)
-        yield here ? "ping" mapTo manifest[(String, ActorRef)]
+        yield (here ? "ping").mapTo(manifest[(String, ActorRef)])
       Await
         .result(Future.sequence(f), timeout.duration)
         .map(_._1)

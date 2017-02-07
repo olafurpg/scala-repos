@@ -46,7 +46,7 @@ object GenerationUtil {
     val addedMembers = ListBuffer[PsiElement]()
     val psiDocManager = PsiDocumentManager.getInstance(aClass.getProject)
     for {
-      anch <- anchor orElse findAnchor(aClass)
+      anch <- anchor.orElse(findAnchor(aClass))
       parent <- Option(anch.getParent)
     } {
       members.foldLeft(anch) { (anchor, member) =>

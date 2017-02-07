@@ -163,12 +163,12 @@ abstract class NumericRange[T](
 
       private lazy val underlyingRange: NumericRange[T] = self
       override def foreach[U](f: A => U) {
-        underlyingRange foreach (x => f(fm(x)))
+        underlyingRange.foreach(x => f(fm(x)))
       }
       override def isEmpty = underlyingRange.isEmpty
       override def apply(idx: Int): A = fm(underlyingRange(idx))
       override def containsTyped(el: A) =
-        underlyingRange exists (x => fm(x) == el)
+        underlyingRange.exists(x => fm(x) == el)
     }
   }
 
@@ -195,7 +195,7 @@ abstract class NumericRange[T](
         // We can do math with no overflow in a Long--easy
         val exact =
           (numRangeElements * ((num toLong head) + (num toInt last))) / 2
-        num fromInt exact.toInt
+        num.fromInt(exact.toInt)
       } else if (num eq scala.math.Numeric.LongIsIntegral) {
         // Uh-oh, might be overflow, so we have to divide before we overflow.
         // Either numRangeElements or (head + last) must be even, so divide the even one before multiplying
@@ -218,8 +218,8 @@ abstract class NumericRange[T](
         import numAsIntegral._
         val a = math.abs(head.toDouble)
         val b = math.abs(last.toDouble)
-        val two = num fromInt 2
-        val nre = num fromInt numRangeElements
+        val two = num.fromInt(2)
+        val nre = num.fromInt(numRangeElements)
         if (a > 1e38 || b > 1e38)
           nre * ((head / two) + (last / two)) // Compute in parts to avoid Infinity if possible
         else
@@ -230,7 +230,7 @@ abstract class NumericRange[T](
         // (not going to worry about running out of memory)
         val numAsIntegral = num.asInstanceOf[Integral[B]]
         import numAsIntegral._
-        ((num fromInt numRangeElements) * (head + last)) / (num fromInt 2)
+        ((num.fromInt(numRangeElements)) * (head + last)) / (num.fromInt(2))
       } else {
         // User provided custom Numeric, so we cannot rely on arithmetic series formula (e.g. won't work on something like Z_6)
         if (isEmpty) num.zero
@@ -252,7 +252,7 @@ abstract class NumericRange[T](
   override lazy val hashCode = super.hashCode()
   override def equals(other: Any) = other match {
     case x: NumericRange[_] =>
-      (x canEqual this) && (length == x.length) &&
+      (x.canEqual(this)) && (length == x.length) &&
         ((length == 0) || // all empty sequences are equal
           (start == x.start &&
             last == x.last) // same length and same endpoints implies equality

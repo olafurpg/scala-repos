@@ -19,7 +19,7 @@ import org.jetbrains.plugins.scala.actions.ScalaActionUtil
 class CreateLightWorksheetAction extends AnAction {
   override def actionPerformed(e: AnActionEvent) {
     val project = e.getProject
-    val editor = e getData CommonDataKeys.EDITOR
+    val editor = e.getData(CommonDataKeys.EDITOR)
     val text = StringUtil.notNullize(
       if (editor == null) null else editor.getSelectionModel.getSelectedText)
 
@@ -33,6 +33,6 @@ class CreateLightWorksheetAction extends AnAction {
   }
 
   override def update(e: AnActionEvent) {
-    ScalaActionUtil enableAndShowIfInScalaFile e
+    ScalaActionUtil.enableAndShowIfInScalaFile(e)
   }
 }

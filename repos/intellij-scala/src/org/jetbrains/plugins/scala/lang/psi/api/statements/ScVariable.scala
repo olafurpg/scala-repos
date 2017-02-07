@@ -44,7 +44,7 @@ trait ScVariable
   def typeElement: Option[ScTypeElement]
 
   def declaredType: Option[ScType] =
-    typeElement map (_.getType(TypingContext.empty).getOrAny)
+    typeElement.map(_.getType(TypingContext.empty).getOrAny)
 
   def getType(ctx: TypingContext): TypeResult[ScType]
 

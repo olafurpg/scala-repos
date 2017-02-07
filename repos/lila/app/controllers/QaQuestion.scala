@@ -11,7 +11,7 @@ import views._
 object QaQuestion extends QaController {
 
   def index(page: Option[Int] = None) = Open { implicit ctx =>
-    api.question.recentPaginator(page getOrElse 1, 20) zip fetchPopular map {
+    api.question.recentPaginator(page.getOrElse(1), 20).zip(fetchPopular).map {
       case (questions, popular) => Ok(html.qa.index(questions, popular))
     }
   }
@@ -22,14 +22,14 @@ object QaQuestion extends QaController {
       fuccess {
         Redirect(routes.QaQuestion.index())
       } else
-      Env.qa search query zip fetchPopular map {
+      Env.qa.search(query).zip(fetchPopular).map {
         case (questions, popular) =>
           Ok(html.qa.search(query, questions, popular))
       }
   }
 
   def byTag(tag: String) = Open { implicit ctx =>
-    api.question.byTag(tag, 20) zip fetchPopular map {
+    api.question.byTag(tag, 20).zip(fetchPopular).map {
       case (questions, popular) => Ok(html.qa.byTag(tag, questions, popular))
     }
   }
@@ -42,7 +42,7 @@ object QaQuestion extends QaController {
 
   private def renderAsk(form: Form[_], status: Results.Status)(
       implicit ctx: Context) =
-    fetchPopular zip api.tag.all zip forms.anyCaptcha map {
+    fetchPopular.zip(api.tag.all).zip(forms.anyCaptcha).map {
       case ((popular, tags), captcha) =>
         status(html.qa.ask(form, tags, popular, captcha))
     }
@@ -58,7 +58,7 @@ object QaQuestion extends QaController {
       forms.question.bindFromRequest.fold(
         err => renderAsk(err, Results.BadRequest),
         data =>
-          api.question.create(data, me) map { q =>
+          api.question.create(data, me).map { q =>
             Redirect(routes.QaQuestion.show(q.id, q.slug))
         }
       )
@@ -67,7 +67,7 @@ object QaQuestion extends QaController {
 
   def edit(id: QuestionId, slug: String) = Auth { implicit ctx => me =>
     WithOwnQuestion(id, slug) { q =>
-      renderEdit(forms editQuestion q, q, Results.Ok)
+      renderEdit(forms.editQuestion(q), q, Results.Ok)
     }
   }
 
@@ -77,7 +77,7 @@ object QaQuestion extends QaController {
       forms.question.bindFromRequest.fold(
         err => renderEdit(err, q, Results.BadRequest),
         data =>
-          api.question.edit(data, q.id) map {
+          api.question.edit(data, q.id).map {
             case None => NotFound
             case Some(q2) => Redirect(routes.QaQuestion.show(q2.id, q2.slug))
         }
@@ -87,7 +87,7 @@ object QaQuestion extends QaController {
 
   private def renderEdit(form: Form[_], q: Question, status: Results.Status)(
       implicit ctx: Context) =
-    fetchPopular zip api.tag.all zip forms.anyCaptcha map {
+    fetchPopular.zip(api.tag.all).zip(forms.anyCaptcha).map {
       case ((popular, tags), captcha) =>
         status(html.qa.edit(form, q, tags, popular, captcha))
     }
@@ -97,7 +97,7 @@ object QaQuestion extends QaController {
     forms.vote.bindFromRequest.fold(
       err => fuccess(BadRequest),
       v =>
-        api.question.vote(id, me, v == 1) map {
+        api.question.vote(id, me, v == 1).map {
           case Some(vote) =>
             Ok(html.qa.vote(routes.QaQuestion.vote(id).url, vote))
           case None => NotFound
@@ -108,7 +108,7 @@ object QaQuestion extends QaController {
   def remove(questionId: QuestionId) = Secure(_.ModerateQa) {
     implicit ctx => me =>
       WithQuestion(questionId) { q =>
-        (api.question remove q.id) >> Env.mod.logApi
+        (api.question.remove(q.id)) >> Env.mod.logApi
           .deleteQaQuestion(me.id, q.userId, q.title) inject Redirect(
           routes.QaQuestion.index())
       }

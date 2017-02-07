@@ -17,7 +17,7 @@ class GraphMergeSpec extends TwoStreamsSetup {
   override type Outputs = Int
 
   override def fixture(b: GraphDSL.Builder[_]): Fixture = new Fixture(b) {
-    val merge = b add Merge[Outputs](2)
+    val merge = b.add(Merge[Outputs](2))
 
     override def left: Inlet[Outputs] = merge.in(0)
     override def right: Inlet[Outputs] = merge.in(1)

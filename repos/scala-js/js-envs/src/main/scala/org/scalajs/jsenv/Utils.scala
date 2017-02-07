@@ -16,7 +16,7 @@ private[jsenv] object Utils {
     // scalastyle:ignore
     def millisLeft: Long =
       if (deadline == null) 0
-      else (deadline.timeLeft.toMillis max 1L)
+      else (deadline.timeLeft.toMillis.max(1L))
 
     def isOverdue: Boolean =
       if (deadline == null) false

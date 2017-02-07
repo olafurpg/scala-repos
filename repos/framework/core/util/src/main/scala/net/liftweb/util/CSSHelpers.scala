@@ -42,7 +42,7 @@ object CSSHelpers extends ControlHelpers {
     var line: String = null;
     try {
       while ({ line = reader.readLine(); line != null }) {
-        res append line + "\n"
+        res.append(line + "\n")
       }
     } finally {
       reader close
@@ -88,7 +88,7 @@ case class CssUrlPrefixer(prefix: String) extends Parsers {
 
       val rest = walk(in) {
         case c =>
-          content append c
+          content.append(c)
           c.toLower match {
             case 'u' if (seqDone == 0) => seqDone = 1;
             case 'r' if (seqDone == 1) => seqDone = 2;

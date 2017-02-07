@@ -411,10 +411,10 @@ abstract class RpcEnvSuite extends SparkFunSuite with BeforeAndAfterAll {
           }
         })
 
-      (0 until 10) foreach { _ =>
+      ((0 until 10)).foreach { _ =>
         new Thread {
           override def run() {
-            (0 until 100) foreach { _ =>
+            ((0 until 100)).foreach { _ =>
               endpointRef.send("Hello")
             }
           }

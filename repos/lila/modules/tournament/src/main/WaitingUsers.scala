@@ -10,9 +10,9 @@ private[tournament] case class WaitingUsers(hash: Map[String, DateTime],
   // 3+0  -> 18 -> 18
   // 5+0  -> 26 -> 26
   // 10+0 -> 46 -> 35
-  private val waitSeconds = {
+  private val waitSeconds = ({
     (clock.fold(60)(_.estimateTotalTime) / 15) + 6
-  } min 35 max 12
+  } min 35).max(12)
 
   lazy val all = hash.keys.toList
   lazy val size = hash.size
@@ -25,7 +25,7 @@ private[tournament] case class WaitingUsers(hash: Map[String, DateTime],
     else all
   }
 
-  def waitSecondsOf(userId: String) = hash get userId map { d =>
+  def waitSecondsOf(userId: String) = hash.get(userId).map { d =>
     nowSeconds - d.getSeconds
   }
 
@@ -47,10 +47,10 @@ private[tournament] case class WaitingUsers(hash: Map[String, DateTime],
     )
   }
 
-  def intersect(us: Seq[String]) = copy(hash = hash filterKeys us.contains)
+  def intersect(us: Seq[String]) = copy(hash = hash.filterKeys(us.contains))
 
   def diff(us: Set[String]) =
-    copy(hash = hash filterKeys { k =>
+    copy(hash = hash.filterKeys { k =>
       !us.contains(k)
     })
 

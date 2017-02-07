@@ -95,7 +95,7 @@ class ReplTest extends WordSpec {
             .map(w => (w.toLowerCase, w.length)))
       }
 
-      "grouped -- Grouped[String,String]" which {
+      "grouped -- Grouped[String,String]".which {
         val grp = TypedPipe.from(TextLine(helloPath)).groupBy(_.toLowerCase)
 
         val correct = helloRef.map(l => (l.toLowerCase, l))
@@ -110,7 +110,7 @@ class ReplTest extends WordSpec {
         }
       }
 
-      "joined -- CoGrouped[String, Long]" which {
+      "joined -- CoGrouped[String, Long]".which {
         val linesByWord = TypedPipe
           .from(TextLine(helloPath))
           .flatMap(_.split("\\s+"))

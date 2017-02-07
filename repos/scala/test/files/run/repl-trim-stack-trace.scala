@@ -38,5 +38,5 @@ scala> :quit"""
     case elided(ellipsis, suffix) => s"$ellipsis???$suffix"
     case s => s
   }
-  override def expected = super.expected map normalize
+  override def expected = super.expected.map(normalize)
 }

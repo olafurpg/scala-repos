@@ -20,17 +20,17 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
     F.map(run)(_.swap)
 
   def getOrElse(default: => B)(implicit F: Functor[F]): F[B] =
-    F.map(run)(_ getOrElse default)
+    F.map(run)(_.getOrElse(default))
 
   /** Return the right value of this disjunction or the given default if left. Alias for `getOrElse` */
   def |(default: => B)(implicit F: Functor[F]): F[B] =
     getOrElse(default)
 
   def exists(f: (=> B) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(run)(_ exists f)
+    F.map(run)(_.exists(f))
 
   def forall(f: (=> B) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(run)(_ forall f)
+    F.map(run)(_.forall(f))
 
   def orElse(x: => LazyEitherT[F, A, B])(
       implicit m: Bind[F]): LazyEitherT[F, A, B] = {
@@ -64,7 +64,7 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
     F.map(run)(_.toStream)
 
   def map[C](f: (=> B) => C)(implicit F: Functor[F]): LazyEitherT[F, A, C] =
-    lazyEitherT(F.map(run)(_ map f))
+    lazyEitherT(F.map(run)(_.map(f)))
 
   def flatMap[C](f: (=> B) => LazyEitherT[F, A, C])(
       implicit M: Monad[F]): LazyEitherT[F, A, C] =
@@ -169,13 +169,13 @@ object LazyEitherT extends LazyEitherTInstances {
     import LazyOptionT._
 
     def getOrElse(default: => A)(implicit F: Functor[F]): F[A] =
-      F.map(lazyEitherT.run)(_.left getOrElse default)
+      F.map(lazyEitherT.run)(_.left.getOrElse(default))
 
     def exists(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-      F.map(lazyEitherT.run)(_.left exists f)
+      F.map(lazyEitherT.run)(_.left.exists(f))
 
     def forall(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
-      F.map(lazyEitherT.run)(_.left forall f)
+      F.map(lazyEitherT.run)(_.left.forall(f))
 
     def orElse(x: => LazyEitherT[F, A, B])(
         implicit m: Bind[F]): LazyEitherT[F, A, B] = {
@@ -202,7 +202,7 @@ object LazyEitherT extends LazyEitherTInstances {
       F.map(lazyEitherT.run)(_.left.toStream)
 
     def map[C](f: (=> A) => C)(implicit F: Functor[F]): LazyEitherT[F, C, B] =
-      LazyEitherT(F.map(lazyEitherT.run)(_.left map f))
+      LazyEitherT(F.map(lazyEitherT.run)(_.left.map(f)))
 
     def flatMap[C](f: (=> A) => LazyEitherT[F, C, B])(
         implicit M: Monad[F]): LazyEitherT[F, C, B] =
@@ -371,7 +371,7 @@ private trait LazyEitherTFunctor[F[_], E]
   implicit def F: Functor[F]
 
   override final def map[A, B](fa: LazyEitherT[F, E, A])(
-      f: A => B): LazyEitherT[F, E, B] = fa map (a => f(a))
+      f: A => B): LazyEitherT[F, E, B] = fa.map(a => f(a))
 }
 
 private trait LazyEitherTMonad[F[_], E]
@@ -383,7 +383,7 @@ private trait LazyEitherTMonad[F[_], E]
 
   def bind[A, B](fa: LazyEitherT[F, E, A])(
       f: A => LazyEitherT[F, E, B]): LazyEitherT[F, E, B] =
-    fa flatMap (a => f(a))
+    fa.flatMap(a => f(a))
 }
 
 private trait LazyEitherTPlus[F[_], E] extends Plus[LazyEitherT[F, E, ?]] {
@@ -429,7 +429,7 @@ private trait LazyEitherTTraverse[F[_], E]
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: LazyEitherT[F, E, A])(
-      f: A => G[B]): G[LazyEitherT[F, E, B]] = fa traverse f
+      f: A => G[B]): G[LazyEitherT[F, E, B]] = fa.traverse(f)
 }
 
 private trait LazyEitherTBifunctor[F[_]]

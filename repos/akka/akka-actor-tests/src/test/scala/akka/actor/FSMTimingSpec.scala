@@ -127,7 +127,7 @@ class FSMTimingSpec extends AkkaSpec with ImplicitSender {
       val seq = receiveWhile(2 seconds) {
         case Tick ⇒ Tick
       }
-      seq should have length 5
+      (seq should have).length(5)
       within(500 millis) {
         expectMsg(Transition(fsm, TestRepeatedTimer, Initial))
       }
@@ -205,7 +205,7 @@ object FSMTimingSpec {
         setTimer("tester", Tick, 100.millis.dilated, true)
         goto(TestRepeatedTimer) using 4
       case Event(TestStateTimeoutOverride, _) ⇒
-        goto(TestStateTimeout) forMax (Duration.Inf)
+        goto(TestStateTimeout).forMax(Duration.Inf)
       case Event(x: FSMTimingSpec.State, _) ⇒ goto(x)
     }
     when(TestStateTimeout, stateTimeout = 800.millis.dilated) {
@@ -263,7 +263,7 @@ object FSMTimingSpec {
         setTimer("named", Tock, 1.millis.dilated)
         TestKit.awaitCond(context.asInstanceOf[ActorCell].mailbox.hasMessages,
                           1.second.dilated)
-        stay forMax (1.millis.dilated) replying Tick
+        stay.forMax(1.millis.dilated) replying Tick
       case Event(Tock, _) ⇒
         goto(TestCancelStateTimerInNamedTimerMessage2)
     }

@@ -32,14 +32,16 @@ final class Firewall(cookieName: Option[String],
 
   def blocks(req: RequestHeader): Fu[Boolean] =
     if (enabled) {
-      cookieName.fold(blocksIp(req.remoteAddress)) { cn =>
-        blocksIp(req.remoteAddress) map (_ || blocksCookies(req.cookies, cn))
-      } addEffect { v =>
-        if (v) lila.mon.security.firewall.block()
-      }
+      cookieName
+        .fold(blocksIp(req.remoteAddress)) { cn =>
+          blocksIp(req.remoteAddress).map(_ || blocksCookies(req.cookies, cn))
+        }
+        .addEffect { v =>
+          if (v) lila.mon.security.firewall.block()
+        }
     } else fuccess(false)
 
-  def accepts(req: RequestHeader): Fu[Boolean] = blocks(req) map (!_)
+  def accepts(req: RequestHeader): Fu[Boolean] = blocks(req).map(!_)
 
   def blockIp(ip: String): Funit = validIp(ip) ?? {
     $update(Json.obj("_id" -> ip),
@@ -48,13 +50,13 @@ final class Firewall(cookieName: Option[String],
   }
 
   def unblockIps(ips: Iterable[String]): Funit =
-    $remove($select.byIds(ips filter validIp)) >>- refresh
+    $remove($select.byIds(ips.filter(validIp))) >>- refresh
 
   private def infectCookie(name: String)(implicit req: RequestHeader) =
     Action {
       logger.info("Infect cookie " + formatReq(req))
       val cookie = LilaCookie.cookie(name, Random nextStringUppercase 32)
-      Redirect("/") withCookies cookie
+      Redirect("/").withCookies(cookie)
     }
 
   def blocksIp(ip: String): Fu[Boolean] = ips contains ip
@@ -68,14 +70,14 @@ final class Firewall(cookieName: Option[String],
       .format(req.remoteAddress, req.uri, req.headers.get("User-Agent") | "?")
 
   private def blocksCookies(cookies: Cookies, name: String) =
-    (cookies get name).isDefined
+    (cookies.get(name)).isDefined
 
   // http://stackoverflow.com/questions/106179/regular-expression-to-match-hostname-or-ip-address
   private val ipRegex =
     """^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$""".r
 
   private def validIp(ip: String) =
-    (ipRegex matches ip) && ip != "127.0.0.1" && ip != "0.0.0.0"
+    (ipRegex.matches(ip)) && ip != "127.0.0.1" && ip != "0.0.0.0"
 
   private type IP = Vector[Byte]
 
@@ -85,12 +87,15 @@ final class Firewall(cookieName: Option[String],
       InetAddress.getByName(ip).getAddress.toVector
     def apply: Fu[Set[IP]] = cache(true)(fetch)
     def clear { cache.clear }
-    def contains(ip: String) = apply map (_ contains strToIp(ip))
+    def contains(ip: String) = apply.map(_ contains strToIp(ip))
     def fetch: Fu[Set[IP]] =
-      firewallTube.coll.distinct("_id") map { res =>
-        lila.db.BSON.asStringSet(res) map strToIp
-      } addEffect { ips =>
-        lila.mon.security.firewall.ip(ips.size)
-      }
+      firewallTube.coll
+        .distinct("_id")
+        .map { res =>
+          lila.db.BSON.asStringSet(res).map(strToIp)
+        }
+        .addEffect { ips =>
+          lila.mon.security.firewall.ip(ips.size)
+        }
   }
 }

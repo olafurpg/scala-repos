@@ -103,8 +103,8 @@ object SerializationBenchmark
   var effectInt: Int = 0
   var effectLong: Long = 0L
 
-  performance of "Serialization" in {
-    measure method "JavaStreamEnrichments.readInt" in {
+  performance.of("Serialization") in {
+    measure.method("JavaStreamEnrichments.readInt") in {
       using(longArrayByte) in { a =>
         val length = a.length
         val is = new ByteArrayInputStream(a)
@@ -115,7 +115,7 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "JavaStreamEnrichments.readLong" in {
+    measure.method("JavaStreamEnrichments.readLong") in {
       using(longArrayByte) in { a =>
         val length = a.length
         val is = new ByteArrayInputStream(a)
@@ -126,7 +126,7 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "UnsignedComparisons.unsignedLongCompare" in {
+    measure.method("UnsignedComparisons.unsignedLongCompare") in {
       using(collection[Long, Array](sizes)) in { a =>
         val max = a.length - 1
         var pos = 0
@@ -137,7 +137,7 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "normal long compare" in {
+    measure.method("normal long compare") in {
       using(collection[Long, Array](sizes)) in { a =>
         val max = a.length - 1
         var pos = 0
@@ -147,7 +147,7 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "UnsignedComparisons.unsignedInt" in {
+    measure.method("UnsignedComparisons.unsignedInt") in {
       using(collection[Int, Array](sizes)) in { a =>
         val max = a.length - 1
         var pos = 0
@@ -158,7 +158,7 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "normal int compare" in {
+    measure.method("normal int compare") in {
       using(collection[Int, Array](sizes)) in { a =>
         val max = a.length - 1
         var pos = 0
@@ -168,7 +168,7 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "UnsignedComparisons.unsignedShort" in {
+    measure.method("UnsignedComparisons.unsignedShort") in {
       using(collection[Short, Array](sizes)) in { a =>
         val max = a.length - 1
         var pos = 0
@@ -179,7 +179,7 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "normal short compare" in {
+    measure.method("normal short compare") in {
       using(collection[Short, Array](sizes)) in { a =>
         val max = a.length - 1
         var pos = 0
@@ -189,7 +189,7 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "UnsignedComparisons.unsignedByte" in {
+    measure.method("UnsignedComparisons.unsignedByte") in {
       using(collection[Byte, Array](sizes)) in { a =>
         val max = a.length - 1
         var pos = 0
@@ -200,7 +200,7 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "normal byte compare" in {
+    measure.method("normal byte compare") in {
       using(collection[Byte, Array](sizes)) in { a =>
         val max = a.length - 1
         var pos = 0
@@ -210,12 +210,12 @@ object SerializationBenchmark
         }
       }
     }
-    measure method "typeclass: Int" in {
+    measure.method("typeclass: Int") in {
       using(collection[Int, List](sizes)) in { l =>
         roundTrip(l.iterator)
       }
     }
-    measure method "kryo: Int" in {
+    measure.method("kryo: Int") in {
       val kryo = KryoPool.withByteArrayOutputStream(
         1,
         com.twitter.scalding.Config.default.getKryo.get)
@@ -224,12 +224,12 @@ object SerializationBenchmark
         kryoRoundTrip(kryo, l.iterator)
       }
     }
-    measure method "typeclass: String" in {
+    measure.method("typeclass: String") in {
       using(collection[String, List](smallSizes)) in { l =>
         roundTrip(l.iterator)
       }
     }
-    measure method "kryo: String" in {
+    measure.method("kryo: String") in {
       val kryo = KryoPool.withByteArrayOutputStream(
         1,
         com.twitter.scalding.Config.default.getKryo.get)
@@ -238,12 +238,12 @@ object SerializationBenchmark
         kryoRoundTrip(kryo, l.iterator)
       }
     }
-    measure method "typeclass: (Int, (Long, String))" in {
+    measure.method("typeclass: (Int, (Long, String))") in {
       using(collection[(Int, (Long, String)), List](smallSizes)) in { l =>
         roundTrip(l.iterator)
       }
     }
-    measure method "kryo: (Int, (Long, String))" in {
+    measure.method("kryo: (Int, (Long, String))") in {
       val kryo = KryoPool.withByteArrayOutputStream(
         1,
         com.twitter.scalding.Config.default.getKryo.get)
@@ -252,12 +252,12 @@ object SerializationBenchmark
         kryoRoundTrip(kryo, l.iterator)
       }
     }
-    measure method "typeclass: (Int, Long, Short)" in {
+    measure.method("typeclass: (Int, Long, Short)") in {
       using(collection[(Int, Long, Short), List](smallSizes)) in { l =>
         roundTrip(l.iterator)
       }
     }
-    measure method "kryo: (Int, Long, Short)" in {
+    measure.method("kryo: (Int, Long, Short)") in {
       val kryo = KryoPool.withByteArrayOutputStream(
         1,
         com.twitter.scalding.Config.default.getKryo.get)
@@ -266,7 +266,7 @@ object SerializationBenchmark
         kryoRoundTrip(kryo, l.iterator)
       }
     }
-    measure method "sort typeclass: Int" in {
+    measure.method("sort typeclass: Int") in {
       val ordSer = implicitly[OrderedSerialization[Int]]
       using(collection[Int, List](smallSizes).map { items =>
         items.map { Serialization.toBytes(_) }.toArray
@@ -274,7 +274,7 @@ object SerializationBenchmark
         java.util.Arrays.sort(ary, toArrayOrd(ordSer))
       }
     }
-    measure method "sort kryo: Int" in {
+    measure.method("sort kryo: Int") in {
       val kryo = KryoPool.withByteArrayOutputStream(
         1,
         com.twitter.scalding.Config.default.getKryo.get)
@@ -286,7 +286,7 @@ object SerializationBenchmark
         java.util.Arrays.sort(ary, toArrayOrd(kryo, ord))
       }
     }
-    measure method "sort typeclass: Long" in {
+    measure.method("sort typeclass: Long") in {
       val ordSer = implicitly[OrderedSerialization[Long]]
       using(collection[Long, List](smallSizes).map { items =>
         items.map { Serialization.toBytes(_) }.toArray
@@ -294,7 +294,7 @@ object SerializationBenchmark
         java.util.Arrays.sort(ary, toArrayOrd(ordSer))
       }
     }
-    measure method "sort kryo: Long" in {
+    measure.method("sort kryo: Long") in {
       val kryo = KryoPool.withByteArrayOutputStream(
         1,
         com.twitter.scalding.Config.default.getKryo.get)
@@ -306,7 +306,7 @@ object SerializationBenchmark
         java.util.Arrays.sort(ary, toArrayOrd(kryo, ord))
       }
     }
-    measure method "sort typeclass: String" in {
+    measure.method("sort typeclass: String") in {
       val ordSer = implicitly[OrderedSerialization[String]]
       using(collection[String, List](smallSizes).map { items =>
         items.map { Serialization.toBytes(_) }.toArray
@@ -314,7 +314,7 @@ object SerializationBenchmark
         java.util.Arrays.sort(ary, toArrayOrd(ordSer))
       }
     }
-    measure method "sort kryo: String" in {
+    measure.method("sort kryo: String") in {
       val kryo = KryoPool.withByteArrayOutputStream(
         1,
         com.twitter.scalding.Config.default.getKryo.get)
@@ -327,7 +327,7 @@ object SerializationBenchmark
       }
     }
 
-    measure method "sort typeclass: (Int, (Long, String))" in {
+    measure.method("sort typeclass: (Int, (Long, String))") in {
       val ordSer = implicitly[OrderedSerialization[(Int, (Long, String))]]
       using(collection[(Int, (Long, String)), List](smallSizes).map { items =>
         items.map { Serialization.toBytes(_) }.toArray
@@ -335,7 +335,7 @@ object SerializationBenchmark
         java.util.Arrays.sort(ary, toArrayOrd(ordSer))
       }
     }
-    measure method "sort kryo: (Int, (Long, String))" in {
+    measure.method("sort kryo: (Int, (Long, String))") in {
       val kryo = KryoPool.withByteArrayOutputStream(
         1,
         com.twitter.scalding.Config.default.getKryo.get)

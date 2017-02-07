@@ -133,8 +133,11 @@ class AppStartActorTest
   }
 
   test("Failed") {
-    scheduler.stopApp(any, any).asInstanceOf[Future[Unit]] returns Future
-      .successful(())
+    scheduler
+      .stopApp(any, any)
+      .asInstanceOf[Future[Unit]]
+      .returns(Future
+        .successful(()))
 
     val app = AppDefinition(id = PathId("app"), instances = 10)
     val promise = Promise[Unit]()

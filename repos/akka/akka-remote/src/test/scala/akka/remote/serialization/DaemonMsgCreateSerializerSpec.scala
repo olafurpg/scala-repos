@@ -117,7 +117,7 @@ class DaemonMsgCreateSerializerSpec extends AkkaSpec {
       // can't compare props.creator when function
       got.props.clazz should ===(expected.props.clazz)
       got.props.args.length should ===(expected.props.args.length)
-      got.props.args zip expected.props.args foreach {
+      got.props.args.zip(expected.props.args).foreach {
         case (g, e) ⇒
           if (e.isInstanceOf[Function0[_]]) ()
           else g should ===(e)

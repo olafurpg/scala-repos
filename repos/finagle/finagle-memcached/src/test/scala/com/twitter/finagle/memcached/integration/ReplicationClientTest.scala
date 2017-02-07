@@ -53,7 +53,7 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       ServerSets.create(zookeeperClient,
                         ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
                         firstPoolPath))
-    (0 to 1) foreach { _ =>
+    ((0 to 1)).foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
           firstTestServerPool :+= server
@@ -66,7 +66,7 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       ServerSets.create(zookeeperClient,
                         ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
                         secondPoolPath))
-    (0 to 1) foreach { _ =>
+    ((0 to 1)).foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
           secondTestServerPool :+= server
@@ -93,8 +93,8 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
     shutdownRegistry.execute()
 
     // shutdown memcached server
-    firstTestServerPool foreach { _.stop() }
-    secondTestServerPool foreach { _.stop() }
+    firstTestServerPool.foreach { _.stop() }
+    secondTestServerPool.foreach { _.stop() }
     firstTestServerPool = List()
     secondTestServerPool = List()
   }

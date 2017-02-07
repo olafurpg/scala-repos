@@ -22,8 +22,10 @@ final class CrosstableApi(coll: Coll) {
   def apply(u1: String, u2: String): Fu[Option[Crosstable]] =
     coll
       .find(select(u1, u2))
-      .one[Crosstable] orElse create(u1, u2) recoverWith lila.db
-      .recoverDuplicateKey(_ => coll.find(select(u1, u2)).one[Crosstable])
+      .one[Crosstable]
+      .orElse(create(u1, u2))
+      .recoverWith(lila.db
+        .recoverDuplicateKey(_ => coll.find(select(u1, u2)).one[Crosstable]))
 
   def nbGames(u1: String, u2: String): Fu[Int] =
     coll
@@ -31,9 +33,10 @@ final class CrosstableApi(coll: Coll) {
         select(u1, u2),
         BSONDocument("n" -> true)
       )
-      .one[BSONDocument] map {
-      ~_.flatMap(_.getAs[Int]("n"))
-    }
+      .one[BSONDocument]
+      .map {
+        ~_.flatMap(_.getAs[Int]("n"))
+      }
 
   def add(game: Game): Funit = game.userIds.distinct.sorted match {
     case List(u1, u2) =>
@@ -65,10 +68,10 @@ final class CrosstableApi(coll: Coll) {
   }
 
   private def exists(u1: String, u2: String) =
-    coll.count(select(u1, u2).some) map (0 !=)
+    coll.count(select(u1, u2).some).map(0 !=)
 
   private def create(x1: String, x2: String): Fu[Option[Crosstable]] =
-    UserRepo.orderByGameCount(x1, x2) map (_ -> List(x1, x2).sorted) flatMap {
+    UserRepo.orderByGameCount(x1, x2).map(_ -> List(x1, x2).sorted).flatMap {
       case (Some((u1, u2)), List(su1, su2)) =>
         val gameColl = tube.gameTube.coll
 

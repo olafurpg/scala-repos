@@ -9,15 +9,15 @@ trait BigIntegerInstances {
   with Show[BigInteger] {
     override def shows(f: BigInteger) = f.toString
 
-    def append(f1: BigInteger, f2: => BigInteger) = f1 add f2
+    def append(f1: BigInteger, f2: => BigInteger) = f1.add(f2)
 
     def zero = BigInteger.ZERO
 
-    def succ(b: BigInteger) = b add BigInteger.ONE
-    def pred(b: BigInteger) = b subtract BigInteger.ONE
-    override def succn(a: Int, b: BigInteger) = b add BigInteger.valueOf(a)
+    def succ(b: BigInteger) = b.add(BigInteger.ONE)
+    def pred(b: BigInteger) = b.subtract(BigInteger.ONE)
+    override def succn(a: Int, b: BigInteger) = b.add(BigInteger.valueOf(a))
     override def predn(a: Int, b: BigInteger) =
-      b subtract BigInteger.valueOf(a)
+      b.subtract(BigInteger.valueOf(a))
     override def min = None
     override def max = None
 
@@ -39,7 +39,7 @@ trait BigIntegerInstances {
 
       def append(f1: BigInteger @@ Multiplication,
                  f2: => BigInteger @@ Multiplication) =
-        Multiplication(Tag.unwrap(f1) multiply Tag.unwrap(f2))
+        Multiplication(Tag.unwrap(f1).multiply(Tag.unwrap(f2)))
 
       def zero: BigInteger @@ Multiplication = Multiplication(BigInteger.ONE)
 

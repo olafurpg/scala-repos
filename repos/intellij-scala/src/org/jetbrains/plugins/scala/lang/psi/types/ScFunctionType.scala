@@ -131,7 +131,7 @@ object ScSynteticSugarClassesUtil {
                 val result = clazz.getType(TypingContext.empty)
                 result match {
                   case Success(t, _) =>
-                    val substituted = (sub followed p.substitutor).subst(t)
+                    val substituted = (sub.followed(p.substitutor)).subst(t)
                     substituted match {
                       case pt: ScParameterizedType =>
                         Some((clazz, pt.typeArgs))

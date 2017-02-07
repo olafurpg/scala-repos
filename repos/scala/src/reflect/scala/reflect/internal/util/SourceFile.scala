@@ -77,8 +77,8 @@ object ScriptSourceFile {
       Pattern.compile("""((?m)^(::)?!#.*|^.*/env .*)(\r|\n|\r\n)""")
     val headerStarts = List("#!", "::#!")
 
-    if (headerStarts exists (cs startsWith _)) {
-      val matcher = headerPattern matcher cs.mkString
+    if (headerStarts.exists(cs.startsWith(_))) {
+      val matcher = headerPattern.matcher(cs.mkString)
       if (matcher.find) matcher.end
       else
         throw new IOException(
@@ -90,7 +90,7 @@ object ScriptSourceFile {
     val underlying = new BatchSourceFile(file, content)
     val headerLen = headerLength(content)
     val stripped =
-      new ScriptSourceFile(underlying, content drop headerLen, headerLen)
+      new ScriptSourceFile(underlying, content.drop(headerLen), headerLen)
 
     stripped
   }
@@ -98,7 +98,7 @@ object ScriptSourceFile {
   def apply(underlying: BatchSourceFile) = {
     val headerLen = headerLength(underlying.content)
     new ScriptSourceFile(underlying,
-                         underlying.content drop headerLen,
+                         underlying.content.drop(headerLen),
                          headerLen)
   }
 }
@@ -111,7 +111,7 @@ class ScriptSourceFile(underlying: BatchSourceFile,
 
   override def positionInUltimateSource(pos: Position) =
     if (!pos.isDefined) super.positionInUltimateSource(pos)
-    else pos withSource underlying withShift start
+    else pos.withSource(underlying).withShift(start)
 }
 
 /** a file whose contents do not change over time */
@@ -137,7 +137,7 @@ class BatchSourceFile(val file: AbstractFile, content0: Array[Char])
   override def identifier(pos: Position) =
     if (pos.isDefined && pos.source == this && pos.point != -1) {
       def isOK(c: Char) = isIdentifierPart(c) || isOperatorPart(c)
-      Some(new String(content drop pos.point takeWhile isOK))
+      Some(new String(content.drop(pos.point).takeWhile(isOK)))
     } else {
       super.identifier(pos)
     }

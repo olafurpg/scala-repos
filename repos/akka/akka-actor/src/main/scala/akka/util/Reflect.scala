@@ -72,7 +72,7 @@ private[akka] object Reflect {
     try constructor.newInstance(args.asInstanceOf[Seq[AnyRef]]: _*)
     catch {
       case e: IllegalArgumentException ⇒
-        val argString = args map safeGetClass mkString ("[", ", ", "]")
+        val argString = args.map(safeGetClass) mkString ("[", ", ", "]")
         throw new IllegalArgumentException(
           s"constructor $constructor is incompatible with arguments $argString",
           e)
@@ -88,28 +88,29 @@ private[akka] object Reflect {
       clazz: Class[T],
       args: immutable.Seq[Any]): Constructor[T] = {
     def error(msg: String): Nothing = {
-      val argClasses = args map safeGetClass mkString ", "
+      val argClasses = args.map(safeGetClass) mkString ", "
       throw new IllegalArgumentException(
         s"$msg found on $clazz for arguments [$argClasses]")
     }
 
     val constructor: Constructor[T] =
-      if (args.isEmpty) Try { clazz.getDeclaredConstructor() } getOrElse (null)
+      if (args.isEmpty) Try { clazz.getDeclaredConstructor() }.getOrElse(null)
       else {
         val length = args.length
         val candidates =
           clazz.getDeclaredConstructors
             .asInstanceOf[Array[Constructor[T]]]
-            .iterator filter { c ⇒
-            val parameterTypes = c.getParameterTypes
-            parameterTypes.length == length &&
-            (parameterTypes.iterator zip args.iterator forall {
-              case (found, required) ⇒
-                found.isInstance(required) ||
-                  BoxedType(found).isInstance(required) ||
-                  (required == null && !found.isPrimitive)
-            })
-          }
+            .iterator
+            .filter { c ⇒
+              val parameterTypes = c.getParameterTypes
+              parameterTypes.length == length &&
+              (parameterTypes.iterator.zip(args.iterator).forall {
+                case (found, required) ⇒
+                  found.isInstance(required) ||
+                    BoxedType(found).isInstance(required) ||
+                    (required == null && !found.isPrimitive)
+              })
+            }
         if (candidates.hasNext) {
           val cstrtr = candidates.next()
           if (candidates.hasNext) error("multiple matching constructors")
@@ -137,10 +138,10 @@ private[akka] object Reflect {
       if (curr.getSuperclass != null &&
           marker.isAssignableFrom(curr.getSuperclass)) rec(curr.getSuperclass)
       else
-        curr.getGenericInterfaces collectFirst {
-          case c: Class[_] if marker isAssignableFrom c ⇒ c
+        curr.getGenericInterfaces.collectFirst {
+          case c: Class[_] if marker.isAssignableFrom(c) ⇒ c
           case t: ParameterizedType
-              if marker isAssignableFrom t.getRawType.asInstanceOf[Class[_]] ⇒
+              if marker.isAssignableFrom(t.getRawType.asInstanceOf[Class[_]]) ⇒
             t
         } match {
           case None ⇒

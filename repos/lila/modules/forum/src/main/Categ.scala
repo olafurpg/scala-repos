@@ -45,7 +45,7 @@ object Categ {
   private def defaults = Json.obj("team" -> none[String])
 
   private[forum] lazy val tube = JsTube(
-    reader = (__.json update merge(defaults)) andThen Json.reads[Categ],
+    reader = (__.json.update(merge(defaults))).andThen(Json.reads[Categ]),
     writer = Json.writes[Categ]
   )
 }

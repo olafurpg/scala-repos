@@ -25,13 +25,13 @@ object ClassDef {
       case ScalaTokenTypes.tIDENTIFIER =>
         builder.advanceLexer() //Ate identifier
       case _ =>
-        builder error ErrMsg("identifier.expected")
+        builder.error(ErrMsg("identifier.expected"))
         return false
     }
     //parsing type parameters
     builder.getTokenType match {
       case ScalaTokenTypes.tLSQBRACKET =>
-        TypeParamClause parse builder
+        TypeParamClause.parse(builder)
       case _ => /*it could be without type parameters*/
     }
     val constructorMarker = builder.mark
@@ -45,16 +45,16 @@ object ClassDef {
       //parse AccessModifier
       builder.getTokenType match {
         case ScalaTokenTypes.kPRIVATE | ScalaTokenTypes.kPROTECTED =>
-          AccessModifier parse builder
+          AccessModifier.parse(builder)
         case _ =>
         /*it could be without acces modifier*/
       }
     }
     modifierMareker.done(ScalaElementTypes.MODIFIERS)
-    ClassParamClauses parse builder
+    ClassParamClauses.parse(builder)
     constructorMarker.done(ScalaElementTypes.PRIMARY_CONSTRUCTOR)
     //parse extends block
-    ClassTemplateOpt parse builder
+    ClassTemplateOpt.parse(builder)
     return true
   }
 }

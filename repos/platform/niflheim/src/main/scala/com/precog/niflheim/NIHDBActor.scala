@@ -85,16 +85,18 @@ object NIHDB {
                    timeout: Timeout,
                    txLogScheduler: ScheduledExecutorService)(
       implicit actorSystem: ActorSystem): IO[Validation[Error, NIHDB]] = {
-    NIHDBActor.create(chef,
-                      authorities,
-                      baseDir,
-                      cookThreshold,
-                      timeout,
-                      txLogScheduler) map {
-      _ map { actor =>
-        new NIHDBImpl(actor, timeout, authorities)
+    NIHDBActor
+      .create(chef,
+              authorities,
+              baseDir,
+              cookThreshold,
+              timeout,
+              txLogScheduler)
+      .map {
+        _.map { actor =>
+          new NIHDBImpl(actor, timeout, authorities)
+        }
       }
-    }
   }
 
   final def open(chef: ActorRef,
@@ -104,14 +106,15 @@ object NIHDB {
                  txLogScheduler: ScheduledExecutorService)(
       implicit actorSystem: ActorSystem) = {
     NIHDBActor
-      .open(chef, baseDir, cookThreshold, timeout, txLogScheduler) map {
-      _ map {
-        _ map {
-          case (authorities, actor) =>
-            new NIHDBImpl(actor, timeout, authorities)
+      .open(chef, baseDir, cookThreshold, timeout, txLogScheduler)
+      .map {
+        _.map {
+          _.map {
+            case (authorities, actor) =>
+              new NIHDBImpl(actor, timeout, authorities)
+          }
         }
       }
-    }
   }
 
   final def hasProjection(dir: File) = NIHDBActor.hasProjection(dir)
@@ -242,8 +245,8 @@ private[niflheim] object NIHDBActor extends Logging {
         }
       }
 
-    currentState map {
-      _ map { s =>
+    currentState.map {
+      _.map { s =>
         actorSystem.actorOf(
           Props(
             new NIHDBActor(s, baseDir, chef, cookThreshold, txLogScheduler)))
@@ -255,7 +258,7 @@ private[niflheim] object NIHDBActor extends Logging {
       baseDir: File): IO[Option[Validation[Error, ProjectionState]]] = {
     val descriptorFile = new File(baseDir, descriptorFilename)
     if (descriptorFile.exists) {
-      ProjectionState.fromFile(descriptorFile) map { Some(_) }
+      ProjectionState.fromFile(descriptorFile).map { Some(_) }
     } else {
       logger.warn("No projection found at " + baseDir)
       IO { None }
@@ -272,9 +275,9 @@ private[niflheim] object NIHDBActor extends Logging {
     val currentState: IO[Option[Validation[Error, ProjectionState]]] =
       readDescriptor(baseDir)
 
-    currentState map {
-      _ map {
-        _ map { s =>
+    currentState.map {
+      _.map {
+        _.map { s =>
           (s.authorities,
            actorSystem.actorOf(Props(
              new NIHDBActor(s, baseDir, chef, cookThreshold, txLogScheduler))))
@@ -319,9 +322,10 @@ private[niflheim] class NIHDBActor private (
   private[this] var actorState: Option[State] = None
   private def state = {
     import scalaz.syntax.effect.id._
-    actorState getOrElse open
-      .flatMap(_.tap(s => IO(actorState = Some(s))))
-      .unsafePerformIO
+    actorState.getOrElse(
+      open
+        .flatMap(_.tap(s => IO(actorState = Some(s))))
+        .unsafePerformIO)
   }
 
   private def initDirs(f: File) = IO {
@@ -357,7 +361,7 @@ private[niflheim] class NIHDBActor private (
       }
 
     rawLogOffsets.sortBy(-_).headOption.foreach { newMaxOffset =>
-      maxOffset = maxOffset max newMaxOffset
+      maxOffset = maxOffset.max(newMaxOffset)
     }
 
     val pendingCooks = txLog.pendingCookIds.map { id =>
@@ -391,7 +395,7 @@ private[niflheim] class NIHDBActor private (
     new State(txLog, blockState, currentBlocks)
   }
 
-  private def open = actorState.map(IO(_)) getOrElse {
+  private def open = actorState.map(IO(_)).getOrElse {
     for {
       _ <- initDirs(cookedDir)
       _ <- initDirs(rawDir)
@@ -400,7 +404,7 @@ private[niflheim] class NIHDBActor private (
   }
 
   private def quiesce = IO {
-    actorState foreach { s =>
+    actorState.foreach { s =>
       logger.debug("Releasing resources for projection in " + baseDir)
       s.blockState.rawLog.close
       s.txLog.close
@@ -411,7 +415,7 @@ private[niflheim] class NIHDBActor private (
 
   private def close = {
     IO(logger.debug("Closing projection in " + baseDir)) >> quiesce
-  } except {
+  }.except {
     case t: Throwable =>
       IO { logger.error("Error during close", t) }
   } ensuring {

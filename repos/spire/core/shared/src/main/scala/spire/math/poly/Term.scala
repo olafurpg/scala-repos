@@ -24,7 +24,7 @@ case class Term[@sp(Float, Double) C](coeff: C, exp: Int) { lhs =>
   def toTuple: (Int, C) = (exp, coeff)
 
   def eval(x: C)(implicit r: Semiring[C]): C =
-    if (exp != 0) coeff * (x pow exp) else coeff
+    if (exp != 0) coeff * (x.pow(exp)) else coeff
 
   def isIndexZero: Boolean =
     exp == 0
@@ -65,13 +65,13 @@ case class Term[@sp(Float, Double) C](coeff: C, exp: Int) { lhs =>
       case _ => None
     }
 
-    simpleCoeff orElse stringCoeff getOrElse s" + $coeff$expString"
+    simpleCoeff.orElse(stringCoeff).getOrElse(s" + $coeff$expString")
   }
 }
 
 object Term {
   implicit def ordering[C]: Order[Term[C]] = new Order[Term[C]] {
-    def compare(x: Term[C], y: Term[C]): Int = x.exp compare y.exp
+    def compare(x: Term[C], y: Term[C]): Int = x.exp.compare(y.exp)
   }
 
   def fromTuple[@sp(Float, Double) C](tpl: (Int, C)): Term[C] =

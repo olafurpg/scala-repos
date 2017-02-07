@@ -31,8 +31,8 @@ object PerfPicker {
     if (variant.standard)
       Some {
         if (daysPerTurn.isDefined) (perfs: Perfs) => perfs.correspondence
-        else Perfs speedLens speed
-      } else Perfs variantLens variant
+        else Perfs.speedLens(speed)
+      } else Perfs.variantLens(variant)
 
   def main(game: Game): Option[Perfs => Perf] =
     main(game.speed, game.ratingVariant, game.daysPerTurn)
@@ -40,11 +40,13 @@ object PerfPicker {
   def mainOrDefault(speed: Speed,
                     variant: chess.variant.Variant,
                     daysPerTurn: Option[Int]): Perfs => Perf =
-    main(speed, variant, daysPerTurn) orElse {
-      (variant == chess.variant.FromPosition) ?? main(speed,
-                                                      chess.variant.Standard,
-                                                      daysPerTurn)
-    } getOrElse default
+    main(speed, variant, daysPerTurn)
+      .orElse {
+        (variant == chess.variant.FromPosition) ?? main(speed,
+                                                        chess.variant.Standard,
+                                                        daysPerTurn)
+      }
+      .getOrElse(default)
 
   def mainOrDefault(game: Game): Perfs => Perf =
     mainOrDefault(game.speed, game.ratingVariant, game.daysPerTurn)

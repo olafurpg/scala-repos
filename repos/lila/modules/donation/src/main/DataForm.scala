@@ -34,7 +34,7 @@ object DataForm {
                  firstName: Option[String],
                  lastName: Option[String]) {
 
-    def name = (firstName |@| lastName) apply { _ + " " + _ }
+    def name = ((firstName |@| lastName)).apply { _ + " " + _ }
 
     def grossCents = (gross * 100).toInt
 

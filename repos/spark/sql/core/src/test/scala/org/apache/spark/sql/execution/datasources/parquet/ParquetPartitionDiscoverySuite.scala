@@ -832,7 +832,7 @@ class ParquetPartitionDiscoverySuite
         val path = dir.getCanonicalPath
         val df = sqlContext
           .range(5)
-          .select('id as 'a, 'id as 'b, 'id as 'c)
+          .select('id.as('a), 'id.as('b), 'id.as('c))
           .coalesce(1)
         df.write.partitionBy("b", "c").parquet(path)
         checkAnswer(sqlContext.read.parquet(path), df)

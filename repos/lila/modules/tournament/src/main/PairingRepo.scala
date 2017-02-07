@@ -38,7 +38,7 @@ object PairingRepo {
   def lastOpponents(tourId: String,
                     userIds: Iterable[String],
                     nb: Int): Fu[Pairing.LastOpponents] =
-    coll
+    (coll
       .find(
         selectTour(tourId) ++ BSONDocument(
           "u" -> BSONDocument("$in" -> userIds)),
@@ -53,7 +53,7 @@ object PairingRepo {
           val acc1 = acc.contains(u1).fold(acc, acc.updated(u1, u2))
           acc.contains(u2).fold(acc1, acc1.updated(u2, u1))
       }
-    } map Pairing.LastOpponents.apply
+    }).map(Pairing.LastOpponents.apply)
 
   def opponentsOf(tourId: String, userId: String): Fu[Set[String]] =
     coll
@@ -114,8 +114,8 @@ object PairingRepo {
                  ))
       .map {
         _.documents.flatMap { doc =>
-          doc.getAs[String]("_id") flatMap { uid =>
-            doc.getAs[Int]("nb") map { uid -> _ }
+          doc.getAs[String]("_id").flatMap { uid =>
+            doc.getAs[Int]("nb").map { uid -> _ }
           }
         }.toMap
       }

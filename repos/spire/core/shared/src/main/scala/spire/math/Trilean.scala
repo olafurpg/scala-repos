@@ -171,5 +171,5 @@ class TrileanAlgebra extends Heyting[Trilean] {
   def complement(a: Trilean): Trilean = !a
   def and(a: Trilean, b: Trilean): Trilean = a & b
   def or(a: Trilean, b: Trilean): Trilean = a | b
-  def imp(a: Trilean, b: Trilean): Trilean = a imp b
+  def imp(a: Trilean, b: Trilean): Trilean = a.imp(b)
 }

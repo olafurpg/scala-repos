@@ -48,7 +48,7 @@ class RateLimitingFilter[Req, Rep](
   private[this] val refused = statsReceiver.counter("refused")
 
   def apply(request: Req, service: Service[Req, Rep]): Future[Rep] =
-    strategy(request) flatMap { isAuthorized =>
+    strategy(request).flatMap { isAuthorized =>
       if (isAuthorized) service(request)
       else {
         refused.incr()

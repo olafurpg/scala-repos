@@ -34,11 +34,11 @@ class DocParser(settings: nsc.Settings, reporter: Reporter)
     */
   def docDefs(code: String) = {
     def loop(enclosing: List[Tree], tree: Tree): List[Parsed] = tree match {
-      case x: PackageDef => x.stats flatMap (t => loop(enclosing :+ x, t))
+      case x: PackageDef => x.stats.flatMap(t => loop(enclosing :+ x, t))
       case x: DocDef =>
         new Parsed(enclosing, x) :: loop(enclosing :+ x.definition,
                                          x.definition)
-      case x => x.children flatMap (t => loop(enclosing, t))
+      case x => x.children.flatMap(t => loop(enclosing, t))
     }
     loop(Nil, docUnit(code))
   }
@@ -64,7 +64,7 @@ object DocParser {
   type Name = Global#Name
 
   class Parsed(val enclosing: List[Tree], val docDef: DocDef) {
-    def nameChain: List[Name] = (enclosing :+ docDef.definition) collect {
+    def nameChain: List[Name] = ((enclosing :+ docDef.definition)).collect {
       case x: DefTree => x.name
     }
     def raw: String = docDef.comment.raw

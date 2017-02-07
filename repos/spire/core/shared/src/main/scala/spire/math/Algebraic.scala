@@ -581,7 +581,7 @@ object Algebraic extends AlgebraicInstances {
   def roots(poly: Polynomial[Rational]): Vector[Algebraic] = {
     val zpoly = Roots.removeFractions(poly)
     val intervals = Roots.isolateRoots(zpoly)
-    intervals.zipWithIndex map {
+    intervals.zipWithIndex.map {
       case (Point(value), _) =>
         new Algebraic(Expr.ConstantRational(value))
       case (Bounded(lb, ub, _), i) =>
@@ -1218,7 +1218,7 @@ object Algebraic extends AlgebraicInstances {
 
   private implicit val JBigDecimalOrder: Order[JBigDecimal] =
     new Order[JBigDecimal] {
-      def compare(x: JBigDecimal, y: JBigDecimal): Int = x compareTo y
+      def compare(x: JBigDecimal, y: JBigDecimal): Int = x.compareTo(y)
     }
 
   /**
@@ -1312,7 +1312,7 @@ object Algebraic extends AlgebraicInstances {
                   .add(BigInteger.valueOf(5)),
                 scale + 1
               ))
-            val cmp = exact compare Algebraic(splitter)
+            val cmp = exact.compare(Algebraic(splitter))
             val roundUp = (mode: @unchecked) match {
               case HALF_DOWN => cmp > 0
               case HALF_UP => cmp >= 0
@@ -1644,13 +1644,13 @@ private[math] trait AlgebraicIsFieldWithNRoot
   def plus(a: Algebraic, b: Algebraic): Algebraic = a + b
   def negate(a: Algebraic): Algebraic = -a
   override def minus(a: Algebraic, b: Algebraic): Algebraic = a - b
-  override def pow(a: Algebraic, b: Int): Algebraic = a pow b
+  override def pow(a: Algebraic, b: Int): Algebraic = a.pow(b)
   override def times(a: Algebraic, b: Algebraic): Algebraic = a * b
   def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
   def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
   def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic])
   def div(a: Algebraic, b: Algebraic): Algebraic = a / b
-  def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
+  def nroot(a: Algebraic, k: Int): Algebraic = a.nroot(k)
   def fpow(a: Algebraic, b: Algebraic): Algebraic =
     throw new UnsupportedOperationException("unsupported operation")
   override def fromInt(n: Int): Algebraic = Algebraic(n)

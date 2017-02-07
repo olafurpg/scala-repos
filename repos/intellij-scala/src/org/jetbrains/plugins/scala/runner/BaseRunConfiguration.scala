@@ -40,7 +40,7 @@ abstract class BaseRunConfiguration(
     this.myConsoleArgs = ensureUsesJavaCpByDefault(s)
   var javaOptions = defaultJavaOptions
   var workingDirectory =
-    Option(getProject.getBaseDir) map (_.getPath) getOrElse ""
+    Option(getProject.getBaseDir).map(_.getPath).getOrElse("")
   def getModule: Module = getConfigurationModule.getModule
   def getValidModules: java.util.List[Module] =
     getProject.modulesWithScala.toList.asJava

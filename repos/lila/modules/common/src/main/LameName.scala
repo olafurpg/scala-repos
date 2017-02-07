@@ -4,16 +4,16 @@ object LameName {
 
   def apply(n: String) = {
     val name = n.toLowerCase
-    (lameUsernames exists name.contains) ||
-    (lamePrefixes exists name.startsWith) ||
-    (lameSuffixes exists name.endsWith)
+    (lameUsernames.exists(name.contains)) ||
+    (lamePrefixes.exists(name.startsWith)) ||
+    (lameSuffixes.exists(name.endsWith))
   }
 
   private val lamePrefixes =
-    "_" :: "-" :: (for {
+    ("_" :: "-" :: (for {
       title <- ("wg" :: "ncfigl".toList).map(_ + "m")
       sep <- List("-", "_")
-    } yield s"$title$sep") ::: (0 to 9).toList map (_.toString)
+    } yield s"$title$sep") ::: (0 to 9).toList).map(_.toString)
 
   private val lameSuffixes = List("-", "_")
 

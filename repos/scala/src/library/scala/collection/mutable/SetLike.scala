@@ -239,7 +239,7 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     case Include(_, x) => this += x
     case Remove(_, x) => this -= x
     case Reset() => clear()
-    case s: Script[_] => s.iterator foreach <<
+    case s: Script[_] => s.iterator.foreach(<<)
     case _ =>
       throw new UnsupportedOperationException(
         "message " + cmd + " not understood")

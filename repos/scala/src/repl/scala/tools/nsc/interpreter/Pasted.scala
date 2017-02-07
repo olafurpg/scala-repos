@@ -43,13 +43,13 @@ abstract class Pasted(prompt: String) {
   def running = isRunning
 
   private def matchesString(line: String, target: String): Boolean =
-    ((line startsWith target) ||
+    ((line.startsWith(target)) ||
       (line.nonEmpty && spacey(line.head) &&
         matchesString(line.tail, target)))
   private def stripString(line: String, target: String) =
     line indexOf target match {
       case -1 => line
-      case idx => line drop (idx + target.length)
+      case idx => line.drop(idx + target.length)
     }
   private var isRunning = false
   private val resReference = """(?<!^)(res\d+)""".r
@@ -57,15 +57,19 @@ abstract class Pasted(prompt: String) {
   private val resAssign = """^val (res\d+).*""".r
 
   private class PasteAnalyzer(val lines: List[String]) {
-    val referenced = lines flatMap
-      (resReference findAllIn _.trim.stripPrefix("res")) toSet
+    val referenced =
+      lines.flatMap(resReference findAllIn _.trim.stripPrefix("res")) toSet
     val ActualPromptString =
-      lines find matchesPrompt map
-        (s =>
-           if (matchesString(s, PromptString)) PromptString
-           else AltPromptString) getOrElse PromptString
-    val cmds = lines reduceLeft append split ActualPromptString filterNot
-      (_.trim == "") toList
+      (lines find matchesPrompt)
+        .map(
+          s =>
+            if (matchesString(s, PromptString)) PromptString
+            else AltPromptString)
+        .getOrElse(PromptString)
+    val cmds = lines
+      .reduceLeft(append)
+      .split(ActualPromptString)
+      .filterNot(_.trim == "") toList
 
     /** If it's a prompt or continuation line, strip the formatting bits and
       *  assemble the code.  Otherwise ship it off to be analyzed for res references
@@ -97,7 +101,7 @@ abstract class Pasted(prompt: String) {
         code.lastIndexOf(ActualPromptString) match {
           case -1 => code
           case idx =>
-            val (str1, str2) = code splitAt (idx + ActualPromptString.length)
+            val (str1, str2) = code.splitAt(idx + ActualPromptString.length)
             str2 match {
               case resAssign(`resName`) => code
               case _ => "%sval %s = { %s }".format(str1, resName, str2)

@@ -174,11 +174,11 @@ sealed case class Reporter(client: Scribe[Future],
     var se =
       new ServiceException(serviceName, e, Time.now, Trace.id.traceId.toLong)
 
-    sourceAddress foreach { sa =>
-      se = se withSource sa
+    sourceAddress.foreach { sa =>
+      se = se.withSource(sa)
     }
-    clientAddress foreach { ca =>
-      se = se withClient ca
+    clientAddress.foreach { ca =>
+      se = se.withClient(ca)
     }
 
     LogEntry(Reporter.scribeCategory,
@@ -192,12 +192,16 @@ sealed case class Reporter(client: Scribe[Future],
     * implications.
     */
   def handle(t: Throwable): Boolean = {
-    client.log(createEntry(t) :: Nil) onSuccess {
-      case ResultCode.Ok => okCounter.incr()
-      case ResultCode.TryLater => tryLaterCounter.incr()
-    } onFailure {
-      case e => statsReceiver.counter("report_exception_" + e.toString).incr()
-    }
+    client
+      .log(createEntry(t) :: Nil)
+      .onSuccess {
+        case ResultCode.Ok => okCounter.incr()
+        case ResultCode.TryLater => tryLaterCounter.incr()
+      }
+      .onFailure {
+        case e =>
+          statsReceiver.counter("report_exception_" + e.toString).incr()
+      }
 
     false // did not actually handle
   }

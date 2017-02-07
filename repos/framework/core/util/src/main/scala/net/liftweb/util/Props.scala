@@ -66,14 +66,14 @@ private[util] trait Props extends Logger {
   def getInt(name: String): Box[Int] =
     get(name).map(toInt) // toInt(props.get(name))
   def getInt(name: String, defVal: Int): Int =
-    getInt(name) openOr defVal // props.get(name).map(toInt(_)) getOrElse defVal
+    getInt(name).openOr(defVal) // props.get(name).map(toInt(_)) getOrElse defVal
   def getLong(name: String): Box[Long] = get(name).flatMap(asLong)
   def getLong(name: String, defVal: Long): Long =
-    getLong(name) openOr defVal // props.get(name).map(toLong(_)) getOrElse defVal
+    getLong(name).openOr(defVal) // props.get(name).map(toLong(_)) getOrElse defVal
   def getBool(name: String): Box[Boolean] = get(name).map(toBoolean)
   def getBool(name: String, defVal: Boolean): Boolean =
-    getBool(name) openOr defVal // props.get(name).map(toBoolean(_)) getOrElse defVal
-  def get(name: String, defVal: String): String = get(name) getOrElse defVal
+    getBool(name).openOr(defVal) // props.get(name).map(toBoolean(_)) getOrElse defVal
+  def get(name: String, defVal: String): String = get(name).getOrElse(defVal)
 
   /**
     * Determine whether the specified properties exist.
@@ -428,7 +428,7 @@ private[util] trait Props extends Logger {
   private[this] var providersAccumulator: Option[List[PropProvider]] = None
 
   private[this] def providers = {
-    providersAccumulator getOrElse {
+    providersAccumulator.getOrElse {
       val baseProviders = List(props)
       providersAccumulator = Some(baseProviders)
 

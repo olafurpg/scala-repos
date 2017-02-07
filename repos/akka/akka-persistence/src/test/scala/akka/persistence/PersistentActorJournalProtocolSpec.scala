@@ -49,7 +49,7 @@ akka.persistence.snapshot-store.plugin = "akka.persistence.no-snapshot-store"
     def receiveRecover = {
       case x ⇒ monitor ! x
     }
-    def receiveCommand = behavior orElse {
+    def receiveCommand = behavior.orElse {
       case m: Multi ⇒ m.cmd.foreach(behavior)
     }
 
@@ -88,7 +88,7 @@ class JournalProbe(implicit private val system: ExtendedActorSystem)
 class JournalPuppet extends Actor {
   val ref = JournalPuppet(context.system).ref
   def receive = {
-    case x ⇒ ref forward x
+    case x ⇒ ref.forward(x)
   }
 }
 
@@ -226,7 +226,7 @@ class PersistentActorJournalProtocolSpec
         val w0 = expectWrite(subject, Msgs("a" +: commands(20, 30): _*))
         journal.expectNoMsg(300.millis)
         confirm(w0)
-        (1 to 11) foreach (x ⇒ expectMsg(Done(-1, x)))
+        ((1 to 11)).foreach(x ⇒ expectMsg(Done(-1, x)))
         val w1 = expectWrite(subject, msgs(0, 20): _*)
         journal.expectNoMsg(300.millis)
         confirm(w1)

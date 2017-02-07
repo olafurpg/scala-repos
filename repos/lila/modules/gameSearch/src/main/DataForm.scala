@@ -49,7 +49,7 @@ private[gameSearch] final class DataForm {
             "field" -> stringIn(Sorting.fields),
             "order" -> stringIn(Sorting.orders)
           )(SearchSort.apply)(SearchSort.unapply))
-      )(SearchData.apply)(SearchData.unapply)) fill SearchData()
+      )(SearchData.apply)(SearchData.unapply)).fill(SearchData())
 }
 
 private[gameSearch] object DataForm {
@@ -92,17 +92,17 @@ private[gameSearch] case class SearchData(players: SearchPlayer =
       winnerColor = winnerColor,
       perf = perf,
       source = source,
-      rated = mode flatMap Mode.apply map (_.rated),
+      rated = mode.flatMap(Mode.apply).map(_.rated),
       turns = Range(turnsMin, turnsMax),
       averageRating = Range(ratingMin, ratingMax),
-      hasAi = hasAi map (_ == 1),
+      hasAi = hasAi.map(_ == 1),
       aiLevel = Range(aiLevelMin, aiLevelMax),
       duration = Range(durationMin, durationMax),
       clock =
         Clocking(clock.initMin, clock.initMax, clock.incMin, clock.incMax),
-      date = Range(dateMin flatMap toDate, dateMax flatMap toDate),
+      date = Range(dateMin.flatMap(toDate), dateMax.flatMap(toDate)),
       status = status,
-      analysed = analysed map (_ == 1),
+      analysed = analysed.map(_ == 1),
       whiteUser = players.cleanWhite,
       blackUser = players.cleanBlack,
       sorting = Sorting(sortOrDefault.field, sortOrDefault.order)
@@ -113,11 +113,11 @@ private[gameSearch] case class SearchData(players: SearchPlayer =
   import DataForm.DateDelta
 
   private def toDate(delta: String): Option[DateTime] = delta match {
-    case DateDelta(n, "h") => parseIntOption(n) map DateTime.now.minusHours
-    case DateDelta(n, "d") => parseIntOption(n) map DateTime.now.minusDays
-    case DateDelta(n, "w") => parseIntOption(n) map DateTime.now.minusWeeks
-    case DateDelta(n, "m") => parseIntOption(n) map DateTime.now.minusMonths
-    case DateDelta(n, "y") => parseIntOption(n) map DateTime.now.minusYears
+    case DateDelta(n, "h") => parseIntOption(n).map(DateTime.now.minusHours)
+    case DateDelta(n, "d") => parseIntOption(n).map(DateTime.now.minusDays)
+    case DateDelta(n, "w") => parseIntOption(n).map(DateTime.now.minusWeeks)
+    case DateDelta(n, "m") => parseIntOption(n).map(DateTime.now.minusMonths)
+    case DateDelta(n, "y") => parseIntOption(n).map(DateTime.now.minusYears)
     case _ => None
   }
   private val dateConstraint =
@@ -139,7 +139,7 @@ private[gameSearch] case class SearchPlayer(a: Option[String] = None,
   private def oneOf(s: Option[String]) =
     clean(s).filter(List(cleanA, cleanB).flatten.contains)
   private def clean(s: Option[String]) =
-    s map (_.trim.toLowerCase) filter (_.nonEmpty)
+    s.map(_.trim.toLowerCase).filter(_.nonEmpty)
 }
 
 private[gameSearch] case class SearchSort(

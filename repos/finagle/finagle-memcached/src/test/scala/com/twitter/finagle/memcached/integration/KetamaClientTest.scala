@@ -123,7 +123,7 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
       .build()
 
     val futureResult =
-      Future.value(true) flatMap { _ =>
+      Future.value(true).flatMap { _ =>
         client.get("foo")
       }
 

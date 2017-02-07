@@ -163,7 +163,7 @@ object Dimension {
                  PieceRole,
                  MyCastling,
                  OpCastling)
-  val byKey = all map { p =>
+  val byKey = all.map { p =>
     (p.key, p)
   } toMap
 
@@ -188,23 +188,23 @@ object Dimension {
   }
 
   def valueByKey[X](d: Dimension[X], key: String): Option[X] = d match {
-    case Perf => PerfType.byKey get key
-    case Phase => parseIntOption(key) flatMap lila.insight.Phase.byId.get
-    case Result => parseIntOption(key) flatMap lila.insight.Result.byId.get
+    case Perf => PerfType.byKey.get(key)
+    case Phase => parseIntOption(key).flatMap(lila.insight.Phase.byId.get)
+    case Result => parseIntOption(key).flatMap(lila.insight.Result.byId.get)
     case Termination =>
-      parseIntOption(key) flatMap lila.insight.Termination.byId.get
+      parseIntOption(key).flatMap(lila.insight.Termination.byId.get)
     case Color => chess.Color(key)
-    case Opening => EcopeningDB.allByEco get key
+    case Opening => EcopeningDB.allByEco.get(key)
     case OpponentStrength =>
-      parseIntOption(key) flatMap RelativeStrength.byId.get
+      parseIntOption(key).flatMap(RelativeStrength.byId.get)
     case PieceRole => chess.Role.all.find(_.name == key)
     case MovetimeRange =>
-      parseIntOption(key) flatMap lila.insight.MovetimeRange.byId.get
+      parseIntOption(key).flatMap(lila.insight.MovetimeRange.byId.get)
     case MyCastling | OpCastling =>
-      parseIntOption(key) flatMap lila.insight.Castling.byId.get
+      parseIntOption(key).flatMap(lila.insight.Castling.byId.get)
     case QueenTrade => lila.insight.QueenTrade(key == "true").some
     case MaterialRange =>
-      parseIntOption(key) flatMap lila.insight.MaterialRange.byId.get
+      parseIntOption(key).flatMap(lila.insight.MaterialRange.byId.get)
   }
 
   def valueToJson[X](d: Dimension[X])(v: X): play.api.libs.json.JsObject = {
@@ -238,7 +238,7 @@ object Dimension {
               d.dbKey -> BSONDocument("$in" -> xs.flatMap(_.tenths.list)))
         }
       case _ =>
-        selected map d.bson.write match {
+        selected.map(d.bson.write) match {
           case Nil => BSONDocument()
           case List(x) => BSONDocument(d.dbKey -> x)
           case xs =>

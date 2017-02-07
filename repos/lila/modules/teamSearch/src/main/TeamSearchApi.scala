@@ -11,11 +11,11 @@ final class TeamSearchApi(client: ESClient,
     extends SearchReadApi[Team, Query] {
 
   def search(query: Query, from: From, size: Size) =
-    client.search(query, from, size) flatMap { res =>
+    client.search(query, from, size).flatMap { res =>
       fetcher(res.ids)
     }
 
-  def count(query: Query) = client.count(query) map (_.count)
+  def count(query: Query) = client.count(query).map(_.count)
 
   def store(team: Team) = client.store(Id(team.id), toDoc(team))
 
@@ -34,7 +34,7 @@ final class TeamSearchApi(client: ESClient,
         $enumerate.bulk[Option[Team]](
           $query[Team](Json.obj("enabled" -> true)),
           300) { teamOptions =>
-          c.storeBulk(teamOptions.flatten map (t => Id(t.id) -> toDoc(t)))
+          c.storeBulk(teamOptions.flatten.map(t => Id(t.id) -> toDoc(t)))
         }
       }
     case _ => funit

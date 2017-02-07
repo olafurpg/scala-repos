@@ -16,8 +16,8 @@ object ScriptCommands {
             VersionUtil.baseVersionSuffix in Global := "SHA-SNAPSHOT",
             // Append build.timestamp to Artifactory URL to get consistent build numbers (see https://github.com/sbt/sbt/issues/2088):
             publishTo in Global :=
-              Some("scala-pr" at url.replaceAll("/$", "") +
-                ";build.timestamp=" + System.currentTimeMillis),
+              Some("scala-pr".at(url.replaceAll("/$", "") +
+                ";build.timestamp=" + System.currentTimeMillis)),
             publishArtifact in (Compile, packageDoc) in ThisBuild := false,
             scalacOptions in Compile in ThisBuild += "-optimise"
           ),

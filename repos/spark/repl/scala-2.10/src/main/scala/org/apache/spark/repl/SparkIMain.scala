@@ -183,9 +183,9 @@ class SparkIMain(initialSettings: Settings,
 
   private lazy val repllog: Logger = new Logger {
     val out: JPrintWriter = imain.out
-    val isInfo: Boolean = BooleanProp keyExists "scala.repl.info"
-    val isDebug: Boolean = BooleanProp keyExists "scala.repl.debug"
-    val isTrace: Boolean = BooleanProp keyExists "scala.repl.trace"
+    val isInfo: Boolean = BooleanProp.keyExists("scala.repl.info")
+    val isDebug: Boolean = BooleanProp.keyExists("scala.repl.debug")
+    val isTrace: Boolean = BooleanProp.keyExists("scala.repl.trace")
   }
   private[repl] lazy val formatting: Formatting = new Formatting {
     val prompt = Properties.shellPromptString
@@ -215,7 +215,7 @@ class SparkIMain(initialSettings: Settings,
   private def _initialize() = {
     try {
       // todo. if this crashes, REPL will hang
-      new _compiler.Run() compileSources _initSources
+      new _compiler.Run().compileSources(_initSources)
       _initializeComplete = true
       true
     } catch AbstractOrMissingHandler()
@@ -519,7 +519,7 @@ class SparkIMain(initialSettings: Settings,
       super.findAbstractFile(name) match {
         // deadlocks on startup if we try to translate names too early
         case null if isInitializeComplete =>
-          generatedName(name) map (x => super.findAbstractFile(x)) orNull
+          generatedName(name).map(x => super.findAbstractFile(x)) orNull
         case file =>
           file
       }
@@ -527,7 +527,7 @@ class SparkIMain(initialSettings: Settings,
   }
   private def makeClassLoader(): AbstractFileClassLoader =
     new TranslatingClassLoader(parentClassLoader match {
-      case null => ScalaClassLoader fromURLs compilerClasspath
+      case null => ScalaClassLoader.fromURLs(compilerClasspath)
       case p =>
         _runtimeClassLoader = new URLClassLoader(compilerClasspath, p)
         with ExposeAddUrl
@@ -556,16 +556,16 @@ class SparkIMain(initialSettings: Settings,
     */
   @DeveloperApi
   def generatedName(simpleName: String): Option[String] = {
-    if (simpleName endsWith nme.MODULE_SUFFIX_STRING)
-      optFlatName(simpleName.init) map (_ + nme.MODULE_SUFFIX_STRING)
+    if (simpleName.endsWith(nme.MODULE_SUFFIX_STRING))
+      optFlatName(simpleName.init).map(_ + nme.MODULE_SUFFIX_STRING)
     else optFlatName(simpleName)
   }
 
   // NOTE: Exposed to repl package since used by SparkILoop
-  private[repl] def flatName(id: String) = optFlatName(id) getOrElse id
+  private[repl] def flatName(id: String) = optFlatName(id).getOrElse(id)
   // NOTE: Exposed to repl package since used by SparkILoop
   private[repl] def optFlatName(id: String) =
-    requestForIdent(id) map (_ fullFlatName id)
+    requestForIdent(id).map(_.fullFlatName(id))
 
   /**
     * Retrieves all simple names contained in the current instance.
@@ -590,14 +590,14 @@ class SparkIMain(initialSettings: Settings,
     */
   @DeveloperApi
   def pathToName(name: Name): String = {
-    if (definedNameMap contains name) definedNameMap(name) fullPath name
+    if (definedNameMap contains name) definedNameMap(name).fullPath(name)
     else name.toString
   }
 
   /** Most recent tree handled which wasn't wholly synthetic. */
   private def mostRecentlyHandledTree: Option[Tree] = {
-    prevRequests.reverse foreach { req =>
-      req.handlers.reverse foreach {
+    prevRequests.reverse.foreach { req =>
+      req.handlers.reverse.foreach {
         case x: MemberDefHandler
             if x.definesValue && !isInternalTermName(x.name) =>
           return Some(x.member)
@@ -619,7 +619,7 @@ class SparkIMain(initialSettings: Settings,
   private def handleTermRedefinition(name: TermName,
                                      old: Request,
                                      req: Request) = {
-    for (t1 <- old.compilerTypeOf get name; t2 <- req.compilerTypeOf get name) {
+    for (t1 <- old.compilerTypeOf.get(name); t2 <- req.compilerTypeOf.get(name)) {
       //    Printing the types here has a tendency to cause assertion errors, like
       //   assertion failed: fatal: <refinement> has owner value x, but a class owner is required
       // so DBG is by-name now to keep it in the family.  (It also traps the assertion error,
@@ -632,18 +632,18 @@ class SparkIMain(initialSettings: Settings,
     if (req == null || referencedNameMap == null) return
 
     prevRequests += req
-    req.referencedNames foreach (x => referencedNameMap(x) = req)
+    req.referencedNames.foreach(x => referencedNameMap(x) = req)
 
     // warning about serially defining companions.  It'd be easy
     // enough to just redefine them together but that may not always
     // be what people want so I'm waiting until I can do it better.
     for {
-      name <- req.definedNames filterNot
-        (x => req.definedNames contains x.companionName)
-      oldReq <- definedNameMap get name.companionName
-      newSym <- req.definedSymbols get name
-      oldSym <- oldReq.definedSymbols get name.companionName
-      if Seq(oldSym, newSym).permutations exists {
+      name <- req.definedNames.filterNot(x =>
+        req.definedNames contains x.companionName)
+      oldReq <- definedNameMap.get(name.companionName)
+      newSym <- req.definedSymbols.get(name)
+      oldSym <- oldReq.definedSymbols.get(name.companionName)
+      if Seq(oldSym, newSym).permutations.exists {
         case Seq(s1, s2) => s1.isClass && s2.isModule
       }
     } {
@@ -654,7 +654,7 @@ class SparkIMain(initialSettings: Settings,
     }
 
     // Updating the defined name map
-    req.definedNames foreach { name =>
+    req.definedNames.foreach { name =>
       if (definedNameMap contains name) {
         if (name.isTypeName)
           handleTypeRedefinition(name.toTypeName, definedNameMap(name), req)
@@ -684,7 +684,7 @@ class SparkIMain(initialSettings: Settings,
   private def compileSourcesKeepingRun(sources: SourceFile*) = {
     val run = new Run()
     reporter.reset()
-    run compileSources sources.toList
+    run.compileSources(sources.toList)
     (!reporter.hasErrors, run)
   }
 
@@ -723,12 +723,11 @@ class SparkIMain(initialSettings: Settings,
   // enclosing in braces it is constructed like "val x =\n5 // foo".
   private def removeComments(line: String): String = {
     showCodeIfDebugging(line) // as we're about to lose our // show
-    line.lines map
-      (s =>
-         s indexOf "//" match {
-           case -1 => s
-           case idx => s take idx
-         }) mkString "\n"
+    line.lines.map(s =>
+      s indexOf "//" match {
+        case -1 => s
+        case idx => s.take(idx)
+    }) mkString "\n"
   }
 
   private def safePos(t: Tree, alt: Int): Int =
@@ -741,7 +740,7 @@ class SparkIMain(initialSettings: Settings,
   // at a '*'.  So look at each subtree and find the earliest of all positions.
   private def earliestPosition(tree: Tree): Int = {
     var pos = Int.MaxValue
-    tree foreach { t =>
+    tree.foreach { t =>
       pos = math.min(pos, safePos(t, Int.MaxValue))
     }
     pos
@@ -757,19 +756,18 @@ class SparkIMain(initialSettings: Settings,
       case Some(trees) => trees
     }
     logDebug(
-      trees map
-        (t => {
-           // [Eugene to Paul] previously it just said `t map ...`
-           // because there was an implicit conversion from Tree to a list of Trees
-           // however Martin and I have removed the conversion
-           // (it was conflicting with the new reflection API),
-           // so I had to rewrite this a bit
-           val subs = t collect { case sub => sub }
-           subs map
-             (t0 =>
-                "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                  "\n") mkString ""
-         }) mkString "\n"
+      trees.map(t => {
+        // [Eugene to Paul] previously it just said `t map ...`
+        // because there was an implicit conversion from Tree to a list of Trees
+        // however Martin and I have removed the conversion
+        // (it was conflicting with the new reflection API),
+        // so I had to rewrite this a bit
+        val subs = t.collect { case sub => sub }
+        subs.map(
+          t0 =>
+            "  " + safePos(t0, -1) + ": " + t0.shortClass +
+            "\n") mkString ""
+      }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
     // AST node position and snap the line off there.  Rewrite the code embodied
@@ -793,15 +791,15 @@ class SparkIMain(initialSettings: Settings,
             // with increasingly hard to decipher positions as we move on to "() => 5",
             // (x: Int) => x + 1, and more.  So I abandon attempts to finesse and just
             // look for semicolons and newlines, which I'm sure is also buggy.
-            val (raw1, raw2) = content splitAt lastpos0
+            val (raw1, raw2) = content.splitAt(lastpos0)
             logDebug("[raw] " + raw1 + "   <--->   " + raw2)
 
-            val adjustment = (raw1.reverse takeWhile
-              (ch => (ch != ';') && (ch != '\n'))).size
+            val adjustment =
+              (raw1.reverse.takeWhile(ch => (ch != ';') && (ch != '\n'))).size
             val lastpos = lastpos0 - adjustment
 
             // the source code split at the laboriously determined position.
-            val (l1, l2) = content splitAt lastpos
+            val (l1, l2) = content.splitAt(lastpos)
             logDebug("[adj] " + l1 + "   <--->   " + l2)
 
             val prefix = if (l1.trim == "") "" else l1 + ";\n"
@@ -813,7 +811,7 @@ class SparkIMain(initialSettings: Settings,
               List("    line" -> line,
                    " content" -> content,
                    "     was" -> l2,
-                   "combined" -> combined) map {
+                   "combined" -> combined).map {
                 case (label, s) => label + ": '" + s + "'"
               } mkString "\n")
             combined
@@ -876,9 +874,10 @@ class SparkIMain(initialSettings: Settings,
         *  output checking, we have to take one off to balance.
         */
       if (succeeded) {
-        if (printResults && result != "") printMessage(result stripSuffix "\n")
+        if (printResults && result != "")
+          printMessage(result.stripSuffix("\n"))
         else if (isReplDebug) // show quiet-mode activity
-          printMessage(result.trim.lines map ("[quiet] " + _) mkString "\n")
+          printMessage(result.trim.lines.map("[quiet] " + _) mkString "\n")
 
         // Book-keeping.  Have to record synthetic requests too,
         // as they may have been issued for information, e.g. :type
@@ -939,7 +938,7 @@ class SparkIMain(initialSettings: Settings,
 
       case Right(_) =>
         val line = "%sval %s = %s.value"
-          .format(modifiers map (_ + " ") mkString, name, bindRep.evalPath)
+          .format(modifiers.map(_ + " ") mkString, name, bindRep.evalPath)
         logDebug("Interpreting: " + line)
         interpret(line)
     }
@@ -980,7 +979,7 @@ class SparkIMain(initialSettings: Settings,
   @DeveloperApi
   def rebind(p: NamedParam): IR.Result = {
     val name = p.name
-    val oldType = typeOfTerm(name) orElse { return IR.Error }
+    val oldType = typeOfTerm(name).orElse { return IR.Error }
     val newType = p.tpe
     val tempName = freshInternalVarName()
 
@@ -1158,7 +1157,7 @@ class SparkIMain(initialSettings: Settings,
 
       val readRoot =
         rootMirror.getClassByName(newTypeName(readPath)) // the outermost wrapper
-      (accessPath split '.').foldLeft(readRoot: Symbol) {
+      (accessPath.split('.')).foldLeft(readRoot: Symbol) {
         case (sym, "") => sym
         case (sym, name) => afterTyper(termMember(sym, name))
       }
@@ -1173,7 +1172,7 @@ class SparkIMain(initialSettings: Settings,
           case Nil => Nil
           case ((pos, msg)) :: rest =>
             val filtered =
-              rest filter {
+              rest.filter {
                 case (pos0, msg0) =>
                   (msg != msg0) ||
                     (pos.lineContent.trim != pos0.lineContent.trim) || {
@@ -1192,7 +1191,7 @@ class SparkIMain(initialSettings: Settings,
       //   mostRecentWarnings = warnings
     }
     private def evalMethod(name: String) =
-      evalClass.getMethods filter (_.getName == name) match {
+      evalClass.getMethods.filter(_.getName == name) match {
         case Array(method) => method
         case xs =>
           sys.error(
@@ -1221,20 +1220,20 @@ class SparkIMain(initialSettings: Settings,
 
     /** handlers for each tree in this request */
     val handlers: List[MemberHandler] =
-      trees map (memberHandlers chooseHandler _)
-    def defHandlers = handlers collect { case x: MemberDefHandler => x }
+      trees.map(memberHandlers.chooseHandler(_))
+    def defHandlers = handlers.collect { case x: MemberDefHandler => x }
 
     /** all (public) names defined by these statements */
-    val definedNames = handlers flatMap (_.definedNames)
+    val definedNames = handlers.flatMap(_.definedNames)
 
     /** list of names used by this expression */
-    val referencedNames: List[Name] = handlers flatMap (_.referencedNames)
+    val referencedNames: List[Name] = handlers.flatMap(_.referencedNames)
 
     /** def and val names */
-    def termNames = handlers flatMap (_.definesTerm)
-    def typeNames = handlers flatMap (_.definesType)
-    def definedOrImported = handlers flatMap (_.definedOrImported)
-    def definedSymbolList = defHandlers flatMap (_.definedSymbols)
+    def termNames = handlers.flatMap(_.definesTerm)
+    def typeNames = handlers.flatMap(_.definesType)
+    def definedOrImported = handlers.flatMap(_.definedOrImported)
+    def definedSymbolList = defHandlers.flatMap(_.definedSymbols)
 
     def definedTypeSymbol(name: String) = definedSymbols(newTypeName(name))
     def definedTermSymbol(name: String) = definedSymbols(newTermName(name))
@@ -1307,7 +1306,7 @@ class SparkIMain(initialSettings: Settings,
       val postamble =
         importsTrailer + "\n}" + "\n" + "object " + lineRep.readName + " {\n" +
           "  val INSTANCE = new " + lineRep.readName + "();\n" + "}\n"
-      val generate = (m: MemberHandler) => m extraCodeToEvaluate Request.this
+      val generate = (m: MemberHandler) => m.extraCodeToEvaluate(Request.this)
 
       /*
       val preamble = """
@@ -1354,16 +1353,16 @@ class SparkIMain(initialSettings: Settings,
       |  }
       |}
       """.stripMargin
-      val generate = (m: MemberHandler) => m resultExtractionCode Request.this
+      val generate = (m: MemberHandler) => m.resultExtractionCode(Request.this)
     }
 
     // get it
-    def getEvalTyped[T]: Option[T] = getEval map (_.asInstanceOf[T])
+    def getEvalTyped[T]: Option[T] = getEval.map(_.asInstanceOf[T])
     def getEval: Option[AnyRef] = {
       // ensure it has been compiled
       compile
       // try to load it and call the value method
-      lineRep.evalValue filterNot (_ == null)
+      lineRep.evalValue.filterNot(_ == null)
     }
 
     /** Compile the object file.  Returns whether the compilation succeeded.
@@ -1380,16 +1379,16 @@ class SparkIMain(initialSettings: Settings,
 
         // Assign symbols to the original trees
         // TODO - just use the new trees.
-        defHandlers foreach { dh =>
+        defHandlers.foreach { dh =>
           val name = dh.member.name
-          definedSymbols get name foreach { sym =>
-            dh.member setSymbol sym
+          definedSymbols.get(name).foreach { sym =>
+            dh.member.setSymbol(sym)
             logDebug("Set symbol of " + name + " to " + sym.defString)
           }
         }
 
         // compile the result-extraction object
-        withoutWarnings(lineRep compile ResultObjectSourceCode(handlers))
+        withoutWarnings(lineRep.compile(ResultObjectSourceCode(handlers)))
       }
     }
 
@@ -1401,14 +1400,14 @@ class SparkIMain(initialSettings: Settings,
     def lookupTypeOf(name: Name) =
       typeOf.getOrElse(name, typeOf(global.encode(name.toString)))
     def simpleNameOfType(name: TypeName) =
-      (compilerTypeOf get name) map (_.typeSymbol.simpleName)
+      (compilerTypeOf.get(name)).map(_.typeSymbol.simpleName)
 
     private def typeMap[T](f: Type => T) =
       mapFrom[Name, Name, T](termNames ++ typeNames)(x =>
         f(cleanMemberDecl(resultSymbol, x)))
 
     /** Types of variables defined by this request. */
-    lazy val compilerTypeOf = typeMap[Type](x => x) withDefaultValue NoType
+    lazy val compilerTypeOf = typeMap[Type](x => x).withDefaultValue(NoType)
 
     /** String representations of same. */
     lazy val typeOf = typeMap[String](tp => afterTyper(tp.toString))
@@ -1419,14 +1418,15 @@ class SparkIMain(initialSettings: Settings,
     lazy val definedSymbols =
       (termNames.map(x => x -> applyToResultMember(x, x => x)) ++ typeNames
         .map(x => x -> compilerTypeOf(x).typeSymbolDirect))
-        .toMap[Name, Symbol] withDefaultValue NoSymbol
+        .toMap[Name, Symbol]
+        .withDefaultValue(NoSymbol)
 
     lazy val typesOfDefinedTerms =
       mapFrom[Name, Name, Type](termNames)(x => applyToResultMember(x, _.tpe))
 
     /** load and run the code using reflection */
     def loadAndRun: (String, Boolean) = {
-      try { ("" + (lineRep call sessionNames.print), true) } catch {
+      try { ("" + (lineRep.call(sessionNames.print)), true) } catch {
         case ex: Throwable => (lineRep.bindError(ex), false)
       }
     }
@@ -1464,7 +1464,7 @@ class SparkIMain(initialSettings: Settings,
   def lastWarnings = mostRecentWarnings
 
   def treesForRequestId(id: Int): List[Tree] =
-    requestForReqId(id).toList flatMap (_.trees)
+    requestForReqId(id).toList.flatMap(_.trees)
 
   def requestForReqId(id: Int): Option[Request] =
     if (executingRequest != null && executingRequest.reqId == id)
@@ -1473,17 +1473,17 @@ class SparkIMain(initialSettings: Settings,
 
   def requestForName(name: Name): Option[Request] = {
     assert(definedNameMap != null, "definedNameMap is null")
-    definedNameMap get name
+    definedNameMap.get(name)
   }
 
   def requestForIdent(line: String): Option[Request] =
-    requestForName(newTermName(line)) orElse requestForName(newTypeName(line))
+    requestForName(newTermName(line)).orElse(requestForName(newTypeName(line)))
 
   def requestHistoryForName(name: Name): List[Request] =
-    prevRequests.toList.reverse filter (_.definedNames contains name)
+    prevRequests.toList.reverse.filter(_.definedNames contains name)
 
   def definitionForName(name: Name): Option[MemberHandler] =
-    requestForName(name) flatMap { req =>
+    requestForName(name).flatMap { req =>
       req.handlers find (_.definedNames contains name)
     }
 
@@ -1498,7 +1498,7 @@ class SparkIMain(initialSettings: Settings,
     */
   @DeveloperApi
   def valueOfTerm(id: String): Option[AnyRef] =
-    requestForName(newTermName(id)) flatMap (_.getEval)
+    requestForName(newTermName(id)).flatMap(_.getEval)
 
   /**
     * Retrieves the class representing the id (variable name, method name,
@@ -1511,7 +1511,7 @@ class SparkIMain(initialSettings: Settings,
     */
   @DeveloperApi
   def classOfTerm(id: String): Option[JClass] =
-    valueOfTerm(id) map (_.getClass)
+    valueOfTerm(id).map(_.getClass)
 
   /**
     * Retrieves the type representing the id (variable name, method name,
@@ -1525,7 +1525,8 @@ class SparkIMain(initialSettings: Settings,
   @DeveloperApi
   def typeOfTerm(id: String): Type = newTermName(id) match {
     case nme.ROOTPKG => RootClass.tpe
-    case name => requestForName(name).fold(NoType: Type)(_ compilerTypeOf name)
+    case name =>
+      requestForName(name).fold(NoType: Type)(_.compilerTypeOf(name))
   }
 
   /**
@@ -1559,9 +1560,9 @@ class SparkIMain(initialSettings: Settings,
     */
   @DeveloperApi
   def runtimeClassAndTypeOfTerm(id: String): Option[(JClass, Type)] = {
-    classOfTerm(id) flatMap { clazz =>
-      new RichClass(clazz).supers find
-        (c => !(new RichClass(c).isScalaAnonymous)) map { nonAnon =>
+    classOfTerm(id).flatMap { clazz =>
+      (new RichClass(clazz).supers find
+        (c => !(new RichClass(c).isScalaAnonymous))).map { nonAnon =>
         (nonAnon, runtimeTypeOfTerm(id))
       }
     }
@@ -1578,13 +1579,13 @@ class SparkIMain(initialSettings: Settings,
     */
   @DeveloperApi
   def runtimeTypeOfTerm(id: String): Type = {
-    typeOfTerm(id) andAlso { tpe =>
-      val clazz = classOfTerm(id) getOrElse { return NoType }
+    typeOfTerm(id).andAlso { tpe =>
+      val clazz = classOfTerm(id).getOrElse { return NoType }
       val staticSym = tpe.typeSymbol
       val runtimeSym = getClassIfDefined(clazz.getName)
 
       if ((runtimeSym != NoSymbol) && (runtimeSym != staticSym) &&
-          (runtimeSym isSubClass staticSym)) runtimeSym.info
+          (runtimeSym.isSubClass(staticSym))) runtimeSym.info
       else NoType
     }
   }
@@ -1638,10 +1639,10 @@ class SparkIMain(initialSettings: Settings,
   def typeOfExpression(expr: String, silent: Boolean = true): Type =
     exprTyper.typeOfExpression(expr, silent)
 
-  protected def onlyTerms(xs: List[Name]) = xs collect {
+  protected def onlyTerms(xs: List[Name]) = xs.collect {
     case x: TermName => x
   }
-  protected def onlyTypes(xs: List[Name]) = xs collect {
+  protected def onlyTypes(xs: List[Name]) = xs.collect {
     case x: TypeName => x
   }
 
@@ -1651,7 +1652,7 @@ class SparkIMain(initialSettings: Settings,
     * @return The list of matching "term" names
     */
   @DeveloperApi
-  def definedTerms = onlyTerms(allDefinedNames) filterNot isInternalTermName
+  def definedTerms = onlyTerms(allDefinedNames).filterNot(isInternalTermName)
 
   /**
     * Retrieves the defined type names in the compiler.
@@ -1677,8 +1678,9 @@ class SparkIMain(initialSettings: Settings,
     */
   @DeveloperApi
   def definedSymbolList =
-    prevRequestList flatMap (_.definedSymbolList) filterNot
-      (s => isInternalTermName(s.name))
+    prevRequestList
+      .flatMap(_.definedSymbolList)
+      .filterNot(s => isInternalTermName(s.name))
 
   // Terms with user-given names (i.e. not res0 and not synthetic)
 
@@ -1689,24 +1691,23 @@ class SparkIMain(initialSettings: Settings,
     */
   @DeveloperApi
   def namedDefinedTerms =
-    definedTerms filterNot
-      (x => isUserVarName("" + x) || directlyBoundNames(x))
+    definedTerms.filterNot(x => isUserVarName("" + x) || directlyBoundNames(x))
 
   private def findName(name: Name) =
-    definedSymbols find (_.name == name) getOrElse NoSymbol
+    (definedSymbols find (_.name == name)).getOrElse(NoSymbol)
 
   /** Translate a repl-defined identifier into a Symbol.
     */
   private def apply(name: String): Symbol =
-    types(name) orElse terms(name)
+    types(name).orElse(terms(name))
 
   private def types(name: String): Symbol = {
     val tpname = newTypeName(name)
-    findName(tpname) orElse getClassIfDefined(tpname)
+    findName(tpname).orElse(getClassIfDefined(tpname))
   }
   private def terms(name: String): Symbol = {
     val termname = newTypeName(name)
-    findName(termname) orElse getModuleIfDefined(termname)
+    findName(termname).orElse(getModuleIfDefined(termname))
   }
   // [Eugene to Paul] possibly you could make use of TypeTags here
   private def types[T: ClassTag]: Symbol =
@@ -1722,7 +1723,7 @@ class SparkIMain(initialSettings: Settings,
     * @return The list of matching ClassSymbol instances
     */
   @DeveloperApi
-  def classSymbols = allDefSymbols collect { case x: ClassSymbol => x }
+  def classSymbols = allDefSymbols.collect { case x: ClassSymbol => x }
 
   /**
     * Retrieves the Symbols representing methods in the compiler.
@@ -1730,7 +1731,7 @@ class SparkIMain(initialSettings: Settings,
     * @return The list of matching MethodSymbol instances
     */
   @DeveloperApi
-  def methodSymbols = allDefSymbols collect { case x: MethodSymbol => x }
+  def methodSymbols = allDefSymbols.collect { case x: MethodSymbol => x }
 
   /** the previous requests this interpreter has processed */
   private var executingRequest: Request = _
@@ -1739,23 +1740,23 @@ class SparkIMain(initialSettings: Settings,
   private val definedNameMap = mutable.Map[Name, Request]()
   private val directlyBoundNames = mutable.Set[Name]()
 
-  private def allHandlers = prevRequestList flatMap (_.handlers)
-  private def allDefHandlers = allHandlers collect {
+  private def allHandlers = prevRequestList.flatMap(_.handlers)
+  private def allDefHandlers = allHandlers.collect {
     case x: MemberDefHandler => x
   }
   private def allDefSymbols =
-    allDefHandlers map (_.symbol) filter (_ ne NoSymbol)
+    allDefHandlers.map(_.symbol).filter(_ ne NoSymbol)
 
   private def lastRequest =
     if (prevRequests.isEmpty) null else prevRequests.last
   // NOTE: Exposed to repl package since used by SparkImports
   private[repl] def prevRequestList = prevRequests.toList
   private def allSeenTypes =
-    prevRequestList flatMap (_.typeOf.values.toList) distinct
+    prevRequestList.flatMap(_.typeOf.values.toList) distinct
   private def allImplicits =
-    allHandlers filter (_.definesImplicit) flatMap (_.definedNames)
+    allHandlers.filter(_.definesImplicit).flatMap(_.definedNames)
   // NOTE: Exposed to repl package since used by SparkILoop and SparkImports
-  private[repl] def importHandlers = allHandlers collect {
+  private[repl] def importHandlers = allHandlers.collect {
     case x: ImportHandler => x
   }
 
@@ -1769,7 +1770,7 @@ class SparkIMain(initialSettings: Settings,
   /** Another entry point for tab-completion, ids in scope */
   // NOTE: Exposed to repl package since used by SparkJLineCompletion
   private[repl] def unqualifiedIds =
-    visibleTermNames map (_.toString) filterNot (_ contains "$") sorted
+    visibleTermNames.map(_.toString).filterNot(_ contains "$") sorted
 
   /** Parse the ScalaSig to find type aliases */
   private def aliasForType(path: String) = ByteCode.aliasForType(path)
@@ -1795,12 +1796,12 @@ class SparkIMain(initialSettings: Settings,
     /** Secret bookcase entrance for repl debuggers: end the line
       *  with "// show" and see what's going on.
       */
-    def isShow = code.lines exists (_.trim endsWith "// show")
-    def isShowRaw = code.lines exists (_.trim endsWith "// raw")
+    def isShow = code.lines.exists(_.trim.endsWith("// show"))
+    def isShowRaw = code.lines.exists(_.trim.endsWith("// raw"))
 
     // old style
-    beSilentDuring(parse(code)) foreach { ts =>
-      ts foreach { t =>
+    beSilentDuring(parse(code)).foreach { ts =>
+      ts.foreach { t =>
         if (isShow || isShowRaw) withoutUnwrapping(echo(asCompactString(t)))
         else withoutUnwrapping(logDebug(asCompactString(t)))
       }
@@ -1839,7 +1840,7 @@ object SparkIMain {
 
     def apply(contributors: List[T]): String = stringFromWriter { code =>
       code println preamble
-      contributors map generate foreach (code println _)
+      contributors.map(generate).foreach(code println _)
       code println postamble
     }
   }
@@ -1854,8 +1855,8 @@ object SparkIMain {
     def isTruncating: Boolean
     def truncate(str: String): String = {
       if (isTruncating &&
-          (maxStringLength != 0 && str.length > maxStringLength))
-        (str take maxStringLength - 3) + "..."
+          (maxStringLength != 0 && str.length > maxStringLength))(str.take(
+        maxStringLength - 3)) + "..."
       else str
     }
   }
@@ -1938,7 +1939,7 @@ class SparkISettings(intp: SparkIMain) extends Logging {
   )
 
   private def allSettingsString =
-    allSettings.toList sortBy (_._1) map {
+    allSettings.toList.sortBy(_._1).map {
       case (k, v) => "  " + k + " = " + v + "\n"
     } mkString
 

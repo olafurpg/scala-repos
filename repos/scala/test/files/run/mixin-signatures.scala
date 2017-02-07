@@ -84,7 +84,7 @@ object Test {
       List(
         if (m.isBridge) "<bridge>" else "",
         if (m.isSynthetic) "<synthetic>" else ""
-      ) filterNot (_ == "") mkString " "
+      ).filterNot(_ == "") mkString " "
 
     if (str == "") "" else " " + str
     //
@@ -94,13 +94,15 @@ object Test {
 
   def show(clazz: Class[_]) {
     print(clazz + " {")
-    clazz.getMethods.sortBy(x => (x.getName, x.isBridge, x.toString)) filter
-      (_.getName.length == 1) foreach { m =>
-      print("\n  " + m + flagsString(m))
-      if ("" + m != "" + m.toGenericString) {
-        print("\n    generic: " + m.toGenericString)
+    clazz.getMethods
+      .sortBy(x => (x.getName, x.isBridge, x.toString))
+      .filter(_.getName.length == 1)
+      .foreach { m =>
+        print("\n  " + m + flagsString(m))
+        if ("" + m != "" + m.toGenericString) {
+          print("\n    generic: " + m.toGenericString)
+        }
       }
-    }
     println("\n}")
     println("")
   }
@@ -108,8 +110,8 @@ object Test {
   def show(x: String) { show(Class.forName(x)) }
 
   def main(args: Array[String]): Unit = {
-    List(bar1, bar2, bar3, bar4, bar5) foreach show
-    List("Foo1", "Foo2") foreach show
+    List(bar1, bar2, bar3, bar4, bar5).foreach(show)
+    List("Foo1", "Foo2").foreach(show)
     println(go)
   }
 }

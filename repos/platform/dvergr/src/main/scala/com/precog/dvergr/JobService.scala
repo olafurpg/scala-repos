@@ -78,8 +78,8 @@ trait JobService
   // Ugh. Why do I need this?
   implicit def byteArray2chunk(
       r: Future[HttpResponse[Array[Byte]]]): Future[HttpResponse[ByteChunk]] =
-    r map { resp =>
-      resp.copy(content = resp.content map (ByteChunk(_)))
+    r.map { resp =>
+      resp.copy(content = resp.content.map(ByteChunk(_)))
     }
 
   implicit def executionContext: ExecutionContext

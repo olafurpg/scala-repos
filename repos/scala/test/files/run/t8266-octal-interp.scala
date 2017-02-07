@@ -11,5 +11,5 @@ trait X {
 }
 
 object Test extends App with X {
-  f foreach println
+  f.foreach(println)
 }

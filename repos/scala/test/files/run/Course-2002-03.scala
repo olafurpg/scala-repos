@@ -293,7 +293,7 @@ object M8 {
     Console.println;
 
     Console.println("set3 contains the following elements:");
-    set3 foreach Console.println;
+    set3.foreach(Console.println);
     Console.println;
 
     Console.println("set4 contains the following elements:");

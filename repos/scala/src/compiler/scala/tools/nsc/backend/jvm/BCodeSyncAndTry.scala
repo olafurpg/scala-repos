@@ -42,7 +42,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
 
       /* ------ (1) pushing and entering the monitor, also keeping a reference to it in a local var. ------ */
       genLoadQualifier(fun)
-      bc dup ObjectRef
+      bc.dup(ObjectRef)
       locals.store(monitor)
       emit(asm.Opcodes.MONITORENTER)
 
@@ -70,7 +70,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
       emit(asm.Opcodes.MONITOREXIT)
       if (hasResult) { locals.load(monitorResult) }
       val postHandler = new asm.Label
-      bc goTo postHandler
+      bc.goTo(postHandler)
 
       /* ------ (4) exception-handler version of monitor-exit code.
        *            Reached upon abrupt termination of (2).
@@ -239,7 +239,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
       unregisterCleanup(finCleanup)
       nopIfNeeded(startTryBody)
       val endTryBody = currProgramPoint()
-      bc goTo postHandlers
+      bc.goTo(postHandlers)
 
       /* ------ (2) One EH for each case-clause (this does not include the EH-version of the finally-clause)
        *            An EH in (2) is reached upon abrupt termination of (1).
@@ -258,7 +258,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
         registerCleanup(finCleanup)
         ch match {
           case NamelessEH(typeToDrop, caseBody) =>
-            bc drop typeToDrop
+            bc.drop(typeToDrop)
             genLoad(caseBody, kind) // adapts caseBody to `kind`, thus it can be stored, if `guardResult`, in `tmp`.
             nopIfNeeded(startHandler)
             endHandler = currProgramPoint()
@@ -279,7 +279,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
         // (2.b)  mark the try-body as protected by this case clause.
         protect(startTryBody, endTryBody, startHandler, excType)
         // (2.c) emit jump to the program point where the finally-clause-for-normal-exit starts, or in effect `after` if no finally-clause was given.
-        bc goTo postHandlers
+        bc.goTo(postHandlers)
       }
 
       /* ------ (3.A) The exception-handler-version of the finally-clause.
@@ -353,12 +353,12 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
             locals.load(earlyReturnVar)
             bc.emitRETURN(locals(earlyReturnVar).tk)
           } else {
-            bc emitRETURN UNIT
+            bc.emitRETURN(UNIT)
           }
           shouldEmitCleanup = false
 
         case nextCleanup :: _ =>
-          bc goTo nextCleanup
+          bc.goTo(nextCleanup)
       }
     }
 
@@ -394,7 +394,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
     }
 
     /* Does this tree have a try-catch block? */
-    def mayCleanStack(tree: Tree): Boolean = tree exists { t =>
+    def mayCleanStack(tree: Tree): Boolean = tree.exists { t =>
       t.isInstanceOf[Try]
     }
 

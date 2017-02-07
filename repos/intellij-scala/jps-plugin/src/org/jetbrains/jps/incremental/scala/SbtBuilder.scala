@@ -161,14 +161,16 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     val hasDirtyDependencies = {
       val dependencies = moduleDependenciesIn(context, representativeTarget)
 
-      targetTimestamp.map { thisTimestamp =>
-        dependencies.exists { dependency =>
-          val thatTimestamp = timestamps.get(dependency)
-          thatTimestamp.map(_ > thisTimestamp).getOrElse(true)
+      targetTimestamp
+        .map { thisTimestamp =>
+          dependencies.exists { dependency =>
+            val thatTimestamp = timestamps.get(dependency)
+            thatTimestamp.map(_ > thisTimestamp).getOrElse(true)
+          }
         }
-      } getOrElse {
-        dependencies.nonEmpty
-      }
+        .getOrElse {
+          dependencies.nonEmpty
+        }
     }
 
     if (!hasDirtyDependencies && !dirtyFilesHolder.hasDirtyFiles &&

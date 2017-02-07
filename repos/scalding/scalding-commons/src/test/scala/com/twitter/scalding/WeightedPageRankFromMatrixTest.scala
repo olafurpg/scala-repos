@@ -60,7 +60,7 @@ class WeightedPageRankFromMatrixSpec extends WordSpec with Matchers {
       .source(TypedTsv[(Int, Double)]("root/iterations/0"),
               iterationZeroVector)
       .sink[(Int, Int, Double)](Tsv("root/constants/M_hat")) { outputBuffer =>
-        outputBuffer should have size 7
+        (outputBuffer should have).size(7)
         val outputMap = toSparseMap(outputBuffer)
         outputMap((0 -> 1)) shouldBe 0.4
         outputMap((0 -> 2)) shouldBe 0.4
@@ -71,20 +71,20 @@ class WeightedPageRankFromMatrixSpec extends WordSpec with Matchers {
         outputMap((4 -> 0)) shouldBe 0.4
       }
       .sink[(Int, Double)](Tsv("root/constants/priorVector")) { outputBuffer =>
-        outputBuffer should have size 5
+        (outputBuffer should have).size(5)
         val expectedValue = ((1 - d) / 2) * d
         assertVectorsEqual(new Array[Double](5).map { v =>
           expectedValue
         }, outputBuffer.map(_._2).toArray)
       }
       .sink[(Int, Double)](Tsv("root/iterations/1")) { outputBuffer =>
-        outputBuffer should have size 5
+        (outputBuffer should have).size(5)
         assertVectorsEqual(expectedSolution,
                            outputBuffer.map(_._2).toArray,
                            0.00001)
       }
       .typedSink(TypedTsv[Double]("root/diff")) { outputBuffer =>
-        outputBuffer should have size 1
+        (outputBuffer should have).size(1)
 
         val expectedDiff = expectedSolution
           .zip(iterationZeroVector.map(_._2))

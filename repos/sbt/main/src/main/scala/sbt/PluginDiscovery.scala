@@ -46,7 +46,7 @@ object PluginDiscovery {
     )
     val detectedAutoPugins = discover[AutoPlugin](AutoPlugins)
     val allAutoPlugins =
-      (defaultAutoPlugins ++ detectedAutoPugins.modules) map {
+      ((defaultAutoPlugins ++ detectedAutoPugins.modules)).map {
         case (name, value) =>
           DetectedAutoPlugin(name,
                              value,
@@ -101,8 +101,8 @@ object PluginDiscovery {
                               resourceName: String,
                               subclasses: String*): Seq[String] =
     (binaryModuleNames(data(classpath), loader, resourceName) ++
-      (analyzed(classpath) flatMap
-        (a => sourceModuleNames(a, subclasses: _*)))).distinct
+      (analyzed(classpath)
+        .flatMap(a => sourceModuleNames(a, subclasses: _*)))).distinct
 
   /** Discovers top-level modules in `analysis` that inherit from any of `subclasses`. */
   def sourceModuleNames(analysis: CompileAnalysis,
@@ -128,14 +128,15 @@ object PluginDiscovery {
     loader
       .getResources(resourceName)
       .toSeq
-      .filter(onClasspath(classpath)) flatMap { u =>
-      IO.readLinesURL(u).map(_.trim).filter(!_.isEmpty)
-    }
+      .filter(onClasspath(classpath))
+      .flatMap { u =>
+        IO.readLinesURL(u).map(_.trim).filter(!_.isEmpty)
+      }
   }
 
   /** Returns `true` if `url` is an entry in `classpath`.*/
   def onClasspath(classpath: Seq[File])(url: URL): Boolean =
-    IO.urlAsFile(url) exists (classpath.contains _)
+    IO.urlAsFile(url).exists(classpath.contains _)
 
   private[sbt] def binarySourceModules[T](data: PluginData,
                                           loader: ClassLoader,
@@ -170,10 +171,10 @@ object PluginDiscovery {
                                         t: LinkageError): Nothing = {
     val evicted =
       data.report.toList.flatMap(_.configurations.flatMap(_.evicted))
-    val evictedModules = evicted map { id =>
+    val evictedModules = evicted.map { id =>
       (id.organization, id.name)
     } distinct;
-    val evictedStrings = evictedModules map { case (o, n) => o + ":" + n }
+    val evictedStrings = evictedModules.map { case (o, n) => o + ":" + n }
     val msgBase = "Binary incompatibility in plugins detected."
     val msgExtra =
       if (evictedStrings.isEmpty) ""

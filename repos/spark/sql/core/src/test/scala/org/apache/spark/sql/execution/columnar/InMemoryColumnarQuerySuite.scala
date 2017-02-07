@@ -136,7 +136,7 @@ class InMemoryColumnarQuerySuite extends QueryTest with SharedSQLContext {
     val df = (1 to 10)
       .map(i => Tuple1(Decimal(i, 15, 10)))
       .toDF("dec")
-      .select($"dec" cast DecimalType(15, 10))
+      .select($"dec".cast(DecimalType(15, 10)))
 
     assert(df.schema.head.dataType === DecimalType(15, 10))
 

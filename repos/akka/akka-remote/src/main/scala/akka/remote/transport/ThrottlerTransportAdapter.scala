@@ -214,11 +214,11 @@ class ThrottlerTransportAdapter(_wrappedTransport: Transport,
   override def managementCommand(cmd: Any): Future[Boolean] = {
     import ActorTransportAdapter.AskTimeout
     cmd match {
-      case s: SetThrottle ⇒ manager ? s map { case SetThrottleAck ⇒ true }
+      case s: SetThrottle ⇒ (manager ? s).map { case SetThrottleAck ⇒ true }
       case f: ForceDisassociate ⇒
-        manager ? f map { case ForceDisassociateAck ⇒ true }
+        (manager ? f).map { case ForceDisassociateAck ⇒ true }
       case f: ForceDisassociateExplicitly ⇒
-        manager ? f map { case ForceDisassociateAck ⇒ true }
+        (manager ? f).map { case ForceDisassociateAck ⇒ true }
       case _ ⇒ wrappedTransport.managementCommand(cmd)
     }
   }
@@ -267,7 +267,7 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
         wrapHandle(handle, associationListener, inbound = true)
       wrappedHandle.throttlerActor ! Handle(wrappedHandle)
     case AssociateUnderlying(remoteAddress, statusPromise) ⇒
-      wrappedTransport.associate(remoteAddress) onComplete {
+      wrappedTransport.associate(remoteAddress).onComplete {
         // Slight modification of pipe, only success is sent, failure is propagated to a separate future
         case Success(handle) ⇒ self ! AssociateResult(handle, statusPromise)
         case Failure(e) ⇒ statusPromise.failure(e)
@@ -279,9 +279,11 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
       val naked = nakedAddress(handle.remoteAddress)
       val inMode = getInboundMode(naked)
       wrappedHandle.outboundThrottleMode.set(getOutboundMode(naked))
-      wrappedHandle.readHandlerPromise.future map {
-        ListenerAndMode(_, inMode)
-      } pipeTo wrappedHandle.throttlerActor
+      wrappedHandle.readHandlerPromise.future
+        .map {
+          ListenerAndMode(_, inMode)
+        }
+        .pipeTo(wrappedHandle.throttlerActor)
       handleTable ::= naked -> wrappedHandle
       statusPromise.success(wrappedHandle)
     case SetThrottle(address, direction, mode) ⇒
@@ -289,21 +291,22 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
       throttlingModes = throttlingModes.updated(naked, (mode, direction))
       val ok = Future.successful(SetThrottleAck)
       Future
-        .sequence(handleTable map {
+        .sequence(handleTable.map {
           case (`naked`, handle) ⇒ setMode(handle, mode, direction)
           case _ ⇒ ok
         })
-        .map(_ ⇒ SetThrottleAck) pipeTo sender()
+        .map(_ ⇒ SetThrottleAck)
+        .pipeTo(sender())
     case ForceDisassociate(address) ⇒
       val naked = nakedAddress(address)
-      handleTable foreach {
+      handleTable.foreach {
         case (`naked`, handle) ⇒ handle.disassociate()
         case _ ⇒
       }
       sender() ! ForceDisassociateAck
     case ForceDisassociateExplicitly(address, reason) ⇒
       val naked = nakedAddress(address)
-      handleTable foreach {
+      handleTable.foreach {
         case (`naked`, handle) ⇒ handle.disassociateWithFailure(reason)
         case _ ⇒
       }
@@ -351,7 +354,7 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
 
   private def askModeWithDeathCompletion(target: ActorRef, mode: ThrottleMode)(
       implicit timeout: Timeout): Future[SetThrottleAck.type] = {
-    if (target.isTerminated) Future successful SetThrottleAck
+    if (target.isTerminated) Future.successful(SetThrottleAck)
     else {
       val internalTarget = target.asInstanceOf[InternalActorRef]
       val ref = PromiseActorRef(internalTarget.provider,
@@ -467,7 +470,7 @@ private[transport] class ThrottledAssociation(
 
   when(WaitOrigin) {
     case Event(InboundPayload(p), ExposedHandle(exposedHandle)) ⇒
-      throttledMessages = throttledMessages enqueue p
+      throttledMessages = throttledMessages.enqueue(p)
       peekOrigin(p) match {
         case Some(origin) ⇒
           manager ! Checkin(origin, exposedHandle)
@@ -478,7 +481,7 @@ private[transport] class ThrottledAssociation(
 
   when(WaitMode) {
     case Event(InboundPayload(p), _) ⇒
-      throttledMessages = throttledMessages enqueue p
+      throttledMessages = throttledMessages.enqueue(p)
       stay()
     case Event(mode: ThrottleMode, ExposedHandle(exposedHandle)) ⇒
       inboundThrottleMode = mode
@@ -487,15 +490,15 @@ private[transport] class ThrottledAssociation(
         exposedHandle.disassociate()
         stop()
       } else {
-        associationHandler notify InboundAssociation(exposedHandle)
-        exposedHandle.readHandlerPromise.future.map(Listener(_)) pipeTo self
+        associationHandler.notify(InboundAssociation(exposedHandle))
+        exposedHandle.readHandlerPromise.future.map(Listener(_)).pipeTo(self)
         goto(WaitUpstreamListener)
       } finally sender() ! SetThrottleAck
   }
 
   when(WaitUpstreamListener) {
     case Event(InboundPayload(p), _) ⇒
-      throttledMessages = throttledMessages enqueue p
+      throttledMessages = throttledMessages.enqueue(p)
       stay()
     case Event(Listener(listener), _) ⇒
       upstreamListener = listener
@@ -512,7 +515,7 @@ private[transport] class ThrottledAssociation(
       self ! Dequeue
       goto(Throttling)
     case Event(InboundPayload(p), _) ⇒
-      throttledMessages = throttledMessages enqueue p
+      throttledMessages = throttledMessages.enqueue(p)
       stay()
   }
 
@@ -534,7 +537,7 @@ private[transport] class ThrottledAssociation(
     case Event(Dequeue, _) ⇒
       if (throttledMessages.nonEmpty) {
         val (payload, newqueue) = throttledMessages.dequeue
-        upstreamListener notify InboundPayload(payload)
+        upstreamListener.notify(InboundPayload(payload))
         throttledMessages = newqueue
         inboundThrottleMode = inboundThrottleMode
           .tryConsumeTokens(System.nanoTime(), payload.length)
@@ -557,7 +560,7 @@ private[transport] class ThrottledAssociation(
       stop() // not notifying the upstream handler is intentional: we are relying on heartbeating
     case Event(FailWith(reason), _) ⇒
       if (upstreamListener ne null)
-        upstreamListener notify Disassociated(reason)
+        upstreamListener.notify(Disassociated(reason))
       stop()
   }
 
@@ -585,7 +588,7 @@ private[transport] class ThrottledAssociation(
           inboundThrottleMode.tryConsumeTokens(System.nanoTime(), tokens)
         if (success) {
           inboundThrottleMode = newbucket
-          upstreamListener notify InboundPayload(payload)
+          upstreamListener.notify(InboundPayload(payload))
         } else {
           throttledMessages = throttledMessages.enqueue(payload)
           scheduleDequeue(

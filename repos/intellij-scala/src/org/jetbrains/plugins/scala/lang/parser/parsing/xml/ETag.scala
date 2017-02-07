@@ -29,7 +29,7 @@ object ETag {
     builder.getTokenType match {
       case ScalaXmlTokenTypes.XML_NAME =>
         builder.advanceLexer()
-      case _ => builder error ErrMsg("xml.name.expected")
+      case _ => builder.error(ErrMsg("xml.name.expected"))
     }
     builder.getTokenType match {
       case XmlTokenType.XML_WHITE_SPACE => builder.advanceLexer()
@@ -39,7 +39,7 @@ object ETag {
       case ScalaXmlTokenTypes.XML_TAG_END =>
         builder.advanceLexer()
       case _ =>
-        builder error ErrMsg("xml.tag.end.expected")
+        builder.error(ErrMsg("xml.tag.end.expected"))
     }
     tagMarker.done(ScalaElementTypes.XML_END_TAG)
     true

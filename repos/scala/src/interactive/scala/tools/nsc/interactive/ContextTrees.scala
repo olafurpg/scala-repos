@@ -63,8 +63,9 @@ trait ContextTrees { self: Global =>
         c.retyping = false
         c
       }
-      locateContextTree(contexts, pos) map locateFinestContextTree map
-        (ct => sanitizeContext(ct.context))
+      locateContextTree(contexts, pos)
+        .map(locateFinestContextTree)
+        .map(ct => sanitizeContext(ct.context))
     }
 
   /** Returns the ContextTree containing `pos`, or the ContextTree positioned just before `pos`,
@@ -81,13 +82,13 @@ trait ContextTrees { self: Global =>
                previousSibling: Option[ContextTree]): Option[ContextTree] = {
         // [SI-8239] enforce loop invariant & ensure recursion metric decreases monotonically on every recursion
         if (lo > hi) previousSibling
-        else if (pos properlyPrecedes contexts(lo).pos) previousSibling
-        else if (contexts(hi).pos properlyPrecedes pos) Some(contexts(hi))
+        else if (pos.properlyPrecedes(contexts(lo).pos)) previousSibling
+        else if (contexts(hi).pos.properlyPrecedes(pos)) Some(contexts(hi))
         else {
           val mid = (lo + hi) / 2
           val midpos = contexts(mid).pos
           if (midpos includes pos) Some(contexts(mid))
-          else if (midpos properlyPrecedes pos)
+          else if (midpos.properlyPrecedes(pos))
             // recursion metric: (hi - ((lo + hi)/2 + 1)) < (hi - lo)
             // since (hi - ((lo + hi)/2 + 1)) - (hi - lo) = lo - ((lo + hi)/2 + 1) < 0
             // since 2*lo - lo - hi - 2 = lo - hi - 2 < 0
@@ -113,7 +114,7 @@ trait ContextTrees { self: Global =>
   def addContext(contexts: Contexts, context: Context): Unit = {
     val cpos = context.tree.pos
     if (cpos.isTransparent)
-      for (t <- context.tree.children flatMap solidDescendants)
+      for (t <- context.tree.children.flatMap(solidDescendants))
         addContext(contexts, context, t.pos)
     else addContext(contexts, context, cpos)
   }
@@ -128,16 +129,16 @@ trait ContextTrees { self: Global =>
           contexts += new ContextTree(cpos, context)
         else {
           val hi = contexts.length - 1
-          if (contexts(hi).pos precedes cpos)
+          if (contexts(hi).pos.precedes(cpos))
             contexts += new ContextTree(cpos, context)
-          else if (contexts(hi).pos properlyIncludes cpos) // fast path w/o search
+          else if (contexts(hi).pos.properlyIncludes(cpos)) // fast path w/o search
             addContext(contexts(hi).children, context, cpos)
-          else if (cpos precedes contexts(0).pos)
+          else if (cpos.precedes(contexts(0).pos))
             new ContextTree(cpos, context) +=: contexts
           else {
             def insertAt(idx: Int): Boolean = {
               val oldpos = contexts(idx).pos
-              if (oldpos sameRange cpos) {
+              if (oldpos.sameRange(cpos)) {
                 contexts(idx) =
                   new ContextTree(cpos, context, contexts(idx).children)
                 true
@@ -159,13 +160,13 @@ trait ContextTrees { self: Global =>
               if (hi - lo > 1) {
                 val mid = (lo + hi) / 2
                 val midpos = contexts(mid).pos
-                if (cpos precedes midpos) loop(lo, mid)
-                else if (midpos precedes cpos) loop(mid, hi)
+                if (cpos.precedes(midpos)) loop(lo, mid)
+                else if (midpos.precedes(cpos)) loop(mid, hi)
                 else addContext(contexts(mid).children, context, cpos)
               } else if (!insertAt(lo) && !insertAt(hi)) {
                 val lopos = contexts(lo).pos
                 val hipos = contexts(hi).pos
-                if ((lopos precedes cpos) && (cpos precedes hipos))
+                if ((lopos.precedes(cpos)) && (cpos.precedes(hipos)))
                   contexts.insert(hi, new ContextTree(cpos, context))
                 else
                   inform(

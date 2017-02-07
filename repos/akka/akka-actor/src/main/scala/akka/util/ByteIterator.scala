@@ -100,7 +100,7 @@ object ByteIterator {
     final override def copyToArray[B >: Byte](xs: Array[B],
                                               start: Int,
                                               len: Int): Unit = {
-      val n = 0 max ((xs.length - start) min this.len min len)
+      val n = 0.max((xs.length - start) min this.len min len)
       Array.copy(this.array, from, xs, start, n)
       this.drop(n)
     }
@@ -325,7 +325,7 @@ object ByteIterator {
       var pos = start
       var rest = len
       while ((rest > 0) && !iterators.isEmpty) {
-        val n = 0 max ((xs.length - pos) min current.len min rest)
+        val n = 0.max((xs.length - pos) min current.len min rest)
         current.copyToArray(xs, pos, n)
         pos += n
         rest -= n
@@ -335,7 +335,7 @@ object ByteIterator {
     }
 
     override def foreach[@specialized U](f: Byte ⇒ U): Unit = {
-      iterators foreach { _ foreach f }
+      iterators.foreach { _.foreach(f) }
       clear()
     }
 
@@ -591,11 +591,11 @@ abstract class ByteIterator extends BufferedIterator[Byte] {
   def getLongPart(n: Int)(implicit byteOrder: ByteOrder): Long = {
     if (byteOrder == ByteOrder.BIG_ENDIAN) {
       var x = 0L
-      (1 to n) foreach (_ ⇒ x = (x << 8) | (next() & 0xff))
+      ((1 to n)).foreach(_ ⇒ x = (x << 8) | (next() & 0xff))
       x
     } else if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
       var x = 0L
-      (0 until n) foreach (i ⇒ x |= (next() & 0xff) << 8 * i)
+      ((0 until n)).foreach(i ⇒ x |= (next() & 0xff) << 8 * i)
       x
     } else
       throw new IllegalArgumentException("Unknown byte order " + byteOrder)

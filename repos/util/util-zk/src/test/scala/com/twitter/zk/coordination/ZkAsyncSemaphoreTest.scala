@@ -29,7 +29,7 @@ class ZkAsyncSemaphoreTest
     val path = "/testing/twitter/service/charm/semaphore/test"
     val permits = new ConcurrentLinkedQueue[Permit]
 
-    Option { System.getProperty("com.twitter.zk.TEST_CONNECT") } foreach {
+    Option { System.getProperty("com.twitter.zk.TEST_CONNECT") }.foreach {
       connectString =>
         def withClient(f: (ZkClient) => Unit) = {
           implicit val timer = new JavaTimer(true)
@@ -38,12 +38,12 @@ class ZkAsyncSemaphoreTest
             .withRetryPolicy(RetryPolicy.Basic(3))
             .withAcl(OPEN_ACL_UNSAFE.asScala)
 
-          Await.result(Future { f(zk) } ensure { zk.release })
+          Await.result(Future { f(zk) }.ensure { zk.release })
         }
 
         def acquire(sem: ZkAsyncSemaphore) = {
-          sem.acquire() onSuccess { permit =>
-            permits add permit
+          sem.acquire().onSuccess { permit =>
+            permits.add(permit)
           }
         }
 

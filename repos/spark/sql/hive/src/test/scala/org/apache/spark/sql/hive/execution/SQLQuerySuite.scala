@@ -1793,7 +1793,7 @@ class SQLQuerySuite
           sql("CREATE VIEW v AS SELECT * FROM add_col")
           sqlContext
             .range(10)
-            .select('id, 'id as 'a)
+            .select('id, 'id.as('a))
             .write
             .mode("overwrite")
             .saveAsTable("add_col")

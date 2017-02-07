@@ -73,7 +73,7 @@ private[io] class UdpListener(val udp: UdpExt,
       bindCommander ! Bound(
         channel.socket.getLocalSocketAddress.asInstanceOf[InetSocketAddress])
       context.become(
-        readHandlers(registration) orElse sendHandlers(registration),
+        readHandlers(registration).orElse(sendHandlers(registration)),
         discardOld = true)
   }
 

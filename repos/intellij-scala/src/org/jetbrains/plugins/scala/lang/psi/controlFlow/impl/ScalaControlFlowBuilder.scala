@@ -200,10 +200,10 @@ class ScalaControlFlowBuilder(startInScope: ScalaPsiElement,
   override def visitDoStatement(stmt: ScDoStmt) {
     startNode(Some(stmt)) { doStmtInstr =>
       checkPendingEdges(doStmtInstr)
-      stmt.getExprBody map { e =>
+      stmt.getExprBody.map { e =>
         e.accept(this)
       }
-      stmt.condition map { c =>
+      stmt.condition.map { c =>
         c.accept(this)
         if (myHead != null) {
           checkPendingEdges(myHead)
@@ -510,7 +510,7 @@ class ScalaControlFlowBuilder(startInScope: ScalaPsiElement,
           case _ => Nil
         }
     }
-    myCatchedExnStack pushAll handledExnTypes
+    myCatchedExnStack.pushAll(handledExnTypes)
     var catchedExnCount = handledExnTypes.size
 
     val fBlock = tryStmt.finallyBlock match {
@@ -518,7 +518,7 @@ class ScalaControlFlowBuilder(startInScope: ScalaPsiElement,
       case Some(x) => x
     }
     if (fBlock != null) {
-      myCatchedExnStack push FinallyInfo(fBlock)
+      myCatchedExnStack.push(FinallyInfo(fBlock))
       catchedExnCount += 1
     }
 

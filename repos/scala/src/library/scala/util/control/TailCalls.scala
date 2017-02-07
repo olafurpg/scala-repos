@@ -55,7 +55,7 @@ object TailCalls {
         case Done(a) => Call(() => f(a))
         case c @ Call(_) => Cont(c, f)
         // Take advantage of the monad associative law to optimize the size of the required stack
-        case c: Cont[a1, b1] => Cont(c.a, (x: a1) => c.f(x) flatMap f)
+        case c: Cont[a1, b1] => Cont(c.a, (x: a1) => c.f(x).flatMap(f))
       }
 
     /** Returns either the next step of the tailcalling computation,
@@ -68,7 +68,7 @@ object TailCalls {
         a match {
           case Done(v) => f(v).resume
           case Call(k) => Left(() => k().flatMap(f))
-          case Cont(b, g) => b.flatMap(x => g(x) flatMap f).resume
+          case Cont(b, g) => b.flatMap(x => g(x).flatMap(f)).resume
         }
     }
 
@@ -82,7 +82,7 @@ object TailCalls {
         a match {
           case Done(v) => f(v).result
           case Call(t) => t().flatMap(f).result
-          case Cont(b, g) => b.flatMap(x => g(x) flatMap f).result
+          case Cont(b, g) => b.flatMap(x => g(x).flatMap(f)).result
         }
     }
   }

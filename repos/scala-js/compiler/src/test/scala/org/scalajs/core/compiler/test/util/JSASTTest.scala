@@ -69,7 +69,7 @@ abstract class JSASTTest extends DirectTest {
     }
 
     def show: this.type = {
-      clDefs foreach println _
+      clDefs.foreach(println _)
       this
     }
   }

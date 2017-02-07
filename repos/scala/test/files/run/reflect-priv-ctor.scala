@@ -11,7 +11,7 @@ object Test {
   def main(args: Array[String]): Unit = {
 
     //val foo = new Foo  // no access
-    val klass = currentMirror reflectClass typeOf[Foo].typeSymbol.asClass
+    val klass = currentMirror.reflectClass(typeOf[Foo].typeSymbol.asClass)
     val init = typeOf[Foo].members find {
       case m: MethodSymbol => m.isConstructor
       case _ => false

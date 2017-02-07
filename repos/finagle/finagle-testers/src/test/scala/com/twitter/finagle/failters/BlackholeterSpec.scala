@@ -10,7 +10,7 @@ import com.twitter.conversions.time._
 
 @RunWith(classOf[JUnitRunner])
 case class BlackholeterSpec() extends FlatSpec with MustMatchers {
-  behavior of "Blackholeter"
+  behavior.of("Blackholeter")
 
   val repeatFor = 10000
 
@@ -18,8 +18,8 @@ case class BlackholeterSpec() extends FlatSpec with MustMatchers {
     val base = mock(classOf[Service[String, String]])
 
     when(base.apply("hello")).thenReturn(Future.value("hi"))
-    val stack = Blackholeter(Var(0.0)) andThen base
-    1 to repeatFor foreach { _ =>
+    val stack = Blackholeter(Var(0.0)).andThen(base)
+    (1 to repeatFor).foreach { _ =>
       Await.result(stack("hello")) must equal("hi")
     }
     verify(base, times(repeatFor)).apply("hello")
@@ -29,8 +29,8 @@ case class BlackholeterSpec() extends FlatSpec with MustMatchers {
     val base = mock(classOf[Service[String, String]])
 
     when(base.apply("hello")).thenReturn(Future.value("hi"))
-    val stack = ByzantineBlackholeter(Var(0.0)) andThen base
-    1 to repeatFor foreach { _ =>
+    val stack = ByzantineBlackholeter(Var(0.0)).andThen(base)
+    (1 to repeatFor).foreach { _ =>
       Await.result(stack("hello")) must equal("hi")
     }
     verify(base, times(repeatFor)).apply("hello")
@@ -40,13 +40,13 @@ case class BlackholeterSpec() extends FlatSpec with MustMatchers {
     val base = mock(classOf[Service[String, String]])
 
     when(base.apply("hello")).thenReturn(Future.value("hi"))
-    val stack = ByzantineBlackholeter(Var(0.5)) andThen base
+    val stack = ByzantineBlackholeter(Var(0.5)).andThen(base)
 
     var pass = 0
 
     evaluating {
-      Await.result(Future.collect(1 to repeatFor map { _ =>
-        stack("hello") onSuccess { _ =>
+      Await.result(Future.collect((1 to repeatFor).map { _ =>
+        stack("hello").onSuccess { _ =>
           pass += 1
         }
       }), 10.seconds)
@@ -62,13 +62,13 @@ case class BlackholeterSpec() extends FlatSpec with MustMatchers {
     val base = mock(classOf[Service[String, String]])
 
     when(base.apply("hello")).thenReturn(Future.value("hi"))
-    val stack = Blackholeter(Var(0.5)) andThen base
+    val stack = Blackholeter(Var(0.5)).andThen(base)
 
     var pass = 0
 
     evaluating {
-      Await.result(Future.collect(1 to repeatFor map { _ =>
-        stack("hello") onSuccess { _ =>
+      Await.result(Future.collect((1 to repeatFor).map { _ =>
+        stack("hello").onSuccess { _ =>
           pass += 1
         }
       }), 10.seconds)

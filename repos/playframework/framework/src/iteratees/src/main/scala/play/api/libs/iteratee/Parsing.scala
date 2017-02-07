@@ -57,8 +57,8 @@ object Parsing {
             val (prefix, suffix) = piece.splitAt(startScan)
             val (matched, left) = suffix.splitAt(needleSize)
             val newResults =
-              previousMatches ++ List(Unmatched(prefix), Matched(matched)) filter
-                (!_.content.isEmpty)
+              (previousMatches ++ List(Unmatched(prefix), Matched(matched)))
+                .filter(!_.content.isEmpty)
 
             if (left.length < needleSize) (newResults, left)
             else scan(newResults, left, 0)

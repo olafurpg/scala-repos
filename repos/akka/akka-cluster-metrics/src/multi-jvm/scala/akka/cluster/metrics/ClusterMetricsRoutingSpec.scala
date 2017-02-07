@@ -60,7 +60,7 @@ object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig {
   def nodeList = Seq(node1, node2, node3)
 
   // Extract individual sigar library for every node.
-  nodeList foreach { role ⇒
+  nodeList.foreach { role ⇒
     nodeConfig(role) {
       ConfigFactory.parseString(
         "akka.cluster.metrics.native-library-extract-folder=${user.dir}/target/native/" +
@@ -193,7 +193,7 @@ abstract class AdaptiveLoadBalancingRouterSpec
         metricsAwait()
 
         val iterationCount = 100
-        1 to iterationCount foreach { _ ⇒
+        (1 to iterationCount).foreach { _ ⇒
           router1 ! "hit"
           // wait a while between each message, since metrics is collected periodically
           Thread.sleep(10)
@@ -229,7 +229,7 @@ abstract class AdaptiveLoadBalancingRouterSpec
         metricsAwait()
 
         val iterationCount = 3000
-        1 to iterationCount foreach { _ ⇒
+        (1 to iterationCount).foreach { _ ⇒
           router2 ! "hit"
         }
 

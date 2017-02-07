@@ -15,7 +15,7 @@ object $insert {
     implicitly[InColl[A]].coll insert js void
 
   def bson[A: BsTubeInColl](doc: A): Funit = bson {
-    implicitly[BsTube[A]].handler write doc
+    implicitly[BsTube[A]].handler.write(doc)
   }
 
   def bson[A: InColl](bs: BSONDocument): Funit =

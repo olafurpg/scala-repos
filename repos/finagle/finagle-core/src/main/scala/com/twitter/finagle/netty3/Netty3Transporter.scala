@@ -69,7 +69,7 @@ private[netty3] class ChannelConnector[In, Out](
     val connectFuture = ch.connect(addr)
 
     val promise = new Promise[Transport[In, Out]]
-    promise setInterruptHandler {
+    promise.setInterruptHandler {
       case _cause =>
         // Propagate cancellations onto the netty future.
         connectFuture.cancel()
@@ -95,7 +95,7 @@ private[netty3] class ChannelConnector[In, Out](
       }
     })
 
-    promise onFailure { _ =>
+    promise.onFailure { _ =>
       Channels.close(ch)
     }
   }
@@ -195,7 +195,7 @@ object Netty3Transporter {
       pipelineFactory,
       newChannel = cf.newChannel(_),
       newTransport = (ch: Channel) => Transport.cast[In, Out](newTransport(ch)),
-      tlsConfig = tls map {
+      tlsConfig = tls.map {
         case engine => Netty3TransporterTLSConfig(engine, tlsHostname)
       },
       httpProxy = httpProxy,

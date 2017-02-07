@@ -186,8 +186,8 @@ private[collection] abstract class TrieIterator[+T](elems: Array[Iterable[T]])
           val szsnd = snd(0).size
           // modify this - pop
           depth -= 1
-          1 until arrayStack.length foreach
-            (i => arrayStack(i - 1) = arrayStack(i))
+          (1 until arrayStack.length).foreach(i =>
+            arrayStack(i - 1) = arrayStack(i))
           arrayStack(arrayStack.length - 1) = Array[Iterable[T]](null)
           posStack = posStack.tail ++ Array[Int](0)
           // we know that `this` is not empty, since it had something on the arrayStack and arrayStack elements are always non-empty

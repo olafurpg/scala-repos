@@ -56,18 +56,18 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
       } else
       new SbtIvyCacheIndexer(new File(root)).artifacts.foreach(processArtifact)
 
-    progressIndicator foreach { _.checkCanceled() }
-    progressIndicator foreach {
+    progressIndicator.foreach { _.checkCanceled() }
+    progressIndicator.foreach {
       _.setText2(SbtBundle("sbt.resolverIndexer.progress.saving"))
     }
 
-    agMap foreach { element =>
+    agMap.foreach { element =>
       artifactToGroupMap.put(element._1, element._2.toSet)
     }
-    gaMap foreach { element =>
+    gaMap.foreach { element =>
       groupToArtifactMap.put(element._1, element._2.toSet)
     }
-    gavMap foreach { element =>
+    gavMap.foreach { element =>
       groupArtifactToVersionMap.put(element._1, element._2.toSet)
     }
     timestamp = System.currentTimeMillis()
@@ -100,11 +100,15 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
   }
 
   def groups() =
-    Option(groupToArtifactMap.getAllKeysWithExistingMapping) map { _.toSet } getOrElse Set.empty
+    Option(groupToArtifactMap.getAllKeysWithExistingMapping)
+      .map { _.toSet }
+      .getOrElse(Set.empty)
   def groups(artifact: String) = artifactToGroupMap.getOrEmpty(artifact)
 
   def artifacts() =
-    Option(artifactToGroupMap.getAllKeysWithExistingMapping) map { _.toSet } getOrElse Set.empty
+    Option(artifactToGroupMap.getAllKeysWithExistingMapping)
+      .map { _.toSet }
+      .getOrElse(Set.empty)
   def artifacts(group: String) = groupToArtifactMap.getOrEmpty(group)
 
   def versions(group: String, artifact: String) =
@@ -187,7 +191,7 @@ object SbtResolverIndex {
 private class SetDescriptor extends DataExternalizer[Set[String]] {
   def save(s: DataOutput, set: Set[String]) {
     s.writeInt(set.size)
-    set foreach s.writeUTF
+    set.foreach(s.writeUTF)
   }
 
   def read(s: DataInput): Set[String] = {

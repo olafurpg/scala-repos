@@ -27,7 +27,7 @@ object ZippedTraversable3 {
       zz: ZippedTraversable3[El1, El2, El3]): Traversable[(El1, El2, El3)] = {
     new scala.collection.AbstractTraversable[(El1, El2, El3)] {
       def foreach[U](f: ((El1, El2, El3)) => U): Unit =
-        zz foreach Function.untupled(f)
+        zz.foreach(Function.untupled(f))
     }
   }
 }

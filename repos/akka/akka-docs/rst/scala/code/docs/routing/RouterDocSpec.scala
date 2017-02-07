@@ -265,7 +265,7 @@ router-dispatcher {}
     var router = {
       val routees = Vector.fill(5) {
         val r = context.actorOf(Props[Worker])
-        context watch r
+        context.watch(r)
         ActorRefRoutee(r)
       }
       Router(RoundRobinRoutingLogic(), routees)
@@ -277,7 +277,7 @@ router-dispatcher {}
       case Terminated(a) =>
         router = router.removeRoutee(a)
         val r = context.actorOf(Props[Worker])
-        context watch r
+        context.watch(r)
         router = router.addRoutee(r)
     }
   }
@@ -528,7 +528,7 @@ class RouterDocSpec
     import akka.routing.Broadcast
     router ! Broadcast("Watch out for Davy Jones' locker")
     //#broadcastDavyJonesWarning
-    receiveN(5, 5.seconds.dilated) should have length (5)
+    (receiveN(5, 5.seconds.dilated) should have).length(5)
   }
 
   "demonstrate PoisonPill" in {

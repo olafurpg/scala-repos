@@ -161,46 +161,48 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     */
   get("/:userName") {
     val userName = params("userName")
-    getAccountByUserName(userName).map { account =>
-      params.getOrElse("tab", "repositories") match {
-        // Public Activity
-        case "activity" =>
-          gitbucket.core.account.html.activity(account,
-                                               if (account.isGroupAccount) Nil
-                                               else
-                                                 getGroupsByUserName(userName),
-                                               getActivitiesByUser(userName,
-                                                                   true))
+    getAccountByUserName(userName)
+      .map { account =>
+        params.getOrElse("tab", "repositories") match {
+          // Public Activity
+          case "activity" =>
+            gitbucket.core.account.html.activity(
+              account,
+              if (account.isGroupAccount) Nil
+              else
+                getGroupsByUserName(userName),
+              getActivitiesByUser(userName, true))
 
-        // Members
-        case "members" if (account.isGroupAccount) => {
-          val members = getGroupMembers(account.userName)
-          gitbucket.core.account.html.members(
-            account,
-            members.map(_.userName),
-            context.loginAccount.exists(x =>
-              members.exists { member =>
-                member.userName == x.userName && member.isManager
-            }))
-        }
+          // Members
+          case "members" if (account.isGroupAccount) => {
+            val members = getGroupMembers(account.userName)
+            gitbucket.core.account.html.members(
+              account,
+              members.map(_.userName),
+              context.loginAccount.exists(x =>
+                members.exists { member =>
+                  member.userName == x.userName && member.isManager
+              }))
+          }
 
-        // Repositories
-        case _ => {
-          val members = getGroupMembers(account.userName)
-          gitbucket.core.account.html.repositories(
-            account,
-            if (account.isGroupAccount)
-              Nil
-            else getGroupsByUserName(userName),
-            getVisibleRepositories(context.loginAccount, Some(userName)),
-            context.loginAccount.exists(x =>
-              members.exists { member =>
-                member.userName == x.userName && member.isManager
-            })
-          )
+          // Repositories
+          case _ => {
+            val members = getGroupMembers(account.userName)
+            gitbucket.core.account.html.repositories(
+              account,
+              if (account.isGroupAccount)
+                Nil
+              else getGroupsByUserName(userName),
+              getVisibleRepositories(context.loginAccount, Some(userName)),
+              context.loginAccount.exists(x =>
+                members.exists { member =>
+                  member.userName == x.userName && member.isManager
+              })
+            )
+          }
         }
       }
-    } getOrElse NotFound
+      .getOrElse(NotFound)
   }
 
   get("/:userName.atom") {
@@ -211,38 +213,45 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
   get("/:userName/_avatar") {
     val userName = params("userName")
-    getAccountByUserName(userName).flatMap(_.image).map { image =>
-      RawData(FileUtil.getMimeType(image),
-              new java.io.File(getUserUploadDir(userName), image))
-    } getOrElse {
-      contentType = "image/png"
-      Thread.currentThread.getContextClassLoader
-        .getResourceAsStream("noimage.png")
-    }
+    getAccountByUserName(userName)
+      .flatMap(_.image)
+      .map { image =>
+        RawData(FileUtil.getMimeType(image),
+                new java.io.File(getUserUploadDir(userName), image))
+      }
+      .getOrElse {
+        contentType = "image/png"
+        Thread.currentThread.getContextClassLoader
+          .getResourceAsStream("noimage.png")
+      }
   }
 
   get("/:userName/_edit")(oneselfOnly {
     val userName = params("userName")
-    getAccountByUserName(userName).map { x =>
-      html.edit(x, flash.get("info"))
-    } getOrElse NotFound
+    getAccountByUserName(userName)
+      .map { x =>
+        html.edit(x, flash.get("info"))
+      }
+      .getOrElse(NotFound)
   })
 
-  post("/:userName/_edit", editForm)(oneselfOnly { form =>
-    val userName = params("userName")
-    getAccountByUserName(userName).map {
-      account =>
-        updateAccount(
-          account.copy(password =
-                         form.password.map(sha1).getOrElse(account.password),
-                       fullName = form.fullName,
-                       mailAddress = form.mailAddress,
-                       url = form.url))
+  post("/:userName/_edit", editForm)(oneselfOnly {
+    form =>
+      val userName = params("userName")
+      getAccountByUserName(userName)
+        .map { account =>
+          updateAccount(
+            account.copy(password =
+                           form.password.map(sha1).getOrElse(account.password),
+                         fullName = form.fullName,
+                         mailAddress = form.mailAddress,
+                         url = form.url))
 
-        updateImage(userName, form.fileId, form.clearImage)
-        flash += "info" -> "Account information has been updated."
-        redirect(s"/${userName}/_edit")
-    } getOrElse NotFound
+          updateImage(userName, form.fileId, form.clearImage)
+          flash += "info" -> "Account information has been updated."
+          redirect(s"/${userName}/_edit")
+        }
+        .getOrElse(NotFound)
   })
 
   get("/:userName/_delete")(oneselfOnly {
@@ -270,9 +279,11 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
   get("/:userName/_ssh")(oneselfOnly {
     val userName = params("userName")
-    getAccountByUserName(userName).map { x =>
-      html.ssh(x, getPublicKeys(x.userName))
-    } getOrElse NotFound
+    getAccountByUserName(userName)
+      .map { x =>
+        html.ssh(x, getPublicKeys(x.userName))
+      }
+      .getOrElse(NotFound)
   })
 
   post("/:userName/_ssh", sshKeyForm)(oneselfOnly { form =>
@@ -290,21 +301,23 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
   get("/:userName/_application")(oneselfOnly {
     val userName = params("userName")
-    getAccountByUserName(userName).map {
-      x =>
-        var tokens = getAccessTokens(x.userName)
-        val generatedToken = flash.get("generatedToken") match {
-          case Some((tokenId: Int, token: String)) => {
-            val gt = tokens.find(_.accessTokenId == tokenId)
-            gt.map { t =>
-              tokens = tokens.filterNot(_ == t)
-              (t, token)
+    getAccountByUserName(userName)
+      .map {
+        x =>
+          var tokens = getAccessTokens(x.userName)
+          val generatedToken = flash.get("generatedToken") match {
+            case Some((tokenId: Int, token: String)) => {
+              val gt = tokens.find(_.accessTokenId == tokenId)
+              gt.map { t =>
+                tokens = tokens.filterNot(_ == t)
+                (t, token)
+              }
             }
+            case _ => None
           }
-          case _ => None
-        }
-        html.application(x, tokens, generatedToken)
-    } getOrElse NotFound
+          html.application(x, tokens, generatedToken)
+      }
+      .getOrElse(NotFound)
   })
 
   post("/:userName/_personalToken", personalTokenForm)(oneselfOnly { form =>
@@ -406,25 +419,27 @@ trait AccountControllerBase extends AccountManagementControllerBase {
                }
                .toList) {
       case (groupName, members) =>
-        getAccountByUserName(groupName, true).map {
-          account =>
-            updateGroup(groupName, form.url, false)
+        getAccountByUserName(groupName, true)
+          .map {
+            account =>
+              updateGroup(groupName, form.url, false)
 
-            // Update GROUP_MEMBER
-            updateGroupMembers(form.groupName, members)
-            // Update COLLABORATOR for group repositories
-            getRepositoryNamesOfUser(form.groupName).foreach {
-              repositoryName =>
-                removeCollaborators(form.groupName, repositoryName)
-                members.foreach {
-                  case (userName, isManager) =>
-                    addCollaborator(form.groupName, repositoryName, userName)
-                }
-            }
+              // Update GROUP_MEMBER
+              updateGroupMembers(form.groupName, members)
+              // Update COLLABORATOR for group repositories
+              getRepositoryNamesOfUser(form.groupName).foreach {
+                repositoryName =>
+                  removeCollaborators(form.groupName, repositoryName)
+                  members.foreach {
+                    case (userName, isManager) =>
+                      addCollaborator(form.groupName, repositoryName, userName)
+                  }
+              }
 
-            updateImage(form.groupName, form.fileId, form.clearImage)
-            redirect(s"/${form.groupName}")
-        } getOrElse NotFound
+              updateImage(form.groupName, form.fileId, form.clearImage)
+              redirect(s"/${form.groupName}")
+          }
+          .getOrElse(NotFound)
     }
   })
 
@@ -470,7 +485,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
         }
         helper.html.forkrepository(
           repository,
-          (groups zip managerPermissions).toMap
+          (groups.zip(managerPermissions)).toMap
         )
       case _ => redirect(s"/${loginUserName}")
     }

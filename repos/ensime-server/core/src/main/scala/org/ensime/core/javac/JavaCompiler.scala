@@ -105,14 +105,14 @@ class JavaCompiler(
   }
 
   def askTypeAtPoint(file: SourceFileInfo, offset: Int): Option[TypeInfo] = {
-    pathToPoint(file, offset) flatMap {
+    pathToPoint(file, offset).flatMap {
       case (info: CompilationInfo, path: TreePath) =>
         getTypeMirror(info, offset).map(typeMirrorToTypeInfo)
     }
   }
 
   def askSymbolAtPoint(file: SourceFileInfo, offset: Int): Option[SymbolInfo] = {
-    pathToPoint(file, offset) flatMap {
+    pathToPoint(file, offset).flatMap {
       case (info: CompilationInfo, path: TreePath) =>
         def withName(name: String): Option[SymbolInfo] = {
           val tpeMirror = Option(info.getTrees().getTypeMirror(path))
@@ -141,7 +141,7 @@ class JavaCompiler(
 
   def askDocSignatureAtPoint(file: SourceFileInfo,
                              offset: Int): Option[DocSigPair] = {
-    pathToPoint(file, offset) flatMap {
+    pathToPoint(file, offset).flatMap {
       case (info: CompilationInfo, path: TreePath) =>
         docSignature(info, path)
     }

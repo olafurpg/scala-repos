@@ -160,7 +160,7 @@ case class Http(
                                                maxHeaderSizeInBytes,
                                                maxChunkSize))
 
-          if (! _streaming)
+          if (!_streaming)
             pipeline.addLast(
               "httpDechunker",
               new HttpChunkAggregator(_maxResponseSize.inBytes.toInt))
@@ -186,7 +186,7 @@ case class Http(
         // Waiting on CSL-915 for a proper fix.
         underlying.map { u =>
           val filters = new ClientContextFilter[Request, Response].andThenIf(
-            ! _streaming -> new PayloadSizeFilter[Request, Response](
+            !_streaming -> new PayloadSizeFilter[Request, Response](
               params[param.Stats].statsReceiver,
               _.content.length,
               _.content.length
@@ -248,11 +248,11 @@ case class Http(
           // Response to ``Expect: Continue'' requests.
           pipeline
             .addLast("respondToExpectContinue", new RespondToExpectContinue)
-          if (! _streaming)
+          if (!_streaming)
             pipeline.addLast("httpDechunker",
                              new HttpChunkAggregator(maxRequestSizeInBytes))
 
-          _annotateCipherHeader foreach { headerName: String =>
+          _annotateCipherHeader.foreach { headerName: String =>
             pipeline.addLast("annotateCipher", new AnnotateCipher(headerName))
           }
 
@@ -275,7 +275,7 @@ case class Http(
           .andThen(new DtabFilter.Finagle[Request])
           .andThen(new ServerContextFilter[Request, Response])
           .andThenIf(
-            ! _streaming -> new PayloadSizeFilter[Request, Response](
+            !_streaming -> new PayloadSizeFilter[Request, Response](
               stats,
               _.content.length,
               _.content.length))
@@ -335,13 +335,13 @@ private object TraceInfo {
       if (Header.Required.forall { request.headers.contains(_) }) {
         val spanId = SpanId.fromString(request.headers.get(Header.SpanId))
 
-        spanId map { sid =>
+        spanId.map { sid =>
           val traceId = SpanId.fromString(request.headers.get(Header.TraceId))
           val parentSpanId =
             SpanId.fromString(request.headers.get(Header.ParentSpanId))
 
           val sampled =
-            Option(request.headers.get(Header.Sampled)) flatMap { sampled =>
+            Option(request.headers.get(Header.Sampled)).flatMap { sampled =>
               Try(sampled.toBoolean).toOption
             }
 
@@ -358,7 +358,7 @@ private object TraceInfo {
       }
 
     // remove so the header is not visible to users
-    Header.All foreach { request.headers.remove(_) }
+    Header.All.foreach { request.headers.remove(_) }
 
     id match {
       case Some(id) =>
@@ -423,7 +423,7 @@ private[finagle] class HttpServerTraceInitializer[Req <: Request, Rep]
         TraceInfo.letTraceIdFromRequestHeaders(req) { svc(req) }
       }
     }
-    traceInitializer andThen next
+    traceInitializer.andThen(next)
   }
 }
 
@@ -440,7 +440,7 @@ private[finagle] class HttpClientTraceInitializer[Req <: Request, Rep]
         svc(req)
       }
     }
-    traceInitializer andThen next
+    traceInitializer.andThen(next)
   }
 }
 

@@ -33,7 +33,7 @@ trait PredefinedToEntityMarshallers extends MultipartMarshallers {
   def charArrayMarshaller(
       mediaType: MediaType.WithOpenCharset): ToEntityMarshaller[Array[Char]] =
     Marshaller.withOpenCharset(mediaType) { (value, charset) ⇒
-      marshalCharArray(value, mediaType withCharset charset)
+      marshalCharArray(value, mediaType.withCharset(charset))
     }
   def charArrayMarshaller(
       mediaType: MediaType.WithFixedCharset): ToEntityMarshaller[Array[Char]] =
@@ -62,7 +62,7 @@ trait PredefinedToEntityMarshallers extends MultipartMarshallers {
   def stringMarshaller(
       mediaType: MediaType.WithOpenCharset): ToEntityMarshaller[String] =
     Marshaller.withOpenCharset(mediaType) { (s, cs) ⇒
-      HttpEntity(mediaType withCharset cs, s)
+      HttpEntity(mediaType.withCharset(cs), s)
     }
   def stringMarshaller(
       mediaType: MediaType.WithFixedCharset): ToEntityMarshaller[String] =
@@ -76,7 +76,7 @@ trait PredefinedToEntityMarshallers extends MultipartMarshallers {
     }
 
   implicit val MessageEntityMarshaller: ToEntityMarshaller[MessageEntity] =
-    Marshaller strict { value ⇒
+    Marshaller.strict { value ⇒
       Marshalling.WithFixedContentType(value.contentType, () ⇒ value)
     }
 }

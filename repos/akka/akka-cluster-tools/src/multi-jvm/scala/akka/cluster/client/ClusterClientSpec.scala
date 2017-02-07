@@ -54,7 +54,7 @@ object ClusterClientSpec extends MultiNodeConfig {
       case "shutdown" ⇒
         context.system.terminate()
       case msg ⇒
-        testActor forward msg
+        testActor.forward(msg)
         sender() ! Reply(msg + "-ack", Cluster(context.system).selfAddress)
     }
   }

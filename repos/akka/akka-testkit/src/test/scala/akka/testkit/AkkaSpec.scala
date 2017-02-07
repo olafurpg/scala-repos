@@ -44,11 +44,13 @@ object AkkaSpec {
   }
 
   def getCallerName(clazz: Class[_]): String = {
-    val s = (Thread.currentThread.getStackTrace map (_.getClassName) drop 1)
-      .dropWhile(_ matches "(java.lang.Thread|.*AkkaSpec.?$)")
+    val s = (Thread.currentThread.getStackTrace
+      .map(_.getClassName)
+      .drop(1))
+      .dropWhile(_.matches("(java.lang.Thread|.*AkkaSpec.?$)"))
     val reduced = s.lastIndexWhere(_ == clazz.getName) match {
       case -1 ⇒ s
-      case z ⇒ s drop (z + 1)
+      case z ⇒ s.drop(z + 1)
     }
     reduced.head.replaceFirst(""".*\.""", "").replaceAll("[^a-zA-Z_0-9]", "_")
   }
@@ -113,7 +115,7 @@ abstract class AkkaSpec(_system: ActorSystem)
         sys.eventStream.publish(
           Mute(DeadLettersFilter(clazz)(occurrences = Int.MaxValue)))
       if (messageClasses.isEmpty) mute(classOf[AnyRef])
-      else messageClasses foreach mute
+      else messageClasses.foreach(mute)
     }
 
   // for ScalaTest === compare of Class objects

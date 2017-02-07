@@ -21,13 +21,14 @@ class WebJarServlet extends HttpServlet {
     def sendResource(resourceURI: String, mime: String): Unit = {
       //scalastyle:off magic.number
       IO.withResource(resourceURI) { stream =>
-        resp.setContentType(mime)
-        resp.setContentLength(stream.available())
-        resp.setStatus(200)
-        IO.transfer(stream, resp.getOutputStream)
-      } getOrElse {
-        resp.sendError(404)
-      }
+          resp.setContentType(mime)
+          resp.setContentLength(stream.available())
+          resp.setStatus(200)
+          IO.transfer(stream, resp.getOutputStream)
+        }
+        .getOrElse {
+          resp.sendError(404)
+        }
     }
 
     def sendResourceNormalized(resourceURI: String, mime: String): Unit = {

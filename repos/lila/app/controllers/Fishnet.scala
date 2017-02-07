@@ -18,11 +18,11 @@ object Fishnet extends LilaController {
   override val logger = lila.log("fishnet")
 
   def clientIp(req: RequestHeader) = lila.fishnet.Client.IpAddress {
-    HTTPRequest lastRemoteAddress req
+    HTTPRequest.lastRemoteAddress(req)
   }
 
   def acquire = ClientAction[JsonApi.Request.Acquire] { req => client =>
-    api acquire client
+    api.acquire(client)
   }
 
   def move(workId: String) = ClientAction[JsonApi.Request.PostMove] {
@@ -52,7 +52,7 @@ object Fishnet extends LilaController {
             BadRequest(jsonError(JsError toJson err)).fuccess
           },
           data =>
-            api.authenticateClient(data, clientIp(req)) flatMap {
+            api.authenticateClient(data, clientIp(req)).flatMap {
               case Failure(msg) => {
                 val ip = lila.common.HTTPRequest.lastRemoteAddress(req)
                 logger.info(

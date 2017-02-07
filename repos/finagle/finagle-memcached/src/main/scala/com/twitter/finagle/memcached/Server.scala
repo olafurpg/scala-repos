@@ -16,7 +16,7 @@ class Server(address: SocketAddress) {
   val slots = 500000
   val slotsPerLru = slots / concurrencyLevel
   val maps =
-    (0 until concurrencyLevel) map { i =>
+    ((0 until concurrencyLevel)).map { i =>
       new SynchronizedLruMap[Buf, Entry](slotsPerLru)
     }
 

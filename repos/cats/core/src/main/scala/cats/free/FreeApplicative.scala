@@ -23,7 +23,7 @@ sealed abstract class FreeApplicative[F[_], A]
   final def map[B](f: A => B): FA[F, B] =
     this match {
       case Pure(a) => Pure(f(a))
-      case Ap(pivot, fn) => apply(pivot)(fn.map(f compose _))
+      case Ap(pivot, fn) => apply(pivot)(fn.map(f.compose(_)))
     }
 
   /** Interprets/Runs the sequence of operations using the semantics of Applicative G

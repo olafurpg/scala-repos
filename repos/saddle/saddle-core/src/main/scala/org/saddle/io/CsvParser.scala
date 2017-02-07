@@ -107,7 +107,7 @@ object CsvParser {
     }
 
     val columns =
-      bufdata map { b =>
+      bufdata.map { b =>
         Vec(b.toArray)
       }
 

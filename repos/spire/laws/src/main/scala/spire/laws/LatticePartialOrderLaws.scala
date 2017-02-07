@@ -39,7 +39,7 @@ trait LatticePartialOrderLaws[A] extends Laws {
       parents = Seq.empty,
       bases = Seq("order" → OrderLaws[A].partialOrder,
                   "lattice" → LatticeLaws[A].meetSemilattice),
-      "meet.lteqv" → forAll((x: A, y: A) => (x <= y) === (x === (x meet y)))
+      "meet.lteqv" → forAll((x: A, y: A) => (x <= y) === (x === (x.meet(y))))
     )
 
   def latticePartialOrder(implicit A: Lattice[A], P: PartialOrder[A]) =

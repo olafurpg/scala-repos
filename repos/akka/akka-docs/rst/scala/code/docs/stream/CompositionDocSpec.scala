@@ -252,7 +252,7 @@ class CompositionDocSpec extends AkkaSpec {
 
     val nestedSink = nestedFlow
       .to(Sink.fold(0)(_ + _)) // wire an atomic sink to the nestedFlow
-      .withAttributes(name("nestedSink") and inputBuffer(3, 3)) // override
+      .withAttributes(name("nestedSink").and(inputBuffer(3, 3))) // override
     //#attributes-inheritance
   }
 }

@@ -30,7 +30,7 @@ trait DenseVectorOps extends DenseVector_GenericOps { this: DenseVector.type =>
         _ + _
       }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : BinaryRegistry[DenseVector[T], Vector[T], Op.type, DenseVector[T]] =
     new BinaryRegistry[DenseVector[T], Vector[T], Op.type, DenseVector[T]] {
 
@@ -63,7 +63,7 @@ trait DenseVectorOps extends DenseVector_GenericOps { this: DenseVector.type =>
                                            OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ * _ }, { _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : BinaryUpdateRegistry[DenseVector[T], Vector[T], Op.type] =
     new BinaryUpdateRegistry[DenseVector[T], Vector[T], Op.type] {
 
@@ -123,7 +123,7 @@ trait DenseVectorOps extends DenseVector_GenericOps { this: DenseVector.type =>
         _ / _
       }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[DenseVector[T], T, DenseVector[T]] =
     new Op.Impl2[DenseVector[T], T, DenseVector[T]] {
       def apply(a: DenseVector[T], b: T): DenseVector[T] = {
@@ -177,7 +177,7 @@ trait DenseVectorOps extends DenseVector_GenericOps { this: DenseVector.type =>
         _ / _
       }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[T, DenseVector[T], DenseVector[T]] =
     new Op.Impl2[T, DenseVector[T], DenseVector[T]] {
       def apply(a: T, b: DenseVector[T]): DenseVector[T] = {
@@ -212,7 +212,7 @@ trait DenseVectorOps extends DenseVector_GenericOps { this: DenseVector.type =>
         _ + _
       }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.Impl2[DenseVector[T], DenseVector[T], DenseVector[T]] = {
     new Op.Impl2[DenseVector[T], DenseVector[T], DenseVector[T]] {
       def apply(a: DenseVector[T], b: DenseVector[T]): DenseVector[T] = {
@@ -260,7 +260,7 @@ trait DenseVectorOps extends DenseVector_GenericOps { this: DenseVector.type =>
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : Op.InPlaceImpl2[DenseVector[T], DenseVector[T]] =
     new Op.InPlaceImpl2[DenseVector[T], DenseVector[T]] {
       def apply(a: DenseVector[T], b: DenseVector[T]): Unit = {

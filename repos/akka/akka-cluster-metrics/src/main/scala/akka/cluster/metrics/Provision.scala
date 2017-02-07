@@ -63,13 +63,14 @@ trait SigarProvider {
   def createSigarInstance: SigarProxy = {
     TryNative {
       verifiedSigarInstance
-    } orElse TryNative {
-      provisionSigarLibrary()
-      verifiedSigarInstance
-    } recover {
-      case e: Throwable ⇒
-        throw new RuntimeException("Failed to load sigar:", e)
-    } get
+    }.orElse(TryNative {
+        provisionSigarLibrary()
+        verifiedSigarInstance
+      })
+      .recover {
+        case e: Throwable ⇒
+          throw new RuntimeException("Failed to load sigar:", e)
+      } get
   }
 }
 

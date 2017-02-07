@@ -17,10 +17,10 @@ final class Env(config: Config,
                 system: ActorSystem) {
 
   private val settings = new {
-    val TopicMaxPerPage = config getInt "topic.max_per_page"
-    val PostMaxPerPage = config getInt "post.max_per_page"
-    val RecentTtl = config duration "recent.ttl"
-    val RecentNb = config getInt "recent.nb"
+    val TopicMaxPerPage = config.getInt("topic.max_per_page")
+    val PostMaxPerPage = config.getInt("post.max_per_page")
+    val RecentTtl = config.duration("recent.ttl")
+    val RecentNb = config.getInt("recent.nb")
     val CollectionCateg = config getString "collection.categ"
     val CollectionTopic = config getString "collection.topic"
     val CollectionPost = config getString "collection.post"
@@ -79,14 +79,15 @@ object Env {
   private def hub = lila.hub.Env.current
 
   lazy val current =
-    "forum" boot new Env(
-      config = lila.common.PlayApp loadConfig "forum",
-      db = lila.db.Env.current,
-      modLog = lila.mod.Env.current.logApi,
-      shutup = lila.hub.Env.current.actor.shutup,
-      hub = lila.hub.Env.current,
-      detectLanguage =
-        DetectLanguage(lila.common.PlayApp loadConfig "detectlanguage"),
-      system = lila.common.PlayApp.system
-    )
+    "forum".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("forum"),
+        db = lila.db.Env.current,
+        modLog = lila.mod.Env.current.logApi,
+        shutup = lila.hub.Env.current.actor.shutup,
+        hub = lila.hub.Env.current,
+        detectLanguage =
+          DetectLanguage(lila.common.PlayApp.loadConfig("detectlanguage")),
+        system = lila.common.PlayApp.system
+      ))
 }

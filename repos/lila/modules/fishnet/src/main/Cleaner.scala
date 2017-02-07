@@ -24,8 +24,8 @@ private final class Cleaner(repo: FishnetRepo,
 
   private def cleanMoves: Unit = {
     val since = durationAgo(moveTimeout)
-    moveDb.find(_ acquiredBefore since).map { move =>
-      moveDb updateOrGiveUp move.timeout
+    moveDb.find(_.acquiredBefore(since)).map { move =>
+      moveDb.updateOrGiveUp(move.timeout)
       clientTimeout(move)
       logger.warn(s"Timeout move ${move.game.id}")
     }
@@ -44,7 +44,8 @@ private final class Cleaner(repo: FishnetRepo,
       .collect[List](100)
       .flatMap {
         _.filter { ana =>
-          ana.acquiredAt.??(_ isBefore durationAgo(analysisTimeout(ana.nbPly)))
+          ana.acquiredAt.??(
+            _.isBefore(durationAgo(analysisTimeout(ana.nbPly))))
         }.map { ana =>
             repo.updateOrGiveUpAnalysis(ana.timeout) >>- {
               clientTimeout(ana)
@@ -53,11 +54,12 @@ private final class Cleaner(repo: FishnetRepo,
           }
           .sequenceFu
           .void
-      } andThenAnyway scheduleAnalysis
+      }
+      .andThenAnyway(scheduleAnalysis)
 
   private def clientTimeout(work: Work) =
-    work.acquiredByKey ?? repo.getClient foreach {
-      _ foreach { client =>
+    (work.acquiredByKey ?? repo.getClient).foreach {
+      _.foreach { client =>
         monitor.timeout(work, client)
         logger.warn(s"Timeout client ${client.fullId}")
       }

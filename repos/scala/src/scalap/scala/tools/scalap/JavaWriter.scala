@@ -139,7 +139,7 @@ class JavaWriter(classfile: Classfile, writer: Writer)
       case Some(cf.Attribute(_, data)) =>
         val n = ((data(0) & 0xff) << 8) + (data(1) & 0xff)
         indent.print("throws ")
-        for (i <- Iterator.range(0, n) map { x =>
+        for (i <- Iterator.range(0, n).map { x =>
                2 * (x + 1)
              }) {
           val inx = ((data(i) & 0xff) << 8) + (data(i + 1) & 0xff)
@@ -159,7 +159,7 @@ class JavaWriter(classfile: Classfile, writer: Writer)
       if (cf.pool(cf.superclass) != null)
         print(" extends " + nameToClass0(getName(cf.superclass)))
     }
-    cf.interfaces foreach { n =>
+    cf.interfaces.foreach { n =>
       print(" with " + getClassName(n))
     }
   }
@@ -186,12 +186,12 @@ class JavaWriter(classfile: Classfile, writer: Writer)
     }
     var statics: List[cf.Member] = Nil
     print(" {").indent.newline
-    cf.fields foreach {
+    cf.fields.foreach {
       case m @ cf.Member(_, flags, name, tpe, attribs) =>
         if (isStatic(flags)) statics = m :: statics
         else printField(flags, name, tpe, attribs)
     }
-    cf.methods foreach {
+    cf.methods.foreach {
       case m @ cf.Member(_, flags, name, tpe, attribs) =>
         if (isStatic(flags)) statics = m :: statics
         else printMethod(flags, name, tpe, attribs)
@@ -200,7 +200,7 @@ class JavaWriter(classfile: Classfile, writer: Writer)
     if (!statics.isEmpty) {
       print("object " + getSimpleClassName(cf.classname) + " {")
       indent.newline
-      statics foreach {
+      statics.foreach {
         case cf.Member(true, flags, name, tpe, attribs) =>
           printField(flags, name, tpe, attribs)
         case cf.Member(false, flags, name, tpe, attribs) =>

@@ -446,7 +446,7 @@ private[akka] object LocalActorRefProvider {
         // termination hooks, they will reply with TerminationHookDone
         // and when all are done the systemGuardian is stopped
         context.become(terminating)
-        terminationHooks foreach { _ ! TerminationHook }
+        terminationHooks.foreach { _ ! TerminationHook }
         stopWhenAllTerminationHooksDone()
       case Terminated(a) ⇒
         // a registered, and watched termination hook terminated before
@@ -455,7 +455,7 @@ private[akka] object LocalActorRefProvider {
       case StopChild(child) ⇒ context.stop(child)
       case RegisterTerminationHook if sender() != context.system.deadLetters ⇒
         terminationHooks += sender()
-        context watch sender()
+        context.watch(sender())
     }
 
     def terminating: Receive = {
@@ -513,8 +513,8 @@ private[akka] class LocalActorRefProvider private[akka] (
   private[akka] val log: LoggingAdapter =
     Logging(eventStream, getClass.getName + "(" + rootPath.address + ")")
 
-  override val deadLetters: InternalActorRef = _deadLetters.getOrElse(
-    (p: ActorPath) ⇒ new DeadLetterActorRef(this, p, eventStream))
+  override val deadLetters: InternalActorRef = _deadLetters
+    .getOrElse((p: ActorPath) ⇒ new DeadLetterActorRef(this, p, eventStream))
     .apply(rootPath / "deadLetters")
 
   private[this] final val terminationPromise: Promise[Terminated] =
@@ -809,7 +809,7 @@ private[akka] class LocalActorRefProvider private[akka] (
     props.deploy.routerConfig match {
       case NoRouter ⇒
         if (settings.DebugRouterMisconfiguration) {
-          deployer.lookup(path) foreach { d ⇒
+          deployer.lookup(path).foreach { d ⇒
             if (d.routerConfig != NoRouter)
               log.warning(
                 "Configuration says that [{}] should be a router, but code disagrees. Remove the config or add a routerConfig to its Props.",
@@ -863,9 +863,9 @@ private[akka] class LocalActorRefProvider private[akka] (
       case router ⇒
         val lookup = if (lookupDeploy) deployer.lookup(path) else None
         val r =
-          router :: deploy.map(_.routerConfig).toList ::: lookup
+          (router :: deploy.map(_.routerConfig).toList ::: lookup
             .map(_.routerConfig)
-            .toList reduce ((a, b) ⇒ b withFallback a)
+            .toList).reduce((a, b) ⇒ b.withFallback(a))
         val p = props.withRouter(r)
 
         if (!system.dispatchers.hasDispatcher(p.dispatcher))

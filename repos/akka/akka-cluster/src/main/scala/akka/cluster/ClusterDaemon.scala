@@ -186,7 +186,7 @@ private[cluster] final class ClusterDaemon(settings: ClusterSettings)
   def receive = {
     case msg: GetClusterCoreRef.type ⇒
       if (coreSupervisor.isEmpty) createChildren()
-      coreSupervisor.foreach(_ forward msg)
+      coreSupervisor.foreach(_.forward(msg))
     case AddOnMemberUpListener(code) ⇒
       context.actorOf(
         Props(classOf[OnMemberStatusChangedListener], code, Up)
@@ -335,7 +335,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
     AutoDownUnreachableAfter match {
       case d: FiniteDuration ⇒
         context.actorOf(
-          AutoDown.props(d) withDispatcher (context.props.dispatcher),
+          AutoDown.props(d).withDispatcher(context.props.dispatcher),
           name = "autoDown")
       case _ ⇒ // auto-down is disabled
     }
@@ -350,14 +350,14 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
     gossipTask.cancel()
     failureDetectorReaperTask.cancel()
     leaderActionsTask.cancel()
-    publishStatsTask foreach { _.cancel() }
+    publishStatsTask.foreach { _.cancel() }
   }
 
   def uninitialized: Actor.Receive = {
     case InitJoin ⇒ sender() ! InitJoinNack(selfAddress)
     case ClusterUserAction.JoinTo(address) ⇒ join(address)
     case JoinSeedNodes(newSeedNodes) ⇒ joinSeedNodes(newSeedNodes)
-    case msg: SubscriptionMessage ⇒ publisher forward msg
+    case msg: SubscriptionMessage ⇒ publisher.forward(msg)
   }
 
   def tryingToJoin(joinWith: Address,
@@ -370,7 +370,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
     case JoinSeedNodes(newSeedNodes) ⇒
       becomeUninitialized()
       joinSeedNodes(newSeedNodes)
-    case msg: SubscriptionMessage ⇒ publisher forward msg
+    case msg: SubscriptionMessage ⇒ publisher.forward(msg)
     case _: Tick ⇒
       if (deadline.exists(_.isOverdue)) {
         // join attempt failed, retry
@@ -410,7 +410,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
     case ClusterUserAction.Down(address) ⇒ downing(address)
     case ClusterUserAction.Leave(address) ⇒ leaving(address)
     case SendGossipTo(address) ⇒ sendGossipTo(address)
-    case msg: SubscriptionMessage ⇒ publisher forward msg
+    case msg: SubscriptionMessage ⇒ publisher.forward(msg)
     case QuarantinedEvent(address, uid) ⇒
       quarantined(UniqueAddress(address, uid))
     case ClusterUserAction.JoinTo(address) ⇒
@@ -423,7 +423,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
   }
 
   def removed: Actor.Receive = {
-    case msg: SubscriptionMessage ⇒ publisher forward msg
+    case msg: SubscriptionMessage ⇒ publisher.forward(msg)
   }
 
   def receive = uninitialized
@@ -571,7 +571,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
           val newMembers =
             localMembers + Member(node, roles) + Member(selfUniqueAddress,
                                                         cluster.selfRoles)
-          val newGossip = latestGossip copy (members = newMembers)
+          val newGossip = latestGossip.copy(members = newMembers)
 
           updateLatestGossip(newGossip)
 
@@ -600,7 +600,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
               joinWith)
     else {
       logInfo("Welcome from [{}]", from.address)
-      latestGossip = gossip seen selfUniqueAddress
+      latestGossip = gossip.seen(selfUniqueAddress)
       assertLatestGossip()
       publish(latestGossip)
       if (from != selfUniqueAddress) gossipTo(from, sender())
@@ -618,10 +618,10 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
     if (latestGossip.members.exists(
           m ⇒ m.address == address && m.status == Up)) {
       val newMembers =
-        latestGossip.members map { m ⇒
+        latestGossip.members.map { m ⇒
           if (m.address == address) m.copy(status = Leaving) else m
         } // mark node as LEAVING
-      val newGossip = latestGossip copy (members = newMembers)
+      val newGossip = latestGossip.copy(members = newMembers)
 
       updateLatestGossip(newGossip)
 
@@ -662,9 +662,9 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
         val newSeen = localSeen - m.uniqueAddress
 
         // update gossip overview
-        val newOverview = localOverview copy (seen = newSeen)
+        val newOverview = localOverview.copy(seen = newSeen)
         val newGossip =
-          localGossip copy (members = newMembers, overview = newOverview) // update gossip
+          localGossip.copy(members = newMembers, overview = newOverview) // update gossip
         updateLatestGossip(newGossip)
 
         publish(latestGossip)
@@ -680,8 +680,8 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
       val newReachability =
         latestGossip.overview.reachability.terminated(selfUniqueAddress, node)
       val newOverview =
-        localGossip.overview copy (reachability = newReachability)
-      val newGossip = localGossip copy (overview = newOverview)
+        localGossip.overview.copy(reachability = newReachability)
+      val newGossip = localGossip.copy(overview = newOverview)
       updateLatestGossip(newGossip)
       log.warning(
         "Cluster Node [{}] - Marking node as TERMINATED [{}], due to quarantine",
@@ -703,7 +703,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
         selfAddress,
         from)
     else {
-      (status.version compareTo latestGossip.version) match {
+      (status.version.compareTo(latestGossip.version)) match {
         case VectorClock.Same ⇒ // same version
         case VectorClock.After ⇒
           gossipStatusTo(from, sender()) // remote is newer
@@ -759,12 +759,12 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
         from)
       Ignored
     } else {
-      val comparison = remoteGossip.version compareTo localGossip.version
+      val comparison = remoteGossip.version.compareTo(localGossip.version)
 
       val (winningGossip, talkback, gossipType) = comparison match {
         case VectorClock.Same ⇒
           // same version
-          (remoteGossip mergeSeen localGossip,
+          (remoteGossip.mergeSeen(localGossip),
            !remoteGossip.seenByNode(selfUniqueAddress),
            Same)
         case VectorClock.Before ⇒
@@ -802,14 +802,14 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
               } else g
             }
 
-          (prunedRemoteGossip merge prunedLocalGossip, true, Merge)
+          (prunedRemoteGossip.merge(prunedLocalGossip), true, Merge)
       }
 
-      latestGossip = winningGossip seen selfUniqueAddress
+      latestGossip = winningGossip.seen(selfUniqueAddress)
       assertLatestGossip()
 
       // for all new joining nodes we remove them from the failure detector
-      latestGossip.members foreach { node ⇒
+      latestGossip.members.foreach { node ⇒
         if (node.status == Joining && !localGossip.members(node))
           failureDetector.remove(node.address)
       }
@@ -888,13 +888,13 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
       if (preferredGossipTargets.nonEmpty) {
         val peer = selectRandomNode(preferredGossipTargets)
         // send full gossip because it has different view
-        peer foreach gossipTo
+        peer.foreach(gossipTo)
       } else {
         // Fall back to localGossip; important to not accidentally use `map` of the SortedSet, since the original order is not preserved)
         val peer = selectRandomNode(localGossip.members.toIndexedSeq.collect {
           case m if validNodeForGossip(m.uniqueAddress) ⇒ m.uniqueAddress
         })
-        peer foreach { node ⇒
+        peer.foreach { node ⇒
           if (localGossip.seenByNode(node)) gossipStatusTo(node)
           else gossipTo(node)
         }
@@ -1022,7 +1022,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
     } yield m
 
     val changedMembers =
-      localMembers collect {
+      localMembers.collect {
         var upNumber = 0
 
         {
@@ -1043,7 +1043,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
 
           case m if m.status == Leaving ⇒
             // Move LEAVING => EXITING (once we have a convergence on LEAVING)
-            m copy (status = Exiting)
+            m.copy(status = Exiting)
         }
       }
 
@@ -1052,15 +1052,15 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
 
       // replace changed members
       val newMembers =
-        changedMembers union localMembers diff removedUnreachable
+        changedMembers.union(localMembers).diff(removedUnreachable)
 
       // removing REMOVED nodes from the `seen` table
       val removed = removedUnreachable.map(_.uniqueAddress)
-      val newSeen = localSeen diff removed
+      val newSeen = localSeen.diff(removed)
       // removing REMOVED nodes from the `reachability` table
       val newReachability = localOverview.reachability.remove(removed)
       val newOverview =
-        localOverview copy (seen = newSeen, reachability = newReachability)
+        localOverview.copy(seen = newSeen, reachability = newReachability)
       // Clear the VectorClock when member is removed. The change made by the leader is stamped
       // and will propagate as is if there are no other changes on other nodes.
       // If other concurrent changes on other nodes (e.g. join) the pruning is also
@@ -1069,18 +1069,19 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
         v.prune(VectorClock.Node(vclockName(node)))
       }
       val newGossip =
-        localGossip copy
-          (members = newMembers, overview = newOverview, version = newVersion)
+        localGossip.copy(members = newMembers,
+                         overview = newOverview,
+                         version = newVersion)
 
       updateLatestGossip(newGossip)
 
       // log status changes
-      changedMembers foreach { m ⇒
+      changedMembers.foreach { m ⇒
         logInfo("Leader is moving node [{}] to [{}]", m.address, m.status)
       }
 
       // log the removal of the unreachable nodes
-      removedUnreachable foreach { m ⇒
+      removedUnreachable.foreach { m ⇒
         val status = if (m.status == Exiting) "exiting" else "unreachable"
         logInfo("Leader is removing {} node [{}]", status, m.address)
       }
@@ -1118,12 +1119,12 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
 
     if (changedMembers.nonEmpty) {
       // replace changed members
-      val newMembers = changedMembers union localMembers
+      val newMembers = changedMembers.union(localMembers)
       val newGossip = localGossip.copy(members = newMembers)
       updateLatestGossip(newGossip)
 
       // log status changes
-      changedMembers foreach { m ⇒
+      changedMembers.foreach { m ⇒
         logInfo("Leader is moving node [{}] to [{}]", m.address, m.status)
       }
 
@@ -1143,7 +1144,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
       val localMembers = localGossip.members
 
       val newlyDetectedUnreachableMembers =
-        localMembers filterNot { member ⇒
+        localMembers.filterNot { member ⇒
           member.uniqueAddress == selfUniqueAddress ||
           localOverview.reachability.status(
             selfUniqueAddress,
@@ -1155,12 +1156,14 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
         }
 
       val newlyDetectedReachableMembers =
-        localOverview.reachability.allUnreachableFrom(selfUniqueAddress) collect {
-          case node
-              if node != selfUniqueAddress &&
-                failureDetector.isAvailable(node.address) ⇒
-            localGossip.member(node)
-        }
+        localOverview.reachability
+          .allUnreachableFrom(selfUniqueAddress)
+          .collect {
+            case node
+                if node != selfUniqueAddress &&
+                  failureDetector.isAvailable(node.address) ⇒
+              localGossip.member(node)
+          }
 
       if (newlyDetectedUnreachableMembers.nonEmpty ||
           newlyDetectedReachableMembers.nonEmpty) {
@@ -1178,8 +1181,8 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
 
         if (newReachability2 ne localOverview.reachability) {
           val newOverview =
-            localOverview copy (reachability = newReachability2)
-          val newGossip = localGossip copy (overview = newOverview)
+            localOverview.copy(reachability = newReachability2)
+          val newGossip = localGossip.copy(overview = newOverview)
 
           updateLatestGossip(newGossip)
 
@@ -1247,7 +1250,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef)
     // Updating the vclock version for the changes
     val versionedGossip = newGossip :+ vclockNode
     // Nobody else have seen this gossip but us
-    val seenVersionedGossip = versionedGossip onlySeen (selfUniqueAddress)
+    val seenVersionedGossip = versionedGossip.onlySeen(selfUniqueAddress)
     // Update the state with the new gossip
     latestGossip = seenVersionedGossip
     assertLatestGossip()
@@ -1314,7 +1317,7 @@ private[cluster] final class FirstSeedNodeProcess(
     case JoinSeedNode ⇒
       if (timeout.hasTimeLeft) {
         // send InitJoin to remaining seed nodes (except myself)
-        remainingSeedNodes foreach { a ⇒
+        remainingSeedNodes.foreach { a ⇒
           context.actorSelection(context.parent.path.toStringWithAddress(a)) ! InitJoin
         }
       } else {
@@ -1379,10 +1382,12 @@ private[cluster] final class JoinSeedNodeProcess(
   def receive = {
     case JoinSeedNode ⇒
       // send InitJoin to all seed nodes (except myself)
-      seedNodes.collect {
-        case a if a != selfAddress ⇒
-          context.actorSelection(context.parent.path.toStringWithAddress(a))
-      } foreach { _ ! InitJoin }
+      seedNodes
+        .collect {
+          case a if a != selfAddress ⇒
+            context.actorSelection(context.parent.path.toStringWithAddress(a))
+        }
+        .foreach { _ ! InitJoin }
     case InitJoinAck(address) ⇒
       // first InitJoinAck reply
       context.parent ! JoinTo(address)

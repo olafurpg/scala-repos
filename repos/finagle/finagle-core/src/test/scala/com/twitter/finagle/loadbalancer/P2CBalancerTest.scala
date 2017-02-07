@@ -159,7 +159,7 @@ class P2CBalancerTest extends FunSuite with App with P2CSuite {
     assert(math.abs(init(0).load - fN1.load) < ε)
 
     val init0Load = init(0).load
-    vec() = vec() drop 1
+    vec() = vec().drop(1)
 
     for (_ <- 0 until R) bal()
     assert(init0Load == init(0).load)
@@ -189,12 +189,12 @@ class P2CBalancerTest extends FunSuite with App with P2CSuite {
 
     run(R)
     assert(init0Load == init(0).load)
-    assertEven(init drop 1)
+    assertEven(init.drop(1))
 
     Closable.all(byIndex(0).toSeq: _*).close()
     for (_ <- 0 until R) bal()
     assert(init(0).load == 0)
-    assertEven(init drop 1)
+    assertEven(init.drop(1))
 
     init(0).stat = Status.Open
 
@@ -238,12 +238,12 @@ class P2CBalancerTest extends FunSuite with App with P2CSuite {
     val init0Load2 = init(0).load
     assert(math.abs(init0Load * 2 - init0Load2) < ε)
 
-    for (f <- init drop N / 2) f.stat = Status.Open
+    for (f <- init.drop(N / 2)) f.stat = Status.Open
     for (_ <- 0 until R) bal()
 
     assert(init0Load2 == init(0).load)
-    assertEven(init drop N / 2)
-    assertEven(init take N / 2)
+    assertEven(init.drop(N / 2))
+    assertEven(init.take(N / 2))
   }
 
   test("Stats") {

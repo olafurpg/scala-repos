@@ -21,7 +21,7 @@ final class PgnDump(netBaseUrl: String,
     }
     val ts = tags(game, initialFen, imported)
     val fenSituation =
-      ts find (_.name == Tag.FEN) flatMap {
+      (ts find (_.name == Tag.FEN)).flatMap {
         case Tag(_, fen) => Forsyth <<< fen
       }
     val moves2 = fenSituation
@@ -50,7 +50,7 @@ final class PgnDump(netBaseUrl: String,
     (game.whitePlayer.userId ?? getLightUser) ->
       (game.blackPlayer.userId ?? getLightUser)
 
-  private val dateFormat = DateTimeFormat forPattern "yyyy.MM.dd";
+  private val dateFormat = DateTimeFormat.forPattern("yyyy.MM.dd");
 
   private def rating(p: Player) = p.rating.fold("?")(_.toString)
 
@@ -70,14 +70,14 @@ final class PgnDump(netBaseUrl: String,
     gameLightUsers(game) match {
       case (wu, bu) =>
         List(
-          Tag(_.Event, imported.flatMap(_ tag "event") | {
+          Tag(_.Event, imported.flatMap(_.tag("event")) | {
             if (game.imported) "Import"
             else game.rated.fold("Rated game", "Casual game")
           }),
           Tag(_.Site, gameUrl(game.id)),
-          Tag(
-            _.Date,
-            imported.flatMap(_ tag "date") | dateFormat.print(game.createdAt)),
+          Tag(_.Date,
+              imported.flatMap(_.tag("date")) | dateFormat.print(
+                game.createdAt)),
           Tag(_.White, player(game.whitePlayer, wu)),
           Tag(_.Black, player(game.blackPlayer, bu)),
           Tag(_.Result, result(game)),
@@ -111,14 +111,19 @@ final class PgnDump(netBaseUrl: String,
     }
 
   private def turns(moves: List[String], from: Int): List[chessPgn.Turn] =
-    (moves grouped 2).zipWithIndex.toList map {
-      case (moves, index) =>
-        chessPgn.Turn(number = index + from,
-                      white = moves.headOption filter (".." !=) map {
-                        chessPgn.Move(_)
-                      },
-                      black = moves lift 1 map { chessPgn.Move(_) })
-    } filterNot (_.isEmpty)
+    (moves
+      .grouped(2))
+      .zipWithIndex
+      .toList
+      .map {
+        case (moves, index) =>
+          chessPgn.Turn(number = index + from,
+                        white = moves.headOption.filter(".." !=).map {
+                          chessPgn.Move(_)
+                        },
+                        black = moves.lift(1).map { chessPgn.Move(_) })
+      }
+      .filterNot(_.isEmpty)
 }
 
 object PgnDump {

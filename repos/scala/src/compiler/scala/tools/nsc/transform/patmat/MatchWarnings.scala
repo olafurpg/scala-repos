@@ -24,11 +24,11 @@ trait MatchWarnings { self: PatternMatching =>
     private def matchingSymbolInScope(pat: Tree): Symbol = {
       def declarationOfName(tpe: Type, name: Name): Symbol = tpe match {
         case PolyType(tparams, restpe) =>
-          tparams find (_.name == name) getOrElse declarationOfName(restpe,
-                                                                    name)
+          (tparams find (_.name == name))
+            .getOrElse(declarationOfName(restpe, name))
         case MethodType(params, restpe) =>
-          params find (_.name == name) getOrElse declarationOfName(restpe,
-                                                                   name)
+          (params find (_.name == name))
+            .getOrElse(declarationOfName(restpe, name))
         case ClassInfoType(_, _, clazz) => clazz.rawInfo member name
         case _ => NoSymbol
       }
@@ -36,7 +36,7 @@ trait MatchWarnings { self: PatternMatching =>
         case Bind(name, _) =>
           context.enclosingContextChain.foldLeft(NoSymbol: Symbol)(
             (res, ctx) =>
-              res orElse declarationOfName(ctx.owner.rawInfo, name))
+              res.orElse(declarationOfName(ctx.owner.rawInfo, name)))
         case _ => NoSymbol
       }
     }
@@ -78,7 +78,7 @@ trait MatchWarnings { self: PatternMatching =>
         // we have a reason to mention its pattern variable name and any corresponding
         // symbol in scope.  Errors will follow from the remaining cases, at least
         // once we make the above warning an error.
-        else if (it.hasNext && (treeInfo isDefaultCase cdef)) {
+        else if (it.hasNext && (treeInfo.isDefaultCase(cdef))) {
           val vpatName = cdef.pat match {
             case Bind(name, _) => s" '$name'"
             case _ => ""

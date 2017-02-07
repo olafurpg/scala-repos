@@ -48,7 +48,7 @@ object FlattenExample {
 
   val t2 = (1, ((2, 3.0), 4))
   val f2 = flatten(t2) // Inferred type is (Int, Int, Double, Int)
-  val ds = f2 map toDouble // Inferred type is (Double, Double, Double, Double)
+  val ds = f2.map(toDouble) // Inferred type is (Double, Double, Double, Double)
   val l2 = ds.toList // Inferred type is List[Double]
   typed[List[Double]](l2)
 

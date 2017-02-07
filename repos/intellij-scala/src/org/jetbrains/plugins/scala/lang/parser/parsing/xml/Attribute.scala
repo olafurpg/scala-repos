@@ -34,12 +34,12 @@ object Attribute {
     builder.getTokenType match {
       case ScalaXmlTokenTypes.XML_EQ => builder.advanceLexer()
       case _ =>
-        builder error ErrMsg("xml.eq.expected")
+        builder.error(ErrMsg("xml.eq.expected"))
         attributeMarker.done(ScalaElementTypes.XML_ATTRIBUTE)
         return true
     }
     if (!AttrValue.parse(builder))
-      builder error ErrMsg("xml.attribute.value.expected")
+      builder.error(ErrMsg("xml.attribute.value.expected"))
     attributeMarker.done(ScalaElementTypes.XML_ATTRIBUTE)
     true
   }

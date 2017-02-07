@@ -51,7 +51,7 @@ object Binding {
       new PartialBinding(field.validateWith(validators: _*))
 
     def transform(transformer: (T) => T): Binding =
-      new PartialBinding(field transform transformer)
+      new PartialBinding(field.transform(transformer))
 
     def validate: Binding =
       throw new BindingException(

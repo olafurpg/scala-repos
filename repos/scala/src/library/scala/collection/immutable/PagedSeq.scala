@@ -49,7 +49,7 @@ object PagedSeq {
         current.getChars(0, cnt, data, start)
         current = current.substring(cnt)
         if (cnt == len) cnt
-        else (more(data, start + cnt, len - cnt) max 0) + cnt
+        else (more(data, start + cnt, len - cnt).max(0)) + cnt
       } else if (source.hasNext) {
         current = source.next()
         more(data, start, len)
@@ -67,7 +67,7 @@ object PagedSeq {
     */
   def fromLines(source: Iterator[String]): PagedSeq[Char] = {
     var isFirst = true
-    fromStrings(source map { line =>
+    fromStrings(source.map { line =>
       if (isFirst) {
         isFirst = false
         line
@@ -204,7 +204,7 @@ class PagedSeq[T: ClassTag] protected (more: (Array[T], Int, Int) => Int,
   /** Convert sequence to string */
   override def toString = {
     val buf = new StringBuilder
-    for (ch <- PagedSeq.this.iterator) buf append ch
+    for (ch <- PagedSeq.this.iterator) buf.append(ch)
     buf.toString
   }
 }

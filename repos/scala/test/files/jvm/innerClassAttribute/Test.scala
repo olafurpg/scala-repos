@@ -26,7 +26,7 @@ object Test extends BytecodeTest {
   def testInner(cls: String, fs: (InnerClassNode => Unit)*) = {
     val ns = innerClassNodes(cls)
     assert(ns.length == fs.length, ns.map(_.name))
-    (ns zip fs.toList) foreach { case (n, f) => f(n) }
+    (ns.zip(fs.toList)).foreach { case (n, f) => f(n) }
   }
 
   final case class EnclosingMethod(name: String,

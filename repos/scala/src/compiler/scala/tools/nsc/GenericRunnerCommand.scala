@@ -46,16 +46,16 @@ class GenericRunnerCommand(args: List[String],
   }
 
   /** String with either the jar file, class name, or script file name. */
-  def thingToRun = targetAndArguments.headOption getOrElse ""
+  def thingToRun = targetAndArguments.headOption.getOrElse("")
 
   /** Arguments to thingToRun. */
-  def arguments = targetAndArguments drop 1
+  def arguments = targetAndArguments.drop(1)
 
   val howToRun = targetAndArguments match {
     case Nil => AsRepl
     case hd :: _ =>
-      waysToRun find (_.name == settings.howtorun.value) getOrElse guessHowToRun(
-        hd)
+      (waysToRun find (_.name == settings.howtorun.value))
+        .getOrElse(guessHowToRun(hd))
   }
 
   def shortUsageMsg =

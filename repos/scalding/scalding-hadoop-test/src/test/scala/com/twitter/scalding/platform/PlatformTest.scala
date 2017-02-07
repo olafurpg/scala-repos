@@ -493,7 +493,7 @@ class PlatformTest
     "Writing to a tsv in a flow shouldn't effect the output" in {
       HadoopPlatformJobTest(new TsvNoCacheJob(_), cluster)
         .source(dataInput, data)
-        .sink(typedThrowAwayOutput) { _.toSet should have size 4 }
+        .sink(typedThrowAwayOutput) { (_.toSet should have).size(4) }
         .sink(typedRealOutput) {
           _.map { f: Float =>
             (f * 10).toInt
@@ -525,10 +525,10 @@ class PlatformTest
         val firstStep = steps.filter(_.getName.startsWith("(1/2"))
         val secondStep = steps.filter(_.getName.startsWith("(2/2"))
         val lab1 = firstStep.map(_.getConfig.get(Config.StepDescriptions))
-        lab1 should have size 1
+        (lab1 should have).size(1)
         lab1(0) should include("write words to disk")
         val lab2 = secondStep.map(_.getConfig.get(Config.StepDescriptions))
-        lab2 should have size 1
+        (lab2 should have).size(1)
         lab2(0) should include("output frequency by length")
       }.run
     }
@@ -540,7 +540,7 @@ class PlatformTest
       HadoopPlatformJobTest(new TypedPipeJoinWithDescriptionJob(_), cluster).inspectCompletedFlow {
         flow =>
           val steps = flow.getFlowSteps.asScala
-          steps should have size 1
+          (steps should have).size(1)
           val firstStep = steps.headOption
             .map(_.getConfig.get(Config.StepDescriptions))
             .getOrElse("")
@@ -565,7 +565,7 @@ class PlatformTest
       HadoopPlatformJobTest(new TypedPipeHashJoinWithForceToDiskJob(_),
                             cluster).inspectCompletedFlow { flow =>
         val steps = flow.getFlowSteps.asScala
-        steps should have size 2
+        (steps should have).size(2)
         val secondStep = steps.lastOption
           .map(_.getConfig.get(Config.StepDescriptions))
           .getOrElse("")
@@ -580,7 +580,7 @@ class PlatformTest
       HadoopPlatformJobTest(new TypedPipeHashJoinWithForceToDiskFilterJob(_),
                             cluster).inspectCompletedFlow { flow =>
         val steps = flow.getFlowSteps.asScala
-        steps should have size 3
+        (steps should have).size(3)
         val lastStep = steps.lastOption
           .map(_.getConfig.get(Config.StepDescriptions))
           .getOrElse("")
@@ -596,7 +596,7 @@ class PlatformTest
         new TypedPipeHashJoinWithForceToDiskWithComplete(_),
         cluster).inspectCompletedFlow { flow =>
         val steps = flow.getFlowSteps.asScala
-        steps should have size 2
+        (steps should have).size(2)
         val lastStep = steps.lastOption
           .map(_.getConfig.get(Config.StepDescriptions))
           .getOrElse("")
@@ -611,7 +611,7 @@ class PlatformTest
       HadoopPlatformJobTest(new TypedPipeHashJoinWithForceToDiskMapJob(_),
                             cluster).inspectCompletedFlow { flow =>
         val steps = flow.getFlowSteps.asScala
-        steps should have size 2
+        (steps should have).size(2)
         val lastStep = steps.lastOption
           .map(_.getConfig.get(Config.StepDescriptions))
           .getOrElse("")
@@ -627,7 +627,7 @@ class PlatformTest
         new TypedPipeHashJoinWithForceToDiskMapWithAutoForceJob(_),
         cluster).inspectCompletedFlow { flow =>
         val steps = flow.getFlowSteps.asScala
-        steps should have size 3
+        (steps should have).size(3)
         val lastStep = steps.lastOption
           .map(_.getConfig.get(Config.StepDescriptions))
           .getOrElse("")
@@ -648,7 +648,7 @@ class PlatformTest
                     ("second", 2)))
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
-          steps should have size 2
+          (steps should have).size(2)
           val lastStep = steps.lastOption
             .map(_.getConfig.get(Config.StepDescriptions))
             .getOrElse("")
@@ -666,7 +666,7 @@ class PlatformTest
         .source(TypedTsv[(Int, Int)]("input1"), List((0, 1), (2, 5), (3, 2)))
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
-          steps should have size 2
+          (steps should have).size(2)
           val lastStep = steps.lastOption
             .map(_.getConfig.get(Config.StepDescriptions))
             .getOrElse("")
@@ -684,7 +684,7 @@ class PlatformTest
                 Seq((1, 30), (1, 10), (1, 20), (2, 20)))
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
-          steps should have size 2
+          (steps should have).size(2)
           val lastStep = steps.lastOption
             .map(_.getConfig.get(Config.StepDescriptions))
             .getOrElse("")

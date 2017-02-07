@@ -18,9 +18,9 @@ final class Env(config: Config,
   }
   import settings._
 
-  val AnimationDuration = config duration "animation.duration"
+  val AnimationDuration = config.duration("animation.duration")
 
-  private val db = new lila.db.Env(config getConfig "mongodb", lifecycle)
+  private val db = new lila.db.Env(config.getConfig("mongodb"), lifecycle)
 
   lazy val api = new PuzzleApi(puzzleColl = puzzleColl,
                                attemptColl = attemptColl,
@@ -31,8 +31,8 @@ final class Env(config: Config,
   lazy val selector = new Selector(
     puzzleColl = puzzleColl,
     api = api,
-    anonMinRating = config getInt "selector.anon_min_rating",
-    maxAttempts = config getInt "selector.max_attempts")
+    anonMinRating = config.getInt("selector.anon_min_rating"),
+    maxAttempts = config.getInt("selector.max_attempts"))
 
   lazy val userInfos = UserInfos(attemptColl = attemptColl)
 
@@ -54,7 +54,7 @@ final class Env(config: Config,
         }
       case "puzzle" :: "disable" :: id :: Nil =>
         parseIntOption(id) ?? { id =>
-          api.puzzle disable id inject "Done"
+          api.puzzle.disable(id) inject "Done"
         }
     }
   }
@@ -66,10 +66,11 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "puzzle" boot new Env(
-      config = lila.common.PlayApp loadConfig "puzzle",
-      renderer = lila.hub.Env.current.actor.renderer,
-      system = lila.common.PlayApp.system,
-      lifecycle = lila.common.PlayApp.lifecycle
-    )
+    "puzzle".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("puzzle"),
+        renderer = lila.hub.Env.current.actor.renderer,
+        system = lila.common.PlayApp.system,
+        lifecycle = lila.common.PlayApp.lifecycle
+      ))
 }

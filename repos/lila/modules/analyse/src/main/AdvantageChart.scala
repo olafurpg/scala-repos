@@ -14,7 +14,7 @@ object AdvantageChart {
     def move(info: Info, advice: Option[Advice]) = "%s%s %s%s".format(
       info.turn,
       info.color.fold(".", "..."),
-      pgnMoves lift (info.ply - 1 - startPly) getOrElse "",
+      pgnMoves.lift(info.ply - 1 - startPly).getOrElse(""),
       advice.??(" " + _.makeComment(withEval = true, withBestMove = false))
     )
 
@@ -22,7 +22,7 @@ object AdvantageChart {
 
     Json stringify {
       Json toJson {
-        advices map {
+        advices.map {
           case (info, advice) =>
             (info.score, info.mate) match {
               case (Some(score), _) =>

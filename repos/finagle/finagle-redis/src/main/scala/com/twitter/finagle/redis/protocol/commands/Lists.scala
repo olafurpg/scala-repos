@@ -83,7 +83,7 @@ object LPush {
   def apply(args: List[Array[Byte]]): LPush = args match {
     case head :: tail =>
       LPush(ChannelBuffers.wrappedBuffer(head),
-            tail map ChannelBuffers.wrappedBuffer)
+            tail.map(ChannelBuffers.wrappedBuffer))
     case _ => throw ClientError("Invalid use of LPush")
   }
 }
@@ -175,7 +175,7 @@ object RPush {
   def apply(args: List[Array[Byte]]): RPush = args match {
     case head :: tail =>
       RPush(ChannelBuffers.wrappedBuffer(head),
-            tail map ChannelBuffers.wrappedBuffer)
+            tail.map(ChannelBuffers.wrappedBuffer))
     case _ => throw ClientError("Invalid use of RPush")
   }
 }

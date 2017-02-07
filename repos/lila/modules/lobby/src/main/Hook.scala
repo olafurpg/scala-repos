@@ -25,17 +25,17 @@ case class Hook(
     ratingRange: String,
     createdAt: DateTime) {
 
-  val realColor = Color orDefault color
+  val realColor = Color.orDefault(color)
 
-  val realVariant = chess.variant.Variant orDefault variant
+  val realVariant = chess.variant.Variant.orDefault(variant)
 
-  val realMode = Mode orDefault mode
+  val realMode = Mode.orDefault(mode)
 
   def memberOnly = !allowAnon
 
   def compatibleWith(h: Hook) =
     compatibilityProperties == h.compatibilityProperties &&
-      (realColor compatibleWith h.realColor) && (memberOnly || h.memberOnly)
+      (realColor.compatibleWith(h.realColor)) && (memberOnly || h.memberOnly)
       .fold(isAuth && h.isAuth, true) && ratingRangeCompatibleWith(h) &&
       h.ratingRangeCompatibleWith(this)
 
@@ -50,11 +50,11 @@ case class Hook(
   lazy val realRatingRange: Option[RatingRange] =
     RatingRange noneIfDefault ratingRange
 
-  def userId = user map (_.id)
+  def userId = user.map(_.id)
   def isAuth = user.nonEmpty
   def username = user.fold(User.anonymous)(_.username)
-  def rating = user flatMap { u =>
-    perfType map (_.key) flatMap u.ratingMap.get
+  def rating = user.flatMap { u =>
+    perfType.map(_.key).flatMap(u.ratingMap.get)
   }
   def engine = user ?? (_.engine)
   def booster = user ?? (_.booster)
@@ -104,7 +104,7 @@ object Hook {
       mode = mode.id,
       allowAnon = allowAnon || user.isEmpty,
       color = color,
-      user = user map { LobbyUser.make(_, blocking) },
+      user = user.map { LobbyUser.make(_, blocking) },
       sid = sid,
       ratingRange = ratingRange.toString,
       createdAt = DateTime.now

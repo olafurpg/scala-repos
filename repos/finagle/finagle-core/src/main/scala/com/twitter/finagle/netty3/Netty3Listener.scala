@@ -102,7 +102,7 @@ object Netty3Listener {
         }
       })
 
-      p.within(deadline - Time.now) transform { _ =>
+      p.within(deadline - Time.now).transform { _ =>
         activeChannels.close()
         // Force close any remaining connections. Don't wait for success.
         bootstrap.releaseExternalResources()
@@ -340,7 +340,7 @@ case class Netty3Listener[In, Out](
   def listen(addr: SocketAddress)(
       serveTransport: Transport[In, Out] => Unit): ListeningServer =
     new ListeningServer with CloseAwaitably {
-      val serverLabel = ServerRegistry.nameOf(addr) getOrElse name
+      val serverLabel = ServerRegistry.nameOf(addr).getOrElse(name)
       val scopedStatsReceiver = statsReceiver match {
         case ServerStatsReceiver if serverLabel.nonEmpty =>
           statsReceiver.scope(serverLabel)

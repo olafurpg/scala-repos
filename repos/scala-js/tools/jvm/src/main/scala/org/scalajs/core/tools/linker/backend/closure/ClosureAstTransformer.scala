@@ -23,7 +23,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
   private val dummySourceName = new java.net.URI("virtualfile:scala.js-ir")
 
   def transformStat(tree: Tree)(implicit parentPos: Position): Node =
-    innerTransformStat(tree, tree.pos orElse parentPos)
+    innerTransformStat(tree, tree.pos.orElse(parentPos))
 
   private def innerTransformStat(tree: Tree, pos_in: Position): Node = {
     implicit val pos = pos_in
@@ -69,7 +69,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
                  transformLabel(label),
                  setNodePosition(doNode, pos))
       case Try(block, errVar, handler, EmptyTree) =>
-        val catchPos = handler.pos orElse pos
+        val catchPos = handler.pos.orElse(pos)
         val catchNode =
           new Node(Token.CATCH, transformName(errVar), transformBlock(handler))
         val blockNode =
@@ -84,7 +84,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
                  blockNode,
                  transformBlock(finalizer))
       case Try(block, errVar, handler, finalizer) =>
-        val catchPos = handler.pos orElse pos
+        val catchPos = handler.pos.orElse(pos)
         val catchNode =
           new Node(Token.CATCH, transformName(errVar), transformBlock(handler))
         val blockNode =
@@ -112,7 +112,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
           bodyNode.putBooleanProp(Node.SYNTHETIC_BLOCK_PROP, true)
           val caseNode = new Node(Token.CASE, transformExpr(expr), bodyNode)
           switchNode.addChildToBack(
-            setNodePosition(caseNode, expr.pos orElse pos))
+            setNodePosition(caseNode, expr.pos.orElse(pos)))
         }
 
         if (default != EmptyTree) {
@@ -120,7 +120,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
           bodyNode.putBooleanProp(Node.SYNTHETIC_BLOCK_PROP, true)
           val caseNode = new Node(Token.DEFAULT_CASE, bodyNode)
           switchNode.addChildToBack(
-            setNodePosition(caseNode, default.pos orElse pos))
+            setNodePosition(caseNode, default.pos.orElse(pos)))
         }
 
         switchNode
@@ -141,7 +141,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
   }
 
   def transformExpr(tree: Tree)(implicit parentPos: Position): Node =
-    innerTransformExpr(tree, tree.pos orElse parentPos)
+    innerTransformExpr(tree, tree.pos.orElse(parentPos))
 
   private def innerTransformExpr(tree: Tree, pos_in: Position): Node = {
     implicit val pos = pos_in
@@ -244,15 +244,15 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
 
   def transformName(ident: Ident)(implicit parentPos: Position): Node =
     setNodePosition(Node.newString(Token.NAME, ident.name),
-                    ident.pos orElse parentPos)
+                    ident.pos.orElse(parentPos))
 
   def transformLabel(ident: Ident)(implicit parentPos: Position): Node =
     setNodePosition(Node.newString(Token.LABEL_NAME, ident.name),
-                    ident.pos orElse parentPos)
+                    ident.pos.orElse(parentPos))
 
   def transformString(pName: PropertyName)(
       implicit parentPos: Position): Node =
-    setNodePosition(Node.newString(pName.name), pName.pos orElse parentPos)
+    setNodePosition(Node.newString(pName.name), pName.pos.orElse(parentPos))
 
   def transformStringKey(pName: PropertyName)(
       implicit parentPos: Position): Node = {
@@ -260,7 +260,7 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
 
     if (pName.isInstanceOf[StringLiteral]) node.setQuotedString()
 
-    setNodePosition(node, pName.pos orElse parentPos)
+    setNodePosition(node, pName.pos.orElse(parentPos))
   }
 
   def transformBlock(tree: Tree)(implicit parentPos: Position): Node = {

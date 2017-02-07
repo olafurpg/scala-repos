@@ -55,11 +55,11 @@ class CompactHessian(M: DenseMatrix[Double],
     // L_k is the k x k matrix with (L_k)_{i,j} = if( i > j ) s_i^T y_j else 0
     // (this is a lower triangular matrix with the diagonal set to all zeroes)
     val D = diag(DenseVector.tabulate[Double](k) { i =>
-      S(i) dot Y(i)
+      S(i).dot(Y(i))
     })
     val L = DenseMatrix.tabulate[Double](k, k) { (i, j) =>
       if (i > j) {
-        S(i) dot Y(j)
+        S(i).dot(Y(j))
       } else {
         0.0
       }

@@ -106,7 +106,7 @@ class FpFilterTest extends FunSuite with Checkers {
     } yield Point(x, y)
 
   def genEpsilon: Gen[Double] =
-    genSimpleDouble map (_ * FpFilter.Eps)
+    genSimpleDouble.map(_ * FpFilter.Eps)
 
   def genSimplex: Gen[Simplex] =
     for {
@@ -154,7 +154,7 @@ class FpFilterTest extends FunSuite with Checkers {
     Arbitrary(genSimplex)
 
   implicit def arbDegenerateSimplex: Arbitrary[Degenerate[Simplex]] =
-    Arbitrary(genDegenerateSimplex map (new Degenerate(_)))
+    Arbitrary(genDegenerateSimplex.map(new Degenerate(_)))
 
   test("Orientation test for simple case")(check(forAll { (s: Simplex) =>
     Sign(signExact(s)) == Sign(signFpFilter(s))

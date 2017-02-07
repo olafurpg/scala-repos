@@ -798,7 +798,7 @@ class HttpServerSpec
         `Remote-Address`(RemoteAddress(theAddress, Some(8080))))
     }
 
-    "support request timeouts" which {
+    "support request timeouts".which {
 
       "are defined via the config" in new RequestTimeoutTestSetup(10.millis) {
         send("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
@@ -910,7 +910,7 @@ class HttpServerSpec
       netOut.expectComplete()
     }
 
-    "support request length verification" which afterWord("is defined via") {
+    "support request length verification".which(afterWord("is defined via") {
 
       class LengthVerificationTest(maxContentLength: Int)
           extends TestSetup(maxContentLength) {
@@ -920,13 +920,13 @@ class HttpServerSpec
                  |Host: example.com
                  |Content-Length: $bytes
                  |
-                 |${entityBase take bytes}""")
+                 |${entityBase.take(bytes)}""")
         def sendDefaultRequestWithLength(bytes: Int) = {
           send(s"""POST /foo HTTP/1.1
                  |Host: example.com
                  |Content-Length: $bytes
                  |
-                 |${entityBase take 3}""")
+                 |${entityBase.take(3)}""")
           send(entityBase.slice(3, 7))
           send(entityBase.slice(7, bytes))
         }
@@ -936,7 +936,7 @@ class HttpServerSpec
                  |Transfer-Encoding: chunked
                  |
                  |3
-                 |${entityBase take 3}
+                 |${entityBase.take(3)}
                  |4
                  |${entityBase.slice(3, 7)}
                  |${bytes - 7}
@@ -1052,14 +1052,14 @@ class HttpServerSpec
         maxContentLength = 12) {
         sendStrictRequestWithLength(10)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[HttpEntity.Strict](10)
 
         // entities that would be strict but have a Content-Length > the configured maximum are delivered
         // as single element Default entities!
         sendStrictRequestWithLength(11)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
       }
 
@@ -1067,12 +1067,12 @@ class HttpServerSpec
         maxContentLength = 12) {
         sendDefaultRequestWithLength(10)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[HttpEntity.Default](10)
 
         sendDefaultRequestWithLength(11)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
       }
 
@@ -1080,12 +1080,12 @@ class HttpServerSpec
         maxContentLength = 12) {
         sendChunkedRequestWithLength(10)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[HttpEntity.Chunked](10)
 
         sendChunkedRequestWithLength(11)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectChunkedEntityWithSizeError(limit = 10)
       }
 
@@ -1095,12 +1095,12 @@ class HttpServerSpec
         // as single element Default entities!
         sendStrictRequestWithLength(10)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[HttpEntity.Default](10)
 
         sendStrictRequestWithLength(11)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
       }
 
@@ -1108,12 +1108,12 @@ class HttpServerSpec
         maxContentLength = 8) {
         sendDefaultRequestWithLength(10)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[HttpEntity.Default](10)
 
         sendDefaultRequestWithLength(11)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
       }
 
@@ -1121,19 +1121,19 @@ class HttpServerSpec
         maxContentLength = 8) {
         sendChunkedRequestWithLength(10)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[HttpEntity.Chunked](10)
 
         sendChunkedRequestWithLength(11)
         expectRequest()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectChunkedEntityWithSizeError(limit = 10)
       }
 
       "the config setting applied before another attribute (default entity)" in new LengthVerificationTest(
         maxContentLength = 10) {
         def nameDataSource(name: String): RequestEntity ⇒ RequestEntity = {
-          case x: HttpEntity.Default ⇒ x.copy(data = x.data named name)
+          case x: HttpEntity.Default ⇒ x.copy(data = x.data.named(name))
           case _ ⇒ ??? // prevent a compile-time warning
         }
         sendDefaultRequestWithLength(10)
@@ -1146,7 +1146,7 @@ class HttpServerSpec
           .mapEntity(nameDataSource("foo"))
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
       }
-    }
+    })
   }
   class TestSetup(maxContentLength: Int = -1) extends HttpServerTestSetupBase {
     implicit def system = spec.system

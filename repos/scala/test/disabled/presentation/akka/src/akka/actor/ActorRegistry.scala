@@ -119,12 +119,12 @@ final class ActorRegistry private[actor] () extends ListenerManagement {
   /**
     * Finds all actors that has a specific id.
     */
-  def actorsFor(id: String): Array[ActorRef] = actorsById values id
+  def actorsFor(id: String): Array[ActorRef] = actorsById.values(id)
 
   /**
     * Finds the actor that has a specific UUID.
     */
-  def actorFor(uuid: Uuid): Option[ActorRef] = Option(actorsByUUID get uuid)
+  def actorFor(uuid: Uuid): Option[ActorRef] = Option(actorsByUUID.get(uuid))
 
   /**
     * Returns all typed actors in the system.
@@ -213,7 +213,7 @@ final class ActorRegistry private[actor] () extends ListenerManagement {
     */
   def typedActorsFor(id: String): Array[AnyRef] = {
     TypedActorModule.ensureEnabled
-    val actorRefs = actorsById values id
+    val actorRefs = actorsById.values(id)
     actorRefs.flatMap(typedActorFor(_))
   }
 
@@ -222,7 +222,7 @@ final class ActorRegistry private[actor] () extends ListenerManagement {
     */
   def typedActorFor(uuid: Uuid): Option[AnyRef] = {
     TypedActorModule.ensureEnabled
-    val actorRef = actorsByUUID get uuid
+    val actorRef = actorsByUUID.get(uuid)
     if (actorRef eq null) None
     else typedActorFor(actorRef)
   }
@@ -255,7 +255,7 @@ final class ActorRegistry private[actor] () extends ListenerManagement {
     val id = actor.id
     val uuid = actor.uuid
 
-    actorsByUUID remove uuid
+    actorsByUUID.remove(uuid)
     actorsById.remove(id, actor)
 
     // notify listeners
@@ -306,7 +306,7 @@ class Index[K <: AnyRef, V <: AnyRef: ArrayTag] {
     def spinPut(k: K, v: V): Boolean = {
       var retry = false
       var added = false
-      val set = container get k
+      val set = container.get(k)
 
       if (set ne null) {
         set.synchronized {
@@ -314,13 +314,13 @@ class Index[K <: AnyRef, V <: AnyRef: ArrayTag] {
             retry = true //IF the set is empty then it has been removed, so signal retry
           else {
             //Else add the value to the set and signal that retry is not needed
-            added = set add v
+            added = set.add(v)
             retry = false
           }
         }
       } else {
         val newSet = new ConcurrentSkipListSet[V]
-        newSet add v
+        newSet.add(v)
 
         // Parry for two simultaneous putIfAbsent(id,newSet)
         val oldSet = container.putIfAbsent(k, newSet)
@@ -330,7 +330,7 @@ class Index[K <: AnyRef, V <: AnyRef: ArrayTag] {
               retry = true //IF the set is empty then it has been removed, so signal retry
             else {
               //Else try to add the value to the set and signal that retry is not needed
-              added = oldSet add v
+              added = oldSet.add(v)
               retry = false
             }
           }
@@ -348,7 +348,7 @@ class Index[K <: AnyRef, V <: AnyRef: ArrayTag] {
     * @return a _new_ array of all existing values for the given key at the time of the call
     */
   def values(key: K): Array[V] = {
-    val set: JSet[V] = container get key
+    val set: JSet[V] = container.get(key)
     val result = if (set ne null) set toArray Naught else Naught
     result.asInstanceOf[Array[V]]
   }
@@ -359,7 +359,7 @@ class Index[K <: AnyRef, V <: AnyRef: ArrayTag] {
     */
   def findValue(key: K)(f: (V) => Boolean): Option[V] = {
     import scala.collection.JavaConversions._
-    val set = container get key
+    val set = container.get(key)
     if (set ne null) set.iterator.find(f)
     else None
   }
@@ -369,7 +369,7 @@ class Index[K <: AnyRef, V <: AnyRef: ArrayTag] {
     */
   def foreach(fun: (K, V) => Unit) {
     import scala.collection.JavaConversions._
-    container.entrySet foreach { (e) =>
+    container.entrySet.foreach { (e) =>
       e.getValue.foreach(fun(e.getKey, _))
     }
   }
@@ -379,7 +379,7 @@ class Index[K <: AnyRef, V <: AnyRef: ArrayTag] {
     * @return true if the value was disassociated from the key and false if it wasn't previously associated with the key
     */
   def remove(key: K, value: V): Boolean = {
-    val set = container get key
+    val set = container.get(key)
 
     if (set ne null) {
       set.synchronized {

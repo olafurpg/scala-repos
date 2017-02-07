@@ -39,7 +39,7 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     * servlet path and its path info, or None if there is no resource at that path.
     */
   def resource(req: HttpServletRequest): Option[URL] = {
-    val path = req.getServletPath + (Option(req.getPathInfo) getOrElse "")
+    val path = req.getServletPath + (Option(req.getPathInfo).getOrElse(""))
     resource(path)
   }
 
@@ -140,7 +140,7 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
                            name: String,
                            loadOnStartup: Int): Unit = {
     val reg =
-      Option(sc.getServletRegistration(name)) getOrElse {
+      Option(sc.getServletRegistration(name)).getOrElse {
         val r = sc.addServlet(name, servlet)
         servlet match {
           case s: HasMultipartConfig =>
@@ -161,7 +161,7 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
                            name: String,
                            loadOnStartup: Int): Unit = {
     val reg =
-      Option(sc.getServletRegistration(name)) getOrElse {
+      Option(sc.getServletRegistration(name)).getOrElse {
         val r = sc.addServlet(name, servletClass)
         // since we only have a Class[_] here, we can't access the MultipartConfig value
         // if (classOf[HasMultipartConfig].isAssignableFrom(servletClass))
@@ -178,7 +178,7 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
                           urlPattern: String,
                           name: String): Unit = {
     val reg =
-      Option(sc.getFilterRegistration(name)) getOrElse {
+      Option(sc.getFilterRegistration(name)).getOrElse {
         val r = sc.addFilter(name, filter)
         if (filter.isInstanceOf[ScalatraAsyncSupport])
           r.setAsyncSupported(true)
@@ -194,7 +194,7 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
                           urlPattern: String,
                           name: String): Unit = {
     val reg =
-      Option(sc.getFilterRegistration(name)) getOrElse {
+      Option(sc.getFilterRegistration(name)).getOrElse {
         val r = sc.addFilter(name, filterClass)
         if (classOf[ScalatraAsyncSupport].isAssignableFrom(filterClass)) {
           r.setAsyncSupported(true)
@@ -213,8 +213,10 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     * absent, as an init parameter.  The default value is `DEVELOPMENT`.
     */
   def environment: String = {
-    sys.props.get(EnvironmentKey) orElse initParameters.get(EnvironmentKey) getOrElse
-      ("DEVELOPMENT")
+    sys.props
+      .get(EnvironmentKey)
+      .orElse(initParameters.get(EnvironmentKey))
+      .getOrElse("DEVELOPMENT")
   }
 
   object initParameters extends mutable.Map[String, String] {

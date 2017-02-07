@@ -46,7 +46,7 @@ class ScalaJSRunner(testFile: File,
   }
 
   override val checkFile: File = {
-    scalaJSConfigFile("check") getOrElse {
+    scalaJSConfigFile("check").getOrElse {
       // this is super.checkFile, but apparently we can't do that
       new FileOps(testFile).changeExtension("check")
     }

@@ -156,7 +156,7 @@ abstract class BasicDirectives extends BasicDirectivesBase {
       import java.{lang ⇒ jl}
       def paramMatches(expected: Class[_], actual: Class[_]): Boolean =
         expected match {
-          case e if e isAssignableFrom actual ⇒ true
+          case e if e.isAssignableFrom(actual) ⇒ true
           case jl.Long.TYPE if actual == classOf[jl.Long] ⇒ true
           case jl.Integer.TYPE if actual == classOf[jl.Integer] ⇒ true
           case jl.Short.TYPE if actual == classOf[jl.Short] ⇒ true

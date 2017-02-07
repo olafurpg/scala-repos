@@ -33,7 +33,7 @@ object Hashers {
   }
 
   /** Hash definitions from a ClassDef where applicable */
-  def hashDefs(defs: List[Tree]): List[Tree] = defs map {
+  def hashDefs(defs: List[Tree]): List[Tree] = defs.map {
     case methodDef: MethodDef => hashMethodDef(methodDef)
     case otherDef => otherDef
   }
@@ -172,7 +172,7 @@ object Hashers {
         case Match(selector, cases, default) =>
           mixTag(TagMatch)
           mixTree(selector)
-          cases foreach {
+          cases.foreach {
             case (patterns, body) =>
               mixTrees(patterns)
               mixTree(body)
@@ -369,7 +369,7 @@ object Hashers {
 
         case JSObjectConstr(fields) =>
           mixTag(TagJSObjectConstr)
-          fields foreach {
+          fields.foreach {
             case (pn, value) =>
               mixPropertyName(pn)
               mixTree(value)

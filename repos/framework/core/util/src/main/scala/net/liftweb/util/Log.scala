@@ -57,7 +57,7 @@ object LoggingAutoConfigurer {
   def apply(): () => Unit =
     () => {
       // Try to configure log4j only if we find the SLF4J Log4j bindings
-      findClass("Log4jLoggerAdapter", List("org.slf4j.impl")) map { _ =>
+      findClass("Log4jLoggerAdapter", List("org.slf4j.impl")).map { _ =>
         findTheFile("log4j.xml", "log4j.props") match {
           case Full(url) => _root_.net.liftweb.common.Log4j.withFile(url)()
           case _ =>
@@ -66,8 +66,8 @@ object LoggingAutoConfigurer {
       }
 
       // Try to configure logback
-      findClass("Logger", List("ch.qos.logback.classic")) map { _ =>
-        findTheFile("logback.xml") map { url =>
+      findClass("Logger", List("ch.qos.logback.classic")).map { _ =>
+        findTheFile("logback.xml").map { url =>
           Logback.withFile(url)()
         }
       }

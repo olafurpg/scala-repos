@@ -300,7 +300,7 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
         val tm = new A
 
         val target = sys.actorOf(Props(new Actor {
-          def receive = { case in ⇒ a1.ref forward in }
+          def receive = { case in ⇒ a1.ref.forward(in) }
         }), "to-be-killed")
 
         es.subscribe(a2.ref, classOf[Any])
@@ -329,7 +329,7 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
         val a1, a2 = TestProbe()
 
         val target = system.actorOf(Props(new Actor {
-          def receive = { case in ⇒ a1.ref forward in }
+          def receive = { case in ⇒ a1.ref.forward(in) }
         }), "to-be-killed")
 
         watch(target)
@@ -429,9 +429,9 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
                      Info("", null, "info"),
                      Warning("", null, "warning"),
                      Error("", null, "error"))
-    val msg = allmsg filter (_.level <= level)
-    allmsg foreach bus.publish
-    msg foreach (expectMsg(_))
+    val msg = allmsg.filter(_.level <= level)
+    allmsg.foreach(bus.publish)
+    msg.foreach(expectMsg(_))
   }
 
   private def fishForDebugMessage(a: TestProbe,
@@ -440,7 +440,7 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
     a.fishForMessage(
       max,
       hint = "expected debug message prefix: " + messagePrefix) {
-      case Logging.Debug(_, _, msg: String) if msg startsWith messagePrefix ⇒
+      case Logging.Debug(_, _, msg: String) if msg.startsWith(messagePrefix) ⇒
         true
       case other ⇒ false
     }

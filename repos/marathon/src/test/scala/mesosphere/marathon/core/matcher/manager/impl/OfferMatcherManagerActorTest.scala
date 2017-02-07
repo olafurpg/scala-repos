@@ -44,8 +44,8 @@ class OfferMatcherManagerActorTest
       manager.underlyingActor.offerMatchers(f.reservedOffer(appId))
 
     Then("The list is sorted in the correct order")
-    orderedMatchers should have size num.toLong
-    orderedMatchers should contain theSameElementsAs matchers
+    (orderedMatchers should have).size(num.toLong)
+    (orderedMatchers should contain).theSameElementsAs(matchers)
   }
 
   test("The list of OfferMatchers is sorted by precedence") {
@@ -65,7 +65,7 @@ class OfferMatcherManagerActorTest
       manager.underlyingActor.offerMatchers(f.reservedOffer(appId))
 
     Then("The list is sorted in the correct order")
-    sortedMatchers should have size 2 * num.toLong
+    (sortedMatchers should have).size(2 * num.toLong)
     val (left, right) = sortedMatchers.splitAt(num)
     left.count(_.precedenceFor.isDefined) should be(num)
     right.count(_.precedenceFor.isDefined) should be(0)
@@ -85,7 +85,7 @@ class OfferMatcherManagerActorTest
 
     def matcher(precedence: Option[PathId] = None): OfferMatcher = {
       val matcher = mock[OfferMatcher]
-      matcher.precedenceFor returns precedence
+      matcher.precedenceFor.returns(precedence)
       matcher
     }
 

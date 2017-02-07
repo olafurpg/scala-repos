@@ -34,7 +34,7 @@ trait FreshNames { self: Names with StdNames =>
 
     // name should start with creatorPrefix and end with number
     val freshlyNamed = {
-      val pre = if (!creatorPrefix.isEmpty) Regex quote creatorPrefix else ""
+      val pre = if (!creatorPrefix.isEmpty) Regex.quote(creatorPrefix) else ""
       s"""$pre(.*?)\\d*""".r
     }
 

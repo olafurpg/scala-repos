@@ -22,7 +22,7 @@ trait ExecutionDirectives {
     Directive { innerRouteBuilder ⇒ ctx ⇒
       import ctx.executionContext
       def handleException: PartialFunction[Throwable, Future[RouteResult]] =
-        handler andThen (_(ctx.withAcceptAll))
+        handler.andThen(_(ctx.withAcceptAll))
       try innerRouteBuilder(())(ctx).fast.recoverWith(handleException)
       catch {
         case NonFatal(e) ⇒
@@ -36,7 +36,7 @@ trait ExecutionDirectives {
     * [[akka.http.scaladsl.server.RejectionHandler]].
     */
   def handleRejections(handler: RejectionHandler): Directive0 =
-    extractRequestContext flatMap { ctx ⇒
+    extractRequestContext.flatMap { ctx ⇒
       val maxIterations = 8
       // allow for up to `maxIterations` nested rejections from RejectionHandler before bailing out
       def handle(rejections: immutable.Seq[Rejection],

@@ -22,7 +22,7 @@ object Test {
                          f.Bar,
                          new Foo with DingDongBippy,
                          new f.Bar with DingDongBippy)
-    instances map (_.getClass.getName) foreach println
-    instances map shortClassOfInstance foreach println
+    instances.map(_.getClass.getName).foreach(println)
+    instances.map(shortClassOfInstance).foreach(println)
   }
 }

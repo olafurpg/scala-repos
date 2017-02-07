@@ -106,7 +106,7 @@ final case class Cord(self: FingerTree[Int, String]) {
     * Modifies each character in this `Cord` by the given function.
     * Time complexity: O(N)
     */
-  def map(f: Char => Char): Cord = cord(self map (_ map f))
+  def map(f: Char => Char): Cord = cord(self.map(_.map(f)))
 
   def toList: List[Char] = toVector.toList
   def toStream: Stream[Char] = toVector.toStream

@@ -18,28 +18,29 @@ trait Logic extends Debugging {
   private def max(xs: Seq[Int]) = if (xs isEmpty) 0 else xs max
   private def alignedColumns(cols: Seq[Any]): Seq[String] = {
     def toString(x: Any) = if (x == null) "" else x.toString
-    if (cols.isEmpty || cols.tails.isEmpty) cols map toString
+    if (cols.isEmpty || cols.tails.isEmpty) cols.map(toString)
     else {
-      val colLens = cols map (c => toString(c).length)
+      val colLens = cols.map(c => toString(c).length)
       val maxLen = max(colLens)
       val avgLen = colLens.sum / colLens.length
       val goalLen = maxLen min avgLen * 2
       def pad(s: String) = {
-        val toAdd = ((goalLen - s.length) max 0) + 2
+        val toAdd = (((goalLen - s.length)).max(0)) + 2
         (" " * (toAdd / 2)) + s + (" " * (toAdd / 2 + (toAdd % 2)))
       }
-      cols map (x => pad(toString(x)))
+      cols.map(x => pad(toString(x)))
     }
   }
 
   def alignAcrossRows(xss: List[List[Any]],
                       sep: String,
                       lineSep: String = "\n"): String = {
-    val maxLen = max(xss map (_.length))
-    val padded = xss map (xs => xs ++ List.fill(maxLen - xs.length)(null))
+    val maxLen = max(xss.map(_.length))
+    val padded = xss.map(xs => xs ++ List.fill(maxLen - xs.length)(null))
     padded.transpose
       .map(alignedColumns)
-      .transpose map (_.mkString(sep)) mkString
+      .transpose
+      .map(_.mkString(sep)) mkString
       (lineSep)
   }
 
@@ -260,8 +261,8 @@ trait Logic extends Debugging {
 
     trait PropTraverser {
       def apply(x: Prop): Unit = x match {
-        case And(ops) => ops foreach apply
-        case Or(ops) => ops foreach apply
+        case And(ops) => ops.foreach(apply)
+        case Or(ops) => ops.foreach(apply)
         case Not(a) => apply(a)
         case Eq(a, b) => applyVar(a); applyConst(b)
         case s: Sym => applySymbol(s)
@@ -292,8 +293,8 @@ trait Logic extends Debugging {
     trait PropMap {
       def apply(x: Prop): Prop = x match {
         // TODO: mapConserve
-        case And(ops) => And(ops map apply)
-        case Or(ops) => Or(ops map apply)
+        case And(ops) => And(ops.map(apply))
+        case Or(ops) => Or(ops.map(apply))
         case Not(a) => Not(apply(a))
         case p => p
       }
@@ -366,10 +367,10 @@ trait Logic extends Debugging {
         }
       }
 
-      props foreach gatherEqualities.apply
-      if (modelNull) vars foreach (_.registerNull())
+      props.foreach(gatherEqualities.apply)
+      if (modelNull) vars.foreach(_.registerNull())
 
-      val pure = props map (p => rewriteEqualsToProp(p))
+      val pure = props.map(p => rewriteEqualsToProp(p))
 
       val eqAxioms = mutable.ArrayBuffer[Prop]()
       @inline def addAxiom(p: Prop) = eqAxioms += p
@@ -381,24 +382,24 @@ trait Logic extends Debugging {
         // exactly one of the types (and whatever it implies, imposed separately) must be chosen
         // consider X ::= A | B | C, and A => B
         // coverage is formulated as: A \/ B \/ C and the implications are
-        v.domainSyms foreach { dsyms =>
+        v.domainSyms.foreach { dsyms =>
           addAxiom(\/(dsyms))
         }
 
         // when this variable cannot be null the equality corresponding to the type test `(x: T)`, where T is x's static type,
         // is always true; when the variable may be null we use the implication `(x != null) => (x: T)` for the axiom
-        v.symForStaticTp foreach { symForStaticTp =>
+        v.symForStaticTp.foreach { symForStaticTp =>
           if (v.mayBeNull)
             addAxiom(Or(v.propForEqualsTo(NullConst), symForStaticTp))
           else addAxiom(symForStaticTp)
         }
 
-        v.implications foreach {
+        v.implications.foreach {
           case (sym, implied, excluded) =>
             // when sym is true, what must hold...
-            implied foreach (impliedSym => addAxiom(Or(Not(sym), impliedSym)))
+            implied.foreach(impliedSym => addAxiom(Or(Not(sym), impliedSym)))
             // ... and what must not?
-            excluded foreach { excludedSym =>
+            excluded.foreach { excludedSym =>
               val exclusive = v.groupedDomains.exists { domain =>
                 domain.contains(sym) && domain.contains(excludedSym)
               }
@@ -464,7 +465,7 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
 
       def resetUniques() = { _nextId = 0; uniques.clear() }
       private val uniques = new mutable.HashMap[Tree, Var]
-      def apply(x: Tree): Var = uniques getOrElseUpdate (x, new Var(x, x.tpe))
+      def apply(x: Tree): Var = uniques.getOrElseUpdate(x, new Var(x, x.tpe))
       def unapply(v: Var) = Some(v.path)
     }
     class Var(val path: Tree, staticTp: Type) extends AbsVar {
@@ -506,7 +507,7 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
         val allConsts =
           if (mayBeNull) {
             registerEquality(NullConst)
-            subConsts map (_ + NullConst)
+            subConsts.map(_ + NullConst)
           } else subConsts
 
         observed(); allConsts
@@ -526,7 +527,7 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
       // populate equalitySyms
       // don't care about the result, but want only one fresh symbol per distinct constant c
       def registerEquality(c: Const): Unit = {
-        ensureCanModify(); symForEqualsTo getOrElseUpdate (c, Sym(this, c))
+        ensureCanModify(); symForEqualsTo.getOrElseUpdate(c, Sym(this, c))
       }
 
       // return the symbol that represents this variable being equal to the constant `c`, if it exists, otherwise False (for robustness)
@@ -587,7 +588,7 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
           *        V = String, but we don't model that.
           */
         def excludes(a: Const, b: Const): Boolean = {
-          val bothInDomain = domain exists (d => d(a) && d(b))
+          val bothInDomain = domain.exists(d => d(a) && d(b))
           val eitherIsNull = a == NullConst || b == NullConst
           val bothAreValues = a.isValue && b.isValue
           bothInDomain && (eitherIsNull || bothAreValues) && (a != b)
@@ -635,23 +636,23 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
           override def hashCode = a.hashCode ^ b.hashCode
         }
 
-        equalitySyms map { sym =>
+        equalitySyms.map { sym =>
           // if we've already excluded the pair at some point (-A \/ -B), then don't exclude the symmetric one (-B \/ -A)
           // (nor the positive implications -B \/ A, or -A \/ B, which would entail the equality axioms falsifying the whole formula)
           val todo =
-            equalitySyms filterNot
-              (b =>
-                 (b.const == sym.const) ||
-                   excludedPair(ExcludedPair(b.const, sym.const)))
+            equalitySyms.filterNot(
+              b =>
+                (b.const == sym.const) ||
+                  excludedPair(ExcludedPair(b.const, sym.const)))
           val (excluded, notExcluded) =
-            todo partition (b => excludes(sym.const, b.const))
-          val implied = notExcluded filter (b => implies(sym.const, b.const))
+            todo.partition(b => excludes(sym.const, b.const))
+          val implied = notExcluded.filter(b => implies(sym.const, b.const))
 
           debug.patmat("eq axioms for: " + sym.const)
           debug.patmat("excluded: " + excluded)
           debug.patmat("implied: " + implied)
 
-          excluded foreach { excludedSym =>
+          excluded.foreach { excludedSym =>
             excludedPair += ExcludedPair(sym.const, excludedSym.const)
           }
 
@@ -661,7 +662,7 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
 
       // accessing after calling registerNull will result in inconsistencies
       lazy val domainSyms: Option[Set[Sym]] =
-        domain map { _ map symForEqualsTo }
+        domain.map { _.map(symForEqualsTo) }
 
       lazy val symForStaticTp: Option[Sym] =
         symForEqualsTo.get(TypeConst(staticTpCheckable))
@@ -747,7 +748,7 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
             case _ =>
               // duplicate, don't mutate old tree (TODO: use a map tree -> type instead?)
               val treeWithNarrowedType =
-                t.duplicate setType freshExistentialSubtype(t.tpe)
+                t.duplicate.setType(freshExistentialSubtype(t.tpe))
               debug.patmat(
                 "uniqued: " + ((t, t.tpe, treeWithNarrowedType.tpe)))
               trees += treeWithNarrowedType

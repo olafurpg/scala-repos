@@ -87,7 +87,7 @@ private[std] sealed trait ListInstances1 extends ListInstances2 {
             case a :: xs =>
               ys match {
                 case b :: ys =>
-                  val n = a partialCompare b
+                  val n = a.partialCompare(b)
                   if (n != 0.0) n else loop(xs, ys)
                 case Nil =>
                   1.0

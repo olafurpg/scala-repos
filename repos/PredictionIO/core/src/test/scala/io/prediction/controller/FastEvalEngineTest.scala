@@ -43,7 +43,7 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
 
     val evalDataSet = engine.eval(sc, engineParams, WorkflowParams())
 
-    evalDataSet should have size en
+    (evalDataSet should have).size(en)
 
     forAll(evalDataSet.zipWithIndex) {
       case (evalData, ex) => {
@@ -52,7 +52,7 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
 
         val qpaSeq: Seq[(Query, Prediction, Actual)] = qpaRDD.collect
 
-        qpaSeq should have size qn
+        (qpaSeq should have).size(qn)
 
         forAll(qpaSeq) {
           case (q, p, a) =>
@@ -68,7 +68,7 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
                 pId shouldBe 3
                 pQ shouldBe q
                 pModels shouldBe None
-                pPs should have size algoCount
+                (pPs should have).size(algoCount)
                 pPs shouldBe Seq(
                   Prediction(id = 20, q = q, models = Some(model0)),
                   Prediction(id = 21, q = q, models = Some(model1)),
@@ -120,15 +120,15 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     // same EI
     evalDataSet0.zip(evalDataSet1).foreach {
       case (e0, e1) => {
-        e0._1 should be theSameInstanceAs e1._1
-        e0._2 should be theSameInstanceAs e1._2
+        (e0._1 should be).theSameInstanceAs(e1._1)
+        (e0._2 should be).theSameInstanceAs(e1._2)
       }
     }
 
     // So as set1 and set2, however, the QPA-RDD should be different.
     evalDataSet1.zip(evalDataSet2).foreach {
       case (e1, e2) => {
-        e1._1 should be theSameInstanceAs e2._1
+        (e1._1 should be).theSameInstanceAs(e2._1)
         val e1Qpa = e1._2
         val e2Qpa = e2._2
         e1Qpa should not be theSameInstanceAs(e2Qpa)
@@ -178,7 +178,7 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     // Set0 should have same EI as Set1, since their dsp are the same instance.
     evalDataSet0.zip(evalDataSet1).foreach {
       case (e0, e1) => {
-        e0._1 should be theSameInstanceAs (e1._1)
+        (e0._1 should be).theSameInstanceAs(e1._1)
       }
     }
 

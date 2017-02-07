@@ -63,8 +63,8 @@ class DecodingToCommandTest extends FunSuite {
 
     Seq(None, Some("slabs"), Some("items")).foreach { arg =>
       val cmd = arg match {
-        case None => Seq("stats") map { Buf.Utf8(_) }
-        case Some(s) => Seq("stats", s) map { Buf.Utf8(_) }
+        case None => Seq("stats").map { Buf.Utf8(_) }
+        case Some(s) => Seq("stats", s).map { Buf.Utf8(_) }
       }
       val buffer = Tokens(cmd)
       val command = decodingToCommand.decode(null, null, buffer)

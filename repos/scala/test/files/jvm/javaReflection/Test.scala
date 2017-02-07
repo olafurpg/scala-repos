@@ -140,6 +140,6 @@ object Test {
         else !isAnonFunClassName(b) && a < b
       })
 
-    classfiles foreach showClass
+    classfiles.foreach(showClass)
   }
 }

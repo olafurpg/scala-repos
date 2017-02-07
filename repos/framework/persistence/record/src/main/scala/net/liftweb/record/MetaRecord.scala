@@ -169,7 +169,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     */
   def createRecord: BaseRecord = {
     val rec = instantiateRecord
-    rec runSafe {
+    rec.runSafe {
       fieldList.foreach(fh => fh.field(rec).setName_!(fh.name))
     }
     rec
@@ -258,7 +258,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
   /** Create a record by decoding a JValue which must be a JObject */
   def fromJValue(jvalue: JValue): Box[BaseRecord] = {
     val inst = createRecord
-    setFieldsFromJValue(inst, jvalue) map (_ => inst)
+    setFieldsFromJValue(inst, jvalue).map(_ => inst)
   }
 
   /** Attempt to decode a JValue, which must be a JObject, into a record instance */
@@ -286,7 +286,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     */
   def fromJsonString(json: String): Box[BaseRecord] = {
     val inst = createRecord
-    setFieldsFromJsonString(inst, json) map (_ => inst)
+    setFieldsFromJsonString(inst, json).map(_ => inst)
   }
 
   /**

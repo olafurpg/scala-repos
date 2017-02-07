@@ -12,7 +12,7 @@ import T.t
 import Z.Test
 
 class D {
-  Seq("a") map { _.test }
+  Seq("a").map { _.test }
 }
 /*
 object T {

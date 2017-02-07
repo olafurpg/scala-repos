@@ -59,7 +59,7 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     * an empty string, if the request URL targets the application root and
     * does not have a trailing slash.
     */
-  def pathInfo: String = Option(r.getPathInfo) getOrElse ""
+  def pathInfo: String = Option(r.getPathInfo).getOrElse("")
 
   /**
     * The initial portion of the request URL's "path" that corresponds to
@@ -73,7 +73,7 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     * The portion of the request URL that follows the ?, if any. May be
     * empty, but is always required!
     */
-  def queryString: String = Option(r.getQueryString) getOrElse ""
+  def queryString: String = Option(r.getQueryString).getOrElse("")
 
   /**
     * A Map of the parameters of this request. Parameters are contained in
@@ -123,7 +123,7 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     }
 
     def iterator: Iterator[(String, String)] = {
-      r.getHeaderNames.asScala map { name =>
+      r.getHeaderNames.asScala.map { name =>
         (name, r.getHeader(name))
       }
     }
@@ -138,7 +138,7 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
   def characterEncoding: Option[String] = Option(r.getCharacterEncoding)
 
   def characterEncoding_=(encoding: Option[String]): Unit = {
-    r.setCharacterEncoding(encoding getOrElse null)
+    r.setCharacterEncoding(encoding.getOrElse(null))
   }
 
   /**
@@ -198,7 +198,7 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     * (defult ISO-8859-1).
     */
   def body: String = {
-    cachedBody getOrElse {
+    cachedBody.getOrElse {
       val encoding = r.getCharacterEncoding
       val enc =
         if (encoding == null || encoding.trim.length == 0) {
@@ -236,7 +236,7 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
       .getOrElse(Array())
       .toSeq
       .groupBy { _.getName }
-      .transform { case (k, v) => v map { _.getValue } }
+      .transform { case (k, v) => v.map { _.getValue } }
       .withDefaultValue(Seq.empty)
     MultiMap(rr)
   }
@@ -267,7 +267,7 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     * @return the client ip address
     */
   def remoteAddress: String =
-    header("X-FORWARDED-FOR").flatMap(_.blankOption) getOrElse r.getRemoteAddr
+    header("X-FORWARDED-FOR").flatMap(_.blankOption).getOrElse(r.getRemoteAddr)
 
   def locale: Locale = r.getLocale
 

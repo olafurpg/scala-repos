@@ -24,7 +24,7 @@ class FutureTest extends SpecLite {
   {
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    implicit def futureEqual[A: Equal] = Equal[Throwable \/ A] contramap {
+    implicit def futureEqual[A: Equal] = Equal[Throwable \/ A].contramap {
       future: Future[A] =>
         val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
         Await.result(futureWithError, duration)
@@ -100,7 +100,7 @@ class FutureTest extends SpecLite {
     "gather maintains order" ! forAll { (xs: List[Int]) =>
       val promises = Vector.fill(xs.size)(Promise[Int]())
       val f = Nondeterminism[Future].gather(promises.map(_.future))
-      (promises zip xs).reverseIterator.foreach {
+      (promises.zip(xs)).reverseIterator.foreach {
         case (p, x) =>
           p.complete(scala.util.Try(x))
       }

@@ -143,16 +143,20 @@ object HRavenHistoryService extends HistoryService {
     val stepNum = step.getStepNum
 
     def findMatchingJobStep(pastFlow: Flow) =
-      pastFlow.getJobs.asScala.find { step =>
-        try {
-          step.getConfiguration.get("cascading.flow.step.num").toInt == stepNum
-        } catch {
-          case _: NumberFormatException => false
+      pastFlow.getJobs.asScala
+        .find { step =>
+          try {
+            step.getConfiguration
+              .get("cascading.flow.step.num")
+              .toInt == stepNum
+          } catch {
+            case _: NumberFormatException => false
+          }
         }
-      } orElse {
-        LOG.warn("No matching job step in the retrieved hRaven flow.")
-        None
-      }
+        .orElse {
+          LOG.warn("No matching job step in the retrieved hRaven flow.")
+          None
+        }
 
     def lookupClusterName(client: HRavenRestClient): Try[String] = {
       // regex for case matching URL to get hostname out

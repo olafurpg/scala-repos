@@ -7,7 +7,7 @@ final class Env(config: Config, system: ActorSystem) {
 
   private val Endpoint = config getString "endpoint"
   private val MassImportEndpoint = config getString "mass_import.endpoint"
-  private val IndexFlow = config getBoolean "index_flow"
+  private val IndexFlow = config.getBoolean("index_flow")
 
   private lazy val indexer = new ExplorerIndexer(endpoint = Endpoint,
                                                  massImportEndpoint =
@@ -23,7 +23,7 @@ final class Env(config: Config, system: ActorSystem) {
   def fetchPgn(id: String): Fu[Option[String]] = {
     import play.api.libs.ws.WS
     import play.api.Play.current
-    WS.url(s"$Endpoint/master/pgn/$id").get() map {
+    WS.url(s"$Endpoint/master/pgn/$id").get().map {
       case res if res.status == 200 => res.body.some
       case _ => None
     }
@@ -41,6 +41,7 @@ final class Env(config: Config, system: ActorSystem) {
 object Env {
 
   lazy val current =
-    "explorer" boot new Env(config = lila.common.PlayApp loadConfig "explorer",
-                            system = lila.common.PlayApp.system)
+    "explorer".boot(
+      new Env(config = lila.common.PlayApp.loadConfig("explorer"),
+              system = lila.common.PlayApp.system))
 }

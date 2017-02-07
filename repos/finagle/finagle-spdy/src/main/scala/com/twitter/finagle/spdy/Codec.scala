@@ -15,7 +15,7 @@ class AnnotateSpdyStreamId extends SimpleFilter[HttpRequest, HttpResponse] {
   def apply(request: HttpRequest,
             service: Service[HttpRequest, HttpResponse]) = {
     val streamId = request.headers.get(SpdyHttpHeaders.Names.STREAM_ID)
-    service(request) map { response =>
+    service(request).map { response =>
       response.headers.set(SpdyHttpHeaders.Names.STREAM_ID, streamId)
       response
     }
@@ -28,7 +28,7 @@ class GenerateSpdyStreamId extends SimpleFilter[HttpRequest, HttpResponse] {
   def apply(request: HttpRequest,
             service: Service[HttpRequest, HttpResponse]) = {
     SpdyHttpHeaders.setStreamId(request, currentStreamId.getAndAdd(2))
-    service(request) map { response =>
+    service(request).map { response =>
       SpdyHttpHeaders.removeStreamId(response)
       response
     }
@@ -82,8 +82,9 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
           underlying: ServiceFactory[HttpRequest, HttpResponse],
           params: Stack.Params
       ): ServiceFactory[HttpRequest, HttpResponse] = {
-        new GenerateSpdyStreamId andThen super
-          .prepareConnFactory(underlying, params)
+        new GenerateSpdyStreamId.andThen(
+          super
+            .prepareConnFactory(underlying, params))
       }
 
       override def newClientTransport(
@@ -118,8 +119,9 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
           underlying: ServiceFactory[HttpRequest, HttpResponse],
           params: Stack.Params
       ): ServiceFactory[HttpRequest, HttpResponse] = {
-        new AnnotateSpdyStreamId andThen super
-          .prepareConnFactory(underlying, params)
+        new AnnotateSpdyStreamId.andThen(
+          super
+            .prepareConnFactory(underlying, params))
       }
 
       override def newServerDispatcher(

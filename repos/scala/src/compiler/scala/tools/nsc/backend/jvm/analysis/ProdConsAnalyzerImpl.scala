@@ -83,7 +83,8 @@ trait ProdConsAnalyzerImpl {
                          slot: Int): Set[AbstractInsnNode] = {
     producersForValueAt(insn, slot).flatMap(prod => {
       val outputNumber = outputValueSlots(prod).indexOf(slot)
-      _consumersOfOutputsFrom.get(prod)
+      _consumersOfOutputsFrom
+        .get(prod)
         .map(v => {
           v(outputNumber)
         })
@@ -106,7 +107,8 @@ trait ProdConsAnalyzerImpl {
       case ExceptionProducer(handlerLabel, handlerFrame) =>
         consumersOfValueAt(handlerLabel, handlerFrame.stackTop)
       case _ =>
-        _consumersOfOutputsFrom.get(insn)
+        _consumersOfOutputsFrom
+          .get(insn)
           .map(v =>
             v.indices
               .flatMap(v.apply)(collection.breakOut): Set[AbstractInsnNode])
@@ -404,7 +406,7 @@ trait ProdConsAnalyzerImpl {
   /** Returns the frame values consumed by executing `insn`. */
   private def inputValues(insn: AbstractInsnNode): Seq[SourceValue] = {
     lazy val frame = frameAt(insn)
-    inputValueSlots(insn) map frame.getValue
+    inputValueSlots(insn).map(frame.getValue)
   }
 
   /** Returns the frame slots holding the values consumed by executing `insn`. */

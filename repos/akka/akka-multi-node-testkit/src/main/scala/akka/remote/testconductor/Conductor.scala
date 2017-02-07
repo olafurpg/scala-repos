@@ -86,9 +86,9 @@ trait Conductor { this: TestConductorExt ⇒
       "controller")
     import Settings.BarrierTimeout
     import system.dispatcher
-    controller ? GetSockAddr flatMap {
+    (controller ? GetSockAddr).flatMap {
       case sockAddr: InetSocketAddress ⇒
-        startClient(name, sockAddr) map (_ ⇒ sockAddr)
+        startClient(name, sockAddr).map(_ ⇒ sockAddr)
     }
   }
 
@@ -99,7 +99,7 @@ trait Conductor { this: TestConductorExt ⇒
     */
   def sockAddr: Future[InetSocketAddress] = {
     import Settings.QueryTimeout
-    controller ? GetSockAddr mapTo classTag[InetSocketAddress]
+    (controller ? GetSockAddr).mapTo(classTag[InetSocketAddress])
   }
 
   /**
@@ -130,8 +130,8 @@ trait Conductor { this: TestConductorExt ⇒
                rateMBit: Double): Future[Done] = {
     import Settings.QueryTimeout
     requireTestConductorTranport()
-    controller ? Throttle(node, target, direction, rateMBit.toFloat) mapTo classTag[
-      Done]
+    (controller ? Throttle(node, target, direction, rateMBit.toFloat))
+      .mapTo(classTag[Done])
   }
 
   /**
@@ -186,7 +186,7 @@ trait Conductor { this: TestConductorExt ⇒
     */
   def disconnect(node: RoleName, target: RoleName): Future[Done] = {
     import Settings.QueryTimeout
-    controller ? Disconnect(node, target, false) mapTo classTag[Done]
+    (controller ? Disconnect(node, target, false)).mapTo(classTag[Done])
   }
 
   /**
@@ -199,7 +199,7 @@ trait Conductor { this: TestConductorExt ⇒
     */
   def abort(node: RoleName, target: RoleName): Future[Done] = {
     import Settings.QueryTimeout
-    controller ? Disconnect(node, target, true) mapTo classTag[Done]
+    (controller ? Disconnect(node, target, true)).mapTo(classTag[Done])
   }
 
   /**
@@ -215,9 +215,11 @@ trait Conductor { this: TestConductorExt ⇒
     import system.dispatcher
     // the recover is needed to handle ClientDisconnectedException exception,
     // which is normal during shutdown
-    controller ? Terminate(node, Right(exitValue)) mapTo classTag[Done] recover {
-      case _: ClientDisconnectedException ⇒ Done
-    }
+    (controller ? Terminate(node, Right(exitValue)))
+      .mapTo(classTag[Done])
+      .recover {
+        case _: ClientDisconnectedException ⇒ Done
+      }
   }
 
   /**
@@ -240,7 +242,7 @@ trait Conductor { this: TestConductorExt ⇒
     import system.dispatcher
     // the recover is needed to handle ClientDisconnectedException exception,
     // which is normal during shutdown
-    controller ? Terminate(node, Left(abort)) mapTo classTag[Done] recover {
+    (controller ? Terminate(node, Left(abort))).mapTo(classTag[Done]).recover {
       case _: ClientDisconnectedException ⇒ Done
     }
   }
@@ -250,7 +252,7 @@ trait Conductor { this: TestConductorExt ⇒
     */
   def getNodes: Future[Iterable[RoleName]] = {
     import Settings.QueryTimeout
-    controller ? GetNodes mapTo classTag[Iterable[RoleName]]
+    (controller ? GetNodes).mapTo(classTag[Iterable[RoleName]])
   }
 
   /**
@@ -263,7 +265,7 @@ trait Conductor { this: TestConductorExt ⇒
     */
   def removeNode(node: RoleName): Future[Done] = {
     import Settings.QueryTimeout
-    controller ? Remove(node) mapTo classTag[Done]
+    (controller ? Remove(node)).mapTo(classTag[Done])
   }
 }
 
@@ -286,9 +288,10 @@ private[akka] class ConductorHandler(_createTimeout: Timeout,
                                 event: ChannelStateEvent) = {
     val channel = event.getChannel
     log.debug("connection from {}", getAddrString(channel))
-    val fsm: ActorRef = Await.result(controller ? Controller.CreateServerFSM(
-                                       channel) mapTo classTag[ActorRef],
-                                     Duration.Inf)
+    val fsm: ActorRef = Await.result(
+      (controller ? Controller.CreateServerFSM(channel))
+        .mapTo(classTag[ActorRef]),
+      Duration.Inf)
     clients.put(channel, fsm)
   }
 
@@ -483,7 +486,7 @@ private[akka] class Controller(private var initialParticipants: Int,
 
   // map keeping unanswered queries for node addresses (enqueued upon GetAddress, serviced upon NodeInfo)
   var addrInterest = Map[RoleName, Set[ActorRef]]()
-  val generation = Iterator from 1
+  val generation = Iterator.from(1)
 
   override def receive = LoggingReceive {
     case CreateServerFSM(channel) ⇒
@@ -495,7 +498,7 @@ private[akka] class Controller(private var initialParticipants: Int,
         Props(classOf[ServerFSM], self, channel).withDeploy(Deploy.local),
         name)
     case c @ NodeInfo(name, addr, fsm) ⇒
-      barrier forward c
+      barrier.forward(c)
       if (nodes contains name) {
         if (initialParticipants > 0) {
           for (NodeInfo(_, _, client) ← nodes.values)
@@ -511,37 +514,37 @@ private[akka] class Controller(private var initialParticipants: Int,
           initialParticipants = 0
         }
         if (addrInterest contains name) {
-          addrInterest(name) foreach (_ ! ToClient(AddressReply(name, addr)))
+          addrInterest(name).foreach(_ ! ToClient(AddressReply(name, addr)))
           addrInterest -= name
         }
       }
     case c @ ClientDisconnected(name) ⇒
       nodes -= name
-      barrier forward c
+      barrier.forward(c)
     case op: ServerOp ⇒
       op match {
-        case _: EnterBarrier ⇒ barrier forward op
-        case _: FailBarrier ⇒ barrier forward op
+        case _: EnterBarrier ⇒ barrier.forward(op)
+        case _: FailBarrier ⇒ barrier.forward(op)
         case GetAddress(node) ⇒
           if (nodes contains node)
             sender() ! ToClient(AddressReply(node, nodes(node).addr))
           else
             addrInterest += node ->
-              ((addrInterest get node getOrElse Set()) + sender())
+              ((addrInterest.get(node).getOrElse(Set())) + sender())
         case _: Done ⇒ //FIXME what should happen?
       }
     case op: CommandOp ⇒
       op match {
         case Throttle(node, target, direction, rateMBit) ⇒
           val t = nodes(target)
-          nodes(node).fsm forward ToClient(
-            ThrottleMsg(t.addr, direction, rateMBit))
+          nodes(node).fsm
+            .forward(ToClient(ThrottleMsg(t.addr, direction, rateMBit)))
         case Disconnect(node, target, abort) ⇒
           val t = nodes(target)
-          nodes(node).fsm forward ToClient(DisconnectMsg(t.addr, abort))
+          nodes(node).fsm.forward(ToClient(DisconnectMsg(t.addr, abort)))
         case Terminate(node, shutdownOrExit) ⇒
           barrier ! BarrierCoordinator.RemoveClient(node)
-          nodes(node).fsm forward ToClient(TerminateMsg(shutdownOrExit))
+          nodes(node).fsm.forward(ToClient(TerminateMsg(shutdownOrExit)))
           nodes -= node
         case Remove(node) ⇒
           barrier ! BarrierCoordinator.RemoveClient(node)
@@ -648,7 +651,7 @@ private[akka] class BarrierCoordinator
           case None ⇒ stay
           case Some(c) ⇒
             throw ClientLost(d.copy(clients = clients - c,
-                                    arrived = arrived filterNot (_ == c.fsm)),
+                                    arrived = arrived.filterNot(_ == c.fsm)),
                              name)
         }
       }
@@ -670,7 +673,7 @@ private[akka] class BarrierCoordinator
       if (clients.isEmpty)
         throw BarrierEmpty(d,
                            "cannot remove " + name + ": no client to remove")
-      stay using d.copy(clients = clients filterNot (_.name == name))
+      stay using d.copy(clients = clients.filterNot(_.name == name))
   }
 
   onTransition {
@@ -697,7 +700,7 @@ private[akka] class BarrierCoordinator
         case Some(client) ⇒
           handleBarrier(
             d.copy(clients = clients - client,
-                   arrived = arrived filterNot (_ == client.fsm)))
+                   arrived = arrived.filterNot(_ == client.fsm)))
       }
     case Event(FailBarrier(name), d @ Data(_, barrier, _, _)) ⇒
       if (name != barrier) throw WrongBarrier(name, sender(), d)
@@ -713,7 +716,7 @@ private[akka] class BarrierCoordinator
     if (data.arrived.isEmpty) {
       goto(Idle) using data.copy(barrier = "")
     } else if ((data.clients.map(_.fsm) -- data.arrived).isEmpty) {
-      data.arrived foreach (_ ! ToClient(BarrierResult(data.barrier, true)))
+      data.arrived.foreach(_ ! ToClient(BarrierResult(data.barrier, true)))
       goto(Idle) using data.copy(barrier = "", arrived = Nil)
     } else {
       stay using data

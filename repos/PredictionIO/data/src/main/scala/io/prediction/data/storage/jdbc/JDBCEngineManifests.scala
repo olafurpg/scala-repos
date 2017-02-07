@@ -40,7 +40,7 @@ class JDBCEngineManifests(client: String,
       engineFactory text not null)""".execute().apply()
   }
 
-  def insert(m: EngineManifest): Unit = DB localTx { implicit session =>
+  def insert(m: EngineManifest): Unit = DB.localTx { implicit session =>
     sql"""
     INSERT INTO $tableName VALUES(
       ${m.id},
@@ -51,7 +51,7 @@ class JDBCEngineManifests(client: String,
       ${m.engineFactory})""".update().apply()
   }
 
-  def get(id: String, version: String): Option[EngineManifest] = DB localTx {
+  def get(id: String, version: String): Option[EngineManifest] = DB.localTx {
     implicit session =>
       sql"""
     SELECT
@@ -67,7 +67,7 @@ class JDBCEngineManifests(client: String,
         .apply()
   }
 
-  def getAll(): Seq[EngineManifest] = DB localTx { implicit session =>
+  def getAll(): Seq[EngineManifest] = DB.localTx { implicit session =>
     sql"""
     SELECT
       id,
@@ -81,7 +81,7 @@ class JDBCEngineManifests(client: String,
 
   def update(m: EngineManifest, upsert: Boolean = false): Unit = {
     var r = 0
-    DB localTx { implicit session =>
+    DB.localTx { implicit session =>
       r = sql"""
       update $tableName set
         engineName = ${m.name},
@@ -99,7 +99,7 @@ class JDBCEngineManifests(client: String,
     }
   }
 
-  def delete(id: String, version: String): Unit = DB localTx {
+  def delete(id: String, version: String): Unit = DB.localTx {
     implicit session =>
       sql"DELETE FROM $tableName WHERE id = $id AND version = $version"
         .update()

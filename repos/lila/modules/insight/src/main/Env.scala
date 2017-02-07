@@ -20,7 +20,7 @@ final class Env(config: Config,
   }
   import settings._
 
-  private val db = new lila.db.Env(config getConfig "mongodb", lifecycle)
+  private val db = new lila.db.Env(config.getConfig("mongodb"), lifecycle)
 
   lazy val share = new Share(getPref, areFriends)
 
@@ -50,7 +50,7 @@ final class Env(config: Config,
   system.actorOf(Props(new Actor {
     system.lilaBus.subscribe(self, 'analysisReady)
     def receive = {
-      case lila.analyse.actorApi.AnalysisReady(game, _) => api updateGame game
+      case lila.analyse.actorApi.AnalysisReady(game, _) => api.updateGame(game)
     }
   }))
 }
@@ -58,12 +58,13 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "insight" boot new Env(
-      config = lila.common.PlayApp loadConfig "insight",
-      getPref = lila.pref.Env.current.api.getPrefById,
-      areFriends = lila.relation.Env.current.api.fetchAreFriends,
-      lightUser = lila.user.Env.current.lightUser,
-      system = lila.common.PlayApp.system,
-      lifecycle = lila.common.PlayApp.lifecycle
-    )
+    "insight".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("insight"),
+        getPref = lila.pref.Env.current.api.getPrefById,
+        areFriends = lila.relation.Env.current.api.fetchAreFriends,
+        lightUser = lila.user.Env.current.lightUser,
+        system = lila.common.PlayApp.system,
+        lifecycle = lila.common.PlayApp.lifecycle
+      ))
 }

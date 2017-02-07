@@ -257,7 +257,7 @@ class FileSourceStrategySuite
 
     if (buckets > 0) {
       val bucketed =
-        df.queryExecution.analyzed transform {
+        df.queryExecution.analyzed.transform {
           case l @ LogicalRelation(r: HadoopFsRelation, _, _) =>
             l.copy(
               relation = r.copy(bucketSpec =

@@ -23,7 +23,7 @@ object HttpServer {
     def apply(request: Request, service: Service[Request, Response]) = {
 
       // `handle` asynchronously handles exceptions.
-      service(request) handle {
+      service(request).handle {
         case error =>
           val statusCode = error match {
             case _: IllegalArgumentException =>
@@ -72,7 +72,7 @@ object HttpServer {
 
     // compose the Filters and Service together:
     val myService: Service[Request, Response] =
-      handleExceptions andThen authorize andThen respond
+      handleExceptions.andThen(authorize).andThen(respond)
 
     val server: Server = ServerBuilder()
       .codec(Http())

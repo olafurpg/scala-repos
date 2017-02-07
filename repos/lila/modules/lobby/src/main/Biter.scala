@@ -41,8 +41,10 @@ private[lobby] object Biter {
 
   private def join(seek: Seek, lobbyUser: LobbyUser): Fu[JoinSeek] =
     for {
-      user ← UserRepo byId lobbyUser.id flatten s"No such user: ${lobbyUser.id}"
-      owner ← UserRepo byId seek.user.id flatten s"No such user: ${seek.user.id}"
+      user ← (UserRepo byId lobbyUser.id)
+        .flatten(s"No such user: ${lobbyUser.id}")
+      owner ← (UserRepo byId seek.user.id)
+        .flatten(s"No such user: ${seek.user.id}")
       creatorColor <- assignCreatorColor(owner.some, user.some, seek.realColor)
       game = blame(
         !creatorColor,
@@ -57,7 +59,8 @@ private[lobby] object Biter {
                                  color: Color): Fu[chess.Color] = color match {
     case Color.Random =>
       UserRepo
-        .firstGetsWhite(creatorUser.map(_.id), joinerUser.map(_.id)) map chess.Color.apply
+        .firstGetsWhite(creatorUser.map(_.id), joinerUser.map(_.id))
+        .map(chess.Color.apply)
     case Color.White => fuccess(chess.White)
     case Color.Black => fuccess(chess.Black)
   }
@@ -97,11 +100,11 @@ private[lobby] object Biter {
     hook.realMode.casual.fold(
       user.isDefined || hook.allowAnon,
       user ?? { _.lame == hook.lame }
-    ) && !(hook.userId ?? (user ?? (_.blocking)).contains) && !((user map
-      (_.id)) ?? (hook.user ?? (_.blocking)).contains) &&
+    ) && !(hook.userId ?? (user ?? (_.blocking)).contains) && !((user.map(
+      _.id)) ?? (hook.user ?? (_.blocking)).contains) &&
       hook.realRatingRange.fold(true) { range =>
         user ?? { u =>
-          (hook.perfType map (_.key) flatMap u.ratingMap.get) ?? range.contains
+          (hook.perfType.map(_.key).flatMap(u.ratingMap.get)) ?? range.contains
         }
       }
 
@@ -110,6 +113,8 @@ private[lobby] object Biter {
       !(user.blocking contains seek.user.id) &&
       !(seek.user.blocking contains user.id) && seek.realRatingRange.fold(true) {
       range =>
-        (seek.perfType map (_.key) flatMap user.ratingMap.get) ?? range.contains
+        (seek.perfType
+          .map(_.key)
+          .flatMap(user.ratingMap.get)) ?? range.contains
     }
 }

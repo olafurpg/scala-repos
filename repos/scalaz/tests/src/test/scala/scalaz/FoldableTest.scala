@@ -17,13 +17,13 @@ object FoldableTest extends SpecLite {
   }
   "maximumOf" ! forAll { (xs: List[Int]) =>
     val f: Int => Double = 1D + _
-    if (xs.isEmpty) (xs maximumOf f) must_== (None)
-    else (xs maximumOf f) must_== (Some((xs.iterator map f).max))
+    if (xs.isEmpty)(xs.maximumOf(f)) must_== (None)
+    else (xs.maximumOf(f)) must_== (Some((xs.iterator.map(f)).max))
   }
   "maximumBy" ! forAll { (xs: List[Int]) =>
     val f: Int => String = _.toString
-    if (xs.isEmpty) (xs maximumBy f) must_== None
-    else (xs maximumBy f) must_== Some((xs zip (xs map f)).maxBy(_._2)._1)
+    if (xs.isEmpty)(xs.maximumBy(f)) must_== None
+    else (xs.maximumBy(f)) must_== Some((xs.zip(xs.map(f))).maxBy(_._2)._1)
   }
   "minimum" ! forAll { (xs: List[Int]) =>
     if (xs.isEmpty) (xs.minimum) must_== None
@@ -32,12 +32,12 @@ object FoldableTest extends SpecLite {
   "minimumOf" ! forAll { (xs: List[Int]) =>
     val f: Int => Double = 1D + _
     if (xs.isEmpty) (xs minimumOf f) must_== None
-    else (xs minimumOf f) must_== Some((xs.iterator map f).min)
+    else (xs minimumOf f) must_== Some((xs.iterator.map(f)).min)
   }
   "minimumBy" ! forAll { (xs: List[Int]) =>
     val f: Int => String = _.toString
     if (xs.isEmpty) (xs minimumBy f) must_== None
-    else (xs minimumBy f) must_== Some((xs zip (xs map f)).minBy(_._2)._1)
+    else (xs minimumBy f) must_== Some((xs.zip(xs.map(f))).minBy(_._2)._1)
   }
 
   "distinct" ! forAll { (xs: List[Int]) =>
@@ -78,41 +78,42 @@ object FoldableTest extends SpecLite {
 
     "foldLeft1Opt" ! forAll { (xs: List[Int]) =>
       xs match {
-        case Nil => (xs foldLeft1Opt gt1) must_== None
-        case y :: ys => (xs foldLeft1Opt gt1) must_== Some(ys.foldLeft(y)(gt1))
+        case Nil => (xs.foldLeft1Opt(gt1)) must_== None
+        case y :: ys =>
+          (xs.foldLeft1Opt(gt1)) must_== Some(ys.foldLeft(y)(gt1))
       }
     }
 
     "foldRight1Opt" ! forAll { (xs: List[Int]) =>
       xs match {
-        case Nil => (xs foldRight1Opt gt2) must_== None
+        case Nil => (xs.foldRight1Opt(gt2)) must_== None
         case _ =>
-          (xs foldRight1Opt gt2) must_== Some(xs.init.foldRight(xs.last)(gt1))
+          (xs.foldRight1Opt(gt2)) must_== Some(xs.init.foldRight(xs.last)(gt1))
       }
     }
 
     "foldl1Opt" ! forAll { (xs: List[Int]) =>
       xs match {
-        case Nil => (xs foldl1Opt gt1.curried) must_== None
+        case Nil => (xs.foldl1Opt(gt1.curried)) must_== None
         case y :: ys =>
-          (xs foldl1Opt gt1.curried) must_== Some(ys.foldLeft(y)(gt1))
+          (xs.foldl1Opt(gt1.curried)) must_== Some(ys.foldLeft(y)(gt1))
       }
     }
 
     "foldr1Opt" ! forAll { (xs: List[Int]) =>
       xs match {
-        case Nil => (xs foldr1Opt gt2.curried) must_== None
+        case Nil => (xs.foldr1Opt(gt2.curried)) must_== None
         case _ =>
-          (xs foldr1Opt gt2.curried) must_==
+          (xs.foldr1Opt(gt2.curried)) must_==
             Some(xs.init.foldRight(xs.last)(gt1))
       }
     }
 
     "foldMap1Opt" ! forAll { (xs: List[String]) =>
       xs.toNel match {
-        case None => (xs foldMap1Opt strlen) must_== None
+        case None => (xs.foldMap1Opt(strlen)) must_== None
         case Some(nel) =>
-          (xs foldMap1Opt strlen) must_== Some(nel.foldMap1(strlen))
+          (xs.foldMap1Opt(strlen)) must_== Some(nel.foldMap1(strlen))
       }
     }
 
@@ -175,7 +176,7 @@ object FoldableTests {
   def anyIsLazy[F[_], A](implicit F: Foldable[F], arb: Arbitrary[F[A]]) =
     forAll { fa: F[A] =>
       var i = 0
-      fa any { x =>
+      fa.any { x =>
         i = i + 1
         true
       }
@@ -186,7 +187,7 @@ object FoldableTests {
   def allIsLazy[F[_], A](implicit F: Foldable[F], arb: Arbitrary[F[A]]) =
     forAll { fa: F[A] =>
       var i = 0
-      fa all { x =>
+      fa.all { x =>
         i = i + 1
         false
       }

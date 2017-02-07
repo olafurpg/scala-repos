@@ -26,7 +26,7 @@ class NumericTest extends FunSuite {
     //val cls = implicitly[ClassTag[A]].runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
-    def runTest(name: String)(f: => Unit) = test("%s:%s" format (cls, name))(f)
+    def runTest(name: String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
 
     // Numeric[A]'s zero
     val z = Numeric[A].zero

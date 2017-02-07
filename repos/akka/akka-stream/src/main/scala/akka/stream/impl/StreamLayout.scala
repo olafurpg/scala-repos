@@ -33,8 +33,8 @@ object StreamLayout {
                      level: Int = 0,
                      doPrint: Boolean = false,
                      idMap: ju.Map[AnyRef, Integer] = new ju.HashMap): Unit = {
-    val ids = Iterator from 1
-    def id(obj: AnyRef) = idMap get obj match {
+    val ids = Iterator.from(1)
+    def id(obj: AnyRef) = idMap.get(obj) match {
       case null ⇒
         val x = ids.next()
         idMap.put(obj, x)
@@ -126,13 +126,13 @@ object StreamLayout {
       val indent = " " * (level * 2)
       println(
         s"$indent${simpleName(this)}($shape): ${ins(inPorts)} ${outs(outPorts)}")
-      downstreams foreach {
+      downstreams.foreach {
         case (o, i) ⇒ println(s"$indent    ${out(o)} -> ${in(i)}")
       }
-      problems foreach (p ⇒ println(s"$indent  -!- $p"))
+      problems.foreach(p ⇒ println(s"$indent  -!- $p"))
     }
 
-    subModules foreach (sm ⇒ validate(sm, level + 1, print, idMap))
+    subModules.foreach(sm ⇒ validate(sm, level + 1, print, idMap))
 
     if (problems.nonEmpty && !doPrint)
       throw new IllegalStateException(
@@ -979,7 +979,7 @@ private[stream] abstract class MaterializerSession(
       s"The top level module cannot be materialized because it has unconnected ports: ${(topLevel.inPorts ++ topLevel.outPorts)
         .mkString(", ")}"
     )
-    try materializeModule(topLevel, initialAttributes and topLevel.attributes)
+    try materializeModule(topLevel, initialAttributes.and(topLevel.attributes))
     catch {
       case NonFatal(cause) ⇒
         // PANIC!!! THE END OF THE MATERIALIZATION IS NEAR!
@@ -999,7 +999,7 @@ private[stream] abstract class MaterializerSession(
 
   protected def mergeAttributes(parent: Attributes,
                                 current: Attributes): Attributes =
-    parent and current
+    parent.and(current)
 
   def registerSrc(ms: MaterializedValueSource[Any]): Unit = {
     if (MaterializerSession.Debug) println(s"registering source $ms")

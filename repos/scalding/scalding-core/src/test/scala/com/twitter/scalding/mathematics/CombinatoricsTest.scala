@@ -42,23 +42,23 @@ class CombinatoricsJobTest extends WordSpec with Matchers {
     JobTest(new CombinatoricsJob(_))
       .sink[(Int, Int)](Tsv("perms.txt")) { pbuf =>
         "correctly compute 10 permute 3 equals 720" in {
-          pbuf.toList should have size 720
+          (pbuf.toList should have).size(720)
         }
       }
       .sink[(Int, Int)](Tsv("combs.txt")) { buf =>
         val csize = buf.toList.size
         "correctly compute 5 choose 2 equals 10" in {
-          buf.toList should have size 10
+          (buf.toList should have).size(10)
         }
       }
       .sink[(Int, Int, Int, Int)](Tsv("invest.txt")) { buf =>
         "correctly compute 169 tuples that allow you to invest $1000 among the 4 given stocks" in {
-          buf.toList should have size 169
+          (buf.toList should have).size(169)
         }
       }
       .sink[(Int, Int, Int, Int)](Tsv("investpos.txt")) { buf =>
         "correctly compute 101 non-zero tuples that allow you to invest $1000 among the 4 given stocks" in {
-          buf.toList should have size 101
+          (buf.toList should have).size(101)
         }
       }
       .run

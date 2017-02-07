@@ -75,7 +75,7 @@ class MetricsExtensionSpec
 
       expected.size should ===(sampleCount)
 
-      history.zip(expected) foreach {
+      history.zip(expected).foreach {
         case (mockMetrics, expectedData) ⇒
           (mockMetrics, expectedData) match {
             case (
@@ -112,7 +112,7 @@ class MetricsExtensionSpec
         size5 should ===(size4)
       }
 
-      (1 to 3) foreach { step ⇒
+      ((1 to 3)).foreach { step ⇒
         cycle()
       }
     }

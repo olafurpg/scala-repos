@@ -132,7 +132,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
         while (true) {
           val item = q1.poll
           if (item.isPoison) {
-            q2 add poison2
+            q2.add(poison2)
             return
           } else {
             try { withCurrentUnit(item.cunit)(visit(item)) } catch {
@@ -195,7 +195,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
         // -------------- bean info class, if needed --------------
         val beanC =
-          if (claszSymbol hasAnnotation BeanInfoAttr) {
+          if (claszSymbol.hasAnnotation(BeanInfoAttr)) {
             beanInfoCodeGen.genBeanInfoClass(
               claszSymbol,
               cunit,
@@ -208,7 +208,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
         val item2 = Item2(arrivalPos, mirrorC, plainC, beanC, outF)
 
-        q2 add item2 // at the very end of this method so that no Worker2 thread starts mutating before we're done.
+        q2.add(item2) // at the very end of this method so that no Worker2 thread starts mutating before we're done.
       } // end of method visit(Item1)
     } // end of class BCodePhase.Worker1
 
@@ -225,7 +225,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
         // add classes to the bytecode repo before building the call graph: the latter needs to
         // look up classes and methods in the code repo.
         if (settings.YoptAddToBytecodeRepository)
-          q2.asScala foreach {
+          q2.asScala.foreach {
             case Item2(_, mirror, plain, bean, _) =>
               if (mirror != null)
                 byteCodeRepository.add(mirror,
@@ -238,7 +238,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
                                        ByteCodeRepository.CompilationUnit)
           }
         if (settings.YoptBuildCallGraph)
-          q2.asScala foreach { item =>
+          q2.asScala.foreach { item =>
             // skip call graph for mirror / bean: wd don't inline into tem, and they are not used in the plain class
             if (item.plain != null) callGraph.addClass(item.plain)
           }
@@ -265,7 +265,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
         while (true) {
           val item = q2.poll
           if (item.isPoison) {
-            q3 add poison3
+            q3.add(poison3)
             return
           } else {
             try {
@@ -314,7 +314,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
           if (beanC != null) AsmUtils.traceClass(beanC.jclassBytes)
         }
 
-        q3 add Item3(arrivalPos, mirrorC, plainC, beanC, outFolder)
+        q3.add(Item3(arrivalPos, mirrorC, plainC, beanC, outFolder))
       }
     } // end of class BCodePhase.Worker2
 
@@ -344,7 +344,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
       scalaPrimitives.init()
       bTypes.initializeCoreBTypes()
       bTypes.javaDefinedClasses.clear()
-      bTypes.javaDefinedClasses ++= currentRun.symSource collect {
+      bTypes.javaDefinedClasses ++= currentRun.symSource.collect {
         case (sym, _) if sym.isJavaDefined => sym.javaBinaryName.toString
       }
       Statistics.stopTimer(BackendStats.bcodeInitTimer, initStart)
@@ -400,7 +400,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
     /* Feed pipeline-1: place all ClassDefs on q1, recording their arrival position. */
     private def feedPipeline1() {
       super.run()
-      q1 add poison1
+      q1.add(poison1)
     }
 
     /* Pipeline that writes classfile representations to disk. */
@@ -451,9 +451,9 @@ abstract class GenBCode extends BCodeSyncAndTry {
       def gen(tree: Tree) {
         tree match {
           case EmptyTree => ()
-          case PackageDef(_, stats) => stats foreach gen
+          case PackageDef(_, stats) => stats.foreach(gen)
           case cd: ClassDef =>
-            q1 add Item1(arrivalPos, cd, cunit)
+            q1.add(Item1(arrivalPos, cd, cunit))
             arrivalPos += 1
         }
       }

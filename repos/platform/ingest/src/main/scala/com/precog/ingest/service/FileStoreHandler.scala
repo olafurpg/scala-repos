@@ -104,10 +104,10 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
         fileName
           .toFailure(())
           .leftMap(_ =>
-            "X-File-Name header not respected for PUT requests; please specify the resource to update via the URL.") map {
-          _ => (resource: Path) =>
+            "X-File-Name header not respected for PUT requests; please specify the resource to update via the URL.")
+          .map { _ => (resource: Path) =>
             resource
-        }
+          }
     }
   }
 
@@ -120,11 +120,11 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
         .flatMap(_.mimeTypes.headOption)
         .toSuccess("Unable to determine content type for file create.")
       val storeMode0 =
-        contentType0 flatMap {
+        contentType0.flatMap {
           validateWriteMode(_: MimeType, request.method)
         }
       val pathf0 =
-        storeMode0 flatMap {
+        storeMode0.flatMap {
           validateFileName(request.headers.get("X-File-Name"), _: WriteMode)
         }
 
@@ -139,64 +139,66 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
                                         fullPath,
                                         Some(timestamp.toInstant)) {
               authorities =>
-                request.content map { content =>
-                  (for {
-                    jobId <- jobManager
-                      .createJob(apiKey,
-                                 "ingest-" + path,
-                                 "ingest",
-                                 None,
-                                 Some(timestamp))
-                      .map(_.id)
-                      .leftMap { errors =>
-                        logger.error(
-                          "File creation failed due to errors in job service: " +
-                            errors)
-                        serverError(errors)
-                      }
-                    bytes <- EitherT {
-                      // FIXME: This should only read at most approximately the upload limit,
-                      // so we don't read GB of data into memory from users.
-                      ByteChunk.forceByteArray(content) map {
-                        // TODO: Raise/remove this limit
-                        case b if b.length > 614400 =>
+                request.content
+                  .map { content =>
+                    (for {
+                      jobId <- jobManager
+                        .createJob(apiKey,
+                                   "ingest-" + path,
+                                   "ingest",
+                                   None,
+                                   Some(timestamp))
+                        .map(_.id)
+                        .leftMap { errors =>
                           logger.error(
-                            "Rejecting excessive file upload of size %d"
-                              .format(b.length))
-                          -\/(badRequest(
-                            "File uploads are currently limited to 600KB"))
+                            "File creation failed due to errors in job service: " +
+                              errors)
+                          serverError(errors)
+                        }
+                      bytes <- EitherT {
+                        // FIXME: This should only read at most approximately the upload limit,
+                        // so we don't read GB of data into memory from users.
+                        ByteChunk.forceByteArray(content).map {
+                          // TODO: Raise/remove this limit
+                          case b if b.length > 614400 =>
+                            logger.error(
+                              "Rejecting excessive file upload of size %d"
+                                .format(b.length))
+                            -\/(badRequest(
+                              "File uploads are currently limited to 600KB"))
 
-                        case b =>
-                          \/-(b)
+                          case b =>
+                            \/-(b)
+                        }
                       }
-                    }
-                    storeFile = StoreFile(apiKey,
-                                          fullPath,
-                                          Some(authorities),
-                                          jobId,
-                                          FileContent(bytes, contentType),
-                                          timestamp.toInstant,
-                                          StreamRef.forWriteMode(storeMode,
-                                                                 true))
-                    _ <- right(eventStore.save(storeFile, ingestTimeout))
-                  } yield {
-                    val resultsPath = (baseURI.path |+| Some("/data/fs/" +
-                      fullPath.path)).map(_.replaceAll("//", "/"))
-                    val locationHeader =
-                      Location(baseURI.copy(path = resultsPath))
-                    HttpResponse[JValue](Accepted,
-                                         headers =
-                                           HttpHeaders(List(locationHeader)))
-                  }).fold(e => e, x => x)
-                } getOrElse {
-                  Promise successful HttpResponse[JValue](
-                    HttpStatus(
-                      BadRequest,
-                      "Attempt to create a file without body content."))
-                }
+                      storeFile = StoreFile(apiKey,
+                                            fullPath,
+                                            Some(authorities),
+                                            jobId,
+                                            FileContent(bytes, contentType),
+                                            timestamp.toInstant,
+                                            StreamRef.forWriteMode(storeMode,
+                                                                   true))
+                      _ <- right(eventStore.save(storeFile, ingestTimeout))
+                    } yield {
+                      val resultsPath = (baseURI.path |+| Some("/data/fs/" +
+                        fullPath.path)).map(_.replaceAll("//", "/"))
+                      val locationHeader =
+                        Location(baseURI.copy(path = resultsPath))
+                      HttpResponse[JValue](Accepted,
+                                           headers =
+                                             HttpHeaders(List(locationHeader)))
+                    }).fold(e => e, x => x)
+                  }
+                  .getOrElse {
+                    Promise.successful(
+                      HttpResponse[JValue](HttpStatus(
+                        BadRequest,
+                        "Attempt to create a file without body content.")))
+                  }
             }
           }
-      } leftMap { errors =>
+      }.leftMap { errors =>
         DispatchError(BadRequest, errors.list.mkString("; "))
       }
     }

@@ -62,11 +62,11 @@ class ActorLookupSpec extends AkkaSpec with DefaultTimeout {
       system.actorFor(system / "c1") should ===(c1)
       system.actorFor(system / "c2") should ===(c2)
       system.actorFor(system / "c2" / "c21") should ===(c21)
-      system.actorFor(system child "c2" child "c21") should ===(c21) // test Java API
+      system.actorFor(system.child("c2").child("c21")) should ===(c21) // test Java API
       system.actorFor(system / Seq("c2", "c21")) should ===(c21)
 
       import scala.collection.JavaConverters._
-      system.actorFor(system descendant Seq("c2", "c21").asJava) // test Java API
+      system.actorFor(system.descendant(Seq("c2", "c21").asJava)) // test Java API
     }
 
     "find actors by looking up their string representation" in {
@@ -272,9 +272,9 @@ class ActorLookupSpec extends AkkaSpec with DefaultTimeout {
                LookupString("") -> system.deadLetters,
                LookupString("akka://all-systems/Nobody") -> system.deadLetters,
                LookupPath(system / "hallo") -> empty("user/hallo"),
-               LookupPath(looker.path child "hallo") -> empty(
+               LookupPath(looker.path.child("hallo")) -> empty(
                  lookname + "hallo"), // test Java API
-               LookupPath(looker.path descendant Seq("a", "b").asJava) -> empty(
+               LookupPath(looker.path.descendant(Seq("a", "b").asJava)) -> empty(
                  lookname + "a/b"), // test Java API
                LookupElems(Seq()) -> system.deadLetters,
                LookupElems(Seq("a")) -> empty(lookname + "a")

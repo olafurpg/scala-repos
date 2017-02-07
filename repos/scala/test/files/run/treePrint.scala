@@ -46,6 +46,6 @@ object Test {
     val power = new Power(intp, vals)
     intp.interpret(
       """def initialize = "Have to interpret something or we get errors." """)
-    power trees code foreach println
+    power.trees(code).foreach(println)
   }
 }

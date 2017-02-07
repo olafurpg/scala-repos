@@ -264,7 +264,7 @@ object MapTest extends SpecLite {
       empty.delete(5) must_=== (empty[Int, Int])
     }
     "be sound" ! forAll { (m: Int ==>> Int, i: Int) =>
-      val a = m delete i
+      val a = m.delete(i)
       structurallySound(a)
       (a member i) must_=== false
       if (m member i) (m.size - 1) must_=== a.size
@@ -330,25 +330,25 @@ object MapTest extends SpecLite {
 
   "==>> union operations" should {
     "be sound" ! forAll { (a: Int ==>> Int, b: Int ==>> Int) =>
-      val c = a union b
+      val c = a.union(b)
       structurallySound(c)
-      (a.keySet union b.keySet) must_=== c.keySet
+      (a.keySet.union(b.keySet)) must_=== c.keySet
     }
 
     "union" in {
-      fromList(List((5, "a"), (3, "b"))) union fromList(
-        List((5, "A"), (7, "C"))) must_==
+      fromList(List((5, "a"), (3, "b")))
+        .union(fromList(List((5, "A"), (7, "C")))) must_==
         fromList(List((3, "b"), (5, "a"), (7, "C")))
     }
 
     "commute" ! forAll { (a: Int ==>> Int, b: Int ==>> Int) =>
-      (a unionWith b)(_ + _) must_=== ((b unionWith a)(_ + _))
+      (a.unionWith(b))(_ + _) must_=== ((b.unionWith(a))(_ + _))
     }
 
     "be idempotent" ! forAll { (a: Int ==>> Int, b: Int ==>> Int) =>
-      val ab = a union b
-      ab union a must_=== (ab)
-      ab union b must_=== (ab)
+      val ab = a.union(b)
+      ab.union(a) must_=== (ab)
+      ab.union(b) must_=== (ab)
     }
 
     "unions" in {
@@ -585,8 +585,8 @@ object MapTest extends SpecLite {
     }
 
     "isSubmapOf" ! forAll { (a: Byte ==>> Byte, b: Byte ==>> Byte) =>
-      if (a isSubmapOf b) {
-        (a.keySet isSubsetOf b.keySet) must_=== true
+      if (a.isSubmapOf(b)) {
+        (a.keySet.isSubsetOf(b.keySet)) must_=== true
         a.difference(b) must_=== ==>>.empty
         a.toList.foreach { case (k, v) => b.lookup(k) must_=== Some(v) }
       }
@@ -624,7 +624,7 @@ object MapTest extends SpecLite {
       val (ma, mb) = m.partition(n > _)
       structurallySound(ma)
       structurallySound(mb)
-      (ma union mb) must_=== m
+      (ma.union(mb)) must_=== m
     }
 
     "partitionWithKey" in {
@@ -823,10 +823,10 @@ object MapTest extends SpecLite {
     val keysB = b.keySet
 
     x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
-    x.keySet must_=== (keysA union keysB)
+    x.keySet must_=== (keysA.union(keysB))
 
-    x.filter(_.isThis).keySet must_=== (keysA difference keysB)
-    x.filter(_.isThat).keySet must_=== (keysB difference keysA)
+    x.filter(_.isThis).keySet must_=== (keysA.difference(keysB))
+    x.filter(_.isThat).keySet must_=== (keysB.difference(keysA))
     x.filter(_.isBoth).keySet must_=== (keysA intersection keysB)
 
     x.filter(_.isThis) must_===

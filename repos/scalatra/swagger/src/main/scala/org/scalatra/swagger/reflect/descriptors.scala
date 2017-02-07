@@ -107,7 +107,7 @@ object ManifestScalaType {
             .empty[TypeVariable[_], ScalaType] ++ erasure.getTypeParameters
             .map(_.asInstanceOf[TypeVariable[_]])
             .toList
-            .zip(manifest.typeArguments map (ManifestScalaType(_)))
+            .zip(manifest.typeArguments.map(ManifestScalaType(_)))
       _typeVars
     }
   }
@@ -163,7 +163,7 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
       _typeVars = Map.empty ++ erasure.getTypeParameters
           .map(_.asInstanceOf[TypeVariable[_]])
           .toList
-          .zip(manifest.typeArguments map (ManifestScalaType(_)))
+          .zip(manifest.typeArguments.map(ManifestScalaType(_)))
     _typeVars
   }
 

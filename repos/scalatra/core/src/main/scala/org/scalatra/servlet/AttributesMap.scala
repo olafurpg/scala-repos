@@ -43,7 +43,7 @@ trait AttributesMap
     */
   def getAs[T](key: String)(implicit mf: Manifest[T],
                             converter: TypeConverter[Any, T]): Option[T] = {
-    get(key) flatMap (converter(_))
+    get(key).flatMap(converter(_))
   }
 
   /**
@@ -56,8 +56,8 @@ trait AttributesMap
     */
   def as[T](key: String)(implicit mf: Manifest[T],
                          converter: TypeConverter[Any, T]): T = {
-    getAs[T](key) getOrElse
-      (throw new ScalatraException("Key " + key + " not found"))
+    getAs[T](key)
+      .getOrElse(throw new ScalatraException("Key " + key + " not found"))
   }
 
   /**
@@ -71,7 +71,7 @@ trait AttributesMap
   def getAsOrElse[T](key: String, default: => T)(
       implicit mf: Manifest[T],
       converter: TypeConverter[Any, T]): T = {
-    getAs[T](key) getOrElse default
+    getAs[T](key).getOrElse(default)
   }
 
   /**
@@ -80,7 +80,7 @@ trait AttributesMap
     * @return the new iterator
     */
   def iterator: Iterator[(String, Any)] = {
-    attributes.getAttributeNames().asScala map { key =>
+    attributes.getAttributeNames().asScala.map { key =>
       (key, attributes.getAttribute(key))
     }
   }

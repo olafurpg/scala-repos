@@ -66,12 +66,12 @@ object EvaluateConfigurations {
             srcs: Seq[File],
             imports: Seq[String]): LazyClassLoaded[LoadedSbtFile] = {
     val loadFiles =
-      srcs.sortBy(_.getName) map { src =>
+      srcs.sortBy(_.getName).map { src =>
         evaluateSbtFile(eval, src, IO.readLines(src), imports, 0)
       }
     loader =>
       (LoadedSbtFile.empty /: loadFiles) { (loaded, load) =>
-        loaded merge load(loader)
+        loaded.merge(load(loader))
       }
   }
 
@@ -162,7 +162,7 @@ object EvaluateConfigurations {
       }
     val allImports = importDefs.map(s => (s, -1)) ++ parsed.imports
     val dslEntries =
-      parsed.settings map {
+      parsed.settings.map {
         case (dslExpression, range) =>
           evaluateDslEntry(eval, name, allImports, dslExpression, range)
       }
@@ -176,17 +176,17 @@ object EvaluateConfigurations {
           case p: Project => resolveBase(file.getParentFile, p)
         }
         val (settingsRaw, manipulationsRaw) =
-          dslEntries map (_.result apply loader) partition {
+          dslEntries.map(_.result.apply(loader)).partition {
             case internals.ProjectSettings(_) => true
             case _ => false
           }
         val settings =
-          settingsRaw flatMap {
+          settingsRaw.flatMap {
             case internals.ProjectSettings(settings) => settings
             case _ => Nil
           }
         val manipulations =
-          manipulationsRaw map {
+          manipulationsRaw.map {
             case internals.ProjectManipulation(f) => f
           }
         // TODO -get project manipulations.
@@ -205,13 +205,13 @@ object EvaluateConfigurations {
   @deprecated("Will no longer be public.", "0.13.6")
   def flatten(mksettings: Seq[ClassLoader => Seq[Setting[_]]])
     : ClassLoader => Seq[Setting[_]] =
-    loader => mksettings.flatMap(_ apply loader)
+    loader => mksettings.flatMap(_.apply(loader))
   def addOffset(offset: Int, lines: Seq[(String, Int)]): Seq[(String, Int)] =
     lines.map { case (s, i) => (s, i + offset) }
   def addOffsetToRange(
       offset: Int,
       ranges: Seq[(String, LineRange)]): Seq[(String, LineRange)] =
-    ranges.map { case (s, r) => (s, r shift offset) }
+    ranges.map { case (s, r) => (s, r.shift(offset)) }
 
   /**
     * The name of the class we cast DSL "setting" (vs. definition) lines to.
@@ -254,7 +254,7 @@ object EvaluateConfigurations {
     }
     // TODO - keep track of configuration classes defined.
     TrackedEvalResult(result.generated, loader => {
-      val pos = RangePosition(name, range shift 1)
+      val pos = RangePosition(name, range.shift(1))
       result.getValue(loader).asInstanceOf[internals.DslEntry].withPos(pos)
     })
   }
@@ -278,12 +278,12 @@ object EvaluateConfigurations {
                       imports: Seq[(String, Int)],
                       expression: String,
                       range: LineRange): LazyClassLoaded[Seq[Setting[_]]] = {
-    evaluateDslEntry(eval, name, imports, expression, range).result andThen {
+    evaluateDslEntry(eval, name, imports, expression, range).result.andThen {
       case internals.ProjectSettings(values) => values
       case _ => Nil
     }
   }
-  private[this] def isSpace = (c: Char) => Character isWhitespace c
+  private[this] def isSpace = (c: Char) => Character.isWhitespace(c)
   private[this] def fstS(f: String => Boolean): ((String, Int)) => Boolean = {
     case (s, i) => f(s)
   }
@@ -321,8 +321,8 @@ object EvaluateConfigurations {
     val blankOrComment = or(blank, comment)
     val importOrBlank = fstS(or(blankOrComment, isImport))
 
-    val (imports, settings) = lines.zipWithIndex span importOrBlank
-    (imports filterNot fstS(blankOrComment),
+    val (imports, settings) = lines.zipWithIndex.span(importOrBlank)
+    (imports.filterNot(fstS(blankOrComment)),
      groupedLines(settings, blank, blankOrComment))
   }
   @deprecated("This method is deprecated and no longer used.", "0.13.7")
@@ -336,7 +336,7 @@ object EvaluateConfigurations {
                accum: Seq[(String, LineRange)]): Seq[(String, LineRange)] =
       if (lines.isEmpty) accum.reverse
       else {
-        val start = lines dropWhile fstS(skipInitial)
+        val start = lines.dropWhile(fstS(skipInitial))
         val (next, tail) = start.span { case (s, _) => !delimiter(s) }
         val grouped =
           if (next.isEmpty) accum
@@ -350,10 +350,10 @@ object EvaluateConfigurations {
 
   private[this] def splitSettingsDefinitions(lines: Seq[(String, LineRange)])
     : (Seq[(String, LineRange)], Seq[(String, LineRange)]) =
-    lines partition { case (line, range) => isDefinition(line) }
+    lines.partition { case (line, range) => isDefinition(line) }
   private[this] def isDefinition(line: String): Boolean = {
     val trimmed = line.trim
-    DefinitionKeywords.exists(trimmed startsWith _)
+    DefinitionKeywords.exists(trimmed.startsWith(_))
   }
   private[this] def extractedValTypes: Seq[String] =
     Seq(classOf[Project],
@@ -403,14 +403,16 @@ object Index {
       label: AttributeKey[_] => String): Map[String, AttributeKey[_]] = {
     val multiMap = settings.groupBy(label)
     val duplicates =
-      multiMap collect {
-        case (k, xs) if xs.size > 1 => (k, xs.map(_.manifest))
-      } collect { case (k, xs) if xs.size > 1 => (k, xs) }
+      multiMap
+        .collect {
+          case (k, xs) if xs.size > 1 => (k, xs.map(_.manifest))
+        }
+        .collect { case (k, xs) if xs.size > 1 => (k, xs) }
     if (duplicates.isEmpty)
       multiMap.collect { case (k, v) if validID(k) => (k, v.head) } toMap
     else
       sys.error(
-        duplicates map {
+        duplicates.map {
           case (k, tps) => "'" + k + "' (" + tps.mkString(", ") + ")"
         } mkString
           ("Some keys were defined with the same name but different types: ",
@@ -424,11 +426,11 @@ object Index {
     for ((_, amap) <- ss.data;
          AttributeEntry(_, value: Task[_]) <- amap.entries) {
       val as = value.info.attributes
-      update(runBefore, value, as get Keys.runBefore)
-      update(triggeredBy, value, as get Keys.triggeredBy)
+      update(runBefore, value, as.get(Keys.runBefore))
+      update(triggeredBy, value, as.get(Keys.triggeredBy))
     }
     val onComplete =
-      Keys.onComplete in GlobalScope get ss getOrElse { () =>
+      (Keys.onComplete in GlobalScope).get(ss).getOrElse { () =>
         ()
       }
     new Triggers[Task](runBefore, triggeredBy, map => { onComplete(); map })

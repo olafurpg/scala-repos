@@ -161,7 +161,7 @@ abstract class MailboxSpec
           yield createProducer(i, Math.min(enqueueN, i + step - 1))
 
         if (parallel == false)
-          ps foreach { Await.ready(_, remainingOrDefault) }
+          ps.foreach { Await.ready(_, remainingOrDefault) }
 
         ps
       }
@@ -170,7 +170,7 @@ abstract class MailboxSpec
         var r = Vector[Envelope]()
 
         while (producers.exists(_.isCompleted == false) ||
-               q.hasMessages) Option(q.dequeue) foreach { message ⇒
+               q.hasMessages) Option(q.dequeue).foreach { message ⇒
           r = r :+ message
         }
 
@@ -189,9 +189,9 @@ abstract class MailboxSpec
       //No message is allowed to be consumed by more than one consumer
       cs.flatten.distinct.size should ===(dequeueN)
       //All consumed messages should have been produced
-      (cs.flatten diff ps.flatten).size should ===(0)
+      (cs.flatten.diff(ps.flatten)).size should ===(0)
       //The ones that were produced and not consumed
-      (ps.flatten diff cs.flatten).size should ===(enqueueN - dequeueN)
+      (ps.flatten.diff(cs.flatten)).size should ===(enqueueN - dequeueN)
     }
   }
 }

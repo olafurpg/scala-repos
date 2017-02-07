@@ -30,7 +30,7 @@ class ScalaAnnotatorHighlightVisitor(project: Project)
 
   override def suitableForFile(file: PsiFile): Boolean = file match {
     case _: ScalaFile => true
-    case otherFile => ScalaLanguageDerivative hasDerivativeOnFile otherFile
+    case otherFile => ScalaLanguageDerivative.hasDerivativeOnFile(otherFile)
   }
 
   def visit(element: PsiElement) {

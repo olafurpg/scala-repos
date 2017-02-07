@@ -89,12 +89,12 @@ object Test {
       case x => println("fail: " + x)
     }
     "catdog" match {
-      case p1.Triple(x, y, z) => List(x, y, z) foreach println
+      case p1.Triple(x, y, z) => List(x, y, z).foreach(println)
       case x => println("fail: " + x)
     }
     // TODO
     "catdog" match {
-      case p2.Triple(x, y, z) => List(x, y, z) foreach println
+      case p2.Triple(x, y, z) => List(x, y, z).foreach(println)
       case x => println("fail: " + x)
     }
 

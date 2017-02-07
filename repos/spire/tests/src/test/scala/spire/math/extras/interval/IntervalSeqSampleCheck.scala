@@ -113,14 +113,14 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
     */
   property("isSupersetOf/intersection") = forAll {
     (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
-      val r1 = a isSupersetOf b
+      val r1 = a.isSupersetOf(b)
       val r2 = (a & b) == b
       r1 == r2
   }
 
   property("isSupersetOf") = forAll { (a: IntervalSeq[Int], x: Int) =>
     val b = a & IntervalSeq.atOrAbove(x)
-    a isSupersetOf b
+    a.isSupersetOf(b)
   }
 
   property("disjoint") = forAll { (s: IntervalSeq[Int], x: Int) =>

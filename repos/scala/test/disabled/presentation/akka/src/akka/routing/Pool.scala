@@ -52,7 +52,7 @@ trait DefaultActorPool extends ActorPool { this: Actor =>
   private var _lastCapacityChange = 0
   private var _lastSelectorCount = 0
 
-  override def postStop() = _delegates foreach { delegate =>
+  override def postStop() = _delegates.foreach { delegate =>
     try {
       delegate ! PoisonPill
     } catch { case e: Exception => } //Ignore any exceptions here
@@ -61,16 +61,16 @@ trait DefaultActorPool extends ActorPool { this: Actor =>
   protected def _route(): Receive = {
     // for testing...
     case Stat =>
-      self reply_? Stats(_delegates length)
+      self.reply_?(Stats(_delegates length))
     case max: MaximumNumberOfRestartsWithinTimeRangeReached =>
-      _delegates = _delegates filterNot { _.uuid == max.victim.uuid }
+      _delegates = _delegates.filterNot { _.uuid == max.victim.uuid }
     case msg =>
       resizeIfAppropriate()
 
       select(_delegates) match {
         case (selectedDelegates, count) =>
           _lastSelectorCount = count
-          selectedDelegates foreach { _ forward msg } //Should we really send the same message to several actors?
+          selectedDelegates.foreach { _.forward(msg) } //Should we really send the same message to several actors?
       }
   }
 
@@ -88,7 +88,7 @@ trait DefaultActorPool extends ActorPool { this: Actor =>
       case qty if qty < 0 =>
         _delegates.splitAt(_delegates.length + requestedCapacity) match {
           case (keep, abandon) =>
-            abandon foreach { _ ! PoisonPill }
+            abandon.foreach { _ ! PoisonPill }
             keep
         }
       case _ => _delegates //No change
@@ -160,7 +160,8 @@ trait RoundRobinSelector {
   */
 trait FixedSizeCapacitor {
   def limit: Int
-  def capacity(delegates: Seq[ActorRef]): Int = (limit - delegates.size) max 0
+  def capacity(delegates: Seq[ActorRef]): Int =
+    ((limit - delegates.size)).max(0)
 }
 
 /**
@@ -189,7 +190,7 @@ trait BoundedCapacitor {
 trait MailboxPressureCapacitor {
   def pressureThreshold: Int
   def pressure(delegates: Seq[ActorRef]): Int =
-    delegates count { _.mailboxSize > pressureThreshold }
+    delegates.count { _.mailboxSize > pressureThreshold }
 }
 
 /**
@@ -197,7 +198,7 @@ trait MailboxPressureCapacitor {
   */
 trait ActiveFuturesPressureCapacitor {
   def pressure(delegates: Seq[ActorRef]): Int =
-    delegates count { _.senderFuture.isDefined }
+    delegates.count { _.senderFuture.isDefined }
 }
 
 /**

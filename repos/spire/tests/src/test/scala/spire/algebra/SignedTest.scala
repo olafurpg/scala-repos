@@ -29,7 +29,7 @@ class SignedTest extends FunSuite {
     val cls = m.runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
-    def runTest(name: String)(f: => Unit) = test("%s:%s" format (cls, name))(f)
+    def runTest(name: String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
 
     runTest("-neg.abs === pos")(assert(neg.abs === pos))
     runTest("pos.abs === pos")(assert(pos.abs === pos))

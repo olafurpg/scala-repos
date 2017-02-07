@@ -35,14 +35,14 @@ trait TraversableForwarder[+A] extends Traversable[A] {
   /** The traversable object to which calls are forwarded. */
   protected def underlying: Traversable[A]
 
-  override def foreach[U](f: A => U): Unit = underlying foreach f
+  override def foreach[U](f: A => U): Unit = underlying.foreach(f)
   override def isEmpty: Boolean = underlying.isEmpty
   override def nonEmpty: Boolean = underlying.nonEmpty
   override def size: Int = underlying.size
   override def hasDefiniteSize = underlying.hasDefiniteSize
-  override def forall(p: A => Boolean): Boolean = underlying forall p
-  override def exists(p: A => Boolean): Boolean = underlying exists p
-  override def count(p: A => Boolean): Int = underlying count p
+  override def forall(p: A => Boolean): Boolean = underlying.forall(p)
+  override def exists(p: A => Boolean): Boolean = underlying.exists(p)
+  override def count(p: A => Boolean): Int = underlying.count(p)
   override def find(p: A => Boolean): Option[A] = underlying find p
   override def foldLeft[B](z: B)(op: (B, A) => B): B =
     underlying.foldLeft(z)(op)
@@ -58,11 +58,11 @@ trait TraversableForwarder[+A] extends Traversable[A] {
     underlying.reduceRight(op)
   override def reduceRightOption[B >: A](op: (A, B) => B): Option[B] =
     underlying.reduceRightOption(op)
-  override def sum[B >: A](implicit num: Numeric[B]): B = underlying sum num
+  override def sum[B >: A](implicit num: Numeric[B]): B = underlying.sum(num)
   override def product[B >: A](implicit num: Numeric[B]): B =
-    underlying product num
+    underlying.product(num)
   override def min[B >: A](implicit cmp: Ordering[B]): A = underlying min cmp
-  override def max[B >: A](implicit cmp: Ordering[B]): A = underlying max cmp
+  override def max[B >: A](implicit cmp: Ordering[B]): A = underlying.max(cmp)
   override def head: A = underlying.head
   override def headOption: Option[A] = underlying.headOption
   override def last: A = underlying.last

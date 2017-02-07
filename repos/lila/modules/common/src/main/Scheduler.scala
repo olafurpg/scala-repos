@@ -10,7 +10,7 @@ final class Scheduler(scheduler: akka.actor.Scheduler,
                       debug: Boolean) {
 
   def throttle[A](delay: FiniteDuration)(batch: Seq[A])(op: A => Unit) {
-    batch.zipWithIndex foreach {
+    batch.zipWithIndex.foreach {
       case (a, i) =>
         try {
           scheduler.scheduleOnce((1 + i) * delay) { op(a) }
@@ -44,8 +44,9 @@ final class Scheduler(scheduler: akka.actor.Scheduler,
         val tagged = "(%s) %s".format(nextString(3), name)
         doDebug ! logger.info(tagged)
         val start = nowMillis
-        op effectFold
-          (e => logger.error("(%s) %s".format(tagged, e.getMessage), e), _ =>
+        op.effectFold(
+          e => logger.error("(%s) %s".format(tagged, e.getMessage), e),
+          _ =>
             doDebug ! logger.info(
               tagged + " - %d ms".format(nowMillis - start)))
       }

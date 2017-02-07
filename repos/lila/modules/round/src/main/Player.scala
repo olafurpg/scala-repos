@@ -29,7 +29,7 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
     play match {
       case HumanPlay(playerId, uci, blur, lag, promiseOption) =>
         pov match {
-          case Pov(game, color) if game playableBy color =>
+          case Pov(game, color) if game.playableBy(color) =>
             lila.mon
               .measure(_.round.move.segment.logic)(
                 applyUci(game, uci, blur, lag))
@@ -37,16 +37,16 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
               .fold(errs => fufail(ClientError(errs.shows)), fuccess)
               .flatMap {
                 case (progress, moveOrDrop) =>
-                  (GameRepo save progress).mon(_.round.move.segment.save) >>-
+                  (GameRepo.save(progress)).mon(_.round.move.segment.save) >>-
                     (pov.game.hasAi ! uciMemo
                       .add(pov.game, moveOrDrop)) >>- notifyMove(
                     moveOrDrop,
                     progress.game) >> progress.game.finished
                     .fold(
-                      moveFinish(progress.game, color) map {
+                      moveFinish(progress.game, color).map {
                         progress.events ::: _
                       }, {
-                        cheatDetector(progress.game) addEffect {
+                        cheatDetector(progress.game).addEffect {
                           case Some(color) => round ! Cheat(color)
                           case None =>
                             if (progress.game.playableByAi)
@@ -63,9 +63,10 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
                         } inject progress.events
                       }
                     ) >>- promiseOption.foreach(_.success(()))
-              } addFailureEffect { e =>
-              promiseOption.foreach(_ failure e)
-            }
+              }
+              .addFailureEffect { e =>
+                promiseOption.foreach(_.failure(e))
+              }
           case Pov(game, _) if game.finished =>
             fufail(ClientError(s"$pov game is finished"))
           case Pov(game, _) if game.aborted =>
@@ -85,11 +86,11 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
           .fold(errs => fufail(ClientError(errs.shows)), fuccess)
           .flatMap {
             case (progress, moveOrDrop) =>
-              (GameRepo save progress) >>- uciMemo
+              (GameRepo.save(progress)) >>- uciMemo
                 .add(progress.game, moveOrDrop) >>- notifyMove(
                 moveOrDrop,
                 progress.game) >> progress.game.finished.fold(
-                moveFinish(progress.game, game.turnColor) map {
+                moveFinish(progress.game, game.turnColor).map {
                   progress.events ::: _
                 },
                 fuccess(progress.events)
@@ -105,11 +106,11 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
                        lag: FiniteDuration) =
     (uci match {
       case Uci.Move(orig, dest, prom) =>
-        game.toChess.apply(orig, dest, prom, lag) map {
+        game.toChess.apply(orig, dest, prom, lag).map {
           case (ncg, move) => ncg -> (Left(move): MoveOrDrop)
         }
       case Uci.Drop(role, pos) =>
-        game.toChess.drop(role, pos, lag) map {
+        game.toChess.drop(role, pos, lag).map {
           case (ncg, drop) => ncg -> (Right(drop): MoveOrDrop)
         }
     }).map {
@@ -123,7 +124,7 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
       MoveEvent(
         gameId = game.id,
         color = color,
-        fen = Forsyth exportBoard game.toChess.board,
+        fen = Forsyth.exportBoard(game.toChess.board),
         move = moveOrDrop.fold(_.toUci.keys, _.toUci.uci),
         mobilePushable = game.mobilePushable,
         opponentUserId = game.player(!color).userId,

@@ -132,7 +132,7 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
         curr = curr.next
       }
       // println("converted " + remaining + " element iterator into buffer: " + buff)
-      buff map { e =>
+      buff.map { e =>
         entry2item(e)
       }
     }

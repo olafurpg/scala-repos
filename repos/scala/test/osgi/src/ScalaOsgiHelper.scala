@@ -9,18 +9,18 @@ trait ScalaOsgiHelper {
   private def allBundleFiles = {
     def bundleLocation =
       new File(sys.props.getOrElse("scala.bundle.dir", "build/osgi"))
-    bundleLocation.listFiles filter (_.getName endsWith ".jar")
+    bundleLocation.listFiles.filter(_.getName.endsWith(".jar"))
   }
 
   private def filteredBundleFiles(names: String*): Array[exam.Option] =
-    for (bundle <- allBundleFiles; if names exists (bundle.getName contains _))
+    for (bundle <- allBundleFiles; if names.exists(bundle.getName contains _))
       yield makeBundle(bundle)
 
   private def makeBundle(file: File): exam.Option =
     bundle(file.toURI.toASCIIString)
 
   def standardOptions: Array[exam.Option] = {
-    val bundles = (allBundleFiles map makeBundle)
+    val bundles = (allBundleFiles.map(makeBundle))
     bundles ++ Array[exam.Option](junitBundles())
     // to change the local repo used (for some operations, but not all -- which is why I didn't bother):
     // systemProperty("org.ops4j.pax.url.mvn.localRepository").value(sys.props("maven.repo.local")))

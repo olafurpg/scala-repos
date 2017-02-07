@@ -283,7 +283,7 @@ final class WeakHashSet[A <: AnyRef](val initialCapacity: Int,
 
   override def apply(x: A): Boolean = this contains x
 
-  override def foreach[U](f: A => U): Unit = iterator foreach f
+  override def foreach[U](f: A => U): Unit = iterator.foreach(f)
 
   // It has the `()` because iterator runs `removeStaleEntries()`
   override def toList(): List[A] = iterator.toList
@@ -393,13 +393,13 @@ final class WeakHashSet[A <: AnyRef](val initialCapacity: Int,
       * Number of buckets that hold collisions. Useful for diagnosing performance issues.
       */
     def collisionBucketsCount: Int =
-      (table count (entry => entry != null && entry.tail != null))
+      (table.count(entry => entry != null && entry.tail != null))
 
     /**
       * Number of buckets that are occupied in this hash table.
       */
     def fullBucketsCount: Int =
-      (table count (entry => entry != null))
+      (table.count(entry => entry != null))
 
     /**
       *  Number of buckets in the table

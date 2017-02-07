@@ -42,16 +42,16 @@ object KetamaClientStress extends App {
 
   def proc(op: () => Future[Any], qps: Int) {
     if (qps == 0)
-      op() ensure {
+      op().ensure {
         throughput_count.incrementAndGet()
         proc(op, 0)
       } else if (qps > 0)
       loadTask = timer.schedule(Time.now, 1.seconds) {
-        1 to qps foreach { _ =>
-          op() ensure { throughput_count.incrementAndGet() }
+        (1 to qps).foreach { _ =>
+          op().ensure { throughput_count.incrementAndGet() }
         }
       } else
-      1 to (qps * -1) foreach { _ =>
+      (1 to (qps * -1)).foreach { _ =>
         proc(op, 0)
       }
   }
@@ -127,28 +127,28 @@ object KetamaClientStress extends App {
               ketamaClient.set(key, value)
             }
         case "getHit" =>
-          keyValueSet foreach { case (k, v) => ketamaClient.set(k, v)() }
+          keyValueSet.foreach { case (k, v) => ketamaClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               ketamaClient.get(key)
             }
         case "getMiss" =>
-          keyValueSet foreach { case (k, _) => ketamaClient.delete(k)() }
+          keyValueSet.foreach { case (k, _) => ketamaClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
               ketamaClient.get(key)
             }
         case "gets" =>
-          keyValueSet foreach { case (k, v) => ketamaClient.set(k, v)() }
+          keyValueSet.foreach { case (k, v) => ketamaClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               ketamaClient.gets(key)
             }
         case "getsMiss" =>
-          keyValueSet foreach { case (k, _) => ketamaClient.delete(k)() }
+          keyValueSet.foreach { case (k, _) => ketamaClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
@@ -177,7 +177,7 @@ object KetamaClientStress extends App {
             ketamaClient
               .add(key + load_count.getAndIncrement().toString, value)
         case "replace" =>
-          keyValueSet foreach { case (k, v) => ketamaClient.set(k, v)() }
+          keyValueSet.foreach { case (k, v) => ketamaClient.set(k, v)() }
           () =>
             {
               val (key, value) = nextKeyValue
@@ -201,28 +201,28 @@ object KetamaClientStress extends App {
               replicationClient.set(key, value)
             }
         case "getAllHit" =>
-          keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
+          keyValueSet.foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getAll(key)
             }
         case "getAllMiss" =>
-          keyValueSet foreach { case (k, _) => replicationClient.delete(k)() }
+          keyValueSet.foreach { case (k, _) => replicationClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getAll(key)
             }
         case "getOneHit" =>
-          keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
+          keyValueSet.foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getOne(key, false)
             }
         case "getOneMiss" =>
-          keyValueSet foreach { case (k, _) => replicationClient.delete(k)() }
+          keyValueSet.foreach { case (k, _) => replicationClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
@@ -230,7 +230,7 @@ object KetamaClientStress extends App {
             }
         case "getSetMix" =>
           assert(config.rwRatio() >= 0 && config.rwRatio() < 100)
-          keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
+          keyValueSet.foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
             {
               val c = load_count.getAndIncrement()
@@ -240,14 +240,14 @@ object KetamaClientStress extends App {
               else replicationClient.getOne(key, false)
             }
         case "getsAll" =>
-          keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
+          keyValueSet.foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
             {
               val (key, _) = nextKeyValue
               replicationClient.getsAll(key)
             }
         case "getsAllMiss" =>
-          keyValueSet foreach { case (k, _) => replicationClient.delete(k)() }
+          keyValueSet.foreach { case (k, _) => replicationClient.delete(k)() }
           () =>
             {
               val (key, _) = nextKeyValue
@@ -289,7 +289,7 @@ object KetamaClientStress extends App {
                 .add(key + load_count.getAndIncrement().toString, value)
             }
         case "replace" =>
-          keyValueSet foreach { case (k, v) => replicationClient.set(k, v)() }
+          keyValueSet.foreach { case (k, v) => replicationClient.set(k, v)() }
           () =>
             {
               val (key, value) = nextKeyValue

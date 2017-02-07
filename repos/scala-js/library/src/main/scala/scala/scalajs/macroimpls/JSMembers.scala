@@ -55,7 +55,7 @@ private[macroimpls] trait JSMembers {
         val (used, unused) = params.splitAt(thatParams.size)
 
         params.size >= thatParams.size && resultType <:< thatResultType &&
-        unused.forall(_.isDefault) && (used zip thatParams).forall {
+        unused.forall(_.isDefault) && (used.zip(thatParams)).forall {
           case (x, y) => x.conformsTo(y)
         }
 

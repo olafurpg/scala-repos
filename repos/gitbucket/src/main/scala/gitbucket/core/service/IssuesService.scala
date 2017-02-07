@@ -17,13 +17,14 @@ trait IssuesService { self: AccountService =>
 
   def getIssue(owner: String, repository: String, issueId: String)(
       implicit s: Session) =
-    if (issueId forall (_.isDigit))
-      Issues filter (_.byPrimaryKey(owner, repository, issueId.toInt)) firstOption
+    if (issueId.forall(_.isDigit))
+      Issues
+        .filter(_.byPrimaryKey(owner, repository, issueId.toInt)) firstOption
     else None
 
   def getComments(owner: String, repository: String, issueId: Int)(
       implicit s: Session) =
-    IssueComments filter (_.byIssue(owner, repository, issueId)) list
+    IssueComments.filter(_.byIssue(owner, repository, issueId)) list
 
   /** @return IssueComment and commentedUser and Issue */
   def getCommentsForApi(owner: String, repository: String, issueId: Int)(
@@ -44,8 +45,8 @@ trait IssuesService { self: AccountService =>
 
   def getComment(owner: String, repository: String, commentId: String)(
       implicit s: Session) =
-    if (commentId forall (_.isDigit))
-      IssueComments filter { t =>
+    if (commentId.forall(_.isDigit))
+      IssueComments.filter { t =>
         t.byPrimaryKey(commentId.toInt) && t.byRepository(owner, repository)
       } firstOption
     else None
@@ -65,7 +66,8 @@ trait IssuesService { self: AccountService =>
                     repository: String,
                     issueId: Int,
                     labelId: Int)(implicit s: Session) =
-    IssueLabels filter (_.byPrimaryKey(owner, repository, issueId, labelId)) firstOption
+    IssueLabels
+      .filter(_.byPrimaryKey(owner, repository, issueId, labelId)) firstOption
 
   /**
     * Returns the count of the search result against  issues.
@@ -329,7 +331,7 @@ trait IssuesService { self: AccountService =>
   private def searchIssueQuery(repos: Seq[(String, String)],
                                condition: IssueSearchCondition,
                                pullRequest: Boolean)(implicit s: Session) =
-    Issues filter { t1 =>
+    Issues.filter { t1 =>
       repos
         .map {
           case (owner, repository) => t1.byRepository(owner, repository)
@@ -343,19 +345,21 @@ trait IssuesService { self: AccountService =>
       (t1.openedUserName === condition.author.get.bind,
       condition.author.isDefined) && (t1.pullRequest === pullRequest.bind) &&
       // Milestone filter
-      (Milestones filter { t2 =>
+      (Milestones.filter { t2 =>
         (t2.byPrimaryKey(t1.userName, t1.repositoryName, t1.milestoneId)) &&
         (t2.title === condition.milestone.get.get.bind)
       } exists, condition.milestone.flatten.isDefined) && // Label filter
-      (IssueLabels filter { t2 =>
+      (IssueLabels.filter { t2 =>
         (t2.byIssue(t1.userName, t1.repositoryName, t1.issueId)) &&
         (t2.labelId in
-          (Labels filter { t3 =>
-            (t3.byRepository(t1.userName, t1.repositoryName)) &&
-            (t3.labelName inSetBind condition.labels)
-          } map (_.labelId)))
+          (Labels
+            .filter { t3 =>
+              (t3.byRepository(t1.userName, t1.repositoryName)) &&
+              (t3.labelName inSetBind condition.labels)
+            }
+            .map(_.labelId)))
       } exists, condition.labels.nonEmpty) && // Visibility filter
-      (Repositories filter { t2 =>
+      (Repositories.filter { t2 =>
         (t2.byRepository(t1.userName, t1.repositoryName)) &&
         (t2.isPrivate === (condition.visibility == Some("private")).bind)
       } exists, condition.visibility.nonEmpty) &&
@@ -364,7 +368,7 @@ trait IssuesService { self: AccountService =>
       // Mentioned filter
       ((t1.openedUserName === condition.mentioned.get.bind) ||
       t1.assignedUserName === condition.mentioned.get.bind ||
-      (IssueComments filter { t2 =>
+      (IssueComments.filter { t2 =>
         (t2.byIssue(t1.userName, t1.repositoryName, t1.issueId)) &&
         (t2.commentedUserName === condition.mentioned.get.bind)
       } exists), condition.mentioned.isDefined)
@@ -413,7 +417,8 @@ trait IssuesService { self: AccountService =>
                        repository: String,
                        issueId: Int,
                        labelId: Int)(implicit s: Session) =
-    IssueLabels filter (_.byPrimaryKey(owner, repository, issueId, labelId)) delete
+    IssueLabels
+      .filter(_.byPrimaryKey(owner, repository, issueId, labelId)) delete
 
   def createComment(owner: String,
                     repository: String,
@@ -472,7 +477,7 @@ trait IssuesService { self: AccountService =>
       .update(content, currentDate)
 
   def deleteComment(commentId: Int)(implicit s: Session) =
-    IssueComments filter (_.byPrimaryKey(commentId)) delete
+    IssueComments.filter(_.byPrimaryKey(commentId)) delete
 
   def updateClosed(owner: String,
                    repository: String,
@@ -510,8 +515,8 @@ trait IssuesService { self: AccountService =>
         case (t1, t2) =>
           keywords
             .map { keyword =>
-              (t1.title.toLowerCase like (s"%${likeEncode(keyword)}%", '^')) ||
-              (t1.content.toLowerCase like (s"%${likeEncode(keyword)}%", '^'))
+              (t1.title.toLowerCase.like(s"%${likeEncode(keyword)}%", '^')) ||
+              (t1.content.toLowerCase.like(s"%${likeEncode(keyword)}%", '^'))
             }
             .reduceLeft(_ && _)
       }
@@ -537,7 +542,7 @@ trait IssuesService { self: AccountService =>
         case ((t1, t2), t3) =>
           keywords
             .map { query =>
-              t1.content.toLowerCase like (s"%${likeEncode(query)}%", '^')
+              t1.content.toLowerCase.like(s"%${likeEncode(query)}%", '^')
             }
             .reduceLeft(_ && _)
       }

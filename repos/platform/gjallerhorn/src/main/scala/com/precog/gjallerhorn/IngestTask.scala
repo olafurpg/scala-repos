@@ -62,7 +62,7 @@ class IngestTask(settings: Settings)
 
     "ingest multiple sync requests" in {
       val account = createAccount
-      (1 to 20) foreach { _ =>
+      ((1 to 20)).foreach { _ =>
         ingestString(account, simpleData, "application/json")(
           _ / account.bareRootPath / "foo")
       }
@@ -75,7 +75,7 @@ class IngestTask(settings: Settings)
 
     "ingest multiple async requests" in {
       val account = createAccount
-      (1 to 20) foreach { _ =>
+      ((1 to 20)).foreach { _ =>
         asyncIngestString(account, simpleData, "application/json")(
           _ / account.bareRootPath / "foo" / "")
       }

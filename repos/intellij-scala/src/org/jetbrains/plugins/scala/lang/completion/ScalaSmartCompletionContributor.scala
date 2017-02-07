@@ -96,7 +96,7 @@ class ScalaSmartCompletionContributor extends ScalaCompletionContributor {
             var elementAdded = false
             val scType = subst.subst(tp)
             import org.jetbrains.plugins.scala.lang.psi.types.Nothing
-            if (!scType.equiv(Nothing) && typez.exists(scType conforms _)) {
+            if (!scType.equiv(Nothing) && typez.exists(scType.conforms(_))) {
               elementAdded = true
               if (etaExpanded) el.etaExpanded = true
               result.addElement(elemToAdd)
@@ -366,7 +366,7 @@ class ScalaSmartCompletionContributor extends ScalaCompletionContributor {
                       (if (foundClazz) t.name + "." else "") + "this"
                     val el = new ScalaLookupItem(t, lookupString)
                     if (!scType.equiv(Nothing) &&
-                        typez.exists(scType conforms _)) {
+                        typez.exists(scType.conforms(_))) {
                       if (!foundClazz) el.bold = true
                       result.addElement(el)
                     } else {

@@ -12,13 +12,13 @@ object TimeMode {
 
   val all = List(Unlimited, RealTime, Correspondence)
 
-  val ids = all map (_.id)
+  val ids = all.map(_.id)
 
-  val byId = all map { v =>
+  val byId = all.map { v =>
     (v.id, v)
   } toMap
 
-  def apply(id: Int): Option[TimeMode] = byId get id
+  def apply(id: Int): Option[TimeMode] = byId.get(id)
 
   def orDefault(id: Int) = apply(id) | default
 

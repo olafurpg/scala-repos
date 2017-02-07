@@ -43,9 +43,11 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
   )
 
   private def best4Of(u: User, perfTypes: List[PerfType]) =
-    perfTypes.sortBy { pt =>
-      -u.perfs(pt).nb
-    } take 4
+    perfTypes
+      .sortBy { pt =>
+        -u.perfs(pt).nb
+      }
+      .take(4)
 
   def miniViewSortedPerfTypes(u: User): List[PerfType] =
     best4Of(u,
@@ -93,14 +95,14 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       u: User,
       perfType: PerfType,
       klass: String = "hint--bottom")(implicit ctx: Context): Html =
-    showPerfRating(perfType, u perfs perfType, klass)
+    showPerfRating(perfType, u.perfs(perfType), klass)
 
   def showPerfRating(u: User, perfKey: String)(
       implicit ctx: Context): Option[Html] =
-    PerfType(perfKey) map { showPerfRating(u, _) }
+    PerfType(perfKey).map { showPerfRating(u, _) }
 
   def showBestPerf(u: User)(implicit ctx: Context): Option[Html] =
-    u.perfs.bestPerf map {
+    u.perfs.bestPerf.map {
       case (pt, perf) => showPerfRating(pt, perf, klass = "hint--bottom")
     }
 
@@ -112,9 +114,9 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     }
   }
 
-  def lightUser(userId: String): Option[LightUser] = Env.user lightUser userId
+  def lightUser(userId: String): Option[LightUser] = Env.user.lightUser(userId)
   def lightUser(userId: Option[String]): Option[LightUser] =
-    userId flatMap lightUser
+    userId.flatMap(lightUser)
 
   def usernameOrId(userId: String) =
     lightUser(userId).fold(userId)(_.titleName)
@@ -187,7 +189,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
   private def titleTag(title: Option[String]) = title match {
     case None => ""
     case Some(t) =>
-      s"""<span class="title" title="${User titleName t}">$t</span>&nbsp;"""
+      s"""<span class="title" title="${User.titleName(t)}">$t</span>&nbsp;"""
   }
 
   private def userIdNameLink(userId: String,
@@ -239,7 +241,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     val klass = userClass(userId, cssClass, withOnline, withPowerTip)
     val href = userHref(name)
     val content = rating.fold(name)(e => s"$name&nbsp;($e)")
-    val titleS = titleTag(user.flatMap(_.title) ifTrue withTitle)
+    val titleS = titleTag(user.flatMap(_.title).ifTrue(withTitle))
     val space = if (withOnline) "&nbsp;" else ""
     val dataIcon = if (withOnline) """ data-icon="r"""" else ""
     Html(s"""<a$dataIcon $klass $href>$space$titleS$content</a>""")
@@ -298,8 +300,8 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
                           withPowerTip: Boolean = true) = {
     "user_link" :: List(
       cssClass,
-      withPowerTip option "ulpt",
-      withOnline option isOnline(userId).fold("online is-green", "offline")
+      withPowerTip.option("ulpt"),
+      withOnline.option(isOnline(userId).fold("online is-green", "offline"))
     ).flatten
   }.mkString("class=\"", " ", "\"")
 
@@ -328,7 +330,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     val name = user.titleUsername
     val nbGames = user.count.game
     val createdAt =
-      org.joda.time.format.DateTimeFormat forStyle "M-" print user.createdAt
+      org.joda.time.format.DateTimeFormat.forStyle("M-") print user.createdAt
     val currentRating =
       user.perfs.bestPerf ?? {
         case (pt, perf) => s" Current ${pt.name} rating: ${perf.intRating}."

@@ -53,7 +53,7 @@ class HMapTests {
 
     // Map over an HList
     val l1 = 23 :: "bar" :: 23 :: "bar" :: HNil
-    val l2 = l1 map hm
+    val l2 = l1.map(hm)
     typed[String :: Int :: String :: Int :: HNil](l2)
     assertEquals("foo" :: 13 :: "foo" :: 13 :: HNil, l2)
 
@@ -105,7 +105,7 @@ class HMapTests {
 
     // Map over an HList
     val l1 = Set("foo") :: Set(23) :: HNil
-    val l2 = l1 map nt
+    val l2 = l1.map(nt)
     typed[Option[String] :: Option[Int] :: HNil](l2)
     assertEquals(Some("bar") :: Some(13) :: HNil, l2)
 

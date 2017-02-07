@@ -22,11 +22,11 @@ object ConstrExpr {
     val constrExprMarker = builder.mark
     builder.getTokenType match {
       case ScalaTokenTypes.tLBRACE =>
-        ConstrBlock parse builder
+        ConstrBlock.parse(builder)
         constrExprMarker.drop()
         return true
       case _ =>
-        SelfInvocation parse builder
+        SelfInvocation.parse(builder)
         constrExprMarker.done(ScalaElementTypes.CONSTR_EXPR)
         return true
     }

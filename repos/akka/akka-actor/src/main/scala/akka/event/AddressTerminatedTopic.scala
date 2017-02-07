@@ -55,6 +55,6 @@ private[akka] final class AddressTerminatedTopic extends Extension {
   }
 
   def publish(msg: AddressTerminated): Unit = {
-    subscribers.get foreach { _.tell(msg, ActorRef.noSender) }
+    subscribers.get.foreach { _.tell(msg, ActorRef.noSender) }
   }
 }

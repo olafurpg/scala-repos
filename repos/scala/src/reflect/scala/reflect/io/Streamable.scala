@@ -38,10 +38,10 @@ object Streamable {
     def length: Long = -1
 
     def bufferedInput() = new BufferedInputStream(inputStream())
-    def bytes(): Iterator[Byte] = bytesAsInts() map (_.toByte)
+    def bytes(): Iterator[Byte] = bytesAsInts().map(_.toByte)
     def bytesAsInts(): Iterator[Int] = {
       val in = bufferedInput()
-      Iterator continually in.read() takeWhile (_ != -1)
+      (Iterator continually in.read()).takeWhile(_ != -1)
     }
 
     /** This method aspires to be the fastest way to read
@@ -138,7 +138,7 @@ object Streamable {
     }).toByteArray()
 
   def slurp(is: => InputStream)(implicit codec: Codec): String =
-    new Chars { def inputStream() = is } slurp codec
+    new Chars { def inputStream() = is }.slurp(codec)
 
   def slurp(url: URL)(implicit codec: Codec): String =
     slurp(url.openStream())

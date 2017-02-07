@@ -65,7 +65,7 @@ trait TimeZoneSpecs[M[+ _]]
              Const(CString("-10:00"))(line))(line)
 
       val result =
-        testEval(input) collect {
+        testEval(input).collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -90,7 +90,7 @@ trait TimeZoneSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(time)) if ids.length == 1 =>
             val newTime = ISODateTimeFormat
               .dateTimeParser()
@@ -118,7 +118,7 @@ trait TimeZoneSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -145,7 +145,7 @@ trait TimeZoneSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -170,7 +170,7 @@ trait TimeZoneSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(time)) if ids.length == 1 =>
             val newTime = ISODateTimeFormat
               .dateTimeParser()
@@ -198,7 +198,7 @@ trait TimeZoneSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 

@@ -26,7 +26,7 @@ object ResultExpr {
     def parseFunctionEnd() = builder.getTokenType match {
       case ScalaTokenTypes.tFUNTYPE =>
         builder.advanceLexer() //Ate =>
-        Block parse (builder, hasBrace = false, needNode = true)
+        Block.parse(builder, hasBrace = false, needNode = true)
         backupMarker.drop()
         resultMarker.done(ScalaElementTypes.FUNCTION_EXPR)
         true
@@ -54,14 +54,14 @@ object ResultExpr {
 
           return parseFunctionEnd()
         case _ =>
-          builder error ErrMsg("fun.sign.expected")
+          builder.error(ErrMsg("fun.sign.expected"))
       }
       parseFunctionEnd()
     }
 
     builder.getTokenType match {
       case ScalaTokenTypes.tLPARENTHESIS =>
-        Bindings parse builder
+        Bindings.parse(builder)
         return parseFunctionEnd()
       case ScalaTokenTypes.kIMPLICIT =>
         val pmarker = builder.mark()

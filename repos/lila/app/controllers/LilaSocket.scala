@@ -21,8 +21,8 @@ trait LilaSocket { self: LilaController =>
       consumer: TokenBucket.Consumer,
       name: String)(f: AcceptType[A]): WebSocket[A, A] =
     WebSocket[A, A] { req =>
-      reqToCtx(req) flatMap { ctx =>
-        val ip = HTTPRequest lastRemoteAddress req
+      reqToCtx(req).flatMap { ctx =>
+        val ip = HTTPRequest.lastRemoteAddress(req)
         def userInfo = {
           val sri = get("sri", req) | "none"
           val username = ctx.usernameOrAnon

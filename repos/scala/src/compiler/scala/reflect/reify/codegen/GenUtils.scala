@@ -6,7 +6,7 @@ trait GenUtils { self: Reifier =>
   import global._
 
   def reifyList(xs: List[Any]): Tree =
-    mkList(xs map reify)
+    mkList(xs.map(reify))
 
   def reifyProduct(x: Product): Tree =
     reifyProduct(x.productPrefix, x.productIterator.toList)
@@ -14,8 +14,8 @@ trait GenUtils { self: Reifier =>
   def reifyProduct(prefix: String, elements: List[Any]): Tree = {
     // reflection would be more robust, but, hey, this is a hot path
     if (prefix.startsWith("Tuple"))
-      scalaFactoryCall(prefix, (elements map reify).toList: _*)
-    else mirrorCall(TermName(prefix), (elements map reify): _*)
+      scalaFactoryCall(prefix, (elements.map(reify)).toList: _*)
+    else mirrorCall(TermName(prefix), (elements.map(reify)): _*)
   }
 
   // helper functions
@@ -43,7 +43,7 @@ trait GenUtils { self: Reifier =>
     call("" + nme.UNIVERSE_BUILD_PREFIX + name, args: _*)
 
   def reifyBuildCall(name: TermName, args: Any*) =
-    mirrorBuildCall(name, args map reify: _*)
+    mirrorBuildCall(name, args.map(reify): _*)
 
   def mirrorMirrorCall(name: TermName, args: Tree*): Tree =
     call("" + nme.MIRROR_PREFIX + name, args: _*)
@@ -71,7 +71,7 @@ trait GenUtils { self: Reifier =>
     *  @param mkName   Creator for last portion of name (either TermName or TypeName)
     */
   def path(fullname: String, mkName: String => Name): Tree = {
-    val parts = fullname split "\\."
+    val parts = fullname.split("\\.")
     val prefixParts = parts.init
     val lastName = mkName(parts.last)
     if (prefixParts.isEmpty) Ident(lastName)

@@ -70,14 +70,14 @@ object MultiNodeClusterSpec {
     import EndActor._
     def receive = {
       case SendEnd ⇒
-        target foreach { t ⇒
+        target.foreach { t ⇒
           context.actorSelection(RootActorPath(t) / self.path.elements) ! End
         }
       case End ⇒
-        testActor forward End
+        testActor.forward(End)
         sender() ! EndAck
       case EndAck ⇒
-        testActor forward EndAck
+        testActor.forward(EndAck)
     }
   }
 }
@@ -112,7 +112,7 @@ trait MultiNodeClusterSpec
         ".*Shutting down cluster Node.*",
         ".*Cluster node successfully shut down.*",
         ".*Using a dedicated scheduler for cluster.*"
-      ) foreach { s ⇒
+      ).foreach { s ⇒
         sys.eventStream.publish(Mute(EventFilter.info(pattern = s)))
       }
 
@@ -300,7 +300,7 @@ trait MultiNodeClusterSpec
              "expectedLeader [%s], got leader [%s], members [%s]"
                .format(expectedLeader, leader, clusterView.members))
       clusterView.status should
-        (be(MemberStatus.Up) or be(MemberStatus.Leaving))
+        (be(MemberStatus.Up).or(be(MemberStatus.Leaving)))
     }
 
   /**
@@ -312,9 +312,8 @@ trait MultiNodeClusterSpec
                      timeout: FiniteDuration = 25.seconds): Unit = {
     within(timeout) {
       if (!canNotBePartOfMemberRing.isEmpty) // don't run this on an empty set
-        awaitAssert(
-          canNotBePartOfMemberRing foreach
-            (a ⇒ clusterView.members.map(_.address) should not contain (a)))
+        awaitAssert(canNotBePartOfMemberRing.foreach(a ⇒
+          clusterView.members.map(_.address) should not contain (a)))
       awaitAssert(clusterView.members.size should ===(numberOfMembers))
       awaitAssert(
         clusterView.members.map(_.status) should ===(Set(MemberStatus.Up)))
@@ -332,7 +331,7 @@ trait MultiNodeClusterSpec
     */
   def awaitSeenSameState(addresses: Address*): Unit =
     awaitAssert(
-      (addresses.toSet diff clusterView.seenBy) should ===(Set.empty))
+      (addresses.toSet.diff(clusterView.seenBy)) should ===(Set.empty))
 
   /**
     * Leader according to the address ordering of the roles.
@@ -365,7 +364,7 @@ trait MultiNodeClusterSpec
     * failure detector.
     */
   def markNodeAsAvailable(address: Address): Unit =
-    failureDetectorPuppet(address) foreach (_.markNodeAsAvailable())
+    failureDetectorPuppet(address).foreach(_.markNodeAsAvailable())
 
   /**
     * Marks a node as unavailable in the failure detector if
@@ -377,7 +376,7 @@ trait MultiNodeClusterSpec
       // before marking it as unavailable there should be at least one heartbeat
       // to create the FailureDetectorPuppet in the FailureDetectorRegistry
       cluster.failureDetector.heartbeat(address)
-      failureDetectorPuppet(address) foreach (_.markNodeAsUnavailable())
+      failureDetectorPuppet(address).foreach(_.markNodeAsUnavailable())
     }
   }
 
@@ -389,7 +388,7 @@ trait MultiNodeClusterSpec
       address: Address): Option[FailureDetectorPuppet] =
     cluster.failureDetector match {
       case reg: DefaultFailureDetectorRegistry[Address] ⇒
-        reg.failureDetector(address) collect {
+        reg.failureDetector(address).collect {
           case p: FailureDetectorPuppet ⇒ p
         }
       case _ ⇒ None

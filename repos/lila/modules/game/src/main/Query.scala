@@ -66,7 +66,7 @@ object Query {
   def win(u: String) = user(u) ++ Json.obj(F.winnerId -> u)
 
   def loss(u: String) =
-    user(u) ++ Json.obj(F.status -> $in(Status.finishedWithWinner map (_.id))) ++ Json
+    user(u) ++ Json.obj(F.status -> $in(Status.finishedWithWinner.map(_.id))) ++ Json
       .obj(F.winnerId -> ($ne(u) ++ $exists(true)))
 
   def opponents(u1: User, u2: User) =
@@ -102,8 +102,8 @@ object Query {
   def createdSince(d: DateTime) =
     Json.obj(F.createdAt -> $gt($date(d)))
 
-  val sortCreated = $sort desc F.createdAt
-  val sortChronological = $sort asc F.createdAt
-  val sortAntiChronological = $sort desc F.createdAt
-  val sortUpdatedNoIndex = $sort desc F.updatedAt
+  val sortCreated = $sort.desc(F.createdAt)
+  val sortChronological = $sort.asc(F.createdAt)
+  val sortAntiChronological = $sort.desc(F.createdAt)
+  val sortUpdatedNoIndex = $sort.desc(F.updatedAt)
 }

@@ -72,15 +72,19 @@ class PortsMatcher(app: AppDefinition,
       failLog: Boolean): Option[Seq[PortWithRole]] = {
     takeEnoughPortsOrNone(expectedSize = requiredPorts.size) {
       requiredPorts.iterator.map { (port: Int) =>
-        offeredPortRanges.find(_.contains(port)).map { offeredRange =>
-          PortWithRole(offeredRange.role, port, offeredRange.reservation)
-        } orElse {
-          if (failLog)
-            log.info(s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
-              s"Couldn't find host port $port (of ${requiredPorts.mkString(", ")}) " +
-              s"in any offered range for app [${app.id}]")
-          None
-        }
+        offeredPortRanges
+          .find(_.contains(port))
+          .map { offeredRange =>
+            PortWithRole(offeredRange.role, port, offeredRange.reservation)
+          }
+          .orElse {
+            if (failLog)
+              log.info(
+                s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
+                  s"Couldn't find host port $port (of ${requiredPorts.mkString(", ")}) " +
+                  s"in any offered range for app [${app.id}]")
+            None
+          }
       }
     }
   }
@@ -92,7 +96,7 @@ class PortsMatcher(app: AppDefinition,
       numberOfPorts: Int): Option[Seq[PortWithRole]] = {
     takeEnoughPortsOrNone(expectedSize = numberOfPorts) {
       shuffledAvailablePorts.map(Some(_))
-    } orElse {
+    }.orElse {
       log.info(
         s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
           s"Couldn't find $numberOfPorts ports in offer for app [${app.id}]")

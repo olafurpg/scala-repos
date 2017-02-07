@@ -25,7 +25,7 @@ final class DList[A] private[scalaz] (f: IList[A] => Trampoline[IList[A]]) {
   def toList: List[A] = toIList.toList
 
   /** Prepend a single element in constant time. */
-  def +:(a: A): DList[A] = mkDList(as => suspend(apply(as) map (a :: _)))
+  def +:(a: A): DList[A] = mkDList(as => suspend(apply(as).map(a :: _)))
 
   /** Append a single element in constant time. */
   def :+(a: A): DList[A] = mkDList(as => suspend(apply(a :: as)))
@@ -66,7 +66,7 @@ final class DList[A] private[scalaz] (f: IList[A] => Trampoline[IList[A]]) {
 
   def zip[B](bs: => DList[B]): DList[(A, B)] =
     uncons(DList(),
-           (h, t) => bs.uncons(DList(), (h2, t2) => (h → h2) +: (t zip t2)))
+           (h, t) => bs.uncons(DList(), (h2, t2) => (h → h2) +: (t.zip(t2))))
 }
 
 object DList extends DListInstances {
@@ -93,8 +93,9 @@ object DList extends DListInstances {
     })
   def unfoldr[A, B](b: B, f: B => Option[(A, B)]): DList[A] = {
     def go(b: B, f: B => Option[(A, B)]): Trampoline[DList[A]] =
-      f(b) map { case (a, c) => suspend(go(c, f)) map (a +: _) } getOrElse return_(
-        DList())
+      f(b)
+        .map { case (a, c) => suspend(go(c, f)).map(a +: _) }
+        .getOrElse(return_(DList()))
     go(b, f).run
   }
 }
@@ -109,11 +110,11 @@ sealed abstract class DListInstances {
   with Traverse[DList] with BindRec[DList] with Zip[DList]
   with IsEmpty[DList] {
     def point[A](a: => A) = DList(a)
-    def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
+    def bind[A, B](as: DList[A])(f: A => DList[B]) = as.flatMap(f)
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
     def empty[A] = DList()
     def isEmpty[A](fa: DList[A]) = fa.isEmpty
-    def zip[A, B](a: => DList[A], b: => DList[B]): DList[(A, B)] = a zip b
+    def zip[A, B](a: => DList[A], b: => DList[B]): DList[(A, B)] = a.zip(b)
     def traverseImpl[F[_], A, B](fa: DList[A])(f: A => F[B])(
         implicit F: Applicative[F]): F[DList[B]] =
       fa.foldr(F.point(DList[B]()))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))

@@ -14,7 +14,7 @@ class PublicKeyAuthenticator
   override def authenticate(username: String,
                             key: PublicKey,
                             session: ServerSession): Boolean = {
-    Database() withSession { implicit session =>
+    Database().withSession { implicit session =>
       getPublicKeys(username).exists { sshKey =>
         SshUtil.str2PublicKey(sshKey.publicKey) match {
           case Some(publicKey) => key.equals(publicKey)

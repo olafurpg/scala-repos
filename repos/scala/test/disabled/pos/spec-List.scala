@@ -201,7 +201,7 @@ sealed trait List[@specialized +A]
   override def slice(start: Int, end: Int): List[A] = {
     var len = end
     if (start > 0) len -= start
-    drop(start) take len
+    drop(start).take(len)
   }
 
   /** Returns the rightmost <code>n</code> elements from this list.
@@ -840,8 +840,8 @@ object List extends SeqFactory[List] {
     val buf = new ListBuffer[List[A]]
     var yss = xss
     while (!yss.head.isEmpty) {
-      buf += (yss map (_.head))
-      yss = (yss map (_.tail))
+      buf += (yss.map(_.head))
+      yss = (yss.map(_.tail))
     }
     buf.toList
   }

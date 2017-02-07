@@ -509,7 +509,7 @@ object RedirectResponse {
     */
   def apply(uri: String, cookies: HTTPCookie*): RedirectResponse =
     new RedirectResponse(uri,
-                         S.request or CurrentReq.box openOr Req.nil,
+                         S.request.or(CurrentReq.box).openOr(Req.nil),
                          cookies: _*)
 }
 
@@ -536,7 +536,7 @@ object SeeOtherResponse {
     */
   def apply(uri: String, cookies: HTTPCookie*): SeeOtherResponse =
     new SeeOtherResponse(uri,
-                         S.request or CurrentReq.box openOr Req.nil,
+                         S.request.or(CurrentReq.box).openOr(Req.nil),
                          cookies: _*)
 }
 
@@ -563,7 +563,7 @@ object RedirectWithState {
             state: RedirectState,
             cookies: HTTPCookie*): RedirectWithState =
     this.apply(uri,
-               S.request or CurrentReq.box openOr Req.nil,
+               S.request.or(CurrentReq.box).openOr(Req.nil),
                state,
                cookies: _*)
 
@@ -694,7 +694,7 @@ trait NodeResponse extends LiftResponse {
   def flipDocTypeForIE6 = false
 
   protected def writeDocType(writer: Writer): Unit = {
-    val doc: String = docType.map(_ + "\n") openOr ""
+    val doc: String = docType.map(_ + "\n").openOr("")
     val encoding: String = if (!includeXmlVersion) "" else _encoding
 
     if (flipDocTypeForIE6 && isIE6) {
@@ -745,7 +745,7 @@ trait XmlNodeResponse extends LiftResponse {
   def encoding: String = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 
   protected def writeDocType(writer: Writer): Unit = {
-    val doc: String = docType.map(_ + "\n") openOr ""
+    val doc: String = docType.map(_ + "\n").openOr("")
 
     writer.append(encoding)
     writer.append(doc)
@@ -803,7 +803,7 @@ case class XhtmlResponse(out: Node,
   }
 
   override protected lazy val _encoding: String =
-    htmlProperties.encoding openOr ""
+    htmlProperties.encoding.openOr("")
 
   val headers: List[(String, String)] =
     _headers.find(_._1 equalsIgnoreCase "content-type") match {
@@ -890,10 +890,10 @@ object XmlResponse {
   /**
     * Additional headers for the XmlResponse
     */
-  def addlHeaders: List[(String, String)] = _addlHeaders.box openOr Nil
+  def addlHeaders: List[(String, String)] = _addlHeaders.box.openOr(Nil)
 
   def withHeaders[T](headers: (String, String)*)(f: => T): T = {
-    val cur = _addlHeaders.box openOr Nil
+    val cur = _addlHeaders.box.openOr(Nil)
     _addlHeaders.doWith(headers.toList ::: cur)(f)
   }
 }

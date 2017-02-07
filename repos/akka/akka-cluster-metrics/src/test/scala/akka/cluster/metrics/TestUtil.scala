@@ -65,7 +65,7 @@ case class MockitoSigarProvider(pid: Long = 123,
   /** Generate monotonic array from 0 to value. */
   def increase(value: Double): Array[Double] = {
     val delta = value / steps
-    (0 to steps) map { _ * delta } toArray
+    ((0 to steps)).map { _ * delta } toArray
   }
 
   /** Sigar mock instance. */
@@ -74,13 +74,13 @@ case class MockitoSigarProvider(pid: Long = 123,
     // Note "thenReturn(0)" invocation is consumed in collector construction.
 
     val cpuPerc = mock[CpuPerc]
-    when(cpuPerc.getCombined) thenReturn (0, increase(cpuCombined): _*)
-    when(cpuPerc.getStolen) thenReturn (0, increase(cpuStolen): _*)
+    when(cpuPerc.getCombined).thenReturn(0, increase(cpuCombined): _*)
+    when(cpuPerc.getStolen).thenReturn(0, increase(cpuStolen): _*)
 
     val sigar = mock[SigarProxy]
-    when(sigar.getPid) thenReturn pid
-    when(sigar.getLoadAverage) thenReturn loadAverage // Constant.
-    when(sigar.getCpuPerc) thenReturn cpuPerc // Increasing.
+    when(sigar.getPid).thenReturn(pid)
+    when(sigar.getLoadAverage).thenReturn(loadAverage) // Constant.
+    when(sigar.getCpuPerc).thenReturn(cpuPerc) // Increasing.
 
     sigar
   }

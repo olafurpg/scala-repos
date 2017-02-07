@@ -120,7 +120,7 @@ class StatusTrackerSuite
       firstJobFuture.jobIds.head
     }
     eventually(timeout(10 seconds)) {
-      sc.statusTracker.getJobIdsForGroup("my-job-group2") should have size 2
+      (sc.statusTracker.getJobIdsForGroup("my-job-group2") should have).size(2)
     }
   }
 }

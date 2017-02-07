@@ -14,7 +14,7 @@ object Scripted {
   lazy val scriptedPrescripted = TaskKey[File => Unit]("scripted-prescripted")
 
   lazy val MavenResolverPluginTest =
-    config("mavenResolverPluginTest") extend Compile
+    config("mavenResolverPluginTest").extend(Compile)
 
   import sbt.complete._
   import DefaultParsers._
@@ -23,7 +23,7 @@ object Scripted {
   def scriptedParser(scriptedBase: File): Parser[Seq[String]] = {
     val scriptedFiles: NameFilter = ("test": NameFilter) | "pending"
     val pairs =
-      (scriptedBase * AllPassFilter * AllPassFilter * scriptedFiles).get map {
+      (scriptedBase * AllPassFilter * AllPassFilter * scriptedFiles).get.map {
         (f: File) =>
           val p = f.getParentFile
           (p.getParentFile.getName, p.getName)
@@ -35,7 +35,7 @@ object Scripted {
 
     // A parser for page definitions
     val pageP: Parser[ScriptedTestPage] =
-      ("*" ~ NatBasic ~ "of" ~ NatBasic) map {
+      (("*" ~ NatBasic ~ "of" ~ NatBasic)).map {
         case _ ~ page ~ _ ~ total => ScriptedTestPage(page, total)
       }
     // Grabs the filenames from a given test group in the current page definition.
@@ -56,13 +56,13 @@ object Scripted {
       files = pagedFilenames(group, page)
       // TODO -  Fail the parser if we don't have enough files for the given page size
       //if !files.isEmpty
-    } yield files map (f => group + '/' + f)
+    } yield files.map(f => group + '/' + f)
 
     val testID =
       (for (group <- groupP; name <- nameP(group)) yield (group, name))
-    val testIdAsGroup = matched(testID) map (test => Seq(test))
+    val testIdAsGroup = matched(testID).map(test => Seq(test))
     //(token(Space) ~> matched(testID)).*
-    (token(Space) ~> (PagedIds | testIdAsGroup)).* map (_.flatten)
+    (token(Space) ~> (PagedIds | testIdAsGroup)).*.map(_.flatten)
   }
 
   // Interface to cross class loader

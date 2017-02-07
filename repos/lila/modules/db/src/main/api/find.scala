@@ -14,7 +14,7 @@ object $find {
     one(modifier($query(q)))
 
   def one[A: TubeInColl](q: QueryBuilder): Fu[Option[A]] =
-    q.one[Option[A]] map (_.flatten)
+    q.one[Option[A]].map(_.flatten)
 
   def byId[ID: Writes, A: TubeInColl](id: ID): Fu[Option[A]] =
     one($select byId id)
@@ -27,7 +27,7 @@ object $find {
 
   def byOrderedIds[ID: Writes, A <: Identified[ID]: TubeInColl](
       ids: Iterable[ID]): Fu[List[A]] =
-    byIds(ids) map { docs =>
+    byIds(ids).map { docs =>
       val docsMap = docs.map(u => u.id -> u).toMap
       ids.flatMap(docsMap.get).toList
     }
@@ -37,7 +37,7 @@ object $find {
 
   def optionsByOrderedIds[ID: Writes, A <: Identified[ID]: TubeInColl](
       ids: Iterable[ID]): Fu[List[Option[A]]] =
-    byIds(ids) map { docs =>
+    byIds(ids).map { docs =>
       val docsMap = docs.map(u => u.id -> u).toMap
       ids.map(docsMap.get).toList
     }
@@ -48,19 +48,19 @@ object $find {
   def all[A: TubeInColl]: Fu[List[A]] = apply($select.all)
 
   def apply[A: TubeInColl](q: JsObject): Fu[List[A]] =
-    $query(q).toList[Option[A]](none) map (_.flatten)
+    $query(q).toList[Option[A]](none).map(_.flatten)
 
   def apply[A: TubeInColl](q: JsObject, nb: Int): Fu[List[A]] =
-    $query(q).toList[Option[A]](nb.some) map (_.flatten)
+    $query(q).toList[Option[A]](nb.some).map(_.flatten)
 
   def apply[A: TubeInColl](b: QueryBuilder): Fu[List[A]] =
-    b.toList[Option[A]](none) map (_.flatten)
+    b.toList[Option[A]](none).map(_.flatten)
 
   def apply[A: TubeInColl](b: QueryBuilder, nb: Int): Fu[List[A]] =
-    b.toList[Option[A]](nb.some) map (_.flatten)
+    b.toList[Option[A]](nb.some).map(_.flatten)
 
   def apply[A: TubeInColl](b: QueryBuilder,
                            nb: Int,
                            readPreference: ReadPreference): Fu[List[A]] =
-    b.toList[Option[A]](nb.some, readPreference) map (_.flatten)
+    b.toList[Option[A]](nb.some, readPreference).map(_.flatten)
 }

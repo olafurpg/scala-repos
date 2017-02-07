@@ -41,7 +41,7 @@ object TypeParam {
     }
     builder.getTokenType match {
       case ScalaTokenTypes.tLSQBRACKET =>
-        TypeParamClause parse builder
+        TypeParamClause.parse(builder)
       case _ =>
     }
 
@@ -59,7 +59,7 @@ object TypeParam {
     builder.getTokenText match {
       case x if x == bound =>
         builder.advanceLexer
-        if (!Type.parse(builder)) builder error ErrMsg("wrong.type")
+        if (!Type.parse(builder)) builder.error(ErrMsg("wrong.type"))
         true
       case _ => false
     }

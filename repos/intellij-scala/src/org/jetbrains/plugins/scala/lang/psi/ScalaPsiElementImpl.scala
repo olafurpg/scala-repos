@@ -76,7 +76,7 @@ abstract class ScalaPsiElementImpl(node: ASTNode)
       clazz: Class[T]): T = findChildByClass[T](clazz)
 
   override protected def lock(handler: => Unit) {
-    if (! _locked.get) {
+    if (!_locked.get) {
       _locked.set(true)
       handler
       _locked.set(false)

@@ -200,7 +200,7 @@ trait ClassHelpers { self: ControlHelpers =>
         case null => false
         case _ => callableMethod_?(clz.getDeclaredMethod(name))
       }
-    } openOr false
+    }.openOr(false)
   }
 
   /**
@@ -254,16 +254,15 @@ trait ClassHelpers { self: ControlHelpers =>
                       inst: AnyRef,
                       meth: String,
                       params: Array[AnyRef]): Box[Any] = {
-    _invokeMethod(clz, inst, meth, params, Empty) or _invokeMethod(
-      clz,
-      inst,
-      StringHelpers.camelify(meth),
-      params,
-      Empty) or _invokeMethod(clz,
-                              inst,
-                              StringHelpers.camelifyMethod(meth),
-                              params,
-                              Empty)
+    _invokeMethod(clz, inst, meth, params, Empty)
+      .or(
+        _invokeMethod(clz, inst, StringHelpers.camelify(meth), params, Empty))
+      .or(
+        _invokeMethod(clz,
+                      inst,
+                      StringHelpers.camelifyMethod(meth),
+                      params,
+                      Empty))
   }
 
   /**
@@ -284,16 +283,19 @@ trait ClassHelpers { self: ControlHelpers =>
                       meth: String,
                       params: Array[AnyRef],
                       ptypes: Array[Class[_]]): Box[Any] = {
-    _invokeMethod(clz, inst, meth, params, Full(ptypes)) or _invokeMethod(
-      clz,
-      inst,
-      StringHelpers.camelify(meth),
-      params,
-      Full(ptypes)) or _invokeMethod(clz,
-                                     inst,
-                                     StringHelpers.camelifyMethod(meth),
-                                     params,
-                                     Full(ptypes))
+    _invokeMethod(clz, inst, meth, params, Full(ptypes))
+      .or(
+        _invokeMethod(clz,
+                      inst,
+                      StringHelpers.camelify(meth),
+                      params,
+                      Full(ptypes)))
+      .or(
+        _invokeMethod(clz,
+                      inst,
+                      StringHelpers.camelifyMethod(meth),
+                      params,
+                      Full(ptypes)))
   }
 
   /**
@@ -332,7 +334,8 @@ trait ClassHelpers { self: ControlHelpers =>
         } else {
 
           val ret = try {
-            val classes: Array[Class[_]] = ptypes openOr params.map(_.getClass)
+            val classes: Array[Class[_]] =
+              ptypes.openOr(params.map(_.getClass))
             List(clz.getMethod(meth, classes: _*))
           } catch {
             case e: NullPointerException => Nil

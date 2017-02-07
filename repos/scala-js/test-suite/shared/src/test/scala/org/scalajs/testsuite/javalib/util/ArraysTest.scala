@@ -494,7 +494,7 @@ class ArraysTest {
       try {
         block
         assertEquals("thrown", "exception")
-      } catch expected orElse catchAll
+      } catch expected.orElse(catchAll)
     }
 
     val array = Array(0, 1, 3, 4)

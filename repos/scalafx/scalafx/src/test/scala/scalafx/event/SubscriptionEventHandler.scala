@@ -40,17 +40,17 @@ class SubscriptionEventHandler extends FlatSpec {
     var called = false
 
     val subscription =
-      property onInvalidate {
+      property.onInvalidate {
         called = true
         ()
       }
 
-    property set "one"
+    property.set("one")
     assert(called === true)
 
     called = false
     subscription.cancel()
-    property set "two"
+    property.set("two")
     assert(called === false)
   }
 }

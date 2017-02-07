@@ -58,7 +58,7 @@ object JsonUtil {
           next
       }
 
-      stream.uncons flatMap {
+      stream.uncons.flatMap {
         case Some((bytes, tail)) =>
           val (ap, p2) = parser(More(ByteBuffer.wrap(bytes)))
           handle(ap, rec(tail, p2))
@@ -80,7 +80,7 @@ object JsonUtil {
     // create a new stream, using the current stream and parser
     StreamT.unfoldM((stream, AsyncParser.stream())) {
       case (stream, parser) =>
-        stream.uncons map {
+        stream.uncons.map {
           case Some((bytes, tail)) =>
             // parse the current byte buffer, keeping track of the
             // new parser instance we were given back

@@ -157,7 +157,7 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
         val lookingForAnnotations: Boolean =
           Option(
             insertedElement.getContainingFile findElementAt
-              (insertedElement.getTextOffset - 1)) exists {
+              (insertedElement.getTextOffset - 1)).exists {
             _.getNode.getElementType == ScalaTokenTypes.tAT
           }
 
@@ -377,7 +377,7 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
     val messages = Array[String](
       null
     )
-    messages apply (new Random).nextInt(messages.length)
+    messages.apply(new Random).nextInt(messages.length)
   }
 
   override def beforeCompletion(context: CompletionInitializationContext) {

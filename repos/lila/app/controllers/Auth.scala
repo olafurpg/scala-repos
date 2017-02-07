@@ -19,11 +19,10 @@ object Auth extends LilaController {
   private def forms = env.forms
 
   private def mobileUserOk(u: UserModel): Fu[Result] =
-    lila.game.GameRepo urgentGames u map { povs =>
+    lila.game.GameRepo.urgentGames(u).map { povs =>
       Ok {
-        Env.user.jsonView(u) ++ Json.obj(
-          "nowPlaying" -> JsArray(
-            povs take 20 map Env.api.lobbyApi.nowPlaying))
+        Env.user.jsonView(u) ++ Json.obj("nowPlaying" -> JsArray(
+          povs.take(20).map(Env.api.lobbyApi.nowPlaying)))
       }
     }
 
@@ -32,19 +31,24 @@ object Auth extends LilaController {
     u.ipBan.fold(
       Env.security.firewall.blockIp(req.remoteAddress) inject BadRequest(
         "blocked by firewall"),
-      api.saveAuthentication(u.id, ctx.mobileApiVersion) flatMap { sessionId =>
-        negotiate(
-          html = Redirect {
-            get("referrer").filter(_.nonEmpty) orElse req.session.get(
-              api.AccessUri) getOrElse routes.Lobby.home.url
-          }.fuccess,
-          api = _ => mobileUserOk(u)
-        ) map {
-          _ withCookies LilaCookie.withSession { session =>
-            session + ("sessionId" -> sessionId) - api.AccessUri
+      api
+        .saveAuthentication(u.id, ctx.mobileApiVersion)
+        .flatMap { sessionId =>
+          negotiate(
+            html = Redirect {
+              get("referrer")
+                .filter(_.nonEmpty)
+                .orElse(req.session.get(api.AccessUri))
+                .getOrElse(routes.Lobby.home.url)
+            }.fuccess,
+            api = _ => mobileUserOk(u)
+          ).map {
+            _.withCookies(LilaCookie.withSession { session =>
+              session + ("sessionId" -> sessionId) - api.AccessUri
+            })
           }
         }
-      } recoverWith authRecovery
+        .recoverWith(authRecovery)
     )
   }
 
@@ -52,14 +56,14 @@ object Auth extends LilaController {
       implicit ctx: Context): PartialFunction[Throwable, Fu[Result]] = {
     case lila.security.Api.AuthFromTorExitNode => noTorResponse
     case lila.security.Api.MustConfirmEmail(userId) =>
-      UserRepo byId userId map {
+      (UserRepo byId userId).map {
         case Some(user) => BadRequest(html.auth.checkYourEmail(user))
         case None => BadRequest
       }
   }
 
   def login = Open { implicit ctx =>
-    if (Env.security.tor isExitNode ctx.req.remoteAddress)
+    if (Env.security.tor.isExitNode(ctx.req.remoteAddress))
       Unauthorized(html.auth.tor()).fuccess
     else {
       val referrer = get("referrer")
@@ -84,18 +88,18 @@ object Auth extends LilaController {
 
   def logout = Open { implicit ctx =>
     implicit val req = ctx.req
-    req.session get "sessionId" foreach lila.security.Store.delete
+    req.session.get("sessionId").foreach(lila.security.Store.delete)
     negotiate(
       html = fuccess(Redirect(routes.Main.mobile)),
       api = apiVersion => Ok(Json.obj("ok" -> true)).fuccess
-    ) map (_ withCookies LilaCookie.newSession)
+    ).map(_.withCookies(LilaCookie.newSession))
   }
 
   def signup = Open { implicit ctx =>
-    if (Env.security.tor isExitNode ctx.req.remoteAddress)
+    if (Env.security.tor.isExitNode(ctx.req.remoteAddress))
       Unauthorized(html.auth.tor()).fuccess
     else {
-      forms.signup.websiteWithCaptcha map {
+      forms.signup.websiteWithCaptcha.map {
         case (form, captcha) =>
           Ok(html.auth.signup(form, captcha, env.RecaptchaPublicKey))
       }
@@ -107,7 +111,7 @@ object Auth extends LilaController {
                        rawEmail: Option[String])(
       implicit ctx: Context): Fu[(UserModel, Option[String])] = {
     val email =
-      rawEmail.map(e => env.emailAddress.validate(e) err s"Invalid email $e")
+      rawEmail.map(e => env.emailAddress.validate(e).err(s"Invalid email $e"))
     UserRepo
       .create(username, password, email, ctx.blindMode, ctx.mobileApiVersion)
       .flatten(s"No user could be created for ${username}")
@@ -120,22 +124,26 @@ object Auth extends LilaController {
       negotiate(
         html = forms.signup.website.bindFromRequest.fold(
           err =>
-            forms.anyCaptcha map { captcha =>
+            forms.anyCaptcha.map { captcha =>
               BadRequest(
                 html.auth.signup(err, captcha, env.RecaptchaPublicKey))
           },
           data =>
             env.recaptcha.verify(data.recaptchaResponse, req).flatMap {
               case false =>
-                forms.signup.websiteWithCaptcha map {
+                forms.signup.websiteWithCaptcha.map {
                   case (form, captcha) =>
-                    BadRequest(html.auth
-                      .signup(form fill data, captcha, env.RecaptchaPublicKey))
+                    BadRequest(
+                      html.auth
+                        .signup(form.fill(data),
+                                captcha,
+                                env.RecaptchaPublicKey))
                 }
               case true =>
                 lila.mon.user.register.website()
                 val email = env.emailAddress
-                    .validate(data.email) err s"Invalid email ${data.email}"
+                  .validate(data.email)
+                  .err(s"Invalid email ${data.email}")
                 UserRepo
                   .create(data.username,
                           data.password,
@@ -159,14 +167,15 @@ object Auth extends LilaController {
             err => fuccess(BadRequest(jsonError(errorsAsJson(err)))),
             data => {
               lila.mon.user.register.mobile()
-              val email = data.email flatMap env.emailAddress.validate
+              val email = data.email.flatMap(env.emailAddress.validate)
               UserRepo
                 .create(data.username,
                         data.password,
                         email,
                         false,
                         apiVersion.some)
-                .flatten(s"No user could be created for ${data.username}") flatMap mobileUserOk
+                .flatten(s"No user could be created for ${data.username}")
+                .flatMap(mobileUserOk)
             }
         )
       )
@@ -174,24 +183,26 @@ object Auth extends LilaController {
   }
 
   def checkYourEmail(name: String) = Open { implicit ctx =>
-    OptionOk(UserRepo named name) { user =>
+    OptionOk(UserRepo.named(name)) { user =>
       html.auth.checkYourEmail(user)
     }
   }
 
   def signupConfirmEmail(token: String) = Open { implicit ctx =>
-    Env.security.emailConfirm.confirm(token) flatMap {
+    Env.security.emailConfirm.confirm(token).flatMap {
       _.fold(notFound)(saveAuthAndRedirect)
     }
   }
 
   private def saveAuthAndRedirect(user: UserModel)(implicit ctx: Context) = {
     implicit val req = ctx.req
-    api.saveAuthentication(user.id, ctx.mobileApiVersion) map { sessionId =>
-      Redirect(routes.User.show(user.username)) withCookies LilaCookie.session(
-        "sessionId",
-        sessionId)
-    } recoverWith authRecovery
+    api
+      .saveAuthentication(user.id, ctx.mobileApiVersion)
+      .map { sessionId =>
+        Redirect(routes.User.show(user.username))
+          .withCookies(LilaCookie.session("sessionId", sessionId))
+      }
+      .recoverWith(authRecovery)
   }
 
   private def noTorResponse(implicit ctx: Context) =
@@ -201,27 +212,28 @@ object Auth extends LilaController {
         _ => Unauthorized(jsonError("Can't login from TOR, sorry!")).fuccess)
 
   def setFingerprint(fp: String, ms: Int) = Auth { ctx => me =>
-    api.setFingerprint(ctx.req, fp) flatMap {
+    api.setFingerprint(ctx.req, fp).flatMap {
       _ ?? { hash =>
         !me.lame ?? {
           api
             .recentUserIdsByFingerprint(hash)
-            .map(_.filter(me.id !=)) flatMap {
-            case otherIds if otherIds.size >= 2 =>
-              UserRepo countEngines otherIds flatMap {
-                case nb if nb >= 2 && nb >= otherIds.size / 2 =>
-                  Env.report.api.autoCheatPrintReport(me.id)
-                case _ => funit
-              }
-            case _ => funit
-          }
+            .map(_.filter(me.id !=))
+            .flatMap {
+              case otherIds if otherIds.size >= 2 =>
+                (UserRepo countEngines otherIds).flatMap {
+                  case nb if nb >= 2 && nb >= otherIds.size / 2 =>
+                    Env.report.api.autoCheatPrintReport(me.id)
+                  case _ => funit
+                }
+              case _ => funit
+            }
         }
       }
     } inject Ok
   }
 
   def passwordReset = Open { implicit ctx =>
-    forms.passwordResetWithCaptcha map {
+    forms.passwordResetWithCaptcha.map {
       case (form, captcha) => Ok(html.auth.passwordReset(form, captcha))
     }
   }
@@ -230,17 +242,17 @@ object Auth extends LilaController {
     implicit val req = ctx.body
     forms.passwordReset.bindFromRequest.fold(
       err =>
-        forms.anyCaptcha map { captcha =>
+        forms.anyCaptcha.map { captcha =>
           BadRequest(html.auth.passwordReset(err, captcha, false.some))
       },
       data => {
         val email = env.emailAddress.validate(data.email) | data.email
-        UserRepo enabledByEmail email flatMap {
+        UserRepo.enabledByEmail(email).flatMap {
           case Some(user) =>
             Env.security.passwordReset.send(user, email) inject Redirect(
               routes.Auth.passwordResetSent(data.email))
           case _ =>
-            forms.passwordResetWithCaptcha map {
+            forms.passwordResetWithCaptcha.map {
               case (form, captcha) =>
                 BadRequest(html.auth.passwordReset(form, captcha, false.some))
             }
@@ -256,7 +268,7 @@ object Auth extends LilaController {
   }
 
   def passwordResetConfirm(token: String) = Open { implicit ctx =>
-    Env.security.passwordReset confirm token flatMap {
+    Env.security.passwordReset.confirm(token).flatMap {
       case Some(user) =>
         fuccess(
           html.auth.passwordResetConfirm(user, token, forms.passwdReset, none))
@@ -265,7 +277,7 @@ object Auth extends LilaController {
   }
 
   def passwordResetConfirmApply(token: String) = OpenBody { implicit ctx =>
-    Env.security.passwordReset confirm token flatMap {
+    Env.security.passwordReset.confirm(token).flatMap {
       case Some(user) =>
         implicit val req = ctx.body
         FormFuResult(forms.passwdReset) { err =>

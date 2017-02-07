@@ -25,8 +25,8 @@ trait Cobind[F[_]] extends Functor[F] { self =>
         g: F[B] => C,
         h: F[C] => D)(implicit F: Equal[D]): Boolean = {
       implicit val C = self
-      val d1 = ((Cokleisli(f) =>= Cokleisli(g)) =>= Cokleisli(h)) run fa
-      val d2 = (Cokleisli(f) =>= (Cokleisli(g) =>= Cokleisli(h))) run fa
+      val d1 = (((Cokleisli(f) =>= Cokleisli(g)) =>= Cokleisli(h))).run(fa)
+      val d2 = ((Cokleisli(f) =>= (Cokleisli(g) =>= Cokleisli(h)))).run(fa)
       F.equal(d1, d2)
     }
   }

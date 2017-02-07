@@ -85,7 +85,7 @@ object BitOp {
     RequireClientProtocol(
       args != null && args.size >= 3,
       "BITOP expected at least 3 elements, found %d".format(args.size))
-    val list = args map (ChannelBuffers.wrappedBuffer)
+    val list = args.map(ChannelBuffers.wrappedBuffer)
     if (list(0) equals Not) {
       RequireClientProtocol(
         args.size == 3,

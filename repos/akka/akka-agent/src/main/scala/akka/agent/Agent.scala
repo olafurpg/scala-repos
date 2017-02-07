@@ -59,9 +59,9 @@ object Agent {
       withinTransaction(new Runnable {
         def run = {
           updater.suspend()
-          result completeWith Future(
-            try ref.single.transformAndGet(f)
-            finally updater.resume())
+          result.completeWith(
+            Future(try ref.single.transformAndGet(f)
+            finally updater.resume()))
         }
       })
       result.future
@@ -84,7 +84,8 @@ object Agent {
       Txn.findCurrent match {
         case Some(txn) ⇒
           val result = Promise[T]()
-          Txn.afterCommit(status ⇒ result completeWith Future(f)(updater))(txn)
+          Txn.afterCommit(status ⇒ result.completeWith(Future(f)(updater)))(
+            txn)
           result.future
         case _ ⇒ Future(f)(updater)
       }

@@ -91,7 +91,7 @@ class RemoteRandomSpec
 
         enterBarrier("end")
         // since it's random we can't be too strict in the assert
-        replies.values count (_ > 0) should be > (connectionCount - 2)
+        replies.values.count(_ > 0) should be > (connectionCount - 2)
         replies.get(node(fourth).address) should ===(None)
 
         // shut down the actor before we let the other node(s) shut down so we don't try to send

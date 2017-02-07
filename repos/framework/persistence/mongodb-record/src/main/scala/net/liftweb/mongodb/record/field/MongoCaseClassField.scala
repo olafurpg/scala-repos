@@ -51,7 +51,7 @@ class MongoCaseClassField[OwnerType <: Record[OwnerType], CaseType](
   override def optional_? = true
 
   def asJValue: JValue =
-    valueBox.map(v => Extraction.decompose(v)) openOr (JNothing: JValue)
+    valueBox.map(v => Extraction.decompose(v)).openOr(JNothing: JValue)
 
   def setFromJValue(jvalue: JValue): Box[CaseType] = jvalue match {
     case JNothing | JNull => setBox(Empty)

@@ -8,7 +8,7 @@ final class SlackApi(client: SlackClient,
                      implicit val lightUser: String => Option[LightUser]) {
 
   def donation(event: lila.hub.actorApi.DonationEvent): Funit = {
-    val user = event.userId flatMap lightUser
+    val user = event.userId.flatMap(lightUser)
     val username = user.fold("Anonymous")(_.titleName)
     def amount(cents: Int) =
       s"$$${lila.common.Maths.truncateAt(cents / 100d, 2)}"

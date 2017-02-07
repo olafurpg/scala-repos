@@ -53,7 +53,7 @@ trait CompactSpec[M[+ _]]
         }
       }.toList
 
-      sizes zip undefined
+      sizes.zip(undefined)
   }
 
   def mkDeref(path: CPath): TransSpec1 = {
@@ -76,11 +76,13 @@ trait CompactSpec[M[+ _]]
 
   def chooseColumn(table: Table): TransSpec1 = table match {
     case cTable: ColumnarTable =>
-      cTable.slices.toStream.copoint.headOption.map { slice =>
-        val chosenPath =
-          Random.shuffle(slice.columns.keys.map(_.selector)).head
-        mkDeref(chosenPath)
-      } getOrElse (mkDeref(CPath.Identity))
+      cTable.slices.toStream.copoint.headOption
+        .map { slice =>
+          val chosenPath =
+            Random.shuffle(slice.columns.keys.map(_.selector)).head
+          mkDeref(chosenPath)
+        }
+        .getOrElse(mkDeref(CPath.Identity))
   }
 
   def undefineTable(fullTable: Table): Table = fullTable match {

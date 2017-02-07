@@ -27,19 +27,19 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
 
     "Accept" in {
       "Accept: audio/midi;q=0.2, audio/basic" =!= Accept(
-        `audio/midi` withQValue 0.2,
+        `audio/midi`.withQValue(0.2),
         `audio/basic`)
       "Accept: text/plain;q=0.5, text/html,\r\n text/css;q=0.8" =!= Accept(
-        `text/plain` withQValue 0.5,
+        `text/plain`.withQValue(0.5),
         `text/html`,
-        `text/css` withQValue 0.8)
+        `text/css`.withQValue(0.8))
         .renderedTo("text/plain;q=0.5, text/html, text/css;q=0.8")
       "Accept: text/html, image/gif, image/jpeg, *;q=.2, */*;q=.2" =!= Accept(
         `text/html`,
         `image/gif`,
         `image/jpeg`,
-        `*/*` withQValue 0.2,
-        `*/*` withQValue 0.2)
+        `*/*`.withQValue(0.2),
+        `*/*`.withQValue(0.2))
         .renderedTo("text/html, image/gif, image/jpeg, */*;q=0.2, */*;q=0.2")
       "Accept: application/vnd.spray" =!= Accept(`application/vnd.spray`)
       "Accept: */*, text/*; foo=bar, custom/custom; bar=\"b>az\"" =!= Accept(
@@ -62,14 +62,14 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Accept-Charset: utf16;q=1" =!= `Accept-Charset`(`UTF-16`).renderedTo(
         "UTF-16")
       "Accept-Charset: utf-8; q=0.5, *" =!= `Accept-Charset`(
-        `UTF-8` withQValue 0.5,
+        `UTF-8`.withQValue(0.5),
         HttpCharsetRange.`*`).renderedTo("UTF-8;q=0.5, *")
       "Accept-Charset: latin1, UTf-16; q=0, *;q=0.8" =!= `Accept-Charset`(
         `ISO-8859-1`,
-        `UTF-16` withQValue 0,
-        HttpCharsetRange.`*` withQValue 0.8)
+        `UTF-16`.withQValue(0),
+        HttpCharsetRange.`*`.withQValue(0.8))
         .renderedTo("ISO-8859-1, UTF-16;q=0.0, *;q=0.8")
-      `Accept-Charset`(`UTF-16` withQValue 0.234567).toString shouldEqual "Accept-Charset: UTF-16;q=0.235"
+      `Accept-Charset`(`UTF-16`.withQValue(0.234567)).toString shouldEqual "Accept-Charset: UTF-16;q=0.235"
       "Accept-Charset: UTF-16, unsupported42" =!= `Accept-Charset`(
         `UTF-16`,
         HttpCharset.custom("unsupported42"))
@@ -143,8 +143,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         HttpEncoding.custom("fancy"))
       "Accept-Encoding: gzip, identity;q=0.5, *;q=0.0" =!= `Accept-Encoding`(
         gzip,
-        identity withQValue 0.5,
-        HttpEncodingRange.`*` withQValue 0)
+        identity.withQValue(0.5),
+        HttpEncodingRange.`*`.withQValue(0))
         .renderedTo("gzip, identity;q=0.5, *;q=0.0")
       "Accept-Encoding: " =!= `Accept-Encoding`()
     }
@@ -152,11 +152,11 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     "Accept-Language" in {
       "Accept-Language: da, en-gb;q=0.8, en;q=0.7" =!= `Accept-Language`(
         Language("da"),
-        Language("en", "gb") withQValue 0.8f,
-        Language("en") withQValue 0.7f)
+        Language("en", "gb").withQValue(0.8f),
+        Language("en").withQValue(0.7f))
       "Accept-Language: de-CH-1901, *;q=0.0" =!= `Accept-Language`(
         Language("de", "CH", "1901"),
-        LanguageRange.`*` withQValue 0f)
+        LanguageRange.`*`.withQValue(0f))
       "Accept-Language: es-419, es" =!= `Accept-Language`(Language("es",
                                                                    "419"),
                                                           Language("es"))
@@ -256,19 +256,20 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         ContentType(`text/plain`, `UTF-8`))
         .renderedTo("text/plain; charset=UTF-8")
       "Content-Type: text/xml2; version=3; charset=windows-1252" =!= `Content-Type`(
-        MediaType.customWithOpenCharset(
-          "text",
-          "xml2",
-          params = Map("version" -> "3")) withCharset HttpCharsets
-          .getForKey("windows-1252")
-          .get)
+        MediaType
+          .customWithOpenCharset("text",
+                                 "xml2",
+                                 params = Map("version" -> "3"))
+          .withCharset(HttpCharsets
+            .getForKey("windows-1252")
+            .get))
       "Content-Type: text/plain; charset=fancy-pants" =!= `Content-Type`(
-        `text/plain` withCharset HttpCharset.custom("fancy-pants"))
+        `text/plain`.withCharset(HttpCharset.custom("fancy-pants")))
       "Content-Type: multipart/mixed; boundary=ABC123" =!= `Content-Type`(
-        `multipart/mixed` withBoundary "ABC123" withCharset `UTF-8`)
+        `multipart/mixed`.withBoundary("ABC123").withCharset(`UTF-8`))
         .renderedTo("multipart/mixed; boundary=ABC123; charset=UTF-8")
       "Content-Type: multipart/mixed; boundary=\"ABC/123\"" =!= `Content-Type`(
-        `multipart/mixed` withBoundary "ABC/123" withCharset `UTF-8`)
+        `multipart/mixed`.withBoundary("ABC/123").withCharset(`UTF-8`))
         .renderedTo("""multipart/mixed; boundary="ABC/123"; charset=UTF-8""")
       "Content-Type: application/*" =!= `Content-Type`(
         MediaType.customBinary("application",
@@ -936,9 +937,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     def apply(line: String) = {
       val Array(name, value) = line.split(": ", 2)
       HttpHeader.parse(name, value, settings) should
-        (equal(HttpHeader.ParsingResult.Ok(header, Nil)) and renderFromHeaderTo(
-          this,
-          line))
+        (equal(HttpHeader.ParsingResult.Ok(header, Nil))
+          .and(renderFromHeaderTo(this, line)))
     }
     def rendering(line: String): String = line
     def settings: HeaderParser.Settings = HeaderParser.DefaultSettings

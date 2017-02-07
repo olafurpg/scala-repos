@@ -18,7 +18,7 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
 
   private implicit val PosBSONHandler = new BSONHandler[BSONString, Pos] {
     def read(bsonStr: BSONString): Pos =
-      Pos.posAt(bsonStr.value) err s"No such pos: ${bsonStr.value}"
+      Pos.posAt(bsonStr.value).err(s"No such pos: ${bsonStr.value}")
     def write(x: Pos) = BSONString(x.key)
   }
 
@@ -57,9 +57,9 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
       }
 
   def loadForDisplay(pov: Pov): Fu[Option[Forecast]] =
-    pov.forecastable ?? coll
+    (pov.forecastable ?? coll
       .find(BSONDocument("_id" -> pov.fullId))
-      .one[Forecast] flatMap {
+      .one[Forecast]).flatMap {
       case None => fuccess(none)
       case Some(fc) =>
         if (firstStep(fc.steps).exists(_.ply != pov.game.turns + 1))
@@ -68,9 +68,9 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
     }
 
   def loadForPlay(pov: Pov): Fu[Option[Forecast]] =
-    pov.game.forecastable ?? coll
+    (pov.game.forecastable ?? coll
       .find(BSONDocument("_id" -> pov.fullId))
-      .one[Forecast] flatMap {
+      .one[Forecast]).flatMap {
       case None => fuccess(none)
       case Some(fc) =>
         if (firstStep(fc.steps).exists(_.ply != pov.game.turns))
@@ -80,15 +80,15 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
 
   def nextMove(g: Game, last: chess.Move): Fu[Option[Uci.Move]] =
     g.forecastable ?? {
-      loadForPlay(Pov player g) flatMap {
+      loadForPlay(Pov.player(g)).flatMap {
         case None => fuccess(none)
         case Some(fc) =>
           fc(g, last) match {
             case Some((newFc, uciMove)) if newFc.steps.nonEmpty =>
               coll.update(BSONDocument("_id" -> fc._id), newFc) inject uciMove.some
             case Some((newFc, uciMove)) =>
-              clearPov(Pov player g) inject uciMove.some
-            case _ => clearPov(Pov player g) inject none
+              clearPov(Pov.player(g)) inject uciMove.some
+            case _ => clearPov(Pov.player(g)) inject none
           }
       }
     }

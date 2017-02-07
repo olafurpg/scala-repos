@@ -341,7 +341,7 @@ object Test {
 
     def flips(l: List[Int]): Int = (l: @unchecked) match {
       case 1 :: ls => 0
-      case n :: ls => flips((l take n reverse) ::: (l drop n)) + 1
+      case n :: ls => flips((l.take(n) reverse) ::: (l.drop(n))) + 1
     }
 
     def run() { assertEquals("both", (Var("x"), Var("y")), f) }

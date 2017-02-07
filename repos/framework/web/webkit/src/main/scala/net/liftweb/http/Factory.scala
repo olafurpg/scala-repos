@@ -81,12 +81,12 @@ trait Factory extends SimpleInjector {
     /**
       * Vend an instance
       */
-    implicit def vend: T = make openOr default.is.apply()
+    implicit def vend: T = make.openOr(default.is.apply())
 
     /**
       * Make a Box of the instance.
       */
     override implicit def make: Box[T] =
-      super.make or find(_sub) or Full(default.is.apply())
+      super.make.or(find(_sub)).or(Full(default.is.apply()))
   }
 }

@@ -54,7 +54,7 @@ class EnsembleBarChart extends EnsembleExample {
     val yAxis = NumberAxis("Units Sold", 0.0d, 3000.0d, 1000.0d)
 
     def xyData(ys: Seq[Number]) =
-      ObservableBuffer(years zip ys map (xy => XYChart.Data(xy._1, xy._2)))
+      ObservableBuffer(years.zip(ys).map(xy => XYChart.Data(xy._1, xy._2)))
 
     val series1 = XYChart.Series("Apples", xyData(Seq(567d, 1292d, 1292d)))
     val series2 = XYChart.Series("Lemons", xyData(Seq(956, 1665, 2559)))

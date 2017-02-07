@@ -86,10 +86,10 @@ trait EnumTypedField[EnumType <: Enumeration]
 
   def defaultValue: EnumType#Value = enum.values.iterator.next
 
-  def asJs = valueBox.map(_ => Str(toString)) openOr JsNull
+  def asJs = valueBox.map(_ => Str(toString)).openOr(JsNull)
 
   def asJIntOrdinal: JValue =
-    toInt.map(i => JInt(BigInt(i))) openOr (JNothing: JValue)
+    toInt.map(i => JInt(BigInt(i))).openOr(JNothing: JValue)
   def setFromJIntOrdinal(jvalue: JValue): Box[EnumType#Value] = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)
     case JInt(i) => setBox(fromInt(i.intValue))
@@ -97,7 +97,7 @@ trait EnumTypedField[EnumType <: Enumeration]
   }
 
   def asJStringName: JValue =
-    valueBox.map(v => JString(v.toString)) openOr (JNothing: JValue)
+    valueBox.map(v => JString(v.toString)).openOr(JNothing: JValue)
   def setFromJStringName(jvalue: JValue): Box[EnumType#Value] = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)
     case JString(s) =>

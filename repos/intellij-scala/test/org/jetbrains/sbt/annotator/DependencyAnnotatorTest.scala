@@ -24,7 +24,7 @@ class DependencyAnnotatorTest extends AnnotatorTestBase {
   val testResolver = new SbtResolver(
     SbtResolver.Kind.Maven,
     "Test repo",
-    "file:/%s/sbt/resolvers/testRepository" format TestUtils.getTestDataPath)
+    "file:/%s/sbt/resolvers/testRepository".format(TestUtils.getTestDataPath))
 
   def testDoNotAnnotateIndexedDep() =
     doTest(Seq.empty)

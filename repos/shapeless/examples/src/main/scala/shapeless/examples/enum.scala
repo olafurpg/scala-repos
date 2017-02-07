@@ -33,7 +33,7 @@ object ScalaEnumDemo /*extends App*/ {
 
   def isWorkingDay(d: WeekDay) = !(d == Sat || d == Sun)
 
-  assert((WeekDay.values filter isWorkingDay) == Set(Mon, Tue, Wed, Thu, Fri))
+  assert((WeekDay.values.filter(isWorkingDay)) == Set(Mon, Tue, Wed, Thu, Fri))
 
   // However ...
 
@@ -59,7 +59,7 @@ object ShapelessEnumDemo extends App {
 
   def isWorkingDay(d: WeekDay) = !(d == Sat || d == Sun)
 
-  assert((WeekDay.values filter isWorkingDay) == Set(Mon, Tue, Wed, Thu, Fri))
+  assert((WeekDay.values.filter(isWorkingDay)) == Set(Mon, Tue, Wed, Thu, Fri))
 
   // ... the payoff ...
 

@@ -82,10 +82,12 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
       .collect[List](max)
 
   private[challenge] def expiredIds(max: Int): Fu[List[Challenge.ID]] =
-    coll.distinct(
-      "_id",
-      BSONDocument("expiresAt" -> BSONDocument("$lt" -> DateTime.now)).some
-    ) map lila.db.BSON.asStrings
+    coll
+      .distinct(
+        "_id",
+        BSONDocument("expiresAt" -> BSONDocument("$lt" -> DateTime.now)).some
+      )
+      .map(lila.db.BSON.asStrings)
 
   def setSeenAgain(id: Challenge.ID) =
     coll
@@ -107,13 +109,13 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
       .void
 
   def offline(challenge: Challenge) =
-    setStatus(challenge, Status.Offline, Some(_ plusHours 3))
+    setStatus(challenge, Status.Offline, Some(_.plusHours(3)))
   def cancel(challenge: Challenge) =
-    setStatus(challenge, Status.Canceled, Some(_ plusHours 3))
+    setStatus(challenge, Status.Canceled, Some(_.plusHours(3)))
   def decline(challenge: Challenge) =
-    setStatus(challenge, Status.Declined, Some(_ plusHours 3))
+    setStatus(challenge, Status.Declined, Some(_.plusHours(3)))
   def accept(challenge: Challenge) =
-    setStatus(challenge, Status.Accepted, Some(_ plusHours 3))
+    setStatus(challenge, Status.Accepted, Some(_.plusHours(3)))
 
   def statusById(id: Challenge.ID) =
     coll

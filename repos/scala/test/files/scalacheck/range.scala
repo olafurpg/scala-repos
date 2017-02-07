@@ -12,19 +12,19 @@ class Counter(r: Range) {
   def apply(x: Int) = {
     cnt += 1L
     if (cnt % 500000000L == 0L) {
-      println("Working: %s %d %d" format (str, cnt, x))
+      println("Working: %s %d %d".format(str, cnt, x))
     }
     if (cnt > (Int.MaxValue.toLong + 1) * 2) {
       val msg =
-        "Count exceeds maximum possible for an Int Range: %s" format str
+        "Count exceeds maximum possible for an Int Range: %s".format(str)
       println(msg) // exception is likely to be eaten by an out of memory error
-      sys error msg
+      sys.error(msg)
     }
     if ((r.step > 0 && last.exists(_ > x)) ||
         (r.step < 0 && last.exists(_ < x))) {
-      val msg = "Range %s wrapped: %d %s" format (str, x, last.toString)
+      val msg = "Range %s wrapped: %d %s".format(str, x, last.toString)
       println(msg) // exception is likely to be eaten by an out of memory error
-      sys error msg
+      sys.error(msg)
     }
     last = Some(x)
   }
@@ -109,7 +109,7 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
     val cnt = new Counter(r)
 //    println("--------------------")
 //    println(r)
-    r foreach { x =>
+    r.foreach { x =>
       cnt(x)
 //      println(x + ", " + (x - r.start) + ", " + (x.toLong - r.start) + ", " + ((x.toLong - r.start) % r.step))
       allValid &&= multiple(r, x)
@@ -122,7 +122,7 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
     var allValid = true
     var last: Option[Int] = None
     val cnt = new Counter(r)
-    r foreach { x =>
+    r.foreach { x =>
       cnt(x)
       allValid &&= within(r, x)
     }
@@ -133,7 +133,7 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
 //    println("foreach.visited.size "+str(r))
     var visited = 0L
     val cnt = new Counter(r)
-    r foreach { x =>
+    r.foreach { x =>
       cnt(x)
       visited += 1L
     }
@@ -201,14 +201,14 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
   }
 
   property("length") =
-    forAll(myGen suchThat (r => expectedSize(r).toInt == expectedSize(r))) {
+    forAll(myGen.suchThat(r => expectedSize(r).toInt == expectedSize(r))) {
       r =>
 //    println("length "+str(r))
         (r.length == expectedSize(r)) :| str(r)
     }
 
   property("isEmpty") =
-    forAll(myGen suchThat (r => expectedSize(r).toInt == expectedSize(r))) {
+    forAll(myGen.suchThat(r => expectedSize(r).toInt == expectedSize(r))) {
       r =>
 //    println("isEmpty "+str(r))
         (r.isEmpty == (expectedSize(r) == 0L)) :| str(r)
@@ -225,17 +225,17 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
     ((within(r, x) && multiple(r, x)) == r.contains(x)) :| str(r) + ": " + x
   }
 
-  property("take") = forAll(myGen suchThat
-                              (r => expectedSize(r).toInt == expectedSize(r)),
-                            arbInt.arbitrary) { (r, x) =>
+  property("take") =
+    forAll(myGen.suchThat(r => expectedSize(r).toInt == expectedSize(r)),
+           arbInt.arbitrary) { (r, x) =>
 //    println("take "+str(r))
-    val t = r take x
-    (t.size == (0 max x min r.size) && t.start == r.start &&
-    t.step == r.step) :| str(r) + " / " + str(t) + ": " + x
-  }
+      val t = r.take(x)
+      (t.size == (0.max(x) min r.size) && t.start == r.start &&
+      t.step == r.step) :| str(r) + " / " + str(t) + ": " + x
+    }
 
   property("init") =
-    forAll(myGen suchThat (r => expectedSize(r).toInt == expectedSize(r))) {
+    forAll(myGen.suchThat(r => expectedSize(r).toInt == expectedSize(r))) {
       r =>
 //    println("init "+str(r))
         (r.size == 0) || {
@@ -245,16 +245,16 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
     }
 
   property("takeWhile") =
-    forAll(myGen suchThat (r => expectedSize(r).toInt == expectedSize(r)),
+    forAll(myGen.suchThat(r => expectedSize(r).toInt == expectedSize(r)),
            arbInt.arbitrary) { (r, x) =>
 //    println("takeWhile "+str(r))
-      val t = (if (r.step > 0) r takeWhile (_ <= x) else r takeWhile (_ >= x))
+      val t = (if (r.step > 0) r.takeWhile(_ <= x) else r.takeWhile(_ >= x))
       if (r.size == 0) {
         (t.size == 0) :| str(r) + " / " + str(t) + ": " + x
       } else {
         val t2 =
           (if (r.step > 0) Range(r.start, x min r.last, r.step).inclusive
-           else Range(r.start, x max r.last, r.step).inclusive)
+           else Range(r.start, x.max(r.last), r.step).inclusive)
         (t.start == r.start && t.size == t2.size && t.step == r.step) :| str(r) +
           " / " + str(t) + " / " + str(t2) + ": " + x
       }

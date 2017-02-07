@@ -85,7 +85,7 @@ trait PrecogLibSpecs[M[+ _]]
 
       val result = testEval(input)
       result must haveSize(6)
-      val numbers = result collect { case (_, SDecimal(n)) => n }
+      val numbers = result.collect { case (_, SDecimal(n)) => n }
       numbers must_== Set(0, -1, 1, 42, 1, -23)
     }
 
@@ -98,9 +98,9 @@ trait PrecogLibSpecs[M[+ _]]
       val result = testEval(input)
       result must haveSize(6)
       val numbers =
-        result flatMap {
+        result.flatMap {
           case (_, SObject(fields)) =>
-            fields get "abc" collect { case SDecimal(n) => n }
+            fields.get("abc").collect { case SDecimal(n) => n }
         }
       numbers must_== Set(0, -1, 1, 42, 1, -23)
     }
@@ -113,9 +113,9 @@ trait PrecogLibSpecs[M[+ _]]
 
       val result = testEval(input)
       result must haveSize(18)
-      val data = result map { case (_, x) => x }
+      val data = result.map { case (_, x) => x }
       data must contain(SDecimal(-10),
-                        SArray(Vector(9, 10, 11) map (SDecimal(_))),
+                        SArray(Vector(9, 10, 11).map(SDecimal(_))),
                         SString("alissa"),
                         SNull,
                         SFalse,

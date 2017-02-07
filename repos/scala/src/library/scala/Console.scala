@@ -167,7 +167,7 @@ object Console extends DeprecatedConsole with AnsiColor {
     *  @param args the arguments used to instantiating the pattern.
     *  @throws java.lang.IllegalArgumentException if there was a problem with the format string or arguments
     */
-  def printf(text: String, args: Any*) { out.print(text format (args: _*)) }
+  def printf(text: String, args: Any*) { out.print(text.format(args: _*)) }
 }
 
 private[scala] abstract class DeprecatedConsole { self: Console.type =>

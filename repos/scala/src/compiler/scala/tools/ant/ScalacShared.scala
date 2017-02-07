@@ -16,10 +16,10 @@ trait ScalacShared extends ScalaMatchingTask {
   val MainClass = "scala.tools.nsc.Main"
 
   def execWithArgFiles(java: Java, paths: List[String]) = {
-    paths foreach (p => java.createArg() setValue ("@" + p))
+    paths.foreach(p => java.createArg().setValue("@" + p))
 
     val debugString =
-      paths map (x => " (@ = '%s')".format(io.File(x).slurp())) mkString ""
+      paths.map(x => " (@ = '%s')".format(io.File(x).slurp())) mkString ""
     log(java.getCommandLine.getCommandline.mkString("", " ", debugString),
         Project.MSG_VERBOSE)
     java.executeJava()

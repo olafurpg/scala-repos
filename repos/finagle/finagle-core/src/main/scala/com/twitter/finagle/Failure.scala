@@ -329,6 +329,6 @@ object Failure {
 
       private[this] val filter = new ProcessFailures[Req, Rep]
 
-      def make(next: ServiceFactory[Req, Rep]) = filter andThen next
+      def make(next: ServiceFactory[Req, Rep]) = filter.andThen(next)
     }
 }

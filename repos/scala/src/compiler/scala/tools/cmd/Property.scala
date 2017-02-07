@@ -25,7 +25,7 @@ class PropertyMapper(reference: Reference)
 
   // e.g. "partest.shootout" -> "--shootout"
   def propNameToOptionName(key: String): Option[String] =
-    (key split '.').toList match {
+    (key.split('.')).toList match {
       case List(RunnerName, name) => Some(name)
       case _ => None
     }
@@ -61,7 +61,7 @@ trait Property extends Reference {
   override def propertyArgs: List[String] = systemPropertiesToOptions
 
   def loadProperties(file: File): Properties =
-    returning(new Properties)(_ load new FileInputStream(file.path))
+    returning(new Properties)(_.load(new FileInputStream(file.path)))
 
   def systemPropertiesToOptions: List[String] =
     propertiesToOptions(new SystemProperties().toList)
@@ -74,5 +74,5 @@ trait Property extends Reference {
     propertiesToOptions(props.toList)
   }
   def propertiesToOptions(props: List[(String, String)]) =
-    props flatMap propMapper
+    props.flatMap(propMapper)
 }

@@ -140,7 +140,7 @@ trait LinearRegressionLibModule[M[+ _]]
                 t1.product.getColumnDimension == t2.product.getColumnDimension &&
                   t1.product.getRowDimension == t2.product.getRowDimension)
 
-              t1.product plus t2.product
+              t1.product.plus(t2.product)
             }
           }
 
@@ -167,7 +167,7 @@ trait LinearRegressionLibModule[M[+ _]]
                        indices0: Array[Int]): Array[Double] = {
         val vlength = values.length
         val indices =
-          indices0 filter { i =>
+          indices0.filter { i =>
             (i >= 0) && (i < vlength + indices0.length)
           }
 
@@ -197,7 +197,7 @@ trait LinearRegressionLibModule[M[+ _]]
                    indices0: Array[Int]): Array[Double] = {
         val vlength = values.length
         val indices =
-          indices0 filter { i =>
+          indices0.filter { i =>
             (i >= 0) && (i < vlength)
           }
 
@@ -208,7 +208,7 @@ trait LinearRegressionLibModule[M[+ _]]
           val bitset = BitSetUtil.create(indices)
           val acc = new Array[Double](length)
 
-          val kept = (0 until values.length) filterNot { bitset(_) }
+          val kept = ((0 until values.length)).filterNot { bitset(_) }
 
           var i = 0
           while (i < length) {
@@ -221,15 +221,17 @@ trait LinearRegressionLibModule[M[+ _]]
 
       def makeArrays(features: Set[Column], range: Range) = {
         val values =
-          features map {
+          features.map {
             case c: HomogeneousArrayColumn[_]
                 if c.tpe.manifest.erasure == classOf[Array[Double]] =>
               val mapped =
-                range.toArray filter { r =>
-                  c.isDefinedAt(r)
-                } map { i =>
-                  c.asInstanceOf[HomogeneousArrayColumn[Double]](i)
-                }
+                range.toArray
+                  .filter { r =>
+                    c.isDefinedAt(r)
+                  }
+                  .map { i =>
+                    c.asInstanceOf[HomogeneousArrayColumn[Double]](i)
+                  }
               Some(mapped)
             case other =>
               logger.warn(
@@ -243,20 +245,20 @@ trait LinearRegressionLibModule[M[+ _]]
         }
 
         val xs =
-          arrays collect {
+          arrays.collect {
             case mx if !mx.isEmpty =>
-              mx collect {
+              mx.collect {
                 case arr if !arr.isEmpty =>
                   1.0 +: (java.util.Arrays.copyOf(arr, arr.length - 1))
               }
           }
         val y0 =
-          arrays collect {
+          arrays.collect {
             case mx if !mx.isEmpty =>
-              mx collect { case arr if !arr.isEmpty => arr.last }
+              mx.collect { case arr if !arr.isEmpty => arr.last }
           }
 
-        (xs map { _.toArray }, y0 map { _.toArray })
+        (xs.map { _.toArray }, y0.map { _.toArray })
       }
 
       def coefficientReducer: Reducer[CoeffAcc] = new Reducer[CoeffAcc] {
@@ -274,14 +276,14 @@ trait LinearRegressionLibModule[M[+ _]]
           val (xs, y0) = makeArrays(features, range)
 
           val matrixX0 =
-            xs map { arr =>
+            xs.map { arr =>
               new Matrix(arr)
             }
 
           // FIXME ultimately we do not want to throw an IllegalArgumentException here
           // once the framework is in place, we will return the empty set and issue a warning to the user
           val matrixX1 =
-            matrixX0 map { mx =>
+            matrixX0.map { mx =>
               if (mx.getRowDimension < mx.getColumnDimension) {
                 throw new IllegalArgumentException(
                   "Matrix is rank deficient. Not enough rows to determine model.")
@@ -338,9 +340,9 @@ trait LinearRegressionLibModule[M[+ _]]
           }
 
           val cleaned: Option[(Matrix, Set[Int])] =
-            matrixX1 map { findDependents }
+            matrixX1.map { findDependents }
 
-          val matrixY = y0 map { case arr => new Matrix(Array(arr)) }
+          val matrixY = y0.map { case arr => new Matrix(Array(arr)) }
 
           val matrixX = for {
             (x, _) <- cleaned
@@ -350,14 +352,14 @@ trait LinearRegressionLibModule[M[+ _]]
           }
 
           val res =
-            matrixX map { _.getArray flatten } getOrElse Array.empty[Double]
+            matrixX.map { _.getArray flatten }.getOrElse(Array.empty[Double])
 
           // We weight the results to handle slices of different sizes.
           // Even though we canonicalize the slices to bound their size,
           // but their sizes still may vary
-          val weightedRes0 = res map { _ * count }
+          val weightedRes0 = res.map { _ * count }
 
-          val removed = cleaned map { _._2 } getOrElse Set.empty[Int]
+          val removed = cleaned.map { _._2 }.getOrElse(Set.empty[Int])
           val weightedRes = insertZeroAt(weightedRes0, removed.toArray)
 
           CoeffAcc(weightedRes, count, removed)
@@ -376,13 +378,13 @@ trait LinearRegressionLibModule[M[+ _]]
                               colDim: Int,
                               idx: Set[Int]): Matrix = {
               val columnIndices =
-                (0 until colDim).toArray filterNot { idx.contains(_) }
+                (0 until colDim).toArray.filterNot { idx.contains(_) }
               matrix.getMatrix(0, rowDim - 1, columnIndices)
             }
 
-            val matrixX0 = xs map { case arr => new Matrix(arr) }
+            val matrixX0 = xs.map { case arr => new Matrix(arr) }
             val matrixX =
-              matrixX0 map { mx =>
+              matrixX0.map { mx =>
                 removeColumns(mx,
                               mx.getRowDimension,
                               mx.getColumnDimension,
@@ -390,20 +392,22 @@ trait LinearRegressionLibModule[M[+ _]]
               }
 
             val matrixProduct =
-              matrixX map { matrix =>
-                matrix.transpose() times matrix
-              } getOrElse { stdErrorMonoid.zero.product }
+              matrixX
+                .map { matrix =>
+                  matrix.transpose().times(matrix)
+                }
+                .getOrElse { stdErrorMonoid.zero.product }
 
             val actualY0 =
-              y0 map { arr =>
+              y0.map { arr =>
                 (new Matrix(Array(arr))).transpose()
               }
 
             val retainedBeta = removeAt(acc.beta, acc.removed.toArray)
-            val weightedBeta = retainedBeta map { _ / acc.count }
+            val weightedBeta = retainedBeta.map { _ / acc.count }
 
             val predictedY0 =
-              matrixX map {
+              matrixX.map {
                 _.times((new Matrix(Array(weightedBeta))).transpose())
               }
 
@@ -412,17 +416,17 @@ trait LinearRegressionLibModule[M[+ _]]
               predictedY <- predictedY0
             } yield {
               val difference = actualY.minus(predictedY)
-              val prod = difference.transpose() times difference
+              val prod = difference.transpose().times(difference)
 
               assert(prod.getRowDimension == 1 && prod.getColumnDimension == 1)
               prod.getArray.head.head
             }
 
-            val rss = rssOpt getOrElse { stdErrorMonoid.zero.rss }
+            val rss = rssOpt.getOrElse { stdErrorMonoid.zero.rss }
 
             val yMean = y0.flatten.sum / y0.flatten.size
 
-            val tss = y0.flatten map { y =>
+            val tss = y0.flatten.map { y =>
               math.pow(y - yMean, 2d)
             } sum
 
@@ -438,7 +442,7 @@ trait LinearRegressionLibModule[M[+ _]]
 
         val spec = TransSpec.concatChildren(tree)
 
-        val weightedBeta = coeffs.beta map { _ / coeffs.count }
+        val weightedBeta = coeffs.beta.map { _ / coeffs.count }
 
         val colDim = errors.product.getColumnDimension
 
@@ -449,7 +453,7 @@ trait LinearRegressionLibModule[M[+ _]]
         val varianceCovariance = inverse.times(varianceEst)
 
         val stdErrors0 =
-          (0 until colDim) map {
+          ((0 until colDim)).map {
             case i => math.sqrt(varianceCovariance.get(i, i))
           }
         val stdErrors =
@@ -461,7 +465,7 @@ trait LinearRegressionLibModule[M[+ _]]
         val resultErrors: Array[CValue] = stdErrors.map(CNum(_)).toArray
 
         val arr =
-          resultCoeffs.zip(resultErrors) map {
+          resultCoeffs.zip(resultErrors).map {
             case (beta, error) =>
               RObject(Map("estimate" -> beta, "standardError" -> error))
           }
@@ -471,7 +475,7 @@ trait LinearRegressionLibModule[M[+ _]]
         val thetaInSchema = theta.transform(spec)
 
         val varCovarArr = varianceCovariance.getArray
-        val varCovarRv = RArray(varCovarArr map { arr =>
+        val varCovarRv = RArray(varCovarArr.map { arr =>
           RArray(arr.map(CNum(_)): _*)
         }: _*)
         val varCovarTable0 = Table.fromRValues(Stream(varCovarRv))
@@ -527,22 +531,22 @@ trait LinearRegressionLibModule[M[+ _]]
           val valueSpec = DerefObjectStatic(TransSpec1.Id, paths.Value)
           val table = table0.transform(valueSpec).transform(arraySpec)
 
-          val schemas: M[Seq[JType]] = table.schemas map { _.toSeq }
+          val schemas: M[Seq[JType]] = table.schemas.map { _.toSeq }
 
           val specs: M[Seq[TransSpec1]] =
-            schemas map {
-              _ map { jtype =>
+            schemas.map {
+              _.map { jtype =>
                 trans.Typed(TransSpec1.Id, jtype)
               }
             }
 
-          val tables: M[Seq[Table]] = specs map { _ map { table.transform } }
+          val tables: M[Seq[Table]] = specs.map { _.map { table.transform } }
 
           val tablesWithType: M[Seq[(Table, JType)]] = for {
             tbls <- tables
             jtypes <- schemas
           } yield {
-            tbls zip jtypes
+            tbls.zip(jtypes)
           }
 
           // important note: regression will explode if there are more than `sliceSize` columns due to rank-deficient matrix
@@ -557,7 +561,7 @@ trait LinearRegressionLibModule[M[+ _]]
 
               val coeffs0 = arrayTable.reduce(coefficientReducer)
               val errors0 =
-                coeffs0 flatMap { acc =>
+                coeffs0.flatMap { acc =>
                   arrayTable.reduce(stdErrorReducer(acc))
                 }
 
@@ -571,14 +575,14 @@ trait LinearRegressionLibModule[M[+ _]]
           }
 
           val reducedTables: M[Seq[Table]] =
-            tablesWithType flatMap {
-              _.map { case (table, jtype) => tableReducer(table, jtype) }.toStream.sequence map
-                (_.toSeq)
+            tablesWithType.flatMap {
+              _.map { case (table, jtype) => tableReducer(table, jtype) }.toStream.sequence
+                .map(_.toSeq)
             }
 
           val objectTables: M[Seq[Table]] =
-            reducedTables map {
-              _.zipWithIndex map {
+            reducedTables.map {
+              _.zipWithIndex.map {
                 case (tbl, idx) =>
                   val modelId = "model" + (idx + 1)
                   tbl.transform(
@@ -590,10 +594,10 @@ trait LinearRegressionLibModule[M[+ _]]
             DerefObjectStatic(Leaf(SourceLeft), paths.Value),
             DerefObjectStatic(Leaf(SourceRight), paths.Value))
 
-          objectTables map {
+          objectTables.map {
             _.reduceOption { (tl, tr) =>
               tl.cross(tr)(buildConstantWrapSpec(spec))
-            } getOrElse Table.empty
+            }.getOrElse(Table.empty)
           }
         }
       }
@@ -613,7 +617,7 @@ trait LinearRegressionLibModule[M[+ _]]
       def alignCustom(t1: Table, t2: Table): M[(Table, Morph1Apply)] = {
         val spec = liftToValues(
           trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble))
-        t2.transform(spec).reduce(reducer) map { models =>
+        t2.transform(spec).reduce(reducer).map { models =>
           (t1.transform(spec),
            morph1Apply(models, scala.Predef.identity[Double]))
         }

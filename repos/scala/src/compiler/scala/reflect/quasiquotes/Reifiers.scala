@@ -165,7 +165,7 @@ trait Reifiers { self: Quasiquotes =>
     }
 
     override def reifyTree(tree: Tree): Tree =
-      reifyTreePlaceholder(tree) orElse reifyTreeSyntactically(tree)
+      reifyTreePlaceholder(tree).orElse(reifyTreeSyntactically(tree))
 
     def reifyTreePlaceholder(tree: Tree): Tree = tree match {
       case Placeholder(hole: ApplyHole) if hole.tpe <:< treeType => hole.tree

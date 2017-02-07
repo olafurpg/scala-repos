@@ -15,14 +15,14 @@ final class Analyser(repo: FishnetRepo,
   val maxPlies = 200
 
   def apply(game: Game, sender: Work.Sender): Fu[Boolean] =
-    AnalysisRepo exists game.id flatMap {
+    AnalysisRepo.exists(game.id).flatMap {
       case true => fuccess(false)
       case false =>
-        limiter(sender) flatMap { accepted =>
+        limiter(sender).flatMap { accepted =>
           accepted ?? {
-            makeWork(game, sender) flatMap { work =>
+            makeWork(game, sender).flatMap { work =>
               sequencer {
-                repo getSimilarAnalysis work flatMap {
+                repo.getSimilarAnalysis(work).flatMap {
                   // already in progress, do nothing
                   case Some(similar) if similar.isAcquired => funit
                   // queued by system, reschedule for the human sender
@@ -32,7 +32,7 @@ final class Analyser(repo: FishnetRepo,
                   // queued for someone else, do nothing
                   case Some(similar) => funit
                   // first request, store
-                  case _ => repo addAnalysis work
+                  case _ => repo.addAnalysis(work)
                 }
               }
             }
@@ -41,20 +41,20 @@ final class Analyser(repo: FishnetRepo,
     }
 
   def apply(gameId: String, sender: Work.Sender): Fu[Boolean] =
-    GameRepo game gameId flatMap {
+    GameRepo.game(gameId).flatMap {
       _ ?? { game =>
         apply(game, sender)
       }
     }
 
   private def makeWork(game: Game, sender: Work.Sender): Fu[Work.Analysis] =
-    GameRepo.initialFen(game) zip uciMemo.get(game) map {
+    GameRepo.initialFen(game).zip(uciMemo.get(game)).map {
       case (initialFen, moves) =>
         Work.Analysis(
           _id = Work.makeId,
           sender = sender,
           game = Work.Game(id = game.id,
-                           initialFen = initialFen map FEN.apply,
+                           initialFen = initialFen.map(FEN.apply),
                            variant = game.variant,
                            moves = moves.take(maxPlies) mkString " "),
           startPly = game.startedAtTurn,

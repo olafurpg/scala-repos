@@ -49,7 +49,8 @@ class BitSet(protected final var elems: Array[Long])
     *
     *  @param initSize    initial size of the bitset.
     */
-  def this(initSize: Int) = this(new Array[Long]((initSize + 63) >> 6 max 1))
+  def this(initSize: Int) =
+    this(new Array[Long](((initSize + 63) >> 6).max(1)))
 
   def this() = this(0)
 

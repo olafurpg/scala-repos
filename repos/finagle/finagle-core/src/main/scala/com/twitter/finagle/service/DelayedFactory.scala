@@ -26,7 +26,7 @@ class DelayedFactory[Req, Rep](
   private[this] val q =
     new ConcurrentLinkedQueue[Promise[ServiceFactory[Req, Rep]]]()
 
-  underlyingF ensure {
+  underlyingF.ensure {
     q.clear()
   }
 
@@ -34,7 +34,7 @@ class DelayedFactory[Req, Rep](
       f: Future[ServiceFactory[Req, Rep]]
   ): Future[ServiceFactory[Req, Rep]] = {
     val p = Promise.attached(f)
-    p setInterruptHandler {
+    p.setInterruptHandler {
       case t: Throwable =>
         if (p.detach()) {
           q.remove(p)
@@ -46,13 +46,13 @@ class DelayedFactory[Req, Rep](
   }
 
   def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
-    wrapped flatMap { fac =>
+    wrapped.flatMap { fac =>
       fac(conn)
     }
 
   override def close(deadline: Time): Future[Unit] = {
     if (underlyingF.isDefined)
-      wrapped flatMap { svc =>
+      wrapped.flatMap { svc =>
         svc.close(deadline)
       } else {
       underlyingF.onSuccess(_.close(deadline))
@@ -84,7 +84,7 @@ object DelayedFactory {
     val delayed = new DelayedFactory(underlying)
 
     val ref = new ServiceFactoryRef[Req, Rep](delayed)
-    underlying respond {
+    underlying.respond {
       case Throw(e) => ref() = new FailingFactory(e)
       case Return(fac) => ref() = fac
     }

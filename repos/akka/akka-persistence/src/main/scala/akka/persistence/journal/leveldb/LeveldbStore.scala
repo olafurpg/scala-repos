@@ -75,7 +75,7 @@ private[persistence] trait LeveldbStore
                     case _ ⇒ (p, Set.empty[String])
                   }
                   if (tags.nonEmpty && hasTagSubscribers)
-                    allTags = allTags union tags
+                    allTags = allTags.union(tags)
 
                   require(
                     !p2.persistenceId.startsWith(tagPersistenceIdPrefix),

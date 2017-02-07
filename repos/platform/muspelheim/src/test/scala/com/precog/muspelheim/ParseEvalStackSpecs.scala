@@ -93,10 +93,12 @@ trait TestStackLike[M[+ _]]
   class ParseEvalStackSpecConfig extends BaseConfig with IdSourceConfig {
     parseEvalLogger.trace("Init yggConfig")
     val config =
-      Configuration parse {
-        Option(System.getProperty("precog.storage.root")) map {
-          "precog.storage.root = " + _
-        } getOrElse { "" }
+      Configuration.parse {
+        Option(System.getProperty("precog.storage.root"))
+          .map {
+            "precog.storage.root = " + _
+          }
+          .getOrElse { "" }
       }
 
     val sortWorkDir = scratchDir
@@ -128,17 +130,17 @@ trait TestStackLike[M[+ _]]
                       new DateTime)
 
   def eval(str: String, debug: Boolean = false): Set[SValue] =
-    evalE(str, debug) map { _._2 }
+    evalE(str, debug).map { _._2 }
 
   def evalE(str: String, debug: Boolean = false): Set[SEvent] = {
     parseEvalLogger.debug("Beginning evaluation of query: " + str)
 
     val preForest = compile(str)
-    val forest = preForest filter { _.errors filterNot isWarning isEmpty }
+    val forest = preForest.filter { _.errors.filterNot(isWarning) isEmpty }
 
     assert(
       forest.size == 1 ||
-        preForest.forall(_.errors filterNot isWarning isEmpty))
+        preForest.forall(_.errors.filterNot(isWarning) isEmpty))
     val tree = forest.head
 
     val Right(dag) = decorate(emit(tree))

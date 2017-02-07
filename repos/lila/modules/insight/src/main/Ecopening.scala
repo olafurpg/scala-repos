@@ -26,7 +26,7 @@ case class Ecopening(eco: Ecopening.ECO,
 
   def ecoName = s"$eco $name"
 
-  def compare(other: Ecopening) = eco compare other.eco
+  def compare(other: Ecopening) = eco.compare(other.eco)
 
   override def toString = s"$ecoName ($moves)"
 }
@@ -54,17 +54,18 @@ object Ecopening {
     else
       chess.Replay
         .boards(
-          moveStrs = game.pgnMoves take EcopeningDB.MAX_MOVES,
+          moveStrs = game.pgnMoves.take(EcopeningDB.MAX_MOVES),
           initialFen = none,
           variant = chess.variant.Standard
         )
-        .toOption flatMap matchChronoBoards
+        .toOption
+        .flatMap(matchChronoBoards)
 
   private def matchChronoBoards(boards: List[chess.Board]): Option[Ecopening] =
     boards.reverse.foldLeft(none[Ecopening]) {
       case (acc, board) =>
-        acc orElse {
-          EcopeningDB.allByFen get chess.format.Forsyth.exportBoard(board)
+        acc.orElse {
+          EcopeningDB.allByFen.get(chess.format.Forsyth.exportBoard(board))
         }
     }
 }

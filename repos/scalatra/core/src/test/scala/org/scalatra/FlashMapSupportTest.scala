@@ -10,7 +10,7 @@ class FlashMapSupportTestServlet extends ScalatraServlet with FlashMapSupport {
   }
 
   get("/message") {
-    flash.get("message") foreach { x =>
+    flash.get("message").foreach { x =>
       response.setHeader("message", x.toString)
     }
   }
@@ -41,7 +41,7 @@ class FlashMapSupportSecondTestServlet
 
 class FlashMapSupportTestFilter extends ScalatraFilter with FlashMapSupport {
   get("/filter") {
-    flash.get("message") foreach { x =>
+    flash.get("message").foreach { x =>
       response.setHeader("message", x.toString)
     }
   }

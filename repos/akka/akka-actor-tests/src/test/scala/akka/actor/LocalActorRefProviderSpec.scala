@@ -126,7 +126,7 @@ class LocalActorRefProviderSpec
         {
           val childProps2 = child.asInstanceOf[LocalActorRef].underlying.props
           childProps2 should not be theSameInstanceAs(childProps1)
-          childProps2 should be theSameInstanceAs ActorCell.terminatedProps
+          (childProps2 should be).theSameInstanceAs(ActorCell.terminatedProps)
         },
         1 second
       )

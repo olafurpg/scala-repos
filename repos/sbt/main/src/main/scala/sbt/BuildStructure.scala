@@ -28,12 +28,12 @@ final class BuildStructure(val units: Map[URI, LoadedBuildUnit],
                            val streams: State => Streams,
                            val delegates: Scope => Seq[Scope],
                            val scopeLocal: ScopeLocal) {
-  val rootProject: URI => String = Load getRootProject units
+  val rootProject: URI => String = Load.getRootProject(units)
   def allProjects: Seq[ResolvedProject] =
     units.values.flatMap(_.defined.values).toSeq
   def allProjects(build: URI): Seq[ResolvedProject] =
     units.get(build).toList.flatMap(_.defined.values)
-  def allProjectRefs: Seq[ProjectRef] = units.toSeq flatMap {
+  def allProjectRefs: Seq[ProjectRef] = units.toSeq.flatMap {
     case (build, unit) => refs(build, unit.defined.values.toSeq)
   }
   def allProjectRefs(build: URI): Seq[ProjectRef] =
@@ -184,15 +184,15 @@ final class DetectedPlugins(val plugins: DetectedModules[Plugin],
   /** A function to select the right [[AutoPlugin]]s from [[autoPlugins]] for a [[Project]]. */
   @deprecated("Use deducePluginsFromProject", "0.13.8")
   lazy val deducePlugins: (Plugins, Logger) => Seq[AutoPlugin] =
-    Plugins.deducer(autoPlugins.toList map { _.value })
+    Plugins.deducer(autoPlugins.toList.map { _.value })
 
   /** Selects the right [[AutoPlugin]]s from a [[Project]]. */
   def deducePluginsFromProject(p: Project, log: Logger): Seq[AutoPlugin] = {
     val ps0 = p.plugins
-    val allDetected = autoPlugins.toList map { _.value }
+    val allDetected = autoPlugins.toList.map { _.value }
     val detected = p match {
       case _: GeneratedRootProject =>
-        allDetected filterNot { _ == sbt.plugins.IvyPlugin }
+        allDetected.filterNot { _ == sbt.plugins.IvyPlugin }
       case _ => allDetected
     }
     Plugins.deducer(detected)(ps0, log)
@@ -225,7 +225,7 @@ final class LoadedPlugins(val base: File,
     this(base,
          pluginData,
          loader,
-         new DetectedPlugins(new DetectedModules(pluginNames zip plugins),
+         new DetectedPlugins(new DetectedModules(pluginNames.zip(plugins)),
                              Nil,
                              new DetectedModules(Nil)))
 
@@ -275,11 +275,11 @@ final class PartBuildUnit(val unit: BuildUnit,
     extends BuildUnitBase {
   def resolve(f: Project => ResolvedProject): LoadedBuildUnit =
     new LoadedBuildUnit(unit,
-                        defined mapValues f toMap,
+                        defined.mapValues(f) toMap,
                         rootProjects,
                         buildSettings)
   def resolveRefs(f: ProjectReference => ProjectRef): LoadedBuildUnit =
-    resolve(_ resolve f)
+    resolve(_.resolve(f))
 }
 
 object BuildStreams {
@@ -293,10 +293,11 @@ object BuildStreams {
                 root: URI,
                 data: Settings[Scope]): State => Streams =
     s =>
-      s get Keys.stateStreams getOrElse std.Streams(
-        path(units, root, data),
-        displayFull,
-        LogManager.construct(data, s))
+      s.get(Keys.stateStreams)
+        .getOrElse(
+          std.Streams(path(units, root, data),
+                      displayFull,
+                      LogManager.construct(data, s)))
 
   def path(units: Map[URI, LoadedBuildUnit], root: URI, data: Settings[Scope])(
       scoped: ScopedKey[_]): File =
@@ -354,5 +355,7 @@ object BuildStreams {
   def refTarget(scope: Scope,
                 fallbackBase: File,
                 data: Settings[Scope]): File =
-    (Keys.target in scope get data getOrElse outputDirectory(fallbackBase).asFile) / StreamsDirectory
+    ((Keys.target in scope)
+      .get(data)
+      .getOrElse(outputDirectory(fallbackBase).asFile)) / StreamsDirectory
 }

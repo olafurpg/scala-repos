@@ -190,7 +190,7 @@ class FuturePoolTest extends FunSuite with Eventually {
     import ctx._
 
     def fake(): String = {
-      pools foreach { pool =>
+      pools.foreach { pool =>
         val rv = pool { return "OK" }
 
         val e = intercept[FutureNonLocalReturnControl] { Await.result(rv) }

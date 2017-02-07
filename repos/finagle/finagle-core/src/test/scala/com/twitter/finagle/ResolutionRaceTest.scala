@@ -26,7 +26,7 @@ class ResolutionRaceTest extends FunSuite with AssertionsForJUnit {
       val addr = server.boundAddress.asInstanceOf[InetSocketAddress]
       val dest = "asyncinet!localhost:%d".format(addr.getPort)
       try {
-        1 to 1000 foreach { i =>
+        (1 to 1000).foreach { i =>
           val phrase = "%03d [%s]".format(i, dest)
           val echo = Echo.newService(dest)
           try {

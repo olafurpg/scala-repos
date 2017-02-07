@@ -36,7 +36,7 @@ trait ModelFactoryTypeSupport {
             appendType0(tp)
           case tp :: tps =>
             appendType0(tp)
-            nameBuffer append sep
+            nameBuffer.append(sep)
             appendTypes0(tps, sep)
         }
 
@@ -44,21 +44,21 @@ trait ModelFactoryTypeSupport {
         /* Type refs */
         case tp: TypeRef if definitions.isFunctionTypeDirect(tp) =>
           val args = tp.typeArgs
-          nameBuffer append '('
+          nameBuffer.append('(')
           appendTypes0(args.init, ", ")
-          nameBuffer append ") ⇒ "
+          nameBuffer.append(") ⇒ ")
           appendType0(args.last)
         case tp: TypeRef if definitions.isScalaRepeatedParamType(tp) =>
           appendType0(tp.args.head)
-          nameBuffer append '*'
+          nameBuffer.append('*')
         case tp: TypeRef if definitions.isByNameParamType(tp) =>
-          nameBuffer append "⇒ "
+          nameBuffer.append("⇒ ")
           appendType0(tp.args.head)
         case tp: TypeRef if definitions.isTupleTypeDirect(tp) =>
           val args = tp.typeArgs
-          nameBuffer append '('
+          nameBuffer.append('(')
           appendTypes0(args, ", ")
-          nameBuffer append ')'
+          nameBuffer.append(')')
         case TypeRef(pre, aSym, targs) =>
           val preSym = pre.widen.typeSymbol
 
@@ -88,7 +88,7 @@ trait ModelFactoryTypeSupport {
               }
             case _ =>
               val oTpl = findTemplateMaybe(owner)
-              (oTpl, oTpl flatMap (findMember(bSym, _))) match {
+              (oTpl, oTpl.flatMap(findMember(bSym, _))) match {
                 case (Some(oTpl), Some(bMbr)) =>
                   // (1) the owner's class
                   LinkToMember(bMbr, oTpl)
@@ -146,9 +146,9 @@ trait ModelFactoryTypeSupport {
                 val qName = makeQualifiedName(owner, Some(inTpl.sym))
                 if (qName != "") qName + "." else ""
               } else {
-                nameBuffer append "("
+                nameBuffer.append("(")
                 appendType0(pre)
-                nameBuffer append ")#"
+                nameBuffer.append(")#")
                 "" // we already appended the prefix
               }
             } else ""
@@ -159,21 +159,21 @@ trait ModelFactoryTypeSupport {
           val name = prefix + bSym.nameString
           val pos0 = nameBuffer.length
           refBuffer += pos0 -> ((link, name.length))
-          nameBuffer append name
+          nameBuffer.append(name)
 
           if (!targs.isEmpty) {
-            nameBuffer append '['
+            nameBuffer.append('[')
             appendTypes0(targs, ", ")
-            nameBuffer append ']'
+            nameBuffer.append(']')
           }
         /* Refined types */
         case RefinedType(parents, defs) =>
           val ignoreParents = Set[Symbol](AnyClass, ObjectClass)
-          val filtParents = parents filterNot
-            (x => ignoreParents(x.typeSymbol)) match {
-            case Nil => parents
-            case ps => ps
-          }
+          val filtParents =
+            parents.filterNot(x => ignoreParents(x.typeSymbol)) match {
+              case Nil => parents
+              case ps => ps
+            }
           appendTypes0(filtParents, " with ")
           // XXX Still todo: properly printing refinements.
           // Since I didn't know how to go about displaying a multi-line type, I went with
@@ -181,14 +181,15 @@ trait ModelFactoryTypeSupport {
           // the number of members if there are more.
           defs.toList match {
             case Nil => ()
-            case x :: Nil => nameBuffer append (" { " + x.defString + " }")
+            case x :: Nil => nameBuffer.append(" { " + x.defString + " }")
             case xs =>
-              nameBuffer append
-                (" { ... /* %d definitions in type refinement */ }" format xs.size)
+              nameBuffer.append(
+                " { ... /* %d definitions in type refinement */ }".format(
+                  xs.size))
           }
         /* Eval-by-name types */
         case NullaryMethodType(result) =>
-          nameBuffer append '⇒'
+          nameBuffer.append('⇒')
           appendType0(result)
 
         /* Polymorphic types */
@@ -203,7 +204,7 @@ trait ModelFactoryTypeSupport {
                     typeParamsToString(tparam.typeParams)
                 }
                 .mkString("[", ", ", "]")
-          nameBuffer append typeParamsToString(tparams)
+          nameBuffer.append(typeParamsToString(tparams))
           appendType0(result)
 
         case et @ ExistentialType(quantified, underlying) =>
@@ -211,68 +212,68 @@ trait ModelFactoryTypeSupport {
             if (sym.isType && !sym.isAliasType && !sym.isClass) {
               tp match {
                 case PolyType(tparams, _) =>
-                  nameBuffer append "["
+                  nameBuffer.append("[")
                   appendTypes0(tparams.map(_.tpe), ", ")
-                  nameBuffer append "]"
+                  nameBuffer.append("]")
                 case _ =>
               }
               tp.resultType match {
                 case rt @ TypeBounds(_, _) =>
                   appendType0(rt)
                 case rt =>
-                  nameBuffer append " <: "
+                  nameBuffer.append(" <: ")
                   appendType0(rt)
               }
             } else {
               // fallback to the Symbol infoString
-              nameBuffer append sym.infoString(tp)
+              nameBuffer.append(sym.infoString(tp))
             }
           }
 
           def appendClauses = {
-            nameBuffer append " forSome {"
+            nameBuffer.append(" forSome {")
             var first = true
             for (sym <- quantified) {
-              if (!first) { nameBuffer append ", " } else first = false
+              if (!first) { nameBuffer.append(", ") } else first = false
               if (sym.isSingletonExistential) {
-                nameBuffer append "val "
-                nameBuffer append tpnme.dropSingletonName(sym.name)
-                nameBuffer append ": "
+                nameBuffer.append("val ")
+                nameBuffer.append(tpnme.dropSingletonName(sym.name))
+                nameBuffer.append(": ")
                 appendType0(dropSingletonType(sym.info.bounds.hi))
               } else {
                 if (sym.flagString != "")
-                  nameBuffer append (sym.flagString + " ")
+                  nameBuffer.append(sym.flagString + " ")
                 if (sym.keyString != "")
-                  nameBuffer append (sym.keyString + " ")
-                nameBuffer append sym.varianceString
-                nameBuffer append sym.nameString
+                  nameBuffer.append(sym.keyString + " ")
+                nameBuffer.append(sym.varianceString)
+                nameBuffer.append(sym.nameString)
                 appendInfoStringReduced(sym, sym.info)
               }
             }
-            nameBuffer append "}"
+            nameBuffer.append("}")
           }
 
           underlying match {
             case TypeRef(pre, sym, args) if et.isRepresentableWithWildcards =>
               appendType0(typeRef(pre, sym, Nil))
-              nameBuffer append "["
+              nameBuffer.append("[")
               var first = true
               val qset = quantified.toSet
               for (arg <- args) {
-                if (!first) { nameBuffer append ", " } else first = false
+                if (!first) { nameBuffer.append(", ") } else first = false
                 arg match {
                   case TypeRef(_, sym, _) if (qset contains sym) =>
-                    nameBuffer append "_"
+                    nameBuffer.append("_")
                     appendInfoStringReduced(sym, sym.info)
                   case arg =>
                     appendType0(arg)
                 }
               }
-              nameBuffer append "]"
+              nameBuffer.append("]")
             case MethodType(_, _) | NullaryMethodType(_) | PolyType(_, _) =>
-              nameBuffer append "("
+              nameBuffer.append("(")
               appendType0(underlying)
-              nameBuffer append ")"
+              nameBuffer.append(")")
               appendClauses
             case _ =>
               appendType0(underlying)
@@ -281,11 +282,11 @@ trait ModelFactoryTypeSupport {
 
         case tb @ TypeBounds(lo, hi) =>
           if (tb.lo != TypeBounds.empty.lo) {
-            nameBuffer append " >: "
+            nameBuffer.append(" >: ")
             appendType0(lo)
           }
           if (tb.hi != TypeBounds.empty.hi) {
-            nameBuffer append " <: "
+            nameBuffer.append(" <: ")
             appendType0(hi)
           }
         // case tpen: ThisType | SingleType | SuperType =>
@@ -298,19 +299,19 @@ trait ModelFactoryTypeSupport {
         //     else prefixString + "type"
         case tpen @ ThisType(sym) =>
           appendType0(typeRef(NoPrefix, sym, Nil))
-          nameBuffer append ".this"
+          nameBuffer.append(".this")
           if (!tpen.underlying.typeSymbol.skipPackageObject.isOmittablePrefix)
-            nameBuffer append ".type"
+            nameBuffer.append(".type")
         case tpen @ SuperType(thistpe, supertpe) =>
-          nameBuffer append "super["
+          nameBuffer.append("super[")
           appendType0(supertpe)
-          nameBuffer append "]"
+          nameBuffer.append("]")
         case tpen @ SingleType(pre, sym) =>
           appendType0(typeRef(pre, sym, Nil))
           if (!tpen.underlying.typeSymbol.skipPackageObject.isOmittablePrefix)
-            nameBuffer append ".type"
+            nameBuffer.append(".type")
         case tpen =>
-          nameBuffer append tpen.toString
+          nameBuffer.append(tpen.toString)
       }
       appendType0(aType)
       val refEntity = refBuffer

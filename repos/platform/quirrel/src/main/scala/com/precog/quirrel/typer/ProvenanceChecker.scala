@@ -79,7 +79,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
              Set(Related(left.provenance, right.provenance)))
           }
         } else {
-          val provenance = unified getOrElse NullProvenance
+          val provenance = unified.getOrElse(NullProvenance)
           (provenance,
            if (unified.isDefined) Set()
            else Set(Error(expr, OperationOnUnrelatedSets)),
@@ -98,23 +98,23 @@ trait ProvenanceChecker extends parser.AST with Binder {
                    constraints: Map[Provenance, Expr])
       : (Provenance, (Set[Error], Set[ProvConstraint])) = {
 
-      val (errorsVec, constrVec) = values map {
+      val (errorsVec, constrVec) = values.map {
         loop(_, relations, constraints)
       } unzip
 
-      val errors = errorsVec reduceOption { _ ++ _ } getOrElse Set()
-      val constr = constrVec reduceOption { _ ++ _ } getOrElse Set()
+      val errors = errorsVec.reduceOption { _ ++ _ }.getOrElse(Set())
+      val constr = constrVec.reduceOption { _ ++ _ }.getOrElse(Set())
 
       if (values.isEmpty) {
         (ValueProvenance, (Set(), Set()))
       } else {
         val provenances: Vector[(Provenance, Set[ProvConstraint], Set[Error])] =
-          values map { expr =>
+          values.map { expr =>
             (expr.provenance, Set[ProvConstraint](), Set[Error]())
           }
 
         val (prov, constrContrib, errorsContrib) =
-          provenances reduce { (pair1, pair2) =>
+          provenances.reduce { (pair1, pair2) =>
             val (prov1, constr1, error1) = pair1
             val (prov2, constr2, error2) = pair2
 
@@ -210,7 +210,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
             unifyProvenance(relations)(pred.provenance, right.provenance)
 
           (leftUnified |@| rightUnified)(
-            handleUnionLike(CondProvenanceDifferentLength)) getOrElse {
+            handleUnionLike(CondProvenanceDifferentLength)).getOrElse {
             (NullProvenance, Set(Error(expr, OperationOnUnrelatedSets)), Set())
           }
         }
@@ -274,7 +274,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
     // A DynamicProvenance being involved in either side means
     // we can't _prove_ the data is coming from different sets,
     // since `(new //foo) intersect (new //foo)` returns `new //foo`
-    def dynamicPossibility(prov: Provenance) = prov.possibilities exists {
+    def dynamicPossibility(prov: Provenance) = prov.possibilities.exists {
       case DynamicProvenance(_) => true
       case _ => false
     }
@@ -338,8 +338,8 @@ trait ProvenanceChecker extends parser.AST with Binder {
           val unified =
             unifyProvenance(relations)(left.provenance, right.provenance)
           val prov =
-            unified getOrElse CoproductProvenance(left.provenance,
-                                                  right.provenance)
+            unified.getOrElse(
+              CoproductProvenance(left.provenance, right.provenance))
           (prov, Set(), Set())
         } else if (isDynamic)
           (CoproductProvenance(left.provenance, right.provenance),
@@ -446,12 +446,12 @@ trait ProvenanceChecker extends parser.AST with Binder {
         }
 
         case Solve(_, solveConstr, child) => {
-          val (errorsVec, constrVec) = solveConstr map {
+          val (errorsVec, constrVec) = solveConstr.map {
             loop(_, relations, constraints)
           } unzip
 
-          val constrErrors = errorsVec reduce { _ ++ _ }
-          val constrConstr = constrVec reduce { _ ++ _ }
+          val constrErrors = errorsVec.reduce { _ ++ _ }
+          val constrConstr = constrVec.reduce { _ ++ _ }
 
           val (errors, constr) = loop(child, relations, constraints)
           val errorSet = constrErrors ++ errors
@@ -603,7 +603,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
         case expr @ Dispatch(_, name, actuals) => {
           expr.binding match {
             case LetBinding(let) => {
-              val (errorsVec, constrVec) = actuals map {
+              val (errorsVec, constrVec) = actuals.map {
                 loop(_, relations, constraints)
               } unzip
 
@@ -612,8 +612,8 @@ trait ProvenanceChecker extends parser.AST with Binder {
                 _ ++ _
               }
 
-              val ids = let.params map { Identifier(Vector(), _) }
-              val zipped = ids zip (actuals map { _.provenance })
+              val ids = let.params.map { Identifier(Vector(), _) }
+              val zipped = ids.zip(actuals.map { _.provenance })
 
               def sub(target: Provenance): Provenance = {
                 zipped.foldLeft(target) {
@@ -623,7 +623,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
               }
 
               val constraints2 =
-                let.constraints map {
+                let.constraints.map {
                   case Related(left, right) => {
                     val left2 = resolveUnifications(relations)(sub(left))
                     val right2 =
@@ -658,7 +658,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
                 }
 
               val mapped =
-                constraints2 flatMap {
+                constraints2.flatMap {
                   case Related(left, right)
                       if !left.isParametric && !right.isParametric => {
                     if (!unifyProvenance(relations)(left, right).isDefined)
@@ -691,9 +691,9 @@ trait ProvenanceChecker extends parser.AST with Binder {
                 }
 
               val constrErrors =
-                mapped collect { case Left(error) => error }
+                mapped.collect { case Left(error) => error }
               val constraints3 =
-                mapped collect { case Right(constr) => constr }
+                mapped.collect { case Right(constr) => constr }
 
               expr.provenance =
                 resolveUnifications(relations)(sub(let.resultProvenance))
@@ -798,9 +798,8 @@ trait ProvenanceChecker extends parser.AST with Binder {
                       case IdentityPolicy.Product(left, right) => {
                         val recLeft = rec(left)
                         val recRight = rec(right)
-                        unifyProvenance(relations)(recLeft, recRight) getOrElse ProductProvenance(
-                          recLeft,
-                          recRight)
+                        unifyProvenance(relations)(recLeft, recRight)
+                          .getOrElse(ProductProvenance(recLeft, recRight))
                       }
 
                       case (_: IdentityPolicy.Retain) =>
@@ -861,9 +860,8 @@ trait ProvenanceChecker extends parser.AST with Binder {
                     val (rightErrors, rightConst, rightProv) = rec(right0)
 
                     val prov =
-                      unifyProvenance(relations)(leftProv, rightProv) getOrElse ProductProvenance(
-                        leftProv,
-                        rightProv)
+                      unifyProvenance(relations)(leftProv, rightProv)
+                        .getOrElse(ProductProvenance(leftProv, rightProv))
                     val (err, const, finalProv) = compute(prov, prov)
 
                     val errors = leftErrors ++ rightErrors ++ err
@@ -885,7 +883,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
                     val prov =
                       unifyProvenance(relations)(
                         left.provenance,
-                        right.provenance) getOrElse product
+                        right.provenance).getOrElse(product)
 
                     compute(prov, prov)
                   }
@@ -899,7 +897,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
                   case IdentityPolicy.Retain.Merge => {
                     val paramProv =
                       UnifiedProvenance(left.provenance, right.provenance)
-                    val prov = unified getOrElse NullProvenance
+                    val prov = unified.getOrElse(NullProvenance)
                     compute(paramProv, prov)
                   }
 
@@ -938,14 +936,14 @@ trait ProvenanceChecker extends parser.AST with Binder {
               result
 
             case NullBinding => {
-              val (errorsVec, constrVec) = actuals map {
+              val (errorsVec, constrVec) = actuals.map {
                 loop(_, relations, constraints)
               } unzip
 
               val errors =
-                errorsVec reduceOption { _ ++ _ } getOrElse Set()
+                errorsVec.reduceOption { _ ++ _ }.getOrElse(Set())
               val constr =
-                constrVec reduceOption { _ ++ _ } getOrElse Set()
+                constrVec.reduceOption { _ ++ _ }.getOrElse(Set())
 
               expr.provenance = NullProvenance
 
@@ -1004,7 +1002,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
         }
       }
 
-      expr.constrainingExpr = constraints get expr.provenance
+      expr.constrainingExpr = constraints.get(expr.provenance)
       expr.relations = relations
 
       back
@@ -1047,10 +1045,10 @@ trait ProvenanceChecker extends parser.AST with Binder {
         case (p1, p2) => p1 & p2
       }
 
-      lazy val unionLeft = leftP map { ProductProvenance(_, right) }
-      lazy val unionRight = rightP map { ProductProvenance(left, _) }
+      lazy val unionLeft = leftP.map { ProductProvenance(_, right) }
+      lazy val unionRight = rightP.map { ProductProvenance(left, _) }
 
-      unionP orElse unionLeft orElse unionRight
+      unionP.orElse(unionLeft).orElse(unionRight)
     }
 
     case (p1, ProductProvenance(left, right)) => {
@@ -1061,10 +1059,10 @@ trait ProvenanceChecker extends parser.AST with Binder {
         case (p1, p2) => p1 & p2
       }
 
-      lazy val unionLeft = leftP map { ProductProvenance(_, right) }
-      lazy val unionRight = rightP map { ProductProvenance(left, _) }
+      lazy val unionLeft = leftP.map { ProductProvenance(_, right) }
+      lazy val unionRight = rightP.map { ProductProvenance(left, _) }
 
-      unionP orElse unionLeft orElse unionRight
+      unionP.orElse(unionLeft).orElse(unionRight)
     }
 
     case (CoproductProvenance(left, right), p2) => {
@@ -1074,7 +1072,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
       val unionP = (leftP |@| rightP) {
         case (p1, p2) => p1 | p2
       }
-      unionP orElse leftP orElse rightP
+      unionP.orElse(leftP).orElse(rightP)
     }
 
     case (p1, CoproductProvenance(left, right)) => {
@@ -1084,7 +1082,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
       val unionP = (leftP |@| rightP) {
         case (p1, p2) => p1 | p2
       }
-      unionP orElse leftP orElse rightP
+      unionP.orElse(leftP).orElse(rightP)
     }
 
     case _ => None
@@ -1102,7 +1100,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
       } else {
         val next = graph.getOrElse(from, Set())
         val seen2 = seen + from
-        next exists dfs(seen2)
+        next.exists(dfs(seen2))
       }
     }
 
@@ -1167,7 +1165,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
         left2
       } else if (!(left2.isParametric && right2.isParametric)) {
         val unified = unifyProvenance(Map())(left2, right2)
-        unified getOrElse CoproductProvenance(left2, right2)
+        unified.getOrElse(CoproductProvenance(left2, right2))
       } else {
         DerivedIntersectProvenance(left2, right2)
       }
@@ -1193,7 +1191,7 @@ trait ProvenanceChecker extends parser.AST with Binder {
       val right2 = resolveUnifications(relations)(right)
 
       val optResult = unifyProvenance(relations)(left2, right2)
-      optResult getOrElse (left2 & right2)
+      optResult.getOrElse(left2 & right2)
     }
 
     case UnifiedProvenance(left, right) => {
@@ -1261,22 +1259,34 @@ trait ProvenanceChecker extends parser.AST with Binder {
 
     private def associateLeft: Provenance = this match {
       case UnifiedProvenance(_, _) =>
-        findChildren(this, true).toList sorted Provenance.order.toScalaOrdering reduceLeft UnifiedProvenance
+        findChildren(this, true).toList
+          .sorted(Provenance.order.toScalaOrdering)
+          .reduceLeft(UnifiedProvenance)
 
       case ProductProvenance(_, _) =>
-        findChildren(this, false).toList sorted Provenance.order.toScalaOrdering reduceLeft ProductProvenance
+        findChildren(this, false).toList
+          .sorted(Provenance.order.toScalaOrdering)
+          .reduceLeft(ProductProvenance)
 
       case CoproductProvenance(_, _) =>
-        findChildren(this, false).toList sorted Provenance.order.toScalaOrdering reduceLeft CoproductProvenance
+        findChildren(this, false).toList
+          .sorted(Provenance.order.toScalaOrdering)
+          .reduceLeft(CoproductProvenance)
 
       case DerivedUnionProvenance(_, _) =>
-        findChildren(this, false).toList sorted Provenance.order.toScalaOrdering reduceLeft DerivedUnionProvenance
+        findChildren(this, false).toList
+          .sorted(Provenance.order.toScalaOrdering)
+          .reduceLeft(DerivedUnionProvenance)
 
       case DerivedIntersectProvenance(_, _) =>
-        findChildren(this, false).toList sorted Provenance.order.toScalaOrdering reduceLeft DerivedIntersectProvenance
+        findChildren(this, false).toList
+          .sorted(Provenance.order.toScalaOrdering)
+          .reduceLeft(DerivedIntersectProvenance)
 
       case DerivedDifferenceProvenance(_, _) =>
-        findChildren(this, false).toList sorted Provenance.order.toScalaOrdering reduceLeft DerivedDifferenceProvenance
+        findChildren(this, false).toList
+          .sorted(Provenance.order.toScalaOrdering)
+          .reduceLeft(DerivedDifferenceProvenance)
 
       case prov => prov
     }

@@ -249,10 +249,10 @@ class ReadOnlyDoublePropertySpec extends FlatSpec with BeforeAndAfterEach {
     var invalidateCount = 0
     var changeCount = 0
     val binding = readOnlyDoubleProperty * doubleProperty2
-    binding onInvalidate {
+    binding.onInvalidate {
       invalidateCount += 1
     }
-    binding onChange {
+    binding.onChange {
       changeCount += 1
     }
     doubleProperty2() = 1

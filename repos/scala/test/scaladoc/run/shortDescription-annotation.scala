@@ -27,7 +27,7 @@ object Test extends ScaladocModelTest {
     import access._
 
     def inlineToStr(inl: Inline): String = inl match {
-      case Chain(items) => items flatMap (inlineToStr(_)) mkString ""
+      case Chain(items) => items.flatMap(inlineToStr(_)) mkString ""
       case Italic(in) => inlineToStr(in)
       case Bold(in) => inlineToStr(in)
       case Underline(in) => inlineToStr(in)

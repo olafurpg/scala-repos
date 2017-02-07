@@ -4,6 +4,6 @@ trait Test {
   val x: R = { case "" => }
   val y: R = { case "" => }
 
-  val z: R = x orElse y
-  val zz = x orElse y
+  val z: R = x.orElse(y)
+  val zz = x.orElse(y)
 }

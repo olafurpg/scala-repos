@@ -62,7 +62,7 @@ class DecodingToResponseTest extends FunSuite {
                     Seq("STAT", "items:1:age", "1468"),
                     Seq("ITEM", "foo", "[5 b;", "1322514067", "s]"))
     val plines = lines.map { line =>
-      Tokens(line map { Buf.Utf8(_) })
+      Tokens(line.map { Buf.Utf8(_) })
     }
     val info = decodingToResponse.decode(null, null, StatLines(plines))
     assert(info.getClass == classOf[InfoLines])

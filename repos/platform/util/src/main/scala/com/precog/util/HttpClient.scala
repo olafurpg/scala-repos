@@ -53,11 +53,11 @@ trait HttpClientModule[M[+ _]] {
     case class ConnectionError(url: Option[String], cause: Throwable)
         extends HttpClientError {
       def userMessage =
-        url map ("Error connecting to " + _) getOrElse "Invalid URL"
+        url.map("Error connecting to " + _).getOrElse("Invalid URL")
     }
     case class NotOk(code: Int, message: String) extends HttpClientError {
       def userMessage =
-        "Bad response from upstream server: %d %s" format (code, message)
+        "Bad response from upstream server: %d %s".format(code, message)
     }
     case object EmptyBody extends HttpClientError {
       def userMessage = "Server returned OK, but with no data"
@@ -77,7 +77,7 @@ trait HttpClientModule[M[+ _]] {
       copy(body = Some(Request.Body(contentType, body)))
 
     def map[B](f: A => B): Request[B] =
-      copy(body = body map {
+      copy(body = body.map {
         case Request.Body(ct, data) => Request.Body(ct, f(data))
       })
   }
@@ -89,11 +89,13 @@ trait HttpClientModule[M[+ _]] {
   case class Response[+A](code: Int, message: String, body: Option[A]) {
     import HttpClientError._
 
-    def map[B](f: A => B): Response[B] = Response(code, message, body map f)
+    def map[B](f: A => B): Response[B] = Response(code, message, body.map(f))
 
     def ok: HttpClientError \/ A =
-      body map { data =>
-        if (code / 200 != 1) -\/(NotOk(code, message)) else \/-(data)
-      } getOrElse -\/(EmptyBody)
+      body
+        .map { data =>
+          if (code / 200 != 1) -\/(NotOk(code, message)) else \/-(data)
+        }
+        .getOrElse(-\/(EmptyBody))
   }
 }

@@ -48,21 +48,21 @@ class ParserUtilsTest extends FunSuite {
   )
 
   test("isDigits: Buf") {
-    strings foreach {
+    strings.foreach {
       case (str, expected) =>
         assert(isDigitsBuf(str) == expected)
     }
   }
 
   test("isDigits: Buf.ByteBuffer") {
-    strings foreach {
+    strings.foreach {
       case (str, expected) =>
         assert(isDigitsBB(str) == expected)
     }
   }
 
   test("isDigits: Buf.ByteArray") {
-    strings foreach {
+    strings.foreach {
       case (str, expected) =>
         assert(isDigitsBA(str) == expected)
     }

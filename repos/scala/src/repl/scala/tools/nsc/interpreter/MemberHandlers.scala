@@ -22,7 +22,7 @@ trait MemberHandlers {
   private def codegenln(xs: String*): String = codegenln(true, xs: _*)
   private def codegen(leadingPlus: Boolean, xs: String*): String = {
     val front = if (leadingPlus) "+ " else ""
-    front + (xs map string2codeQuoted mkString " + ")
+    front + (xs.map(string2codeQuoted) mkString " + ")
   }
   private implicit def name2string(name: Name) = name.toString
 
@@ -36,7 +36,7 @@ trait MemberHandlers {
       case Ident(name) =>
         // XXX this is obviously inadequate but it's going to require some effort
         // to get right.
-        if (name.toString startsWith "x$") ()
+        if (name.toString.startsWith("x$")) ()
         else {
           importVars += name
           // Needed to import `xxx` during line 2 of:
@@ -53,7 +53,7 @@ trait MemberHandlers {
   private object ImportVarsTraverser {
     def apply(member: Tree) = {
       val ivt = new ImportVarsTraverser()
-      ivt traverse member
+      ivt.traverse(member)
       ivt.importVars.toList
     }
   }
@@ -82,9 +82,9 @@ trait MemberHandlers {
 
     override def definesImplicit = member.mods.isImplicit
     override def definesTerm: Option[TermName] =
-      Some(name.toTermName) filter (_ => name.isTermName)
+      Some(name.toTermName).filter(_ => name.isTermName)
     override def definesType: Option[TypeName] =
-      Some(name.toTypeName) filter (_ => name.isTypeName)
+      Some(name.toTypeName).filter(_ => name.isTypeName)
     override def definedSymbols = if (symbol.exists) symbol :: Nil else Nil
   }
 
@@ -110,7 +110,7 @@ trait MemberHandlers {
     def extraCodeToEvaluate(req: Request): String = ""
     def resultExtractionCode(req: Request): String = ""
 
-    private def shortName = this.getClass.toString split '.' last
+    private def shortName = this.getClass.toString.split('.') last
     override def toString =
       shortName + referencedNames.mkString(" (refs: ", ", ", ")")
   }
@@ -149,7 +149,7 @@ trait MemberHandlers {
           else ""
 
         val nameString = colorName(prettyName) + vidString
-        val typeString = colorType(req typeOf name)
+        val typeString = colorType(req.typeOf(name))
         s""" + "$nameString: $typeString = " + $resultString"""
       }
     }
@@ -160,7 +160,7 @@ trait MemberHandlers {
       flattensToEmpty(member.vparamss) // true if 0-arity
     override def resultExtractionCode(req: Request) = {
       val nameString = colorName(name)
-      val typeString = colorType(req typeOf name)
+      val typeString = colorType(req.typeOf(name))
       if (mods.isPublic) s""" + "$nameString: $typeString\\n"""" else ""
     }
   }
@@ -194,8 +194,8 @@ trait MemberHandlers {
 
     /** Print out lhs instead of the generated varName */
     override def resultExtractionCode(req: Request) = {
-      val lhsType = string2code(req lookupTypeOf name)
-      val res = string2code(req fullPath name)
+      val lhsType = string2code(req.lookupTypeOf(name))
+      val res = string2code(req.fullPath(name))
       """ + "%s: %s = " + %s + "\n" """
         .format(string2code(lhs.toString), lhsType, res) + "\n"
     }
@@ -211,9 +211,9 @@ trait MemberHandlers {
 
   class ClassHandler(member: ClassDef) extends MemberDefHandler(member) {
     override def definedSymbols =
-      List(symbol, symbol.companionSymbol) filterNot (_ == NoSymbol)
+      List(symbol, symbol.companionSymbol).filterNot(_ == NoSymbol)
     override def definesType = Some(name.toTypeName)
-    override def definesTerm = Some(name.toTermName) filter (_ => mods.isCase)
+    override def definesTerm = Some(name.toTermName).filter(_ => mods.isCase)
 
     override def resultExtractionCode(req: Request) =
       codegenln("defined %s %s".format(keyword, name))
@@ -221,7 +221,7 @@ trait MemberHandlers {
 
   class TypeAliasHandler(member: TypeDef) extends MemberDefHandler(member) {
     private def isAlias = mods.isPublic && treeInfo.isAliasTypeDef(member)
-    override def definesType = Some(name.toTypeName) filter (_ => isAlias)
+    override def definesType = Some(name.toTypeName).filter(_ => isAlias)
 
     override def resultExtractionCode(req: Request) =
       codegenln("defined type alias ", name) + "\n"
@@ -236,34 +236,33 @@ trait MemberHandlers {
       }
     private def importableTargetMembers = importableMembers(targetType).toList
     // wildcard imports, e.g. import foo._
-    private def selectorWild = selectors filter (_.name == nme.USCOREkw)
+    private def selectorWild = selectors.filter(_.name == nme.USCOREkw)
     // renamed imports, e.g. import foo.{ bar => baz }
     private def selectorRenames =
-      selectors map (_.rename) filterNot (_ == null)
+      selectors.map(_.rename).filterNot(_ == null)
 
     /** Whether this import includes a wildcard import */
     val importsWildcard = selectorWild.nonEmpty
 
-    def implicitSymbols = importedSymbols filter (_.isImplicit)
+    def implicitSymbols = importedSymbols.filter(_.isImplicit)
     def importedSymbols = individualSymbols ++ wildcardSymbols
 
     private val selectorNames =
-      selectorRenames filterNot (_ == nme.USCOREkw) flatMap
-        (_.bothNames) toSet
+      selectorRenames.filterNot(_ == nme.USCOREkw).flatMap(_.bothNames) toSet
     lazy val individualSymbols: List[Symbol] = exitingTyper(
-      importableTargetMembers filter (m => selectorNames(m.name)))
+      importableTargetMembers.filter(m => selectorNames(m.name)))
     lazy val wildcardSymbols: List[Symbol] = exitingTyper(
       if (importsWildcard) importableTargetMembers else Nil)
 
     /** Complete list of names imported by a wildcard */
-    lazy val wildcardNames: List[Name] = wildcardSymbols map (_.name)
-    lazy val individualNames: List[Name] = individualSymbols map (_.name)
+    lazy val wildcardNames: List[Name] = wildcardSymbols.map(_.name)
+    lazy val individualNames: List[Name] = individualSymbols.map(_.name)
 
     /** The names imported by this statement */
     override lazy val importedNames: List[Name] =
       wildcardNames ++ individualNames
     lazy val importsSymbolNamed: Set[String] =
-      importedNames map (_.toString) toSet
+      importedNames.map(_.toString) toSet
 
     def importString = imp.toString
     override def resultExtractionCode(req: Request) =

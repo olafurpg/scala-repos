@@ -54,44 +54,51 @@ trait IngestSupport extends Logging {
                                      timestampO: Option[Instant] = None)(
       f: Authorities => Future[HttpResponse[JValue]])
     : Future[HttpResponse[JValue]] = {
-    val timestamp = timestampO getOrElse clock.now().toInstant
+    val timestamp = timestampO.getOrElse(clock.now().toInstant)
     val requestAuthorities = for {
       paramIds <- request.parameters.get('ownerAccountId)
       ids = paramIds.split("""\s*,\s*""")
       auths <- Authorities.ifPresent(ids.toSet) if ids.nonEmpty
     } yield auths
 
-    requestAuthorities map { authorities =>
-      permissionsFinder.checkWriteAuthorities(authorities,
-                                              apiKey,
-                                              path,
-                                              timestamp.toInstant) map {
-        _.option(authorities)
+    requestAuthorities
+      .map { authorities =>
+        permissionsFinder
+          .checkWriteAuthorities(authorities,
+                                 apiKey,
+                                 path,
+                                 timestamp.toInstant)
+          .map {
+            _.option(authorities)
+          }
       }
-    } getOrElse {
-      permissionsFinder.inferWriteAuthorities(apiKey,
-                                              path,
-                                              Some(timestamp.toInstant))
-    } onFailure {
-      case ex: Exception =>
-        logger.error("Request " + request.shows +
-                       " failed due to unavailability of security subsystem.",
-                     ex)
-      // FIXME: Provisionally accept data for ingest if one of the permissions-checking services is unavailable
-    } flatMap {
-      case Some(authorities) =>
-        f(authorities)
+      .getOrElse {
+        permissionsFinder.inferWriteAuthorities(apiKey,
+                                                path,
+                                                Some(timestamp.toInstant))
+      }
+      .onFailure {
+        case ex: Exception =>
+          logger.error(
+            "Request " + request.shows +
+              " failed due to unavailability of security subsystem.",
+            ex)
+        // FIXME: Provisionally accept data for ingest if one of the permissions-checking services is unavailable
+      }
+      .flatMap {
+        case Some(authorities) =>
+          f(authorities)
 
-      case None =>
-        logger.warn(
-          "Unable to resolve accounts for write from %s owners %s to path %s"
-            .format(apiKey, request.parameters.get('ownerAccountId), path))
-        M.point(
-          HttpResponse[JValue](
-            Forbidden,
-            content = Some(JString(
-              "Either the ownerAccountId parameter you specified could not be resolved to a set of permitted accounts, or the API key specified was invalid."))
-          ))
-    }
+        case None =>
+          logger.warn(
+            "Unable to resolve accounts for write from %s owners %s to path %s"
+              .format(apiKey, request.parameters.get('ownerAccountId), path))
+          M.point(
+            HttpResponse[JValue](
+              Forbidden,
+              content = Some(JString(
+                "Either the ownerAccountId parameter you specified could not be resolved to a set of permitted accounts, or the API key specified was invalid."))
+            ))
+      }
   }
 }

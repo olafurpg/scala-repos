@@ -1074,7 +1074,7 @@ private object ClientBuilderClient {
 
       val stats =
         new StatsFilter[Req, Rep](statsReceiver.scope("tries"), categorizer)
-      stats andThen next
+      stats.andThen(next)
     }
   }
 
@@ -1096,7 +1096,7 @@ private object ClientBuilderClient {
         val exception = new GlobalRequestTimeoutException(timeout)
         val globalTimeout =
           new TimeoutFilter[Req, Rep](timeout, exception, timer)
-        globalTimeout andThen next
+        globalTimeout.andThen(next)
       }
     }
   }
@@ -1113,7 +1113,7 @@ private object ClientBuilderClient {
       val Label(label) = labelP
 
       val exceptionSource = new ExceptionSourceFilter[Req, Rep](label)
-      exceptionSource andThen next
+      exceptionSource.andThen(next)
     }
   }
 
@@ -1143,7 +1143,7 @@ private object ClientBuilderClient {
           return Future.exception(new IllegalStateException)
         }
 
-        super.close(deadline) ensure {
+        super.close(deadline).ensure {
           exitGuard.foreach(_.unguard())
         }
       }
@@ -1217,7 +1217,7 @@ private case class CodecClient[Req, Rep](
           val stat = stats.stat("codec_connection_preparation_latency_ms")
           override def apply(conn: ClientConnection) = {
             val begin = Time.now
-            super.apply(conn) ensure {
+            super.apply(conn).ensure {
               stat.add((Time.now - begin).inMilliseconds)
             }
           }

@@ -103,7 +103,8 @@ trait TypersTracking { self: Analyzer =>
         if (pt.isWildcard || context.inTypeConstructorAllowed) ""
         else s": pt=$pt"
       def all_s =
-        List(tree_s, pt_s, mode, fullSiteString(context)) filterNot (_ == "") mkString " "
+        List(tree_s, pt_s, mode, fullSiteString(context))
+          .filterNot(_ == "") mkString " "
 
       atLowerIndent(show(indented("""|-- """ + all_s)))
     }
@@ -151,7 +152,7 @@ trait TypersTracking { self: Analyzer =>
   }
   def tpe_s(tp: Type, colorize: String => String): String = tp match {
     case OverloadedType(pre, alts) =>
-      alts map (alt => tpe_s(pre memberType alt, colorize)) mkString " <and> "
+      alts.map(alt => tpe_s(pre memberType alt, colorize)) mkString " <and> "
     case _ => colorize(tp.toLongString)
   }
   // def sym_s(s: Symbol) = if (s eq null) "" + s else s.getClass.getName split '.' last;

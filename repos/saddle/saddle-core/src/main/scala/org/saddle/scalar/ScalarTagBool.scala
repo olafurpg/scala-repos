@@ -41,7 +41,7 @@ object ScalarTagBool extends ScalarTag[Boolean] {
   def inf(implicit ev: NUM[Boolean]) = true
   def negInf(implicit ev: NUM[Boolean]) = false
 
-  def show(v: Boolean) = "%b" format v
+  def show(v: Boolean) = "%b".format(v)
 
   override def runtimeClass = classOf[Boolean]
 

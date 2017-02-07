@@ -34,7 +34,7 @@ import scala.concurrent.duration._
 class Task[+A](val get: Future[Throwable \/ A]) {
 
   def flatMap[B](f: A => Task[B]): Task[B] =
-    new Task(get flatMap {
+    new Task(get.flatMap {
       case -\/(e) => Future.now(-\/(e))
       case \/-(a) =>
         Task.Try(f(a)) match {
@@ -44,15 +44,15 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     })
 
   def map[B](f: A => B): Task[B] =
-    new Task(get map {
-      _ flatMap { a =>
+    new Task(get.map {
+      _.flatMap { a =>
         Task.Try(f(a))
       }
     })
 
   /** 'Catches' exceptions in the given task and returns them as values. */
   def attempt: Task[Throwable \/ A] =
-    new Task(get map {
+    new Task(get.map {
       case -\/(e) => \/-(-\/(e))
       case \/-(a) => \/-(\/-(a))
     })
@@ -63,7 +63,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     * `Task`.
     */
   def onFinish(f: Option[Throwable] => Task[Unit]): Task[A] =
-    new Task(get flatMap {
+    new Task(get.flatMap {
       case -\/(e) =>
         Task
           .Try(f(Some(e)))
@@ -78,15 +78,15 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     * are reraised.
     */
   def handle[B >: A](f: PartialFunction[Throwable, B]): Task[B] =
-    handleWith(f andThen Task.now)
+    handleWith(f.andThen(Task.now))
 
   /**
     * Calls `attempt` and handles some exceptions using the given partial
     * function. Any nonmatching exceptions are reraised.
     */
   def handleWith[B >: A](f: PartialFunction[Throwable, Task[B]]): Task[B] =
-    attempt flatMap {
-      case -\/(e) => f.lift(e) getOrElse Task.fail(e)
+    attempt.flatMap {
+      case -\/(e) => f.lift(e).getOrElse(Task.fail(e))
       case \/-(a) => Task.now(a)
     }
 
@@ -96,7 +96,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     * `flatMap` for more fine grained control of exception handling.
     */
   def or[B >: A](t2: Task[B]): Task[B] =
-    new Task(this.get flatMap {
+    new Task(this.get.flatMap {
       case -\/(e) => t2.get
       case a => Future.now(a)
     })
@@ -294,11 +294,11 @@ class Task[+A](val get: Future[Throwable \/ A]) {
       : Future[Throwable \/ (A, List[Throwable])] = {
       def acc = if (accumulateErrors) es.toList else Nil
       ds match {
-        case Seq() => get map (_.map(_ -> acc))
+        case Seq() => get.map(_.map(_ -> acc))
         case Seq(t, ts @ _ *) =>
-          get flatMap {
+          get.flatMap {
             case -\/(e) if p(e) =>
-              help(ts, e #:: es) after t
+              help(ts, e #:: es).after(t)
             case x => Future.now(x.map(_ -> acc))
           }
       }
@@ -314,7 +314,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     * Delays the execution of this `Task` by the duration `t`.
     */
   def after(t: Duration): Task[A] =
-    new Task(get after t)
+    new Task(get.after(t))
 }
 
 object Task {
@@ -325,9 +325,9 @@ object Task {
     val F = Nondeterminism[Future]
     def point[A](a: => A) = Task.point(a)
     def bind[A, B](a: Task[A])(f: A => Task[B]): Task[B] =
-      a flatMap f
+      a.flatMap(f)
     def chooseAny[A](h: Task[A], t: Seq[Task[A]]): Task[(A, Seq[Task[A]])] =
-      new Task(F.map(F.chooseAny(h.get, t map (_ get))) {
+      new Task(F.map(F.chooseAny(h.get, t.map(_ get))) {
         case (a, residuals) =>
           a.map((_, residuals.map(new Task(_))))
       })

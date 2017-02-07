@@ -907,7 +907,7 @@ sealed case class Failure(msg: String,
       "An Failure Box was opened.  Failure Message: " + msg +
         ".  The justification for allowing the openOrThrowException was " +
         justification) {
-      override def getCause() = exception openOr null
+      override def getCause() = exception.openOr(null)
     }
 
   override def map[B](f: A => B): Box[B] = this
@@ -935,7 +935,7 @@ sealed case class Failure(msg: String,
   def exceptionChain: List[Throwable] = {
     import scala.collection.mutable.ListBuffer
     val ret = new ListBuffer[Throwable]()
-    var e: Throwable = exception openOr null
+    var e: Throwable = exception.openOr(null)
 
     while (e ne null) {
       ret += e

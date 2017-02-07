@@ -16,7 +16,7 @@ trait JavaReflectionRuntimes { self: scala.tools.nsc.typechecker.Analyzer =>
       // relies on the fact that macro impls cannot be overloaded
       // so every methName can resolve to at maximum one method
       val implMeth =
-        implMeths getOrElse {
+        implMeths.getOrElse {
           throw new NoSuchMethodException(s"$className.$methName")
         }
       macroLogVerbose(

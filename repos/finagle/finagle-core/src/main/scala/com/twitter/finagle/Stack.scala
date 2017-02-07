@@ -201,7 +201,7 @@ sealed trait Stack[T] {
 
   override def toString = {
     val elems =
-      tails map {
+      tails.map {
         case Node(head, mk, _) =>
           s"Node(role = ${head.role}, description = ${head.description})"
         case Leaf(head, t) =>

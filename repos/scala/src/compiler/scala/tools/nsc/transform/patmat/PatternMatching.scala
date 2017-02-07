@@ -67,7 +67,7 @@ trait PatternMatching
                          transform(sel),
                          transformTrees(cases).asInstanceOf[List[CaseDef]]))
         try {
-          localTyper.typed(translated) setType origTp
+          localTyper.typed(translated).setType(origTp)
         } catch {
           case x: (Types#TypeError) =>
             // TODO: this should never happen; error should've been reported during type checking
@@ -263,7 +263,7 @@ trait Interface extends ast.TreeDSL {
           def typedStable(t: Tree) =
             typer.typed(t.shallowDuplicate,
                         Mode.MonoQualifierModes | Mode.TYPEPATmode)
-          lazy val toTypes: List[Type] = to map (tree => typedStable(tree).tpe)
+          lazy val toTypes: List[Type] = to.map(tree => typedStable(tree).tpe)
 
           override def transform(tree: Tree): Tree = {
             def subst(from: List[Symbol], to: List[Tree]): Tree =
@@ -297,7 +297,7 @@ trait Interface extends ast.TreeDSL {
       // forall t: Tree. this(other(t)) == (this >> other)(t)
       def >>(other: Substitution): Substitution = {
         val (fromFiltered, toFiltered) =
-          (from, to).zipped filter { (f, t) =>
+          (from, to).zipped.filter { (f, t) =>
             !other.from.contains(f)
           }
         new Substitution(
@@ -306,7 +306,7 @@ trait Interface extends ast.TreeDSL {
             .map(apply) ++ toFiltered) // a quick benchmarking run indicates the `.map(apply)` is not too costly
       }
       override def toString =
-        (from.map(_.name) zip to) mkString ("Substitution(", ", ", ")")
+        (from.map(_.name).zip(to)) mkString ("Substitution(", ", ", ")")
     }
 
     object EmptySubstitution extends Substitution(Nil, Nil) {

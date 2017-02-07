@@ -848,7 +848,7 @@ object tuple {
       new Transposer[T] {
         type Out = tp.Out
         def apply(t: T): Out =
-          ((gen.to(t) map productElements).transpose map tupled).tupled
+          ((gen.to(t).map(productElements)).transpose.map(tupled)).tupled
       }
   }
 
@@ -875,7 +875,7 @@ object tuple {
       new ZipApply[FT, AT] {
         type Out = tp.Out
         def apply(ft: FT, at: AT): Out =
-          (genf.to(ft) zipApply gena.to(at)).tupled
+          (genf.to(ft).zipApply(gena.to(at))).tupled
       }
   }
 
@@ -908,7 +908,9 @@ object tuple {
       new ZipOne[HT, TT] {
         type Out = tp.Out
         def apply(h: HT, t: TT): Out =
-          ((genh.to(h) zipOne (gent.to(t) map productElements)) map tupled).tupled
+          (((genh.to(h) zipOne (gent.to(t).map(productElements))))
+            .map(tupled))
+            .tupled
       }
   }
 

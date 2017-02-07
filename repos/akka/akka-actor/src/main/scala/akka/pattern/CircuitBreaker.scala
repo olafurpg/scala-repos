@@ -292,7 +292,7 @@ class CircuitBreaker(
       *
       * @param listener listener implementation
       */
-    def addListener(listener: Runnable): Unit = listeners add listener
+    def addListener(listener: Runnable): Unit = listeners.add(listener)
 
     /**
       * Test for whether listeners exist
@@ -343,11 +343,11 @@ class CircuitBreaker(
         }
 
         val timeout = scheduler.scheduleOnce(callTimeout) {
-          p tryCompleteWith timeoutFuture
+          p.tryCompleteWith(timeoutFuture)
         }
 
         materialize(body).onComplete { result ⇒
-          p tryComplete result
+          p.tryComplete(result)
           timeout.cancel
         }
         p.future

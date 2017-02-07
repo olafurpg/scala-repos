@@ -54,23 +54,25 @@ trait EvaluatorMethodsModule[M[+ _]]
 
     def transRValue[A <: SourceType](rvalue: RValue,
                                      target: TransSpec[A]): TransSpec[A] = {
-      rValueToCValue(rvalue) map { cvalue =>
-        trans.ConstLiteral(cvalue, target)
-      } getOrElse {
-        rvalue match {
-          case RArray(elements) =>
-            InnerArrayConcat(elements map { element =>
-              trans.WrapArray(transRValue(element, target))
-            }: _*)
-          case RObject(fields) =>
-            InnerObjectConcat(fields.toSeq map {
-              case (key, value) =>
-                trans.WrapObject(transRValue(value, target), key)
-            }: _*)
-          case _ =>
-            sys.error("Can't handle RValue")
+      rValueToCValue(rvalue)
+        .map { cvalue =>
+          trans.ConstLiteral(cvalue, target)
         }
-      }
+        .getOrElse {
+          rvalue match {
+            case RArray(elements) =>
+              InnerArrayConcat(elements.map { element =>
+                trans.WrapArray(transRValue(element, target))
+              }: _*)
+            case RObject(fields) =>
+              InnerObjectConcat(fields.toSeq.map {
+                case (key, value) =>
+                  trans.WrapObject(transRValue(value, target), key)
+              }: _*)
+            case _ =>
+              sys.error("Can't handle RValue")
+          }
+        }
     }
 
     def transFromBinOp[A <: SourceType](op: BinaryOperation,
@@ -90,8 +92,10 @@ trait EvaluatorMethodsModule[M[+ _]]
     }
 
     def combineTransSpecs(specs: List[TransSpec1]): TransSpec1 =
-      specs map { trans.WrapArray(_): TransSpec1 } reduceLeftOption {
-        trans.OuterArrayConcat(_, _)
+      specs
+        .map { trans.WrapArray(_): TransSpec1 }
+        .reduceLeftOption {
+          trans.OuterArrayConcat(_, _)
       } get
 
     def buildJoinKeySpec(sharedLength: Int): TransSpec1 = {
@@ -99,7 +103,7 @@ trait EvaluatorMethodsModule[M[+ _]]
         yield
           trans.WrapArray(DerefArrayStatic(SourceKey.Single, CPathIndex(i))): TransSpec1
 
-      components reduceLeft { trans.InnerArrayConcat(_, _) }
+      components.reduceLeft { trans.InnerArrayConcat(_, _) }
     }
 
     def buildWrappedJoinSpec(idMatch: IdentityMatch,
@@ -125,7 +129,7 @@ trait EvaluatorMethodsModule[M[+ _]]
 
       val newIdentitySpec =
         if (derefs.isEmpty) trans.ConstLiteral(CEmptyArray, Leaf(SourceLeft))
-        else derefs reduceLeft { trans.InnerArrayConcat(_, _) }
+        else derefs.reduceLeft { trans.InnerArrayConcat(_, _) }
 
       val wrappedIdentitySpec =
         trans.WrapObject(newIdentitySpec, paths.Key.name)
@@ -137,7 +141,7 @@ trait EvaluatorMethodsModule[M[+ _]]
         trans.WrapObject(spec(leftValueSpec, rightValueSpec), paths.Value.name)
 
       val valueKeySpecs =
-        valueKeys map { key =>
+        valueKeys.map { key =>
           trans.WrapObject(
             DerefObjectStatic(Leaf(SourceLeft), CPathField("sort-" + key)),
             "sort-" + key)
@@ -175,9 +179,11 @@ trait EvaluatorMethodsModule[M[+ _]]
     }
 
     def buildIdShuffleSpec(indexes: Vector[Int]): TransSpec1 = {
-      indexes map { idx =>
-        trans.WrapArray(DerefArrayStatic(Leaf(Source), CPathIndex(idx))): TransSpec1
-      } reduceLeft { trans.InnerArrayConcat(_, _) }
+      indexes
+        .map { idx =>
+          trans.WrapArray(DerefArrayStatic(Leaf(Source), CPathIndex(idx))): TransSpec1
+        }
+        .reduceLeft { trans.InnerArrayConcat(_, _) }
     }
   }
 }

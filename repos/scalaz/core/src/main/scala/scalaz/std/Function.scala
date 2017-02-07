@@ -123,7 +123,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
     def first[A, B, C](a: A => B) = (ac: (A, C)) => (a(ac._1), ac._2)
 
-    def compose[A, B, C](f: B => C, g: A => B) = f compose g
+    def compose[A, B, C](f: B => C, g: A => B) = f.compose(g)
 
     def id[A]: A => A = a => a
 
@@ -171,7 +171,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function1Contravariant[R]: Contravariant[? => R] =
     new Contravariant[? => R] {
-      def contramap[A, B](r: A => R)(f: B => A) = r compose f
+      def contramap[A, B](r: A => R)(f: B => A) = r.compose(f)
     }
 
   implicit def function2Instance[T1, T2]
@@ -379,7 +379,7 @@ private trait Function1Cobind[M, R] extends Cobind[M => ?] {
   override def cojoin[A](a: M => A) = (m1: M) => (m2: M) => a(M.append(m1, m2))
   def cobind[A, B](fa: M => A)(f: (M => A) => B) =
     (m1: M) => f((m2: M) => fa(M.append(m1, m2)))
-  override def map[A, B](fa: M => A)(f: A => B) = fa andThen f
+  override def map[A, B](fa: M => A)(f: A => B) = fa.andThen(f)
 }
 
 private trait Function1Comonad[M, R]

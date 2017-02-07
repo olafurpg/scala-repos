@@ -6,6 +6,6 @@ import Dingus._
 
 class A {
   flippitx = 123
-  Nil map identiyt
+  Nil.map(identiyt)
   new Bingus
 }

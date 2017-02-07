@@ -147,17 +147,19 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
 
   private def properties(common: Common, eventProps: JObject): JObject = {
     import org.json4s.JsonDSL._
-    common.context map { context ⇒
-      try {
-        ("context" → Extraction.decompose(context)) ~ eventProps
-      } catch {
-        case e: Throwable ⇒
-          throw new ConnectorException(
-            s"Cannot convert $context to event JSON. ${e.getMessage}",
-            e
-          )
+    common.context
+      .map { context ⇒
+        try {
+          ("context" → Extraction.decompose(context)) ~ eventProps
+        } catch {
+          case e: Throwable ⇒
+            throw new ConnectorException(
+              s"Cannot convert $context to event JSON. ${e.getMessage}",
+              e
+            )
+        }
       }
-    } getOrElse eventProps
+      .getOrElse(eventProps)
   }
 
   private def commonToJson(common: Common): JObject =

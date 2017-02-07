@@ -196,7 +196,7 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     // default access OK in same package
     for ((m, declCls) <- Set((rbC, cCl), (rfC, cCl), (rbD, dCl), (rfD, dCl));
          c <- allClasses) {
-      if (c.name startsWith "a/") check(m, declCls, c, assertEmpty)
+      if (c.name.startsWith("a/")) check(m, declCls, c, assertEmpty)
       else check(m, declCls, c, cOrDOwner)
     }
 

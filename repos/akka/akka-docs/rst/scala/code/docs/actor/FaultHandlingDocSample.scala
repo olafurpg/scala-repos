@@ -104,9 +104,11 @@ class Worker extends Actor with ActorLogging {
       counterService ! Increment(1)
 
       // Send current progress to the initial sender
-      counterService ? GetCurrentCount map {
-        case CurrentCount(_, count) => Progress(100.0 * count / totalCount)
-      } pipeTo progressListener.get
+      (counterService ? GetCurrentCount)
+        .map {
+          case CurrentCount(_, count) => Progress(100.0 * count / totalCount)
+        }
+        .pipeTo(progressListener.get)
   }
 }
 
@@ -161,7 +163,7 @@ class CounterService extends Actor {
     storage = Some(
       context.watch(context.actorOf(Props[Storage], name = "storage")))
     // Tell the counter, if any, to use the new storage
-    counter foreach { _ ! UseStorage(storage) }
+    counter.foreach { _ ! UseStorage(storage) }
     // We need the initial value to be able to operate
     storage.get ! Get(key)
   }
@@ -187,7 +189,7 @@ class CounterService extends Actor {
       // We receive Terminated because we watch the child, see initStorage.
       storage = None
       // Tell the counter that there is no storage for the moment
-      counter foreach { _ ! UseStorage(None) }
+      counter.foreach { _ ! UseStorage(None) }
       // Try to re-establish storage after while
       context.system.scheduler.scheduleOnce(10 seconds, self, Reconnect)
 
@@ -201,7 +203,7 @@ class CounterService extends Actor {
     // the counter. Before that we place the messages in a backlog, to be sent
     // to the counter when it is initialized.
     counter match {
-      case Some(c) => c forward msg
+      case Some(c) => c.forward(msg)
       case None =>
         if (backlog.size >= MaxBacklog)
           throw new ServiceUnavailable(
@@ -246,7 +248,7 @@ class Counter(key: String, initialValue: Long) extends Actor {
   def storeCount() {
     // Delegate dangerous work, to protect our valuable state.
     // We can continue without storage.
-    storage foreach { _ ! Store(Entry(key, count)) }
+    storage.foreach { _ ! Store(Entry(key, count)) }
   }
 }
 

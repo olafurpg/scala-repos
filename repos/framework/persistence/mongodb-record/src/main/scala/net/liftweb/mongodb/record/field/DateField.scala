@@ -78,7 +78,7 @@ trait DateTypedField extends TypedField[Date] {
   }
 
   def asJValue: JValue =
-    valueBox.map(v => JsonDate(v)(formats)) openOr (JNothing: JValue)
+    valueBox.map(v => JsonDate(v)(formats)).openOr(JNothing: JValue)
 }
 
 class DateField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
@@ -100,9 +100,11 @@ class DateField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
   override def toString = value match {
     case null => "null"
     case d =>
-      valueBox.map { v =>
-        formats.dateFormat.format(v)
-      } openOr ""
+      valueBox
+        .map { v =>
+          formats.dateFormat.format(v)
+        }
+        .openOr("")
   }
 }
 

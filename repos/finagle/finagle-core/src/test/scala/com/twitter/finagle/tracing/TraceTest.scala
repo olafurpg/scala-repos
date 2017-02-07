@@ -20,7 +20,7 @@ class TraceTest
     with BeforeAndAfter
     with OneInstancePerTest {
   val Seq(id0, id1, id2) =
-    0 until 3 map { i =>
+    (0 until 3).map { i =>
       TraceId(Some(SpanId(i)), Some(SpanId(i)), SpanId(i), None, Flags(i))
     }
 
@@ -391,7 +391,7 @@ class TraceTest
     }
 
     def spanIds(seed: Long): Seq[Option[SpanId]] =
-      None +: (longs(seed) map (l => Some(SpanId(l))))
+      None +: (longs(seed).map(l => Some(SpanId(l))))
 
     val traceIds = for {
       traceId <- spanIds(1L)

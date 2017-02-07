@@ -11,7 +11,7 @@ class MultipleFilterFileUploadSupportTest extends ScalatraFunSuite {
   }, "/*")
   addFilter(new ScalatraFilter with FileUploadSupport {
     post("/multipart") {
-      fileParams.get("file") foreach { file =>
+      fileParams.get("file").foreach { file =>
         response.setHeader("file", new String(file.get))
       }
     }

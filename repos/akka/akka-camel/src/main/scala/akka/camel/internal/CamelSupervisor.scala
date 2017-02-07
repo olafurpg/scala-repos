@@ -33,8 +33,8 @@ private[camel] class CamelSupervisor extends Actor with CamelSupport {
   def receive = {
     case AddWatch(actorRef) ⇒ context.watch(actorRef)
     case Terminated(actorRef) ⇒ registry ! DeRegister(actorRef)
-    case msg: ActivationMessage ⇒ activationTracker forward msg
-    case msg ⇒ registry forward (msg)
+    case msg: ActivationMessage ⇒ activationTracker.forward(msg)
+    case msg ⇒ registry.forward(msg)
   }
 }
 
@@ -149,7 +149,7 @@ private[camel] class Registry(activationTracker: ActorRef)
     case msg @ Register(consumer, _, Some(_)) ⇒
       if (!consumers(consumer)) {
         consumers += consumer
-        consumerRegistrar forward msg
+        consumerRegistrar.forward(msg)
         parent ! AddWatch(consumer)
       }
     case msg @ Register(producer, _, None) ⇒
@@ -157,7 +157,7 @@ private[camel] class Registry(activationTracker: ActorRef)
         producers += producer
         parent ! AddWatch(producer)
       }
-      producerRegistrar forward msg
+      producerRegistrar.forward(msg)
     case DeRegister(actorRef) ⇒
       producers.find(_ == actorRef).foreach { p ⇒
         deRegisterProducer(p)
@@ -202,13 +202,13 @@ private[camel] class ProducerRegistrar(activationTracker: ActorRef)
           case NonFatal(e) ⇒ throw new ActorActivationException(producer, e)
         }
       } else {
-        camelObjects.get(producer) foreach {
+        camelObjects.get(producer).foreach {
           case (endpoint, processor) ⇒
             producer ! CamelProducerObjects(endpoint, processor)
         }
       }
     case DeRegister(producer) ⇒
-      camelObjects.get(producer) foreach {
+      camelObjects.get(producer).foreach {
         case (_, processor) ⇒
           try {
             camelObjects.get(producer).foreach(_._2.stop())

@@ -39,7 +39,7 @@ class TaskUpdateActorTest
     And("a processor that fails immediately")
     val processingFailure: RuntimeException =
       new scala.RuntimeException("processing failed")
-    f.processor.process(eq(op))(any) returns Future.failed(processingFailure)
+    f.processor.process(eq(op))(any).returns(Future.failed(processingFailure))
 
     When("the op is passed to the actor for processing")
     f.updateActor.receive(TaskUpdateActor.ProcessTaskOp(op))
@@ -69,7 +69,7 @@ class TaskUpdateActorTest
     )
 
     And("a processor that succeeds immediately")
-    f.processor.process(eq(op))(any) returns Future.successful(())
+    f.processor.process(eq(op))(any).returns(Future.successful(()))
 
     When("the op is passed to the actor for processing")
     f.updateActor.receive(TaskUpdateActor.ProcessTaskOp(op))
@@ -83,7 +83,7 @@ class TaskUpdateActorTest
 
     Given("a processor that processes 'anotherOp' immediately")
     val anotherOp = op.copy(deadline = f.oneSecondInFuture)
-    f.processor.process(eq(anotherOp))(any) returns Future.successful(())
+    f.processor.process(eq(anotherOp))(any).returns(Future.successful(()))
 
     When("we process another op, it is not effected")
     f.updateActor.receive(TaskUpdateActor.ProcessTaskOp(anotherOp))
@@ -109,7 +109,7 @@ class TaskUpdateActorTest
     )
 
     And("a processor that processes it immediately")
-    f.processor.process(eq(op))(any) returns Future.successful(())
+    f.processor.process(eq(op))(any).returns(Future.successful(()))
 
     When("the op is passed to the actor for processing")
     f.updateActor.receive(TaskUpdateActor.ProcessTaskOp(op))
@@ -139,7 +139,7 @@ class TaskUpdateActorTest
     )
 
     And("a processor that does not return")
-    f.processor.process(eq(op))(any) returns Promise[Unit]().future
+    f.processor.process(eq(op))(any).returns(Promise[Unit]().future)
 
     When("the op is passed to the actor for processing")
     f.updateActor.receive(TaskUpdateActor.ProcessTaskOp(op))
@@ -177,9 +177,9 @@ class TaskUpdateActorTest
 
     And("a processor that does not return")
     val op1Promise: Promise[Unit] = Promise[Unit]()
-    f.processor.process(eq(op1))(any) returns op1Promise.future
+    f.processor.process(eq(op1))(any).returns(op1Promise.future)
     val op2Promise: Promise[Unit] = Promise[Unit]()
-    f.processor.process(eq(op2))(any) returns op2Promise.future
+    f.processor.process(eq(op2))(any).returns(op2Promise.future)
 
     When("the ops are passed to the actor for processing")
     f.updateActor.receive(TaskUpdateActor.ProcessTaskOp(op1))
@@ -204,11 +204,11 @@ class TaskUpdateActorTest
       f.actorMetrics.numberOfActiveOps.getValue == 1)
 
     And("the second task doesn't have queue anymore")
-    f.updateActor.underlyingActor.operationsByTaskId should have size 1
+    (f.updateActor.underlyingActor.operationsByTaskId should have).size(1)
 
     And("but the first task still does have a queue")
-    f.updateActor.underlyingActor
-      .operationsByTaskId(task1Id) should have size 1
+    (f.updateActor.underlyingActor
+      .operationsByTaskId(task1Id) should have).size(1)
   }
 
   test("ops for the same task are processed sequentially") {
@@ -232,7 +232,7 @@ class TaskUpdateActorTest
 
     And("a processor that does not return")
     val op1Promise: Promise[Unit] = Promise[Unit]()
-    f.processor.process(eq(op1))(any) returns op1Promise.future
+    f.processor.process(eq(op1))(any).returns(op1Promise.future)
 
     When("the ops are passed to the actor for processing")
     f.updateActor.receive(TaskUpdateActor.ProcessTaskOp(op1))
@@ -250,7 +250,7 @@ class TaskUpdateActorTest
 
     When("op1 finishes")
     val op2Promise: Promise[Unit] = Promise[Unit]()
-    f.processor.process(eq(op2))(any) returns op2Promise.future
+    f.processor.process(eq(op2))(any).returns(op2Promise.future)
     op1Promise.success(())
 
     Then("eventually process gets called on op2")

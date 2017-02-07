@@ -80,7 +80,7 @@ abstract class Task(settings: Settings) extends Specification {
     val rb2 =
       if (setContentType) rb <:< List("Content-Type" -> "application/json")
       else rb
-    JParser.parseFromString(Http(rb2 OK as.String)()).valueOr(throw _)
+    JParser.parseFromString(Http(rb2.OK(as.String))()).valueOr(throw _)
   }
 
   def createAccount: Account = {
@@ -104,14 +104,14 @@ abstract class Task(settings: Settings) extends Specification {
       (security / "").addQueryParameter("apiKey", parent.apiKey) << {
         body.format(parent.rootPath + subPath, parent.accountId)
       }
-    val result = Http(req OK as.String)
+    val result = Http(req.OK(as.String))
     val json = JParser.parseFromString(result()).valueOr(throw _)
     (json \ "apiKey").deserialize[String]
   }
 
   def deleteAPIKey(apiKey: String) {
     val req = (security / apiKey).DELETE
-    val res = Http(req OK as.String)
+    val res = Http(req.OK(as.String))
     res()
   }
 
@@ -123,7 +123,7 @@ abstract class Task(settings: Settings) extends Specification {
       ((ingest / "sync" / "fs" / path).POST <:< List(
         "Content-Type" -> contentType) <<? List("apiKey" -> account.apiKey /*,
                         "ownerAccountId" -> account.accountId*/ ) <<< file)
-    Http(req OK as.String)()
+    Http(req.OK(as.String))()
   }
 
   def ingestString(account: Account, data: String, contentType: String)(
@@ -132,7 +132,7 @@ abstract class Task(settings: Settings) extends Specification {
       (f(ingest / "sync" / "fs").POST <:< List("Content-Type" -> contentType) <<? List(
         "apiKey" -> account.apiKey,
         "ownerAccountId" -> account.accountId) << data)
-    Http(req OK as.String)()
+    Http(req.OK(as.String))()
   }
 
   def asyncIngestString(account: Account, data: String, contentType: String)(
@@ -141,7 +141,7 @@ abstract class Task(settings: Settings) extends Specification {
       (f(ingest / "async" / "fs").POST <:< List("Content-Type" -> contentType) <<? List(
         "apiKey" -> account.apiKey,
         "ownerAccountId" -> account.accountId) << data)
-    Http(req OK as.String)()
+    Http(req.OK(as.String))()
   }
 
   def ingestString(authAPIKey: String,
@@ -153,12 +153,12 @@ abstract class Task(settings: Settings) extends Specification {
         "apiKey" -> authAPIKey,
         "ownerAccountId" -> ownerAccount.accountId) << data)
 
-    Http(req OK as.String).either()
+    Http(req.OK(as.String)).either()
   }
 
   def deletePath(auth: String)(f: Req => Req) {
     val req = f(ingest / "sync" / "fs").DELETE <<? List("apiKey" -> auth)
-    Http(req OK as.String)()
+    Http(req.OK(as.String))()
   }
 
   def metadataFor(apiKey: String,
@@ -166,11 +166,11 @@ abstract class Task(settings: Settings) extends Specification {
                   prop: Option[String] = None)(f: Req => Req): JValue = {
     val params = List(
       Some("apiKey" -> apiKey),
-      tpe map ("type" -> _),
-      prop map ("property" -> _)
+      tpe.map("type" -> _),
+      prop.map("property" -> _)
     ).flatten
     val req = f(metadata / "fs") <<? params
-    Http(req OK as.String).either
+    Http(req.OK(as.String)).either
       .apply()
       .fold(
         error => JUndefined,

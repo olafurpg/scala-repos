@@ -19,9 +19,9 @@ trait Decoder {
 
   def decode[T <: HttpMessage](message: T)(
       implicit mapper: DataMapper[T]): T#Self =
-    if (message.headers exists Encoder.isContentEncodingHeader)
+    if (message.headers.exists(Encoder.isContentEncodingHeader))
       decodeData(message).withHeaders(
-        message.headers filterNot Encoder.isContentEncodingHeader)
+        message.headers.filterNot(Encoder.isContentEncodingHeader))
     else message.self
 
   def decodeData[T](t: T)(implicit mapper: DataMapper[T]): T =

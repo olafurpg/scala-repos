@@ -136,7 +136,7 @@ object CsvImplicits {
 
           // for each depth of the column index, write a row
           for (i <- 0 until cDepth) {
-            stream write {
+            stream.write {
               val seq =
                 if (!withRowIx) colIxSeq.map(csm.strList(_)(i))
                 else lead ++: frame.colIx.toSeq.map(csm.strList(_)(i))
@@ -153,7 +153,7 @@ object CsvImplicits {
         // now write each row of the frame
         frame.toRowSeq.foreach {
           case (ridx, row) =>
-            stream write {
+            stream.write {
               val seq =
                 if (!withRowIx) row.values.toSeq.map(_.toString)
                 else rsm.strList(ridx) ++: row.values.toSeq.map(_.toString)

@@ -666,16 +666,18 @@ trait HtmlFixer {
     val w = new java.io.StringWriter
 
     val xhtml =
-      S.session.map { session =>
-        session.normalizeHtmlAndAppendEventHandlers(
-          session.processSurroundAndInclude(
-            s"JS SetHTML id: $uid",
-            content
+      S.session
+        .map { session =>
+          session.normalizeHtmlAndAppendEventHandlers(
+            session.processSurroundAndInclude(
+              s"JS SetHTML id: $uid",
+              content
+            )
           )
-        )
-      } openOr {
-        content
-      }
+        }
+        .openOr {
+          content
+        }
 
     import scala.collection.mutable.ListBuffer
     val lb = new ListBuffer[JsCmd]
@@ -894,7 +896,7 @@ object JsCmds {
   trait HasTime {
     def time: Box[TimeSpan]
 
-    def timeStr = time.map(_.millis.toString) openOr ""
+    def timeStr = time.map(_.millis.toString).openOr("")
   }
 
   case class After(time: TimeSpan, toDo: JsCmd) extends JsCmd {

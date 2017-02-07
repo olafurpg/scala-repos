@@ -118,18 +118,19 @@ trait Metalevels { self: Reifier =>
       case TreeSplice(
           ReifiedTree(universe, mirror, symtab, rtree, tpe, rtpe, concrete)) =>
         if (reifyDebug) println("entering inlineable splice: " + tree)
-        val inlinees = symtab.syms filter (_.isLocalToReifee)
-        inlinees foreach
-          (inlinee =>
-             symtab.symAliases(inlinee) foreach
-               (alias =>
-                  inlineableBindings(alias) = symtab.symBinding(inlinee)))
+        val inlinees = symtab.syms.filter(_.isLocalToReifee)
+        inlinees.foreach(
+          inlinee =>
+            symtab
+              .symAliases(inlinee)
+              .foreach(alias =>
+                inlineableBindings(alias) = symtab.symBinding(inlinee)))
         val symtab1 = symtab -- inlinees
         if (reifyDebug)
           println(
             "trimmed %s inlineable free defs from its symbol table: %s".format(
               inlinees.length,
-              inlinees map (inlinee => symtab.symName(inlinee)) mkString
+              inlinees.map(inlinee => symtab.symName(inlinee)) mkString
                 (", ")))
         withinSplice {
           super.transform(
@@ -145,18 +146,19 @@ trait Metalevels { self: Reifier =>
       case TreeSplice(splicee) =>
         if (reifyDebug) println("entering splice: " + splicee)
         val breaches =
-          splicee filter
-            (sub =>
-               sub.hasSymbolField && sub.symbol != NoSymbol &&
-                 sub.symbol.metalevel > 0)
+          splicee.filter(
+            sub =>
+              sub.hasSymbolField && sub.symbol != NoSymbol &&
+                sub.symbol.metalevel > 0)
         if (!insideSplice && breaches.nonEmpty) {
           // we used to convert dynamic splices into runtime evals transparently, but we no longer do that
           // why? see comments above
           // if (settings.logRuntimeSplices.value) reporter.echo(tree.pos, "this splice cannot be resolved statically")
           // withinSplice { super.transform(tree) }
           if (reifyDebug)
-            println("metalevel breach in %s: %s"
-              .format(tree, (breaches map (_.symbol)).distinct mkString ", "))
+            println(
+              "metalevel breach in %s: %s"
+                .format(tree, (breaches.map(_.symbol)).distinct mkString ", "))
           CannotReifyRuntimeSplice(tree)
         } else {
           withinSplice { super.transform(tree) }

@@ -62,7 +62,7 @@ final case class GenericHttpCredentials(
     r ~~ scheme
     if (!token.isEmpty) r ~~ ' ' ~~ token
     if (params.nonEmpty)
-      params foreach new (((String, String)) ⇒ Unit) {
+      params.foreach(new (((String, String)) ⇒ Unit) {
         var first = true
         def apply(kvp: (String, String)): Unit = {
           val (k, v) = kvp
@@ -70,7 +70,7 @@ final case class GenericHttpCredentials(
           if (!k.isEmpty) r ~~ k ~~ '='
           r ~~# v
         }
-      }
+      })
     r
   }
 }

@@ -94,7 +94,7 @@ class HashMap[A, B] private[collection] (
 
   def -=(key: A): this.type = { removeEntry(key); this }
 
-  def iterator = entriesIterator map (e => ((e.key, e.value)))
+  def iterator = entriesIterator.map(e => ((e.key, e.value)))
 
   override def foreach[U](f: ((A, B)) => U): Unit =
     foreachEntry(e => f((e.key, e.value)))

@@ -46,9 +46,9 @@ sealed abstract class EphemeralStream[A] {
   }
 
   def filter(p: A => Boolean): EphemeralStream[A] = {
-    val rest = this dropWhile (!p(_))
+    val rest = this.dropWhile(!p(_))
     if (rest.isEmpty) emptyEphemeralStream
-    else cons(rest.head(), rest.tail() filter p)
+    else cons(rest.head(), rest.tail().filter(p))
   }
 
   def dropWhile(p: A => Boolean): EphemeralStream[A] = {
@@ -103,7 +103,7 @@ sealed abstract class EphemeralStream[A] {
 
   def zip[B](b: => EphemeralStream[B]): EphemeralStream[(A, B)] =
     if (isEmpty || b.isEmpty) emptyEphemeralStream
-    else cons((head(), b.head()), tail() zip b.tail())
+    else cons((head(), b.head()), tail().zip(b.tail()))
 
   def unzip[X, Y](
       implicit ev: A <:< (X, Y)): (EphemeralStream[X], EphemeralStream[Y]) =
@@ -163,11 +163,11 @@ sealed abstract class EphemeralStreamInstances {
           f: EphemeralStream[A] => B): EphemeralStream[B] = map(cojoin(fa))(f)
       def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
       def bind[A, B](fa: EphemeralStream[A])(f: A => EphemeralStream[B]) =
-        fa flatMap f
+        fa.flatMap(f)
       def point[A](a: => A) = EphemeralStream(a)
       def empty[A] = EphemeralStream()
       def zip[A, B](a: => EphemeralStream[A], b: => EphemeralStream[B]) =
-        a zip b
+        a.zip(b)
       def unzip[A, B](a: EphemeralStream[(A, B)]) = a.unzip
       def alignWith[A, B, C](f: A \&/ B => C) =
         (a, b) => a.alignWith(f)(b)
@@ -235,7 +235,7 @@ sealed abstract class EphemeralStreamInstances {
   import std.list._
 
   implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] =
-    Equal[List[A]] contramap { (_: EphemeralStream[A]).toList }
+    Equal[List[A]].contramap { (_: EphemeralStream[A]).toList }
 }
 
 object EphemeralStream extends EphemeralStreamInstances {

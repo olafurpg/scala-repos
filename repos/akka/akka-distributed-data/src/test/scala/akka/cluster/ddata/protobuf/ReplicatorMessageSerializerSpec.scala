@@ -158,7 +158,7 @@ class ReplicatorMessageSerializerSpec
       cache.get(e) should be("E")
     }
 
-    "handle Int wrap around" ignore {
+    "handle Int wrap around".ignore {
       // ignored because it takes 20 seconds (but it works)
       val cache = new SmallCache[Read, String](2, 5.seconds, _ ⇒ null)
       val a = Read("a")
@@ -202,7 +202,7 @@ class ReplicatorMessageSerializerSpec
       val a = Read("a")
       val v1 = cache.getOrAdd(a)
       v1.toString should be("v1")
-      cache.getOrAdd(a) should be theSameInstanceAs v1
+      (cache.getOrAdd(a) should be).theSameInstanceAs(v1)
     }
 
     "evict cache after time-to-live" in {

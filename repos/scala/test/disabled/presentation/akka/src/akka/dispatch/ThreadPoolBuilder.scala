@@ -102,7 +102,7 @@ object ThreadPoolConfigDispatcherBuilder {
       fun: (T) => ThreadPoolConfigDispatcherBuilder => ThreadPoolConfigDispatcherBuilder)
     : Option[
       (ThreadPoolConfigDispatcherBuilder) => ThreadPoolConfigDispatcherBuilder] =
-    opt map fun
+    opt.map(fun)
 }
 
 case class ThreadPoolConfigDispatcherBuilder(

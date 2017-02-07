@@ -64,7 +64,7 @@ trait TimeMillisSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
         }
 
@@ -85,7 +85,7 @@ trait TimeMillisSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
         }
 
@@ -111,7 +111,7 @@ trait TimeMillisSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 
@@ -141,7 +141,7 @@ trait TimeMillisSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 1 => d.toString
         }
 

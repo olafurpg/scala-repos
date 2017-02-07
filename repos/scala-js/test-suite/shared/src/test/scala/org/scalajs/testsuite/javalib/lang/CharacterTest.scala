@@ -18,12 +18,12 @@ class CharacterTest {
   @Test def isISOControl(): Unit = {
     val isoControlChars =
       (('\u0000' to '\u001F') ++ ('\u007F' to '\u009F')).map(_.toInt).toSet
-    isoControlChars foreach { c =>
+    isoControlChars.foreach { c =>
       assertEquals(true, Character.isISOControl(c))
     }
 
     val randomInts = List.fill(100)(scala.util.Random.nextInt)
-    ((-1000 to 1000) ++ randomInts).filterNot(isoControlChars) foreach { c =>
+    ((-1000 to 1000) ++ randomInts).filterNot(isoControlChars).foreach { c =>
       assertEquals(false, Character.isISOControl(c))
     }
   }
@@ -48,15 +48,15 @@ class CharacterTest {
   }
 
   @Test def toChars(): Unit = {
-    assertTrue(Character.toChars(0x61) sameElements Array('a'))
+    assertTrue(Character.toChars(0x61).sameElements(Array('a')))
     assertTrue(
-      Character.toChars(0x10000) sameElements Array('\uD800', '\uDC00'))
+      Character.toChars(0x10000).sameElements(Array('\uD800', '\uDC00')))
     assertTrue(
-      Character.toChars(0x10001) sameElements Array('\uD800', '\uDC01'))
+      Character.toChars(0x10001).sameElements(Array('\uD800', '\uDC01')))
     assertTrue(
-      Character.toChars(0x10401) sameElements Array('\uD801', '\uDC01'))
+      Character.toChars(0x10401).sameElements(Array('\uD801', '\uDC01')))
     assertTrue(
-      Character.toChars(0x10FFFF) sameElements Array('\uDBFF', '\uDFFF'))
+      Character.toChars(0x10FFFF).sameElements(Array('\uDBFF', '\uDFFF')))
 
     expectThrows(classOf[IllegalArgumentException],
                  Character.toChars(Integer.MAX_VALUE))

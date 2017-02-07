@@ -15,8 +15,8 @@ class TensorPairs[K, V, +This](private val tensor: This,
   def iterator = { if (active) tensor.activeIterator else tensor.iterator }
     .filter(f)
 
-  def foreach[U](fn: ((K, V)) => U) = iterator foreach fn
-  def foreach[U](fn: (K, V) => U) = iterator foreach {
+  def foreach[U](fn: ((K, V)) => U) = iterator.foreach(fn)
+  def foreach[U](fn: (K, V) => U) = iterator.foreach {
     case (a, b) => fn(a, b)
   }
 

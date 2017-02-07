@@ -55,10 +55,10 @@ class Utf8CodingSpecs
     bytes
       .map(b ⇒ ByteString(b)) // chunk in smallest chunks possible
       .foreach { bs ⇒
-        builder append decoder.decode(bs, endOfInput = false).get
+        builder.append(decoder.decode(bs, endOfInput = false).get)
       }
 
-    builder append decoder.decode(ByteString.empty, endOfInput = true).get
+    builder.append(decoder.decode(ByteString.empty, endOfInput = true).get)
     builder.toString()
   }
 }

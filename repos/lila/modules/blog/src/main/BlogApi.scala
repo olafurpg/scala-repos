@@ -22,12 +22,13 @@ final class BlogApi(prismicUrl: String, collection: String) {
       .forms(collection)
       .query(s"""[[:d = at(document.id, "$id")]]""")
       .ref(ref | api.master.ref)
-      .submit() map (_.results.headOption)
+      .submit()
+      .map(_.results.headOption)
 
   // -- Build a Prismic context
   def context(ref: Option[String])(
       implicit linkResolver: (Api, Option[String]) => DocumentLinkResolver) =
-    prismicApi map { api =>
+    prismicApi.map { api =>
       BlogApi.Context(
         api,
         ref.map(_.trim).filterNot(_.isEmpty).getOrElse(api.master.ref),
@@ -37,8 +38,8 @@ final class BlogApi(prismicUrl: String, collection: String) {
   private val cache = BuiltInCache(200)
   private val prismicLogger = (level: Symbol, message: String) =>
     level match {
-      case 'DEBUG => logger debug message
-      case 'ERROR => logger error message
+      case 'DEBUG => logger.debug(message)
+      case 'ERROR => logger.error(message)
       case _ => logger info message
   }
 

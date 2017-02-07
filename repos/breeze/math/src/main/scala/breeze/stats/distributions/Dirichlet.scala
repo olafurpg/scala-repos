@@ -132,7 +132,7 @@ object Dirichlet {
     def likelihoodFunction(stats: SufficientStatistic) = new DiffFunction[T] {
       val p = stats.t / stats.n
       def calculate(x: T) = {
-        val lp = -stats.n * (-lbeta(x) + ((x - 1.0) dot p))
+        val lp = -stats.n * (-lbeta(x) + (((x - 1.0)).dot(p)))
         val grad: T = (digamma(x) - digamma(sum(x)) - p) * (stats.n)
         if (lp.isNaN) (Double.PositiveInfinity, grad)
         else (lp, grad)

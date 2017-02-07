@@ -452,7 +452,7 @@ class VM(val mode: VmMode,
       case Some(str: StringReference) =>
         Some(str.value)
       case Some(obj: ObjectReference) =>
-        threadById(threadId) flatMap { thread =>
+        threadById(threadId).flatMap { thread =>
           callMethod(thread,
                      obj,
                      "toString",

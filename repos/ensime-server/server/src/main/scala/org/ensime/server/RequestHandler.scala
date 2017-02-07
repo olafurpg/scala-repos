@@ -42,11 +42,11 @@ class RequestHandler(
 
   def receive = LoggingReceive.withLabel("receive") {
     case err: EnsimeServerError =>
-      server forward RpcResponseEnvelope(Some(envelope.callId), err)
+      server.forward(RpcResponseEnvelope(Some(envelope.callId), err))
       context stop self
 
     case response: RpcResponse =>
-      server forward RpcResponseEnvelope(Some(envelope.callId), response)
+      server.forward(RpcResponseEnvelope(Some(envelope.callId), response))
       context stop self
   }
 }

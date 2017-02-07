@@ -19,7 +19,7 @@ abstract class CompilerTest extends DirectTest {
 
   override def extraSettings = "-feature -usejavacp -d " + testOutput.path
 
-  def show() = (sources, units).zipped foreach check
+  def show() = (sources, units).zipped.foreach(check)
 
   // Override at least one of these...
   def code = ""
@@ -35,8 +35,8 @@ abstract class CompilerTest extends DirectTest {
 
   def allMembers(root: Symbol): List[Symbol] = {
     def loop(seen: Set[Symbol], roots: List[Symbol]): List[Symbol] = {
-      val latest = roots flatMap (_.info.members) filterNot (seen contains _)
-      if (latest.isEmpty) seen.toList.sortWith(_ isLess _)
+      val latest = roots.flatMap(_.info.members).filterNot(seen contains _)
+      if (latest.isEmpty) seen.toList.sortWith(_.isLess(_))
       else loop(seen ++ latest, latest)
     }
     loop(Set(), List(root))
@@ -44,12 +44,12 @@ abstract class CompilerTest extends DirectTest {
 
   class SymsInPackage(pkgName: String) {
     def pkg = rootMirror.getPackage(TermName(pkgName))
-    def classes = allMembers(pkg) filter (_.isClass)
-    def modules = allMembers(pkg) filter (_.isModule)
-    def symbols = classes ++ terms filterNot (_ eq NoSymbol)
-    def terms = allMembers(pkg) filter (s => s.isTerm && !s.isConstructor)
-    def tparams = classes flatMap (_.info.typeParams)
-    def tpes = symbols map (_.tpe) distinct
+    def classes = allMembers(pkg).filter(_.isClass)
+    def modules = allMembers(pkg).filter(_.isModule)
+    def symbols = (classes ++ terms).filterNot(_ eq NoSymbol)
+    def terms = allMembers(pkg).filter(s => s.isTerm && !s.isConstructor)
+    def tparams = classes.flatMap(_.info.typeParams)
+    def tpes = symbols.map(_.tpe) distinct
   }
 }
 
@@ -88,18 +88,18 @@ package ll {
 
   object syms extends SymsInPackage("ll") {
     def isPossibleEnclosure(encl: Symbol, sym: Symbol) =
-      sym.enclClassChain drop 1 exists (_ isSubClass encl)
+      sym.enclClassChain.drop(1).exists(_.isSubClass(encl))
     def isInterestingPrefix(pre: Type) =
       pre.typeConstructor.typeParams.nonEmpty && pre.members.exists(_.isType)
 
-    def asSeenPrefixes = tpes map (_.finalResultType) distinct
-    def typeRefPrefixes = asSeenPrefixes filter isInterestingPrefix
+    def asSeenPrefixes = tpes.map(_.finalResultType) distinct
+    def typeRefPrefixes = asSeenPrefixes.filter(isInterestingPrefix)
 
     def nestsIn(outer: Symbol) =
-      classes filter (c => c.enclClassChain drop 1 exists (_ isSubClass outer))
+      classes.filter(c => c.enclClassChain.drop(1).exists(_.isSubClass(outer)))
     def typeRefs(targs: List[Type]) =
       (for (p <- typeRefPrefixes;
-            c <- classes filter (isPossibleEnclosure(p.typeSymbol, _));
+            c <- classes.filter(isPossibleEnclosure(p.typeSymbol, _));
             a <- targs) yield typeRef(p, c, List(a)))
 
     val wfmt = "%-" + 25 + "s"
@@ -107,7 +107,7 @@ package ll {
       wfmt.format(x.toString.replaceAll("""\bll\.""", ""))
 
     def fmt(args: Any*): String = {
-      (args map to_s mkString "  ").replaceAll("""\s+$""", "")
+      (args.map(to_s) mkString "  ").replaceAll("""\s+$""", "")
     }
     def fname(sym: Symbol) = {
       val p = "" + sym.owner.name
@@ -120,7 +120,7 @@ package ll {
 
     def permuteAsSeenFrom(targs: List[Type]) =
       (for {
-        tp <- typeRefs(targs filterNot (_ eq NoType))
+        tp <- typeRefs(targs.filterNot(_ eq NoType))
         prefix <- asSeenPrefixes if tp.prefix != prefix
         site <- classes
         seen = tp.asSeenFrom(prefix, site) if tp != seen
@@ -138,21 +138,25 @@ package ll {
       permuteAsSeenFrom(targs)
         .groupBy(_._1)
         .toList
-        .sortBy(_._1.toString) flatMap {
-        case (site, xs) =>
-          block(fmt(site)) {
-            fmt("type", "seen from prefix", "is") :: fmt("----",
-                                                         "----------------",
-                                                         "--") :: {
-              xs.groupBy(_._2).toList.sortBy(_._1.toString) flatMap {
-                case (tp, ys) =>
-                  (ys map {
-                    case (_, _, prefix, seen) => fmt(tp, prefix, seen)
-                  }).sorted.distinct
+        .sortBy(_._1.toString)
+        .flatMap {
+          case (site, xs) =>
+            block(fmt(site)) {
+              fmt("type", "seen from prefix", "is") :: fmt("----",
+                                                           "----------------",
+                                                           "--") :: {
+                xs.groupBy(_._2).toList.sortBy(_._1.toString).flatMap {
+                  case (tp, ys) =>
+                    (ys
+                      .map {
+                        case (_, _, prefix, seen) => fmt(tp, prefix, seen)
+                      })
+                      .sorted
+                      .distinct
+                }
               }
             }
-          }
-      }
+        }
     }
   }
 
@@ -160,10 +164,11 @@ package ll {
     if (xs.isEmpty) "" else xs.mkString("\n  ", "\n  ", "\n")
 
   def signaturesIn(info: Type): List[String] =
-    (info.members.toList filterNot
-      (s =>
-         s.isType || s.owner == ObjectClass || s.owner == AnyClass ||
-           s.isConstructor) map (_.defString))
+    (info.members.toList
+      .filterNot(s =>
+        s.isType || s.owner == ObjectClass || s.owner == AnyClass ||
+          s.isConstructor)
+      .map(_.defString))
 
   def check(source: String, unit: global.CompilationUnit) = {
     import syms._
@@ -171,10 +176,10 @@ package ll {
     exitingTyper {
       val typeArgs =
         List[Type](IntClass.tpe, ListClass[Int]) ++ tparams.map(_.tpe)
-      permute(typeArgs) foreach println
+      permute(typeArgs).foreach(println)
     }
     for (x <- classes ++ terms) {
-      afterEachPhase(signaturesIn(x.tpe)) collect {
+      afterEachPhase(signaturesIn(x.tpe)).collect {
         case (ph, sigs) if sigs.nonEmpty =>
           println(
             sigs.mkString(x + " { // after " + ph + "\n  ", "\n  ", "\n}\n"))

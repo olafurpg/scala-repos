@@ -42,8 +42,8 @@ class TypesTest {
     val (module, moduleClass) =
       EmptyPackageClass.newModuleAndClassSymbol(TermName("O"), NoPosition, 0L)
     val minfo = ClassInfoType(List(ObjectTpe), newScope, moduleClass)
-    module.moduleClass setInfo minfo
-    module setInfo module.moduleClass.tpe
+    module.moduleClass.setInfo(minfo)
+    module.setInfo(module.moduleClass.tpe)
     val tp1 = TypeRef(ThisType(EmptyPackageClass), moduleClass, Nil)
     val tp2 = SingleType(ThisType(EmptyPackageClass), module)
     val tp3 = ThisType(moduleClass)

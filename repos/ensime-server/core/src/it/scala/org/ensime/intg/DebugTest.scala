@@ -27,7 +27,7 @@ class DebugTest
   // TODO This is broken because step in our case is stepping into
   // the classloader for inner class rather than doing a user
   // visible step.
-  "Debug - stepping" should "handle basic stepping" ignore {
+  ("Debug - stepping" should "handle basic stepping").ignore {
     withEnsimeConfig { implicit config =>
       withTestKit { implicit testkit =>
         withProject { (project, asyncHelper) =>
@@ -212,10 +212,11 @@ class DebugTest
           project ! DebugListBreakpointsReq
           inside(expectMsgType[BreakpointList]) {
             case BreakpointList(activeBreakpoints, pendingBreakpoints) =>
-              activeBreakpoints should contain theSameElementsAs Set(
-                Breakpoint(breakpointsFile, 11),
-                Breakpoint(breakpointsFile, 13)
-              )
+              (activeBreakpoints should contain).theSameElementsAs(
+                Set(
+                  Breakpoint(breakpointsFile, 11),
+                  Breakpoint(breakpointsFile, 13)
+                ))
               pendingBreakpoints shouldBe empty
           }
 

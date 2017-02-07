@@ -223,7 +223,7 @@ trait JobManager[M[+ _]] { self =>
 
       def getResult(job: JobId)
         : N[Either[String, (Option[MimeType], StreamT[N, Array[Byte]])]] =
-        t(self.getResult(job)) map {
+        t(self.getResult(job)).map {
           case Left(s) => Left(s)
           case Right((mimeType, data)) =>
             Right((mimeType, transformStreamForward(data)))
@@ -245,7 +245,7 @@ trait JobStateManager[M[+ _]] { self: JobManager[M] =>
     transition(id) {
       case NotStarted => Right(Started(startTime, NotStarted))
       case badState =>
-        Left("Cannot start job. %s" format JobState.describe(badState))
+        Left("Cannot start job. %s".format(JobState.describe(badState)))
     }
 
   def cancel(id: JobId,
@@ -265,8 +265,8 @@ trait JobStateManager[M[+ _]] { self: JobManager[M] =>
         Right(Aborted(reason, abortedAt, prev))
       case badState =>
         Left(
-          "Job already in terminal state. %s" format JobState.describe(
-            badState))
+          "Job already in terminal state. %s".format(
+            JobState.describe(badState)))
     }
 
   def finish(id: JobId,
@@ -276,8 +276,8 @@ trait JobStateManager[M[+ _]] { self: JobManager[M] =>
         Right(Finished(finishedAt, prev))
       case badState =>
         Left(
-          "Job already in terminal state. %s" format JobState.describe(
-            badState))
+          "Job already in terminal state. %s".format(
+            JobState.describe(badState)))
     }
 
   def expire(id: JobId,
@@ -287,8 +287,8 @@ trait JobStateManager[M[+ _]] { self: JobManager[M] =>
         Right(Expired(expiredAt, prev))
       case badState =>
         Left(
-          "Job already in terminal state. %s" format JobState.describe(
-            badState))
+          "Job already in terminal state. %s".format(
+            JobState.describe(badState)))
     }
 }
 
@@ -301,19 +301,18 @@ trait JobResultManager[M[+ _]] { self: JobManager[M] =>
   def setResult(id: JobId,
                 mimeType: Option[MimeType],
                 data: StreamT[M, Array[Byte]]): M[Either[String, Unit]] = {
-    findJob(id) flatMap
-      (_ map { job =>
-        fs.save(job.id, FileData(mimeType, data)) map (Right(_))
-      } getOrElse M.point(Left("Invalid job id: " + id)))
+    findJob(id).flatMap(_.map { job =>
+      fs.save(job.id, FileData(mimeType, data)).map(Right(_))
+    }.getOrElse(M.point(Left("Invalid job id: " + id))))
   }
 
   def getResult(job: JobId)
     : M[Either[String, (Option[MimeType], StreamT[M, Array[Byte]])]] = {
-    fs.load(job) map
-      (_ map {
+    fs.load(job)
+      .map(_.map {
         case FileData(mimeType, data) =>
           Right((mimeType, data))
-      } getOrElse {
+      }.getOrElse {
         Left("No results exist for job " + job)
       })
   }

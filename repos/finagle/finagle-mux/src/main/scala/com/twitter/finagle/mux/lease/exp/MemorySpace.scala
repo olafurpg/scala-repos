@@ -52,7 +52,7 @@ private[lease] class MemorySpace(
     lr.record("discountHandleBytes", handleBytes.toString)
 
     if (handleBytes < maxDiscount) {
-      val low = handleBytes max minDiscount
+      val low = handleBytes.max(minDiscount)
 
       // choose a random number of bytes between 0 and discountRange
       val discountWin = (rnd() % (maxDiscount - low).inBytes).bytes

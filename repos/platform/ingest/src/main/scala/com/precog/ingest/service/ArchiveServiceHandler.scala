@@ -52,23 +52,25 @@ class ArchiveServiceHandler[A](
     Success { (apiKey: APIKey, path: Path) =>
       import Permission._
       // FIXME: This delete permission check may be excessively restrictive, need to look at the implementation
-      accessControl.hasCapability(apiKey,
-                                  Set(DeletePermission(path, WrittenByAny)),
-                                  Some(clock.now())) flatMap {
-        case true =>
-          //FIXME: this should spawn a job
-          val archiveInstance = Archive(apiKey, path, None, clock.instant())
-          logger.trace("Archiving path: " + archiveInstance)
-          eventStore.save(archiveInstance, archiveTimeout) map { _ =>
-            HttpResponse[JValue](OK)
-          }
+      accessControl
+        .hasCapability(apiKey,
+                       Set(DeletePermission(path, WrittenByAny)),
+                       Some(clock.now()))
+        .flatMap {
+          case true =>
+            //FIXME: this should spawn a job
+            val archiveInstance = Archive(apiKey, path, None, clock.instant())
+            logger.trace("Archiving path: " + archiveInstance)
+            eventStore.save(archiveInstance, archiveTimeout).map { _ =>
+              HttpResponse[JValue](OK)
+            }
 
-        case false =>
-          M.point(HttpResponse[JValue](
-            Unauthorized,
-            content = Some(JString(
-              "Your API key does not have permissions to archive this path."))))
-      }
+          case false =>
+            M.point(HttpResponse[JValue](
+              Unauthorized,
+              content = Some(JString(
+                "Your API key does not have permissions to archive this path."))))
+        }
     }
   }
 

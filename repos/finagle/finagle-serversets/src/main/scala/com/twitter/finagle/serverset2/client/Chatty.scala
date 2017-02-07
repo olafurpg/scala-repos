@@ -19,7 +19,7 @@ private[serverset2] trait ChattyClient extends ZooKeeperClient {
                            op: => Future[U],
                            args: String*): Future[U] = {
     print("->" + name + "(" + (args mkString ",") + ")")
-    op respond { t =>
+    op.respond { t =>
       print("<-" + name + "(" + (args mkString ",") + ") = " + t)
     }
   }

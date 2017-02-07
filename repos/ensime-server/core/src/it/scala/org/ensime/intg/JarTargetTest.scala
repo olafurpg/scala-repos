@@ -25,7 +25,7 @@ class JarTargetTest
         withProject { (project, asyncHelper) =>
           import tk._
 
-          mainTarget should be a 'file
+          (mainTarget should be).a('file)
 
           eventually(interval(1 second)) {
             project ! PublicSymbolSearchReq(List("Foo"), 5)
@@ -45,7 +45,7 @@ class JarTargetTest
     withEnsimeConfig { implicit config =>
       withTestKit { implicit tk =>
         withProject { (project, asyncHelper) =>
-          mainTarget should be a 'file
+          (mainTarget should be).a('file)
 
           // no scaling here
           eventually(timeout(30 seconds), interval(1 second)) {
@@ -77,14 +77,14 @@ class MissingJarTargetTest
           import tk._
 
           // internal consistency check
-          mainTarget(original) should be a 'file
+          (mainTarget(original) should be).a('file)
 
           // we want to support the case where the .jar doesn't
           // exist on startup, and we don't try to create it.
           mainTarget should not be 'exists
 
           FileUtils.copyFile(mainTarget(original), mainTarget)
-          mainTarget should be a 'file
+          (mainTarget should be).a('file)
 
           // means the file addition was detected
           asyncHelper.expectMsg(CompilerRestartedEvent)

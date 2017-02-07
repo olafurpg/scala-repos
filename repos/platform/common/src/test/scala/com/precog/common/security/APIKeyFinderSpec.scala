@@ -58,7 +58,7 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         key0 <- mgr.newStandardAPIKeyRecord("user1", None, None)
       } yield (key0.apiKey -> mgr)).copoint
       withAPIKeyFinder(mgr) { keyFinder =>
-        keyFinder.findAPIKey(key, None).copoint map (_.apiKey) must_==
+        keyFinder.findAPIKey(key, None).copoint.map(_.apiKey) must_==
           Some(key)
       }
     }
@@ -112,11 +112,11 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         key0 <- mgr.newStandardAPIKeyRecord("user1", None, None)
         key1 <- mgr.createAPIKey(None, None, key0.apiKey, Set.empty)
         key2 <- mgr.createAPIKey(None, None, key0.apiKey, Set.empty)
-      } yield ((key0.apiKey, Set(key1, key2) map (_.apiKey), mgr))).copoint
+      } yield ((key0.apiKey, Set(key1, key2).map(_.apiKey), mgr))).copoint
 
       withAPIKeyFinder(mgr) { keyFinder =>
         val children = keyFinder.findAllAPIKeys(parent).copoint
-        children map (_.apiKey) must_== keys
+        children.map(_.apiKey) must_== keys
       }
     }
 
@@ -129,7 +129,7 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
       } yield ((key0.apiKey, key1.apiKey, mgr))).copoint
 
       withAPIKeyFinder(mgr) { keyFinder =>
-        val children = keyFinder.findAllAPIKeys(parent).copoint map (_.apiKey)
+        val children = keyFinder.findAllAPIKeys(parent).copoint.map(_.apiKey)
         children must_== Set(child)
       }
     }

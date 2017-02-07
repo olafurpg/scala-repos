@@ -122,7 +122,7 @@ trait ShardQueryExecutorPlatform[M[+ _]]
       }
 
     lazy val report =
-      queryReport contramap { (l: instructions.Line) =>
+      queryReport.contramap { (l: instructions.Line) =>
         Option(FaultPosition(l.line, l.col, l.text))
       }
 
@@ -136,8 +136,8 @@ trait ShardQueryExecutorPlatform[M[+ _]]
 
       val qid = yggConfig.queryId.getAndIncrement()
       queryLogger.info(
-        "[QID:%d] Executing query for %s: %s, context: %s" format
-          (qid, evaluationContext.apiKey, query, evaluationContext))
+        "[QID:%d] Executing query for %s: %s, context: %s"
+          .format(qid, evaluationContext.apiKey, query, evaluationContext))
 
       import EvaluationError._
 
@@ -147,14 +147,15 @@ trait ShardQueryExecutorPlatform[M[+ _]]
             val (faults, bytecode) = asBytecode(query)
 
             val resultVN: N[EvaluationError \/ Table] = {
-              bytecode map { instrs =>
-                ((systemError _) <-: (StackException(_)) <-: decorate(instrs).disjunction) traverse {
-                  dag =>
+              bytecode
+                .map { instrs =>
+                  (((systemError _) <-: (StackException(_)) <-: decorate(
+                    instrs).disjunction)).traverse { dag =>
                     applyQueryOptions(opts) {
                       logger.debug("[QID:%d] Evaluating query".format(qid))
 
                       if (queryLogger.isDebugEnabled) {
-                        eval(dag, evaluationContext, true) map {
+                        eval(dag, evaluationContext, true).map {
                           _.logged(queryLogger,
                                    "[QID:" + qid + "]",
                                    "begin result stream",
@@ -166,29 +167,32 @@ trait ShardQueryExecutorPlatform[M[+ _]]
                         eval(dag, evaluationContext, true)
                       }
                     }
+                  }
                 }
-              } getOrElse {
-                // compilation errors will be reported as warnings, but there are no results so
-                // we just return an empty stream as the success
-                N.point(\/.right(Table.empty))
-              }
+                .getOrElse {
+                  // compilation errors will be reported as warnings, but there are no results so
+                  // we just return an empty stream as the success
+                  N.point(\/.right(Table.empty))
+                }
             }
 
-            EitherT(resultVN) flatMap { table =>
+            EitherT(resultVN).flatMap { table =>
               EitherT.right {
-                faults.toStream traverse {
-                  case Fault.Error(pos, msg) =>
-                    queryReport.error(pos, msg) map { _ =>
-                      true
-                    }
-                  case Fault.Warning(pos, msg) =>
-                    queryReport.warn(pos, msg) map { _ =>
-                      false
-                    }
-                } map { errors =>
-                  faults ->
-                    (if (errors.exists(_ == true)) Table.empty else table)
-                }
+                faults.toStream
+                  .traverse {
+                    case Fault.Error(pos, msg) =>
+                      queryReport.error(pos, msg).map { _ =>
+                        true
+                      }
+                    case Fault.Warning(pos, msg) =>
+                      queryReport.warn(pos, msg).map { _ =>
+                        false
+                      }
+                  }
+                  .map { errors =>
+                    faults ->
+                      (if (errors.exists(_ == true)) Table.empty else table)
+                  }
               }
             }
           }
@@ -209,7 +213,7 @@ trait ShardQueryExecutorPlatform[M[+ _]]
 
       def sort(table: N[Table]): N[Table] =
         if (!opts.sortOn.isEmpty) {
-          val sortKey = InnerArrayConcat(opts.sortOn map { cpath =>
+          val sortKey = InnerArrayConcat(opts.sortOn.map { cpath =>
             WrapArray(
               cpath.nodes.foldLeft(constants.SourceValue.Single: TransSpec1) {
                 case (inner, f @ CPathField(_)) =>
@@ -219,7 +223,7 @@ trait ShardQueryExecutorPlatform[M[+ _]]
               })
           }: _*)
 
-          table flatMap { tbl =>
+          table.flatMap { tbl =>
             mn(tbl.sort(sortKey, opts.sortOrder))
           }
         } else {
@@ -227,12 +231,14 @@ trait ShardQueryExecutorPlatform[M[+ _]]
         }
 
       def page(table: N[Table]): N[Table] =
-        opts.page map {
-          case (offset, limit) =>
-            table map { _.takeRange(offset, limit) }
-        } getOrElse table
+        opts.page
+          .map {
+            case (offset, limit) =>
+              table.map { _.takeRange(offset, limit) }
+          }
+          .getOrElse(table)
 
-      page(sort(table map (_.compact(constants.SourceValue.Single))))
+      page(sort(table.map(_.compact(constants.SourceValue.Single))))
     }
 
     private def asBytecode(
@@ -251,21 +257,21 @@ trait ShardQueryExecutorPlatform[M[+ _]]
       try {
         val forest = compile(query)
         val validForest =
-          forest filter { tree =>
-            tree.errors forall isWarning
+          forest.filter { tree =>
+            tree.errors.forall(isWarning)
           }
 
         if (validForest.size == 1) {
           val tree = validForest.head
-          val faults = tree.errors map renderError
+          val faults = tree.errors.map(renderError)
 
           (faults, Some(emit(validForest.head)))
         } else if (validForest.size > 1) {
           (Set(Fault.Error(None, "Ambiguous parse results.")), None)
         } else {
           val faults =
-            forest flatMap { tree =>
-              (tree.errors: Set[Error]) map renderError
+            forest.flatMap { tree =>
+              (tree.errors: Set[Error]).map(renderError)
             }
 
           (faults, None)

@@ -21,7 +21,7 @@ final case class Kleisli[F[_], A, B](run: A => F[B]) { self =>
     Kleisli(a => F.map(run(a))(f))
 
   def mapF[N[_], C](f: F[B] => N[C]): Kleisli[N, A, C] =
-    Kleisli(run andThen f)
+    Kleisli(run.andThen(f))
 
   def flatMap[C](f: B => Kleisli[F, A, C])(
       implicit F: FlatMap[F]): Kleisli[F, A, C] =
@@ -35,14 +35,14 @@ final case class Kleisli[F[_], A, B](run: A => F[B]) { self =>
 
   def andThen[C](k: Kleisli[F, B, C])(
       implicit F: FlatMap[F]): Kleisli[F, A, C] =
-    this andThen k.run
+    this.andThen(k.run)
 
   def compose[Z](f: Z => F[A])(implicit F: FlatMap[F]): Kleisli[F, Z, B] =
     Kleisli((z: Z) => F.flatMap(f(z))(run))
 
   def compose[Z](k: Kleisli[F, Z, A])(
       implicit F: FlatMap[F]): Kleisli[F, Z, B] =
-    this compose k.run
+    this.compose(k.run)
 
   def traverse[G[_]](f: G[A])(implicit F: Applicative[F],
                               G: Traverse[G]): F[G[B]] =
@@ -78,7 +78,7 @@ private[data] sealed trait KleisliFunctions {
     Kleisli(F.pure)
 
   def local[M[_], A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] =
-    Kleisli(f andThen fa.run)
+    Kleisli(f.andThen(fa.run))
 }
 
 private[data] sealed abstract class KleisliInstances
@@ -308,7 +308,8 @@ private trait KleisliSemigroupK[F[_]]
   implicit def F: FlatMap[F]
 
   override def combineK[A](a: Kleisli[F, A, A],
-                           b: Kleisli[F, A, A]): Kleisli[F, A, A] = a compose b
+                           b: Kleisli[F, A, A]): Kleisli[F, A, A] =
+    a.compose(b)
 }
 
 private trait KleisliMonoidK[F[_]]

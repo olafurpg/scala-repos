@@ -296,10 +296,10 @@ object LiftedEmbedding extends App {
         //#delete2
         //
         val q =
-          coffees filter { coffee =>
+          coffees.filter { coffee =>
             // You can do any subquery here - this example uses the foreign key relation in coffees.
             coffee.supID in
-              (coffee.supplier filter { _.name === "Delete Me" } map { _.id })
+              (coffee.supplier.filter { _.name === "Delete Me" }.map { _.id })
           }
         val action = q.delete
         val affectedRowsCount: Future[Int] = db.run(action)
@@ -385,11 +385,10 @@ object LiftedEmbedding extends App {
 
       val actions = DBIO.seq(
         users2.schema.create,
-        users2 forceInsertQuery
-          (users.map { u =>
-            (u.id, u.first ++ " " ++ u.last)
-          }),
-        users2 forceInsertExpr (users.length + 1, "admin")
+        users2.forceInsertQuery(users.map { u =>
+          (u.id, u.first ++ " " ++ u.last)
+        }),
+        users2.forceInsertExpr(users.length + 1, "admin")
       )
       //#insert4
       Await.result(db.run(actions), Duration.Inf)

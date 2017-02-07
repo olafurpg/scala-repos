@@ -39,13 +39,13 @@ class Jar(file: File) extends Iterable[JarEntry] {
 
   lazy val manifest = withJarInput(s => Option(s.getManifest))
 
-  def mainClass = manifest map (f => f(Name.MAIN_CLASS))
+  def mainClass = manifest.map(f => f(Name.MAIN_CLASS))
 
   /** The manifest-defined classpath String if available. */
   def classPathString: Option[String] =
-    for (m <- manifest; cp <- m.attrs get Name.CLASS_PATH) yield cp
+    for (m <- manifest; cp <- m.attrs.get(Name.CLASS_PATH)) yield cp
   def classPathElements: List[String] = classPathString match {
-    case Some(s) => s split "\\s+" toList
+    case Some(s) => s.split("\\s+") toList
     case _ => Nil
   }
 
@@ -53,12 +53,12 @@ class Jar(file: File) extends Iterable[JarEntry] {
   def withEntryStream[A](name: String)(f: Option[InputStream] => A) = {
     val jarFile = new JarFile(file.jfile)
     def apply() =
-      jarFile getEntry name match {
+      jarFile.getEntry(name) match {
         case null => f(None)
         case entry =>
-          val in = Some(jarFile getInputStream entry)
+          val in = Some(jarFile.getInputStream(entry))
           try f(in)
-          finally in map (_.close())
+          finally in.map(_.close())
       }
     try apply()
     finally jarFile.close()
@@ -74,7 +74,7 @@ class Jar(file: File) extends Iterable[JarEntry] {
   }
 
   override def foreach[U](f: JarEntry => U): Unit = withJarInput { in =>
-    Iterator continually in.getNextJarEntry() takeWhile (_ != null) foreach f
+    (Iterator continually in.getNextJarEntry()).takeWhile(_ != null).foreach(f)
   }
   override def iterator: Iterator[JarEntry] = this.toList.iterator
   override def toString = "" + file
@@ -89,16 +89,16 @@ class JarWriter(val file: File, val manifest: Manifest) {
     */
   def newOutputStream(path: String): DataOutputStream = {
     val entry = new JarEntry(path)
-    out putNextEntry entry
+    out.putNextEntry(entry)
     new DataOutputStream(out)
   }
 
   def writeAllFrom(dir: Directory) {
-    try dir.list foreach (x => addEntry(x, ""))
+    try dir.list.foreach(x => addEntry(x, ""))
     finally out.close()
   }
   def addStream(entry: JarEntry, in: InputStream) {
-    out putNextEntry entry
+    out.putNextEntry(entry)
     try transfer(in, out)
     finally out.closeEntry()
   }
@@ -111,7 +111,7 @@ class JarWriter(val file: File, val manifest: Manifest) {
     else addDirectory(entry.toDirectory, prefix + entry.name + "/")
   }
   def addDirectory(entry: Directory, prefix: String) {
-    entry.list foreach (p => addEntry(p, prefix))
+    entry.list.foreach(p => addEntry(p, prefix))
   }
 
   private def transfer(in: InputStream, out: OutputStream) = {
@@ -146,7 +146,8 @@ object Jar {
       manifest
         .getMainAttributes()
         .asInstanceOf[AttributeMap]
-        .asScala withDefaultValue null
+        .asScala
+        .withDefaultValue(null)
     def initialMainAttrs: Map[Attributes.Name, String] = {
       import scala.util.Properties._
       Map(
@@ -171,6 +172,6 @@ object Jar {
 
   def create(file: File, sourceDir: Directory, mainClass: String) {
     val writer = new Jar(file).jarWriter(Name.MAIN_CLASS -> mainClass)
-    writer writeAllFrom sourceDir
+    writer.writeAllFrom(sourceDir)
   }
 }

@@ -73,7 +73,7 @@ sealed abstract class Maybe[A] {
     cata(_ => false, true)
 
   final def map[B](f: A => B): Maybe[B] =
-    cata(f andThen just[B], empty[B])
+    cata(f.andThen(just[B]), empty[B])
 
   final def flatMap[B](f: A => Maybe[B]) =
     cata(f, empty[B])
@@ -251,7 +251,7 @@ sealed abstract class MaybeInstances {
     def zero: MinMaybe[A] = Tag(empty)
 
     def append(f1: MinMaybe[A], f2: => MinMaybe[A]) =
-      Tag((Tag unwrap f1, Tag unwrap f2) match {
+      Tag((Tag.unwrap(f1), Tag.unwrap(f2)) match {
         case (Just(v1), Just(v2)) => Just(Order[A].min(v1, v2))
         case (_f1 @ Just(_), Empty()) => _f1
         case (Empty(), _f2 @ Just(_)) => _f2
@@ -272,7 +272,7 @@ sealed abstract class MaybeInstances {
     def zero: MaxMaybe[A] = Tag(empty)
 
     def append(f1: MaxMaybe[A], f2: => MaxMaybe[A]) =
-      Tag((Tag unwrap f1, Tag unwrap f2) match {
+      Tag((Tag.unwrap(f1), Tag.unwrap(f2)) match {
         case (Just(v1), Just(v2)) => Just(Order[A].max(v1, v2))
         case (_f1 @ Just(_), Empty()) => _f1
         case (Empty(), _f2 @ Just(_)) => _f2
@@ -299,9 +299,9 @@ sealed abstract class MaybeInstances {
       def point[A](a: => A) = just(a)
 
       override def ap[A, B](fa: => Maybe[A])(mf: => Maybe[A => B]) =
-        mf.cata(f => fa.cata(f andThen just, empty), empty)
+        mf.cata(f => fa.cata(f.andThen(just), empty), empty)
 
-      def bind[A, B](fa: Maybe[A])(f: A => Maybe[B]) = fa flatMap f
+      def bind[A, B](fa: Maybe[A])(f: A => Maybe[B]) = fa.flatMap(f)
 
       @scala.annotation.tailrec
       def tailrecM[A, B](f: A => Maybe[A \/ B])(a: A): Maybe[B] =
@@ -311,7 +311,7 @@ sealed abstract class MaybeInstances {
           case Just(\/-(b)) => Just(b)
         }
 
-      override def map[A, B](fa: Maybe[A])(f: A => B) = fa map f
+      override def map[A, B](fa: Maybe[A])(f: A => B) = fa.map(f)
 
       def traverseImpl[F[_], A, B](fa: Maybe[A])(f: A => F[B])(
           implicit F: Applicative[F]) =
@@ -319,7 +319,7 @@ sealed abstract class MaybeInstances {
 
       def empty[A]: Maybe[A] = Maybe.empty
 
-      def plus[A](a: Maybe[A], b: => Maybe[A]) = a orElse b
+      def plus[A](a: Maybe[A], b: => Maybe[A]) = a.orElse(b)
 
       override def foldRight[A, B](fa: Maybe[A], z: => B)(f: (A, => B) => B) =
         fa.cata(f(_, z), z)

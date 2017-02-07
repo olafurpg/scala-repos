@@ -741,7 +741,7 @@ private[collection] object RedBlackTree {
       }
     private[this] var index = 0
     private[this] var lookahead: Tree[A, B] =
-      start map startFrom getOrElse findLeftMostOrPopOnEmpty(root)
+      start.map(startFrom).getOrElse(findLeftMostOrPopOnEmpty(root))
 
     /**
       * Find the leftmost subtree whose key is equal to the given key, or if no such thing,

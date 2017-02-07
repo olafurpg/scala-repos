@@ -402,8 +402,8 @@ trait Names extends api.Names {
     /** Some thoroughly self-explanatory convenience functions.  They
       *  assume that what they're being asked to do is known to be valid.
       */
-    final def startChar: Char = this charAt 0
-    final def endChar: Char = this charAt len - 1
+    final def startChar: Char = this.charAt(0)
+    final def endChar: Char = this.charAt(len - 1)
     final def startsWith(char: Char): Boolean = len > 0 && startChar == char
     final def startsWith(name: String): Boolean = startsWith(name, 0)
     final def endsWith(char: Char): Boolean = len > 0 && endChar == char
@@ -420,7 +420,7 @@ trait Names extends api.Names {
 
     /** The lastPos methods already return -1 on failure. */
     def lastIndexOf(ch: Char): Int = lastPos(ch)
-    def lastIndexOf(s: String): Int = toString lastIndexOf s
+    def lastIndexOf(s: String): Int = toString.lastIndexOf(s)
 
     /** Replace all occurrences of `from` by `to` in
       *  name; result is always a term name.
@@ -490,24 +490,25 @@ trait Names extends api.Names {
   final class NameOps[T <: Name](name: T) {
     import NameTransformer._
     def stripSuffix(suffix: String): T =
-      if (name endsWith suffix) dropRight(suffix.length) else name // OPT avoid creating a Name with `suffix`
+      if (name.endsWith(suffix)) dropRight(suffix.length) else name // OPT avoid creating a Name with `suffix`
     def stripSuffix(suffix: Name): T =
-      if (name endsWith suffix) dropRight(suffix.length) else name
+      if (name.endsWith(suffix)) dropRight(suffix.length) else name
     def take(n: Int): T = name.subName(0, n).asInstanceOf[T]
     def drop(n: Int): T = name.subName(n, name.length).asInstanceOf[T]
     def dropRight(n: Int): T = name.subName(0, name.length - n).asInstanceOf[T]
-    def dropLocal: TermName = name.toTermName stripSuffix LOCAL_SUFFIX_STRING
-    def dropSetter: TermName = name.toTermName stripSuffix SETTER_SUFFIX_STRING
-    def dropModule: T = this stripSuffix MODULE_SUFFIX_STRING
-    def localName: TermName = getterName append LOCAL_SUFFIX_STRING
-    def setterName: TermName = getterName append SETTER_SUFFIX_STRING
+    def dropLocal: TermName = name.toTermName.stripSuffix(LOCAL_SUFFIX_STRING)
+    def dropSetter: TermName =
+      name.toTermName.stripSuffix(SETTER_SUFFIX_STRING)
+    def dropModule: T = this.stripSuffix(MODULE_SUFFIX_STRING)
+    def localName: TermName = getterName.append(LOCAL_SUFFIX_STRING)
+    def setterName: TermName = getterName.append(SETTER_SUFFIX_STRING)
     def getterName: TermName = dropTraitSetterSeparator.dropSetter.dropLocal
 
     private def dropTraitSetterSeparator: TermName =
       name indexOf TRAIT_SETTER_SEPARATOR_STRING match {
         case -1 => name.toTermName
         case idx =>
-          name.toTermName drop idx drop TRAIT_SETTER_SEPARATOR_STRING.length
+          name.toTermName.drop(idx).drop(TRAIT_SETTER_SEPARATOR_STRING.length)
       }
   }
 

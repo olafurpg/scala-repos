@@ -28,7 +28,7 @@ object NumericComparisons {
 
   @inline def compare(a: Long, b: Double): Int = -compare(b, a)
 
-  @inline def compare(a: Long, b: BigDecimal): Int = BigDecimal(a) compare b
+  @inline def compare(a: Long, b: BigDecimal): Int = BigDecimal(a).compare(b)
 
   def compare(a: Double, bl: Long): Int = {
     val b = bl.toDouble
@@ -43,16 +43,16 @@ object NumericComparisons {
   @inline def compare(a: Double, b: Double): Int =
     if (a < b) -1 else if (a == b) 0 else 1
 
-  @inline def compare(a: Double, b: BigDecimal): Int = BigDecimal(a) compare b
+  @inline def compare(a: Double, b: BigDecimal): Int = BigDecimal(a).compare(b)
 
-  @inline def compare(a: BigDecimal, b: Long): Int = a compare BigDecimal(b)
+  @inline def compare(a: BigDecimal, b: Long): Int = a.compare(BigDecimal(b))
 
-  @inline def compare(a: BigDecimal, b: Double): Int = a compare BigDecimal(b)
+  @inline def compare(a: BigDecimal, b: Double): Int = a.compare(BigDecimal(b))
 
-  @inline def compare(a: BigDecimal, b: BigDecimal): Int = a compare b
+  @inline def compare(a: BigDecimal, b: BigDecimal): Int = a.compare(b)
 
   @inline def compare(a: DateTime, b: DateTime): Int = {
-    val res: Int = a compareTo b
+    val res: Int = a.compareTo(b)
     if (res < 0) -1
     else if (res > 0) 1
     else 0

@@ -243,7 +243,7 @@ trait MappedNullableField[
     */
   override final def dbNotNull_? : Boolean = false
 
-  override def toString = get.map(_.toString) openOr ""
+  override def toString = get.map(_.toString).openOr("")
 
   /**
     * Create an input field for the item
@@ -473,7 +473,8 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
       case other => other
     }
 
-    _toForm.map(_.flatMap(mf))
+    _toForm
+      .map(_.flatMap(mf))
       .map(SHtml.ElemAttr.applyToAllElems(_, formElemAttrs))
   }
 
@@ -703,7 +704,7 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
     */
   override def equals(other: Any): Boolean = {
     (other match {
-      case e: scala.Equals => e canEqual this
+      case e: scala.Equals => e.canEqual(this)
       case _ => true
     }) &&
     (other match {

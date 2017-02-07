@@ -75,7 +75,7 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
     shutdownRegistry.execute()
 
     // shutdown memcached server
-    testServers foreach { case (s, _) => s.stop() }
+    testServers.foreach { case (s, _) => s.stop() }
     testServers = List()
   }
 
@@ -83,7 +83,7 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
     test("doesn't blow up") {
       val myPool = new ZookeeperCacheNodeGroup(zkPath, zookeeperClient)
       assert(waitForMemberSize(myPool, 0, 5))
-      assert(myPool.members forall (_.key.isDefined))
+      assert(myPool.members.forall(_.key.isDefined))
     }
 
   if (!Option(System.getProperty("SKIP_FLAKY")).isDefined)

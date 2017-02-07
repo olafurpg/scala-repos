@@ -39,12 +39,14 @@ object Dependencies {
   lazy val htmlparser = "nu.validator.htmlparser" % "htmlparser" % "1.4"
   lazy val mongo_java_driver = "org.mongodb" % "mongo-java-driver" % "2.14.0"
   lazy val paranamer = "com.thoughtworks.paranamer" % "paranamer" % "2.8"
-  lazy val scalajpa = "org.scala-libs" % "scalajpa" % "1.5" cross CVMappingAll
+  lazy val scalajpa =
+    ("org.scala-libs" % "scalajpa" % "1.5").cross(CVMappingAll)
   lazy val scalap: ModuleMap = "org.scala-lang" % "scalap" % _
   lazy val scala_compiler: ModuleMap = "org.scala-lang" % "scala-compiler" % _
   lazy val scalaz7_core =
-    "org.scalaz" % "scalaz-core" % "7.2.0" cross CVMappingAll
-  lazy val squeryl = "org.squeryl" % "squeryl" % "0.9.5-7" cross CVMappingAll
+    ("org.scalaz" % "scalaz-core" % "7.2.0").cross(CVMappingAll)
+  lazy val squeryl =
+    ("org.squeryl" % "squeryl" % "0.9.5-7").cross(CVMappingAll)
   lazy val slf4j_api = "org.slf4j" % "slf4j-api" % slf4jVersion
   lazy val scala_xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
   lazy val rhino = "org.mozilla" % "rhino" % "1.7.7.1"

@@ -14,7 +14,7 @@ trait TypeConverterSupport {
 
   implicit def safe[S, T](f: S => T): TypeConverter[S, T] =
     new TypeConverter[S, T] {
-      def apply(s: S): Option[T] = allCatch opt f(s)
+      def apply(s: S): Option[T] = allCatch.opt(f(s))
     }
 
   /**

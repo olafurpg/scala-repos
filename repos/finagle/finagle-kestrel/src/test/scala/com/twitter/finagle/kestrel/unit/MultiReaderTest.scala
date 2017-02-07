@@ -56,7 +56,7 @@ class MultiReaderTest
     val queueNameBuf = Buf.Utf8(queueName)
     val N = 3
     val handles =
-      (0 until N) map { _ =>
+      ((0 until N)).map { _ =>
         Mockito.spy(new MockHandle)
       }
     val va: Var[Return[ISet[ReadHandle]]] = Var.value(Return(handles.toSet))
@@ -67,7 +67,7 @@ class MultiReaderTest
     val queueNameBuf = Buf.Utf8(queueName)
     val N = 3
     val hosts =
-      0 until N map { i =>
+      (0 until N).map { i =>
         Address(
           InetSocketAddress.createUnresolved("10.0.0.%d".format(i), 22133))
       }
@@ -119,7 +119,7 @@ class MultiReaderTest
                                                        ClientConfig.Yes,
                                                        ClientConfig.Yes,
                                                        ClientConfig.Yes]]
-        when(result.addrs(host)) thenReturn mockHostClientBuilder
+        when(result.addrs(host)).thenReturn(mockHostClientBuilder)
 
         val queues = hostQueuesMap(host)
         val factory = new ServiceFactory[Command, Response] {
@@ -129,7 +129,7 @@ class MultiReaderTest
           def close(deadline: Time) = Future.Done
           override def toString() = "ServiceFactory for %s".format(host)
         }
-        when(mockHostClientBuilder.buildFactory()) thenReturn factory
+        when(mockHostClientBuilder.buildFactory()).thenReturn(factory)
       }
       result
     }
@@ -144,7 +144,7 @@ class MultiReaderTest
       val messages = MSet[String]()
       val UTF8 = Charset.forName("UTF-8")
 
-      handle.messages foreach { msg =>
+      handle.messages.foreach { msg =>
         val Buf.Utf8(str) = msg.bytes
         messages += str
         msg.ack.sync()
@@ -182,7 +182,7 @@ class MultiReaderTest
 
     val N = 3
     val hosts =
-      0 until N map { i =>
+      (0 until N).map { i =>
         InetSocketAddress.createUnresolved("10.0.0.%d".format(i), 22133)
       }
 
@@ -233,7 +233,7 @@ class MultiReaderTest
                                                        ClientConfig.Yes,
                                                        ClientConfig.Yes,
                                                        ClientConfig.Yes]]
-        when(result.addrs(Address(host))) thenReturn mockHostClientBuilder
+        when(result.addrs(Address(host))).thenReturn(mockHostClientBuilder)
 
         val queues = hostQueuesMap(host)
         val factory = new ServiceFactory[Command, Response] {
@@ -243,7 +243,7 @@ class MultiReaderTest
           def close(deadline: Time) = Future.Done
           override def toString() = "ServiceFactory for %s".format(host)
         }
-        when(mockHostClientBuilder.buildFactory()) thenReturn factory
+        when(mockHostClientBuilder.buildFactory()).thenReturn(factory)
       }
       result
     }
@@ -257,7 +257,7 @@ class MultiReaderTest
     def configureMessageReader(handle: ReadHandle): MSet[String] = {
       val messages = MSet[String]()
 
-      handle.messages foreach { msg =>
+      handle.messages.foreach { msg =>
         val Buf.Utf8(str) = msg.bytes
         messages += str
         msg.ack.sync()
@@ -272,16 +272,16 @@ class MultiReaderTest
       val handle = MultiReaderHelper.merge(va)
 
       val messages = new ArrayBuffer[ReadMessage]
-      handle.messages foreach { messages += _ }
+      handle.messages.foreach { messages += _ }
 
       // stripe some messages across
       val sentMessages =
-        0 until N * 100 map { _ =>
+        (0 until N * 100).map { _ =>
           mock[ReadMessage]
         }
 
       assert(messages.size == 0)
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           handles(i % handles.size)._messages ! m
       }
@@ -297,7 +297,7 @@ class MultiReaderTest
       Time.withTimeAt(Time.epoch + 1.seconds) { _ =>
         // stuff the queues beforehand
         val ms =
-          handles map { h =>
+          handles.map { h =>
             val m = mock[ReadMessage]
             h._messages ! m
             m
@@ -315,12 +315,12 @@ class MultiReaderTest
 
   test("static ReadHandle cluster should propagate closes") {
     new MultiReaderHelper {
-      handles foreach { h =>
+      handles.foreach { h =>
         verify(h, times(0)).close()
       }
       val handle = MultiReaderHelper.merge(va)
       handle.close()
-      handles foreach { h =>
+      handles.foreach { h =>
         verify(h).close()
       }
     }
@@ -331,7 +331,7 @@ class MultiReaderTest
     new MultiReaderHelper {
       val handle = MultiReaderHelper.merge(va)
       val e = handle.error.sync()
-      handles foreach { h =>
+      handles.foreach { h =>
         assert(e.isDefined == false)
         h._error ! new Exception("sad panda")
       }
@@ -348,12 +348,12 @@ class MultiReaderTest
         MultiReader(va, queueName).clientBuilder(mockClientBuilder).build()
       val messages = configureMessageReader(handle)
       val sentMessages =
-        0 until N * 10 map { i =>
+        (0 until N * 10).map { i =>
           "message %d".format(i)
         }
       assert(messages.size == 0)
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)
@@ -374,12 +374,12 @@ class MultiReaderTest
         MultiReader(va, queueName).clientBuilder(mockClientBuilder).build()
       val messages = configureMessageReader(handle)
       val sentMessages =
-        0 until N * 10 map { i =>
+        (0 until N * 10).map { i =>
           "message %d".format(i)
         }
       assert(messages.size == 0)
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)
@@ -413,12 +413,12 @@ class MultiReaderTest
 
       val messages = configureMessageReader(handle)
       val sentMessages =
-        0 until N * 10 map { i =>
+        (0 until N * 10).map { i =>
           "message %d".format(i)
         }
       assert(messages.size == 0)
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)
@@ -435,7 +435,7 @@ class MultiReaderTest
           va.update(Addr.Bound(mutableHosts: _*))
 
           // write to all 3
-          sentMessages.zipWithIndex foreach {
+          sentMessages.zipWithIndex.foreach {
             case (m, i) =>
               Await.result(
                 services(i % services.size)
@@ -465,12 +465,12 @@ class MultiReaderTest
       val messages = configureMessageReader(handle)
       val error = handle.error.sync()
       val sentMessages =
-        0 until N * 10 map { i =>
+        (0 until N * 10).map { i =>
           "message %d".format(i)
         }
       assert(messages.size == 0)
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)
@@ -525,12 +525,12 @@ class MultiReaderTest
         .build()
       val messages = configureMessageReader(handle)
       val sentMessages =
-        0 until N * 10 map { i =>
+        (0 until N * 10).map { i =>
           "message %d".format(i)
         }
       assert(messages.size == 0)
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)
@@ -553,12 +553,12 @@ class MultiReaderTest
         .build()
       val messages = configureMessageReader(handle)
       val sentMessages =
-        0 until N * 10 map { i =>
+        (0 until N * 10).map { i =>
           "message %d".format(i)
         }
       assert(messages.size == 0)
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)
@@ -594,12 +594,12 @@ class MultiReaderTest
 
       val messages = configureMessageReader(handle)
       val sentMessages =
-        0 until N * 10 map { i =>
+        (0 until N * 10).map { i =>
           "message %d".format(i)
         }
       assert(messages.size == 0)
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)
@@ -616,7 +616,7 @@ class MultiReaderTest
           cluster.del(host)
 
           // write to all 3
-          sentMessages.zipWithIndex foreach {
+          sentMessages.zipWithIndex.foreach {
             case (m, i) =>
               Await.result(
                 services(i % services.size)
@@ -648,12 +648,12 @@ class MultiReaderTest
       val messages = configureMessageReader(handle)
       val errors = (handle.error ?)
       val sentMessages =
-        0 until N * 10 map { i =>
+        (0 until N * 10).map { i =>
           "message %d".format(i)
         }
       assert(messages.size == 0)
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)
@@ -701,11 +701,11 @@ class MultiReaderTest
 
       val messages = configureMessageReader(handle)
       val sentMessages =
-        0 until N * 10 map { i =>
+        (0 until N * 10).map { i =>
           "message %d".format(i)
         }
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)
@@ -718,7 +718,7 @@ class MultiReaderTest
 
       cluster.del(InetSocketAddress.createUnresolved("10.0.0.100", 22133))
 
-      sentMessages.zipWithIndex foreach {
+      sentMessages.zipWithIndex.foreach {
         case (m, i) =>
           Await.result(
             services(i % services.size)

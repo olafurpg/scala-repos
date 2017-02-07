@@ -77,7 +77,7 @@ abstract class Directive[L](implicit val ev: Tuple[L]) {
   def tflatMap[R: Tuple](f: L ⇒ Directive[R]): Directive[R] =
     Directive[R] { inner ⇒
       tapply { values ⇒
-        f(values) tapply inner
+        f(values).tapply(inner)
       }
     }
 

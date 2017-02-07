@@ -45,7 +45,7 @@ class FusingSpec extends AkkaSpec {
       if (Debug) println(extractName(curr, "unknown"))
       curr match {
         case CopiedModule(_, attributes, copyOf)
-            if (attributes and copyOf.attributes).contains(to) ⇒
+            if (attributes.and(copyOf.attributes)).contains(to) ⇒
           ()
         case other if other.attributes.contains(to) ⇒ ()
         case _ ⇒
@@ -88,7 +88,7 @@ class FusingSpec extends AkkaSpec {
 
     "not fuse a FusedGraph again" in {
       val g = Fusing.aggressive(graph(false))
-      Fusing.aggressive(g) should be theSameInstanceAs g
+      (Fusing.aggressive(g) should be).theSameInstanceAs(g)
     }
 
     "properly fuse a FusedGraph that has been extended (no AsyncBoundary)" in {

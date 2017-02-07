@@ -31,8 +31,8 @@ object CloseNotifier {
     }
 
     // Invokes close handlers in reverse order from which they were added.
-    closing ensure {
-      closeHandlers foreach { handler =>
+    closing.ensure {
+      closeHandlers.foreach { handler =>
         handler()
       }
     }

@@ -419,7 +419,7 @@ Reply, ItemId](underlying: CommandExecutorFactory[CommandExecutor])
         .sync()
     }
 
-    underlying() respond {
+    underlying().respond {
       case Return(r) => recv(r, openCommand)
       case Throw(t) => error ! t
     }
@@ -439,7 +439,7 @@ Reply, ItemId](underlying: CommandExecutorFactory[CommandExecutor])
       closed: Promise[Throwable]
   ) {
     offer.sync().foreach { item =>
-      set(queueName, item).unit respond {
+      set(queueName, item).unit.respond {
         case Return(_) => write(queueName, offer)
         case Throw(t) => closed() = Return(t)
       }
@@ -567,8 +567,8 @@ protected[kestrel] class ThriftConnectedClient(
   }
 
   private def withClient[T](f: (FinagledClient) => Future[T]) =
-    underlying() flatMap { client =>
-      f(client) ensure {
+    underlying().flatMap { client =>
+      f(client).ensure {
         client.service.close()
       }
     }
@@ -618,7 +618,7 @@ protected[kestrel] class ThriftConnectedClient(
 
   private def confirmAndOpenRead(queueName: String)(id: Long)(
       client: FinagledClosableClient): Future[Seq[Item]] =
-    client.confirm(queueName, collection.Set(id)) flatMap { _ =>
+    client.confirm(queueName, collection.Set(id)).flatMap { _ =>
       openRead(queueName)(client)
     }
 

@@ -1,6 +1,6 @@
 object IdeaBug1 {
   private[this] implicit def toSerFix[K, V](m: Map[K, V]) = new {
-    def sf = m map identity
+    def sf = m.map(identity)
   }
 
   def main(args: Array[String]) = {

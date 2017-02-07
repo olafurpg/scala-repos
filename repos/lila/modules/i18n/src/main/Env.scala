@@ -16,12 +16,12 @@ final class Env(config: Config,
     val FilePathRelative = config getString "file_path.relative"
     val UpstreamUrlPattern = config getString "upstream.url_pattern"
     val HideCallsCookieName = config getString "hide_calls.cookie.name"
-    val HideCallsCookieMaxAge = config getInt "hide_calls.cookie.max_age"
+    val HideCallsCookieMaxAge = config.getInt("hide_calls.cookie.max_age")
     val CollectionTranslation = config getString "collection.translation"
     val ContextGitUrl = config getString "context.git.url"
     val ContextGitFile = config getString "context.git.file"
     val CdnDomain = config getString "cdn_domain"
-    val CallThreshold = config getInt "call.threshold"
+    val CallThreshold = config.getInt("call.threshold")
   }
   import settings._
 
@@ -55,7 +55,7 @@ final class Env(config: Config,
   lazy val forms =
     new DataForm(keys = keys, captcher = captcher, callApi = callApi)
 
-  def upstreamFetch = new UpstreamFetch(id => UpstreamUrlPattern format id)
+  def upstreamFetch = new UpstreamFetch(id => UpstreamUrlPattern.format(id))
 
   lazy val gitWrite = new GitWrite(transRelPath = FilePathRelative,
                                    repoPath = appPath,
@@ -75,7 +75,7 @@ final class Env(config: Config,
 
   def jsonFromVersion(v: Int): Fu[JsValue] = {
     import tube.translationTube
-    TranslationRepo findFrom v map { ts =>
+    (TranslationRepo findFrom v).map { ts =>
       Json toJson ts
     }
   }
@@ -83,7 +83,8 @@ final class Env(config: Config,
   def cli = new lila.common.Cli {
     def process = {
       case "i18n" :: "fetch" :: from :: Nil =>
-        upstreamFetch(from) flatMap gitWrite.apply inject "Fetched translations from upstream"
+        upstreamFetch(from)
+          .flatMap(gitWrite.apply) inject "Fetched translations from upstream"
       case "i18n" :: "js" :: "dump" :: Nil =>
         jsDump.apply inject "Dumped JavaScript translations"
       case "i18n" :: "file" :: "fix" :: Nil =>
@@ -97,12 +98,13 @@ object Env {
   import lila.common.PlayApp
 
   lazy val current =
-    "i18n" boot new Env(
-      config = lila.common.PlayApp loadConfig "i18n",
-      db = lila.db.Env.current,
-      system = PlayApp.system,
-      messages = PlayApp.messages,
-      captcher = lila.hub.Env.current.actor.captcher,
-      appPath = PlayApp withApp (_.path.getCanonicalPath)
-    )
+    "i18n".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("i18n"),
+        db = lila.db.Env.current,
+        system = PlayApp.system,
+        messages = PlayApp.messages,
+        captcher = lila.hub.Env.current.actor.captcher,
+        appPath = PlayApp.withApp(_.path.getCanonicalPath)
+      ))
 }

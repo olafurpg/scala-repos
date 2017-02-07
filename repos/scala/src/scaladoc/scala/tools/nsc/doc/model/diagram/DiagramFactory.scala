@@ -144,7 +144,7 @@ trait DiagramFactory extends DiagramDirectiveParser {
         // classes is the entire set of classes and traits in the package, they are the superset of nodes in the diagram
         // we collect classes, traits and objects without a companion, which are usually used as values(e.g. scala.None)
         val nodesAll =
-          pack.members collect {
+          pack.members.collect {
             case d: TemplateEntity
                 if ((!diagramFilter.hideInheritedNodes) || (d.inTemplate == pack)) =>
               d
@@ -156,13 +156,15 @@ trait DiagramFactory extends DiagramDirectiveParser {
             case (ScalaPackage, NullClass) =>
               List(makeTemplate(AnyRefClass))
             case (ScalaPackage, NothingClass) =>
-              (List(NullClass) ::: ScalaValueClasses) map { makeTemplate(_) }
+              ((List(NullClass) ::: ScalaValueClasses)).map { makeTemplate(_) }
             case _ =>
-              member.parentTypes map {
-                case (template, tpe) => template
-              } filter {
-                nodesAll.contains(_)
-              }
+              member.parentTypes
+                .map {
+                  case (template, tpe) => template
+                }
+                .filter {
+                  nodesAll.contains(_)
+                }
           }
         }
 
@@ -192,13 +194,15 @@ trait DiagramFactory extends DiagramDirectiveParser {
           val nodes =
             nodesAll.filter(nodesShown.contains(_)).flatMap(mapNodes.get(_))
           val edges =
-            edgesAll.map {
-              case (entity, superClasses) => {
-                (mapNodes(entity), superClasses flatMap { mapNodes.get(_) })
+            edgesAll
+              .map {
+                case (entity, superClasses) => {
+                  (mapNodes(entity), superClasses.flatMap { mapNodes.get(_) })
+                }
               }
-            } filterNot {
-              case (node, superClassNodes) => superClassNodes.isEmpty
-            }
+              .filterNot {
+                case (node, superClassNodes) => superClassNodes.isEmpty
+              }
 
           val diagram =
             // TODO: Everyone should be able to use the @{inherit,content}Diagram annotation to change the diagrams.

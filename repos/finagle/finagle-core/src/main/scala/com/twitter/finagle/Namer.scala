@@ -87,14 +87,14 @@ object Namer {
       val prefix = Path.Utf8("$", "fail")
 
       def unapply(path: Path): Boolean =
-        path startsWith prefix
+        path.startsWith(prefix)
     }
 
     private[this] object NilPath {
       val prefix = Path.Utf8("$", "nil")
 
       def unapply(path: Path): Boolean =
-        path startsWith prefix
+        path.startsWith(prefix)
     }
 
     private[this] object NamerPath {
@@ -168,7 +168,7 @@ object Namer {
       lookup: Path => Activity[NameTree[Name]],
       tree: NameTree[Path]
   ): Activity[NameTree[Name.Bound]] =
-    bind(lookup, 0, None)(tree map { path =>
+    bind(lookup, 0, None)(tree.map { path =>
       Name.Path(path)
     })
 

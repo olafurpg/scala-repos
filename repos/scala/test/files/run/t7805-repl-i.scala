@@ -3,7 +3,7 @@ import scala.tools.nsc.{GenericRunnerSettings, Settings}
 import scala.tools.nsc.settings.MutableSettings
 
 object Test extends ReplTest with HangingRepl with Welcoming {
-  def script = testPath changeExtension "script"
+  def script = testPath.changeExtension("script")
   override def transformSettings(s: Settings) = s match {
     case m: MutableSettings =>
       val t = new GenericRunnerSettings(s.errorFn)
@@ -35,7 +35,7 @@ trait HangingRepl extends ReplTest {
   import Resulting._
   def timeout = 120 seconds
   def hanging[A](a: => A): A = Future(a) resultWithin timeout
-  override def show() = Try(hanging(super.show())) recover {
+  override def show() = Try(hanging(super.show())).recover {
     case e => e.printStackTrace()
   }
 }

@@ -26,28 +26,26 @@ class MetricsCollectorSpec
         val sample1 = collector.sample.metrics
         val sample2 = collector.sample.metrics
         val merged12 =
-          sample2 flatMap
-            (latest ⇒
-               sample1 collect {
-                 case peer if latest sameAs peer ⇒
-                   val m = peer :+ latest
-                   m.value should ===(latest.value)
-                   m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
-                   m
-               })
+          sample2.flatMap(latest ⇒
+            sample1.collect {
+              case peer if latest.sameAs(peer) ⇒
+                val m = peer :+ latest
+                m.value should ===(latest.value)
+                m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
+                m
+          })
 
         val sample3 = collector.sample.metrics
         val sample4 = collector.sample.metrics
         val merged34 =
-          sample4 flatMap
-            (latest ⇒
-               sample3 collect {
-                 case peer if latest sameAs peer ⇒
-                   val m = peer :+ latest
-                   m.value should ===(latest.value)
-                   m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
-                   m
-               })
+          sample4.flatMap(latest ⇒
+            sample3.collect {
+              case peer if latest.sameAs(peer) ⇒
+                val m = peer :+ latest
+                m.value should ===(latest.value)
+                m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
+                m
+          })
       }
     }
   }
@@ -61,10 +59,10 @@ class MetricsCollectorSpec
     "collect accurate metrics for a node" in {
       val sample = collector.sample
       val metrics = sample.metrics.collect { case m ⇒ (m.name, m.value) }
-      val used = metrics collectFirst { case (HeapMemoryUsed, b) ⇒ b }
+      val used = metrics.collectFirst { case (HeapMemoryUsed, b) ⇒ b }
       val committed =
-        metrics collectFirst { case (HeapMemoryCommitted, b) ⇒ b }
-      metrics foreach {
+        metrics.collectFirst { case (HeapMemoryCommitted, b) ⇒ b }
+      metrics.foreach {
         case (SystemLoadAverage, b) ⇒ b.doubleValue should be >= (0.0)
         case (Processors, b) ⇒ b.intValue should be >= (0)
         case (HeapMemoryUsed, b) ⇒ b.longValue should be >= (0L)
@@ -95,7 +93,7 @@ class MetricsCollectorSpec
 
     "collect 50 node metrics samples in an acceptable duration" taggedAs LongRunningTest in within(
       10 seconds) {
-      (1 to 50) foreach { _ ⇒
+      ((1 to 50)).foreach { _ ⇒
         val sample = collector.sample
         sample.metrics.size should be >= (3)
         Thread.sleep(100)

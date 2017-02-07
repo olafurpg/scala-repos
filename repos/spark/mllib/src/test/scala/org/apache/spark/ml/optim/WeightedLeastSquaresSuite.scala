@@ -95,7 +95,7 @@ class WeightedLeastSquaresSuite
           standardizeLabel = standardization).fit(instances)
         val actual = Vectors
           .dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
-        assert(actual ~== expected(idx) absTol 1e-4)
+        assert(actual ~== expected(idx).absTol(1e-4))
       }
       idx += 1
     }
@@ -128,7 +128,7 @@ class WeightedLeastSquaresSuite
           standardizeLabel = standardization).fit(instancesConstLabel)
         val actual = Vectors
           .dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
-        assert(actual ~== expected(idx) absTol 1e-4)
+        assert(actual ~== expected(idx).absTol(1e-4))
       }
       idx += 1
     }
@@ -202,7 +202,7 @@ class WeightedLeastSquaresSuite
                                  standardizeLabel = true).fit(instances)
       val actual =
         Vectors.dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
-      assert(actual ~== expected(idx) absTol 1e-4)
+      assert(actual ~== expected(idx).absTol(1e-4))
       idx += 1
     }
   }

@@ -19,13 +19,13 @@ class SeqCoder(words: List[String]) {
 
   /** Maps a word to the digit string it represents,
     * e.g. `Java` -> `5282`  */
-  private def wordCode(word: String): String = word.toUpperCase map charCode
+  private def wordCode(word: String): String = word.toUpperCase.map(charCode)
 
   /** A map from digit strings to the words that represent
     *  them e.g. `5282` -> List(`Java`, `Kata`, `Lava`, ...)
     */
   val wordsForNum: Map[String, List[String]] =
-    words groupBy wordCode withDefaultValue List()
+    words.groupBy(wordCode).withDefaultValue(List())
 
   val memo =
     collection.mutable.Map[String, Set[List[String]]]("" -> Set(List()))
@@ -45,13 +45,13 @@ class SeqCoder(words: List[String]) {
       // } yield word :: rest
       val r =
         splits.flatMap(split => {
-          val wfn = wordsForNum(number take split).flatMap(word => {
-            val subs = encode(number drop split)
+          val wfn = wordsForNum(number.take(split)).flatMap(word => {
+            val subs = encode(number.drop(split))
             val subsmapped = subs.map(rest => word :: rest)
-            subsmemo += (number, number drop split, word) -> subsmapped
+            subsmemo += (number, number.drop(split), word) -> subsmapped
             subsmapped
           })
-          wfnmemo += (number, number take split) -> wfn.toSet
+          wfnmemo += (number, number.take(split)) -> wfn.toSet
           wfn
         })
       memo += number -> r
@@ -61,7 +61,7 @@ class SeqCoder(words: List[String]) {
   /** Maps a number to a list of all word phrases that can
     *  represent it */
   def translate(number: String): Set[String] =
-    encode(number) map (_ mkString " ")
+    encode(number).map(_ mkString " ")
 
   def ??? : Nothing = throw new UnsupportedOperationException
 }
@@ -84,13 +84,13 @@ class ParCoder(words: List[String]) {
 
   /** Maps a word to the digit string it represents,
     * e.g. `Java` -> `5282`  */
-  private def wordCode(word: String): String = word.toUpperCase map charCode
+  private def wordCode(word: String): String = word.toUpperCase.map(charCode)
 
   /** A map from digit strings to the words that represent
     *  them e.g. `5282` -> List(`Java`, `Kata`, `Lava`, ...)
     */
   val wordsForNum: Map[String, List[String]] =
-    words groupBy wordCode withDefaultValue List()
+    words.groupBy(wordCode).withDefaultValue(List())
 
   val comparison = new SeqCoder(words)
 
@@ -106,14 +106,14 @@ class ParCoder(words: List[String]) {
       // } yield word :: rest
       val r =
         splits.flatMap(split => {
-          val wfn = wordsForNum(number take split).flatMap(word => {
-            val subs = encode(number drop split)
-            assertNumber(number drop split, subs)
+          val wfn = wordsForNum(number.take(split)).flatMap(word => {
+            val subs = encode(number.drop(split))
+            assertNumber(number.drop(split), subs)
             val subsmapped = subs.map(rest => word :: rest)
-            assertSubs(number, number drop split, word, subsmapped)
+            assertSubs(number, number.drop(split), word, subsmapped)
             subsmapped.toList
           })
-          assertWfn(number, number take split, number drop split, wfn)
+          assertWfn(number, number.take(split), number.drop(split), wfn)
           wfn
         })
       assertNumber(number, r)
@@ -178,7 +178,7 @@ class ParCoder(words: List[String]) {
     *  represent it */
   def translate(number: String): ParSet[String] = {
     comparison.translate(number)
-    encode(number) map (_ mkString " ")
+    encode(number).map(_ mkString " ")
   }
 
   def ??? : Nothing = throw new UnsupportedOperationException

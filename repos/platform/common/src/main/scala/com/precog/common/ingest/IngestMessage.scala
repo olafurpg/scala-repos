@@ -170,33 +170,35 @@ object IngestMessage {
           (obj.validated[Int]("producerId") |@| obj
             .validated[Int]("eventId")) { (producerId, sequenceId) =>
             val eventRecords =
-              ingest.data map { jv =>
+              ingest.data.map { jv =>
                 IngestRecord(EventId(producerId, sequenceId), jv)
               }
-            ingest.writeAs map { authorities =>
-              assert(ingest.data.size == 1)
-              \/.right(
-                IngestMessage(ingest.apiKey,
-                              ingest.path,
-                              authorities,
-                              eventRecords,
-                              ingest.jobId,
-                              defaultTimestamp,
-                              StreamRef.Append))
-            } getOrElse {
-              \/.left(
-                (ingest.apiKey,
-                 ingest.path,
-                 (authorities: Authorities) =>
-                   IngestMessage(ingest.apiKey,
-                                 ingest.path,
-                                 authorities,
-                                 eventRecords,
-                                 ingest.jobId,
-                                 defaultTimestamp,
-                                 StreamRef.Append))
-              )
-            }
+            ingest.writeAs
+              .map { authorities =>
+                assert(ingest.data.size == 1)
+                \/.right(
+                  IngestMessage(ingest.apiKey,
+                                ingest.path,
+                                authorities,
+                                eventRecords,
+                                ingest.jobId,
+                                defaultTimestamp,
+                                StreamRef.Append))
+              }
+              .getOrElse {
+                \/.left(
+                  (ingest.apiKey,
+                   ingest.path,
+                   (authorities: Authorities) =>
+                     IngestMessage(ingest.apiKey,
+                                   ingest.path,
+                                   authorities,
+                                   eventRecords,
+                                   ingest.jobId,
+                                   defaultTimestamp,
+                                   StreamRef.Append))
+                )
+              }
           }
         }
     }

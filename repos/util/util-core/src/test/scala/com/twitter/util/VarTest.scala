@@ -28,7 +28,7 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
   test("Var.map") {
     val v = Var(123)
-    val s = v map (_.toString)
+    val s = v.map(_.toString)
     assert(Var.sample(s) == "123")
     v() = 8923
     assert(Var.sample(s) == "8923")
@@ -46,15 +46,15 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
     val v0 = U(3)
     val v1 = U(2)
     val v2 =
-      v1 flatMap { i =>
+      v1.flatMap { i =>
         v1
       }
     val v3 =
-      v2 flatMap { i =>
+      v2.flatMap { i =>
         v1
       }
     val v4 =
-      v3 flatMap { i =>
+      v3.flatMap { i =>
         v0
       }
 
@@ -102,7 +102,7 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
     val us = Seq.fill(5) { U(0) }
     def short(us: Seq[Var[Int]]): Var[Int] = us match {
       case Seq(hd, tl @ _ *) =>
-        hd flatMap {
+        hd.flatMap {
           case 0 => short(tl)
           case i => Var(i)
         }
@@ -124,28 +124,28 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
     val sub = s.changes.register(Witness({ cur = _ }))
     assert(cur == -1)
 
-    assert(us forall (_.observerCount == 1))
+    assert(us.forall(_.observerCount == 1))
 
     us(0).update(123)
     assert(cur == 123)
     assert(us(0).observerCount == 1)
-    assert(us drop 1 forall (_.observerCount == 0))
+    assert(us.drop(1).forall(_.observerCount == 0))
 
     us(1).update(333)
     assert(cur == 123)
     assert(us(0).observerCount == 1)
-    assert(us drop 1 forall (_.observerCount == 0))
+    assert(us.drop(1).forall(_.observerCount == 0))
 
     us(0).update(0)
     assert(cur == 333)
     assert(us(0).observerCount == 1)
     assert(us(1).observerCount == 1)
-    assert(us drop 2 forall (_.observerCount == 0))
+    assert(us.drop(2).forall(_.observerCount == 0))
 
     val f = sub.close()
     assert(f.isDefined)
     Await.result(f)
-    assert(us forall (_.observerCount == 0))
+    assert(us.forall(_.observerCount == 0))
   }
 
   test("Var(init)") {
@@ -165,8 +165,8 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
   test("multiple observers at the same level") {
     val v = Var(2)
-    val a = v map (_ * 2)
-    val b = v map (_ * 3)
+    val a = v.map(_ * 2)
+    val b = v.map(_ * 3)
 
     var x, y = 0
     a.changes.register(Witness({ x = _ }))
@@ -336,11 +336,11 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("Var not executing until observed") {
     val x = Var(0)
     val invertX =
-      x map { i =>
+      x.map { i =>
         1 / i
       }
     val result =
-      x flatMap { i =>
+      x.flatMap { i =>
         if (i == 0) Var(0) else invertX
       }
 
@@ -372,7 +372,7 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
       val v = Var(123)
       val w = newVar(333)
       val x =
-        v flatMap { _ =>
+        v.flatMap { _ =>
           w
         }
       var buf = mutable.Buffer[Int]()
@@ -390,7 +390,7 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
       val w1 = newVar(333)
       val w2 = newVar(444)
       val x =
-        v flatMap {
+        v.flatMap {
           case 123 => w1
           case _ => w2
         }

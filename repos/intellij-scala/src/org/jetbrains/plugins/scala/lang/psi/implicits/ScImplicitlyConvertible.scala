@@ -297,19 +297,20 @@ class ScImplicitlyConvertible(place: PsiElement,
               place.getResolveScope,
               ScalaPsiManager.ClassCategory.TYPE
             )
-        ) collect {
-          case cl: ScTrait =>
-            ScParameterizedType(
-              ScType.designator(cl),
-              cl.typeParameters.map(
-                tp =>
-                  new ScUndefinedType(
-                    new ScTypeParameterType(tp, ScSubstitutor.empty),
-                    1)))
-        } flatMap {
-          case p: ScParameterizedType => Some(p)
-          case _ => None
-        }
+        ).collect {
+            case cl: ScTrait =>
+              ScParameterizedType(
+                ScType.designator(cl),
+                cl.typeParameters.map(
+                  tp =>
+                    new ScUndefinedType(
+                      new ScTypeParameterType(tp, ScSubstitutor.empty),
+                      1)))
+          }
+          .flatMap {
+            case p: ScParameterizedType => Some(p)
+            case _ => None
+          }
 
       def firstArgType = funType.map(_.typeArgs.head)
 
@@ -471,12 +472,13 @@ class ScImplicitlyConvertible(place: PsiElement,
                             f.paramClauses.clauses.last.effectiveParameters
                               .map(param => new Parameter(param))
                           val (inferredParams, expr, _) =
-                            InferUtil.findImplicits(
-                              params,
-                              None,
-                              place,
-                              check = false,
-                              abstractSubstitutor = subst followed dependentSubst followed unSubst)
+                            InferUtil.findImplicits(params,
+                                                    None,
+                                                    place,
+                                                    check = false,
+                                                    abstractSubstitutor = subst
+                                                      .followed(dependentSubst)
+                                                      .followed(unSubst))
                           inferredParams
                             .zip(expr)
                             .map {

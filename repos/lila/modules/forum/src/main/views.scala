@@ -6,9 +6,9 @@ case class CategView(categ: Categ,
                      lastPost: Option[(Topic, Post, Int)],
                      troll: Boolean) {
 
-  def nbTopics = categ nbTopics troll
-  def nbPosts = categ nbPosts troll
-  def lastPostId = categ lastPostId troll
+  def nbTopics = categ.nbTopics(troll)
+  def nbPosts = categ.nbPosts(troll)
+  def lastPostId = categ.lastPostId(troll)
 
   def slug = categ.slug
   def name = categ.name
@@ -21,10 +21,10 @@ case class TopicView(categ: Categ,
                      lastPage: Int,
                      troll: Boolean) {
 
-  def updatedAt = topic updatedAt troll
-  def nbPosts = topic nbPosts troll
-  def nbReplies = topic nbReplies troll
-  def lastPostId = topic lastPostId troll
+  def updatedAt = topic.updatedAt(troll)
+  def nbPosts = topic.nbPosts(troll)
+  def nbReplies = topic.nbReplies(troll)
+  def lastPostId = topic.lastPostId(troll)
 
   def id = topic.id
   def slug = topic.slug

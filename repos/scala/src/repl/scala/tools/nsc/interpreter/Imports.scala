@@ -16,12 +16,12 @@ trait Imports { self: IMain =>
 
   /** Synthetic import handlers for the language defined imports. */
   private def makeWildcardImportHandler(sym: Symbol): ImportHandler = {
-    val hd :: tl = sym.fullName.split('.').toList map newTermName
+    val hd :: tl = sym.fullName.split('.').toList.map(newTermName)
     val tree = Import(
       tl.foldLeft(Ident(hd): Tree)((x, y) => Select(x, y)),
       ImportSelector.wildList
     )
-    tree setSymbol sym
+    tree.setSymbol(sym)
     new ImportHandler(tree)
   }
 
@@ -29,9 +29,9 @@ trait Imports { self: IMain =>
   def languageWildcardSyms: List[Symbol] =
     List(JavaLangPackage, ScalaPackage, PredefModule)
   def languageWildcardHandlers =
-    languageWildcardSyms map makeWildcardImportHandler
+    languageWildcardSyms.map(makeWildcardImportHandler)
 
-  def allImportedNames = importHandlers flatMap (_.importedNames)
+  def allImportedNames = importHandlers.flatMap(_.importedNames)
 
   /** Types which have been wildcard imported, such as:
     *    val x = "abc" ; import x._  // type java.lang.String
@@ -45,29 +45,31 @@ trait Imports { self: IMain =>
     *  into the compiler scopes.
     */
   def sessionWildcards: List[Type] = {
-    importHandlers filter (_.importsWildcard) map (_.targetType) distinct
+    importHandlers.filter(_.importsWildcard).map(_.targetType) distinct
   }
 
-  def languageSymbols = languageWildcardSyms flatMap membersAtPickler
-  def sessionImportedSymbols = importHandlers flatMap (_.importedSymbols)
+  def languageSymbols = languageWildcardSyms.flatMap(membersAtPickler)
+  def sessionImportedSymbols = importHandlers.flatMap(_.importedSymbols)
   def importedSymbols = languageSymbols ++ sessionImportedSymbols
-  def importedTermSymbols = importedSymbols collect { case x: TermSymbol => x }
+  def importedTermSymbols = importedSymbols.collect { case x: TermSymbol => x }
 
   /** Tuples of (source, imported symbols) in the order they were imported.
     */
   def importedSymbolsBySource: List[(Symbol, List[Symbol])] = {
-    val lang = languageWildcardSyms map (sym => (sym, membersAtPickler(sym)))
+    val lang = languageWildcardSyms.map(sym => (sym, membersAtPickler(sym)))
     val session =
-      importHandlers filter (_.targetType != NoType) map { mh =>
+      importHandlers.filter(_.targetType != NoType).map { mh =>
         (mh.targetType.typeSymbol, mh.importedSymbols)
       }
 
     lang ++ session
   }
   def implicitSymbolsBySource: List[(Symbol, List[Symbol])] = {
-    importedSymbolsBySource map {
-      case (k, vs) => (k, vs filter (_.isImplicit))
-    } filterNot (_._2.isEmpty)
+    importedSymbolsBySource
+      .map {
+        case (k, vs) => (k, vs.filter(_.isImplicit))
+      }
+      .filterNot(_._2.isEmpty)
   }
 
   /** Compute imports that allow definitions from previous
@@ -132,8 +134,8 @@ trait Imports { self: IMain =>
           case _: ImportHandler => true
           case x if generousImports =>
             x.definesImplicit ||
-              (x.definedNames exists (d => wanted.exists(w => d.startsWith(w))))
-          case x => x.definesImplicit || (x.definedNames exists wanted)
+              (x.definedNames.exists(d => wanted.exists(w => d.startsWith(w))))
+          case x => x.definesImplicit || (x.definedNames.exists(wanted))
         }
 
         reqs match {
@@ -148,7 +150,7 @@ trait Imports { self: IMain =>
       }
 
       /** Flatten the handlers out and pair each with the original request */
-      select(allReqAndHandlers reverseMap {
+      select(allReqAndHandlers.reverseMap {
         case (r, h) => ReqAndHandler(r, h)
       }, wanted).reverse
     }
@@ -156,13 +158,13 @@ trait Imports { self: IMain =>
     // add code for a new object to hold some imports
     def addWrapper() {
       import nme.{INTERPRETER_IMPORT_WRAPPER => iw}
-      code append (wrapper.prewrap format iw)
-      trailingBraces append wrapper.postwrap
-      accessPath append s".$iw"
+      code.append(wrapper.prewrap.format(iw))
+      trailingBraces.append(wrapper.postwrap)
+      accessPath.append(s".$iw")
       currentImps.clear()
     }
 
-    def maybeWrap(names: Name*) = if (names exists currentImps) addWrapper()
+    def maybeWrap(names: Name*) = if (names.exists(currentImps)) addWrapper()
 
     def wrapBeforeAndAfter[T](op: => T): T = {
       addWrapper()
@@ -183,14 +185,14 @@ trait Imports { self: IMain =>
         handler match {
           case h: ImportHandler if checkHeader(h) =>
             header.clear()
-            header append f"${h.member}%n"
+            header.append(f"${h.member}%n")
           // If the user entered an import, then just use it; add an import wrapping
           // level if the import might conflict with some other import
           case x: ImportHandler if x.importsWildcard =>
-            wrapBeforeAndAfter(code append (x.member + "\n"))
+            wrapBeforeAndAfter(code.append(x.member + "\n"))
           case x: ImportHandler =>
             maybeWrap(x.importedNames: _*)
-            code append (x.member + "\n")
+            code.append(x.member + "\n")
             currentImps ++= x.importedNames
 
           case x if isClassBased =>
@@ -221,7 +223,7 @@ trait Imports { self: IMain =>
           case x =>
             for (sym <- x.definedSymbols) {
               maybeWrap(sym.name)
-              code append s"import ${x.path}\n"
+              code.append(s"import ${x.path}\n")
               currentImps += sym.name
             }
         }
@@ -236,7 +238,7 @@ trait Imports { self: IMain =>
   }
 
   private def allReqAndHandlers =
-    prevRequestList flatMap (req => req.handlers map (req -> _))
+    prevRequestList.flatMap(req => req.handlers.map(req -> _))
 
   private def membersAtPickler(sym: Symbol): List[Symbol] =
     enteringPickler(sym.info.nonPrivateMembers.toList)

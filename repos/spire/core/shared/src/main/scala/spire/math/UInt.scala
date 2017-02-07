@@ -73,7 +73,7 @@ private[math] trait UIntIsRig extends Rig[UInt] {
   def plus(a: UInt, b: UInt): UInt = a + b
   override def pow(a: UInt, b: Int): UInt = {
     if (b < 0)
-      throw new IllegalArgumentException("negative exponent: %s" format b)
+      throw new IllegalArgumentException("negative exponent: %s".format(b))
     a ** UInt(b)
   }
   override def times(a: UInt, b: UInt): UInt = a * b

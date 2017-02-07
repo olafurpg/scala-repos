@@ -6,6 +6,6 @@ object InfixApply {
   def foo[A]: Query[A] = null
 
   /*start*/
-  InfixApply foo 1 /*end*/
+  InfixApply.foo(1) /*end*/
 }
 //Int

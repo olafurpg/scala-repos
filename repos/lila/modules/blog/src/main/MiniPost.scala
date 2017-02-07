@@ -13,9 +13,9 @@ object MiniPost {
 
   def fromDocument(coll: String)(doc: io.prismic.Document): Option[MiniPost] =
     for {
-      title <- doc getText s"$coll.title"
-      shortlede = ~(doc getText s"$coll.shortlede")
-      date <- doc getDate s"$coll.date" map (_.value)
+      title <- doc.getText(s"$coll.title")
+      shortlede = ~(doc.getText(s"$coll.shortlede"))
+      date <- doc.getDate(s"$coll.date").map(_.value)
       image = ~doc.getImage(s"$coll.image", "column").map(_.url)
     } yield
       MiniPost(doc.id,

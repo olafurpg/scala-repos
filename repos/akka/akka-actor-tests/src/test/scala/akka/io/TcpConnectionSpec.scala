@@ -94,7 +94,7 @@ class TcpConnectionSpec extends AkkaSpec("""
       }
     }
 
-    "set socket options after connecting" ignore new LocalServerTest() {
+    "set socket options after connecting".ignore(new LocalServerTest() {
       run {
         // Workaround for systems where SO_KEEPALIVE is true by default
         val connectionActor =
@@ -107,7 +107,7 @@ class TcpConnectionSpec extends AkkaSpec("""
           clientChannel.socket.getKeepAlive should ===(false)
         }
       }
-    }
+    })
 
     "send incoming data to the connection handler" in new EstablishedConnectionTest() {
       run {
@@ -1145,10 +1145,10 @@ class TcpConnectionSpec extends AkkaSpec("""
         def apply(key: SelectionKey) =
           MatchResult(
             checkFor(key, interest, duration.toMillis.toInt),
-            "%s key was not selected for %s after %s" format
-              (key.attachment(), interestsDesc(interest), duration),
-            "%s key was selected for %s after %s" format
-              (key.attachment(), interestsDesc(interest), duration)
+            "%s key was not selected for %s after %s"
+              .format(key.attachment(), interestsDesc(interest), duration),
+            "%s key was selected for %s after %s"
+              .format(key.attachment(), interestsDesc(interest), duration)
           )
       }
 

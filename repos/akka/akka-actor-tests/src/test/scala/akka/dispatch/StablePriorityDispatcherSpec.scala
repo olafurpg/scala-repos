@@ -72,7 +72,7 @@ class StablePriorityDispatcherSpec
 
           val acc = scala.collection.mutable.ListBuffer[Int]()
 
-          shuffled foreach { m ⇒
+          shuffled.foreach { m ⇒
             self ! m
           }
 
@@ -90,7 +90,7 @@ class StablePriorityDispatcherSpec
       // Low messages should come out first, and in priority order.  High messages follow - they are equal priority and
       // should come out in the same order in which they were sent.
       val lo = (1 to 100) toList
-      val hi = shuffled filter { _ > 100 }
+      val hi = shuffled.filter { _ > 100 }
       expectMsgType[List[Int]] should ===(lo ++ hi)
     }
   }

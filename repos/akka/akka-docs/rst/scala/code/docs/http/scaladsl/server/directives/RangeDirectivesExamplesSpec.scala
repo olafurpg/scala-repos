@@ -43,7 +43,7 @@ class RangeDirectivesExamplesSpec extends RoutingSpec {
 
       val response = Await.result(responseF, 3.seconds).reverse
 
-      response should have length 2
+      (response should have).length(2)
 
       val part1 = response(0)
       part1.contentRange === ContentRange(0, 2, 8)

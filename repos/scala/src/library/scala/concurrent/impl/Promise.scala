@@ -49,11 +49,11 @@ private[concurrent] trait Promise[T]
     val p = new DefaultPromise[S]()
     onComplete { v =>
       try f(v) match {
-        case fut if fut eq this => p complete v.asInstanceOf[Try[S]]
+        case fut if fut eq this => p.complete(v.asInstanceOf[Try[S]])
         case dp: DefaultPromise[_] =>
           dp.asInstanceOf[DefaultPromise[S]].linkRootOf(p)
-        case fut => p completeWith fut
-      } catch { case NonFatal(t) => p failure t }
+        case fut => p.completeWith(fut)
+      } catch { case NonFatal(t) => p.failure(t) }
     }
     p.future
   }
@@ -77,7 +77,7 @@ private final class CallbackRunnable[T](val executor: ExecutionContext,
     require(value ne null) // must set value to non-null before running!
     try onComplete(value)
     catch {
-      case NonFatal(e) => executor reportFailure e
+      case NonFatal(e) => executor.reportFailure(e)
     }
   }
 
@@ -88,7 +88,7 @@ private final class CallbackRunnable[T](val executor: ExecutionContext,
     // already be running on a different thread!
     try executor.execute(this)
     catch {
-      case NonFatal(t) => executor reportFailure t
+      case NonFatal(t) => executor.reportFailure(t)
     }
   }
 }

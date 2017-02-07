@@ -640,7 +640,7 @@ private[hive] class HiveMetastoreCatalog(val client: HiveClient,
         return plan
       }
 
-      plan transformUp {
+      plan.transformUp {
         // Write path
         case InsertIntoTable(r: MetastoreRelation,
                              partition,
@@ -690,7 +690,7 @@ private[hive] class HiveMetastoreCatalog(val client: HiveClient,
     * For example, because of a CREATE TABLE X AS statement.
     */
   object CreateTables extends Rule[LogicalPlan] {
-    def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+    def apply(plan: LogicalPlan): LogicalPlan = plan.transform {
       // Wait until children are resolved.
       case p: LogicalPlan if !p.childrenResolved => p
       case p: LogicalPlan if p.resolved => p

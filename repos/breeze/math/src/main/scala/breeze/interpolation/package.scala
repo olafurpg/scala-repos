@@ -33,15 +33,15 @@ package object interpolation {
       throw new Exception("need to provide at least one pair of coordinates")
 
     private val nodes =
-      x_coords.toArray zip y_coords.toArray sortBy { n =>
+      x_coords.toArray.zip(y_coords.toArray).sortBy { n =>
         n._1
       }
     protected val X: Array[T] =
-      nodes map { n =>
+      nodes.map { n =>
         n._1
       }
     protected val Y: Array[T] =
-      nodes map { n =>
+      nodes.map { n =>
         n._2
       }
 

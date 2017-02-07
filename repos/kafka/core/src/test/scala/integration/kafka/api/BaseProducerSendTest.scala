@@ -379,7 +379,7 @@ abstract class BaseProducerSendTest extends KafkaServerTestHarness {
         assertTrue("Request should have completed", future.isDone)
 
       // make sure all of them end up in the same partition with increasing offset values
-      for ((future, offset) <- futures zip (0 until numRecords)) {
+      for ((future, offset) <- futures.zip(0 until numRecords)) {
         assertEquals(offset.toLong, future.get.offset)
         assertEquals(topic, future.get.topic)
         assertEquals(partition, future.get.partition)
@@ -455,7 +455,7 @@ abstract class BaseProducerSendTest extends KafkaServerTestHarness {
       val record =
         new ProducerRecord[Array[Byte], Array[Byte]](topic, "value".getBytes)
       for (i <- 0 until 50) {
-        val responses = (0 until numRecords) map (i => producer.send(record))
+        val responses = ((0 until numRecords)).map(i => producer.send(record))
         assertTrue("No request is complete.", responses.forall(!_.isDone()))
         producer.flush()
         assertTrue("All requests are complete.", responses.forall(_.isDone()))
@@ -485,7 +485,7 @@ abstract class BaseProducerSendTest extends KafkaServerTestHarness {
     // Test closing from caller thread.
     for (i <- 0 until 50) {
       val producer = createProducer(brokerList, lingerMs = Long.MaxValue)
-      val responses = (0 until numRecords) map (i => producer.send(record0))
+      val responses = ((0 until numRecords)).map(i => producer.send(record0))
       assertTrue("No request is complete.", responses.forall(!_.isDone()))
       producer.close(0, TimeUnit.MILLISECONDS)
       responses.foreach { future =>
@@ -539,7 +539,7 @@ abstract class BaseProducerSendTest extends KafkaServerTestHarness {
                                 exception: Exception) {
         // Trigger another batch in accumulator before close the producer. These messages should
         // not be sent.
-        (0 until numRecords) map (i => producer.send(record))
+        ((0 until numRecords)).map(i => producer.send(record))
         // The close call will be called by all the message callbacks. This tests idempotence of the close call.
         producer.close(0, TimeUnit.MILLISECONDS)
         // Test close with non zero timeout. Should not block at all.
@@ -551,8 +551,8 @@ abstract class BaseProducerSendTest extends KafkaServerTestHarness {
       try {
         // send message to partition 0
         val responses =
-          ((0 until numRecords) map
-            (i => producer.send(record, new CloseCallback(producer))))
+          (((0 until numRecords)).map(i =>
+            producer.send(record, new CloseCallback(producer))))
         assertTrue("No request is complete.", responses.forall(!_.isDone()))
         // flush the messages.
         producer.flush()

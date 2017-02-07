@@ -36,7 +36,7 @@ import FastFuture._
   */
 sealed abstract class StrictForm {
   def fields: immutable.Seq[(String, StrictForm.Field)]
-  def field(name: String): Option[StrictForm.Field] = fields collectFirst {
+  def field(name: String): Option[StrictForm.Field] = fields.collectFirst {
     case (`name`, field) ⇒ field
   }
 }
@@ -175,7 +175,7 @@ object StrictForm {
 
   object FileData {
     implicit val unmarshaller: FromStrictFormFieldUnmarshaller[FileData] =
-      Unmarshaller strict {
+      Unmarshaller.strict {
         case Field.FromString(_) ⇒
           throw Unmarshaller.UnsupportedContentTypeException(
             MediaTypes.`application/x-www-form-urlencoded`)

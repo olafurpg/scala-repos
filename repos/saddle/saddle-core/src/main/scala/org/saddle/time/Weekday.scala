@@ -60,5 +60,5 @@ case class WeekdayNum(n: Int, d: Weekday) {
   protected[time] def toICal: com.google.ical.values.WeekdayNum =
     new com.google.ical.values.WeekdayNum(n, d.toICal)
 
-  override def toString = "%s(%d)" format (d, n)
+  override def toString = "%s(%d)".format(d, n)
 }

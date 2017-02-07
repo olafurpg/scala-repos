@@ -84,7 +84,7 @@ object Logger {
 
   def loggerNameFor(cls: Class[_]) = {
     val className = cls.getName
-    if (className endsWith "$") className.substring(0, className.length - 1)
+    if (className.endsWith("$")) className.substring(0, className.length - 1)
     else className
   }
 
@@ -126,7 +126,7 @@ object MDC {
     * Put a (key,value) pair into the Mapped Diagnostic Context
     */
   def put(kvs: (String, Any)*) = {
-    kvs foreach { v =>
+    kvs.foreach { v =>
       SLF4JMDC.put(v._1, v._2.toString)
     }
   }
@@ -135,7 +135,7 @@ object MDC {
     * Clear key from the Mapped Diagnostic Context
     */
   def remove(keys: String*) = {
-    keys foreach { k =>
+    keys.foreach { k =>
       SLF4JMDC.remove(k)
     }
   }

@@ -19,7 +19,7 @@ class DryRun {
     compiler.test2
     compiler.test3
     val run = new compiler.Run
-    run compile command.files
+    run.compile(command.files)
   }
 }
 

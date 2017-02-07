@@ -9,7 +9,7 @@ object build extends Build {
   lazy val k4 = taskKey[Unit]("")
 
   val UpdateK1 = Command.command("UpdateK1") { st: State =>
-    val ex = Project extract st
+    val ex = Project.extract(st)
     import ex._
     val session2 = BuiltinCommands
       .setThis(st,
@@ -26,7 +26,7 @@ object build extends Build {
   }
 
   val UpdateK3 = Command.command("UpdateK3") { st: State =>
-    val ex = Project extract st
+    val ex = Project.extract(st)
     import ex._
     val session2 = BuiltinCommands
       .setThis(

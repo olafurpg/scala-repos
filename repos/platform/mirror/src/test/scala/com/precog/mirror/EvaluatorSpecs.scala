@@ -293,14 +293,14 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
       val actual = doEval(q)
 
       expect.length == actual.length &&
-      (expect zip actual forall { case (a, b) => a == b })
+      (expect.zip(actual).forall { case (a, b) => a == b })
     }
 
     def message(q: String): String = {
       val actual = doEval(q)
 
       "evaluates to [%s], not [%s]"
-        .format(actual map { _.renderCompact } mkString ",", expect map {
+        .format(actual.map { _.renderCompact } mkString ",", expect.map {
           _.renderCompact
         } mkString ",")
     }
@@ -317,7 +317,7 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
   }
 
   private def compileSingle(str: String): Expr = {
-    val forest = compile(str) filter { _.errors must beEmpty }
+    val forest = compile(str).filter { _.errors must beEmpty }
     forest must haveSize(1)
     forest.head
   }

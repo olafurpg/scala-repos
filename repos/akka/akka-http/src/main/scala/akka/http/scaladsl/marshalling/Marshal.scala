@@ -57,12 +57,12 @@ class Marshal[A](val value: A) {
           ctn.pickContentType(supportedAlternatives).flatMap {
             case best @ (_: ContentType.Binary |
                 _: ContentType.WithFixedCharset) ⇒
-              marshallings collectFirst {
+              marshallings.collectFirst {
                 case Marshalling.WithFixedContentType(`best`, marshal) ⇒
                   marshal
               }
             case best @ ContentType.WithCharset(bestMT, bestCS) ⇒
-              marshallings collectFirst {
+              marshallings.collectFirst {
                 case Marshalling.WithFixedContentType(`best`, marshal) ⇒
                   marshal
                 case Marshalling.WithOpenCharset(`bestMT`, marshal) ⇒
@@ -71,14 +71,15 @@ class Marshal[A](val value: A) {
               }
           }
         } else None
-      } orElse {
-        marshallings collectFirst {
-          case Marshalling.Opaque(marshal) ⇒ marshal
+      }.orElse {
+          marshallings.collectFirst {
+            case Marshalling.Opaque(marshal) ⇒ marshal
+          }
         }
-      } getOrElse {
-        throw UnacceptableResponseContentTypeException(
-          supportedAlternatives.toSet)
-      }
+        .getOrElse {
+          throw UnacceptableResponseContentTypeException(
+            supportedAlternatives.toSet)
+        }
       bestMarshal()
     }
   }

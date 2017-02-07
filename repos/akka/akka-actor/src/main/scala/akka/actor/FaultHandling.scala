@@ -205,7 +205,7 @@ object SupervisorStrategy extends SupervisorStrategyLowPriorityImplicits {
     * the given Throwables matches the cause and restarts, otherwise escalates.
     */
   def makeDecider(trapExit: immutable.Seq[Class[_ <: Throwable]]): Decider = {
-    case x ⇒ if (trapExit exists (_ isInstance x)) Restart else Escalate
+    case x ⇒ if (trapExit.exists(_.isInstance(x))) Restart else Escalate
   }
 
   /**
@@ -226,7 +226,9 @@ object SupervisorStrategy extends SupervisorStrategyLowPriorityImplicits {
 
     {
       case x ⇒
-        directives collectFirst { case (c, d) if c isInstance x ⇒ d } getOrElse Escalate
+        directives
+          .collectFirst { case (c, d) if c.isInstance(x) ⇒ d }
+          .getOrElse(Escalate)
     }
   }
 
@@ -244,8 +246,8 @@ object SupervisorStrategy extends SupervisorStrategyLowPriorityImplicits {
   private[akka] def sort(
       in: Iterable[CauseDirective]): immutable.Seq[CauseDirective] =
     (new ArrayBuffer[CauseDirective](in.size) /: in) { (buf, ca) ⇒
-      buf.indexWhere(_._1 isAssignableFrom ca._1) match {
-        case -1 ⇒ buf append ca
+      buf.indexWhere(_._1.isAssignableFrom(ca._1)) match {
+        case -1 ⇒ buf.append(ca)
         case x ⇒ buf insert (x, ca)
       }
       buf
@@ -504,11 +506,8 @@ case class AllForOneStrategy(maxNrOfRetries: Int = -1,
     if (children.nonEmpty) {
       if (restart &&
           children.forall(_.requestRestartPermission(retriesWindow)))
-        children foreach
-          (crs ⇒
-             restartChild(crs.child,
-                          cause,
-                          suspendFirst = (crs.child != child)))
+        children.foreach(crs ⇒
+          restartChild(crs.child, cause, suspendFirst = (crs.child != child)))
       else for (c ← children) context.stop(c.child)
     }
   }

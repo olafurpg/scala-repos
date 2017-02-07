@@ -5,7 +5,7 @@ object Test {
   def main(args: Array[String]) = {
     val tests = 5000
     val jm: java.util.Map[Int, Int] = scala.collection.mutable
-      .Map((0 until tests) zip (0 until tests).reverse: _*)
+      .Map(((0 until tests)).zip(0 until tests).reverse: _*)
     val es = jm.entrySet()
     val it = es.iterator
 

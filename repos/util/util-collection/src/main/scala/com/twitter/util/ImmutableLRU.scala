@@ -80,9 +80,11 @@ class ImmutableLRU[K, V] private (maxSize: Int,
   def get(k: K): (Option[V], ImmutableLRU[K, V]) = {
     val (optionalValue, lru) = remove(k)
     val newLru =
-      optionalValue.map { v =>
-        (lru + (k -> v))._2
-      } getOrElse (lru)
+      optionalValue
+        .map { v =>
+          (lru + (k -> v))._2
+        }
+        .getOrElse(lru)
     (optionalValue, newLru)
   }
 

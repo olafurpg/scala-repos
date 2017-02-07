@@ -204,7 +204,7 @@ class AccountServiceSpec extends TestAccountService with Tags {
     accounts.header(auth(user, pass)).delete(accountId + "/plan")
 
   def createAccountAndGetId(email: String, pass: String): Future[String] = {
-    createAccount(email, pass) map {
+    createAccount(email, pass).map {
       case HttpResponse(HttpStatus(OK, _), _, Some(jv), _) =>
         val JString(id) = jv \ "accountId"
         id

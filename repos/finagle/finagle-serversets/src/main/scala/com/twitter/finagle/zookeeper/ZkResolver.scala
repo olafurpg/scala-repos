@@ -129,7 +129,7 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
     val (zkClient, zkHealthHandler) = factory.get(zkHosts)
     val zkOffer = new ZkOffer(new ServerSetImpl(zkClient, path), path)
     val addrOffer =
-      zkOffer map { newSet =>
+      zkOffer.map { newSet =>
         val sockaddrs = toAddresses(newSet)
         if (sockaddrs.nonEmpty) Addr.Bound(sockaddrs)
         else Addr.Neg
@@ -141,7 +141,7 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
                                  DefaultStatsReceiver.scope("zkGroup"))
 
     val v = Var[Addr](Addr.Pending)
-    stable foreach { newAddr =>
+    stable.foreach { newAddr =>
       v() = newAddr
     }
 

@@ -8,7 +8,7 @@ object Analyser {
   )
 
   private def wordsRegexes: List[String] = Dictionary.en.map { word =>
-    if (word endsWith "s") word
+    if (word.endsWith("s")) word
     else word + "s?"
   }
 

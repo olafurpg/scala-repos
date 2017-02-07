@@ -39,7 +39,7 @@ class MarshallingSpec
     }
     "FormDataMarshaller should marshal FormData instances to application/x-www-form-urlencoded content" in {
       marshal(FormData(Map("name" -> "Bob", "pass" -> "hällo", "admin" -> ""))) shouldEqual HttpEntity(
-        `application/x-www-form-urlencoded` withCharset `UTF-8`,
+        `application/x-www-form-urlencoded`.withCharset(`UTF-8`),
         "name=Bob&pass=h%C3%A4llo&admin=")
     }
   }
@@ -65,7 +65,9 @@ class MarshallingSpec
           Multipart.General(
             `multipart/mixed`,
             Multipart.General.BodyPart.Strict(""))) shouldEqual HttpEntity(
-          contentType = `multipart/mixed` withBoundary randomBoundary withCharset `UTF-8`,
+          contentType = `multipart/mixed`
+            .withBoundary(randomBoundary)
+            .withCharset(`UTF-8`),
           string = s"""--$randomBoundary
                       |Content-Type: text/plain; charset=UTF-8
                       |
@@ -85,7 +87,9 @@ class MarshallingSpec
                   Map("name" -> "email")) :: Nil
             )
           )) shouldEqual HttpEntity(
-          contentType = `multipart/alternative` withBoundary randomBoundary withCharset `UTF-8`,
+          contentType = `multipart/alternative`
+            .withBoundary(randomBoundary)
+            .withCharset(`UTF-8`),
           string = s"""--$randomBoundary
                         |Content-Type: text/plain; charset=UTF-8
                         |Content-Disposition: form-data; name=email
@@ -99,14 +103,16 @@ class MarshallingSpec
           Multipart.General(
             `multipart/related`,
             Multipart.General.BodyPart.Strict(
-              HttpEntity(`text/plain` withCharset `US-ASCII`,
+              HttpEntity(`text/plain`.withCharset(`US-ASCII`),
                          "first part, with a trailing linebreak\r\n")),
             Multipart.General.BodyPart.Strict(
               HttpEntity(`application/octet-stream`,
                          ByteString("filecontent")),
               RawHeader("Content-Transfer-Encoding", "binary") :: Nil)
           )) shouldEqual HttpEntity(
-          contentType = `multipart/related` withBoundary randomBoundary withCharset `UTF-8`,
+          contentType = `multipart/related`
+            .withBoundary(randomBoundary)
+            .withCharset(`UTF-8`),
           string = s"""--$randomBoundary
                       |Content-Type: text/plain; charset=US-ASCII
                       |
@@ -128,7 +134,9 @@ class MarshallingSpec
           Multipart.FormData(
             ListMap("surname" -> HttpEntity("Mike"),
                     "age" -> marshal(<int>42</int>)))) shouldEqual HttpEntity(
-          contentType = `multipart/form-data` withBoundary randomBoundary withCharset `UTF-8`,
+          contentType = `multipart/form-data`
+            .withBoundary(randomBoundary)
+            .withCharset(`UTF-8`),
           string = s"""--$randomBoundary
                       |Content-Type: text/plain; charset=UTF-8
                       |Content-Disposition: form-data; name=surname
@@ -148,7 +156,7 @@ class MarshallingSpec
           Multipart.FormData(Source(List(
             Multipart.FormData.BodyPart(
               "attachment[0]",
-              HttpEntity(`text/csv` withCharset `UTF-8`,
+              HttpEntity(`text/csv`.withCharset(`UTF-8`),
                          "name,age\r\n\"John Doe\",20\r\n"),
               Map("filename" -> "attachment.csv")),
             Multipart.FormData.BodyPart(
@@ -157,7 +165,9 @@ class MarshallingSpec
               Map("filename" -> "attachment2.csv"),
               List(RawHeader("Content-Transfer-Encoding", "binary")))
           )))) shouldEqual HttpEntity(
-          contentType = `multipart/form-data` withBoundary randomBoundary withCharset `UTF-8`,
+          contentType = `multipart/form-data`
+            .withBoundary(randomBoundary)
+            .withCharset(`UTF-8`),
           string = s"""--$randomBoundary
                         |Content-Type: text/csv; charset=UTF-8
                         |Content-Disposition: form-data; filename=attachment.csv; name="attachment[0]"

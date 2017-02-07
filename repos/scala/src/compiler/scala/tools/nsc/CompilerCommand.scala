@@ -14,7 +14,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
   def this(arguments: List[String],
            settings: Settings,
            error: String => Unit) =
-    this(arguments, settings withErrorFn error)
+    this(arguments, settings.withErrorFn(error))
 
   type Setting = Settings#Setting
 
@@ -45,14 +45,14 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     |
   """.stripMargin.trim + "\n"
 
-  def shortUsage = "Usage: %s <options> <source files>" format cmdName
+  def shortUsage = "Usage: %s <options> <source files>".format(cmdName)
 
   /** Creates a help message for a subset of options based on cond */
   def createUsageMsg(cond: Setting => Boolean): String = {
     val baseList =
-      (settings.visibleSettings filter cond).toList sortBy (_.name)
-    val width = (baseList map (_.helpSyntax.length)).max
-    def format(s: String) = ("%-" + width + "s") format s
+      (settings.visibleSettings.filter(cond)).toList.sortBy(_.name)
+    val width = (baseList.map(_.helpSyntax.length)).max
+    def format(s: String) = (("%-" + width + "s")).format(s)
     def helpStr(s: Setting) = {
       val str = format(s.helpSyntax) + "  " + s.helpDescription
       val suffix = s.deprecationMessage match {
@@ -61,9 +61,9 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
       }
       str + suffix
     }
-    val debugs = baseList filter (_.isForDebug)
-    val deprecateds = baseList filter (_.isDeprecated)
-    val theRest = baseList filterNot (debugs.toSet ++ deprecateds)
+    val debugs = baseList.filter(_.isForDebug)
+    val deprecateds = baseList.filter(_.isDeprecated)
+    val theRest = baseList.filterNot(debugs.toSet ++ deprecateds)
 
     def sstring(msg: String, xs: List[Setting]) =
       if (xs.isEmpty) None else Some(msg :: xs.map(helpStr) mkString "\n  ")
@@ -81,7 +81,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     val prefix =
       List(
         Some(shortUsage),
-        Some(explainAdvanced) filter (_ => shouldExplain),
+        Some(explainAdvanced).filter(_ => shouldExplain),
         Some(label + " options include:")
       ).flatten mkString "\n"
 
@@ -123,8 +123,8 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     // would be nicer if we could ask all the options for their helpful messages
     else {
       val sb = new StringBuilder
-      allSettings foreach {
-        case s: MultiChoiceSetting[_] if s.isHelping => sb append s.help
+      allSettings.foreach {
+        case s: MultiChoiceSetting[_] if s.isHelping => sb.append(s.help)
         case _ =>
       }
       sb.toString
@@ -136,13 +136,13 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     * file named like each argument.
     */
   def expandArg(arg: String): List[String] = {
-    def stripComment(s: String) = s takeWhile (_ != '#')
-    val file = File(arg stripPrefix "@")
+    def stripComment(s: String) = s.takeWhile(_ != '#')
+    val file = File(arg.stripPrefix("@"))
     if (!file.exists)
       throw new java.io.FileNotFoundException(
-        "argument file %s could not be found" format file.name)
+        "argument file %s could not be found".format(file.name))
 
-    settings splitParams (file.lines() map stripComment mkString " ")
+    settings.splitParams(file.lines().map(stripComment) mkString " ")
   }
 
   // override this if you don't want arguments processed here
@@ -151,8 +151,8 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
   def processArguments: (Boolean, List[String]) = {
     // expand out @filename to the contents of that filename
     val expandedArguments =
-      arguments flatMap {
-        case x if x startsWith "@" => expandArg(x)
+      arguments.flatMap {
+        case x if x.startsWith("@") => expandArg(x)
         case x => List(x)
       }
 

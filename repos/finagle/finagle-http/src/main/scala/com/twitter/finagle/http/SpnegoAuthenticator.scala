@@ -26,7 +26,7 @@ object SpnegoAuthenticator {
   private object AuthHeader {
     val SchemePrefixLength = AuthScheme.length + 1
     def apply(token: Option[Token]): Option[String] =
-      token map { t =>
+      token.map { t =>
         AuthScheme + " " + Base64StringEncoder.encode(t)
       }
 
@@ -313,32 +313,42 @@ object SpnegoAuthenticator {
 
     final def apply(req: Req,
                     authed: Service[Authenticated[Req], Rsp]): Future[Rsp] =
-      reqs.authorizationHeader(req).collect {
-        case AuthHeader(negotiation) =>
-          credSrc.load() flatMap {
-            credSrc.accept(_, negotiation)
-          } flatMap { negotiated =>
-            negotiated.established map { ctx =>
-              authed(reqs.authenticated(req, ctx))
-            } getOrElse {
-              Future value unauthorized(req)
-            } map { rsp =>
-              negotiated.wwwAuthenticate foreach {
-                rsps.wwwAuthenticateHeader(rsp, _)
+      reqs
+        .authorizationHeader(req)
+        .collect {
+          case AuthHeader(negotiation) =>
+            credSrc
+              .load()
+              .flatMap {
+                credSrc.accept(_, negotiation)
               }
-              rsp
-            }
-          } handle {
-            case e: GSSException => {
-              log.error(e, "authenticating")
-              unauthorized(req)
-            }
-          }
-      } getOrElse {
-        log.debug(
-          "Request had no AuthHeader information.  Returning Unauthorized.")
-        Future value unauthorized(req)
-      }
+              .flatMap { negotiated =>
+                negotiated.established
+                  .map { ctx =>
+                    authed(reqs.authenticated(req, ctx))
+                  }
+                  .getOrElse {
+                    Future.value(unauthorized(req))
+                  }
+                  .map { rsp =>
+                    negotiated.wwwAuthenticate.foreach {
+                      rsps.wwwAuthenticateHeader(rsp, _)
+                    }
+                    rsp
+                  }
+              }
+              .handle {
+                case e: GSSException => {
+                  log.error(e, "authenticating")
+                  unauthorized(req)
+                }
+              }
+        }
+        .getOrElse {
+          log.debug(
+            "Request had no AuthHeader information.  Returning Unauthorized.")
+          Future.value(unauthorized(req))
+        }
   }
 
   case class ClientFilter(credSrc: Credentials.ClientSource)

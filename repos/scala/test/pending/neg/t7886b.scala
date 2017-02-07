@@ -6,7 +6,7 @@ trait T
 case class Unravel[A](m: Contra[A], msg: A) extends T
 
 object Test extends Covariant[Any] {
-  def g(m: Contra[Any]): Unit = m accept 5
+  def g(m: Contra[Any]): Unit = m.accept(5)
   def f(x: T): Unit = x match {
     case Unravel(m, msg) => g(m)
     case _ =>

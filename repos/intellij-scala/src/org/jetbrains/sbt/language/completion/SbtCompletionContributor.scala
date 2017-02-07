@@ -135,8 +135,8 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
               applyVariant(lookup)
             }
             obj.members.foreach {
-              case v: ScValue => v.declaredElements foreach fetchAndApply
-              case v: ScVariable => v.declaredElements foreach fetchAndApply
+              case v: ScValue => v.declaredElements.foreach(fetchAndApply)
+              case v: ScVariable => v.declaredElements.foreach(fetchAndApply)
               case obj: ScObject => fetchAndApply(obj)
               case _ => // do nothing
             }
@@ -162,8 +162,8 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
             case typed: ScTypedDefinition
                 if typed.getType().getOrAny.conforms(expectedType) =>
               variant.isLocalVariable = (typed.isVar || typed.isVal) &&
-                  (typed.containingFile exists
-                    (_.getName == parameters.getOriginalFile.getName))
+                  (typed.containingFile.exists(
+                    _.getName == parameters.getOriginalFile.getName))
               apply(variant)
             case _ => // do nothing
           }
@@ -176,11 +176,12 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
               case ScProjectionType(proj,
                                     _: ScTypeAlias | _: ScClass | _: ScTrait,
                                     _) =>
-                ScType.extractClass(proj) foreach collectAndApplyVariants
+                ScType.extractClass(proj).foreach(collectAndApplyVariants)
               case _ => // do nothing
             }
             ScalaPsiUtil
-              .getCompanionModule(clazz) foreach collectAndApplyVariants
+              .getCompanionModule(clazz)
+              .foreach(collectAndApplyVariants)
           case Some(p: PsiClass) if isAccessible(p) =>
             p.getFields.foreach(field => {
               if (field.hasModifierProperty("static") &&
@@ -200,7 +201,7 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
         }
 
         // Get results from parent reference
-        parentRef.getVariants() foreach applyVariant
+        parentRef.getVariants().foreach(applyVariant)
       }
     }
   )

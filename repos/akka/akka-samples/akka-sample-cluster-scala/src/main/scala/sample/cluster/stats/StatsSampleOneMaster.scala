@@ -20,7 +20,7 @@ object StatsSampleOneMaster {
   }
 
   def startup(ports: Seq[String]): Unit = {
-    ports foreach { port =>
+    ports.foreach { port =>
       // Override the configuration of the port when specified as program argument
       val config = ConfigFactory
         .parseString(s"akka.remote.netty.tcp.port=" + port)

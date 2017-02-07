@@ -13,15 +13,15 @@ import org.scalacheck.Prop.forAll
 object ZipperTest extends SpecLite {
 
   "Zipper From Stream" ! forAll { (xs: Stream[Int]) =>
-    (xs.toZipper map (_.toStream)).getOrElse(Stream()) === xs
+    (xs.toZipper.map(_.toStream)).getOrElse(Stream()) === xs
   }
 
   "Mapping on a zipper should be the same as mapping on the elements of the stream" ! forAll {
     (xs: Stream[Int], a: Int) =>
       val fun: Int => Int = _ + a
 
-      (for (z <- xs.toZipper; zM <- (xs map fun).toZipper)
-        yield z.map(fun) must_=== (zM)) getOrElse { xs.length must_=== (0) }
+      (for (z <- xs.toZipper; zM <- (xs.map(fun)).toZipper)
+        yield z.map(fun) must_=== (zM)).getOrElse { xs.length must_=== (0) }
   }
 
   "Zipper Move Then To Stream" in check {
@@ -33,7 +33,7 @@ object ZipperTest extends SpecLite {
     (for (z <- xs.toZipper; zn <- z.next) yield {
       (zn.lefts.length must_=== (z.lefts.length + 1));
       (zn.rights.length must_=== (z.rights.length - 1))
-    }) getOrElse { xs.length mustBe_< (2) }
+    }).getOrElse { xs.length mustBe_< (2) }
   }
 
   "nextC moves focus or loops" ! forAll { z: Zipper[Int] =>
@@ -75,8 +75,8 @@ object ZipperTest extends SpecLite {
   "Previous Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (for (z <- xs.zipperEnd; zn <- z.previous)
       yield
-        zn.lefts.length must_=== (z.lefts.length - 1) and
-          (zn.rights.length must_=== (z.rights.length + 1))) getOrElse {
+        (zn.lefts.length must_=== (z.lefts.length - 1))
+          .and(zn.rights.length must_=== (z.rights.length + 1))).getOrElse {
       xs.length mustBe_< (2)
     }
   }
@@ -131,20 +131,26 @@ object ZipperTest extends SpecLite {
 
   val leftAndFocusChanged: (Zipper[Int], Zipper[Int], Int) => Prop = {
     (zNew, zOld, newFocus) =>
-      { zNew.focus must_=== (newFocus) } and {
-        zNew.lefts.head must_=== (zOld.focus)
-      } and { zNew.lefts.tail must_=== (zOld.lefts) } and {
-        zNew.rights must_=== (zOld.rights)
-      }
+      { zNew.focus must_=== (newFocus) }
+        .and {
+          zNew.lefts.head must_=== (zOld.focus)
+        }
+        .and { zNew.lefts.tail must_=== (zOld.lefts) }
+        .and {
+          zNew.rights must_=== (zOld.rights)
+        }
   }
 
   val rightAndFocusChanged: (Zipper[Int], Zipper[Int], Int) => Prop = {
     (zNew, zOld, newFocus) =>
-      { zNew.focus must_=== (newFocus) } and {
-        zNew.lefts must_=== (zOld.lefts)
-      } and { zNew.rights.head must_=== (zOld.focus) } and {
-        zNew.rights.tail must_=== (zOld.rights)
-      }
+      { zNew.focus must_=== (newFocus) }
+        .and {
+          zNew.lefts must_=== (zOld.lefts)
+        }
+        .and { zNew.rights.head must_=== (zOld.focus) }
+        .and {
+          zNew.rights.tail must_=== (zOld.rights)
+        }
   }
 
   insertionTest("insertRight changes focus and appends to lefts",
@@ -159,14 +165,14 @@ object ZipperTest extends SpecLite {
 
   "DeleteRight Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (for (z <- xs.toZipper; zn <- z.deleteRight)
-      yield zn.rights.length must_=== (z.rights.length - 1)) getOrElse {
+      yield zn.rights.length must_=== (z.rights.length - 1)).getOrElse {
       xs.length mustBe_< (2)
     }
   }
 
   "DeleteRightC Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (for (z <- xs.toZipper; zn <- z.deleteRightC)
-      yield zn.rights.length must_=== (z.rights.length - 1)) getOrElse {
+      yield zn.rights.length must_=== (z.rights.length - 1)).getOrElse {
       xs.length mustBe_< (2)
     }
   }
@@ -178,8 +184,8 @@ object ZipperTest extends SpecLite {
       } yield {
         if (z.rights.length > 0) zd.focus must_=== (z.rights(0))
         else zd.focus must_=== (z.lefts.last)
-      }) getOrElse {
-        (z.lefts.isEmpty must_== (true)) and (z.rights.isEmpty must_== (true))
+      }).getOrElse {
+        ((z.lefts.isEmpty must_== (true))).and(z.rights.isEmpty must_== (true))
       }
   }
 
@@ -193,8 +199,8 @@ object ZipperTest extends SpecLite {
   "DeleteRight Affects Lengths and Moves Left if at end" ! forAll {
     (xs: Stream[Int]) =>
       (for (z <- xs.zipperEnd; zn <- z.deleteRight)
-        yield zn.lefts.length must_=== (z.lefts.length - 1)) getOrElse
-        (xs.length mustBe_< (2))
+        yield zn.lefts.length must_=== (z.lefts.length - 1))
+        .getOrElse(xs.length mustBe_< (2))
   }
 
   "deleteRight moves the focus to the right or if not possible left" ! forAll {
@@ -204,8 +210,8 @@ object ZipperTest extends SpecLite {
       } yield {
         if (z.rights.length > 0) zd.focus must_=== (z.rights(0))
         else zd.focus must_=== (z.lefts(0))
-      }) getOrElse {
-        (z.lefts.isEmpty must_== (true)) and (z.rights.isEmpty must_== (true))
+      }).getOrElse {
+        ((z.lefts.isEmpty must_== (true))).and(z.rights.isEmpty must_== (true))
       }
   }
 
@@ -214,16 +220,16 @@ object ZipperTest extends SpecLite {
       val zd = z.deleteRightOr(alt)
       if (z.lefts.length == 0 && z.rights.length == 0) zd must_=== (alt)
       else if (z.rights.length != 0)
-        (zd.rights must_=== (z.rights.tail)) and (zd.lefts must_=== (z.lefts))
+        ((zd.rights must_=== (z.rights.tail))).and(zd.lefts must_=== (z.lefts))
       else
-        (zd.rights.isEmpty must_== (true)) and
-          (zd.lefts must_=== (z.lefts.tail))
+        ((zd.rights.isEmpty must_== (true)))
+          .and(zd.lefts must_=== (z.lefts.tail))
   }
 
   "DeleteLeft Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (for (z <- xs.zipperEnd; zn <- z.deleteLeft)
-      yield zn.lefts.length must_=== (z.lefts.length - 1)) getOrElse
-      (xs.length mustBe_< (2))
+      yield zn.lefts.length must_=== (z.lefts.length - 1))
+      .getOrElse(xs.length mustBe_< (2))
   }
 
   "deleteLeft moves the focus to the left or if not possible right" ! forAll {
@@ -233,14 +239,14 @@ object ZipperTest extends SpecLite {
       } yield {
         if (z.lefts.length > 0) zd.focus must_=== (z.lefts(0))
         else zd.focus must_=== (z.rights(0))
-      }) getOrElse
-        ((z.lefts.isEmpty must_== (true)) and (z.rights.isEmpty must_== (true)))
+      }).getOrElse(((z.lefts.isEmpty must_== (true)))
+        .and(z.rights.isEmpty must_== (true)))
   }
 
   "DeleteLeftC Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (for (z <- xs.zipperEnd; zn <- z.deleteLeftC)
-      yield zn.lefts.length must_=== (z.lefts.length - 1)) getOrElse
-      (xs.length mustBe_< (2))
+      yield zn.lefts.length must_=== (z.lefts.length - 1))
+      .getOrElse(xs.length mustBe_< (2))
   }
 
   "deleteLeftC moves the focus to the left or if not possible to the last element" ! forAll {
@@ -250,8 +256,8 @@ object ZipperTest extends SpecLite {
       } yield {
         if (z.lefts.length > 0) zd.focus must_=== (z.lefts(0))
         else zd.focus must_=== (z.rights.last)
-      }) getOrElse
-        ((z.lefts.isEmpty must_== (true)) and (z.rights.isEmpty must_== (true)))
+      }).getOrElse(((z.lefts.isEmpty must_== (true)))
+        .and(z.rights.isEmpty must_== (true)))
   }
 
   "deleteLeftCOr should return Some of deleteLeftC or an alternative" ! forAll {
@@ -277,8 +283,8 @@ object ZipperTest extends SpecLite {
   "DeleteLeft Affects Lengths and Moves Right if at start" ! forAll {
     (xs: Stream[Int]) =>
       (for (z <- xs.toZipper; zn <- z.deleteLeft)
-        yield zn.rights.length must_=== (z.rights.length - 1)) getOrElse
-        (xs.length mustBe_< (2))
+        yield zn.rights.length must_=== (z.rights.length - 1))
+        .getOrElse(xs.length mustBe_< (2))
   }
 
   "deleteLeftOr should return Some of deleteLeft or an alternative" ! forAll {
@@ -300,28 +306,31 @@ object ZipperTest extends SpecLite {
   "DeleteRightC Affects Lengths and Cycles to Start if at end" ! forAll {
     (xs: Stream[Int]) =>
       (for (z <- xs.zipperEnd; zn <- z.deleteRightC)
-        yield zn.rights.length must_=== (z.lefts.length - 1)) getOrElse
-        (xs.length mustBe_< (2))
+        yield zn.rights.length must_=== (z.lefts.length - 1))
+        .getOrElse(xs.length mustBe_< (2))
   }
 
   "DeleteLeftC Affects Lengths and Cycles to end if at start" ! forAll {
     (xs: Stream[Int]) =>
       (for (z <- xs.toZipper; zn <- z.deleteLeftC)
-        yield zn.lefts.length must_=== (z.rights.length - 1)) getOrElse
-        (xs.length mustBe_< (2))
+        yield zn.lefts.length must_=== (z.rights.length - 1))
+        .getOrElse(xs.length mustBe_< (2))
   }
 
   "Move" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Short) =>
-    zipper(xs, f, ys).move(n) map { (z: Zipper[Int]) =>
-      z.lefts.length must_=== (xs.length + n)
-      z.rights.length must_=== (ys.length - n)
-      if (n > 0) ys(n - 1) must_=== (z.focus)
-      else if (n < 0) xs(-(n + 1)) must_=== (z.focus)
-      else f must_=== (z.focus)
-    } getOrElse {
-      val okay = xs.length < -n || ys.length < n
-      okay must_== (true)
-    }
+    zipper(xs, f, ys)
+      .move(n)
+      .map { (z: Zipper[Int]) =>
+        z.lefts.length must_=== (xs.length + n)
+        z.rights.length must_=== (ys.length - n)
+        if (n > 0) ys(n - 1) must_=== (z.focus)
+        else if (n < 0) xs(-(n + 1)) must_=== (z.focus)
+        else f must_=== (z.focus)
+      }
+      .getOrElse {
+        val okay = xs.length < -n || ys.length < n
+        okay must_== (true)
+      }
   }
 
   "move should not cause a stackoverflow error" in {
@@ -389,17 +398,23 @@ object ZipperTest extends SpecLite {
   "Find" ! forAll {
     (xs: Stream[Int], ys: Stream[Int], f: Int, n: Int, m: Int) =>
       val p = (i: Int) => i < n && i > m
-      zipper(xs, f, ys).findZ(p) map { z =>
-        p(z.focus)
-      } getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f))
+      zipper(xs, f, ys)
+        .findZ(p)
+        .map { z =>
+          p(z.focus)
+        }
+        .getOrElse(!(xs.find(p).isDefined || ys.find(p).isDefined || p(f)))
   }
 
   "findZ shouldn't change elements" ! forAll {
     (xs: Stream[Int], ys: Stream[Int], f: Int, n: Int, m: Int) =>
       val p = (i: Int) => i < n && i > m
-      zipper(xs, f, ys).findZ(p).map { z =>
-        z.toStream == zipper(xs, f, ys).toStream
-      } getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f))
+      zipper(xs, f, ys)
+        .findZ(p)
+        .map { z =>
+          z.toStream == zipper(xs, f, ys).toStream
+        }
+        .getOrElse(!(xs.find(p).isDefined || ys.find(p).isDefined || p(f)))
   }
 
   "findZor returns some of find or an alternative" ! forAll {

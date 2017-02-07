@@ -91,10 +91,11 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
     "parse a Google account response" in {
       val response = mock[WSResponse]
-      response.header(HeaderNames.CONTENT_TYPE) returns Some(
-        "application/xrds+xml")
-      response.xml returns scala.xml.XML
-        .loadString(readFixture("discovery/xrds/google-account-response.xml"))
+      response
+        .header(HeaderNames.CONTENT_TYPE)
+        .returns(Some("application/xrds+xml"))
+      response.xml.returns(scala.xml.XML
+        .loadString(readFixture("discovery/xrds/google-account-response.xml")))
       val maybeOpenIdServer = new XrdsResolver().resolve(response)
       maybeOpenIdServer.map(_.url) must beSome(
         "https://www.google.com/accounts/o8/ud")
@@ -102,10 +103,12 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
     "parse an XRDS response with a single Service element" in {
       val response = mock[WSResponse]
-      response.header(HeaderNames.CONTENT_TYPE) returns Some(
-        "application/xrds+xml")
-      response.xml returns scala.xml.XML
-        .loadString(readFixture("discovery/xrds/simple-op.xml"))
+      response
+        .header(HeaderNames.CONTENT_TYPE)
+        .returns(Some("application/xrds+xml"))
+      response.xml.returns(
+        scala.xml.XML
+          .loadString(readFixture("discovery/xrds/simple-op.xml")))
       val maybeOpenIdServer = new XrdsResolver().resolve(response)
       maybeOpenIdServer.map(_.url) must beSome(
         "https://www.google.com/a/example.com/o8/ud?be=o8")
@@ -113,10 +116,12 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
     "parse an XRDS response with multiple Service elements" in {
       val response = mock[WSResponse]
-      response.header(HeaderNames.CONTENT_TYPE) returns Some(
-        "application/xrds+xml")
-      response.xml returns scala.xml.XML
-        .loadString(readFixture("discovery/xrds/multi-service.xml"))
+      response
+        .header(HeaderNames.CONTENT_TYPE)
+        .returns(Some("application/xrds+xml"))
+      response.xml.returns(
+        scala.xml.XML
+          .loadString(readFixture("discovery/xrds/multi-service.xml")))
       val maybeOpenIdServer = new XrdsResolver().resolve(response)
       maybeOpenIdServer.map(_.url) must beSome(
         "http://www.myopenid.com/server")
@@ -125,10 +130,12 @@ object DiscoveryClientSpec extends Specification with Mockito {
     // See 7.3.2.2.  Extracting Authentication Data
     "return the OP Identifier over the Claimed Identifier if both are present" in {
       val response = mock[WSResponse]
-      response.header(HeaderNames.CONTENT_TYPE) returns Some(
-        "application/xrds+xml")
-      response.xml returns scala.xml.XML.loadString(readFixture(
-        "discovery/xrds/multi-service-with-op-and-claimed-id-service.xml"))
+      response
+        .header(HeaderNames.CONTENT_TYPE)
+        .returns(Some("application/xrds+xml"))
+      response.xml.returns(
+        scala.xml.XML.loadString(readFixture(
+          "discovery/xrds/multi-service-with-op-and-claimed-id-service.xml")))
       val maybeOpenIdServer = new XrdsResolver().resolve(response)
       maybeOpenIdServer.map(_.url) must beSome(
         "http://openidprovider-opid.example.com")
@@ -136,10 +143,12 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
     "extract and use OpenID Authentication 1.0 service elements from XRDS documents, if Yadis succeeds on an URL Identifier." in {
       val response = mock[WSResponse]
-      response.header(HeaderNames.CONTENT_TYPE) returns Some(
-        "application/xrds+xml")
-      response.xml returns scala.xml.XML
-        .loadString(readFixture("discovery/xrds/simple-openid-1-op.xml"))
+      response
+        .header(HeaderNames.CONTENT_TYPE)
+        .returns(Some("application/xrds+xml"))
+      response.xml.returns(
+        scala.xml.XML
+          .loadString(readFixture("discovery/xrds/simple-openid-1-op.xml")))
       val maybeOpenIdServer = new XrdsResolver().resolve(response)
       maybeOpenIdServer.map(_.url) must beSome(
         "http://openidprovider-server-1.example.com")
@@ -147,10 +156,12 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
     "extract and use OpenID Authentication 1.1 service elements from XRDS documents, if Yadis succeeds on an URL Identifier." in {
       val response = mock[WSResponse]
-      response.header(HeaderNames.CONTENT_TYPE) returns Some(
-        "application/xrds+xml")
-      response.xml returns scala.xml.XML
-        .loadString(readFixture("discovery/xrds/simple-openid-1.1-op.xml"))
+      response
+        .header(HeaderNames.CONTENT_TYPE)
+        .returns(Some("application/xrds+xml"))
+      response.xml.returns(
+        scala.xml.XML
+          .loadString(readFixture("discovery/xrds/simple-openid-1.1-op.xml")))
       val maybeOpenIdServer = new XrdsResolver().resolve(response)
       maybeOpenIdServer.map(_.url) must beSome(
         "http://openidprovider-server-1.1.example.com")
@@ -162,10 +173,11 @@ object DiscoveryClientSpec extends Specification with Mockito {
     "resolve an OpenID server via Yadis" in {
       "with a single service element" in {
         val ws = new WSMock
-        ws.response.xml returns scala.xml.XML
-          .loadString(readFixture("discovery/xrds/simple-op.xml"))
-        ws.response.header(HeaderNames.CONTENT_TYPE) returns Some(
-          "application/xrds+xml")
+        ws.response.xml.returns(scala.xml.XML
+          .loadString(readFixture("discovery/xrds/simple-op.xml")))
+        ws.response
+          .header(HeaderNames.CONTENT_TYPE)
+          .returns(Some("application/xrds+xml"))
 
         val returnTo = "http://foo.bar.com/openid"
         val openId = "http://abc.example.com/foo"
@@ -174,7 +186,7 @@ object DiscoveryClientSpec extends Specification with Mockito {
                          .redirectURL(openId, returnTo),
                        dur)
 
-        there was one(ws.request).get()
+        there.was(one(ws.request).get())
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.google.com/a/example.com/o8/ud"
 
@@ -185,10 +197,11 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
       "should redirect to identifier selection" in {
         val ws = new WSMock
-        ws.response.xml returns scala.xml.XML
-          .loadString(readFixture("discovery/xrds/simple-op-non-unique.xml"))
-        ws.response.header(HeaderNames.CONTENT_TYPE) returns Some(
-          "application/xrds+xml")
+        ws.response.xml.returns(scala.xml.XML
+          .loadString(readFixture("discovery/xrds/simple-op-non-unique.xml")))
+        ws.response
+          .header(HeaderNames.CONTENT_TYPE)
+          .returns(Some("application/xrds+xml"))
 
         val returnTo = "http://foo.bar.com/openid"
         val openId = "http://abc.example.com/foo"
@@ -199,7 +212,7 @@ object DiscoveryClientSpec extends Specification with Mockito {
                          .redirectURL(openId, returnTo),
                        dur)
 
-        there was one(ws.request).get()
+        there.was(one(ws.request).get())
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.google.com/a/example.com/o8/ud"
 
@@ -210,13 +223,15 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
       "should fall back to HTML based discovery if OP Identifier cannot be found in the XRDS" in {
         val ws = new WSMock
-        ws.response.status returns OK thenReturns OK
-        ws.response.body returns readFixture(
-          "discovery/html/openIDProvider.html")
-        ws.response.xml returns scala.xml.XML
-          .loadString(readFixture("discovery/xrds/invalid-op-identifier.xml"))
-        ws.response.header(HeaderNames.CONTENT_TYPE) returns Some("text/html") thenReturns Some(
-          "application/xrds+xml")
+        ws.response.status.returns(OK).thenReturns(OK)
+        ws.response.body
+          .returns(readFixture("discovery/html/openIDProvider.html"))
+        ws.response.xml.returns(scala.xml.XML
+          .loadString(readFixture("discovery/xrds/invalid-op-identifier.xml")))
+        ws.response
+          .header(HeaderNames.CONTENT_TYPE)
+          .returns(Some("text/html"))
+          .thenReturns(Some("application/xrds+xml"))
 
         val returnTo = "http://foo.bar.com/openid"
         val openId = "http://abc.example.com/foo"
@@ -225,7 +240,7 @@ object DiscoveryClientSpec extends Specification with Mockito {
                          .redirectURL(openId, returnTo),
                        dur)
 
-        there was one(ws.request).get()
+        there.was(one(ws.request).get())
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.example.com/openidserver/openid.server"
 
@@ -237,13 +252,15 @@ object DiscoveryClientSpec extends Specification with Mockito {
       // OpenID 1.1 compatibility - http://openid.net/specs/openid-authentication-2_0.html#anchor38
       "should fall back to HTML based discovery (with an OpenID 1.1 document) if OP Identifier cannot be found in the XRDS" in {
         val ws = new WSMock
-        ws.response.status returns OK thenReturns OK
-        ws.response.body returns readFixture(
-          "discovery/html/openIDProvider-OpenID-1.1.html")
-        ws.response.xml returns scala.xml.XML
-          .loadString(readFixture("discovery/xrds/invalid-op-identifier.xml"))
-        ws.response.header(HeaderNames.CONTENT_TYPE) returns Some("text/html") thenReturns Some(
-          "application/xrds+xml")
+        ws.response.status.returns(OK).thenReturns(OK)
+        ws.response.body.returns(
+          readFixture("discovery/html/openIDProvider-OpenID-1.1.html"))
+        ws.response.xml.returns(scala.xml.XML
+          .loadString(readFixture("discovery/xrds/invalid-op-identifier.xml")))
+        ws.response
+          .header(HeaderNames.CONTENT_TYPE)
+          .returns(Some("text/html"))
+          .thenReturns(Some("application/xrds+xml"))
 
         val returnTo = "http://foo.bar.com/openid"
         val openId = "http://abc.example.com/foo"
@@ -252,7 +269,7 @@ object DiscoveryClientSpec extends Specification with Mockito {
                          .redirectURL(openId, returnTo),
                        dur)
 
-        there was one(ws.request).get()
+        there.was(one(ws.request).get())
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.example.com/openidserver/openid.server-1"
 
@@ -266,8 +283,8 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
       "when given a response that includes openid meta information" in {
         val ws = new WSMock
-        ws.response.body returns readFixture(
-          "discovery/html/openIDProvider.html")
+        ws.response.body
+          .returns(readFixture("discovery/html/openIDProvider.html"))
 
         val returnTo = "http://foo.bar.com/openid"
         val openId = "http://abc.example.com/foo"
@@ -276,7 +293,7 @@ object DiscoveryClientSpec extends Specification with Mockito {
                          .redirectURL(openId, returnTo),
                        dur)
 
-        there was one(ws.request).get()
+        there.was(one(ws.request).get())
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.example.com/openidserver/openid.server"
 
@@ -287,8 +304,8 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
       "when given a response that includes a local identifier (using openid2.local_id openid.delegate)" in {
         val ws = new WSMock
-        ws.response.body returns readFixture(
-          "discovery/html/opLocalIdentityPage.html")
+        ws.response.body
+          .returns(readFixture("discovery/html/opLocalIdentityPage.html"))
 
         val returnTo = "http://foo.bar.com/openid"
         val redirectUrl =
@@ -296,7 +313,7 @@ object DiscoveryClientSpec extends Specification with Mockito {
                          .redirectURL("http://example.com/", returnTo),
                        dur)
 
-        there was one(ws.request).get()
+        there.was(one(ws.request).get())
 
         new URL(redirectUrl).hostAndPath must be equalTo "http://www.example.com:8080/openidserver/openid.server"
 

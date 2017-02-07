@@ -76,12 +76,12 @@ class WorksheetAutoRunner(project: Project, woof: WolfTheProblemSolver)
   }
 
   def removeListener(document: Document) {
-    val listener = listeners remove document
+    val listener = listeners.remove(document)
     if (listener != null) document removeDocumentListener listener
   }
 
   private class MyDocumentAdapter(document: Document) extends DocumentAdapter {
-    val documentManager = PsiDocumentManager getInstance project
+    val documentManager = PsiDocumentManager.getInstance(project)
 
     @inline private def isDisabledOn(file: PsiFile) = {
       WorksheetAutoRunner.isSetDisabled(file) || !settings.isInteractiveMode &&
@@ -91,7 +91,7 @@ class WorksheetAutoRunner(project: Project, woof: WolfTheProblemSolver)
     override def documentChanged(e: DocumentEvent) {
       if (project.isDisposed) return
 
-      val psiFile = documentManager getPsiFile document
+      val psiFile = documentManager.getPsiFile(document)
       if (isDisabledOn(psiFile)) return
 
       val virtualFile = psiFile.getVirtualFile

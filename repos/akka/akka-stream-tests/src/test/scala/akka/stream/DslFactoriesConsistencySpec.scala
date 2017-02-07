@@ -42,7 +42,7 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
       (classOf[akka.stream.scaladsl.Sink[_, _]],        classOf[akka.stream.javadsl.Sink[_, _]]) ::
       (classOf[akka.stream.scaladsl.Flow[_, _, _]],     classOf[akka.stream.javadsl.Flow[_, _, _]]) ::
       (classOf[akka.stream.scaladsl.RunnableGraph[_]],  classOf[akka.stream.javadsl.RunnableGraph[_]]) ::
-      ((2 to 22) map { i => (Class.forName(s"scala.Function$i"), Class.forName(s"akka.japi.function.Function$i")) }).toList
+      (((2 to 22)) .map { i => (Class.forName(s"scala.Function$i"), Class.forName(s"akka.japi.function.Function$i")) }).toList
   // format: ON
 
   val sSource = classOf[scaladsl.Source[_, _]]
@@ -107,15 +107,15 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
   )
 
   "Java DSL" must provide {
-    testCases foreach {
+    testCases.foreach {
       case TestCase(name, Some(sClass), jClass, jFactoryOption) ⇒
-        name which {
+        name.which {
           s"allows creating the same ${name}s as Scala DSL" in {
             runSpec(
               getSMethods(sClass),
               jClass.toList.flatMap(getJMethods) ++ jFactoryOption.toList
                 .flatMap(f ⇒
-                  getJMethods(f).map(unspecializeName andThen curryLikeJava)))
+                  getJMethods(f).map(unspecializeName.andThen(curryLikeJava))))
           }
         }
     }
@@ -231,7 +231,7 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
       if (matches.length == 0) {
         warnings += 1
         alert("No match for " + row._1)
-        row._2 foreach { m ⇒
+        row._2.foreach { m ⇒
           alert(s" > ${m.j.toString}: ${m.reason}")
         }
       } else if (matches.length == 1) {
@@ -244,17 +244,17 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
       } else {
         warnings += 1
         alert("Multiple matches for " + row._1 + "!")
-        matches foreach { m ⇒
+        matches.foreach { m ⇒
           alert(s" > ${m.j.toString}")
         }
       }
     }
 
     if (warnings > 0) {
-      jMethods foreach { m ⇒
+      jMethods.foreach { m ⇒
         info("  java: " + m + ": " + returnTypeString(m))
       }
-      sMethods foreach { m ⇒
+      sMethods.foreach { m ⇒
         info(" scala: " + m + ": " + returnTypeString(m))
       }
       fail(

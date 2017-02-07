@@ -53,11 +53,11 @@ object ActorPublisherDocSpec {
         if (totalDemand <= Int.MaxValue) {
           val (use, keep) = buf.splitAt(totalDemand.toInt)
           buf = keep
-          use foreach onNext
+          use.foreach(onNext)
         } else {
           val (use, keep) = buf.splitAt(Int.MaxValue)
           buf = keep
-          use foreach onNext
+          use.foreach(onNext)
           deliverBuf()
         }
       }

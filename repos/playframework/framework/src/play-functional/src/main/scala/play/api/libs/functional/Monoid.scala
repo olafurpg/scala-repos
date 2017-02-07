@@ -11,7 +11,7 @@ trait Monoid[A] {
 
 object Monoid {
   implicit def endomorphismMonoid[A]: Monoid[A => A] = new Monoid[A => A] {
-    override def append(f1: A => A, f2: A => A) = f2 compose f1
+    override def append(f1: A => A, f2: A => A) = f2.compose(f1)
     override def identity = Predef.identity
   }
 }

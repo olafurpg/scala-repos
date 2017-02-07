@@ -94,7 +94,7 @@ class DispatcherActorSpec
       }).withDispatcher(throughputDispatcher))
 
       assert(Await.result(slowOne ? "hogexecutor", timeout.duration) === "OK")
-      (1 to 100) foreach { _ ⇒
+      ((1 to 100)).foreach { _ ⇒
         slowOne ! "ping"
       }
       fastOne ! "sabotage"

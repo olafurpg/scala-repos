@@ -36,7 +36,7 @@ object Meta {
       val name = "bash"
       val action = () => {
         val file = File.makeTemp("scala.cmd.bash")
-        file writeAll interpolate(bashTemplate)
+        file.writeAll(interpolate(bashTemplate))
 
         // Would be nice to print something like this but comments are
         // not always comments in bash, and breaking it is worse.
@@ -56,8 +56,8 @@ object Meta {
       val name = "self-update"
       val action = () => {
         val file = File(selfUpdateName.get)
-        file writeAll interpolate(runnerTemplate)
-        file setExecutable true
+        file.writeAll(interpolate(runnerTemplate))
+        file.setExecutable(true)
         ()
       }
     }

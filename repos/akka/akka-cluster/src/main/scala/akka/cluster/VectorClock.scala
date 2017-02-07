@@ -27,7 +27,7 @@ private[cluster] object VectorClock {
 
     private def hash(name: String): String = {
       val digester = MessageDigest.getInstance("MD5")
-      digester update name.getBytes("UTF-8")
+      digester.update(name.getBytes("UTF-8"))
       digester.digest.map { h ⇒
         "%02x".format(0xFF & h)
       }.mkString
@@ -138,7 +138,7 @@ final case class VectorClock(
           if (currentOrder eq Before) Concurrent else After
         } else {
           // compare the nodes
-          val nc = nt1._1 compareTo nt2._1
+          val nc = nt1._1.compareTo(nt2._1)
           if (nc == 0) {
             // both nodes exist compare the timestamps
             // same timestamp so just continue with the next nodes

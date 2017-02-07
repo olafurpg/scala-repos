@@ -232,7 +232,7 @@ class ScProjectionType private (
       val candidates = proc.candidates
       if (candidates.length == 1 &&
           candidates(0).element.isInstanceOf[PsiNamedElement]) {
-        val defaultSubstitutor = emptySubst followed candidates(0).substitutor
+        val defaultSubstitutor = emptySubst.followed(candidates(0).substitutor)
         if (superReference) {
           ScalaPsiUtil
             .superTypeMembersAndSubstitutors(candidates(0).element)
@@ -240,7 +240,7 @@ class ScProjectionType private (
               _.info == element
             } match {
             case Some(node) =>
-              Some(element, defaultSubstitutor followed node.substitutor)
+              Some(element, defaultSubstitutor.followed(node.substitutor))
             case _ => Some(element, defaultSubstitutor)
           }
         } else Some(candidates(0).element, defaultSubstitutor)
@@ -259,7 +259,7 @@ class ScProjectionType private (
             candidates(0).element.isInstanceOf[PsiNamedElement]) {
           //todo: superMemberSubstitutor? However I don't know working example for this case
           Some(candidates(0).element,
-               emptySubst followed candidates(0).substitutor)
+               emptySubst.followed(candidates(0).substitutor))
         } else None
       case d: ScTypeDefinition => processType(d.name)
       case d: PsiClass => processType(d.getName)
@@ -348,7 +348,8 @@ class ScProjectionType private (
             case o: ScObject =>
             case t: ScTypedDefinition if t.isStable =>
               val s: ScSubstitutor =
-                new ScSubstitutor(Map.empty, Map.empty, Some(projected)) followed actualSubst
+                new ScSubstitutor(Map.empty, Map.empty, Some(projected))
+                  .followed(actualSubst)
               t.getType(TypingContext.empty) match {
                 case Success(tp, _) if ScType.isSingletonType(tp) =>
                   return Equivalence
@@ -361,7 +362,8 @@ class ScProjectionType private (
             case o: ScObject =>
             case t: ScTypedDefinition =>
               val s: ScSubstitutor =
-                new ScSubstitutor(Map.empty, Map.empty, Some(p1)) followed proj2.actualSubst
+                new ScSubstitutor(Map.empty, Map.empty, Some(p1))
+                  .followed(proj2.actualSubst)
               t.getType(TypingContext.empty) match {
                 case Success(tp, _) if ScType.isSingletonType(tp) =>
                   return Equivalence
@@ -406,7 +408,7 @@ class ScProjectionType private (
 
   override def equals(other: Any): Boolean = other match {
     case that: ScProjectionType =>
-      (that canEqual this) && projected == that.projected &&
+      (that.canEqual(this)) && projected == that.projected &&
         element == that.element && superReference == that.superReference
     case _ => false
   }

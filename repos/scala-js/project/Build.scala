@@ -247,8 +247,8 @@ object Build extends sbt.Build {
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
       if (isSnapshot.value)
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+        Some("snapshots".at(nexus + "content/repositories/snapshots"))
+      else Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
     },
     pomExtra := (<developers>
             <developer>
@@ -302,10 +302,12 @@ object Build extends sbt.Build {
           val snapshotsOrReleases =
             if (scalaJSIsSnapshotVersion) "snapshots" else "releases"
           Some(
-            Resolver.sftp(s"scala-js-$snapshotsOrReleases",
-                          "repo.scala-js.org",
-                          s"/home/scalajsrepo/www/repo/$snapshotsOrReleases")(
-              Resolver.ivyStylePatterns) as (user, pass))
+            Resolver
+              .sftp(s"scala-js-$snapshotsOrReleases",
+                    "repo.scala-js.org",
+                    s"/home/scalajsrepo/www/repo/$snapshotsOrReleases")(
+                Resolver.ivyStylePatterns)
+              .as(user, pass))
         case _ =>
           None
       }
@@ -544,8 +546,8 @@ object Build extends sbt.Build {
     settings = commonToolsSettings ++ Seq(
         libraryDependencies ++= Seq(
           "com.google.javascript" % "closure-compiler" % "v20130603",
-          "com.googlecode.json-simple" % "json-simple" % "1.1.1" exclude
-            ("junit", "junit"),
+          ("com.googlecode.json-simple" % "json-simple" % "1.1.1")
+            .exclude("junit", "junit"),
           "com.novocode" % "junit-interface" % "0.9" % "test"
         )
       )
@@ -650,7 +652,7 @@ object Build extends sbt.Build {
         val deps = (externalDependencyClasspath in Compile).value
 
         val sbtJars =
-          deps filter { attributed =>
+          deps.filter { attributed =>
             val p = attributed.data.getPath
             p.contains("/org.scala-sbt/") && p.endsWith(".jar")
           }
@@ -912,7 +914,8 @@ object Build extends sbt.Build {
         noClassFilesSettings,
         exportJars := true,
         jsDependencies +=
-          "org.webjars" % "jszip" % "2.4.0" / "jszip.min.js" commonJSName "JSZip"
+          ("org.webjars" % "jszip" % "2.4.0" / "jszip.min.js").commonJSName(
+            "JSZip")
       ) ++ (scalaJSExternalCompileSettings)
   ).withScalaJSCompiler.dependsOn(library)
 
@@ -965,7 +968,8 @@ object Build extends sbt.Build {
         name := "Scala.js jasmine test framework",
         jsDependencies ++= Seq(
           ProvidedJS / "jasmine-polyfills.js",
-          "org.webjars" % "jasmine" % "1.3.1" / "jasmine.js" dependsOn "jasmine-polyfills.js"
+          ("org.webjars" % "jasmine" % "1.3.1" / "jasmine.js").dependsOn(
+            "jasmine-polyfills.js")
         )
       )
   ).withScalaJSCompiler.dependsOn(library, testInterface)
@@ -1312,8 +1316,8 @@ object Build extends sbt.Build {
             "org.scala-lang.modules" %% "scala-partest" % "1.0.9",
             "com.google.javascript" % "closure-compiler" % "v20130603",
             "io.apigee" % "rhino" % "1.7R5pre4",
-            "com.googlecode.json-simple" % "json-simple" % "1.1.1" exclude
-              ("junit", "junit")
+            ("com.googlecode.json-simple" % "json-simple" % "1.1.1")
+              .exclude("junit", "junit")
           )
         else Seq()
       },

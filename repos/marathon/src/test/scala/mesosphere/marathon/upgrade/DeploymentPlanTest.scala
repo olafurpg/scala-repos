@@ -46,13 +46,13 @@ class DeploymentPlanTest
     val partitionedApps = DeploymentPlan.appsGroupedByLongestPath(group)
 
     Then("three equivalence classes should be computed")
-    partitionedApps should have size (3)
+    (partitionedApps should have).size(3)
 
     partitionedApps.keySet should contain(1)
     partitionedApps.keySet should contain(2)
     partitionedApps.keySet should contain(3)
 
-    partitionedApps(2) should have size (2)
+    (partitionedApps(2) should have).size(2)
   }
 
   test("partition a complex group's apps into concurrently deployable subsets") {
@@ -79,14 +79,14 @@ class DeploymentPlanTest
     val partitionedApps = DeploymentPlan.appsGroupedByLongestPath(group)
 
     Then("three equivalence classes should be computed")
-    partitionedApps should have size (4)
+    (partitionedApps should have).size(4)
 
     partitionedApps.keySet should contain(1)
     partitionedApps.keySet should contain(2)
     partitionedApps.keySet should contain(3)
     partitionedApps.keySet should contain(4)
 
-    partitionedApps(1) should have size (2)
+    (partitionedApps(1) should have).size(2)
   }
 
   test("start from empty group") {
@@ -204,7 +204,7 @@ class DeploymentPlanTest
     val plan = DeploymentPlan(from, to)
 
     Then("the deployment steps are correct")
-    plan.steps should have size 2
+    (plan.steps should have).size(2)
     plan.steps(0).actions.toSet should equal(Set(RestartApplication(mongo._2)))
     plan.steps(1).actions.toSet should equal(
       Set(RestartApplication(service._2)))
@@ -232,7 +232,7 @@ class DeploymentPlanTest
     val plan = DeploymentPlan(emptyGroup, targetGroup)
 
     Then("we get two deployment steps")
-    plan.steps should have size 2
+    (plan.steps should have).size(2)
     Then("the first with all StartApplication actions")
     plan.steps(0).actions.toSet should equal(apps.map(StartApplication(_, 0)))
     Then("and the second with all ScaleApplication actions")
@@ -290,7 +290,7 @@ class DeploymentPlanTest
     val plan = DeploymentPlan(from, to)
 
     Then("the deployment steps are correct")
-    plan.steps should have size 1
+    (plan.steps should have).size(1)
     plan.steps(0).actions.toSet should equal(
       Set(RestartApplication(mongo._2), RestartApplication(service._2)))
   }
@@ -372,9 +372,9 @@ class DeploymentPlanTest
 
     Then(
       "the deployment contains steps for dependent and independent applications")
-    plan.steps should have size (5)
+    (plan.steps should have).size(5)
 
-    actionsOf(plan) should have size (6)
+    (actionsOf(plan) should have).size(6)
 
     plan.steps(0).actions.toSet should equal(Set(StopApplication(toStop)))
     plan.steps(1).actions.toSet should equal(Set(StartApplication(toStart, 0)))
@@ -404,7 +404,7 @@ class DeploymentPlanTest
     val plan = DeploymentPlan(from, to)
 
     Then("the deployment contains one step consisting of one stop action")
-    plan.steps should have size 1
+    (plan.steps should have).size(1)
     plan.steps(0).actions.toSet should be(Set(StopApplication(app._1)))
   }
 
@@ -452,7 +452,7 @@ class DeploymentPlanTest
     val from = Group("/".toPath, apps = Set(app))
     val to = from.copy(apps = Set(appNew))
 
-    DeploymentPlan(from, to).steps should have size (1)
+    (DeploymentPlan(from, to).steps should have).size(1)
     DeploymentPlan(from, to).steps.head should be(
       DeploymentStep(Seq(RestartApplication(appNew))))
   }

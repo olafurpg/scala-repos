@@ -167,12 +167,12 @@ class RangeConsistencyTest {
   @Test
   def testSI9348() {
     // Test exclusive range with (end-start) != 0 (mod step)
-    assert((0.0f until 0.4f by 0.25f) sameElements List(0.0f, 0.25f))
-    assert((1.0 until 2.2 by 0.5) sameElements List(1.0, 1.5, 2.0))
+    assert(((0.0f until 0.4f by 0.25f)).sameElements(List(0.0f, 0.25f)))
+    assert(((1.0 until 2.2 by 0.5)).sameElements(List(1.0, 1.5, 2.0)))
 
     def bd(d: Double) = BigDecimal(d)
     val bdRange = bd(-10.0) until bd(0.0) by bd(4.5)
-    assert(bdRange sameElements List(bd(-10.0), bd(-5.5), bd(-1.0)))
+    assert(bdRange.sameElements(List(bd(-10.0), bd(-5.5), bd(-1.0))))
   }
 
   @Test
@@ -187,7 +187,7 @@ class RangeConsistencyTest {
       def toFloat(x: Int): Float = x.toFloat
       def toInt(x: Int): Int = x
       def toLong(x: Int): Long = x.toLong
-      def compare(x: Int, y: Int) = x compare y
+      def compare(x: Int, y: Int) = x.compare(y)
     }
     val r = (Int.MinValue to Int.MaxValue by (1 << 23))
     val nr = NumericRange(Int.MinValue, Int.MaxValue, 1 << 23)

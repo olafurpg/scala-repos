@@ -183,7 +183,7 @@ private[akka] class RemoteWatcher(
   }
 
   def reapUnreachable(): Unit =
-    watchingNodes foreach { a ⇒
+    watchingNodes.foreach { a ⇒
       if (!unreachable(a) && !failureDetector.isAvailable(a)) {
         log.warning("Detected unreachable: [{}]", a)
         quarantine(a, addressUids.get(a))
@@ -205,7 +205,7 @@ private[akka] class RemoteWatcher(
     watchNode(watchee)
 
     // add watch from self, this will actually send a Watch to the target when necessary
-    context watch watchee
+    context.watch(watchee)
   }
 
   def watchNode(watchee: InternalActorRef): Unit = {
@@ -230,7 +230,7 @@ private[akka] class RemoteWatcher(
         if (watchers.isEmpty) {
           // clean up self watch when no more watchers of this watchee
           log.debug("Cleanup self watch of [{}]", watchee.path)
-          context unwatch watchee
+          context.unwatch(watchee)
           removeWatchee(watchee)
         }
       case None ⇒
@@ -278,7 +278,7 @@ private[akka] class RemoteWatcher(
   }
 
   def sendHeartbeat(): Unit =
-    watchingNodes foreach { a ⇒
+    watchingNodes.foreach { a ⇒
       if (!unreachable(a)) {
         if (failureDetector.isMonitoring(a)) {
           log.debug("Sending Heartbeat to [{}]", a)

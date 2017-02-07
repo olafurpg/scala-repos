@@ -40,7 +40,7 @@ private[lobby] final class Socket(val history: History[Messadata],
       Future {
         ping(uid)
         withMember(uid) { m =>
-          history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+          history.since(v).fold(resync(m))(_.foreach(sendMessage(m)))
         }
       }
 
@@ -58,7 +58,7 @@ private[lobby] final class Socket(val history: History[Messadata],
     case NewForumPost => notifyAllAsync("reload_forum")
 
     case ReloadTimeline(userId) =>
-      membersByUserId(userId) foreach (_ push makeMessage("reload_timeline"))
+      membersByUserId(userId).foreach(_.push(makeMessage("reload_timeline")))
 
     case AddHook(hook) =>
       notifyVersion("had", hook.render, Messadata(hook = hook.some))
@@ -74,9 +74,9 @@ private[lobby] final class Socket(val history: History[Messadata],
       withMember(uid)(notifyPlayerStart(game, !creatorColor))
 
     case JoinSeek(userId, seek, game, creatorColor) =>
-      membersByUserId(seek.user.id) foreach notifyPlayerStart(game,
-                                                              creatorColor)
-      membersByUserId(userId) foreach notifyPlayerStart(game, !creatorColor)
+      membersByUserId(seek.user.id)
+        .foreach(notifyPlayerStart(game, creatorColor))
+      membersByUserId(userId).foreach(notifyPlayerStart(game, !creatorColor))
 
     case HookIds(ids) => notifyVersion("hli", ids mkString ",", Messadata())
 
@@ -94,8 +94,8 @@ private[lobby] final class Socket(val history: History[Messadata],
     notifyMember("redirect",
                  Json
                    .obj(
-                     "id" -> (game fullIdOf color),
-                     "url" -> playerUrl(game fullIdOf color),
+                     "id" -> (game.fullIdOf(color)),
+                     "url" -> playerUrl(game.fullIdOf(color)),
                      "cookie" -> AnonCookie.json(game, color)
                    )
                    .noNull) _

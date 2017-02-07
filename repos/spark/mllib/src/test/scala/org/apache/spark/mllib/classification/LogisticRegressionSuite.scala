@@ -255,8 +255,8 @@ class LogisticRegressionSuite
     val model = lr.run(testRDD)
 
     // Test the weights
-    assert(model.weights(0) ~== B relTol 0.02)
-    assert(model.intercept ~== A relTol 0.02)
+    assert(model.weights(0) ~== B.relTol(0.02))
+    assert(model.intercept ~== A.relTol(0.02))
 
     val validationData =
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
@@ -298,8 +298,8 @@ class LogisticRegressionSuite
     val model = lr.run(testRDD)
 
     // Test the weights
-    assert(model.weights(0) ~== B relTol 0.02)
-    assert(model.intercept ~== A relTol 0.02)
+    assert(model.weights(0) ~== B.relTol(0.02))
+    assert(model.intercept ~== A.relTol(0.02))
 
     val validationData =
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
@@ -334,8 +334,8 @@ class LogisticRegressionSuite
     val model = lr.run(testRDD, initialWeights)
 
     // Test the weights
-    assert(model.weights(0) ~== B relTol 0.02)
-    assert(model.intercept ~== A relTol 0.02)
+    assert(model.weights(0) ~== B.relTol(0.02))
+    assert(model.intercept ~== A.relTol(0.02))
 
     val validationData =
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
@@ -372,8 +372,8 @@ class LogisticRegressionSuite
 
     // Test the weights
     // With regularization, the resulting weights will be smaller.
-    assert(model.weights(0) ~== -0.14 relTol 0.02)
-    assert(model.intercept ~== 0.25 relTol 0.02)
+    assert(model.weights(0) ~== -0.14.relTol(0.02))
+    assert(model.intercept ~== 0.25.relTol(0.02))
 
     val validationData =
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
@@ -409,8 +409,8 @@ class LogisticRegressionSuite
     val model = lr.run(testRDD, initialWeights)
 
     // Test the weights
-    assert(model.weights(0) ~== B relTol 0.02)
-    assert(model.intercept ~== A relTol 0.02)
+    assert(model.weights(0) ~== B.relTol(0.02))
+    assert(model.intercept ~== A.relTol(0.02))
 
     val validationData =
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
@@ -486,15 +486,15 @@ class LogisticRegressionSuite
     // For model trained with feature standardization, the weights should
     // be the same in the scaled space. Note that the weights here are already
     // in the original space, we transform back to scaled space to compare.
-    assert(modelA1.weights(0) ~== modelA2.weights(0) * 1.0E3 absTol 0.01)
-    assert(modelA1.weights(0) ~== modelA3.weights(0) * 1.0E6 absTol 0.01)
+    assert(modelA1.weights(0) ~== (modelA2.weights(0) * 1.0E3).absTol(0.01))
+    assert(modelA1.weights(0) ~== (modelA3.weights(0) * 1.0E6).absTol(0.01))
 
     // Training data with different scales without feature standardization
     // should still converge quickly since the model still uses standardization but
     // simply modifies the regularization function. See regParamL1Fun and related
     // inside of LogisticRegression
-    assert(modelB1.weights(0) ~== modelB2.weights(0) * 1.0E3 absTol 0.1)
-    assert(modelB1.weights(0) ~== modelB3.weights(0) * 1.0E6 absTol 0.1)
+    assert(modelB1.weights(0) ~== (modelB2.weights(0) * 1.0E3).absTol(0.1))
+    assert(modelB1.weights(0) ~== (modelB3.weights(0) * 1.0E6).absTol(0.1))
   }
 
   test("multinomial logistic regression with LBFGS") {
@@ -581,7 +581,7 @@ class LogisticRegressionSuite
       Array(-0.5837166, 0.9285260, -0.3783612, -0.8123411, 2.6228269,
         -0.1691865, -0.811048, -0.0646380, -0.2919834, 4.1119745))
 
-    assert(model.weights ~== weightsR relTol 0.05)
+    assert(model.weights ~== weightsR.relTol(0.05))
 
     val validationData =
       LogisticRegressionSuite.generateMultinomialLogisticInput(weights,
@@ -684,12 +684,12 @@ class LogisticRegressionSuite
     val coefficientsR =
       Vectors.dense(-0.5895848, 0.8931147, -0.3925051, -0.7996864)
 
-    assert(model1.intercept ~== interceptR relTol 1E-3)
-    assert(model1.weights ~= coefficientsR relTol 1E-3)
+    assert(model1.intercept ~== interceptR.relTol(1E-3))
+    assert(model1.weights ~= coefficientsR.relTol(1E-3))
 
     // Without regularization, with or without feature scaling will converge to the same solution.
-    assert(model2.intercept ~== interceptR relTol 1E-3)
-    assert(model2.weights ~= coefficientsR relTol 1E-3)
+    assert(model2.intercept ~== interceptR.relTol(1E-3))
+    assert(model2.weights ~= coefficientsR.relTol(1E-3))
   }
 
   test("binary logistic regression without intercept without regularization") {
@@ -726,12 +726,12 @@ class LogisticRegressionSuite
     val coefficientsR =
       Vectors.dense(-0.3534996, 1.2964482, -0.3571741, -0.7407946)
 
-    assert(model1.intercept ~== interceptR relTol 1E-3)
-    assert(model1.weights ~= coefficientsR relTol 1E-2)
+    assert(model1.intercept ~== interceptR.relTol(1E-3))
+    assert(model1.weights ~= coefficientsR.relTol(1E-2))
 
     // Without regularization, with or without feature scaling should converge to the same solution.
-    assert(model2.intercept ~== interceptR relTol 1E-3)
-    assert(model2.weights ~= coefficientsR relTol 1E-2)
+    assert(model2.intercept ~== interceptR.relTol(1E-3))
+    assert(model2.weights ~= coefficientsR.relTol(1E-2))
   }
 
   test("binary logistic regression with intercept with L1 regularization") {
@@ -768,8 +768,8 @@ class LogisticRegressionSuite
     val interceptR1 = -0.05627428
     val coefficientsR1 = Vectors.dense(0.0, 0.0, -0.04325749, -0.02481551)
 
-    assert(model1.intercept ~== interceptR1 relTol 1E-2)
-    assert(model1.weights ~= coefficientsR1 absTol 2E-2)
+    assert(model1.intercept ~== interceptR1.relTol(1E-2))
+    assert(model1.weights ~= coefficientsR1.absTol(2E-2))
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -793,8 +793,8 @@ class LogisticRegressionSuite
     val interceptR2 = 0.3722152
     val coefficientsR2 = Vectors.dense(0.0, 0.0, -0.1665453, 0.0)
 
-    assert(model2.intercept ~== interceptR2 relTol 1E-2)
-    assert(model2.weights ~= coefficientsR2 absTol 1E-3)
+    assert(model2.intercept ~== interceptR2.relTol(1E-2))
+    assert(model2.weights ~= coefficientsR2.absTol(1E-3))
   }
 
   test("binary logistic regression without intercept with L1 regularization") {
@@ -832,8 +832,8 @@ class LogisticRegressionSuite
     val interceptR1 = 0.0
     val coefficientsR1 = Vectors.dense(0.0, 0.0, -0.05189203, -0.03891782)
 
-    assert(model1.intercept ~== interceptR1 relTol 1E-3)
-    assert(model1.weights ~= coefficientsR1 absTol 1E-3)
+    assert(model1.intercept ~== interceptR1.relTol(1E-3))
+    assert(model1.weights ~= coefficientsR1.absTol(1E-3))
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -857,8 +857,8 @@ class LogisticRegressionSuite
     val interceptR2 = 0.0
     val coefficientsR2 = Vectors.dense(0.0, 0.0, -0.08420782, 0.0)
 
-    assert(model2.intercept ~== interceptR2 absTol 1E-3)
-    assert(model2.weights ~= coefficientsR2 absTol 1E-3)
+    assert(model2.intercept ~== interceptR2.absTol(1E-3))
+    assert(model2.weights ~= coefficientsR2.absTol(1E-3))
   }
 
   test("binary logistic regression with intercept with L2 regularization") {
@@ -896,8 +896,8 @@ class LogisticRegressionSuite
     val coefficientsR1 =
       Vectors.dense(-0.07251837, 0.10724191, -0.04865309, -0.10062872)
 
-    assert(model1.intercept ~== interceptR1 relTol 1E-3)
-    assert(model1.weights ~= coefficientsR1 relTol 1E-3)
+    assert(model1.intercept ~== interceptR1.relTol(1E-3))
+    assert(model1.weights ~= coefficientsR1.relTol(1E-3))
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -922,8 +922,8 @@ class LogisticRegressionSuite
     val coefficientsR2 =
       Vectors.dense(-0.05155371, 0.02301057, -0.11482896, -0.06266838)
 
-    assert(model2.intercept ~== interceptR2 relTol 1E-3)
-    assert(model2.weights ~= coefficientsR2 relTol 1E-3)
+    assert(model2.intercept ~== interceptR2.relTol(1E-3))
+    assert(model2.weights ~= coefficientsR2.relTol(1E-3))
   }
 
   test("binary logistic regression without intercept with L2 regularization") {
@@ -962,8 +962,8 @@ class LogisticRegressionSuite
     val coefficientsR1 =
       Vectors.dense(-0.06099165, 0.12857058, -0.04708770, -0.09799775)
 
-    assert(model1.intercept ~== interceptR1 absTol 1E-3)
-    assert(model1.weights ~= coefficientsR1 relTol 1E-2)
+    assert(model1.intercept ~== interceptR1.absTol(1E-3))
+    assert(model1.weights ~= coefficientsR1.relTol(1E-2))
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -988,8 +988,8 @@ class LogisticRegressionSuite
     val coefficientsR2 =
       Vectors.dense(-0.005679651, 0.048967094, -0.093714016, -0.053314311)
 
-    assert(model2.intercept ~== interceptR2 absTol 1E-3)
-    assert(model2.weights ~= coefficientsR2 relTol 1E-2)
+    assert(model2.intercept ~== interceptR2.absTol(1E-3))
+    assert(model2.weights ~= coefficientsR2.relTol(1E-2))
   }
 }
 

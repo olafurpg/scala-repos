@@ -37,7 +37,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
 
   override def postStop() {
     lilaBus.publish(lila.socket.SocketHub.Close(self), 'socket)
-    members.keys foreach eject
+    members.keys.foreach(eject)
   }
 
   // to be defined in subclassing actor
@@ -60,7 +60,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
     case d: Deploy => onDeploy(d)
   }
 
-  def receive = receiveSpecific orElse receiveGeneric
+  def receive = receiveSpecific.orElse(receiveGeneric)
 
   def notifyAll[A: Writes](t: String, data: A) {
     notifyAll(makeMessage(t, data))
@@ -71,7 +71,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
   }
 
   def notifyAll(msg: JsObject) {
-    members.values.foreach(_ push msg)
+    members.values.foreach(_.push(msg))
   }
 
   def notifyAllAsync[A: Writes](t: String, data: A) = Future {
@@ -87,16 +87,16 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
   }
 
   def notifyMember[A: Writes](t: String, data: A)(member: M) {
-    member push makeMessage(t, data)
+    member.push(makeMessage(t, data))
   }
 
   def ping(uid: String) {
     setAlive(uid)
-    withMember(uid)(_ push pong)
+    withMember(uid)(_.push(pong))
   }
 
   def broom {
-    members.keys foreach { uid =>
+    members.keys.foreach { uid =>
       if (!aliveUids.get(uid)) eject(uid)
     }
   }
@@ -109,7 +109,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
   }
 
   def quit(uid: String) {
-    members get uid foreach { member =>
+    members.get(uid).foreach { member =>
       members -= uid
       lilaBus.publish(SocketLeave(uid, member), 'socketDoor)
     }
@@ -133,7 +133,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
   }
 
   protected def resyncNow(member: M) {
-    member push resyncMessage
+    member.push(resyncMessage)
   }
 
   def addMember(uid: String, member: M) {
@@ -143,9 +143,9 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
     lilaBus.publish(SocketEnter(uid, member), 'socketDoor)
   }
 
-  def setAlive(uid: String) { aliveUids put uid }
+  def setAlive(uid: String) { aliveUids.put(uid) }
 
-  def membersByUserId(userId: String): Iterable[M] = members collect {
+  def membersByUserId(userId: String): Iterable[M] = members.collect {
     case (_, member) if member.userId.contains(userId) => member
   }
 
@@ -177,6 +177,6 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
   }
 
   def withMember(uid: String)(f: M => Unit) {
-    members get uid foreach f
+    members.get(uid).foreach(f)
   }
 }

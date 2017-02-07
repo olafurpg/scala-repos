@@ -20,7 +20,7 @@ class HttpTransport(self: Transport[Any, Any], manager: ConnectionManager)
   def close(deadline: Time) = self.close(deadline)
 
   def read(): Future[Any] =
-    self.read() onSuccess { m =>
+    self.read().onSuccess { m =>
       manager.observeMessage(m)
       if (manager.shouldClose) self.close()
     }

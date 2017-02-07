@@ -129,7 +129,7 @@ object Name {
           // this is a bit of a hack
           @volatile var first = true
 
-          group.set map {
+          group.set.map {
             case newSet if first && newSet.isEmpty => Addr.Pending
             case newSet =>
               first = false
@@ -168,7 +168,7 @@ object Name {
     else if (names.size == 1) names.head
     else {
       val va =
-        Var.collect(names map (_.addr)) map {
+        Var.collect(names.map(_.addr)).map {
           case addrs if addrs.exists({
                 case Addr.Bound(_, _) => true; case _ => false
               }) =>
@@ -187,7 +187,7 @@ object Name {
           case _ => Addr.Pending
         }
 
-      val id = names map { case bound @ Name.Bound(_) => bound.id }
+      val id = names.map { case bound @ Name.Bound(_) => bound.id }
       Name.Bound(va, id)
     }
 }

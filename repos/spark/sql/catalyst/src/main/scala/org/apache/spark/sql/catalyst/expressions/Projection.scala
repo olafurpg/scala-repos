@@ -125,7 +125,7 @@ object UnsafeProjection {
     * Returns an UnsafeProjection for given sequence of Expressions (bounded).
     */
   def create(exprs: Seq[Expression]): UnsafeProjection = {
-    val unsafeExprs = exprs.map(_ transform {
+    val unsafeExprs = exprs.map(_.transform {
       case CreateStruct(children) => CreateStructUnsafe(children)
       case CreateNamedStruct(children) => CreateNamedStructUnsafe(children)
     })
@@ -152,7 +152,7 @@ object UnsafeProjection {
              subexpressionEliminationEnabled: Boolean): UnsafeProjection = {
     val e = exprs
       .map(BindReferences.bindReference(_, inputSchema))
-      .map(_ transform {
+      .map(_.transform {
         case CreateStruct(children) => CreateStructUnsafe(children)
         case CreateNamedStruct(children) => CreateNamedStructUnsafe(children)
       })

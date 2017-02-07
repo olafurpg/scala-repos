@@ -22,7 +22,7 @@ sealed trait Work {
   def isAcquired = acquired.isDefined
   def nonAcquired = !isAcquired
 
-  def acquiredBefore(date: DateTime) = acquiredAt.??(_ isBefore date)
+  def acquiredBefore(date: DateTime) = acquiredAt.??(_.isBefore(date))
 }
 
 object Work {
@@ -50,7 +50,7 @@ object Work {
                     system: Boolean) {
 
     override def toString =
-      if (system) "lichess" else userId orElse ip getOrElse "unknown"
+      if (system) "lichess" else userId.orElse(ip).getOrElse("unknown")
   }
 
   case class Move(_id: Work.Id, // random
@@ -109,5 +109,5 @@ object Work {
       s"id:$id game:${game.id} tries:$tries requestedBy:$sender acquired:$acquired"
   }
 
-  def makeId = Id(scala.util.Random.alphanumeric take 8 mkString)
+  def makeId = Id(scala.util.Random.alphanumeric.take(8) mkString)
 }

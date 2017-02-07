@@ -155,7 +155,7 @@ class GraphBalanceSpec extends AkkaSpec {
           })
         .run()
 
-      Set(s1, s2, s3, s4, s5) flatMap (Await.result(_, 3.seconds)) should be(
+      Set(s1, s2, s3, s4, s5).flatMap(Await.result(_, 3.seconds)) should be(
         (0 to 14).toSet)
     }
 

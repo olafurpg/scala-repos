@@ -46,24 +46,24 @@ class SbtDependencyCompletionContributor extends ScalaCompletionContributor {
           results.addElement(LookupElementBuilder.create(result))
 
         def completeGroup(artifact: String) = {
-          indexes foreach { index =>
-            if (artifact.nonEmpty) index.groups(artifact) foreach addResult
-            else index.groups foreach addResult
+          indexes.foreach { index =>
+            if (artifact.nonEmpty) index.groups(artifact).foreach(addResult)
+            else index.groups.foreach(addResult)
           }
           results.stopHere()
         }
 
         def completeArtifact(group: String) = {
-          indexes foreach { index =>
-            if (group.nonEmpty) index.artifacts(group) foreach addResult
-            else index.groups flatMap index.artifacts foreach addResult
+          indexes.foreach { index =>
+            if (group.nonEmpty) index.artifacts(group).foreach(addResult)
+            else index.groups.flatMap(index.artifacts).foreach(addResult)
           }
           results.stopHere()
         }
 
         def completeVersion(group: String, artifact: String): Unit = {
           if (group.isEmpty || artifact.isEmpty) return
-          indexes foreach (_.versions(group, artifact) foreach addResult)
+          indexes.foreach(_.versions(group, artifact).foreach(addResult))
           results.stopHere()
         }
 

@@ -30,7 +30,7 @@ object VarDcl {
     //Look for identifier
     builder.getTokenType match {
       case ScalaTokenTypes.tIDENTIFIER =>
-        Ids parse builder
+        Ids.parse(builder)
         //Look for :
         builder.getTokenType match {
           case ScalaTokenTypes.tCOLON => {
@@ -38,12 +38,12 @@ object VarDcl {
             if (Type.parse(builder)) {
               returnMarker.drop
             } else {
-              builder error ScalaBundle.message("wrong.type")
+              builder.error(ScalaBundle.message("wrong.type"))
               returnMarker.drop
             }
           }
           case _ => {
-            builder error ScalaBundle.message("wrong.var.declaration")
+            builder.error(ScalaBundle.message("wrong.var.declaration"))
             returnMarker.drop
           }
         }
@@ -59,7 +59,7 @@ object VarDcl {
           }
         }
       case _ =>
-        builder error ScalaBundle.message("identifier.expected")
+        builder.error(ScalaBundle.message("identifier.expected"))
         returnMarker.drop
         return false
     }

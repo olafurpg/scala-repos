@@ -53,7 +53,7 @@ trait ReplConfig {
   def isReplInfo: Boolean = replProps.info || isReplDebug
   def isReplPower: Boolean = replProps.power
 
-  private def csv(p: String, v: String) = p split "," contains v
+  private def csv(p: String, v: String) = p.split(",") contains v
   def isPaged: Boolean =
     replProps.format.isSet && csv(replProps.format.get, "paged")
   def isAcross: Boolean =

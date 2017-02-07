@@ -373,7 +373,7 @@ trait Solving extends Logic {
     import scala.collection.mutable.ArrayBuffer
 
     def cnfString(f: Array[Clause]): String = {
-      val lits: Array[List[String]] = f map (_.map(_.toString).toList)
+      val lits: Array[List[String]] = f.map(_.map(_.toString).toList)
       val xss: List[List[String]] = lits toList
       val aligned: String = alignAcrossRows(xss, "\\/", " /\\\n")
       aligned
@@ -415,7 +415,7 @@ trait Solving extends Logic {
       final case class TseitinSolution(model: TseitinModel,
                                        unassigned: List[Int]) {
         def projectToSolution(symForVar: Map[Int, Sym]) =
-          Solution(projectToModel(model, symForVar), unassigned map symForVar)
+          Solution(projectToModel(model, symForVar), unassigned.map(symForVar))
       }
 
       def findAllModels(clauses: Array[Clause],
@@ -462,7 +462,7 @@ trait Solving extends Logic {
     private def dropUnit(clauses: Array[Clause], unitLit: Lit): Array[Clause] = {
       val negated = -unitLit
       val simplified = new ArrayBuffer[Clause](clauses.size)
-      clauses foreach {
+      clauses.foreach {
         case trivial if trivial contains unitLit => // drop
         case clause => simplified += clause - negated
       }
@@ -486,7 +486,7 @@ trait Solving extends Logic {
 
       val satisfiableWithModel: TseitinModel =
         if (clauses isEmpty) EmptyTseitinModel
-        else if (clauses exists (_.isEmpty)) NoTseitinModel
+        else if (clauses.exists(_.isEmpty)) NoTseitinModel
         else
           clauses.find(_.size == 1) match {
             case Some(unitClause) =>
@@ -533,7 +533,7 @@ trait Solving extends Logic {
       else if (model == EmptyTseitinModel) EmptyModel
       else {
         val mappedModels =
-          model.toList collect {
+          model.toList.collect {
             case lit if symForVar isDefinedAt lit.variable =>
               (symForVar(lit.variable), lit.positive)
           }

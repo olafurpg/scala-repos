@@ -133,23 +133,23 @@ object PerfType {
                                  RacingKings,
                                  Puzzle,
                                  Opening)
-  val byKey = all map { p =>
+  val byKey = all.map { p =>
     (p.key, p)
   } toMap
-  val byId = all map { p =>
+  val byId = all.map { p =>
     (p.id, p)
   } toMap
 
   val default = Standard
 
-  def apply(key: Perf.Key): Option[PerfType] = byKey get key
+  def apply(key: Perf.Key): Option[PerfType] = byKey.get(key)
   def orDefault(key: Perf.Key): PerfType = apply(key) | default
 
-  def apply(id: Perf.ID): Option[PerfType] = byId get id
+  def apply(id: Perf.ID): Option[PerfType] = byId.get(id)
 
-  def name(key: Perf.Key): Option[String] = apply(key) map (_.name)
+  def name(key: Perf.Key): Option[String] = apply(key).map(_.name)
 
-  def id2key(id: Perf.ID): Option[Perf.Key] = byId get id map (_.key)
+  def id2key(id: Perf.ID): Option[Perf.Key] = byId.get(id).map(_.key)
 
   val nonPuzzle: List[PerfType] = List(Bullet,
                                        Blitz,

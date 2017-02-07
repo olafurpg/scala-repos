@@ -30,7 +30,7 @@ trait BytecodeWriters {
   import global._
 
   def outputDirectory(sym: Symbol): AbstractFile =
-    settings.outputDirs outputDirFor enteringFlatten(sym.sourceFile)
+    settings.outputDirs.outputDirFor(enteringFlatten(sym.sourceFile))
 
   /**
     * @param clsName cls.getName
@@ -48,7 +48,7 @@ trait BytecodeWriters {
     val pathParts = clsName.split("[./]").toList
     for (part <- pathParts.init)
       dir = ensureDirectory(dir) subdirectoryNamed part
-    ensureDirectory(dir) fileNamed pathParts.last + suffix
+    ensureDirectory(dir).fileNamed(pathParts.last + suffix)
   }
   def getFile(sym: Symbol, clsName: String, suffix: String): AbstractFile =
     getFile(outputDirectory(sym), clsName, suffix)
@@ -132,7 +132,7 @@ trait BytecodeWriters {
 
       val segments = jclassName.split("[./]")
       val asmpFile =
-        segments.foldLeft(baseDir: Path)(_ / _) changeExtension "asmp" toFile;
+        segments.foldLeft(baseDir: Path)(_ / _).changeExtension("asmp") toFile;
 
       asmpFile.parent.createDirectory()
       emitAsmp(jclassBytes, asmpFile)
@@ -168,7 +168,8 @@ trait BytecodeWriters {
       val dumpFile =
         pathName
           .split("[./]")
-          .foldLeft(baseDir: Path)(_ / _) changeExtension "class" toFile;
+          .foldLeft(baseDir: Path)(_ / _)
+          .changeExtension("class") toFile;
       dumpFile.parent.createDirectory()
       val outstream = new DataOutputStream(new FileOutputStream(dumpFile.path))
 

@@ -19,7 +19,7 @@ class DenseDotProductBenchmark extends BreezeBenchmark {
   def timeBigDVDotMasked(reps: Int) = {
     var sum = 0.0
     cforRange(0 until reps) { rep =>
-      sum += (dvBig: Vector[Double]) dot (dv2Big: Vector[Double])
+      sum += (dvBig: Vector[Double]).dot(dv2Big: Vector[Double])
     }
     sum
   }
@@ -46,7 +46,7 @@ class DenseDotProductBenchmark extends BreezeBenchmark {
   def timeBigDVDot(reps: Int) = {
     var sum = 0.0
     cforRange(0 until reps) { rep =>
-      sum += dvBig dot dv2Big
+      sum += dvBig.dot(dv2Big)
     }
     sum
   }
@@ -54,7 +54,7 @@ class DenseDotProductBenchmark extends BreezeBenchmark {
   def timeSmallDVDot(reps: Int) = {
     var sum = 0.0
     cforRange(0 until reps) { rep =>
-      sum += dv dot dv2
+      sum += dv.dot(dv2)
     }
     sum
   }
@@ -83,7 +83,7 @@ class DenseDotProductBenchmark extends BreezeBenchmark {
   def timeBigFVDot(reps: Int) = {
     var sum = 0.0
     cforRange(0 until reps) { rep =>
-      sum += fvBig dot fv2Big
+      sum += fvBig.dot(fv2Big)
     }
     sum
   }

@@ -21,12 +21,12 @@ final class PgnDump(dumper: lila.game.PgnDump,
       .fold(pgn)(pgn.withEvent)
   }
 
-  def filename(game: Game) = dumper filename game
+  def filename(game: Game) = dumper.filename(game)
 
   def exportUserGames(userId: String): Enumerator[String] = PgnStream {
     import lila.game.tube.gameTube
     import lila.game.BSONHandlers.gameBSONHandler
-    pimpQB($query(Query user userId)).sort(Query.sortCreated).cursor[Game]()
+    pimpQB($query(Query.user(userId))).sort(Query.sortCreated).cursor[Game]()
   }
 
   def exportGamesFromIds(ids: List[String]): Enumerator[String] = PgnStream {
@@ -38,7 +38,7 @@ final class PgnDump(dumper: lila.game.PgnDump,
   private def PgnStream(
       cursor: reactivemongo.api.Cursor[Game]): Enumerator[String] = {
     val toPgn = Enumeratee.mapM[Game].apply[String] { game =>
-      GameRepo initialFen game map { initialFen =>
+      (GameRepo initialFen game).map { initialFen =>
         apply(game, initialFen).toString + "\n\n\n"
       }
     }

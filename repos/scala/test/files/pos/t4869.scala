@@ -4,5 +4,5 @@
 class C[T]
 class A {
   def f[T](x: T): C[_ <: T] = null
-  def g = List(1d) map f
+  def g = List(1d).map(f)
 }

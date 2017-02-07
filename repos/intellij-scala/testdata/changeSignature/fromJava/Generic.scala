@@ -4,5 +4,5 @@ class GenericTest extends Generic[String, String] {
 
   foo("1")
 
-  this foo ""
+  this.foo("")
 }

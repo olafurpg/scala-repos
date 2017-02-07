@@ -111,8 +111,8 @@ object LBFGS {
     def repr: ApproximateInverseHessian[T] = this
 
     def updated(step: T, gradDelta: T) = {
-      val memStep = (step +: this.memStep) take m
-      val memGradDelta = (gradDelta +: this.memGradDelta) take m
+      val memStep = ((step +: this.memStep)).take(m)
+      val memGradDelta = ((gradDelta +: this.memGradDelta)).take(m)
 
       new ApproximateInverseHessian(m, memStep, memGradDelta)
     }
@@ -124,8 +124,8 @@ object LBFGS {
         if (historyLength > 0) {
           val prevStep = memStep.head
           val prevGradStep = memGradDelta.head
-          val sy = prevStep dot prevGradStep
-          val yy = prevGradStep dot prevGradStep
+          val sy = prevStep.dot(prevGradStep)
+          val yy = prevGradStep.dot(prevGradStep)
           if (sy < 0 || sy.isNaN) throw new NaNHistory
           sy / yy
         } else {
@@ -137,8 +137,8 @@ object LBFGS {
       val rho = new Array[Double](m)
 
       for (i <- 0 until historyLength) {
-        rho(i) = (memStep(i) dot memGradDelta(i))
-        as(i) = (memStep(i) dot dir) / rho(i)
+        rho(i) = (memStep(i).dot(memGradDelta(i)))
+        as(i) = (memStep(i).dot(dir)) / rho(i)
         if (as(i).isNaN) {
           throw new NaNHistory
         }
@@ -148,7 +148,7 @@ object LBFGS {
       dir *= diag
 
       for (i <- (historyLength - 1) to 0 by (-1)) {
-        val beta = (memGradDelta(i) dot dir) / rho(i)
+        val beta = (memGradDelta(i).dot(dir)) / rho(i)
         axpy(as(i) - beta, memStep(i), dir)
       }
 

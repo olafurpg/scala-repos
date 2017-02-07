@@ -13,10 +13,10 @@ object Test {
     assert(!prop.isSet)
     assert(prop.get != null)
 
-    prop set "dingus"
+    prop.set("dingus")
     assert(prop.get == "dingus")
     assert(!prop.value)
-    prop set "true"
+    prop.set("true")
     assert(prop.value)
     prop.toggle()
     assert(!prop.value)

@@ -21,8 +21,8 @@ class ScalaLoggingSpec extends Specification with Mockito {
       object Logger extends play.api.LoggerLike {
         // Mock underlying logger implementation
         val logger = mock[org.slf4j.Logger].smart
-        logger.isDebugEnabled() returns true
-        logger.isErrorEnabled() returns true
+        logger.isDebugEnabled().returns(true)
+        logger.isErrorEnabled().returns(true)
       }
 
       //#logging-default-logger
@@ -42,10 +42,10 @@ class ScalaLoggingSpec extends Specification with Mockito {
       }
       //#logging-default-logger
 
-      there was atLeastOne(Logger.logger).isDebugEnabled()
-      there was atLeastOne(Logger.logger).debug(anyString)
-      there was atMostOne(Logger.logger).isErrorEnabled()
-      there was atMostOne(Logger.logger).error(anyString, any[Throwable])
+      there.was(atLeastOne(Logger.logger).isDebugEnabled())
+      there.was(atLeastOne(Logger.logger).debug(anyString))
+      there.was(atMostOne(Logger.logger).isErrorEnabled())
+      there.was(atMostOne(Logger.logger).error(anyString, any[Throwable]))
     }
   }
 

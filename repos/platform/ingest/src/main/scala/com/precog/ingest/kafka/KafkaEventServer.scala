@@ -59,14 +59,15 @@ object KafkaEventServer
   def configureEventService(config: Configuration): EventService.State = {
     val accountFinder = new CachingAccountFinder(
       WebAccountFinder(config.detach("accounts"))
-        .map(_.withM[Future]) valueOr { errs =>
-        sys.error(
-          "Unable to build new WebAccountFinder: " +
-            errs.list.mkString("\n", "\n", ""))
-      })
+        .map(_.withM[Future])
+        .valueOr { errs =>
+          sys.error(
+            "Unable to build new WebAccountFinder: " +
+              errs.list.mkString("\n", "\n", ""))
+        })
 
     val apiKeyFinder = new CachingAPIKeyFinder(
-      WebAPIKeyFinder(config.detach("security")).map(_.withM[Future]) valueOr {
+      WebAPIKeyFinder(config.detach("security")).map(_.withM[Future]).valueOr {
         errs =>
           sys.error(
             "Unable to build new WebAPIKeyFinder: " +
@@ -80,7 +81,7 @@ object KafkaEventServer
         config[Long]("ingest.timestamp_required_after", 1363327426906L)))
 
     val (eventStore, stoppable) =
-      KafkaEventStore(config.detach("eventStore"), permissionsFinder) valueOr {
+      KafkaEventStore(config.detach("eventStore"), permissionsFinder).valueOr {
         errs =>
           sys.error(
             "Unable to build new KafkaEventStore: " +
@@ -88,14 +89,14 @@ object KafkaEventServer
       }
 
     val jobManager =
-      WebJobManager(config.detach("jobs")) valueOr { errs =>
+      WebJobManager(config.detach("jobs")).valueOr { errs =>
         sys.error(
           "Unable to build new WebJobManager: " +
             errs.list.mkString("\n", "\n", ""))
       }
 
     val serviceConfig =
-      EventService.ServiceConfig.fromConfiguration(config) valueOr { errors =>
+      EventService.ServiceConfig.fromConfiguration(config).valueOr { errors =>
         sys.error(
           "Unable to obtain self-referential service locator for event service: %s"
             .format(errors.list.mkString("; ")))

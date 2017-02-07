@@ -59,7 +59,7 @@ private[lease] class MinAlarm(left: Alarm, right: Alarm) extends Alarm {
 private[lease] class DurationAlarm(dur: Duration) extends Alarm {
   private[this] val elapsed = Stopwatch.start()
 
-  def sleeptime: Duration = dur - elapsed() max Duration.Zero
+  def sleeptime: Duration = (dur - elapsed()).max(Duration.Zero)
   def finished: Boolean = elapsed() >= dur
 }
 

@@ -323,7 +323,7 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
 
     tlsStage.joinMat(transportFlow) { (_, tcpConnFuture) ⇒
       import system.dispatcher
-      tcpConnFuture map { tcpConn ⇒
+      tcpConnFuture.map { tcpConn ⇒
         OutgoingConnection(tcpConn.localAddress, tcpConn.remoteAddress)
       }
     }
@@ -902,7 +902,7 @@ object Http extends ExtensionId[HttpExt] with ExtensionIdProvider {
   def lookup() = Http
 
   def createExtension(system: ExtendedActorSystem): HttpExt =
-    new HttpExt(system.settings.config getConfig "akka.http")(system)
+    new HttpExt(system.settings.config.getConfig("akka.http"))(system)
 }
 
 /**

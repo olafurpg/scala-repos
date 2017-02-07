@@ -147,7 +147,7 @@ abstract class ClusterDeathWatchSpec
       enterBarrier("after-1")
     }
 
-    "receive Terminated when watched path doesn't exist" ignore {
+    "receive Terminated when watched path doesn't exist".ignore {
       Thread.sleep(5000)
       runOn(first) {
         val path = RootActorPath(second) / "user" / "non-existing"

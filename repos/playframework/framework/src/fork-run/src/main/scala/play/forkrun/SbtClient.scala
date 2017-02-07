@@ -48,7 +48,7 @@ class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
         val events = context.actorOf(SbtEvents.props(log), "sbt-server-events")
         client ! SbtClientProxy.SubscribeToEvents(sendTo = events)
       }
-      pending foreach self.!
+      pending.foreach(self.!)
       context become active(client)
     case request: SbtRequest =>
       context become awaitingDaemon(client, pending :+ request)
@@ -76,14 +76,17 @@ class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
     case request @ Request(key, sendTo) =>
       val name = java.net.URLEncoder.encode(key, "utf-8")
       val task =
-        context.child(name) getOrElse context
-          .actorOf(SbtTask.props(key, client), name)
+        context
+          .child(name)
+          .getOrElse(
+            context
+              .actorOf(SbtTask.props(key, client), name))
       task ! request
     case Shutdown => shutdownWithClient(client)
   }
 
   def fail(error: Throwable, requests: Seq[SbtRequest]): Unit = {
-    requests foreach { request =>
+    requests.foreach { request =>
       request match {
         case Request(_, sendTo) => sendTo ! Failed(error)
         case _ => // ignore
@@ -133,7 +136,7 @@ class SbtEvents(logger: Logger) extends Actor {
   // log events from sbt server currently have duplicates that are
   // taken from standard out and prefixed with "Read from stdout: "
   def accepted(message: String): Boolean =
-    !(message startsWith "Read from stdout: ")
+    !(message.startsWith("Read from stdout: "))
 }
 
 object SbtTask {
@@ -161,7 +164,7 @@ class SbtTask(name: String, client: ActorRef) extends Actor {
     case SbtClientProxy.LookupScopedKeyResponse(name, Failure(error)) =>
       fail(error, pending)
     case SbtClientProxy.WatchingTask(taskKey) =>
-      pending foreach self.!
+      pending.foreach(self.!)
       context become active(taskKey.key)
   }
 
@@ -175,12 +178,12 @@ class SbtTask(name: String, client: ActorRef) extends Actor {
     case SbtClientProxy.ExecutionId(Failure(error), _) =>
       fail(error, requests)
     case SbtClientProxy.WatchEvent(key, result) =>
-      requests foreach (_.sendTo ! Response(name, result))
+      requests.foreach(_.sendTo ! Response(name, result))
       context become active(key)
   }
 
   def fail(error: Throwable, requests: Seq[Request]): Unit = {
-    requests foreach (_.sendTo ! Failed(error))
+    requests.foreach(_.sendTo ! Failed(error))
     context become broken(error)
   }
 

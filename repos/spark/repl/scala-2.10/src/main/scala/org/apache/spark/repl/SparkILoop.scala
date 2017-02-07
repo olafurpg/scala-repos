@@ -237,14 +237,14 @@ class SparkILoop(
       }
   }
   private def helpSummary() = {
-    val usageWidth = commands map (_.usageMsg.length) max
+    val usageWidth = commands.map(_.usageMsg.length) max
     val formatStr = "%-" + usageWidth + "s %s %s"
 
     echo("All commands can be abbreviated, e.g. :he instead of :help.")
     echo(
       "Those marked with a * have more detailed help, e.g. :help imports.\n")
 
-    commands foreach { cmd =>
+    commands.foreach { cmd =>
       val star = if (cmd.hasLongHelp) "*" else " "
       echo(formatStr.format(cmd.usageMsg, star, cmd.help))
     }
@@ -260,7 +260,7 @@ class SparkILoop(
     Result(true, None)
   }
   private def matchingCommands(cmd: String) =
-    commands filter (_.name startsWith cmd)
+    commands.filter(_.name.startsWith(cmd))
   private def uniqueCommand(cmd: String): Option[LoopCommand] = {
     // this lets us add commands willy-nilly and only requires enough command to disambiguate
     matchingCommands(cmd) match {
@@ -298,7 +298,7 @@ class SparkILoop(
       val current = history.index
       val count = try xs.head.toInt
       catch { case _: Exception => defaultLines }
-      val lines = history.asStrings takeRight count
+      val lines = history.asStrings.takeRight(count)
       val offset = current - lines.size + 1
 
       for ((line, index) <- lines.zipWithIndex)
@@ -431,19 +431,19 @@ class SparkILoop(
     val handlers = intp.languageWildcardHandlers ++ intp.importHandlers
     val isVerbose = tokens contains "-v"
 
-    handlers.filterNot(_.importedSymbols.isEmpty).zipWithIndex foreach {
+    handlers.filterNot(_.importedSymbols.isEmpty).zipWithIndex.foreach {
       case (handler, idx) =>
         val (types, terms) =
-          handler.importedSymbols partition (_.name.isTypeName)
+          handler.importedSymbols.partition(_.name.isTypeName)
         val imps = handler.implicitSymbols
-        val found = tokens filter (handler importsSymbolNamed _)
+        val found = tokens.filter(handler.importsSymbolNamed(_))
         val typeMsg = if (types.isEmpty) "" else types.size + " types"
         val termMsg = if (terms.isEmpty) "" else terms.size + " terms"
         val implicitMsg = if (imps.isEmpty) "" else imps.size + " are implicit"
         val foundMsg =
           if (found.isEmpty) "" else found.mkString(" // imports: ", ", ", "")
         val statsMsg =
-          List(typeMsg, termMsg, implicitMsg) filterNot (_ == "") mkString
+          List(typeMsg, termMsg, implicitMsg).filterNot(_ == "") mkString
             ("(", ", ", ")")
 
         intp.reporter.printMessage(
@@ -464,55 +464,55 @@ class SparkILoop(
 
     // If an argument is given, only show a source with that
     // in its name somewhere.
-    val args = line split "\\s+"
+    val args = line.split("\\s+")
     val filtered =
-      intp.implicitSymbolsBySource filter {
+      intp.implicitSymbolsBySource.filter {
         case (source, syms) =>
           (args contains "-v") || {
             if (line == "") (source.fullName.toString != "scala.Predef")
-            else (args exists (source.name.toString contains _))
+            else (args.exists(source.name.toString contains _))
           }
       }
 
     if (filtered.isEmpty)
       return "No implicits have been imported other than those in Predef."
 
-    filtered foreach {
+    filtered.foreach {
       case (source, syms) =>
         p(
           "/* " + syms.size + " implicit members imported from " +
             source.fullName + " */")
 
         // This groups the members by where the symbol is defined
-        val byOwner = syms groupBy (_.owner)
+        val byOwner = syms.groupBy(_.owner)
         val sortedOwners =
-          byOwner.toList sortBy {
+          byOwner.toList.sortBy {
             case (owner, _) =>
               afterTyper(source.info.baseClasses indexOf owner)
           }
 
-        sortedOwners foreach {
+        sortedOwners.foreach {
           case (owner, members) =>
             // Within each owner, we cluster results based on the final result type
             // if there are more than a couple, and sort each cluster based on name.
             // This is really just trying to make the 100 or so implicits imported
             // by default into something readable.
             val memberGroups: List[List[Symbol]] = {
-              val groups = members groupBy (_.tpe.finalResultType) toList
-              val (big, small) = groups partition (_._2.size > 3)
+              val groups = members.groupBy(_.tpe.finalResultType) toList
+              val (big, small) = groups.partition(_._2.size > 3)
               val xss =
-                ((big sortBy (_._1.toString) map (_._2)) :+
-                  (small flatMap (_._2)))
+                ((big.sortBy(_._1.toString).map(_._2)) :+
+                  (small.flatMap(_._2)))
 
-              xss map (xs => xs sortBy (_.name.toString))
+              xss.map(xs => xs.sortBy(_.name.toString))
             }
 
             val ownerMessage =
               if (owner == source) " defined in " else " inherited from "
             p("  /* " + members.size + ownerMessage + owner.fullName + " */")
 
-            memberGroups foreach { group =>
-              group foreach (s => p("  " + intp.symbolDefString(s)))
+            memberGroups.foreach { group =>
+              group.foreach(s => p("  " + intp.symbolDefString(s)))
               p("")
             }
         }
@@ -548,11 +548,11 @@ class SparkILoop(
     new JavapClass(addToolsJarToLoader(),
                    new SparkIMain.ReplStrippingWriter(intp)) {
       override def tryClass(path: String): Array[Byte] = {
-        val hd :: rest = path split '.' toList;
+        val hd :: rest = path.split('.') toList;
         // If there are dots in the name, the first segment is the
         // key to finding it.
         if (rest.nonEmpty) {
-          intp optFlatName hd match {
+          intp.optFlatName(hd) match {
             case Some(flat) =>
               val clazz = flat :: rest mkString NAME_JOIN_STRING
               val bytes = super.tryClass(clazz)
@@ -564,9 +564,9 @@ class SparkILoop(
           // Look for Foo first, then Foo$, but if Foo$ is given explicitly,
           // we have to drop the $ to find object Foo, then tack it back onto
           // the end of the flattened name.
-          def className = intp flatName path
+          def className = intp.flatName(path)
           def moduleName =
-            (intp flatName path.stripSuffix(MODULE_SUFFIX_STRING)) +
+            (intp.flatName(path.stripSuffix(MODULE_SUFFIX_STRING))) +
               MODULE_SUFFIX_STRING
 
           val bytes = super.tryClass(className)
@@ -583,8 +583,8 @@ class SparkILoop(
   private def typeCommand(line0: String): Result = {
     line0.trim match {
       case "" => ":type [-v] <expression>"
-      case s if s startsWith "-v " =>
-        typeCommandInternal(s stripPrefix "-v " trim, true)
+      case s if s.startsWith("-v ") =>
+        typeCommandInternal(s.stripPrefix("-v ") trim, true)
       case s => typeCommandInternal(s, false)
     }
   }
@@ -592,7 +592,7 @@ class SparkILoop(
   private def warningsCommand(): Result = {
     if (intp.lastWarnings.isEmpty) "Can't find any cached warnings."
     else
-      intp.lastWarnings foreach {
+      intp.lastWarnings.foreach {
         case (pos, msg) => intp.reporter.warning(pos, msg)
       }
   }
@@ -600,11 +600,11 @@ class SparkILoop(
   private def javapCommand(line: String): Result = {
     if (javap == null)
       ":javap unavailable, no tools.jar at %s.  Set JDK_HOME.".format(jdkHome)
-    else if (javaVersion startsWith "1.7")
+    else if (javaVersion.startsWith("1.7"))
       ":javap not yet working with java 1.7"
     else if (line == "") ":javap [-lcsvp] [path1 path2 ...]"
     else
-      javap(words(line)) foreach { res =>
+      javap(words(line)).foreach { res =>
         if (res.isError) return "Failed: " + res.value
         else res.show()
       }
@@ -632,7 +632,7 @@ class SparkILoop(
         case wrapper :: Nil =>
           intp.typeOfExpression(wrapper) match {
             case PolyType(List(targ), MethodType(List(arg), restpe)) =>
-              intp setExecutionWrapper intp.pathToTerm(wrapper)
+              intp.setExecutionWrapper(intp.pathToTerm(wrapper))
               "Set wrapper to '" + wrapper + "'"
             case tp =>
               failMsg + "\nFound: <unknown>"
@@ -742,7 +742,7 @@ class SparkILoop(
   private def interpretAllFrom(file: File) {
     savingReader {
       savingReplayStack {
-        file applyReader { reader =>
+        file.applyReader { reader =>
           in = SimpleReader(reader, out, false)
           echo("Loading " + file + "...")
           loop()
@@ -766,7 +766,7 @@ class SparkILoop(
     echo("Resetting repl state.")
     if (replayCommandStack.nonEmpty) {
       echo("Forgetting this session history:\n")
-      replayCommands foreach echo
+      replayCommands.foreach(echo)
       echo("")
       replayCommandStack = Nil
     }
@@ -877,11 +877,11 @@ class SparkILoop(
     * (1) whether to keep running, (2) the line to record for replay,
     * if any. */
   private[repl] def command(line: String): Result = {
-    if (line startsWith ":") {
-      val cmd = line.tail takeWhile (x => !x.isWhitespace)
+    if (line.startsWith(":")) {
+      val cmd = line.tail.takeWhile(x => !x.isWhitespace)
       uniqueCommand(cmd) match {
         case Some(lc) =>
-          lc(line.tail stripPrefix cmd dropWhile (_.isWhitespace))
+          lc(line.tail.stripPrefix(cmd).dropWhile(_.isWhitespace))
         case _ => ambiguousError(cmd)
       }
     } else if (intp.global == null)
@@ -890,7 +890,7 @@ class SparkILoop(
   }
 
   private def readWhile(cond: String => Boolean) = {
-    Iterator continually in.readLine("") takeWhile (x => x != null && cond(x))
+    (Iterator continually in.readLine("")).takeWhile(x => x != null && cond(x))
   }
 
   private def pasteCommand(): Result = {
@@ -968,7 +968,7 @@ class SparkILoop(
     } else if (Completion.looksLikeInvocation(code) &&
                intp.mostRecentVar != "") {
       interpretStartingWith(intp.mostRecentVar + code)
-    } else if (code.trim startsWith "//") {
+    } else if (code.trim.startsWith("//")) {
       // line comment, do nothing
       None
     } else reallyInterpret._2
@@ -1050,7 +1050,7 @@ class SparkILoop(
       import Properties.userHome
       import scala.compat.Platform.EOL
       val autorun =
-        replProps.replAutorunCode.option flatMap (f => io.File(f).safeSlurp())
+        replProps.replAutorunCode.option.flatMap(f => io.File(f).safeSlurp())
       if (autorun.isDefined) intp.quietRun(autorun.get)
     })
 
@@ -1184,7 +1184,7 @@ object SparkILoop extends Logging {
         val output = new JPrintWriter(new OutputStreamWriter(ostream), true) {
           override def write(str: String) = {
             // completely skip continuation lines
-            if (str forall (ch => ch.isWhitespace || ch == '|')) ()
+            if (str.forall(ch => ch.isWhitespace || ch == '|')) ()
             // print a newline on empty scala prompts
             else if ((str contains '\n') && (str.trim == "scala> "))
               super.write("\n")
@@ -1211,7 +1211,7 @@ object SparkILoop extends Logging {
           .map(jar => new URI(jar).getPath)
           .foreach(settings.classpath.append(_))
 
-        repl process settings
+        repl.process(settings)
       }
     }
   }
@@ -1231,10 +1231,10 @@ object SparkILoop extends Logging {
         if (sets.classpath.isDefault)
           sets.classpath.value = sys.props("java.class.path")
 
-        repl process sets
+        repl.process(sets)
       }
     }
   }
   private[repl] def run(lines: List[String]): String =
-    run(lines map (_ + "\n") mkString)
+    run(lines.map(_ + "\n") mkString)
 }

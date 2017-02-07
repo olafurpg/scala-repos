@@ -10,7 +10,7 @@ object LilaCookie {
   private val domainRegex = """^.+(\.[^\.]+\.[^\.]+)$""".r
 
   private def domain(req: RequestHeader): String =
-    domainRegex.replaceAllIn(req.domain, m => quoteReplacement(m group 1))
+    domainRegex.replaceAllIn(req.domain, m => quoteReplacement(m.group(1)))
 
   val sessionId = "sid"
 
@@ -37,7 +37,7 @@ object LilaCookie {
       httpOnly: Option[Boolean] = None)(implicit req: RequestHeader): Cookie =
     Cookie(name,
            value,
-           maxAge orElse Session.maxAge orElse 86400.some,
+           maxAge.orElse(Session.maxAge).orElse(86400.some),
            "/",
            domain(req).some,
            Session.secure,

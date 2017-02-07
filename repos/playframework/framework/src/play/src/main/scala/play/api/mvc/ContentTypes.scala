@@ -375,9 +375,9 @@ trait BodyParsers {
               bf.push(bs); bf
             }
             sink.mapMaterializedValue { future =>
-              future andThen { case _ => buffer.close() }
+              future.andThen { case _ => buffer.close() }
             }
-          } map (buffer => Right(buffer))
+          }.map(buffer => Right(buffer))
         )
       }
 
@@ -437,16 +437,20 @@ trait BodyParsers {
     def json[A](implicit reader: Reads[A]): BodyParser[A] =
       BodyParser("json reader") { request =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
-        json(request) mapFuture {
+        json(request).mapFuture {
           case Left(simpleResult) =>
             Future.successful(Left(simpleResult))
           case Right(jsValue) =>
-            jsValue.validate(reader) map { a =>
-              Future.successful(Right(a))
-            } recoverTotal { jsError =>
-              val msg = s"Json validation error ${JsError.toFlatForm(jsError)}"
-              createBadResult(msg)(request) map Left.apply
-            }
+            jsValue
+              .validate(reader)
+              .map { a =>
+                Future.successful(Right(a))
+              }
+              .recoverTotal { jsError =>
+                val msg =
+                  s"Json validation error ${JsError.toFlatForm(jsError)}"
+                createBadResult(msg)(request).map(Left.apply)
+              }
         }
       }
 
@@ -845,7 +849,7 @@ trait BodyParsers {
           Accumulator(
             Sink.fold[ByteString, ByteString](ByteString.empty)((state, bs) =>
               state ++ bs)
-          ) mapFuture { bytes =>
+          ).mapFuture { bytes =>
             try {
               Future.successful(Right(parser(request, bytes)))
             } catch {

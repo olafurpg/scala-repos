@@ -138,7 +138,7 @@ class DenseVectorTest extends FunSuite with Checkers {
     val a = DenseVector(0.56390, 0.36231, 0.14601, 0.60294, 0.14535)
     val b = DenseVector(0.15951, 0.83671, 0.56002, 0.57797, 0.54450)
     assertClose(a.t * b, .90249)
-    assertClose(a dot b, .90249)
+    assertClose(a.dot(b), .90249)
   }
 
   test("MulOuter") {
@@ -380,7 +380,7 @@ class DenseVectorTest extends FunSuite with Checkers {
     val b = DenseVector(3.0, 4.0, 5.0)
     (a: Vector[Double]) += (b: Vector[Double])
     assert(a === DenseVector(4.0, 6.0, 8.0))
-    assert((a: Vector[Double]).dot(b: Vector[Double]) === (a dot b))
+    assert((a: Vector[Double]).dot(b: Vector[Double]) === (a.dot(b)))
     (a: Vector[Double]) *= (b: Vector[Double])
     assert(a === DenseVector(12.0, 24.0, 40.0))
     a += (b: Vector[Double])
@@ -485,7 +485,7 @@ class DenseVectorTest extends FunSuite with Checkers {
     val foo = DenseVector(1.0, 2.0, 3.0, 4.0)
     val fneg = foo(3 to 0 by -1)
     println(fneg, fneg.offset, fneg.data, fneg.length, fneg.stride)
-    assert((foo dot foo(3 to 0 by -1)) === 20.0)
+    assert((foo.dot(foo(3 to 0 by -1))) === 20.0)
   }
 
   test("negative step sizes and + -- Double") {

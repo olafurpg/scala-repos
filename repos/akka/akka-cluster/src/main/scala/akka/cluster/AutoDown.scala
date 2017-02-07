@@ -87,13 +87,13 @@ private[cluster] abstract class AutoDownBase(
   var leader = false
 
   override def postStop(): Unit = {
-    scheduledUnreachable.values foreach { _.cancel }
+    scheduledUnreachable.values.foreach { _.cancel }
   }
 
   def receive = {
     case state: CurrentClusterState ⇒
       leader = state.leader.exists(_ == selfAddress)
-      state.unreachable foreach unreachableMember
+      state.unreachable.foreach(unreachableMember)
 
     case UnreachableMember(m) ⇒ unreachableMember(m)
 
@@ -142,7 +142,7 @@ private[cluster] abstract class AutoDownBase(
   }
 
   def remove(node: UniqueAddress): Unit = {
-    scheduledUnreachable.get(node) foreach { _.cancel }
+    scheduledUnreachable.get(node).foreach { _.cancel }
     scheduledUnreachable -= node
     pendingUnreachable -= node
   }

@@ -150,7 +150,7 @@ trait LowPriorityOrderingImplicits {
     *  `Comparable[A]` anyway, we can throw in some Java interop too.
     */
   implicit def ordered[A <% Comparable[A]]: Ordering[A] = new Ordering[A] {
-    def compare(x: A, y: A): Int = x compareTo y
+    def compare(x: A, y: A): Int = x.compareTo(y)
   }
   implicit def comparatorToOrdering[A](
       implicit cmp: Comparator[A]): Ordering[A] = new Ordering[A] {

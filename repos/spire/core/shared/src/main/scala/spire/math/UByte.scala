@@ -88,7 +88,7 @@ private[math] trait UByteIsRig extends Rig[UByte] {
   def plus(a: UByte, b: UByte): UByte = a + b
   override def pow(a: UByte, b: Int): UByte = {
     if (b < 0)
-      throw new IllegalArgumentException("negative exponent: %s" format b)
+      throw new IllegalArgumentException("negative exponent: %s".format(b))
     a ** UByte(b)
   }
   override def times(a: UByte, b: UByte): UByte = a * b

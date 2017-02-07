@@ -78,7 +78,7 @@ trait ScTypeAliasDefinition extends ScTypeAlias {
             val refersToClass =
               Equivalence.equiv(pte.designator, ScType.designator(cls))
             val typeParamsAppliedInOrder =
-              (pte.typeArgs corresponds typeParameters) {
+              (pte.typeArgs.corresponds(typeParameters)) {
                 case (tpt: ScTypeParameterType, tp) if tpt.param == tp => true
                 case _ => false
               }
@@ -88,7 +88,7 @@ trait ScTypeAliasDefinition extends ScTypeAlias {
       val varianceAndBoundsMatch = cls match {
         case sc0 @ (_: ScClass | _: ScTrait) =>
           val sc = sc0.asInstanceOf[ScTypeParametersOwner]
-          (typeParameters corresponds sc.typeParameters) {
+          (typeParameters.corresponds(sc.typeParameters)) {
             case (tp1, tp2) =>
               tp1.variance == tp2.variance &&
                 tp1.upperBound == tp2.upperBound &&
@@ -97,7 +97,7 @@ trait ScTypeAliasDefinition extends ScTypeAlias {
                 tp2.viewBound.isEmpty
           }
         case _ => // Java class
-          (typeParameters corresponds cls.getTypeParameters) {
+          (typeParameters.corresponds(cls.getTypeParameters)) {
             case (tp1, tp2) =>
               tp1.variance == ScTypeParam.Invariant &&
                 tp1.upperTypeElement.isEmpty &&

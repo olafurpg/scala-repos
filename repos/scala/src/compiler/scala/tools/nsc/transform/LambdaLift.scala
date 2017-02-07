@@ -23,7 +23,7 @@ abstract class LambdaLift extends InfoTransform {
       case TypeRef(NoPrefix, sym, Nil) if sym.isClass && !sym.isPackageClass =>
         typeRef(apply(sym.owner.enclClass.thisType), sym, Nil)
       case ClassInfoType(parents, decls, clazz) =>
-        val parents1 = parents mapConserve this
+        val parents1 = parents.mapConserve(this)
         if (parents1 eq parents) tp
         else ClassInfoType(parents1, decls, clazz)
       case _ =>
@@ -68,7 +68,7 @@ abstract class LambdaLift extends InfoTransform {
     /** Symbols that are called from an inner class. */
     private val calledFromInner = new LinkedHashSet[Symbol]
 
-    private val ord = Ordering.fromLessThan[Symbol](_ isLess _)
+    private val ord = Ordering.fromLessThan[Symbol](_.isLess(_))
     private def newSymSet = TreeSet.empty[Symbol](ord)
 
     private def symSet(f: LinkedHashMap[Symbol, SymSet], sym: Symbol): SymSet =
@@ -157,7 +157,7 @@ abstract class LambdaLift extends InfoTransform {
             renamable += sym
             changedFreeVars = true
             debuglog(s"$sym is free in $enclosure")
-            if (sym.isVariable) sym setFlag CAPTURED
+            if (sym.isVariable) sym.setFlag(CAPTURED)
           }
           !enclosure.isClass
         }
@@ -184,7 +184,7 @@ abstract class LambdaLift extends InfoTransform {
           case DefDef(_, _, _, _, _, _) =>
             if (sym.isLocalToBlock) {
               renamable += sym
-              sym setFlag (PrivateLocal | FINAL)
+              sym.setFlag(PrivateLocal | FINAL)
             } else if (sym.isPrimaryConstructor) {
               symSet(called, sym) += sym.owner
             }
@@ -222,12 +222,12 @@ abstract class LambdaLift extends InfoTransform {
       do {
         changedFreeVars = false
         for ((caller, callees) <- called; callee <- callees;
-             fvs <- free get callee; fv <- fvs) markFree(fv, caller)
+             fvs <- free.get(callee); fv <- fvs) markFree(fv, caller)
       } while (changedFreeVars)
 
       def renameSym(sym: Symbol) {
         val originalName = sym.name
-        sym setName newName(sym)
+        sym.setName(newName(sym))
         debuglog(
           "renaming in %s: %s => %s"
             .format(sym.owner.fullLocationString, originalName, sym.name))
@@ -279,8 +279,9 @@ abstract class LambdaLift extends InfoTransform {
             debuglog(s"new proxy ${proxyName} in ${owner.fullLocationString}")
             val proxy =
               owner
-                .newValue(proxyName.toTermName, owner.pos, newFlags.toLong) setInfo fv.info
-            if (owner.isClass) owner.info.decls enter proxy
+                .newValue(proxyName.toTermName, owner.pos, newFlags.toLong)
+                .setInfo(fv.info)
+            if (owner.isClass) owner.info.decls.enter(proxy)
             proxy
           }
         }
@@ -299,9 +300,9 @@ abstract class LambdaLift extends InfoTransform {
 
         val proxyName = proxyNames.getOrElse(sym, sym.name)
         val ps =
-          (proxies get enclosure.logicallyEnclosingMember).toList.flatten find
+          (proxies.get(enclosure.logicallyEnclosingMember)).toList.flatten find
             (_.name == proxyName)
-        ps getOrElse searchIn(enclosure.skipConstructor.owner)
+        ps.getOrElse(searchIn(enclosure.skipConstructor.owner))
       }
       debuglog(
         "proxy %s from %s has logical enclosure %s".format(
@@ -328,7 +329,7 @@ abstract class LambdaLift extends InfoTransform {
       def qual =
         if (clazz == currentClass) gen.mkAttributedThis(clazz)
         else {
-          sym resetFlag (LOCAL | PRIVATE)
+          sym.resetFlag(LOCAL | PRIVATE)
           if (isUnderConstruction(clazz)) prematureSelfReference()
           else if (clazz.isStaticOwner)
             gen.mkAttributedQualifier(clazz.thisType)
@@ -341,7 +342,7 @@ abstract class LambdaLift extends InfoTransform {
 
       qual match {
         case EmptyTree => EmptyTree
-        case qual => Select(qual, sym) setType sym.tpe
+        case qual => Select(qual, sym).setType(sym.tpe)
       }
     }
 
@@ -360,7 +361,7 @@ abstract class LambdaLift extends InfoTransform {
         case Nil => args
         case fvs =>
           addFree(sym,
-                  free = fvs map (fv => atPos(pos)(proxyRef(fv))),
+                  free = fvs.map(fv => atPos(pos)(proxyRef(fv))),
                   original = args)
       }
 
@@ -378,7 +379,7 @@ abstract class LambdaLift extends InfoTransform {
           else {
             val paramSyms = cloneSymbols(ps).map(_.setFlag(PARAM))
             val paramDefs =
-              ps map (p => ValDef(p) setPos tree.pos setType NoType)
+              ps.map(p => ValDef(p).setPos(tree.pos).setType(NoType))
 
             sym.updateInfo(
               lifted(
@@ -392,7 +393,8 @@ abstract class LambdaLift extends InfoTransform {
 
         case ClassDef(_, _, _, _) =>
           val freeParamDefs =
-            freeParams(sym) map (p => ValDef(p) setPos tree.pos setType NoType)
+            freeParams(sym).map(p =>
+              ValDef(p).setPos(tree.pos).setType(NoType))
 
           if (freeParamDefs.isEmpty) tree
           else
@@ -446,15 +448,15 @@ abstract class LambdaLift extends InfoTransform {
           def msg =
             s"SI-1909 Unable to STATICally lift $sym, which is defined in the self- or super-constructor call of ${sym.owner.owner}. A VerifyError is likely."
           devWarning(tree.pos, msg)
-        } else sym setFlag STATIC
+        } else sym.setFlag(STATIC)
       }
 
       sym.owner = sym.owner.enclClass
-      if (sym.isMethod) sym setFlag LIFTED
+      if (sym.isMethod) sym.setFlag(LIFTED)
       liftedDefs(sym.owner) ::= tree
       // TODO: this modifies the ClassInfotype of the enclosing class, which is associated with another phase (explicitouter).
       // This breaks type history: in a phase travel to before lambda lift, the ClassInfoType will contain lifted classes.
-      sym.owner.info.decls enterUnique sym
+      sym.owner.info.decls.enterUnique(sym)
       debuglog("lifted: " + sym + " from " + oldOwner + " to " + sym.owner)
       EmptyTree
     }
@@ -469,7 +471,7 @@ abstract class LambdaLift extends InfoTransform {
 
         case ValDef(mods, name, tpt, rhs) =>
           if (sym.isCapturedVariable) {
-            val tpt1 = TypeTree(sym.tpe) setPos tpt.pos
+            val tpt1 = TypeTree(sym.tpe).setPos(tpt.pos)
 
             val refTypeSym = sym.tpe.typeSymbol
 
@@ -487,7 +489,9 @@ abstract class LambdaLift extends InfoTransform {
             treeCopy.ValDef(tree, mods, name, tpt1, factoryCall)
           } else tree
         case Return(Block(stats, value)) =>
-          Block(stats, treeCopy.Return(tree, value)) setType tree.tpe setPos tree.pos
+          Block(stats, treeCopy.Return(tree, value))
+            .setType(tree.tpe)
+            .setPos(tree.pos)
         case Return(expr) =>
           assert(sym == currentMethod, sym)
           tree
@@ -510,14 +514,14 @@ abstract class LambdaLift extends InfoTransform {
             atPos(tree.pos) {
               val tp = tree.tpe
               val elemTree =
-                typer typed Select(tree1 setType sym.tpe, nme.elem)
+                typer.typed(Select(tree1.setType(sym.tpe), nme.elem))
               if (elemTree.tpe.typeSymbol != tp.typeSymbol)
                 gen.mkAttributedCast(elemTree, tp)
               else elemTree
             } else tree1
         case Block(stats, expr0) =>
           val (lzyVals, rest) =
-            stats partition {
+            stats.partition {
               case stat: ValDef =>
                 stat.symbol.isLazy || stat.symbol.isModuleVar
               case _ => false
@@ -530,7 +534,7 @@ abstract class LambdaLift extends InfoTransform {
     }
 
     private def preTransform(tree: Tree) =
-      super.transform(tree) setType lifted(tree.tpe)
+      super.transform(tree).setType(lifted(tree.tpe))
 
     override def transform(tree: Tree): Tree = tree match {
       case Select(ReferenceToBoxed(idt), elem) if elem == nme.elem =>
@@ -546,8 +550,8 @@ abstract class LambdaLift extends InfoTransform {
                                 exprOwner: Symbol): List[Tree] = {
       def addLifted(stat: Tree): Tree = stat match {
         case ClassDef(_, _, _, _) =>
-          val lifted = liftedDefs remove stat.symbol match {
-            case Some(xs) => xs reverseMap addLifted
+          val lifted = liftedDefs.remove(stat.symbol) match {
+            case Some(xs) => xs.reverseMap(addLifted)
             case _ =>
               log("unexpectedly no lifted defs for " + stat.symbol); Nil
           }
@@ -559,7 +563,7 @@ abstract class LambdaLift extends InfoTransform {
         case _ =>
           stat
       }
-      super.transformStats(stats, exprOwner) map addLifted
+      super.transformStats(stats, exprOwner).map(addLifted)
     }
 
     override def transformUnit(unit: CompilationUnit) {

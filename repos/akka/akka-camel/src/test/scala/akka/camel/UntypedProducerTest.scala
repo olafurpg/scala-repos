@@ -99,7 +99,7 @@ object UntypedProducerTest {
         def process(exchange: Exchange) = {
           exchange.getIn.getBody match {
             case "fail" ⇒ throw new Exception("failure")
-            case body ⇒ exchange.getOut.setBody("received %s" format body)
+            case body ⇒ exchange.getOut.setBody("received %s".format(body))
           }
         }
       })

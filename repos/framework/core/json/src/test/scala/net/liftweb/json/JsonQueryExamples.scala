@@ -71,7 +71,7 @@ object JsonQueryExamples extends Specification {
       x
     }
 
-    computerCpuCount reduceLeft (_ + _) mustEqual 40
+    computerCpuCount.reduceLeft(_ + _) mustEqual 40
   }
 
   "Servers sorted by uptime" in {
@@ -86,7 +86,7 @@ object JsonQueryExamples extends Specification {
       Server(ip, uptime.longValue)
     }
 
-    servers sortWith (_.uptime > _.uptime) mustEqual List(
+    servers.sortWith(_.uptime > _.uptime) mustEqual List(
       Server("192.168.1.127", 901214),
       Server("192.168.2.125", 453423),
       Server("192.168.2.126", 214312),

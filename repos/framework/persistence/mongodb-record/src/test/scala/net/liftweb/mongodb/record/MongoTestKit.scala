@@ -45,7 +45,7 @@ trait MongoTestKit extends Specification with BeforeAfterEach {
 
   def before = {
     // define the dbs
-    dbs foreach {
+    dbs.foreach {
       case (id, db) =>
         MongoDB.defineDb(id, mongo, db)
     }
@@ -55,7 +55,7 @@ trait MongoTestKit extends Specification with BeforeAfterEach {
     try {
       if (dbs.length < 1) false
       else {
-        dbs foreach {
+        dbs.foreach {
           case (id, _) =>
             MongoDB.use(id)(db => { db.getName })
         }
@@ -71,7 +71,7 @@ trait MongoTestKit extends Specification with BeforeAfterEach {
   def after = {
     if (!debug && isMongoRunning) {
       // drop the databases
-      dbs foreach {
+      dbs.foreach {
         case (id, _) =>
           MongoDB.use(id) { db =>
             db.dropDatabase

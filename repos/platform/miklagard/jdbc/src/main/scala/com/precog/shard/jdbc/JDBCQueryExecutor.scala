@@ -114,8 +114,8 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
           case dbName :: tableName :: Nil =>
             yggConfig.dbMap
               .get(dbName)
-              .toSuccess("DB %s is not configured".format(dbName)) flatMap {
-              url =>
+              .toSuccess("DB %s is not configured".format(dbName))
+              .flatMap { url =>
                 Validation
                   .fromTryCatch {
                     val conn = DriverManager.getConnection(url)
@@ -143,7 +143,7 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
                   .bimap({ t =>
                     logger.error("Error enumerating tables", t); t.getMessage
                   }, x => x)
-            }
+              }
 
           case _ =>
             Success(JNum(0))
@@ -169,8 +169,8 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
             // A little more complicated. Need to use metadata interface to enumerate table names
             yggConfig.dbMap
               .get(dbName)
-              .toSuccess("DB %s is not configured".format(dbName)) flatMap {
-              url =>
+              .toSuccess("DB %s is not configured".format(dbName))
+              .flatMap { url =>
                 Validation
                   .fromTryCatch {
                     val conn = DriverManager.getConnection(url)
@@ -196,7 +196,7 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
                   .bimap({ t =>
                     logger.error("Error enumerating tables", t); t.getMessage
                   }, x => x)
-            }
+              }
 
           case dbName :: collectionName :: Nil =>
             Success(JArray(Nil))

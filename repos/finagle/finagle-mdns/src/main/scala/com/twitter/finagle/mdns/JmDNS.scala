@@ -42,9 +42,9 @@ private class JmDNSAnnouncer extends MDNSAnnouncerIface {
   ): Future[Announcement] = {
     val info =
       ServiceInfo.create(regType + "." + domain, name, addr.getPort, "")
-    DNS.registerService(info) map { _ =>
+    DNS.registerService(info).map { _ =>
       new Announcement {
-        def unannounce() = DNS.unregisterService(info) map { _ =>
+        def unannounce() = DNS.unregisterService(info).map { _ =>
           ()
         }
       }
@@ -63,7 +63,7 @@ private object JmDNSResolver {
         def serviceResolved(event: ServiceEvent) {}
 
         def serviceAdded(event: ServiceEvent) {
-          DNS.getServiceInfo(event.getType, event.getName) foreach {
+          DNS.getServiceInfo(event.getType, event.getName).foreach {
             info =>
               val addresses = info.getInetAddresses
               val metadata =
@@ -110,7 +110,7 @@ private class JmDNSGroup(regType: String) extends Group[Address] {
       def serviceResolved(event: ServiceEvent) {}
 
       def serviceAdded(event: ServiceEvent) {
-        DNS.getServiceInfo(event.getType, event.getName) foreach {
+        DNS.getServiceInfo(event.getType, event.getName).foreach {
           info =>
             val addresses = info.getInetAddresses
             val metadata =

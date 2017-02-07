@@ -9,7 +9,7 @@ import User.{BSONFields => F}
 
 final class LightUserApi(coll: Coll) {
 
-  def get(id: String): Option[LightUser] = cache get id
+  def get(id: String): Option[LightUser] = cache.get(id)
 
   def invalidate = cache invalidate _
 
@@ -17,8 +17,8 @@ final class LightUserApi(coll: Coll) {
 
     def read(doc: BSONDocument) =
       LightUser(
-        id = doc.getAs[String](F.id) err "LightUser id missing",
-        name = doc.getAs[String](F.username) err "LightUser username missing",
+        id = doc.getAs[String](F.id).err("LightUser id missing"),
+        name = doc.getAs[String](F.username).err("LightUser username missing"),
         title = doc.getAs[String](F.title)
       )
   }
@@ -33,6 +33,6 @@ final class LightUserApi(coll: Coll) {
         .one[LightUser],
     timeToLive = 20 minutes,
     default = id => LightUser(id, id, None).some,
-    logger = logger branch "LightUserApi"
+    logger = logger.branch("LightUserApi")
   )
 }

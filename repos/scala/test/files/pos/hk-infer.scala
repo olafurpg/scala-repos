@@ -23,7 +23,7 @@ object ShouldWorkHK {
   }
   implicit def mkBoop[M[_]](xs: Seq[M[_]]) = new Booper(xs)
 
-  def f1 = x BOOP y BOOP x1 BOOP x2
+  def f1 = x.BOOP(y).BOOP(x1).BOOP(x2)
 }
 
 object DoesWorkHK {
@@ -34,5 +34,5 @@ object DoesWorkHK {
   }
   implicit def mkBoop[M[_]](xs: Seq[M[_]]) = new Booper[M](xs)
 
-  def f1 = x BOOP y BOOP x1 BOOP x2
+  def f1 = x.BOOP(y).BOOP(x1).BOOP(x2)
 }

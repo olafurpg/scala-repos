@@ -36,17 +36,18 @@ object JsonFormatsSpec extends Specification with TypeHintExamples {
     FullTypeHintExamples.formats.typeHints.hintFor(classOf[Animal])
 
   "hintsFor across composite formats" in {
-    (formats.typeHints.hintFor(classOf[Fish]) mustEqual (hintsForFish)) and
-      (formats.typeHints.hintFor(classOf[Dog]) mustEqual (hintsForDog)) and
-      (formats.typeHints.hintFor(classOf[Animal]) mustEqual (hintsForAnimal))
+    ((formats.typeHints.hintFor(classOf[Fish]) mustEqual (hintsForFish)))
+      .and(formats.typeHints.hintFor(classOf[Dog]) mustEqual (hintsForDog))
+      .and(
+        formats.typeHints.hintFor(classOf[Animal]) mustEqual (hintsForAnimal))
   }
 
   "classFor across composite formats" in {
-    (formats.typeHints.classFor(hintsForFish) mustEqual
-      (ShortTypeHintExamples.formats.typeHints.classFor(hintsForFish))) and
-      (formats.typeHints.classFor(hintsForDog) mustEqual
-        (ShortTypeHintExamples.formats.typeHints.classFor(hintsForDog))) and
-      (formats.typeHints.classFor(hintsForAnimal) mustEqual
+    ((formats.typeHints.classFor(hintsForFish) mustEqual
+      (ShortTypeHintExamples.formats.typeHints.classFor(hintsForFish))))
+      .and(formats.typeHints.classFor(hintsForDog) mustEqual
+        (ShortTypeHintExamples.formats.typeHints.classFor(hintsForDog)))
+      .and(formats.typeHints.classFor(hintsForAnimal) mustEqual
         (FullTypeHintExamples.formats.typeHints.classFor(hintsForAnimal)))
   }
 

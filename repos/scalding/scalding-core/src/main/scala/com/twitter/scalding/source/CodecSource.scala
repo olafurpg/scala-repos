@@ -56,7 +56,7 @@ class CodecSource[T] private (val hdfsPaths: Seq[String],
 
   val fieldSym = 'encodedBytes
   lazy val field = new Fields(fieldSym.name)
-  val injectionBox = Externalizer(injection andThen BytesWritableCodec.get)
+  val injectionBox = Externalizer(injection.andThen(BytesWritableCodec.get))
 
   def localPaths = hdfsPaths
 

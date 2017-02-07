@@ -128,29 +128,30 @@ class DefaultIngestProcessingSelectors(maxFields: Int,
       request.headers
         .header[`Content-Type`]
         .toSeq
-        .flatMap(_.mimeTypes) collectFirst {
-        case JSON =>
-          new JSONIngestProcessing(apiKey,
-                                   path,
-                                   authorities,
-                                   JSONValueStyle,
-                                   maxFields,
-                                   ingestStore)
-        case JSON_STREAM =>
-          new JSONIngestProcessing(apiKey,
-                                   path,
-                                   authorities,
-                                   JSONStreamStyle,
-                                   maxFields,
-                                   ingestStore)
-        case CSV =>
-          new CSVIngestProcessing(apiKey,
-                                  path,
-                                  authorities,
-                                  batchSize,
-                                  tmpdir,
-                                  ingestStore)
-      }
+        .flatMap(_.mimeTypes)
+        .collectFirst {
+          case JSON =>
+            new JSONIngestProcessing(apiKey,
+                                     path,
+                                     authorities,
+                                     JSONValueStyle,
+                                     maxFields,
+                                     ingestStore)
+          case JSON_STREAM =>
+            new JSONIngestProcessing(apiKey,
+                                     path,
+                                     authorities,
+                                     JSONStreamStyle,
+                                     maxFields,
+                                     ingestStore)
+          case CSV =>
+            new CSVIngestProcessing(apiKey,
+                                    path,
+                                    authorities,
+                                    batchSize,
+                                    tmpdir,
+                                    ingestStore)
+        }
     }
   }
 
@@ -166,23 +167,25 @@ class DefaultIngestProcessingSelectors(maxFields: Int,
         request.headers
           .header[`Content-Type`]
           .toSeq
-          .flatMap(_.mimeTypes) collectFirst {
-          case JSON_STREAM =>
-            new JSONIngestProcessing(apiKey,
-                                     path,
-                                     authorities,
-                                     JSONStreamStyle,
-                                     maxFields,
-                                     ingestStore)
-        } orElse {
-          Some(
-            new JSONIngestProcessing(apiKey,
-                                     path,
-                                     authorities,
-                                     JSONValueStyle,
-                                     maxFields,
-                                     ingestStore))
-        }
+          .flatMap(_.mimeTypes)
+          .collectFirst {
+            case JSON_STREAM =>
+              new JSONIngestProcessing(apiKey,
+                                       path,
+                                       authorities,
+                                       JSONStreamStyle,
+                                       maxFields,
+                                       ingestStore)
+          }
+          .orElse {
+            Some(
+              new JSONIngestProcessing(apiKey,
+                                       path,
+                                       authorities,
+                                       JSONValueStyle,
+                                       maxFields,
+                                       ingestStore))
+          }
       } else {
         None
       }

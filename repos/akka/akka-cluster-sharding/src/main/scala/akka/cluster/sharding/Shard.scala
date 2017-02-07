@@ -294,7 +294,7 @@ private[akka] class Shard(typeName: String,
 
       //Now there is no deliveryBuffer we can try to redeliver
       // and as the child exists, the message will be directly forwarded
-      messages foreach {
+      messages.foreach {
         case (msg, snd) ⇒ deliverMessage(msg, snd)
       }
     }
@@ -404,7 +404,7 @@ private[akka] class PersistentShard(
     case EntityStopped(id) ⇒ state = state.copy(state.entities - id)
     case SnapshotOffer(_, snapshot: State) ⇒ state = snapshot
     case RecoveryCompleted ⇒
-      state.entities foreach getEntity
+      state.entities.foreach(getEntity)
       super.initialized()
       log.debug("Shard recovery completed {}", shardId)
   }

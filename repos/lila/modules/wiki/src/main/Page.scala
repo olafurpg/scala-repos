@@ -21,7 +21,7 @@ object Page {
   // name = en_1_Some Title
   def make(name: String, body: String): Option[Page] = name match {
     case NameRegex(lang, numberStr, title) =>
-      parseIntOption(numberStr) map { number =>
+      parseIntOption(numberStr).map { number =>
         Page(id = name,
              number = number,
              slug = slugify(title),
@@ -45,5 +45,5 @@ object Page {
   }
 
   private def dropNumber(input: String) =
-    """^\d+_(.+)$""".r.replaceAllIn(input, m => quoteReplacement(m group 1))
+    """^\d+_(.+)$""".r.replaceAllIn(input, m => quoteReplacement(m.group(1)))
 }

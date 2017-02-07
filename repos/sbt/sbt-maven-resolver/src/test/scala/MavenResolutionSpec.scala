@@ -97,7 +97,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
       m <- conf.modules if (m.module.name contains "stringtemplate")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
-    jars should have size 1
+    (jars should have).size(1)
   }
 
   def resolveCrossConfigurations = {
@@ -111,7 +111,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
       m <- conf.modules if (m.module.name contains "scala-compiler")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
-    jars should have size 1
+    (jars should have).size(1)
   }
 
   def resolveSbtPlugins = {
@@ -134,10 +134,10 @@ class MavenResolutionSpec extends BaseIvySpecification {
     System.err.println(s"${oldJars.mkString("\n")}")
     val newJars = findSbtIdeaJars(sbtPlugin, "new")
     System.err.println(s"${newJars.mkString("\n")}")
-    (newJars should have size 1)
-    (oldJars should have size 1)
+    ((newJars should have).size(1))
+    ((oldJars should have).size(1))
     (oldJars.map(_._2) should not(
-      contain theSameElementsAs (newJars.map(_._2))))
+      contain.theSameElementsAs(newJars.map(_._2))))
   }
 
   def resolveSnapshotPubDate = {
@@ -148,10 +148,10 @@ class MavenResolutionSpec extends BaseIvySpecification {
     val report = ivyUpdate(m)
     val pubTime = for {
       conf <- report.configurations if conf.configuration == "compile"
-      m <- conf.modules if m.module.revision endsWith "-SNAPSHOT"
+      m <- conf.modules if m.module.revision.endsWith("-SNAPSHOT")
       date <- m.publicationDate
     } yield date
-    (pubTime should have size 1)
+    ((pubTime should have).size(1))
   }
 
   def resolvePomArtifactAndDependencies = {
@@ -166,7 +166,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
         (m.module.name contains "parser")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
-    jars should have size 2
+    (jars should have).size(2)
   }
 
   def failIfPomMissing = {
@@ -199,8 +199,8 @@ class MavenResolutionSpec extends BaseIvySpecification {
       m <- conf.modules if m.module.name == "testng"
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
-    (report.configurations should have size configurations.size)
-    (jars should have size 1)
+    ((report.configurations should have).size(configurations.size))
+    ((jars should have).size(1))
     (jars.forall(_.exists) shouldBe true)
   }
 
@@ -215,7 +215,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
       m <- conf.modules if m.module.name == "scala-library"
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
-    (report.configurations should have size configurations.size)
+    ((report.configurations should have).size(configurations.size))
     (jars should not be empty)
     (jars.forall(_.exists) shouldBe true)
   }
@@ -238,7 +238,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
         (m.module.name contains "testkit")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
-    (report.configurations should have size configurations.size)
+    ((report.configurations should have).size(configurations.size))
     (transitiveJars shouldBe empty)
     (directJars.forall(_.exists) shouldBe true)
   }
@@ -254,7 +254,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
       m <- conf.modules if m.module.name contains "akka-actor"
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
-    (report.configurations should have size configurations.size)
+    ((report.configurations should have).size(configurations.size))
     (jars should not be empty)
     (jars.forall(_.exists) shouldBe true)
   }
@@ -278,8 +278,8 @@ class MavenResolutionSpec extends BaseIvySpecification {
       (a, f) <- m.artifacts if (f.getName contains "sources") ||
         (f.getName contains "javadoc")
     } yield f
-    (report.configurations should have size configurations.size)
-    (jars should have size 2)
+    ((report.configurations should have).size(configurations.size))
+    ((jars should have).size(2))
   }
 
   def publishMavenMetadata = {
@@ -324,6 +324,6 @@ class MavenResolutionSpec extends BaseIvySpecification {
       allFiles.filter(_.getName contains "maven-metadata-local")
     // TODO - maybe we check INSIDE the metadata, or make sure we can get a publication date on resolve...
     // We end up with 4 files, two mavne-metadata files, and 2 maven-metadata-local files.
-    metadataFiles should have size 2
+    (metadataFiles should have).size(2)
   }
 }

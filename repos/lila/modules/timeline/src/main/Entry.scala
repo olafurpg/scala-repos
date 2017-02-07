@@ -54,7 +54,7 @@ object Entry {
       case d: SimulJoin => "simul-join" -> Json.toJson(d)
     }) match {
       case (typ, json) =>
-        json.asOpt[JsObject] map {
+        json.asOpt[JsObject].map {
           new Entry(BSONObjectID.generate,
                     users,
                     typ,

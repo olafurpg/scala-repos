@@ -24,7 +24,7 @@ class BufsTest extends FunSuite {
     val str = "12345"
     val expectedBytes = str.getBytes
     val buf = RichBuf(Buf.Utf8("12345"))
-    (1 until str.length) foreach { idx =>
+    ((1 until str.length)).foreach { idx =>
       assert(buf(idx) == expectedBytes(idx))
     }
   }

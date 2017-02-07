@@ -47,7 +47,7 @@ trait ScopeAnnotator {
         clashesOf(jointTerms ::: objects) ::: clashesOf(types ::: caseClasses) ::: clashesOf(
           jointTerms ::: caseClasses)
 
-      val clashes = (complexClashes.distinct diff clashesOf(parameters))
+      val clashes = (complexClashes.distinct.diff(clashesOf(parameters)))
 
       clashes.foreach { e =>
         holder.createErrorAnnotation(

@@ -881,23 +881,25 @@ object JGitUtil {
     */
   def getSubmodules(git: Git, tree: RevTree): List[SubmoduleInfo] = {
     val repository = git.getRepository
-    getContentFromPath(git, tree, ".gitmodules", true).map { bytes =>
-      (try {
-        val config = new BlobBasedConfig(repository.getConfig(), bytes)
-        config.getSubsections("submodule").asScala.map { module =>
-          val path = config.getString("submodule", module, "path")
-          val url = config.getString("submodule", module, "url")
-          SubmoduleInfo(module, path, url)
-        }
-      } catch {
-        case e: ConfigInvalidException => {
-          logger.error("Failed to load .gitmodules file for " +
-                         repository.getDirectory(),
-                       e)
-          Nil
-        }
-      }).toList
-    } getOrElse Nil
+    getContentFromPath(git, tree, ".gitmodules", true)
+      .map { bytes =>
+        (try {
+          val config = new BlobBasedConfig(repository.getConfig(), bytes)
+          config.getSubsections("submodule").asScala.map { module =>
+            val path = config.getString("submodule", module, "path")
+            val url = config.getString("submodule", module, "url")
+            SubmoduleInfo(module, path, url)
+          }
+        } catch {
+          case e: ConfigInvalidException => {
+            logger.error("Failed to load .gitmodules file for " +
+                           repository.getDirectory(),
+                         e)
+            Nil
+          }
+        }).toList
+      }
+      .getOrElse(Nil)
   }
 
   /**
@@ -925,7 +927,7 @@ object JGitUtil {
       treeWalk.addTree(revTree)
       treeWalk.setRecursive(true)
       getPathObjectId(path, treeWalk)
-    } flatMap { objectId =>
+    }.flatMap { objectId =>
       getContentFromId(git, objectId, fetchLargeFile)
     }
   }

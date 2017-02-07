@@ -51,7 +51,7 @@ class BaseCharsetTest(val charset: Charset) {
 
       val expectedTry = Try {
         val expectedChars = Array.newBuilder[Char]
-        outParts foreach {
+        outParts.foreach {
           case BufferPart(buf) =>
             val bufArray = new Array[Char](buf.remaining)
             buf.mark()
@@ -137,7 +137,7 @@ class BaseCharsetTest(val charset: Charset) {
 
       val expectedTry = Try {
         val expectedBytes = Array.newBuilder[Byte]
-        outParts foreach {
+        outParts.foreach {
           case BufferPart(buf) =>
             val bufArray = new Array[Byte](buf.remaining)
             buf.mark()

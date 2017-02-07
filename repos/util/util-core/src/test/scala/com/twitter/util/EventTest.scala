@@ -63,7 +63,7 @@ class EventTest extends FunSuite {
 
   test("Event.collect") {
     val e = Event[Int]()
-    val events = e collect { case i if i % 2 == 0 => i * 2 }
+    val events = e.collect { case i if i % 2 == 0 => i * 2 }
     val ref = new AtomicReference[Seq[Int]](Seq.empty)
     events.build.register(Witness(ref))
 
@@ -108,7 +108,7 @@ class EventTest extends FunSuite {
     val e = Event[Int]()
     val inners = new mutable.ArrayBuffer[Witness[String]]
     val e2 =
-      e mergeMap { i =>
+      e.mergeMap { i =>
         val e = Event[String]()
         inners += e
         e
@@ -146,7 +146,7 @@ class EventTest extends FunSuite {
     }
 
     val e12 =
-      e1 mergeMap { _ =>
+      e1.mergeMap { _ =>
         e2
       }
 
@@ -161,7 +161,7 @@ class EventTest extends FunSuite {
   test("Event.select") {
     val e1 = Event[Int]()
     val e2 = Event[String]()
-    val e = e1 select e2
+    val e = e1.select(e2)
     val ref = new AtomicReference[Seq[Either[Int, String]]](Seq.empty)
     e.build.register(Witness(ref))
     assert(ref.get.isEmpty)
@@ -178,7 +178,7 @@ class EventTest extends FunSuite {
   test("Event.zip") {
     val e1 = Event[Int]()
     val e2 = Event[String]()
-    val e = e1 zip e2
+    val e = e1.zip(e2)
     val ref = new AtomicReference[Seq[(Int, String)]](Seq.empty)
     e.build.register(Witness(ref))
 
@@ -187,7 +187,7 @@ class EventTest extends FunSuite {
     for (i <- 50 until 100) e2.notify(i.toString)
     for (i <- 50 until 100) e1.notify(i)
 
-    assert(ref.get == ((0 until 100) zip ((0 until 100) map (_.toString))))
+    assert(ref.get == (((0 until 100)).zip(((0 until 100)).map(_.toString))))
   }
 
   test("Event.joinLast") {
@@ -228,7 +228,7 @@ class EventTest extends FunSuite {
 
   test("Event.merge") {
     val e1, e2 = Event[Int]()
-    val e = e1 merge e2
+    val e = e1.merge(e2)
     val ref = new AtomicReference[Seq[Int]](Seq.empty)
     e.build.register(Witness(ref))
 
@@ -282,7 +282,7 @@ class EventTest extends FunSuite {
     }
 
     def ite[T](i: Var[Boolean], t: Var[T], e: Var[T]) =
-      i flatMap { i =>
+      i.flatMap { i =>
         if (i) t else e
       }
 

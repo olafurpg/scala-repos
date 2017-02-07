@@ -77,10 +77,10 @@ class JavaUniverse
                   if (manifest.typeArguments.isEmpty) sym.toType
                   else {
                     val tags =
-                      manifest.typeArguments map
-                        (targ => ju.internal.manifestToTypeTag(jm, targ))
+                      manifest.typeArguments.map(targ =>
+                        ju.internal.manifestToTypeTag(jm, targ))
                     ju.appliedType(sym.toTypeConstructor,
-                                   tags map (_.in(jm).tpe))
+                                   tags.map(_.in(jm).tpe))
                   }
                 tpe.asInstanceOf[U#Type]
               case u =>

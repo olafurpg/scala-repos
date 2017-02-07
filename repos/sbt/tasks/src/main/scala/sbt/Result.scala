@@ -32,7 +32,7 @@ object Result {
       }
   }
   def tryValues[S](r: Seq[Result[Unit]], v: Result[S]): S = {
-    r foreach tryValue[Unit]
+    r.foreach(tryValue[Unit])
     tryValue[S](v)
   }
   implicit def fromEither[T](e: Either[Incomplete, T]): Result[T] = e match {

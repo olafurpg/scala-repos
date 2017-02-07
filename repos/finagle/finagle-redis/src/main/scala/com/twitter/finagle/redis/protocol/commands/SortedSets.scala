@@ -335,7 +335,7 @@ object ZRangeResults {
   def apply(tuples: Seq[(ChannelBuffer, ChannelBuffer)]): ZRangeResults = {
     val arrays = tuples.unzip
     val doubles =
-      arrays._2 map { score =>
+      arrays._2.map { score =>
         NumberFormat.toDouble(BytesToString(score.array))
       }
     ZRangeResults(arrays._1.toArray, doubles.toArray)

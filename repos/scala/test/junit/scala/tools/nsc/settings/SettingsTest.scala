@@ -145,7 +145,7 @@ class SettingsTest {
       assertSame(
         r,
         s.lint.value.contains(
-          (s.LintWarnings withName v).asInstanceOf[s.lint.domain.Value]))
+          (s.LintWarnings.withName(v)).asInstanceOf[s.lint.domain.Value]))
       r
     }
 

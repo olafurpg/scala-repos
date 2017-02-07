@@ -55,7 +55,7 @@ abstract class SocketServer(fixPort: Int = 0) extends CompileOutputCommon {
   })
   private def setTimeoutOnSocket(mins: Int) = {
     try {
-      serverSocket setSoTimeout (mins * 60 * 1000)
+      serverSocket.setSoTimeout(mins * 60 * 1000)
       info("Set socket timeout to " + mins + " minutes.")
       true
     } catch {
@@ -85,7 +85,7 @@ abstract class SocketServer(fixPort: Int = 0) extends CompileOutputCommon {
           try doSession(clientSocket)
           finally clientSocket.close()
         case Left(_: SocketTimeoutException) =>
-          warn("Idle timeout exceeded on port %d; exiting" format port)
+          warn("Idle timeout exceeded on port %d; exiting".format(port))
           timeout()
           return
         case _ =>

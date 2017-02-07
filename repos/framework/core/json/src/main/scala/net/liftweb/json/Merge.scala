@@ -78,7 +78,7 @@ object Merge {
           yleft find (_.name == xn) match {
             case Some(y @ JField(yn, yv)) =>
               JField(xn, merge(xv, yv)) :: mergeRec(xs,
-                                                    yleft filterNot (_ == y))
+                                                    yleft.filterNot(_ == y))
             case None => JField(xn, xv) :: mergeRec(xs, yleft)
           }
       }
@@ -94,7 +94,7 @@ object Merge {
         case x :: xs =>
           yleft find (_ == x) match {
             case Some(y) =>
-              merge(x, y) :: mergeRec(xs, yleft filterNot (_ == y))
+              merge(x, y) :: mergeRec(xs, yleft.filterNot(_ == y))
             case None => x :: mergeRec(xs, yleft)
           }
       }

@@ -165,8 +165,8 @@ object MediaRangeSpec extends Specification {
           "Media type format: '" + format + "' Invalid character: " + c.toInt
         val parsed = MediaRange.parse(format.format(c))
 
-        parsed aka description must haveSize(1)
-        parsed.head aka description must_== new MediaRange(
+        parsed.aka(description) must haveSize(1)
+        parsed.head.aka(description) must_== new MediaRange(
           "text",
           "plain",
           Seq("charset" -> Some("utf-8")),

@@ -48,7 +48,8 @@ private final class Storage(coll: Coll) {
 
   def ecos(userId: String): Fu[Set[String]] =
     coll
-      .distinct(F.eco, selectUserId(userId).some) map lila.db.BSON.asStringSet
+      .distinct(F.eco, selectUserId(userId).some)
+      .map(lila.db.BSON.asStringSet)
 
   def nbByPerf(userId: String): Fu[Map[PerfType, Int]] =
     coll

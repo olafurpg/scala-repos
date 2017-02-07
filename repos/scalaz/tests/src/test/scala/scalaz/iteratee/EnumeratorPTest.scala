@@ -44,7 +44,7 @@ object EnumeratorPTest extends SpecLite {
       val enum3 = enumPStream[Int, Id](Stream(3, 5, 8))
 
       val cf = cogroupE[Int, Int, Id]
-      val enumR = cf(cf(enum, enum2) map {
+      val enumR = cf(cf(enum, enum2).map {
         _.fold(identity[Int], _._1, identity[Int])
       }, enum3)
 

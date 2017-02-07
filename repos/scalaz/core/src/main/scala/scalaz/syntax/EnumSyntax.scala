@@ -6,7 +6,7 @@ final class EnumOps[F] private[syntax] (val self: F)(implicit val F: Enum[F])
     extends Ops[F] {
   ////
   final def succ: F =
-    F succ self
+    F.succ(self)
 
   final def -+-(n: Int): F =
     F.succn(n, self)
@@ -15,7 +15,7 @@ final class EnumOps[F] private[syntax] (val self: F)(implicit val F: Enum[F])
     F.succx.apply(self)
 
   final def pred: F =
-    F pred self
+    F.pred(self)
 
   final def ---(n: Int): F =
     F.predn(n, self)

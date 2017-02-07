@@ -17,10 +17,10 @@ final class Env(config: Config,
 
   private val settings = new {
     val CollectionRelation = config getString "collection.relation"
-    val ActorNotifyFreq = config duration "actor.notify_freq"
+    val ActorNotifyFreq = config.duration("actor.notify_freq")
     val ActorName = config getString "actor.name"
-    val MaxFollow = config getInt "limit.follow"
-    val MaxBlock = config getInt "limit.block"
+    val MaxFollow = config.getInt("limit.follow")
+    val MaxBlock = config.getInt("limit.block")
   }
   import settings._
 
@@ -60,14 +60,15 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "relation" boot new Env(
-      config = lila.common.PlayApp loadConfig "relation",
-      db = lila.db.Env.current,
-      hub = lila.hub.Env.current,
-      getOnlineUserIds = () => lila.user.Env.current.onlineUserIdMemo.keySet,
-      lightUser = lila.user.Env.current.lightUser,
-      followable = lila.pref.Env.current.api.followable _,
-      system = lila.common.PlayApp.system,
-      scheduler = lila.common.PlayApp.scheduler
-    )
+    "relation".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("relation"),
+        db = lila.db.Env.current,
+        hub = lila.hub.Env.current,
+        getOnlineUserIds = () => lila.user.Env.current.onlineUserIdMemo.keySet,
+        lightUser = lila.user.Env.current.lightUser,
+        followable = lila.pref.Env.current.api.followable _,
+        system = lila.common.PlayApp.system,
+        scheduler = lila.common.PlayApp.scheduler
+      ))
 }

@@ -25,22 +25,22 @@ case class UserRecord(_id: String,
   def newBan: Option[TempBan] = {
     !banInEffect && nbBadOutcomes >= nbBadOutcomesBeforeBan &&
     badOutcomeRatio >= 1d / 3
-  } option bans.lastOption.filterNot(_.isOld).fold(TempBan.initial) { prev =>
+  }.option(bans.lastOption.filterNot(_.isOld).fold(TempBan.initial) { prev =>
     TempBan(prev.mins * 2)
-  }
+  })
 }
 
 case class TempBan(date: DateTime, mins: Int) {
 
   lazy val endsAt = date plusMinutes mins
 
-  def remainingSeconds: Int = (endsAt.getSeconds - nowSeconds).toInt max 0
+  def remainingSeconds: Int = (endsAt.getSeconds - nowSeconds).toInt.max(0)
 
-  def remainingMinutes: Int = (remainingSeconds / 60) max 1
+  def remainingMinutes: Int = ((remainingSeconds / 60)).max(1)
 
-  def inEffect = endsAt isAfter DateTime.now
+  def inEffect = endsAt.isAfter(DateTime.now)
 
-  def isOld = date isBefore DateTime.now.minusDays(2)
+  def isOld = date.isBefore(DateTime.now.minusDays(2))
 }
 
 object TempBan {
@@ -60,9 +60,9 @@ object Outcome {
 
   val all = List(Good, Abort, NoPlay, RageQuit)
 
-  val byId = all map { v =>
+  val byId = all.map { v =>
     (v.id, v)
   } toMap
 
-  def apply(id: Int): Option[Outcome] = byId get id
+  def apply(id: Int): Option[Outcome] = byId.get(id)
 }

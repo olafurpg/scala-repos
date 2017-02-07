@@ -33,7 +33,7 @@ class DelayedReleaseServiceTest extends FunSuite with MockitoSugar {
     val proxy = new DelayedReleaseService(service)
 
     val f =
-      proxy(request) flatMap { response =>
+      proxy(request).flatMap { response =>
         proxy.close()
         verify(service, never).close()
         Reader.readAll(response.reader)

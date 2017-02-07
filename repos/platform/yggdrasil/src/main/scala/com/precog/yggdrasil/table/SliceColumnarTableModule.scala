@@ -93,7 +93,7 @@ trait SliceColumnarTableModule[M[+ _]]
                   Some(Schema.flatten(tpe, struct.toList).toSet)
               }
 
-              acc ++ StreamT.wrapEffect(constraints map { c =>
+              acc ++ StreamT.wrapEffect(constraints.map { c =>
                 slices(proj, c)
               })
           }

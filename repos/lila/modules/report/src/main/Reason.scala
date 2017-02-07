@@ -17,10 +17,10 @@ object Reason {
   val communication: Set[Reason] = Set(Insult, Troll, Other)
 
   val all = List(Cheat, CheatPrint, Insult, Troll, Boost, Other)
-  val names = all map (_.name)
-  val byName = all map { v =>
+  val names = all.map(_.name)
+  val byName = all.map { v =>
     (v.name, v)
   } toMap
 
-  def apply(name: String): Option[Reason] = byName get name
+  def apply(name: String): Option[Reason] = byName.get(name)
 }

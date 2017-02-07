@@ -16,7 +16,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 object EventBusSpec {
   class TestActorWrapperActor(testActor: ActorRef) extends Actor {
     def receive = {
-      case x ⇒ testActor forward x
+      case x ⇒ testActor.forward(x)
     }
   }
 }
@@ -82,18 +82,18 @@ abstract class EventBusSpec(busName: String,
 
     "allow to add multiple subscribers" in {
       val subscribers =
-        (1 to 10) map { _ ⇒
+        ((1 to 10)).map { _ ⇒
           createNewSubscriber()
         }
       val events = createEvents(10)
-      val classifiers = events map getClassifierFor
-      subscribers.zip(classifiers) forall { case (s, c) ⇒ bus.subscribe(s, c) } should ===(
+      val classifiers = events.map(getClassifierFor)
+      subscribers.zip(classifiers).forall { case (s, c) ⇒ bus.subscribe(s, c) } should ===(
         true)
-      subscribers.zip(classifiers) forall {
+      subscribers.zip(classifiers).forall {
         case (s, c) ⇒ bus.unsubscribe(s, c)
       } should ===(true)
 
-      subscribers foreach (disposeSubscriber(system, _))
+      subscribers.foreach(disposeSubscriber(system, _))
     }
 
     "publishing events without any subscribers shouldn't be a problem" in {
@@ -122,15 +122,15 @@ abstract class EventBusSpec(busName: String,
 
     "publish the given event to all intended subscribers" in {
       val range = 0 until 10
-      val subscribers = range map (_ ⇒ createNewSubscriber())
-      subscribers foreach { s ⇒
+      val subscribers = range.map(_ ⇒ createNewSubscriber())
+      subscribers.foreach { s ⇒
         bus.subscribe(s, classifier) should ===(true)
       }
       bus.publish(event)
-      range foreach { _ ⇒
+      range.foreach { _ ⇒
         expectMsg(event)
       }
-      subscribers foreach { s ⇒
+      subscribers.foreach { s ⇒
         bus.unsubscribe(s, classifier) should ===(true);
         disposeSubscriber(system, s)
       }
@@ -313,7 +313,7 @@ object ScanningEventBusSpec {
     type Classifier = String
 
     protected def compareClassifiers(a: Classifier, b: Classifier): Int =
-      a compareTo b
+      a.compareTo(b)
     protected def compareSubscribers(a: Subscriber, b: Subscriber): Int =
       akka.util.Helpers.compareIdentityHash(a, b)
 

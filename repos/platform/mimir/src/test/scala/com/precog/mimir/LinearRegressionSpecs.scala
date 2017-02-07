@@ -55,7 +55,7 @@ trait LinearRegressionTestSupport[M[+ _]]
       actualThetas: Array[Double]): Seq[(Array[Double], Double)] = {
     val testSeqX = {
       def createXs: Array[Double] = {
-        Seq.fill(length - 1)(Random.nextDouble) map { x =>
+        Seq.fill(length - 1)(Random.nextDouble).map { x =>
           x * 2.0 - 1.0
         } toArray
       }
@@ -66,7 +66,7 @@ trait LinearRegressionTestSupport[M[+ _]]
     val deciders = Seq.fill(noSamples)(Random.nextDouble)
 
     val testSeqY = {
-      testSeqX map {
+      testSeqX.map {
         case xs => {
           val yvalue = dotProduct(actualThetas, 1.0 +: xs)
           yvalue + Random.nextGaussian
@@ -74,7 +74,7 @@ trait LinearRegressionTestSupport[M[+ _]]
       }
     }
 
-    testSeqX zip testSeqY
+    testSeqX.zip(testSeqY)
   }
 }
 
@@ -117,7 +117,7 @@ trait LinearRegressionSpecs[M[+ _]]
     : (Set[SEvent], Seq[(Array[Double], Double)]) = {
     val samples = createLinearSamplePoints(num, numPoints, actualThetas)
 
-    val points = jvalues(samples, cpaths) map { _.renderCompact }
+    val points = jvalues(samples, cpaths).map { _.renderCompact }
 
     val suffix = ".json"
     val tmpFile = File.createTempFile("values", suffix)
@@ -141,15 +141,15 @@ trait LinearRegressionSpecs[M[+ _]]
 
   def computeRSquared(ys: List[Seq[Double]]) = {
     val yMeans =
-      ys map { seq =>
+      ys.map { seq =>
         seq.sum / seq.size
       }
 
     val ssTotals =
-      ys.zip(yMeans) map {
+      ys.zip(yMeans).map {
         case (ys, yMean) =>
           val diffs =
-            ys map { y =>
+            ys.map { y =>
               math.pow(y - yMean, 2d)
             }
           diffs.sum
@@ -184,7 +184,7 @@ trait LinearRegressionSpecs[M[+ _]]
       val (result, samples) = produceResult(cpaths, num, actualThetas)
 
       val collection =
-        result collect {
+        result.collect {
           case (ids, SObject(elems)) if ids.length == 0 =>
             elems.keys mustEqual Set("model1")
 
@@ -219,22 +219,22 @@ trait LinearRegressionSpecs[M[+ _]]
     val combinedThetas = combineResults(num, thetas)
     val combinedErrors = combineResults(num, errors)
 
-    val allThetas = actualThetas zip combinedThetas
-    val okThetas = allThetas map { case (t, ts) => isOk(t, ts) }
+    val allThetas = actualThetas.zip(combinedThetas)
+    val okThetas = allThetas.map { case (t, ts) => isOk(t, ts) }
 
     val actualErrors =
-      combinedThetas map { t =>
+      combinedThetas.map { t =>
         madMedian(t)._1
       }
 
-    val allErrors = actualErrors zip combinedErrors
+    val allErrors = actualErrors.zip(combinedErrors)
 
-    val okErrors = allErrors map { case (e, es) => isOk(e, es) } toArray
+    val okErrors = allErrors.map { case (e, es) => isOk(e, es) } toArray
 
     okThetas mustEqual Array.fill(num)(true)
     okErrors mustEqual Array.fill(num)(true)
 
-    val ys = sampleValues map { _.map { _._2 } }
+    val ys = sampleValues.map { _.map { _._2 } }
     val expectedRSquared = computeRSquared(ys)
 
     isOk(expectedRSquared, rSquareds) mustEqual true
@@ -263,7 +263,7 @@ trait LinearRegressionSpecs[M[+ _]]
       val (result, samples) = produceResult(cpaths, num, actualThetas)
 
       val collection =
-        result collect {
+        result.collect {
           case (ids, SObject(elems)) if ids.length == 0 =>
             elems.keys mustEqual Set("model1")
 
@@ -327,21 +327,21 @@ trait LinearRegressionSpecs[M[+ _]]
     val combinedThetas = combineResults(num, thetas)
     val combinedErrors = combineResults(num, errors)
 
-    val allThetas = actualThetas zip combineResults(num, thetas)
-    val okThetas = allThetas map { case (t, ts) => isOk(t, ts) }
+    val allThetas = actualThetas.zip(combineResults(num, thetas))
+    val okThetas = allThetas.map { case (t, ts) => isOk(t, ts) }
 
     val actualErrors =
-      combinedThetas map { t =>
+      combinedThetas.map { t =>
         madMedian(t)._1
       }
 
-    val allErrors = actualErrors zip combinedErrors
-    val okErrors = allErrors map { case (e, es) => isOk(e, es) } toArray
+    val allErrors = actualErrors.zip(combinedErrors)
+    val okErrors = allErrors.map { case (e, es) => isOk(e, es) } toArray
 
     okThetas mustEqual Array.fill(num)(true)
     okErrors mustEqual Array.fill(num)(true)
 
-    val ys = sampleValues map { _.map { _._2 } }
+    val ys = sampleValues.map { _.map { _._2 } }
     val expectedRSquared = computeRSquared(ys)
 
     isOk(expectedRSquared, rSquareds) mustEqual true
@@ -384,11 +384,11 @@ trait LinearRegressionSpecs[M[+ _]]
 
       val samples = {
         val samples0 = createLinearSamplePoints(num, 100, actualThetas)
-        samples0 map {
+        samples0.map {
           case (xs, y) => (Random.nextGaussian +: Random.nextGaussian +: xs, y)
         }
       }
-      val points = jvalues(samples, cpaths, num) map { _.renderCompact }
+      val points = jvalues(samples, cpaths, num).map { _.renderCompact }
 
       val suffix = ".json"
       val tmpFile = File.createTempFile("values", suffix)
@@ -405,7 +405,7 @@ trait LinearRegressionSpecs[M[+ _]]
 
       result must haveSize(1)
 
-      def theta(model: String) = result collect {
+      def theta(model: String) = result.collect {
         case (ids, SObject(elems)) if ids.length == 0 =>
           elems.keys mustEqual Set("model1", "model2", "model3")
 
@@ -465,32 +465,32 @@ trait LinearRegressionSpecs[M[+ _]]
 
     def getBooleans(actuals: List[Double],
                     values: List[List[Double]]): Array[Boolean] = {
-      val zipped = actuals zip combineResults(num, values)
-      zipped map { case (t, ts) => isOk(t, ts) } toArray
+      val zipped = actuals.zip(combineResults(num, values))
+      zipped.map { case (t, ts) => isOk(t, ts) } toArray
     }
 
     val thetas = List(thetasSchema1, thetasSchema2, thetasSchema3)
     val errors = List(errorsSchema1, errorsSchema2, errorsSchema3)
 
     val resultThetas: List[Array[Boolean]] =
-      thetas map { ts =>
+      thetas.map { ts =>
         getBooleans(actualThetas.toList, ts)
       }
 
     val actualErrors: List[Seq[Double]] =
-      thetas map { ts =>
-        combineResults(num, ts) map { arr =>
+      thetas.map { ts =>
+        combineResults(num, ts).map { arr =>
           madMedian(arr)._1
         }
       }
 
-    val zipped = actualErrors zip errors
+    val zipped = actualErrors.zip(errors)
 
     val resultErrors =
-      zipped map {
+      zipped.map {
         case (actual, err) =>
-          val z = actual zip combineResults(num, err)
-          z map { case (e, es) => isOk(e, es) }
+          val z = actual.zip(combineResults(num, err))
+          z.map { case (e, es) => isOk(e, es) }
       }
 
     val expected = Array.fill(num)(true)
@@ -503,7 +503,7 @@ trait LinearRegressionSpecs[M[+ _]]
     resultErrors(1).toArray mustEqual expected
     resultErrors(2).toArray mustEqual expected
 
-    val ys = sampleValues map { _.map { _._2 } }
+    val ys = sampleValues.map { _.map { _._2 } }
     val expectedRSquared = computeRSquared(ys)
 
     isOk(expectedRSquared, rSquaredsSchema1) mustEqual true
@@ -513,11 +513,11 @@ trait LinearRegressionSpecs[M[+ _]]
 
   "linear regression" should {
     "pass randomly generated test with a single feature" in
-      (testTrivial or testTrivial)
+      (testTrivial.or(testTrivial))
     "pass randomly generated test with three features inside an object" in
-      (testThreeFeatures or testThreeFeatures)
+      (testThreeFeatures.or(testThreeFeatures))
     "pass randomly generated test with three distinct schemata" in
-      (testThreeSchemata or testThreeSchemata)
+      (testThreeSchemata.or(testThreeSchemata))
   }
 
   //more comprehensive linear prediction tests in muspelheim

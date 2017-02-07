@@ -62,9 +62,9 @@ trait SeqViewLike[
       if (idx >= 0 && idx + from < until) self.apply(idx + from)
       else throw new IndexOutOfBoundsException(idx.toString)
 
-    override def foreach[U](f: A => U) = iterator foreach f
+    override def foreach[U](f: A => U) = iterator.foreach(f)
     override def iterator: Iterator[A] =
-      self.iterator drop from take endpoints.width
+      self.iterator.drop(from).take(endpoints.width)
   }
 
   trait Mapped[B] extends super.Mapped[B] with Transformed[B] {
@@ -118,14 +118,14 @@ trait SeqViewLike[
         arr(len) = i
         len += 1
       }
-      arr take len
+      arr.take(len)
     }
     def length = index.length
     def apply(idx: Int) = self(index(idx))
   }
 
   trait TakenWhile extends super.TakenWhile with Transformed[A] {
-    protected[this] lazy val len = self prefixLength pred
+    protected[this] lazy val len = self.prefixLength(pred)
     def length = len
     def apply(idx: Int) =
       if (idx < len) self(idx)
@@ -133,7 +133,7 @@ trait SeqViewLike[
   }
 
   trait DroppedWhile extends super.DroppedWhile with Transformed[A] {
-    protected[this] lazy val start = self prefixLength pred
+    protected[this] lazy val start = self.prefixLength(pred)
     def length = self.length - start
     def apply(idx: Int) =
       if (idx >= 0) self(idx + start)
@@ -144,7 +144,7 @@ trait SeqViewLike[
     protected[this] lazy val thatSeq = other.seq.toSeq
     /* Have to be careful here - other may be an infinite sequence. */
     def length =
-      if ((thatSeq lengthCompare self.length) <= 0) thatSeq.length
+      if ((thatSeq.lengthCompare(self.length)) <= 0) thatSeq.length
       else self.length
     def apply(idx: Int) = (self.apply(idx), thatSeq.apply(idx))
   }
@@ -153,7 +153,7 @@ trait SeqViewLike[
       extends super.ZippedAll[A1, B]
       with Transformed[(A1, B)] {
     protected[this] lazy val thatSeq = other.seq.toSeq
-    def length: Int = self.length max thatSeq.length
+    def length: Int = self.length.max(thatSeq.length)
     def apply(idx: Int) =
       (if (idx < self.length) self.apply(idx) else thisElem,
        if (idx < thatSeq.length) thatSeq.apply(idx) else thatElem)
@@ -181,7 +181,7 @@ trait SeqViewLike[
     protected[this] val replaced: Int
     private lazy val plen = patch.length
     override def iterator: Iterator[B] =
-      self.iterator patch (from, patch.iterator, replaced)
+      self.iterator.patch(from, patch.iterator, replaced)
     def length: Int = {
       val len = self.length
       val pre = math.min(from, len)
@@ -270,7 +270,7 @@ trait SeqViewLike[
 
   override def reverseMap[B, That](f: A => B)(
       implicit bf: CanBuildFrom[This, B, That]): That =
-    reverse map f
+    reverse.map(f)
 
   override def updated[B >: A, That](index: Int, elem: B)(
       implicit bf: CanBuildFrom[This, B, That]): That = {
@@ -288,22 +288,22 @@ trait SeqViewLike[
 
   override def union[B >: A, That](that: GenSeq[B])(
       implicit bf: CanBuildFrom[This, B, That]): That =
-    newForced(thisSeq union that).asInstanceOf[That]
+    newForced(thisSeq.union(that)).asInstanceOf[That]
 
   override def diff[B >: A](that: GenSeq[B]): This =
-    newForced(thisSeq diff that).asInstanceOf[This]
+    newForced(thisSeq.diff(that)).asInstanceOf[This]
 
   override def intersect[B >: A](that: GenSeq[B]): This =
     newForced(thisSeq intersect that).asInstanceOf[This]
 
   override def sorted[B >: A](implicit ord: Ordering[B]): This =
-    newForced(thisSeq sorted ord).asInstanceOf[This]
+    newForced(thisSeq.sorted(ord)).asInstanceOf[This]
 
   override def sortWith(lt: (A, A) => Boolean): This =
-    newForced(thisSeq sortWith lt).asInstanceOf[This]
+    newForced(thisSeq.sortWith(lt)).asInstanceOf[This]
 
   override def sortBy[B](f: (A) => B)(implicit ord: Ordering[B]): This =
-    newForced(thisSeq sortBy f).asInstanceOf[This]
+    newForced(thisSeq.sortBy(f)).asInstanceOf[This]
 
   override def combinations(n: Int): Iterator[This] =
     (thisSeq combinations n).map(as => newForced(as).asInstanceOf[This])

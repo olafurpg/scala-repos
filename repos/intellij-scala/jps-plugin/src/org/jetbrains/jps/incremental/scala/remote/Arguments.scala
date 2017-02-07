@@ -100,7 +100,7 @@ object Arguments {
 
       val outputToCacheMap = outputs.zip(caches).toMap
 
-      val outputGroups = sourceRoots zip outputDirs
+      val outputGroups = sourceRoots.zip(outputDirs)
 
       val sbtIncOptions = SbtIncrementalOptions.fromString(sbtIncOptionsString)
 

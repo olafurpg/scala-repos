@@ -30,7 +30,7 @@ class DedupingLogsReceiver(log: Logger) extends LogsReceiver {
 
   def flush() {
     val strings =
-      map.asScala map {
+      map.asScala.map {
         case (left, right) =>
           "%s=%s".format(left, right)
       }

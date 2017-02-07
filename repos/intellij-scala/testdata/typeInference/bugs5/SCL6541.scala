@@ -9,8 +9,8 @@ object SCL6541 {
       val bldr =
         new java.lang.StringBuilder(StringContext.treatEscapes(pi.next()))
       while (ai.hasNext) {
-        bldr append ai.next
-        bldr append StringContext.treatEscapes(pi.next())
+        bldr.append(ai.next)
+        bldr.append(StringContext.treatEscapes(pi.next()))
       }
       bldr.toString
     }

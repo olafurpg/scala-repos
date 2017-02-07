@@ -867,7 +867,7 @@ abstract class GenIncOptimizer private[optimizer] (
       *  UPDATE PASS ONLY. Not concurrency safe on same instance.
       */
     def updateWith(linkedMethod: LinkedMember[MethodDef]): Boolean = {
-      assert(! _deleted, "updateWith() called on a deleted method")
+      assert(!_deleted, "updateWith() called on a deleted method")
 
       if (lastInVersion.isDefined && lastInVersion == linkedMethod.version) {
         false
@@ -877,9 +877,11 @@ abstract class GenIncOptimizer private[optimizer] (
         val methodDef = linkedMethod.tree
 
         val changed = {
-          originalDef == null || (methodDef.hash zip originalDef.hash).forall {
-            case (h1, h2) => !Hashers.hashesEqual(h1, h2, considerPositions)
-          }
+          originalDef == null || (methodDef.hash
+            .zip(originalDef.hash))
+            .forall {
+              case (h1, h2) => !Hashers.hashesEqual(h1, h2, considerPositions)
+            }
         }
 
         if (changed) {
@@ -903,7 +905,7 @@ abstract class GenIncOptimizer private[optimizer] (
 
     /** UPDATE PASS ONLY. Not concurrency safe on same instance. */
     def delete(): Unit = {
-      assert(! _deleted, "delete() called twice")
+      assert(!_deleted, "delete() called twice")
       _deleted = true
       if (protectTag()) unregisterFromEverywhere()
     }
@@ -921,7 +923,7 @@ abstract class GenIncOptimizer private[optimizer] (
     }
 
     /** PROCESS PASS ONLY. */
-    def process(): Unit = if (! _deleted) {
+    def process(): Unit = if (!_deleted) {
       val rawOptimizedDef = new Optimizer().optimize(thisType, originalDef)
       lastOutVersion += 1
       optimizedMethodDef = new LinkedMember(rawOptimizedDef.info,

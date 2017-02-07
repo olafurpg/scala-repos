@@ -145,11 +145,11 @@ object TypedActor
 
     def isOneWay = method.getReturnType == java.lang.Void.TYPE
     def returnsFuture =
-      classOf[Future[_]] isAssignableFrom method.getReturnType
+      classOf[Future[_]].isAssignableFrom(method.getReturnType)
     def returnsJOption =
-      classOf[akka.japi.Option[_]] isAssignableFrom method.getReturnType
+      classOf[akka.japi.Option[_]].isAssignableFrom(method.getReturnType)
     def returnsOption =
-      classOf[scala.Option[_]] isAssignableFrom method.getReturnType
+      classOf[scala.Option[_]].isAssignableFrom(method.getReturnType)
 
     /**
       * Invokes the Method on the supplied instance
@@ -341,7 +341,7 @@ object TypedActor
         me match {
           case l: PreRestart ⇒ l.preRestart(reason, message)
           case _ ⇒
-            context.children foreach context.stop //Can't be super.preRestart(reason, message) since that would invoke postStop which would set the actorVar to DL and proxyVar to null
+            context.children.foreach(context.stop) //Can't be super.preRestart(reason, message) since that would invoke postStop which would set the actorVar to DL and proxyVar to null
         }
       }
 
@@ -353,12 +353,12 @@ object TypedActor
     }
 
     protected def withContext[U](unitOfWork: ⇒ U): U = {
-      TypedActor.selfReference set proxyVar.get
-      TypedActor.currentContext set context
+      TypedActor.selfReference.set(proxyVar.get)
+      TypedActor.currentContext.set(context)
       try unitOfWork
       finally {
-        TypedActor.selfReference set null
-        TypedActor.currentContext set null
+        TypedActor.selfReference.set(null)
+        TypedActor.currentContext.set(null)
       }
     }
 
@@ -372,7 +372,7 @@ object TypedActor
               m(me) match {
                 case f: Future[_] if m.returnsFuture ⇒
                   implicit val dispatcher = context.dispatcher
-                  f onComplete {
+                  f.onComplete {
                     case Success(null) ⇒ s ! NullResponse
                     case Success(result) ⇒ s ! result
                     case Failure(f) ⇒ s ! Status.Failure(f)
@@ -495,7 +495,7 @@ object TypedActor
             case m if m.isOneWay ⇒
               actor ! m; null //Null return value
             case m if m.returnsFuture ⇒
-              ask(actor, m)(timeout) map {
+              ask(actor, m)(timeout).map {
                 case NullResponse ⇒ null
                 case other ⇒ other
               }
@@ -715,7 +715,7 @@ final case class TypedProps[T <: AnyRef] protected[TypedProps] (
     */
   def withoutInterface(interface: Class[_ >: T]): TypedProps[T] =
     this.copy(
-      interfaces = interfaces diff TypedProps.extractInterfaces(interface))
+      interfaces = interfaces.diff(TypedProps.extractInterfaces(interface)))
 
   /**
     * Returns the akka.actor.Props representation of this TypedProps
@@ -782,23 +782,25 @@ class TypedActorExtension(val system: ExtendedActorSystem)
     val actorVar = new AtomVar[ActorRef](null)
     val proxy = Proxy
       .newProxyInstance(
-        (props.loader orElse props.interfaces.collectFirst {
-          case any ⇒ any.getClassLoader
-        }).orNull, //If we have no loader, we arbitrarily take the loader of the first interface
+        (props.loader
+          .orElse(props.interfaces.collectFirst {
+            case any ⇒ any.getClassLoader
+          }))
+          .orNull, //If we have no loader, we arbitrarily take the loader of the first interface
         props.interfaces.toArray,
         new TypedActorInvocationHandler(
           this,
           actorVar,
-          props.timeout getOrElse DefaultReturnTimeout)
+          props.timeout.getOrElse(DefaultReturnTimeout))
       )
       .asInstanceOf[R]
 
     if (proxyVar eq null) {
-      actorVar set actorRef
+      actorVar.set(actorRef)
       proxy
     } else {
-      proxyVar set proxy // Chicken and egg situation we needed to solve, set the proxy so that we can set the self-reference inside each receive
-      actorVar set actorRef //Make sure the InvocationHandler gets a hold of the actor reference, this is not a problem since the proxy hasn't escaped this method yet
+      proxyVar.set(proxy) // Chicken and egg situation we needed to solve, set the proxy so that we can set the self-reference inside each receive
+      actorVar.set(actorRef) //Make sure the InvocationHandler gets a hold of the actor reference, this is not a problem since the proxy hasn't escaped this method yet
       proxyVar.get
     }
   }

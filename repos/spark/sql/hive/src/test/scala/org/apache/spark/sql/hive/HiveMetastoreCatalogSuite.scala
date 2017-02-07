@@ -59,8 +59,8 @@ class DataSourceWithHiveMetastoreCatalogSuite
 
   private val testDF = range(1, 3)
     .select(
-      ('id + 0.1) cast DecimalType(10, 3) as 'd1,
-      'id cast StringType as 'd2
+      (('id + 0.1)).cast(DecimalType(10, 3)).as('d1),
+      'id.cast(StringType).as('d2)
     )
     .coalesce(1)
 

@@ -244,8 +244,8 @@ class Regex private[matching] (val pattern: Pattern, groupNames: String*)
   def unapplySeq(s: CharSequence): Option[List[String]] = s match {
     case null => None
     case _ =>
-      val m = pattern matcher s
-      if (runMatcher(m)) Some((1 to m.groupCount).toList map m.group)
+      val m = pattern.matcher(s)
+      if (runMatcher(m)) Some((1 to m.groupCount).toList.map(m.group))
       else None
   }
 
@@ -282,9 +282,9 @@ class Regex private[matching] (val pattern: Pattern, groupNames: String*)
     *  @return       The match
     */
   def unapplySeq(c: Char): Option[List[Char]] = {
-    val m = pattern matcher c.toString
+    val m = pattern.matcher(c.toString)
     if (runMatcher(m)) {
-      if (m.groupCount > 0) Some((m group 1).toList) else Some(Nil)
+      if (m.groupCount > 0) Some((m.group(1)).toList) else Some(Nil)
     } else None
   }
 
@@ -300,7 +300,7 @@ class Regex private[matching] (val pattern: Pattern, groupNames: String*)
   def unapplySeq(m: Match): Option[List[String]] =
     if (m == null || m.matched == null) None
     else if (m.matcher.pattern == this.pattern)
-      Some((1 to m.groupCount).toList map m.group)
+      Some((1 to m.groupCount).toList.map(m.group))
     else unapplySeq(m.matched)
 
   /** Tries to match target.
@@ -312,8 +312,8 @@ class Regex private[matching] (val pattern: Pattern, groupNames: String*)
     "2.11.0")
   def unapplySeq(target: Any): Option[List[String]] = target match {
     case s: CharSequence =>
-      val m = pattern matcher s
-      if (runMatcher(m)) Some((1 to m.groupCount).toList map m.group)
+      val m = pattern.matcher(s)
+      if (runMatcher(m)) Some((1 to m.groupCount).toList.map(m.group))
       else None
     case m: Match => unapplySeq(m.matched)
     case _ => None
@@ -477,7 +477,7 @@ class Regex private[matching] (val pattern: Pattern, groupNames: String*)
     */
   def replaceAllIn(target: CharSequence, replacer: Match => String): String = {
     val it = new Regex.MatchIterator(target, this, groupNames).replacementData
-    it foreach (md => it replace replacer(md))
+    it.foreach(md => it.replace(replacer(md)))
     it.replaced
   }
 
@@ -506,7 +506,7 @@ class Regex private[matching] (val pattern: Pattern, groupNames: String*)
                     replacer: Match => Option[String]): String = {
     val it = new Regex.MatchIterator(target, this, groupNames).replacementData
     for (matchdata <- it; replacement <- replacer(matchdata))
-      it replace replacement
+      it.replace(replacement)
 
     it.replaced
   }
@@ -629,7 +629,7 @@ object Regex {
       else null
 
     /** All capturing groups, i.e., not including group(0). */
-    def subgroups: List[String] = (1 to groupCount).toList map group
+    def subgroups: List[String] = (1 to groupCount).toList.map(group)
 
     /** The char sequence before first character of match,
       *  or `null` if nothing was matched.
@@ -694,9 +694,9 @@ object Regex {
     def groupCount = matcher.groupCount
 
     private lazy val starts: Array[Int] =
-      ((0 to groupCount) map matcher.start).toArray
+      (((0 to groupCount)).map(matcher.start)).toArray
     private lazy val ends: Array[Int] =
-      ((0 to groupCount) map matcher.end).toArray
+      (((0 to groupCount)).map(matcher.end)).toArray
 
     /** The index of the first matched character in group `i`. */
     def start(i: Int) = starts(i)
@@ -738,7 +738,7 @@ object Regex {
     */
   object Groups {
     def unapplySeq(m: Match): Option[Seq[String]] =
-      if (m.groupCount > 0) Some(1 to m.groupCount map m.group) else None
+      if (m.groupCount > 0) Some((1 to m.groupCount).map(m.group)) else None
   }
 
   /** A class to step through a sequence of regex matches.
@@ -832,7 +832,7 @@ object Regex {
     *
     *  @example {{{List("US$", "CAN$").map(Regex.quote).mkString("|").r}}}
     */
-  def quote(text: String): String = Pattern quote text
+  def quote(text: String): String = Pattern.quote(text)
 
   /** Quotes replacement strings to be used in replacement methods.
     *
@@ -846,5 +846,5 @@ object Regex {
     *  @return A string that can be used to replace matches with `text`.
     *  @example {{{"CURRENCY".r.replaceAllIn(input, Regex quoteReplacement "US$")}}}
     */
-  def quoteReplacement(text: String): String = Matcher quoteReplacement text
+  def quoteReplacement(text: String): String = Matcher.quoteReplacement(text)
 }

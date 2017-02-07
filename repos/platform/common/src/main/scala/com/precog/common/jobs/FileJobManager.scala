@@ -109,7 +109,7 @@ class FileJobManager[M[+ _]] private[FileJobManager] (workDir: File,
   }
 
   private[this] def loadJob(jobId: JobId): Option[FileJobState] = {
-    cache.get(jobId) orElse {
+    cache.get(jobId).orElse {
       if (jobFile(jobId).exists) {
         JParser
           .parseFromFile(jobFile(jobId))
@@ -138,7 +138,7 @@ class FileJobManager[M[+ _]] private[FileJobManager] (workDir: File,
         name,
         jobType,
         data,
-        started map (Started(_, NotStarted)) getOrElse NotStarted) unsafeTap {
+        started.map(Started(_, NotStarted)).getOrElse(NotStarted)).unsafeTap {
       job =>
         val jobState = FileJobState(job, None, Map.empty)
         saveJob(job.id, jobState)
@@ -192,9 +192,11 @@ class FileJobManager[M[+ _]] private[FileJobManager] (workDir: File,
                    since: Option[MessageId]): M[Seq[Message]] = M.point {
     val posts =
       cache.get(jobId).flatMap(_.messages.get(channel)).getOrElse(Nil)
-    since map { mId =>
-      posts.takeWhile(_.id != mId).reverse
-    } getOrElse posts.reverse
+    since
+      .map { mId =>
+        posts.takeWhile(_.id != mId).reverse
+      }
+      .getOrElse(posts.reverse)
   }
 
   def updateStatus(jobId: JobId,
@@ -208,7 +210,7 @@ class FileJobManager[M[+ _]] private[FileJobManager] (workDir: File,
       JField("message", JString(msg)) :: JField("progress", JNum(progress)) :: JField(
         "unit",
         JString(unit)) ::
-        (extra map (JField("info", _) :: Nil) getOrElse Nil)
+        (extra.map(JField("info", _) :: Nil).getOrElse(Nil))
     )
 
     cache

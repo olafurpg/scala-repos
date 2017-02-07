@@ -35,7 +35,7 @@ object Spec {
   class Accumulator[T: FromString]() {
     private var _buf: List[T] = Nil
 
-    def convert(s: String) = implicitly[FromString[T]] apply s
+    def convert(s: String) = implicitly[FromString[T]].apply(s)
     def apply(s: String): T = returning(convert(s))(_buf +:= _)
 
     lazy val get = _buf

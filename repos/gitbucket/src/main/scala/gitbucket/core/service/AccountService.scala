@@ -28,11 +28,14 @@ trait AccountService {
     */
   private def defaultAuthentication(userName: String, password: String)(
       implicit s: Session) = {
-    getAccountByUserName(userName).collect {
-      case account
-          if (!account.isGroupAccount && account.password == sha1(password)) =>
-        Some(account)
-    } getOrElse None
+    getAccountByUserName(userName)
+      .collect {
+        case account
+            if (!account.isGroupAccount && account.password == sha1(
+              password)) =>
+          Some(account)
+      }
+      .getOrElse(None)
   }
 
   /**
@@ -93,10 +96,11 @@ trait AccountService {
 
   def getAccountByUserName(userName: String, includeRemoved: Boolean = false)(
       implicit s: Session): Option[Account] =
-    Accounts filter
-      (t =>
-         (t.userName === userName.bind) &&
-           (t.removed === false.bind, !includeRemoved)) firstOption
+    Accounts
+      .filter(
+        t =>
+          (t.userName === userName.bind) &&
+            (t.removed === false.bind, !includeRemoved)) firstOption
 
   def getAccountsByUserNames(userNames: Set[String],
                              knowns: Set[Account],
@@ -121,17 +125,18 @@ trait AccountService {
   def getAccountByMailAddress(
       mailAddress: String,
       includeRemoved: Boolean = false)(implicit s: Session): Option[Account] =
-    Accounts filter
-      (t =>
-         (t.mailAddress.toLowerCase === mailAddress.toLowerCase.bind) &&
-           (t.removed === false.bind, !includeRemoved)) firstOption
+    Accounts
+      .filter(
+        t =>
+          (t.mailAddress.toLowerCase === mailAddress.toLowerCase.bind) &&
+            (t.removed === false.bind, !includeRemoved)) firstOption
 
   def getAllUsers(includeRemoved: Boolean = true)(
       implicit s: Session): List[Account] =
     if (includeRemoved) {
-      Accounts sortBy (_.userName) list
+      Accounts.sortBy(_.userName) list
     } else {
-      Accounts filter (_.removed === false.bind) sortBy (_.userName) list
+      Accounts.filter(_.removed === false.bind).sortBy(_.userName) list
     }
 
   def createAccount(userName: String,

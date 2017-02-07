@@ -40,7 +40,7 @@ class IngestStress(settings: Settings) extends Task(settings) {
     def loop(n: Int, accumulated: Int = 0): Int = {
       val sd = generator.arbitrary.sample.get
       val actualSize = sd.data.length
-      val str = sd.data map { _.renderCompact } mkString "\n"
+      val str = sd.data.map { _.renderCompact } mkString "\n"
 
       try {
         ingestString(account.apiKey, account, str, "application/json")(
@@ -62,7 +62,7 @@ class IngestStress(settings: Settings) extends Task(settings) {
   val throttles = new AtomicReferenceArray[Double](clients)
 
   val threads =
-    accountSet.zipWithIndex map {
+    accountSet.zipWithIndex.map {
       case (account, i) => {
         new Thread(new Runnable {
           def run() {
@@ -86,13 +86,13 @@ class IngestStress(settings: Settings) extends Task(settings) {
   println("Starting ingestion; batton down the hatches! (Ctrl-C to abort)")
   println("Target EPS: %d; Threads: %d".format(eps, clients))
 
-  threads foreach { _.start() }
+  threads.foreach { _.start() }
 
   while (true) {
     Thread.sleep(5000)
 
-    val burstRate = math.round(0 until clients map rates.get sum)
-    val throttle = math.round(0 until clients map throttles.get sum)
+    val burstRate = math.round((0 until clients).map(rates.get) sum)
+    val throttle = math.round((0 until clients).map(throttles.get) sum)
 
     println(
       ">>> burst rate = %s; current throttle = %s".format(burstRate, throttle))

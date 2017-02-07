@@ -207,13 +207,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
       }
 
       val weights =
-        result collect { case (_, SObject(elems)) => elems("weight") }
-      val expectedWeights = result2 collect { case (_, w) => w }
+        result.collect { case (_, SObject(elems)) => elems("weight") }
+      val expectedWeights = result2.collect { case (_, w) => w }
 
       val weightsPlus =
-        result collect { case (_, SObject(elems)) => elems("increasedWeight") }
+        result.collect { case (_, SObject(elems)) => elems("increasedWeight") }
       val expectedWeightsPlus =
-        expectedWeights collect { case SDecimal(d) => SDecimal(d + 5) }
+        expectedWeights.collect { case SDecimal(d) => SDecimal(d + 5) }
 
       weights mustEqual (expectedWeights)
       weightsPlus mustEqual (expectedWeightsPlus)
@@ -247,16 +247,16 @@ trait MiscStackSpecs extends EvalStackSpecs {
       }
 
       val fives =
-        result collect {
+        result.collect {
           case (_, SObject(elems)) =>
             (elems("five"): @unchecked) match { case SDecimal(d) => d }
         }
-      val weights = result2 collect { case (_, w) => w }
+      val weights = result2.collect { case (_, w) => w }
 
       val weightsPlus =
-        result collect { case (_, SObject(elems)) => elems("increasedWeight") }
+        result.collect { case (_, SObject(elems)) => elems("increasedWeight") }
       val expectedWeightsPlus =
-        weights collect { case SDecimal(d) => SDecimal(d + 5) }
+        weights.collect { case SDecimal(d) => SDecimal(d + 5) }
 
       fives must contain(BigDecimal(5)).only
       weightsPlus mustEqual (expectedWeightsPlus)
@@ -313,7 +313,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
           elems must haveSize(4)
 
-          val decimals = elems collect { case SDecimal(d) => d }
+          val decimals = elems.collect { case SDecimal(d) => d }
 
           decimals(0) must be < (decimals(1))
           decimals(0) mustEqual decimals(2)
@@ -350,7 +350,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(1)
 
       val actual =
-        result collect {
+        result.collect {
           case (ids, SString(str)) if ids.length == 1 => str
         }
 
@@ -372,7 +372,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(1)
 
       val actual =
-        result collect {
+        result.collect {
           case (ids, SString(str)) if ids.length == 1 => str
         }
 
@@ -396,12 +396,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result.size mustEqual expectedResult.size
 
       val actual =
-        result collect {
+        result.collect {
           case (ids, SString(str)) if ids.length == 1 => str
         }
 
       val expected =
-        expectedResult collect {
+        expectedResult.collect {
           case (ids, SString(str)) if ids.length == 1 => str
         }
 
@@ -438,12 +438,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result.size mustEqual expectedResult.size
 
       val actual =
-        result collect {
+        result.collect {
           case (ids, SArray(arr)) if ids.length == 1 => arr
         }
 
       val expected =
-        expectedResult collect {
+        expectedResult.collect {
           case (ids, SArray(arr)) if ids.length == 1 => arr
         }
 
@@ -462,7 +462,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(1)
 
       val actual =
-        result collect {
+        result.collect {
           case (ids, SDecimal(num)) if ids.length == 0 =>
             num.toDouble ~= 174257.3421888046
         }
@@ -481,7 +481,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(1)
 
       val actual =
-        result collect {
+        result.collect {
           case (ids, SString(time)) if ids.length == 0 => time
         }
 
@@ -498,7 +498,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result1 = evalE(input1)
 
       val actual =
-        result1 collect {
+        result1.collect {
           case (ids, value) if ids.length == 1 => value
         }
 
@@ -510,7 +510,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result2 = evalE(input2)
 
       val expected =
-        result2 collect {
+        result2.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => SDecimal(d)
         }
 
@@ -525,7 +525,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result = evalE(input)
 
       val actual =
-        result collect {
+        result.collect {
           case (ids, SDecimal(year)) if ids.length == 0 => year
         }
 
@@ -712,7 +712,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(2)
 
       val results2 =
-        result collect {
+        result.collect {
           case (ids, obj) if ids.length == 1 => obj
         }
 
@@ -740,7 +740,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(2)
 
       val results2 =
-        result collect {
+        result.collect {
           case (ids, obj) if ids.length == 1 => obj
         }
 
@@ -794,7 +794,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       resultsE must haveSize(473)
 
       val results =
-        resultsE collect {
+        resultsE.collect {
           case (ids, str) if ids.length == 2 => str
         }
 
@@ -842,17 +842,17 @@ trait MiscStackSpecs extends EvalStackSpecs {
         case (ids, SObject(obj)) =>
           ids must haveSize(1)
           obj must haveSize(2)
-          obj must haveKey("userId") or haveKey("pageId")
+          (obj must haveKey("userId")).or(haveKey("pageId"))
           obj must haveKey("size")
       }
 
       val containsUserId =
-        results collect {
+        results.collect {
           case (_, SObject(obj)) if obj contains "userId" => obj
         }
 
       containsUserId must haveSize(21)
-      containsUserId collect {
+      containsUserId.collect {
         case obj => obj("userId")
       } mustEqual Set(
         SString("user-1000"),
@@ -879,12 +879,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       )
 
       val containsPageId =
-        results collect {
+        results.collect {
           case (_, SObject(obj)) if obj contains "pageId" => obj
         }
 
       containsPageId must haveSize(5)
-      containsPageId collect {
+      containsPageId.collect {
         case obj => obj("pageId")
       } mustEqual Set(SString("page-0"),
                       SString("page-1"),
@@ -960,14 +960,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
       results must haveSize(16 + 570)
 
       val maps =
-        results.toSeq collect {
+        results.toSeq.collect {
           case (ids, SObject(obj)) => obj
         }
 
-      val india = maps filter { _.values forall { _ == SString("India") } }
+      val india = maps.filter { _.values.forall { _ == SString("India") } }
       india.size mustEqual (16)
 
-      val canada = maps filter { _.values forall { _ == SString("Canada") } }
+      val canada = maps.filter { _.values.forall { _ == SString("Canada") } }
       canada.size mustEqual (570)
     }
 
@@ -988,11 +988,11 @@ trait MiscStackSpecs extends EvalStackSpecs {
       results must haveSize(16)
 
       val maps =
-        results.toSeq collect {
+        results.toSeq.collect {
           case (ids, SObject(obj)) => obj
         }
 
-      val india = maps filter { _.values forall { _ == SString("India") } }
+      val india = maps.filter { _.values.forall { _ == SString("India") } }
       india.size mustEqual (16)
     }
 
@@ -1660,7 +1660,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       resultsE must haveSize(52)
 
       val results =
-        resultsE collect {
+        resultsE.collect {
           case (ids, sv) if ids.length == 1 => sv
         }
 
@@ -1930,7 +1930,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         val results = evalE(input)
         val results2 =
-          results map {
+          results.map {
             case (ids, SDecimal(d)) =>
               ids.length must_== 1
               d.toInt
@@ -1948,7 +1948,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
           val results = evalE(input)
           val results2 =
-            results map {
+            results.map {
               case (ids, SDecimal(d)) =>
                 ids.length must_== 0
                 d.toDouble
@@ -1983,7 +1983,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
           results must haveSize(1)
 
           val results2 =
-            results map {
+            results.map {
               case (ids, SDecimal(d)) =>
                 ids.length must_== 0
                 d.toDouble
@@ -2000,7 +2000,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
           results must haveSize(1)
 
           val results2 =
-            results map {
+            results.map {
               case (ids, SObject(fields)) =>
                 ids.length must_== 0
                 fields
@@ -2049,7 +2049,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       results must haveSize(5)
 
       val stripped =
-        results collect {
+        results.collect {
           case (ids, SDecimal(d)) if ids.length == 1 => d
         }
 
@@ -2123,7 +2123,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       resultsE must haveSize(63)
 
       val results =
-        resultsE collect {
+        resultsE.collect {
           case (ids, obj) if ids.length == 1 => obj
         }
 
@@ -2839,7 +2839,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       resultsE must haveSize(20)
 
       val results =
-        resultsE collect {
+        resultsE.collect {
           case (ids, sv) if ids.length == 1 => sv
         }
 
@@ -3671,7 +3671,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       }
 
       val result2 =
-        result collect {
+        result.collect {
           case (_, SArray(arr)) if !(arr.isEmpty) => arr.head
         }
       result2 mustEqual Set(SDecimal(2), SDecimal(3), SDecimal(4))
@@ -3704,7 +3704,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       }
 
       val result2 =
-        result collect {
+        result.collect {
           case (_, SArray(arr)) if !(arr.isEmpty) => arr.head
         }
       result2 mustEqual Set(SDecimal(2), SDecimal(3), SDecimal(4))
@@ -3775,9 +3775,10 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val input = """std::string::split((//clicks).userId, "1")"""
 
       val expected =
-        eval("(//clicks).userId") collect {
+        eval("(//clicks).userId").collect {
           case SString(str) =>
-            SArray(Vector(Pattern.compile("1").split(str, -1) map SString: _*))
+            SArray(
+              Vector(Pattern.compile("1").split(str, -1).map(SString): _*))
         }
 
       eval(input) must containTheSameElementsAs(expected.toSeq)

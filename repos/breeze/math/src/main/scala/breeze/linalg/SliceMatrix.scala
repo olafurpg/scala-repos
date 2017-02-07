@@ -114,7 +114,7 @@ object SliceMatrix {
 
       /** Iterates all key-value pairs from the given collection. */
       def traverse(from: SliceMatrix[K1, K2, V], fn: ValuesVisitor[V]): Unit = {
-        from.activeValuesIterator foreach {
+        from.activeValuesIterator.foreach {
           fn.visit(_)
         }
       }
@@ -127,7 +127,7 @@ object SliceMatrix {
       /** Traverses all values from the given collection. */
       override def traverse(from: SliceMatrix[K1, K2, V],
                             fn: KeyValuePairsVisitor[(Int, Int), V]): Unit = {
-        from.iterator foreach {
+        from.iterator.foreach {
           case (k, v) => fn.visit(k, v)
         }
       }

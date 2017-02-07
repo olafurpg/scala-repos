@@ -27,10 +27,10 @@ object CaseClause {
         caseClauseMarker.drop()
         return false
     }
-    if (!Pattern.parse(builder)) builder error ErrMsg("pattern.expected")
+    if (!Pattern.parse(builder)) builder.error(ErrMsg("pattern.expected"))
     builder.getTokenType match {
       case ScalaTokenTypes.kIF =>
-        Guard parse builder
+        Guard.parse(builder)
       case _ =>
     }
     builder.getTokenType match {
@@ -39,12 +39,12 @@ object CaseClause {
         builder.restoreNewlinesState
       case _ =>
         builder.restoreNewlinesState
-        builder error ErrMsg("fun.sign.expected")
+        builder.error(ErrMsg("fun.sign.expected"))
         caseClauseMarker.done(ScalaElementTypes.CASE_CLAUSE)
         return true
     }
     if (!Block.parse(builder, hasBrace = false, needNode = true)) {
-      builder error ErrMsg("wrong.expression")
+      builder.error(ErrMsg("wrong.expression"))
     }
     caseClauseMarker.done(ScalaElementTypes.CASE_CLAUSE)
     true

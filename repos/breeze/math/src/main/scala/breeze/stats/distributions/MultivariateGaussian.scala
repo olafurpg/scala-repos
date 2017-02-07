@@ -45,7 +45,7 @@ case class MultivariateGaussian(
     val centered = t - mean
     val slv = covariance \ centered
 
-    -(slv dot centered) / 2.0
+    -(slv.dot(centered)) / 2.0
   }
 
   override lazy val logNormalizer = {

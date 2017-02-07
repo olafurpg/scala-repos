@@ -64,7 +64,7 @@ trait MarkupParsers { self: Parsers =>
 
     var input: CharArrayReader = _
     def lookahead(): BufferedIterator[Char] =
-      (input.buf drop input.charOffset).iterator.buffered
+      (input.buf.drop(input.charOffset)).iterator.buffered
 
     import parser.{symbXMLBuilder => handle, o2p, r2p}
 
@@ -145,7 +145,8 @@ trait MarkupParsers { self: Parsers =>
         }
         // well-formedness constraint: unique attribute names
         if (aMap contains key)
-          reportSyntaxError("attribute %s may only be defined once" format key)
+          reportSyntaxError(
+            "attribute %s may only be defined once".format(key))
 
         aMap(key) = value
         if (ch != '/' && ch != '>') xSpace()
@@ -184,15 +185,15 @@ trait MarkupParsers { self: Parsers =>
     def appendText(pos: Position, ts: Buffer[Tree], txt: String): Unit = {
       def append(text: String): Unit = {
         val tree = handle.text(pos, text)
-        ts append tree
+        ts.append(tree)
       }
       val clean =
         if (preserveWS) txt
         else {
           val sb = new StringBuilder()
-          txt foreach { c =>
-            if (!isSpace(c)) sb append c
-            else if (sb.isEmpty || !isSpace(sb.last)) sb append ' '
+          txt.foreach { c =>
+            if (!isSpace(c)) sb.append(c)
+            else if (sb.isEmpty || !isSpace(sb.last)) sb.append(' ')
           }
           sb.toString.trim
         }
@@ -216,7 +217,7 @@ trait MarkupParsers { self: Parsers =>
           handle.entityRef(tmppos, n)
       }
 
-      ts append toAppend
+      ts.append(toAppend)
     }
 
     /**
@@ -224,7 +225,7 @@ trait MarkupParsers { self: Parsers =>
       *  @postcond: xEmbeddedBlock == false!
       */
     def content_BRACE(p: Position, ts: ArrayBuffer[Tree]): Unit =
-      if (xCheckEmbeddedBlock) ts append xEmbeddedExpr
+      if (xCheckEmbeddedBlock) ts.append(xEmbeddedExpr)
       else appendText(p, ts, xText)
 
     /** At an open angle-bracket, detects an end tag
@@ -240,7 +241,7 @@ trait MarkupParsers { self: Parsers =>
           case '?' => nextch(); xProcInstr // PI
           case _ => element // child node
         }
-        ts append toAppend
+        ts.append(toAppend)
         false
       }
 
@@ -249,7 +250,7 @@ trait MarkupParsers { self: Parsers =>
       val coalescing = settings.XxmlSettings.isCoalescing
       @tailrec def loopContent(): Unit =
         if (xEmbeddedBlock) {
-          ts append xEmbeddedExpr
+          ts.append(xEmbeddedExpr)
           loopContent()
         } else {
           tmppos = o2p(curOffset)
@@ -282,7 +283,7 @@ trait MarkupParsers { self: Parsers =>
           for (t <- ts) t.attachments.get[handle.TextAttache] match {
             case Some(ta) =>
               if (acc.isEmpty) pos = ta.pos
-              acc append ta.text
+              acc.append(ta.text)
             case _ =>
               emit()
               buf += t
@@ -342,7 +343,7 @@ trait MarkupParsers { self: Parsers =>
             if (charComingAfter(nextch()) == '}') nextch()
             else errorBraces()
           }
-          buf append ch
+          buf.append(ch)
           nextch()
         } while (!(ch == SU || xCheckEmbeddedBlock || ch == '<' || ch == '&'))
       buf.toString
@@ -360,8 +361,8 @@ trait MarkupParsers { self: Parsers =>
         case _: ArrayIndexOutOfBoundsException =>
           parser.syntaxError(
             debugLastPos,
-            "missing end tag in XML literal for <%s>" format debugLastElem)
-      } finally parser.in resume Tokens.XMLSTART
+            "missing end tag in XML literal for <%s>".format(debugLastElem))
+      } finally parser.in.resume(Tokens.XMLSTART)
 
       parser.errorTermTree
     }
@@ -424,7 +425,7 @@ trait MarkupParsers { self: Parsers =>
       xEmbeddedBlock = false
       val res =
         saving[List[Int], A](parser.in.sepRegions, parser.in.sepRegions = _) {
-          parser.in resume LBRACE
+          parser.in.resume(LBRACE)
           op
         }
       if (parser.in.token != RBRACE)
@@ -468,7 +469,7 @@ trait MarkupParsers { self: Parsers =>
             ch match {
               case '<' => // tag
                 nextch()
-                if (ch != '/') ts append xPattern // child
+                if (ch != '/') ts.append(xPattern) // child
                 else return false // terminate
 
               case '{' if xCheckEmbeddedBlock =>

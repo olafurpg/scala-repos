@@ -138,7 +138,7 @@ private class PoolInterfaceActor(
     /////////////// FROM CLIENT //////////////
 
     case x: PoolRequest if isActive ⇒
-      activeIdleTimeout foreach { timeout ⇒
+      activeIdleTimeout.foreach { timeout ⇒
         timeout.cancel()
         activeIdleTimeout = None
       }

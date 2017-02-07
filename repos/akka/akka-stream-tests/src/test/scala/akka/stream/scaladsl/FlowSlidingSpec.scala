@@ -62,7 +62,8 @@ class FlowSlidingSpec extends AkkaSpec with GeneratorDrivenPropertyChecks {
       Source.empty
         .sliding(1)
         .runForeach(testActor ! _)
-        .map(_ ⇒ "done") pipeTo testActor
+        .map(_ ⇒ "done")
+        .pipeTo(testActor)
       expectMsg("done")
     }
   }

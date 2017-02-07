@@ -34,7 +34,7 @@ class ShardingServiceTest extends FunSuite with MockitoSugar {
 
     val reqA = new ShardingRequest(1L)
     val serviceForA = mock[Service[MockRequest, String]]
-    when(serviceForA.close(any)) thenReturn Future.Done
+    when(serviceForA.close(any)).thenReturn(Future.Done)
 
     val unshardableReq = new MockRequest
     val reply = Future.value("hello")
@@ -46,17 +46,17 @@ class ShardingServiceTest extends FunSuite with MockitoSugar {
 
     val reqB = new ShardingRequest(2L)
     val serviceForB = mock[Service[MockRequest, String]]
-    when(serviceForB.close(any)) thenReturn Future.Done
+    when(serviceForB.close(any)).thenReturn(Future.Done)
 
-    when(distributor.nodeForHash(1L)) thenReturn serviceForA
-    when(serviceForA.status) thenReturn Status.Open
-    when(serviceForA.apply(reqA)) thenReturn reply
+    when(distributor.nodeForHash(1L)).thenReturn(serviceForA)
+    when(serviceForA.status).thenReturn(Status.Open)
+    when(serviceForA.apply(reqA)).thenReturn(reply)
     service(reqA)
     verify(serviceForA).apply(reqA)
 
-    when(distributor.nodeForHash(2L)) thenReturn serviceForB
-    when(serviceForB.status) thenReturn Status.Open
-    when(serviceForB.apply(reqB)) thenReturn reply
+    when(distributor.nodeForHash(2L)).thenReturn(serviceForB)
+    when(serviceForB.status).thenReturn(Status.Open)
+    when(serviceForB.apply(reqB)).thenReturn(reply)
     service(reqB)
     verify(serviceForB).apply(reqB)
   }
@@ -66,8 +66,8 @@ class ShardingServiceTest extends FunSuite with MockitoSugar {
     val h = new ShardingServiceHelper
     import h._
 
-    when(distributor.nodeForHash(1L)) thenReturn serviceForA
-    when(serviceForA.status) thenReturn Status.Closed
+    when(distributor.nodeForHash(1L)).thenReturn(serviceForA)
+    when(serviceForA.status).thenReturn(Status.Closed)
     intercept[ShardNotAvailableException] {
       Await.result(service(reqA))
     }

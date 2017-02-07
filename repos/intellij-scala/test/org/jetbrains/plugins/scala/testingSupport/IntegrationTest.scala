@@ -126,7 +126,7 @@ trait IntegrationTest {
       case configTestName =>
         val configTests = parseTestName(configTestName)
         configTests.size == testNames.size &&
-        ((configTests zip testNames) forall {
+        ((configTests.zip(testNames)).forall {
           case (actual, required) => actual == required
         })
     })

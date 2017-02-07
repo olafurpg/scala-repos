@@ -233,7 +233,7 @@ abstract class BTypes {
     // if classNode is a nested class, it has an innerClass attribute for itself. in this
     // case we build the NestedInfo.
     val nestedInfo =
-      classNode.innerClasses.asScala.find(_.name == classNode.name) map {
+      classNode.innerClasses.asScala.find(_.name == classNode.name).map {
         case innerEntry =>
           val enclosingClass =
             if (innerEntry.outerName != null) {
@@ -316,7 +316,7 @@ abstract class BTypes {
     // being compiled. For those classes, the info is only needed if the inliner is enabled, othewise
     // we can save the memory.
     if (!compilerSettings.YoptInlinerEnabled) BTypes.EmptyInlineInfo
-    else fromClassfileAttribute getOrElse fromClassfileWithoutAttribute
+    else fromClassfileAttribute.getOrElse(fromClassfileWithoutAttribute)
   }
 
   /**
@@ -1002,7 +1002,7 @@ abstract class BTypes {
     def innerClassAttributeEntry: Either[NoClassBTypeInfo,
                                          Option[InnerClassEntry]] =
       info.map(i =>
-        i.nestedInfo map {
+        i.nestedInfo.map {
           case NestedInfo(_, outerName, innerName, isStaticNestedClass) =>
             InnerClassEntry(
               internalName,

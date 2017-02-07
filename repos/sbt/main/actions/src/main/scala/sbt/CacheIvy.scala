@@ -134,7 +134,7 @@ object CacheIvy {
          m.artifacts,
          m.missingArtifacts,
          m.status,
-         m.publicationDate map { _.getTime },
+         m.publicationDate.map { _.getTime },
          m.resolver,
          m.artifactResolver,
          m.evicted,
@@ -149,7 +149,7 @@ object CacheIvy {
          m.licenses,
          m.callers), {
         case (m, as, ms, s, pd, r, a, e, ed, er, p, h, ea, d, b, cs, ls, ks) =>
-          new ModuleReport(m, as, ms, s, pd map {
+          new ModuleReport(m, as, ms, s, pd.map {
             new ju.Date(_)
           }, r, a, e, ed, er, p, h, ea, d, b, cs, ls, ks)
       }

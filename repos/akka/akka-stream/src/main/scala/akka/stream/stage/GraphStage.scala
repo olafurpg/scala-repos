@@ -1225,7 +1225,7 @@ abstract class TimerGraphStageLogic(_shape: Shape)
   import TimerMessages._
 
   private val keyToTimers = mutable.Map[Any, Timer]()
-  private val timerIdGen = Iterator from 1
+  private val timerIdGen = Iterator.from(1)
 
   private var _timerAsyncCallback: AsyncCallback[Scheduled] = _
   private def getTimerAsyncCallback: AsyncCallback[Scheduled] = {

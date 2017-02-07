@@ -34,23 +34,29 @@ trait GroupFinder extends parser.AST with Tracer {
       solve: Solve,
       dispatches: Set[Dispatch]): Set[(Sigma, Where, List[Dispatch])] = {
     val vars =
-      solve.vars map { findVars(solve, _)(solve.child) } reduceOption {
-        _ ++ _
-      } getOrElse Set()
+      solve.vars
+        .map { findVars(solve, _)(solve.child) }
+        .reduceOption {
+          _ ++ _
+        }
+        .getOrElse(Set())
 
     // TODO minimize by sigma subsetting
-    val btraces = vars flatMap buildBacktrace(solve.trace)
+    val btraces = vars.flatMap(buildBacktrace(solve.trace))
 
-    btraces flatMap { btrace =>
+    btraces.flatMap { btrace =>
       val result = codrill(btrace)
 
       val mapped =
-        result map {
+        result.map {
           case (sigma, where) =>
             val dtrace =
-              btrace map { _._2 } dropWhile { !_.isInstanceOf[Where] } collect {
-                case d: Dispatch if d.binding.isInstanceOf[LetBinding] => d
-              }
+              btrace
+                .map { _._2 }
+                .dropWhile { !_.isInstanceOf[Where] }
+                .collect {
+                  case d: Dispatch if d.binding.isInstanceOf[LetBinding] => d
+                }
 
             (sigma, where, dtrace)
         }
@@ -67,9 +73,9 @@ trait GroupFinder extends parser.AST with Tracer {
        * allow it through and the compiler will fail to solve 'a.  Leaving
        * this case unresolve for now since macros are going away.
        */
-      mapped filter {
+      mapped.filter {
         case (_, _, dtrace) =>
-          dispatches filter { _.actuals.length > 0 } forall dtrace.contains
+          dispatches.filter { _.actuals.length > 0 }.forall(dtrace.contains)
       }
     }
   }
@@ -104,7 +110,10 @@ trait GroupFinder extends parser.AST with Tracer {
 
       case Solve(_, constraints, child) => {
         val constrVars =
-          constraints map findVars(solve, id) reduceOption { _ ++ _ } getOrElse Set()
+          constraints
+            .map(findVars(solve, id))
+            .reduceOption { _ ++ _ }
+            .getOrElse(Set())
         constrVars ++ findVars(solve, id)(child)
       }
 
@@ -124,6 +133,9 @@ trait GroupFinder extends parser.AST with Tracer {
       case _: TicVar => Set()
 
       case NaryOp(_, values) =>
-        values map findVars(solve, id) reduceOption { _ ++ _ } getOrElse Set()
+        values
+          .map(findVars(solve, id))
+          .reduceOption { _ ++ _ }
+          .getOrElse(Set())
     }
 }

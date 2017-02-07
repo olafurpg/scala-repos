@@ -293,10 +293,10 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     val classesIterator = classes.iterator()
     while (classesIterator.hasNext) {
       val clazz: PsiClass = classesIterator.next()
-      strings add clazz.getName
+      strings.add(clazz.getName)
       clazz match {
         case t: ScTemplateDefinition =>
-          for (name <- t.additionalJavaNames) strings add name
+          for (name <- t.additionalJavaNames) strings.add(name)
         case _ =>
       }
     }

@@ -26,7 +26,7 @@ trait FutureTimeoutSupport {
     } else {
       val p = Promise[T]()
       using.scheduleOnce(duration) {
-        p completeWith {
+        p.completeWith {
           try value
           catch { case NonFatal(t) ⇒ Future.failed(t) }
         }

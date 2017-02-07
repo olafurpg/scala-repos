@@ -95,29 +95,31 @@ trait ManagedExecution
 
     implicit val M = shardQueryMonad.M
 
-    shardQueryMonad.jobId map { jobId0 =>
-      val lift = new (Future ~> JobQueryTF) {
-        def apply[A](fa: Future[A]) = fa.liftM[JobQueryT]
-      }
+    shardQueryMonad.jobId
+      .map { jobId0 =>
+        val lift = new (Future ~> JobQueryTF) {
+          def apply[A](fa: Future[A]) = fa.liftM[JobQueryT]
+        }
 
-      new JobQueryLogger[JobQueryTF, A] with ShardQueryLogger[JobQueryTF, A]
-      with TimingQueryLogger[JobQueryTF, A] {
-        val M = shardQueryMonad
-        val jobManager = self.jobManager.withM[JobQueryTF](lift,
-                                                           implicitly,
-                                                           shardQueryMonad.M,
-                                                           shardQueryMonad)
-        val jobId = jobId0
-        val clock = yggConfig.clock
-        val decomposer = decomposer0
+        new JobQueryLogger[JobQueryTF, A] with ShardQueryLogger[JobQueryTF, A]
+        with TimingQueryLogger[JobQueryTF, A] {
+          val M = shardQueryMonad
+          val jobManager = self.jobManager.withM[JobQueryTF](lift,
+                                                             implicitly,
+                                                             shardQueryMonad.M,
+                                                             shardQueryMonad)
+          val jobId = jobId0
+          val clock = yggConfig.clock
+          val decomposer = decomposer0
+        }
       }
-    } getOrElse {
-      new LoggingQueryLogger[JobQueryTF, A]
-      with ShardQueryLogger[JobQueryTF, A]
-      with TimingQueryLogger[JobQueryTF, A] {
-        val M = shardQueryMonad
+      .getOrElse {
+        new LoggingQueryLogger[JobQueryTF, A]
+        with ShardQueryLogger[JobQueryTF, A]
+        with TimingQueryLogger[JobQueryTF, A] {
+          val M = shardQueryMonad
+        }
       }
-    }
   }
 
   protected def executor(implicit shardQueryMonad: JobQueryTFMonad)
@@ -133,7 +135,7 @@ trait ManagedExecution
         def execute(query: String,
                     context: EvaluationContext,
                     opts: QueryOptions) = {
-          queryExec.execute(query, context, opts) map { _._2 }
+          queryExec.execute(query, context, opts).map { _._2 }
         }
       }
     }
@@ -165,11 +167,12 @@ trait ManagedExecution
         UserQuery(query, context.basePath, opts.sortOn, opts.sortOrder)
 
       //TODO: this is craziness
-      EitherT.right(
-        createQueryJob(context.apiKey,
-                       Some(userQuery.serialize),
-                       opts.timeout)(executionContext)) flatMap {
-        implicit shardQueryMonad: JobQueryTFMonad =>
+      EitherT
+        .right(
+          createQueryJob(context.apiKey,
+                         Some(userQuery.serialize),
+                         opts.timeout)(executionContext))
+        .flatMap { implicit shardQueryMonad: JobQueryTFMonad =>
           import JobQueryState._
 
           complete(EitherT
@@ -177,7 +180,7 @@ trait ManagedExecution
                      .hoist(sink)
                      .apply(executor.execute(query, context, opts)),
                    opts.output)
-      }
+        }
     }
   }
 
@@ -189,7 +192,7 @@ trait ManagedExecution
       : EitherT[Future,
                 EvaluationError,
                 (Option[JobId], StreamT[Future, Slice])] = {
-      result map { stream =>
+      result.map { stream =>
         M.jobId -> completeJob(stream)
       }
     }
@@ -205,7 +208,7 @@ trait ManagedExecution
                                  charset: Charset)(
         implicit M: Monad[Future]): StreamT[Future, Array[Byte]] = {
       val encoder = charset.newEncoder
-      stream map { chars =>
+      stream.map { chars =>
         val buffer = encoder.encode(chars)
         chars.flip()
 
@@ -219,32 +222,36 @@ trait ManagedExecution
         resultE: EitherT[Future, EvaluationError, StreamT[JobQueryTF, Slice]],
         outputType: MimeType)(implicit M: JobQueryTFMonad)
       : EitherT[Future, EvaluationError, JobId] = {
-      M.jobId map { jobId =>
-        resultE map { result =>
-          val derefed = result.map(_.deref(TransSpecModule.paths.Value))
-          val convertedStream: StreamT[JobQueryTF, CharBuffer] =
-            ColumnarTableModule.toCharBuffers(outputType, derefed)
-          //FIXME: Thread this through the EitherT
-          jobManager.setResult(jobId,
-                               Some(JSON),
-                               encodeCharStream(completeJob(convertedStream),
-                                                Utf8)) map {
-            case Left(error) =>
-              jobManager.abort(jobId,
-                               "Error occured while storing job results: " +
-                                 error,
-                               yggConfig.clock.now())
-            case Right(_) =>
-            // This is "finished" by `completeJob`.
-          }
+      M.jobId
+        .map { jobId =>
+          resultE.map { result =>
+            val derefed = result.map(_.deref(TransSpecModule.paths.Value))
+            val convertedStream: StreamT[JobQueryTF, CharBuffer] =
+              ColumnarTableModule.toCharBuffers(outputType, derefed)
+            //FIXME: Thread this through the EitherT
+            jobManager
+              .setResult(jobId,
+                         Some(JSON),
+                         encodeCharStream(completeJob(convertedStream), Utf8))
+              .map {
+                case Left(error) =>
+                  jobManager.abort(
+                    jobId,
+                    "Error occured while storing job results: " +
+                      error,
+                    yggConfig.clock.now())
+                case Right(_) =>
+                // This is "finished" by `completeJob`.
+              }
 
-          jobId
+            jobId
+          }
         }
-      } getOrElse {
-        EitherT.left(
-          Future(InvalidStateError(
-            "Jobs service is down; cannot execute asynchronous queries.")))
-      }
+        .getOrElse {
+          EitherT.left(
+            Future(InvalidStateError(
+              "Jobs service is down; cannot execute asynchronous queries.")))
+        }
     }
   }
 }

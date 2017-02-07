@@ -27,10 +27,10 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
       videos: Seq[Video]): Fu[Seq[VideoView]] = userOption match {
     case None =>
       fuccess {
-        videos map { VideoView(_, false) }
+        videos.map { VideoView(_, false) }
       }
     case Some(user) =>
-      view.seenVideoIds(user, videos) map { ids =>
+      view.seenVideoIds(user, videos).map { ids =>
         videos.map { v =>
           VideoView(v, ids contains v.id)
         }
@@ -55,13 +55,13 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         "score" -> BSONDocument("$meta" -> "textScore"))
       Paginator(
         adapter = new BSONAdapter[Video](
-            collection = videoColl,
-            selector = BSONDocument(
-              "$text" -> BSONDocument("$search" -> q)
-            ),
-            projection = textScore,
-            sort = textScore
-          ) mapFutureList videoViews(user),
+          collection = videoColl,
+          selector = BSONDocument(
+            "$text" -> BSONDocument("$search" -> q)
+          ),
+          projection = textScore,
+          sort = textScore
+        ).mapFutureList(videoViews(user)),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -91,16 +91,16 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         .void
 
     def allIds: Fu[List[Video.ID]] =
-      videoColl.distinct("_id", none) map lila.db.BSON.asStrings
+      videoColl.distinct("_id", none).map(lila.db.BSON.asStrings)
 
     def popular(user: Option[User], page: Int): Fu[Paginator[VideoView]] =
       Paginator(
         adapter = new BSONAdapter[Video](
-            collection = videoColl,
-            selector = BSONDocument(),
-            projection = BSONDocument(),
-            sort = BSONDocument("metadata.likes" -> -1)
-          ) mapFutureList videoViews(user),
+          collection = videoColl,
+          selector = BSONDocument(),
+          projection = BSONDocument(),
+          sort = BSONDocument("metadata.likes" -> -1)
+        ).mapFutureList(videoViews(user)),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -112,13 +112,13 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
       else
         Paginator(
           adapter = new BSONAdapter[Video](
-              collection = videoColl,
-              selector = BSONDocument(
-                "tags" -> BSONDocument("$all" -> tags)
-              ),
-              projection = BSONDocument(),
-              sort = BSONDocument("metadata.likes" -> -1)
-            ) mapFutureList videoViews(user),
+            collection = videoColl,
+            selector = BSONDocument(
+              "tags" -> BSONDocument("$all" -> tags)
+            ),
+            projection = BSONDocument(),
+            sort = BSONDocument("metadata.likes" -> -1)
+          ).mapFutureList(videoViews(user)),
           currentPage = page,
           maxPerPage = maxPerPage
         )
@@ -128,13 +128,13 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                  page: Int): Fu[Paginator[VideoView]] =
       Paginator(
         adapter = new BSONAdapter[Video](
-            collection = videoColl,
-            selector = BSONDocument(
-              "author" -> author
-            ),
-            projection = BSONDocument(),
-            sort = BSONDocument("metadata.likes" -> -1)
-          ) mapFutureList videoViews(user),
+          collection = videoColl,
+          selector = BSONDocument(
+            "author" -> author
+          ),
+          projection = BSONDocument(),
+          sort = BSONDocument("metadata.likes" -> -1)
+        ).mapFutureList(videoViews(user)),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -152,10 +152,13 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         .cursor[Video]()
         .collect[List]()
         .map { videos =>
-          videos.sortBy { v =>
-            -v.similarity(video)
-          } take max
-        } flatMap videoViews(user)
+          videos
+            .sortBy { v =>
+              -v.similarity(video)
+            }
+            .take(max)
+        }
+        .flatMap(videoViews(user))
 
     object count {
 
@@ -164,7 +167,7 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
 
       def clearCache = cache.clear
 
-      def apply: Fu[Int] = cache apply true
+      def apply: Fu[Int] = cache.apply(true)
     }
   }
 
@@ -179,21 +182,25 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         .one[View]
 
     def add(a: View) =
-      (viewColl insert a).void recover lila.db.recoverDuplicateKey(_ => ())
+      (viewColl insert a).void.recover(lila.db.recoverDuplicateKey(_ => ()))
 
     def hasSeen(user: User, video: Video): Fu[Boolean] =
-      viewColl.count(
-        BSONDocument(
-          View.BSONFields.id -> View.makeId(video.id, user.id)
-        ).some) map (0 !=)
+      viewColl
+        .count(
+          BSONDocument(
+            View.BSONFields.id -> View.makeId(video.id, user.id)
+          ).some)
+        .map(0 !=)
 
     def seenVideoIds(user: User, videos: Seq[Video]): Fu[Set[Video.ID]] =
-      viewColl.distinct(View.BSONFields.videoId,
-                        BSONDocument(
-                          "_id" -> BSONDocument("$in" -> videos.map { v =>
-                            View.makeId(v.id, user.id)
-                          })
-                        ).some) map lila.db.BSON.asStringSet
+      viewColl
+        .distinct(View.BSONFields.videoId,
+                  BSONDocument(
+                    "_id" -> BSONDocument("$in" -> videos.map { v =>
+                      View.makeId(v.id, user.id)
+                    })
+                  ).some)
+        .map(lila.db.BSON.asStringSet)
   }
 
   object tag {
@@ -222,7 +229,7 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         f = filterTags => {
           val allPaths =
             if (filterTags.isEmpty)
-              allPopular map { tags =>
+              allPopular.map { tags =>
                 tags.filterNot(_.isNumeric)
               } else
               videoColl
@@ -236,15 +243,18 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                 )
                 .map(_.documents.flatMap(_.asOpt[TagNb]))
 
-          allPopular zip allPaths map {
+          allPopular.zip(allPaths).map {
             case (all, paths) =>
               val tags =
-                all map { t =>
-                  paths find (_._id == t._id) getOrElse TagNb(t._id, 0)
-                } filterNot (_.empty) take max
+                all
+                  .map { t =>
+                    (paths find (_._id == t._id)).getOrElse(TagNb(t._id, 0))
+                  }
+                  .filterNot(_.empty)
+                  .take(max)
               val missing =
-                filterTags filterNot { t =>
-                  tags exists (_.tag == t)
+                filterTags.filterNot { t =>
+                  tags.exists(_.tag == t)
                 }
               val list =
                 tags.take(max - missing.size) ::: missing.flatMap { t =>

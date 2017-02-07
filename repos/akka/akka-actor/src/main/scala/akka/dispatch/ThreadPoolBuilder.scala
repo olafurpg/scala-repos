@@ -237,7 +237,7 @@ final case class MonitorableThreadFactory(
   protected def wire[T <: Thread](t: T): T = {
     t.setUncaughtExceptionHandler(exceptionHandler)
     t.setDaemon(daemonic)
-    contextClassLoader foreach t.setContextClassLoader
+    contextClassLoader.foreach(t.setContextClassLoader)
     t
   }
 }

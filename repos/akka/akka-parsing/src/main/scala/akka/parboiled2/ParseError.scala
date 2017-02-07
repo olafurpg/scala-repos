@@ -36,7 +36,7 @@ case class ParseError(position: Position,
     s"ParseError($position, $principalPosition, <${traces.size} traces>)"
 
   lazy val effectiveTraces: immutable.Seq[RuleTrace] =
-    traces map {
+    traces.map {
       val commonPrefixLen = RuleTrace.commonNonAtomicPrefixLength(traces)
       if (commonPrefixLen > 0)
         t ⇒
@@ -116,7 +116,7 @@ object RuleTrace {
       @tailrec
       def rec(current: List[NonTerminal], namedIx: Int, ix: Int): Int =
         current match {
-          case head :: tail if tracesTail forall hasElem(ix, head) ⇒
+          case head :: tail if tracesTail.forall(hasElem(ix, head)) ⇒
             head.key match {
               case Named(_) ⇒
                 rec(tail, if (namedIx >= 0) namedIx else ix, ix + 1)

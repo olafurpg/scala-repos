@@ -168,7 +168,7 @@ private[akka] object GraphInterpreter {
         }
 
         val logicAndMat = stage.createLogicAndMaterializedValue(
-          inheritedAttributes and originalAttributes(i))
+          inheritedAttributes.and(originalAttributes(i)))
         matVal.put(copiedModules(i), logicAndMat._2)
 
         logics(i) = logicAndMat._1

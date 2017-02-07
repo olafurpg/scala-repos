@@ -189,7 +189,7 @@ object Queue extends SeqFactory[Queue] {
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Queue[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 
-  def newBuilder[A]: Builder[A, Queue[A]] = new MutableList[A] mapResult {
+  def newBuilder[A]: Builder[A, Queue[A]] = new MutableList[A].mapResult {
     _.toQueue
   }
 }

@@ -259,7 +259,7 @@ trait IsomorphismBindRec[F[_], G[_]]
   implicit def G: BindRec[G]
 
   def tailrecM[A, B](f: A => F[A \/ B])(a: A): F[B] =
-    iso.from(G.tailrecM(f andThen iso.unlift[A \/ B].to)(a))
+    iso.from(G.tailrecM(f.andThen(iso.unlift[A \/ B].to))(a))
 }
 
 trait IsomorphismMonad[F[_], G[_]]

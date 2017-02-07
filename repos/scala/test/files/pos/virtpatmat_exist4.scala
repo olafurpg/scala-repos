@@ -20,9 +20,9 @@ object Test {
   var intp: IMain with MemberHandlers = null
 
   val handlers = intp.handlers
-  handlers.filterNot(_.importedSymbols.isEmpty).zipWithIndex foreach {
+  handlers.filterNot(_.importedSymbols.isEmpty).zipWithIndex.foreach {
     case (handler, idx) =>
-      val (types, terms) = handler.importedSymbols partition (_.foo)
+      val (types, terms) = handler.importedSymbols.partition(_.foo)
   }
 }
 
@@ -30,6 +30,6 @@ object Test2 {
   type JClass = java.lang.Class[_]
 
   def tvarString(bounds: List[AnyRef]) = {
-    bounds collect { case x: JClass => x }
+    bounds.collect { case x: JClass => x }
   }
 }

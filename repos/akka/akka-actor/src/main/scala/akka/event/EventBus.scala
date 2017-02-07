@@ -54,7 +54,7 @@ trait EventBus {
   */
 trait ActorEventBus extends EventBus {
   type Subscriber = ActorRef
-  protected def compareSubscribers(a: ActorRef, b: ActorRef) = a compareTo b
+  protected def compareSubscribers(a: ActorRef, b: ActorRef) = a.compareTo(b)
 }
 
 /**
@@ -179,7 +179,7 @@ trait SubchannelClassification { this: EventBus ⇒
             cache(c)
           }
         }
-    recv foreach (publish(event, _))
+    recv.foreach(publish(event, _))
   }
 
   /**
@@ -189,7 +189,7 @@ trait SubchannelClassification { this: EventBus ⇒
   private[akka] def hasSubscriptions(subscriber: Subscriber): Boolean =
     // FIXME binary incompatible, but I think it is safe to filter out this problem,
     //       since it is only called from new functionality in EventStreamUnsubscriber
-    cache.values exists { _ contains subscriber }
+    cache.values.exists { _ contains subscriber }
 
   private def removeFromCache(
       changes: immutable.Seq[(Classifier, Set[Subscriber])]): Unit =
@@ -464,7 +464,7 @@ trait ActorClassification { this: ActorEventBus with ActorClassifier ⇒
   @tailrec
   protected final def associate(monitored: ActorRef,
                                 monitor: ActorRef): Boolean = {
-    val current = mappings get monitored
+    val current = mappings.get(monitored)
     current match {
       case null ⇒
         if (monitored.isTerminated) false
@@ -493,7 +493,7 @@ trait ActorClassification { this: ActorEventBus with ActorClassifier ⇒
     @tailrec
     def dissociateAsMonitored(
         monitored: ActorRef): immutable.Iterable[ActorRef] = {
-      val current = mappings get monitored
+      val current = mappings.get(monitored)
       current match {
         case null ⇒ empty
         case raw: immutable.TreeSet[_] ⇒
@@ -525,7 +525,7 @@ trait ActorClassification { this: ActorEventBus with ActorClassifier ⇒
   @tailrec
   protected final def dissociate(monitored: ActorRef,
                                  monitor: ActorRef): Boolean = {
-    val current = mappings get monitored
+    val current = mappings.get(monitored)
     current match {
       case null ⇒ false
       case raw: immutable.TreeSet[_] ⇒
@@ -555,7 +555,7 @@ trait ActorClassification { this: ActorEventBus with ActorClassifier ⇒
 
   def publish(event: Event): Unit = mappings.get(classify(event)) match {
     case null ⇒ ()
-    case some ⇒ some foreach { _ ! event }
+    case some ⇒ some.foreach { _ ! event }
   }
 
   def subscribe(subscriber: Subscriber, to: Classifier): Boolean =

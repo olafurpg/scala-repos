@@ -304,7 +304,7 @@ final class ClusterClient(settings: ClusterClientSettings)
   val buffer = new java.util.LinkedList[(Any, ActorRef)]
 
   def scheduleRefreshContactsTick(interval: FiniteDuration): Unit = {
-    refreshContactsTask foreach { _.cancel() }
+    refreshContactsTask.foreach { _.cancel() }
     refreshContactsTask = Some(
       context.system.scheduler
         .schedule(interval, interval, self, RefreshContactsTick))
@@ -313,7 +313,7 @@ final class ClusterClient(settings: ClusterClientSettings)
   override def postStop(): Unit = {
     super.postStop()
     heartbeatTask.cancel()
-    refreshContactsTask foreach { _.cancel() }
+    refreshContactsTask.foreach { _.cancel() }
   }
 
   def receive = establishing
@@ -327,7 +327,7 @@ final class ClusterClient(settings: ClusterClientSettings)
       case Contacts(contactPoints) ⇒
         if (contactPoints.nonEmpty) {
           contacts = contactPoints.map(context.actorSelection)
-          contacts foreach { _ ! Identify(None) }
+          contacts.foreach { _ ! Identify(None) }
         }
       case ActorIdentity(_, Some(receptionist)) ⇒
         log.info("Connected to [{}]", receptionist.path)
@@ -356,12 +356,13 @@ final class ClusterClient(settings: ClusterClientSettings)
 
   def active(receptionist: ActorRef): Actor.Receive = {
     case Send(path, msg, localAffinity) ⇒
-      receptionist forward DistributedPubSubMediator
-        .Send(path, msg, localAffinity)
+      receptionist.forward(
+        DistributedPubSubMediator
+          .Send(path, msg, localAffinity))
     case SendToAll(path, msg) ⇒
-      receptionist forward DistributedPubSubMediator.SendToAll(path, msg)
+      receptionist.forward(DistributedPubSubMediator.SendToAll(path, msg))
     case Publish(topic, msg) ⇒
-      receptionist forward DistributedPubSubMediator.Publish(topic, msg)
+      receptionist.forward(DistributedPubSubMediator.Publish(topic, msg))
     case HeartbeatTick ⇒
       if (!failureDetector.isAvailable) {
         log.info("Lost contact with [{}], restablishing connection",
@@ -385,7 +386,7 @@ final class ClusterClient(settings: ClusterClientSettings)
   def sendGetContacts(): Unit = {
     val sendTo =
       if (contacts.isEmpty) initialContactsSel
-      else if (contacts.size == 1) (initialContactsSel union contacts)
+      else if (contacts.size == 1)(initialContactsSel.union(contacts))
       else contacts
     if (log.isDebugEnabled)
       log.debug(s"""Sending GetContacts to [${sendTo.mkString(",")}]""")
@@ -767,7 +768,7 @@ final class ClusterReceptionist(pubSubMediator: ActorRef,
         val slice = {
           val first = nodes.from(a).tail.take(numberOfContacts)
           if (first.size == numberOfContacts) first
-          else first union nodes.take(numberOfContacts - first.size)
+          else first.union(nodes.take(numberOfContacts - first.size))
         }
         val contacts = Contacts(
           slice.map(a ⇒ self.path.toStringWithAddress(a))(collection.breakOut))
@@ -779,10 +780,10 @@ final class ClusterReceptionist(pubSubMediator: ActorRef,
       }
 
     case state: CurrentClusterState ⇒
-      nodes = nodes.empty union state.members.collect {
+      nodes = nodes.empty.union(state.members.collect {
         case m if m.status != MemberStatus.Joining && matchingRole(m) ⇒
           m.address
-      }
+      })
       consistentHash = ConsistentHash(nodes, virtualNodesFactor)
 
     case MemberUp(m) ⇒

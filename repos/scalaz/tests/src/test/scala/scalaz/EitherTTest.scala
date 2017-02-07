@@ -50,7 +50,7 @@ object EitherTTest extends SpecLite {
 
   "flatMapF consistent with flatMap" ! forAll {
     (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
-      a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
+      a.flatMap(f.andThen(EitherT.apply)) must_=== a.flatMapF(f)
   }
 
   "orElse only executes the left hand monad once" should {
@@ -59,7 +59,7 @@ object EitherTTest extends SpecLite {
       EitherT.right(() => counter.incrementAndGet())
     val other: EitherTComputation[Int] = EitherT.right(() => 0) // does nothing
 
-    (inc orElse other).run.apply() must_== \/-(1)
+    (inc.orElse(other)).run.apply() must_== \/-(1)
     counter.get() must_== 1
   }
 

@@ -72,7 +72,7 @@ abstract class GenTraversableFactory[
   def concat[A](xss: Traversable[A]*): CC[A] = {
     val b = newBuilder[A]
     // At present we're using IndexedSeq as a proxy for "has a cheap size method".
-    if (xss forall (_.isInstanceOf[IndexedSeq[_]]))
+    if (xss.forall(_.isInstanceOf[IndexedSeq[_]]))
       b.sizeHint(xss.map(_.size).sum)
 
     for (xs <- xss.seq) b ++= xs

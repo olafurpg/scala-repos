@@ -303,7 +303,7 @@ abstract class MappedNullableLong[T <: Mapper[T]](val fieldOwner: T)
           * @param v the field value
           * @return the string representation of the field value
           */
-        def asString(v: T): String = v.map(_.toString) openOr ""
+        def asString(v: T): String = v.map(_.toString).openOr("")
 
         /**
           * Convert the field into NodeSeq, if possible
@@ -347,10 +347,10 @@ abstract class MappedNullableLong[T <: Mapper[T]](val fieldOwner: T)
     data
   }
 
-  def asJsExp: JsExp = get.map(v => JE.Num(v)) openOr JE.JsNull
+  def asJsExp: JsExp = get.map(v => JE.Num(v)).openOr(JE.JsNull)
 
   def asJsonValue: Box[JsonAST.JValue] =
-    Full(get.map(v => JsonAST.JInt(v)) openOr JsonAST.JNull)
+    Full(get.map(v => JsonAST.JInt(v)).openOr(JsonAST.JNull))
 
   override def readPermission_? = true
   override def writePermission_? = true

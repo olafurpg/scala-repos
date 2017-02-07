@@ -306,7 +306,7 @@ class GroupsResource @Inject()(groupManager: GroupManager,
       updatedGroup
     }
 
-    versionChange orElse scaleChange getOrElse createOrUpdateChange
+    versionChange.orElse(scaleChange).getOrElse(createOrUpdateChange)
   }
 
   private def updateOrCreate(id: PathId, update: GroupUpdate, force: Boolean)(

@@ -74,14 +74,16 @@ class FutureTest
           val iteration = Future.times(3) {
             val promise = new Promise[Unit]
             promise.setInterruptHandler { case _ => ninterrupt += 1 }
-            queue add promise
+            queue.add(promise)
             promise
           }
-          iteration onSuccess { _ =>
-            complete = true
-          } onFailure { f =>
-            failure = true
-          }
+          iteration
+            .onSuccess { _ =>
+              complete = true
+            }
+            .onFailure { f =>
+              failure = true
+            }
           assert(complete == false)
           assert(failure == false)
         }
@@ -153,15 +155,17 @@ class FutureTest
           val iteration = Future.whileDo(i < 3) {
             i += 1
             val promise = new HandledPromise[Unit]
-            queue add promise
+            queue.add(promise)
             promise
           }
 
-          iteration onSuccess { _ =>
-            complete = true
-          } onFailure { f =>
-            failure = true
-          }
+          iteration
+            .onSuccess { _ =>
+              complete = true
+            }
+            .onFailure { f =>
+              failure = true
+            }
           assert(complete == false)
           assert(failure == false)
         }
@@ -197,9 +201,9 @@ class FutureTest
 
         "when interrupted" in {
           new WhileDoHelper {
-            assert((queue.asScala exists (_.handled.isDefined)) == false)
+            assert((queue.asScala.exists(_.handled.isDefined)) == false)
             iteration.raise(new Exception)
-            assert((queue.asScala forall (_.handled.isDefined)) == true)
+            assert((queue.asScala.forall(_.handled.isDefined)) == true)
           }
         }
       }
@@ -246,7 +250,7 @@ class FutureTest
           val f = mock[Seq[Int] => Future[Seq[Int]]]
           val batcher = Future.batched(3)(f)
 
-          when(f.apply(Seq(1, 2, 3))) thenReturn (Future.value(result))
+          when(f.apply(Seq(1, 2, 3))).thenReturn(Future.value(result))
           batcher(1)
           verify(f, never()).apply(any[Seq[Int]])
           batcher(2)
@@ -259,7 +263,7 @@ class FutureTest
           val f = mock[Seq[Int] => Future[Seq[Int]]]
           val batcher = Future.batched(3, sizePercentile = 0.67f)(f)
 
-          when(f.apply(Seq(1, 2, 3))) thenReturn (Future.value(result))
+          when(f.apply(Seq(1, 2, 3))).thenReturn(Future.value(result))
           batcher(1)
           verify(f, never()).apply(any[Seq[Int]])
           batcher(2)
@@ -270,7 +274,7 @@ class FutureTest
           val f = mock[Seq[Int] => Future[Seq[Int]]]
           val batcher = Future.batched(3, sizePercentile = 0.4f)(f)
 
-          when(f.apply(Seq(1, 2, 3))) thenReturn (Future.value(result))
+          when(f.apply(Seq(1, 2, 3))).thenReturn(Future.value(result))
           batcher(1)
           verify(f).apply(Seq(1))
         }
@@ -279,7 +283,7 @@ class FutureTest
           val f = mock[Seq[Int] => Future[Seq[Int]]]
           val batcher = Future.batched(3, sizePercentile = 1.3f)(f)
 
-          when(f.apply(Seq(1, 2, 3))) thenReturn (Future.value(result))
+          when(f.apply(Seq(1, 2, 3))).thenReturn(Future.value(result))
           batcher(1)
           verify(f, never()).apply(any[Seq[Int]])
           batcher(2)
@@ -293,7 +297,7 @@ class FutureTest
           val batcher = Future.batched(3, 3.seconds)(f)
 
           Time.withCurrentTimeFrozen { control =>
-            when(f(Seq(1))) thenReturn (Future.value(Seq(4)))
+            when(f(Seq(1))).thenReturn(Future.value(Seq(4)))
             batcher(1)
             verify(f, never()).apply(any[Seq[Int]])
 
@@ -316,7 +320,7 @@ class FutureTest
           val batcher = Future.batched(3)(f)
 
           Time.withCurrentTimeFrozen { control =>
-            when(f(Seq(1, 2, 3))) thenReturn (Future.value(result))
+            when(f(Seq(1, 2, 3))).thenReturn(Future.value(result))
             batcher(1)
             batcher(2)
             batcher(3)
@@ -391,7 +395,7 @@ class FutureTest
           val batcher = Future.batched(3)(f)
 
           Time.withCurrentTimeFrozen { control =>
-            when(f(Seq(1, 2, 3))) thenReturn (Future.value(result))
+            when(f(Seq(1, 2, 3))).thenReturn(Future.value(result))
             val res1 = batcher(1)
             assert(res1.isDefined == false)
             val res2 = batcher(2)
@@ -417,7 +421,7 @@ class FutureTest
             val blocker = new Promise[Unit]
             val thread = new Thread {
               override def run() {
-                when(f(result)) thenReturn (Future.value(Seq(7, 8, 9)))
+                when(f(result)).thenReturn(Future.value(Seq(7, 8, 9)))
                 batcher(4)
                 batcher(5)
                 batcher(6)
@@ -426,7 +430,7 @@ class FutureTest
               }
             }
 
-            when(f(Seq(1, 2, 3))) thenAnswer {
+            when(f(Seq(1, 2, 3))).thenAnswer {
               new Answer[Future[Seq[Int]]] {
                 def answer(invocation: InvocationOnMock) = {
                   thread.start()
@@ -447,7 +451,7 @@ class FutureTest
           val f = mock[Seq[Int] => Future[Seq[Int]]]
           val batcher = Future.batched(3)(f)
 
-          when(f(Seq(1, 2, 3))) thenAnswer {
+          when(f(Seq(1, 2, 3))).thenAnswer {
             new Answer[Unit] {
               def answer(invocation: InvocationOnMock) = {
                 throw new Exception
@@ -660,10 +664,10 @@ class FutureTest
         var ran = 0
         local() = 1010
 
-        f ensure {
+        f.ensure {
           assert(local() == Some(1010))
           local() = 1212
-          f ensure {
+          f.ensure {
             assert(local() == Some(1212))
             local() = 1313
             ran += 1
@@ -680,9 +684,9 @@ class FutureTest
         val f = const.value(111)
 
         var count = 0
-        f onSuccess { _ =>
+        f.onSuccess { _ =>
           assert(count == 0)
-          f ensure {
+          f.ensure {
             assert(count == 1)
             count += 1
           }
@@ -699,7 +703,7 @@ class FutureTest
         val exc = new Exception("a raw exception")
 
         val f = Future.monitored {
-          inner ensure { throw exc }
+          inner.ensure { throw exc }
         }
 
         assert(f.poll == Some(Throw(exc)))
@@ -707,11 +711,11 @@ class FutureTest
     }
 
     "Future (%s)".format(name) should {
-      "select" which {
+      "select".which {
         trait SelectHelper {
           var nhandled = 0
           val p0, p1 = new HandledPromise[Int]
-          val f = p0 select p1
+          val f = p0.select(p1)
           assert(f.isDefined == false)
         }
 
@@ -734,9 +738,9 @@ class FutureTest
         "propagate interrupts" in {
           new SelectHelper {
             val ps = Seq(p0, p1)
-            assert((ps exists (_.handled.isDefined)) == false)
+            assert((ps.exists(_.handled.isDefined)) == false)
             f.raise(new Exception)
-            assert((ps forall (_.handled.isDefined)) == true)
+            assert((ps.forall(_.handled.isDefined)) == true)
           }
         }
       }
@@ -794,7 +798,7 @@ class FutureTest
       testJoin("Future.join(f, g)", Future.join(_, _))
 
       "toJavaFuture" should {
-        "return the same thing as our Future when initialized" which {
+        "return the same thing as our Future when initialized".which {
           val f = const.value(1)
           val jf = f.toJavaFuture
           assert(Await.result(f) == jf.get())
@@ -805,7 +809,7 @@ class FutureTest
           }
         }
 
-        "return the same thing as our Future when set later" which {
+        "return the same thing as our Future when set later".which {
           val f = new Promise[Int]
           val jf = f.toJavaFuture
           f.setValue(1)
@@ -859,18 +863,20 @@ class FutureTest
             val inner1 = new Promise[Int]
             var ran = false
             val f = Future.monitored {
-              inner1 ensure {
-                throw exc
-              } ensure {
-                // Note that these are sequenced so that interrupts
-                // will be delivered before inner's handler is cleared.
-                ran = true
-                try {
-                  inner.update(Return(1))
-                } catch {
-                  case e: Throwable => assert(true == false)
+              inner1
+                .ensure {
+                  throw exc
                 }
-              }
+                .ensure {
+                  // Note that these are sequenced so that interrupts
+                  // will be delivered before inner's handler is cleared.
+                  ran = true
+                  try {
+                    inner.update(Return(1))
+                  } catch {
+                    case e: Throwable => assert(true == false)
+                  }
+                }
               inner
             }
             assert(ran == false)
@@ -927,11 +933,11 @@ class FutureTest
     }
 
     "Promise (%s)".format(name) should {
-      "apply" which {
+      "apply".which {
         "when we're inside of a respond block (without deadlocking)" in {
           val f = Future(1)
           var didRun = false
-          f foreach { _ =>
+          f.foreach { _ =>
             f mustProduce Return(1)
             didRun = true
           }
@@ -939,10 +945,10 @@ class FutureTest
         }
       }
 
-      "map" which {
+      "map".which {
         "when it's all chill" in {
           val f =
-            Future(1) map { x =>
+            Future(1).map { x =>
               x + 1
             }
           assert(Await.result(f) == 2)
@@ -951,7 +957,7 @@ class FutureTest
         "when there's a problem in the passed in function" in {
           val e = new Exception
           val f =
-            Future(1) map { x =>
+            Future(1).map { x =>
               throw e
               x + 1
             }
@@ -1034,7 +1040,7 @@ class FutureTest
 
           val actual = intercept[FatalException] {
             Monitor.using(m) {
-              const.value(1) transform { case _ => throw exc }
+              const.value(1).transform { case _ => throw exc }
             }
           }
 
@@ -1097,7 +1103,7 @@ class FutureTest
           seqop: (Future[Unit], () => Future[Unit]) => Future[Unit]) {
         which when {
           "successes" should {
-            "interruption of the produced future" which {
+            "interruption of the produced future".which {
               "before the antecedent Future completes, propagates back to the antecedent" in {
                 val f1, f2 = new HandledPromise[Unit]
                 val f = seqop(f1, () => f2)
@@ -1164,22 +1170,22 @@ class FutureTest
 
       testSequence("flatMap",
                    (a, next) =>
-                     a flatMap { _ =>
+                     a.flatMap { _ =>
                        next()
                    })
       testSequence("before", (a, next) => a before next())
 
       "flatMap (values)" should {
         val f =
-          Future(1) flatMap { x =>
+          Future(1).flatMap { x =>
             Future(x + 1)
           }
 
-        "apply" which {
+        "apply".which {
           assert(Await.result(f) == 2)
         }
 
-        "respond" which {
+        "respond".which {
           f mustProduce Return(2)
         }
       }
@@ -1225,8 +1231,8 @@ class FutureTest
       "rescue" should {
         val e = new Exception
 
-        "successes" which {
-          val f = Future(1) rescue { case e => Future(2) }
+        "successes".which {
+          val f = Future(1).rescue { case e => Future(2) }
 
           "apply" in {
             assert(Await.result(f) == 1)
@@ -1237,8 +1243,8 @@ class FutureTest
           }
         }
 
-        "failures" which {
-          val g = Future[Int](throw e) rescue { case e => Future(2) }
+        "failures".which {
+          val g = Future[Int](throw e).rescue { case e => Future(2) }
 
           "apply" in {
             assert(Await.result(g) == 2)
@@ -1250,16 +1256,16 @@ class FutureTest
 
           "when the error handler errors" in {
             val g =
-              Future[Int](throw e) rescue { case e => throw e; Future(2) }
+              Future[Int](throw e).rescue { case e => throw e; Future(2) }
             val actual = intercept[Exception] { Await.result(g) }
             assert(actual == e)
           }
         }
 
-        "interruption of the produced future" which {
+        "interruption of the produced future".which {
           "before the antecedent Future completes, propagates back to the antecedent" in {
             val f1, f2 = new HandledPromise[Int]
-            val f = f1 rescue { case _ => f2 }
+            val f = f1.rescue { case _ => f2 }
             assert(f1.handled == None)
             assert(f2.handled == None)
             f.raise(new Exception)
@@ -1277,7 +1283,7 @@ class FutureTest
 
           "after the antecedent Future completes, does not propagate back to the antecedent" in {
             val f1, f2 = new HandledPromise[Int]
-            val f = f1 rescue { case _ => f2 }
+            val f = f1.rescue { case _ => f2 }
             assert(f1.handled == None)
             assert(f2.handled == None)
             f1() = Throw(new Exception)
@@ -1294,7 +1300,7 @@ class FutureTest
       "foreach" in {
         var wasCalledWith: Option[Int] = None
         val f = Future(1)
-        f foreach { i =>
+        f.foreach { i =>
           wasCalledWith = Some(i)
         }
         assert(wasCalledWith == Some(1))
@@ -1304,7 +1310,7 @@ class FutureTest
         "when the result has arrived" in {
           var wasCalledWith: Option[Int] = None
           val f = Future(1)
-          f respond {
+          f.respond {
             case Return(i) => wasCalledWith = Some(i)
             case Throw(e) => fail(e.toString)
           }
@@ -1314,7 +1320,7 @@ class FutureTest
         "when the result has not yet arrived it buffers computations" in {
           var wasCalledWith: Option[Int] = None
           val f = new Promise[Int]
-          f foreach { i =>
+          f.foreach { i =>
             wasCalledWith = Some(i)
           }
           assert(wasCalledWith == None)
@@ -1325,15 +1331,18 @@ class FutureTest
         "runs callbacks just once and in order" in {
           var i, j, k, h = 0
           val p = new Promise[Int]
-          p ensure {
-            i = i + j + k + h + 1
-          } ensure {
-            j = i + j + k + h + 1
-          } ensure {
-            k = i + j + k + h + 1
-          } ensure {
-            h = i + j + k + h + 1
-          }
+          p.ensure {
+              i = i + j + k + h + 1
+            }
+            .ensure {
+              j = i + j + k + h + 1
+            }
+            .ensure {
+              k = i + j + k + h + 1
+            }
+            .ensure {
+              h = i + j + k + h + 1
+            }
 
           assert(i == 0)
           assert(j == 0)
@@ -1354,7 +1363,7 @@ class FutureTest
           assert(m.handled == null)
 
           Monitor.using(m) {
-            const.value(1) ensure { throw exc }
+            const.value(1).ensure { throw exc }
           }
 
           assert(m.handled == exc)
@@ -1362,8 +1371,8 @@ class FutureTest
       }
 
       "willEqual" in {
-        assert(Await.result(const.value(1) willEqual (const.value(1)),
-                            1.second) == true)
+        assert(Await
+          .result(const.value(1).willEqual(const.value(1)), 1.second) == true)
       }
 
       "Future() handles exceptions" in {
@@ -1381,9 +1390,9 @@ class FutureTest
         local() = 1010
 
         val both =
-          promise0 flatMap { _ =>
+          promise0.flatMap { _ =>
             val local0 = local()
-            promise1 map { _ =>
+            promise1.map { _ =>
               val local1 = local()
               (local0, local1)
             }
@@ -1404,7 +1413,7 @@ class FutureTest
 
         local() = 123
         val done =
-          promise map { otherValue =>
+          promise.map { otherValue =>
             (otherValue, local())
           }
 
@@ -1788,9 +1797,9 @@ class FutureTest
     import Arbitrary.arbitrary
     val genLen = Gen.choose(1, 10)
 
-    "return the first result" which {
+    "return the first result".which {
       forAll(genLen, arbitrary[Boolean]) { (n, fail) =>
-        val ps = ((0 until n) map (_ => new Promise[Int])).toList
+        val ps = (((0 until n)).map(_ => new Promise[Int])).toList
         assert(ps.map(_.waitqLength).sum == 0)
         val f = Future.select(ps)
         val i = Random.nextInt(ps.length)
@@ -1807,7 +1816,7 @@ class FutureTest
     "not accumulate listeners when losing or" in {
       val p = new Promise[Unit]
       val q = new Promise[Unit]
-      p or q
+      p.or(q)
       assert(p.waitqLength == 1)
       q.setDone()
       assert(p.waitqLength == 0)
@@ -1824,14 +1833,14 @@ class FutureTest
 
     "not accumulate listeners if not selected" in {
       forAll(genLen, arbitrary[Boolean]) { (n, fail) =>
-        val ps = ((0 until n) map (_ => new Promise[Int])).toList
+        val ps = (((0 until n)).map(_ => new Promise[Int])).toList
         assert(ps.map(_.waitqLength).sum == 0)
         val f = Future.select(ps)
         assert(ps.map(_.waitqLength).sum == n)
         val i = Random.nextInt(ps.length)
         val e = new Exception("sad panda")
         val t = if (fail) Throw(e) else Return(i)
-        f respond { _ =>
+        f.respond { _ =>
           ()
         }
         assert(ps.map(_.waitqLength).sum == n)
@@ -1861,9 +1870,9 @@ class FutureTest
     import Arbitrary.arbitrary
     val genLen = Gen.choose(1, 10)
 
-    "return the first result" which {
+    "return the first result".which {
       forAll(genLen, arbitrary[Boolean]) { (n, fail) =>
-        val ps = ((0 until n) map (_ => new Promise[Int])).toIndexedSeq
+        val ps = (((0 until n)).map(_ => new Promise[Int])).toIndexedSeq
         assert(ps.map(_.waitqLength).sum == 0)
         val f = Future.selectIndex(ps)
         val i = Random.nextInt(ps.length)
@@ -1886,14 +1895,14 @@ class FutureTest
 
     "not accumulate listeners if not selected" in {
       forAll(genLen, arbitrary[Boolean]) { (n, fail) =>
-        val ps = ((0 until n) map (_ => new Promise[Int])).toIndexedSeq
+        val ps = (((0 until n)).map(_ => new Promise[Int])).toIndexedSeq
         assert(ps.map(_.waitqLength).sum == 0)
         val f = Future.selectIndex(ps)
         assert(ps.map(_.waitqLength).sum == n)
         val i = Random.nextInt(ps.length)
         val e = new Exception("sad panda")
         val t = if (fail) Throw(e) else Return(i)
-        f respond { _ =>
+        f.respond { _ =>
           ()
         }
         assert(ps.map(_.waitqLength).sum == n)

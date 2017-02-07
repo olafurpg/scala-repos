@@ -40,7 +40,7 @@ case class AppUpdate(id: Option[PathId] = None,
   require(version.isEmpty || onlyVersionOrIdSet,
           "The 'version' field may only be combined with the 'id' field.")
 
-  protected[api] def onlyVersionOrIdSet: Boolean = productIterator forall {
+  protected[api] def onlyVersionOrIdSet: Boolean = productIterator.forall {
     case x @ Some(_) => x == version || x == id
     case _ => true
   }
@@ -95,14 +95,15 @@ case class AppUpdate(id: Option[PathId] = None,
 
 object AppUpdate {
   implicit val appUpdateValidator = validator[AppUpdate] { appUp =>
-    appUp.id is valid
-    appUp.dependencies is valid
-    appUp.upgradeStrategy is valid
-    appUp.storeUrls is optional(every(urlCanBeResolvedValidator))
-    appUp.portDefinitions is optional(PortDefinitions.portDefinitionsValidator)
-    appUp.fetch is optional(every(fetchUriIsValid))
-    appUp.container.each is valid
-    appUp.residency is valid
+    appUp.id.is(valid)
+    appUp.dependencies.is(valid)
+    appUp.upgradeStrategy.is(valid)
+    appUp.storeUrls.is(optional(every(urlCanBeResolvedValidator)))
+    appUp.portDefinitions.is(
+      optional(PortDefinitions.portDefinitionsValidator))
+    appUp.fetch.is(optional(every(fetchUriIsValid)))
+    appUp.container.each.is(valid)
+    appUp.residency.is(valid)
     appUp.mem should optional(be >= 0.0)
     appUp.cpus should optional(be >= 0.0)
     appUp.instances should optional(be >= 0)

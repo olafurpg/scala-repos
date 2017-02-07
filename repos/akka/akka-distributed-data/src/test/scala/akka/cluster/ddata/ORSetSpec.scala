@@ -114,13 +114,13 @@ class ORSetSpec extends WordSpec with Matchers {
       c2.elements should contain(user4)
 
       // merge both ways
-      val merged1 = c1 merge c2
+      val merged1 = c1.merge(c2)
       merged1.elements should contain(user1)
       merged1.elements should contain(user2)
       merged1.elements should not contain (user3)
       merged1.elements should contain(user4)
 
-      val merged2 = c2 merge c1
+      val merged2 = c2.merge(c1)
       merged2.elements should contain(user1)
       merged2.elements should contain(user2)
       merged2.elements should not contain (user3)
@@ -154,13 +154,13 @@ class ORSetSpec extends WordSpec with Matchers {
       c2.elements should contain(user4)
 
       // merge both ways
-      val merged1 = c1 merge c2
+      val merged1 = c1.merge(c2)
       merged1.elements should contain(user1)
       merged1.elements should contain(user2)
       merged1.elements should not contain (user3)
       merged1.elements should contain(user4)
 
-      val merged2 = c2 merge c1
+      val merged2 = c2.merge(c1)
       merged2.elements should contain(user1)
       merged2.elements should contain(user2)
       merged2.elements should not contain (user3)
@@ -181,12 +181,12 @@ class ORSetSpec extends WordSpec with Matchers {
       c2.elements should not contain (user3)
 
       // merge both ways
-      val merged1 = c1 merge c2
+      val merged1 = c1.merge(c2)
       merged1.elements should contain(user1)
       merged1.elements should not contain (user2)
       merged1.elements should not contain (user3)
 
-      val merged2 = c2 merge c1
+      val merged2 = c2.merge(c1)
       merged2.elements should contain(user1)
       merged2.elements should not contain (user2)
       merged2.elements should not contain (user3)
@@ -194,13 +194,13 @@ class ORSetSpec extends WordSpec with Matchers {
       val c3 = c1.add(node1, user4).remove(node1, user3).add(node1, user2)
 
       // merge both ways
-      val merged3 = c2 merge c3
+      val merged3 = c2.merge(c3)
       merged3.elements should contain(user1)
       merged3.elements should contain(user2)
       merged3.elements should not contain (user3)
       merged3.elements should contain(user4)
 
-      val merged4 = c3 merge c2
+      val merged4 = c3.merge(c2)
       merged4.elements should contain(user1)
       merged4.elements should contain(user2)
       merged4.elements should not contain (user3)
@@ -212,23 +212,23 @@ class ORSetSpec extends WordSpec with Matchers {
       val c2 = c1.remove(node2, user2)
 
       // merge both ways
-      val merged1 = c1 merge c2
+      val merged1 = c1.merge(c2)
       merged1.elements should contain(user1)
       merged1.elements should not contain (user2)
 
-      val merged2 = c2 merge c1
+      val merged2 = c2.merge(c1)
       merged2.elements should contain(user1)
       merged2.elements should not contain (user2)
 
       val c3 = c1.add(node1, user3)
 
       // merge both ways
-      val merged3 = c3 merge c2
+      val merged3 = c3.merge(c2)
       merged3.elements should contain(user1)
       merged3.elements should not contain (user2)
       merged3.elements should contain(user3)
 
-      val merged4 = c2 merge c3
+      val merged4 = c2.merge(c3)
       merged4.elements should contain(user1)
       merged4.elements should not contain (user2)
       merged4.elements should contain(user3)

@@ -50,8 +50,8 @@ final class TriangularArray[T: ClassTag](val dimension: Int)
     def iterator = Iterator.range(r, dimension).map(apply _)
   }
 
-  def iterator = Iterator.range(0, numElems) map slice
-  def foreach(f: T => Unit) { data foreach f }
+  def iterator = Iterator.range(0, numElems).map(slice)
+  def foreach(f: T => Unit) { data.foreach(f) }
 
   def map[U: ClassTag](f: T => U) =
     tabulate(dimension)((i, j) => f(apply(i, j)))

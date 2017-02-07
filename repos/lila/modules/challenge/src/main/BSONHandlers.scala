@@ -36,9 +36,10 @@ private object BSONHandlers {
     def reads(r: Reader) =
       (r.intO("l") |@| r.intO("i")) {
         case (limit, inc) => TimeControl.Clock(limit, inc)
-      } orElse {
-        r intO "d" map TimeControl.Correspondence.apply
-      } getOrElse TimeControl.Unlimited
+      }.orElse {
+          (r intO "d").map(TimeControl.Correspondence.apply)
+        }
+        .getOrElse(TimeControl.Unlimited)
     def writes(w: Writer, t: TimeControl) = t match {
       case TimeControl.Clock(l, i) => BSONDocument("l" -> l, "i" -> i)
       case TimeControl.Correspondence(d) => BSONDocument("d" -> d)
@@ -47,12 +48,12 @@ private object BSONHandlers {
   }
   implicit val VariantBSONHandler = new BSONHandler[BSONInteger, Variant] {
     def read(b: BSONInteger): Variant =
-      Variant(b.value) err s"No such variant: ${b.value}"
+      Variant(b.value).err(s"No such variant: ${b.value}")
     def write(x: Variant) = BSONInteger(x.id)
   }
   implicit val StatusBSONHandler = new BSONHandler[BSONInteger, Status] {
     def read(b: BSONInteger): Status =
-      Status(b.value) err s"No such status: ${b.value}"
+      Status(b.value).err(s"No such status: ${b.value}")
     def write(x: Status) = BSONInteger(x.id)
   }
   implicit val ModeBSONHandler = new BSONHandler[BSONBoolean, Mode] {
@@ -75,8 +76,8 @@ private object BSONHandlers {
   }
   implicit val EitherChallengerBSONHandler = new BSON[EitherChallenger] {
     def reads(r: Reader) =
-      if (r contains "id") Right(RegisteredBSONHandler reads r)
-      else Left(AnonymousBSONHandler reads r)
+      if (r contains "id") Right(RegisteredBSONHandler.reads(r))
+      else Left(AnonymousBSONHandler.reads(r))
     def writes(w: Writer, c: EitherChallenger) =
       c.fold(a => AnonymousBSONHandler.writes(w, a),
              r => RegisteredBSONHandler.writes(w, r))

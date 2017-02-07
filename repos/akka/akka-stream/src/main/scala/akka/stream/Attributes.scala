@@ -73,7 +73,7 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
     */
   def getFirstAttribute[T <: Attribute](c: Class[T]): Optional[T] =
     attributeList.collectFirst {
-      case attr if c.isInstance(attr) => c cast attr
+      case attr if c.isInstance(attr) => c.cast(attr)
     }.asJava
 
   /**
@@ -254,7 +254,7 @@ object Attributes {
   def extractName(mod: Module, default: String): String = {
     mod match {
       case CopiedModule(_, attr, copyOf) ⇒
-        (attr and copyOf.attributes).nameOrDefault(default)
+        (attr.and(copyOf.attributes)).nameOrDefault(default)
       case _ ⇒ mod.attributes.nameOrDefault(default)
     }
   }

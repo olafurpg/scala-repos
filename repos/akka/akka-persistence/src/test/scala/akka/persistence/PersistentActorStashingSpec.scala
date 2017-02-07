@@ -41,7 +41,7 @@ object PersistentActorStashingSpec {
     var stashed = false
 
     val receiveCommand: Receive =
-      unstashBehavior orElse {
+      unstashBehavior.orElse {
         case Cmd("a") if !stashed ⇒ stash(); stashed = true
         case Cmd("a") ⇒ sender() ! "a"
         case Cmd("b") ⇒ persist(Evt("b"))(evt ⇒ sender() ! evt.data)
@@ -65,7 +65,7 @@ object PersistentActorStashingSpec {
   class UserStashManyPersistentActor(name: String)
       extends StashExamplePersistentActor(name) {
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd("a") ⇒
           persist(Evt("a")) { evt ⇒
             updateState(evt)
@@ -76,7 +76,7 @@ object PersistentActorStashingSpec {
       }
 
     val processC: Receive =
-      unstashBehavior orElse {
+      unstashBehavior.orElse {
         case other ⇒ stash()
       }
 
@@ -102,7 +102,7 @@ object PersistentActorStashingSpec {
   class UserStashFailurePersistentActor(name: String)
       extends StashExamplePersistentActor(name) {
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior.orElse {
         case Cmd(data) ⇒
           if (data == "b-2") throw new TestException("boom")
           persist(Evt(data)) { evt ⇒
@@ -112,7 +112,7 @@ object PersistentActorStashingSpec {
       }
 
     val otherCommandHandler: Receive =
-      unstashBehavior orElse {
+      unstashBehavior.orElse {
         case other ⇒ stash()
       }
 
@@ -143,7 +143,7 @@ object PersistentActorStashingSpec {
     var stashed = false
 
     val receiveCommand: Receive =
-      commonBehavior orElse unstashBehavior orElse {
+      commonBehavior.orElse(unstashBehavior).orElse {
         case Cmd("a") ⇒ persistAsync(Evt("a"))(updateState)
         case Cmd("b") if !stashed ⇒ stash(); stashed = true
         case Cmd("b") ⇒ persistAsync(Evt("b"))(updateState)
@@ -187,10 +187,10 @@ abstract class PersistentActorStashingSpec(config: Config)
       val persistentActor = namedPersistentActor[T]
       val n = 10
       val cmds =
-        1 to n flatMap (_ ⇒ List(Cmd("a"), Cmd("b-1"), Cmd("b-2"), Cmd("c")))
-      val evts = 1 to n flatMap (_ ⇒ List("a", "c", "b-1", "b-2"))
+        (1 to n).flatMap(_ ⇒ List(Cmd("a"), Cmd("b-1"), Cmd("b-2"), Cmd("c")))
+      val evts = (1 to n).flatMap(_ ⇒ List("a", "c", "b-1", "b-2"))
 
-      cmds foreach (persistentActor ! _)
+      cmds.foreach(persistentActor ! _)
       persistentActor ! GetState
       expectMsg(evts)
     }
@@ -199,9 +199,9 @@ abstract class PersistentActorStashingSpec(config: Config)
   def stashUnderFailures[T <: NamedPersistentActor: ClassTag](): Unit = {
     "support user stash operations under failures" in {
       val persistentActor = namedPersistentActor[T]
-      val bs = 1 to 10 map ("b-" + _)
+      val bs = (1 to 10).map("b-" + _)
       persistentActor ! Cmd("a")
-      bs foreach (persistentActor ! Cmd(_))
+      bs.foreach(persistentActor ! Cmd(_))
       persistentActor ! Cmd("c")
       persistentActor ! GetState
       expectMsg(List("a", "c") ++ bs.filter(_ != "b-2"))
@@ -209,17 +209,18 @@ abstract class PersistentActorStashingSpec(config: Config)
   }
 
   "Stashing in a persistent actor" must {
-    behave like stash[UserStashPersistentActor]()
-    behave like stashWithSeveralMessages[UserStashManyPersistentActor]()
-    behave like stashUnderFailures[UserStashFailurePersistentActor]()
+    behave.like(stash[UserStashPersistentActor]())
+    behave.like(stashWithSeveralMessages[UserStashManyPersistentActor]())
+    behave.like(stashUnderFailures[UserStashFailurePersistentActor]())
   }
 
   "Stashing(unstashAll called in handler) in a persistent actor" must {
-    behave like stash[UserStashWithinHandlerPersistentActor]()
-    behave like stashWithSeveralMessages[
-      UserStashWithinHandlerManyPersistentActor]()
-    behave like stashUnderFailures[
-      UserStashWithinHandlerFailureCallbackPersistentActor]()
+    behave.like(stash[UserStashWithinHandlerPersistentActor]())
+    behave.like(
+      stashWithSeveralMessages[UserStashWithinHandlerManyPersistentActor]())
+    behave.like(
+      stashUnderFailures[
+        UserStashWithinHandlerFailureCallbackPersistentActor]())
   }
 }
 
@@ -263,11 +264,11 @@ class SteppingInMemPersistentActorStashingSpec
   }
 
   "Stashing in a persistent actor mixed with persistAsync" must {
-    behave like stash[AsyncStashingPersistentActor]()
+    behave.like(stash[AsyncStashingPersistentActor]())
   }
 
   "Stashing(unstashAll called in handler) in a persistent actor mixed with persistAsync" must {
-    behave like stash[AsyncStashingWithinHandlerPersistentActor]()
+    behave.like(stash[AsyncStashingWithinHandlerPersistentActor]())
   }
 }
 

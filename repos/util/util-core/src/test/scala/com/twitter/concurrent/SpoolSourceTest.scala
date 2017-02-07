@@ -24,7 +24,7 @@ class SpoolSourceTest extends WordSpec {
       source.close()
       source.offer(4)
       source.offer(5)
-      assert(Await.result(futureSpool flatMap (_.toSeq)) == Seq(1, 2, 3))
+      assert(Await.result(futureSpool.flatMap(_.toSeq)) == Seq(1, 2, 3))
     }
 
     "add values to the spool, ignoring values after offerAndClose" in {
@@ -37,7 +37,7 @@ class SpoolSourceTest extends WordSpec {
       source.offerAndClose(3)
       source.offer(4)
       source.offer(5)
-      assert(Await.result(futureSpool flatMap (_.toSeq)) == Seq(1, 2, 3))
+      assert(Await.result(futureSpool.flatMap(_.toSeq)) == Seq(1, 2, 3))
       assert(Await.result(source.closed.liftToTry) == Return(()))
     }
 
@@ -53,9 +53,9 @@ class SpoolSourceTest extends WordSpec {
       source.offer(3)
       val futureSpool4 = source()
       source.close()
-      assert(Await.result(futureSpool1 flatMap (_.toSeq)) == Seq(1, 2, 3))
-      assert(Await.result(futureSpool2 flatMap (_.toSeq)) == Seq(2, 3))
-      assert(Await.result(futureSpool3 flatMap (_.toSeq)) == Seq(3))
+      assert(Await.result(futureSpool1.flatMap(_.toSeq)) == Seq(1, 2, 3))
+      assert(Await.result(futureSpool2.flatMap(_.toSeq)) == Seq(2, 3))
+      assert(Await.result(futureSpool3.flatMap(_.toSeq)) == Seq(3))
       assert(Await.result(futureSpool4).isEmpty == true)
     }
 
@@ -69,7 +69,7 @@ class SpoolSourceTest extends WordSpec {
       val futureSpool2 = source()
       source.offer(1)
       intercept[Exception] {
-        Await.result(futureSpool1 flatMap (_.toSeq))
+        Await.result(futureSpool1.flatMap(_.toSeq))
       }
       assert(Await.result(futureSpool2).isEmpty == true)
     }
@@ -107,7 +107,7 @@ class SpoolSourceTest extends WordSpec {
       d.raise(new Exception("sad panda 3"))
       assert(fired.get() == 3)
 
-      assert(Await.result(a flatMap (_.toSeq)) == Seq(1, 2, 3))
+      assert(Await.result(a.flatMap(_.toSeq)) == Seq(1, 2, 3))
     }
   }
 }

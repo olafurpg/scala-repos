@@ -3,7 +3,7 @@ package lila.simul
 private[simul] sealed abstract class SimulStatus(val id: Int)
     extends Ordered[SimulStatus] {
 
-  def compare(other: SimulStatus) = id compare other.id
+  def compare(other: SimulStatus) = id.compare(other.id)
 
   def name = toString
 
@@ -19,9 +19,9 @@ private[simul] object SimulStatus {
 
   val all = List(Created, Started, Finished)
 
-  val byId = all map { v =>
+  val byId = all.map { v =>
     (v.id, v)
   } toMap
 
-  def apply(id: Int): Option[SimulStatus] = byId get id
+  def apply(id: Int): Option[SimulStatus] = byId.get(id)
 }

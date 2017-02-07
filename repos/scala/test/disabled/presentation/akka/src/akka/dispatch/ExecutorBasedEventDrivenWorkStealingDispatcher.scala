@@ -121,7 +121,7 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
         attemptDonationOf(invocation, mbox)) {
       //We were busy and we got to donate the message to some other lucky guy, we're done here
     } else {
-      mbox enqueue invocation
+      mbox.enqueue(invocation)
       registerForExecution(mbox)
     }
   }

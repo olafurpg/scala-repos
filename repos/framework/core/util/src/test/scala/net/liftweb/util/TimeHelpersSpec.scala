@@ -40,7 +40,7 @@ object TimeHelpersSpec
     with NoTimeConversions {
   "TimeHelpers Specification".title
 
-  "A TimeSpan" can {
+  "A TimeSpan".can {
     "be created from a number of milliseconds" in forAllTimeZones {
       TimeSpan(3000) must_== TimeSpan(3 * 1000)
     }
@@ -111,7 +111,7 @@ object TimeHelpersSpec
     "have a toString method returning the relevant number of weeks, days, hours, minutes, seconds, millis" in forAllTimeZones {
       val conversionIsOk = forAll(timeAmounts)((t: TimeAmounts) => {
         val (timeSpanToString, timeSpanAmounts) = t
-        timeSpanAmounts forall {
+        timeSpanAmounts.forall {
           case (amount, unit) =>
             amount >= 1 && timeSpanToString.contains(amount.toString) || true
         }
@@ -119,7 +119,7 @@ object TimeHelpersSpec
       val timeSpanStringIsPluralized =
         forAll(timeAmounts)((t: TimeAmounts) => {
           val (timeSpanToString, timeSpanAmounts) = t
-          timeSpanAmounts forall {
+          timeSpanAmounts.forall {
             case (amount, unit) =>
               amount > 1 && timeSpanToString.contains(unit + "s") ||
                 amount == 1 && timeSpanToString.contains(unit) ||
@@ -221,10 +221,10 @@ object TimeHelpersSpec
     }
     "provide a toDate returning a Full(date) from many kinds of objects" in forAllTimeZones {
       val d = now
-      List(null, Nil, None, Failure("", Empty, Empty)) forall {
+      List(null, Nil, None, Failure("", Empty, Empty)).forall {
         toDate(_) must_== Empty
       }
-      List(Full(d), Some(d), List(d)) forall { toDate(_) must_== Full(d) }
+      List(Full(d), Some(d), List(d)).forall { toDate(_) must_== Full(d) }
 
       toDate(internetDateFormatter.format(d)) must beLike {
         case Full(converted) =>

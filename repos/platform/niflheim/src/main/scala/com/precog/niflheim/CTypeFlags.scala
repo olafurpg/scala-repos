@@ -99,10 +99,10 @@ object CTypeFlags {
         case FDouble => Success(CDouble)
         case FBigDecimal => Success(CNum)
         case FDate => Success(CDate)
-        case FArray => readCValueType(buffer.get()) map (CArrayType(_))
+        case FArray => readCValueType(buffer.get()).map(CArrayType(_))
         case flag =>
           Failure(
-            new IOException("Unexpected segment type flag: %x" format flag))
+            new IOException("Unexpected segment type flag: %x".format(flag)))
       }
 
     buffer.get() match {

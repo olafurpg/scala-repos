@@ -42,21 +42,21 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
       owner: Symbol,
       name: TypeName,
       completer: (Symbol, Symbol) => LazyType) = {
-    assert(!(name.toString endsWith "[]"), name)
+    assert(!(name.toString.endsWith("[]")), name)
     val clazz = owner.newClass(name)
     val module = owner.newModule(name.toTermName)
     // without this check test/files/run/t5256g and test/files/run/t5256h will crash
     // todo. reflection meeting verdict: need to enter the symbols into the first symbol in the owner chain that has a non-empty scope
     if (owner.info.decls != EmptyScope) {
-      owner.info.decls enter clazz
-      owner.info.decls enter module
+      owner.info.decls.enter(clazz)
+      owner.info.decls.enter(module)
     }
     initClassAndModule(clazz, module, completer(clazz, module))
     (clazz, module)
   }
 
   protected def setAllInfos(clazz: Symbol, module: Symbol, info: Type) = {
-    List(clazz, module, module.moduleClass) foreach (_ setInfo info)
+    List(clazz, module, module.moduleClass).foreach(_.setInfo(info))
   }
 
   protected def initClassAndModule(clazz: Symbol,
@@ -73,7 +73,7 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
       // creates a module symbol and invokes invokes `companionModule` while the `infos` field is
       // still null. This calls `isModuleNotMethod`, which forces the `info` if run after refchecks.
       slowButSafeEnteringPhaseNotLaterThan(picklerPhase) {
-        sym setInfo new ClassInfoType(List(), new PackageScope(sym), sym)
+        sym.setInfo(new ClassInfoType(List(), new PackageScope(sym), sym))
         // override def safeToString = pkgClass.toString
         openPackageModule(sym)
         markAllCompleted(sym)
@@ -147,8 +147,8 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
               } else {
                 val origOwner =
                   loadingMirror.packageNameToScala(pkgClass.fullName)
-                val clazz = origOwner.info decl name.toTypeName
-                val module = origOwner.info decl name.toTermName
+                val clazz = origOwner.info.decl(name.toTypeName)
+                val module = origOwner.info.decl(name.toTermName)
                 assert(clazz != NoSymbol)
                 assert(module != NoSymbol)
                 // currentMirror.mirrorDefining(cls) might side effect by entering symbols into pkgClass.info.decls

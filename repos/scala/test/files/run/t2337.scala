@@ -2,9 +2,9 @@ object Test {
 
   def compare(first: Any, second: Any): Any = {
     (first, second) match {
-      case (k: Int, o: Int) => k compare o
+      case (k: Int, o: Int) => k.compare(o)
       //why the next case matches (Float, Int) but does not match (Int, Float) ???
-      case (k: Number, o: Number) => k.doubleValue() compare o.doubleValue()
+      case (k: Number, o: Number) => k.doubleValue().compare(o.doubleValue())
       case _ => "BOGON"
       // throw new Exception("Unsupported compare " + first + "; " + second)
     }

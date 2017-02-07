@@ -11,9 +11,9 @@ final class Env(config: Config,
 
   private val PrismicApiUrl = config getString "prismic.api_url"
   private val PrismicCollection = config getString "prismic.collection"
-  private val NotifyDelay = config duration "notify.delay"
+  private val NotifyDelay = config.duration("notify.delay")
   private val NotifySender = config getString "notify.sender"
-  private val LastPostCacheTtl = config duration "last_post_cache.ttl"
+  private val LastPostCacheTtl = config.duration("last_post_cache.ttl")
 
   val RssEmail = config getString "rss.email"
 
@@ -44,7 +44,8 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "blog" boot new Env(config = lila.common.PlayApp loadConfig "blog",
-                        scheduler = lila.common.PlayApp.scheduler,
-                        messageApi = lila.message.Env.current.api)
+    "blog".boot(
+      new Env(config = lila.common.PlayApp.loadConfig("blog"),
+              scheduler = lila.common.PlayApp.scheduler,
+              messageApi = lila.message.Env.current.api))
 }

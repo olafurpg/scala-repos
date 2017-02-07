@@ -59,11 +59,11 @@ abstract class ForwardingWarmUpFilter[Req, Rep](
       } else {
         val r = rng.nextFloat()
         if (percentWarm > r) {
-          Stat.timeFuture(localLatency)(service(request)) onFailure { _ =>
+          Stat.timeFuture(localLatency)(service(request)).onFailure { _ =>
             localFailureCounter.incr()
           }
         } else {
-          Stat.timeFuture(forwardLatency)(forwardTo(request)) onFailure { _ =>
+          Stat.timeFuture(forwardLatency)(forwardTo(request)).onFailure { _ =>
             forwardFailureCounter.incr()
           }
         }

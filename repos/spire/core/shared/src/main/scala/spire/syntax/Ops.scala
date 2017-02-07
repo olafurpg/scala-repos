@@ -79,11 +79,11 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
     macro Ops.binopWithLift[Int, Field[A], A]
 
   def compare(rhs: Number)(implicit c: ConvertableFrom[A]): Int =
-    c.toNumber(lhs) compare rhs
+    c.toNumber(lhs).compare(rhs)
   def min(rhs: Number)(implicit c: ConvertableFrom[A]): Number =
     c.toNumber(lhs) min rhs
   def max(rhs: Number)(implicit c: ConvertableFrom[A]): Number =
-    c.toNumber(lhs) max rhs
+    c.toNumber(lhs).max(rhs)
 }
 
 final class LiteralIntOrderOps(val lhs: Int) extends AnyVal {
@@ -377,7 +377,7 @@ final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
     ev.fpow(lhs, c.fromDouble(rhs))
 
   def pow(rhs: Number)(implicit c: ConvertableFrom[A]): Number =
-    c.toNumber(lhs) pow rhs
+    c.toNumber(lhs).pow(rhs)
   def **(rhs: Number)(implicit c: ConvertableFrom[A]): Number =
     c.toNumber(lhs) ** rhs
 }

@@ -105,7 +105,7 @@ class JDBCLEvents(client: String,
 
   def futureInsert(event: Event, appId: Int, channelId: Option[Int])(
       implicit ec: ExecutionContext): Future[String] = Future {
-    DB localTx { implicit session =>
+    DB.localTx { implicit session =>
       val id = event.eventId.getOrElse(JDBCUtils.generateId)
       val tableName = sqls.createUnsafely(
         JDBCUtils.eventTableName(namespace, appId, channelId))
@@ -132,7 +132,7 @@ class JDBCLEvents(client: String,
 
   def futureGet(eventId: String, appId: Int, channelId: Option[Int])(
       implicit ec: ExecutionContext): Future[Option[Event]] = Future {
-    DB readOnly { implicit session =>
+    DB.readOnly { implicit session =>
       val tableName = sqls.createUnsafely(
         JDBCUtils.eventTableName(namespace, appId, channelId))
       sql"""
@@ -158,7 +158,7 @@ class JDBCLEvents(client: String,
 
   def futureDelete(eventId: String, appId: Int, channelId: Option[Int])(
       implicit ec: ExecutionContext): Future[Boolean] = Future {
-    DB localTx { implicit session =>
+    DB.localTx { implicit session =>
       val tableName = sqls.createUnsafely(
         JDBCUtils.eventTableName(namespace, appId, channelId))
       sql"""
@@ -181,7 +181,7 @@ class JDBCLEvents(client: String,
       limit: Option[Int] = None,
       reversed: Option[Boolean] = None
   )(implicit ec: ExecutionContext): Future[Iterator[Event]] = Future {
-    DB readOnly { implicit session =>
+    DB.readOnly { implicit session =>
       val tableName = sqls.createUnsafely(
         JDBCUtils.eventTableName(namespace, appId, channelId))
       val whereClause =

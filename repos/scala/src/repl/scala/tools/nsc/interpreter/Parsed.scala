@@ -20,7 +20,7 @@ trait Delimited { self: Parsed =>
     else
       (s indexWhere isDelimiterChar) match {
         case -1 => List(s)
-        case idx => (s take idx) :: toArgs(s drop (idx + 1))
+        case idx => (s.take(idx)) :: toArgs(s.drop(idx + 1))
       }
 
   def isDelimiterChar(ch: Char) = delimited(ch)
@@ -44,13 +44,14 @@ class Parsed private (
   def withVerbosity(v: Int): this.type =
     returning[this.type](this)(_ => _verbosity = v)
 
-  def args = toArgs(buffer take cursor).toList
+  def args = toArgs(buffer.take(cursor)).toList
   def bufferHead = args.head
   def headLength = bufferHead.length + 1
   def bufferTail =
-    new Parsed(buffer drop headLength, cursor - headLength, delimited) withVerbosity verbosity
+    new Parsed(buffer.drop(headLength), cursor - headLength, delimited)
+      .withVerbosity(verbosity)
 
-  def prev = new Parsed(buffer, cursor - 1, delimited) withVerbosity verbosity
+  def prev = new Parsed(buffer, cursor - 1, delimited).withVerbosity(verbosity)
   def currentChar = buffer(cursor)
   def currentArg = args.last
   def position =

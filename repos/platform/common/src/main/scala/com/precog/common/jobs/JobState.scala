@@ -59,12 +59,12 @@ object JobState extends JobStateSerialization {
 
   def describe(state: JobState): String = state match {
     case NotStarted => "The job has not yet been started."
-    case Started(started, _) => "The job was started at %s." format started
+    case Started(started, _) => "The job was started at %s.".format(started)
     case Cancelled(reason, _, _) =>
-      "The job has been cancelled due to '%s'." format reason
+      "The job has been cancelled due to '%s'.".format(reason)
     case Aborted(reason, _, _) =>
-      "The job was aborted early due to '%s'." format reason
-    case Expired(expiration, _) => "The job expired at %s." format expiration
+      "The job was aborted early due to '%s'.".format(reason)
+    case Expired(expiration, _) => "The job expired at %s.".format(expiration)
     case Finished(_, _) => "The job has finished successfully."
   }
 }
@@ -84,7 +84,7 @@ trait JobStateSerialization {
         jfield("state", state) :: jfield("timestamp", timestamp) :: jfield(
           "previous",
           decompose(previous)) ::
-          (reason map { jfield("reason", _) :: Nil } getOrElse Nil)
+          (reason.map { jfield("reason", _) :: Nil }.getOrElse(Nil))
       )
     }
 
@@ -116,12 +116,12 @@ trait JobStateSerialization {
     }
 
     override def validated(obj: JValue) = {
-      (obj \ "state").validated[String] flatMap {
+      (obj \ "state").validated[String].flatMap {
         case "not_started" =>
           success[Error, JobState](NotStarted)
 
         case "started" =>
-          extractBase(obj) map (Started(_, _)).tupled
+          extractBase(obj).map(Started(_, _)).tupled
 
         case "cancelled" =>
           ((obj \ "reason").validated[String] |@| extractBase(obj)) {
@@ -136,10 +136,10 @@ trait JobStateSerialization {
           }
 
         case "expired" =>
-          extractBase(obj) map (Expired(_, _)).tupled
+          extractBase(obj).map(Expired(_, _)).tupled
 
         case "finished" =>
-          extractBase(obj) flatMap {
+          extractBase(obj).flatMap {
             case (timestamp, previous) =>
               success(Finished(timestamp, previous))
           }

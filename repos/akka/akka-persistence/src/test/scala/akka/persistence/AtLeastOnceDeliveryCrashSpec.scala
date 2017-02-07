@@ -22,7 +22,7 @@ object AtLeastOnceDeliveryCrashSpec {
     val crashingActor =
       context.actorOf(Props(new CrashingActor(testProbe)), "CrashingActor")
 
-    def receive: Receive = { case msg ⇒ crashingActor forward msg }
+    def receive: Receive = { case msg ⇒ crashingActor.forward(msg) }
   }
 
   object CrashingActor {

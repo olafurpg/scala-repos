@@ -14,7 +14,7 @@ class OptionallyServableFilter[Req, Rep](f: Req => Future[Boolean])
   private[this] val notServableException = new NotServableException
 
   def apply(req: Req, service: Service[Req, Rep]) = {
-    f(req) flatMap {
+    f(req).flatMap {
       case true => service(req)
       case false => Future.exception(notServableException)
     }

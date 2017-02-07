@@ -39,8 +39,8 @@ package object reify {
       // If we're in the constructor of an object or others don't have easy access to `this`, we have no good way to grab
       // the class of that object.  Instead, we construct an anonymous class and grab his class file, assuming
       // this is enough to get the correct class loadeer for the class we *want* a mirror for, the object itself.
-      rClassTree orElse Apply(Select(gen.mkAnonymousNew(Nil), sn.GetClass),
-                              Nil)
+      rClassTree.orElse(
+        Apply(Select(gen.mkAnonymousNew(Nil), sn.GetClass), Nil))
     }
     // JavaUniverse is defined in scala-reflect.jar, so we must be very careful in case someone reifies stuff having only scala-library.jar on the classpath
     val isJavaUniverse =
@@ -112,20 +112,19 @@ package object reify {
       typer0: global.analyzer.Typer): global.Tree = {
     import global._
     def isThisInScope =
-      typer0.context.enclosingContextChain exists
-        (_.tree.isInstanceOf[ImplDef])
+      typer0.context.enclosingContextChain.exists(_.tree.isInstanceOf[ImplDef])
     if (isThisInScope) {
       val enclosingClasses =
-        typer0.context.enclosingContextChain map (_.tree) collect {
+        typer0.context.enclosingContextChain.map(_.tree).collect {
           case classDef: ClassDef => classDef
         }
-      val classInScope = enclosingClasses.headOption getOrElse EmptyTree
+      val classInScope = enclosingClasses.headOption.getOrElse(EmptyTree)
       def isUnsafeToUseThis = {
         val isInsideConstructorSuper =
-          typer0.context.enclosingContextChain exists (_.inSelfSuperCall)
+          typer0.context.enclosingContextChain.exists(_.inSelfSuperCall)
         // Note: It's ok to check for any object here, because if we were in an enclosing class, we'd already have returned its classOf
         val isInsideObject =
-          typer0.context.enclosingContextChain map (_.tree) exists {
+          typer0.context.enclosingContextChain.map(_.tree).exists {
             case _: ModuleDef => true; case _ => false
           }
         isInsideConstructorSuper && isInsideObject

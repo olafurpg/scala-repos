@@ -89,7 +89,7 @@ object TestActorRefSpec {
   }
 
   class ReceiveTimeoutActor(target: ActorRef) extends Actor {
-    context setReceiveTimeout 1.second
+    context.setReceiveTimeout(1.second)
     def receive = {
       case ReceiveTimeout ⇒
         target ! "timeout"
@@ -115,7 +115,7 @@ class TestActorRefSpec
   override def beforeEach(): Unit = otherthread = null
 
   private def assertThread(): Unit =
-    otherthread should (be(null) or equal(thread))
+    otherthread should (be(null).or(equal(thread)))
 
   "A TestActorRef should be an ActorRef, hence it" must {
 
@@ -179,8 +179,8 @@ class TestActorRefSpec
         val forwarder = system.actorOf(Props(new Actor {
           context.watch(a)
           def receive = {
-            case t: Terminated ⇒ testActor forward WrappedTerminated(t)
-            case x ⇒ testActor forward x
+            case t: Terminated ⇒ testActor.forward(WrappedTerminated(t))
+            case x ⇒ testActor.forward(x)
           }
         }))
         a.!(PoisonPill)(testActor)
@@ -254,7 +254,8 @@ class TestActorRefSpec
 
     "set receiveTimeout to None" in {
       val a = TestActorRef[WorkerActor]
-      a.underlyingActor.context.receiveTimeout should be theSameInstanceAs Duration.Undefined
+      (a.underlyingActor.context.receiveTimeout should be)
+        .theSameInstanceAs(Duration.Undefined)
     }
 
     "set CallingThreadDispatcher" in {

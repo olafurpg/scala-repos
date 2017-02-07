@@ -30,9 +30,9 @@ final class DataSet[V, @sp(Double) F, @sp(Double) K](
     }
 
     val vars =
-      variables.zipWithIndex map {
+      variables.zipWithIndex.map {
         case (v, i) =>
-          s"    %2d. ${v.label} (${varType(v)})" format (i + 1)
+          s"    %2d. ${v.label} (${varType(v)})".format(i + 1)
       } mkString "\n"
 
     s"""$name - ${data.size} points with ${variables.size} variables (${space.dimensions} effective):
@@ -63,21 +63,21 @@ object DataSet {
     : (Int, List[(CC[F], K)]) = {
 
     // Perform our first pass, building the conversion functions.
-    val builders = variables map (_.apply())
-    lines foreach { fields =>
-      builders zip fields foreach {
+    val builders = variables.map(_.apply())
+    lines.foreach { fields =>
+      builders.zip(fields).foreach {
         case (b, s) =>
           b += s
       }
     }
 
     // Perform our second pass, converting strings to variables.
-    val maps = builders map (_.result())
+    val maps = builders.map(_.result())
     val (dimensions, datar) =
       lines.foldLeft((Int.MaxValue, List.empty[(CC[F], K)])) {
         case ((dim, res), fields) =>
           val bldr = cbf()
-          val vd = (maps zip fields).foldLeft(0) {
+          val vd = (maps.zip(fields)).foldLeft(0) {
             case (acc, (f, s)) =>
               val vars = f(s)
               bldr ++= vars
@@ -99,7 +99,7 @@ object DataSet {
 
     val lines = readDataSet(res)
     val (dimensions, data) =
-      fromLines(lines map (_.split(sep).toList), variables, out)(cbf)
+      fromLines(lines.map(_.split(sep).toList), variables, out)(cbf)
     val space = cs(dimensions)
 
     new DataSet[CC[F], F, K](name, variables, space, data)
@@ -207,8 +207,8 @@ object Variable {
         val orderedCategories = categories.toList
 
         { s =>
-          orderedCategories map
-            (cat => if (cat == s) Ring[F].one else Ring[F].zero)
+          orderedCategories.map(cat =>
+            if (cat == s) Ring[F].one else Ring[F].zero)
         }
       }
     }
@@ -268,7 +268,7 @@ object CrossValidation {
         val (removed, right) = right0.splitAt(len)
         val predict = train(dataset.space)(left ++ right)
         val results =
-          removed map {
+          removed.map {
             case (in, out) =>
               Result(in, out, predict(in))
           }

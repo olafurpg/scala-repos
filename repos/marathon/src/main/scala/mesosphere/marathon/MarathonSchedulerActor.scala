@@ -83,7 +83,7 @@ class MarathonSchedulerActor private (
   def suspended: Receive = LoggingReceive.withLabel("suspended") {
     case LocalLeadershipEvent.ElectedAsLeader =>
       log.info("Starting scheduler actor")
-      deploymentRepository.all() onComplete {
+      deploymentRepository.all().onComplete {
         case Success(deployments) => self ! RecoverDeployments(deployments)
         case Failure(_) => self ! RecoverDeployments(Nil)
       }
@@ -108,7 +108,7 @@ class MarathonSchedulerActor private (
   //TODO: fix style issue and enable this scalastyle check
   //scalastyle:off cyclomatic.complexity method.length
   def started: Receive =
-    LoggingReceive.withLabel("started")(sharedHandlers orElse {
+    LoggingReceive.withLabel("started")(sharedHandlers.orElse {
       case LocalLeadershipEvent.Standby =>
         log.info("Suspending scheduler actor")
         healthCheckManager.removeAll()
@@ -157,13 +157,13 @@ class MarathonSchedulerActor private (
           if (origSender != context.system.deadLetters)
             res.sendAnswer(origSender, cmd)
 
-          res andThen {
+          res.andThen {
             case _ => self ! cmd.answer // unlock app
           }
         }
 
       case cmd: CancelDeployment =>
-        deploymentManager forward cmd
+        deploymentManager.forward(cmd)
 
       case cmd @ Deploy(plan, force) =>
         deploy(sender(), cmd)
@@ -180,7 +180,7 @@ class MarathonSchedulerActor private (
             Some(app) <- appRepository.currentVersion(appId)
           } yield schedulerActions.scale(driver, app)
 
-          res onComplete { _ =>
+          res.onComplete { _ =>
             self ! cmd.answer // unlock app
           }
 
@@ -205,7 +205,7 @@ class MarathonSchedulerActor private (
     case TasksKilled(appId, _) => lockedApps -= appId
 
     case RetrieveRunningDeployments =>
-      deploymentManager forward RetrieveRunningDeployments
+      deploymentManager.forward(RetrieveRunningDeployments)
   }
 
   /**
@@ -221,21 +221,23 @@ class MarathonSchedulerActor private (
   def awaitCancellation(plan: DeploymentPlan,
                         origSender: ActorRef,
                         cancellationHandler: Cancellable): Receive =
-    sharedHandlers.andThen[Unit] { _ =>
-      if (tryDeploy(plan, origSender)) {
-        cancellationHandler.cancel()
+    sharedHandlers
+      .andThen[Unit] { _ =>
+        if (tryDeploy(plan, origSender)) {
+          cancellationHandler.cancel()
+        }
       }
-    } orElse {
-      case CancellationTimeoutExceeded =>
-        val reason = new TimeoutException(
-          "Exceeded timeout for canceling conflicting deployments.")
-        deploymentFailed(plan, reason)
-        origSender ! CommandFailed(Deploy(plan, force = true), reason)
-        unstashAll()
-        context.become(started)
+      .orElse {
+        case CancellationTimeoutExceeded =>
+          val reason = new TimeoutException(
+            "Exceeded timeout for canceling conflicting deployments.")
+          deploymentFailed(plan, reason)
+          origSender ! CommandFailed(Deploy(plan, force = true), reason)
+          unstashAll()
+          context.become(started)
 
-      case _ => stash()
-    }
+        case _ => stash()
+      }
 
   /**
     * If all required apps are unlocked, start the deployment,
@@ -424,7 +426,7 @@ object MarathonSchedulerActor {
   implicit class AnswerOps[A](val f: Future[A]) extends AnyVal {
     def sendAnswer(receiver: ActorRef, cmd: Command)(
         implicit ec: ExecutionContext): Future[A] = {
-      f onComplete {
+      f.onComplete {
         case Success(_) =>
           receiver ! cmd.answer
 

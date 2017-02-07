@@ -25,7 +25,7 @@ class HashableTest extends FunSuite with GeneratorDrivenPropertyChecks {
     }
   }
 
-  algorithms foreach { algo =>
+  algorithms.foreach { algo =>
     test(s"$algo hashing algorithm should be consistent") {
       testConsistency(algo)
     }

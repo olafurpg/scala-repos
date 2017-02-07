@@ -177,7 +177,7 @@ private trait IndexedReaderWriterStateTFunctor[F[_], R, W, S1, S2]
 
   override final def map[A, B](
       fa: IndexedReaderWriterStateT[F, R, W, S1, S2, A])(
-      f: A => B): IndexedReaderWriterStateT[F, R, W, S1, S2, B] = fa map f
+      f: A => B): IndexedReaderWriterStateT[F, R, W, S1, S2, B] = fa.map(f)
 }
 
 private trait ReaderWriterStateTBind[F[_], R, W, S]
@@ -188,7 +188,7 @@ private trait ReaderWriterStateTBind[F[_], R, W, S]
 
   override final def bind[A, B](fa: ReaderWriterStateT[F, R, W, S, A])(
       f: A => ReaderWriterStateT[F, R, W, S, B]) =
-    fa flatMap f
+    fa.flatMap(f)
 }
 
 private trait ReaderWriterStateTBindRec[F[_], R, W, S]

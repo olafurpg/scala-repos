@@ -23,24 +23,26 @@ private[stream] class DelayedReleaseService[Req](
     else {
       val p = new Promise[Unit]
       done = p
-      self(req) map { res =>
-        new StreamResponse {
-          def info = res.info
-          def messages = res.messages
-          def error = res.error
-          def release() {
-            p.setDone()
-            res.release()
+      self(req)
+        .map { res =>
+          new StreamResponse {
+            def info = res.info
+            def messages = res.messages
+            def error = res.error
+            def release() {
+              p.setDone()
+              res.release()
+            }
           }
         }
-      } onFailure { _ =>
-        p.setDone()
-      }
+        .onFailure { _ =>
+          p.setDone()
+        }
     }
   }
 
   override def close(deadline: Time) =
-    done ensure { self.close(deadline) }
+    done.ensure { self.close(deadline) }
 }
 
 object Stream {
@@ -90,7 +92,7 @@ class Stream[Req: RequestType] extends CodecFactory[Req, StreamResponse] {
       override def prepareServiceFactory(
           underlying: ServiceFactory[Req, StreamResponse]
       ): ServiceFactory[Req, StreamResponse] =
-        underlying map (new DelayedReleaseService(_))
+        underlying.map(new DelayedReleaseService(_))
 
       // TODO: remove when ChannelTransport is the default for clients.
       override def newClientTransport(

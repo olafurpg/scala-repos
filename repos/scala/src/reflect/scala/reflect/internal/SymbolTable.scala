@@ -78,7 +78,7 @@ abstract class SymbolTable
     if (isDeveloper) Console.err.println(msg)
   def throwableAsString(t: Throwable): String = "" + t
   def throwableAsString(t: Throwable, maxFrames: Int): String =
-    t.getStackTrace take maxFrames mkString "\n  at "
+    t.getStackTrace.take(maxFrames) mkString "\n  at "
 
   @inline final def devWarningDumpStack(msg: => String, maxFrames: Int): Unit =
     devWarning(msg + "\n" + throwableAsString(new Throwable, maxFrames))
@@ -133,7 +133,7 @@ abstract class SymbolTable
 
   @inline final def findSymbol(xs: TraversableOnce[Symbol])(
       p: Symbol => Boolean): Symbol = {
-    xs find p getOrElse NoSymbol
+    (xs find p).getOrElse(NoSymbol)
   }
 
   // For too long have we suffered in order to sort NAMES.
@@ -146,7 +146,7 @@ abstract class SymbolTable
     def compare(n1: Names#Name, n2: Names#Name) =
       (if (n1 eq n2) 0
        else
-         n1.toString compareTo n2.toString)
+         n1.toString.compareTo(n2.toString))
   }
 
   /** Dump each symbol to stdout after shutdown.
@@ -383,7 +383,7 @@ abstract class SymbolTable
 
     def clearAll() = {
       debuglog("Clearing " + caches.size + " caches.")
-      caches foreach (ref => Option(ref.get).foreach(_.clear))
+      caches.foreach(ref => Option(ref.get).foreach(_.clear))
       caches = caches.filterNot(_.get == null)
     }
 

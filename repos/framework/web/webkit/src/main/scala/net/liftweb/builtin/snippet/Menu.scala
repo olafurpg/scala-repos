@@ -98,15 +98,17 @@ object Menu extends DispatchSnippet {
     * </pre>
     */
   def builder(info: NodeSeq): NodeSeq = {
-    val outerTag: String = S.attr("outer_tag") openOr "ul"
-    val innerTag: String = S.attr("inner_tag") openOr "li"
-    val expandAll = (S.attr("expandAll") or S.attr("expandall")).isDefined
+    val outerTag: String = S.attr("outer_tag").openOr("ul")
+    val innerTag: String = S.attr("inner_tag").openOr("li")
+    val expandAll = (S.attr("expandAll").or(S.attr("expandall"))).isDefined
     val linkToSelf: Boolean =
-      (S.attr("linkToSelf") or S.attr("linktoself"))
-        .map(Helpers.toBoolean) openOr false
+      (S.attr("linkToSelf")
+        .or(S.attr("linktoself")))
+        .map(Helpers.toBoolean)
+        .openOr(false)
 
     val expandAny: Boolean =
-      S.attr("expand").map(Helpers.toBoolean) openOr true
+      S.attr("expand").map(Helpers.toBoolean).openOr(true)
 
     val level: Box[Int] = for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs))
       yield i
@@ -270,7 +272,7 @@ object Menu extends DispatchSnippet {
     (if (expandAll)
        for { sm <- LiftRules.siteMap; req <- S.request } yield
          sm.buildMenu(req.location).lines
-     else S.request.map(_.buildMenu.lines)) openOr Nil
+     else S.request.map(_.buildMenu.lines)).openOr(Nil)
 
   def jsonMenu(ignore: NodeSeq): NodeSeq = {
     val toRender = renderWhat(true)
@@ -282,7 +284,7 @@ object Menu extends DispatchSnippet {
           "uri" -> uri.toString,
           "children" -> buildItems(kids),
           "current" -> current,
-          "cssClass" -> Str(in.cssClass openOr ""),
+          "cssClass" -> Str(in.cssClass.openOr("")),
           "placeholder" -> in.placeholder_?,
           "path" -> path
         )
@@ -292,7 +294,7 @@ object Menu extends DispatchSnippet {
       JsArray(in.map(buildItem): _*)
 
     Script(
-      JsCrVar(S.attr("var") openOr "lift_menu",
+      JsCrVar(S.attr("var").openOr("lift_menu"),
               JsObj("menu" -> buildItems(toRender))))
   }
 
@@ -328,23 +330,24 @@ object Menu extends DispatchSnippet {
     text match {
       case TitleText(attrs, str) => {
         r.map { rt =>
-          {
-            val rts = rt.text
-            val idx = str.indexOf("%*%")
-            val bodyStr =
-              if (idx >= 0) {
-                str.substring(0, idx) + rts + str.substring(idx + 3)
-              } else {
-                str + " " + rts
-              }
+            {
+              val rts = rt.text
+              val idx = str.indexOf("%*%")
+              val bodyStr =
+                if (idx >= 0) {
+                  str.substring(0, idx) + rts + str.substring(idx + 3)
+                } else {
+                  str + " " + rts
+                }
 
-            <title>{bodyStr}</title> % attrs
+              <title>{bodyStr}</title> % attrs
+            }
           }
-        } openOr text
+          .openOr(text)
       }
 
       case _ => {
-        r openOr Text("")
+        r.openOr(Text(""))
       }
     }
   }
@@ -411,9 +414,9 @@ object Menu extends DispatchSnippet {
     * }}}
     */
   def group: CssSel = {
-    val repeatedSelector = S.attr("repeatedSelector") openOr "li"
-    val linkSelector = S.attr("linkSelector") openOr "a"
-    val hrefSelector = S.attr("hrefSelector") openOr "[href]"
+    val repeatedSelector = S.attr("repeatedSelector").openOr("li")
+    val linkSelector = S.attr("linkSelector").openOr("a")
+    val hrefSelector = S.attr("hrefSelector").openOr("[href]")
 
     repeatedSelector #> {
       for {
@@ -473,10 +476,12 @@ object Menu extends DispatchSnippet {
     *
     */
   def item(_text: NodeSeq): NodeSeq = {
-    val donthide = S.attr("donthide").map(Helpers.toBoolean) openOr false
+    val donthide = S.attr("donthide").map(Helpers.toBoolean).openOr(false)
     val linkToSelf =
-      (S.attr("linkToSelf") or S.attr("linktoself"))
-        .map(Helpers.toBoolean) openOr false
+      (S.attr("linkToSelf")
+        .or(S.attr("linktoself")))
+        .map(Helpers.toBoolean)
+        .openOr(false)
 
     val text = ("a" #>
       ((n: NodeSeq) =>
@@ -513,7 +518,7 @@ object Menu extends DispatchSnippet {
             Helpers.addCssClass(
               typedLoc.cssClassForMenuItem,
               <a href={link}></a> % S.prefixedAttrsToMetaData("a"))
-          }) openOr {
+          }).openOr {
             Text("")
           }
         }
@@ -525,7 +530,7 @@ object Menu extends DispatchSnippet {
               if (!text.isEmpty) {
                 Group(text)
               } else {
-                Group(loc.linkText openOr Text(loc.name))
+                Group(loc.linkText.openOr(Text(loc.name)))
               }
             }
             case _ => Text("")

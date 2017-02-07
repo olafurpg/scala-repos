@@ -58,7 +58,7 @@ object StackOverflow3 {
   class Preprocessor[In <: HList, Out <: HList, R](ctor: Out => R)(
       implicit mapped: Mapped.Aux[Out, Input, In],
       mapper: Mapper.Aux[value.type, In, Out]) {
-    def apply(in: In) = ctor(in map value)
+    def apply(in: In) = ctor(in.map(value))
   }
 
   case class Foo(input1: Int, input2: String)

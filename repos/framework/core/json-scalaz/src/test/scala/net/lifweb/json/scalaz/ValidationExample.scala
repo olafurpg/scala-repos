@@ -34,8 +34,9 @@ object ValidationExample extends Specification {
       // Age must be between 16 an 60
       import Validation.Monad._
       val person =
-        Person.applyJSON(field("name"),
-                         validate[Int]("age") >=> min(16) >=> max(60) apply _)
+        Person.applyJSON(
+          field("name"),
+          (validate[Int]("age") >=> min(16) >=> max(60)).apply(_))
       person(json) mustEqual Success(Person("joe", 17))
     }
   }

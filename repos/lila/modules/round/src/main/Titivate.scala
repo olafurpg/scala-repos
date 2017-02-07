@@ -39,7 +39,7 @@ private[round] final class Titivate(roundMap: ActorRef,
       $enumerate.over[Game]($query(Query.checkable), 5000) { game =>
         if (game.finished || game.isPgnImport)
           delayF {
-            GameRepo unsetCheckAt game
+            GameRepo.unsetCheckAt(game)
           } else if (game.outoftime(_ => chess.Clock.maxGraceMillis))
           delay {
             roundMap ! Tell(game.id, Outoftime)
@@ -49,7 +49,7 @@ private[round] final class Titivate(roundMap: ActorRef,
           } else if (game.unplayed)
           delayF {
             bookmark ! lila.hub.actorApi.bookmark.Remove(game.id)
-            GameRepo remove game.id
+            GameRepo.remove(game.id)
           } else
           game.clock match {
             case Some(clock) if clock.isRunning =>
@@ -60,17 +60,17 @@ private[round] final class Titivate(roundMap: ActorRef,
             case Some(clock) =>
               delayF {
                 val hours = Game.unplayedHours
-                GameRepo.setCheckAt(game, DateTime.now plusHours hours)
+                GameRepo.setCheckAt(game, DateTime.now.plusHours(hours))
               }
             case None =>
               delayF {
                 val days =
                   game.daysPerTurn | game.hasAi.fold(Game.aiAbandonedDays,
                                                      Game.abandonedDays)
-                GameRepo.setCheckAt(game, DateTime.now plusDays days)
+                GameRepo.setCheckAt(game, DateTime.now.plusDays(days))
               }
           }
-      }.void andThenAnyway {
+      }.void.andThenAnyway {
         self ! Schedule
       }
   }

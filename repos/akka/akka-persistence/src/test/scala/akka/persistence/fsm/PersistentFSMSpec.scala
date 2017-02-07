@@ -388,35 +388,35 @@ object PersistentFSMSpec {
 
     when(LookingAround) {
       case Event(AddItem(item), _) ⇒
-        goto(Shopping) applying ItemAdded(item) forMax (1 seconds)
+        (goto(Shopping) applying ItemAdded(item)).forMax(1 seconds)
       case Event(GetCurrentCart, data) ⇒
         stay replying data
     }
 
     when(Shopping) {
       case Event(AddItem(item), _) ⇒
-        stay applying ItemAdded(item) forMax (1 seconds)
+        (stay applying ItemAdded(item)).forMax(1 seconds)
       case Event(Buy, _) ⇒
-        goto(Paid) applying OrderExecuted andThen {
+        (goto(Paid) applying OrderExecuted).andThen {
           case NonEmptyShoppingCart(items) ⇒
             reportActor ! PurchaseWasMade(items)
           case EmptyShoppingCart ⇒ // do nothing...
         }
       case Event(Leave, _) ⇒
-        stop applying OrderDiscarded andThen {
+        (stop applying OrderDiscarded).andThen {
           case _ ⇒ reportActor ! ShoppingCardDiscarded
         }
       case Event(GetCurrentCart, data) ⇒
         stay replying data
       case Event(StateTimeout, _) ⇒
-        goto(Inactive) forMax (2 seconds)
+        goto(Inactive).forMax(2 seconds)
     }
 
     when(Inactive) {
       case Event(AddItem(item), _) ⇒
-        goto(Shopping) applying ItemAdded(item) forMax (1 seconds)
+        (goto(Shopping) applying ItemAdded(item)).forMax(1 seconds)
       case Event(StateTimeout, _) ⇒
-        stop applying OrderDiscarded andThen {
+        (stop applying OrderDiscarded).andThen {
           case _ ⇒ reportActor ! ShoppingCardDiscarded
         }
     }

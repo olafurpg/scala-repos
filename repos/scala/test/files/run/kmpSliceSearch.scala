@@ -1,7 +1,7 @@
 object Test {
   import scala.collection.SeqLike
   def slowSearch[A](xs: Seq[A], ys: Seq[A], start: Int = 0): Int = {
-    if (xs startsWith ys) start
+    if (xs.startsWith(ys)) start
     else if (xs.isEmpty) -1
     else slowSearch(xs.tail, ys, start + 1)
   }
@@ -57,7 +57,7 @@ object Test {
       List(1, 1, 1, 1, 1, 2),
       5 to 9
     )
-    (haystacks zip needles) foreach {
+    (haystacks.zip(needles)).foreach {
       case (hay, nee) =>
         println(hay.indexOfSlice(nee, 2) + " " + hay.lastIndexOfSlice(nee, 13))
     }

@@ -62,8 +62,8 @@ class AbdicateOnConnectionLossActorTest
 
   before {
     val zookeeper = mock[ZooKeeper]
-    zookeeper.getState returns ZooKeeper.States.CONNECTED
+    zookeeper.getState.returns(ZooKeeper.States.CONNECTED)
     zk = mock[ZooKeeperClient]
-    zk.get() returns zookeeper
+    zk.get().returns(zookeeper)
   }
 }

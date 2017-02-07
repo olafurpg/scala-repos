@@ -97,7 +97,7 @@ trait IterateeFunctions {
   def groupBy[A, F[_]](pred: (A, A) => Boolean)(
       implicit mon: Monoid[F[A]],
       pr: Applicative[F]): Iteratee[A, F[A]] = {
-    Iteratee.peek[A, Id] flatMap {
+    Iteratee.peek[A, Id].flatMap {
       case None => done(Monoid[F[A]].zero, Input.Empty[A])
       case Some(h) => takeWhile(pred(_, h))
     }

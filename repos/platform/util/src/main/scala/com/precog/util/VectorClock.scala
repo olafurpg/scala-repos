@@ -34,13 +34,13 @@ case class VectorClock(map: Map[Int, Int]) {
   def hasId(producerId: Int): Boolean = map.contains(producerId)
 
   def update(producerId: Int, sequenceId: Int): VectorClock =
-    if (map.get(producerId) forall { _ <= sequenceId }) {
+    if (map.get(producerId).forall { _ <= sequenceId }) {
       VectorClock(map + (producerId -> sequenceId))
     } else {
       this
     }
 
-  def isDominatedBy(other: VectorClock): Boolean = map forall {
+  def isDominatedBy(other: VectorClock): Boolean = map.forall {
     case (prodId, maxSeqId) => other.get(prodId).forall(_ >= maxSeqId)
   }
 }

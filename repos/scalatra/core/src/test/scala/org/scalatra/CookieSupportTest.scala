@@ -7,7 +7,7 @@ import org.scalatra.test.scalatest.ScalatraFunSuite
 class CookieSupportServlet extends ScalatraServlet {
 
   get("/getcookie") {
-    cookies.get("anothercookie") foreach { cookie =>
+    cookies.get("anothercookie").foreach { cookie =>
       response.setHeader("X-Another-Cookie", cookie)
     }
     cookies.get("somecookie") match {
@@ -18,7 +18,7 @@ class CookieSupportServlet extends ScalatraServlet {
 
   post("/setcookie") {
     cookies.update("somecookie", params("cookieval"))
-    params.get("anothercookieval") foreach { cookies("anothercookie") = _ }
+    params.get("anothercookieval").foreach { cookies("anothercookie") = _ }
     "OK"
   }
 

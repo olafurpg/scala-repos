@@ -27,7 +27,7 @@ class RouteConcurrencyServlet extends ScalatraServlet {
       }
     }
   } yield (x, y)
-  Await.result(Future.sequence(b map (kv => kv._1.flatMap(_ => kv._2))),
+  Await.result(Future.sequence(b.map(kv => kv._1.flatMap(_ => kv._2))),
                5.seconds)
 
   get("/count/:method") {

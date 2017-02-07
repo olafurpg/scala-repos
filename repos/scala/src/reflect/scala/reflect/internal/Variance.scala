@@ -81,7 +81,7 @@ object Variance {
 
   def fold(variances: List[Variance]): Variance =
     (if (variances.isEmpty) Bivariant
-     else variances reduceLeft (_ & _))
+     else variances.reduceLeft(_ & _))
   val Bivariant = new Variance(2)
   val Covariant = new Variance(1)
   val Contravariant = new Variance(-1)

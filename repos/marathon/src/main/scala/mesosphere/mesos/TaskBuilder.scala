@@ -152,7 +152,7 @@ class TaskBuilder(app: AppDefinition,
       case PathExecutor(path) =>
         val executorId = f"marathon-${taskId.idString}" // Fresh executor
         val executorPath = s"'$path'" // TODO: Really escape this.
-        val cmd = app.cmd orElse app.args.map(_ mkString " ") getOrElse ""
+        val cmd = app.cmd.orElse(app.args.map(_ mkString " ")).getOrElse("")
         val shell = s"chmod ug+rx $executorPath && exec $executorPath $cmd"
         val command = TaskBuilder
           .commandInfo(app,
@@ -243,7 +243,7 @@ class TaskBuilder(app: AppDefinition,
       app.container.foreach { c =>
         val portMappings = c.docker.map { d =>
           d.portMappings.map { pms =>
-            pms zip ports map {
+            pms.zip(ports).map {
               case (mapping, port) =>
                 // Use case: containerPort = 0 and hostPort = 0
                 //

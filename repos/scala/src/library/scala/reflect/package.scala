@@ -50,7 +50,7 @@ package object reflect {
     */
   def ensureAccessible[T <: jAccessibleObject](m: T): T = {
     if (!m.isAccessible) {
-      try m setAccessible true
+      try m.setAccessible(true)
       catch { case _: SecurityException => } // does nothing
     }
     m

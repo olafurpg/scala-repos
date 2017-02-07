@@ -20,7 +20,7 @@ class AkkaLoader {
   /*
    * Boot initializes the specified bundles
    */
-  def boot(withBanner: Boolean, b: Bootable): Unit = hasBooted switchOn {
+  def boot(withBanner: Boolean, b: Bootable): Unit = hasBooted.switchOn {
     if (withBanner) printBanner()
     println("Starting Akka...")
     b.onLoad
@@ -33,7 +33,7 @@ class AkkaLoader {
    * Shutdown, well, shuts down the bundles used in boot
    */
   def shutdown() {
-    hasBooted switchOff {
+    hasBooted.switchOff {
       println("Shutting down Akka...")
       _bundles.foreach(_.onUnload)
       _bundles = None

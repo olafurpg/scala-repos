@@ -61,7 +61,7 @@ final class SinatraRouteMatcher(pattern: String)
         copy(path = path + params(name), params = params - name)
       else
         throw new Exception(
-          "Builder \"%s\" requires param \"%s\"" format (pattern, name))
+          "Builder \"%s\" requires param \"%s\"".format(pattern, name))
 
     def addOptional(name: String): Builder =
       if (params contains name)
@@ -77,9 +77,9 @@ final class SinatraRouteMatcher(pattern: String)
     def get: String = {
       if (!splats.isEmpty)
         throw new Exception(
-          "Too many splats for builder \"%s\"" format pattern)
+          "Too many splats for builder \"%s\"".format(pattern))
       val pairs =
-        params map {
+        params.map {
           case (key, value) => key.urlEncode + "=" + value.urlEncode
         }
       val queryString = if (pairs.isEmpty) "" else pairs.mkString("?", "&", "")
@@ -93,7 +93,7 @@ final class SinatraRouteMatcher(pattern: String)
       parseAll(tokens, pattern) get
 
     private def tokens: Parser[Builder => Builder] = rep(token) ^^ { tokens =>
-      tokens reduceLeft ((acc, fun) => builder => fun(acc(builder)))
+      tokens.reduceLeft((acc, fun) => builder => fun(acc(builder)))
     }
 
     private def token: Parser[Builder => Builder] =
@@ -107,22 +107,22 @@ final class SinatraRouteMatcher(pattern: String)
       ("." | "/") ~ "?:" ~ """\w+""".r ~ "?" ^^ {
         case p ~ "?:" ~ o ~ "?" =>
           builder =>
-            builder addPrefixedOptional (o, p)
+            builder.addPrefixedOptional(o, p)
       }
 
     private def optional: Parser[Builder => Builder] =
       "?:" ~> """\w+""".r <~ "?" ^^ { str => builder =>
-        builder addOptional str
+        builder.addOptional(str)
       }
 
     private def named: Parser[Builder => Builder] =
       ":" ~> """\w+""".r ^^ { str => builder =>
-        builder addNamed str
+        builder.addNamed(str)
       }
 
     private def literal: Parser[Builder => Builder] =
       ("""[\.\+\(\)\$]""".r | ".".r) ^^ { str => builder =>
-        builder addLiteral str
+        builder.addLiteral(str)
       }
   }
 
@@ -155,7 +155,7 @@ final class RailsRouteMatcher(pattern: String)
         copy(path = path + params(name), params = params - name)
       else
         throw new Exception(
-          "Builder \"%s\" requires param \"%s\"" format (pattern, name))
+          "Builder \"%s\" requires param \"%s\"".format(pattern, name))
 
     def optional(builder: Builder => Builder): Builder =
       try builder(this)
@@ -164,7 +164,7 @@ final class RailsRouteMatcher(pattern: String)
     // appends additional params as a query string
     def get: String = {
       val pairs =
-        params map {
+        params.map {
           case (key, value) => key.urlEncode + "=" + value.urlEncode
         }
       val queryString = if (pairs.isEmpty) "" else pairs.mkString("?", "&", "")
@@ -178,7 +178,7 @@ final class RailsRouteMatcher(pattern: String)
       parseAll(tokens, pattern) get
 
     private def tokens: Parser[Builder => Builder] = rep(token) ^^ { tokens =>
-      tokens reduceLeft ((acc, fun) => builder => fun(acc(builder)))
+      tokens.reduceLeft((acc, fun) => builder => fun(acc(builder)))
     }
 
     //private def token = param | glob | optional | static
@@ -187,22 +187,22 @@ final class RailsRouteMatcher(pattern: String)
 
     private def param: Parser[Builder => Builder] =
       ":" ~> identifier ^^ { str => builder =>
-        builder addParam str
+        builder.addParam(str)
       }
 
     private def glob: Parser[Builder => Builder] =
       "*" ~> identifier ^^ { str => builder =>
-        builder addParam str
+        builder.addParam(str)
       }
 
     private def optional: Parser[Builder => Builder] =
       "(" ~> tokens <~ ")" ^^ { subBuilder => builder =>
-        builder optional subBuilder
+        builder.optional(subBuilder)
       }
 
     private def static: Parser[Builder => Builder] =
       (escaped | char) ^^ { str => builder =>
-        builder addStatic str
+        builder.addStatic(str)
       }
 
     private def identifier: Regex = """[a-zA-Z_]\w*""".r
@@ -240,7 +240,7 @@ final class RegexRouteMatcher(regex: Regex) extends RouteMatcher {
     * captured groups in a "captures" variable.  Otherwise, returns None.
     */
   def apply(requestPath: String): Option[MultiMap] =
-    regex.findFirstMatchIn(requestPath) map {
+    regex.findFirstMatchIn(requestPath).map {
       _.subgroups match {
         case Nil => MultiMap()
         case xs => Map("captures" -> xs)

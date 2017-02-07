@@ -54,7 +54,7 @@ trait ReductionLibSpecs[M[+ _]]
     result must haveSize(1)
 
     val result2 =
-      result collect {
+      result.collect {
         case (ids, SDecimal(d)) if ids.length == 0 => d.toDouble
       }
 
@@ -158,7 +158,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 0 => d
         }
 
@@ -173,7 +173,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 0 => d
         }
 
@@ -237,7 +237,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SBoolean(b)) if ids.length == 0 => b
         }
 
@@ -254,7 +254,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SBoolean(b)) if ids.length == 0 => b
         }
 
@@ -311,7 +311,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 0 => d
         }
 
@@ -326,7 +326,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 0 => d
         }
 
@@ -422,7 +422,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 0 => d
         }
 
@@ -439,7 +439,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 0 => d
         }
 
@@ -539,7 +539,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 0 => d
         }
 
@@ -556,7 +556,7 @@ trait ReductionLibSpecs[M[+ _]]
       result must haveSize(1)
 
       val result2 =
-        result collect {
+        result.collect {
           case (ids, SString(d)) if ids.length == 0 => d
         }
 

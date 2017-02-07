@@ -20,7 +20,7 @@ object Main {
   def main(args: Array[String]) {
     val foo: Foo[String] = new Foo[String];
 
-    val d = foo.< ref > pal (42)("abc")
+    val d = foo.<.ref(>).pal(42)("abc")
 
     println(d)
   }

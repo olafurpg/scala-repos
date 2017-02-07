@@ -130,7 +130,8 @@ object ReliableProxy {
 private[akka] trait ReliableProxyDebugLogging extends ActorLogging {
   this: Actor ⇒
   val debug: Boolean =
-    Try(context.system.settings.config.getBoolean("akka.reliable-proxy.debug")) getOrElse false
+    Try(context.system.settings.config.getBoolean("akka.reliable-proxy.debug"))
+      .getOrElse(false)
 
   def enabled: Boolean = debug && log.isDebugEnabled
 
@@ -320,14 +321,14 @@ class ReliableProxy(targetPath: ActorPath,
     case Event(Terminated(_), _) ⇒
       terminated()
     case Event(Ack(serial), queue) ⇒
-      val q = queue dropWhile (m ⇒ compare(m.serial, serial) <= 0)
+      val q = queue.dropWhile(m ⇒ compare(m.serial, serial) <= 0)
       if (compare(serial, lastAckSerial) > 0) lastAckSerial = serial
       scheduleTick()
       if (q.isEmpty) goto(Idle) using Vector.empty
       else stay using q
     case Event(Tick, queue) ⇒
       logResend(queue.size)
-      queue foreach { tunnel ! _ }
+      queue.foreach { tunnel ! _ }
       scheduleTick()
       stay()
     case Event(Unsent(msgs), queue) ⇒
@@ -348,7 +349,7 @@ class ReliableProxy(targetPath: ActorPath,
     case Event(ActorIdentity(_, None), _) ⇒
       stay()
     case Event(ReconnectTick, _) ⇒
-      if (maxConnectAttempts exists (_ == attemptedReconnects)) {
+      if (maxConnectAttempts.exists(_ == attemptedReconnects)) {
         logDebug("Failed to reconnect after {}", attemptedReconnects)
         stop()
       } else {
@@ -380,11 +381,11 @@ class ReliableProxy(targetPath: ActorPath,
     m
   }
 
-  def updateSerial(q: Vector[Message]) = q map (_.copy(serial = nextSerial()))
+  def updateSerial(q: Vector[Message]) = q.map(_.copy(serial = nextSerial()))
 
   def resend(q: Vector[Message]): Vector[Message] = {
     logResend(q.size)
-    q foreach { tunnel ! _ }
+    q.foreach { tunnel ! _ }
     q
   }
 
@@ -414,5 +415,5 @@ class ReliableProxy(targetPath: ActorPath,
     * Returns the next retry interval duration.  By default each interval is the same, reconnectAfter.
     */
   def nextBackoff(): FiniteDuration =
-    reconnectAfter getOrElse defaultConnectInterval
+    reconnectAfter.getOrElse(defaultConnectInterval)
 }

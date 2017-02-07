@@ -129,8 +129,8 @@ object PathId {
     * For external usage. Needed to overwrite the whole description, e.g. id.path -> id.
     */
   implicit val pathIdValidator = validator[PathId] { path =>
-    path is childOf(path.parent)
-    path is validPathChars
+    path.is(childOf(path.parent))
+    path.is(validPathChars)
   }
 
   /**
@@ -139,8 +139,8 @@ object PathId {
     */
   def validPathWithBase(base: PathId): Validator[PathId] = validator[PathId] {
     path =>
-      path is childOf(base)
-      path is validPathChars
+      path.is(childOf(base))
+      path.is(validPathChars)
   }
 
   private def childOf(parent: PathId): Validator[PathId] = {

@@ -43,7 +43,7 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
     compilingMethods
       .map(methodNode => {
         var requests = Set.empty[InlineRequest]
-        callGraph.callsites(methodNode).valuesIterator foreach {
+        callGraph.callsites(methodNode).valuesIterator.foreach {
           case callsite @ Callsite(_,
                                    _,
                                    _,
@@ -164,7 +164,7 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
             !callsite.annotatedNoInline) {
           def shouldInlineHO =
             callee.samParamTypes.nonEmpty &&
-              (callee.samParamTypes exists {
+              (callee.samParamTypes.exists {
                 case (index, _) => callsite.argInfos.contains(index)
               })
           if (callee.annotatedInline || callsite.annotatedInline ||

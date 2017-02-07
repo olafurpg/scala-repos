@@ -51,7 +51,7 @@ abstract class Reifier extends States with Phases with Errors with Utils {
     */
   lazy val reification: Tree = {
     try {
-      if (universe exists (_.isErroneous)) CannotReifyErroneousPrefix(universe)
+      if (universe.exists(_.isErroneous)) CannotReifyErroneousPrefix(universe)
       if (universe.tpe == null) CannotReifyUntypedPrefix(universe)
 
       val result = reifee match {
@@ -64,7 +64,7 @@ abstract class Reifier extends States with Phases with Errors with Utils {
           reifyTrace("reifee is located at: ")(tree.pos)
           reifyTrace("universe = ")(universe)
           reifyTrace("mirror = ")(mirror)
-          if (tree exists (_.isErroneous)) CannotReifyErroneousReifee(tree)
+          if (tree.exists(_.isErroneous)) CannotReifyErroneousReifee(tree)
           if (tree.tpe == null) CannotReifyUntypedReifee(tree)
           val pipeline = mkReificationPipeline
           val rtree = pipeline(tree)
@@ -143,9 +143,9 @@ abstract class Reifier extends States with Phases with Errors with Utils {
         ReflectRuntimePackage,
         runDefinitions.ReflectRuntimeCurrentMirror
       )
-      importantSymbols ++= importantSymbols map (_.companionSymbol)
-      importantSymbols ++= importantSymbols map (_.moduleClass)
-      importantSymbols ++= importantSymbols map (_.linkedClassOfClass)
+      importantSymbols ++= importantSymbols.map(_.companionSymbol)
+      importantSymbols ++= importantSymbols.map(_.moduleClass)
+      importantSymbols ++= importantSymbols.map(_.linkedClassOfClass)
       def isImportantSymbol(sym: Symbol): Boolean =
         sym != null && sym != NoSymbol && importantSymbols(sym)
       val untyped = brutallyResetAttrs(

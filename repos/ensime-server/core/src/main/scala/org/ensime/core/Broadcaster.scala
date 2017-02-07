@@ -41,7 +41,7 @@ class Broadcaster extends Actor with ActorLogging {
       subscribers += sender()
       persistant.foreach {
         case (originalSender, message) =>
-          sender() tell (message, originalSender)
+          sender().tell(message, originalSender)
       }
 
     case Unregister => subscribers -= sender()
@@ -56,7 +56,7 @@ class Broadcaster extends Actor with ActorLogging {
     for {
       subscriber <- subscribers
     } {
-      subscriber forward message
+      subscriber.forward(message)
     }
 }
 

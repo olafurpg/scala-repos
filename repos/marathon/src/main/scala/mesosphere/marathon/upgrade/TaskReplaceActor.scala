@@ -80,7 +80,7 @@ class TaskReplaceActor(driver: SchedulerDriver,
       if (app.healthChecks.nonEmpty) healthCheckingBehavior
       else taskStateBehavior
 
-    behavior orElse commonBehavior: PartialFunction[Any, Unit] // type annotation makes Intellij happy
+    behavior.orElse(commonBehavior): PartialFunction[Any, Unit] // type annotation makes Intellij happy
   }
 
   def taskStateBehavior: Receive = {

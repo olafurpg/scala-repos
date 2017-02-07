@@ -161,9 +161,9 @@ trait BaseSyntaxTest {
     ((a <= b) == PartialOrder[A].lteqv(a, b)) &&
     ((a >= b) == PartialOrder[A].gteqv(a, b)) &&
     ((a pmin b) == PartialOrder[A].pmin(a, b)) &&
-    ((a pmax b) == PartialOrder[A].pmax(a, b)) &&
-    ((a partialCompare b) == PartialOrder[A].partialCompare(a, b)) &&
-    ((a tryCompare b) == PartialOrder[A].tryCompare(a, b))
+    ((a.pmax(b)) == PartialOrder[A].pmax(a, b)) &&
+    ((a.partialCompare(b)) == PartialOrder[A].partialCompare(a, b)) &&
+    ((a.tryCompare(b)) == PartialOrder[A].tryCompare(a, b))
   }
 
   def testOrderSyntax[A: Order](a: A, b: A) = {
@@ -171,8 +171,8 @@ trait BaseSyntaxTest {
     ((a === b) == Order[A].eqv(a, b)) && ((a =!= b) == Order[A].neqv(a, b)) &&
     ((a < b) == Order[A].lt(a, b)) && ((a > b) == Order[A].gt(a, b)) &&
     ((a <= b) == Order[A].lteqv(a, b)) && ((a >= b) == Order[A].gteqv(a, b)) &&
-    ((a min b) == Order[A].min(a, b)) && ((a max b) == Order[A].max(a, b)) &&
-    ((a compare b) == Order[A].compare(a, b))
+    ((a min b) == Order[A].min(a, b)) && ((a.max(b)) == Order[A].max(a, b)) &&
+    ((a.compare(b)) == Order[A].compare(a, b))
   }
 
   def testSignedSyntax[A: Signed](a: A) = {
@@ -248,27 +248,28 @@ trait BaseSyntaxTest {
     import spire.syntax.semiring._
     ((a + b) == Semiring[A].plus(a, b)) && ((a * b) == Semiring[A]
       .times(a, b)) &&
-    ((a ** 2) == Semiring[A].pow(a, 2)) && ((a pow 2) == Semiring[A].pow(a, 2))
+    ((a ** 2) == Semiring[A].pow(a, 2)) && ((a.pow(2)) == Semiring[A].pow(a,
+                                                                          2))
   }
 
   def testRigSyntax[A: Rig](a: A, b: A) = {
     import spire.syntax.rig._
     ((a + b) == Rig[A].plus(a, b)) && ((a * b) == Rig[A].times(a, b)) &&
-    ((a ** 2) == Rig[A].pow(a, 2)) && ((a pow 2) == Rig[A].pow(a, 2))
+    ((a ** 2) == Rig[A].pow(a, 2)) && ((a.pow(2)) == Rig[A].pow(a, 2))
   }
 
   def testRngSyntax[A: Rng](a: A, b: A) = {
     import spire.syntax.rng._
     ((a + b) == Rng[A].plus(a, b)) && ((a - b) == Rng[A].minus(a, b)) &&
     (-a == Rng[A].negate(a)) && ((a * b) == Rng[A].times(a, b)) &&
-    ((a ** 2) == Rng[A].pow(a, 2)) && ((a pow 2) == Rng[A].pow(a, 2))
+    ((a ** 2) == Rng[A].pow(a, 2)) && ((a.pow(2)) == Rng[A].pow(a, 2))
   }
 
   def testRingSyntax[A: Ring](a: A, b: A) = {
     import spire.syntax.ring._
     ((a + b) == Ring[A].plus(a, b)) && ((a - b) == Ring[A].minus(a, b)) &&
     (-a == Ring[A].negate(a)) && ((a * b) == Ring[A].times(a, b)) &&
-    ((a ** 2) == Ring[A].pow(a, 2)) && ((a pow 2) == Ring[A].pow(a, 2)) &&
+    ((a ** 2) == Ring[A].pow(a, 2)) && ((a.pow(2)) == Ring[A].pow(a, 2)) &&
     ((a + 42) == Ring[A].plus(a, Ring[A].fromInt(42))) &&
     ((42 + a) == Ring[A].plus(Ring[A].fromInt(42), a)) &&
     ((a - 42) == Ring[A].minus(a, Ring[A].fromInt(42))) &&
@@ -284,9 +285,9 @@ trait BaseSyntaxTest {
     ((a /~ b) == EuclideanRing[A].quot(a, b)) &&
     ((a % b) == EuclideanRing[A].mod(a, b)) &&
     ((a /% b) == EuclideanRing[A].quotmod(a, b)) &&
-    ((a ** 2) == Ring[A].pow(a, 2)) && ((a pow 2) == Ring[A].pow(a, 2)) &&
-    ((a gcd b) == EuclideanRing[A].gcd(a, b)) &&
-    ((a lcm b) == EuclideanRing[A].lcm(a, b)) &&
+    ((a ** 2) == Ring[A].pow(a, 2)) && ((a.pow(2)) == Ring[A].pow(a, 2)) &&
+    ((a.gcd(b)) == EuclideanRing[A].gcd(a, b)) &&
+    ((a.lcm(b)) == EuclideanRing[A].lcm(a, b)) &&
     ((a + 42) == Ring[A].plus(a, Ring[A].fromInt(42))) &&
     ((42 + a) == Ring[A].plus(Ring[A].fromInt(42), a)) &&
     ((a - 42) == Ring[A].minus(a, Ring[A].fromInt(42))) &&
@@ -314,9 +315,9 @@ trait BaseSyntaxTest {
     ((a % b) === EuclideanRing[A].mod(a, b)) &&
     ((a /% b) === EuclideanRing[A].quotmod(a, b)) &&
     ((a / b) === Field[A].div(a, b)) && ((a ** 2) === Ring[A].pow(a, 2)) &&
-    ((a pow 2) === Ring[A].pow(a, 2)) &&
-    ((a gcd b) === EuclideanRing[A].gcd(a, b)) &&
-    ((a lcm b) === EuclideanRing[A].lcm(a, b)) &&
+    ((a.pow(2)) === Ring[A].pow(a, 2)) &&
+    ((a.gcd(b)) === EuclideanRing[A].gcd(a, b)) &&
+    ((a.lcm(b)) === EuclideanRing[A].lcm(a, b)) &&
     ((a + 42) === Ring[A].plus(a, Ring[A].fromInt(42))) &&
     ((a - 42) === Ring[A].minus(a, Ring[A].fromInt(42))) &&
     ((a * 42) === Ring[A].times(a, Ring[A].fromInt(42))) &&
@@ -336,8 +337,8 @@ trait BaseSyntaxTest {
   def testNRootSyntax[A: NRoot: Field](a: A) = {
     import spire.syntax.nroot._
     val half = Field[A].fromDouble(0.5)
-    (a.sqrt == NRoot[A].sqrt(a)) && ((a nroot 5) == NRoot[A].nroot(a, 5)) &&
-    ((a fpow half) == NRoot[A].fpow(a, half)) &&
+    (a.sqrt == NRoot[A].sqrt(a)) && ((a.nroot(5)) == NRoot[A].nroot(a, 5)) &&
+    ((a.fpow(half)) == NRoot[A].fpow(a, half)) &&
     ((a ** 0.5) == NRoot[A].fpow(a, half))
   }
 
@@ -393,7 +394,7 @@ trait BaseSyntaxTest {
     //((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
     //((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
     //((v :/ 2) == V.divr(v, A.fromInt(2))) &&
-    ((v dot w) == V.dot(v, w)) && ((v ⋅ w) == V.dot(v, w))
+    ((v.dot(w)) == V.dot(v, w)) && ((v ⋅ w) == V.dot(v, w))
   }
 
   def testCoordinateSpaceSyntax[V, A](v: V, w: V, a: A)(
@@ -408,7 +409,7 @@ trait BaseSyntaxTest {
     //((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
     //((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
     //((v :/ 2) == V.divr(v, A.fromInt(2))) &&
-    ((v dot w) == V.dot(v, w)) && ((v ⋅ w) == V
+    ((v.dot(w)) == V.dot(v, w)) && ((v ⋅ w) == V
       .dot(v, w)) && (v._x == V._x(v)) &&
     (v._y == V._y(v)) && (v._z == V._z(v)) && (v.coord(0) == V.coord(v, 0)) &&
     (v.coord(1) == V.coord(v, 1))

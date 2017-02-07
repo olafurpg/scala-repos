@@ -26,7 +26,7 @@ object EarlyDef {
         builder.advanceLexer() //Ate {
         builder.enableNewlines
       case _ =>
-        builder error ScalaBundle.message("unreachable.error")
+        builder.error(ScalaBundle.message("unreachable.error"))
         earlyMarker.drop()
         return false
     }
@@ -38,7 +38,7 @@ object EarlyDef {
           builder.advanceLexer() //Ate }
           true
         case _ =>
-          if (PatVarDef parse builder) {
+          if (PatVarDef.parse(builder)) {
             builder.getTokenType match {
               case ScalaTokenTypes.tRBRACE => {
                 builder.advanceLexer() //Ate }
@@ -63,7 +63,7 @@ object EarlyDef {
     }
     if (!subparse) {
       builder.restoreNewlinesState
-      builder error ScalaBundle.message("unreachable.error")
+      builder.error(ScalaBundle.message("unreachable.error"))
       earlyMarker.rollbackTo()
       return false
     }
@@ -75,7 +75,7 @@ object EarlyDef {
         builder.advanceLexer() //Ate with
         true
       case _ =>
-        builder error ScalaBundle.message("unreachable.error")
+        builder.error(ScalaBundle.message("unreachable.error"))
         earlyMarker.rollbackTo()
         false
     }

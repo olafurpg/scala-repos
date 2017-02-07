@@ -67,7 +67,7 @@ case class Runner(args: Array[String],
     *  @throws IllegalStateException if invoked after <code>done</code> has been invoked.
     */
   def tasks(taskDefs: Array[TaskDef]): Array[sbt.testing.Task] =
-    taskDefs map (PartestTask(_, args): sbt.testing.Task)
+    taskDefs.map(PartestTask(_, args): sbt.testing.Task)
 
   /** Indicates the client is done with this <code>Runner</code> instance.
     *
@@ -93,15 +93,15 @@ case class PartestTask(taskDef: TaskDef, args: Array[String]) extends Task {
       forkedCp.split(java.io.File.pathSeparator).map(new File(_).toURI.toURL))
 
     if (Runtime.getRuntime().maxMemory() / (1024 * 1024) < 800)
-      loggers foreach
-        (_.warn(
-          s"""Low heap size detected (~ ${Runtime.getRuntime().maxMemory() /
-            (1024 * 1024)}M). Please add the following to your build.sbt: javaOptions in Test += "-Xmx1G""""))
+      loggers.foreach(_.warn(s"""Low heap size detected (~ ${Runtime
+        .getRuntime()
+        .maxMemory() /
+        (1024 * 1024)}M). Please add the following to your build.sbt: javaOptions in Test += "-Xmx1G""""))
 
     val maybeOptions =
       ScalaJSPartestOptions(args, str => loggers.foreach(_.error(str)))
 
-    maybeOptions foreach { options =>
+    maybeOptions.foreach { options =>
       val runner =
         SBTRunner(
           Framework.fingerprint,
@@ -116,10 +116,10 @@ case class PartestTask(taskDef: TaskDef, args: Array[String]) extends Task {
           scalaVersion
         )
 
-      try runner execute Array("run", "pos", "neg")
+      try runner.execute(Array("run", "pos", "neg"))
       catch {
         case ex: ClassNotFoundException =>
-          loggers foreach { l =>
+          loggers.foreach { l =>
             l.error(
               "Please make sure partest is running in a forked VM by including the following line in build.sbt:\nfork in Test := true")
           }

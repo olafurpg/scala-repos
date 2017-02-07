@@ -64,7 +64,7 @@ trait JobResultSerialization {
         List(
           JField("content",
                  JString(Base64.encodeBase64String(result.content))),
-          JField("mimeTypes", JArray(result.mimeTypes map { mimeType =>
+          JField("mimeTypes", JArray(result.mimeTypes.map { mimeType =>
             JString(mimeType.value)
           }))
         ))
@@ -75,9 +75,9 @@ trait JobResultSerialization {
 
     override def validated(obj: JValue): Validation[Error, JobResult] = {
       val mimeTypes =
-        (obj \ "mimeTypes").validated[List[String]] flatMap { rawTypes =>
+        (obj \ "mimeTypes").validated[List[String]].flatMap { rawTypes =>
           success[Error, List[MimeType]](
-            (rawTypes flatMap (MimeTypes.parseMimeTypes(_))).toList)
+            (rawTypes.flatMap(MimeTypes.parseMimeTypes(_))).toList)
         }
       (mimeTypes |@| (obj \ "content").validated[String]) {
         (mimeTypes, content) =>

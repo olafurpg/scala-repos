@@ -38,7 +38,7 @@ object Compatibility {
   var seqClass: Option[PsiClass] = None
 
   def compatibleWithViewApplicability(l: ScType, r: ScType): Boolean =
-    r conforms l
+    r.conforms(l)
 
   case class Expression(expr: ScExpression) {
     var typez: ScType = null

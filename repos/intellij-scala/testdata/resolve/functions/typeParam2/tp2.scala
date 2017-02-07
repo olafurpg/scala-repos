@@ -29,7 +29,7 @@ object Main {
 
 //    foo.puk[Int, Int](42)
 
-    foo.< ref > gul (42)
+    foo.<.ref(>).gul(42)
 
 //    4.asInstanceOf[Foo]
 

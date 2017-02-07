@@ -203,7 +203,7 @@ class NIHDBProjectionSpecs
 
       val expected: Seq[JValue] = (0L to 1950L).map(JNum(_)).toSeq
 
-      (0L to 1950L).map(JNum(_)).grouped(400).zipWithIndex foreach {
+      (0L to 1950L).map(JNum(_)).grouped(400).zipWithIndex.foreach {
         case (values, id) =>
           nihdb.insert(Seq(NIHDB.Batch(id.toLong, values))).unsafePerformIO
       }

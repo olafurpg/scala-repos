@@ -71,7 +71,7 @@ trait UnCurry {
       val tp = expandAlias(tp0)
       tp match {
         case ClassInfoType(parents, decls, clazz) =>
-          val parents1 = parents mapConserve uncurry
+          val parents1 = parents.mapConserve(uncurry)
           if (parents1 eq parents) tp
           else
             ClassInfoType(parents1, decls, clazz) // @MAT normalize in decls??

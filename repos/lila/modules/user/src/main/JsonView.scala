@@ -37,7 +37,7 @@ final class JsonView(isOnline: String => Boolean) {
       .noNull
 
   def perfs(u: User, onlyPerf: Option[PerfType] = None) =
-    JsObject(u.perfs.perfsMap collect {
+    JsObject(u.perfs.perfsMap.collect {
       case (key, perf) if onlyPerf.fold(true)(_.key == key) =>
         key -> perfWrites.writes(perf)
     })

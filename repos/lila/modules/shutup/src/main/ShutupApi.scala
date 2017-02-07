@@ -34,11 +34,14 @@ final class ShutupApi(coll: Coll,
     record(userId, text, TextType.PublicChat)
 
   def privateChat(chatId: String, userId: String, text: String) =
-    GameRepo.getUserIds(chatId) map {
-      _ find (userId !=)
-    } flatMap {
-      record(userId, text, TextType.PrivateChat, _)
-    }
+    GameRepo
+      .getUserIds(chatId)
+      .map {
+        _ find (userId !=)
+      }
+      .flatMap {
+        record(userId, text, TextType.PrivateChat, _)
+      }
 
   def privateMessage(userId: String, toUserId: String, text: String) =
     record(userId, text, TextType.PrivateMessage, toUserId.some)
@@ -47,10 +50,10 @@ final class ShutupApi(coll: Coll,
                      text: String,
                      textType: TextType,
                      toUserId: Option[String] = None): Funit =
-    UserRepo isTroll userId flatMap {
+    UserRepo.isTroll(userId).flatMap {
       case true => funit
       case false =>
-        toUserId ?? { follows(userId, _) } flatMap {
+        (toUserId ?? { follows(userId, _) }).flatMap {
           case true => funit
           case false =>
             val analysed = Analyser(text)
@@ -71,10 +74,13 @@ final class ShutupApi(coll: Coll,
                              update = BSONDocument("$push" -> push),
                              fetchNewObject = true,
                              upsert = true)
-              .map(_.value) map2 UserRecordBSONHandler.read flatMap {
-              case None => fufail(s"can't find user record for $userId")
-              case Some(userRecord) => legiferate(userRecord)
-            } logFailure lila.log("shutup")
+              .map(_.value)
+              .map2(UserRecordBSONHandler.read)
+              .flatMap {
+                case None => fufail(s"can't find user record for $userId")
+                case Some(userRecord) => legiferate(userRecord)
+              }
+              .logFailure(lila.log("shutup"))
         }
     }
 

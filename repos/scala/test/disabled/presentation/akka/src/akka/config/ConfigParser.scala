@@ -53,8 +53,8 @@ class ConfigParser(var prefix: String = "",
 
   def includeFile = "include" ~> string ^^ {
     case filename: String =>
-      new ConfigParser(prefix, map, importer) parse importer.importFile(
-        filename)
+      new ConfigParser(prefix, map, importer)
+        .parse(importer.importFile(filename))
   }
 
   def assignment = identToken ~ assignToken ~ value ^^ {
@@ -62,7 +62,7 @@ class ConfigParser(var prefix: String = "",
   }
 
   def sectionOpen = sectionToken <~ "{" ^^ { name =>
-    sections push name
+    sections.push(name)
     createPrefix
   }
 

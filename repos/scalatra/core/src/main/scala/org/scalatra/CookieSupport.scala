@@ -23,7 +23,7 @@ object Cookie {
   @volatile private[this] var _currentTimeMillis: Option[Long] = None
 
   def currentTimeMillis: Long =
-    _currentTimeMillis getOrElse System.currentTimeMillis
+    _currentTimeMillis.getOrElse(System.currentTimeMillis)
 
   def currentTimeMillis_=(ct: Long): Unit = _currentTimeMillis = Some(ct)
 
@@ -43,8 +43,8 @@ case class Cookie(name: String, value: String)(
 
   def toCookieString: String = {
     val sb = new StringBuilder
-    sb append name append "="
-    sb append value
+    sb.append(name).append("=")
+    sb.append(value)
 
     if (cookieOptions.domain.nonBlank && cookieOptions.domain != "localhost")
       sb.append("; Domain=")
@@ -55,16 +55,16 @@ case class Cookie(name: String, value: String)(
 
     val pth = cookieOptions.path
     if (pth.nonBlank) {
-      sb append "; Path=" append (if (!pth.startsWith("/")) "/" + pth else pth)
+      sb.append("; Path=").append(if (!pth.startsWith("/")) "/" + pth else pth)
     }
     if (cookieOptions.comment.nonBlank) {
-      sb append ("; Comment=") append cookieOptions.comment
+      sb.append("; Comment=").append(cookieOptions.comment)
     }
 
     appendMaxAge(sb, cookieOptions.maxAge, cookieOptions.version)
 
-    if (cookieOptions.secure) sb append "; Secure"
-    if (cookieOptions.httpOnly) sb append "; HttpOnly"
+    if (cookieOptions.secure) sb.append("; Secure")
+    if (cookieOptions.httpOnly) sb.append("; HttpOnly")
     sb.toString
   }
 
@@ -81,16 +81,16 @@ case class Cookie(name: String, value: String)(
     // This used to be Max-Age but IE is not always very happy with that
     // see: http://mrcoles.com/blog/cookies-max-age-vs-expires/
     // see Q1: http://blogs.msdn.com/b/ieinternals/archive/2009/08/20/wininet-ie-cookie-internals-faq.aspx
-    val bOpt = dateInMillis map (ms => appendExpires(sb, new Date(ms)))
+    val bOpt = dateInMillis.map(ms => appendExpires(sb, new Date(ms)))
     val agedOpt =
-      if (version > 0) bOpt map (_.append("; Max-Age=").append(maxAge))
+      if (version > 0) bOpt.map(_.append("; Max-Age=").append(maxAge))
       else bOpt
-    agedOpt getOrElse sb
+    agedOpt.getOrElse(sb)
   }
 
   private[this] def appendExpires(sb: StringBuilder,
                                   expires: Date): StringBuilder =
-    sb append "; Expires=" append formatExpires(expires)
+    sb.append("; Expires=").append(formatExpires(expires))
 }
 
 class SweetCookies(private[this] val reqCookies: Map[String, String],
@@ -103,8 +103,10 @@ class SweetCookies(private[this] val reqCookies: Map[String, String],
   def get(key: String): Option[String] = cookies.get(key)
 
   def apply(key: String): String = {
-    cookies.get(key) getOrElse
-      (throw new Exception("No cookie could be found for the specified key"))
+    cookies
+      .get(key)
+      .getOrElse(
+        throw new Exception("No cookie could be found for the specified key"))
   }
 
   def update(name: String, value: String)(

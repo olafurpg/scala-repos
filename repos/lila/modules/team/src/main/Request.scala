@@ -25,8 +25,8 @@ object Request {
   import play.api.libs.json._
 
   private[team] lazy val tube = JsTube(
-    (__.json update readDate('date)) andThen Json.reads[Request],
-    Json.writes[Request] andThen (__.json update writeDate('date))
+    (__.json.update(readDate('date))).andThen(Json.reads[Request]),
+    Json.writes[Request].andThen(__.json.update(writeDate('date)))
   )
 }
 

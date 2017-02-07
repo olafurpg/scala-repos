@@ -16,7 +16,7 @@ object Test {
     val foo1 = mkFoo[Double](5.0d)
     val foo2 = mkFoo[Long](5l)
 
-    List(foo1, foo2, foo1.##, foo2.##, foo1 == foo2) foreach println
+    List(foo1, foo2, foo1.##, foo2.##, foo1 == foo2).foreach(println)
 
     println("## method 1: " + foo1.##)
     println("## method 2: " + foo2.##)
@@ -35,10 +35,10 @@ object Timing {
     val start = System.nanoTime
 
     println("Warmup.")
-    1 to 10000 foreach mkFoo
+    (1 to 10000).foreach(mkFoo)
 
     hash = 0
-    1 to reps foreach (i => hash += mkFoo(i).##)
+    (1 to reps).foreach(i => hash += mkFoo(i).##)
 
     val end = System.nanoTime
     println("hash = " + hash)

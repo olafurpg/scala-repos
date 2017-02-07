@@ -41,8 +41,8 @@ trait Parser extends RegexParsers with Filters with AST {
 
   def parse(input: LineStream): Set[Expr] = {
     val results = expr(input)
-    val successes = results collect { case Success(tree, _) => tree }
-    val failures = results collect { case f: Failure => f }
+    val successes = results.collect { case Success(tree, _) => tree }
+    val failures = results.collect { case f: Failure => f }
 
     if (successes.isEmpty) handleFailures(failures)
     else handleSuccesses(successes)
@@ -51,7 +51,7 @@ trait Parser extends RegexParsers with Filters with AST {
   // TODO these functions need to be privatized
   def handleSuccesses(forest: Stream[Expr]): Set[Expr] = {
     val back =
-      forest map { root =>
+      forest.map { root =>
         bindRoot(root, root)
         root
       }
@@ -60,17 +60,17 @@ trait Parser extends RegexParsers with Filters with AST {
   }
 
   def handleFailures(forest: Stream[Failure]): Nothing = {
-    val sorted = forest.toList sortWith { _.tail.length < _.tail.length }
+    val sorted = forest.toList.sortWith { _.tail.length < _.tail.length }
     val length = sorted.head.tail.length
 
-    val failures = Set(sorted takeWhile { _.tail.length == length }: _*)
+    val failures = Set(sorted.takeWhile { _.tail.length == length }: _*)
     throw ParseException(failures)
   }
 
   // %%
 
   lazy val expr: Parser[Expr] =
-    (id ~ "(" ~ formals ~ ")" ~ ":=" ~ expr ~ expr ^# {
+    ((id ~ "(" ~ formals ~ ")" ~ ":=" ~ expr ~ expr ^# {
       (loc, id, _, fs, _, _, e1, e2) =>
         Let(loc, Identifier(Vector(), id), fs, e1, e2)
     } | id ~ ":=" ~ expr ~ expr ^# { (loc, id, _, e1, e2) =>
@@ -162,7 +162,7 @@ trait Parser extends RegexParsers with Filters with AST {
       Neg(loc, e)
     } | "(" ~ expr ~ ")" ^# { (loc, _, e, _) =>
       Paren(loc, e)
-    }) filter (precedence & arrayDefDeref & relateRelate)
+    })).filter(precedence & arrayDefDeref & relateRelate)
 
   private lazy val importSpec: Parser[ImportSpec] =
     (namespace ~ "::" ~ "*" ^^ { (p, _, _) =>
@@ -297,7 +297,7 @@ trait Parser extends RegexParsers with Filters with AST {
                               relations: Vector[Expr],
                               e: Expr): Expr = {
     val builders =
-      relations zip (relations drop 1) map {
+      relations.zip(relations.drop(1)).map {
         case (e1, e2) => { e3: Expr =>
           Relate(loc, e1, e2, e3)
         }
@@ -343,11 +343,11 @@ trait Parser extends RegexParsers with Filters with AST {
     def mkString = {
       val tail =
         failures.head.tail // if we have an empty set of failures, that's bad
-      val result = ParseException reduceFailures failures
-      tail formatError ("error:%d: " + result + "%n  %s%n  %s")
+      val result = ParseException.reduceFailures(failures)
+      tail.formatError("error:%d: " + result + "%n  %s%n  %s")
     }
 
-    override def getMessage = ParseException reduceFailures failures
+    override def getMessage = ParseException.reduceFailures(failures)
   }
 
   object ParseException extends (Set[Failure] => ParseException) {
@@ -368,31 +368,33 @@ trait Parser extends RegexParsers with Filters with AST {
 
     private def reduceFailures(failures: Set[Failure]) = {
       val expectedPowerSet =
-        failures map { _.data } collect {
+        failures.map { _.data }.collect {
           case ExpectedLiteral(expect, _) =>
-            Parsers.keySet filter { _.first contains expect.head } map Parsers
+            Parsers.keySet.filter { _.first contains expect.head }.map(Parsers)
 
           case ExpectedRegex(regex) => {
             val first = {
-              val back = RegexUtils first regex
+              val back = RegexUtils.first(regex)
 
               if (back contains None) UniversalCharSet
               else
-                back flatMap { x =>
+                back.flatMap { x =>
                   x
                 }
             }
 
-            Parsers.keySet filterNot { _.first intersect first isEmpty } map Parsers
+            Parsers.keySet
+              .filterNot { _.first intersect first isEmpty }
+              .map(Parsers)
           }
 
           case UnexpectedEndOfStream(Some(expect)) =>
-            Parsers.keySet filter { _.first contains expect.head } map Parsers
+            Parsers.keySet.filter { _.first contains expect.head }.map(Parsers)
         }
 
       val expectedCountPS =
-        expectedPowerSet map { set =>
-          Map(set map { str =>
+        expectedPowerSet.map { set =>
+          Map(set.map { str =>
             str -> 1
           } toSeq: _*)
         }
@@ -400,7 +402,7 @@ trait Parser extends RegexParsers with Filters with AST {
       val expectedCounts = expectedCountPS.fold(Map()) { (left, right) =>
         right.foldLeft(left) {
           case (acc, (str, count)) =>
-            acc.updated(str, acc get str map (count +) getOrElse count)
+            acc.updated(str, acc.get(str).map(count +).getOrElse(count))
         }
       }
 
@@ -409,9 +411,9 @@ trait Parser extends RegexParsers with Filters with AST {
       }
 
       val expectation =
-        pairs.headOption flatMap {
+        pairs.headOption.flatMap {
           case (_, headCount) => {
-            val (possibilities, _) = (pairs takeWhile {
+            val (possibilities, _) = (pairs.takeWhile {
               case (_, c) => headCount == c
             }).unzip
 
@@ -420,7 +422,7 @@ trait Parser extends RegexParsers with Filters with AST {
           }
         }
 
-      expectation map { ExpectedPattern format _ } getOrElse SyntaxPattern
+      expectation.map { ExpectedPattern.format(_) }.getOrElse(SyntaxPattern)
     }
 
     // %%

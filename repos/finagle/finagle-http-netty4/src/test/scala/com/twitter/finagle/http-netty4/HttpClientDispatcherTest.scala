@@ -57,7 +57,7 @@ class HttpClientDispatcherTest extends FunSuite {
     val cc = res.reader.read(Int.MaxValue)
     assert(!cc.isDefined)
     req.writer.write(Buf.Utf8("some other thing"))
-    serverT.read() flatMap { c =>
+    serverT.read().flatMap { c =>
       serverT.write(c)
     }
     assert(Await.result(cc, timeout) == Some(Buf.Utf8("some other thing")))
@@ -65,7 +65,7 @@ class HttpClientDispatcherTest extends FunSuite {
     val last = res.reader.read(Int.MaxValue)
     assert(!last.isDefined)
     req.close()
-    serverT.read() flatMap { c =>
+    serverT.read().flatMap { c =>
       serverT.write(c)
     }
     assert(Await.result(last, timeout).isEmpty)
@@ -467,7 +467,7 @@ class HttpClientDispatcherTest extends FunSuite {
       case Close(res) :: rest =>
         ops = rest
         status = Status.Closed
-        res respond {
+        res.respond {
           case Return(()) =>
             onClose.setValue(new Exception("closed"))
           case Throw(exc) =>

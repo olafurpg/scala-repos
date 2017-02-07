@@ -35,7 +35,7 @@ object Bounds {
   //similar to Scala code, this code is duplicated and optimized to avoid closures.
   def typeDepth(ts: Seq[ScType]): Int = {
     @tailrec def loop(tps: Seq[ScType], acc: Int): Int = tps match {
-      case tp :: rest => loop(rest, acc max tp.typeDepth)
+      case tp :: rest => loop(rest, acc.max(tp.typeDepth))
       case _ => acc
     }
     loop(ts, 0)
@@ -43,7 +43,7 @@ object Bounds {
 
   def baseTypeSeqDepth(ts: Seq[ScType]): Int = {
     @tailrec def loop(tps: Seq[ScType], acc: Int): Int = tps match {
-      case tp :: rest => loop(rest, acc max tp.baseTypeSeqDepth)
+      case tp :: rest => loop(rest, acc.max(tp.baseTypeSeqDepth))
       case _ => acc
     }
     loop(ts, 0)
@@ -52,15 +52,15 @@ object Bounds {
   def lubDepth(ts: Seq[ScType]): Int = {
     val td = typeDepth(ts)
     val bd = baseTypeSeqDepth(ts)
-    lubDepthAdjust(td, td max bd)
+    lubDepthAdjust(td, td.max(bd))
   }
 
   //This weird method is copy from Scala compiler. See scala.reflect.internal.Types#lubDepthAdjust
   private def lubDepthAdjust(td: Int, bd: Int): Int = {
     if (bd <= 3) bd
-    else if (bd <= 5) td max (bd - 1)
-    else if (bd <= 7) td max (bd - 2)
-    else (td - 1) max (bd - 3)
+    else if (bd <= 5) td.max(bd - 1)
+    else if (bd <= 7) td.max(bd - 2)
+    else ((td - 1)).max(bd - 3)
   }
 
   private class Options(_tp: ScType) extends {
@@ -395,14 +395,14 @@ object Bounds {
     : (ScType, Option[ScExistentialArgument]) = {
     if (substed1 equiv substed2) (substed1, None)
     else {
-      if (substed1 conforms substed2) {
+      if (substed1.conforms(substed2)) {
         (ScTypeVariable("_$" + count),
          Some(
            ScExistentialArgument("_$" + count,
                                  List.empty,
                                  substed1,
                                  substed2)))
-      } else if (substed2 conforms substed1) {
+      } else if (substed2.conforms(substed1)) {
         (ScTypeVariable("_$" + count),
          Some(
            ScExistentialArgument("_$" + count,

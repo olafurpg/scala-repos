@@ -178,23 +178,23 @@ class ScalaTypeParameterInfoHandler
             var paramText = param.name
             if (param.isContravariant) paramText = "-" + paramText
             else if (param.isCovariant) paramText = "+" + paramText
-            param.lowerBound foreach {
+            param.lowerBound.foreach {
               case psi.types.Nothing =>
               case tp: ScType =>
                 paramText = paramText + " >: " +
                     ScType.presentableText(substitutor.subst(tp))
             }
-            param.upperBound foreach {
+            param.upperBound.foreach {
               case psi.types.Any =>
               case tp: ScType =>
                 paramText = paramText + " <: " +
                     ScType.presentableText(substitutor.subst(tp))
             }
-            param.viewBound foreach { (tp: ScType) =>
+            param.viewBound.foreach { (tp: ScType) =>
               paramText = paramText + " <% " +
                   ScType.presentableText(substitutor.subst(tp))
             }
-            param.contextBound foreach { (tp: ScType) =>
+            param.contextBound.foreach { (tp: ScType) =>
               paramText = paramText + " : " +
                   ScType.presentableText(substitutor.subst(tp))
             }

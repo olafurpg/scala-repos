@@ -39,13 +39,13 @@ private[setup] trait Config {
 
   def clockHasTime = time + increment > 0
 
-  def makeClock = hasClock option justMakeClock
+  def makeClock = hasClock.option(justMakeClock)
 
   protected def justMakeClock =
     Clock((time * 60).toInt, clockHasTime.fold(increment, 1))
 
   def makeDaysPerTurn: Option[Int] =
-    (timeMode == TimeMode.Correspondence) option days
+    ((timeMode == TimeMode.Correspondence)).option(days)
 }
 
 trait Positional { self: Config =>
@@ -59,13 +59,13 @@ trait Positional { self: Config =>
   lazy val validFen =
     variant != chess.variant.FromPosition || {
       fen ?? { f =>
-        ~(Forsyth <<< f).map(_.situation playable strictFen)
+        ~(Forsyth <<< f).map(_.situation.playable(strictFen))
       }
     }
 
   def fenGame(builder: ChessGame => Game): Game = {
     val baseState =
-      fen ifTrue (variant == chess.variant.FromPosition) flatMap Forsyth.<<<
+      fen.ifTrue(variant == chess.variant.FromPosition).flatMap(Forsyth.<<<)
     val (chessGame, state) = baseState.fold(makeGame -> none[SituationPlus]) {
       case sit @ SituationPlus(Situation(board, color), _) =>
         val game = ChessGame(board = board,
@@ -106,7 +106,7 @@ trait BaseConfig {
   val variantsWithFenAndVariants =
     variantsWithVariants :+ chess.variant.FromPosition.id
 
-  val speeds = Speed.all map (_.id)
+  val speeds = Speed.all.map(_.id)
 
   private val timeMin = 0
   private val timeMax = 180

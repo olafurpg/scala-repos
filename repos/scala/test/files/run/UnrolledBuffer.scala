@@ -28,11 +28,11 @@ object Test {
     assert(u1 == UnrolledBuffer(1, 3))
     assert(u1.toList == List(1, 3))
 
-    u1 concat UnrolledBuffer(5, 7, 9)
+    u1.concat(UnrolledBuffer(5, 7, 9))
     assert(u1 == UnrolledBuffer(1, 3, 5, 7, 9))
 
     val u2 =
-      u1 map { x =>
+      u1.map { x =>
         (x - 1) / 2
       }
     assert(u2 == UnrolledBuffer(0, 1, 2, 3, 4))
@@ -47,18 +47,18 @@ object Test {
     assert(u1.size == 500)
     assert(u2.size == 500)
     assert(u1.iterator.toList == (0 until 500).toList)
-    assert((for (elem <- u1) yield elem) sameElements (0 until 500))
+    assert((for (elem <- u1) yield elem).sameElements(0 until 500))
 
-    u1 concat u2
+    u1.concat(u2)
     assert(u1.size == 1000)
     assert(u2.size == 0)
     assertCorrect(u1)
 
-    u1 concat UnrolledBuffer()
+    u1.concat(UnrolledBuffer())
     assertCorrect(u1)
 
     val u3 =
-      u1 map { x =>
+      u1.map { x =>
         x
       }
     var i = 0
@@ -118,7 +118,7 @@ object Test {
     for (i <- 0 until sz) u1(i) = store(i)
     for (i <- 0 until sz) assert(store(i) == u1(i))
 
-    assert((u1 map { x =>
+    assert((u1.map { x =>
       x
     }) == u1)
     assert(u1.iterator.toSeq.size == u1.size)

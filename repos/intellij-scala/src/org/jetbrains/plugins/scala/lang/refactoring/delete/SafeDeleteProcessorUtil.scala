@@ -83,7 +83,7 @@ object SafeDeleteProcessorUtil {
                 e.asOptionOf[ScObject].exists(_.isSyntheticObject)
               val nonSyntheticTargets =
                 results.map(_.getElement).filterNot(isSyntheticObject)
-              nonSyntheticTargets.toSet subsetOf allElementsToDelete.toSet
+              nonSyntheticTargets.toSet.subsetOf(allElementsToDelete.toSet)
             case _ => true
           }
 

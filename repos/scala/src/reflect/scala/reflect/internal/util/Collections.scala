@@ -33,11 +33,11 @@ trait Collections {
     *  intermediate structures like those created via flatten.
     */
   final def mexists[A](xss: List[List[A]])(p: A => Boolean) =
-    xss exists (_ exists p)
+    xss.exists(_.exists(p))
   final def mforall[A](xss: List[List[A]])(p: A => Boolean) =
-    xss forall (_ forall p)
+    xss.forall(_.forall(p))
   final def mmap[A, B](xss: List[List[A]])(f: A => B) =
-    xss map (_ map f)
+    xss.map(_.map(f))
   final def mfind[A](xss: List[List[A]])(p: A => Boolean): Option[A] = {
     var res: Option[A] = null
     mforeach(xss)(x => if ((res eq null) && p(x)) res = Some(x))
@@ -49,9 +49,9 @@ trait Collections {
     *  but people are branching out in their collections so here's an overload.
     */
   final def mforeach[A](xss: List[List[A]])(f: A => Unit) =
-    xss foreach (_ foreach f)
+    xss.foreach(_.foreach(f))
   final def mforeach[A](xss: Traversable[Traversable[A]])(f: A => Unit) =
-    xss foreach (_ foreach f)
+    xss.foreach(_.foreach(f))
 
   /** A version of List#map, specialized for List, and optimized to avoid allocation if `as` is empty */
   final def mapList[A, B](as: List[A])(f: A => B): List[B] =
@@ -166,7 +166,7 @@ trait Collections {
   final def distinctBy[A, B](xs: List[A])(f: A => B): List[A] = {
     val buf = new ListBuffer[A]
     val seen = mutable.Set[B]()
-    xs foreach { x =>
+    xs.foreach { x =>
       val y = f(x)
       if (!seen(y)) {
         buf += x
@@ -193,15 +193,15 @@ trait Collections {
   // @inline
   final def findOrElse[A](xs: TraversableOnce[A])(p: A => Boolean)(
       orElse: => A): A = {
-    xs find p getOrElse orElse
+    (xs find p).getOrElse(orElse)
   }
 
   final def mapFrom[A, A1 >: A, B](xs: List[A])(f: A => B): Map[A1, B] = {
-    Map[A1, B](xs map (x => (x, f(x))): _*)
+    Map[A1, B](xs.map(x => (x, f(x))): _*)
   }
   final def linkedMapFrom[A, A1 >: A, B](xs: List[A])(
       f: A => B): mutable.LinkedHashMap[A1, B] = {
-    mutable.LinkedHashMap[A1, B](xs map (x => (x, f(x))): _*)
+    mutable.LinkedHashMap[A1, B](xs.map(x => (x, f(x))): _*)
   }
 
   final def mapWithIndex[A, B](xs: List[A])(f: (A, Int) => B): List[B] = {

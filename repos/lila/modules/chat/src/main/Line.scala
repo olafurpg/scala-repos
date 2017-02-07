@@ -7,7 +7,7 @@ sealed trait Line {
   def author: String
   def isSystem = author == systemUserId
   def isHuman = !isSystem
-  def humanAuthor = isHuman option author
+  def humanAuthor = isHuman.option(author)
 }
 
 case class UserLine(username: String, text: String, troll: Boolean)
@@ -46,9 +46,9 @@ object Line {
   def userLineToStr(x: UserLine) =
     s"${x.username}${if (x.troll) "!" else " "}${x.text}"
 
-  def strToLine(str: String): Option[Line] = strToUserLine(str) orElse {
-    str.headOption flatMap Color.apply map { color =>
-      PlayerLine(color, str drop 2)
+  def strToLine(str: String): Option[Line] = strToUserLine(str).orElse {
+    str.headOption.flatMap(Color.apply).map { color =>
+      PlayerLine(color, str.drop(2))
     }
   }
   def lineToStr(x: Line) = x match {
@@ -65,6 +65,6 @@ object Line {
   }
 
   def toJsonString(lines: List[Line]) = Json stringify {
-    JsArray(lines map toJson)
+    JsArray(lines.map(toJson))
   }
 }

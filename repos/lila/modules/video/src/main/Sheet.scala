@@ -18,7 +18,7 @@ private[video] final class Sheet(url: String, api: VideoApi) {
   def select(entry: Entry) =
     entry.include && entry.lang == "en"
 
-  def fetchAll: Funit = fetch map (_ filter select) flatMap { entries =>
+  def fetchAll: Funit = fetch.map(_.filter(select)).flatMap { entries =>
     entries
       .map { entry =>
         api.video
@@ -62,9 +62,9 @@ private[video] final class Sheet(url: String, api: VideoApi) {
       .removeNotIn(entries.map(_.youtubeId)) >> api.video.count.clearCache >> api.tag.clearCache
   }
 
-  private def fetch: Fu[List[Entry]] = WS.url(url).get() flatMap {
+  private def fetch: Fu[List[Entry]] = WS.url(url).get().flatMap {
     case res if res.status == 200 =>
-      readEntries reads res.json match {
+      readEntries.reads(res.json) match {
         case JsError(err) => fufail(err.toString)
         case JsSuccess(entries, _) => fuccess(entries.toList)
       }
@@ -94,7 +94,8 @@ object Sheet {
       `gsx$target`.toString
         .split(';')
         .map(_.trim)
-        .toList flatMap parseIntOption
+        .toList
+        .flatMap(parseIntOption)
     def tags =
       `gsx$tags`.toString
         .split(';')

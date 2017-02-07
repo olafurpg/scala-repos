@@ -27,8 +27,8 @@ class Base64LongTest extends WordSpec {
       }
       val checkExpectedLength =
         (n: Long) => assert(toBase64(n).length == expectedLength(n))
-      Seq(0L, 1L, 63L, 64L, 4095L, 4096L, -1L) foreach checkExpectedLength
-      (1 to 200) foreach { _ =>
+      Seq(0L, 1L, 63L, 64L, 4095L, 4096L, -1L).foreach(checkExpectedLength)
+      ((1 to 200)).foreach { _ =>
         checkExpectedLength(Random.nextLong)
       }
     }

@@ -280,11 +280,13 @@ final case class ContentSecurityPolicy(
       }
       .mkString("; ")
 
-    reportUri.map { uri =>
-      s"$restrictionString; report-uri $uri"
-    } getOrElse {
-      restrictionString
-    }
+    reportUri
+      .map { uri =>
+        s"$restrictionString; report-uri $uri"
+      }
+      .getOrElse {
+        restrictionString
+      }
   }
 
   private[this] lazy val reportOnlyHeaders = {
@@ -379,8 +381,9 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
         {
           violation match {
             case Full(violation) =>
-              LiftRules.contentSecurityPolicyViolationReport(violation) or Full(
-                OkResponse())
+              LiftRules
+                .contentSecurityPolicyViolationReport(violation)
+                .or(Full(OkResponse()))
 
             case _ =>
               logger.warn(

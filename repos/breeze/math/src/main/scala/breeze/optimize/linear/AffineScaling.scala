@@ -21,7 +21,7 @@ class AffineScaling extends SerializableLogging {
                eps: Double = 1E-5) = {
     var converged = false
     var x = x0
-    var cv = x dot c
+    var cv = x.dot(c)
     while (!converged) {
       val vk = b - A * x
       val D = diag(vk :^ -2.0)
@@ -33,9 +33,9 @@ class AffineScaling extends SerializableLogging {
         (for (i <- 0 until hv.length if hv(i) < 0) yield (-vk(i) / hv(i)))
       val alpha = if (constraints.size > 1) constraints.min * gamma else 0.0
       val xn = x + hx * alpha
-      val cvn = xn dot c
+      val cvn = xn.dot(c)
       logger.info("Current obj: " + cvn)
-      if ((cvn - cv).abs / (1.0 max cvn) < eps) converged = true
+      if ((cvn - cv).abs / (1.0.max(cvn)) < eps) converged = true
       cv = cvn
       x = xn
     }

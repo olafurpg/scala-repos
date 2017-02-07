@@ -29,7 +29,7 @@ object ScalatraAtmosphereHandler {
     def onPreSuspend(event: AtmosphereResourceEvent) {}
 
     def onHeartbeat(event: AtmosphereResourceEvent) {
-      client(event.getResource) foreach (_.receive.lift(Heartbeat))
+      client(event.getResource).foreach(_.receive.lift(Heartbeat))
     }
 
     def onBroadcast(event: AtmosphereResourceEvent) {
@@ -43,8 +43,8 @@ object ScalatraAtmosphereHandler {
     def onDisconnect(event: AtmosphereResourceEvent) {
       val disconnector =
         if (event.isCancelled) ClientDisconnected else ServerDisconnected
-      client(event.getResource) foreach
-        (_.receive.lift(Disconnected(disconnector, Option(event.throwable))))
+      client(event.getResource).foreach(
+        _.receive.lift(Disconnected(disconnector, Option(event.throwable))))
       //      if (!event.getResource.isResumed) {
       //        event.getResource.session.invalidate()
       //      } else {
@@ -58,8 +58,8 @@ object ScalatraAtmosphereHandler {
     def onSuspend(event: AtmosphereResourceEvent) {}
 
     def onThrowable(event: AtmosphereResourceEvent) {
-      client(event.getResource) foreach
-        (_.receive.lift(Error(Option(event.throwable()))))
+      client(event.getResource)
+        .foreach(_.receive.lift(Error(Option(event.throwable()))))
     }
 
     def onClose(event: AtmosphereResourceEvent) {}
@@ -138,14 +138,14 @@ class ScalatraAtmosphereHandler(scalatraApp: ScalatraBase)(
   }
 
   private[this] def clientForRoute(route: MatchedRoute): AtmosphereClient = {
-    liftAction(route.action) getOrElse {
+    liftAction(route.action).getOrElse {
       throw new ScalatraException(
         "An atmosphere route should return an atmosphere client")
     }
   }
 
   private[this] def requestUri(resource: AtmosphereResource) = {
-    val u = resource.getRequest.getRequestURI.blankOption getOrElse "/"
+    val u = resource.getRequest.getRequestURI.blankOption.getOrElse("/")
     if (u.endsWith("/")) u + "*" else u + "/*"
   }
 

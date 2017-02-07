@@ -42,7 +42,7 @@ private[kestrel] class ResponseToEncoding extends OneToOneEncoder {
       case Error() => ErrorTokens
       case Values(values) =>
         val tokensWithData =
-          values map {
+          values.map {
             case Value(key, value) =>
               TokensWithData(Seq(ValueCb, key, ZeroCb), value)
           }

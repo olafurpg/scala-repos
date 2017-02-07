@@ -14,7 +14,7 @@ package neg1 {
 
   object Test {
     // bar can't be inlined - it is overridden in Baz3
-    def f = Foo.mkFoo() bar 10
+    def f = Foo.mkFoo().bar(10)
   }
 }
 
@@ -34,6 +34,6 @@ package neg2 {
 
   object Test {
     // bar can't be inlined - Baz3 is not final
-    def f = Foo.mkFoo() bar 10
+    def f = Foo.mkFoo().bar(10)
   }
 }

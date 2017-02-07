@@ -197,7 +197,7 @@ private trait CoproductFunctor[F[_], G[_]]
   implicit def G: Functor[G]
 
   override def map[A, B](a: Coproduct[F, G, A])(f: A => B) =
-    a map f
+    a.map(f)
 }
 
 private trait CoproductContravariant[F[_], G[_]]
@@ -206,7 +206,7 @@ private trait CoproductContravariant[F[_], G[_]]
   implicit def G: Contravariant[G]
 
   override def contramap[A, B](a: Coproduct[F, G, A])(f: B => A) =
-    a contramap f
+    a.contramap(f)
 }
 
 private trait CoproductFoldable[F[_], G[_]]
@@ -220,7 +220,7 @@ private trait CoproductFoldable[F[_], G[_]]
 
   override def foldMap[A, B](fa: Coproduct[F, G, A])(f: A => B)(
       implicit M: Monoid[B]) =
-    fa foldMap f
+    fa.foldMap(f)
 }
 
 private trait CoproductFoldable1[F[_], G[_]]
@@ -243,11 +243,11 @@ private trait CoproductTraverse[F[_], G[_]]
   implicit def G: Traverse[G]
 
   override def map[A, B](a: Coproduct[F, G, A])(f: A => B) =
-    a map f
+    a.map(f)
 
   override def traverseImpl[X[_]: Applicative, A, B](fa: Coproduct[F, G, A])(
       f: A => X[B]): X[Coproduct[F, G, B]] =
-    fa traverse f
+    fa.traverse(f)
 }
 
 private trait CoproductTraverse1[F[_], G[_]]
@@ -258,10 +258,10 @@ private trait CoproductTraverse1[F[_], G[_]]
 
   override final def traverse1Impl[X[_]: Apply, A, B](fa: Coproduct[F, G, A])(
       f: A => X[B]): X[Coproduct[F, G, B]] =
-    fa traverse1 f
+    fa.traverse1(f)
 
   override final def map[A, B](a: Coproduct[F, G, A])(f: A => B) =
-    a map f
+    a.map(f)
 }
 
 private trait CoproductCobind[F[_], G[_]] extends Cobind[Coproduct[F, G, ?]] {
@@ -269,7 +269,7 @@ private trait CoproductCobind[F[_], G[_]] extends Cobind[Coproduct[F, G, ?]] {
   implicit def G: Cobind[G]
 
   override def map[A, B](a: Coproduct[F, G, A])(f: A => B) =
-    a map f
+    a.map(f)
 
   override def cobind[A, B](a: Coproduct[F, G, A])(
       f: Coproduct[F, G, A] => B) =
@@ -282,7 +282,7 @@ private trait CoproductComonad[F[_], G[_]]
   implicit def G: Comonad[G]
 
   override def map[A, B](a: Coproduct[F, G, A])(f: A => B) =
-    a map f
+    a.map(f)
 
   override def copoint[A](p: Coproduct[F, G, A]) =
     p.copoint

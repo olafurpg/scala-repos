@@ -57,7 +57,7 @@ trait PostalCodeTypedField extends StringTypedField {
     }
   }
   private def genericCheck(zip: ValueType): List[FieldError] = {
-    toBoxMyType(zip) flatMap {
+    toBoxMyType(zip).flatMap {
       case null => Full(Text(S.?("invalid.postal.code")))
       case s if s.length < 3 => Full(Text(S.?("invalid.postal.code")))
       case _ => Empty

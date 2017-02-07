@@ -70,7 +70,7 @@ class BindingFactoryTest
       Trace.letTracer(tracer) { f }
       verify(tracer, atLeastOnce()).record(captor.capture())
       val annotations =
-        captor.getAllValues.asScala collect { case Record(_, _, a, _) => a }
+        captor.getAllValues.asScala.collect { case Record(_, _, a, _) => a }
       assert(expected == annotations)
     }
 

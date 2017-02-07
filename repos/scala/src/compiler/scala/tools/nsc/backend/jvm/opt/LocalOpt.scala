@@ -622,8 +622,9 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     AsmAnalyzer.sizeOKForBasicValue(method) && {
       def isSubType(aRefDesc: String, bClass: InternalName): Boolean =
         aRefDesc == bClass || bClass == ObjectRef.internalName || {
-          (bTypeForDescriptorOrInternalNameFromClassfile(aRefDesc) conformsTo classBTypeFromParsedClassfile(
-            bClass)).getOrElse(false)
+          (bTypeForDescriptorOrInternalNameFromClassfile(aRefDesc)
+            .conformsTo(classBTypeFromParsedClassfile(bClass)))
+            .getOrElse(false)
         }
 
       lazy val typeAnalyzer = new NonLubbingTypeFlowAnalyzer(method, owner)
@@ -644,7 +645,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
         case _ =>
       }
 
-      toRemove foreach method.instructions.remove
+      toRemove.foreach(method.instructions.remove)
       toRemove.nonEmpty
     }
   }
@@ -761,7 +762,7 @@ object LocalOptImpls {
     val firstLocalIndex = parametersSize(method)
     for (i <- 0 until firstLocalIndex)
       renumber += i // parameters and `this` are always used.
-    method.instructions.iterator().asScala foreach {
+    method.instructions.iterator().asScala.foreach {
       case VarInstruction(varIns, slot) => addVar(varIns, slot)
       case _ =>
     }

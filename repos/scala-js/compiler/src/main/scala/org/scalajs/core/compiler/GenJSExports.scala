@@ -45,7 +45,7 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
       val newlyDecldExportNames =
         newlyDecldExports.map(_.name.toTermName).toList.distinct
 
-      newlyDecldExportNames map { genMemberExport(classSym, _) }
+      newlyDecldExportNames.map { genMemberExport(classSym, _) }
     }
 
     def genJSClassDispatchers(
@@ -611,7 +611,7 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
 
       // optional repeated parameter list
       val jsVarArgPrep =
-        repeatedTpe map { tpe =>
+        repeatedTpe.map { tpe =>
           // new WrappedArray(varargs)
           val rhs = genNew(WrappedArrayClass,
                            WrappedArray_ctor,
@@ -652,7 +652,7 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
       val params = paramsPosterasure ++ paramsNow.drop(paramsPosterasure.size)
 
       for {
-        (jsArg, (param, i)) <- jsArgs zip params.zipWithIndex
+        (jsArg, (param, i)) <- jsArgs.zip(params.zipWithIndex)
       } yield {
         // Unboxed argument (if it is defined)
         val unboxedArg =
@@ -909,7 +909,7 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
 
   private def genFormalArgs(minArgc: Int, needsRestParam: Boolean)(
       implicit pos: Position): List[js.ParamDef] = {
-    val fixedParams = (1 to minArgc map genFormalArg).toList
+    val fixedParams = ((1 to minArgc).map(genFormalArg)).toList
     if (needsRestParam) fixedParams :+ genRestFormalArg()
     else fixedParams
   }

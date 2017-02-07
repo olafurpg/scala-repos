@@ -15,7 +15,7 @@ class FixedPointOverflow(n: Long) extends Exception(n.toString)
 
 case class FixedScale(denom: Int) {
   if (denom < 1)
-    throw new IllegalArgumentException("illegal denominator: %s" format denom)
+    throw new IllegalArgumentException("illegal denominator: %s".format(denom))
 }
 
 /**
@@ -219,7 +219,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   def pow(k: Int)(implicit scale: FixedScale): FixedPoint = {
     if (k < 0)
-      throw new IllegalArgumentException("exponent %s not allowed" format k)
+      throw new IllegalArgumentException("exponent %s not allowed".format(k))
     k match {
       case 0 =>
         new FixedPoint(scale.denom)
@@ -248,7 +248,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   def fpow(k: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
     val r = this.toRational
-    val g = k.long gcd scale.denom
+    val g = k.long.gcd(scale.denom)
     val n = (k.long / g)
     val d = (scale.denom / g)
     if (n.isValidInt && d.isValidInt) {
@@ -303,7 +303,7 @@ trait FixedPointInstances {
       def signum(x: FixedPoint): Int = x.signum
 
       override def eqv(x: FixedPoint, y: FixedPoint): Boolean = x == y
-      def compare(x: FixedPoint, y: FixedPoint): Int = x compare y
+      def compare(x: FixedPoint, y: FixedPoint): Int = x.compare(y)
 
       def zero: FixedPoint = FixedPoint.zero
       def one: FixedPoint = FixedPoint.one
@@ -312,7 +312,7 @@ trait FixedPointInstances {
       override def minus(x: FixedPoint, y: FixedPoint): FixedPoint = x - y
       def times(x: FixedPoint, y: FixedPoint): FixedPoint = x * y
 
-      def gcd(x: FixedPoint, y: FixedPoint): FixedPoint = x gcd y
+      def gcd(x: FixedPoint, y: FixedPoint): FixedPoint = x.gcd(y)
       def quot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
       def mod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
 

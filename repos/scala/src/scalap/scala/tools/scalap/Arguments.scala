@@ -49,7 +49,7 @@ object Arguments {
       (str indexOf separator) match {
         case -1 =>
           argumentError(s"missing '$separator' in binding '$str'"); ("", "")
-        case idx => ((str take idx).trim, (str drop (idx + 1)).trim)
+        case idx => ((str.take(idx)).trim, (str.drop(idx + 1)).trim)
       }
 
     def parse(args: Array[String]): Arguments = {
@@ -92,7 +92,7 @@ object Arguments {
           val j = i
           while ((i == j) && iter.hasNext) {
             val prefix = iter.next
-            if (args(i) startsWith prefix) {
+            if (args(i).startsWith(prefix)) {
               res
                 .addPrefixed(prefix, args(i).substring(prefix.length()).trim())
               i += 1
@@ -102,7 +102,7 @@ object Arguments {
             val iter = prefixedBindings.keysIterator
             while ((i == j) && iter.hasNext) {
               val prefix = iter.next
-              if (args(i) startsWith prefix) {
+              if (args(i).startsWith(prefix)) {
                 val arg = args(i).substring(prefix.length()).trim()
                 i = i + 1
                 res.addBinding(prefix,
@@ -121,8 +121,8 @@ object Arguments {
 
   def parse(options: String*)(args: Array[String]): Arguments = {
     val parser = new Parser('-')
-    options foreach parser.withOption
-    parser parse args
+    options.foreach(parser.withOption)
+    parser.parse(args)
   }
 }
 
@@ -152,19 +152,19 @@ class Arguments {
 
   def contains(option: String): Boolean = options(option)
 
-  def getArgument(option: String): Option[String] = arguments get option
+  def getArgument(option: String): Option[String] = arguments.get(option)
 
   def getSuffixes(prefix: String): mutable.Set[String] =
     prefixes.getOrElse(prefix, new mutable.HashSet)
 
   def containsSuffix(prefix: String, suffix: String): Boolean =
-    prefixes get prefix exists (set => set(suffix))
+    prefixes.get(prefix).exists(set => set(suffix))
 
   def getBindings(tag: String): mutable.Map[String, String] =
     bindings.getOrElse(tag, new mutable.HashMap)
 
   def getBinding(option: String, key: String): Option[String] =
-    bindings get option flatMap (_ get key)
+    bindings.get(option).flatMap(_.get(key))
 
   def getOthers: List[String] = others.toList
 }

@@ -28,7 +28,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     def filterAnnotations(p: AnnotationInfo => Boolean): Self // Retain only annotations meeting the condition.
     def withoutAnnotations: Self // Remove all annotations from this type.
 
-    def staticAnnotations = annotations filter (_.isStatic)
+    def staticAnnotations = annotations.filter(_.isStatic)
 
     def addThrowsAnnotation(throwableSym: Symbol): Self = {
       val throwableTpe =
@@ -40,10 +40,10 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
           // monomorphic one by introducing existentials, see SI-7009 for details
           existentialAbstraction(throwableSym.typeParams, throwableSym.tpe)
         }
-      this withAnnotation AnnotationInfo(
-        appliedType(ThrowsClass, throwableTpe),
-        List(Literal(Constant(throwableTpe))),
-        Nil)
+      this.withAnnotation(
+        AnnotationInfo(appliedType(ThrowsClass, throwableTpe),
+                       List(Literal(Constant(throwableTpe))),
+                       Nil))
     }
 
     /** Tests for, get, or remove an annotation */
@@ -59,7 +59,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       }
 
     def removeAnnotation(cls: Symbol): Self =
-      filterAnnotations(ann => !(ann matches cls))
+      filterAnnotations(ann => !(ann.matches(cls)))
 
     final def withAnnotation(annot: AnnotationInfo): Self =
       withAnnotations(List(annot))
@@ -69,7 +69,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
         cls: Symbol): List[AnnotationInfo] =
       anns match {
         case ann :: rest =>
-          if (ann matches cls) anns else dropOtherAnnotations(rest, cls)
+          if (ann.matches(cls)) anns else dropOtherAnnotations(rest, cls)
         case Nil => Nil
       }
   }
@@ -140,9 +140,11 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     */
   case class ScalaSigBytes(bytes: Array[Byte]) extends ClassfileAnnotArg {
     override def toString =
-      (bytes map { byte =>
-        (byte & 0xff).toHexString
-      }).mkString("[ ", " ", " ]")
+      (bytes
+        .map { byte =>
+          (byte & 0xff).toHexString
+        })
+        .mkString("[ ", " ", " ]")
     lazy val sevenBitsMayBeZero: Array[Byte] = {
       mapToNextModSevenBits(
         scala.reflect.internal.pickling.ByteCodecs.encode8to7(bytes))
@@ -157,7 +159,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     def fitsInOneString: Boolean = {
       // due to escaping, a zero byte in a classfile-annotation of string-type takes actually two characters.
       val numZeros =
-        (sevenBitsMayBeZero count { b =>
+        (sevenBitsMayBeZero.count { b =>
           b == 0
         })
 
@@ -201,21 +203,21 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       (ann.metaAnnotations, ann.defaultTargets) match {
         case (Nil, Nil) => defaultRetention
         case (Nil, defaults) => defaults contains category
-        case (metas, _) => metas exists (_ matches category)
+        case (metas, _) => metas.exists(_.matches(category))
       }
 
     def mkFilter(categories: List[Symbol], defaultRetention: Boolean)(
         ann: AnnotationInfo) =
       (ann.metaAnnotations, ann.defaultTargets) match {
         case (Nil, Nil) => defaultRetention
-        case (Nil, defaults) => categories exists defaults.contains
+        case (Nil, defaults) => categories.exists(defaults.contains)
         case (metas, _) =>
           val metaSyms =
-            metas collect {
+            metas.collect {
               case ann if !ann.symbol.isInstanceOf[StubSymbol] => ann.symbol
             }
-          categories exists
-            (category => metaSyms exists (_ isNonBottomSubClass category))
+          categories.exists(category =>
+            metaSyms.exists(_ isNonBottomSubClass category))
       }
   }
 
@@ -232,7 +234,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     def original = orig
     def setOriginal(t: Tree): this.type = {
       orig = t
-      this setPos t.pos
+      this.setPos(t.pos)
       this
     }
 
@@ -244,7 +246,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     val s_args = if (!args.isEmpty) args.mkString("(", ", ", ")") else ""
     val s_assocs =
       if (!assocs.isEmpty)
-        (assocs map { case (x, y) => x + " = " + y } mkString ("(", ", ", ")"))
+        (assocs.map { case (x, y) => x + " = " + y } mkString ("(", ", ", ")"))
       else ""
     s"${atp}${s_args}${s_assocs}"
   }
@@ -348,12 +350,12 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       *    List(getter, setter, beanGetter, beanSetter).
       */
     def defaultTargets =
-      symbol.annotations map (_.symbol) filter isMetaAnnotation
+      symbol.annotations.map(_.symbol).filter(isMetaAnnotation)
     // Test whether the typeSymbol of atp conforms to the given class.
     def matches(clazz: Symbol) =
       !symbol.isInstanceOf[StubSymbol] && (symbol isNonBottomSubClass clazz)
     // All subtrees of all args are considered.
-    def hasArgWhich(p: Tree => Boolean) = args exists (_ exists p)
+    def hasArgWhich(p: Tree => Boolean) = args.exists(_.exists(p))
 
     /** Check whether the type or any of the arguments are erroneous */
     def isErroneous = atp.isErroneous || args.exists(_.isErroneous)
@@ -363,9 +365,9 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     /** Check whether any of the arguments mention a symbol */
     def refsSymbol(sym: Symbol) = hasArgWhich(_.symbol == sym)
 
-    def stringArg(index: Int) = constantAtIndex(index) map (_.stringValue)
-    def intArg(index: Int) = constantAtIndex(index) map (_.intValue)
-    def symbolArg(index: Int) = argAtIndex(index) collect {
+    def stringArg(index: Int) = constantAtIndex(index).map(_.stringValue)
+    def intArg(index: Int) = constantAtIndex(index).map(_.intValue)
+    def symbolArg(index: Int) = argAtIndex(index).collect {
       case Apply(fun, Literal(str) :: Nil)
           if fun.symbol == definitions.Symbol_apply =>
         newTermName(str.stringValue)
@@ -375,7 +377,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     // expression, there is a fair chance they will turn up here not as
     // Literal(const) but some arbitrary AST.
     def constantAtIndex(index: Int): Option[Constant] =
-      argAtIndex(index) collect { case Literal(x) => x }
+      argAtIndex(index).collect { case Literal(x) => x }
 
     def argAtIndex(index: Int): Option[Tree] =
       if (index < args.size) Some(args(index)) else None
@@ -406,9 +408,9 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       def reverseEngineerArg(jarg: ClassfileAnnotArg): Tree = jarg match {
         case LiteralAnnotArg(const) =>
           val tpe = if (const.tag == UnitTag) UnitTpe else ConstantType(const)
-          Literal(const) setType tpe
+          Literal(const).setType(tpe)
         case ArrayAnnotArg(jargs) =>
-          val args = jargs map reverseEngineerArg
+          val args = jargs.map(reverseEngineerArg)
           // TODO: I think it would be a good idea to typecheck Java annotations using a more traditional algorithm
           // sure, we can't typecheck them as is using the `new jann(foo = bar)` syntax (because jann is going to be an @interface)
           // however we can do better than `typedAnnotation` by desugaring the aforementioned expression to
@@ -437,7 +439,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     // later on, in 2.12, for every annotation we could save an entire tree instead of just bits and pieces
     // but for 2.11 the current situation will have to do
     val ctorSelection = Select(New(TypeTree(ann.atp)), nme.CONSTRUCTOR)
-    Apply(ctorSelection, reverseEngineerArgs()) setType ann.atp
+    Apply(ctorSelection, reverseEngineerArgs()).setType(ann.atp)
   }
 
   protected[scala] def treeToAnnotation(tree: Tree): Annotation = tree match {
@@ -445,7 +447,7 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
       def encodeJavaArg(arg: Tree): ClassfileAnnotArg = arg match {
         case Literal(const) => LiteralAnnotArg(const)
         case Apply(ArrayModule, args) =>
-          ArrayAnnotArg(args map encodeJavaArg toArray)
+          ArrayAnnotArg(args.map(encodeJavaArg) toArray)
         case Apply(Select(New(tpt), nme.CONSTRUCTOR), args) =>
           NestedAnnotArg(treeToAnnotation(arg))
         case _ =>

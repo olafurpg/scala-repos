@@ -107,7 +107,7 @@ private[pref] final class DataForm {
       )
   }
 
-  def prefOf(p: Pref): Form[PrefData] = pref fill PrefData(p)
+  def prefOf(p: Pref): Form[PrefData] = pref.fill(PrefData(p))
 
   val miniPref = Form(
     mapping(
@@ -138,7 +138,7 @@ private[pref] final class DataForm {
                    submitMove = pref.submitMove)
   }
 
-  def miniPrefOf(p: Pref): Form[MiniPrefData] = miniPref fill MiniPrefData(p)
+  def miniPrefOf(p: Pref): Form[MiniPrefData] = miniPref.fill(MiniPrefData(p))
 
   val theme = Form(
     single(

@@ -6,7 +6,7 @@ final class ArrayOpt[T](val xs: Array[T]) extends AnyVal {
 }
 
 object Bip {
-  def mkInts(xs: Array[Short]) = xs map (_.toInt)
+  def mkInts(xs: Array[Short]) = xs.map(_.toInt)
   def unapplySeq(x: Any): ArrayOpt[Int] = x match {
     case xs: Array[Int] => new ArrayOpt(xs)
     case xs: Array[Short] => new ArrayOpt(mkInts(xs))

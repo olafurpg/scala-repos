@@ -144,14 +144,14 @@ abstract class SessionVar[T](dflt: => T)
     S.session.foreach(_.unset(name))
 
   override protected def wasInitialized(name: String, bn: String): Boolean = {
-    val old: Boolean = S.session.flatMap(_.get(bn)) openOr false
+    val old: Boolean = S.session.flatMap(_.get(bn)).openOr(false)
     S.session.foreach(_.set(bn, true))
     old
   }
 
   override protected def testWasSet(name: String, bn: String): Boolean = {
     S.session.flatMap(_.get(name)).isDefined ||
-    (S.session.flatMap(_.get(bn)) openOr false)
+    (S.session.flatMap(_.get(bn)).openOr(false))
   }
 
   protected override def registerCleanupFunc(in: LiftSession => Unit): Unit =
@@ -267,22 +267,26 @@ abstract class ContainerVar[T](dflt: => T)(
 
   override protected def wasInitialized(name: String, bn: String): Boolean = {
     val old: Boolean =
-      S.session.flatMap(s =>
-        localGet(s, bn) match {
-          case Full(b: Boolean) => Full(b)
-          case _ => Empty
-      }) openOr false
+      S.session
+        .flatMap(s =>
+          localGet(s, bn) match {
+            case Full(b: Boolean) => Full(b)
+            case _ => Empty
+        })
+        .openOr(false)
     S.session.foreach(s => localSet(s, bn, true))
     old
   }
 
   override protected def testWasSet(name: String, bn: String): Boolean = {
     S.session.flatMap(s => localGet(s, name)).isDefined ||
-    (S.session.flatMap(s =>
-      localGet(s, bn) match {
-        case Full(b: Boolean) => Full(b)
-        case _ => Empty
-    }) openOr false)
+    (S.session
+      .flatMap(s =>
+        localGet(s, bn) match {
+          case Full(b: Boolean) => Full(b)
+          case _ => Empty
+      })
+      .openOr(false))
   }
 
   protected override def registerCleanupFunc(in: LiftSession => Unit): Unit =
@@ -452,7 +456,7 @@ abstract class RequestVar[T](dflt: => T)
     RequestVarHandler.clear(name)
 
   override protected def wasInitialized(name: String, bn: String): Boolean = {
-    val old: Boolean = RequestVarHandler.get(bn) openOr false
+    val old: Boolean = RequestVarHandler.get(bn).openOr(false)
     RequestVarHandler.set(bn, this, true)
     old
   }
@@ -467,7 +471,7 @@ abstract class RequestVar[T](dflt: => T)
 
   override protected def testWasSet(name: String, bn: String): Boolean = {
     RequestVarHandler.get(name).isDefined ||
-    (RequestVarHandler.get(bn) openOr false)
+    (RequestVarHandler.get(bn).openOr(false))
   }
 
   /**
@@ -518,14 +522,14 @@ abstract class TransientRequestVar[T](dflt: => T)
     TransientRequestVarHandler.clear(name)
 
   override protected def wasInitialized(name: String, bn: String): Boolean = {
-    val old: Boolean = TransientRequestVarHandler.get(bn) openOr false
+    val old: Boolean = TransientRequestVarHandler.get(bn).openOr(false)
     TransientRequestVarHandler.set(bn, this, true)
     old
   }
 
   protected override def testWasSet(name: String, bn: String): Boolean = {
     TransientRequestVarHandler.get(name).isDefined ||
-    (TransientRequestVarHandler.get(bn) openOr false)
+    (TransientRequestVarHandler.get(bn).openOr(false))
   }
 
   /**

@@ -36,6 +36,6 @@ object Test extends BytecodeTest {
   def countComparisons(insnList: InsnList): Int = {
     def isComparison(node: asm.tree.AbstractInsnNode): Boolean =
       (comparisons contains node.getOpcode)
-    insnList.iterator.asScala count isComparison
+    insnList.iterator.asScala.count(isComparison)
   }
 }

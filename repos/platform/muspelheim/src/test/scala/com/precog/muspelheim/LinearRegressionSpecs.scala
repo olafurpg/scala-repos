@@ -821,7 +821,7 @@ trait LinearRegressionSpecs extends EvalStackSpecs {
           ids must haveSize(1)
       }
 
-      val predResults = prediction collect { case (_, values) => values }
+      val predResults = prediction.collect { case (_, values) => values }
 
       predResults mustEqual Set(
         SObject(

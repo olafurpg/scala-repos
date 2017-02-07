@@ -16,18 +16,18 @@ final class Env(config: Config,
                 scheduler: lila.common.Scheduler) {
 
   private val settings = new {
-    val MessageTtl = config duration "message.ttl"
+    val MessageTtl = config.duration("message.ttl")
     val NetDomain = config getString "net.domain"
     val SocketName = config getString "socket.name"
-    val SocketUidTtl = config duration "socket.uid.ttl"
-    val OrphanHookTtl = config duration "orphan_hook.ttl"
+    val SocketUidTtl = config.duration("socket.uid.ttl")
+    val OrphanHookTtl = config.duration("orphan_hook.ttl")
     val ActorName = config getString "actor.name"
-    val BroomPeriod = config duration "broom_period"
-    val ResyncIdsPeriod = config duration "resync_ids_period"
+    val BroomPeriod = config.duration("broom_period")
+    val ResyncIdsPeriod = config.duration("resync_ids_period")
     val CollectionSeek = config getString "collection.seek"
     val CollectionSeekArchive = config getString "collection.seek_archive"
-    val SeekMaxPerPage = config getInt "seek.max_per_page"
-    val SeekMaxPerUser = config getInt "seek.max_per_user"
+    val SeekMaxPerPage = config.getInt("seek.max_per_page")
+    val SeekMaxPerUser = config.getInt("seek.max_per_user")
   }
   import settings._
 
@@ -70,7 +70,7 @@ final class Env(config: Config,
     system.lilaBus.subscribe(self, 'abortGame)
     def receive = {
       case lila.game.actorApi.AbortedBy(pov) if pov.game.isCorrespondence =>
-        abortListener recreateSeek pov
+        abortListener.recreateSeek(pov)
     }
   }))
 }
@@ -78,14 +78,15 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "lobby" boot new Env(
-      config = lila.common.PlayApp loadConfig "lobby",
-      db = lila.db.Env.current,
-      hub = lila.hub.Env.current,
-      onStart = lila.game.Env.current.onStart,
-      blocking = lila.relation.Env.current.api.fetchBlocking,
-      playban = lila.playban.Env.current.api.currentBan _,
-      system = lila.common.PlayApp.system,
-      scheduler = lila.common.PlayApp.scheduler
-    )
+    "lobby".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("lobby"),
+        db = lila.db.Env.current,
+        hub = lila.hub.Env.current,
+        onStart = lila.game.Env.current.onStart,
+        blocking = lila.relation.Env.current.api.fetchBlocking,
+        playban = lila.playban.Env.current.api.currentBan _,
+        system = lila.common.PlayApp.system,
+        scheduler = lila.common.PlayApp.scheduler
+      ))
 }

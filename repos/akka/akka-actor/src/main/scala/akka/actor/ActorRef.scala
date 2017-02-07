@@ -113,7 +113,7 @@ abstract class ActorRef
     * Comparison takes path and the unique id of the actor cell into account.
     */
   final def compareTo(other: ActorRef) = {
-    val x = this.path compareTo other.path
+    val x = this.path.compareTo(other.path)
     if (x == 0)
       if (this.path.uid < other.path.uid) -1
       else if (this.path.uid == other.path.uid) 0
@@ -803,11 +803,11 @@ private[akka] final class FunctionRef(override val path: ActorPath,
     val watchedBy = _watchedBy.getAndSet(null)
     if (watchedBy != null) {
       if (watchedBy.nonEmpty) {
-        watchedBy foreach sendTerminated(ifLocal = false)
-        watchedBy foreach sendTerminated(ifLocal = true)
+        watchedBy.foreach(sendTerminated(ifLocal = false))
+        watchedBy.foreach(sendTerminated(ifLocal = true))
       }
       if (watching.nonEmpty) {
-        watching foreach unwatchWatched
+        watching.foreach(unwatchWatched)
         watching = Set.empty
       }
     }
@@ -841,7 +841,7 @@ private[akka] final class FunctionRef(override val path: ActorPath,
 
         if (watcheeSelf && !watcherSelf) {
           if (!watchedBy.contains(watcher))
-            if (! _watchedBy.compareAndSet(watchedBy, watchedBy + watcher))
+            if (!_watchedBy.compareAndSet(watchedBy, watchedBy + watcher))
               addWatcher(watchee, watcher) // try again
         } else if (!watcheeSelf && watcherSelf) {
           publish(
@@ -866,7 +866,7 @@ private[akka] final class FunctionRef(override val path: ActorPath,
 
         if (watcheeSelf && !watcherSelf) {
           if (watchedBy.contains(watcher))
-            if (! _watchedBy.compareAndSet(watchedBy, watchedBy - watcher))
+            if (!_watchedBy.compareAndSet(watchedBy, watchedBy - watcher))
               remWatcher(watchee, watcher) // try again
         } else if (!watcheeSelf && watcherSelf) {
           publish(

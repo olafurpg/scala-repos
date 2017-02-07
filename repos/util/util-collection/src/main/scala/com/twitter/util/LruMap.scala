@@ -24,7 +24,7 @@ trait JMapWrapperLike[A, B, +Repr <: MapLike[A, B, Repr] with Map[A, B]]
   override def +=(kv: (A, B)): this.type = {
     underlying.put(kv._1, kv._2); this
   }
-  override def -=(key: A): this.type = { underlying remove key; this }
+  override def -=(key: A): this.type = { underlying.remove(key); this }
 
   override def put(k: A, v: B): Option[B] = underlying.asScala.put(k, v)
 

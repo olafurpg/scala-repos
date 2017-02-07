@@ -33,13 +33,13 @@ class SimpleHistory extends History {
   def get(idx: Int): CharSequence = buf(idx)
   def add(item: CharSequence): Unit = buf += item
   def replace(item: CharSequence): Unit = {
-    buf trimEnd 1
+    buf.trimEnd(1)
     add(item)
   }
 
-  def remove(idx: Int): CharSequence = buf remove idx
-  def removeFirst(): CharSequence = buf remove 0
-  def removeLast(): CharSequence = buf remove lastIndex
+  def remove(idx: Int): CharSequence = buf.remove(idx)
+  def removeFirst(): CharSequence = buf.remove(0)
+  def removeLast(): CharSequence = buf.remove(lastIndex)
   def set(idx: Int, to: CharSequence): Unit = buf(idx) = to
 
   def current() =

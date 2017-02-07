@@ -75,7 +75,7 @@ sealed trait Matrix2[R, C, V] extends Serializable {
     that * this
 
   def /(that: Scalar2[V])(implicit field: Field[V]): Matrix2[R, C, V] =
-    that divMatrix this
+    that.divMatrix(this)
 
   /**
     * Convert the current Matrix to a TypedPipe

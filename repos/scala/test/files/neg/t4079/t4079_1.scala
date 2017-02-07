@@ -21,10 +21,10 @@ object Cat {
 
 object Functors {
   implicit val List = new Functor[List] {
-    def map[A, B](fa: List[A], f: A => B): List[B] = fa map f
+    def map[A, B](fa: List[A], f: A => B): List[B] = fa.map(f)
   }
   implicit val Option = new Functor[Option] {
-    def map[A, B](fa: Option[A], f: A => B): Option[B] = fa map f
+    def map[A, B](fa: Option[A], f: A => B): Option[B] = fa.map(f)
   }
 }
 

@@ -47,7 +47,7 @@ class RequestSemaphoreFilterTest extends FunSuite {
       def apply(req: Int) = Future.never
     }
     val q = new AsyncSemaphore(1, 0)
-    val svc = new RequestSemaphoreFilter(q) andThen neverSvc
+    val svc = new RequestSemaphoreFilter(q).andThen(neverSvc)
     svc(1)
     val f = intercept[Failure] { Await.result(svc(1)) }
     assert(f.isFlagged(Failure.Restartable))
@@ -59,7 +59,7 @@ class RequestSemaphoreFilterTest extends FunSuite {
       def apply(req: Int) = Future.exception(exc)
     }
     val q = new AsyncSemaphore(1, 0)
-    val svc = new RequestSemaphoreFilter(q) andThen neverSvc
+    val svc = new RequestSemaphoreFilter(q).andThen(neverSvc)
     svc(1)
     val e = intercept[Exception] { Await.result(svc(1)) }
     assert(e == exc)

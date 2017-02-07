@@ -31,11 +31,14 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
                              Service[Try[Int], Try[Int]]) => Closable = {
         case (transport, service) =>
           val f =
-            transport.read() flatMap { num =>
-              service(num)
-            } respond { result =>
-              transport.write(result.flatten)
-            }
+            transport
+              .read()
+              .flatMap { num =>
+                service(num)
+              }
+              .respond { result =>
+                transport.write(result.flatten)
+              }
           service
       }
 
@@ -66,7 +69,7 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       val clientTransport = new QueueTransport(qOut, qIn)
 
       val mockConnHandle = mock[Closable]
-      when(mockConnHandle.close(any[Time])) thenReturn Future.Done
+      when(mockConnHandle.close(any[Time])).thenReturn(Future.Done)
 
       val serviceTransport: (Transport[Try[Int], Try[Int]],
                              Service[Try[Int], Try[Int]]) => Closable =
@@ -80,8 +83,8 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       val socket = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
       val factory = mock[ServiceFactory[Try[Int], Try[Int]]]
       val service = Service.mk[Try[Int], Try[Int]] { Future.value }
-      when(factory(any[ClientConnection])) thenReturn Future.value(service)
-      when(factory.close(any[Time])) thenReturn Future.Done
+      when(factory(any[ClientConnection])).thenReturn(Future.value(service))
+      when(factory.close(any[Time])).thenReturn(Future.Done)
       val listeningServer: ListeningServer = server.serve(socket, factory)
 
       assert(clientTransport.write(Return(3)).isDefined == true)
@@ -99,7 +102,7 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       val clientTransport = new QueueTransport(qOut, qIn)
 
       val mockConnHandle = mock[Closable]
-      when(mockConnHandle.close(any[Time])) thenReturn Future.Done
+      when(mockConnHandle.close(any[Time])).thenReturn(Future.Done)
 
       val serviceTransport: (Transport[Try[Int], Try[Int]],
                              Service[Try[Int], Try[Int]]) => Closable =

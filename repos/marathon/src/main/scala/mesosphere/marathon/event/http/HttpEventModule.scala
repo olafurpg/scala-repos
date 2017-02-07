@@ -82,10 +82,10 @@ class HttpEventModule(httpEventConfiguration: HttpEventConfiguration)
     val local_ip = java.net.InetAddress.getLocalHost.getHostAddress
 
     val actor = system.actorOf(Props(new SubscribersKeeperActor(store)))
-    conf.httpEventEndpoints.get foreach { urls =>
+    conf.httpEventEndpoints.get.foreach { urls =>
       log.info(
         s"http_endpoints($urls) are specified at startup. Those will be added to subscribers list.")
-      urls foreach { url =>
+      urls.foreach { url =>
         val f =
           (actor ? Subscribe(local_ip, url)).mapTo[MarathonSubscriptionEvent]
         f.onFailure {

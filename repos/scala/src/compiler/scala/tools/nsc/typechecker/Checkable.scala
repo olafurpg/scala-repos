@@ -75,18 +75,18 @@ trait Checkable { self: Analyzer =>
     */
   def propagateKnownTypes(from: Type, to: Symbol): Type = {
     def tparams = to.typeParams
-    val tvars = tparams map (p => TypeVar(p))
+    val tvars = tparams.map(p => TypeVar(p))
     val tvarType = appliedType(to, tvars: _*)
-    val bases = from.baseClasses filter (to.baseClasses contains _)
+    val bases = from.baseClasses.filter(to.baseClasses contains _)
 
-    bases foreach { bc =>
-      val tps1 = (from baseType bc).typeArgs
-      val tps2 = (tvarType baseType bc).typeArgs
+    bases.foreach { bc =>
+      val tps1 = (from.baseType(bc)).typeArgs
+      val tps2 = (tvarType.baseType(bc)).typeArgs
       if (tps1.size != tps2.size)
         devWarning(
           s"Unequally sized type arg lists in propagateKnownTypes($from, $to): ($tps1, $tps2)")
 
-      (tps1, tps2).zipped foreach (_ =:= _)
+      (tps1, tps2).zipped.foreach(_ =:= _)
     // Alternate, variance respecting formulation causes
     // neg/unchecked3.scala to fail (abstract types).  TODO -
     // figure it out. It seems there is more work to do if I
@@ -101,7 +101,7 @@ trait Checkable { self: Analyzer =>
     }
 
     val resArgs =
-      tparams zip tvars map {
+      tparams.zip(tvars).map {
         case (_, tvar) if tvar.instValid => tvar.constr.inst
         case (tparam, _) => tparam.tpeHK
       }
@@ -118,11 +118,11 @@ trait Checkable { self: Analyzer =>
       ||
         isUnwarnableTypeArgSymbol(arg.typeSymbolDirect) // has to be direct: see pos/t1439
     )
-  private def uncheckedOk(tp: Type) = tp hasAnnotation UncheckedClass
+  private def uncheckedOk(tp: Type) = tp.hasAnnotation(UncheckedClass)
 
   private def typeArgsInTopLevelType(tp: Type): List[Type] = {
     val tps = tp match {
-      case RefinedType(parents, _) => parents flatMap typeArgsInTopLevelType
+      case RefinedType(parents, _) => parents.flatMap(typeArgsInTopLevelType)
       case TypeRef(_, ArrayClass, arg :: Nil) =>
         if (arg.typeSymbol.isAbstractType) arg :: Nil
         else typeArgsInTopLevelType(arg)
@@ -131,7 +131,7 @@ trait Checkable { self: Analyzer =>
         tparams.map(_.tpe) ++ typeArgsInTopLevelType(underlying)
       case _ => Nil
     }
-    tps filterNot isUnwarnableTypeArg
+    tps.filterNot(isUnwarnableTypeArg)
   }
 
   private def scrutConformsToPatternType(scrut: Type, pattTp: Type): Boolean = {
@@ -191,12 +191,11 @@ trait Checkable { self: Analyzer =>
             // with a WildcardType, except for 'targ'. If !(XR <: derived) then
             // 'targ' is uncheckable.
             val derived =
-              P map
-                (tp =>
-                   if (possibles(tp) && !(tp =:= targ)) WildcardType else tp)
+              P.map(tp =>
+                if (possibles(tp) && !(tp =:= targ)) WildcardType else tp)
             !(XR <:< derived)
           }
-        opt getOrElse NoType
+        opt.getOrElse(NoType)
       }
 
     def neverSubClass = isNeverSubClass(Xsym, Psym)
@@ -219,14 +218,13 @@ trait Checkable { self: Analyzer =>
     /** Are these symbols classes with no subclass relationship? */
     def areUnrelatedClasses(sym1: Symbol, sym2: Symbol) =
       (sym1.isClass &&
-        sym2.isClass && !(sym1 isSubClass sym2) && !(sym2 isSubClass sym1))
+        sym2.isClass && !(sym1.isSubClass(sym2)) && !(sym2.isSubClass(sym1)))
 
     /** Are all children of these symbols pairwise irreconcilable? */
     def allChildrenAreIrreconcilable(sym1: Symbol, sym2: Symbol) =
-      (sym1.sealedChildren.toList forall
-        (c1 =>
-           sym2.sealedChildren.toList forall
-             (c2 => areIrreconcilableAsParents(c1, c2))))
+      (sym1.sealedChildren.toList.forall(c1 =>
+        sym2.sealedChildren.toList.forall(c2 =>
+          areIrreconcilableAsParents(c1, c2))))
 
     /** Is it impossible for the given symbols to be parents in the same class?
       *  This means given A and B, can there be an instance of A with B? This is the
@@ -269,7 +267,7 @@ trait Checkable { self: Analyzer =>
            else if (variance.isCovariant) isNeverSubType(t2, t1)
            else if (variance.isContravariant) isNeverSubType(t1, t2)
            else false)
-        exists3(tps1, tps2, tparams map (_.variance))(isNeverSubArg)
+        exists3(tps1, tps2, tparams.map(_.variance))(isNeverSubArg)
       }
     private def isNeverSameType(tp1: Type, tp2: Type): Boolean =
       (tp1, tp2) match {
@@ -284,8 +282,8 @@ trait Checkable { self: Analyzer =>
       /*logResult(s"isNeverSubType($tp1, $tp2)")*/ ((tp1.dealias, tp2.dealias) match {
         case (TypeRef(_, sym1, args1), TypeRef(_, sym2, args2)) =>
           isNeverSubClass(sym1, sym2) || {
-            (sym1 isSubClass sym2) && {
-              val tp1seen = tp1 baseType sym2
+            (sym1.isSubClass(sym2)) && {
+              val tp1seen = tp1.baseType(sym2)
               isNeverSubArgs(tp1seen.typeArgs, args2, sym2.typeParams)
             }
           }
@@ -303,7 +301,7 @@ trait Checkable { self: Analyzer =>
           case TypeRef(_, NothingClass | NullClass | AnyValClass, _) =>
             false
           case RefinedType(_, decls) if !decls.isEmpty => false
-          case RefinedType(parents, _) => parents forall isCheckable
+          case RefinedType(parents, _) => parents.forall(isCheckable)
           case p => new CheckabilityChecker(AnyTpe, p) isCheckable
         }))
 
@@ -338,8 +336,8 @@ trait Checkable { self: Analyzer =>
             tree.pos,
             s"a pattern match on a refinement type is unchecked")
         case RefinedType(parents, _) =>
-          parents foreach
-            (p => checkCheckable(tree, p, X, inPattern, canRemedy))
+          parents.foreach(p =>
+            checkCheckable(tree, p, X, inPattern, canRemedy))
         case _ =>
           val checker = new CheckabilityChecker(X, P)
           if (checker.result == RuntimeCheckable) log(checker.summaryString)

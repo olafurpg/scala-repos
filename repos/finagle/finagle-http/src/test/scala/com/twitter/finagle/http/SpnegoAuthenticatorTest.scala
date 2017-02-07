@@ -87,13 +87,13 @@ class SpnegoAuthenticatorTest extends FunSuite with MockitoSugar {
   ) = {
     val service = mock[Service[Authenticated[Request], Response]]
     val server = com.twitter.finagle.Http
-      .serve("localhost:*", new ServerFilter(serverSrc) andThen service)
+      .serve("localhost:*", new ServerFilter(serverSrc).andThen(service))
     val port = server.boundAddress.asInstanceOf[InetSocketAddress].getPort
     val rawClient = com.twitter.finagle.Http.newService(s"localhost:$port")
 
     val client = clientSrc
       .map { src =>
-        new ClientFilter(src) andThen rawClient
+        new ClientFilter(src).andThen(rawClient)
       }
       .getOrElse {
         rawClient

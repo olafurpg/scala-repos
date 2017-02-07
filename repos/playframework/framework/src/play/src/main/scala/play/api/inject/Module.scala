@@ -158,16 +158,18 @@ object Modules {
 
       {
         tryConstruct(environment, configuration)
-      } orElse {
-        tryConstruct(new JavaEnvironment(environment),
-                     new JavaConfiguration(configuration))
-      } orElse {
-        tryConstruct()
-      } getOrElse {
-        throw new PlayException(
-          "No valid constructors",
-          "Module [" + className + "] cannot be instantiated.")
-      }
+      }.orElse {
+          tryConstruct(new JavaEnvironment(environment),
+                       new JavaConfiguration(configuration))
+        }
+        .orElse {
+          tryConstruct()
+        }
+        .getOrElse {
+          throw new PlayException(
+            "No valid constructors",
+            "Module [" + className + "] cannot be instantiated.")
+        }
     } catch {
       case e: PlayException => throw e
       case e: VirtualMachineError => throw e

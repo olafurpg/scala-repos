@@ -87,7 +87,7 @@ object EnumerateesSpec
           case Input.Empty => Enumerator.empty
           case Input.EOF => Enumerator.empty
         }(mapEC)
-        mustTransformTo(1, 2)(2, 4)(eee compose Enumeratee.take(2))
+        mustTransformTo(1, 2)(2, 4)(eee.compose(Enumeratee.take(2)))
       }
     }
   }

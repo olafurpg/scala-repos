@@ -18,7 +18,7 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
     val builder = new ProcessBuilder(args.tail: _*)
     builder.directory(new File(args.head))
 
-    descriptor = Option(builder.start()) map {
+    descriptor = Option(builder.start()).map {
       case p =>
         createDescriptor(p, consumer).startListening()
     }
@@ -81,7 +81,7 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
     }
 
     private def processMessage(msg: String) {
-      consumer consume msg
+      consumer.consume(msg)
     }
   }
 

@@ -120,7 +120,7 @@ final class JsonView {
     private implicit val SerieWrites = Json.writes[Chart.Serie]
     private implicit val ChartWrites = Json.writes[Chart]
 
-    def apply(c: Chart) = ChartWrites writes c
+    def apply(c: Chart) = ChartWrites.writes(c)
   }
 
   def question(metric: String, dimension: String, filters: String) = Json.obj(
@@ -129,7 +129,7 @@ final class JsonView {
     "filters" ->
       (filters
         .split('/')
-        .map(_ split ':')
+        .map(_.split(':'))
         .collect {
           case Array(key, values) =>
             key -> JsArray(values.split(',').map(JsString.apply))

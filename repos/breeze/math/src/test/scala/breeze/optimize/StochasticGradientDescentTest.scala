@@ -32,7 +32,7 @@ class StochasticGradientDescentTest extends OptimizeTestBase {
       val f = new BatchDiffFunction[DenseVector[Double]] {
         def calculate(x: DenseVector[Double], r: IndexedSeq[Int]) = {
           val r = x - 3.0
-          ((r dot r), (x * 2.0) - 6.0)
+          ((r.dot(r)), (x * 2.0) - 6.0)
         }
         val fullRange = 0 to 1
       }
@@ -51,7 +51,7 @@ class StochasticGradientDescentTest extends OptimizeTestBase {
       val f = new BatchDiffFunction[Counter[String, Double]] {
         def calculate(x: Counter[String, Double], r: IndexedSeq[Int]) = {
           val r = x - 3.0
-          ((r dot r), (x * 2.0) - 6.0)
+          ((r.dot(r)), (x * 2.0) - 6.0)
         }
         val fullRange = 0 to 1
       }

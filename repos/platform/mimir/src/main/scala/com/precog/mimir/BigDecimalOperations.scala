@@ -42,7 +42,7 @@ object BigDecimalOperations {
         gen(d / 3)
       }
 
-      approx take k last
+      approx.take(k) last
     } else if (d == 0) {
       0
     } else {

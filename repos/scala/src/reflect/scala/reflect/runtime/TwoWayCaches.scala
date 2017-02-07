@@ -31,7 +31,7 @@ private[runtime] trait TwoWayCaches { self: SymbolTable =>
     }
 
     def toScala(key: J)(body: => S): S = gilSynchronized {
-      toScalaMap get key match {
+      toScalaMap.get(key) match {
         case SomeRef(v) =>
           v
         case _ =>
@@ -42,7 +42,7 @@ private[runtime] trait TwoWayCaches { self: SymbolTable =>
     }
 
     def toJava(key: S)(body: => J): J = gilSynchronized {
-      toJavaMap get key match {
+      toJavaMap.get(key) match {
         case SomeRef(v) =>
           v
         case _ =>
@@ -53,7 +53,7 @@ private[runtime] trait TwoWayCaches { self: SymbolTable =>
     }
 
     def toJavaOption(key: S)(body: => Option[J]): Option[J] = gilSynchronized {
-      toJavaMap get key match {
+      toJavaMap.get(key) match {
         case SomeRef(v) =>
           Some(v)
         case _ =>

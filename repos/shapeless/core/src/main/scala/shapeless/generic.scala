@@ -358,7 +358,7 @@ trait CaseClassMacros extends ReprTypes {
     val tSym = tpe.typeSymbol
     if (tSym.isClass && isAnonOrRefinement(tSym)) Nil
     else
-      tpe.decls.toList collect {
+      tpe.decls.toList.collect {
         case sym: TermSymbol if isCaseAccessorLike(sym) =>
           (sym.name.toTermName, sym.typeSignatureIn(tpe).finalResultType)
       }
@@ -392,7 +392,7 @@ trait CaseClassMacros extends ReprTypes {
 
   def ctorsOfAux(tpe: Type, hk: Boolean): List[Type] = {
     def collectCtors(classSym: ClassSymbol): List[ClassSymbol] = {
-      classSym.knownDirectSubclasses.toList flatMap { child0 =>
+      classSym.knownDirectSubclasses.toList.flatMap { child0 =>
         val child = child0.asClass
         child.typeSignature // Workaround for <https://issues.scala-lang.org/browse/SI-7755>
         if (isCaseClassLike(child) || isCaseObjectLike(child)) List(child)
@@ -417,7 +417,7 @@ trait CaseClassMacros extends ReprTypes {
 
       val ctorSyms = collectCtors(baseSym).sortBy(_.fullName)
       val ctors =
-        ctorSyms flatMap { sym =>
+        ctorSyms.flatMap { sym =>
           def substituteArgs: List[Type] = {
             val subst = c.internal.thisType(sym).baseType(baseSym).typeArgs
             sym.typeParams.map { param =>
@@ -500,7 +500,7 @@ trait CaseClassMacros extends ReprTypes {
       val HConsSym = hconsTpe.typeSymbol
       if (u <:< HNilTpe) acc
       else
-        (u baseType HConsSym) match {
+        (u.baseType(HConsSym)) match {
           case TypeRef(pre, _, List(hd, tl)) if pre =:= HConsPre =>
             unfold(tl, hd :: acc)
           case _ => abort(s"$tpe is not an HList type")
@@ -657,7 +657,7 @@ trait CaseClassMacros extends ReprTypes {
 
   def isSealedHierarchyClassSymbol(symbol: ClassSymbol): Boolean = {
     def helper(classSym: ClassSymbol): Boolean = {
-      classSym.knownDirectSubclasses.toList forall { child0 =>
+      classSym.knownDirectSubclasses.toList.forall { child0 =>
         val child = child0.asClass
         child.typeSignature // Workaround for <https://issues.scala-lang.org/browse/SI-7755>
 
@@ -822,7 +822,7 @@ trait CaseClassMacros extends ReprTypes {
     }
 
   def equalTypes(as: List[Type], bs: List[Type]): Boolean =
-    as.length == bs.length && (as zip bs).foldLeft(true) {
+    as.length == bs.length && (as.zip(bs)).foldLeft(true) {
       case (acc, (a, b)) => acc && unByName(a) =:= unByName(b)
     }
 
@@ -1104,7 +1104,7 @@ class GenericMacros(val c: whitebox.Context) extends CaseClassMacros {
 
     val to = {
       val toCases =
-        ctorsOf(tpe) zip (Stream from 0) map (mkCoproductCases _).tupled
+        ctorsOf(tpe).zip(Stream.from(0)).map(mkCoproductCases _).tupled
       q"""_root_.shapeless.Coproduct.unsafeMkCoproduct((p: @_root_.scala.unchecked) match { case ..$toCases }, p).asInstanceOf[Repr]"""
     }
 

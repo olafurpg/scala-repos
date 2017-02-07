@@ -22,7 +22,7 @@ trait PreparedStatement {
     * is returned, the function returns an empty Seq.
     */
   def select[T](params: Parameter*)(f: Row => T): Future[Seq[T]] =
-    apply(params: _*) map {
+    apply(params: _*).map {
       case rs: ResultSet => rs.rows.map(f)
       case _ => Nil
     }

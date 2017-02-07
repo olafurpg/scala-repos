@@ -98,7 +98,7 @@ object TrigTest {
     val t0 = System.currentTimeMillis()
     println(s"testing $name")
     while (i < limit) {
-      if (verbose) println("  trying i=%s" format i)
+      if (verbose) println("  trying i=%s".format(i))
       implicit val mc = new MathContext(i)
       val seen = f(i)
       if (check) {
@@ -125,7 +125,7 @@ object TrigTest {
     val t0 = System.currentTimeMillis()
     println(s"testing $name")
     while (i < limit) {
-      if (verbose) println("  trying i=%s" format i)
+      if (verbose) println("  trying i=%s".format(i))
       implicit val mc = new MathContext(i)
       val seen = f(mc)
       if (check) {

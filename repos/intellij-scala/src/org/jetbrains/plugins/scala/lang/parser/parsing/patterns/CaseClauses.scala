@@ -21,7 +21,7 @@ object CaseClauses {
       caseClausesMarker.drop()
       return false
     }
-    while (CaseClause parse builder) {}
+    while (CaseClause.parse(builder)) {}
     caseClausesMarker.done(ScalaElementTypes.CASE_CLAUSES)
     return true
   }

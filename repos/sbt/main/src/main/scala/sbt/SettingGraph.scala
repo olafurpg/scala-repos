@@ -26,7 +26,7 @@ object SettingGraph {
       val key = scoped.key
       val scope = scoped.scope
       val definedIn =
-        structure.data.definingScope(scope, key) map { sc =>
+        structure.data.definingScope(scope, key).map { sc =>
           display(ScopedKey(sc, key))
         }
       val depends = cMap.get(scoped) match {
@@ -40,7 +40,7 @@ object SettingGraph {
                    Project.scopedKeyData(structure, scope, key),
                    key.description,
                    basedir,
-                   depends map { (x: ScopedKey[_]) =>
+                   depends.map { (x: ScopedKey[_]) =>
                      loop(x, generation + 1)
                    })
     }
@@ -55,19 +55,23 @@ case class SettingGraph(name: String,
                         basedir: File,
                         depends: Set[SettingGraph]) {
   def dataString: String =
-    data map { d =>
-      d.settingValue map {
-        case f: File => IO.relativize(basedir, f) getOrElse { f.toString }
-        case x => x.toString
-      } getOrElse { d.typeName }
-    } getOrElse { "" }
+    data
+      .map { d =>
+        d.settingValue
+          .map {
+            case f: File => IO.relativize(basedir, f).getOrElse { f.toString }
+            case x => x.toString
+          }
+          .getOrElse { d.typeName }
+      }
+      .getOrElse { "" }
 
   def dependsAscii: String =
-    Graph.toAscii(this,
-                  (x: SettingGraph) => x.depends.toSeq.sortBy(_.name),
-                  (x: SettingGraph) =>
-                    "%s = %s" format
-                      (x.definedIn getOrElse { "" }, x.dataString))
+    Graph.toAscii(
+      this,
+      (x: SettingGraph) => x.depends.toSeq.sortBy(_.name),
+      (x: SettingGraph) =>
+        "%s = %s".format(x.definedIn.getOrElse { "" }, x.dataString))
 }
 
 object Graph {
@@ -98,11 +102,11 @@ object Graph {
       val line = limitLine(
         (twoSpaces * level) + (if (level == 0) "" else "+-") + display(node))
       val cs = Vector(children(node): _*)
-      val childLines = cs map { toAsciiLines(_, level + 1) }
+      val childLines = cs.map { toAsciiLines(_, level + 1) }
       val withBar =
-        childLines.zipWithIndex flatMap {
+        childLines.zipWithIndex.flatMap {
           case (lines, pos) if pos < (cs.size - 1) =>
-            lines map { insertBar(_, 2 * (level + 1)) }
+            lines.map { insertBar(_, 2 * (level + 1)) }
           case (lines, pos) =>
             if (lines.last.trim != "") lines ++ Vector(twoSpaces * (level + 1))
             else lines

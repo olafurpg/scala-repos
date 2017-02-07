@@ -26,16 +26,16 @@ object PI {
     }
     builder.getTokenType match {
       case ScalaXmlTokenTypes.XML_NAME => builder.advanceLexer()
-      case _ => builder error ErrMsg("xml.name.expected")
+      case _ => builder.error(ErrMsg("xml.name.expected"))
     }
-    while (Attribute parse builder) {}
+    while (Attribute.parse(builder)) {}
     builder.getTokenType match {
       case ScalaXmlTokenTypes.XML_TAG_CHARACTERS => builder.advanceLexer()
       case _ =>
     }
     builder.getTokenType match {
       case ScalaXmlTokenTypes.XML_PI_END => builder.advanceLexer()
-      case _ => builder error ErrMsg("xml.PI.end.expected")
+      case _ => builder.error(ErrMsg("xml.PI.end.expected"))
     }
     PIMarker.done(ScalaElementTypes.XML_PI)
     true

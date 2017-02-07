@@ -31,11 +31,11 @@ class MarathonExceptionMapperTest
     val entity = Json.parse(entityString)
     (entity \ "message").as[String] should be("Invalid JSON")
     val details = (entity \ "details").as[Seq[JsObject]]
-    details should have size 1
+    (details should have).size(1)
     val firstDetail = details.head
     (firstDetail \ "path").as[String] should be("/id")
     val errors = (firstDetail \ "errors").as[Seq[String]]
-    errors should have size 1
+    (errors should have).size(1)
     errors.head should be("error.expected.jsstring")
   }
 
@@ -94,7 +94,7 @@ class MarathonExceptionMapperTest
     val entity = Json.parse(entityString)
     (entity \ "message").as[String] should be("Object is not valid")
     val errors = (entity \ "details").as[Seq[JsObject]]
-    errors should have size 1
+    (errors should have).size(1)
     val firstError = errors.head
     (firstError \ "path").as[String] should be("/")
     val errorMsgs = (firstError \ "errors").as[Seq[String]]

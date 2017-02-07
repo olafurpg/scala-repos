@@ -36,7 +36,7 @@ final class InMemoryFileStorage[M[+ _]](implicit M: Monad[M])
 
   def exists(file: String): M[Boolean] = M.point { files contains file }
 
-  def save(file: String, data: FileData[M]): M[Unit] = data.data.toStream map {
+  def save(file: String, data: FileData[M]): M[Unit] = data.data.toStream.map {
     chunks =>
       val length = chunks.foldLeft(0)(_ + _.length)
       val bytes = new Array[Byte](length)
@@ -49,7 +49,7 @@ final class InMemoryFileStorage[M[+ _]](implicit M: Monad[M])
   }
 
   def load(file: String): M[Option[FileData[M]]] = M.point {
-    files get file map {
+    files.get(file).map {
       case (mimeType, data) =>
         FileData(mimeType, data :: StreamT.empty[M, Array[Byte]])
     }

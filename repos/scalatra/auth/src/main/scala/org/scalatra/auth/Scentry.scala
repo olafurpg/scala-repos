@@ -82,17 +82,17 @@ class Scentry[UserType <: AnyRef](
   }
 
   def strategies: mutable.Map[String, ScentryStrategy[UserType]] =
-    (globalStrategies ++ _strategies) map {
+    ((globalStrategies ++ _strategies)).map {
       case (nm, fact) ⇒ (nm -> fact.asInstanceOf[StrategyFactory](app))
     }
 
   def userOption(implicit request: HttpServletRequest,
                  response: HttpServletResponse): Option[UserType] =
-    Option(_user) orElse {
-      store.get.blankOption flatMap { key =>
+    Option(_user).orElse {
+      store.get.blankOption.flatMap { key =>
         runCallbacks() { _.beforeFetch(key) }
         val o =
-          fromSession lift key flatMap (Option(_)) map { res =>
+          fromSession.lift(key).flatMap(Option(_)).map { res =>
             runCallbacks() { _.afterFetch(res) }
             request(scentryAuthKey) = res
             res
@@ -104,7 +104,7 @@ class Scentry[UserType <: AnyRef](
 
   def user(implicit request: HttpServletRequest,
            response: HttpServletResponse): UserType =
-    userOption getOrElse null.asInstanceOf[UserType]
+    userOption.getOrElse(null.asInstanceOf[UserType])
 
   def user_=(v: UserType)(implicit request: HttpServletRequest,
                           response: HttpServletResponse) = {
@@ -119,10 +119,10 @@ class Scentry[UserType <: AnyRef](
   }
 
   def fromSession: PartialFunction[String, UserType] =
-    deserialize orElse missingDeserializer
+    deserialize.orElse(missingDeserializer)
 
   def toSession: PartialFunction[UserType, String] =
-    serialize orElse missingSerializer
+    serialize.orElse(missingSerializer)
 
   private def missingSerializer: PartialFunction[UserType, String] = {
     case _ ⇒
@@ -146,14 +146,14 @@ class Scentry[UserType <: AnyRef](
       implicit request: HttpServletRequest,
       response: HttpServletResponse): Option[UserType] = {
     val r =
-      runAuthentication(names: _*) map {
+      runAuthentication(names: _*).map {
         case (stratName, usr) ⇒
           runCallbacks() { _.afterAuthenticate(stratName, usr) }
           user_=(usr)
           user
       }
     if (names.isEmpty)
-      r orElse { defaultUnauthenticated foreach (_.apply()); None } else r
+      r.orElse { defaultUnauthenticated.foreach(_.apply()); None } else r
   }
 
   private[this] def runAuthentication(names: String*)(
@@ -163,16 +163,20 @@ class Scentry[UserType <: AnyRef](
       if (names.isEmpty) strategies.values
       else
         strategies.filterKeys(names.contains).values
-    (subset filter (_.isValid) map { strat =>
-      logger.debug("Authenticating with: %s" format strat.name)
-      runCallbacks(_.isValid) { _.beforeAuthenticate }
-      strat.authenticate() match {
-        case Some(usr) ⇒ Some(strat.name -> usr)
-        case _ ⇒
-          strat.unauthenticated()
-          None
-      }
-    }).find(_.isDefined) getOrElse None
+    (subset
+      .filter(_.isValid)
+      .map { strat =>
+        logger.debug("Authenticating with: %s".format(strat.name))
+        runCallbacks(_.isValid) { _.beforeAuthenticate }
+        strat.authenticate() match {
+          case Some(usr) ⇒ Some(strat.name -> usr)
+          case _ ⇒
+            strat.unauthenticated()
+            None
+        }
+      })
+      .find(_.isDefined)
+      .getOrElse(None)
   }
 
   private[this] var defaultUnauthenticated: Option[() ⇒ Unit] = None
@@ -192,7 +196,7 @@ class Scentry[UserType <: AnyRef](
 
   private[this] def runCallbacks(guard: StrategyType ⇒ Boolean = s ⇒ true)(
       which: StrategyType ⇒ Unit) {
-    strategies foreach {
+    strategies.foreach {
       case (_, v) if guard(v) ⇒ which(v)
       case _ ⇒ // guard failed
     }

@@ -61,7 +61,7 @@ class NaturalTest
 
   property("x compare y") {
     forAll { (x: N, y: N) =>
-      (Natural(x.num) compare Natural(y.num)) shouldBe (x.num compare y.num)
+      (Natural(x.num).compare(Natural(y.num))) shouldBe (x.num.compare(y.num))
     }
   }
 

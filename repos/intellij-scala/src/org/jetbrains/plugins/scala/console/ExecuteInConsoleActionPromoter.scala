@@ -22,7 +22,7 @@ class ExecuteInConsoleActionPromoter extends ActionPromoter {
 
       if (action.isInstanceOf[ScalaConsoleExecuteAction]) {
         val promoted = new util.ArrayList[AnAction](1)
-        promoted add action
+        promoted.add(action)
         return promoted
       }
     }

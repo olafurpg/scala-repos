@@ -32,12 +32,12 @@ trait ViewMkString[+A] { self: Traversable[A] =>
                          sep: String,
                          end: String): StringBuilder = {
     var first = true
-    b append start
+    b.append(start)
     for (x <- self) {
-      if (first) first = false else b append sep
-      b append x
+      if (first) first = false else b.append(sep)
+      b.append(x)
     }
-    b append end
+    b.append(end)
     b
   }
 }
@@ -142,7 +142,7 @@ trait TraversableViewLike[
     */
   trait Forced[B] extends Transformed[B] {
     protected[this] val forced: GenSeq[B]
-    def foreach[U](f: B => U) = forced foreach f
+    def foreach[U](f: B => U) = forced.foreach(f)
     final override protected[this] def viewIdentifier = "C"
   }
 
@@ -185,8 +185,8 @@ trait TraversableViewLike[
   trait Appended[B >: A] extends Transformed[B] {
     protected[this] val rest: GenTraversable[B]
     def foreach[U](f: B => U) {
-      self foreach f
-      rest foreach f
+      self.foreach(f)
+      rest.foreach(f)
     }
     final override protected[this] def viewIdentifier = "A"
   }
@@ -194,8 +194,8 @@ trait TraversableViewLike[
   trait Prepended[B >: A] extends Transformed[B] {
     protected[this] val fst: GenTraversable[B]
     def foreach[U](f: B => U) {
-      fst foreach f
-      self foreach f
+      fst.foreach(f)
+      self.foreach(f)
     }
     final override protected[this] def viewIdentifier = "A"
   }
@@ -325,7 +325,7 @@ trait TraversableViewLike[
     newForced(thisSeq.scanRight(z)(op)).asInstanceOf[That]
 
   override def groupBy[K](f: A => K): immutable.Map[K, This] =
-    thisSeq groupBy f mapValues (xs => newForced(xs))
+    thisSeq.groupBy(f).mapValues(xs => newForced(xs))
 
   override def unzip[A1, A2](implicit asPair: A => (A1, A2)) =
     (newMapped(x => asPair(x)._1), newMapped(x => asPair(x)._2)) // TODO - Performance improvements.

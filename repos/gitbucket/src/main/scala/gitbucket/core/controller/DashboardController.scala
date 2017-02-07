@@ -29,23 +29,25 @@ trait DashboardControllerBase extends ControllerBase {
   get("/dashboard/issues")(usersOnly {
     val q = request.getParameter("q")
     val account = context.loginAccount.get
-    Option(q).map {
-      q =>
-        val condition = IssueSearchCondition(q, Map[String, Int]())
-        q match {
-          case q if (q.contains("is:pr")) =>
-            redirect(s"/dashboard/pulls?q=${StringUtil.urlEncode(q)}")
-          case q if (q.contains(s"author:${account.userName}")) =>
-            redirect(s"/dashboard/issues/created_by${condition.toURL}")
-          case q if (q.contains(s"assignee:${account.userName}")) =>
-            redirect(s"/dashboard/issues/assigned${condition.toURL}")
-          case q if (q.contains(s"mentions:${account.userName}")) =>
-            redirect(s"/dashboard/issues/mentioned${condition.toURL}")
-          case _ => searchIssues("created_by")
-        }
-    } getOrElse {
-      searchIssues("created_by")
-    }
+    Option(q)
+      .map {
+        q =>
+          val condition = IssueSearchCondition(q, Map[String, Int]())
+          q match {
+            case q if (q.contains("is:pr")) =>
+              redirect(s"/dashboard/pulls?q=${StringUtil.urlEncode(q)}")
+            case q if (q.contains(s"author:${account.userName}")) =>
+              redirect(s"/dashboard/issues/created_by${condition.toURL}")
+            case q if (q.contains(s"assignee:${account.userName}")) =>
+              redirect(s"/dashboard/issues/assigned${condition.toURL}")
+            case q if (q.contains(s"mentions:${account.userName}")) =>
+              redirect(s"/dashboard/issues/mentioned${condition.toURL}")
+            case _ => searchIssues("created_by")
+          }
+      }
+      .getOrElse {
+        searchIssues("created_by")
+      }
   })
 
   get("/dashboard/issues/assigned")(usersOnly {
@@ -63,23 +65,25 @@ trait DashboardControllerBase extends ControllerBase {
   get("/dashboard/pulls")(usersOnly {
     val q = request.getParameter("q")
     val account = context.loginAccount.get
-    Option(q).map {
-      q =>
-        val condition = IssueSearchCondition(q, Map[String, Int]())
-        q match {
-          case q if (q.contains("is:issue")) =>
-            redirect(s"/dashboard/issues?q=${StringUtil.urlEncode(q)}")
-          case q if (q.contains(s"author:${account.userName}")) =>
-            redirect(s"/dashboard/pulls/created_by${condition.toURL}")
-          case q if (q.contains(s"assignee:${account.userName}")) =>
-            redirect(s"/dashboard/pulls/assigned${condition.toURL}")
-          case q if (q.contains(s"mentions:${account.userName}")) =>
-            redirect(s"/dashboard/pulls/mentioned${condition.toURL}")
-          case _ => searchPullRequests("created_by")
-        }
-    } getOrElse {
-      searchPullRequests("created_by")
-    }
+    Option(q)
+      .map {
+        q =>
+          val condition = IssueSearchCondition(q, Map[String, Int]())
+          q match {
+            case q if (q.contains("is:issue")) =>
+              redirect(s"/dashboard/issues?q=${StringUtil.urlEncode(q)}")
+            case q if (q.contains(s"author:${account.userName}")) =>
+              redirect(s"/dashboard/pulls/created_by${condition.toURL}")
+            case q if (q.contains(s"assignee:${account.userName}")) =>
+              redirect(s"/dashboard/pulls/assigned${condition.toURL}")
+            case q if (q.contains(s"mentions:${account.userName}")) =>
+              redirect(s"/dashboard/pulls/mentioned${condition.toURL}")
+            case _ => searchPullRequests("created_by")
+          }
+      }
+      .getOrElse {
+        searchPullRequests("created_by")
+      }
   })
 
   get("/dashboard/pulls/created_by")(usersOnly {

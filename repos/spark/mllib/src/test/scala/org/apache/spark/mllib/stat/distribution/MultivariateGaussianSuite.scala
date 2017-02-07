@@ -32,13 +32,13 @@ class MultivariateGaussianSuite
     val mu = Vectors.dense(0.0)
     val sigma1 = Matrices.dense(1, 1, Array(1.0))
     val dist1 = new MultivariateGaussian(mu, sigma1)
-    assert(dist1.pdf(x1) ~== 0.39894 absTol 1E-5)
-    assert(dist1.pdf(x2) ~== 0.12952 absTol 1E-5)
+    assert(dist1.pdf(x1) ~== 0.39894.absTol(1E-5))
+    assert(dist1.pdf(x2) ~== 0.12952.absTol(1E-5))
 
     val sigma2 = Matrices.dense(1, 1, Array(4.0))
     val dist2 = new MultivariateGaussian(mu, sigma2)
-    assert(dist2.pdf(x1) ~== 0.19947 absTol 1E-5)
-    assert(dist2.pdf(x2) ~== 0.15057 absTol 1E-5)
+    assert(dist2.pdf(x1) ~== 0.19947.absTol(1E-5))
+    assert(dist2.pdf(x2) ~== 0.15057.absTol(1E-5))
   }
 
   test("multivariate") {
@@ -48,13 +48,13 @@ class MultivariateGaussianSuite
     val mu = Vectors.dense(0.0, 0.0)
     val sigma1 = Matrices.dense(2, 2, Array(1.0, 0.0, 0.0, 1.0))
     val dist1 = new MultivariateGaussian(mu, sigma1)
-    assert(dist1.pdf(x1) ~== 0.15915 absTol 1E-5)
-    assert(dist1.pdf(x2) ~== 0.05855 absTol 1E-5)
+    assert(dist1.pdf(x1) ~== 0.15915.absTol(1E-5))
+    assert(dist1.pdf(x2) ~== 0.05855.absTol(1E-5))
 
     val sigma2 = Matrices.dense(2, 2, Array(4.0, -1.0, -1.0, 2.0))
     val dist2 = new MultivariateGaussian(mu, sigma2)
-    assert(dist2.pdf(x1) ~== 0.060155 absTol 1E-5)
-    assert(dist2.pdf(x2) ~== 0.033971 absTol 1E-5)
+    assert(dist2.pdf(x1) ~== 0.060155.absTol(1E-5))
+    assert(dist2.pdf(x2) ~== 0.033971.absTol(1E-5))
   }
 
   test("multivariate degenerate") {
@@ -64,8 +64,8 @@ class MultivariateGaussianSuite
     val mu = Vectors.dense(0.0, 0.0)
     val sigma = Matrices.dense(2, 2, Array(1.0, 1.0, 1.0, 1.0))
     val dist = new MultivariateGaussian(mu, sigma)
-    assert(dist.pdf(x1) ~== 0.11254 absTol 1E-5)
-    assert(dist.pdf(x2) ~== 0.068259 absTol 1E-5)
+    assert(dist.pdf(x1) ~== 0.11254.absTol(1E-5))
+    assert(dist.pdf(x2) ~== 0.068259.absTol(1E-5))
   }
 
   test("SPARK-11302") {
@@ -86,6 +86,6 @@ class MultivariateGaussianSuite
     )
     val dist = new MultivariateGaussian(mu, sigma)
     // Agrees with R's dmvnorm: 7.154782e-05
-    assert(dist.pdf(x) ~== 7.154782224045512E-5 absTol 1E-9)
+    assert(dist.pdf(x) ~== 7.154782224045512E-5.absTol(1E-9))
   }
 }

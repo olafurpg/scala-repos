@@ -11,7 +11,7 @@ object Test extends Properties("TreeMap") {
     for {
       keys <- listOf(arbitrary[A])
       values <- listOfN(keys.size, arbitrary[B])
-    } yield TreeMap(keys zip values: _*)
+    } yield TreeMap(keys.zip(values): _*)
   implicit def arbTreeMap[A: Arbitrary: Ordering, B: Arbitrary] =
     Arbitrary(genTreeMap[A, B])
 
@@ -37,7 +37,7 @@ object Test extends Properties("TreeMap") {
        */
       val highest = if (even) (1 << (n + 1)) - 2 else 3 * (1 << n) - 2
       val values = (1 to highest).reverse
-      val subject = TreeMap(values zip values: _*)
+      val subject = TreeMap(values.zip(values): _*)
       val it = subject.iterator
       try { while (it.hasNext) it.next; true } catch { case _ => false }
     }
@@ -65,14 +65,14 @@ object Test extends Properties("TreeMap") {
 
   property("head") = forAll { (elements: List[Int]) =>
     elements.nonEmpty ==> {
-      val subject = TreeMap(elements zip elements: _*)
+      val subject = TreeMap(elements.zip(elements): _*)
       elements.min == subject.head._1
     }
   }
 
   property("last") = forAll { (elements: List[Int]) =>
     elements.nonEmpty ==> {
-      val subject = TreeMap(elements zip elements: _*)
+      val subject = TreeMap(elements.zip(elements): _*)
       elements.max == subject.last._1
     }
   }

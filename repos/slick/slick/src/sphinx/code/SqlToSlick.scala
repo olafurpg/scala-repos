@@ -144,7 +144,7 @@ object SqlToSlick extends App {
         db.run(squared.to[Set].result.zip(pow.to[Set].result)),
         Duration.Inf)
       assert(sRes == pRes)
-      assert(Set(998001, 1002001) subsetOf pRes)
+      assert(Set(998001, 1002001).subsetOf(pRes))
     };
     {
       //#overrideSql
@@ -164,7 +164,7 @@ object SqlToSlick extends App {
         people.result
         //#slickQueryProjection*
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
       };
@@ -181,7 +181,7 @@ object SqlToSlick extends App {
           .result
         //#slickQueryProjection
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
       };
@@ -194,7 +194,7 @@ object SqlToSlick extends App {
         people.filter(p => p.age >= 18 && p.name === "C. Vogt").result
         //#slickQueryFilter
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
       };
@@ -206,7 +206,7 @@ object SqlToSlick extends App {
         people.sortBy(p => (p.age.asc, p.name)).result
         //#slickQueryOrderBy
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
       };
@@ -218,7 +218,7 @@ object SqlToSlick extends App {
         people.map(_.age).max.result
         //#slickQueryAggregate
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
       };
       {
@@ -236,7 +236,7 @@ object SqlToSlick extends App {
           .result
         //#slickQueryGroupBy
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
         assert(sqlRes.exists(_._2 == Some(1000)))
@@ -259,7 +259,7 @@ object SqlToSlick extends App {
           .result
         //#slickQueryHaving
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
       };
@@ -288,7 +288,7 @@ object SqlToSlick extends App {
           yield (p.name, a.city)).result
         //#slickQueryImplicitJoin
         val ((sqlRes, slickRes), slick2Res) =
-          Await.result(db.run(sql zip slick zip slick2), Duration.Inf)
+          Await.result(db.run(sql.zip(slick).zip(slick2)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(slickRes == slick2Res)
         assert(sqlRes.size > 0)
@@ -302,12 +302,15 @@ object SqlToSlick extends App {
           """.as[(String, String)]
         //#sqlQueryExplicitJoin
         val slick = //#slickQueryExplicitJoin
-        (people join addresses on (_.addressId === _.id)).map {
-          case (p, a) => (p.name, a.city)
-        }.result
+        ((people join addresses)
+          .on(_.addressId === _.id))
+          .map {
+            case (p, a) => (p.name, a.city)
+          }
+          .result
         //#slickQueryExplicitJoin
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
       };
@@ -320,12 +323,15 @@ object SqlToSlick extends App {
           """.as[(Option[String], String)]
         //#sqlQueryLeftJoin
         val slick = //#slickQueryLeftJoin
-        (addresses joinLeft people on (_.id === _.addressId)).map {
-          case (a, p) => (p.map(_.name), a.city)
-        }.result
+        ((addresses joinLeft people)
+          .on(_.id === _.addressId))
+          .map {
+            case (a, p) => (p.map(_.name), a.city)
+          }
+          .result
         //#slickQueryLeftJoin
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
       };
@@ -347,7 +353,7 @@ object SqlToSlick extends App {
           //#slickQueryCollectionSubQuery
         }
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
       };
@@ -368,7 +374,7 @@ object SqlToSlick extends App {
           //#slickQueryInSet
         }
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
       };
@@ -430,14 +436,14 @@ object SqlToSlick extends App {
           //#slickQueryDelete
         }
         val (sqlInsertRes, slickInsertRes) =
-          Await.result(db.run(sqlInsert zip slickInsert), Duration.Inf)
+          Await.result(db.run(sqlInsert.zip(slickInsert)), Duration.Inf)
         assert(sqlInsertRes == slickInsertRes)
         val (sqlUpdateRes, slickUpdateRes) =
-          Await.result(db.run(sqlUpdate zip slickUpdate), Duration.Inf)
+          Await.result(db.run(sqlUpdate.zip(slickUpdate)), Duration.Inf)
         assert(sqlUpdateRes == 2)
         assert(slickUpdateRes == 0)
         val (sqlDeleteRes, slickDeleteRes) =
-          Await.result(db.run(sqlDelete zip slickDelete), Duration.Inf)
+          Await.result(db.run(sqlDelete.zip(slickDelete)), Duration.Inf)
         assert(sqlDeleteRes == 2)
         assert(slickDeleteRes == 0)
       };
@@ -454,12 +460,17 @@ object SqlToSlick extends App {
         //#sqlCase
         val slick = //#slickCase
         people
-          .map(p =>
-            Case If (p.addressId === 1) Then "A" If (p.addressId === 2) Then "B")
+          .map(
+            p =>
+              Case
+                .If(p.addressId === 1)
+                .Then("A")
+                .If(p.addressId === 2)
+                .Then("B"))
           .result
         //#slickCase
         val (sqlRes, slickRes) =
-          Await.result(db.run(sql zip slick), Duration.Inf)
+          Await.result(db.run(sql.zip(slick)), Duration.Inf)
         assert(sqlRes == slickRes)
       }
     }

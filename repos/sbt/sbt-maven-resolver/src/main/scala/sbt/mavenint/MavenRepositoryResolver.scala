@@ -197,7 +197,7 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
         s"Aether resolved ${dd.getDependencyId} w/ packaging ${packaging}")
 
       // TODO - better pub date if we have no metadata.
-      val lastModifiedTime = getPublicationTime(drid) getOrElse 0L
+      val lastModifiedTime = getPublicationTime(drid).getOrElse(0L)
 
       // Construct a new Ivy module descriptor
       val desc: ModuleDescriptor = {
@@ -283,11 +283,11 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
   def getArtifactProperties(
       dd: ModuleRevisionId): java.util.Map[String, String] = {
     val m = new java.util.HashMap[String, String]
-    Option(dd.getExtraAttribute(PomExtraDependencyAttributes.ScalaVersionKey)) foreach {
-      sv =>
+    Option(dd.getExtraAttribute(PomExtraDependencyAttributes.ScalaVersionKey))
+      .foreach { sv =>
         m.put(SbtPomExtraProperties.POM_SCALA_VERSION, sv)
-    }
-    getSbtVersion(dd) foreach { sv =>
+      }
+    getSbtVersion(dd).foreach { sv =>
       m.put(SbtPomExtraProperties.POM_SBT_VERSION, sv)
     }
     m
@@ -432,7 +432,7 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
         val tmp = ModuleRevisionId.newInstance(d.getArtifact.getGroupId,
                                                d.getArtifact.getArtifactId,
                                                d.getArtifact.getVersion)
-        extraAttributes get tmp match {
+        extraAttributes.get(tmp) match {
           case Some(props) =>
             Message.debug(
               s"Found $tmp w/ extra attributes ${props.mkString(",")}")
@@ -553,7 +553,7 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
           s"Failed to resolve artifacts from ${getName}, ${e.getMessage}")
         (e.getResults.asScala, true)
     }
-    for ((result, art) <- aetherResults zip artifacts) {
+    for ((result, art) <- aetherResults.zip(artifacts)) {
       Message.debug(s"Aether resolved artifact result: $result")
       val adr = new ArtifactDownloadReport(art)
       adr.setDownloadDetails(result.toString)

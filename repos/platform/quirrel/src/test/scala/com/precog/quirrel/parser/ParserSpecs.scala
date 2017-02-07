@@ -2561,7 +2561,7 @@ object ParserSpecs
                    ArrayDef(_, Vector(NumLit(_, "1")))) =>
             ok
         }
-      } or {
+      }.or {
         forest.head must beLike {
           case Let(_,
                    Identifier(Vector(), "a"),
@@ -2595,7 +2595,7 @@ object ParserSpecs
 
   if (exampleDir.exists) {
     "specification examples" >> {
-      for (file <- exampleDir.listFiles if file.getName endsWith ".qrl") {
+      for (file <- exampleDir.listFiles if file.getName.endsWith(".qrl")) {
         file.getName >> {
           parseSingle(LineStream(Source.fromFile(file))) must not(
             throwA[Throwable])

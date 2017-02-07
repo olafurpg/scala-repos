@@ -88,8 +88,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
       *  guarding addLoBound/addHiBound somehow broke raw types so it
       *  only guards against being created with them.]
       */
-    private var lobounds = lo0 filterNot typeIsNothing
-    private var hibounds = hi0 filterNot typeIsAny
+    private var lobounds = lo0.filterNot(typeIsNothing)
+    private var hibounds = hi0.filterNot(typeIsAny)
     private var numlo = numlo0
     private var numhi = numhi0
     private var avoidWidening = avoidWidening0
@@ -148,8 +148,9 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
 
     def isWithinBounds(tp: Type): Boolean =
       (lobounds.forall(_ <:< tp) &&
-        hibounds.forall(tp <:< _) && (numlo == NoType || (numlo weak_<:< tp)) &&
-        (numhi == NoType || (tp weak_<:< numhi)))
+        hibounds.forall(tp <:< _) && (numlo == NoType || (numlo
+        .weak_<:<(tp))) &&
+        (numhi == NoType || (tp.weak_<:<(numhi))))
 
     var inst: Type = NoType // @M reduce visibility?
 
@@ -164,12 +165,12 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
 
     override def toString = {
       val boundsStr = {
-        val lo = loBounds filterNot typeIsNothing match {
+        val lo = loBounds.filterNot(typeIsNothing) match {
           case Nil => ""
           case tp :: Nil => " >: " + tp
           case tps => tps.mkString(" >: (", ", ", ")")
         }
-        val hi = hiBounds filterNot typeIsAny match {
+        val hi = hiBounds.filterNot(typeIsAny) match {
           case Nil => ""
           case tp :: Nil => " <: " + tp
           case tps => tps.mkString(" <: (", ", ", ")")
@@ -219,14 +220,15 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
             if (bound.typeSymbol != AnyClass) {
               debuglog(
                 s"$tvar addHiBound $bound.instantiateTypeParams($tparams, $tvars)")
-              tvar addHiBound bound.instantiateTypeParams(tparams, tvars)
+              tvar.addHiBound(bound.instantiateTypeParams(tparams, tvars))
             }
             for (tparam2 <- tparams) tparam2.info.bounds.lo.dealias match {
               case TypeRef(_, `tparam`, _) =>
                 debuglog(
                   s"$tvar addHiBound $tparam2.tpeHK.instantiateTypeParams($tparams, $tvars)")
-                tvar addHiBound tparam2.tpeHK
-                  .instantiateTypeParams(tparams, tvars)
+                tvar.addHiBound(
+                  tparam2.tpeHK
+                    .instantiateTypeParams(tparams, tvars))
               case _ =>
             }
           } else {
@@ -234,14 +236,15 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
                 bound.typeSymbol != tparam) {
               debuglog(
                 s"$tvar addLoBound $bound.instantiateTypeParams($tparams, $tvars)")
-              tvar addLoBound bound.instantiateTypeParams(tparams, tvars)
+              tvar.addLoBound(bound.instantiateTypeParams(tparams, tvars))
             }
             for (tparam2 <- tparams) tparam2.info.bounds.hi.dealias match {
               case TypeRef(_, `tparam`, _) =>
                 debuglog(
                   s"$tvar addLoBound $tparam2.tpeHK.instantiateTypeParams($tparams, $tvars)")
-                tvar addLoBound tparam2.tpeHK
-                  .instantiateTypeParams(tparams, tvars)
+                tvar.addLoBound(
+                  tparam2.tpeHK
+                    .instantiateTypeParams(tparams, tvars))
               case _ =>
             }
           }
@@ -259,7 +262,7 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
            })
 
         debuglog(s"$tvar setInst $newInst")
-        tvar setInst newInst
+        tvar.setInst(newInst)
         //Console.println("solving "+tvar+" "+up+" "+(if (up) (tvar.constr.hiBounds) else tvar.constr.loBounds)+((if (up) (tvar.constr.hiBounds) else tvar.constr.loBounds) map (_.widen))+" = "+tvar.constr.inst)//@MDEBUG
       }
     }
@@ -274,7 +277,7 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
       s"Inferred type for ${tv.originString} (${tv.inst}) $what"
     }
 
-    tvars forall (tv => tv.instWithinBounds || util.andFalse(logBounds(tv)))
+    tvars.forall(tv => tv.instWithinBounds || util.andFalse(logBounds(tv)))
   }
 }
 

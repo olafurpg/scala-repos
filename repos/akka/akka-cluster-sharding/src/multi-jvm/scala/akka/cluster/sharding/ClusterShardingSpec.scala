@@ -107,7 +107,7 @@ object ClusterShardingSpec {
     }
 
     def receive = {
-      case msg ⇒ counter forward msg
+      case msg ⇒ counter.forward(msg)
     }
   }
   //#supervisor

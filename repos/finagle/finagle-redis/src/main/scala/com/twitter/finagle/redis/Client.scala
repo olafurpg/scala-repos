@@ -109,12 +109,11 @@ class BaseClient(service: Service[Command, Reply]) {
     */
   private[redis] def doRequest[T](cmd: Command)(
       handler: PartialFunction[Reply, Future[T]]) =
-    service(cmd) flatMap
-      (handler orElse {
-        case ErrorReply(message) =>
-          Future.exception(new ServerError(message))
-        case _ => Future.exception(new IllegalStateException)
-      })
+    service(cmd).flatMap(handler.orElse {
+      case ErrorReply(message) =>
+        Future.exception(new ServerError(message))
+      case _ => Future.exception(new IllegalStateException)
+    })
 
   /**
     * Helper function to convert a Redis multi-bulk reply into a map of pairs
@@ -192,33 +191,35 @@ private[redis] class ConnectedTransactionalClient(
     with TransactionalClient {
 
   def transaction(cmds: Seq[Command]): Future[Seq[Reply]] = {
-    serviceFactory() flatMap { svc =>
-      multi(svc) before {
+    serviceFactory().flatMap { svc =>
+      (multi(svc) before {
         val cmdQueue =
-          cmds map { cmd =>
+          cmds.map { cmd =>
             svc(cmd)
           }
         Future.collect(cmdQueue).unit before exec(svc)
-      } rescue {
-        case e =>
-          svc(Discard).unit before {
-            Future.exception(ClientError("Transaction failed: " + e.toString))
-          }
-      } ensure {
-        svc.close()
-      }
+      }).rescue {
+          case e =>
+            svc(Discard).unit before {
+              Future.exception(
+                ClientError("Transaction failed: " + e.toString))
+            }
+        }
+        .ensure {
+          svc.close()
+        }
     }
   }
 
   private def multi(svc: Service[Command, Reply]): Future[Unit] =
-    svc(Multi) flatMap {
+    svc(Multi).flatMap {
       case StatusReply(message) => Future.Unit
       case ErrorReply(message) => Future.exception(new ServerError(message))
       case _ => Future.exception(new IllegalStateException)
     }
 
   private def exec(svc: Service[Command, Reply]): Future[Seq[Reply]] =
-    svc(Exec) flatMap {
+    svc(Exec).flatMap {
       case MBulkReply(messages) => Future.value(messages)
       case EmptyMBulkReply() => Future.Nil
       case NilMBulkReply() =>

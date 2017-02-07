@@ -356,7 +356,7 @@ class RequestRendererSpec
                                          NoLogging) {
 
     def renderTo(expected: String): Matcher[HttpRequest] =
-      equal(expected.stripMarginWithNewline("\r\n")).matcher[String] compose {
+      equal(expected.stripMarginWithNewline("\r\n")).matcher[String].compose {
         request ⇒
           val byteStringSource = renderToSource(
             RequestRenderingContext(request, Host(serverAddress)))

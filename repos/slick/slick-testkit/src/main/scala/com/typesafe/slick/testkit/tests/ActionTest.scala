@@ -37,7 +37,7 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
     }
     val ts = TableQuery[T]
 
-    val aSetup = ts.schema.create andThen (ts ++= Seq(2, 3, 1, 5, 4))
+    val aSetup = ts.schema.create.andThen(ts ++= Seq(2, 3, 1, 5, 4))
 
     val aNotPinned = for {
       p1 <- IsPinned
@@ -51,7 +51,7 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
     } yield ()
 
     val aFused = for {
-      ((s1, l), s2) <- GetSession zip ts.length.result zip GetSession
+      ((s1, l), s2) <- GetSession.zip(ts.length.result).zip(GetSession)
       _ = s1 shouldBe s2
     } yield ()
 
@@ -70,7 +70,7 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
       _ = p3 shouldBe false
     } yield ()
 
-    aSetup andThen aNotPinned andThen aFused andThen aPinned
+    aSetup.andThen(aNotPinned).andThen(aFused).andThen(aPinned)
   }
 
   def testStreaming = {
@@ -110,7 +110,7 @@ class ActionTest extends AsyncTest[RelationalTestDB] {
       val a4 = DBIO.seq((1 to 50000).toSeq.map(i => DBIO.successful("a4")): _*)
       val a5 = (1 to 50000).toSeq
         .map(i => DBIO.successful("a5"))
-        .reduceLeft(_ andThen _)
+        .reduceLeft(_.andThen(_))
 
       DBIO.seq(
         a1.map(_ shouldBe (1 to 5000).toSeq),

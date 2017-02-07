@@ -36,17 +36,17 @@ object Test {
       newFile
     }
 
-    def writeAll(text: String): Unit = File(file) writeAll text
+    def writeAll(text: String): Unit = File(file).writeAll(text)
 
     def moveContentToZip(zipName: String): Unit = {
-      val newZip = zipsDir createFile s"$zipName.zip"
+      val newZip = zipsDir.createFile(s"$zipName.zip")
       val outputStream = new ZipOutputStream(new FileOutputStream(newZip))
 
       def addFileToZip(dirPrefix: String = "")(fileToAdd: JFile): Unit =
         if (fileToAdd.isDirectory) {
           val dirEntryName = fileToAdd.getName + "/"
           outputStream.putNextEntry(new ZipEntry(dirEntryName))
-          fileToAdd.listFiles() foreach addFileToZip(dirEntryName)
+          fileToAdd.listFiles().foreach(addFileToZip(dirEntryName))
         } else {
           val inputStream = new FileInputStream(fileToAdd)
           outputStream.putNextEntry(
@@ -62,14 +62,14 @@ object Test {
           inputStream.close()
         }
 
-      file.listFiles() foreach addFileToZip()
+      file.listFiles().foreach(addFileToZip())
       outputStream.close()
 
       cleanDir(file)
     }
 
     def moveContentToJar(jarName: String): Unit = {
-      val newJar = jarsDir createFile s"$jarName.jar"
+      val newJar = jarsDir.createFile(s"$jarName.jar")
       Jar.create(file = File(newJar),
                  sourceDir = Directory(file),
                  mainClass = "won't be used")
@@ -92,13 +92,13 @@ object Test {
   // root dir will be automatically deleted after the end of test
   private val rootDir = new JFile(sys.props("partest.output"))
   private val testDir =
-    rootDir createDir s"cp-tests-${System.currentTimeMillis()}"
+    rootDir.createDir(s"cp-tests-${System.currentTimeMillis()}")
 
-  private val jarsDir = testDir createDir "jars"
-  private val zipsDir = testDir createDir "zips"
-  private val srcDir = testDir createDir "src"
-  private val binDir = testDir createDir "bin"
-  private val outDir = testDir createDir "out"
+  private val jarsDir = testDir.createDir("jars")
+  private val zipsDir = testDir.createDir("zips")
+  private val srcDir = testDir.createDir("src")
+  private val binDir = testDir.createDir("bin")
+  private val outDir = testDir.createDir("out")
 
   def main(args: Array[String]): Unit = {
     createClassesZipInZipsDir()
@@ -116,7 +116,7 @@ object Test {
     val baseFileName = "ZipBin"
     createStandardSrcHierarchy(baseFileName)
     compileSrc(baseFileName)
-    outDir moveContentToZip "Bin"
+    outDir.moveContentToZip("Bin")
     cleanDir(srcDir)
   }
 
@@ -124,7 +124,7 @@ object Test {
     val baseFileName = "JarBin"
     createStandardSrcHierarchy(baseFileName)
     compileSrc(baseFileName)
-    outDir moveContentToJar "Bin"
+    outDir.moveContentToJar("Bin")
     cleanDir(srcDir)
   }
 
@@ -137,19 +137,19 @@ object Test {
 
   private def createSourcesZipInZipsDir(): Unit = {
     createStandardSrcHierarchy(baseFileName = "ZipSrc")
-    srcDir moveContentToZip "Src"
+    srcDir.moveContentToZip("Src")
   }
 
   private def createSourcesJarInJarsDir(): Unit = {
     createStandardSrcHierarchy(baseFileName = "JarSrc")
-    srcDir moveContentToJar "Src"
+    srcDir.moveContentToJar("Src")
   }
 
   private def createSourcesInSrcDir(): Unit = {
     createStandardSrcHierarchy(baseFileName = "DirSrc")
 
-    val appFile = srcDir createSrcFile "Main"
-    appFile writeAll s"""import nested._
+    val appFile = srcDir.createSrcFile("Main")
+    appFile.writeAll(s"""import nested._
          | object Main extends App {
          |   println(new ZipBin)
          |   println(new JarBin)
@@ -165,7 +165,7 @@ object Test {
          |   println(new NestedJarSrc)
          |   println(new NestedDirSrc)
          | }
-       """.stripMargin
+       """.stripMargin)
   }
 
   private def compileFinalApp(): Unit = {
@@ -208,17 +208,17 @@ object Test {
   private def createSources(pkg: String,
                             dirFile: JFile,
                             dirRep: DirRep): Unit = {
-    dirRep.nestedDirs foreach { rep =>
-      val nestedDir = dirFile createDir rep.name
+    dirRep.nestedDirs.foreach { rep =>
+      val nestedDir = dirFile.createDir(rep.name)
       val nestedPkg = PackageNameUtils.packagePrefix(pkg) + rep.name
       createSources(nestedPkg, nestedDir, rep)
     }
 
     val pkgHeader = if (pkg == RootPackage) "" else s"package $pkg\n\n"
-    dirRep.sourceFiles foreach { srcName =>
+    dirRep.sourceFiles.foreach { srcName =>
       val text = s"""${pkgHeader}case class $srcName(x: String = "")"""
-      val srcFile = dirFile createSrcFile srcName
-      srcFile writeAll text
+      val srcFile = dirFile.createSrcFile(srcName)
+      srcFile.writeAll(text)
     }
   }
 

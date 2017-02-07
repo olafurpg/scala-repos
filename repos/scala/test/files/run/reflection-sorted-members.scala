@@ -9,6 +9,6 @@ object Test {
         with T2
     import scala.reflect.runtime.{currentMirror => cm}
     val members = cm.classSymbol(classOf[Foo]).info.members
-    members.sorted.toList.filter(!_.isMethod) foreach System.out.println
+    members.sorted.toList.filter(!_.isMethod).foreach(System.out.println)
   }
 }

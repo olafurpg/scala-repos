@@ -27,12 +27,15 @@ object CLI extends App with EvaluatorModule {
   val config = processArgs(args.toList)
 
   val forest = compile(config('query))
-  val filtered = forest filter { _.errors filterNot isWarning isEmpty }
+  val filtered = forest.filter { _.errors.filterNot(isWarning) isEmpty }
 
   if (filtered.size == 1) {
-    filtered flatMap { _.errors filter isWarning } map showError foreach System.err.println
+    filtered
+      .flatMap { _.errors.filter(isWarning) }
+      .map(showError)
+      .foreach(System.err.println)
 
-    eval(filtered.head)(load) foreach { jv =>
+    eval(filtered.head)(load).foreach { jv =>
       println(jv.renderCompact)
     }
   } else if (filtered.size > 1) {
@@ -40,8 +43,8 @@ object CLI extends App with EvaluatorModule {
     System.exit(-1)
   } else {
     val out =
-      forest map { tree =>
-        tree.errors map showError mkString "\n\n"
+      forest.map { tree =>
+        tree.errors.map(showError) mkString "\n\n"
       } mkString "\n-------------\n"
     System.err.println(out)
     System.exit(-1)
@@ -65,7 +68,7 @@ object CLI extends App with EvaluatorModule {
   }
 
   def load(path: String): Seq[JValue] = {
-    val basePath = config get 'base getOrElse "."
+    val basePath = config.get('base).getOrElse(".")
 
     if (path == "-") {
       stdin

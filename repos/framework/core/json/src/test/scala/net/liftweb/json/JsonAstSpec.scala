@@ -24,14 +24,14 @@ import org.scalacheck.Prop.{forAll, forAllNoShrink}
 
 object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
   "Functor identity" in {
-    val identityProp = (json: JValue) => json == (json map identity)
+    val identityProp = (json: JValue) => json == (json.map(identity))
     forAll(identityProp)
   }
 
   "Functor composition" in {
     val compositionProp =
       (json: JValue, fa: JValue => JValue, fb: JValue => JValue) =>
-        json.map(fb).map(fa) == json.map(fa compose fb)
+        json.map(fb).map(fa) == json.map(fa.compose(fb))
 
     forAll(compositionProp)
   }
@@ -50,46 +50,46 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
 
   "Merge identity" in {
     val identityProp = (json: JValue) =>
-      (json merge JNothing) == json && (JNothing merge json) == json
+      (json.merge(JNothing)) == json && (JNothing.merge(json)) == json
     forAll(identityProp)
   }
 
   "Merge idempotency" in {
-    val idempotencyProp = (x: JValue) => (x merge x) == x
+    val idempotencyProp = (x: JValue) => (x.merge(x)) == x
     forAll(idempotencyProp)
   }
 
   "Diff identity" in {
     val identityProp = (json: JValue) =>
-      (json diff JNothing) == Diff(JNothing, JNothing, json) &&
-        (JNothing diff json) == Diff(JNothing, json, JNothing)
+      (json.diff(JNothing)) == Diff(JNothing, JNothing, json) &&
+        (JNothing.diff(json)) == Diff(JNothing, json, JNothing)
 
     forAll(identityProp)
   }
 
   "Diff with self is empty" in {
     val emptyProp =
-      (x: JValue) => (x diff x) == Diff(JNothing, JNothing, JNothing)
+      (x: JValue) => (x.diff(x)) == Diff(JNothing, JNothing, JNothing)
     forAll(emptyProp)
   }
 
   "Diff is subset of originals" in {
     val subsetProp = (x: JObject, y: JObject) => {
-      val Diff(c, a, d) = x diff y
-      y == (y merge (c merge a))
+      val Diff(c, a, d) = x.diff(y)
+      y == (y.merge(c.merge(a)))
     }
     forAll(subsetProp)
   }
 
   "Diff result is same when fields are reordered" in {
     val reorderProp = (x: JObject) =>
-      (x diff reorderFields(x)) == Diff(JNothing, JNothing, JNothing)
+      (x.diff(reorderFields(x))) == Diff(JNothing, JNothing, JNothing)
     forAll(reorderProp)
   }
 
   "Remove all" in {
     val removeAllProp = (x: JValue) =>
-      (x remove { _ =>
+      (x.remove { _ =>
         true
       }) == JNothing
     forAll(removeAllProp)
@@ -97,7 +97,7 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
 
   "Remove nothing" in {
     val removeNothingProp = (x: JValue) =>
-      (x remove { _ =>
+      (x.remove { _ =>
         false
       }) == x
     forAll(removeNothingProp)
@@ -107,10 +107,10 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
     forAllNoShrink(genJValue, genJValueClass) {
       (json: JValue, x: Class[_ <: JValue]) =>
         {
-          val removed = json remove typePredicate(x)
-          val Diff(c, a, d) = json diff removed
+          val removed = json.remove(typePredicate(x))
+          val Diff(c, a, d) = json.diff(removed)
           val elemsLeft =
-            removed filter {
+            removed.filter {
               case _ => true
             }
           c == JNothing && a == JNothing && elemsLeft.forall(_.getClass != x)
@@ -217,7 +217,7 @@ object JsonAstSpec extends Specification with JValueGen with ScalaCheck {
       JObject(List(JField("charlie", JString("i'm a masseuse"))))
   }
 
-  private def reorderFields(json: JValue) = json map {
+  private def reorderFields(json: JValue) = json.map {
     case JObject(xs) => JObject(xs.reverse)
     case x => x
   }

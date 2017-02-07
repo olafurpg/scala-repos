@@ -128,8 +128,8 @@ object PartestUtil {
     }
 
     val SrcPath =
-      ((token(srcPathOption) <~ Space) ~ token(
-        StringBasic.examples(Set("files", "pending", "scaladoc")))) map {
+      (((token(srcPathOption) <~ Space) ~ token(
+        StringBasic.examples(Set("files", "pending", "scaladoc"))))).map {
         case opt ~ path =>
           srcPath = path
           opt + " " + path

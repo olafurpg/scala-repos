@@ -12,13 +12,13 @@ object Test {
     val q = new scala.concurrent.SyncVar[Int]
 
     val producers =
-      (1 to 3) map { z =>
+      ((1 to 3)).map { z =>
         new Thread {
           override def run() {
             var again = true
             while (again) {
               val x = i.getAndDecrement()
-              if (x > 0) q put x
+              if (x > 0) q.put(x)
               else again = false
             }
           }
@@ -26,12 +26,12 @@ object Test {
       }
 
     val summers =
-      (1 to 7) map { z =>
+      ((1 to 7)).map { z =>
         new Thread {
           override def run() {
             val x = j.decrementAndGet()
             if (x >= 0) {
-              sum addAndGet q.take()
+              sum.addAndGet(q.take())
             }
             if (x > 0) {
               run()
@@ -42,16 +42,16 @@ object Test {
         }
       }
 
-    summers foreach { _.start() }
-    producers foreach { _.start() }
+    summers.foreach { _.start() }
+    producers.foreach { _.start() }
 
-    summers foreach { _.join() }
+    summers.foreach { _.join() }
 
     val got = sum.get
     val expected = (n + 1) * n / 2
     println(got + " " + expected + " " + (got == expected))
 
-    producers foreach { _.join() }
+    producers.foreach { _.join() }
   }
 }
 

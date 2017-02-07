@@ -194,7 +194,7 @@ package object util {
         implicit cbf: CanBuildFrom[java.util.BitSet, U, C]) = {
       val r: mutable.Builder[U, C] = cbf(bs)
       r.sizeHint(bs.size)
-      iterator foreach { i =>
+      iterator.foreach { i =>
         r += f(i)
       }
 
@@ -210,22 +210,22 @@ package object util {
     }
 
     def &=(other: BitSet) = {
-      bs and other
+      bs.and(other)
       bs
     }
 
     def &~=(other: BitSet) = {
-      bs andNot other
+      bs.andNot(other)
       bs
     }
 
     def |=(other: BitSet) = {
-      bs or other
+      bs.or(other)
       bs
     }
 
     def ^=(other: BitSet) = {
-      bs xor other
+      bs.xor(other)
       bs
     }
 

@@ -54,7 +54,7 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     if (!analyzed) {
       val afterRuleOnChildren =
         transformChildren(rule, (t, r) => t.resolveOperators(r))
-      if (this fastEquals afterRuleOnChildren) {
+      if (this.fastEquals(afterRuleOnChildren)) {
         CurrentOrigin.withOrigin(origin) {
           rule.applyOrElse(this, identity[LogicalPlan])
         }
@@ -294,7 +294,7 @@ abstract class UnaryNode extends LogicalPlan {
     projectList.flatMap {
       case a @ Alias(e, _) =>
         child.constraints
-          .map(_ transform {
+          .map(_.transform {
             case expr: Expression if expr.semanticEquals(e) =>
               a.toAttribute
           })

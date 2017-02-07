@@ -46,7 +46,7 @@ class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
       sendAllMessages()
   }
 
-  def stashEvents: Receive = handleWorkDone orElse {
+  def stashEvents: Receive = handleWorkDone.orElse {
     case event: MarathonEvent if outstanding.size >= maxOutStanding =>
       dropEvent(event)
     case event: MarathonEvent => outstanding = event :: outstanding
@@ -73,7 +73,7 @@ class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
       }(ThreadPoolContext.ioContext)
 
       import context.dispatcher
-      sendFuture pipeTo self
+      sendFuture.pipeTo(self)
     } else {
       context.become(waitForEvent)
     }

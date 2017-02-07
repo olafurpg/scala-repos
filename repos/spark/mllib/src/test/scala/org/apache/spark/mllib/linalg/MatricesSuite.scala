@@ -316,8 +316,9 @@ class MatricesSuite extends SparkFunSuite {
     assert(deHorz2.numCols === 0)
     assert(deHorz2.toArray.length === 0)
 
-    assert(deHorz1 ~== spHorz2.asInstanceOf[SparseMatrix].toDense absTol 1e-15)
-    assert(spHorz2 ~== spHorz3 absTol 1e-15)
+    assert(
+      deHorz1 ~== spHorz2.asInstanceOf[SparseMatrix].toDense.absTol(1e-15))
+    assert(spHorz2 ~== spHorz3.absTol(1e-15))
     assert(spHorz(0, 0) === 1.0)
     assert(spHorz(2, 1) === 5.0)
     assert(spHorz(0, 2) === 1.0)
@@ -339,10 +340,10 @@ class MatricesSuite extends SparkFunSuite {
     val spHorz3T = Matrices.horzcat(Array(deMat1TT, spMat2))
     val deHorz1T = Matrices.horzcat(Array(deMat1TT, deMat2))
 
-    assert(deHorz1T ~== deHorz1 absTol 1e-15)
-    assert(spHorzT ~== spHorz absTol 1e-15)
-    assert(spHorz2T ~== spHorz2 absTol 1e-15)
-    assert(spHorz3T ~== spHorz3 absTol 1e-15)
+    assert(deHorz1T ~== deHorz1.absTol(1e-15))
+    assert(spHorzT ~== spHorz.absTol(1e-15))
+    assert(spHorz2T ~== spHorz2.absTol(1e-15))
+    assert(spHorz3T ~== spHorz3.absTol(1e-15))
 
     intercept[IllegalArgumentException] {
       Matrices.horzcat(Array(spMat1, spMat3))
@@ -370,8 +371,9 @@ class MatricesSuite extends SparkFunSuite {
     assert(deVert2.numCols === 0)
     assert(deVert2.toArray.length === 0)
 
-    assert(deVert1 ~== spVert2.asInstanceOf[SparseMatrix].toDense absTol 1e-15)
-    assert(spVert2 ~== spVert3 absTol 1e-15)
+    assert(
+      deVert1 ~== spVert2.asInstanceOf[SparseMatrix].toDense.absTol(1e-15))
+    assert(spVert2 ~== spVert3.absTol(1e-15))
     assert(spVert(0, 0) === 1.0)
     assert(spVert(2, 1) === 5.0)
     assert(spVert(3, 0) === 1.0)
@@ -389,10 +391,10 @@ class MatricesSuite extends SparkFunSuite {
     val spVert2T = Matrices.vertcat(Array(spMat1TT, deMat3))
     val spVert3T = Matrices.vertcat(Array(deMat1TT, spMat3))
 
-    assert(deVert1T ~== deVert1 absTol 1e-15)
-    assert(spVertT ~== spVert absTol 1e-15)
-    assert(spVert2T ~== spVert2 absTol 1e-15)
-    assert(spVert3T ~== spVert3 absTol 1e-15)
+    assert(deVert1T ~== deVert1.absTol(1e-15))
+    assert(spVertT ~== spVert.absTol(1e-15))
+    assert(spVert2T ~== spVert2.absTol(1e-15))
+    assert(spVert3T ~== spVert3.absTol(1e-15))
 
     intercept[IllegalArgumentException] {
       Matrices.vertcat(Array(spMat1, spMat2))

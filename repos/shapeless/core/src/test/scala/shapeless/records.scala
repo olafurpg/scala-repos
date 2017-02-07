@@ -578,7 +578,7 @@ class RecordTests {
     }
 
     val r = ("foo" ->> "joe") :: ("bar" ->> true) :: ("baz" ->> 2.0) :: HNil
-    val r2 = r map toUpper
+    val r2 = r.map(toUpper)
 
     val v1 = r2("foo")
     typed[String](v1)
@@ -937,7 +937,7 @@ class RecordTests {
       }
 
       val r = ("foo" ->> "joe") :: ("bar" ->> true) :: ("baz" ->> 2.0) :: HNil
-      val r2 = r mapValues toUpper
+      val r2 = r.mapValues(toUpper)
 
       val v1 = r2("foo")
       typed[String](v1)

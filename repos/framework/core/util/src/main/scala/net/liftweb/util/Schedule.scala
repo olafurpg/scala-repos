@@ -197,11 +197,11 @@ private object TF extends ThreadFactory {
   val threadFactory = Executors.defaultThreadFactory()
   def newThread(r: Runnable): Thread = {
     val d: Thread = threadFactory.newThread(r)
-    d setName "Lift Scheduler"
-    d setDaemon true
+    d.setName("Lift Scheduler")
+    d.setDaemon(true)
 
     if (ThreadPoolRules.nullContextClassLoader) {
-      d setContextClassLoader null
+      d.setContextClassLoader(null)
     }
     d
   }

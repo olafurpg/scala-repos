@@ -49,7 +49,7 @@ trait ListHelpers {
     * lists.  The resulting List of commands will be returned.
     */
   def delta[T, Res](old: Box[Seq[T]], newList: Seq[T])(
-      f: DeltaInfo[T] => Res): List[Res] = delta(old openOr Nil, newList)(f)
+      f: DeltaInfo[T] => Res): List[Res] = delta(old.openOr(Nil), newList)(f)
 
   /**
     * Compute the deltas between two sequences of a given type.
@@ -136,7 +136,7 @@ trait ListHelpers {
     * @return a Box containing the first Full Box or Empty if f never returns a Full Box
     */
   def first[B, C](in: Seq[B])(_f: B => Box[C]): Box[C] = {
-    val f: B => Iterable[C] = _f andThen Box.box2Iterable[C]
+    val f: B => Iterable[C] = _f.andThen(Box.box2Iterable[C])
     // We use toStream here to avoid multiple execution of "f" for each element access (Issue #596)
     Box(in.toStream.flatMap(f).headOption)
   }

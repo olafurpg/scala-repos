@@ -18,7 +18,7 @@ class IdleConnectionFilterTest extends FunSuite with MockitoSugar {
 
   class ChannelHelper {
     val service = mock[Service[String, String]]
-    when(service.close(any)) thenReturn Future.Done
+    when(service.close(any)).thenReturn(Future.Done)
     val underlying = ServiceFactory.const(service)
 
     val threshold = OpenConnectionsThresholds(2, 4, 1.second)
@@ -27,9 +27,9 @@ class IdleConnectionFilterTest extends FunSuite with MockitoSugar {
     def open(filter: IdleConnectionFilter[_, _]) = {
       val c = mock[ClientConnection]
       val closeFuture = new Promise[Unit]
-      when(c.onClose) thenReturn closeFuture
+      when(c.onClose).thenReturn(closeFuture)
 
-      when(c.close()) thenAnswer {
+      when(c.close()).thenAnswer {
         new Answer[Future[Unit]] {
           override def answer(invocation: InvocationOnMock): Future[Unit] = {
             closeFuture.setDone()
@@ -59,7 +59,7 @@ class IdleConnectionFilterTest extends FunSuite with MockitoSugar {
 
     assert(filter.openConnections == 0)
     val closeFutures =
-      (1 to threshold.highWaterMark) map { _ =>
+      ((1 to threshold.highWaterMark)).map { _ =>
         val (_, closeFuture) = open(filter)
         closeFuture
       }
@@ -67,7 +67,7 @@ class IdleConnectionFilterTest extends FunSuite with MockitoSugar {
     open(filter)
     assert(filter.openConnections == threshold.highWaterMark)
 
-    closeFutures foreach {
+    closeFutures.foreach {
       _.setDone()
     }
     assert(filter.openConnections == 0)
@@ -82,7 +82,7 @@ class IdleConnectionFilterTest extends FunSuite with MockitoSugar {
       Mockito.spy(new IdleConnectionFilter(underlying, threshold))
 
     assert(spyFilter.openConnections == 0)
-    (1 to threshold.lowWaterMark) map { _ =>
+    ((1 to threshold.lowWaterMark)).map { _ =>
       open(spyFilter)
     }
     assert(spyFilter.openConnections == threshold.lowWaterMark)
@@ -106,7 +106,7 @@ class IdleConnectionFilterTest extends FunSuite with MockitoSugar {
       val spyFilter =
         Mockito.spy(new IdleConnectionFilter(underlying, threshold))
       assert(spyFilter.openConnections == 0)
-      (1 to threshold.highWaterMark) map { _ =>
+      ((1 to threshold.highWaterMark)).map { _ =>
         val (c, _) = open(spyFilter)
         spyFilter.filterFactory(c)("titi", service)
       }
@@ -117,9 +117,9 @@ class IdleConnectionFilterTest extends FunSuite with MockitoSugar {
 
       val c = mock[ClientConnection]
       val closeFuture = new Promise[Unit]
-      when(c.onClose) thenReturn closeFuture
+      when(c.onClose).thenReturn(closeFuture)
       /* same pb as before*/
-      when(c.close()) thenAnswer {
+      when(c.close()).thenAnswer {
         new Answer[Future[Unit]] {
           override def answer(invocation: InvocationOnMock): Future[Unit] = {
             closeFuture.setDone()
@@ -154,13 +154,13 @@ class IdleConnectionFilterTest extends FunSuite with MockitoSugar {
         Mockito.spy(new IdleConnectionFilter(underlying, threshold))
 
       // Open all connections
-      (1 to threshold.highWaterMark) map { _ =>
+      ((1 to threshold.highWaterMark)).map { _ =>
         val (c, _) = open(spyFilter)
         spyFilter.filterFactory(c)("titi", Await.result(underlying(c)))
       }
 
       // Simulate response from the server
-      responses foreach { f =>
+      responses.foreach { f =>
         f.setValue("toto")
       }
 
@@ -169,7 +169,7 @@ class IdleConnectionFilterTest extends FunSuite with MockitoSugar {
 
       val c = mock[ClientConnection]
       val closeFuture = new Promise[Unit]
-      when(c.onClose) thenReturn closeFuture
+      when(c.onClose).thenReturn(closeFuture)
       spyFilter(c)
 
       verify(c, times(0)).close()

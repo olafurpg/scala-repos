@@ -76,7 +76,7 @@ object Test extends DirectTest {
 
     val fos = new FileOutputStream(
       new File(s"${testOutput.path}/$className.class"))
-    try fos write bytes
+    try fos.write(bytes)
     finally fos.close()
   }
 

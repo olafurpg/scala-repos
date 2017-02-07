@@ -97,14 +97,14 @@ class BinomialHeap[T <% Ordered[T]]
   }
 
   private val comp = { (x: T, y: T) =>
-    x compare y
+    x.compare(y)
   }
   def iterator: Iterator[T] =
-    Iterators.merge((trees map treeIterator): _*)(comp)
+    Iterators.merge((trees.map(treeIterator)): _*)(comp)
 
   private def treeIterator(n: Node[T]): Iterator[T] = {
     Iterators.merge(
-      (Iterator.single(n.x) :: (n.children map treeIterator)): _*)(comp)
+      (Iterator.single(n.x) :: (n.children.map(treeIterator))): _*)(comp)
   }
 
   override def toString() = iterator.mkString("Heap(", ",", ")")

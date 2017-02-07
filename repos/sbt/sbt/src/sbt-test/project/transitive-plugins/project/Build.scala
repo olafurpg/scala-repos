@@ -14,8 +14,10 @@ object Build extends Build {
       resolvers <+= appConfiguration { app =>
         // need this to resolve sbt
         val ivyHome =
-          Classpaths.bootIvyHome(app) getOrElse sys.error(
-            "Launcher did not provide the Ivy home directory.")
+          Classpaths
+            .bootIvyHome(app)
+            .getOrElse(
+              sys.error("Launcher did not provide the Ivy home directory."))
         Resolver.file("real-local", ivyHome / "local")(
           Resolver.ivyStylePatterns)
       },

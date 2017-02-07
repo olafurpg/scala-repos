@@ -14,9 +14,9 @@ final class Env(config: Config,
                 system: ActorSystem) {
 
   private val settings = new {
-    val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
-    val CachedNbTtl = config duration "cached.nb.ttl"
-    val OnlineTtl = config duration "online.ttl"
+    val PaginatorMaxPerPage = config.getInt("paginator.max_per_page")
+    val CachedNbTtl = config.duration("cached.nb.ttl")
+    val OnlineTtl = config.duration("online.ttl")
     val CollectionUser = config getString "collection.user"
     val CollectionNote = config getString "collection.note"
     val CollectionTrophy = config getString "collection.trophy"
@@ -42,9 +42,9 @@ final class Env(config: Config,
   val forms = DataForm
 
   def lightUser(id: String): Option[lila.common.LightUser] =
-    lightUserApi get id
+    lightUserApi.get(id)
 
-  def isOnline(userId: String) = onlineUserIdMemo get userId
+  def isOnline(userId: String) = onlineUserIdMemo.get(userId)
 
   def countEnabled = cached.countEnabled
 
@@ -52,7 +52,7 @@ final class Env(config: Config,
     import tube.userTube
     def process = {
       case "user" :: "email" :: userId :: email :: Nil =>
-        UserRepo.email(User normalize userId, email) inject "done"
+        UserRepo.email(User.normalize(userId), email) inject "done"
     }
   }
 
@@ -63,12 +63,12 @@ final class Env(config: Config,
     }
     def receive = {
       case lila.hub.actorApi.mod.MarkCheater(userId) =>
-        rankingApi remove userId
+        rankingApi.remove(userId)
       case lila.hub.actorApi.mod.MarkBooster(userId) =>
-        rankingApi remove userId
+        rankingApi.remove(userId)
       case User.Active(user) =>
-        if (!user.seenRecently) UserRepo setSeenAt user.id
-        onlineUserIdMemo put user.id
+        if (!user.seenRecently) UserRepo.setSeenAt(user.id)
+        onlineUserIdMemo.put(user.id)
     }
   }))
 
@@ -90,12 +90,13 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "user" boot new Env(
-      config = lila.common.PlayApp loadConfig "user",
-      db = lila.db.Env.current,
-      mongoCache = lila.memo.Env.current.mongoCache,
-      scheduler = lila.common.PlayApp.scheduler,
-      timeline = lila.hub.Env.current.actor.timeline,
-      system = lila.common.PlayApp.system
-    )
+    "user".boot(
+      new Env(
+        config = lila.common.PlayApp.loadConfig("user"),
+        db = lila.db.Env.current,
+        mongoCache = lila.memo.Env.current.mongoCache,
+        scheduler = lila.common.PlayApp.scheduler,
+        timeline = lila.hub.Env.current.actor.timeline,
+        system = lila.common.PlayApp.system
+      ))
 }

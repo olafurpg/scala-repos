@@ -47,7 +47,7 @@ abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
                          templateName: String,
                          parameters: String*): PsiFile = {
     val templateManager = FileTemplateManager.getDefaultInstance
-    val template = templateManager getInternalTemplate templateName
+    val template = templateManager.getInternalTemplate(templateName)
     val project = directory.getProject
     val properties = new Properties(templateManager.getDefaultProperties)
 
@@ -63,7 +63,7 @@ abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
 
     var text: String = null
 
-    try text = template getText properties
+    try text = template.getText(properties)
     catch {
       case e: Exception =>
         throw new RuntimeException(
@@ -78,9 +78,9 @@ abstract class NewTypeDefinitionBase[T <: ScTemplateDefinition](
   }
 
   protected def isUnderSourceRoots(dataContext: DataContext): Boolean =
-    (dataContext getData LangDataKeys.MODULE.getName,
-     dataContext getData LangDataKeys.IDE_VIEW.getName,
-     dataContext getData CommonDataKeys.PROJECT.getName) match {
+    (dataContext.getData(LangDataKeys.MODULE.getName),
+     dataContext.getData(LangDataKeys.IDE_VIEW.getName),
+     dataContext.getData(CommonDataKeys.PROJECT.getName)) match {
       case (module: Module, view: IdeView, project: Project) =>
         if (!Option(module).exists(checkModule)) return false
 

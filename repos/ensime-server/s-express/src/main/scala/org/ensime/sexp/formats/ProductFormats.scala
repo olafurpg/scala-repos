@@ -68,7 +68,7 @@ trait LowPriorityProductFormats {
     def write(x: T): Sexp =
       if (keys.isEmpty) SexpNil
       else {
-        val pairs = keys zip r.value.write(g.to(x))
+        val pairs = keys.zip(r.value.write(g.to(x)))
         if (skipNilValues) SexpData(pairs.filterNot(_._2 == SexpNil))
         else SexpData(pairs)
       }

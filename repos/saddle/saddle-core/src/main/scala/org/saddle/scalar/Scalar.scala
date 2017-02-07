@@ -86,7 +86,7 @@ object Scalar {
   implicit def scalarToOption[T](sc: Scalar[T]): Option[T] =
     if (sc.isNA) None else Some(sc.get)
   implicit def optionToScalar[T: ST](op: Option[T]): Scalar[T] =
-    op.map { Scalar(_) } getOrElse NA
+    op.map { Scalar(_) }.getOrElse(NA)
 }
 
 case class Value[+T: ST](el: T) extends Scalar[T] {

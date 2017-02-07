@@ -11,7 +11,7 @@ import org.mockito.Mockito._
 
 @RunWith(classOf[JUnitRunner])
 case class RejectFailterSpec() extends FlatSpec with MustMatchers {
-  behavior of "RejectFailters"
+  behavior.of("RejectFailters")
 
   val repeatFor = 10000
 
@@ -19,8 +19,8 @@ case class RejectFailterSpec() extends FlatSpec with MustMatchers {
     val base = mock(classOf[Service[String, String]])
 
     when(base.apply("hello")).thenReturn(Future.value("hi"))
-    val stack = RejectFailter(Var(0.0)) andThen base
-    1 to repeatFor foreach { _ =>
+    val stack = RejectFailter(Var(0.0)).andThen(base)
+    (1 to repeatFor).foreach { _ =>
       Await.result(stack("hello")) must equal("hi")
     }
     verify(base, times(repeatFor)).apply("hello")
@@ -30,8 +30,8 @@ case class RejectFailterSpec() extends FlatSpec with MustMatchers {
     val base = mock(classOf[Service[String, String]])
 
     when(base.apply("hello")).thenReturn(Future.value("hi"))
-    val stack = ByzantineRejectFailter(Var(0.0)) andThen base
-    1 to repeatFor foreach { _ =>
+    val stack = ByzantineRejectFailter(Var(0.0)).andThen(base)
+    (1 to repeatFor).foreach { _ =>
       Await.result(stack("hello")) must equal("hi")
     }
     verify(base, times(repeatFor)).apply("hello")
@@ -41,18 +41,20 @@ case class RejectFailterSpec() extends FlatSpec with MustMatchers {
     val base = mock(classOf[Service[String, String]])
 
     when(base.apply("hello")).thenReturn(Future.value("hi"))
-    val stack = ByzantineRejectFailter(Var(0.5)) andThen base
+    val stack = ByzantineRejectFailter(Var(0.5)).andThen(base)
 
     var fail = 0
     var pass = 0
 
     try {
-      Await.result(Future.collect(1 to repeatFor map { _ =>
-        stack("hello") onSuccess { _ =>
-          pass += 1
-        } onFailure { _ =>
-          fail += 1
-        }
+      Await.result(Future.collect((1 to repeatFor).map { _ =>
+        stack("hello")
+          .onSuccess { _ =>
+            pass += 1
+          }
+          .onFailure { _ =>
+            fail += 1
+          }
       }))
     } catch {
       case r: RejectedExecutionException => // Ignore
@@ -68,18 +70,21 @@ case class RejectFailterSpec() extends FlatSpec with MustMatchers {
     val base = mock(classOf[Service[String, String]])
 
     when(base.apply("hello")).thenReturn(Future.value("hi"))
-    val stack = RejectFailter(Var(0.5)) andThen base
+    val stack = RejectFailter(Var(0.5)).andThen(base)
 
     var fail = 0
     var pass = 0
 
-    1 to repeatFor foreach { _ =>
+    (1 to repeatFor).foreach { _ =>
       try {
-        Await.result(stack("hello") onSuccess { _ =>
-          pass += 1
-        } onFailure { _ =>
-          fail += 1
-        })
+        Await.result(
+          stack("hello")
+            .onSuccess { _ =>
+              pass += 1
+            }
+            .onFailure { _ =>
+              fail += 1
+            })
       } catch {
         case t: RejectedExecutionException => // Ignore
       }

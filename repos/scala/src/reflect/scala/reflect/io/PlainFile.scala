@@ -11,7 +11,7 @@ package io
 class PlainDirectory(givenPath: Directory) extends PlainFile(givenPath) {
   override def isDirectory = true
   override def iterator =
-    givenPath.list filter (_.exists) map (x => new PlainFile(x))
+    givenPath.list.filter(_.exists).map(x => new PlainFile(x))
   override def delete(): Unit = givenPath.deleteRecursively()
 }
 
@@ -63,7 +63,7 @@ class PlainFile(val givenPath: Path) extends AbstractFile {
       case _ => path.exists
     }
     if (!isDirectory) Iterator.empty
-    else givenPath.toDirectory.list filter existsFast map (new PlainFile(_))
+    else givenPath.toDirectory.list.filter(existsFast).map(new PlainFile(_))
   }
 
   /**

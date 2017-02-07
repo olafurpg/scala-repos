@@ -37,7 +37,7 @@ private[sird] object QueryStringParameterMacros {
       case Apply(_, List(Apply(_, rawParts))) =>
         // extract the part literals
         val parts =
-          rawParts map { case Literal(Constant(const: String)) => const }
+          rawParts.map { case Literal(Constant(const: String)) => const }
 
         // Extract paramName, and validate
         val startOfString = c.enclosingPosition.point + name.length + 1

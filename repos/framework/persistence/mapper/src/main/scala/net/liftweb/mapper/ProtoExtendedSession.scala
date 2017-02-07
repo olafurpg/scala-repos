@@ -96,7 +96,7 @@ trait MetaProtoExtendedSession[T <: ProtoExtendedSession[T]]
   def userDidLogout(uid: Box[UserType]) {
     for (cook <- S.findCookie(CookieName)) {
       S.deleteCookie(cook)
-      find(By(cookieId, cook.value openOr "")).foreach(_.delete_!)
+      find(By(cookieId, cook.value.openOr(""))).foreach(_.delete_!)
     }
   }
 
@@ -112,7 +112,7 @@ trait MetaProtoExtendedSession[T <: ProtoExtendedSession[T]]
     {
       (recoverUserId, S.findCookie(CookieName)) match {
         case (Empty, Full(c)) =>
-          find(By(cookieId, c.value openOr "")) match {
+          find(By(cookieId, c.value.openOr(""))) match {
             case Full(es) if es.expiration.get < millis => es.delete_!
             case Full(es) => logUserIdIn(es.userId.get)
             case _ =>

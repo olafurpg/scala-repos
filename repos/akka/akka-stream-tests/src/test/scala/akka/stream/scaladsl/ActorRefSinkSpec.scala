@@ -15,7 +15,7 @@ import akka.testkit.AkkaSpec
 object ActorRefSinkSpec {
   case class Fw(ref: ActorRef) extends Actor {
     def receive = {
-      case msg ⇒ ref forward msg
+      case msg ⇒ ref.forward(msg)
     }
   }
 }

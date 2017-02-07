@@ -102,25 +102,25 @@ private class ApachePollingFileWatcher(
       def fileChanged(event: FileChangeEvent): Unit = {
         if (watched(event)) {
           if (log.isDebugEnabled()) log.debug(s"${event.getFile} was changed")
-          listeners foreach (_.fileChanged(event.getFile))
+          listeners.foreach(_.fileChanged(event.getFile))
         }
       }
       def fileCreated(event: FileChangeEvent): Unit =
         if (watched(event)) {
           if (log.isDebugEnabled()) log.debug(s"${event.getFile} was created")
-          listeners foreach (_.fileAdded(event.getFile))
+          listeners.foreach(_.fileAdded(event.getFile))
         }
       def fileDeleted(event: FileChangeEvent): Unit =
         if (base == event.getFile.getName.getURI) {
           log.info(s"$base (a watched base) was deleted")
-          listeners foreach (_.baseRemoved(event.getFile))
+          listeners.foreach(_.baseRemoved(event.getFile))
           // this is a best efforts thing, subject to race conditions
           fm.stop() // the delete stack is a liability
           fm = create()
           init(restarted = true)
         } else if (watched(event)) {
           if (log.isDebugEnabled()) log.debug(s"${event.getFile} was deleted")
-          listeners foreach (_.fileRemoved(event.getFile))
+          listeners.foreach(_.fileRemoved(event.getFile))
         }
     })
 
@@ -141,7 +141,7 @@ private class ApachePollingFileWatcher(
       // in dupes, but we figure that's better than dropping the
       // message.
       if (restarted && selector.includeFile(fo)) {
-        listeners foreach (_.fileAdded(fo))
+        listeners.foreach(_.fileAdded(fo))
       }
     }
 

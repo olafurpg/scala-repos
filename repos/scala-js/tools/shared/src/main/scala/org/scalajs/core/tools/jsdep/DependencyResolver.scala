@@ -89,7 +89,7 @@ object DependencyResolver {
       resourceName: String,
       origins: List[Origin],
       relPaths: Traversable[String]): Either[Problem, String] = {
-    val candidates = (relPaths collect {
+    val candidates = (relPaths.collect {
       case relPath if ("/" + relPath).endsWith("/" + resourceName) =>
         relPath
     }).toList
@@ -125,7 +125,7 @@ object DependencyResolver {
       else if (coll.tail.isEmpty) coll.head :: acc
       else {
         val (selected, pending) = coll.partition { x =>
-          coll forall { y =>
+          coll.forall { y =>
             (x eq y) || !y.dependencies.contains(x.relPath)
           }
         }

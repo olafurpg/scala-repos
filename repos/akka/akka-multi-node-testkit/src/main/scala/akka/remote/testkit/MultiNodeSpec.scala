@@ -40,8 +40,8 @@ abstract class MultiNodeConfig {
     * Register a config override for a specific participant.
     */
   def nodeConfig(roles: RoleName*)(configs: Config*): Unit = {
-    val c = configs.reduceLeft(_ withFallback _)
-    _nodeConf ++= roles map { _ -> c }
+    val c = configs.reduceLeft(_.withFallback(_))
+    _nodeConf ++= roles.map { _ -> c }
   }
 
   /**
@@ -70,7 +70,7 @@ abstract class MultiNodeConfig {
     * filled.
     */
   def role(name: String): RoleName = {
-    if (_roles exists (_.name == name))
+    if (_roles.exists(_.name == name))
       throw new IllegalArgumentException("non-unique role name " + name)
     val r = RoleName(name)
     _roles :+= r
@@ -79,7 +79,7 @@ abstract class MultiNodeConfig {
 
   def deployOn(role: RoleName, deployment: String): Unit =
     _deployments += role ->
-      ((_deployments get role getOrElse Vector()) :+ deployment)
+      ((_deployments.get(role).getOrElse(Vector())) :+ deployment)
 
   def deployOnAll(deployment: String): Unit = _allDeploy :+= deployment
 
@@ -106,12 +106,14 @@ abstract class MultiNodeConfig {
       else ConfigFactory.empty
 
     val configs =
-      (_nodeConf get myself).toList ::: _commonConf.toList ::: transportConfig :: MultiNodeSpec.nodeConfig :: MultiNodeSpec.baseConfig :: Nil
-    configs reduceLeft (_ withFallback _)
+      (_nodeConf
+        .get(myself))
+        .toList ::: _commonConf.toList ::: transportConfig :: MultiNodeSpec.nodeConfig :: MultiNodeSpec.baseConfig :: Nil
+    configs.reduceLeft(_.withFallback(_))
   }
 
   private[testkit] def deployments(node: RoleName): immutable.Seq[String] =
-    (_deployments get node getOrElse Nil) ++ _allDeploy
+    (_deployments.get(node).getOrElse(Nil)) ++ _allDeploy
 
   private[testkit] def roles: immutable.Seq[RoleName] = _roles
 }
@@ -126,8 +128,8 @@ object MultiNodeSpec {
     * }}}
     */
   val maxNodes: Int =
-    Option(Integer.getInteger("multinode.max-nodes")) getOrElse
-      (throw new IllegalStateException(
+    Option(Integer.getInteger("multinode.max-nodes")).getOrElse(
+      throw new IllegalStateException(
         "need system property multinode.max-nodes to be set"))
 
   require(maxNodes > 0, "multinode.max-nodes must be greater than 0")
@@ -174,8 +176,8 @@ object MultiNodeSpec {
     * }}}
     */
   val serverName: String =
-    Option(System.getProperty("multinode.server-host")) getOrElse
-      (throw new IllegalStateException(
+    Option(System.getProperty("multinode.server-host")).getOrElse(
+      throw new IllegalStateException(
         "need system property multinode.server-host to be set"))
 
   require(serverName != "", "multinode.server-host must not be empty")
@@ -202,8 +204,8 @@ object MultiNodeSpec {
     * }}}
     */
   val selfIndex =
-    Option(Integer.getInteger("multinode.index")) getOrElse
-      (throw new IllegalStateException(
+    Option(Integer.getInteger("multinode.index")).getOrElse(
+      throw new IllegalStateException(
         "need system property multinode.index to be set"))
 
   require(selfIndex >= 0 && selfIndex < maxNodes,
@@ -240,11 +242,13 @@ object MultiNodeSpec {
 
   private def getCallerName(clazz: Class[_]): String = {
     val s =
-      Thread.currentThread.getStackTrace map (_.getClassName) drop 1 dropWhile
-        (_ matches ".*MultiNodeSpec.?$")
+      Thread.currentThread.getStackTrace
+        .map(_.getClassName)
+        .drop(1)
+        .dropWhile(_.matches(".*MultiNodeSpec.?$"))
     val reduced = s.lastIndexWhere(_ == clazz.getName) match {
       case -1 ⇒ s
-      case z ⇒ s drop (z + 1)
+      case z ⇒ s.drop(z + 1)
     }
     reduced.head.replaceFirst(""".*\.""", "").replaceAll("[^a-zA-Z_0-9]", "_")
   }
@@ -398,7 +402,7 @@ abstract class MultiNodeSpec(val myself: RoleName,
         sys.eventStream.publish(
           Mute(DeadLettersFilter(clazz)(occurrences = Int.MaxValue)))
       if (messageClasses.isEmpty) mute(classOf[AnyRef])
-      else messageClasses foreach mute
+      else messageClasses.foreach(mute)
     }
 
   /*
@@ -429,11 +433,11 @@ abstract class MultiNodeSpec(val myself: RoleName,
     lazy val addr = node(role).address.toString
   }
 
-  private val replacements = roles map (r ⇒ Replacement("@" + r.name + "@", r))
+  private val replacements = roles.map(r ⇒ Replacement("@" + r.name + "@", r))
 
   protected def injectDeployments(sys: ActorSystem, role: RoleName): Unit = {
     val deployer = sys.asInstanceOf[ExtendedActorSystem].provider.deployer
-    deployments(role) foreach { str ⇒
+    deployments(role).foreach { str ⇒
       val deployString = (str /: replacements) {
         case (base, r @ Replacement(tag, _)) ⇒
           base.indexOf(tag) match {
@@ -454,9 +458,9 @@ abstract class MultiNodeSpec(val myself: RoleName,
           }
       }
       import scala.collection.JavaConverters._
-      ConfigFactory.parseString(deployString).root.asScala foreach {
+      ConfigFactory.parseString(deployString).root.asScala.foreach {
         case (key, value: ConfigObject) ⇒
-          deployer.parseConfig(key, value.toConfig) foreach deployer.deploy
+          deployer.parseConfig(key, value.toConfig).foreach(deployer.deploy)
         case (key, x) ⇒
           throw new IllegalArgumentException(
             s"key $key must map to deployment section, not simple value $x")

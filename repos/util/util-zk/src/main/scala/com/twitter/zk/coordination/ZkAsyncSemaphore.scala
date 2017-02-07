@@ -67,47 +67,49 @@ class ZkAsyncSemaphore(zk: ZkClient,
 
   def acquire(): Future[Permit] = synchronized {
     val futurePermit =
-      futureSemaphoreNode flatMap { semaphoreNode =>
+      futureSemaphoreNode.flatMap { semaphoreNode =>
         zk(permitNodePathPrefix).create(
           data = numPermits.toString.getBytes(Charset.forName("UTF8")),
           mode = CreateMode.EPHEMERAL_SEQUENTIAL)
       }
-    futurePermit flatMap { permitNode =>
+    futurePermit.flatMap { permitNode =>
       val mySequenceNumber = sequenceNumberOf(permitNode.path)
 
-      permitNodes() flatMap { permits =>
+      permitNodes().flatMap { permits =>
         val sequenceNumbers =
-          permits map { child =>
+          permits.map { child =>
             sequenceNumberOf(child.path)
           }
-        getConsensusNumPermits(permits) flatMap { consensusNumPermits =>
-          if (consensusNumPermits != numPermits) {
-            throw ZkAsyncSemaphore.PermitMismatchException(
-              "Attempted to create semaphore of %d permits when consensus is %d"
-                .format(numPermits, consensusNumPermits))
-          }
-          if (permits.size < numPermits) {
-            Future.value(new ZkSemaphorePermit(permitNode))
-          } else if (mySequenceNumber <= sequenceNumbers(numPermits - 1)) {
-            Future.value(new ZkSemaphorePermit(permitNode))
-          } else {
-            maxWaiters match {
-              case Some(max) if (waitq.size >= max) => {
-                MaxWaitersExceededException
-              }
-              case _ => {
-                val promise = new Promise[ZkSemaphorePermit]
-                waitq.add((promise, permitNode))
-                promise
+        getConsensusNumPermits(permits)
+          .flatMap { consensusNumPermits =>
+            if (consensusNumPermits != numPermits) {
+              throw ZkAsyncSemaphore.PermitMismatchException(
+                "Attempted to create semaphore of %d permits when consensus is %d"
+                  .format(numPermits, consensusNumPermits))
+            }
+            if (permits.size < numPermits) {
+              Future.value(new ZkSemaphorePermit(permitNode))
+            } else if (mySequenceNumber <= sequenceNumbers(numPermits - 1)) {
+              Future.value(new ZkSemaphorePermit(permitNode))
+            } else {
+              maxWaiters match {
+                case Some(max) if (waitq.size >= max) => {
+                  MaxWaitersExceededException
+                }
+                case _ => {
+                  val promise = new Promise[ZkSemaphorePermit]
+                  waitq.add((promise, permitNode))
+                  promise
+                }
               }
             }
           }
-        } onFailure {
-          case err => {
-            permitNode.delete()
-            Future.exception(err)
+          .onFailure {
+            case err => {
+              permitNode.delete()
+              Future.exception(err)
+            }
           }
-        }
       }
     }
   }
@@ -119,14 +121,14 @@ class ZkAsyncSemaphore(zk: ZkClient,
     * - Check waiters if the client has reconnected and our session is still valid.
     */
   private[this] def createSemaphoreNode(): Future[ZNode] = {
-    safeCreate(path) map { semaphoreNode =>
-      zk() map { client =>
+    safeCreate(path).map { semaphoreNode =>
+      zk().map { client =>
         // client is always connected here.
         monitorSemaphore(semaphoreNode)
-        zk onSessionEvent {
+        zk.onSessionEvent {
           case StateEvent.Expired => rejectWaitQueue()
           case StateEvent.Connected => {
-            permitNodes() map { nodes =>
+            permitNodes().map { nodes =>
               checkWaiters(nodes)
             }
             monitorSemaphore(semaphoreNode)
@@ -144,12 +146,12 @@ class ZkAsyncSemaphore(zk: ZkClient,
     * @return A Future ZNode that is satisfied when the full path exists.
     */
   private[this] def safeCreate(path: String): Future[ZNode] = {
-    val nodes = path.split(pathSeparator) filter { !_.isEmpty }
+    val nodes = path.split(pathSeparator).filter { !_.isEmpty }
     val head = Future.value(zk(pathSeparator + nodes.head))
     nodes.tail.foldLeft(head) { (futureParent, child) =>
-      futureParent flatMap { parent =>
+      futureParent.flatMap { parent =>
         val newParent = parent(child)
-        newParent.create() rescue {
+        newParent.create().rescue {
           case err: KeeperException.NodeExistsException =>
             Future.value(newParent)
         }
@@ -164,11 +166,13 @@ class ZkAsyncSemaphore(zk: ZkClient,
     *         The sequence includes both nodes that have entered the semaphore as well as waiters.
     */
   private[this] def permitNodes(): Future[Seq[ZNode]] = {
-    futureSemaphoreNode flatMap { semaphoreNode =>
-      semaphoreNode.getChildren() map { zop =>
-        zop.children filter { child =>
-          child.path.startsWith(permitNodePathPrefix)
-        } sortBy (child => sequenceNumberOf(child.path))
+    futureSemaphoreNode.flatMap { semaphoreNode =>
+      semaphoreNode.getChildren().map { zop =>
+        zop.children
+          .filter { child =>
+            child.path.startsWith(permitNodePathPrefix)
+          }
+          .sortBy(child => sequenceNumberOf(child.path))
       }
     }
   }
@@ -182,8 +186,8 @@ class ZkAsyncSemaphore(zk: ZkClient,
     */
   private[this] def monitorSemaphore(node: ZNode) = {
     val monitor = node.getChildren.monitor()
-    monitor foreach { tryChildren =>
-      tryChildren map { zop =>
+    monitor.foreach { tryChildren =>
+      tryChildren.map { zop =>
         checkWaiters(zop.children)
       }
     }
@@ -206,11 +210,13 @@ class ZkAsyncSemaphore(zk: ZkClient,
       }
     }
     val permits =
-      nodes filter { child =>
-        child.path.startsWith(permitNodePathPrefix)
-      } sortBy (child => sequenceNumberOf(child.path))
+      nodes
+        .filter { child =>
+          child.path.startsWith(permitNodePathPrefix)
+        }
+        .sortBy(child => sequenceNumberOf(child.path))
     val ids =
-      permits map { child =>
+      permits.map { child =>
         sequenceNumberOf(child.path)
       }
     val waitqIterator = waitq.iterator()
@@ -257,15 +263,17 @@ class ZkAsyncSemaphore(zk: ZkClient,
     * @throws LackOfConsensusException When there is no consensus.
     */
   private[this] def getConsensusNumPermits(permits: Seq[ZNode]): Future[Int] = {
-    Future.collect(permits map numPermitsOf) map { purportedNumPermits =>
+    Future.collect(permits.map(numPermitsOf)).map { purportedNumPermits =>
       val groupedByNumPermits =
-        purportedNumPermits filter { i =>
-          0 < i
-        } groupBy { i =>
-          i
-        }
+        purportedNumPermits
+          .filter { i =>
+            0 < i
+          }
+          .groupBy { i =>
+            i
+          }
       val permitsToBelievers =
-        groupedByNumPermits map {
+        groupedByNumPermits.map {
           case (permits, believers) => (permits, believers.size)
         }
       val (numPermitsInMax, numBelieversOfMax) = permitsToBelievers.maxBy {
@@ -293,7 +301,7 @@ class ZkAsyncSemaphore(zk: ZkClient,
   }
 
   private[this] def numPermitsOf(node: ZNode): Future[Int] = {
-    node.getData() map { data =>
+    node.getData().map { data =>
       try {
         new String(data.bytes, Charset.forName("UTF8")).toInt
       } catch {

@@ -18,5 +18,5 @@ final class StringFormat(val self: Any) extends AnyVal {
     *  Format strings are as for `String.format`
     *  (@see java.lang.String.format).
     */
-  @inline def formatted(fmtstr: String): String = fmtstr format self
+  @inline def formatted(fmtstr: String): String = fmtstr.format(self)
 }

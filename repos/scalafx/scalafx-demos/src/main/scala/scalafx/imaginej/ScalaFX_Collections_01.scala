@@ -102,10 +102,10 @@ object ScalaFX_Collections_01 {
 
   def main(args: Array[String]) {
     val observableStringBuffer = ObservableBuffer[String]()
-    observableStringBuffer onInvalidate {
+    observableStringBuffer.onInvalidate {
       println("observable string buffer invalidated")
     }
-    observableStringBuffer onChange { (_, changes) =>
+    observableStringBuffer.onChange { (_, changes) =>
       for (change <- changes) change match {
         case Add(position, elements) =>
           println("added " + elements + " at position " + position)

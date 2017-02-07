@@ -77,7 +77,7 @@ class RequestMeterFilterTest extends FunSuite with MockitoSugar {
     }
     Time.withCurrentTimeFrozen { ctl =>
       val meter = AsyncMeter.perSecond(1, 1)(timer)
-      val svc = new RequestMeterFilter(meter) andThen excSvc
+      val svc = new RequestMeterFilter(meter).andThen(excSvc)
       val e = intercept[Exception] { Await.result(svc(1)) }
       assert(e == exc)
     }

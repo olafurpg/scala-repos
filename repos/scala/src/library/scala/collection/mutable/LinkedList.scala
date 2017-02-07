@@ -122,5 +122,5 @@ object LinkedList extends SeqFactory[LinkedList] {
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 
   def newBuilder[A]: Builder[A, LinkedList[A]] =
-    (new MutableList) mapResult ((l: MutableList[A]) => l.toLinkedList)
+    (new MutableList).mapResult((l: MutableList[A]) => l.toLinkedList)
 }

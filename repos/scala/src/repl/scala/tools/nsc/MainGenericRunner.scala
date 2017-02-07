@@ -16,16 +16,16 @@ object JarRunner extends CommonRunner {
              arguments: Seq[String]): Either[Throwable, Boolean] = {
     val jar = new io.Jar(jarPath)
     val mainClass =
-      jar.mainClass getOrElse sys.error(
-        "Cannot find main class for jar: " + jarPath)
-    val jarURLs = ClassPath expandManifestPath jarPath
+      jar.mainClass.getOrElse(
+        sys.error("Cannot find main class for jar: " + jarPath))
+    val jarURLs = ClassPath.expandManifestPath(jarPath)
     val urls =
       if (jarURLs.isEmpty) File(jarPath).toURL +: settings.classpathURLs
       else jarURLs
 
     if (settings.Ylogcp) {
       Console.err.println("Running jar with these URLs as the classpath:")
-      urls foreach println
+      urls.foreach(println)
     }
 
     runAndCatch(urls, mainClass, arguments)
@@ -41,7 +41,7 @@ class MainGenericRunner {
               e: Option[Throwable] = None,
               isFailure: Boolean = true): Boolean = {
     if (str.nonEmpty) Console.err println str
-    e foreach (_.printStackTrace())
+    e.foreach(_.printStackTrace())
     !isFailure
   }
 
@@ -69,7 +69,7 @@ class MainGenericRunner {
       if (isI) settings.Yreplsync.value = true
 
       def combinedCode = {
-        val files = if (isI) dashi map (file => File(file).slurp()) else Nil
+        val files = if (isI) dashi.map(file => File(file).slurp()) else Nil
         val str = if (isE) List(dashe) else Nil
 
         files ++ str mkString "\n\n"
@@ -88,7 +88,7 @@ class MainGenericRunner {
           Right(false)
         case _ =>
           // We start the repl when no arguments are given.
-          Right(new interpreter.ILoop process settings)
+          Right(new interpreter.ILoop.process(settings))
       }
 
       /** If -e and -i were both given, we want to execute the -e code after the
@@ -111,7 +111,7 @@ class MainGenericRunner {
 
     if (!command.ok) errorFn(f"%n$shortUsageMsg")
     else if (shouldStopWithInfo)
-      errorFn(command getInfoMessage sampleCompiler, isFailure = false)
+      errorFn(command.getInfoMessage(sampleCompiler), isFailure = false)
     else run()
   }
 }

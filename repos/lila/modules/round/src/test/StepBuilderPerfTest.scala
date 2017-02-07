@@ -24,7 +24,7 @@ class StepBuilderPerfTest extends Specification {
                 None,
                 format.Forsyth.initial,
                 withOpening = withOpening)
-  def run(withOpening: Boolean) { gameMoves foreach runOne(withOpening) }
+  def run(withOpening: Boolean) { gameMoves.foreach(runOne(withOpening)) }
 
   def runTests(withOpening: Boolean) = {
     runOne(withOpening)(gameMoves.head)

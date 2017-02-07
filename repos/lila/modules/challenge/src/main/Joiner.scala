@@ -12,16 +12,18 @@ import lila.user.{User, UserRepo}
 private[challenge] final class Joiner(onStart: String => Unit) {
 
   def apply(c: Challenge, destUser: Option[User]): Fu[Option[Pov]] =
-    GameRepo exists c.id flatMap {
+    GameRepo.exists(c.id).flatMap {
       case true => fuccess(None)
       case false =>
-        c.challengerUserId.??(UserRepo.byId) flatMap { challengerUser =>
+        c.challengerUserId.??(UserRepo.byId).flatMap { challengerUser =>
           def makeChess(variant: chess.variant.Variant): chess.Game =
             chess.Game(board = chess.Board init variant,
                        clock = c.clock.map(_.chessClock))
 
           val baseState =
-            c.initialFen.ifTrue(c.variant == chess.variant.FromPosition) flatMap Forsyth.<<<
+            c.initialFen
+              .ifTrue(c.variant == chess.variant.FromPosition)
+              .flatMap(Forsyth.<<<)
           val (chessGame, state) =
             baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
               case sit @ SituationPlus(Situation(board, color), _) =>
@@ -50,9 +52,8 @@ private[challenge] final class Joiner(onStart: String => Unit) {
               blackPlayer =
                 makePlayer(chess.Black,
                            c.finalColor.fold(destUser, challengerUser)),
-              mode =
-                (realVariant == chess.variant.FromPosition).fold(Mode.Casual,
-                                                                 c.mode),
+              mode = (realVariant == chess.variant.FromPosition)
+                .fold(Mode.Casual, c.mode),
               variant = realVariant,
               source = (realVariant == chess.variant.FromPosition)
                 .fold(Source.Position, Source.Friend),

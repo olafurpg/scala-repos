@@ -81,7 +81,7 @@ object IngestSystem extends Logging {
       logger.debug(
         config.logPrefix + " Stop call for " + name + " actor returned " + b)
     }
-  } recover {
+  }.recover {
     case e => logger.error("Error stopping " + name + " actor", e)
   }
 }
@@ -103,7 +103,7 @@ trait ShardSystemActorModule extends YggConfigComponent with Logging {
     val ingestActorSystem: ActorSystem = ActorSystem("Ingest")
 
     def loadCheckpoint(): Option[YggCheckpoint] =
-      yggConfig.ingestConfig flatMap { _ =>
+      yggConfig.ingestConfig.flatMap { _ =>
         checkpointCoordination.loadYggCheckpoint(yggConfig.shardId) match {
           case Some(Failure(errors)) =>
             logger.error("Unable to load Kafka checkpoint: " + errors)
@@ -128,16 +128,19 @@ trait ShardSystemActorModule extends YggConfigComponent with Logging {
       import IngestSystem.actorStop
       logger.info("Stopping bifrost system")
       for {
-        _ <- ingestActor map {
-          actorStop(yggConfig, _, "ingestActor")(ingestActorSystem,
-                                                 ingestActorSystem.dispatcher)
-        } getOrElse { Future(())(ingestActorSystem.dispatcher) }
+        _ <- ingestActor
+          .map {
+            actorStop(yggConfig, _, "ingestActor")(
+              ingestActorSystem,
+              ingestActorSystem.dispatcher)
+          }
+          .getOrElse { Future(())(ingestActorSystem.dispatcher) }
       } yield {
         ingestActorSystem.shutdown()
         logger.info("Shard system stopped.")
       }
     })
 
-    ingestActor map { IngestSystem(_, stoppable) }
+    ingestActor.map { IngestSystem(_, stoppable) }
   }
 }

@@ -273,12 +273,12 @@ trait ScPattern extends ScalaPsiElement {
           if (fun.typeParameters.isEmpty) substitutor
           else {
             val undefSubst =
-              substitutor followed fun.typeParameters.foldLeft(
-                ScSubstitutor.empty) { (s, p) =>
-                s.bindT(
-                  (p.name, ScalaPsiUtil.getPsiElementId(p)),
-                  ScUndefinedType(new ScTypeParameterType(p, substitutor)))
-              }
+              substitutor.followed(
+                fun.typeParameters.foldLeft(ScSubstitutor.empty) { (s, p) =>
+                  s.bindT(
+                    (p.name, ScalaPsiUtil.getPsiElementId(p)),
+                    ScUndefinedType(new ScTypeParameterType(p, substitutor)))
+                })
             val firstParameterRetTp =
               fun.parameters.head.getType(TypingContext.empty) match {
                 case Success(tp, _) => tp

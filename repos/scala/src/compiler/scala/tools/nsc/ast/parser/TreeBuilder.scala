@@ -44,7 +44,7 @@ abstract class TreeBuilder {
   def makeTupleType(elems: List[Tree]) = gen.mkTupleType(elems)
 
   def makeAnnotated(t: Tree, annot: Tree): Tree =
-    atPos(annot.pos union t.pos)(Annotated(annot, t))
+    atPos(annot.pos.union(t.pos))(Annotated(annot, t))
 
   def makeSelfDef(name: TermName, tpt: Tree): ValDef =
     ValDef(Modifiers(PRIVATE), name, tpt, EmptyTree)
@@ -93,7 +93,7 @@ abstract class TreeBuilder {
       case Alternative(ts) => ts
       case _ => List(t)
     }
-    Alternative(ts flatMap alternatives)
+    Alternative(ts.flatMap(alternatives))
   }
 
   /** Create tree for case definition <case pat if guard => rhs> */
@@ -143,7 +143,7 @@ abstract class TreeBuilder {
                freshTermName(nme.EVIDENCE_PARAM_PREFIX),
                tpt,
                EmptyTree)
-      val evidenceParams = contextBounds map makeEvidenceParam
+      val evidenceParams = contextBounds.map(makeEvidenceParam)
 
       val vparamssLast = if (vparamss.nonEmpty) vparamss.last else Nil
       if (vparamssLast.nonEmpty && vparamssLast.head.mods.hasFlag(IMPLICIT))

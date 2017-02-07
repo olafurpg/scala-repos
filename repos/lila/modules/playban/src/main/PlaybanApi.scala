@@ -18,7 +18,8 @@ final class PlaybanApi(coll: Coll, isRematch: String => Boolean) {
   private implicit val OutcomeBSONHandler =
     new BSONHandler[BSONInteger, Outcome] {
       def read(bsonInt: BSONInteger): Outcome =
-        Outcome(bsonInt.value) err s"No such playban outcome: ${bsonInt.value}"
+        Outcome(bsonInt.value)
+          .err(s"No such playban outcome: ${bsonInt.value}")
       def write(x: Outcome) = BSONInteger(x.id)
     }
   private implicit val banBSONHandler = Macros.handler[TempBan]
@@ -31,10 +32,11 @@ final class PlaybanApi(coll: Coll, isRematch: String => Boolean) {
 
   def abort(pov: Pov): Funit =
     blameable(pov.game) ?? {
-      if (pov.game olderThan 45)
-        pov.game.playerWhoDidNotMove map { Blame(_, Outcome.NoPlay) } else if (pov.game olderThan 15)
+      if (pov.game.olderThan(45))
+        pov.game.playerWhoDidNotMove.map { Blame(_, Outcome.NoPlay) } else if (pov.game.olderThan(
+                                                                                 15))
         none
-      else pov.player.some map { Blame(_, Outcome.Abort) }
+      else pov.player.some.map { Blame(_, Outcome.Abort) }
     } ?? {
       case Blame(player, outcome) => player.userId.??(save(outcome))
     }
@@ -81,8 +83,8 @@ final class PlaybanApi(coll: Coll, isRematch: String => Boolean) {
       .collect[List]()
       .map {
         _.flatMap { obj =>
-          obj.getAs[String]("_id") flatMap { id =>
-            obj.getAs[BSONArray]("b") map { id -> _.stream.size }
+          obj.getAs[String]("_id").flatMap { id =>
+            obj.getAs[BSONArray]("b").map { id -> _.stream.size }
           }
         }.toMap
       }
@@ -100,10 +102,12 @@ final class PlaybanApi(coll: Coll, isRematch: String => Boolean) {
           upsert = true
         )
         .map(_.value)
-    } map2 UserRecordBSONHandler.read flatMap {
-      case None => fufail(s"can't find record for user $userId")
-      case Some(record) => legiferate(record)
-    } logFailure lila.log("playban")
+    }.map2(UserRecordBSONHandler.read)
+      .flatMap {
+        case None => fufail(s"can't find record for user $userId")
+        case Some(record) => legiferate(record)
+      }
+      .logFailure(lila.log("playban"))
 
   private def legiferate(record: UserRecord): Funit = record.newBan ?? { ban =>
     coll

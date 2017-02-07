@@ -26,7 +26,7 @@ final class Debouncer[A: Manifest](length: FiniteDuration, function: A => Unit)
 
     case DelayEnd =>
       context become ready
-      delayed foreach { a =>
+      delayed.foreach { a =>
         self ! a
         delayed = none
       }

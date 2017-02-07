@@ -45,15 +45,18 @@ class HasManyThrough[From <: KeyedMapper[ThroughType, From],
           throughToField._dbColumnNameLC + " AND " + through._dbTableNameLC +
           "." + throughFromField._dbColumnNameLC + " = ?"
       DB.prepareStatement(query, conn) { st =>
-        owner.getSingleton.indexedField(owner).map { indVal =>
-          if (indVal.dbIgnoreSQLType_?) st.setObject(1, indVal.jdbcFriendly)
-          else st.setObject(1, indVal.jdbcFriendly, indVal.targetSQLType)
+        owner.getSingleton
+          .indexedField(owner)
+          .map { indVal =>
+            if (indVal.dbIgnoreSQLType_?) st.setObject(1, indVal.jdbcFriendly)
+            else st.setObject(1, indVal.jdbcFriendly, indVal.targetSQLType)
 
-          DB.exec(st) { rs =>
-            otherSingleton
-              .createInstances(owner.connectionIdentifier, rs, Empty, Empty)
+            DB.exec(st) { rs =>
+              otherSingleton
+                .createInstances(owner.connectionIdentifier, rs, Empty, Empty)
+            }
           }
-        } openOr Nil
+          .openOr(Nil)
       }
     }
   }

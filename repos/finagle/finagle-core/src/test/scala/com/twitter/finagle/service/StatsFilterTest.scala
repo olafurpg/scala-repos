@@ -29,7 +29,7 @@ class StatsFilterTest extends FunSuite {
       def apply(request: String) = promise
     }
 
-    (promise, receiver, statsFilter andThen service)
+    (promise, receiver, statsFilter.andThen(service))
   }
 
   test("latency stat defaults to milliseconds") {
@@ -37,9 +37,9 @@ class StatsFilterTest extends FunSuite {
     val filter = new StatsFilter[String, String](sr)
     val promise = new Promise[String]
     val svc =
-      filter andThen new Service[String, String] {
+      filter.andThen(new Service[String, String] {
         def apply(request: String) = promise
-      }
+      })
 
     Time.withCurrentTimeFrozen { tc =>
       svc("1")
@@ -56,9 +56,9 @@ class StatsFilterTest extends FunSuite {
                                                  TimeUnit.MICROSECONDS)
     val promise = new Promise[String]
     val svc =
-      filter andThen new Service[String, String] {
+      filter.andThen(new Service[String, String] {
         def apply(request: String) = promise
-      }
+      })
 
     Time.withCurrentTimeFrozen { tc =>
       svc("1")

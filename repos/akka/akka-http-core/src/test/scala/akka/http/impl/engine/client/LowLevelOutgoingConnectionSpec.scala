@@ -29,7 +29,7 @@ class LowLevelOutgoingConnectionSpec
 
   "The connection-level client implementation" should {
 
-    "handle a request/response round-trip" which {
+    "handle a request/response round-trip".which {
 
       "has a request with empty entity" in new TestSetup {
         sendStandardRequest()
@@ -207,7 +207,7 @@ class LowLevelOutgoingConnectionSpec
       }
     }
 
-    "handle several requests on one persistent connection" which {
+    "handle several requests on one persistent connection".which {
       "has a first response that was chunked" in new TestSetup {
         requestsSub.sendNext(HttpRequest())
         expectWireData("""GET / HTTP/1.1
@@ -261,7 +261,7 @@ class LowLevelOutgoingConnectionSpec
       }
     }
 
-    "produce proper errors" which {
+    "produce proper errors".which {
 
       "catch the request entity stream being shorter than the Content-Length" in new TestSetup {
         val probe = TestPublisher.manualProbe[ByteString]()
@@ -382,7 +382,7 @@ class LowLevelOutgoingConnectionSpec
     }
 
     def isDefinedVia = afterWord("is defined via")
-    "support response length verification" which isDefinedVia {
+    "support response length verification".which(isDefinedVia {
       import HttpEntity._
 
       class LengthVerificationTest(maxContentLength: Int)
@@ -393,12 +393,12 @@ class LowLevelOutgoingConnectionSpec
           sendWireData(s"""HTTP/1.1 200 OK
                |Content-Length: $bytes
                |
-               |${entityBase take bytes}""")
+               |${entityBase.take(bytes)}""")
         def sendDefaultResponseWithLength(bytes: Int) = {
           sendWireData(s"""HTTP/1.1 200 OK
                |Content-Length: $bytes
                |
-               |${entityBase take 3}""")
+               |${entityBase.take(3)}""")
           sendWireData(entityBase.slice(3, 7))
           sendWireData(entityBase.slice(7, bytes))
         }
@@ -407,7 +407,7 @@ class LowLevelOutgoingConnectionSpec
                |Transfer-Encoding: chunked
                |
                |3
-               |${entityBase take 3}
+               |${entityBase.take(3)}
                |4
                |${entityBase.slice(3, 7)}
                |${bytes - 7}
@@ -418,7 +418,7 @@ class LowLevelOutgoingConnectionSpec
         def sendCloseDelimitedResponseWithLength(bytes: Int) = {
           sendWireData(s"""HTTP/1.1 200 OK
                |
-               |${entityBase take 3}""")
+               |${entityBase.take(3)}""")
           sendWireData(entityBase.slice(3, 7))
           sendWireData(entityBase.slice(7, bytes))
           netInSub.sendComplete()
@@ -428,7 +428,7 @@ class LowLevelOutgoingConnectionSpec
           def expectStrictEntityWithLength(bytes: Int) =
             response shouldEqual HttpResponse(
               entity = Strict(ContentTypes.`application/octet-stream`,
-                              ByteString(entityBase take bytes)))
+                              ByteString(entityBase.take(bytes))))
 
           def expectEntity[T <: HttpEntity: ClassTag](bytes: Int) =
             inside(response) {
@@ -514,7 +514,7 @@ class LowLevelOutgoingConnectionSpec
         sendStandardRequest()
         sendStrictResponseWithLength(10)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectStrictEntityWithLength(10)
 
         // entities that would be strict but have a Content-Length > the configured maximum are delivered
@@ -522,7 +522,7 @@ class LowLevelOutgoingConnectionSpec
         sendStandardRequest()
         sendStrictResponseWithLength(11)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectSizeErrorInEntityOfType[Default](limit = 10,
                                                   actualSize = Some(11))
       }
@@ -532,13 +532,13 @@ class LowLevelOutgoingConnectionSpec
         sendStandardRequest()
         sendDefaultResponseWithLength(10)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[Default](10)
 
         sendStandardRequest()
         sendDefaultResponseWithLength(11)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectSizeErrorInEntityOfType[Default](limit = 10,
                                                   actualSize = Some(11))
       }
@@ -548,13 +548,13 @@ class LowLevelOutgoingConnectionSpec
         sendStandardRequest()
         sendChunkedResponseWithLength(10)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[Chunked](10)
 
         sendStandardRequest()
         sendChunkedResponseWithLength(11)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectSizeErrorInEntityOfType[Chunked](limit = 10)
       }
 
@@ -563,14 +563,14 @@ class LowLevelOutgoingConnectionSpec
           sendStandardRequest()
           sendCloseDelimitedResponseWithLength(10)
           expectResponse()
-            .mapEntity(_ withSizeLimit 10)
+            .mapEntity(_.withSizeLimit(10))
             .expectEntity[CloseDelimited](10)
         }
         new LengthVerificationTest(maxContentLength = 12) {
           sendStandardRequest()
           sendCloseDelimitedResponseWithLength(11)
           expectResponse()
-            .mapEntity(_ withSizeLimit 10)
+            .mapEntity(_.withSizeLimit(10))
             .expectSizeErrorInEntityOfType[CloseDelimited](limit = 10)
         }
       }
@@ -582,13 +582,13 @@ class LowLevelOutgoingConnectionSpec
         sendStandardRequest()
         sendStrictResponseWithLength(10)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[Default](10)
 
         sendStandardRequest()
         sendStrictResponseWithLength(11)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectSizeErrorInEntityOfType[Default](limit = 10,
                                                   actualSize = Some(11))
       }
@@ -598,13 +598,13 @@ class LowLevelOutgoingConnectionSpec
         sendStandardRequest()
         sendDefaultResponseWithLength(10)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[Default](10)
 
         sendStandardRequest()
         sendDefaultResponseWithLength(11)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectSizeErrorInEntityOfType[Default](limit = 10,
                                                   actualSize = Some(11))
       }
@@ -614,13 +614,13 @@ class LowLevelOutgoingConnectionSpec
         sendStandardRequest()
         sendChunkedResponseWithLength(10)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectEntity[Chunked](10)
 
         sendStandardRequest()
         sendChunkedResponseWithLength(11)
         expectResponse()
-          .mapEntity(_ withSizeLimit 10)
+          .mapEntity(_.withSizeLimit(10))
           .expectSizeErrorInEntityOfType[Chunked](limit = 10)
       }
 
@@ -629,20 +629,20 @@ class LowLevelOutgoingConnectionSpec
           sendStandardRequest()
           sendCloseDelimitedResponseWithLength(10)
           expectResponse()
-            .mapEntity(_ withSizeLimit 10)
+            .mapEntity(_.withSizeLimit(10))
             .expectEntity[CloseDelimited](10)
         }
         new LengthVerificationTest(maxContentLength = 8) {
           sendStandardRequest()
           sendCloseDelimitedResponseWithLength(11)
           expectResponse()
-            .mapEntity(_ withSizeLimit 10)
+            .mapEntity(_.withSizeLimit(10))
             .expectSizeErrorInEntityOfType[CloseDelimited](limit = 10)
         }
       }
-    }
+    })
 
-    "support requests with an `Expect: 100-continue` headers" which {
+    "support requests with an `Expect: 100-continue` headers".which {
 
       "have a strict entity and receive a `100 Continue` response" in new TestSetup {
         requestsSub.sendNext(

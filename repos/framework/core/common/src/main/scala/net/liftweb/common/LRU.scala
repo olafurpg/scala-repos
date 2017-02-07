@@ -88,7 +88,7 @@ class LRUMap[K, V](initMaxSize: Int,
   private[common] def value1: K = throw new NullPointerException("Foo")
 
   private[this] val localMap =
-    new HashMap[K, LinkedListElem[K, V]](maxSize / 4, loadFactor openOr 0.75f)
+    new HashMap[K, LinkedListElem[K, V]](maxSize / 4, loadFactor.openOr(0.75f))
 
   /**
     * Fetches the given key, returning `[[Empty]]` if the key does not exist in

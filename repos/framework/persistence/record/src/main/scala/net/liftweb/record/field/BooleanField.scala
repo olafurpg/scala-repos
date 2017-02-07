@@ -48,7 +48,7 @@ trait BooleanTypedField extends TypedField[Boolean] {
 
   private def elem(attrs: SHtml.ElemAttr*) =
     SHtml.checkbox(
-      valueBox openOr false,
+      valueBox.openOr(false),
       (b: Boolean) => this.setBox(Full(b)),
       (("tabindex" -> tabIndex.toString): SHtml.ElemAttr) :: attrs.toList: _*)
 
@@ -59,9 +59,9 @@ trait BooleanTypedField extends TypedField[Boolean] {
       case _ => Full(elem())
     }
 
-  def asJs: JsExp = valueBox.map(boolToJsExp) openOr JsNull
+  def asJs: JsExp = valueBox.map(boolToJsExp).openOr(JsNull)
 
-  def asJValue: JValue = valueBox.map(JBool) openOr (JNothing: JValue)
+  def asJValue: JValue = valueBox.map(JBool).openOr(JNothing: JValue)
   def setFromJValue(jvalue: JValue) = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)
     case JBool(b) => setBox(Full(b))

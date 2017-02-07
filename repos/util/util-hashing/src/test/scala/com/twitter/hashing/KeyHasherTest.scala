@@ -22,11 +22,11 @@ class KeyHasherTest extends WordSpec {
   def decode(str: String) = base64.decode(str)
 
   def testHasher(name: String, hasher: KeyHasher) = {
-    val sources = readResource(name + "_source") map { decode(_) }
+    val sources = readResource(name + "_source").map { decode(_) }
     val hashes = readResource(name + "_hashes")
     assert(sources.size > 0)
 
-    sources zip hashes foreach {
+    sources.zip(hashes).foreach {
       case (source, hashAsString) =>
         val hash = BigInt(hashAsString).toLong
         assert(hasher.hashKey(source) == hash)

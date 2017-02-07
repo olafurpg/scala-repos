@@ -77,7 +77,7 @@ object KMeansExample extends App {
     // Our seed points are chosen rather naively. However, the points below are
     // generated randomly, so we don't need to worry about being too smart here.
 
-    val init: Array[V] = points take k
+    val init: Array[V] = points.take(k)
     val clusters = loop(assign(init), init)
 
     // We work with arrays above, but turn it into the collection type the user

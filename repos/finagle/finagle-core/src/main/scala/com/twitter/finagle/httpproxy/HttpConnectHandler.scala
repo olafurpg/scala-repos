@@ -65,7 +65,7 @@ class HttpConnectHandler(proxyAddr: SocketAddress,
   private[this] val connectFuture = new AtomicReference[ChannelFuture](null)
 
   private[this] def fail(c: Channel, t: Throwable) {
-    Option(connectFuture.get) foreach { _.setFailure(t) }
+    Option(connectFuture.get).foreach { _.setFailure(t) }
     Channels.close(c)
   }
 

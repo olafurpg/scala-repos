@@ -50,13 +50,13 @@ object Path {
   implicit def jfile2path(jfile: JFile): Path = apply(jfile)
 
   def onlyDirs(xs: Iterator[Path]): Iterator[Directory] =
-    xs filter (_.isDirectory) map (_.toDirectory)
+    xs.filter(_.isDirectory).map(_.toDirectory)
   def onlyDirs(xs: List[Path]): List[Directory] =
-    xs filter (_.isDirectory) map (_.toDirectory)
+    xs.filter(_.isDirectory).map(_.toDirectory)
   def onlyFiles(xs: Iterator[Path]): Iterator[File] =
-    xs filter (_.isFile) map (_.toFile)
+    xs.filter(_.isFile).map(_.toFile)
 
-  def roots: List[Path] = java.io.File.listRoots().toList map Path.apply
+  def roots: List[Path] = java.io.File.listRoots().toList.map(Path.apply)
 
   def apply(path: String): Path = apply(new JFile(path))
   def apply(jfile: JFile): Path =
@@ -79,7 +79,7 @@ object Path {
     } catch { case ex: SecurityException => new Path(jfile) }
 
   /** Avoiding any shell/path issues by only using alphanumerics. */
-  private[io] def randomPrefix = alphanumeric take 6 mkString ""
+  private[io] def randomPrefix = alphanumeric.take(6) mkString ""
   private[io] def fail(msg: String) = throw FileOperationException(msg)
 }
 import Path._
@@ -124,8 +124,8 @@ class Path private[io] (val jfile: JFile) {
     *  file and subdirectory underneath it will appear.
     */
   def walkFilter(cond: Path => Boolean): Iterator[Path] =
-    if (isFile) toFile walkFilter cond
-    else if (isDirectory) toDirectory walkFilter cond
+    if (isFile) toFile.walkFilter(cond)
+    else if (isDirectory) toDirectory.walkFilter(cond)
     else Iterator.empty
 
   /** Equivalent to walkFilter(_ => false).
@@ -156,7 +156,7 @@ class Path private[io] (val jfile: JFile) {
   }
 
   def segments: List[String] =
-    (path split separator).toList filterNot (_.length == 0)
+    (path.split(separator)).toList.filterNot(_.length == 0)
 
   /**
     * @return The path of the parent directory, or root if path is already root
@@ -178,7 +178,7 @@ class Path private[io] (val jfile: JFile) {
   }
   def parents: List[Directory] = {
     val p = parent
-    if (p isSame this) Nil else p :: p.parents
+    if (p.isSame(this)) Nil else p :: p.parents
   }
   // if name ends with an extension (e.g. "foo.jpg") returns the extension ("jpg"), otherwise ""
   def extension: String = {
@@ -194,7 +194,7 @@ class Path private[io] (val jfile: JFile) {
     ext.toLowerCase == lower || exts.exists(_.toLowerCase == lower)
   }
   // returns the filename without the extension.
-  def stripExtension: String = name stripSuffix ("." + extension)
+  def stripExtension: String = name.stripSuffix("." + extension)
   // returns the Path with the extension.
   def addExtension(ext: String): Path = Path(path + "." + ext)
   // changes the existing extension out for a new one, or adds it
@@ -239,7 +239,7 @@ class Path private[io] (val jfile: JFile) {
   def length = jfile.length()
 
   // Boolean path comparisons
-  def endsWith(other: Path) = segments endsWith other.segments
+  def endsWith(other: Path) = segments.endsWith(other.segments)
   def isSame(other: Path) = toCanonical == other.toCanonical
   def isFresher(other: Path) = lastModified > other.lastModified
 
@@ -248,14 +248,14 @@ class Path private[io] (val jfile: JFile) {
                       failIfExists: Boolean = false): Directory = {
     val res = if (force) jfile.mkdirs() else jfile.mkdir()
     if (!res && failIfExists && exists)
-      fail("Directory '%s' already exists." format name)
+      fail("Directory '%s' already exists.".format(name))
     else if (isDirectory) toDirectory
     else new Directory(jfile)
   }
   def createFile(failIfExists: Boolean = false): File = {
     val res = jfile.createNewFile()
     if (!res && failIfExists && exists)
-      fail("File '%s' already exists." format name)
+      fail("File '%s' already exists.".format(name))
     else if (isFile) toFile
     else new File(jfile)
   }
@@ -271,7 +271,7 @@ class Path private[io] (val jfile: JFile) {
     if (f.isDirectory)
       f.listFiles match {
         case null =>
-        case xs => xs foreach deleteRecursively
+        case xs => xs.foreach(deleteRecursively)
       }
     f.delete()
   }
@@ -279,7 +279,7 @@ class Path private[io] (val jfile: JFile) {
   def truncate() =
     isFile && {
       val raf = new RandomAccessFile(jfile, "rw")
-      raf setLength 0
+      raf.setLength(0)
       raf.close()
       length == 0
     }

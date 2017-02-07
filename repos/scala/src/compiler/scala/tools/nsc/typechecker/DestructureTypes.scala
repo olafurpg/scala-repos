@@ -38,7 +38,7 @@ trait DestructureTypes {
     private val openSymbols = scala.collection.mutable.Set[Symbol]()
 
     private def nodeList[T](elems: List[T], mkNode: T => Node): Node =
-      if (elems.isEmpty) wrapEmpty else list(elems map mkNode)
+      if (elems.isEmpty) wrapEmpty else list(elems.map(mkNode))
 
     private def scopeMemberList(elems: List[Symbol]): Node =
       nodeList(elems, wrapAtom)
@@ -83,8 +83,7 @@ trait DestructureTypes {
     def product(tp: Type, nodes: Node*): Node =
       product(typeTypeName(tp), nodes: _*)
     def product(typeName: String, nodes: Node*): Node =
-      (nodes.toList filterNot
-        (_ == wrapEmpty) match {
+      (nodes.toList.filterNot(_ == wrapEmpty) match {
         case Nil => wrapEmpty
         case xs => withType(wrapProduct(xs), typeName)
       })
@@ -196,7 +195,7 @@ trait DestructureTypes {
       case OverloadedType(pre, alts) =>
         product(tp,
                 prefix(pre),
-                node("alts", typeList(alts map pre.memberType)))
+                node("alts", typeList(alts.map(pre.memberType))))
       case RefinedType(parents, decls) =>
         product(tp, parentList(parents), scope(decls))
       case SingleType(pre, sym) => product(tp, prefix(pre), wrapAtom(sym))

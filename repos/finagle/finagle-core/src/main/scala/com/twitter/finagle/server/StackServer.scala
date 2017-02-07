@@ -74,7 +74,7 @@ object StackServer {
     stk.push(ExceptionSourceFilter.module)
     stk.push(Role.jvmTracing,
              ((next: ServiceFactory[Req, Rep]) =>
-                newJvmFilter[Req, Rep]() andThen next))
+                newJvmFilter[Req, Rep]().andThen(next)))
     stk.push(ServerStatsFilter.module)
     stk.push(Role.protoTracing, identity[ServiceFactory[Req, Rep]](_))
     stk.push(ServerTracingFilter.module)
@@ -216,7 +216,7 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
       // for naming addresses (i.e. label=addr). Until we deprecate
       // its usage, it takes precedence for identifying a server as
       // it is the most recently set label.
-      val serverLabel = ServerRegistry.nameOf(addr) getOrElse label
+      val serverLabel = ServerRegistry.nameOf(addr).getOrElse(label)
 
       // Connection bookkeeping used to explicitly manage
       // connection resources per ListeningServer. Note, draining
@@ -241,7 +241,7 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
 
       val serverParams =
         params + Label(serverLabel) + Stats(statsReceiver) + Monitor(
-          reporter(label, None) andThen monitor)
+          reporter(label, None).andThen(monitor))
 
       val serviceFactory =
         (stack ++ Stack.Leaf(Endpoint, factory)).make(serverParams)
@@ -252,11 +252,11 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
       // `serviceFactory` via `newDispatcher`.
       val listener = server.newListener()
       val underlying = listener.listen(addr) { transport =>
-        serviceFactory(newConn(transport)) respond {
+        serviceFactory(newConn(transport)).respond {
           case Return(service) =>
             val d = server.newDispatcher(transport, service)
             connections.add(d)
-            transport.onClose ensure connections.remove(d)
+            transport.onClose.ensure(connections.remove(d))
           case Throw(exc) =>
             // If we fail to create a new session locally, we continue establishing
             // the session but (1) reject any incoming requests; (2) close it right
@@ -270,7 +270,7 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
                                    exc)))
             )
             connections.add(d)
-            transport.onClose ensure connections.remove(d)
+            transport.onClose.ensure(connections.remove(d))
             // We give it a generous amount of time to shut down the session to
             // improve our chances of being able to do so gracefully.
             d.close(10.seconds)

@@ -17,14 +17,14 @@ trait PipeToSupport {
       implicit executionContext: ExecutionContext) {
     def pipeTo(recipient: ActorRef)(
         implicit sender: ActorRef = Actor.noSender): Future[T] = {
-      future andThen {
+      future.andThen {
         case Success(r) ⇒ recipient ! r
         case Failure(f) ⇒ recipient ! Status.Failure(f)
       }
     }
     def pipeToSelection(recipient: ActorSelection)(
         implicit sender: ActorRef = Actor.noSender): Future[T] = {
-      future andThen {
+      future.andThen {
         case Success(r) ⇒ recipient ! r
         case Failure(f) ⇒ recipient ! Status.Failure(f)
       }

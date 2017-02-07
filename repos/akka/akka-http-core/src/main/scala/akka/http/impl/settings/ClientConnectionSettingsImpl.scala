@@ -41,7 +41,7 @@ object ClientConnectionSettingsImpl
         c.getString("user-agent-header").toOption.map(`User-Agent`(_)),
       connectingTimeout = c getFiniteDuration "connecting-timeout",
       idleTimeout = c getPotentiallyInfiniteDuration "idle-timeout",
-      requestHeaderSizeHint = c getIntBytes "request-header-size-hint",
+      requestHeaderSizeHint = c.getIntBytes("request-header-size-hint"),
       websocketRandomFactory = Randoms.SecureRandomInstances, // can currently only be overridden from code
       socketOptions = SocketOptionSettings
         .fromSubConfig(root, c.getConfig("socket-options")),

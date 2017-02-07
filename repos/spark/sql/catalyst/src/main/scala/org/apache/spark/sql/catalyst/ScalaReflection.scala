@@ -364,7 +364,7 @@ object ScalaReflection extends ScalaReflection {
               val newTypePath =
                 s"""- field (class: "$clsName", name: "$fieldName")""" +: walkedTypePath
               // For tuples, we based grab the inner fields by ordinal instead of name.
-              if (cls.getName startsWith "scala.Tuple") {
+              if (cls.getName.startsWith("scala.Tuple")) {
                 constructorFor(
                   fieldType,
                   Some(addToPathOrdinal(i, dataType, newTypePath)),

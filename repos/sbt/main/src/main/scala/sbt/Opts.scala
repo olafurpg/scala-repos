@@ -71,9 +71,10 @@ object DefaultOptions {
     else Nil
   }
   def addResolvers: Setting[_] =
-    Keys.resolvers <++= Keys.isSnapshot apply resolvers
+    Keys.resolvers <++= Keys.isSnapshot.apply(resolvers)
   def addPluginResolvers: Setting[_] =
-    Keys.resolvers <++= (Keys.sbtPlugin, Keys.isSnapshot) apply pluginResolvers
+    Keys.resolvers <++= (Keys.sbtPlugin, Keys.isSnapshot)
+      .apply(pluginResolvers)
 
   @deprecated(
     "Use `credentials(State)` instead to make use of configuration path dynamically configured via `Keys.globalSettingsDirectory`; relying on ~/.ivy2 is not recommended anymore.",
@@ -85,7 +86,7 @@ object DefaultOptions {
     Credentials(
       getGlobalSettingsDirectory(state, getGlobalBase(state)) / ".credentials")
   def addCredentials: Setting[_] =
-    Keys.credentials <+= Keys.state map credentials
+    Keys.credentials <+= Keys.state.map(credentials)
 
   def shellPrompt(version: String): State => String =
     s =>
@@ -93,5 +94,5 @@ object DefaultOptions {
                           extract(s).currentProject.id,
                           version)
   def setupShellPrompt: Setting[_] =
-    Keys.shellPrompt <<= Keys.version apply shellPrompt
+    Keys.shellPrompt <<= Keys.version.apply(shellPrompt)
 }

@@ -21,7 +21,7 @@ private object BSONHandlers {
   implicit val ClientSkillBSONHandler =
     new BSONHandler[BSONString, Client.Skill] {
       def read(x: BSONString) =
-        Client.Skill byKey x.value err s"Invalid client skill ${x.value}"
+        (Client.Skill byKey x.value).err(s"Invalid client skill ${x.value}")
       def write(x: Client.Skill) = BSONString(x.key)
     }
 
@@ -35,7 +35,7 @@ private object BSONHandlers {
 
   implicit val VariantBSONHandler = new BSONHandler[BSONInteger, Variant] {
     def read(b: BSONInteger): Variant =
-      Variant(b.value) err s"No such variant: ${b.value}"
+      Variant(b.value).err(s"No such variant: ${b.value}")
     def write(x: Variant) = BSONInteger(x.id)
   }
   implicit val FENBSONHandler = new BSONHandler[BSONString, FEN] {

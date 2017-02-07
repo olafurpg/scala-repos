@@ -258,7 +258,7 @@ abstract class Parser(initialValueStackSize: Int = 16,
     if (c < max) {
       c += 1
       _cursor = c
-      _cursorChar = if (c == max) EOI else input charAt c
+      _cursorChar = if (c == max) EOI else input.charAt(c)
     }
     true
   }
@@ -435,7 +435,7 @@ abstract class Parser(initialValueStackSize: Int = 16,
           case Parser.StartTracingException ⇒
             import RuleTrace._
             __bubbleUp(NonTerminal(StringMatch(string), -ix) :: Nil,
-                       CharMatch(string charAt ix))
+                       CharMatch(string.charAt(ix)))
         }
       } else true
 
@@ -467,7 +467,7 @@ abstract class Parser(initialValueStackSize: Int = 16,
           case Parser.StartTracingException ⇒
             import RuleTrace._
             __bubbleUp(NonTerminal(IgnoreCaseString(string), -ix) :: Nil,
-                       IgnoreCaseChar(string charAt ix))
+                       IgnoreCaseChar(string.charAt(ix)))
         }
       } else true
 

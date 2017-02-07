@@ -138,18 +138,18 @@ trait ScTypePresentation {
       if (param.isContravariant) buffer ++= "-"
       else if (param.isCovariant) buffer ++= "+"
       buffer ++= param.name
-      param.lowerBound foreach {
+      param.lowerBound.foreach {
         case psi.types.Nothing =>
         case tp: ScType => buffer ++= s" >: ${typeText0(tp)}"
       }
-      param.upperBound foreach {
+      param.upperBound.foreach {
         case psi.types.Any =>
         case tp: ScType => buffer ++= s" <: ${typeText0(tp)}"
       }
-      param.viewBound foreach { (tp: ScType) =>
+      param.viewBound.foreach { (tp: ScType) =>
         buffer ++= s" <% ${typeText0(tp)}"
       }
-      param.contextBound foreach { (tp: ScType) =>
+      param.contextBound.foreach { (tp: ScType) =>
         buffer ++=
           s" : ${typeText0(ScTypeUtil.stripTypeArgs(subst.subst(tp)))}"
       }

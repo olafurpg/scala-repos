@@ -17,7 +17,7 @@ case class Glicko(rating: Double, deviation: Double, volatility: Double) {
   def provisional = deviation >= Glicko.provisionalDeviation
   def established = !provisional
 
-  def establishedIntRating = established option intRating
+  def establishedIntRating = established.option(intRating)
 
   def sanityCheck =
     rating > 0 && rating < 4000 && deviation > 0 && deviation < 1000 &&
@@ -42,9 +42,9 @@ case object Glicko {
   implicit val glickoBSONHandler = new BSON[Glicko] {
 
     def reads(r: BSON.Reader): Glicko =
-      Glicko(rating = r double "r",
-             deviation = r double "d",
-             volatility = r double "v")
+      Glicko(rating = r.double("r"),
+             deviation = r.double("d"),
+             volatility = r.double("v"))
 
     def writes(w: BSON.Writer, o: Glicko) =
       BSONDocument("r" -> w.double(o.rating),

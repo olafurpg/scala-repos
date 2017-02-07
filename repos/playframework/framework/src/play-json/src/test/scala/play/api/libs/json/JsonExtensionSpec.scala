@@ -381,7 +381,7 @@ object JsonExtensionSpec extends Specification {
 
       implicit def genericEntityWrapperFormat[A: Format, B: Format]
         : Format[GenericCaseClass2[A, B]] =
-        (((__ \ "obj1").format[A] and (__ \ "obj2").format[B]))(
+        (((__ \ "obj1").format[A].and(__ \ "obj2").format[B]))(
           GenericCaseClass2[A, B] _,
           unlift(GenericCaseClass2.unapply[A, B]))
 
@@ -475,7 +475,7 @@ object JsonExtensionSpec extends Specification {
       //val c2Reads1 = Json.reads[C2]
 
       implicit def c1Reads[A](implicit rds: Reads[Id[A]]) = {
-        ((__ \ 'id).read(rds) and (__ \ 'name).read[String])((id, name) =>
+        ((__ \ 'id).read(rds).and(__ \ 'name).read[String])((id, name) =>
           C1[A](id, name))
       }
 

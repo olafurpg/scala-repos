@@ -100,7 +100,7 @@ trait SHtml extends Loggable {
       in.map(a => a: ElemAttr)
 
     def applyToAllElems(in: Seq[Node], elemAttrs: Seq[ElemAttr]): Seq[Node] =
-      in map {
+      in.map {
         case Group(ns) => Group(applyToAllElems(ns, elemAttrs))
         case e: Elem =>
           val updated = elemAttrs.foldLeft(e)((e, f) => f(e))
@@ -145,8 +145,8 @@ trait SHtml extends Loggable {
     */
   def makeAjaxCall(in: JsExp, context: AjaxContext): JsExp = new JsExp {
     def toJsCmd =
-      "lift.ajax(" + in.toJsCmd + ", " + (context.success openOr "null") +
-        ", " + (context.failure openOr "null") + ", " +
+      "lift.ajax(" + in.toJsCmd + ", " + (context.success.openOr("null")) +
+        ", " + (context.failure.openOr("null")) + ", " +
         context.responseType.toString.encJs + ")"
   }
 
@@ -203,7 +203,7 @@ trait SHtml extends Loggable {
     */
   def jsonCall(jsCalcValue: JsExp, func: JsonAST.JValue => JsCmd): GUIDJsExp =
     jsonCall_*(jsCalcValue,
-               SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop))
+               SFuncHolder(s => parseOptOrLog(s).map(func).getOrElse(Noop)))
 
   /**
     * Build a JavaScript function that will perform a JSON call based on a value calculated in JavaScript.
@@ -221,7 +221,7 @@ trait SHtml extends Loggable {
                func: JsonAST.JValue => JsCmd): GUIDJsExp =
     jsonCall_*(jsCalcValue,
                jsContext,
-               SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop))
+               SFuncHolder(s => parseOptOrLog(s).map(func).getOrElse(Noop)))
 
   /**
     * Build a JavaScript function that will perform a JSON call based on a value calculated in JavaScript.
@@ -241,7 +241,7 @@ trait SHtml extends Loggable {
     jsonCall_*(jsCalcValue,
                jsonContext,
                S.SFuncHolder(s =>
-                 parseOptOrLog(s).map(func) getOrElse JsonAST.JNothing))
+                 parseOptOrLog(s).map(func).getOrElse(JsonAST.JNothing)))
 
   /**
     * Build a JavaScript function that will perform an AJAX call based on a value calculated in JavaScript
@@ -1019,7 +1019,7 @@ trait SHtml extends Loggable {
     }
 
     def process(nonce: String): JsCmd =
-      secure.find(_.nonce == nonce).map(x => onSubmit(x.value)) getOrElse Noop
+      secure.find(_.nonce == nonce).map(x => onSubmit(x.value)).getOrElse(Noop)
     //  (nonces, defaultNonce, SFuncHolder(process))
 
     ajaxSelect_*(nonces,
@@ -1077,7 +1077,7 @@ trait SHtml extends Loggable {
     }
 
     def process(nonce: String): JsCmd =
-      secure.find(_.nonce == nonce).map(x => onSubmit(x.value)) getOrElse Noop
+      secure.find(_.nonce == nonce).map(x => onSubmit(x.value)).getOrElse(Noop)
     //  (nonces, defaultNonce, SFuncHolder(process))
 
     ajaxSelect_*(nonces,
@@ -1102,9 +1102,11 @@ trait SHtml extends Loggable {
                          attrs: ElemAttr*): Elem = {
 
     val id =
-      attrs.collectFirst {
-        case BasicElemAttr(name, value) if name == "id" => value
-      } getOrElse nextFuncName
+      attrs
+        .collectFirst {
+          case BasicElemAttr(name, value) if name == "id" => value
+        }
+        .getOrElse(nextFuncName)
     val attributes =
       if (attrs.contains(BasicElemAttr("id", id))) attrs
       else BasicElemAttr("id", id) +: attrs
@@ -1294,10 +1296,10 @@ trait SHtml extends Loggable {
   }
 
   private def isRadio(in: MetaData): Boolean =
-    in.get("type").map(_.text equalsIgnoreCase "radio") getOrElse false
+    in.get("type").map(_.text equalsIgnoreCase "radio").getOrElse(false)
 
   private def isCheckbox(in: MetaData): Boolean =
-    in.get("type").map(_.text equalsIgnoreCase "checkbox") getOrElse false
+    in.get("type").map(_.text equalsIgnoreCase "checkbox").getOrElse(false)
 
   /**
     * If you want to update the href of an &lt;a> tag,
@@ -1925,7 +1927,7 @@ trait SHtml extends Loggable {
          (ns match {
            case e: Elem => {
              val id: String =
-               e.attribute("id").map(_.text) getOrElse Helpers.nextFuncName
+               e.attribute("id").map(_.text).getOrElse(Helpers.nextFuncName)
 
              val newMeta = e.attributes.filter {
                case up: UnprefixedAttribute =>
@@ -2732,7 +2734,7 @@ object Html5ElemAttr {
   * When you're done with the snippet, <code>S.redirectTo(whence)</code>
   */
 trait Whence {
-  protected val whence = S.referer openOr "/"
+  protected val whence = S.referer.openOr("/")
 }
 
 /**

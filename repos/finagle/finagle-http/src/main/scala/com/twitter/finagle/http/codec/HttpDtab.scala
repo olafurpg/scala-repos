@@ -26,14 +26,14 @@ object HttpDtab {
   private val Utf8 = Charset.forName("UTF-8")
   private val Base64 = BaseEncoding.base64()
 
-  private val indexstr: Int => String = ((0 until Maxsize) map
-    (i => i -> "%02d".format(i))).toMap
+  private val indexstr: Int => String =
+    (((0 until Maxsize)).map(i => i -> "%02d".format(i))).toMap
 
   private def b64Encode(v: String): String =
     Base64.encode(v.getBytes(Utf8))
 
   private def b64Decode(v: String): Try[String] =
-    Try { Base64.decode(v) } map (new String(_, Utf8))
+    Try { Base64.decode(v) }.map(new String(_, Utf8))
 
   private val unmatchedFailure = Failure("Unmatched X-Dtab headers")
 
@@ -156,7 +156,7 @@ object HttpDtab {
     else
       Try {
         val headers = msg.headerMap.getAll(Header)
-        val dentries = headers.view.flatMap(_ split ',').flatMap(Dtab.read(_))
+        val dentries = headers.view.flatMap(_.split(',')).flatMap(Dtab.read(_))
         Dtab(dentries.toIndexedSeq)
       }
 

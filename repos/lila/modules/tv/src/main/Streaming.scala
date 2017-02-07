@@ -19,7 +19,7 @@ private final class Streaming(system: ActorSystem,
 
   def onAir: Fu[List[StreamOnAir]] = {
     import makeTimeout.short
-    actor ? Get mapTo manifest[List[StreamOnAir]]
+    (actor ? Get).mapTo(manifest[List[StreamOnAir]])
     // fuccess(List(StreamOnAir(
     //   service = "twitch",
     //   name = "Chess master streams at lichess.org",
@@ -48,36 +48,42 @@ private final class Streaming(system: ActorSystem,
                     .map(_.streamerName)
                     .mkString(","))
                 .withHeaders("Accept" -> "application/vnd.twitchtv.v3+json")
-                .get() map {
-                res =>
-                  res.json.validate[Twitch.Result] match {
-                    case JsSuccess(data, _) =>
-                      data.streamsOnAir(streamers) filter
-                        (_.name.toLowerCase contains keyword) take max
-                    case JsError(err) =>
-                      logger.warn(
-                        s"twitch ${res.status} $err ${~res.body.lines.toList.headOption}")
-                      Nil
-                  }
-              }
+                .get()
+                .map {
+                  res =>
+                    res.json.validate[Twitch.Result] match {
+                      case JsSuccess(data, _) =>
+                        data
+                          .streamsOnAir(streamers)
+                          .filter(_.name.toLowerCase contains keyword)
+                          .take(max)
+                      case JsError(err) =>
+                        logger.warn(
+                          s"twitch ${res.status} $err ${~res.body.lines.toList.headOption}")
+                        Nil
+                    }
+                }
             val hitbox =
               WS.url(
                   "http://api.hitbox.tv/media/live/" + streamers
                     .filter(_.twitch)
                     .map(_.streamerName)
                     .mkString(","))
-                .get() map {
-                res =>
-                  res.json.validate[Hitbox.Result] match {
-                    case JsSuccess(data, _) =>
-                      data.streamsOnAir(streamers) filter
-                        (_.name.toLowerCase contains keyword) take max
-                    case JsError(err) =>
-                      logger.warn(
-                        s"hitbox ${res.status} $err ${~res.body.lines.toList.headOption}")
-                      Nil
-                  }
-              }
+                .get()
+                .map {
+                  res =>
+                    res.json.validate[Hitbox.Result] match {
+                      case JsSuccess(data, _) =>
+                        data
+                          .streamsOnAir(streamers)
+                          .filter(_.name.toLowerCase contains keyword)
+                          .take(max)
+                      case JsError(err) =>
+                        logger.warn(
+                          s"hitbox ${res.status} $err ${~res.body.lines.toList.headOption}")
+                        Nil
+                    }
+                }
             val youtube =
               WS.url("https://www.googleapis.com/youtube/v3/search")
                 .withQueryString(
@@ -87,42 +93,47 @@ private final class Streaming(system: ActorSystem,
                   "q" -> keyword,
                   "key" -> googleApiKey
                 )
-                .get() map {
-                res =>
-                  res.json.validate[Youtube.Result] match {
-                    case JsSuccess(data, _) =>
-                      data.streamsOnAir(streamers) filter
-                        (_.name.toLowerCase contains keyword) take max
-                    case JsError(err) =>
-                      logger.warn(
-                        s"youtube ${res.status} $err ${~res.body.lines.toList.headOption}")
-                      Nil
+                .get()
+                .map {
+                  res =>
+                    res.json.validate[Youtube.Result] match {
+                      case JsSuccess(data, _) =>
+                        data
+                          .streamsOnAir(streamers)
+                          .filter(_.name.toLowerCase contains keyword)
+                          .take(max)
+                      case JsError(err) =>
+                        logger.warn(
+                          s"youtube ${res.status} $err ${~res.body.lines.toList.headOption}")
+                        Nil
+                    }
+                }
+            ((twitch |+| hitbox |+| youtube))
+              .map { ss =>
+                StreamsOnAir {
+                  ss.foldLeft(List.empty[StreamOnAir]) {
+                    case (acc, s) if acc.exists(_.id == s.id) => acc
+                    case (acc, s) => acc :+ s
                   }
-              }
-            (twitch |+| hitbox |+| youtube) map { ss =>
-              StreamsOnAir {
-                ss.foldLeft(List.empty[StreamOnAir]) {
-                  case (acc, s) if acc.exists(_.id == s.id) => acc
-                  case (acc, s) => acc :+ s
                 }
               }
-            } pipeTo self
+              .pipeTo(self)
         }
 
       case event @ StreamsOnAir(streams) =>
         if (onAir != streams) {
           onAir = streams
           import makeTimeout.short
-          renderer ? event foreach {
+          (renderer ? event).foreach {
             case html: play.twirl.api.Html =>
               context.system.lilaBus
                 .publish(lila.hub.actorApi.StreamsOnAir(html.body), 'streams)
           }
         }
-        streamerList.get foreach { all =>
-          all foreach { streamer =>
+        streamerList.get.foreach { all =>
+          all.foreach { streamer =>
             lila.mon.tv.stream.name(streamer.id) {
-              if (streams.exists(_ is streamer)) 1 else 0
+              if (streams.exists(_.is(streamer))) 1 else 0
             }
           }
         }

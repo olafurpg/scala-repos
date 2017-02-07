@@ -35,7 +35,7 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
     boundary.charAt(boundary.length - 1) != ' ',
     "'boundary' parameter of multipart Content-Type must not end with a space char")
   require(
-    boundaryChar matchesAll boundary,
+    boundaryChar.matchesAll(boundary),
     s"'boundary' parameter of multipart Content-Type contains illegal character '${boundaryChar.firstMismatch(boundary).get}'"
   )
 
@@ -244,7 +244,7 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
           emitPartChunk(headers, contentType, input.slice(offset, emitEnd))
           val simpleEmit: (List[HttpHeader], ContentType, ByteString) ⇒ Unit =
             (_, _, bytes) ⇒ emit(bytes)
-          continue(input drop emitEnd, 0)(
+          continue(input.drop(emitEnd), 0)(
             parseEntity(null, null, simpleEmit, simpleEmit))
         } else
           continue(input, offset)(

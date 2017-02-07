@@ -15,12 +15,12 @@ class ServiceTest extends FunSuite with MockitoSugar {
 
   test("ServiceProxy should proxy all requests") {
     val service = mock[Service[String, String]]
-    when(service.close(any)) thenReturn Future.Done
-    when(service.status) thenReturn Status.Closed
+    when(service.close(any)).thenReturn(Future.Done)
+    when(service.status).thenReturn(Status.Closed)
 
     val proxied = new ServiceProxy(service) {}
 
-    when(service.apply(any[String])) thenAnswer {
+    when(service.apply(any[String])).thenAnswer {
       new Answer[Future[String]] {
         override def answer(invocation: InvocationOnMock) = {
           if (proxied.status == Status.Open) service("ok")
@@ -67,8 +67,8 @@ class ServiceTest extends FunSuite with MockitoSugar {
     "ServiceFactory.const should resolve immediately to the given service" +
       "resolve immediately to the given service") {
     val service = mock[Service[String, String]]
-    when(service.close(any)) thenReturn Future.Done
-    when(service("ok")) thenReturn Future.value("ko")
+    when(service.close(any)).thenReturn(Future.Done)
+    when(service("ok")).thenReturn(Future.value("ko"))
     val factory = ServiceFactory.const(service)
 
     val f: Future[Service[String, String]] = factory()
@@ -82,7 +82,7 @@ class ServiceTest extends FunSuite with MockitoSugar {
   test("ServiceFactory.flatMap should release underlying service on failure") {
     val exc = new Exception
     val service = mock[Service[String, String]]
-    when(service.close(any)) thenReturn Future.Done
+    when(service.close(any)).thenReturn(Future.Done)
     val factory = new ServiceFactory[String, String] {
       def apply(conn: ClientConnection) = Future.value(service)
       def close(deadline: Time) = Future.Done
@@ -92,7 +92,7 @@ class ServiceTest extends FunSuite with MockitoSugar {
 
     var didRun = false
     val f2 =
-      factory flatMap { _ =>
+      factory.flatMap { _ =>
         didRun = true
         Future.exception(exc)
       }

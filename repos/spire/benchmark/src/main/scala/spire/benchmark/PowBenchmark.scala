@@ -45,7 +45,7 @@ class PowBenchmarks extends MyBenchmark {
   def timeBigIntPowForInt(reps: Int) = run(reps) {
     var t = 0
     ints.foreach { n =>
-      t += (BigInt(n) pow 2).toInt
+      t += (BigInt(n).pow(2)).toInt
     }
     t
   }
@@ -69,7 +69,7 @@ class PowBenchmarks extends MyBenchmark {
   def timeBigIntPowForLong(reps: Int) = run(reps) {
     var t = 0L
     longs.foreach { n =>
-      t += (BigInt(n) pow 2).toLong
+      t += (BigInt(n).pow(2)).toLong
     }
     t
   }

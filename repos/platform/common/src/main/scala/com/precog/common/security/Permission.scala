@@ -191,33 +191,38 @@ object Permission {
     private def writtenByPermission(obj: JValue,
                                     pathV: Validation[Error, Path])(
         f: (Path, WrittenBy) => Permission): Validation[Error, Permission] = {
-      (obj \? "ownerAccountIds") map { ids =>
-        Apply[({ type l[a] = Validation[Error, a] })#l].zip
-          .zip(pathV, ids.validated[Set[AccountId]]) flatMap {
-          case (path, accountIds) =>
-            if (accountIds.isEmpty) success(f(path, WrittenByAny))
-            else if (accountIds.size == 1)
-              success(f(path, WrittenByAccount(accountIds.head)))
-            else
-              failure(Invalid(
-                "Cannot extract read permission for more than one account ID."))
+      ((obj \? "ownerAccountIds"))
+        .map { ids =>
+          Apply[({ type l[a] = Validation[Error, a] })#l].zip
+            .zip(pathV, ids.validated[Set[AccountId]])
+            .flatMap {
+              case (path, accountIds) =>
+                if (accountIds.isEmpty) success(f(path, WrittenByAny))
+                else if (accountIds.size == 1)
+                  success(f(path, WrittenByAccount(accountIds.head)))
+                else
+                  failure(Invalid(
+                    "Cannot extract read permission for more than one account ID."))
+            }
         }
-      } getOrElse {
-        pathV map { f(_: Path, WrittenByAny) }
-      }
+        .getOrElse {
+          pathV.map { f(_: Path, WrittenByAny) }
+        }
     }
 
     override def validated(obj: JValue) = {
       val pathV = obj.validated[Path]("path")
-      obj.validated[String]("accessType").map(_.toLowerCase.trim) flatMap {
+      obj.validated[String]("accessType").map(_.toLowerCase.trim).flatMap {
         case "write" =>
-          (obj \? "ownerAccountIds") map { ids =>
-            (pathV |@| ids.validated[Set[AccountId]]) { (path, accountIds) =>
-              WritePermission(path, WriteAs(accountIds))
+          ((obj \? "ownerAccountIds"))
+            .map { ids =>
+              (pathV |@| ids.validated[Set[AccountId]]) { (path, accountIds) =>
+                WritePermission(path, WriteAs(accountIds))
+              }
             }
-          } getOrElse {
-            pathV map { WritePermission(_: Path, WriteAsAny) }
-          }
+            .getOrElse {
+              pathV.map { WritePermission(_: Path, WriteAsAny) }
+            }
 
         case "read" =>
           writtenByPermission(obj, pathV) { ReadPermission.apply _ }
@@ -235,25 +240,29 @@ object Permission {
     private def writtenByPermission(obj: JValue,
                                     pathV: Validation[Error, Path])(
         f: (Path, WrittenBy) => Permission): Validation[Error, Permission] = {
-      obj.validated[Option[String]]("ownerAccountId") flatMap { opt =>
-        opt map { id =>
-          pathV map { f(_: Path, WrittenByAccount(id)) }
-        } getOrElse {
-          pathV map { f(_: Path, WrittenByAny) }
-        }
+      obj.validated[Option[String]]("ownerAccountId").flatMap { opt =>
+        opt
+          .map { id =>
+            pathV.map { f(_: Path, WrittenByAccount(id)) }
+          }
+          .getOrElse {
+            pathV.map { f(_: Path, WrittenByAny) }
+          }
       }
     }
 
     override def validated(obj: JValue) = {
       val pathV = obj.validated[Path]("path")
-      obj.validated[String]("type").map(_.toLowerCase.trim) flatMap {
+      obj.validated[String]("type").map(_.toLowerCase.trim).flatMap {
         case "write" =>
-          obj.validated[Option[String]]("ownerAccountId") flatMap { opt =>
-            opt map { id =>
-              pathV map { WritePermission(_: Path, WriteAs(Set(id))) }
-            } getOrElse {
-              pathV map { WritePermission(_: Path, WriteAsAny) }
-            }
+          obj.validated[Option[String]]("ownerAccountId").flatMap { opt =>
+            opt
+              .map { id =>
+                pathV.map { WritePermission(_: Path, WriteAs(Set(id))) }
+              }
+              .getOrElse {
+                pathV.map { WritePermission(_: Path, WriteAsAny) }
+              }
           }
 
         case "read" =>

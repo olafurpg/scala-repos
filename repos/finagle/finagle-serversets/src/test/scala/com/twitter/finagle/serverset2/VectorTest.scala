@@ -18,16 +18,16 @@ class VectorTest extends FunSuite {
       Endpoint(Array(null), "1.0.0.2", port, 3, Endpoint.Status.Alive, "12345")
 
     val host = Selector.Host("10.0.0.1", port)
-    assert(host matches ep1)
-    assert(!(host matches ep2))
+    assert(host.matches(ep1))
+    assert(!(host.matches(ep2)))
 
     val mem = Selector.Member("12345")
-    assert(!(mem matches ep1))
-    assert(mem matches ep2)
+    assert(!(mem.matches(ep1)))
+    assert(mem.matches(ep2))
 
     val shard = Selector.Shard(3)
-    assert(!(mem matches ep1))
-    assert(mem matches ep2)
+    assert(!(mem.matches(ep1)))
+    assert(mem.matches(ep2))
   }
 
   test("Vector.weightOf") {

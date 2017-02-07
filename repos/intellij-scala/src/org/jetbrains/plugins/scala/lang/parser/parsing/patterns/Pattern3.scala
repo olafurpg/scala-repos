@@ -38,9 +38,9 @@ object Pattern3 {
       var exit = false
       while (!exit) {
         if (opStack.isEmpty) {
-          opStack push s
+          opStack.push(s)
           val newMarker = backupMarker.precede
-          markerStack push newMarker
+          markerStack.push(newMarker)
           exit = true
         } else if (!compar(s, opStack.top, builder)) {
           opStack.pop()
@@ -48,9 +48,9 @@ object Pattern3 {
           backupMarker = markerStack.top.precede
           markerStack.pop().done(ScalaElementTypes.INFIX_PATTERN)
         } else {
-          opStack push s
+          opStack.push(s)
           val newMarker = backupMarker.precede
-          markerStack push newMarker
+          markerStack.push(newMarker)
           exit = true
         }
       }
@@ -63,7 +63,7 @@ object Pattern3 {
       backupMarker.drop()
       backupMarker = builder.mark
       if (!SimplePattern.parse(builder)) {
-        builder error ScalaBundle.message("simple.pattern.expected")
+        builder.error(ScalaBundle.message("simple.pattern.expected"))
       }
     }
     backupMarker.drop()
@@ -91,7 +91,7 @@ object Pattern3 {
       if (associate(id1) == -1) true
       else false
     else {
-      builder error ErrMsg("wrong.type.associativity")
+      builder.error(ErrMsg("wrong.type.associativity"))
       false
     }
   }

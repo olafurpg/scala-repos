@@ -89,7 +89,7 @@ abstract class RestartNode3Spec
       runOn(second) {
         enterBarrier("second-address-receiver-ready")
         secondUniqueAddress = Cluster(secondSystem).selfUniqueAddress
-        List(first, third) foreach { r ⇒
+        List(first, third).foreach { r ⇒
           system.actorSelection(RootActorPath(r) / "user" / "address-receiver") ! secondUniqueAddress
           expectMsg(5.seconds, "ok")
         }

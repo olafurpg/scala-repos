@@ -156,7 +156,7 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
       iterator.retreat()
       while (iterator.getStart > 0 && iterator.getTokenType != null) {
         if (matcher.isRBraceToken(iterator, txt, fileType))
-          stack push iterator.getTokenType
+          stack.push(iterator.getTokenType)
         else if (matcher.isLBraceToken(iterator, txt, fileType)) {
           if (stack.isEmpty ||
               !matcher.isPairBraces(iterator.getTokenType, stack.pop()))

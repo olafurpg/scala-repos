@@ -103,7 +103,7 @@ object Test {
   val xs = List("abc", Nil, 5, Test)
 
   def main(args: Array[String]): Unit = {
-    xs map f foreach println
-    xs map g foreach println
+    xs.map(f).foreach(println)
+    xs.map(g).foreach(println)
   }
 }

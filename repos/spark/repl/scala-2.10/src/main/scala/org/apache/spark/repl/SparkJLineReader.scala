@@ -40,7 +40,7 @@ private[repl] class SparkJLineReader(_completion: => Completion)
                  candidates: JList[CharSequence]): Int = {
       val buf = if (_buf == null) "" else _buf
       val Candidates(newCursor, newCandidates) = tc.complete(buf, cursor)
-      newCandidates foreach (candidates add _)
+      newCandidates.foreach(candidates.add(_))
       newCursor
     }
   }
@@ -61,15 +61,15 @@ private[repl] class SparkJLineReader(_completion: => Completion)
 
     // A hook for running code after the repl is done initializing.
     lazy val postInit: Unit = {
-      this setBellEnabled false
+      this.setBellEnabled(false)
 
       if (completion ne NoCompletion) {
         val argCompletor: ArgumentCompleter = new ArgumentCompleter(
           new JLineDelimiter,
           scalaToJline(completion.completer()))
-        argCompletor setStrict false
+        argCompletor.setStrict(false)
 
-        this addCompleter argCompletor
+        this.addCompleter(argCompletor)
         this setAutoprintThreshold 400 // max completion candidates without warning
       }
     }

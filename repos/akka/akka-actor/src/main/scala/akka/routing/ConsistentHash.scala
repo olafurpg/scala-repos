@@ -41,7 +41,7 @@ class ConsistentHash[T: ClassTag] private (nodes: immutable.SortedMap[Int, T],
   def :+(node: T): ConsistentHash[T] = {
     val nodeHash = hashFor(node.toString)
     new ConsistentHash(nodes ++
-                         ((1 to virtualNodesFactor) map { r ⇒
+                         (((1 to virtualNodesFactor)).map { r ⇒
                            (concatenateNodeHash(nodeHash, r) -> node)
                          }),
                        virtualNodesFactor)
@@ -62,7 +62,7 @@ class ConsistentHash[T: ClassTag] private (nodes: immutable.SortedMap[Int, T],
   def :-(node: T): ConsistentHash[T] = {
     val nodeHash = hashFor(node.toString)
     new ConsistentHash(nodes --
-                         ((1 to virtualNodesFactor) map { r ⇒
+                         (((1 to virtualNodesFactor)).map { r ⇒
                            concatenateNodeHash(nodeHash, r)
                          }),
                        virtualNodesFactor)
@@ -94,7 +94,7 @@ class ConsistentHash[T: ClassTag] private (nodes: immutable.SortedMap[Int, T],
   def nodeFor(key: Array[Byte]): T = {
     if (isEmpty)
       throw new IllegalStateException(
-        "Can't get node for [%s] from an empty node ring" format key)
+        "Can't get node for [%s] from an empty node ring".format(key))
 
     nodeRing(idx(Arrays.binarySearch(nodeHashRing, hashFor(key))))
   }
@@ -107,7 +107,7 @@ class ConsistentHash[T: ClassTag] private (nodes: immutable.SortedMap[Int, T],
   def nodeFor(key: String): T = {
     if (isEmpty)
       throw new IllegalStateException(
-        "Can't get node for [%s] from an empty node ring" format key)
+        "Can't get node for [%s] from an empty node ring".format(key))
 
     nodeRing(idx(Arrays.binarySearch(nodeHashRing, hashFor(key))))
   }

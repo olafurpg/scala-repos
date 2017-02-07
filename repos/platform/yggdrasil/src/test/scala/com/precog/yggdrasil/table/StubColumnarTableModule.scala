@@ -93,7 +93,7 @@ trait StubColumnarTableModule[M[+ _]]
     }
 
     override def load(apiKey: APIKey, jtpe: JType) = EitherT {
-      self.toJson map { events =>
+      self.toJson.map { events =>
         val parsedV =
           events.toStream.traverse[({
                                      type λ[α] = Validation[ResourceError, α]
@@ -106,20 +106,20 @@ trait StubColumnarTableModule[M[+ _]]
                   val path = Path(pathStr)
 
                   val index =
-                    initialIndices get path getOrElse {
+                    initialIndices.get(path).getOrElse {
                       initialIndices += (path -> currentIndex)
                       currentIndex
                     }
 
                   val target = path.path.replaceAll("/$", ".json")
                   val src =
-                    io.Source fromInputStream getClass.getResourceAsStream(
-                      target)
-                  val parsed = src.getLines map JParser.parse toStream
+                    io.Source.fromInputStream(
+                      getClass.getResourceAsStream(target))
+                  val parsed = src.getLines.map(JParser.parse) toStream
 
                   currentIndex += parsed.length
 
-                  parsed zip (Stream from index) map {
+                  parsed.zip(Stream.from(index)).map {
                     case (value, id) =>
                       JObject(
                         JField("key", JArray(JNum(id) :: Nil)) :: JField(

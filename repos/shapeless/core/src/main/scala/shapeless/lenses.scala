@@ -50,11 +50,11 @@ trait Lens[S, A] extends LPLens[S, A] { outer =>
 
   def >>(n: Nat)(
       implicit mkLens: MkNthFieldLens[A, n.N]): Lens[S, mkLens.Elem] =
-    mkLens() compose this
+    mkLens().compose(this)
 
   def >>(k: Witness)(
       implicit mkLens: MkFieldLens[A, k.T]): Lens[S, mkLens.Elem] =
-    mkLens() compose this
+    mkLens().compose(this)
 
   def selectDynamic(k: String)(
       implicit mkLens: MkSelectDynamicOptic[Lens[S, A],
@@ -64,7 +64,7 @@ trait Lens[S, A] extends LPLens[S, A] { outer =>
     mkLens(this)
 
   def apply[B](implicit mkPrism: MkCtorPrism[A, B]): Prism[S, B] =
-    mkPrism() compose this
+    mkPrism().compose(this)
 
   def unapply(s: S): Option[A] = Some(get(s))
 
@@ -113,7 +113,7 @@ trait Prism[S, A] extends LPPrism[S, A] { outer =>
     mkPrism(this)
 
   def apply[B](implicit mkPrism: MkCtorPrism[A, B]): Prism[S, B] =
-    mkPrism() compose this
+    mkPrism().compose(this)
 
   def unapply(s: S): Option[A] = get(s)
 
@@ -189,7 +189,7 @@ object OpticDefns {
   def apply[C] = id[C]
 
   object compose extends Poly2 {
-    implicit def default[A, B, C] = at[Lens[B, C], Lens[A, B]](_ compose _)
+    implicit def default[A, B, C] = at[Lens[B, C], Lens[A, B]](_.compose(_))
   }
 
   class RootLens[C] extends Lens[C, C] {
@@ -210,7 +210,7 @@ object OpticDefns {
 
   def mapLens[K, V](k: K) =
     new Lens[Map[K, V], Option[V]] {
-      def get(m: Map[K, V]): Option[V] = m get k
+      def get(m: Map[K, V]): Option[V] = m.get(k)
       def set(m: Map[K, V])(ov: Option[V]): Map[K, V] = ov match {
         case Some(v) => m + (k -> v)
         case None => m - k
@@ -219,7 +219,7 @@ object OpticDefns {
 
   def mapPrism[K, V](k: K) =
     new Prism[Map[K, V], V] {
-      def get(m: Map[K, V]): Option[V] = m get k
+      def get(m: Map[K, V]): Option[V] = m.get(k)
       def set(m: Map[K, V])(v: V): Map[K, V] = m + (k -> v)
     }
 
@@ -247,25 +247,25 @@ object OpticComposer {
   implicit def composeLL[S, A, T]: Aux[Lens[S, A], Lens[T, S], Lens[T, A]] =
     new OpticComposer[Lens[S, A], Lens[T, S]] {
       type Out = Lens[T, A]
-      def apply(l: Lens[S, A], r: Lens[T, S]): Lens[T, A] = l compose r
+      def apply(l: Lens[S, A], r: Lens[T, S]): Lens[T, A] = l.compose(r)
     }
 
   implicit def composeLP[S, A, T]: Aux[Lens[S, A], Prism[T, S], Prism[T, A]] =
     new OpticComposer[Lens[S, A], Prism[T, S]] {
       type Out = Prism[T, A]
-      def apply(l: Lens[S, A], r: Prism[T, S]): Prism[T, A] = l compose r
+      def apply(l: Lens[S, A], r: Prism[T, S]): Prism[T, A] = l.compose(r)
     }
 
   implicit def composePL[S, A, T]: Aux[Prism[S, A], Lens[T, S], Prism[T, A]] =
     new OpticComposer[Prism[S, A], Lens[T, S]] {
       type Out = Prism[T, A]
-      def apply(l: Prism[S, A], r: Lens[T, S]): Prism[T, A] = l compose r
+      def apply(l: Prism[S, A], r: Lens[T, S]): Prism[T, A] = l.compose(r)
     }
 
   implicit def composePP[S, A, T]: Aux[Prism[S, A], Prism[T, S], Prism[T, A]] =
     new OpticComposer[Prism[S, A], Prism[T, S]] {
       type Out = Prism[T, A]
-      def apply(l: Prism[S, A], r: Prism[T, S]): Prism[T, A] = l compose r
+      def apply(l: Prism[S, A], r: Prism[T, S]): Prism[T, A] = l.compose(r)
     }
 }
 
@@ -282,7 +282,7 @@ object MkFieldLens {
       mkLens: MkRecordSelectLens[R, K]): Aux[A, K, mkLens.Elem] =
     new MkFieldLens[A, K] {
       type Elem = mkLens.Elem
-      def apply(): Lens[A, mkLens.Elem] = mkLens() compose mkGen()
+      def apply(): Lens[A, mkLens.Elem] = mkLens().compose(mkGen())
     }
 }
 
@@ -299,7 +299,7 @@ object MkNthFieldLens {
       mkLens: MkHListNthLens[R, N]): Aux[A, N, mkLens.Elem] =
     new MkNthFieldLens[A, N] {
       type Elem = mkLens.Elem
-      def apply(): Lens[A, mkLens.Elem] = mkLens() compose mkGen()
+      def apply(): Lens[A, mkLens.Elem] = mkLens().compose(mkGen())
     }
 }
 
@@ -312,7 +312,7 @@ object MkCtorPrism {
       implicit mkGen: MkGenericLens.Aux[A, R],
       mkPrism: MkCoproductSelectPrism[R, B]): MkCtorPrism[A, B] =
     new MkCtorPrism[A, B] {
-      def apply(): Prism[A, B] = mkPrism() compose mkGen()
+      def apply(): Prism[A, B] = mkPrism().compose(mkGen())
     }
 }
 
@@ -356,7 +356,7 @@ trait LowPriorityMkSelectDynamicOptic {
     : Aux[R, A, K, Nothing, compose.Out] =
     new MkSelectDynamicOptic[R, A, K, Nothing] {
       type Out = compose.Out
-      def apply(r: R): Out = compose(mkPSel() compose mkCSel(), r)
+      def apply(r: R): Out = compose(mkPSel().compose(mkCSel()), r)
     }
 
   implicit def mkSelFieldCtor[R, A, K, B, C](
@@ -365,7 +365,7 @@ trait LowPriorityMkSelectDynamicOptic {
       compose: OpticComposer[Prism[A, B], R]): Aux[R, A, K, B, compose.Out] =
     new MkSelectDynamicOptic[R, A, K, B] {
       type Out = compose.Out
-      def apply(r: R): Out = compose(mkCSel() compose mkPSel(), r)
+      def apply(r: R): Out = compose(mkCSel().compose(mkPSel()), r)
     }
 }
 
@@ -538,7 +538,7 @@ trait LowPriorityMkPathOptic {
       type Out = compose.Out
       type Elem = E
       def apply(): compose.Out =
-        compose(mkLens() compose mkPrism(), mkPrefix())
+        compose(mkLens().compose(mkPrism()), mkPrefix())
     }
 }
 

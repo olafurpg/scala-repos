@@ -69,13 +69,13 @@ object Test extends StoreReporterDirectTest {
       |""".stripMargin.trim
     val output = ILoop.run(codeToRun, settings)
     var lines = output.lines.drop(headerLength)
-    lines = lines drop promptLength
+    lines = lines.drop(promptLength)
     val added = lines.next
     assert(
       added.contains("Added") && added.contains("test1.jar"),
       s"[${added}] in [${output.lines.mkString("/")}]"
     )
-    lines = lines drop promptLength
+    lines = lines.drop(promptLength)
     assert {
       lines.next.contains("testing...")
     }
@@ -93,12 +93,12 @@ object Test extends StoreReporterDirectTest {
       |""".stripMargin.trim
     val output = ILoop.run(codeToRun, settings)
     var lines = output.lines.drop(headerLength)
-    lines = lines drop promptLength
+    lines = lines.drop(promptLength)
     val added = lines.next
     assert {
       added.contains("Added") && added.contains("test1.jar")
     }
-    lines = lines drop promptLength
+    lines = lines.drop(promptLength)
     val msg = lines.next
     assert {
       msg.contains("test2.jar") &&
@@ -119,12 +119,12 @@ object Test extends StoreReporterDirectTest {
       |""".stripMargin.trim
     val output = ILoop.run(codeToRun, settings)
     var lines = output.lines.drop(headerLength)
-    lines = lines drop promptLength
+    lines = lines.drop(promptLength)
     val added = lines.next
     assert {
       added.contains("Added") && added.contains("test1.jar")
     }
-    lines = lines drop (2 * promptLength + 1)
+    lines = lines.drop(2 * promptLength + 1)
     assert {
       lines.next.contains("new object in existing package")
     }
@@ -139,12 +139,12 @@ object Test extends StoreReporterDirectTest {
       |""".stripMargin.trim
     val output = ILoop.run(codeToRun, settings)
     var lines = output.lines.drop(headerLength)
-    lines = lines drop promptLength
+    lines = lines.drop(promptLength)
     val added = lines.next
     assert {
       added.contains("Added") && added.contains("test1.jar")
     }
-    lines = lines drop promptLength
+    lines = lines.drop(promptLength)
     val msg = lines.next
     assert {
       msg.contains("test1.jar") &&

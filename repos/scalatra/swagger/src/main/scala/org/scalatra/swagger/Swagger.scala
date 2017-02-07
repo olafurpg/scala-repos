@@ -167,7 +167,7 @@ object Swagger {
       val apiModel = Option(klass.erasure.getAnnotation(classOf[ApiModel]))
 
       val fields =
-        klass.erasure.getDeclaredFields.toList collect {
+        klass.erasure.getDeclaredFields.toList.collect {
           case f: Field
               if f.getAnnotation(classOf[ApiModelProperty]) != null =>
             val annot = f.getAnnotation(classOf[ApiModelProperty])
@@ -177,26 +177,33 @@ object Swagger {
                               annot.required(),
                               annot.description().blankOption,
                               annot.allowableValues()) _
-            descr.properties.find(_.mangledName == f.getName) map asModelProperty
+            descr.properties
+              .find(_.mangledName == f.getName)
+              .map(asModelProperty)
 
           case f: Field =>
             val asModelProperty = toModelProperty(descr) _
-            descr.properties.find(_.mangledName == f.getName) map asModelProperty
+            descr.properties
+              .find(_.mangledName == f.getName)
+              .map(asModelProperty)
         }
 
       val result =
-        apiModel map { am =>
-          Model(name,
-                name,
-                klass.fullName.blankOption,
-                properties = fields.flatten,
-                baseModel = am.parent.getName.blankOption,
-                discriminator = am.discriminator.blankOption)
-        } orElse Some(
-          Model(name,
-                name,
-                klass.fullName.blankOption,
-                properties = fields.flatten))
+        apiModel
+          .map { am =>
+            Model(name,
+                  name,
+                  klass.fullName.blankOption,
+                  properties = fields.flatten,
+                  baseModel = am.parent.getName.blankOption,
+                  discriminator = am.discriminator.blankOption)
+          }
+          .orElse(
+            Some(
+              Model(name,
+                    name,
+                    klass.fullName.blankOption,
+                    properties = fields.flatten)))
       //      if (descr.simpleName == "Pet") println("The collected fields:\n" + result)
       result
     }
@@ -281,7 +288,7 @@ class Swagger(val swaggerVersion: String,
     logger.debug(
       s"registering swagger api with: { listingPath: $listingPath, resourcePath: $resourcePath, description: $resourcePath, servlet: ${s.getClass} }")
     val endpoints: List[Endpoint] =
-      s.endpoints(resourcePath) collect { case m: Endpoint => m }
+      s.endpoints(resourcePath).collect { case m: Endpoint => m }
     _docs +=
       listingPath -> Api(
         apiVersion,
@@ -562,7 +569,8 @@ case class Model(id: String,
   def setRequired(property: String, required: Boolean): Model = {
     val prop = properties.find(_._1 == property).get
     copy(
-      properties = (property -> prop._2.copy(required = required)) :: properties)
+      properties = (property -> prop._2
+          .copy(required = required)) :: properties)
   }
 }
 

@@ -6,9 +6,9 @@ trait Lst[+A] {
 }
 class C[@specialized(Int) T] {
   def moo(t: T) = {
-    def foo1(c: Ctx)(l: Lst[c.Tree]) = l zip l
-    def foo2(c: Ctx)(l: Lst[c.Tree]*) = l(0) zip l(1)
-    def foo3(c: Ctx)(l: => Lst[c.Tree]) = l zip l
+    def foo1(c: Ctx)(l: Lst[c.Tree]) = l.zip(l)
+    def foo2(c: Ctx)(l: Lst[c.Tree]*) = l(0).zip(l(1))
+    def foo3(c: Ctx)(l: => Lst[c.Tree]) = l.zip(l)
     ???
   }
 }

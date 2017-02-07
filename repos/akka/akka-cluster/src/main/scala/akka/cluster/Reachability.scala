@@ -78,7 +78,7 @@ private[cluster] class Reachability private (
         val unreachableBuilder =
           new SetBuilder[UniqueAddress, Set[UniqueAddress]](Set.empty)
 
-        records foreach { r ⇒
+        records.foreach { r ⇒
           val m = mapBuilder.get(r.observer) match {
             case None ⇒ Map(r.subject -> r)
             case Some(m) ⇒ m.updated(r.subject, r)
@@ -94,7 +94,7 @@ private[cluster] class Reachability private (
           mapBuilder.toMap
         val allTerminated: Set[UniqueAddress] = terminatedBuilder.result()
         val allUnreachable: Set[UniqueAddress] =
-          unreachableBuilder.result() diff allTerminated
+          unreachableBuilder.result().diff(allTerminated)
 
         (observerRowsMap, allUnreachable, allTerminated)
       }
@@ -102,7 +102,7 @@ private[cluster] class Reachability private (
 
     val allUnreachableOrTerminated: Set[UniqueAddress] =
       if (allTerminated.isEmpty) allUnreachable
-      else allUnreachable union allTerminated
+      else allUnreachable.union(allTerminated)
   }
 
   @transient private lazy val cache = new Cache
@@ -178,7 +178,7 @@ private[cluster] class Reachability private (
     val recordBuilder = new immutable.VectorBuilder[Record]
     recordBuilder.sizeHint(math.max(this.records.size, other.records.size))
     var newVersions = versions
-    allowed foreach { observer ⇒
+    allowed.foreach { observer ⇒
       val observerVersion1 = this.currentVersion(observer)
       val observerVersion2 = other.currentVersion(observer)
 

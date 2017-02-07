@@ -38,7 +38,7 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
       def apply(a: Int, b: Int) = a + b
     }))
 
-  def source = Source from asJavaIterable(1 to 3)
+  def source = Source.from(asJavaIterable(1 to 3))
   def sawait[T](f: Future[T]) = Await.result(f, 10.seconds)
   def await[T](f: CompletionStage[T]) =
     f.toCompletableFuture.get(10, TimeUnit.SECONDS)
@@ -59,7 +59,7 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
         val completable = new CompletableFuture[Accumulator[Int, Int]]()
 
         val fAcc = Accumulator.flatten[Int, Int](completable, m)
-        completable complete sum
+        completable.complete(sum)
 
         await(fAcc.run(source, m)) must_== 6
       }
@@ -73,8 +73,8 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
         await(fAcc.run(source, m)) must throwA[ExecutionException].like {
           case ex =>
             val cause = ex.getCause
-            cause.isInstanceOf[RuntimeException] must beTrue and
-              (cause.getMessage must_== "failed")
+            (cause.isInstanceOf[RuntimeException] must beTrue)
+              .and(cause.getMessage must_== "failed")
         }
       }
 
@@ -82,13 +82,13 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
         val completable = new CompletableFuture[Accumulator[Int, Int]]()
 
         val fAcc = Accumulator.flatten[Int, Int](completable, m)
-        completable complete sum
+        completable.complete(sum)
 
         await(fAcc.run(errorSource, m)) must throwA[ExecutionException].like {
           case ex =>
             val cause = ex.getCause
-            cause.isInstanceOf[RuntimeException] must beTrue and
-              (cause.getMessage must_== "error")
+            (cause.isInstanceOf[RuntimeException] must beTrue)
+              .and(cause.getMessage must_== "error")
         }
       }
     }

@@ -31,14 +31,14 @@ object RankedPairing {
 
   def apply(ranking: Ranking)(pairing: Pairing): Option[RankedPairing] =
     for {
-      r1 <- ranking get pairing.user1
-      r2 <- ranking get pairing.user2
+      r1 <- ranking.get(pairing.user1)
+      r2 <- ranking.get(pairing.user2)
     } yield RankedPairing(pairing, r1 + 1, r2 + 1)
 }
 
 case class RankedPlayer(rank: Int, player: Player) {
 
-  def is(other: RankedPlayer) = player is other.player
+  def is(other: RankedPlayer) = player.is(other.player)
 
   override def toString = s"$rank. ${player.userId}[${player.rating}]"
 }
@@ -46,7 +46,7 @@ case class RankedPlayer(rank: Int, player: Player) {
 object RankedPlayer {
 
   def apply(ranking: Ranking)(player: Player): Option[RankedPlayer] =
-    ranking get player.userId map { rank =>
+    ranking.get(player.userId).map { rank =>
       RankedPlayer(rank + 1, player)
     }
 }

@@ -92,8 +92,8 @@ abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
       }
     )
 
-  protected def i_is_! = data openOr false
-  protected def i_was_! = orgData openOr false
+  protected def i_is_! = data.openOr(false)
+  protected def i_was_! = orgData.openOr(false)
   protected[mapper] def doneWithSave() { orgData = data }
 
   protected def real_i_set_!(value: Boolean): Boolean = {
@@ -113,7 +113,7 @@ abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
     new java.lang.Integer(if (value) 1 else 0)
 
   def jdbcFriendly(field: String) =
-    data.map(v => new java.lang.Integer(if (v) 1 else 0)) openOr null
+    data.map(v => new java.lang.Integer(if (v) 1 else 0)).openOr(null)
 
   def asJsExp: JsExp = if (get) JE.JsTrue else JE.JsFalse
 

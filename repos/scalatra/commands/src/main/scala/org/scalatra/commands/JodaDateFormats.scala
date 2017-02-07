@@ -35,9 +35,9 @@ object JodaDateFormats extends DateParser {
     def dateTimeFormat: DateTimeFormatter
 
     def parse(s: String) = {
-      s.blankOption flatMap { s ⇒
-        catching(classOf[IllegalArgumentException]) opt {
-          dateTimeFormat parseDateTime s
+      s.blankOption.flatMap { s ⇒
+        catching(classOf[IllegalArgumentException]).opt {
+          dateTimeFormat.parseDateTime(s)
         }
       }
     }
@@ -57,8 +57,8 @@ object JodaDateFormats extends DateParser {
     val dateTimeFormat = DateTimeFormat.forPattern(pattern)
 
     override def parse(s: String) = {
-      s.blankOption flatMap { s ⇒
-        allCatch opt {
+      s.blankOption.flatMap { s ⇒
+        allCatch.opt {
           // I couldn't get this to work with joda time
           // going round by simpledateformat.
           //

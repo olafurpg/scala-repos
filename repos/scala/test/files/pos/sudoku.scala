@@ -5,7 +5,7 @@ object SudokuSolver extends App {
   var m: Array[Array[Char]] = Array.tabulate(9)((x: Int) => readLine.toArray)
 
   // For printing m, a method print is defined
-  def print = { println(""); m map (carr => println(new String(carr))) }
+  def print = { println(""); m.map(carr => println(new String(carr))) }
 
   // The test for validity is performed by looping over i=0..8 and
   // testing the row, column and 3x3 square containing the given

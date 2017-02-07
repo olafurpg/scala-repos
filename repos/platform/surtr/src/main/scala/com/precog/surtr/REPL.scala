@@ -89,7 +89,7 @@ class REPLConfig(dataDir: Option[String])
   val defaultConfig =
     Configuration.loadResource("/default_ingest.conf", BlockFormat)
   val config =
-    dataDir map { defaultConfig.set("precog.storage.root", _) } getOrElse {
+    dataDir.map { defaultConfig.set("precog.storage.root", _) }.getOrElse {
       defaultConfig
     }
 
@@ -156,7 +156,7 @@ trait REPL
         out.println(color.red(strs mkString "\n"))
       }
 
-      if (tree.errors filterNot isWarning isEmpty) Some(tree)
+      if (tree.errors.filterNot(isWarning) isEmpty) Some(tree)
       else None
     }
 
@@ -172,10 +172,11 @@ trait REPL
 
           for (graph <- eitherGraph.right) {
             val result = {
-              consumeEval(graph, dummyEvaluationContext) fold
-                (error =>
+              consumeEval(graph, dummyEvaluationContext).fold(
+                error =>
                   "An error occurred processing your query: " +
-                    error.getMessage, results =>
+                    error.getMessage,
+                results =>
                   JArray(results.toList.map(_._2.toJValue)).renderPretty)
             }
 
@@ -210,8 +211,8 @@ trait REPL
 
     def loop() {
       val results = prompt(readNext(reader, color))
-      val successes = results collect { case Success(tree, _) => tree }
-      val failures = results collect { case f: Failure => f }
+      val successes = results.collect { case Success(tree, _) => tree }
+      val failures = results.collect { case f: Failure => f }
 
       if (successes.isEmpty) {
         try {
@@ -226,7 +227,7 @@ trait REPL
         loop()
       } else {
         val command =
-          if ((successes lengthCompare 1) > 0)
+          if ((successes.lengthCompare(1)) > 0)
             throw new AssertionError(
               "Fatal error: ambiguous parse results: " +
                 results.mkString(", "))

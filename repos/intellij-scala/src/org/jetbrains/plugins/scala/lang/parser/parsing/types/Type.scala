@@ -31,7 +31,7 @@ object Type {
             case ">:" =>
               builder.advanceLexer()
               if (!Type.parse(builder)) {
-                builder error ScalaBundle.message("wrong.type")
+                builder.error(ScalaBundle.message("wrong.type"))
               }
             case _ => //nothing
           }
@@ -39,7 +39,7 @@ object Type {
             case "<:" =>
               builder.advanceLexer()
               if (!Type.parse(builder)) {
-                builder error ScalaBundle.message("wrong.type")
+                builder.error(ScalaBundle.message("wrong.type"))
               }
             case _ => //nothing
           }
@@ -49,7 +49,7 @@ object Type {
               val funMarker = typeMarker.precede()
               builder.advanceLexer() //Ate =>
               if (!Type.parse(builder, star = false, isPattern = isPattern)) {
-                builder error ScalaBundle.message("wrong.type")
+                builder.error(ScalaBundle.message("wrong.type"))
               }
               funMarker.done(ScalaElementTypes.TYPE)
             case _ =>
@@ -65,11 +65,11 @@ object Type {
       case ScalaTokenTypes.tFUNTYPE =>
         builder.advanceLexer() //Ate =>
         if (!Type.parse(builder, star = false, isPattern = isPattern)) {
-          builder error ScalaBundle.message("wrong.type")
+          builder.error(ScalaBundle.message("wrong.type"))
         }
         typeMarker.done(ScalaElementTypes.TYPE)
       case ScalaTokenTypes.kFOR_SOME =>
-        ExistentialClause parse builder
+        ExistentialClause.parse(builder)
         typeMarker.done(ScalaElementTypes.EXISTENTIAL_TYPE)
       case _ => typeMarker.drop()
     }

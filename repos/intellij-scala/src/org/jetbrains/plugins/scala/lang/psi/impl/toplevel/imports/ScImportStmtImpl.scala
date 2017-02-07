@@ -283,11 +283,11 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
             case Some(set) =>
               val shadowed: mutable.HashSet[(ScImportSelector, PsiElement)] =
                 mutable.HashSet.empty
-              set.selectors foreach { selector =>
+              set.selectors.foreach { selector =>
                 ProgressManager.checkCanceled()
                 val selectorResolve: Array[ResolveResult] =
                   selector.reference.multiResolve(false)
-                selectorResolve foreach { result =>
+                selectorResolve.foreach { result =>
                   if (selector.isAliasedImport &&
                       selector.importedName != selector.reference.refName) {
                     //Resolve the name imported by selector
@@ -393,11 +393,11 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
               }
 
               //wildcard import first, to show that this imports are unused if they really are
-              set.selectors foreach { selector =>
+              set.selectors.foreach { selector =>
                 ProgressManager.checkCanceled()
                 val selectorResolve: Array[ResolveResult] =
                   selector.reference.multiResolve(false)
-                selectorResolve foreach { result =>
+                selectorResolve.foreach { result =>
                   var newState: ResolveState = state
                   if (!selector.isAliasedImport ||
                       selector.importedName == selector.reference.refName) {

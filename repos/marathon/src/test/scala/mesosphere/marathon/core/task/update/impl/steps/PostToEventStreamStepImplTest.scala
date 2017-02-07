@@ -39,7 +39,7 @@ class PostToEventStreamStepImplTest
     }
 
     Then("the appropriate event is posted")
-    events should have size 1
+    (events should have).size(1)
     events should be(
       Seq(
         MesosStatusUpdateEvent(
@@ -56,7 +56,7 @@ class PostToEventStreamStepImplTest
         )
       ))
     And("only sending event info gets logged")
-    logs should have size 1
+    (logs should have).size(1)
     logs.map(_.toString) should be(Seq(
       s"[INFO] Sending event notification for $taskId of app [$appId]: ${status.getState}"
     ))
@@ -122,7 +122,7 @@ class PostToEventStreamStepImplTest
     }
 
     Then("the appropriate event is posted")
-    events should have size 1
+    (events should have).size(1)
     events should be(
       Seq(
         MesosStatusUpdateEvent(
@@ -139,7 +139,7 @@ class PostToEventStreamStepImplTest
         )
       ))
     And("only sending event info gets logged")
-    logs should have size 1
+    (logs should have).size(1)
     logs.map(_.toString) should be(Seq(
       s"[INFO] Sending event notification for $taskId of app [$appId]: ${status.getState}"
     ))

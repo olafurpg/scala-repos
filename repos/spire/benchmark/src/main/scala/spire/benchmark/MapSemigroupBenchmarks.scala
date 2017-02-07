@@ -48,7 +48,7 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
     y.foldLeft(x) {
       case (z, kv) =>
         z +
-          ((kv._1, (x get kv._1) match {
+          ((kv._1, (x.get(kv._1)) match {
             case Some(u) =>
               if (flip) semigroup.op(kv._2, u) else semigroup.op(u, kv._2)
             case None => kv._2
@@ -77,8 +77,8 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
   def genMaps(gen: Int => (Int, Int)): Array[Map[Int, Int]] = {
     val arr = new Array[Map[Int, Int]](numMaps)
     var i = 0
-    (0 until numMaps) foreach { i =>
-      arr(i) = Map((1 to mapSize) map gen: _*)
+    ((0 until numMaps)).foreach { i =>
+      arr(i) = Map(((1 to mapSize)).map(gen): _*)
     }
     arr
   }

@@ -31,7 +31,7 @@ class ResolveArtifactsActor(app: AppDefinition,
 
   override def preStart(): Unit = {
     import context.dispatcher
-    downloads.map(_.get.map(DownloadFinished) pipeTo self)
+    downloads.map(_.get.map(DownloadFinished).pipeTo(self))
     if (url2Path.isEmpty) promise.success(true) // handle empty list
   }
 

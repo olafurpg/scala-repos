@@ -15,7 +15,7 @@ abstract class Set[T <: AnyRef] {
 
   def iterator: Iterator[T]
 
-  def foreach[U](f: T => U): Unit = iterator foreach f
+  def foreach[U](f: T => U): Unit = iterator.foreach(f)
 
   def apply(x: T): Boolean = contains(x)
 

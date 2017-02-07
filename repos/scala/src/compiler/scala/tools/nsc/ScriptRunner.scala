@@ -54,7 +54,7 @@ class ScriptRunner extends HasCompileSocket {
 
   /** Choose a jar filename to hold the compiled version of a script. */
   private def jarFileFor(scriptFile: String) = File(
-    if (scriptFile endsWith ".jar") scriptFile
+    if (scriptFile.endsWith(".jar")) scriptFile
     else scriptFile.stripSuffix(".scala") + ".jar"
   )
 
@@ -64,14 +64,14 @@ class ScriptRunner extends HasCompileSocket {
                                 scriptFileIn: String) = {
     val scriptFile = Path(scriptFileIn).toAbsolute.path
     val compSettingNames =
-      new Settings(sys.error).visibleSettings.toList map (_.name)
+      new Settings(sys.error).visibleSettings.toList.map(_.name)
     val compSettings =
-      settings.visibleSettings.toList filter (compSettingNames contains _.name)
-    val coreCompArgs = compSettings flatMap (_.unparse)
+      settings.visibleSettings.toList.filter(compSettingNames contains _.name)
+    val coreCompArgs = compSettings.flatMap(_.unparse)
     val compArgs =
       coreCompArgs ++ List("-Xscript", scriptMain(settings), scriptFile)
 
-    CompileSocket getOrCreateSocket "" match {
+    CompileSocket.getOrCreateSocket("") match {
       case Some(sock) => compileOnServer(sock, compArgs)
       case _ => false
     }
@@ -94,7 +94,7 @@ class ScriptRunner extends HasCompileSocket {
      * class files, if the compilation succeeded.
      */
     def compile: Option[Directory] = {
-      val compiledPath = Directory makeTemp "scalascript"
+      val compiledPath = Directory.makeTemp("scalascript")
 
       // delete the directory after the user code has finished
       sys.addShutdownHook(compiledPath.deleteRecursively())
@@ -109,7 +109,7 @@ class ScriptRunner extends HasCompileSocket {
         val reporter = new ConsoleReporter(settings)
         val compiler = newGlobal(settings, reporter)
 
-        new compiler.Run compile List(scriptFile)
+        new compiler.Run.compile(List(scriptFile))
         if (reporter.hasErrors) None else Some(compiledPath)
       } else if (compileWithDaemon(settings, scriptFile)) Some(compiledPath)
       else None
@@ -131,7 +131,7 @@ class ScriptRunner extends HasCompileSocket {
     util.waitingForThreads {
       if (settings.save) {
         val jarFile = jarFileFor(scriptFile)
-        def jarOK = jarFile.canRead && (jarFile isFresher File(scriptFile))
+        def jarOK = jarFile.canRead && (jarFile.isFresher(File(scriptFile)))
 
         def recompile() = {
           jarFile.delete()
@@ -164,7 +164,7 @@ class ScriptRunner extends HasCompileSocket {
         else recompile() // jar old - recompile the script.
       }
       // don't use a cache jar at all--just use the class files, if they exist
-      else compile exists (cp => !hasClassToRun(cp) || handler(cp.path))
+      else compile.exists(cp => !hasClassToRun(cp) || handler(cp.path))
     }
   }
 
@@ -218,7 +218,7 @@ class ScriptRunner extends HasCompileSocket {
                  scriptArgs: List[String]): Boolean = {
     val scriptFile = File.makeTemp("scalacmd", ".scala")
     // save the command to the file
-    scriptFile writeAll command
+    scriptFile.writeAll(command)
 
     try withCompiledScript(settings, scriptFile.path) {
       runCompiled(settings, _, scriptArgs)

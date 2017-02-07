@@ -26,7 +26,7 @@ class AkkaException(message: String = "", cause: Throwable = null)
   def stackTraceToString = {
     val trace = getStackTrace
     val sb = new StringBuffer
-    for (i ← 0 until trace.length) sb.append("\tat %s\n" format trace(i))
+    for (i ← 0 until trace.length) sb.append("\tat %s\n".format(trace(i)))
     sb.toString
   }
 }

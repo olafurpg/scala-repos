@@ -75,7 +75,7 @@ private[stream] object Stages {
     val repeat = name("repeat")
     val unfold = name("unfold")
     val unfoldAsync = name("unfoldAsync")
-    val delay = name("delay") and inputBuffer(16, 16)
+    val delay = name("delay").and(inputBuffer(16, 16))
 
     val terminationWatcher = name("terminationWatcher")
 
@@ -93,14 +93,14 @@ private[stream] object Stages {
     val actorPublisherSource = name("actorPublisherSource")
     val actorRefSource = name("actorRefSource")
     val queueSource = name("queueSource")
-    val inputStreamSource = name("inputStreamSource") and IODispatcher
-    val outputStreamSource = name("outputStreamSource") and IODispatcher
-    val fileSource = name("fileSource") and IODispatcher
+    val inputStreamSource = name("inputStreamSource").and(IODispatcher)
+    val outputStreamSource = name("outputStreamSource").and(IODispatcher)
+    val fileSource = name("fileSource").and(IODispatcher)
 
     val subscriberSink = name("subscriberSink")
     val cancelledSink = name("cancelledSink")
-    val headSink = name("headSink") and inputBufferOne
-    val headOptionSink = name("headOptionSink") and inputBufferOne
+    val headSink = name("headSink").and(inputBufferOne)
+    val headOptionSink = name("headOptionSink").and(inputBufferOne)
     val lastSink = name("lastSink")
     val lastOptionSink = name("lastOptionSink")
     val seqSink = name("seqSink")
@@ -111,9 +111,9 @@ private[stream] object Stages {
     val actorRefWithAck = name("actorRefWithAckSink")
     val actorSubscriberSink = name("actorSubscriberSink")
     val queueSink = name("queueSink")
-    val outputStreamSink = name("outputStreamSink") and IODispatcher
-    val inputStreamSink = name("inputStreamSink") and IODispatcher
-    val fileSink = name("fileSource") and IODispatcher
+    val outputStreamSink = name("outputStreamSink").and(IODispatcher)
+    val inputStreamSink = name("inputStreamSink").and(IODispatcher)
+    val fileSink = name("fileSource").and(IODispatcher)
   }
 
   import DefaultAttributes._

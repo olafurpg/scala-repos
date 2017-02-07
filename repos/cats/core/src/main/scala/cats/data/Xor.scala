@@ -162,9 +162,9 @@ object Xor extends XorInstances with XorFunctions {
 private[data] sealed abstract class XorInstances extends XorInstances1 {
   implicit def xorOrder[A: Order, B: Order]: Order[A Xor B] =
     new Order[A Xor B] {
-      def compare(x: A Xor B, y: A Xor B): Int = x compare y
+      def compare(x: A Xor B, y: A Xor B): Int = x.compare(y)
       override def partialCompare(x: A Xor B, y: A Xor B): Double =
-        x partialCompare y
+        x.partialCompare(y)
       override def eqv(x: A Xor B, y: A Xor B): Boolean = x === y
     }
 
@@ -227,10 +227,10 @@ private[data] sealed abstract class XorInstances extends XorInstances1 {
       override def attempt[B](fab: A Xor B): A Xor (A Xor B) = Xor.right(fab)
       override def recover[B](fab: A Xor B)(
           pf: PartialFunction[A, B]): A Xor B =
-        fab recover pf
+        fab.recover(pf)
       override def recoverWith[B](fab: A Xor B)(
           pf: PartialFunction[A, A Xor B]): A Xor B =
-        fab recoverWith pf
+        fab.recoverWith(pf)
     }
 }
 
@@ -245,7 +245,7 @@ private[data] sealed abstract class XorInstances1 extends XorInstances2 {
   implicit def xorPartialOrder[A: PartialOrder, B: PartialOrder]
     : PartialOrder[A Xor B] =
     new PartialOrder[A Xor B] {
-      def partialCompare(x: A Xor B, y: A Xor B): Double = x partialCompare y
+      def partialCompare(x: A Xor B, y: A Xor B): Double = x.partialCompare(y)
       override def eqv(x: A Xor B, y: A Xor B): Boolean = x === y
     }
 }

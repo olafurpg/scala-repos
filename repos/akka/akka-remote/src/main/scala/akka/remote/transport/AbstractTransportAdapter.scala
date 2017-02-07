@@ -249,11 +249,11 @@ abstract class ActorTransportAdapterManager
   def receive: Receive = {
     case ListenUnderlying(listenAddress, upstreamListenerFuture) ⇒
       localAddress = listenAddress
-      upstreamListenerFuture.future.map { ListenerRegistered(_) } pipeTo self
+      upstreamListenerFuture.future.map { ListenerRegistered(_) }.pipeTo(self)
 
     case ListenerRegistered(listener) ⇒
       associationListener = listener
-      delayedEvents foreach { self.tell(_, Actor.noSender) }
+      delayedEvents.foreach { self.tell(_, Actor.noSender) }
       delayedEvents = immutable.Queue.empty[Any]
       context.become(ready)
 
@@ -261,7 +261,7 @@ abstract class ActorTransportAdapterManager
      * queue. The difference is that these messages will not survive a restart -- which is not needed here.
      * These messages will be processed in the ready state.
      */
-    case otherEvent ⇒ delayedEvents = delayedEvents enqueue otherEvent
+    case otherEvent ⇒ delayedEvents = delayedEvents.enqueue(otherEvent)
   }
 
   protected def ready: Receive

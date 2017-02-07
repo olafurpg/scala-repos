@@ -46,8 +46,8 @@ class ConstraintTest extends MarathonSpec with Matchers {
       .asOpt[Constraint] should be(empty)
     val ex = intercept[JsResultException](
       Json.parse("""["foo", "CLUSTER", "bla", "bla2"]""").as[Constraint])
-    ex.errors should have size 1
-    ex.errors.head._2 should have size 1
+    (ex.errors should have).size(1)
+    (ex.errors.head._2 should have).size(1)
     ex.errors.head._2.head.messages.head should startWith(
       "Constraint definition must be an array of string")
   }
@@ -57,8 +57,8 @@ class ConstraintTest extends MarathonSpec with Matchers {
     import mesosphere.marathon.api.v2.json.Formats._
     val ex = intercept[JsResultException](
       Json.parse("""["foo", "unique"]""").as[Constraint])
-    ex.errors should have size 1
-    ex.errors.head._2 should have size 1
+    (ex.errors should have).size(1)
+    (ex.errors.head._2 should have).size(1)
     ex.errors.head._2.head.messages.head should startWith(
       "Constraint operator must be one of the following")
   }

@@ -169,7 +169,7 @@ object expand {
           val mappedTree = tmap(typeMap(tname))
           mappedTree match {
             case fn @ Function(fargs, body) =>
-              (fargs zip args).foldLeft(body) { (currentBody, pair) =>
+              (fargs.zip(args)).foldLeft(body) { (currentBody, pair) =>
                 val (fa, a) = pair
                 new InlineTerm(fa.name, a).transform(currentBody)
               }
@@ -181,7 +181,7 @@ object expand {
         case _ =>
           super.transform(tree)
       }
-    } transform rhs
+    }.transform(rhs)
   }
 
   /** for a valdef with a [[breeze.macros.expand.sequence]] annotation, converts the sequence of associations to a Map */
@@ -199,7 +199,9 @@ object expand {
         }
         val predef = context.mirror.staticModule("scala.Predef").asModule
         val missing = Select(Ident(predef), newTermName("???"))
-        nme2 -> (typeMappings(nme2) zip args.flatten).toMap
+        nme2 -> (typeMappings(nme2)
+          .zip(args.flatten))
+          .toMap
           .withDefaultValue(missing)
     }
     x.get
@@ -254,9 +256,11 @@ object expand {
                 "arguments to @exclude does not have the same arity as the type symbols!")
           args.map(
             aa =>
-              (targs zip aa
-                .map(c.typeCheck(_))
-                .map(_.symbol.asModule.companionSymbol.asType.toType)).toMap)
+              (targs
+                .zip(aa
+                  .map(c.typeCheck(_))
+                  .map(_.symbol.asModule.companionSymbol.asType.toType)))
+                .toMap)
       }
       .flatten
       .toSeq

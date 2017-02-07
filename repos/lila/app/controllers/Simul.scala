@@ -20,58 +20,60 @@ object Simul extends LilaController {
     NotFound(html.simul.notFound())
 
   val home = Open { implicit ctx =>
-    fetchSimuls map {
+    fetchSimuls.map {
       case ((created, started), finished) =>
         Ok(html.simul.home(created, started, finished))
     }
   }
 
   val homeReload = Open { implicit ctx =>
-    fetchSimuls map {
+    fetchSimuls.map {
       case ((created, started), finished) =>
         Ok(html.simul.homeInner(created, started, finished))
     }
   }
 
   private def fetchSimuls =
-    env.allCreated(true) zip env.repo.allStarted zip env.repo.allFinished(10)
+    env.allCreated(true).zip(env.repo.allStarted).zip(env.repo.allFinished(10))
 
   def show(id: String) = Open { implicit ctx =>
-    env.repo find id flatMap {
-      _.fold(simulNotFound.fuccess) { sim =>
-        env.version(sim.id) zip env.jsonView(sim) zip chatOf(sim) map {
-          case ((version, data), chat) =>
-            html.simul.show(sim, version, data, chat)
+    (env.repo find id)
+      .flatMap {
+        _.fold(simulNotFound.fuccess) { sim =>
+          env.version(sim.id).zip(env.jsonView(sim)).zip(chatOf(sim)).map {
+            case ((version, data), chat) =>
+              html.simul.show(sim, version, data, chat)
+          }
         }
       }
-    } map NoCache
+      .map(NoCache)
   }
 
   def start(simulId: String) = Open { implicit ctx =>
     AsHost(simulId) { simul =>
-      env.api start simul.id
-      Ok(Json.obj("ok" -> true)) as JSON
+      env.api.start(simul.id)
+      Ok(Json.obj("ok" -> true)).as(JSON)
     }
   }
 
   def abort(simulId: String) = Open { implicit ctx =>
     AsHost(simulId) { simul =>
-      env.api abort simul.id
-      Ok(Json.obj("ok" -> true)) as JSON
+      env.api.abort(simul.id)
+      Ok(Json.obj("ok" -> true)).as(JSON)
     }
   }
 
   def accept(simulId: String, userId: String) = Open { implicit ctx =>
     AsHost(simulId) { simul =>
       env.api.accept(simul.id, userId, true)
-      Ok(Json.obj("ok" -> true)) as JSON
+      Ok(Json.obj("ok" -> true)).as(JSON)
     }
   }
 
   def reject(simulId: String, userId: String) = Open { implicit ctx =>
     AsHost(simulId) { simul =>
       env.api.accept(simul.id, userId, false)
-      Ok(Json.obj("ok" -> true)) as JSON
+      Ok(Json.obj("ok" -> true)).as(JSON)
     }
   }
 
@@ -87,7 +89,7 @@ object Simul extends LilaController {
       env.forms.create.bindFromRequest.fold(
         err => BadRequest(html.simul.form(err, env.forms)).fuccess,
         setup =>
-          env.api.create(setup, me) map { simul =>
+          env.api.create(setup, me).map { simul =>
             Redirect(routes.Simul.show(simul.id))
         })
     }
@@ -97,7 +99,7 @@ object Simul extends LilaController {
     NoEngine {
       fuccess {
         env.api.addApplicant(id, me, variant)
-        if (HTTPRequest isXhr ctx.req) Ok(Json.obj("ok" -> true)) as JSON
+        if (HTTPRequest.isXhr(ctx.req)) Ok(Json.obj("ok" -> true)).as(JSON)
         else Redirect(routes.Simul.show(id))
       }
     }
@@ -106,7 +108,7 @@ object Simul extends LilaController {
   def withdraw(id: String) = Auth { implicit ctx => me =>
     fuccess {
       env.api.removeApplicant(id, me)
-      if (HTTPRequest isXhr ctx.req) Ok(Json.obj("ok" -> true)) as JSON
+      if (HTTPRequest.isXhr(ctx.req)) Ok(Json.obj("ok" -> true)).as(JSON)
       else Redirect(routes.Simul.show(id))
     }
   }
@@ -120,12 +122,12 @@ object Simul extends LilaController {
 
   private def chatOf(sim: Sim)(implicit ctx: Context) =
     ctx.isAuth ?? {
-      Env.chat.api.userChat find sim.id map (_.forUser(ctx.me).some)
+      (Env.chat.api.userChat find sim.id).map(_.forUser(ctx.me).some)
     }
 
   private def AsHost(simulId: Sim.ID)(f: Sim => Result)(
       implicit ctx: Context): Fu[Result] =
-    env.repo.find(simulId) flatMap {
+    env.repo.find(simulId).flatMap {
       case None => notFound
       case Some(simul) if ctx.userId.exists(simul.hostId ==) =>
         fuccess(f(simul))

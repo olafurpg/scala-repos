@@ -134,7 +134,7 @@ object PlayRun {
         maybeContinuous match {
           case Some(watched) =>
             // ~ run mode
-            interaction doWithoutEcho {
+            interaction.doWithoutEcho {
               twiddleRunMonitor(watched,
                                 state,
                                 devModeServer.buildLink,
@@ -166,9 +166,9 @@ object PlayRun {
     @tailrec def shouldTerminate: Boolean =
       (System.in.available > 0) && (isEOF(System.in.read()) || shouldTerminate)
 
-    val sourcesFinder = PathFinder { watched watchPaths state }
+    val sourcesFinder = PathFinder { watched.watchPaths(state) }
     val watchState =
-      ws.getOrElse(state get ContinuousState getOrElse WatchState.empty)
+      ws.getOrElse(state.get(ContinuousState).getOrElse(WatchState.empty))
 
     val (triggered, newWatchState, newState) = try {
       val (triggered, newWatchState) =

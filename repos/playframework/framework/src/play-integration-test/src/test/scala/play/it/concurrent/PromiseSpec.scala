@@ -9,7 +9,7 @@ import play.api.libs.concurrent.Promise
 
 class PromiseSpec extends PlaySpecification {
 
-  "Promise" can {
+  "Promise".can {
 
     "Redeemed values" in new WithApplication() {
       val p = Promise.timeout(42, 100)

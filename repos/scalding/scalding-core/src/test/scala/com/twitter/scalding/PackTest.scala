@@ -152,7 +152,7 @@ class PackTest extends WordSpec with Matchers {
       .source(Tsv("input"), inputData)
       .sink[(Int, Int)](Tsv("output")) { buf =>
         "correctly populate container objects" in {
-          buf should have size 3
+          (buf should have).size(3)
           buf.toSet shouldBe inputData.toSet
         }
       }
@@ -165,13 +165,13 @@ class PackTest extends WordSpec with Matchers {
       .source(Tsv("input"), inputData)
       .sink[(Int, Int)](Tsv("output")) { buf =>
         "correctly populate container objects" in {
-          buf should have size 3
+          (buf should have).size(3)
           buf.toSet shouldBe inputData.toSet
         }
       }
       .sink[(Int, Int)](Tsv("output-cc")) { buf =>
         "correctly populate container case class objects" in {
-          buf should have size 3
+          (buf should have).size(3)
           buf.toSet shouldBe inputData.toSet
         }
       }

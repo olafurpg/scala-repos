@@ -27,7 +27,7 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
                                            protocolFactory: TProtocolFactory)
     extends SimpleFilter[ThriftClientRequest, Array[Byte]] {
   private[this] val clientIdBuf =
-    clientId map { id =>
+    clientId.map { id =>
       Buf.Utf8(id.name)
     }
 
@@ -123,7 +123,7 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
       // Oneway requests don't contain replies, so they can't be traced.
       reply
     } else {
-      reply map { response =>
+      reply.map { response =>
         if (isUpgraded) {
           // Peel off the ResponseHeader.
           InputBuffer

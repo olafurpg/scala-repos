@@ -78,7 +78,7 @@ trait JsonOutput[T] extends ApiFormats with JsonMethods[T] {
             writeJson(transformResponseBody(jv), writer)
             ()
         }
-    }: RenderPipeline) orElse super.renderPipeline
+    }: RenderPipeline).orElse(super.renderPipeline)
 
   protected def writeJsonAsXml(json: JValue, writer: Writer) {
     if (json != JNothing)

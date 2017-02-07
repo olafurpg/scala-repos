@@ -84,7 +84,7 @@ trait ClusteringLibSpecs[M[+ _]]
       case SArray(arr) =>
         arr.collect({ case SDecimal(n) => n.toDouble }).toList
       case SObject(obj) =>
-        obj.toList.sortBy(_._1) flatMap { case (_, v) => getPoint(v) }
+        obj.toList.sortBy(_._1).flatMap { case (_, v) => getPoint(v) }
       case _ => sys.error("not supported")
     }
 
@@ -169,7 +169,7 @@ trait ClusteringLibSpecs[M[+ _]]
 
       result must haveSize(1)
 
-      val expected = resultNumbers collect { case (_, SDecimal(num)) => num }
+      val expected = resultNumbers.collect { case (_, SDecimal(num)) => num }
 
       result must haveAllElementsLike {
         case (ids, SObject(obj)) if ids.size == 0 =>
@@ -182,7 +182,7 @@ trait ClusteringLibSpecs[M[+ _]]
               }
 
               val actual =
-                clusterIds.map(clusterMap(_)) collect { case SDecimal(d) => d }
+                clusterIds.map(clusterMap(_)).collect { case SDecimal(d) => d }
               actual.toSet mustEqual expected
           }
       }
@@ -202,7 +202,7 @@ trait ClusteringLibSpecs[M[+ _]]
 
       result must haveSize(1)
 
-      val expected = resultData collect { case (_, SObject(obj)) => obj }
+      val expected = resultData.collect { case (_, SObject(obj)) => obj }
 
       result must haveAllElementsLike {
         case (ids, SObject(obj)) if ids.size == 0 =>
@@ -215,7 +215,7 @@ trait ClusteringLibSpecs[M[+ _]]
               }
 
               val actual =
-                clusterIds.map(clusterMap(_)) collect {
+                clusterIds.map(clusterMap(_)).collect {
                   case SObject(obj) => obj
                 }
               actual.toSet mustEqual expected
@@ -232,11 +232,11 @@ trait ClusteringLibSpecs[M[+ _]]
       val GeneratedPointSet(pointsB, centersB) = genPoints(5000, dimensionB, k)
 
       val jvalsA =
-        pointsToJson(pointsA) map { v =>
+        pointsToJson(pointsA).map { v =>
           RObject(Map("a" -> v))
         }
       val jvalsB =
-        pointsToJson(pointsB) map { v =>
+        pointsToJson(pointsB).map { v =>
           RObject(Map("b" -> v))
         }
       val jvals = Random.shuffle(jvalsA ++ jvalsB)
@@ -285,7 +285,7 @@ trait ClusteringLibSpecs[M[+ _]]
       val GeneratedPointSet(pointsA, centersA) = genPoints(5000, dimension, k)
 
       val points =
-        pointsA.zipWithIndex map {
+        pointsA.zipWithIndex.map {
           case (p, i) if i % 3 == 2 => p ++ Array.fill(3)(Random.nextDouble)
           case (p, _) => p
         }
@@ -366,13 +366,13 @@ trait ClusteringLibSpecs[M[+ _]]
 
     model("clusterCenter") must beLike {
       case SArray(arr0) =>
-        val arr = arr0 collect { case SDecimal(d) => d }
+        val arr = arr0.collect { case SDecimal(d) => d }
 
         val rvalue = clusterMap((model("clusterId"): @unchecked) match {
           case SString(s) => s
         })
         val res = (rvalue: @unchecked) match {
-          case RArray(values) => values collect { case CNum(x) => x }
+          case RArray(values) => values.collect { case CNum(x) => x }
         }
 
         arr must_== res
@@ -450,15 +450,15 @@ trait ClusteringLibSpecs[M[+ _]]
             case (ids, SObject(obj)) =>
               ids.length mustEqual 2
 
-              (obj.keySet mustEqual Set("point", "model1")) or
-                (obj.keySet mustEqual Set("point", "model1", "model2"))
+              ((obj.keySet mustEqual Set("point", "model1")))
+                .or(obj.keySet mustEqual Set("point", "model1", "model2"))
 
               val point = obj("point")
 
               point must beLike {
                 case SArray(arr) =>
-                  (arr must haveSize(dimensionA)) or
-                    (arr must haveSize(dimensionB))
+                  ((arr must haveSize(dimensionA)))
+                    .or(arr must haveSize(dimensionB))
               }
 
               obj("model1") must beLike {
@@ -490,7 +490,7 @@ trait ClusteringLibSpecs[M[+ _]]
       val GeneratedPointSet(points0, centers) = genPoints(size, dimension, k)
 
       val points =
-        points0.zipWithIndex map {
+        points0.zipWithIndex.map {
           case (p, i) if i % 3 == 2 => p ++ Array.fill(3)(Random.nextDouble)
           case (p, _) => p
         }
@@ -539,7 +539,7 @@ trait ClusteringLibSpecs[M[+ _]]
       result0 must haveSize(7)
 
       val result =
-        result0 collect { case (ids, value) if ids.size == 2 => value }
+        result0.collect { case (ids, value) if ids.size == 2 => value }
 
       result mustEqual Set(
         SObject(

@@ -145,7 +145,7 @@ trait SchemasSpec[M[+ _]]
         """{ "a": {} }""",
         """{ "a": [ 1, "a", true ] }""",
         """{ "a": { "b": { "c": 3 } } }"""
-      ) map (JParser.parseUnsafe(_))
+      ).map(JParser.parseUnsafe(_))
 
     val table = fromSample(SampleData(data), Some(10))
     table.schemas.copoint must_== expected

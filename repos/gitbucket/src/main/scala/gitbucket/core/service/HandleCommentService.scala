@@ -67,13 +67,13 @@ trait HandleCommentService {
         }
 
         // record comment activity if comment is entered
-        content foreach {
+        content.foreach {
           (if (issue.isPullRequest) recordCommentPullRequestActivity _
            else recordCommentIssueActivity _)
           (owner, name, userName, issue.issueId, _)
         }
-        recordActivity foreach
-          (_(owner, name, userName, issue.issueId, issue.title))
+        recordActivity.foreach(
+          _(owner, name, userName, issue.issueId, issue.title))
 
         // extract references and create refer comment
         content.map { content =>
@@ -118,14 +118,14 @@ trait HandleCommentService {
         // notifications
         Notifier() match {
           case f =>
-            content foreach {
+            content.foreach {
               f.toNotify(repository, issue, _) {
                 Notifier.msgComment(
                   s"${context.baseUrl}/${owner}/${name}/${if (issue.isPullRequest) "pull"
                   else "issues"}/${issue.issueId}#comment-${commentId.get}")
               }
             }
-            action foreach {
+            action.foreach {
               f.toNotify(repository, issue, _) {
                 Notifier.msgStatus(
                   s"${context.baseUrl}/${owner}/${name}/issues/${issue.issueId}")

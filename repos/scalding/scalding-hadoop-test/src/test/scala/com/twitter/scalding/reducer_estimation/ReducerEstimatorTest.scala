@@ -105,7 +105,7 @@ class ReducerEstimatorTest
       HadoopPlatformJobTest(new SimpleJob(_, customConfig), cluster).inspectCompletedFlow {
         flow =>
           val steps = flow.getFlowSteps.asScala
-          steps should have size 1
+          (steps should have).size(1)
 
           val conf = Config.fromHadoop(steps.head.getConfig)
           conf.getNumReducers should contain(2)
@@ -121,7 +121,7 @@ class ReducerEstimatorTest
       HadoopPlatformJobTest(new SimpleJob(_, customConfig), cluster).inspectCompletedFlow {
         flow =>
           val steps = flow.getFlowSteps.asScala
-          steps should have size 1
+          (steps should have).size(1)
 
           val conf = Config.fromHadoop(steps.head.getConfig)
           conf.getNumReducers should contain(3)
@@ -138,7 +138,7 @@ class ReducerEstimatorTest
       HadoopPlatformJobTest(new GroupAllJob(_, customConfig), cluster).inspectCompletedFlow {
         flow =>
           val steps = flow.getFlowSteps.asScala
-          steps should have size 1
+          (steps should have).size(1)
 
           val conf = Config.fromHadoop(steps.head.getConfig)
           conf.getNumReducers should contain(1)
@@ -173,7 +173,7 @@ class ReducerEstimatorTest
       HadoopPlatformJobTest(new SimpleMapOnlyJob(_, customConfig), cluster).inspectCompletedFlow {
         flow =>
           val steps = flow.getFlowSteps.asScala
-          steps should have size 1
+          (steps should have).size(1)
 
           val conf = Config.fromHadoop(steps.head.getConfig)
           val numReducers = conf.getNumReducers

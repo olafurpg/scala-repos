@@ -70,7 +70,7 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
            s.substring(0, indexAfterTarget) + " " +
              s.substring(indexAfterTarget + defaultPrefix.length + 1);
          (pathToPoint(SourceFileInfo(info.file, Some(patched), None),
-                      indexAfterTarget - 1) map {
+                      indexAfterTarget - 1).map {
            case (info: CompilationInfo, path: TreePath) => {
              memberCandidates(info,
                               path.getLeaf,
@@ -80,7 +80,7 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
            }
          })
        } else if (ImportRegexp.findFirstMatchIn(preceding).isDefined) {
-         (pathToPoint(info, indexAfterTarget) flatMap {
+         (pathToPoint(info, indexAfterTarget).flatMap {
            case (info: CompilationInfo, path: TreePath) => {
              getEnclosingMemberSelectTree(path).map { m =>
                packageMemberCandidates(info, m, defaultPrefix, caseSens)
@@ -94,7 +94,7 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
            s.substring(0, indexAfterTarget) + ".wait()" +
              s.substring(indexAfterTarget + defaultPrefix.length + 1);
          (pathToPoint(SourceFileInfo(info.file, Some(patched), None),
-                      indexAfterTarget + 1) flatMap {
+                      indexAfterTarget + 1).flatMap {
            case (info: CompilationInfo, path: TreePath) => {
              getEnclosingMemberSelectTree(path).map { m =>
                memberCandidates(info,
@@ -114,21 +114,23 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
                fetchTypeSearchCompletions(defaultPrefix, maxResults, indexer))
            } else None
 
-         (scopeForPoint(info, indexAfterTarget) map {
-           case (info: CompilationInfo, s: Scope) => {
-             scopeMemberCandidates(info,
-                                   s,
-                                   defaultPrefix,
-                                   caseSens,
-                                   constructing)
+         (scopeForPoint(info, indexAfterTarget)
+           .map {
+             case (info: CompilationInfo, s: Scope) => {
+               scopeMemberCandidates(info,
+                                     s,
+                                     defaultPrefix,
+                                     caseSens,
+                                     constructing)
+             }
+           })
+           .map { scopeCandidates =>
+             val typeSearchResult =
+               typeSearch
+                 .flatMap(Await.result(_, Duration.Inf))
+                 .getOrElse(List())
+             scopeCandidates ++ typeSearchResult
            }
-         }) map { scopeCandidates =>
-           val typeSearchResult =
-             typeSearch
-               .flatMap(Await.result(_, Duration.Inf))
-               .getOrElse(List())
-           scopeCandidates ++ typeSearchResult
-         }
        }).getOrElse(List())
     CompletionInfoList(
       defaultPrefix,
@@ -169,12 +171,13 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
       caseSense: Boolean
   ): List[CompletionInfo] = {
     val pkg = selectedPackageName(select)
-    val candidates = (Option(info.getElements.getPackageElement(pkg)) map {
-      p: PackageElement =>
+    val candidates = (Option(info.getElements.getPackageElement(pkg))
+      .map { p: PackageElement =>
         p.getEnclosedElements().flatMap { e =>
           filterElement(info, e, prefix, caseSense, true, false)
         }
-    }).getOrElse(List())
+      })
+      .getOrElse(List())
     candidates.toList
   }
 

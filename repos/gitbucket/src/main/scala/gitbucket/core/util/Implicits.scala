@@ -63,7 +63,7 @@ object Implicits {
       sb.toString
     }
 
-    def toIntOpt: Option[Int] = catching(classOf[NumberFormatException]) opt {
+    def toIntOpt: Option[Int] = catching(classOf[NumberFormatException]).opt {
       Integer.parseInt(value)
     }
   }

@@ -33,12 +33,12 @@ trait Uncompilable {
 
   def docSymbol(p: DocParser.Parsed) =
     p.nameChain.foldLeft(RootClass: Symbol)(_.tpe member _)
-  def docDefs(code: String) = new DocParser(settings, reporter) docDefs code
+  def docDefs(code: String) = new DocParser(settings, reporter).docDefs(code)
   def docPairs(code: String) =
-    docDefs(code) map (p => (docSymbol(p), new DocComment(p.raw)))
+    docDefs(code).map(p => (docSymbol(p), new DocComment(p.raw)))
 
   lazy val pairs =
-    files flatMap { f =>
+    files.flatMap { f =>
       val comments = docPairs(f.slurp())
       if (settings.verbose)
         inform(
@@ -48,12 +48,13 @@ trait Uncompilable {
       comments
     }
   def files = settings.uncompilableFiles
-  def symbols = pairs map (_._1)
+  def symbols = pairs.map(_._1)
   def templates =
-    symbols filter
-      (x =>
-         x.isClass || x.isTrait ||
-           x == AnyRefClass /* which is now a type alias */ ) toSet
+    symbols
+      .filter(
+        x =>
+          x.isClass || x.isTrait ||
+          x == AnyRefClass /* which is now a type alias */ ) toSet
   def comments = {
     if (settings.debug || settings.verbose)
       inform(
@@ -67,6 +68,7 @@ trait Uncompilable {
   }
   override def toString =
     pairs.size + " uncompilable symbols:\n" +
-      (symbols filterNot (_ == NoSymbol) map
-        (x => "  " + x.owner.fullName + " " + x.defString) mkString "\n")
+      (symbols
+        .filterNot(_ == NoSymbol)
+        .map(x => "  " + x.owner.fullName + " " + x.defString) mkString "\n")
 }

@@ -328,7 +328,7 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
           actor.self + " processing system message " + msg + " with " +
             actor.childrenRefs)
       // we know here that systemInvoke ensures that only "fatal" exceptions get rethrown
-      actor systemInvoke msg
+      actor.systemInvoke(msg)
       if (Thread.interrupted())
         interruption = new InterruptedException(
           "Interrupted while processing system messages")
@@ -579,7 +579,7 @@ trait UnboundedMessageQueueSemantics
 trait UnboundedQueueBasedMessageQueue
     extends QueueBasedMessageQueue
     with UnboundedMessageQueueSemantics {
-  def enqueue(receiver: ActorRef, handle: Envelope): Unit = queue add handle
+  def enqueue(receiver: ActorRef, handle: Envelope): Unit = queue.add(handle)
   def dequeue(): Envelope = queue.poll()
 }
 
@@ -614,7 +614,7 @@ trait BoundedQueueBasedMessageQueue
           .deadLetters
           .tell(DeadLetter(handle.message, handle.sender, receiver),
                 handle.sender)
-    } else queue put handle
+    } else queue.put(handle)
 
   def dequeue(): Envelope = queue.poll()
 }
@@ -647,9 +647,9 @@ trait DequeBasedMessageQueue
 trait UnboundedDequeBasedMessageQueue
     extends DequeBasedMessageQueue
     with UnboundedDequeBasedMessageQueueSemantics {
-  def enqueue(receiver: ActorRef, handle: Envelope): Unit = queue add handle
+  def enqueue(receiver: ActorRef, handle: Envelope): Unit = queue.add(handle)
   def enqueueFirst(receiver: ActorRef, handle: Envelope): Unit =
-    queue addFirst handle
+    queue.addFirst(handle)
   def dequeue(): Envelope = queue.poll()
 }
 
@@ -672,7 +672,7 @@ trait BoundedDequeBasedMessageQueue
           .deadLetters
           .tell(DeadLetter(handle.message, handle.sender, receiver),
                 handle.sender)
-    } else queue put handle
+    } else queue.put(handle)
 
   def enqueueFirst(receiver: ActorRef, handle: Envelope): Unit =
     if (pushTimeOut.length >= 0) {
@@ -683,7 +683,7 @@ trait BoundedDequeBasedMessageQueue
           .deadLetters
           .tell(DeadLetter(handle.message, handle.sender, receiver),
                 handle.sender)
-    } else queue putFirst handle
+    } else queue.putFirst(handle)
 
   def dequeue(): Envelope = queue.poll()
 }
@@ -986,8 +986,8 @@ trait ControlAwareMessageQueueSemantics extends QueueBasedMessageQueue {
   def queue: Queue[Envelope]
 
   def enqueue(receiver: ActorRef, handle: Envelope): Unit = handle match {
-    case envelope @ Envelope(_: ControlMessage, _) ⇒ controlQueue add envelope
-    case envelope ⇒ queue add envelope
+    case envelope @ Envelope(_: ControlMessage, _) ⇒ controlQueue.add(envelope)
+    case envelope ⇒ queue.add(envelope)
   }
 
   def dequeue(): Envelope = {

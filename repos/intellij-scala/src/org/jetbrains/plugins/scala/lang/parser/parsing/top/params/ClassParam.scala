@@ -40,7 +40,7 @@ object ClassParam {
         builder.advanceLexer() //Let's ate this!
       case _ =>
         if (isModifier) {
-          builder error ScalaBundle.message("val.var.expected")
+          builder.error(ScalaBundle.message("val.var.expected"))
         }
     }
     //Look for identifier
@@ -67,7 +67,7 @@ object ClassParam {
       case ScalaTokenTypes.tASSIGN =>
         builder.advanceLexer() //Ate '='
         if (!Expr.parse(builder)) {
-          builder error ScalaBundle.message("wrong.expression")
+          builder.error(ScalaBundle.message("wrong.expression"))
         }
       case _ =>
     }

@@ -124,11 +124,11 @@ final class StringClientIntegrationSuite extends RedisClientTest {
     withRedisClient { client =>
       Await.result(client.pSetEx(foo, 10000L, bar))
       assert(Await.result(client.get(foo)) == Some(bar))
-      assert(Await.result(client.ttl(foo)) forall (_ <= 10L))
+      assert(Await.result(client.ttl(foo)).forall(_ <= 10L))
 
       Await.result(client.setEx(bar, 10L, foo))
       assert(Await.result(client.get(bar)) == Some(foo))
-      assert(Await.result(client.ttl(bar)) forall (_ <= 10L))
+      assert(Await.result(client.ttl(bar)).forall(_ <= 10L))
 
       assert(Await.result(client.setNx(baz, foo)) == true)
       assert(Await.result(client.setNx(baz, bar)) == false)
@@ -143,12 +143,12 @@ final class StringClientIntegrationSuite extends RedisClientTest {
     withRedisClient { client =>
       assert(Await.result(client.setExNx(foo, 10L, bar)) == true)
       assert(Await.result(client.get(foo)) == Some(bar))
-      assert(Await.result(client.ttl(foo)) forall (_ <= 10L))
+      assert(Await.result(client.ttl(foo)).forall(_ <= 10L))
       assert(Await.result(client.setExNx(foo, 10L, baz)) == false)
 
       assert(Await.result(client.setPxNx(bar, 10000L, baz)) == true)
       assert(Await.result(client.get(bar)) == Some(baz))
-      assert(Await.result(client.ttl(bar)) forall (_ <= 10L))
+      assert(Await.result(client.ttl(bar)).forall(_ <= 10L))
       assert(Await.result(client.setPxNx(bar, 100L, bar)) == false)
 
       assert(Await.result(client.setXx(baz, foo)) == false)
@@ -160,17 +160,17 @@ final class StringClientIntegrationSuite extends RedisClientTest {
       Await.result(client.set(boo, foo))
       assert(Await.result(client.setExXx(boo, 10L, bar)) == true)
       assert(Await.result(client.get(boo)) == Some(bar))
-      assert(Await.result(client.ttl(boo)) forall (_ <= 10L))
+      assert(Await.result(client.ttl(boo)).forall(_ <= 10L))
 
       assert(Await.result(client.setPxXx(moo, 10000L, foo)) == false)
       Await.result(client.set(moo, foo))
       assert(Await.result(client.setPxXx(moo, 10000L, bar)) == true)
       assert(Await.result(client.get(moo)) == Some(bar))
-      assert(Await.result(client.ttl(moo)) forall (_ <= 10L))
+      assert(Await.result(client.ttl(moo)).forall(_ <= 10L))
 
       Await.result(client.setPx(num, 10000L, foo))
       assert(Await.result(client.get(num)) == Some(foo))
-      assert(Await.result(client.ttl(num)) forall (_ <= 10L))
+      assert(Await.result(client.ttl(num)).forall(_ <= 10L))
     }
   }
 

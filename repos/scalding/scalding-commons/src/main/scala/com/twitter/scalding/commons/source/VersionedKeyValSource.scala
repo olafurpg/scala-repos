@@ -150,10 +150,10 @@ class VersionedKeyValSource[K, V](val path: String,
   def resourceExists(mode: Mode): Boolean =
     mode match {
       case Test(buffers) => {
-        buffers(this) map { !_.isEmpty } getOrElse false
+        buffers(this).map { !_.isEmpty }.getOrElse(false)
       }
       case HadoopTest(conf, buffers) => {
-        buffers(this) map { !_.isEmpty } getOrElse false
+        buffers(this).map { !_.isEmpty }.getOrElse(false)
       }
       case _ => {
         val conf = new JobConf(mode.asInstanceOf[HadoopMode].jobConf)
@@ -166,10 +166,10 @@ class VersionedKeyValSource[K, V](val path: String,
       case Some(version) =>
         mode match {
           case Test(buffers) =>
-            buffers(this) map { !_.isEmpty } getOrElse false
+            buffers(this).map { !_.isEmpty }.getOrElse(false)
 
           case HadoopTest(conf, buffers) =>
-            buffers(this) map { !_.isEmpty } getOrElse false
+            buffers(this).map { !_.isEmpty }.getOrElse(false)
 
           case m: HadoopMode =>
             val conf = new JobConf(m.jobConf)

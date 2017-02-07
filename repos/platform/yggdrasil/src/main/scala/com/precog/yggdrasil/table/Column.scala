@@ -242,7 +242,7 @@ trait NumColumn extends Column with (Int => BigDecimal) {
   def apply(row: Int): BigDecimal
   def rowEq(row1: Int, row2: Int): Boolean = apply(row1) == apply(row2)
   def rowCompare(row1: Int, row2: Int): Int =
-    apply(row1) compare apply(row2)
+    apply(row1).compare(apply(row2))
 
   override val tpe = CNum
   override def jValue(row: Int) = JNum(this(row))
@@ -255,7 +255,7 @@ trait StrColumn extends Column with (Int => String) {
   def apply(row: Int): String
   def rowEq(row1: Int, row2: Int): Boolean = apply(row1) == apply(row2)
   def rowCompare(row1: Int, row2: Int): Int =
-    apply(row1) compareTo apply(row2)
+    apply(row1).compareTo(apply(row2))
 
   override val tpe = CString
   override def jValue(row: Int) = JString(this(row))
@@ -268,7 +268,7 @@ trait DateColumn extends Column with (Int => DateTime) {
   def apply(row: Int): DateTime
   def rowEq(row1: Int, row2: Int): Boolean = apply(row1) == apply(row2)
   def rowCompare(row1: Int, row2: Int): Int =
-    apply(row1) compareTo apply(row2)
+    apply(row1).compareTo(apply(row2))
 
   override val tpe = CDate
   override def jValue(row: Int) = JString(this(row).toString)
@@ -525,7 +525,7 @@ object Column {
 
   object unionRightSemigroup extends Semigroup[Column] {
     def append(c1: Column, c2: => Column): Column = {
-      cf.util.UnionRight(c1, c2) getOrElse {
+      cf.util.UnionRight(c1, c2).getOrElse {
         sys.error(
           "Illgal attempt to merge columns of dissimilar type: " +
             c1.tpe + "," + c2.tpe)

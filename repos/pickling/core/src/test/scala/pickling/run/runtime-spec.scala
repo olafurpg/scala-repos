@@ -33,35 +33,35 @@ object RuntimeJsonSpec extends Properties("runtime-json") {
     obj.asInstanceOf[G].a.mkString(",") == up.asInstanceOf[G].a.mkString(",")
   }
 
-  property("Int") = Prop forAll { (i: Int) =>
+  property("Int") = Prop.forAll { (i: Int) =>
     roundTrip(i)
   }
 
-  property("Double") = Prop forAll { (d: Double) =>
+  property("Double") = Prop.forAll { (d: Double) =>
     roundTrip(d)
   }
 
-  property("Long") = Prop forAll { (l: Long) =>
+  property("Long") = Prop.forAll { (l: Long) =>
     roundTrip(l)
   }
 
-  property("Char") = Prop forAll { (c: Char) =>
+  property("Char") = Prop.forAll { (c: Char) =>
     roundTrip(c)
   }
 
-  property("Float") = Prop forAll { (f: Float) =>
+  property("Float") = Prop.forAll { (f: Float) =>
     roundTrip(f)
   }
 
-  property("Boolean") = Prop forAll { (b: Boolean) =>
+  property("Boolean") = Prop.forAll { (b: Boolean) =>
     roundTrip(b)
   }
 
-  property("Short") = Prop forAll { (s: Short) =>
+  property("Short") = Prop.forAll { (s: Short) =>
     roundTrip(s)
   }
 
-  property("Byte") = Prop forAll { (b: Byte) =>
+  property("Byte") = Prop.forAll { (b: Byte) =>
     roundTrip(b)
   }
 
@@ -70,31 +70,31 @@ object RuntimeJsonSpec extends Properties("runtime-json") {
   //   roundTrip(u)
   // }
 
-  property("(Int, String)") = Prop forAll { (p: (Int, String)) =>
+  property("(Int, String)") = Prop.forAll { (p: (Int, String)) =>
     roundTrip(p)
   }
 
-  property("C") = Prop forAll { (i: Int) =>
+  property("C") = Prop.forAll { (i: Int) =>
     roundTrip(C(i))
   }
 
-  property("D") = Prop forAll { (p: (Int, Double)) =>
+  property("D") = Prop.forAll { (p: (Int, Double)) =>
     roundTrip(D(p._1, p._2))
   }
 
-  property("E") = Prop forAll { (p: (Int, String)) =>
+  property("E") = Prop.forAll { (p: (Int, String)) =>
     roundTrip(E(p._1, p._2))
   }
 
-  property("F") = Prop forAll { (p: (Int, Int)) =>
+  property("F") = Prop.forAll { (p: (Int, Int)) =>
     roundTrip(F(p._1, C(p._2)))
   }
 
-  property("G") = Prop forAll { (arr: Array[Int]) =>
+  property("G") = Prop.forAll { (arr: Array[Int]) =>
     roundTripG(G(arr))
   }
 
-  property("(Int, Array[Double])") = Prop forAll { (t: (Int, Array[Double])) =>
+  property("(Int, Array[Double])") = Prop.forAll { (t: (Int, Array[Double])) =>
     val obj: Any = t
     val p = obj.pickle
     val up = p.unpickle[Any]
@@ -126,35 +126,35 @@ object RuntimeBinarySpec extends Properties("runtime-binary") {
     obj.asInstanceOf[G].a.mkString(",") == up.asInstanceOf[G].a.mkString(",")
   }
 
-  property("Int") = Prop forAll { (i: Int) =>
+  property("Int") = Prop.forAll { (i: Int) =>
     roundTrip(i)
   }
 
-  property("Double") = Prop forAll { (d: Double) =>
+  property("Double") = Prop.forAll { (d: Double) =>
     roundTrip(d)
   }
 
-  property("Long") = Prop forAll { (l: Long) =>
+  property("Long") = Prop.forAll { (l: Long) =>
     roundTrip(l)
   }
 
-  property("Char") = Prop forAll { (c: Char) =>
+  property("Char") = Prop.forAll { (c: Char) =>
     roundTrip(c)
   }
 
-  property("Float") = Prop forAll { (f: Float) =>
+  property("Float") = Prop.forAll { (f: Float) =>
     roundTrip(f)
   }
 
-  property("Boolean") = Prop forAll { (b: Boolean) =>
+  property("Boolean") = Prop.forAll { (b: Boolean) =>
     roundTrip(b)
   }
 
-  property("Short") = Prop forAll { (s: Short) =>
+  property("Short") = Prop.forAll { (s: Short) =>
     roundTrip(s)
   }
 
-  property("Byte") = Prop forAll { (b: Byte) =>
+  property("Byte") = Prop.forAll { (b: Byte) =>
     roundTrip(b)
   }
 
@@ -163,31 +163,31 @@ object RuntimeBinarySpec extends Properties("runtime-binary") {
   //   roundTrip(u)
   // }
 
-  property("(Int, String)") = Prop forAll { (p: (Int, String)) =>
+  property("(Int, String)") = Prop.forAll { (p: (Int, String)) =>
     roundTrip(p)
   }
 
-  property("C") = Prop forAll { (i: Int) =>
+  property("C") = Prop.forAll { (i: Int) =>
     roundTrip(C(i))
   }
 
-  property("D") = Prop forAll { (p: (Int, Double)) =>
+  property("D") = Prop.forAll { (p: (Int, Double)) =>
     roundTrip(D(p._1, p._2))
   }
 
-  property("E") = Prop forAll { (p: (Int, String)) =>
+  property("E") = Prop.forAll { (p: (Int, String)) =>
     roundTrip(E(p._1, p._2))
   }
 
-  property("F") = Prop forAll { (p: (Int, Int)) =>
+  property("F") = Prop.forAll { (p: (Int, Int)) =>
     roundTrip(F(p._1, C(p._2)))
   }
 
-  property("G") = Prop forAll { (arr: Array[Int]) =>
+  property("G") = Prop.forAll { (arr: Array[Int]) =>
     roundTripG(G(arr))
   }
 
-  property("(Int, Array[Double])") = Prop forAll { (t: (Int, Array[Double])) =>
+  property("(Int, Array[Double])") = Prop.forAll { (t: (Int, Array[Double])) =>
     val obj: Any = t
     val p = obj.pickle
     val up = p.unpickle[Any]

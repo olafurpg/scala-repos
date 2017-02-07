@@ -39,11 +39,11 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     for ((f, i) <- fs.zipWithIndex) {
-      xs foreach (x => println(s"f${i + 1}($x) == ${f(x)}"))
+      xs.foreach(x => println(s"f${i + 1}($x) == ${f(x)}"))
       println("")
     }
     for ((f, i) <- fseqs.zipWithIndex) {
-      xs foreach (x => println(s"f${i + 1}seq($x) == ${f(x)}"))
+      xs.foreach(x => println(s"f${i + 1}seq($x) == ${f(x)}"))
       println("")
     }
   }

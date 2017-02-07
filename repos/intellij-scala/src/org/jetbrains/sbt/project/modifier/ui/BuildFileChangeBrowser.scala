@@ -35,7 +35,7 @@ class BuildFileChangeBrowser(
   override def afterDiffRefresh() {
     val updatedChanges = new java.util.ArrayList[Change]
     updatedChanges.addAll(
-      getSelectedChanges map { myChange =>
+      getSelectedChanges.map { myChange =>
         {
           val changeSwapped =
             BuildFileChange.swap(myChange.asInstanceOf[BuildFileChange])

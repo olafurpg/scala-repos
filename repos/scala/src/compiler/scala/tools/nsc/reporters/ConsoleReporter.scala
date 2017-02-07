@@ -79,7 +79,7 @@ class ConsoleReporter(val settings: Settings,
       val response = reader.read().asInstanceOf[Char].toLower
       if (response == 'a' || response == 's') {
         (new Exception).printStackTrace()
-        if (response == 'a') sys exit 1
+        if (response == 'a') sys.exit(1)
 
         writer.print("\n")
         writer.flush()

@@ -79,30 +79,31 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
         val perfsW = mkPerfs(ratingsW, white.perfs, game)
         val perfsB = mkPerfs(ratingsB, black.perfs, game)
         def intRatingLens(perfs: Perfs) = mainPerf(perfs).glicko.intRating
-        resetGameRatings.fold(
-          GameRepo.setRatingAndDiffs(
-            game.id,
-            intRatingLens(white.perfs) ->
-              (intRatingLens(perfsW) -
-                intRatingLens(white.perfs)),
-            intRatingLens(black.perfs) ->
-              (intRatingLens(perfsB) -
-                intRatingLens(black.perfs))
-          ),
-          GameRepo.setRatingDiffs(game.id,
-                                  intRatingLens(perfsW) -
-                                    intRatingLens(white.perfs),
-                                  intRatingLens(perfsB) -
-                                    intRatingLens(black.perfs))
-        ) zip UserRepo.setPerfs(white, perfsW, white.perfs) zip UserRepo
-          .setPerfs(black, perfsB, black.perfs) zip historyApi.add(
-          white,
-          game,
-          perfsW) zip historyApi.add(black, game, perfsB) zip rankingApi
-          .save(white.id, game.perfType, perfsW) zip rankingApi.save(
-          black.id,
-          game.perfType,
-          perfsB)
+        resetGameRatings
+          .fold(
+            GameRepo.setRatingAndDiffs(
+              game.id,
+              intRatingLens(white.perfs) ->
+                (intRatingLens(perfsW) -
+                  intRatingLens(white.perfs)),
+              intRatingLens(black.perfs) ->
+                (intRatingLens(perfsB) -
+                  intRatingLens(black.perfs))
+            ),
+            GameRepo.setRatingDiffs(game.id,
+                                    intRatingLens(perfsW) -
+                                      intRatingLens(white.perfs),
+                                    intRatingLens(perfsB) -
+                                      intRatingLens(black.perfs))
+          )
+          .zip(UserRepo.setPerfs(white, perfsW, white.perfs))
+          .zip(UserRepo
+            .setPerfs(black, perfsB, black.perfs))
+          .zip(historyApi.add(white, game, perfsW))
+          .zip(historyApi.add(black, game, perfsB))
+          .zip(rankingApi
+            .save(white.id, game.perfType, perfsW))
+          .zip(rankingApi.save(black.id, game.perfType, perfsB))
       }.void
     }
 

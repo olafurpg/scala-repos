@@ -52,7 +52,7 @@ trait Task[R, +Tp] {
       tryBreakable {
         leaf(lastres)
         result = result // ensure that effects of `leaf` are visible to readers of `result`
-      } catchBreak {
+      }.catchBreak {
         signalAbort()
       }
     } catch {
@@ -498,21 +498,23 @@ private[parallel] final class FutureTasks(executor: ExecutionContext)
         val subtasks = task.split
         val subfutures = for (subtask <- subtasks.iterator)
           yield compute(subtask, depth + 1)
-        subfutures.reduceLeft { (firstFuture, nextFuture) =>
-          for {
-            firstTask <- firstFuture
-            nextTask <- nextFuture
-          } yield {
-            firstTask tryMerge nextTask.repr
-            firstTask
+        subfutures
+          .reduceLeft { (firstFuture, nextFuture) =>
+            for {
+              firstTask <- firstFuture
+              nextTask <- nextFuture
+            } yield {
+              firstTask.tryMerge(nextTask.repr)
+              firstTask
+            }
           }
-        } andThen {
-          case Success(firstTask) =>
-            task.throwable = firstTask.throwable
-            task.result = firstTask.result
-          case Failure(exception) =>
-            task.throwable = exception
-        }
+          .andThen {
+            case Success(firstTask) =>
+              task.throwable = firstTask.throwable
+              task.result = firstTask.result
+            case Failure(exception) =>
+              task.throwable = exception
+          }
       } else
         Future {
           task.tryLeaf(None)
@@ -520,7 +522,7 @@ private[parallel] final class FutureTasks(executor: ExecutionContext)
         }
     }
 
-    compute(topLevelTask, 0) map { t =>
+    compute(topLevelTask, 0).map { t =>
       t.forwardThrowable()
       t.result
     }
@@ -570,10 +572,10 @@ trait ExecutionContextTasks extends Tasks {
     case _ => new FutureTasks(environment)
   }
 
-  def execute[R, Tp](task: Task[R, Tp]): () => R = driver execute task
+  def execute[R, Tp](task: Task[R, Tp]): () => R = driver.execute(task)
 
   def executeAndWaitResult[R, Tp](task: Task[R, Tp]): R =
-    driver executeAndWaitResult task
+    driver.executeAndWaitResult(task)
 
   def parallelismLevel = driver.parallelismLevel
 }

@@ -26,7 +26,7 @@ object Api extends LilaController {
         "app" -> Json.obj(
           "current" -> app.currentVersion
         )
-      )) as JSON
+      )).as(JSON)
   }
 
   def user(name: String) = ApiResult { implicit ctx =>
@@ -46,27 +46,29 @@ object Api extends LilaController {
   }
 
   def userGames(name: String) = ApiResult { implicit ctx =>
-    lila.user.UserRepo named name flatMap {
+    lila.user.UserRepo.named(name).flatMap {
       _ ?? { user =>
-        gameApi.byUser(
-          user = user,
-          rated = getBoolOpt("rated"),
-          analysed = getBoolOpt("analysed"),
-          withAnalysis = getBool("with_analysis"),
-          withMoves = getBool("with_moves"),
-          withOpening = getBool("with_opening"),
-          withMoveTimes = getBool("with_movetimes"),
-          token = get("token"),
-          nb = getInt("nb"),
-          page = getInt("page")
-        ) map (_.some)
+        gameApi
+          .byUser(
+            user = user,
+            rated = getBoolOpt("rated"),
+            analysed = getBoolOpt("analysed"),
+            withAnalysis = getBool("with_analysis"),
+            withMoves = getBool("with_moves"),
+            withOpening = getBool("with_opening"),
+            withMoveTimes = getBool("with_movetimes"),
+            token = get("token"),
+            nb = getInt("nb"),
+            page = getInt("page")
+          )
+          .map(_.some)
       }
     }
   }
 
   def game(id: String) = ApiResult { implicit ctx =>
     gameApi.one(
-      id = id take lila.game.Game.gameIdSize,
+      id = id.take(lila.game.Game.gameIdSize),
       withAnalysis = getBool("with_analysis"),
       withMoves = getBool("with_moves"),
       withOpening = getBool("with_opening"),
@@ -78,12 +80,12 @@ object Api extends LilaController {
 
   private def ApiResult(js: lila.api.Context => Fu[Option[JsValue]]) = Open {
     implicit ctx =>
-      js(ctx) map {
+      js(ctx).map {
         case None => NotFound
         case Some(json) =>
           get("callback") match {
-            case None => Ok(json) as JSON
-            case Some(callback) => Ok(s"$callback($json)") as JAVASCRIPT
+            case None => Ok(json).as(JSON)
+            case Some(callback) => Ok(s"$callback($json)").as(JAVASCRIPT)
           }
       }
   }

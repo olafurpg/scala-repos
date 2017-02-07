@@ -218,7 +218,7 @@ class EndToEndTest extends FunSuite with StringClient with StringServer {
       .build()
 
     val responses = new Array[Future[String]](5)
-    0 until 5 foreach { i =>
+    (0 until 5).foreach { i =>
       responses(i) = client(i.toString)
       assert(!responses(i).isDefined)
     }
@@ -229,7 +229,7 @@ class EndToEndTest extends FunSuite with StringClient with StringServer {
     }
 
     cluster.ready.map { _ =>
-      0 until 5 foreach { i =>
+      (0 until 5).foreach { i =>
         assert(Await.result(responses(i), 1.second) == i.toString)
       }
     }

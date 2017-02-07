@@ -130,7 +130,7 @@ abstract class MongoAccountManager(
 
         database(
           insert(account0.serialize.asInstanceOf[JObject])
-            .into(settings.accounts)) map { _ =>
+            .into(settings.accounts)).map { _ =>
           account0
         }
       }
@@ -141,7 +141,7 @@ abstract class MongoAccountManager(
                                  keyValue: String,
                                  collection: String)(
       implicit extractor: Extractor[A]): Future[Option[A]] = {
-    database(selectOne().from(collection).where(keyName === keyValue)) map {
+    database(selectOne().from(collection).where(keyName === keyValue)).map {
       _.map(_.deserialize(extractor))
     }
   }
@@ -150,14 +150,14 @@ abstract class MongoAccountManager(
       keyName: String,
       keyValue: String,
       collection: String)(implicit extractor: Extractor[A]): Future[Set[A]] = {
-    database(selectAll.from(collection).where(keyName === keyValue)) map {
+    database(selectAll.from(collection).where(keyName === keyValue)).map {
       _.map(_.deserialize(extractor)).toSet
     }
   }
 
   private def findAll[A](collection: String)(
       implicit extract: Extractor[A]): Future[Seq[A]] =
-    database(selectAll.from(collection)) map {
+    database(selectAll.from(collection)).map {
       _.map(_.deserialize(extract)).toSeq
     }
 
@@ -186,7 +186,7 @@ abstract class MongoAccountManager(
     logger.debug("Marking reset token %s as used".format(tokenId))
     database(
       update(settings.resetTokens)
-        .set("usedAt" set (new DateTime).serialize)
+        .set("usedAt".set(new DateTime).serialize)
         .where("tokenId" === tokenId)).map { _ =>
       logger.debug("Reset token %s marked as used".format(tokenId)); PrecogUnit
     }
@@ -214,7 +214,7 @@ abstract class MongoAccountManager(
           update(settings.accounts)
             .set(updateObj)
             .where("accountId" === account.accountId)
-        } map { _ =>
+        }.map { _ =>
           true
         }
 

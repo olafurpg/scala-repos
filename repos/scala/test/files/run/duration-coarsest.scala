@@ -11,7 +11,7 @@ object Test extends App {
     (48 hours, 2 days),
     (5 seconds, 5 seconds),
     (1 second, 1 second)
-  ) foreach {
+  ).foreach {
     case (x, expected) =>
       val actual = x.toCoarsest
       assert(actual.unit == expected.unit, s"$actual, $expected")
@@ -24,7 +24,7 @@ object Test extends App {
     1500 millis,
     23 hours,
     40 days
-  ) foreach (x => assert(x == x.toCoarsest, x))
+  ).foreach(x => assert(x == x.toCoarsest, x))
 
   // toCoarsest on a FiniteDuration should return a FiniteDuration
   val finite: FiniteDuration = 1.second.toCoarsest

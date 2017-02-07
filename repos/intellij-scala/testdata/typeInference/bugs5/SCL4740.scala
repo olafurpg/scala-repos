@@ -26,7 +26,7 @@ object PhoneCode {
         (word: String) =>
           word.map(mappingReversed).mkString
       }
-      dictEntries.toArray.groupBy(cleanString andThen wordToDigits)
+      dictEntries.toArray.groupBy(cleanString.andThen(wordToDigits))
     }
     //i love to create classes nested inside methods just before i need them :) (6 lines)
     case class Step(translated: String, remaining: String, original: String) {

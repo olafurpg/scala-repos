@@ -33,7 +33,7 @@ object MaskCancelFilter {
         "Prevent cancellations from propagating to other services"
       def make(_param: Param, next: ServiceFactory[Req, Rep]) = {
         _param match {
-          case Param(true) => new MaskCancelFilter[Req, Rep] andThen next
+          case Param(true) => new MaskCancelFilter[Req, Rep].andThen(next)
           case _ => next
         }
       }

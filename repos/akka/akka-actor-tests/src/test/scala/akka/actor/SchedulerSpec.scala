@@ -334,7 +334,7 @@ trait SchedulerSpec
                 throw new Exception(s"failed expecting the $i-th latency", e)
             }
       }
-      val histogram = latencies groupBy (_ / 100000000L)
+      val histogram = latencies.groupBy(_ / 100000000L)
       for (k ← histogram.keys.toSeq.sorted) {
         system.log.info(f"${k * 100}%3d: ${histogram(k).size}")
       }
@@ -413,7 +413,7 @@ class LightArrayRevolverSchedulerSpec
                 throw new Exception(s"failed expecting the $i-th latency", e)
             }
       }
-      val histogram = latencies groupBy (_ / 100000000L)
+      val histogram = latencies.groupBy(_ / 100000000L)
       for (k ← histogram.keys.toSeq.sorted) {
         system.log.info(f"${k * 100}%3d: ${histogram(k).size}")
       }
@@ -439,8 +439,8 @@ class LightArrayRevolverSchedulerSpec
           def delay =
             if (ThreadLocalRandom.current.nextBoolean) step * 2 else step
           val N = 1000000
-          (1 to N) foreach
-            (_ ⇒ sched.scheduleOnce(delay)(counter.incrementAndGet()))
+          ((1 to N)).foreach(_ ⇒
+            sched.scheduleOnce(delay)(counter.incrementAndGet()))
           sched.close()
           Await.result(terminated, 3.seconds.dilated) should be > 10
           awaitCond(counter.get == N)
@@ -452,14 +452,14 @@ class LightArrayRevolverSchedulerSpec
         implicit def ec = localEC
         import driver._
         val start = step / 2
-        (0 to 3) foreach
-          (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
+        ((0 to 3)).foreach(i ⇒
+          sched.scheduleOnce(start + step * i, testActor, "hello"))
         expectNoMsg(step)
         wakeUp(step)
         expectWait(step)
         wakeUp(step * 4 + step / 2)
         expectWait(step / 2)
-        (0 to 3) foreach (_ ⇒ expectMsg(Duration.Zero, "hello"))
+        ((0 to 3)).foreach(_ ⇒ expectMsg(Duration.Zero, "hello"))
       }
     }
 
@@ -485,8 +485,8 @@ class LightArrayRevolverSchedulerSpec
           implicit def ec = localEC
           import driver._
           val start = step / 2
-          (0 to 3) foreach
-            (i ⇒ sched.scheduleOnce(start + step * i, probe.ref, "hello"))
+          ((0 to 3)).foreach(i ⇒
+            sched.scheduleOnce(start + step * i, probe.ref, "hello"))
           probe.expectNoMsg(step)
           wakeUp(step)
           expectWait(step)
@@ -513,8 +513,8 @@ class LightArrayRevolverSchedulerSpec
         implicit def ec = localEC
         import driver._
         val start = step / 2
-        (0 to 3) foreach
-          (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
+        ((0 to 3)).foreach(i ⇒
+          sched.scheduleOnce(start + step * i, testActor, "hello"))
         expectNoMsg(step)
         wakeUp(step)
         expectWait(step)

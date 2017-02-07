@@ -91,19 +91,22 @@ trait TypeDebugging { self: SymbolTable =>
     def ptBlock(label: String, pairs: (String, Any)*): String = {
       if (pairs.isEmpty) label + "{ }"
       else {
-        val width = (pairs map (_._1.length)).max
+        val width = (pairs.map(_._1.length)).max
         val fmt = "%-" + (width + 1) + "s %s"
-        val strs = pairs map { case (k, v) => fmt.format(k, to_s(v)) }
+        val strs = pairs.map { case (k, v) => fmt.format(k, to_s(v)) }
 
         strs.mkString(label + " {\n  ", "\n  ", "\n}")
       }
     }
     def ptLine(pairs: (String, Any)*): String =
-      (pairs map {
-        case (k, v) => (k, to_s(v))
-      } filterNot { case (_, v) => v == "" } map {
-        case ("", v) => v; case (k, v) => s"$k=$v"
-      } mkString ", ")
+      (pairs
+        .map {
+          case (k, v) => (k, to_s(v))
+        }
+        .filterNot { case (_, v) => v == "" }
+        .map {
+          case ("", v) => v; case (k, v) => s"$k=$v"
+        } mkString ", ")
     def ptTree(t: Tree): String = t match {
       case PackageDef(pid, _) => s"package $pid"
       case ModuleDef(_, name, _) => s"object $name"
@@ -127,14 +130,14 @@ trait TypeDebugging { self: SymbolTable =>
       name + ptTypeParams(tparams) + ptTree(rhs)
     }
     def ptTypeParams(tparams: List[TypeDef]): String =
-      str brackets (tparams map ptTypeParam)
+      str.brackets(tparams.map(ptTypeParam))
 
     object str {
       def parentheses(xs: List[_]): String = xs.mkString("(", ", ", ")")
       def brackets(xs: List[_]): String =
         if (xs.isEmpty) "" else xs.mkString("[", ", ", "]")
-      def tparams(tparams: List[Type]): String = brackets(tparams map debug)
-      def parents(ps: List[Type]): String = (ps map debug).mkString(" with ")
+      def tparams(tparams: List[Type]): String = brackets(tparams.map(debug))
+      def parents(ps: List[Type]): String = (ps.map(debug)).mkString(" with ")
       def refine(defs: Scope): String = defs.toList.mkString("{", " ;\n ", "}")
       def bounds(lo: Type, hi: Type): String = {
         val lo_s = if (typeIsNothing(lo)) "" else s" >: $lo"
@@ -162,8 +165,8 @@ trait TypeDebugging { self: SymbolTable =>
     def debugString(tp: Type) = debug(tp)
   }
   def paramString(tp: Type) =
-    typeDebug.str parentheses (tp.params map (_.defString))
+    typeDebug.str.parentheses(tp.params.map(_.defString))
   def typeParamsString(tp: Type) =
-    typeDebug.str brackets (tp.typeParams map (_.defString))
+    typeDebug.str.brackets(tp.typeParams.map(_.defString))
   def debugString(tp: Type) = typeDebug debugString tp
 }

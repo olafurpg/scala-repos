@@ -39,8 +39,8 @@ object Test extends Properties("concurrent.TrieMap") {
           }
         }
 
-    threads foreach (_.start())
-    threads map (_.result)
+    threads.foreach(_.start())
+    threads.map(_.result)
   }
 
   property("concurrent getOrElseUpdate insertions") =

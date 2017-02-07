@@ -273,7 +273,7 @@ object MediaType {
                           params: Map[String, String]): String = {
     val r = new StringRendering ~~ mainType ~~ '/' ~~ subType
     if (params.nonEmpty)
-      params foreach { case (k, v) ⇒ r ~~ ';' ~~ ' ' ~~ k ~~ '=' ~~# v }
+      params.foreach { case (k, v) ⇒ r ~~ ';' ~~ ' ' ~~ k ~~ '=' ~~# v }
     r.get
   }
 

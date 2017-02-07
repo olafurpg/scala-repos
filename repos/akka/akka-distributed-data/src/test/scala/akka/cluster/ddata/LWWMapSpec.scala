@@ -33,8 +33,8 @@ class LWWMapSpec extends WordSpec with Matchers {
 
       // merge both ways
       val expected = Map("a" -> 1, "b" -> 2, "c" -> 3)
-      (m1 merge m2).entries should be(expected)
-      (m2 merge m1).entries should be(expected)
+      (m1.merge(m2)).entries should be(expected)
+      (m2.merge(m1)).entries should be(expected)
     }
 
     "be able to remove entry" in {
@@ -43,14 +43,14 @@ class LWWMapSpec extends WordSpec with Matchers {
         .put(node1, "b", 2, defaultClock[Int])
       val m2 = LWWMap.empty.put(node2, "c", 3, defaultClock[Int])
 
-      val merged1 = m1 merge m2
+      val merged1 = m1.merge(m2)
 
       val m3 = merged1.remove(node1, "b")
-      (merged1 merge m3).entries should be(Map("a" -> 1, "c" -> 3))
+      (merged1.merge(m3)).entries should be(Map("a" -> 1, "c" -> 3))
 
       // but if there is a conflicting update the entry is not removed
       val m4 = merged1.put(node2, "b", 22, defaultClock[Int])
-      (m3 merge m4).entries should be(Map("a" -> 1, "b" -> 22, "c" -> 3))
+      (m3.merge(m4)).entries should be(Map("a" -> 1, "b" -> 22, "c" -> 3))
     }
 
     "have unapply extractor" in {

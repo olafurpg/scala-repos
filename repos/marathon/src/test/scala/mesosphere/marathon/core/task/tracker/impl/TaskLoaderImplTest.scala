@@ -20,7 +20,7 @@ class TaskLoaderImplTest
     val f = new Fixture
 
     Given("no tasks")
-    f.taskRepository.allIds() returns Future.successful(Iterable.empty)
+    f.taskRepository.allIds().returns(Future.successful(Iterable.empty))
 
     When("loadTasks is called")
     val loaded = f.loader.loadTasks()
@@ -46,9 +46,9 @@ class TaskLoaderImplTest
     val app2task1 = MarathonTestHelper.dummyTaskProto(app2Id)
     val tasks = Iterable(app1task1, app1task2, app2task1)
 
-    f.taskRepository.allIds() returns Future.successful(tasks.map(_.getId))
+    f.taskRepository.allIds().returns(Future.successful(tasks.map(_.getId)))
     for (task <- tasks) {
-      f.taskRepository.task(task.getId) returns Future.successful(Some(task))
+      f.taskRepository.task(task.getId).returns(Future.successful(Some(task)))
     }
 
     When("loadTasks is called")

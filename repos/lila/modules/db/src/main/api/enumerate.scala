@@ -15,13 +15,13 @@ object $enumerate {
   def apply[A: BSONDocumentReader](
       query: QueryBuilder,
       limit: Int = Int.MaxValue)(op: A => Any): Funit =
-    query.cursor[A]().enumerate(limit) run {
+    query.cursor[A]().enumerate(limit).run {
       Iteratee.foreach((obj: A) => op(obj))
     }
 
   def over[A: TubeInColl](query: QueryBuilder, limit: Int = Int.MaxValue)(
       op: A => Funit): Funit =
-    query.cursor[Option[A]]().enumerate(limit, stopOnError = false) run {
+    query.cursor[Option[A]]().enumerate(limit, stopOnError = false).run {
       Iteratee.foldM(()) {
         case (_, Some(obj)) => op(obj)
         case _ => funit
@@ -32,7 +32,7 @@ object $enumerate {
       query: QueryBuilder,
       size: Int,
       limit: Int = Int.MaxValue)(op: List[A] => Funit): Funit =
-    query.batch(size).cursor[A]().enumerateBulks(limit) run {
+    query.batch(size).cursor[A]().enumerateBulks(limit).run {
       Iteratee.foldM(()) {
         case (_, objs) => op(objs.toList)
       }

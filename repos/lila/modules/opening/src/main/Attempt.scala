@@ -44,11 +44,11 @@ object Attempt {
 
     def reads(r: BSON.Reader): Attempt =
       Attempt(
-        id = r str id,
+        id = r.str(id),
         openingId = r int openingId,
-        userId = r str userId,
+        userId = r.str(userId),
         date = r.get[DateTime](date),
-        win = r bool win,
+        win = r.bool(win),
         openingRating = r int openingRating,
         openingRatingDiff = r int openingRatingDiff,
         userRating = r int userRating,

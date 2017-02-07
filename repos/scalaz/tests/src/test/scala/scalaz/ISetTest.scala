@@ -73,7 +73,7 @@ object ISetTest extends SpecLite {
       (b.size + c.size + 1) must_=== a.size
       b.union(c).insert(i) must_=== a
     } else {
-      (b union c) must_=== a
+      (b.union(c)) must_=== a
     }
   }
 
@@ -88,7 +88,7 @@ object ISetTest extends SpecLite {
       (b.size + d.size + 1) must_=== a.size
       b.union(d).insert(i) must_=== a
     } else {
-      (b union d) must_=== a
+      (b.union(d)) must_=== a
     }
   }
 
@@ -109,10 +109,10 @@ object ISetTest extends SpecLite {
 
   "lookupIndex" ! forAll { a: ISet[Int] =>
     val l = a.toList
-    (0 until a.size) foreach { i =>
+    ((0 until a.size)).foreach { i =>
       a.lookupIndex(l(i)) must_=== Some(i)
     }
-    (0 until 5) foreach { _ =>
+    ((0 until 5)).foreach { _ =>
       val r = Random.nextInt()
       if (a.member(r)) a.lookupIndex(r) must_=== Some(l.indexOf(r))
       else a.lookupIndex(r) must_=== None
@@ -121,7 +121,7 @@ object ISetTest extends SpecLite {
 
   "deleteAt" ! forAll { a: ISet[Int] =>
     val l = a.toList
-    (0 until a.size) foreach { i =>
+    ((0 until a.size)).foreach { i =>
       val e = l(i)
       val b = a.deleteAt(i)
       structurallySound(b)
@@ -175,18 +175,18 @@ object ISetTest extends SpecLite {
   }
 
   "sound union" ! forAll { (a: ISet[Int], b: ISet[Int]) =>
-    (a union b) must_=== ISet.fromList(a.toList ++ b.toList)
-    structurallySound(a union b)
+    (a.union(b)) must_=== ISet.fromList(a.toList ++ b.toList)
+    structurallySound(a.union(b))
   }
 
   "union commute" ! forAll { (a: ISet[Int], b: ISet[Int]) =>
-    (a union b) must_=== (b union a)
+    (a.union(b)) must_=== (b.union(a))
   }
 
   "union idempotent" ! forAll { (a: ISet[Int], b: ISet[Int]) =>
-    val ab = a union b
-    ab union a must_=== (ab)
-    ab union b must_=== (ab)
+    val ab = a.union(b)
+    ab.union(a) must_=== (ab)
+    ab.union(b) must_=== (ab)
   }
 
   "sound intersection" ! forAll { (a: ISet[Int], b: ISet[Int]) =>
@@ -203,30 +203,30 @@ object ISetTest extends SpecLite {
   }
 
   "difference is an inverse" ! forAll { (a: ISet[Int]) =>
-    (a difference a) must_=== (ISet.empty[Int])
+    (a.difference(a)) must_=== (ISet.empty[Int])
   }
 
   "sound difference" ! forAll { (a: ISet[Int], b: ISet[Int]) =>
-    val c = a difference b
+    val c = a.difference(b)
     structurallySound(c)
     Foldable[ISet].any(c)(b member _) must_=== false
     Foldable[ISet].all(c)(a member _) must_=== true
   }
 
   "filter" ! forAll { (a: ISet[Int], p: Int => Boolean) =>
-    (a filter p).toList must_=== a.toList.filter(p)
+    (a.filter(p)).toList must_=== a.toList.filter(p)
   }
 
   "sound partition" ! forAll { (a: ISet[Int], p: Int => Boolean) =>
-    val (ma, mb) = a partition p
+    val (ma, mb) = a.partition(p)
     structurallySound(ma)
     structurallySound(mb)
     (ma.size + mb.size) must_=== a.size
-    (ma union mb) must_=== a
+    (ma.union(mb)) must_=== a
   }
 
   "partition" ! forAll { (a: ISet[Int], p: Int => Boolean) =>
-    val part = a partition p
+    val part = a.partition(p)
     (part._1.toList, part._2.toList) must_=== a.toList.partition(p)
   }
 
@@ -267,9 +267,9 @@ object ISetTest extends SpecLite {
   }
 
   "isSubsetOf" ! forAll { (a: ISet[Int], b: ISet[Int]) =>
-    val c = a isSubsetOf b
-    c must_=== (a.toList.toSet subsetOf b.toList.toSet)
+    val c = a.isSubsetOf(b)
+    c must_=== (a.toList.toSet.subsetOf(b.toList.toSet))
     c must_=== Foldable[ISet].all(a)(b member _)
-    (c && (b isSubsetOf a)) must_=== Equal[ISet[Int]].equal(a, b)
+    (c && (b.isSubsetOf(a))) must_=== Equal[ISet[Int]].equal(a, b)
   }
 }

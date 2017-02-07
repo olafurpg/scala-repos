@@ -180,7 +180,7 @@ private object DNSSD {
     val proxy = instance.newProxy(instance.BrowseListenerClass) {
       case ("serviceFound", args) =>
         val record = mkRecord(args)
-        instance.resolve(record) foreach { resolved =>
+        instance.resolve(record).foreach { resolved =>
           val metadata =
             MdnsAddrMetadata(record.serviceName, record.regType, record.domain)
           val addr = Address.Inet(new InetSocketAddress(resolved.hostName,

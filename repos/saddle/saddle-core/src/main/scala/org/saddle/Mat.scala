@@ -277,7 +277,7 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
     * @param c Column index
     */
   def col(c: Int)(implicit ev: ST[A]): Vec[A] = {
-    assert(c >= 0 && c < numCols, "Array index %d out of bounds" format c)
+    assert(c >= 0 && c < numCols, "Array index %d out of bounds".format(c))
     flattenT.slice(c * numRows, (c + 1) * numRows)
   }
 
@@ -320,7 +320,7 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
     * @param r Row index
     */
   def row(r: Int)(implicit ev: ST[A]): Vec[A] = {
-    assert(r >= 0 && r < numRows, "Array index %d out of bounds" format r)
+    assert(r >= 0 && r < numRows, "Array index %d out of bounds".format(r))
     flatten.slice(r * numCols, (r + 1) * numCols)
   }
 
@@ -432,7 +432,8 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
 
     val maxStrLen = (a: Int, b: String) => a.max(b.length)
     val maxColLen = (c: Vec[A]) =>
-      (c.head(halfr) concat c.tail(halfr))
+      (c.head(halfr)
+        .concat(c.tail(halfr)))
         .map(scalarTag.show(_))
         .foldLeft(0)(maxStrLen)
     val colIdx = util.grab(Range(0, numCols), halfc)
@@ -446,8 +447,8 @@ trait Mat[@spec(Boolean, Int, Long, Double) A]
       val buf = new StringBuilder()
       val strFn = (col: Int) => {
         val l = lenMap(col)
-        "%" + { if (l > 0) l else 1 } + "s " format scalarTag.show(
-          apply(r, col))
+        ("%" + { if (l > 0) l else 1 } + "s ")
+          .format(scalarTag.show(apply(r, col)))
       }
       buf.append(util.buildStr(ncols, numCols, strFn))
       buf.append("\n")

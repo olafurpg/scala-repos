@@ -391,7 +391,7 @@ object ClassfileConstants {
   }
   object FlagTranslation extends FlagTranslation {}
 
-  def toScalaMethodFlags(flags: Int): Long = FlagTranslation methodFlags flags
-  def toScalaClassFlags(flags: Int): Long = FlagTranslation classFlags flags
-  def toScalaFieldFlags(flags: Int): Long = FlagTranslation fieldFlags flags
+  def toScalaMethodFlags(flags: Int): Long = FlagTranslation.methodFlags(flags)
+  def toScalaClassFlags(flags: Int): Long = FlagTranslation.classFlags(flags)
+  def toScalaFieldFlags(flags: Int): Long = FlagTranslation.fieldFlags(flags)
 }

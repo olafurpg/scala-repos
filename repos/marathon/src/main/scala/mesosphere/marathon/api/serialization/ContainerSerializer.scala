@@ -91,7 +91,7 @@ object DockerSerializer {
         docker.parameters.map(ParameterSerializer.toMesos).asJava)
       .setForcePullImage(docker.forcePullImage)
 
-    docker.network foreach builder.setNetwork
+    docker.network.foreach(builder.setNetwork)
 
     docker.portMappings.foreach { pms =>
       builder.addAllPortMappings(pms.map(PortMappingSerializer.toProto).asJava)
@@ -123,7 +123,7 @@ object DockerSerializer {
 
     builder.setImage(docker.image)
 
-    docker.network foreach builder.setNetwork
+    docker.network.foreach(builder.setNetwork)
 
     docker.portMappings.foreach { pms =>
       builder.addAllPortMappings(pms.map(PortMappingSerializer.toMesos).asJava)

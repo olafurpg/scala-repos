@@ -82,8 +82,8 @@ object Test {
   //       73: invokespecial #44                 // Method scala/Some."<init>":(Ljava/lang/Object;)V
   //       76: areturn
   def main(args: Array[String]): Unit = {
-    "abcd" foreach (ch => println(f(ch)))
-    "abcd" foreach (ch => println(g(ch)))
+    "abcd".foreach(ch => println(f(ch)))
+    "abcd".foreach(ch => println(g(ch)))
     println(prod(new SomeProduct))
   }
 }

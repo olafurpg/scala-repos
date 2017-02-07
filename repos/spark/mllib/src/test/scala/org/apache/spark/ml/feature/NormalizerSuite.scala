@@ -94,7 +94,7 @@ class NormalizerSuite
 
   def assertValues(lhs: Array[Vector], rhs: Array[Vector]): Unit = {
     assert((lhs, rhs).zipped.forall { (vector1, vector2) =>
-      vector1 ~== vector2 absTol 1E-5
+      vector1 ~== vector2.absTol(1E-5)
     }, "The vector value is not correct after normalization.")
   }
 

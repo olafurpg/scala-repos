@@ -264,12 +264,14 @@ trait JobManagerSpec[M[+ _]] extends Specification {
         jobs
           .updateStatus(job.id, None, "1", 0.0, "%", None)
           .copoint
-          .right getOrElse sys.error("..."))
+          .right
+          .getOrElse(sys.error("...")))
       val status2 = Status.toMessage(
         jobs
           .updateStatus(job.id, None, "2", 5.0, "%", Some(JString("...")))
           .copoint
-          .right getOrElse sys.error("..."))
+          .right
+          .getOrElse(sys.error("...")))
       jobs.listChannels(job.id).copoint must contain(
         JobManager.channels.Status)
       val statuses =

@@ -73,19 +73,19 @@ trait Ordered[A] extends Any with java.lang.Comparable[A] {
 
   /** Returns true if `this` is less than `that`
     */
-  def <(that: A): Boolean = (this compare that) < 0
+  def <(that: A): Boolean = (this.compare(that)) < 0
 
   /** Returns true if `this` is greater than `that`.
     */
-  def >(that: A): Boolean = (this compare that) > 0
+  def >(that: A): Boolean = (this.compare(that)) > 0
 
   /** Returns true if `this` is less than or equal to `that`.
     */
-  def <=(that: A): Boolean = (this compare that) <= 0
+  def <=(that: A): Boolean = (this.compare(that)) <= 0
 
   /** Returns true if `this` is greater than or equal to `that`.
     */
-  def >=(that: A): Boolean = (this compare that) >= 0
+  def >=(that: A): Boolean = (this.compare(that)) >= 0
 
   /** Result of comparing `this` with operand `that`.
     */

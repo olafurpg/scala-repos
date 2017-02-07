@@ -36,7 +36,7 @@ class JObjectField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
 
   def owner = rec
 
-  def asJValue: JValue = valueBox openOr (JNothing: JValue)
+  def asJValue: JValue = valueBox.openOr(JNothing: JValue)
 
   def setFromJValue(jvalue: JValue): Box[JObject] = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)

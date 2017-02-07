@@ -150,7 +150,7 @@ object Polynomial extends PolynomialInstances {
       poly: Polynomial[C]): (Array[Int], Array[C]) = {
     val es = ArrayBuilder.make[Int]()
     val cs = ArrayBuilder.make[C]()
-    poly foreach { (e, c) =>
+    poly.foreach { (e, c) =>
       es += e
       cs += c
     }
@@ -358,7 +358,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
   def mapTerms[D: Semiring: Eq: ClassTag](f: Term[C] => Term[D])(
       implicit ring: Semiring[C],
       eq: Eq[C]): Polynomial[D] =
-    Polynomial(terms map f)
+    Polynomial(terms.map(f))
 
   /**
     * Returns this polynomial shifted by `h`. Equivalent to calling

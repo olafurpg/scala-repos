@@ -63,7 +63,7 @@ private[akka] object RemoteActorRefProvider {
       case Event(TerminationHookDone, Some(internals)) ⇒
         log.info(
           "Remote daemon shut down; proceeding with flushing remote transports.")
-        internals.transport.shutdown() pipeTo self
+        internals.transport.shutdown().pipeTo(self)
         goto(WaitTransportShutdown)
     }
 
@@ -317,12 +317,12 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
       val deployment = {
         deploy.toList ::: lookup.toList match {
           case Nil ⇒ Nil
-          case l ⇒ List(l reduce ((a, b) ⇒ b withFallback a))
+          case l ⇒ List(l.reduce((a, b) ⇒ b.withFallback(a)))
         }
       }
 
-      Iterator(props.deploy) ++ deployment.iterator reduce
-        ((a, b) ⇒ b withFallback a) match {
+      (Iterator(props.deploy) ++ deployment.iterator).reduce((a, b) ⇒
+        b.withFallback(a)) match {
         case d @ Deploy(_, _, _, RemoteScope(addr), _, _) ⇒
           if (hasAddress(addr)) {
             local.actorOf(system,
@@ -577,7 +577,7 @@ private[akka] class RemoteActorRef private[akka] (
     val s = name.toStream
     s.headOption match {
       case None ⇒ this
-      case Some("..") ⇒ getParent getChild name
+      case Some("..") ⇒ getParent.getChild(name)
       case _ ⇒
         new RemoteActorRef(remote,
                            localAddressToUse,

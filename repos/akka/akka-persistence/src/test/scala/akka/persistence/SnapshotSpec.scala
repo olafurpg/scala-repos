@@ -60,7 +60,7 @@ object SnapshotSpec {
                                           _recovery: Recovery,
                                           probe: ActorRef)
       extends LoadSnapshotTestPersistentActor(name, _recovery, probe) {
-    override def receiveCommand = receiveDelete orElse super.receiveCommand
+    override def receiveCommand = receiveDelete.orElse(super.receiveCommand)
     def receiveDelete: Receive = {
       case Delete1(metadata) ⇒ deleteSnapshot(metadata.sequenceNr)
       case DeleteN(criteria) ⇒ deleteSnapshots(criteria)

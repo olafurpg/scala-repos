@@ -66,7 +66,7 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
   private def guardLoc(loc: Int): Int =
     if (loc < 0 || loc >= length)
       throw new ArrayIndexOutOfBoundsException(
-        "Location %d is out of bounds" format loc)
+        "Location %d is out of bounds".format(loc))
     else loc
 
   def raw(loc: Int) = from + guardLoc(loc)
@@ -119,7 +119,7 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
 
   def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](
       f: (Int) => B): Index[B] =
-    genIdx map f
+    genIdx.map(f)
 
   private[saddle] def toArray = asArr
 }

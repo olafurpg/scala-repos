@@ -67,7 +67,7 @@ class GetResultTest extends FunSuite with MockitoSugar {
     import context._
 
     val subResults =
-      (1 to 10) map { i =>
+      ((1 to 10)).map { i =>
         GetResult(hits = Map("h" + i -> mock[Value]),
                   misses = immutable.Set("m" + i),
                   failures = Map("f" + i -> mock[Exception]))

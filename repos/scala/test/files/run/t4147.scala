@@ -21,7 +21,7 @@ object Test {
     assert(projection.size == 2)
 
     // Let's check that modification are taken into account
-    tree add 4
+    tree.add(4)
     assert(tree == immutable.SortedSet(1, 2, 3, 4, 5, 6, 7))
     assert(projection == immutable.SortedSet(3, 4, 5))
     assert(tree.size == 7)

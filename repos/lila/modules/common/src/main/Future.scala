@@ -5,7 +5,7 @@ object Future {
   def lazyFold[T, R](futures: Stream[Fu[T]])(zero: R)(op: (R, T) => R): Fu[R] =
     Stream.cons.unapply(futures).fold(fuccess(zero)) {
       case (future, rest) =>
-        future flatMap { f =>
+        future.flatMap { f =>
           lazyFold(rest)(op(zero, f))(op)
         }
     }
@@ -14,7 +14,7 @@ object Future {
     list match {
       case h :: t =>
         f(h).flatMap { r =>
-          traverseSequentially(t)(f) map (r +: _)
+          traverseSequentially(t)(f).map(r +: _)
         }
       case Nil => fuccess(Nil)
     }

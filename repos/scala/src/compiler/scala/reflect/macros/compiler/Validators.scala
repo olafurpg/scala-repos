@@ -23,7 +23,7 @@ trait Validators { self: DefaultMacroCompiler =>
         MacroImplWrongNumberOfTypeArgumentsError()
       if (!macroImpl.isPublic) MacroImplNotPublicError()
       if (macroImpl.isOverloaded) MacroImplOverloadedError()
-      val implicitParams = aparamss.flatten filter (_.isImplicit)
+      val implicitParams = aparamss.flatten.filter(_.isImplicit)
       if (implicitParams.nonEmpty)
         MacroImplNonTagImplicitParameters(implicitParams)
       val effectiveOwner =
@@ -39,7 +39,7 @@ trait Validators { self: DefaultMacroCompiler =>
     }
 
     private def checkMacroDefMacroImplCorrespondence() = {
-      val atvars = atparams map freshVar
+      val atvars = atparams.map(freshVar)
       def atpeToRtpe(atpe: Type) =
         atpe
           .substSym(aparamss.flatten, rparamss.flatten)
@@ -73,11 +73,11 @@ trait Validators { self: DefaultMacroCompiler =>
         checkMacroImplResultTypeMismatch(atpeToRtpe(aret), rret)
 
         val maxLubDepth =
-          lubDepth(aparamss.flatten map (_.tpe)) max lubDepth(
-            rparamss.flatten map (_.tpe))
+          lubDepth(aparamss.flatten.map(_.tpe))
+            .max(lubDepth(rparamss.flatten.map(_.tpe)))
         val atargs = solvedTypes(atvars,
                                  atparams,
-                                 atparams map varianceInType(aret),
+                                 atparams.map(varianceInType(aret)),
                                  upper = false,
                                  maxLubDepth)
         val boundsOk = typer.silent(
@@ -113,10 +113,10 @@ trait Validators { self: DefaultMacroCompiler =>
         if (tparams.isEmpty) ""
         else tparams.map(_.defString).mkString("[", ", ", "]")
       private def paramss_s =
-        paramss map
-          (ps =>
-             ps.map(s => s"${s.name}: ${s.tpe_*}")
-               .mkString("(", ", ", ")")) mkString ""
+        paramss.map(
+          ps =>
+            ps.map(s => s"${s.name}: ${s.tpe_*}")
+              .mkString("(", ", ", ")")) mkString ""
       override def toString =
         "MacroImplSig(" + tparams_s + paramss_s + ret + ")"
     }
@@ -197,7 +197,8 @@ trait Validators { self: DefaultMacroCompiler =>
         val macroDefRet =
           if (!macroDdef.tpt.isEmpty) typer.typedType(macroDdef.tpt).tpe
           else
-            computeMacroDefTypeFromMacroImplRef(macroDdef, macroImplRef) orElse AnyTpe
+            computeMacroDefTypeFromMacroImplRef(macroDdef, macroImplRef)
+              .orElse(AnyTpe)
         val implReturnType = sigma(increaseMetalevel(ctxPrefix, macroDefRet))
 
         object SigmaTypeMap extends TypeMap {
@@ -223,7 +224,7 @@ trait Validators { self: DefaultMacroCompiler =>
         def sigma(tpe: Type): Type = SigmaTypeMap(tpe)
 
         def makeParam(name: Name, pos: Position, tpe: Type, flags: Long) =
-          macroDef.newValueParameter(name.toTermName, pos, flags) setInfo tpe
+          macroDef.newValueParameter(name.toTermName, pos, flags).setInfo(tpe)
         def param(tree: Tree): Symbol = (
           cache.getOrElseUpdate(
             tree.symbol, {
@@ -241,7 +242,7 @@ trait Validators { self: DefaultMacroCompiler =>
       import SigGenerator._
       macroLogVerbose(s"generating macroImplSigs for: $macroDdef")
       val result =
-        MacroImplSig(macroDdef.tparams map (_.symbol), paramss, implReturnType)
+        MacroImplSig(macroDdef.tparams.map(_.symbol), paramss, implReturnType)
       macroLogVerbose(s"result is: $result")
       result
     }

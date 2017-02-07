@@ -38,7 +38,8 @@ object Store {
         BSONDocument("_id" -> sessionId, "up" -> true),
         BSONDocument("user" -> true, "_id" -> false)
       )
-      .one[BSONDocument] map { _ flatMap (_.getAs[String]("user")) }
+      .one[BSONDocument]
+      .map { _.flatMap(_.getAs[String]("user")) }
 
   case class UserIdAndFingerprint(user: String, fp: Option[String])
   private implicit val UserIdAndFingerprintBSONReader =
@@ -96,16 +97,18 @@ object Store {
   def setFingerprint(id: String, fingerprint: String): Fu[String] = {
     import java.util.Base64
     import org.apache.commons.codec.binary.Hex
-    scala.concurrent.Future {
-      Base64.getEncoder encodeToString {
-        Hex decodeHex fingerprint.toArray
-      } take 8
-    } flatMap { hash =>
-      storeColl.update(
-        BSONDocument("_id" -> id),
-        BSONDocument("$set" -> BSONDocument("fp" -> hash))
-      ) inject hash
-    }
+    scala.concurrent
+      .Future {
+        (Base64.getEncoder encodeToString {
+          Hex.decodeHex(fingerprint.toArray)
+        }).take(8)
+      }
+      .flatMap { hash =>
+        storeColl.update(
+          BSONDocument("_id" -> id),
+          BSONDocument("$set" -> BSONDocument("fp" -> hash))
+        ) inject hash
+      }
   }
 
   case class Info(ip: String, ua: String, fp: Option[String]) {
@@ -136,17 +139,18 @@ object Store {
         ))
       .sort(BSONDocument("date" -> -1))
       .cursor[DedupInfo]()
-      .collect[List]() flatMap { sessions =>
-      val olds = sessions
-        .groupBy(_.compositeKey)
-        .values
-        .map(_ drop 1)
-        .flatten
-        .filter(_._id != keepSessionId)
-      storeColl
-        .remove(
-          BSONDocument("_id" -> BSONDocument("$in" -> olds.map(_._id)))
-        )
-        .void
-    }
+      .collect[List]()
+      .flatMap { sessions =>
+        val olds = sessions
+          .groupBy(_.compositeKey)
+          .values
+          .map(_.drop(1))
+          .flatten
+          .filter(_._id != keepSessionId)
+        storeColl
+          .remove(
+            BSONDocument("_id" -> BSONDocument("$in" -> olds.map(_._id)))
+          )
+          .void
+      }
 }

@@ -28,7 +28,7 @@ object InlineInfoTest extends ClearAfterClass.Clearable {
       compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
       compiler.genBCode.bTypes.byteCodeRepository.parsedClasses
     )
-  notPerRun foreach compiler.perRunCaches.unrecordCache
+  notPerRun.foreach(compiler.perRunCaches.unrecordCache)
 }
 
 @RunWith(classOf[JUnit4])

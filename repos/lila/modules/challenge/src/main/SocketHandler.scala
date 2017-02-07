@@ -23,7 +23,7 @@ private[challenge] final class SocketHandler(
            userId: Option[User.ID],
            owner: Boolean): Fu[Option[JsSocketHandler]] =
     for {
-      socket ← socketHub ? Get(challengeId) mapTo manifest[ActorRef]
+      socket ← (socketHub ? Get(challengeId)).mapTo(manifest[ActorRef])
       join = Socket.Join(uid = uid, userId = userId, owner = owner)
       handler ← Handler(hub, socket, uid, join, userId) {
         case Socket.Connected(enum, member) =>
@@ -36,7 +36,7 @@ private[challenge] final class SocketHandler(
                          uid: String,
                          member: Socket.Member): Handler.Controller = {
     case ("p", o) =>
-      o int "v" foreach { v =>
+      (o int "v").foreach { v =>
         socket ! PingVersion(uid, v)
       }
     case ("ping", _) if member.owner => pingChallenge(challengeId)

@@ -65,7 +65,7 @@ class Settings(error: String => Unit,
   lazy val uncompilableFiles = docUncompilable.value match {
     case "" => Nil
     case path =>
-      io.Directory(path).deepFiles filter (_ hasExtension "scala") toList
+      io.Directory(path).deepFiles.filter(_.hasExtension("scala")) toList
   }
 
   /** A setting that defines a URL to be concatenated with source locations and show a link to source files.
@@ -211,7 +211,7 @@ class Settings(error: String => Unit,
     BooleanSetting(
       "-expand-all-types",
       "Expand all type aliases and abstract types into full template pages. (locally this can be done with the @template annotation)"
-    ) withDeprecationMessage (removalIn213)
+    ).withDeprecationMessage(removalIn213)
 
   val docGroups = BooleanSetting(
     "-groups",
@@ -250,7 +250,7 @@ class Settings(error: String => Unit,
     docExpandAllTypes,
     docGroups
   )
-  val isScaladocSpecific: String => Boolean = scaladocSpecific map (_.name)
+  val isScaladocSpecific: String => Boolean = scaladocSpecific.map(_.name)
 
   override def isScaladoc = true
 
@@ -267,7 +267,7 @@ class Settings(error: String => Unit,
   lazy val hiddenImplicits: Set[String] = {
     if (docImplicitsHide.value.isEmpty) hardcoded.commonConversionTargets
     else
-      docImplicitsHide.value.toSet flatMap { name: String =>
+      docImplicitsHide.value.toSet.flatMap { name: String =>
         if (name == ".") hardcoded.commonConversionTargets
         else Set(name)
       }
@@ -276,7 +276,7 @@ class Settings(error: String => Unit,
   def appendIndex(url: String): String =
     url.stripSuffix("index.html").stripSuffix("/") + "/index.html"
 
-  lazy val extUrlMapping: Map[String, String] = docExternalDoc.value flatMap {
+  lazy val extUrlMapping: Map[String, String] = docExternalDoc.value.flatMap {
     s =>
       val idx = s.indexOf("#")
       if (idx > 0) {
@@ -346,7 +346,7 @@ class Settings(error: String => Unit,
         """^scala.Product.*""",
         """^scala.Function.*""",
         """^scala.runtime.AbstractFunction.*"""
-      ) map (_.r)
+      ).map(_.r)
 
     private val notExcludedClasses = Set(
       "scala.Tuple1",

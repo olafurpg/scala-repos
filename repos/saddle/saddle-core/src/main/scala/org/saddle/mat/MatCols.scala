@@ -30,7 +30,7 @@ class MatCols[A: ST](cols: IndexedSeq[Vec[A]])
 
   def scalarTag = implicitly[ST[A]]
 
-  def numRows = cols.headOption.map(_.length) getOrElse 0
+  def numRows = cols.headOption.map(_.length).getOrElse(0)
 
   def numCols = cols.length
 
@@ -103,14 +103,14 @@ object MatCols {
     val maxf = (a: Int, b: String) => a.max(b.length)
 
     if (numCols <= len) {
-      Range(0, numCols) zip cols.map { v =>
-        val takeCol = v.head(half) concat v.tail(half)
+      Range(0, numCols).zip(cols.map { v =>
+        val takeCol = v.head(half).concat(v.tail(half))
         takeCol.map(k => v.scalarTag.show(k)).foldLeft(2)(maxf)
-      }
+      })
     } else {
       val colnums = Range(0, half) ++ Range(numCols - half, numCols)
-      colnums zip (cols.take(half) ++ cols.takeRight(half)).map { v =>
-        val takeCol = v.head(half) concat v.tail(half)
+      colnums.zip(cols.take(half) ++ cols.takeRight(half)).map { v =>
+        val takeCol = v.head(half).concat(v.tail(half))
         takeCol.map(k => v.scalarTag.show(k)).foldLeft(2)(maxf)
       }
     }

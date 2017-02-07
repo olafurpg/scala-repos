@@ -16,10 +16,11 @@ object Game extends LilaController {
   def searchForm = searchEnv.forms.search
 
   def delete(gameId: String) = Auth { implicit ctx => me =>
-    OptionFuResult(GameRepo game gameId) { game =>
+    OptionFuResult(GameRepo.game(gameId)) { game =>
       if (game.pgnImport.flatMap(_.user) ?? (me.id ==)) {
         Env.hub.actor.bookmark ! lila.hub.actorApi.bookmark.Remove(game.id)
-        (GameRepo remove game.id) >> (lila.analyse.AnalysisRepo remove game.id) >> Env.game.cached
+        (GameRepo.remove(game.id)) >> (lila.analyse.AnalysisRepo
+          .remove(game.id)) >> Env.game.cached
           .clearNbImportedByCache(me.id) inject Redirect(
           routes.User.show(me.username))
       } else
@@ -30,7 +31,7 @@ object Game extends LilaController {
   }
 
   def export(user: String) = Auth { implicit ctx => _ =>
-    Env.security.forms.emptyWithCaptcha map {
+    Env.security.forms.emptyWithCaptcha.map {
       case (form, captcha) => Ok(html.game.export(user, form, captcha))
     }
   }
@@ -41,7 +42,7 @@ object Game extends LilaController {
     if (me.id == userId)
       Env.security.forms.empty.bindFromRequest.fold(
         err =>
-          Env.security.forms.anyCaptcha map { captcha =>
+          Env.security.forms.anyCaptcha.map { captcha =>
             BadRequest(html.game.export(userId, err, captcha))
         },
         _ =>
@@ -49,8 +50,8 @@ object Game extends LilaController {
             import org.joda.time.DateTime
             import org.joda.time.format.DateTimeFormat
             val date =
-              (DateTimeFormat forPattern "yyyy-MM-dd") print new DateTime
-            Ok.chunked(Env.api.pgnDump exportUserGames userId)
+              (DateTimeFormat.forPattern("yyyy-MM-dd")) print new DateTime
+            Ok.chunked(Env.api.pgnDump.exportUserGames(userId))
               .withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
                            CONTENT_DISPOSITION ->
                              ("attachment; filename=" +

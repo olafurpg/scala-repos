@@ -86,12 +86,12 @@ class GCounterSpec extends WordSpec with Matchers {
       c26.value should be(10)
 
       // merge both ways
-      val merged1 = c16 merge c26
+      val merged1 = c16.merge(c26)
       merged1.state(node1) should be(7)
       merged1.state(node2) should be(10)
       merged1.value should be(17)
 
-      val merged2 = c26 merge c16
+      val merged2 = c26.merge(c16)
       merged2.state(node1) should be(7)
       merged2.state(node2) should be(10)
       merged2.value should be(17)
@@ -123,12 +123,12 @@ class GCounterSpec extends WordSpec with Matchers {
       c26.value should be(13)
 
       // merge both ways
-      val merged1 = c16 merge c26
+      val merged1 = c16.merge(c26)
       merged1.state(node1) should be(7)
       merged1.state(node2) should be(10)
       merged1.value should be(17)
 
-      val merged2 = c26 merge c16
+      val merged2 = c26.merge(c16)
       merged2.state(node1) should be(7)
       merged2.state(node2) should be(10)
       merged2.value should be(17)

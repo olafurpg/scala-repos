@@ -183,7 +183,7 @@ class DefaultClientTest
 
       assert(
         statsReceiver.stats(Seq(name, "request_latency_ms")) ==
-          (Seq(dur, dur) map (_.inMillis)))
+          (Seq(dur, dur).map(_.inMillis)))
     }
   }
 
@@ -251,7 +251,7 @@ class DefaultClientTest
 
   test("DefaultClient should handle failureAccrual default") {
     new DefaultFailureAccrualHelper {
-      0 until 10 foreach { service(_) }
+      (0 until 10).foreach { service(_) }
       assert(statsReceiver.counters(Seq("failure_accrual", "removals")) == 1)
     }
   }
@@ -266,19 +266,20 @@ class DefaultClientTest
         timer = timer,
         statsReceiver = statsReceiver,
         failureAccrual = { factory: ServiceFactory[Int, Int] =>
-          FailureAccrualFactory.wrapper(
-            statsReceiver,
-            FailureAccrualPolicy.consecutiveFailures(6,
-                                                     Backoff.const(3.seconds)),
-            name,
-            DefaultLogger,
-            failing,
-            ResponseClassifier.Default)(timer) andThen factory
+          FailureAccrualFactory
+            .wrapper(statsReceiver,
+                     FailureAccrualPolicy
+                       .consecutiveFailures(6, Backoff.const(3.seconds)),
+                     name,
+                     DefaultLogger,
+                     failing,
+                     ResponseClassifier.Default)(timer)
+            .andThen(factory)
         }
       )
 
       Time.withCurrentTimeFrozen { control =>
-        0 until 10 foreach { service(_) }
+        (0 until 10).foreach { service(_) }
         assert(statsReceiver.counters(Seq("failure_accrual", "removals")) == 1)
         control.advance(4.seconds)
         timer.tick()

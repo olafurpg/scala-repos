@@ -92,7 +92,7 @@ trait Player { this: TestConductorExt ⇒
           }
         }))
 
-    a ? client mapTo classTag[Done]
+    (a ? client).mapTo(classTag[Done])
   }
 
   /**
@@ -109,7 +109,7 @@ trait Player { this: TestConductorExt ⇒
   def enter(timeout: Timeout, name: immutable.Seq[String]) {
     system.log.debug("entering barriers " + name.mkString("(", ", ", ")"))
     val stop = Deadline.now + timeout.duration
-    name foreach { b ⇒
+    name.foreach { b ⇒
       val barrierTimeout = stop.timeLeft
       if (barrierTimeout < Duration.Zero) {
         client ! ToServer(FailBarrier(b))
@@ -138,7 +138,7 @@ trait Player { this: TestConductorExt ⇒
     */
   def getAddressFor(name: RoleName): Future[Address] = {
     import Settings.QueryTimeout
-    client ? ToServer(GetAddress(name)) mapTo classTag[Address]
+    (client ? ToServer(GetAddress(name))).mapTo(classTag[Address])
   }
 }
 
@@ -288,7 +288,7 @@ private[akka] class ClientFSM(name: RoleName,
           val cmdFuture = TestConductor().transport
             .managementCommand(SetThrottle(t.target, t.direction, mode))
 
-          cmdFuture onSuccess {
+          cmdFuture.onSuccess {
             case true ⇒ self ! ToServer(Done)
             case _ ⇒
               throw new RuntimeException(

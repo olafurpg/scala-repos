@@ -156,8 +156,8 @@ class NameTreeTest extends FunSuite {
 
     for ((tree, res) <- cases) {
       val expect =
-        res map { set =>
-          set map { el: String =>
+        res.map { set =>
+          set.map { el: String =>
             Path.read(el)
           }
         }

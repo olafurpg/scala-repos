@@ -46,7 +46,7 @@ private[http] abstract class SettingsCompanion[T](protected val prefix: String) 
         .withFallback(defaultReference(getClass.getClassLoader)))
 
   def apply(config: Config): T =
-    fromSubConfig(config, config getConfig prefix)
+    fromSubConfig(config, config.getConfig(prefix))
 
   def fromSubConfig(root: Config, c: Config): T
 }

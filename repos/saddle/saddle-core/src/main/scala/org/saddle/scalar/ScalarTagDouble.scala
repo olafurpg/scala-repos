@@ -44,7 +44,7 @@ object ScalarTagDouble extends ScalarTag[Double] {
   def negInf(implicit ev: NUM[Double]) = Double.NegativeInfinity
 
   def show(v: Double) =
-    if (isMissing(v)) "%s" format "NA" else "%.4f" format (v)
+    if (isMissing(v)) "%s".format("NA") else "%.4f".format(v)
 
   override def runtimeClass = classOf[Double]
 

@@ -55,7 +55,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
         def altName(index: Int) =
           newTermName(imeth.name + "$extension" + index)
         altName(index) #::
-          ((0 until alts.length).toStream filter (index != _) map altName)
+          ((0 until alts.length).toStream.filter(index != _).map(altName))
       case tpe =>
         assert(tpe != NoType,
                imeth.name + " not found in " + imeth.owner + "'s decls: " +
@@ -74,10 +74,10 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
     enteringPhase(currentRun.refchecksPhase) {
       val companionInfo = companionModuleForce(imeth.owner).info
       val candidates =
-        extensionNames(imeth) map (companionInfo.decl(_)) filter (_.exists)
+        extensionNames(imeth).map(companionInfo.decl(_)).filter(_.exists)
       val matching =
-        candidates filter
-          (alt => normalize(alt.tpe, imeth.owner) matches imeth.tpe)
+        candidates.filter(alt =>
+          normalize(alt.tpe, imeth.owner).matches(imeth.tpe))
       assert(
         matching.nonEmpty,
         sm"""|no extension method found for:
@@ -126,7 +126,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
     case PolyType(tparams, restpe) =>
       // method type parameters, class type parameters
       val (mtparams, ctparams) =
-        tparams splitAt (tparams.length - clazz.typeParams.length)
+        tparams.splitAt(tparams.length - clazz.typeParams.length)
       GenPolyType(
         mtparams,
         normalize(restpe.substSym(ctparams, clazz.typeParams), clazz))
@@ -172,30 +172,33 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
       // Start with the class type parameters - clones will be method type parameters
       // so must drop their variance.
       val tparamsFromClass =
-        cloneSymbolsAtOwner(clazz.typeParams, extensionMeth) map
-          (_ resetFlag COVARIANT | CONTRAVARIANT)
+        cloneSymbolsAtOwner(clazz.typeParams, extensionMeth)
+          .map(_.resetFlag(COVARIANT | CONTRAVARIANT))
 
       val thisParamType =
-        appliedType(clazz, tparamsFromClass map (_.tpeHK): _*)
+        appliedType(clazz, tparamsFromClass.map(_.tpeHK): _*)
       val thisParam =
         extensionMeth
-          .newValueParameter(nme.SELF, extensionMeth.pos) setInfo thisParamType
+          .newValueParameter(nme.SELF, extensionMeth.pos)
+          .setInfo(thisParamType)
       val resultType =
         MethodType(List(thisParam), dropNullaryMethod(methodResult))
       val selfParamType =
         singleType(currentOwner.companionModule.thisType, thisParam)
 
       def fixres(tp: Type) =
-        tp substThisAndSym
-          (clazz, selfParamType, clazz.typeParams, tparamsFromClass)
+        tp.substThisAndSym(clazz,
+                           selfParamType,
+                           clazz.typeParams,
+                           tparamsFromClass)
       def fixtparam(tp: Type) =
-        tp substSym (clazz.typeParams, tparamsFromClass)
+        tp.substSym(clazz.typeParams, tparamsFromClass)
 
       // We can't substitute symbols on the entire polytype because we
       // need to modify the bounds of the cloned type parameters, but we
       // don't want to substitute for the cloned type parameters themselves.
       val tparams = tparamsFromMethod ::: tparamsFromClass
-      GenPolyType(tparams map (_ modifyInfo fixtparam), fixres(resultType))
+      GenPolyType(tparams.map(_.modifyInfo(fixtparam)), fixres(resultType))
 
       // For reference, calling fix on the GenPolyType plays out like this:
       // error: scala.reflect.internal.Types$TypeError: type arguments [B#7344,A#6966]
@@ -234,16 +237,18 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
           val origThis = currentOwner
           val origTpeParams =
             tparams.map(_.symbol) ::: origThis.typeParams // method type params ++ class type params
-          val origParams = vparamss.flatten map (_.symbol)
+          val origParams = vparamss.flatten.map(_.symbol)
           val companion = origThis.companionModule
 
           def makeExtensionMethodSymbol = {
             val extensionName = extensionNames(origMeth).head.toTermName
             val extensionMeth =
-              (companion.moduleClass.newMethod(
-                extensionName,
-                tree.pos.focus,
-                origMeth.flags & ~OVERRIDE & ~PROTECTED & ~PRIVATE & ~LOCAL | FINAL) setAnnotations origMeth.annotations)
+              (companion.moduleClass
+                .newMethod(
+                  extensionName,
+                  tree.pos.focus,
+                  origMeth.flags & ~OVERRIDE & ~PROTECTED & ~PRIVATE & ~LOCAL | FINAL)
+                .setAnnotations(origMeth.annotations))
             origMeth.removeAnnotation(TailrecClass) // it's on the extension method, now.
             companion.info.decls.enter(extensionMeth)
           }
@@ -251,7 +256,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
           val extensionMeth = makeExtensionMethodSymbol
           val newInfo =
             extensionMethInfo(extensionMeth, origMeth.info, origThis)
-          extensionMeth setInfo newInfo
+          extensionMeth.setInfo(newInfo)
 
           log(
             s"Value class $origThis spawns extension method.\n  Old: ${origMeth.defString}\n  New: ${extensionMeth.defString}")
@@ -260,7 +265,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
                           MethodType(thiz :: Nil, extensionMono)) = newInfo
           val extensionParams = allParameters(extensionMono)
           val extensionThis =
-            gen.mkAttributedStableRef(thiz setPos extensionMeth.pos)
+            gen.mkAttributedStableRef(thiz.setPos(extensionMeth.pos))
 
           val extensionBody: Tree = {
             val tree = rhs
@@ -290,7 +295,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
           val sel = Select(
             gen.mkAttributedRef(companion.owner.thisType, companion),
             extensionMeth)
-          val targs = origTpeParams map (_.tpeHK)
+          val targs = origTpeParams.map(_.tpeHK)
           val callPrefix = gen.mkMethodCall(sel, targs, This(origThis) :: Nil)
 
           // Apply all the argument lists.
@@ -308,14 +313,14 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
 
     override def transformStats(stats: List[Tree],
                                 exprOwner: Symbol): List[Tree] =
-      super.transformStats(stats, exprOwner) map {
+      super.transformStats(stats, exprOwner).map {
         case md @ ModuleDef(_, _, _) =>
-          val extraStats = extensionDefs remove md.symbol match {
+          val extraStats = extensionDefs.remove(md.symbol) match {
             case Some(defns) =>
-              defns.toList map
-                (defn =>
-                   atOwner(md.symbol)(
-                     localTyper.typedPos(md.pos.focus)(defn.duplicate)))
+              defns.toList.map(
+                defn =>
+                  atOwner(md.symbol)(
+                    localTyper.typedPos(md.pos.focus)(defn.duplicate)))
             case _ => Nil
           }
           if (extraStats.isEmpty) md

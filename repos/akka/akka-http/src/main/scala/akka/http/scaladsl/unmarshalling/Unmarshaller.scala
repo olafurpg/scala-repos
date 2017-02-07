@@ -23,16 +23,16 @@ trait Unmarshaller[-A, B] {
     }
 
   def map[C](f: B ⇒ C): Unmarshaller[A, C] =
-    transform(implicit ec ⇒ _ ⇒ _.fast map f)
+    transform(implicit ec ⇒ _ ⇒ _.fast.map(f))
 
   def flatMap[C](
       f: ExecutionContext ⇒ Materializer ⇒ B ⇒ Future[C]): Unmarshaller[A, C] =
-    transform(implicit ec ⇒ mat ⇒ _.fast flatMap f(ec)(mat))
+    transform(implicit ec ⇒ mat ⇒ _.fast.flatMap(f(ec)(mat)))
 
   def recover[C >: B](
       pf: ExecutionContext ⇒ Materializer ⇒ PartialFunction[Throwable, C])
     : Unmarshaller[A, C] =
-    transform(implicit ec ⇒ mat ⇒ _.fast recover pf(ec)(mat))
+    transform(implicit ec ⇒ mat ⇒ _.fast.recover(pf(ec)(mat)))
 
   def withDefaultValue[BB >: B](defaultValue: BB): Unmarshaller[A, BB] =
     recover(_ ⇒ _ ⇒ { case Unmarshaller.NoContentException ⇒ defaultValue })
@@ -117,7 +117,7 @@ object Unmarshaller
     def forContentTypes(ranges: ContentTypeRange*): FromEntityUnmarshaller[A] =
       Unmarshaller.withMaterializer { implicit ec ⇒ implicit mat ⇒ entity ⇒
         if (entity.contentType == ContentTypes.NoContentType ||
-            ranges.exists(_ matches entity.contentType)) {
+            ranges.exists(_.matches(entity.contentType))) {
           underlying(entity).fast.recover[A](
             barkAtUnsupportedContentTypeException(ranges, entity.contentType))
         } else FastFuture.failed(UnsupportedContentTypeException(ranges: _*))

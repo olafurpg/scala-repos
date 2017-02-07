@@ -24,9 +24,9 @@ trait SetInstances {
       r
     }
     override def all[A](fa: Set[A])(f: A => Boolean) =
-      fa forall f
+      fa.forall(f)
     override def any[A](fa: Set[A])(f: A => Boolean) =
-      fa exists f
+      fa.exists(f)
   }
 
   import Ordering._

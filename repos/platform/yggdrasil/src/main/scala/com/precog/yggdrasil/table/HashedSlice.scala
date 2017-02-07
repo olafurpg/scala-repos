@@ -35,13 +35,13 @@ final class HashedSlice private (slice0: Slice,
   def mapRowsFrom(slice1: Slice): Int => (Int => Unit) => Unit = {
     val hasher = new SliceHasher(slice1)
     val rowComparator: RowComparator = Slice.rowComparatorFor(slice1, slice0) {
-      _.columns.keys map (_.selector)
+      _.columns.keys.map(_.selector)
     }
 
     { (lrow: Int) =>
       { (f: Int => Unit) =>
-        val matches = rowMap get hasher.hash(lrow) getOrElse IntNil
-        matches foreach { rrow =>
+        val matches = rowMap.get(hasher.hash(lrow)).getOrElse(IntNil)
+        matches.foreach { rrow =>
           if (rowComparator.compare(lrow, rrow) == scalaz.Ordering.EQ) f(rrow)
         }
       }
@@ -71,7 +71,7 @@ object HashedSlice {
   */
 private final class SliceHasher(slice: Slice) {
   private val hashers: Array[ColumnHasher] =
-    slice.columns.toArray map {
+    slice.columns.toArray.map {
       case (ref, col) =>
         ColumnHasher(ref, col)
     }

@@ -45,7 +45,7 @@ class ListMap[A, B]
   private var elems: List[(A, B)] = List()
   private var siz: Int = 0
 
-  def get(key: A): Option[B] = elems find (_._1 == key) map (_._2)
+  def get(key: A): Option[B] = (elems find (_._1 == key)).map(_._2)
   def iterator: Iterator[(A, B)] = elems.iterator
 
   @deprecatedOverriding(

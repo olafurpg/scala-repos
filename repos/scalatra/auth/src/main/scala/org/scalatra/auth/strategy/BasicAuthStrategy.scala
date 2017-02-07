@@ -36,7 +36,8 @@ trait BasicAuthSupport[UserType <: AnyRef] {
                             response: HttpServletResponse) = {
     val baReq = new BasicAuthStrategy.BasicAuthRequest(request)
     if (!baReq.providesAuth) {
-      response.setHeader("WWW-Authenticate", "Basic realm=\"%s\"" format realm)
+      response.setHeader("WWW-Authenticate",
+                         "Basic realm=\"%s\"".format(realm))
       halt(401, "Unauthenticated")
     }
     if (!baReq.isBasicAuth) {
@@ -55,7 +56,9 @@ object BasicAuthStrategy {
   class BasicAuthRequest(r: HttpServletRequest) {
 
     def parts =
-      authorizationKey map { r.getHeader(_).split(" ", 2).toList } getOrElse Nil
+      authorizationKey
+        .map { r.getHeader(_).split(" ", 2).toList }
+        .getOrElse(Nil)
     def scheme: Option[String] =
       parts.headOption.map(sch => sch.toLowerCase(Locale.ENGLISH))
     def params = parts.lastOption
@@ -71,7 +74,7 @@ object BasicAuthStrategy {
     private[this] var _credentials: Option[(String, String)] = None
     def credentials = {
       if (_credentials.isEmpty)
-        _credentials = params map { p =>
+        _credentials = params.map { p =>
           (null.asInstanceOf[(String, String)] /: new String(
             Base64.decode(p),
             Codec.UTF8.charSet).split(":", 2)) { (t, l) =>
@@ -80,8 +83,8 @@ object BasicAuthStrategy {
         }
       _credentials
     }
-    def username = credentials map { _._1 } getOrElse null
-    def password = credentials map { _._2 } getOrElse null
+    def username = credentials.map { _._1 }.getOrElse(null)
+    def password = credentials.map { _._2 }.getOrElse(null)
   }
 }
 abstract class BasicAuthStrategy[UserType <: AnyRef](
@@ -95,7 +98,7 @@ abstract class BasicAuthStrategy[UserType <: AnyRef](
   implicit def request2BasicAuthRequest(r: HttpServletRequest) =
     new BasicAuthStrategy.BasicAuthRequest(r)
 
-  protected def challenge = "Basic realm=\"%s\"" format realm
+  protected def challenge = "Basic realm=\"%s\"".format(realm)
 
   override def isValid(implicit request: HttpServletRequest) =
     request.isBasicAuth && request.providesAuth
@@ -119,7 +122,7 @@ abstract class BasicAuthStrategy[UserType <: AnyRef](
 
   override def unauthenticated()(implicit request: HttpServletRequest,
                                  response: HttpServletResponse) {
-    app halt Unauthorized(headers = Map("WWW-Authenticate" -> challenge))
+    app.halt(Unauthorized(headers = Map("WWW-Authenticate" -> challenge)))
   }
 
   override def afterLogout(user: UserType)(

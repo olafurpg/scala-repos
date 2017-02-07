@@ -267,10 +267,10 @@ object Iterator {
       else empty.next()
     }
     override protected def sliceIterator(from: Int, until: Int): Iterator[A] = {
-      val lo = from max 0
+      val lo = from.max(0)
       def adjustedBound =
         if (unbounded) -1
-        else 0 max (remaining - lo)
+        else 0.max(remaining - lo)
       val rest =
         if (until < 0) adjustedBound // respect current bound, if any
         else if (until <= lo) 0 // empty
@@ -398,7 +398,7 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
     *          whole iterator, if it produces fewer than `n` values.
     *  @note   Reuse: $consumesAndProducesIterator
     */
-  def take(n: Int): Iterator[A] = sliceIterator(0, n max 0)
+  def take(n: Int): Iterator[A] = sliceIterator(0, n.max(0))
 
   /** Advances this iterator past the first ''n'' elements, or the length of the iterator, whichever is smaller.
     *
@@ -426,11 +426,11 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
     *  @note         Reuse: $consumesAndProducesIterator
     */
   def slice(from: Int, until: Int): Iterator[A] =
-    sliceIterator(from, until max 0)
+    sliceIterator(from, until.max(0))
 
   /** Creates an optionally bounded slice, unbounded if `until` is negative. */
   protected def sliceIterator(from: Int, until: Int): Iterator[A] = {
-    val lo = from max 0
+    val lo = from.max(0)
     val rest =
       if (until < 0) -1 // unbounded
       else if (until <= lo) 0 // empty
@@ -1172,7 +1172,7 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
     }
 
     private def padding(x: Int) = List.fill(x)(pad.get())
-    private def gap = (step - size) max 0
+    private def gap = ((step - size)).max(0)
 
     private def go(count: Int) = {
       val prevSize = buffer.size
@@ -1193,13 +1193,13 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
       // elements is less than the gap between sequences, we are done.
       def deliver(howMany: Int) = {
         (howMany > 0 && (isFirst || len > gap)) && {
-          if (!isFirst) buffer trimStart (step min prevSize)
+          if (!isFirst) buffer.trimStart(step min prevSize)
 
           val available =
             if (isFirst) len
             else howMany min (len - gap)
 
-          buffer ++= (xs takeRight available)
+          buffer ++= (xs.takeRight(available))
           filled = true
           true
         }
@@ -1302,7 +1302,7 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
         if (gap.isEmpty) ahead = this
         if (this eq ahead) {
           val e = self.next()
-          gap enqueue e
+          gap.enqueue(e)
           e
         } else gap.dequeue()
       }
@@ -1338,14 +1338,14 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
         (if (from > 0) from else 0) // Counts down, switch to patch on 0, -1 means use patch first
       def hasNext: Boolean = {
         if (i == 0) {
-          origElems = origElems drop replaced
+          origElems = origElems.drop(replaced)
           i = -1
         }
         origElems.hasNext || patchElems.hasNext
       }
       def next(): B = {
         if (i == 0) {
-          origElems = origElems drop replaced
+          origElems = origElems.drop(replaced)
           i = -1
         }
         if (i < 0) {

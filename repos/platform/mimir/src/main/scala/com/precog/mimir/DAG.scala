@@ -69,7 +69,7 @@ trait DAG extends Instructions {
             List[Either[BucketSpec, DepGraph]]])
         : Trampoline[Either[StackError, DepGraph]] = {
         Free.suspend(
-          M.sequence(f(roots).right map { roots2 =>
+          M.sequence(f(roots).right.map { roots2 =>
               loop(loc, roots2, splits, stream.tail)
             })
             .map(_.joinRight))
@@ -77,13 +77,13 @@ trait DAG extends Instructions {
 
       def processJoinInstr(instr: JoinInstr) = {
         val maybeOpSort =
-          Some(instr) collect {
+          Some(instr).collect {
             case instructions.Map2Match(op) => (op, IdentitySort)
             case instructions.Map2Cross(op) => (op, Cross(None))
           }
 
         val eitherRootsOp =
-          maybeOpSort map {
+          maybeOpSort.map {
             case (op, joinSort) =>
               continue {
                 case Right(right) :: Right(left) :: tl =>
@@ -95,7 +95,7 @@ trait DAG extends Instructions {
           }
 
         val eitherRootsAbom =
-          Some(instr) collect {
+          Some(instr).collect {
             case instr @ instructions.Observe =>
               continue {
                 case Right(samples) :: Right(data) :: tl =>
@@ -134,18 +134,18 @@ trait DAG extends Instructions {
               }
           }
 
-        eitherRootsOp orElse eitherRootsAbom get // assertion
+        eitherRootsOp.orElse(eitherRootsAbom) get // assertion
       }
 
       def processFilter(
           instr: Instruction,
           joinSort: JoinSort): Trampoline[Either[StackError, DepGraph]] = {
-        val (args, roots2) = roots splitAt 2
+        val (args, roots2) = roots.splitAt(2)
 
         if (args.lengthCompare(2) < 0) {
           Left(StackUnderflow(instr)).point[Trampoline]
         } else {
-          val rightArgs = args flatMap { _.right.toOption }
+          val rightArgs = args.flatMap { _.right.toOption }
 
           if (rightArgs.lengthCompare(2) < 0) {
             Left(OperationOnBucket(instr)).point[Trampoline]
@@ -160,7 +160,7 @@ trait DAG extends Instructions {
       }
 
       val tail: Option[Trampoline[Either[StackError, DepGraph]]] =
-        stream.headOption map {
+        stream.headOption.map {
           case instr @ Map1(instructions.New) => {
             continue {
               case Right(hd) :: tl => Right(Right(New(hd)(loc)) :: tl)
@@ -296,7 +296,7 @@ trait DAG extends Instructions {
               case Nil => (Left(UnmatchedMerge), Nil)
             }
 
-            M.sequence(eitherRoots.right map { roots2 =>
+            M.sequence(eitherRoots.right.map { roots2 =>
                 loop(loc, roots2, splits2, stream.tail)
               })
               .map(_.joinRight)
@@ -317,8 +317,8 @@ trait DAG extends Instructions {
               if (roots.lengthCompare(depth + 1) < 0) {
                 Left(StackUnderflow(instr)).point[Trampoline]
               } else {
-                val (span, rest) = roots splitAt (depth + 1)
-                val (spanInit, spanTail) = span splitAt depth
+                val (span, rest) = roots.splitAt(depth + 1)
+                val (spanInit, spanTail) = span.splitAt(depth)
                 val roots2 =
                   spanTail ::: spanInit.tail ::: (span.head :: rest)
                 loop(loc, roots2, splits, stream.tail)
@@ -364,13 +364,15 @@ trait DAG extends Instructions {
               splits find { open =>
                 findGraphWithId(id)(open.spec).isDefined
               }
-            openPoss map { open =>
-              loop(loc,
-                   Right(SplitParam(id, open.id)(loc)) :: roots,
-                   splits,
-                   stream.tail)
-            } getOrElse Left(UnableToLocateSplitDescribingId(id))
-              .point[Trampoline]
+            openPoss
+              .map { open =>
+                loop(loc,
+                     Right(SplitParam(id, open.id)(loc)) :: roots,
+                     splits,
+                     stream.tail)
+              }
+              .getOrElse(Left(UnableToLocateSplitDescribingId(id))
+                .point[Trampoline])
           }
 
           case PushGroup(id) => {
@@ -378,15 +380,17 @@ trait DAG extends Instructions {
               splits find { open =>
                 findGraphWithId(id)(open.spec).isDefined
               }
-            openPoss map { open =>
-              val graph = findGraphWithId(id)(open.spec).get
-              loop(
-                loc,
-                Right(SplitGroup(id, graph.identities, open.id)(loc)) :: roots,
-                splits,
-                stream.tail)
-            } getOrElse Left(UnableToLocateSplitDescribingId(id))
-              .point[Trampoline]
+            openPoss
+              .map { open =>
+                val graph = findGraphWithId(id)(open.spec).get
+                loop(
+                  loc,
+                  Right(SplitGroup(id, graph.identities, open.id)(loc)) :: roots,
+                  splits,
+                  stream.tail)
+              }
+              .getOrElse(Left(UnableToLocateSplitDescribingId(id))
+                .point[Trampoline])
           }
 
           case instr: RootInstr => {
@@ -408,7 +412,7 @@ trait DAG extends Instructions {
           }
         }
 
-      tail getOrElse {
+      tail.getOrElse {
         {
           if (!splits.isEmpty) {
             Left(UnmatchedSplit)
@@ -442,13 +446,15 @@ trait DAG extends Instructions {
           case PushArray => RArray.empty
         }
 
-        line map { ln =>
-          Right((Const(rvalue)(ln), stream.tail))
-        } getOrElse Left(UnknownLine)
+        line
+          .map { ln =>
+            Right((Const(rvalue)(ln), stream.tail))
+          }
+          .getOrElse(Left(UnknownLine))
       }
 
       val back =
-        stream.headOption collect {
+        stream.headOption.collect {
           case ln: Line => findFirstRoot(Some(ln), stream.tail)
 
           case i: PushString => buildConstRoot(i)
@@ -460,20 +466,22 @@ trait DAG extends Instructions {
           case PushArray => buildConstRoot(PushArray)
 
           case PushUndefined =>
-            line map { ln =>
-              Right((Undefined(ln), stream.tail))
-            } getOrElse Left(UnknownLine)
+            line
+              .map { ln =>
+                Right((Undefined(ln), stream.tail))
+              }
+              .getOrElse(Left(UnknownLine))
 
           case instr => Left(StackUnderflow(instr))
         }
 
-      back getOrElse Left(EmptyStream)
+      back.getOrElse(Left(EmptyStream))
     }
 
     if (stream.isEmpty) {
       Left(EmptyStream)
     } else {
-      M.sequence(findFirstRoot(None, stream).right map {
+      M.sequence(findFirstRoot(None, stream).right.map {
           case (root, tail) => loop(root.loc, Right(root) :: Nil, Nil, tail)
         })
         .map(_.joinRight)
@@ -484,9 +492,9 @@ trait DAG extends Instructions {
   private def findGraphWithId(id: Int)(
       spec: dag.BucketSpec): Option[DepGraph] = spec match {
     case dag.UnionBucketSpec(left, right) =>
-      findGraphWithId(id)(left) orElse findGraphWithId(id)(right)
+      findGraphWithId(id)(left).orElse(findGraphWithId(id)(right))
     case dag.IntersectBucketSpec(left, right) =>
-      findGraphWithId(id)(left) orElse findGraphWithId(id)(right)
+      findGraphWithId(id)(left).orElse(findGraphWithId(id)(right))
     case dag.Group(`id`, target, _) => Some(target)
     case dag.Group(_, _, child) => findGraphWithId(id)(child)
     case dag.UnfixedSolution(`id`, target) => Some(target)
@@ -518,7 +526,7 @@ trait DAG extends Instructions {
     }
     case class Specs(specs: Vector[dag.IdentitySpec]) extends Identities {
       override def length = specs.length
-      override def distinct = Specs(specs map { _.canonicalize } distinct)
+      override def distinct = Specs(specs.map { _.canonicalize } distinct)
       override def fold[A](identities: Vector[dag.IdentitySpec] => A, b: A) =
         identities(specs)
     }
@@ -651,7 +659,7 @@ trait DAG extends Instructions {
             dag.Extra(memoized(target))
         }
 
-        memotable.get(new DepGraphWrapper(node)) getOrElse {
+        memotable.get(new DepGraphWrapper(node)).getOrElse {
           val result = inner(node)
           memotable += (new DepGraphWrapper(node) -> result)
           result
@@ -881,7 +889,7 @@ trait DAG extends Instructions {
             } yield node
         }
 
-        memotable.get(node) getOrElse {
+        memotable.get(node).getOrElse {
           val result = inner(node)
           memotable += (node -> result)
           result
@@ -1064,7 +1072,7 @@ trait DAG extends Instructions {
       case _ => false
     }
 
-    override def hashCode: Int = System identityHashCode graph
+    override def hashCode: Int = System.identityHashCode(graph)
   }
 
   object dag {
@@ -1409,7 +1417,7 @@ trait DAG extends Instructions {
         with StagingPoint {
       lazy val identities = (left.identities, right.identities) match {
         case (Identities.Specs(a), Identities.Specs(b)) =>
-          Identities.Specs((a, b).zipped map CoproductIds)
+          Identities.Specs((a, b).zipped.map(CoproductIds))
         case _ => Identities.Undefined
       }
 
@@ -1561,7 +1569,7 @@ trait DAG extends Instructions {
 
         val pos = this2.possibilities
 
-        pos reduceOption CoproductIds orElse pos.headOption getOrElse this2
+        pos.reduceOption(CoproductIds).orElse(pos.headOption).getOrElse(this2)
       }
 
       override def possibilities: Set[IdentitySpec] = {
@@ -1595,15 +1603,15 @@ trait DAG extends Instructions {
       def identities: Identities = (left.identities, right.identities) match {
         case (Identities.Specs(lSpecs), Identities.Specs(rSpecs)) =>
           val specs =
-            (sharedIndices map { case (lIdx, _) => lSpecs(lIdx) }) ++
-              (leftIndices map lSpecs) ++ (rightIndices map rSpecs)
-          Identities.Specs(specs map (_.canonicalize))
+            (sharedIndices.map { case (lIdx, _) => lSpecs(lIdx) }) ++
+              (leftIndices.map(lSpecs)) ++ (rightIndices.map(rSpecs))
+          Identities.Specs(specs.map(_.canonicalize))
         case (_, _) => Identities.Undefined
       }
 
       private def canonicalize(identities: Identities) = identities match {
         case Identities.Specs(ids) =>
-          Identities.Specs(ids map (_.canonicalize))
+          Identities.Specs(ids.map(_.canonicalize))
         case other => other
       }
 
@@ -1635,7 +1643,7 @@ trait DAG extends Instructions {
 
       private def matches = (leftIdentities, rightIdentities) match {
         case (Identities.Specs(a), Identities.Specs(b)) =>
-          a.zipWithIndex flatMap findMatch(b)
+          a.zipWithIndex.flatMap(findMatch(b))
         case (Identities.Undefined, _) | (_, Identities.Undefined) =>
           Vector.empty
       }
@@ -1643,7 +1651,7 @@ trait DAG extends Instructions {
       private def extras(identities: Identities): Vector[Int] =
         identities match {
           case Identities.Specs(ids) =>
-            ids.zipWithIndex collect {
+            ids.zipWithIndex.collect {
               case (id, index) if !(sharedIds contains id) =>
                 index
             }

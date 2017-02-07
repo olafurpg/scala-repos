@@ -124,7 +124,7 @@ class AbstractTestRerunFailedTestsAction(
     val list = new ArrayList[AbstractTestProxy]()
     val allTests = getModel.getRoot.getAllTests
     import scala.collection.JavaConversions._
-    for (test <- allTests if isFailed(test)) list add test
+    for (test <- allTests if isFailed(test)) list.add(test)
     list
   }
 }

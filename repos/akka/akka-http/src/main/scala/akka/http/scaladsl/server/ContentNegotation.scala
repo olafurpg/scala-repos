@@ -35,7 +35,8 @@ final class MediaTypeNegotiator(requestHeaders: Seq[HttpHeader]) {
     acceptedMediaRanges match {
       case Nil ⇒ 1.0f
       case x ⇒
-        x collectFirst { case r if r matches mediaType ⇒ r.qValue } getOrElse 0f
+        x.collectFirst { case r if r.matches(mediaType) ⇒ r.qValue }
+          .getOrElse(0f)
     }
 
   /**
@@ -69,7 +70,8 @@ final class CharsetNegotiator(requestHeaders: Seq[HttpHeader]) {
     acceptedCharsetRanges match {
       case Nil ⇒ 1.0f
       case x ⇒
-        x collectFirst { case r if r matches charset ⇒ r.qValue } getOrElse 0f
+        x.collectFirst { case r if r.matches(charset) ⇒ r.qValue }
+          .getOrElse(0f)
     }
 
   /**
@@ -182,7 +184,8 @@ final class EncodingNegotiator(requestHeaders: Seq[HttpHeader]) {
     acceptedEncodingRanges match {
       case Nil ⇒ 1.0f
       case x ⇒
-        x collectFirst { case r if r matches encoding ⇒ r.qValue } getOrElse 0f
+        x.collectFirst { case r if r.matches(encoding) ⇒ r.qValue }
+          .getOrElse(0f)
     }
 
   /**
@@ -194,7 +197,7 @@ final class EncodingNegotiator(requestHeaders: Seq[HttpHeader]) {
     * Determines whether the request has an `Accept-Encoding` clause matching the given encoding.
     */
   def hasMatchingFor(encoding: HttpEncoding): Boolean =
-    acceptedEncodingRanges.exists(_ matches encoding)
+    acceptedEncodingRanges.exists(_.matches(encoding))
 
   /**
     * Picks the best of the given encoding alternatives given the preferences
@@ -244,7 +247,8 @@ final class LanguageNegotiator(requestHeaders: Seq[HttpHeader]) {
     acceptedLanguageRanges match {
       case Nil ⇒ 1.0f
       case x ⇒
-        x collectFirst { case r if r matches language ⇒ r.qValue } getOrElse 0f
+        x.collectFirst { case r if r.matches(language) ⇒ r.qValue }
+          .getOrElse(0f)
     }
 
   /**

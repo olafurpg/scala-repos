@@ -49,7 +49,7 @@ trait PerfTestRunner[M[+ _], T] {
   private def fill[A](run: RunResult[A]): RunResult[A] = run match {
     case n @ Tree.Node((_: RunQuery, _, _), _) => n
     case Tree.Node((test, a, _), children) =>
-      val kids = children map (fill(_))
+      val kids = children.map(fill(_))
       val t = kids.foldLeft(None: Option[(T, T)]) {
         case (acc, Tree.Node((_, _, t), _)) =>
           acc |+| t
@@ -61,7 +61,7 @@ trait PerfTestRunner[M[+ _], T] {
                                f: Option[(T, T)] => A): Tree[(PerfTest, A)] = {
     fill(run) match {
       case Tree.Node((test, a, time), children) =>
-        Tree.node((test, a |+| f(time)), children map (merge(_, f)))
+        Tree.node((test, a |+| f(time)), children.map(merge(_, f)))
     }
   }
 
@@ -76,41 +76,45 @@ trait PerfTestRunner[M[+ _], T] {
       f: Option[(T, T)] => A) = {
     require(n > 0)
 
-    (1 to n).foldLeft((test map (_ -> Monoid[A].zero)).pure[M]) { (acc, _) =>
-      acc flatMap (runM(_)) map (merge(_, f))
+    (1 to n).foldLeft((test.map(_ -> Monoid[A].zero)).pure[M]) { (acc, _) =>
+      acc.flatMap(runM(_)).map(merge(_, f))
     }
   }
 
   def runM[A](test: Tree[(PerfTest, A)]): M[RunResult[A]] = {
     test match {
       case Tree.Node((test @ RunQuery(q), a), _) =>
-        timeQuery(q) map {
+        timeQuery(q).map {
           case (t, _) =>
             Tree.leaf((test, a, Some(t)))
         }
 
       case Tree.Node((RunSequential, a), tests) =>
-        tests.foldLeft(List[RunResult[A]]().pure[M]) { (acc, test) =>
-          acc flatMap { rs =>
-            runM(test) map (_ :: rs)
+        tests
+          .foldLeft(List[RunResult[A]]().pure[M]) { (acc, test) =>
+            acc.flatMap { rs =>
+              runM(test).map(_ :: rs)
+            }
           }
-        } map { children =>
-          Tree.node((RunSequential, a, None), children.reverse.toStream)
-        }
+          .map { children =>
+            Tree.node((RunSequential, a, None), children.reverse.toStream)
+          }
 
       case Tree.Node((RunConcurrent, a), tests) =>
-        (tests map (runM(_))).foldLeft(List[RunResult[A]]().pure[M]) {
-          (acc, run) =>
-            acc flatMap { rs =>
-              run map { _ :: rs }
+        (tests
+          .map(runM(_)))
+          .foldLeft(List[RunResult[A]]().pure[M]) { (acc, run) =>
+            acc.flatMap { rs =>
+              run.map { _ :: rs }
             }
-        } map { children =>
-          Tree.node((RunConcurrent, a, None), children.reverse.toStream)
-        }
+          }
+          .map { children =>
+            Tree.node((RunConcurrent, a, None), children.reverse.toStream)
+          }
 
       case Tree.Node((g: Group, a), tests) =>
         // tests really should only have size 1 in this case...
-        runM(Tree.node((RunConcurrent, a), tests)) map {
+        runM(Tree.node((RunConcurrent, a), tests)).map {
           case Tree.Node((_, a, t), tests) =>
             Tree.node((g, a, t), tests)
         }
@@ -125,7 +129,7 @@ trait PerfTestRunner[M[+ _], T] {
 
   private def timeQuery(q: String): M[((T, T), Result)] = {
     val start = now()
-    eval(q) map (timeSpan(start, now()) -> _)
+    eval(q).map(timeSpan(start, now()) -> _)
   }
 }
 
@@ -139,7 +143,7 @@ class MockPerfTestRunner[M[+ _]](evalTime: => Int)(
   val timer = SimpleTimer
 
   def eval(query: String): M[Result] = {
-    (()).pure[M] map { _ =>
+    (()).pure[M].map { _ =>
       Thread.sleep(evalTime)
       ()
     }

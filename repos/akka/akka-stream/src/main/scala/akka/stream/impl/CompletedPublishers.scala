@@ -64,7 +64,7 @@ private[akka] final case class MaybePublisher[T](
       if (elements < 1) rejectDueToNonPositiveDemand(subscriber)
       if (!done) {
         done = true
-        promise.future foreach {
+        promise.future.foreach {
           // We consciously do not catch SpecViolation here, it will be reported to the ExecutionContext
           case Some(v) ⇒
             tryOnNext(subscriber, v)
@@ -80,7 +80,7 @@ private[akka] final case class MaybePublisher[T](
     try {
       requireNonNullSubscriber(subscriber)
       tryOnSubscribe(subscriber, new MaybeSubscription(subscriber))
-      promise.future onFailure {
+      promise.future.onFailure {
         case error ⇒ tryOnError(subscriber, error)
       }
     } catch {

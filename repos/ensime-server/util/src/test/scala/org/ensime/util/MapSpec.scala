@@ -39,9 +39,9 @@ class MapSpec extends FlatSpec with Matchers {
   }
 
   it should "merge multimap sets" in {
-    (as merge Map.empty) shouldBe as
-    (Map.empty[Int, Set[Symbol]] merge as) shouldBe as
+    (as.merge(Map.empty)) shouldBe as
+    (Map.empty[Int, Set[Symbol]].merge(as)) shouldBe as
 
-    (as merge bs) shouldBe merged
+    (as.merge(bs)) shouldBe merged
   }
 }

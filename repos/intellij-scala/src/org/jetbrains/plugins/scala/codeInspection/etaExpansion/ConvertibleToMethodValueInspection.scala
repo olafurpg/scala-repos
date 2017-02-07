@@ -132,10 +132,10 @@ class ConvertibleToMethodValueInspection
     oldExpr.expectedType(fromUnderscore = false) match {
       case Some(expectedType) if ScFunctionType.isFunctionType(expectedType) =>
         def conformsExpected(expr: ScExpression): Boolean =
-          expr.getType().getOrAny conforms expectedType
+          expr.getType().getOrAny.conforms(expectedType)
         conformsExpected(oldExpr) && conformsExpected(newExpr) &&
         oldExpr.getType().getOrAny.conforms(newExpr.getType().getOrNothing)
-      case None if newExprText endsWith "_" =>
+      case None if newExprText.endsWith("_") =>
         (oldExpr.getType(), newExpr.getType()) match {
           case (Success(oldType, _), Success(newType, _)) =>
             oldType.equiv(newType)
@@ -148,7 +148,7 @@ class ConvertibleToMethodValueInspection
   private def possibleReplacements(expr: ScExpression): Seq[String] = {
     val withoutArguments = methodWithoutArgumentsText(expr)
     val withUnderscore =
-      if (expr.getText endsWith "_") Nil
+      if (expr.getText.endsWith("_")) Nil
       else withoutArguments.map(_ + " _")
 
     withoutArguments ++ withUnderscore

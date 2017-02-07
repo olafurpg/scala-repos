@@ -1,8 +1,8 @@
 class A {
   // First three compile.
-  def f1(x: Either[Int, String]) = x.right map (y => y)
+  def f1(x: Either[Int, String]) = x.right.map(y => y)
   def f2(x: Either[Int, String]) = for (y <- x.right) yield y
-  def f3(x: Either[Int, (String, Int)]) = x.right map {
+  def f3(x: Either[Int, (String, Int)]) = x.right.map {
     case (y1, y2) => (y1, y2)
   }
   // Last one fails.

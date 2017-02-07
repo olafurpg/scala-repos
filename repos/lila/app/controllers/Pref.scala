@@ -17,7 +17,7 @@ object Pref extends LilaController {
     lila.pref.PrefCateg(categSlug) match {
       case None => notFound
       case Some(categ) =>
-        Ok(html.account.pref(me, forms prefOf ctx.pref, categ)).fuccess
+        Ok(html.account.pref(me, forms.prefOf(ctx.pref), categ)).fuccess
     }
   }
 
@@ -41,10 +41,10 @@ object Pref extends LilaController {
 
   def set(name: String) = OpenBody { implicit ctx =>
     implicit val req = ctx.body
-    (setters get name) ?? {
+    (setters.get(name)) ?? {
       case (form, fn) =>
         FormResult(form) { v =>
-          fn(v, ctx) map { cookie =>
+          fn(v, ctx).map { cookie =>
             Ok(()).withCookies(cookie)
           }
         }

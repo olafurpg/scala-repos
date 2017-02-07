@@ -83,8 +83,8 @@ object GlobalPlugin {
                        (prods ++ intcp).distinct)(updateReport)
     }
     val resolvedTaskInit =
-      taskInit mapReferenced Project.mapScope(Scope replaceThis p)
-    val task = resolvedTaskInit evaluate data
+      taskInit.mapReferenced(Project.mapScope(Scope.replaceThis(p)))
+    val task = resolvedTaskInit.evaluate(data)
     val roots = resolvedTaskInit.dependencies
     evaluate(state, structure, task, roots)
   }

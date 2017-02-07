@@ -142,7 +142,7 @@ private[stream] object Fusing {
       case copy @ CopiedModule(shape, attr, gsm: GraphStageModule) ⇒
         stages(pos) = gsm.stage
         matValIDs(pos) = copy
-        attributes(pos) = attr and gsm.attributes
+        attributes(pos) = attr.and(gsm.attributes)
 
         shape.inlets.iterator.zip(gsm.shape.inlets.iterator).foreach {
           case (in, orig) ⇒
@@ -237,7 +237,7 @@ private[stream] object Fusing {
       case None ⇒ Attributes.none
       case Some(d) ⇒ Attributes(d)
     }
-    val attr = async and disp
+    val attr = async.and(disp)
 
     GraphModule(new GraphInterpreter.GraphAssembly(stages,
                                                    attributes,
@@ -301,7 +301,7 @@ private[stream] object Fusing {
           if (Debug)
             log(
               s"dissolving graph module ${m.toString.replace("\n", "\n" + "  " * indent)}")
-          val attributes = inheritedAttributes and m.attributes
+          val attributes = inheritedAttributes.and(m.attributes)
           gm.matValIDs.flatMap(sub ⇒
             descend(sub, attributes, struct, localGroup, indent + 1))(
             collection.breakOut)
@@ -388,7 +388,7 @@ private[stream] object Fusing {
             m -> struct.addModule(m, localGroup, inheritedAttributes, indent))
       }
     } else {
-      val attributes = inheritedAttributes and m.attributes
+      val attributes = inheritedAttributes.and(m.attributes)
       m match {
         case CopiedModule(shape, _, copyOf) ⇒
           val ret =
@@ -778,8 +778,8 @@ private[stream] object Fusing {
       if (Debug)
         println(
           "  " * indent + s"wiring $out (${hash(out)}) -> $in (${hash(in)})")
-      val newOut = removeMapping(out, newOuts) nonNull s"$out (${hash(out)})"
-      val newIn = removeMapping(in, newIns) nonNull s"$in (${hash(in)})"
+      val newOut = removeMapping(out, newOuts).nonNull(s"$out (${hash(out)})")
+      val newIn = removeMapping(in, newIns).nonNull(s"$in (${hash(in)})")
       downstreams.put(newOut, newIn)
       upstreams.put(newIn, newOut)
     }
@@ -796,15 +796,15 @@ private[stream] object Fusing {
         case (oldIn, newIn) ⇒
           addMapping(
             newIn,
-            removeMapping(oldIn, newIns) nonNull s"$oldIn (${hash(oldIn)})",
+            removeMapping(oldIn, newIns).nonNull(s"$oldIn (${hash(oldIn)})"),
             newIns)
       }
       oldShape.outlets.iterator.zip(newShape.outlets.iterator).foreach {
         case (oldOut, newOut) ⇒
-          addMapping(
-            newOut,
-            removeMapping(oldOut, newOuts) nonNull s"$oldOut (${hash(oldOut)})",
-            newOuts)
+          addMapping(newOut,
+                     removeMapping(oldOut, newOuts).nonNull(
+                       s"$oldOut (${hash(oldOut)})"),
+                     newOuts)
       }
     }
 
@@ -826,7 +826,7 @@ private[stream] object Fusing {
     */
   private def isAsync(m: CopiedModule): Boolean = m match {
     case CopiedModule(_, inherited, orig) ⇒
-      val attr = inherited and orig.attributes
+      val attr = inherited.and(orig.attributes)
       attr.contains(AsyncBoundary)
   }
 
@@ -836,7 +836,7 @@ private[stream] object Fusing {
   private def dispatcher(m: Module): Option[ActorAttributes.Dispatcher] =
     m match {
       case CopiedModule(_, inherited, orig) ⇒
-        val attr = inherited and orig.attributes
+        val attr = inherited.and(orig.attributes)
         attr.get[ActorAttributes.Dispatcher]
       case x ⇒ x.attributes.get[ActorAttributes.Dispatcher]
     }

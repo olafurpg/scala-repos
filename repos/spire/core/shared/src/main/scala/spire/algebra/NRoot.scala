@@ -38,7 +38,7 @@ object NRoot {
     * `x * x < y < (x+1)*(x+1)`, by using `intSearch(x => x * x <= y)`.
     */
   private def intSearch(f: Int => Boolean): Int = {
-    val ceil = (0 until 32) find (i => !f(1 << i)) getOrElse 33
+    val ceil = ((0 until 32) find (i => !f(1 << i))).getOrElse(33)
     if (ceil == 0) {
       0
     } else {
@@ -94,15 +94,15 @@ object NRoot {
       BigDecimal(1)
     } else if (a.signum < 0) {
       if (k % 2 == 0) {
-        throw new ArithmeticException("%d-root of negative number" format k)
+        throw new ArithmeticException("%d-root of negative number".format(k))
       } else {
         -nroot(-a, k, ctxt)
       }
     } else {
       val underlying = BigInt(a.bigDecimal.unscaledValue.toByteArray)
-      val scale = BigInt(10) pow a.scale
+      val scale = BigInt(10).pow(a.scale)
       val intPart = digitize(underlying / scale, radix)
-      val fracPart = decDiv(underlying % scale, scale, radix) map (_.toInt)
+      val fracPart = decDiv(underlying % scale, scale, radix).map(_.toInt)
       val leader =
         if (intPart.size % k == 0) Stream.empty
         else {
@@ -110,7 +110,7 @@ object NRoot {
         }
       val digits =
         leader ++ intPart.toStream ++ fracPart ++ Stream.continually(0)
-      val radixPowK = BigInt(radix) pow k
+      val radixPowK = BigInt(radix).pow(k)
 
       // Total # of digits to compute.
       // Note: I originally had `+ 1` here, but some edge cases were missed, so now
@@ -122,22 +122,22 @@ object NRoot {
                    r: BigInt,
                    i: Int): (Int, BigInt) = {
         val y_ = y * radix
-        val a = undigitize(digits take k, radix)
+        val a = undigitize(digits.take(k), radix)
         // Note: target grows quite fast (so I imagine (y_ + b) pow k does too).
-        val target = radixPowK * r + a + (y_ pow k)
-        val b = intSearch(b => ((y_ + b) pow k) <= target)
+        val target = radixPowK * r + a + (y_.pow(k))
+        val b = intSearch(b => (((y_ + b)).pow(k)) <= target)
 
         val ny = y_ + b
 
         if (i == maxSize) {
           (i, ny)
         } else {
-          val nr = target - (ny pow k)
+          val nr = target - (ny.pow(k))
 
           // TODO: Add stopping condition for when nr == 0 and there are no more
           // digits. Tricky part is refactoring to know when digits end...
 
-          findRoot(digits drop k, ny, nr, i + 1)
+          findRoot(digits.drop(k), ny, nr, i + 1)
         }
       }
 

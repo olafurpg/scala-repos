@@ -23,11 +23,11 @@ object Setup extends LilaController with TheftPrevention {
     new lila.memo.RateLimit(5, 1 minute, "setup post")
 
   def aiForm = Open { implicit ctx =>
-    if (HTTPRequest isXhr ctx.req) {
-      env.forms aiFilled get("fen") map { form =>
+    if (HTTPRequest.isXhr(ctx.req)) {
+      env.forms.aiFilled(get("fen")).map { form =>
         html.setup.ai(form,
                       Env.fishnet.aiPerfApi.intRatings,
-                      form("fen").value flatMap ValidFen(getBool("strict")))
+                      form("fen").value.flatMap(ValidFen(getBool("strict"))))
       }
     } else
       fuccess {
@@ -36,17 +36,17 @@ object Setup extends LilaController with TheftPrevention {
   }
 
   def ai = process(env.forms.ai) { config => implicit ctx =>
-    env.processor ai config
+    env.processor.ai(config)
   }
 
   def friendForm(userId: Option[String]) = Open { implicit ctx =>
-    if (HTTPRequest isXhr ctx.req) {
-      env.forms friendFilled get("fen") flatMap { form =>
-        val validFen = form("fen").value flatMap ValidFen(false)
-        userId ?? UserRepo.named flatMap {
+    if (HTTPRequest.isXhr(ctx.req)) {
+      env.forms.friendFilled(get("fen")).flatMap { form =>
+        val validFen = form("fen").value.flatMap(ValidFen(false))
+        (userId ?? UserRepo.named).flatMap {
           case None => fuccess(html.setup.friend(form, none, none, validFen))
           case Some(user) =>
-            Challenge.restriction(user) map { error =>
+            Challenge.restriction(user).map { error =>
               html.setup.friend(form, user.some, error, validFen)
             }
         }
@@ -71,20 +71,23 @@ object Setup extends LilaController with TheftPrevention {
                 api = _ => fuccess(BadRequest(errorsAsJson(f)))
             ), {
               case config =>
-                userId ?? UserRepo.byId flatMap {
+                (userId ?? UserRepo.byId).flatMap {
                   destUser =>
                     import lila.challenge.Challenge._
                     val challenge = lila.challenge.Challenge.make(
                       variant = config.variant,
                       initialFen = config.fen,
-                      timeControl = config.makeClock map { c =>
-                        TimeControl.Clock(c.limit, c.increment)
-                      } orElse config.makeDaysPerTurn.map {
-                        TimeControl.Correspondence.apply
-                      } getOrElse TimeControl.Unlimited,
+                      timeControl = config.makeClock
+                        .map { c =>
+                          TimeControl.Clock(c.limit, c.increment)
+                        }
+                        .orElse(config.makeDaysPerTurn.map {
+                          TimeControl.Correspondence.apply
+                        })
+                        .getOrElse(TimeControl.Unlimited),
                       mode = config.mode,
                       color = config.color.name,
-                      challenger = (ctx.me, HTTPRequest sid req) match {
+                      challenger = (ctx.me, HTTPRequest.sid(req)) match {
                         case (Some(user), _) => Right(user)
                         case (_, Some(sid)) => Left(sid)
                         case _ => Left("no_sid")
@@ -93,10 +96,10 @@ object Setup extends LilaController with TheftPrevention {
                       rematchOf = none
                     )
                     env.processor.saveFriendConfig(config) >>
-                      (Env.challenge.api create challenge) >> negotiate(
+                      (Env.challenge.api.create(challenge)) >> negotiate(
                       html = fuccess(
                         Redirect(routes.Round.watcher(challenge.id, "white"))),
-                      api = _ => Challenge showChallenge challenge)
+                      api = _ => Challenge.showChallenge(challenge))
                 }
             }
           )
@@ -104,9 +107,9 @@ object Setup extends LilaController with TheftPrevention {
     }
 
   def hookForm = Open { implicit ctx =>
-    if (HTTPRequest isXhr ctx.req)
+    if (HTTPRequest.isXhr(ctx.req))
       NoPlaybanOrCurrent {
-        env.forms.hookFilled(timeModeString = get("time")) map {
+        env.forms.hookFilled(timeModeString = get("time")).map {
           html.setup.hook(_)
         }
       } else
@@ -116,7 +119,7 @@ object Setup extends LilaController with TheftPrevention {
   }
 
   private def hookResponse(hookId: String) =
-    Ok(Json.obj("ok" -> true, "hook" -> Json.obj("id" -> hookId))) as JSON
+    Ok(Json.obj("ok" -> true, "hook" -> Json.obj("id" -> hookId))).as(JSON)
 
   def hook(uid: String) = OpenBody { implicit ctx =>
     implicit val req = ctx.body
@@ -130,15 +133,15 @@ object Setup extends LilaController with TheftPrevention {
               negotiate(html = BadRequest(errorsAsJson(err).toString).fuccess,
                         api = _ => BadRequest(errorsAsJson(err)).fuccess),
             config =>
-              (ctx.userId ?? Env.relation.api.fetchBlocking) flatMap {
+              ((ctx.userId ?? Env.relation.api.fetchBlocking)).flatMap {
                 blocking =>
-                  env.processor.hook(config,
-                                     uid,
-                                     HTTPRequest sid req,
-                                     blocking) map hookResponse recover {
-                    case e: IllegalArgumentException =>
-                      BadRequest(jsonError(e.getMessage)) as JSON
-                  }
+                  env.processor
+                    .hook(config, uid, HTTPRequest.sid(req), blocking)
+                    .map(hookResponse)
+                    .recover {
+                      case e: IllegalArgumentException =>
+                        BadRequest(jsonError(e.getMessage)).as(JSON)
+                    }
             }
           )
       }
@@ -148,28 +151,31 @@ object Setup extends LilaController with TheftPrevention {
   def like(uid: String, gameId: String) = Open { implicit ctx =>
     PostRateLimit(ctx.req.remoteAddress) {
       NoPlaybanOrCurrent {
-        env.forms.hookConfig flatMap { config =>
-          GameRepo game gameId map {
-            _.fold(config)(config.updateFrom)
-          } flatMap { config =>
-            (ctx.userId ?? Env.relation.api.fetchBlocking) flatMap {
-              blocking =>
-                env.processor.hook(config,
-                                   uid,
-                                   HTTPRequest sid ctx.req,
-                                   blocking) map hookResponse recover {
-                  case e: IllegalArgumentException =>
-                    BadRequest(jsonError(e.getMessage)) as JSON
-                }
+        env.forms.hookConfig.flatMap { config =>
+          GameRepo
+            .game(gameId)
+            .map {
+              _.fold(config)(config.updateFrom)
             }
-          }
+            .flatMap { config =>
+              ((ctx.userId ?? Env.relation.api.fetchBlocking)).flatMap {
+                blocking =>
+                  env.processor
+                    .hook(config, uid, HTTPRequest.sid(ctx.req), blocking)
+                    .map(hookResponse)
+                    .recover {
+                      case e: IllegalArgumentException =>
+                        BadRequest(jsonError(e.getMessage)).as(JSON)
+                    }
+              }
+            }
         }
       }
     }
   }
 
   def filterForm = Open { implicit ctx =>
-    env.forms.filterFilled map {
+    env.forms.filterFilled.map {
       case (form, filter) => html.setup.filter(form, filter)
     }
   }
@@ -184,12 +190,12 @@ object Setup extends LilaController with TheftPrevention {
           logger.branch("setup").warn(f.errors.toString)
           BadRequest(()).fuccess
         },
-        config => JsonOk(env.processor filter config inject config.render)
+        config => JsonOk(env.processor.filter(config) inject config.render)
       )
   }
 
   def validateFen = Open { implicit ctx =>
-    get("fen") flatMap ValidFen(getBool("strict")) match {
+    get("fen").flatMap(ValidFen(getBool("strict"))) match {
       case None => BadRequest.fuccess
       case Some(v) => Ok(html.game.miniBoard(v.fen, v.color.name)).fuccess
     }
@@ -207,12 +213,12 @@ object Setup extends LilaController with TheftPrevention {
               api = _ => fuccess(BadRequest(errorsAsJson(f)))
           ),
           config =>
-            op(config)(ctx) flatMap { pov =>
+            op(config)(ctx).flatMap { pov =>
               negotiate(
                 html = fuccess(redirectPov(pov)),
                 api = apiVersion =>
-                  Env.api.roundApi.player(pov, apiVersion) map { data =>
-                    Created(data) as JSON
+                  Env.api.roundApi.player(pov, apiVersion).map { data =>
+                    Created(data).as(JSON)
                 }
               )
           }
@@ -225,9 +231,10 @@ object Setup extends LilaController with TheftPrevention {
     val redir = Redirect(routes.Round.watcher(pov.game.id, "white"))
     if (ctx.isAuth) redir
     else
-      redir withCookies LilaCookie.cookie(AnonCookie.name,
-                                          pov.playerId,
-                                          maxAge = AnonCookie.maxAge.some,
-                                          httpOnly = false.some)
+      redir.withCookies(
+        LilaCookie.cookie(AnonCookie.name,
+                          pov.playerId,
+                          maxAge = AnonCookie.maxAge.some,
+                          httpOnly = false.some))
   }
 }

@@ -92,8 +92,10 @@ trait PhaseAssembly { self: Global =>
      * names are sorted alphabetical at each level, into the compiler phase list
      */
     def compilerPhaseList(): List[SubComponent] =
-      nodes.values.toList filter (_.level > 0) sortBy
-        (x => (x.level, x.phasename)) flatMap (_.phaseobj) flatten
+      nodes.values.toList
+        .filter(_.level > 0)
+        .sortBy(x => (x.level, x.phasename))
+        .flatMap(_.phaseobj) flatten
 
     /* Test if there are cycles in the graph, assign levels to the nodes
      * and collapse hard links into nodes
@@ -152,14 +154,14 @@ trait PhaseAssembly { self: Global =>
               "There is no runs right after dependency, where there should be one! This is not supposed to happen!")
           } else if (sanity.length > 1) {
             dump("phase-order")
-            val following = (sanity map (_.frm.phasename)).sorted mkString ","
+            val following = (sanity.map(_.frm.phasename)).sorted mkString ","
             throw new FatalError(
               s"Multiple phases want to run right after ${sanity.head.to.phasename}; followers: $following; created phase-order.dot")
           } else {
 
             val promote = hl.to.before.filter(e => (!e.hard))
             hl.to.before.clear()
-            sanity foreach (edge => hl.to.before += edge)
+            sanity.foreach(edge => hl.to.before += edge)
             for (edge <- promote) {
               rerun = true
               informProgress(
@@ -179,7 +181,7 @@ trait PhaseAssembly { self: Global =>
       *  dependency on something that is dropped.
       */
     def removeDanglingNodes() {
-      for (node <- nodes.values filter (_.phaseobj.isEmpty)) {
+      for (node <- nodes.values.filter(_.phaseobj.isEmpty)) {
         val msg =
           "dropping dependency on node with no phase object: " + node.phasename
         informProgress(msg)
@@ -188,7 +190,7 @@ trait PhaseAssembly { self: Global =>
         for (edge <- node.before) {
           edges -= edge
           edge.frm.after -= edge
-          if (edge.frm.phaseobj exists (lsc => !lsc.head.internal))
+          if (edge.frm.phaseobj.exists(lsc => !lsc.head.internal))
             warning(msg)
         }
       }
@@ -208,7 +210,7 @@ trait PhaseAssembly { self: Global =>
 
     // Output the phase dependency graph at this stage
     def dump(stage: Int) =
-      dot foreach (n => graphToDotFile(graph, s"$n-$stage.dot"))
+      dot.foreach(n => graphToDotFile(graph, s"$n-$stage.dot"))
 
     dump(1)
 
@@ -292,10 +294,10 @@ trait PhaseAssembly { self: Global =>
         "\"" + edge.frm.allPhaseNames + "(" + edge.frm.level + ")" +
           "\"->\"" + edge.to.allPhaseNames + "(" + edge.to.level + ")" + "\"")
       if (!edge.frm.phaseobj.get.head.internal) extnodes += edge.frm
-      edge.frm.phaseobj foreach
-        (phobjs => if (phobjs.tail.nonEmpty) fatnodes += edge.frm)
-      edge.to.phaseobj foreach
-        (phobjs => if (phobjs.tail.nonEmpty) fatnodes += edge.to)
+      edge.frm.phaseobj.foreach(phobjs =>
+        if (phobjs.tail.nonEmpty) fatnodes += edge.frm)
+      edge.to.phaseobj.foreach(phobjs =>
+        if (phobjs.tail.nonEmpty) fatnodes += edge.to)
       val color = if (edge.hard) "#0000ff" else "#000000"
       sbuf.append(s""" [color="$color"]\n""")
     }
@@ -312,6 +314,7 @@ trait PhaseAssembly { self: Global =>
     sbuf.append("}\n")
     import reflect.io._
     for (d <- settings.outputDirs.getSingleOutput
-         if !d.isVirtual) Path(d.file) / File(filename) writeAll sbuf.toString
+         if !d.isVirtual)
+      (Path(d.file) / File(filename)).writeAll(sbuf.toString)
   }
 }

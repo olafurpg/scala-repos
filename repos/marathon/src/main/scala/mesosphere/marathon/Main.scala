@@ -63,7 +63,7 @@ class MarathonApp extends App {
   }
 
   def getEventsModule: Option[Module] = {
-    conf.eventSubscriber.get flatMap {
+    conf.eventSubscriber.get.flatMap {
       case "http_callback" =>
         log.info(
           "Using HttpCallbackEventSubscriber for event" + "notification")

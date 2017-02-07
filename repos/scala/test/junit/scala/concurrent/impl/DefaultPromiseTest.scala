@@ -246,7 +246,7 @@ class DefaultPromiseTest {
       pMap(key)
     }
 
-    actions foreach { action =>
+    actions.foreach { action =>
       action match {
         case Complete(p) => t.complete(byKey(p))
         case Link(a, b) => t.link(byKey(a), byKey(b))
@@ -308,7 +308,7 @@ class DefaultPromiseTest {
       val events = flatMapEvents(flatMapCount, t.newPromise(), Nil)
       assertEquals(flatMapCount + 1, t.chains.size) // All promises are unlinked
       val shuffled = random.shuffle(events)
-      shuffled foreach {
+      shuffled.foreach {
         case Link(a, b) => t.link(a, b)
         case Complete(p) => t.complete(p)
       }

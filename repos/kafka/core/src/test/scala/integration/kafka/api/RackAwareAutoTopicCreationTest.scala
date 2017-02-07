@@ -39,12 +39,14 @@ class RackAwareAutoTopicCreationTest
     .put(KafkaConfig.DefaultReplicationFactorProp, replicationFactor.toString)
 
   def generateConfigs() =
-    (0 until numServers) map { node =>
-      TestUtils.createBrokerConfig(node,
-                                   zkConnect,
-                                   enableControlledShutdown = false,
-                                   rack = Some((node / 2).toString))
-    } map (KafkaConfig.fromProps(_, overridingProps))
+    ((0 until numServers))
+      .map { node =>
+        TestUtils.createBrokerConfig(node,
+                                     zkConnect,
+                                     enableControlledShutdown = false,
+                                     rack = Some((node / 2).toString))
+      }
+      .map(KafkaConfig.fromProps(_, overridingProps))
 
   private val topic = "topic"
 

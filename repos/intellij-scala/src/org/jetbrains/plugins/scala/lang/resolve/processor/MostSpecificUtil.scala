@@ -130,7 +130,7 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
         new InnerScalaResolveResult(r.element,
                                     None,
                                     r,
-                                    r.implicitDependentSubst followed r.subst,
+                                    r.implicitDependentSubst.followed(r.subst),
                                     callByName,
                                     implicitCase = true)
       }),

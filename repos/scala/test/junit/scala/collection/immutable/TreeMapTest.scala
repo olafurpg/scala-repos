@@ -12,9 +12,9 @@ class TreeMapTest {
   def hasCorrectDropAndTakeMethods() {
     val tree = TreeMap(1 -> "a", 2 -> "b", 3 -> "c")
 
-    assertEquals(TreeMap.empty[Int, String], tree take Int.MinValue)
-    assertEquals(TreeMap.empty[Int, String], tree takeRight Int.MinValue)
-    assertEquals(tree, tree drop Int.MinValue)
-    assertEquals(tree, tree dropRight Int.MinValue)
+    assertEquals(TreeMap.empty[Int, String], tree.take(Int.MinValue))
+    assertEquals(TreeMap.empty[Int, String], tree.takeRight(Int.MinValue))
+    assertEquals(tree, tree.drop(Int.MinValue))
+    assertEquals(tree, tree.dropRight(Int.MinValue))
   }
 }

@@ -92,13 +92,13 @@ class IdleConnectionFilter[Req, Rep](
   def openConnections = connectionCounter.get()
 
   override def apply(c: ClientConnection) = {
-    c.onClose ensure { connectionCounter.decrementAndGet() }
+    c.onClose.ensure { connectionCounter.decrementAndGet() }
     if (accept(c)) {
       queue.add(c)
-      c.onClose ensure {
+      c.onClose.ensure {
         queue.remove(c)
       }
-      self(c) map { filterFactory(c) andThen _ }
+      self(c).map { filterFactory(c).andThen(_) }
     } else {
       refused.incr()
       val address = c.remoteAddress
@@ -117,7 +117,7 @@ class IdleConnectionFilter[Req, Rep](
     new SimpleFilter[Req, Rep] {
       def apply(request: Req, service: Service[Req, Rep]) = {
         queue.remove(c)
-        service(request) ensure {
+        service(request).ensure {
           queue.touch(c)
         }
       }

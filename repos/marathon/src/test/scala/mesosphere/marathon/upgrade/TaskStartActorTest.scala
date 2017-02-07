@@ -415,7 +415,7 @@ class TaskStartActorTest
       Some(LaunchQueueTestHelper.zeroCounts.copy(
         tasksLeftToLaunch = app.instances)))
     when(taskTracker.countLaunchedAppTasksSync(app.id)).thenReturn(4)
-    List(0, 1, 2, 3) foreach { i =>
+    List(0, 1, 2, 3).foreach { i =>
       system.eventStream.publish(
         MesosStatusUpdateEvent("",
                                Task.Id(s"task-$i"),

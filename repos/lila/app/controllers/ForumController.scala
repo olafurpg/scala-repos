@@ -34,8 +34,8 @@ private[controllers] trait ForumController extends forum.Granter {
 
   protected def CategGrantMod[A <: Result](categSlug: String)(a: => Fu[A])(
       implicit ctx: Context): Fu[Result] =
-    isGrantedMod(categSlug) flatMap { granted =>
-      (granted | isGranted(_.ModerateForum)) fold
-        (a, fuccess(Forbidden("You cannot post to this category")))
+    isGrantedMod(categSlug).flatMap { granted =>
+      ((granted | isGranted(_.ModerateForum)))
+        .fold(a, fuccess(Forbidden("You cannot post to this category")))
     }
 }

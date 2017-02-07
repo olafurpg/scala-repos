@@ -157,7 +157,7 @@ class ThresholdFailureDetectorTest
     timer.tick()
     assert(d.status == Status.Open)
     // after 10ms mark busy, keep in busy state for 1000ms until it closes
-    (1 to 99) foreach { p =>
+    ((1 to 99)).foreach { p =>
       tc.advance(10.milliseconds)
       timer.tick()
       assert(d.status == Status.Busy)

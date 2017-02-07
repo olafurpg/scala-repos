@@ -73,13 +73,13 @@ object MacroSupportInterpolationImpl {
                     ctx.universe.EmptyTree
                   )
                 case '[' => // open parenthesis with indent
-                  sb append '('
+                  sb.append('(')
                   flushSB
                   exprs += Select(sqlBuilder, TermName("newLineIndent"))
                 case ']' => // close parenthesis with dedent
                   flushSB
                   exprs += Select(sqlBuilder, TermName("newLineDedent"))
-                  sb append ')'
+                  sb.append(')')
                 case 'n' =>
                   flushSB
                   exprs += Select(sqlBuilder, TermName("newLineOrSpace"))
@@ -89,7 +89,7 @@ object MacroSupportInterpolationImpl {
                               "' in literal \"" + str + "\"")
               }
             }
-          case c => sb append c
+          case c => sb.append(c)
         }
         pos += 1
       }

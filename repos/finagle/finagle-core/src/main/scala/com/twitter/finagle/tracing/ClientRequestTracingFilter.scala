@@ -16,7 +16,7 @@ trait ClientRequestTracingFilter[Req, Res] extends SimpleFilter[Req, Res] {
       Trace.recordRpc(methodName(request))
       Trace.record(Annotation.ClientSend())
 
-      service(request) onSuccess { _ =>
+      service(request).onSuccess { _ =>
         Trace.record(Annotation.ClientRecv())
       }
     } else service(request)

@@ -107,7 +107,7 @@ class ParHashMap[K, +V] private[immutable] (
             // iterator of the collision map case
             val buff = triter.toBuffer
             val (fp, sp) = buff.splitAt(buff.length / 2)
-            Seq(fp, sp) map { b =>
+            Seq(fp, sp).map { b =>
               new ParHashMapIterator(b.iterator, b.length)
             }
         }
@@ -345,7 +345,7 @@ private[parallel] abstract class HashMapCombiner[K, V]
         new HashMap.HashMap1[K, Repr](hm1.key, hm1.hash, evaledvalue, null)
       case hmc: HashMap.HashMapCollision1[_, _] =>
         val evaledkvs =
-          hmc.kvs map { p =>
+          hmc.kvs.map { p =>
             (p._1, p._2.result)
           }
         new HashMap.HashMapCollision1[K, Repr](hmc.hash, evaledkvs)

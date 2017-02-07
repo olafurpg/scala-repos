@@ -15,9 +15,9 @@ class RefcountedServiceTest extends FunSuite with MockitoSugar {
 
   class PoolServiceWrapperHelper {
     val service = mock[Service[Any, Any]]
-    when(service.close(any)) thenReturn Future.Done
+    when(service.close(any)).thenReturn(Future.Done)
     val promise = new Promise[Any]
-    when(service(Matchers.any)) thenReturn promise
+    when(service(Matchers.any)).thenReturn(promise)
     val wrapper = Mockito.spy(new RefcountedService[Any, Any](service))
   }
 

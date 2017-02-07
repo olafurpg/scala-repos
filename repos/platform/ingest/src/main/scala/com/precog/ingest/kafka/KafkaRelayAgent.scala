@@ -84,7 +84,7 @@ object KafkaRelayAgent extends Logging {
                                          producer,
                                          centralTopic,
                                          maxMessageSize)
-    val stoppable = Stoppable.fromFuture(relayAgent.stop map { _ =>
+    val stoppable = Stoppable.fromFuture(relayAgent.stop.map { _ =>
       consumer.close; producer.close
     })
 
@@ -118,7 +118,7 @@ final class KafkaRelayAgent(
   private val stopPromise = Promise[PrecogUnit]()
   private implicit val M: Monad[Future] = new FutureMonad(executor)
 
-  def stop: Future[PrecogUnit] = Future({ runnable = false }) flatMap { _ =>
+  def stop: Future[PrecogUnit] = Future({ runnable = false }).flatMap { _ =>
     stopPromise
   }
 
@@ -165,7 +165,7 @@ final class KafkaRelayAgent(
         ingestBatch(newOffset, batch + 1, newDelay, newWaitCount)
       }
 
-      ingestStep onFailure {
+      ingestStep.onFailure {
         case ex =>
           if (retries > 0) {
             logger.error(
@@ -208,110 +208,123 @@ final class KafkaRelayAgent(
 
   private def forwardAll(messages: List[MessageAndOffset]) = {
     val outgoing: List[Validation[Error, Future[Authorized]]] =
-      messages map { msg =>
-        EventEncoding.read(msg.message.payload) map { ev =>
+      messages.map { msg =>
+        EventEncoding.read(msg.message.payload).map { ev =>
           deriveAuthority(ev).map { Authorized(ev, msg.offset, _) }
         }
       }
 
-    outgoing.sequence[({ type λ[α] = Validation[Error, α] })#λ,
-                      Future[Authorized]] map { messageFutures =>
-      Future.sequence(messageFutures) map { messages: List[Authorized] =>
-        val identified: List[Message] = messages.flatMap {
-          case Authorized(
-              Ingest(apiKey, path, _, data, jobId, timestamp, storeMode),
-              offset,
-              Some(authorities)) =>
-            def encodeIngestMessages(ev: List[IngestMessage]): List[Message] = {
-              val messages = ev.map(centralCodec.toMessage)
+    outgoing
+      .sequence[({ type λ[α] = Validation[Error, α] })#λ, Future[Authorized]]
+      .map { messageFutures =>
+        Future
+          .sequence(messageFutures)
+          .map { messages: List[Authorized] =>
+            val identified: List[Message] = messages.flatMap {
+              case Authorized(
+                  Ingest(apiKey, path, _, data, jobId, timestamp, storeMode),
+                  offset,
+                  Some(authorities)) =>
+                def encodeIngestMessages(
+                    ev: List[IngestMessage]): List[Message] = {
+                  val messages = ev.map(centralCodec.toMessage)
 
-              if (messages.forall(_.size <= maxMessageSize)) {
-                messages
-              } else {
-                if (ev.size == data.length) {
-                  logger.error(
-                    "Failed to reach reasonable message size after splitting IngestRecords to individual relays!")
-                  throw new Exception(
-                    "Failed relay of excessively large event(s)!")
+                  if (messages.forall(_.size <= maxMessageSize)) {
+                    messages
+                  } else {
+                    if (ev.size == data.length) {
+                      logger.error(
+                        "Failed to reach reasonable message size after splitting IngestRecords to individual relays!")
+                      throw new Exception(
+                        "Failed relay of excessively large event(s)!")
+                    }
+
+                    logger.debug(
+                      "Breaking %d ingest records into %d messages for relay still too large, splitting."
+                        .format(data.length, messages.size))
+                    encodeIngestMessages(ev.flatMap(_.split))
+                  }
                 }
 
-                logger.debug(
-                  "Breaking %d ingest records into %d messages for relay still too large, splitting."
-                    .format(data.length, messages.size))
-                encodeIngestMessages(ev.flatMap(_.split))
-              }
+                val ingestRecords =
+                  data.map { IngestRecord(eventIdSeq.next(offset), _) }
+                encodeIngestMessages(
+                  List(
+                    IngestMessage(apiKey,
+                                  path,
+                                  authorities,
+                                  ingestRecords,
+                                  jobId,
+                                  timestamp,
+                                  storeMode)))
+
+              case Authorized(event: Ingest, _, None) =>
+                // cannot relay event without a resolved owner account ID; fail loudly.
+                // this will abort the future, ensuring that state doesn't get corrupted
+                sys.error(
+                  "Unable to establish owner account ID for ingest of event " +
+                    event)
+
+              case Authorized(
+                  archive @ Archive(apiKey, path, jobId, timestamp),
+                  offset,
+                  _) =>
+                List(
+                  centralCodec.toMessage(
+                    ArchiveMessage(apiKey,
+                                   path,
+                                   jobId,
+                                   eventIdSeq.next(offset),
+                                   timestamp)))
+
+              case Authorized(StoreFile(apiKey,
+                                        path,
+                                        _,
+                                        jobId,
+                                        content,
+                                        timestamp,
+                                        stream),
+                              offset,
+                              Some(authorities)) =>
+                List(
+                  centralCodec.toMessage(
+                    StoreFileMessage(apiKey,
+                                     path,
+                                     authorities,
+                                     Some(jobId),
+                                     eventIdSeq.next(offset),
+                                     content,
+                                     timestamp,
+                                     stream)))
+
+              case Authorized(s: StoreFile, _, None) =>
+                sys.error(
+                  "Unable to establish owner account ID for storage of file " +
+                    s)
             }
 
-            val ingestRecords =
-              data map { IngestRecord(eventIdSeq.next(offset), _) }
-            encodeIngestMessages(
-              List(
-                IngestMessage(apiKey,
-                              path,
-                              authorities,
-                              ingestRecords,
-                              jobId,
-                              timestamp,
-                              storeMode)))
-
-          case Authorized(event: Ingest, _, None) =>
-            // cannot relay event without a resolved owner account ID; fail loudly.
-            // this will abort the future, ensuring that state doesn't get corrupted
-            sys.error(
-              "Unable to establish owner account ID for ingest of event " +
-                event)
-
-          case Authorized(archive @ Archive(apiKey, path, jobId, timestamp),
-                          offset,
-                          _) =>
-            List(
-              centralCodec.toMessage(
-                ArchiveMessage(apiKey,
-                               path,
-                               jobId,
-                               eventIdSeq.next(offset),
-                               timestamp)))
-
-          case Authorized(
-              StoreFile(apiKey, path, _, jobId, content, timestamp, stream),
-              offset,
-              Some(authorities)) =>
-            List(
-              centralCodec.toMessage(
-                StoreFileMessage(apiKey,
-                                 path,
-                                 authorities,
-                                 Some(jobId),
-                                 eventIdSeq.next(offset),
-                                 content,
-                                 timestamp,
-                                 stream)))
-
-          case Authorized(s: StoreFile, _, None) =>
-            sys.error(
-              "Unable to establish owner account ID for storage of file " +
-                s)
-        }
-
-        producer.send {
-          new ProducerData[String, Message](centralTopic, identified)
-        }
-      } onFailure {
-        case ex =>
+            producer.send {
+              new ProducerData[String, Message](centralTopic, identified)
+            }
+          }
+          .onFailure {
+            case ex =>
+              logger.error(
+                "An error occurred forwarding messages from the local queue to central.",
+                ex)
+          }
+          .onSuccess {
+            case _ =>
+              if (messages.nonEmpty) eventIdSeq.saveState(messages.last.offset)
+          }
+      }
+      .valueOr { error =>
+        Promise.successful {
           logger.error(
-            "An error occurred forwarding messages from the local queue to central.",
-            ex)
-      } onSuccess {
-        case _ =>
-          if (messages.nonEmpty) eventIdSeq.saveState(messages.last.offset)
+            "Deserialization errors occurred reading events from Kafka: " +
+              error.message)
+        }
       }
-    } valueOr { error =>
-      Promise successful {
-        logger.error(
-          "Deserialization errors occurred reading events from Kafka: " +
-            error.message)
-      }
-    }
   }
 
   private def deriveAuthority(event: Event): Future[Option[Authorities]] =
@@ -323,7 +336,7 @@ final class KafkaRelayAgent(
             .inferWriteAuthorities(apiKey, path, Some(timestamp))
 
       case StoreFile(apiKey, path, writeAs, _, _, timestamp, _) =>
-        if (writeAs.isDefined) Promise successful writeAs
+        if (writeAs.isDefined) Promise.successful(writeAs)
         else
           permissionsFinder
             .inferWriteAuthorities(apiKey, path, Some(timestamp))

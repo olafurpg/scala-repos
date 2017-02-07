@@ -103,7 +103,7 @@ class OneVsRestSuite extends SparkFunSuite with MLlibTestSparkContext {
     val ovaMetrics = new MulticlassMetrics(ovaResults)
     assert(
       expectedMetrics.confusionMatrix ~==
-        ovaMetrics.confusionMatrix absTol 400)
+        ovaMetrics.confusionMatrix.absTol(400))
   }
 
   test("one-vs-rest: pass label metadata correctly during train") {

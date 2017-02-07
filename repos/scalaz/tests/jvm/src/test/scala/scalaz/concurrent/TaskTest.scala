@@ -24,7 +24,7 @@ object TaskTest extends SpecLite {
 
   val options =
     List[(=> Int) => Task[Int]](n => Task.now(n), Task.delay _, Task.apply _)
-  val combinations = (options tuple options)
+  val combinations = (options.tuple(options))
 
   "left associated binds" ! check {
     combinations.forall {

@@ -30,7 +30,7 @@ class SourceResolver(
     source.filename match {
       case None => None
       case Some(filename) =>
-        all.get(clazz) flatMap {
+        all.get(clazz).flatMap {
           _.find(_.getName.getBaseName == filename)
         } match {
           case s @ Some(_) => s
@@ -79,7 +79,7 @@ class SourceResolver(
     } yield (infer(dir, file), file)
   }.toMultiMapSet
 
-  private def recalculate = depSources merge userSources
+  private def recalculate = depSources.merge(userSources)
 
   private var all = recalculate
 
@@ -87,6 +87,6 @@ class SourceResolver(
     // getRelativeName feels the wrong way round, but this is correct
     val relative = base.getName.getRelativeName(file.getName)
     // vfs separator char is always /
-    PackageName((relative split "/").toList.init)
+    PackageName((relative.split("/")).toList.init)
   }
 }

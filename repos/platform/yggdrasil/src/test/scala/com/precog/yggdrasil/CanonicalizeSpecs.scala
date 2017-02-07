@@ -66,7 +66,7 @@ trait CanonicalizeSpec[M[+ _]]
       val maxLength = minLength + Gen.choose(1, size / 2 + 1).sample.get
 
       val canonicalizedTable = table.canonicalize(minLength, Some(maxLength))
-      val slices = canonicalizedTable.slices.toStream.copoint map (_.size)
+      val slices = canonicalizedTable.slices.toStream.copoint.map(_.size)
       if (size > 0) {
         slices.init must haveAllElementsLike {
           case (sliceSize: Int) =>

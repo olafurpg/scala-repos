@@ -45,7 +45,7 @@ class DefaultDBApi(configuration: Map[String, Config],
     * Try to connect to all data sources.
     */
   def connect(logConnection: Boolean = false): Unit = {
-    databases foreach { db =>
+    databases.foreach { db =>
       try {
         db.getConnection.close()
         if (logConnection)
@@ -61,7 +61,7 @@ class DefaultDBApi(configuration: Map[String, Config],
   }
 
   def shutdown(): Unit = {
-    databases foreach (_.shutdown())
+    databases.foreach(_.shutdown())
   }
 }
 

@@ -61,7 +61,7 @@ object TypedActorSpec {
       findNext
     }
 
-    override def exists(f: T ⇒ Boolean): Boolean = items exists f
+    override def exists(f: T ⇒ Boolean): Boolean = items.exists(f)
   }
 
   trait Foo {
@@ -517,7 +517,7 @@ class TypedActorSpec
         val mNew = in.readObject().asInstanceOf[TypedActor.MethodCall]
 
         mNew.method should ===(m.method)
-        mNew.parameters should have size 3
+        (mNew.parameters should have).size(3)
         mNew.parameters(0) should not be null
         mNew.parameters(0).getClass should ===(classOf[Bar])
         mNew.parameters(1) should ===(null)
@@ -605,7 +605,7 @@ class TypedActorRouterSpec
       val t3 = newFooBar
       val t4 = newFooBar
       val routees =
-        List(t1, t2, t3, t4) map { t ⇒
+        List(t1, t2, t3, t4).map { t ⇒
           TypedActor(system).getActorRefFor(t).path.toStringWithoutAddress
         }
 

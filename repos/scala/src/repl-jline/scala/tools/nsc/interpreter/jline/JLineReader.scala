@@ -35,7 +35,7 @@ class InteractiveReader(completer: () => Completion)
     reader setPaginationEnabled interpreter.`package`.isPaged
 
     // ASAP
-    reader setExpandEvents false
+    reader.setExpandEvents(false)
 
     reader setHistory history.asInstanceOf[JHistory]
 
@@ -93,10 +93,10 @@ private class JLineConsoleReader
   }
 
   private def printColumns_(items: List[String]): Unit =
-    if (items exists (_ != "")) {
+    if (items.exists(_ != "")) {
       val grouped = tabulate(items)
       var linesLeft = if (isPaginationEnabled()) height - 1 else Int.MaxValue
-      grouped foreach { xs =>
+      grouped.foreach { xs =>
         println(xs.mkString)
         linesLeft -= 1
         if (linesLeft <= 0) {
@@ -120,7 +120,7 @@ private class JLineConsoleReader
 
   // A hook for running code after the repl is done initializing.
   def initCompletion(completion: Completion): Unit = {
-    this setBellEnabled false
+    this.setBellEnabled(false)
 
     // adapt the JLine completion interface
     def completer =
@@ -132,14 +132,14 @@ private class JLineConsoleReader
           val buf = if (_buf == null) "" else _buf
           val Candidates(newCursor, newCandidates) =
             completion.complete(buf, cursor)
-          newCandidates foreach (candidates add _)
+          newCandidates.foreach(candidates.add(_))
           newCursor
         }
       }
 
     completion match {
       case NoCompletion => ()
-      case _ => this addCompleter completer
+      case _ => this.addCompleter(completer)
     }
 
     // This is a workaround for https://github.com/jline/jline2/issues/208

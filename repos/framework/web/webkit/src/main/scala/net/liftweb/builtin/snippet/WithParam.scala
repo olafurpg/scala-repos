@@ -46,7 +46,7 @@ object WithParam extends DispatchSnippet {
       ctx <- S.session ?~ ("FIX" + "ME: Invalid session")
       req <- S.request ?~ ("FIX" + "ME: Invalid request")
     } yield {
-      val name: String = S.attr("name") openOr "main"
+      val name: String = S.attr("name").openOr("main")
       val body = ctx.processSurroundAndInclude(PageName.get, kids)
       WithParamVar.atomicUpdate(_ + (name -> body))
       NodeSeq.Empty

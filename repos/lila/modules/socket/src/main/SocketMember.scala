@@ -10,10 +10,10 @@ trait SocketMember extends Ordered[SocketMember] {
 
   def isAuth = userId.isDefined
 
-  def compare(other: SocketMember) = ~userId compare ~other.userId
+  def compare(other: SocketMember) = ~userId.compare(~other.userId)
 
   def push(msg: JsValue) {
-    channel push msg
+    channel.push(msg)
   }
 
   def end {

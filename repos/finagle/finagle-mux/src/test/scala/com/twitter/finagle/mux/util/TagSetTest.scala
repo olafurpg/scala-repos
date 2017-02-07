@@ -34,8 +34,8 @@ class TagSetTest extends FunSuite {
     assert(set.toSeq == range.toSeq)
 
     set.release(2)
-    assert(set.sameElements(range filter (_ != 2)))
+    assert(set.sameElements(range.filter(_ != 2)))
     set.release(8)
-    assert(set.sameElements(range filter (e => e != 2 && e != 8)))
+    assert(set.sameElements(range.filter(e => e != 2 && e != 8)))
   }
 }

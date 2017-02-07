@@ -33,7 +33,7 @@ object Try {
     if (ts.isEmpty) Return(Seq.empty[A])
     else
       Try {
-        ts map { t =>
+        ts.map { t =>
           t()
         }
       }

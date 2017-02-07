@@ -31,11 +31,11 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
     */
   def shakeTree(tree: Expr): Expr = {
     // if binder rejects a tree, shaking it can remove the errors
-    if (bindNames(tree.root) forall isWarning) {
+    if (bindNames(tree.root).forall(isWarning)) {
       val (root, _, _, errors) = performShake(tree.root)
       bindRoot(root, root)
 
-      root._errors appendFrom tree._errors
+      root._errors.appendFrom(tree._errors)
       root._errors ++= errors
 
       root
@@ -55,12 +55,12 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
         performShake(right)
 
       if (rightNameBindings contains (id -> LetBinding(b))) {
-        val ids = params map { Identifier(Vector(), _) }
+        val ids = params.map { Identifier(Vector(), _) }
         val unusedParamBindings =
-          Set(ids zip (Stream continually (FormalBinding(b): NameBinding)): _*) &~ leftNameBindings
+          Set(ids.zip(Stream continually (FormalBinding(b): NameBinding)): _*) &~ leftNameBindings
 
         val errors =
-          unusedParamBindings map {
+          unusedParamBindings.map {
             case (id, _) => Error(b, UnusedFormalBinding(id))
           }
 
@@ -77,27 +77,28 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
     }
 
     case b @ Solve(loc, constraints, child) => {
-      val mapped = constraints map performShake
+      val mapped = constraints.map(performShake)
 
-      val constraints2 = mapped map { _._1 }
+      val constraints2 = mapped.map { _._1 }
 
-      val (constNameVector, constVarVector) = mapped map {
+      val (constNameVector, constVarVector) = mapped.map {
         case (_, names, vars, _) => (names, vars)
       } unzip
 
-      val constNames = constNameVector reduce { _ ++ _ }
-      val constVars = constVarVector reduce { _ ++ _ }
+      val constNames = constNameVector.reduce { _ ++ _ }
+      val constVars = constVarVector.reduce { _ ++ _ }
 
-      val constErrors = mapped map { _._4 } reduce { _ ++ _ }
+      val constErrors = mapped.map { _._4 }.reduce { _ ++ _ }
 
       val (child2, childNames, childVars, childErrors) = performShake(child)
 
       val unusedBindings =
-        Set(b.vars.toSeq zip
-          (Stream continually (SolveBinding(b): VarBinding)): _*) &~ childVars
+        Set(
+          b.vars.toSeq
+            .zip(Stream continually (SolveBinding(b): VarBinding)): _*) &~ childVars
 
       val errors =
-        unusedBindings map {
+        unusedBindings.map {
           case (id, _) => Error(b, UnusedTicVariable(id))
         }
 
@@ -164,12 +165,12 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
           Set[(Identifier, NameBinding)],
           Set[(TicId, VarBinding)],
           Set[Error]))] =
-        props map {
+        props.map {
           case (key, value) => (key, performShake(value))
         }
 
       val props2 =
-        mapped map { case (key, (value, _, _, _)) => (key, value) }
+        mapped.map { case (key, (value, _, _, _)) => (key, value) }
 
       val (names, vars) = mapped.foldLeft(
         (Set[(Identifier, NameBinding)](), Set[(TicId, VarBinding)]())) {
@@ -185,8 +186,8 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
     }
 
     case ArrayDef(loc, values) => {
-      val mapped = values map performShake
-      val values2 = mapped map { case (value, _, _, _) => value }
+      val mapped = values.map(performShake)
+      val values2 = mapped.map { case (value, _, _, _) => value }
 
       val (names, vars) = mapped.foldLeft(
         (Set[(Identifier, NameBinding)](), Set[(TicId, VarBinding)]())) {
@@ -222,8 +223,8 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
     }
 
     case d @ Dispatch(loc, name, actuals) => {
-      val mapped = actuals map performShake
-      val actuals2 = mapped map { case (value, _, _, _) => value }
+      val mapped = actuals.map(performShake)
+      val actuals2 = mapped.map { case (value, _, _, _) => value }
 
       val (names, vars) = mapped.foldLeft(
         (Set[(Identifier, NameBinding)](), Set[(TicId, VarBinding)]())) {

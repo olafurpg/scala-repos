@@ -97,7 +97,7 @@ abstract class IngestProducer(args: Array[String])
       threads.foreach(_.start)
       threads.foreach(_.join)
 
-      val totalErrors = testRuns map { _.errorCount } reduce { _ + _ }
+      val totalErrors = testRuns.map { _.errorCount }.reduce { _ + _ }
 
       val seconds = (System.nanoTime - start) / 1000000000.0
 

@@ -68,7 +68,7 @@ sealed trait Multipart extends jm.Multipart {
                                     log))
       .flatMapConcat(ConstantFun.scalaIdentityFunction)
     HttpEntity
-      .Chunked(mediaType withBoundary boundary withCharset charset, chunks)
+      .Chunked(mediaType.withBoundary(boundary).withCharset(charset), chunks)
   }
 
   /** Java API */
@@ -112,7 +112,7 @@ object Multipart {
                                          charset.nioCharset,
                                          partHeadersSizeHint = 128,
                                          log)
-      HttpEntity(mediaType withBoundary boundary withCharset charset, data)
+      HttpEntity(mediaType.withBoundary(boundary).withCharset(charset), data)
     }
 
     /** Java API */
@@ -326,7 +326,7 @@ object Multipart {
             Success(
               f(name,
                 params - "name",
-                headers.filterNot(_ is "content-disposition")))
+                headers.filterNot(_.is("content-disposition"))))
           case None ⇒
             Failure(IllegalHeaderException(
               "multipart/form-data part must contain `Content-Disposition` header with `name` parameter"))
@@ -337,7 +337,7 @@ object Multipart {
         : Try[T] =
         headers.collectFirst { case x: `Content-Range` ⇒ x } match {
           case Some(`Content-Range`(unit, range)) ⇒
-            Success(f(range, unit, headers.filterNot(_ is "content-range")))
+            Success(f(range, unit, headers.filterNot(_.is("content-range"))))
           case None ⇒
             Failure(IllegalHeaderException(
               "multipart/byteranges part must contain `Content-Range` header"))

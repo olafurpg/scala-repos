@@ -54,18 +54,18 @@ class SyntaxTests extends AllInstances with AllSyntax {
     val b1: Boolean = x <= y
     val b2: Boolean = x > y
     val b3: Boolean = x >= y
-    val f: Double = x partialCompare y
-    val oi: Option[Int] = x tryCompare y
+    val f: Double = x.partialCompare(y)
+    val oi: Option[Int] = x.tryCompare(y)
     val oz0: Option[A] = x pmin y
-    val oz1: Option[A] = x pmax y
+    val oz1: Option[A] = x.pmax(y)
   }
 
   def testOrder[A: Order]: Unit = {
     val x = mock[A]
     val y = mock[A]
-    val i: Int = x compare y
+    val i: Int = x.compare(y)
     val z0: A = x min y
-    val z1: A = x max y
+    val z1: A = x.max(y)
   }
 
   def testInvariantFunctor[F[_]: Invariant, A, B]: Unit = {

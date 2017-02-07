@@ -28,7 +28,7 @@ trait Enumeratee2TFunctions {
         // your memory. Sorry!
         def advance(j: J, buf: List[K], s: StepT[Either3[J, (J, K), K], F, A])
           : IterateeT[Either3[J, (J, K), K], F, A] = {
-          s mapCont { contf =>
+          s.mapCont { contf =>
             buf match {
               case k :: Nil if order(j, k) == EQ =>
                 contf(elInput(Middle3((j, k))))
@@ -110,7 +110,7 @@ trait Enumeratee2TFunctions {
         )
 
         (step: StepT[(J, K), F, A]) =>
-          cogroupI[J, K, F].apply(cstep(step)) flatMap {
+          cogroupI[J, K, F].apply(cstep(step)).flatMap {
             endStep[J, K, (J, K), F, A]
           }
       }
@@ -164,7 +164,7 @@ trait Enumeratee2TFunctions {
           cont = contf =>
             scont { in: Input[Either3[J, (J, K), K]] =>
               val nextInput =
-                in map {
+                in.map {
                   case Left3(j) => j
                   case Middle3((j, k)) => m.append(j, f(k))
                   case Right3(k) => m.zero
@@ -178,7 +178,7 @@ trait Enumeratee2TFunctions {
         )
 
         (step: StepT[J, F, A]) =>
-          cogroupI[J, K, F].apply(cstep(step)) flatMap {
+          cogroupI[J, K, F].apply(cstep(step)).flatMap {
             endStep[J, K, J, F, A]
           }
       }

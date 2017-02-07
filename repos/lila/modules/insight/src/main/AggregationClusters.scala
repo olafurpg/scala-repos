@@ -8,7 +8,7 @@ object AggregationClusters {
   def apply[X](question: Question[X],
                res: AggregationResult): List[Cluster[X]] =
     postSort(question) {
-      if (Metric isStacked question.metric) stacked(question, res)
+      if (Metric.isStacked(question.metric)) stacked(question, res)
       else single(question, res)
     }
 
@@ -29,7 +29,7 @@ object AggregationClusters {
   private def stacked[X](question: Question[X],
                          res: AggregationResult): List[Cluster[X]] =
     res.documents.flatMap { doc =>
-      val metricValues = Metric valuesOf question.metric
+      val metricValues = Metric.valuesOf(question.metric)
       // println(lila.db.BSON debug doc)
       for {
         x <- doc.getAs[X]("_id")(question.dimension.bson)

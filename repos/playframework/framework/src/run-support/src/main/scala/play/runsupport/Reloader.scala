@@ -84,7 +84,7 @@ object Reloader {
 
     val props = properties.toMap
     def prop(key: String): Option[String] =
-      props.get(key) orElse sys.props.get(key)
+      props.get(key).orElse(sys.props.get(key))
 
     def parsePortValue(portValue: Option[String],
                        defaultValue: Option[Int] = None): Option[Int] = {
@@ -99,20 +99,24 @@ object Reloader {
     // the http port can be disabled (set to None) by setting any of the input methods to "disabled"
     // Or it can be defined in devSettings as "play.server.http.port"
     val httpPortString: Option[String] =
-      otherArgs.headOption orElse prop("http.port") orElse devSettings.toMap
-        .get("play.server.http.port")
+      otherArgs.headOption
+        .orElse(prop("http.port"))
+        .orElse(devSettings.toMap
+          .get("play.server.http.port"))
     val httpPort: Option[Int] =
       parsePortValue(httpPortString, Option(defaultHttpPort))
 
     // https port can be defined as a -Dhttps.port argument or system property
     val httpsPortString: Option[String] =
-      prop("https.port") orElse devSettings.toMap.get("play.server.https.port")
+      prop("https.port").orElse(
+        devSettings.toMap.get("play.server.https.port"))
     val httpsPort = parsePortValue(httpsPortString)
 
     // http address can be defined as a -Dhttp.address argument or system property
     val httpAddress =
-      prop("http.address") orElse devSettings.toMap.get(
-        "play.server.http.address") getOrElse defaultHttpAddress
+      prop("http.address")
+        .orElse(devSettings.toMap.get("play.server.http.address"))
+        .getOrElse(defaultHttpAddress)
 
     (properties, httpPort, httpsPort, httpAddress)
   }
@@ -271,7 +275,7 @@ object Reloader {
       val docsLoader =
         new URLClassLoader(urls(docsClasspath), applicationLoader)
       val maybeDocsJarFile =
-        docsJar map { f =>
+        docsJar.map { f =>
           new JarFile(f)
         }
       val docHandlerFactoryClass =

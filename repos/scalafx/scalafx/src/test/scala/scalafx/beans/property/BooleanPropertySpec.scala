@@ -210,10 +210,10 @@ class BooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
     var invalidateCount = 0
     var changeCount = 0
     val binding = booleanProperty2 || booleanProperty3
-    binding onInvalidate {
+    binding.onInvalidate {
       invalidateCount += 1
     }
-    binding onChange {
+    binding.onChange {
       changeCount += 1
     }
     booleanProperty2() = true
@@ -224,5 +224,5 @@ class BooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
     changeCount should equal(1)
   }
 
-  it should "support comparison starting with boolean constants" is (pending)
+  (it should "support comparison starting with boolean constants").is(pending)
 }

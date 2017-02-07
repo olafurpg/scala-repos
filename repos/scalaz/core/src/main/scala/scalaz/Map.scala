@@ -527,7 +527,8 @@ sealed abstract class ==>>[A, B] {
     (this, other) match {
       case (Tip(), t2) => t2
       case (t1, Tip()) => t1
-      case (t1, t2) => t1.hedgeUnionL(Function const LT, Function const GT, t2)
+      case (t1, t2) =>
+        t1.hedgeUnionL(Function.const(LT), Function.const(GT), t2)
     }
   }
 
@@ -543,7 +544,7 @@ sealed abstract class ==>>[A, B] {
         case (t1, Tip()) =>
           t1
         case (Tip(), Bin(kx, x, l, r)) =>
-          (l filterGt cmplo).join(kx, x, (r filterLt cmphi))
+          (l.filterGt(cmplo)).join(kx, x, (r.filterLt(cmphi)))
         case (Bin(kx, x, l, r), t2) =>
           val cmpkx = (k: A) => o.order(kx, k)
           val (found, gt) = t2.trimLookupLo(kx, cmphi)
@@ -562,7 +563,7 @@ sealed abstract class ==>>[A, B] {
       case (t1, Tip()) =>
         t1
       case (t1, t2) =>
-        hedgeUnionWithKey(Function const LT, Function const GT, t1, t2)
+        hedgeUnionWithKey(Function.const(LT), Function.const(GT), t1, t2)
     }
   }
 
@@ -573,7 +574,7 @@ sealed abstract class ==>>[A, B] {
       case (t1, Tip()) =>
         t1
       case (Tip(), Bin(kx, x, l, r)) =>
-        (l filterGt cmpLo).join(kx, x, r filterLt cmpHi)
+        (l.filterGt(cmpLo)).join(kx, x, r.filterLt(cmpHi))
       case (Bin(kx, x, l, r), t2) =>
         val cmpkx = (k: A) => o.order(kx, k)
         val a = l.hedgeUnionL(cmpLo, cmpkx, t2.trim(cmpLo, cmpkx))
@@ -594,12 +595,12 @@ sealed abstract class ==>>[A, B] {
         case (Tip(), _) =>
           empty
         case (Bin(kx, x, l, r), Tip()) =>
-          (l filterGt cmplo).join(kx, x, (r filterLt cmphi))
+          (l.filterGt(cmplo)).join(kx, x, (r.filterLt(cmphi)))
         case (t, Bin(kx, _, l, r)) =>
           val cmpkx = (k: A) => o.order(kx, k)
           val aa = hedgeDiff(cmplo, cmpkx, t.trim(cmplo, cmpkx), l)
           val bb = hedgeDiff(cmpkx, cmphi, t.trim(cmpkx, cmphi), r)
-          aa merge bb
+          aa.merge(bb)
       }
 
     (this, other) match {
@@ -608,7 +609,7 @@ sealed abstract class ==>>[A, B] {
       case (t1, Tip()) =>
         t1
       case (t1, t2) =>
-        hedgeDiff(Function const LT, Function const GT, t1, t2)
+        hedgeDiff(Function.const(LT), Function.const(GT), t1, t2)
     }
   }
 
@@ -626,7 +627,7 @@ sealed abstract class ==>>[A, B] {
         case (Tip(), _) =>
           empty
         case (Bin(kx, x, l, r), Tip()) =>
-          (l filterGt cmplo).join(kx, x, r filterLt cmphi)
+          (l.filterGt(cmplo)).join(kx, x, r.filterLt(cmphi))
         case (t, Bin(kx, x, l, r)) =>
           val cmpkx = (k: A) => o.order(kx, k)
           val (found, gt) = t.trimLookupLo(kx, cmphi)
@@ -636,11 +637,11 @@ sealed abstract class ==>>[A, B] {
 
           found match {
             case None =>
-              tl merge tr
+              tl.merge(tr)
             case Some((ky, y)) =>
               f(ky, y, x) match {
                 case None =>
-                  tl merge tr
+                  tl.merge(tr)
                 case Some(z) =>
                   tl.join(kx, z, tr)
               }
@@ -653,7 +654,7 @@ sealed abstract class ==>>[A, B] {
       case (t1, Tip()) =>
         t1
       case (t1, t2) =>
-        hedgeDiffWithKey(Function const LT, Function const GT, t1, t2)
+        hedgeDiffWithKey(Function.const(LT), Function.const(GT), t1, t2)
     }
   }
 
@@ -674,22 +675,22 @@ sealed abstract class ==>>[A, B] {
         empty
       case (t1 @ Bin(k1, x1, l1, r1), t2 @ Bin(k2, x2, l2, r2)) =>
         if (t1.size >= t2.size) {
-          val (lt, found, gt) = t1 splitLookupWithKey k2
+          val (lt, found, gt) = t1.splitLookupWithKey(k2)
           val tl = lt.intersectionWithKey(l2)(f)
           val tr = gt.intersectionWithKey(r2)(f)
           found match {
             case None =>
-              tl merge tr
+              tl.merge(tr)
             case Some((k, x)) =>
               tl.join(k, f(k, x, x2), tr)
           }
         } else {
-          val (lt, found, gt) = t2 splitLookup k1
+          val (lt, found, gt) = t2.splitLookup(k1)
           val tl = l1.intersectionWithKey(lt)(f)
           val tr = r1.intersectionWithKey(gt)(f)
           found match {
             case None =>
-              tl merge tr
+              tl.merge(tr)
             case Some(x) =>
               tl.join(k1, f(k1, x1, x), tr)
           }
@@ -712,7 +713,7 @@ sealed abstract class ==>>[A, B] {
       case (_, Tip()) =>
         false
       case (Bin(kx, x, l, r), t) =>
-        val (lt, found, gt) = t splitLookup kx
+        val (lt, found, gt) = t.splitLookup(kx)
         found match {
           case None =>
             false
@@ -731,7 +732,7 @@ sealed abstract class ==>>[A, B] {
         empty
       case Bin(kx, x, l, r) =>
         if (p(kx, x)) l.filterWithKey(p).join(kx, x, r.filterWithKey(p))
-        else l.filterWithKey(p) merge r.filterWithKey(p)
+        else l.filterWithKey(p).merge(r.filterWithKey(p))
     }
 
   // Partition
@@ -744,11 +745,11 @@ sealed abstract class ==>>[A, B] {
       case Tip() =>
         (empty, empty)
       case Bin(kx, x, l, r) =>
-        val (l1, l2) = l partitionWithKey p
-        val (r1, r2) = r partitionWithKey p
+        val (l1, l2) = l.partitionWithKey(p)
+        val (r1, r2) = r.partitionWithKey(p)
 
-        if (p(kx, x)) (l1.join(kx, x, r1), l2 merge r2)
-        else (l1 merge r1, l2.join(kx, x, r2))
+        if (p(kx, x)) (l1.join(kx, x, r1), l2.merge(r2))
+        else (l1.merge(r1), l2.join(kx, x, r2))
     }
 
   def mapOption[C](f: B => Option[C])(implicit o: Order[A]): A ==>> C =
@@ -783,9 +784,9 @@ sealed abstract class ==>>[A, B] {
 
         f(kx, x) match {
           case -\/(y) =>
-            (l1.join(kx, y, r1), l2 merge r2)
+            (l1.join(kx, y, r1), l2.merge(r2))
           case \/-(z) =>
-            (l1 merge r1, l2.join(kx, z, r2))
+            (l1.merge(r1), l2.join(kx, z, r2))
         }
     }
 
@@ -815,10 +816,10 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
-            val (lt, z, gt) = l splitLookup k
+            val (lt, z, gt) = l.splitLookup(k)
             (lt, z, gt.join(kx, x, r))
           case GT =>
-            val (lt, z, gt) = r splitLookup k
+            val (lt, z, gt) = r.splitLookup(k)
             (l.join(kx, x, lt), z, gt)
           case EQ =>
             (l, some(x), r)
@@ -833,10 +834,10 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
-            val (lt, z, gt) = l splitLookupWithKey k
+            val (lt, z, gt) = l.splitLookupWithKey(k)
             (lt, z, gt.join(kx, x, r))
           case GT =>
-            val (lt, z, gt) = r splitLookupWithKey k
+            val (lt, z, gt) = r.splitLookupWithKey(k)
             (l.join(kx, x, lt), z, gt)
           case EQ =>
             (l, some((kx, x)), r)
@@ -871,7 +872,7 @@ sealed abstract class ==>>[A, B] {
           case LT =>
             cmphi(kx) match {
               case GT =>
-                (t lookupAssoc lo, t)
+                (t.lookupAssoc(lo), t)
               case _ =>
                 l.trimLookupLo(lo, cmphi)
             }
@@ -903,7 +904,7 @@ sealed abstract class ==>>[A, B] {
           case LT =>
             l.filterGt(f).join(kx, x, r)
           case GT =>
-            r filterGt f
+            r.filterGt(f)
           case EQ =>
             r
         }
@@ -916,9 +917,9 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         f(kx) match {
           case LT =>
-            l filterLt f
+            l.filterLt(f)
           case GT =>
-            l.join(kx, x, r filterLt f)
+            l.join(kx, x, r.filterLt(f))
           case EQ =>
             l
         }
@@ -961,7 +962,7 @@ sealed abstract class MapInstances0 {
     : Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] =
     new Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
-        fa map f
+        fa.map(f)
 
       def bind[A, B](fa: S ==>> A)(f: A => (S ==>> B)) =
         fa.mapOptionWithKey((k, v) => f(v).lookup(k))
@@ -1030,7 +1031,7 @@ sealed abstract class MapInstances extends MapInstances0 {
 
   implicit def mapUnion[A, B](implicit A: Order[A],
                               B: Semigroup[B]): Monoid[A ==>> B] =
-    Monoid.instance((l, r) => (l unionWith r)(B.append(_, _)), Tip())
+    Monoid.instance((l, r) => (l.unionWith(r))(B.append(_, _)), Tip())
 
   implicit def mapIntersection[A, B](
       implicit A: Order[A],
@@ -1069,7 +1070,7 @@ sealed abstract class MapInstances extends MapInstances0 {
         }
 
       override def map[A, B](fa: S ==>> A)(f: A => B) =
-        fa map f
+        fa.map(f)
 
       override def foldMap[A, B](fa: S ==>> A)(f: A => B)(
           implicit F: Monoid[B]): B =

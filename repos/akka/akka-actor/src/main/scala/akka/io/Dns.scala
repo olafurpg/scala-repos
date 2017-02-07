@@ -30,7 +30,7 @@ object Dns extends ExtensionId[DnsExt] with ExtensionIdProvider {
                       ipv6: immutable.Seq[Inet6Address])
       extends Command {
     val addrOption: Option[InetAddress] =
-      ipv4.headOption orElse ipv6.headOption
+      ipv4.headOption.orElse(ipv6.headOption)
 
     @throws[UnknownHostException]
     def addr: InetAddress = addrOption match {

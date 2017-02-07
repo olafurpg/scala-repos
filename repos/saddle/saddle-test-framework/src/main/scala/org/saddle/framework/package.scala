@@ -37,7 +37,7 @@ package object framework {
   def longEpochToNow: Gen[Long] = Gen.choose(1l, System.currentTimeMillis)
 
   /** A generator for DateTimeS between the start of the epoch and now. */
-  def dateTimeEpochToNow: Gen[DateTime] = longEpochToNow map (new DateTime(_))
+  def dateTimeEpochToNow: Gen[DateTime] = longEpochToNow.map(new DateTime(_))
 
   /** A generator for Vectors of an arbitrary size. */
   def genVectorOfN[S: Gen: ScalarTag](size: Int): Gen[Vec[S]] =

@@ -31,7 +31,7 @@ class NNLS(val maxIters: Int = -1) extends SerializableLogging {
 
   // find the optimal unconstrained step
   private def steplen(ata: BDM, dir: BDV, res: BDV, tmp: BDV): Double = {
-    val top = dir dot res
+    val top = dir.dot(res)
     gemv(1.0, ata, dir, 0.0, tmp)
     // Push the denominator upward very slightly to avoid infinities and silliness
     top / (tmp.dot(dir) + 1e-20)
@@ -132,7 +132,7 @@ class NNLS(val maxIters: Int = -1) extends SerializableLogging {
       // use a CG direction under certain conditions
       var step = steplen(ata, grad, res, tmp)
       var ndir = 0.0
-      val nx = x dot x
+      val nx = x.dot(x)
 
       if (nextIter > nextWall + 1) {
         val alpha = ngrad / nextNorm
@@ -142,12 +142,12 @@ class NNLS(val maxIters: Int = -1) extends SerializableLogging {
         if (stop(dstep, ndir, nx)) {
           // reject the CG step if it could lead to premature termination
           dir := grad
-          ndir = dir dot dir
+          ndir = dir.dot(dir)
         } else {
           step = dstep
         }
       } else {
-        ndir = dir dot dir
+        ndir = dir.dot(dir)
       }
 
       // terminate?

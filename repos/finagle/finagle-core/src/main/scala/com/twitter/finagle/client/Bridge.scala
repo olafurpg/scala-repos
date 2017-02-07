@@ -28,7 +28,7 @@ object Bridge {
       newDispatcher: Transport[In, Out] => Service[Req, Rep]
   ): ((Address, StatsReceiver) => ServiceFactory[Req, Rep]) = {
     case (Address.Inet(ia, _), sr) =>
-      ServiceFactory(() => transporter(ia, sr) map newDispatcher)
+      ServiceFactory(() => transporter(ia, sr).map(newDispatcher))
     case (com.twitter.finagle.exp.Address
             .ServiceFactory(sf: ServiceFactory[Req, Rep], _),
           _) =>

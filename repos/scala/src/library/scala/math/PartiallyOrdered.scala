@@ -26,22 +26,22 @@ trait PartiallyOrdered[+A] {
   def tryCompareTo[B >: A <% PartiallyOrdered[B]](that: B): Option[Int]
 
   def <[B >: A <% PartiallyOrdered[B]](that: B): Boolean =
-    (this tryCompareTo that) match {
+    (this.tryCompareTo(that)) match {
       case Some(x) if x < 0 => true
       case _ => false
     }
   def >[B >: A <% PartiallyOrdered[B]](that: B): Boolean =
-    (this tryCompareTo that) match {
+    (this.tryCompareTo(that)) match {
       case Some(x) if x > 0 => true
       case _ => false
     }
   def <=[B >: A <% PartiallyOrdered[B]](that: B): Boolean =
-    (this tryCompareTo that) match {
+    (this.tryCompareTo(that)) match {
       case Some(x) if x <= 0 => true
       case _ => false
     }
   def >=[B >: A <% PartiallyOrdered[B]](that: B): Boolean =
-    (this tryCompareTo that) match {
+    (this.tryCompareTo(that)) match {
       case Some(x) if x >= 0 => true
       case _ => false
     }

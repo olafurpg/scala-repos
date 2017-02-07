@@ -36,7 +36,7 @@ import org.joda.time._
 trait JodaTimeTypedField extends TypedField[DateTime] with JodaHelpers {
 
   def setFromAny(in: Any): Box[DateTime] =
-    toDateTime(in).flatMap(d => setBox(Full(d))) or genericSetFromAny(in)
+    toDateTime(in).flatMap(d => setBox(Full(d))).or(genericSetFromAny(in))
 
   def setFromString(s: String): Box[DateTime] = s match {
     case null | "" if optional_? => setBox(Empty)
@@ -58,10 +58,10 @@ trait JodaTimeTypedField extends TypedField[DateTime] with JodaHelpers {
       case _ => Full(elem)
     }
 
-  def asJs = valueBox.map(v => Num(v.getMillis)) openOr JsNull
+  def asJs = valueBox.map(v => Num(v.getMillis)).openOr(JsNull)
 
   protected def asJInt(encode: MyType => BigInt): JValue =
-    valueBox.map(v => JInt(encode(v))) openOr (JNothing: JValue)
+    valueBox.map(v => JInt(encode(v))).openOr(JNothing: JValue)
 
   def asJValue: JValue = asJInt(v => v.getMillis)
   def setFromJValue(jvalue: JValue) = setFromJInt(jvalue) { v =>

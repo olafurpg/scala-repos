@@ -1099,21 +1099,21 @@ object ScalaPsiElementFactory {
                 x.typeParameters.map(buildText).mkString("[", ",", "]")
             }
             val lowerBoundText =
-              typeParam.lowerBound.toOption collect {
+              typeParam.lowerBound.toOption.collect {
                 case psi.types.Nothing => ""
                 case x => " >: " + ScType.canonicalText(substitutor.subst(x))
               }
             val upperBoundText =
-              typeParam.upperBound.toOption collect {
+              typeParam.upperBound.toOption.collect {
                 case psi.types.Any => ""
                 case x => " <: " + ScType.canonicalText(substitutor.subst(x))
               }
             val viewBoundText =
-              typeParam.viewBound map { x =>
+              typeParam.viewBound.map { x =>
                 " <% " + ScType.canonicalText(substitutor.subst(x))
               }
             val contextBoundText =
-              typeParam.contextBound collect {
+              typeParam.contextBound.collect {
                 case tp: ScType =>
                   " : " + ScType.canonicalText(
                     ScTypeUtil.stripTypeArgs(substitutor.subst(tp)))

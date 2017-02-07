@@ -11,5 +11,5 @@ class VarargsTest extends Varargs {
 
   foo(i = 1, "2", "3")
   foo(strs = "2", i = 1)
-  this foo (i = 1, "2", "3")
+  this.foo(i = 1, "2", "3")
 }

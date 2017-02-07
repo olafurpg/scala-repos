@@ -67,7 +67,7 @@ class FuncTests extends CatsSuite {
     val g = appFunc { (x: Int) =>
       List(x * 2)
     }
-    val h = f product g
+    val h = f.product(g)
     val x = h.run(1)
     (x.first, x.second) should ===((Some(11), List(2)))
   }
@@ -76,7 +76,7 @@ class FuncTests extends CatsSuite {
     val f = Func.appFunc { (x: Int) =>
       (Some(x + 10): Option[Int])
     }
-    val xs = f traverse List(1, 2, 3)
+    val xs = f.traverse(List(1, 2, 3))
     xs should ===(Some(List(11, 12, 13)))
   }
 }

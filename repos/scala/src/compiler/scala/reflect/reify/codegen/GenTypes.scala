@@ -119,11 +119,11 @@ trait GenTypes { self: Reifier =>
 
   private def spliceAsManifest(tpe: Type): Tree = {
     def isSynthetic(manifest: Tree) =
-      manifest exists
-        (sub =>
-           sub.symbol != null &&
-             (sub.symbol == FullManifestModule ||
-               sub.symbol.owner == FullManifestModule))
+      manifest.exists(
+        sub =>
+          sub.symbol != null &&
+            (sub.symbol == FullManifestModule ||
+              sub.symbol.owner == FullManifestModule))
     def searchForManifest(typer: analyzer.Typer): Tree =
       analyzer.inferImplicit(
         EmptyTree,
@@ -199,7 +199,7 @@ trait GenTypes { self: Reifier =>
   private def reifyAnnotatedType(tpe: AnnotatedType): Tree = {
     val AnnotatedType(anns, underlying) = tpe
     mirrorBuildCall(nme.AnnotatedType,
-                    mkList(anns map reifyAnnotationInfo),
+                    mkList(anns.map(reifyAnnotationInfo)),
                     reify(underlying))
   }
 
@@ -208,8 +208,8 @@ trait GenTypes { self: Reifier =>
     if (reifyDebug) println("tough type: %s (%s)".format(tpe, tpe.kind))
 
     def reifyScope(scope: Scope): Tree = {
-      scope foreach reifySymDef
-      mirrorBuildCall(nme.newScopeWith, scope.toList map reify: _*)
+      scope.foreach(reifySymDef)
+      mirrorBuildCall(nme.newScopeWith, scope.toList.map(reify): _*)
     }
 
     tpe match {
@@ -220,7 +220,7 @@ trait GenTypes { self: Reifier =>
                         reifyScope(decls),
                         reify(tpe.typeSymbol))
       case tpe @ ExistentialType(tparams, underlying) =>
-        tparams foreach reifySymDef
+        tparams.foreach(reifySymDef)
         reifyBuildCall(nme.ExistentialType, tparams, underlying)
       case tpe @ ClassInfoType(parents, decls, clazz) =>
         reifySymDef(clazz)
@@ -229,10 +229,10 @@ trait GenTypes { self: Reifier =>
                         reifyScope(decls),
                         reify(tpe.typeSymbol))
       case tpe @ MethodType(params, restpe) =>
-        params foreach reifySymDef
+        params.foreach(reifySymDef)
         reifyBuildCall(nme.MethodType, params, restpe)
       case tpe @ PolyType(tparams, underlying) =>
-        tparams foreach reifySymDef
+        tparams.foreach(reifySymDef)
         reifyBuildCall(nme.PolyType, tparams, underlying)
       case _ =>
         throw new Error(

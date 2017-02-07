@@ -247,7 +247,7 @@ class FileHandler(path: String,
       }
     }
 
-    rv map { _.getTimeInMillis }
+    rv.map { _.getTimeInMillis }
   }
 
   /**
@@ -292,13 +292,13 @@ class FileHandler(path: String,
       if (examineRollTime) {
         // Only allow a single thread at a time to do a roll
         synchronized {
-          nextRollTime foreach { time =>
+          nextRollTime.foreach { time =>
             if (Time.now.inMilliseconds > time) roll()
           }
         }
       }
 
-      maxFileSize foreach { size =>
+      maxFileSize.foreach { size =>
         synchronized {
           if (bytesWrittenToFile + lineSizeBytes > size.bytes) roll()
         }

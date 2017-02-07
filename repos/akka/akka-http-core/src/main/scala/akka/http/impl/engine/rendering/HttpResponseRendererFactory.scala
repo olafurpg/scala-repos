@@ -243,9 +243,9 @@ private[http] class HttpResponseRendererFactory(
                                   dateSeen)
 
                   case x: RawHeader
-                      if (x is "content-type") || (x is "content-length") ||
-                        (x is "transfer-encoding") || (x is "date") ||
-                        (x is "server") || (x is "connection") ⇒
+                      if (x.is("content-type")) || (x.is("content-length")) ||
+                        (x.is("transfer-encoding")) || (x.is("date")) ||
+                        (x.is("server")) || (x.is("connection")) ⇒
                     suppressionWarning(log, x, "illegal RawHeader")
                     renderHeaders(tail,
                                   alwaysClose,

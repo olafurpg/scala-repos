@@ -42,7 +42,7 @@ abstract class GitCommand() extends Command {
 
   private def newTask(user: String): Runnable = new Runnable {
     override def run(): Unit = {
-      Database() withSession { implicit session =>
+      Database().withSession { implicit session =>
         try {
           runTask(user)
           callback.onExit(0)

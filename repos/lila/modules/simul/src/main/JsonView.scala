@@ -11,7 +11,7 @@ import lila.quote.Quote.quoteWriter
 final class JsonView(getLightUser: String => Option[LightUser]) {
 
   def apply(simul: Simul): Fu[JsObject] =
-    GameRepo.games(simul.gameIds) map { games =>
+    GameRepo.games(simul.gameIds).map { games =>
       val lightHost = getLightUser(simul.hostId)
       Json.obj(
         "id" -> simul.id,
@@ -67,7 +67,7 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
     Json.obj(
       "id" -> g.id,
       "status" -> g.status.id,
-      "fen" -> (chess.format.Forsyth exportBoard g.toChess.board),
+      "fen" -> (chess.format.Forsyth.exportBoard(g.toChess.board)),
       "lastMove" -> ~g.castleLastMoveTime.lastMoveString,
       "orient" -> g.playerByUserId(hostId).map(_.color)
     )

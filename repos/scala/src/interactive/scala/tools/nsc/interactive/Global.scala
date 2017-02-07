@@ -76,16 +76,16 @@ trait InteractiveAnalyzer extends Analyzer {
     override def enterExistingSym(sym: Symbol, tree: Tree): Context = {
       if (sym != null && sym.owner.isTerm) {
         enterIfNotThere(sym)
-        if (sym.isLazy) sym.lazyAccessor andAlso enterIfNotThere
+        if (sym.isLazy) sym.lazyAccessor.andAlso(enterIfNotThere)
 
         for (defAtt <- sym.attachments.get[DefaultsOfLocalMethodAttachment])
-          defAtt.defaultGetters foreach enterIfNotThere
+          defAtt.defaultGetters.foreach(enterIfNotThere)
       } else if (sym != null && sym.isClass && sym.isImplicit) {
         val owningInfo = sym.owner.info
         val existingDerivedSym = owningInfo
           .decl(sym.name.toTermName)
           .filter(sym => sym.isSynthetic && sym.isMethod)
-        existingDerivedSym.alternatives foreach (owningInfo.decls.unlink)
+        existingDerivedSym.alternatives.foreach(owningInfo.decls.unlink)
         val defTree = tree match {
           case dd: DocDef =>
             dd.definition // See SI-9011, Scala IDE's presentation compiler incorporates ScaladocGlobal with InteractiveGlobal, so we have to unwrap DocDefs.
@@ -99,11 +99,11 @@ trait InteractiveAnalyzer extends Analyzer {
       val scope = context.scope
       @tailrec
       def search(e: ScopeEntry) {
-        if ((e eq null) || (e.owner ne scope)) scope enter sym
+        if ((e eq null) || (e.owner ne scope)) scope.enter(sym)
         else if (e.sym ne sym) // otherwise, aborts since we found sym
           search(e.tail)
       }
-      search(scope lookupEntry sym.name)
+      search(scope.lookupEntry(sym.name))
     }
   }
 }
@@ -214,7 +214,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
   private def cleanResponses(rmap: ResponseMap): Unit = {
     for ((source, rs) <- rmap.toList) {
       for (r <- rs) {
-        if (getUnit(source).isEmpty) r raise new NoSuchUnitError(source.file)
+        if (getUnit(source).isEmpty) r.raise(new NoSuchUnitError(source.file))
         if (r.isComplete) rmap(source) -= r
       }
       if (rmap(source).isEmpty) rmap -= source
@@ -233,7 +233,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
   private def checkNoOutstanding(rmap: ResponseMap): Unit =
     for ((_, rs) <- rmap.toList; r <- rs) {
       debugLog("ERROR: missing response, request will be discarded")
-      r raise new MissingResponse
+      r.raise(new MissingResponse)
     }
 
   def checkNoResponsesOutstanding() {
@@ -261,11 +261,11 @@ with ContextTrees with RichCompilationUnits with Picklers {
       for (f <- toBeRemoved) {
         informIDE("removed: " + s)
         unitOfFile -= f
-        allSources = allSources filter (_.file != f)
+        allSources = allSources.filter(_.file != f)
       }
       toBeRemoved.clear()
     }
-    unitOfFile get s.file
+    unitOfFile.get(s.file)
   }
 
   /** A list giving all files to be typechecked in the order they should be checked.
@@ -346,7 +346,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
     if (canObserveTree) {
       if (context.unit.exists && result.pos.isOpaqueRange &&
           (result.pos includes context.unit.targetPos)) {
-        var located = new TypedLocator(context.unit.targetPos) locateIn result
+        var located = new TypedLocator(context.unit.targetPos).locateIn(result)
         if (located == EmptyTree) {
           println(
             "something's wrong: no " + context.unit + " in " + result +
@@ -569,7 +569,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
     reporter.reset()
 
     // remove any files in first that are no longer maintained by presentation compiler (i.e. closed)
-    allSources = allSources filter (s => unitOfFile contains (s.file))
+    allSources = allSources.filter(s => unitOfFile contains (s.file))
 
     // ensure all loaded units are parsed
     for (s <- allSources; unit <- getUnit(s)) {
@@ -597,7 +597,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
           else
             debugLog("%s has syntax errors. Skipped typechecking".format(unit))
         else debugLog("already up to date: " + unit)
-        for (r <- waitLoadedTypeResponses(unit.source)) r set unit.body
+        for (r <- waitLoadedTypeResponses(unit.source)) r.set(unit.body)
         serviceParsedEntered()
       } catch {
         case ex: FreshRunReq => throw ex // propagate a new run request
@@ -694,7 +694,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
   /** Update deleted and current top-level symbols sets */
   def syncTopLevelSyms(unit: RichCompilationUnit) {
     val deleted =
-      currentTopLevelSyms filter { sym =>
+      currentTopLevelSyms.filter { sym =>
         /** We sync after namer phase and it resets all the top-level symbols
           *  that survive the new parsing
           *  round to NoPeriod.
@@ -711,7 +711,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
 
   /** Move list of files to front of allSources */
   def moveToFront(fs: List[SourceFile]) {
-    allSources = fs ::: (allSources diff fs)
+    allSources = fs ::: (allSources.diff(fs))
   }
 
   // ----------------- Implementations of client commands -----------------------
@@ -729,9 +729,9 @@ with ContextTrees with RichCompilationUnits with Picklers {
           val result = results.head
           results = results.tail
           if (results.isEmpty) {
-            response set result
+            response.set(result)
             debugLog("responded" + timeStep)
-          } else response setProvisionally result
+          } else response.setProvisionally(result)
         }
       }
     } catch {
@@ -742,7 +742,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
           println("FreshRunReq thrown during response")
           ex.printStackTrace()
         }
-        response raise ex
+        response.raise(ex)
         throw ex
 
       case ex @ ShutdownReq =>
@@ -750,7 +750,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
           println("ShutdownReq thrown during response")
           ex.printStackTrace()
         }
-        response raise ex
+        response.raise(ex)
         throw ex
 
       case ex: Throwable =>
@@ -758,7 +758,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
           println("exception thrown during response: " + ex)
           ex.printStackTrace()
         }
-        response raise ex
+        response.raise(ex)
     } finally {
       pendingResponse = prevResponse
     }
@@ -777,7 +777,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
   private def reloadSources(sources: List[SourceFile]) {
     newTyperRun()
     minRunId = currentRunId
-    sources foreach reloadSource
+    sources.foreach(reloadSource)
     moveToFront(sources)
   }
 
@@ -795,7 +795,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
     informIDE("files deleted: " + sources)
     val deletedFiles = sources.map(_.file).toSet
     val deletedSyms =
-      currentTopLevelSyms filter { sym =>
+      currentTopLevelSyms.filter { sym =>
         deletedFiles contains sym.sourceFile
       }
     for (d <- deletedSyms) {
@@ -803,7 +803,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
       deletedTopLevelSyms += d
       currentTopLevelSyms -= d
     }
-    sources foreach (removeUnitOf(_))
+    sources.foreach(removeUnitOf(_))
     minRunId = currentRunId
     respond(response)(())
     demandNewCompilerRun()
@@ -814,7 +814,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
     *  Calls to this method could probably be replaced by removeUnit once default parameters are handled more robustly.
     */
   private def afterRunRemoveUnitsOf(sources: List[SourceFile]) {
-    toBeRemovedAfterRun ++= sources map (_.file)
+    toBeRemovedAfterRun ++= sources.map(_.file)
   }
 
   /** A fully attributed tree located at position `pos` */
@@ -849,7 +849,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
 //          println("tree not found at "+pos)
             EmptyTree
           } catch {
-            case ex: TyperResult => new Locator(pos) locateIn ex.tree
+            case ex: TyperResult => new Locator(pos).locateIn(ex.tree)
           } finally {
             unit.targetPos = NoPosition
           }
@@ -885,7 +885,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
       f: (SourceFile => RichCompilationUnit) => T): T = {
     val unitOfSrc: SourceFile => RichCompilationUnit = src =>
       unitOfFile(src.file)
-    sources filterNot (getUnit(_).isDefined) match {
+    sources.filterNot(getUnit(_).isDefined) match {
       case Nil =>
         f(unitOfSrc)
       case unknown =>
@@ -911,18 +911,18 @@ with ContextTrees with RichCompilationUnits with Picklers {
     val pre = adaptToNewRunMap(ThisType(sym.owner))
     val rawsym = pre.typeSymbol.info.decl(sym.name)
     val newsym =
-      rawsym filter { alt =>
+      rawsym.filter { alt =>
         sym.isType || {
           try {
-            val tp1 = pre.memberType(alt) onTypeError NoType
+            val tp1 = pre.memberType(alt).onTypeError(NoType)
             val tp2 =
-              adaptToNewRunMap(sym.tpe) substSym
-                (originalTypeParams, sym.owner.typeParams)
+              adaptToNewRunMap(sym.tpe).substSym(originalTypeParams,
+                                                 sym.owner.typeParams)
             matchesType(tp1, tp2, alwaysMatchSimple = false) || {
               debugLog(s"findMirrorSymbol matchesType($tp1, $tp2) failed")
               val tp3 =
-                adaptToNewRunMap(sym.tpe) substSym
-                  (originalTypeParams, alt.owner.typeParams)
+                adaptToNewRunMap(sym.tpe).substSym(originalTypeParams,
+                                                   alt.owner.typeParams)
               matchesType(tp1, tp3, alwaysMatchSimple = false) || {
                 debugLog(
                   s"findMirrorSymbol fallback matchesType($tp1, $tp3) failed")
@@ -974,7 +974,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
   }
 
   private def forceDocComment(sym: Symbol, unit: RichCompilationUnit) {
-    unit.body foreachPartial {
+    unit.body.foreachPartial {
       case DocDef(comment, defn) if defn.symbol == sym =>
         fillDocComment(defn.symbol, comment)
         EmptyTree
@@ -1045,7 +1045,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
 
     private def matching(sym: Symbol, symtpe: Type, ms: Set[M]): Option[M] =
       ms.find { m =>
-        (m.sym.name == sym.name) && (m.sym.isType || (m.tpe matches symtpe))
+        (m.sym.name == sym.name) && (m.sym.isType || (m.tpe.matches(symtpe)))
       }
 
     private def keepSecond(m: M,
@@ -1061,7 +1061,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
         add(sym.accessed, pre, implicitlyAdded)(toMember)
       } else if (!sym.name.decodedName.containsName("$") && !sym.isError &&
                  !sym.isArtifact && sym.hasRawInfo) {
-        val symtpe = pre.memberType(sym) onTypeError ErrorType
+        val symtpe = pre.memberType(sym).onTypeError(ErrorType)
         matching(sym, symtpe, this(sym.name)) match {
           case Some(m) =>
             if (keepSecond(m, sym, implicitlyAdded)) {
@@ -1164,7 +1164,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
 
     // TODO: guard with try/catch to deal with ill-typed qualifiers.
     val tree =
-      if (shouldTypeQualifier) analyzer newTyper context typedQualifier tree0
+      if (shouldTypeQualifier)
+        (analyzer newTyper context).typedQualifier(tree0)
       else tree0
 
     debugLog("typeMembers at " + tree + " " + tree.tpe)
@@ -1196,7 +1197,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
       assert(view.tree != EmptyTree)
       analyzer
         .newTyper(context.makeImplicit(reportAmbiguousErrors = false))
-        .typed(Apply(view.tree, List(tree)) setPos tree.pos)
+        .typed(Apply(view.tree, List(tree)).setPos(tree.pos))
         .onTypeError(EmptyTree)
     }
 
@@ -1247,7 +1248,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
       candidate => candidate.startsWith(entered)): List[M] = {
       val enteredName = if (name == nme.ERROR) nme.EMPTY else name
       val matcher = nameMatcher(enteredName)
-      results filter { (member: Member) =>
+      results.filter { (member: Member) =>
         val symbol = member.sym
         def isStable =
           member.tpe.isStable || member.sym.isStable ||
@@ -1384,7 +1385,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
       case Some(unit) =>
         if (unit.isUpToDate) {
           debugLog("already typed")
-          response set unit.body
+          response.set(unit.body)
         } else if (ignoredFiles(source.file)) {
           response.raise(lastException.getOrElse(CancelException))
         } else if (onSameThread) {
@@ -1456,7 +1457,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
       *  @return true iff typechecked correctly
       */
     private def applyPhase(phase: Phase, unit: CompilationUnit) {
-      enteringPhase(phase) { phase.asInstanceOf[GlobalPhase] applyPhase unit }
+      enteringPhase(phase) { phase.asInstanceOf[GlobalPhase].applyPhase(unit) }
     }
   }
 

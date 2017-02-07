@@ -32,7 +32,7 @@ class VecCheck extends Specification with ScalaCheck {
 
     "vectors equality" in {
       forAll { (v: Vec[Double]) =>
-        (v must_== Vec(v.contents)) and (v must_== v)
+        ((v must_== Vec(v.contents))).and(v must_== v)
       }
     }
 
@@ -41,8 +41,8 @@ class VecCheck extends Specification with ScalaCheck {
         val idx = Gen.choose(0, v.length - 1)
         val data = v.contents
         forAll(idx) { i =>
-          (v.at(i).isNA must beTrue) or (v.at(i) must_== Value(data(i)))
-          (v.raw(i).isNaN must beTrue) or (v.raw(i) must_== data(i))
+          ((v.at(i).isNA must beTrue)).or(v.at(i) must_== Value(data(i)))
+          ((v.raw(i).isNaN must beTrue)).or(v.raw(i) must_== data(i))
         }
       }
     }
@@ -252,7 +252,7 @@ class VecCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Double]) =>
         val res = v.scanLeft(0)((c: Int, x: Double) => c + 1)
         res.length must_== v.length
-        (res.last.isNA must beTrue) or (res.last must_== Value(v.count))
+        ((res.last.isNA must beTrue)).or(res.last must_== Value(v.count))
       }
     }
 
@@ -260,14 +260,14 @@ class VecCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Double]) =>
         val res = v.filterScanLeft(_ > 0.5)(0)((c: Int, x: Double) => c + 1)
         res.length must_== v.length
-        (res.last.isNA must beTrue) or
-          (res.last must_== Value(v.filter(_ > 0.5).count))
+        ((res.last.isNA must beTrue))
+          .or(res.last must_== Value(v.filter(_ > 0.5).count))
       }
     }
 
     "concat works" in {
       forAll { (v1: Vec[Double], v2: Vec[Double]) =>
-        val res = v1 concat v2
+        val res = v1.concat(v2)
         val exp = Vec(v1.toArray ++ v2.toArray)
         res must_== exp
       }
@@ -311,7 +311,7 @@ class VecCheck extends Specification with ScalaCheck {
           val (res1, res2) = v.splitAt(i)
           res1.length must_== i
           res2.length must_== (v.length - i)
-          (res1 concat res2) must_== v
+          (res1.concat(res2)) must_== v
         }
       }
     }

@@ -42,13 +42,13 @@ class ReachabilitySpec extends WordSpec with Matchers {
 
     "not change terminated entry" in {
       val r = Reachability.empty.terminated(nodeB, nodeA)
-      r.reachable(nodeB, nodeA) should be theSameInstanceAs (r)
-      r.unreachable(nodeB, nodeA) should be theSameInstanceAs (r)
+      (r.reachable(nodeB, nodeA) should be).theSameInstanceAs(r)
+      (r.unreachable(nodeB, nodeA) should be).theSameInstanceAs(r)
     }
 
     "not change when same status" in {
       val r = Reachability.empty.unreachable(nodeB, nodeA)
-      r.unreachable(nodeB, nodeA) should be theSameInstanceAs (r)
+      (r.unreachable(nodeB, nodeA) should be).theSameInstanceAs(r)
     }
 
     "be unreachable when some observed unreachable and others reachable" in {

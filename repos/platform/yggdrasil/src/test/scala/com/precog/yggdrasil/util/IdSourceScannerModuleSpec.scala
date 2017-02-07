@@ -56,7 +56,7 @@ trait IdSourceScannerModuleSpec[M[+ _]]
     "assign unique IDs" in {
       val idCols = scan(5, blockSize)(freshIdScanner)
       val ids =
-        idCols.toSet flatMap { col: LongColumn =>
+        idCols.toSet.flatMap { col: LongColumn =>
           (0 until blockSize).map(col(_)).toSet
         }
       ids must haveSize(5 * blockSize)
@@ -67,9 +67,9 @@ trait IdSourceScannerModuleSpec[M[+ _]]
       val idCols0 = scan(5, blockSize)(scanner)
       val idCols1 = scan(5, blockSize)(scanner)
 
-      (idCols0 zip idCols1) map {
+      (idCols0.zip(idCols1)).map {
         case (idCol0, idCol1) =>
-          (0 until blockSize) foreach { row =>
+          ((0 until blockSize)).foreach { row =>
             idCol0(row) must_== idCol1(row)
           }
       }

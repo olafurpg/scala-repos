@@ -107,7 +107,7 @@ class CountMinSketchSuite extends FunSuite {
         sketch
       }
 
-      val mergedSketch = sketches.reduce(_ mergeInPlace _)
+      val mergedSketch = sketches.reduce(_.mergeInPlace(_))
       checkSerDe(mergedSketch)
 
       val expectedSketch = {

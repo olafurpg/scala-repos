@@ -7,7 +7,7 @@ import play.api.libs.json._
 object Export {
 
   private def base64(str: String) =
-    Base64.getEncoder.encodeToString(str getBytes StandardCharsets.UTF_8)
+    Base64.getEncoder.encodeToString(str.getBytes(StandardCharsets.UTF_8))
 
   def apply(api: PuzzleApi, nb: Int) =
     api.puzzle.export(nb * 2).map { puzzles =>

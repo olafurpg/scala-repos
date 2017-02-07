@@ -29,9 +29,9 @@ trait MatchCps { self: PatternMatching =>
     // (only test availability of MarkerCPSAdaptPlus assuming they are either all available or none of them are)
     def removeCPSFromPt(pt: Type): Type =
       (if (MarkerCPSAdaptPlus.exists &&
-           (stripTriggerCPSAnns exists pt.hasAnnotation))
-         pt filterAnnotations (ann => !(strippedCPSAnns exists ann.matches))
+           (stripTriggerCPSAnns.exists(pt.hasAnnotation)))
+         pt.filterAnnotations(ann => !(strippedCPSAnns.exists(ann.matches)))
        else pt)
   }
-  def removeCPSFromPt(pt: Type): Type = CpsSymbols removeCPSFromPt pt
+  def removeCPSFromPt(pt: Type): Type = CpsSymbols.removeCPSFromPt(pt)
 }

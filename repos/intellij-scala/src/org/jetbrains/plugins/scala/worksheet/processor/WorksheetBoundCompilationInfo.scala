@@ -15,7 +15,7 @@ object WorksheetBoundCompilationInfo {
 
   def updateOrCreate(filePath: String, fileName: String): (Int, File, File) = {
     synchronized {
-      val result = cache get filePath
+      val result = cache.get(filePath)
       if (result != null) {
         val (it, src, out) = result
         cache.put(filePath, (it + 1, src, out))

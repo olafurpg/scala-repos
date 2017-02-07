@@ -30,13 +30,13 @@ sealed trait Advice {
 
   def evalComment: Option[String] = {
     List(prev.evalComment, info.evalComment).flatten mkString " → "
-  }.some filter (_.nonEmpty)
+  }.some.filter(_.nonEmpty)
 }
 
 private[analyse] object Advice {
 
   def apply(prev: Info, info: Info): Option[Advice] =
-    CpAdvice(prev, info) orElse MateAdvice(prev, info)
+    CpAdvice(prev, info).orElse(MateAdvice(prev, info))
 }
 
 private[analyse] case class CpAdvice(nag: Nag, info: Info, prev: Info)
@@ -67,12 +67,12 @@ private[analyse] object CpAdvice {
 
   def apply(prev: Info, info: Info): Option[CpAdvice] =
     for {
-      cp ← prev.score map (_.ceiled.centipawns)
-      infoCp ← info.score map (_.ceiled.centipawns)
+      cp ← prev.score.map(_.ceiled.centipawns)
+      infoCp ← info.score.map(_.ceiled.centipawns)
       delta = (infoCp - cp) |> { d =>
         info.color.fold(-d, d)
       }
-      nag ← cpNags find { case (d, n) => d <= delta } map (_._2)
+      nag ← (cpNags find { case (d, n) => d <= delta }).map(_._2)
     } yield CpAdvice(nag, info, prev)
 }
 
@@ -86,7 +86,7 @@ private[analyse] case object MateCreated
 
 private[analyse] object MateSequence {
   def apply(prev: Option[Int], next: Option[Int]): Option[MateSequence] =
-    (prev, next).some collect {
+    (prev, next).some.collect {
       case (None, Some(n)) if n < 0 => MateCreated
       case (Some(p), None) if p > 0 => MateLost
       case (Some(p), Some(n)) if (p > 0) && (n < 0) => MateLost
@@ -104,7 +104,7 @@ private[analyse] object MateAdvice {
     def reverse(m: Int) = info.color.fold(m, -m)
     def prevScore = reverse(prev.score ?? (_.centipawns))
     def nextScore = reverse(info.score ?? (_.centipawns))
-    MateSequence(prev.mate map reverse, info.mate map reverse) map {
+    MateSequence(prev.mate.map(reverse), info.mate.map(reverse)).map {
       sequence =>
         val nag = sequence match {
           case MateCreated if prevScore < -999 => Nag.Inaccuracy

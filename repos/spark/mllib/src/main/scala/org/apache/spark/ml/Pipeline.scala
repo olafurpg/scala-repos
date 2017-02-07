@@ -364,7 +364,7 @@ object PipelineModel extends MLReadable[PipelineModel] {
       val (uid: String, stages: Array[PipelineStage]) =
         SharedReadWrite.load(className, sc, path)
       val transformers =
-        stages map {
+        stages.map {
           case stage: Transformer => stage
           case other =>
             throw new RuntimeException(

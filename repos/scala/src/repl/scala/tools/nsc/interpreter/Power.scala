@@ -68,7 +68,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
 
     def loop(todo: Set[Symbol]): Set[Symbol] = {
       pass += 1
-      val (repeats, unseen) = todo partition seen
+      val (repeats, unseen) = todo.partition(seen)
       unseenHistory += unseen.size
       if (settings.verbose) {
         println(
@@ -79,9 +79,9 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
         return keep.toSet
 
       lastCount = processed
-      keep ++= (unseen filter isKeep filterNot isIgnore)
+      keep ++= (unseen.filter(isKeep).filterNot(isIgnore))
       seen ++= unseen
-      loop(unseen filter isRecur flatMap members)
+      loop(unseen.filter(isRecur).flatMap(members))
     }
 
     def apply(sym: Symbol): Set[Symbol] = {
@@ -95,7 +95,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
 
     /** Looking for dwindling returns */
     def droppedEnough() = unseenHistory.size >= 4 && {
-      unseenHistory takeRight 4 sliding 2 forall { it =>
+      (unseenHistory.takeRight(4) sliding 2).forall { it =>
         val List(a, b) = it.toList
         a > b
       }
@@ -115,12 +115,12 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     }
   }
 
-  private def customBanner = replProps.powerBanner.option flatMap {
+  private def customBanner = replProps.powerBanner.option.flatMap {
     case f if f.getName == "classic" => Some(classic)
     case f => io.File(f).safeSlurp()
   }
   private def customInit =
-    replProps.powerInitCode.option flatMap (f => io.File(f).safeSlurp())
+    replProps.powerInitCode.option.flatMap(f => io.File(f).safeSlurp())
 
   def classic = """
     |** Power User mode enabled - BEEP WHIR GYVE **
@@ -131,11 +131,12 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
   """.stripMargin.trim
 
   def banner =
-    customBanner getOrElse """
+    customBanner.getOrElse(
+      """
     |Power mode enabled. :phase is at typer.
     |import scala.tools.nsc._, intp.global._, definitions._
     |Try :help or completions for vals._ and power._
-  """.stripMargin.trim
+  """.stripMargin.trim)
 
   private def initImports =
     """scala.tools.nsc._
@@ -146,7 +147,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     |replImplicits._
     |treedsl.CODE._""".stripMargin.lines
 
-  def init = customInit getOrElse initImports.mkString("import ", ", ", "")
+  def init = customInit.getOrElse(initImports.mkString("import ", ", ", ""))
 
   /** Quietly starts up power mode and runs whatever is in init.
     */
@@ -156,7 +157,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     // Then we import everything from $r.
     intp interpret s"import ${intp.originalPath("$r")}._"
     // And whatever else there is to do.
-    init.lines foreach (intp interpret _)
+    init.lines.foreach(intp interpret _)
   }
 
   trait LowPriorityInternalInfo {
@@ -184,7 +185,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
       implicit typeEvidence: ru.TypeTag[T],
       runtimeClassEvidence: ClassTag[T]) {
     private def isSpecialized(s: Symbol) = s.name.toString contains "$mc"
-    private def isImplClass(s: Symbol) = s.name.toString endsWith "$class"
+    private def isImplClass(s: Symbol) = s.name.toString.endsWith("$class")
 
     /** Standard noise reduction filter. */
     def excludeMember(s: Symbol) =
@@ -192,12 +193,12 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
         s.isAnonOrRefinementClass || s.isAnonymousFunction)
     def symbol = compilerSymbolFromTag(tag)
     def tpe = compilerTypeFromTag(tag)
-    def members = membersUnabridged filterNot excludeMember
+    def members = membersUnabridged.filterNot(excludeMember)
     def membersUnabridged = tpe.members.toList
     def pkg = symbol.enclosingPackage
     def tag = typeEvidence
     def runtimeClass = runtimeClassEvidence.runtimeClass
-    def shortClass = runtimeClass.getName split "[$.]" last
+    def shortClass = runtimeClass.getName.split("[$.]") last
     def baseClasses = tpe.baseClasses
 
     override def toString = value match {
@@ -208,14 +209,14 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
 
   trait LowPriorityPrettifier {
     implicit object AnyPrettifier extends Prettifier[Any] {
-      def show(x: Any): Unit = prettify(x) foreach println
+      def show(x: Any): Unit = prettify(x).foreach(println)
       def prettify(x: Any): TraversableOnce[String] = x match {
         case x: Name => List(x.decode)
         case Tuple2(k, v) =>
           List(
             prettify(k).toIterator ++ Iterator("->") ++ prettify(v) mkString " ")
-        case xs: Array[_] => xs.iterator flatMap prettify
-        case xs: TraversableOnce[_] => xs flatMap prettify
+        case xs: Array[_] => xs.iterator.flatMap(prettify)
+        case xs: TraversableOnce[_] => xs.flatMap(prettify)
         case x => List(Prettifier.stringOf(x))
       }
     }
@@ -227,8 +228,8 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
   object Prettifier extends LowPriorityPrettifier {
     def stringOf(x: Any): String = scala.runtime.ScalaRunTime.stringOf(x)
     def default[T] = new Prettifier[T] {
-      def prettify(x: T): TraversableOnce[String] = AnyPrettifier prettify x
-      def show(x: T): Unit = AnyPrettifier show x
+      def prettify(x: T): TraversableOnce[String] = AnyPrettifier.prettify(x)
+      def show(x: T): Unit = AnyPrettifier.show(x)
     }
   }
   trait Prettifier[T] {
@@ -236,7 +237,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     def prettify(x: T): TraversableOnce[String]
 
     def prettify(xs: TraversableOnce[T]): TraversableOnce[String] =
-      xs flatMap (x => prettify(x))
+      xs.flatMap(x => prettify(x))
   }
 
   abstract class PrettifierClass[T: Prettifier]() {
@@ -244,11 +245,15 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     def value: Seq[T]
 
     def pp(f: Seq[T] => Seq[T]): Unit =
-      pretty prettify f(value) foreach (StringPrettifier show _)
+      pretty.prettify(f(value)).foreach(StringPrettifier.show(_))
 
     def freq[U](p: T => U) =
-      (value.toSeq groupBy p mapValues (_.size)).toList sortBy (-_._2) map
-        (_.swap)
+      (value.toSeq
+        .groupBy(p)
+        .mapValues(_.size))
+        .toList
+        .sortBy(-_._2)
+        .map(_.swap)
 
     def >>(implicit ord: Ordering[T]): Unit = pp(_.sorted)
     def >!(): Unit = pp(_.distinct)
@@ -292,13 +297,13 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     object symbolSubtypeOrdering extends Ordering[Symbol] {
       def compare(s1: Symbol, s2: Symbol) =
         if (s1 eq s2) 0
-        else if (s1 isLess s2) -1
+        else if (s1.isLess(s2)) -1
         else 1
     }
     implicit lazy val powerSymbolOrdering: Ordering[Symbol] =
-      Ordering[Name] on (_.name)
+      Ordering[Name].on(_.name)
     implicit lazy val powerTypeOrdering: Ordering[Type] =
-      Ordering[Symbol] on (_.typeSymbol)
+      Ordering[Symbol].on(_.typeSymbol)
 
     implicit def replInternalInfo[T: ru.TypeTag: ClassTag](
         x: T): InternalInfoWrapper[T] = new InternalInfoWrapper[T](Some(x))
@@ -324,7 +329,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     def ?[T: ru.TypeTag: ClassTag] = InternalInfo[T]
     def sanitize(s: String): String = sanitize(s.getBytes())
     def sanitize(s: Array[Byte]): String =
-      (s map {
+      (s.map {
         case x if x.toChar.isControl => '?'
         case x => x.toChar
       }).mkString
@@ -332,7 +337,7 @@ class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     def strings(s: Seq[Byte]): List[String] = {
       if (s.length == 0) Nil
       else
-        s dropWhile (_.toChar.isControl) span (x => !x.toChar.isControl) match {
+        s.dropWhile(_.toChar.isControl).span(x => !x.toChar.isControl) match {
           case (next, rest) => next.map(_.toChar).mkString :: strings(rest)
         }
     }

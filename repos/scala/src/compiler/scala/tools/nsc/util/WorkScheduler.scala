@@ -68,7 +68,7 @@ class WorkScheduler {
       val todo = op
     }
     synchronized {
-      interruptReqs enqueue ir
+      interruptReqs.enqueue(ir)
       notify()
     }
     ir
@@ -76,7 +76,7 @@ class WorkScheduler {
 
   /** Called from client: have action executed by server */
   def postWorkItem(action: Action) = synchronized {
-    todo enqueue action
+    todo.enqueue(action)
     notify()
   }
 
@@ -89,7 +89,7 @@ class WorkScheduler {
     *  Require an exception to be thrown on next poll.
     */
   def raise(exc: Throwable) = synchronized {
-    throwables enqueue exc
+    throwables.enqueue(exc)
     postWorkItem { new EmptyAction }
   }
 }

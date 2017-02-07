@@ -35,8 +35,8 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
                    run: Boolean,
                    exec: Option[CompilationProcess]) = {
     val layout = new BoxLayout(panel, BoxLayout.LINE_AXIS)
-    panel setLayout layout
-    panel setAlignmentX 0.0f //leftmost
+    panel.setLayout(layout)
+    panel.setAlignmentX(0.0f) //leftmost
 
     import WorksheetUiConstructor._
 
@@ -66,7 +66,7 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
           createSelectClassPathList(
             Option(
               RunWorksheetAction
-                .getModuleFor(PsiManager getInstance project findFile file)
+                .getModuleFor(PsiManager.getInstance(project) findFile file)
                 .getName),
             file))
         addChild(panel, new JLabel("Use class path of module:  "))
@@ -83,7 +83,7 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
       new CleanWorksheetAction().init(panel)
       addFiller()
       if (run) new RunWorksheetAction().init(panel)
-      else exec foreach (new StopWorksheetAction(_).init(panel))
+      else exec.foreach(new StopWorksheetAction(_).init(panel))
     }
 
     Option(statusDisplayN)
@@ -93,14 +93,14 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
                                         file: VirtualFile) = {
     val modulesBox = new ModulesComboBox()
 
-    modulesBox fillModules project
+    modulesBox.fillModules(project)
     modulesBox.setToolTipText("Using class path of the module...")
 
-    defaultModule foreach {
+    defaultModule.foreach {
       case nn =>
         val foundModule: Module =
-          ModuleManager getInstance project findModuleByName nn
-        if (foundModule != null) modulesBox setSelectedModule foundModule
+          ModuleManager.getInstance(project) findModuleByName nn
+        if (foundModule != null) modulesBox.setSelectedModule(foundModule)
     }
 
     modulesBox.addActionListener(new ActionListener {
@@ -110,7 +110,7 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
         if (m == null) return
 
         WorksheetCompiler.setModuleForCpName(
-          PsiManager getInstance project findFile file,
+          PsiManager.getInstance(project) findFile file,
           m.getName)
       }
     })
@@ -124,12 +124,12 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
     createCheckBox(
       "Make project",
       WorksheetCompiler.isMakeBeforeRun(
-        PsiManager getInstance project findFile file),
+        PsiManager.getInstance(project) findFile file),
       box =>
         new ChangeListener {
           override def stateChanged(e: ChangeEvent) {
             WorksheetCompiler.setMakeBeforeRun(
-              PsiManager getInstance project findFile file,
+              PsiManager.getInstance(project) findFile file,
               box.isSelected)
           }
       }
@@ -137,7 +137,7 @@ class WorksheetUiConstructor(base: JComponent, project: Project) {
   }
 
   def createAutoRunChb(file: VirtualFile): JCheckBox = {
-    val psiFile = PsiManager getInstance project findFile file
+    val psiFile = PsiManager.getInstance(project) findFile file
 
     import org.jetbrains.plugins.scala.worksheet.interactive.WorksheetAutoRunner._
 
@@ -193,7 +193,7 @@ object WorksheetUiConstructor {
         new Dimension(sqSize, sqSize)
       } else new Dimension(preferredSize.width, preferredSize.height)
 
-    comp setMaximumSize size
+    comp.setMaximumSize(size)
   }
 
   def addChild(parent: JComponent, child: Component, idx: Int = 0) {
@@ -204,7 +204,7 @@ object WorksheetUiConstructor {
     val separator = new JSeparator(SwingConstants.VERTICAL)
     val size = new Dimension(separator.getPreferredSize.width,
                              separator.getMaximumSize.height)
-    separator setMaximumSize size
+    separator.setMaximumSize(size)
 
     separator
   }

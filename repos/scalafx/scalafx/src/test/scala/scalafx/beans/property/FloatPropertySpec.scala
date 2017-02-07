@@ -316,10 +316,10 @@ class FloatPropertySpec extends FlatSpec with BeforeAndAfterEach {
     var invalidateCount = 0
     var changeCount = 0
     val binding = floatProperty * floatProperty2
-    binding onInvalidate {
+    binding.onInvalidate {
       invalidateCount += 1
     }
-    binding onChange {
+    binding.onChange {
       changeCount += 1
     }
     floatProperty() = 1

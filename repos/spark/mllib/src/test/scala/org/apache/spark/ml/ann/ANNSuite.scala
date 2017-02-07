@@ -97,7 +97,7 @@ class ANNSuite extends SparkFunSuite with MLlibTestSparkContext {
       .collect()
     predictionAndLabels.foreach {
       case (p, l) =>
-        assert(p ~== l absTol 0.5)
+        assert(p ~== l.absTol(0.5))
     }
   }
 }

@@ -24,17 +24,17 @@ class ClusterTest extends FunSuite {
     val h = new ClusterHelper
     import h._
 
-    0 until N foreach { cluster1.add(_) }
+    (0 until N).foreach { cluster1.add(_) }
     val (seq, changes) = cluster2.snap
     var set = seq.toSet
-    changes foreach { spool =>
-      spool foreach {
+    changes.foreach { spool =>
+      spool.foreach {
         case Cluster.Add(elem) => set += elem
         case Cluster.Rem(elem) => set -= elem
       }
     }
     assert(set.size == N)
-    0 until N foreach { cluster1.del(_) }
+    (0 until N).foreach { cluster1.del(_) }
     assert(set.size == 0)
   }
 
@@ -45,7 +45,7 @@ class ClusterTest extends FunSuite {
 
     val changes = mutable.Queue[Cluster.Change[WrappedInt]]()
     val (_, spool) = cluster2.snap
-    spool foreach { _ foreach { changes enqueue _ } }
+    spool.foreach { _.foreach { changes.enqueue(_) } }
     cluster1.add(1)
     cluster1.add(2)
     cluster1.add(1)
@@ -74,7 +74,7 @@ class ClusterTest extends FunSuite {
 
     cluster1.del(100)
     assert(changes.size == 9)
-    for (ch <- changes take 8) assert(ch.value != changes(8).value)
+    for (ch <- changes.take(8)) assert(ch.value != changes(8).value)
   }
 
   test("Cluster ready should wait on cluster initialization") {

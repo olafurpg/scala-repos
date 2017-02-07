@@ -58,7 +58,7 @@ abstract class LazyVals
 
     /** map from method symbols to the number of lazy values it defines. */
     private val lazyVals =
-      perRunCaches.newMap[Symbol, Int]() withDefaultValue 0
+      perRunCaches.newMap[Symbol, Int]().withDefaultValue(0)
 
     import symtab.Flags._
     private def flattenThickets(stats: List[Tree]): List[Tree] =
@@ -172,7 +172,7 @@ abstract class LazyVals
             // TODO: shady business... can this logic be encapsulated in LocalLazyValFinder?
             var added = false
             val stats =
-              super.transformTrees(body) mapConserve {
+              super.transformTrees(body).mapConserve {
                 case stat: ValDef =>
                   typed(deriveValDef(stat)(addBitmapDefs(stat.symbol, _)))
                 case stat: TermTree
@@ -250,10 +250,10 @@ abstract class LazyVals
         case _ => Block(stats, tree)
       }
 
-      val bmps = bitmaps(methSym) map (ValDef(_, ZERO))
+      val bmps = bitmaps(methSym).map(ValDef(_, ZERO))
 
       def isMatch(params: List[Ident]) =
-        (params.tail corresponds methSym.tpe.params)(_.tpe == _.tpe)
+        (params.tail.corresponds(methSym.tpe.params))(_.tpe == _.tpe)
 
       if (bmps.isEmpty) rhs
       else
@@ -279,7 +279,7 @@ abstract class LazyVals
         nme.newLazyValSlowComputeName(lzyVal.name.toTermName),
         lzyVal.pos,
         STABLE | PRIVATE)
-      defSym setInfo MethodType(List(), lzyVal.tpe.resultType)
+      defSym.setInfo(MethodType(List(), lzyVal.tpe.resultType))
       defSym.owner = lzyVal.owner
       debuglog(
         s"crete slow compute path $defSym with owner ${defSym.owner} for lazy val $lzyVal")
@@ -357,7 +357,7 @@ abstract class LazyVals
           (mkBlock(rhs), UNIT)
       }
 
-      def cond = (bitmapRef GEN_& (mask, bitmapKind)) GEN_== (ZERO, bitmapKind)
+      def cond = (bitmapRef.GEN_&(mask, bitmapKind)).GEN_==(ZERO, bitmapKind)
       val lazyDefs = mkFastPathBody(methOrClass.enclClass,
                                     lazyVal,
                                     cond,
@@ -369,9 +369,9 @@ abstract class LazyVals
     }
 
     private def mkSetFlag(bmp: Symbol, mask: Tree, bmpRef: Tree): Tree =
-      bmpRef === (bmpRef GEN_| (mask, bitmapKind))
+      bmpRef === (bmpRef.GEN_|(mask, bitmapKind))
 
-    val bitmaps = mutable.Map[Symbol, List[Symbol]]() withDefaultValue Nil
+    val bitmaps = mutable.Map[Symbol, List[Symbol]]().withDefaultValue(Nil)
 
     /** Return the symbol corresponding of the right bitmap int inside meth,
       *  given offset.
@@ -385,7 +385,7 @@ abstract class LazyVals
           .newVariable(nme.newBitmapName(nme.BITMAP_NORMAL, n), meth.pos)
           .setInfo(ByteTpe)
         enteringTyper {
-          sym addAnnotation VolatileAttr
+          sym.addAnnotation(VolatileAttr)
         }
 
         bitmaps(meth) = (sym :: bmps).reverse

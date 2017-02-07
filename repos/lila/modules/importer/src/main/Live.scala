@@ -27,8 +27,8 @@ final class Live(roundMap: ActorRef) {
   }
 
   def move(id: String, move: String) =
-    GameRepo game id flatMap {
-      _ filter (g => g.playable && g.imported) match {
+    GameRepo.game(id).flatMap {
+      _.filter(g => g.playable && g.imported) match {
         case None => fufail("No such playing game: " + id)
         case Some(game) =>
           Uci(move) match {

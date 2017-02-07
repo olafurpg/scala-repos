@@ -332,7 +332,7 @@ trait DefaultWrites {
     */
   def temporalWrites[A <: Temporal, B](formatting: B)(
       implicit f: B => TemporalFormatter[A]): Writes[A] = new Writes[A] {
-    def writes(temporal: A): JsValue = JsString(f(formatting) format temporal)
+    def writes(temporal: A): JsValue = JsString(f(formatting).format(temporal))
   }
 
   /**
@@ -404,7 +404,7 @@ trait DefaultWrites {
   val ZonedDateTimeNumberWrites: Writes[ZonedDateTime] =
     new Writes[ZonedDateTime] {
       def writes(t: ZonedDateTime): JsValue =
-        JsNumber(BigDecimal valueOf t.toInstant.toEpochMilli)
+        JsNumber(BigDecimal.valueOf(t.toInstant.toEpochMilli))
     }
 
   /**
@@ -436,7 +436,7 @@ trait DefaultWrites {
     */
   val InstantNumberWrites: Writes[Instant] = new Writes[Instant] {
     def writes(t: Instant): JsValue =
-      JsNumber(BigDecimal valueOf t.toEpochMilli)
+      JsNumber(BigDecimal.valueOf(t.toEpochMilli))
   }
 
   /**

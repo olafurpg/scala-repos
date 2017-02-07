@@ -19,7 +19,7 @@ sealed abstract class DualInstances extends DualInstances0 {
     }
 
   implicit def dualOrder[F](implicit F0: Order[F]): Order[F @@ Tags.Dual] =
-    Tag subst F0.reverseOrder
+    Tag.subst(F0.reverseOrder)
 }
 
 private trait DualSemigroup[F] extends Semigroup[F @@ Tags.Dual] {

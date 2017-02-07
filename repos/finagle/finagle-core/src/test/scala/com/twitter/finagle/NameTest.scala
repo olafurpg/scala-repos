@@ -44,6 +44,6 @@ class NameTest extends FunSuite {
     val names = Seq.fill(10) { Name.Bound.singleton(Var(Addr.Pending)) }.toSet
 
     assert(Name.all(names) == Name.all(names))
-    assert(Name.all(names) != Name.all(names drop 1))
+    assert(Name.all(names) != Name.all(names.drop(1)))
   }
 }

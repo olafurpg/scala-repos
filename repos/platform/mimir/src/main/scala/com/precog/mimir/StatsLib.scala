@@ -108,7 +108,7 @@ trait StatsLibModule[M[+ _]]
           } else {
             val middleValue =
               M.point(sortedTable.takeRange((count.toLong / 2), 1))
-            middleValue map {
+            middleValue.map {
               _.transform(trans.DerefObjectStatic(Leaf(Source), paths.Value))
             }
           }
@@ -144,10 +144,10 @@ trait StatsLibModule[M[+ _]]
       def reducer(ctx: MorphContext): Reducer[Result] = new Reducer[Result] {
         //TODO add cases for other column types; get information necessary for dealing with slice boundaries and unsoretd slices in the Iterable[Slice] that's used in table.reduce
         def reduce(schema: CSchema, range: Range): Result = {
-          schema.columns(JNumberT) flatMap {
+          schema.columns(JNumberT).flatMap {
             case col: LongColumn =>
               val mapped =
-                range filter col.isDefinedAt map { x =>
+                range.filter(col.isDefinedAt).map { x =>
                   col(x)
                 }
               if (mapped.isEmpty) {
@@ -290,29 +290,32 @@ trait StatsLibModule[M[+ _]]
             case (ColumnRef(AlphaPath, _), col) => col
           })
 
-          init orElse findFirst(values, range.start, range.end) map { init0 =>
-            val smoothed = new Array[BigDecimal](range.end)
-            val defined = BitSetUtil.create()
-            var row = range.start
-            var s = init0
-            while (row < smoothed.length) {
-              if (values.isDefinedAt(row) && alphas.isDefinedAt(row)) {
-                defined.set(row)
-                val x = values(row)
-                val a = alphas(row)
-                s = a * x + (BigDecimal(1) - a) * s
-                smoothed(row) = s
+          init
+            .orElse(findFirst(values, range.start, range.end))
+            .map { init0 =>
+              val smoothed = new Array[BigDecimal](range.end)
+              val defined = BitSetUtil.create()
+              var row = range.start
+              var s = init0
+              while (row < smoothed.length) {
+                if (values.isDefinedAt(row) && alphas.isDefinedAt(row)) {
+                  defined.set(row)
+                  val x = values(row)
+                  val a = alphas(row)
+                  s = a * x + (BigDecimal(1) - a) * s
+                  smoothed(row) = s
+                }
+                row += 1
               }
-              row += 1
-            }
 
-            (Some(s),
-             Map(
-               ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(defined,
-                                                                 smoothed)))
-          } getOrElse {
-            (None, Map.empty)
-          }
+              (Some(s),
+               Map(
+                 ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(defined,
+                                                                   smoothed)))
+            }
+            .getOrElse {
+              (None, Map.empty)
+            }
         }
       }
 
@@ -395,23 +398,25 @@ trait StatsLibModule[M[+ _]]
                 findFirst(values, rowM.getOrElse(range.start), range.end) match {
                   case Some((_, x1)) => loop(Continue(x0, x1 - x0, true), None)
                   case None =>
-                    rowM map { row =>
-                      // In this case, we found a single value in this slice, but
-                      // failed to find a second one. So, we still need to output
-                      // this value in this slice, due to the contract of Scanner.
+                    rowM
+                      .map { row =>
+                        // In this case, we found a single value in this slice, but
+                        // failed to find a second one. So, we still need to output
+                        // this value in this slice, due to the contract of Scanner.
 
-                      val defined = BitSetUtil.create()
-                      val smoothed = new Array[BigDecimal](range.end)
-                      defined.set(row)
-                      smoothed(row) = x0
-                      (FindSecond(x0),
-                       Map(
-                         ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(
-                           defined,
-                           smoothed)))
-                    } getOrElse {
-                      (FindSecond(x0), Map.empty)
-                    }
+                        val defined = BitSetUtil.create()
+                        val smoothed = new Array[BigDecimal](range.end)
+                        defined.set(row)
+                        smoothed(row) = x0
+                        (FindSecond(x0),
+                         Map(
+                           ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(
+                             defined,
+                             smoothed)))
+                      }
+                      .getOrElse {
+                        (FindSecond(x0), Map.empty)
+                      }
                 }
 
               case Continue(s00, b00, first0) =>
@@ -498,14 +503,16 @@ trait StatsLibModule[M[+ _]]
           val cross = for (l <- left; r <- right) yield (l, r)
 
           val result: Set[Result] =
-            cross map {
+            cross.map {
               case (c1: LongColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter { r =>
-                    c1.isDefinedAt(r) && c2.isDefinedAt(r)
-                  } map { i =>
-                    (c1(i), c2(i))
-                  }
+                  range
+                    .filter { r =>
+                      c1.isDefinedAt(r) && c2.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      (c1(i), c2(i))
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -530,11 +537,13 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter { r =>
-                    c1.isDefinedAt(r) && c2.isDefinedAt(r)
-                  } map { i =>
-                    (c1(i), c2(i))
-                  }
+                  range
+                    .filter { r =>
+                      c1.isDefinedAt(r) && c2.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      (c1(i), c2(i))
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -559,11 +568,13 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter { r =>
-                    c1.isDefinedAt(r) && c2.isDefinedAt(r)
-                  } map { i =>
-                    (c1(i), c2(i))
-                  }
+                  range
+                    .filter { r =>
+                      c1.isDefinedAt(r) && c2.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      (c1(i), c2(i))
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -588,11 +599,13 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: LongColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter { r =>
-                    c1.isDefinedAt(r) && c2.isDefinedAt(r)
-                  } map { i =>
-                    (c1(i), c2(i))
-                  }
+                  range
+                    .filter { r =>
+                      c1.isDefinedAt(r) && c2.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      (c1(i), c2(i))
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -617,11 +630,13 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: LongColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter { r =>
-                    c1.isDefinedAt(r) && c2.isDefinedAt(r)
-                  } map { i =>
-                    (c1(i), c2(i))
-                  }
+                  range
+                    .filter { r =>
+                      c1.isDefinedAt(r) && c2.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      (c1(i), c2(i))
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -646,11 +661,13 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter { r =>
-                    c1.isDefinedAt(r) && c2.isDefinedAt(r)
-                  } map { i =>
-                    (c1(i), c2(i))
-                  }
+                  range
+                    .filter { r =>
+                      c1.isDefinedAt(r) && c2.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      (c1(i), c2(i))
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -675,11 +692,13 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter { r =>
-                    c1.isDefinedAt(r) && c2.isDefinedAt(r)
-                  } map { i =>
-                    (c1(i), c2(i))
-                  }
+                  range
+                    .filter { r =>
+                      c1.isDefinedAt(r) && c2.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      (c1(i), c2(i))
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -704,11 +723,13 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter { r =>
-                    c1.isDefinedAt(r) && c2.isDefinedAt(r)
-                  } map { i =>
-                    (c1(i), c2(i))
-                  }
+                  range
+                    .filter { r =>
+                      c1.isDefinedAt(r) && c2.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      (c1(i), c2(i))
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -733,11 +754,13 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter { r =>
-                    c1.isDefinedAt(r) && c2.isDefinedAt(r)
-                  } map { i =>
-                    (c1(i), c2(i))
-                  }
+                  range
+                    .filter { r =>
+                      c1.isDefinedAt(r) && c2.isDefinedAt(r)
+                    }
+                    .map { i =>
+                      (c1(i), c2(i))
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -769,35 +792,38 @@ trait StatsLibModule[M[+ _]]
       }
 
       def extract(res: Result): Table = {
-        res filter (_._1 > 0) map {
-          case (count, sum1, sum2, sumsq1, sumsq2, productSum) =>
-            val unscaledVar1 = count * sumsq1 - sum1 * sum1
-            val unscaledVar2 = count * sumsq2 - sum2 * sum2
-            if (unscaledVar1 != 0 && unscaledVar2 != 0) {
-              val cov = (productSum - ((sum1 * sum2) / count)) / count
-              val stdDev1 = sqrt(unscaledVar1) / count
-              val stdDev2 = sqrt(unscaledVar2) / count
-              val correlation = cov / (stdDev1 * stdDev2)
+        res
+          .filter(_._1 > 0)
+          .map {
+            case (count, sum1, sum2, sumsq1, sumsq2, productSum) =>
+              val unscaledVar1 = count * sumsq1 - sum1 * sum1
+              val unscaledVar2 = count * sumsq2 - sum2 * sum2
+              if (unscaledVar1 != 0 && unscaledVar2 != 0) {
+                val cov = (productSum - ((sum1 * sum2) / count)) / count
+                val stdDev1 = sqrt(unscaledVar1) / count
+                val stdDev2 = sqrt(unscaledVar2) / count
+                val correlation = cov / (stdDev1 * stdDev2)
 
-              val resultTable =
-                Table.constDecimal(Set(correlation)) //TODO the following lines are used throughout. refactor!
-              val valueTable = resultTable.transform(
-                trans.WrapObject(Leaf(Source), paths.Value.name))
-              val keyTable = Table.constEmptyArray.transform(
-                trans.WrapObject(Leaf(Source), paths.Key.name))
+                val resultTable =
+                  Table.constDecimal(Set(correlation)) //TODO the following lines are used throughout. refactor!
+                val valueTable = resultTable.transform(
+                  trans.WrapObject(Leaf(Source), paths.Value.name))
+                val keyTable = Table.constEmptyArray.transform(
+                  trans.WrapObject(Leaf(Source), paths.Key.name))
 
-              valueTable.cross(keyTable)(
-                InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
-            } else {
-              Table.empty
-            }
-        } getOrElse Table.empty
+                valueTable.cross(keyTable)(
+                  InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+              } else {
+                Table.empty
+              }
+          }
+          .getOrElse(Table.empty)
       }
 
       private val morph1 = new Morph1Apply {
         def apply(table: Table, ctx: MorphContext) = {
           val valueSpec = DerefObjectStatic(TransSpec1.Id, paths.Value)
-          table.transform(valueSpec).reduce(reducer(ctx)) map extract
+          table.transform(valueSpec).reduce(reducer(ctx)).map(extract)
         }
       }
     }
@@ -821,13 +847,14 @@ trait StatsLibModule[M[+ _]]
           val cross = for (l <- left; r <- right) yield (l, r)
 
           val result =
-            cross map {
+            cross.map {
               case (c1: LongColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -844,10 +871,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -864,10 +892,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -884,10 +913,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: LongColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -904,10 +934,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: LongColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -924,10 +955,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -944,10 +976,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -964,10 +997,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -984,10 +1018,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1013,30 +1048,32 @@ trait StatsLibModule[M[+ _]]
 
       def extract(res: Result): Table = {
         val res2 =
-          res filter {
+          res.filter {
             case (count, _, _, _) => count != 0
           }
 
-        res2 map {
-          case (count, sum1, sum2, productSum) => {
-            val cov = (productSum - ((sum1 * sum2) / count)) / count
+        res2
+          .map {
+            case (count, sum1, sum2, productSum) => {
+              val cov = (productSum - ((sum1 * sum2) / count)) / count
 
-            val resultTable = Table.constDecimal(Set(cov))
-            val valueTable = resultTable.transform(
-              trans.WrapObject(Leaf(Source), paths.Value.name))
-            val keyTable = Table.constEmptyArray.transform(
-              trans.WrapObject(Leaf(Source), paths.Key.name))
+              val resultTable = Table.constDecimal(Set(cov))
+              val valueTable = resultTable.transform(
+                trans.WrapObject(Leaf(Source), paths.Value.name))
+              val keyTable = Table.constEmptyArray.transform(
+                trans.WrapObject(Leaf(Source), paths.Key.name))
 
-            valueTable.cross(keyTable)(
-              InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+              valueTable.cross(keyTable)(
+                InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+            }
           }
-        } getOrElse Table.empty
+          .getOrElse(Table.empty)
       }
 
       private val morph1 = new Morph1Apply {
         def apply(table: Table, ctx: MorphContext) = {
           val valueSpec = DerefObjectStatic(TransSpec1.Id, paths.Value)
-          table.transform(valueSpec).reduce(reducer(ctx)) map extract
+          table.transform(valueSpec).reduce(reducer(ctx)).map(extract)
         }
       }
     }
@@ -1065,13 +1102,14 @@ trait StatsLibModule[M[+ _]]
           val cross = for (l <- left; r <- right) yield (l, r)
 
           val result =
-            cross map {
+            cross.map {
               case (c1: LongColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1093,10 +1131,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1118,10 +1157,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1143,10 +1183,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: LongColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1168,10 +1209,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: LongColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1193,10 +1235,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1218,10 +1261,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1243,10 +1287,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1268,10 +1313,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1302,40 +1348,42 @@ trait StatsLibModule[M[+ _]]
 
       def extract(res: Result): Table = {
         val res2 =
-          res filter {
+          res.filter {
             case (count, _, _, _, _) => count != 0
           }
 
-        res2 map {
-          case (count, sum1, sum2, sumsq1, productSum) => {
-            val cov = (productSum - ((sum1 * sum2) / count)) / count
-            val vari = (sumsq1 - (sum1 * (sum1 / count))) / count
+        res2
+          .map {
+            case (count, sum1, sum2, sumsq1, productSum) => {
+              val cov = (productSum - ((sum1 * sum2) / count)) / count
+              val vari = (sumsq1 - (sum1 * (sum1 / count))) / count
 
-            val slope = cov / vari
-            val yint = (sum2 / count) - (slope * (sum1 / count))
+              val slope = cov / vari
+              val yint = (sum2 / count) - (slope * (sum1 / count))
 
-            val constSlope = Table.constDecimal(Set(slope))
-            val constIntercept = Table.constDecimal(Set(yint))
+              val constSlope = Table.constDecimal(Set(slope))
+              val constIntercept = Table.constDecimal(Set(yint))
 
-            val slopeSpec = trans.WrapObject(Leaf(SourceLeft), "slope")
-            val yintSpec = trans.WrapObject(Leaf(SourceRight), "intercept")
-            val concatSpec = trans.InnerObjectConcat(slopeSpec, yintSpec)
+              val slopeSpec = trans.WrapObject(Leaf(SourceLeft), "slope")
+              val yintSpec = trans.WrapObject(Leaf(SourceRight), "intercept")
+              val concatSpec = trans.InnerObjectConcat(slopeSpec, yintSpec)
 
-            val valueTable = constSlope.cross(constIntercept)(
-              trans.WrapObject(concatSpec, paths.Value.name))
-            val keyTable = Table.constEmptyArray.transform(
-              trans.WrapObject(Leaf(Source), paths.Key.name))
+              val valueTable = constSlope.cross(constIntercept)(
+                trans.WrapObject(concatSpec, paths.Value.name))
+              val keyTable = Table.constEmptyArray.transform(
+                trans.WrapObject(Leaf(Source), paths.Key.name))
 
-            valueTable.cross(keyTable)(
-              InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+              valueTable.cross(keyTable)(
+                InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+            }
           }
-        } getOrElse Table.empty
+          .getOrElse(Table.empty)
       }
 
       private val morph1 = new Morph1Apply {
         def apply(table: Table, ctx: MorphContext) = {
           val valueSpec = DerefObjectStatic(TransSpec1.Id, paths.Value)
-          table.transform(valueSpec).reduce(reducer(ctx)) map extract
+          table.transform(valueSpec).reduce(reducer(ctx)).map(extract)
         }
       }
     }
@@ -1364,13 +1412,14 @@ trait StatsLibModule[M[+ _]]
           val cross = for (l <- left; r <- right) yield (l, r)
 
           val result =
-            cross map {
+            cross.map {
               case (c1: LongColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1397,10 +1446,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1427,10 +1477,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1457,10 +1508,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: LongColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1487,10 +1539,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: LongColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1517,10 +1570,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1547,10 +1601,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: DoubleColumn, c2: NumColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1577,10 +1632,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: LongColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1607,10 +1663,11 @@ trait StatsLibModule[M[+ _]]
                 }
               case (c1: NumColumn, c2: DoubleColumn) =>
                 val mapped =
-                  range filter (r => c1.isDefinedAt(r) && c2.isDefinedAt(r)) map {
-                    i =>
+                  range
+                    .filter(r => c1.isDefinedAt(r) && c2.isDefinedAt(r))
+                    .map { i =>
                       (c1(i), c2(i))
-                  }
+                    }
                 if (mapped.isEmpty) {
                   None
                 } else {
@@ -1646,40 +1703,42 @@ trait StatsLibModule[M[+ _]]
 
       def extract(res: Result): Table = {
         val res2 =
-          res filter {
+          res.filter {
             case (count, _, _, _, _) => count != 0
           }
 
-        res2 map {
-          case (count, sum1, sum2, sumsq1, productSum) => {
-            val cov = (productSum - ((sum1 * sum2) / count)) / count
-            val vari = (sumsq1 - (sum1 * (sum1 / count))) / count
+        res2
+          .map {
+            case (count, sum1, sum2, sumsq1, productSum) => {
+              val cov = (productSum - ((sum1 * sum2) / count)) / count
+              val vari = (sumsq1 - (sum1 * (sum1 / count))) / count
 
-            val slope = cov / vari
-            val yint = (sum2 / count) - (slope * (sum1 / count))
+              val slope = cov / vari
+              val yint = (sum2 / count) - (slope * (sum1 / count))
 
-            val constSlope = Table.constDecimal(Set(slope))
-            val constIntercept = Table.constDecimal(Set(yint))
+              val constSlope = Table.constDecimal(Set(slope))
+              val constIntercept = Table.constDecimal(Set(yint))
 
-            val slopeSpec = trans.WrapObject(Leaf(SourceLeft), "slope")
-            val yintSpec = trans.WrapObject(Leaf(SourceRight), "intercept")
-            val concatSpec = trans.InnerObjectConcat(slopeSpec, yintSpec)
+              val slopeSpec = trans.WrapObject(Leaf(SourceLeft), "slope")
+              val yintSpec = trans.WrapObject(Leaf(SourceRight), "intercept")
+              val concatSpec = trans.InnerObjectConcat(slopeSpec, yintSpec)
 
-            val valueTable = constSlope.cross(constIntercept)(
-              trans.WrapObject(concatSpec, paths.Value.name))
-            val keyTable = Table.constEmptyArray.transform(
-              trans.WrapObject(Leaf(Source), paths.Key.name))
+              val valueTable = constSlope.cross(constIntercept)(
+                trans.WrapObject(concatSpec, paths.Value.name))
+              val keyTable = Table.constEmptyArray.transform(
+                trans.WrapObject(Leaf(Source), paths.Key.name))
 
-            valueTable.cross(keyTable)(
-              InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+              valueTable.cross(keyTable)(
+                InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+            }
           }
-        } getOrElse Table.empty
+          .getOrElse(Table.empty)
       }
 
       private val morph1 = new Morph1Apply {
         def apply(table: Table, ctx: MorphContext) = {
           val valueSpec = DerefObjectStatic(TransSpec1.Id, paths.Value)
-          table.transform(valueSpec).reduce(reducer(ctx)) map extract
+          table.transform(valueSpec).reduce(reducer(ctx)).map(extract)
         }
       }
     }
@@ -1736,7 +1795,7 @@ trait StatsLibModule[M[+ _]]
                   if (bs2.get(j)) arr(j) = col(j + start))
                 bs.or(bs2)
               case col =>
-                sys.error("unexpected column found: %s" format col)
+                sys.error("unexpected column found: %s".format(col))
             }
 
             m2(ColumnRef(path, CNum)) =

@@ -34,8 +34,8 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     val b = new B(99)
-    b.f foreach println
-    b.g(new B(99)) foreach println
+    b.f.foreach(println)
+    b.g(new B(99)).foreach(println)
 
     println(f(b))
     println(g1(b))

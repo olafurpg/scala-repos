@@ -167,8 +167,8 @@ final case class TreeLoc[A](tree: Tree[A],
   /** Maps the given function over the elements. */
   def map[B](f: A => B): TreeLoc[B] = {
     val ff = (_: Tree[A]).map(f)
-    TreeLoc.loc(tree map f, lefts map ff, rights map ff, parents.map {
-      case (l, t, r) => (l map ff, f(t), r map ff)
+    TreeLoc.loc(tree.map(f), lefts.map(ff), rights.map(ff), parents.map {
+      case (l, t, r) => (l.map(ff), f(t), r.map(ff))
     })
   }
 
@@ -225,7 +225,7 @@ sealed abstract class TreeLocInstances {
 
       def copoint[A](p: TreeLoc[A]): A = p.tree.rootLabel
 
-      override def map[A, B](fa: TreeLoc[A])(f: A => B): TreeLoc[B] = fa map f
+      override def map[A, B](fa: TreeLoc[A])(f: A => B): TreeLoc[B] = fa.map(f)
 
       def cobind[A, B](fa: TreeLoc[A])(f: TreeLoc[A] => B): TreeLoc[B] =
         map(cojoin(fa))(f)

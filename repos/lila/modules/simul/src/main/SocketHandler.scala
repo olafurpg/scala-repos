@@ -24,12 +24,12 @@ private[simul] final class SocketHandler(hub: lila.hub.Env,
   def join(simId: String,
            uid: String,
            user: Option[User]): Fu[Option[JsSocketHandler]] =
-    exists(simId) flatMap {
+    exists(simId).flatMap {
       _ ?? {
         for {
-          socket ← socketHub ? Get(simId) mapTo manifest[ActorRef]
+          socket ← (socketHub ? Get(simId)).mapTo(manifest[ActorRef])
           join = Join(uid = uid, user = user)
-          handler ← Handler(hub, socket, uid, join, user map (_.id)) {
+          handler ← Handler(hub, socket, uid, join, user.map(_.id)) {
             case Connected(enum, member) =>
               (controller(socket, simId, uid, member), enum, member)
           }
@@ -42,12 +42,12 @@ private[simul] final class SocketHandler(hub: lila.hub.Env,
                          uid: String,
                          member: Member): Handler.Controller = {
     case ("p", o) =>
-      o int "v" foreach { v =>
+      (o int "v").foreach { v =>
         socket ! PingVersion(uid, v)
       }
     case ("talk", o) =>
-      o str "d" foreach { text =>
-        member.userId foreach { userId =>
+      o.str("d").foreach { text =>
+        member.userId.foreach { userId =>
           chat ! lila.chat.actorApi.UserTalk(simId, userId, text, socket)
         }
       }

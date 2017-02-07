@@ -78,7 +78,7 @@ object ScalatraBase {
 
   def runCallbacks(data: Try[Any])(
       implicit request: HttpServletRequest): Unit = {
-    callbacks.reverse foreach (_(data))
+    callbacks.reverse.foreach(_(data))
   }
 
   def renderCallbacks(
@@ -95,7 +95,7 @@ object ScalatraBase {
 
   def runRenderCallbacks(data: Try[Any])(
       implicit request: HttpServletRequest): Unit = {
-    renderCallbacks.reverse foreach (_(data))
+    renderCallbacks.reverse.foreach(_(data))
   }
 
   def getServletRegistration(app: ScalatraBase): Option[ServletRegistration] = {
@@ -205,8 +205,8 @@ trait ScalatraBase
         val actionResult = runRoutes(routes(request.requestMethod)).headOption
         // Give the status code handler a chance to override the actionResult
         val r =
-          handleStatusCode(status) getOrElse {
-            actionResult orElse matchOtherMethods() getOrElse doNotFound()
+          handleStatusCode(status).getOrElse {
+            actionResult.orElse(matchOtherMethods()).getOrElse(doNotFound())
           }
         rendered = false
         r
@@ -383,7 +383,7 @@ trait ScalatraBase
   }
 
   def error(handler: ErrorHandler): Unit = {
-    errorHandler = handler orElse errorHandler
+    errorHandler = handler.orElse(errorHandler)
   }
 
   protected[scalatra] def withRouteMultiParams[S](
@@ -417,7 +417,7 @@ trait ScalatraBase
     */
   protected def renderResponse(actionResult: Any): Unit = {
     if (contentType == null)
-      contentTypeInferrer.lift(actionResult) foreach {
+      contentTypeInferrer.lift(actionResult).foreach {
         contentType = _
       }
 
@@ -482,7 +482,7 @@ trait ScalatraBase
       doNotFound()
     case ActionResult(status, x: Int, resultHeaders) =>
       response.status = status
-      resultHeaders foreach {
+      resultHeaders.foreach {
         case (name, value) => response.addHeader(name, value)
       }
       response.writer.print(x.toString)
@@ -497,7 +497,7 @@ trait ScalatraBase
         util.io.copy(_, response.outputStream)
       }
     case file: File =>
-      if (contentType startsWith "text")
+      if (contentType.startsWith("text"))
         response.setCharacterEncoding(FileCharset(file).name)
       using(new FileInputStream(file)) { in =>
         zeroCopy(in, response.outputStream)
@@ -580,7 +580,7 @@ trait ScalatraBase
           response.status = ResponseStatus(status)
         case HaltException(None, _, _, _) => // leave status line alone
       }
-      e.headers foreach {
+      e.headers.foreach {
         case (name, value) => response.addHeader(name, value)
       }
       if (!rendered) renderResponse(e.body)
@@ -731,15 +731,17 @@ trait ScalatraBase
       case x if x.startsWith("/") && includeContextPath =>
         ensureSlash(contextPath) + ensureContextPathStripped(ensureSlash(path))
       case x if x.startsWith("/") && includeServletPath =>
-        request.getServletPath.blankOption map {
-          ensureSlash(_) + ensureServletPathStripped(ensureSlash(path))
-        } getOrElse "/"
+        request.getServletPath.blankOption
+          .map {
+            ensureSlash(_) + ensureServletPathStripped(ensureSlash(path))
+          }
+          .getOrElse("/")
       case _ if absolutize => ensureContextPathsStripped(ensureSlash(path))
       case _ => path
     }
 
     val pairs =
-      params map {
+      params.map {
         case (key, None) => key.urlEncode + "="
         case (key, Some(value)) =>
           key.urlEncode + "=" + value.toString.urlEncode
@@ -752,12 +754,12 @@ trait ScalatraBase
 
   private[this] def ensureContextPathsStripped(path: String)(
       implicit request: HttpServletRequest): String = {
-    ((ensureContextPathStripped _) andThen (ensureServletPathStripped _))(path)
+    ((ensureContextPathStripped _).andThen(ensureServletPathStripped _))(path)
   }
 
   private[this] def ensureServletPathStripped(path: String)(
       implicit request: HttpServletRequest): String = {
-    val sp = ensureSlash(request.getServletPath.blankOption getOrElse "")
+    val sp = ensureSlash(request.getServletPath.blankOption.getOrElse(""))
     val np = if (path.startsWith(sp + "/")) path.substring(sp.length) else path
     ensureSlash(np)
   }
@@ -784,7 +786,8 @@ trait ScalatraBase
       servletContext
         .getInitParameter(ForceHttpsKey)
         .blankOption
-        .map(_.toBoolean) getOrElse false
+        .map(_.toBoolean)
+        .getOrElse(false)
     }
   }
 
@@ -842,13 +845,16 @@ trait ScalatraBase
   }
 
   def serverHost(implicit request: HttpServletRequest): String = {
-    initParameter(HostNameKey).flatMap(_.blankOption) getOrElse request.getServerName
+    initParameter(HostNameKey)
+      .flatMap(_.blankOption)
+      .getOrElse(request.getServerName)
   }
 
   def serverPort(implicit request: HttpServletRequest): Int = {
     initParameter(PortKey)
       .flatMap(_.blankOption)
-      .map(_.toInt) getOrElse request.getServerPort
+      .map(_.toInt)
+      .getOrElse(request.getServerPort)
   }
 
   protected def contextPath: String = servletContext.contextPath
@@ -862,13 +868,16 @@ trait ScalatraBase
     *         `None` if the parameter is not set.
     */
   def initParameter(name: String): Option[String] = {
-    config.initParameters.get(name) orElse {
+    config.initParameters.get(name).orElse {
       servletContext.initParameters.get(name)
     }
   }
 
   def environment: String = {
-    sys.props.get(EnvironmentKey) orElse initParameter(EnvironmentKey) getOrElse "DEVELOPMENT"
+    sys.props
+      .get(EnvironmentKey)
+      .orElse(initParameter(EnvironmentKey))
+      .getOrElse("DEVELOPMENT")
   }
 
   /**
@@ -900,10 +909,12 @@ trait ScalatraBase
   def multiParams(implicit request: HttpServletRequest): MultiParams = {
     val read = request.contains("MultiParamsRead")
     val found =
-      request.get(MultiParamsKey) map
-        (_.asInstanceOf[MultiParams] ++
-          (if (read) Map.empty else request.multiParameters))
-    val multi = found getOrElse request.multiParameters
+      request
+        .get(MultiParamsKey)
+        .map(
+          _.asInstanceOf[MultiParams] ++
+            (if (read) Map.empty else request.multiParameters))
+    val multi = found.getOrElse(request.multiParameters)
     request("MultiParamsRead") = new {}
     request(MultiParamsKey) = multi
     multi.withDefaultValue(Seq.empty)

@@ -21,7 +21,7 @@ object StepBuilder {
             withOpening: Boolean): JsArray = {
     chess.Replay.gameWhileValid(pgnMoves, initialFen, variant) match {
       case (games, error) =>
-        error foreach logChessError(id)
+        error.foreach(logChessError(id))
         val lastPly = games.lastOption.??(_.turns)
         val openingOf: String => Option[FullOpening] =
           if (withOpening && Variant.openingSensibleVariants(variant))
@@ -58,7 +58,7 @@ object StepBuilder {
 
   private def applyAnalysisEvals(steps: List[Step],
                                  analysis: Analysis): List[Step] =
-    steps.zipWithIndex map {
+    steps.zipWithIndex.map {
       case (step, index) =>
         analysis.infos.lift(index - 1).fold(step) { info =>
           step.copy(
@@ -79,8 +79,8 @@ object StepBuilder {
       case (steps, ad) =>
         val index = ad.ply - analysis.startPly
         (for {
-          before <- steps lift (index - 1)
-          after <- steps lift index
+          before <- steps.lift(index - 1)
+          after <- steps.lift(index)
         } yield
           steps
             .updated(
@@ -104,9 +104,9 @@ object StepBuilder {
                             info: Info,
                             variant: Variant): List[Step] = {
     chess.Replay
-      .gameWhileValid(info.variation take 20, fromStep.fen, variant) match {
+      .gameWhileValid(info.variation.take(20), fromStep.fen, variant) match {
       case (games, error) =>
-        error foreach logChessError(gameId)
+        error.foreach(logChessError(gameId))
         val lastPly = games.lastOption.??(_.turns)
         games.drop(1).map { g =>
           Step(

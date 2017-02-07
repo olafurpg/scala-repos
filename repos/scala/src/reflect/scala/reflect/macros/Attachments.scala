@@ -43,7 +43,7 @@ abstract class Attachments { self =>
 
   /** Check underlying payload contains an instance of type `T`. */
   def contains[T: ClassTag]: Boolean =
-    !isEmpty && (all exists matchesTag[T])
+    !isEmpty && (all.exists(matchesTag[T]))
 
   /** Creates a copy of this attachment with the payload slot of T added/updated with the provided value.
     *  Replaces an existing payload of the same type, if exists.
@@ -53,7 +53,7 @@ abstract class Attachments { self =>
 
   /** Creates a copy of this attachment with the payload of the given class type `T` removed. */
   def remove[T: ClassTag]: Attachments { type Pos = self.Pos } = {
-    val newAll = all filterNot matchesTag[T]
+    val newAll = all.filterNot(matchesTag[T])
     if (newAll.isEmpty) pos.asInstanceOf[Attachments { type Pos = self.Pos }]
     else new NonemptyAttachments[Pos](this.pos, newAll)
   }

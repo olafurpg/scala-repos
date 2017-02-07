@@ -82,7 +82,8 @@ trait LabelsControllerBase extends ControllerBase {
       getLabel(repository.owner, repository.name, params("labelId").toInt)
         .map { label =>
           html.edit(Some(label), repository)
-        } getOrElse NotFound()
+        }
+        .getOrElse(NotFound())
     })
 
   ajaxPost("/:owner/:repository/issues/labels/:labelId/edit", labelForm)(

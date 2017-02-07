@@ -56,7 +56,7 @@ object Container {
       val UDP = "udp"
 
       val portMappingValidator = validator[PortMapping] { portMapping =>
-        portMapping.protocol is oneOf(TCP, UDP)
+        portMapping.protocol.is(oneOf(TCP, UDP))
         portMapping.containerPort should be >= 0
         portMapping.hostPort should be >= 0
         portMapping.servicePort should be >= 0
@@ -70,9 +70,10 @@ object Container {
       }
 
     implicit val dockerValidator = validator[Docker] { docker =>
-      docker.image is notEmpty
-      docker.portMappings is optional(every(PortMapping.portMappingValidator)) and optional(
-        uniquePortNames)
+      docker.image.is(notEmpty)
+      docker.portMappings
+        .is(optional(every(PortMapping.portMappingValidator)))
+        .and(optional(uniquePortNames))
     }
   }
 
@@ -80,18 +81,18 @@ object Container {
   // delegates validation to the matching validator
   implicit val validContainer: Validator[Container] = {
     val validGeneralContainer = validator[Container] { container =>
-      container.volumes is every(valid)
+      container.volumes.is(every(valid))
     }
 
     val validDockerContainer: Validator[Container] = validator[Container] {
       container =>
-        container.docker is notEmpty
-        container.docker.each is valid
+        container.docker.is(notEmpty)
+        container.docker.each.is(valid)
     }
 
     val validMesosContainer: Validator[Container] = validator[Container] {
       container =>
-        container.docker is empty
+        container.docker.is(empty)
     }
 
     new Validator[Container] {
@@ -101,6 +102,6 @@ object Container {
           validate(c)(validDockerContainer)
         case _ => Failure(Set(RuleViolation(c.`type`, "unknown", None)))
       }
-    } and validGeneralContainer
+    }.and(validGeneralContainer)
   }
 }

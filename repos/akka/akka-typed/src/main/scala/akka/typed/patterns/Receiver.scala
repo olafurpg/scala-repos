@@ -109,8 +109,8 @@ object Receiver {
 
     Full {
       case Sig(_, ReceiveTimeout) ⇒
-        val (overdue, remaining) = queue partition (_.deadline.isOverdue)
-        overdue foreach (a ⇒ a.replyTo ! GetOneResult(ctx.self, None))
+        val (overdue, remaining) = queue.partition(_.deadline.isOverdue)
+        overdue.foreach(a ⇒ a.replyTo ! GetOneResult(ctx.self, None))
         if (remaining.isEmpty) {
           ctx.setReceiveTimeout(Duration.Undefined)
           empty(ctx)
@@ -122,7 +122,7 @@ object Receiver {
             g.replyTo ! GetOneResult(ctx.self, None)
             asked(ctx, queue)
           case g @ GetOne(d) ⇒
-            asked(ctx, queue enqueue Asked(g.replyTo, Deadline.now + d))
+            asked(ctx, queue.enqueue(Asked(g.replyTo, Deadline.now + d)))
           case g @ GetAll(d) if d <= Duration.Zero ⇒
             g.replyTo ! GetAllResult(ctx.self, Nil)
             asked(ctx, queue)

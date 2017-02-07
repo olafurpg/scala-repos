@@ -74,7 +74,7 @@ abstract class WrappedArray[T]
   override def stringPrefix = "WrappedArray"
 
   /** Clones this object, including the underlying Array. */
-  override def clone(): WrappedArray[T] = WrappedArray make array.clone()
+  override def clone(): WrappedArray[T] = WrappedArray.make(array.clone())
 
   /** Creates new builder for this collection ==> move to subclasses
     */
@@ -114,9 +114,9 @@ object WrappedArray {
     : CanBuildFrom[WrappedArray[_], T, WrappedArray[T]] =
     new CanBuildFrom[WrappedArray[_], T, WrappedArray[T]] {
       def apply(from: WrappedArray[_]): Builder[T, WrappedArray[T]] =
-        ArrayBuilder.make[T]()(m) mapResult WrappedArray.make[T]
+        ArrayBuilder.make[T]()(m).mapResult(WrappedArray.make[T])
       def apply: Builder[T, WrappedArray[T]] =
-        ArrayBuilder.make[T]()(m) mapResult WrappedArray.make[T]
+        ArrayBuilder.make[T]()(m).mapResult(WrappedArray.make[T])
     }
 
   def newBuilder[A]: Builder[A, IndexedSeq[A]] = new ArrayBuffer

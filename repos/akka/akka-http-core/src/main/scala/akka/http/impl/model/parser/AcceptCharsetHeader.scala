@@ -20,7 +20,7 @@ private[parser] trait AcceptCharsetHeader {
     `charset-range-def` ~ optional(weight) ~> { (range, optQ) ⇒
       optQ match {
         case None ⇒ range
-        case Some(q) ⇒ range withQValue q
+        case Some(q) ⇒ range.withQValue(q)
       }
     }
   }

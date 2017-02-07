@@ -57,7 +57,7 @@ class CachingAPIKeyFinder[M[+ _]: Monad](
     apiKeyCache.get(tid) match {
       case None =>
         delegate.findAPIKey(tid, rootKey).map {
-          _ map { _ tap add unsafePerformIO }
+          _.map { _.tap(add) unsafePerformIO }
         }
       case t => t.point[M]
     }
@@ -75,12 +75,12 @@ class CachingAPIKeyFinder[M[+ _]: Monad](
   def createAPIKey(accountId: AccountId,
                    keyName: Option[String] = None,
                    keyDesc: Option[String] = None): M[v1.APIKeyDetails] =
-    delegate.createAPIKey(accountId, keyName, keyDesc) map {
-      _ tap add unsafePerformIO
+    delegate.createAPIKey(accountId, keyName, keyDesc).map {
+      _.tap(add) unsafePerformIO
     }
 
   def addGrant(accountKey: APIKey, grantId: GrantId): M[Boolean] =
-    delegate.addGrant(accountKey, grantId) map { result =>
+    delegate.addGrant(accountKey, grantId).map { result =>
       // invalidate the cache on modification
       apiKeyCache.remove(accountKey)
       result

@@ -7,6 +7,6 @@ object Test {
 
   implicit val orderEntries = new Ordering[Entry] {
     def compare(first: Entry, second: Entry) =
-      extractTime(first) compare extractTime(second)
+      extractTime(first).compare(extractTime(second))
   }
 }

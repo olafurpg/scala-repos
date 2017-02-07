@@ -462,11 +462,13 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     */
   def reindexRow(rix: Index[RX]): Frame[RX, CX, T] = {
     val ixer = rowIx.getIndexer(rix)
-    ixer.map { i =>
-      Frame(values.map(v => Vec(array.take(v, i, v.scalarTag.missing))),
-            rix,
-            colIx)
-    } getOrElse this
+    ixer
+      .map { i =>
+        Frame(values.map(v => Vec(array.take(v, i, v.scalarTag.missing))),
+              rix,
+              colIx)
+      }
+      .getOrElse(this)
   }
 
   /**
@@ -476,9 +478,11 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     */
   def reindexCol(cix: Index[CX]): Frame[RX, CX, T] = {
     val ixer = colIx.getIndexer(cix)
-    ixer.map { i =>
-      Frame(values.take(i), rowIx, cix)
-    } getOrElse this
+    ixer
+      .map { i =>
+        Frame(values.take(i), rowIx, cix)
+      }
+      .getOrElse(this)
   }
 
   // -----------------------------------------
@@ -506,7 +510,7 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
 
     val frm = Panel(columns1 ++ columns2,
                     rowIx,
-                    colIx.take(locs1) concat colIx.take(locs2))
+                    colIx.take(locs1).concat(colIx.take(locs2)))
     val tkr = array.argsort(array.flatten(Seq(locs1, locs2)))
 
     frm.colAt(tkr)
@@ -522,7 +526,7 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     * @tparam Y Type of elements of new Index
     */
   def setRowIndex[Y: ST: ORD](newIx: Index[Y]): Frame[Y, CX, T] =
-    Frame(values, newIx, colIx) withMat cachedMat
+    Frame(values, newIx, colIx).withMat(cachedMat)
 
   /**
     * Create a new Frame using the current values but with the new row index specified
@@ -549,7 +553,7 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     * @tparam Y Result type of index, ie Index[Y]
     */
   def mapRowIndex[Y: ST: ORD](fn: RX => Y): Frame[Y, CX, T] =
-    Frame(values, rowIx.map(fn), colIx) withMat cachedMat
+    Frame(values, rowIx.map(fn), colIx).withMat(cachedMat)
 
   /**
     * Create a new Frame using the current values but with the new col index. Positions
@@ -558,7 +562,7 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     * @tparam Y Type of elements of new Index
     */
   def setColIndex[Y: ST: ORD](newIx: Index[Y]): Frame[RX, Y, T] =
-    Frame(values, rowIx, newIx) withMat cachedMat
+    Frame(values, rowIx, newIx).withMat(cachedMat)
 
   /**
     * Create a new Frame using the current values but with the new col index specified
@@ -587,21 +591,21 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     * @tparam Y Result type of index, ie Index[Y]
     */
   def mapColIndex[Y: ST: ORD](fn: CX => Y): Frame[RX, Y, T] =
-    Frame(values, rowIx, colIx.map(fn)) withMat cachedMat
+    Frame(values, rowIx, colIx.map(fn)).withMat(cachedMat)
 
   /**
     * Create a new Frame whose values are the same, but whose row index has been changed
     * to the bound [0, numRows - 1), as in an array.
     */
   def resetRowIndex: Frame[Int, CX, T] =
-    Frame(values, IndexIntRange(numRows), colIx) withMat cachedMat
+    Frame(values, IndexIntRange(numRows), colIx).withMat(cachedMat)
 
   /**
     * Create a new Frame whose values are the same, but whose col index has been changed
     * to the bound [0, numCols - 1), as in an array.
     */
   def resetColIndex: Frame[RX, Int, T] =
-    Frame(values, rowIx, IndexIntRange(numCols)) withMat cachedMat
+    Frame(values, rowIx, IndexIntRange(numCols)).withMat(cachedMat)
 
   // ----------------------------------------
   // some helpful ops
@@ -918,13 +922,13 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
 
     val ixc = colIx.join(other.colIx, how)
 
-    val lft = ixc.lTake.map(x => values.take(x)) getOrElse values
-    val rgt = ixc.rTake.map(x => other.values.take(x)) getOrElse other.values
+    val lft = ixc.lTake.map(x => values.take(x)).getOrElse(values)
+    val rgt = ixc.rTake.map(x => other.values.take(x)).getOrElse(other.values)
 
-    val mfn = (v: Vec[T], u: Vec[U]) => v concat u
-    val zpp = lft zip rgt
+    val mfn = (v: Vec[T], u: Vec[U]) => v.concat(u)
+    val zpp = lft.zip(rgt)
     val dat = zpp.map { case (top, bot) => mfn(top, bot) }
-    val idx = rowIx concat other.rowIx
+    val idx = rowIx.concat(other.rowIx)
 
     Frame(dat, idx, ixc.index)
   }
@@ -1043,13 +1047,17 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
             how: JoinType = LeftJoin): Frame[RX, Int, T] = {
     val indexer = rowIx.join(other.index, how)
     val lft =
-      indexer.lTake.map { loc =>
-        values.map(_.take(loc))
-      } getOrElse values
+      indexer.lTake
+        .map { loc =>
+          values.map(_.take(loc))
+        }
+        .getOrElse(values)
     val rgt =
-      indexer.rTake.map { loc =>
-        other.values.take(loc)
-      } getOrElse other.values
+      indexer.rTake
+        .map { loc =>
+          other.values.take(loc)
+        }
+        .getOrElse(other.values)
     Frame(lft :+ rgt, indexer.index, IndexIntRange(colIx.length + 1))
   }
 
@@ -1085,13 +1093,17 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
            how: JoinType = LeftJoin): Frame[RX, Int, T] = {
     val indexer = rowIx.join(other.rowIx, how)
     val lft =
-      indexer.lTake.map { loc =>
-        values.map(_.take(loc))
-      } getOrElse values
+      indexer.lTake
+        .map { loc =>
+          values.map(_.take(loc))
+        }
+        .getOrElse(values)
     val rgt =
-      indexer.rTake.map { loc =>
-        other.values.map(_.take(loc))
-      } getOrElse other.values
+      indexer.rTake
+        .map { loc =>
+          other.values.map(_.take(loc))
+        }
+        .getOrElse(other.values)
     Frame(lft ++ rgt,
           indexer.index,
           IndexIntRange(colIx.length + other.colIx.length))
@@ -1115,13 +1127,17 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
                how: JoinType = LeftJoin): Frame[RX, Int, Any] = {
     val indexer = rowIx.join(other.index, how)
     val lft =
-      indexer.lTake.map { loc =>
-        values.map(_.take(loc))
-      } getOrElse values
+      indexer.lTake
+        .map { loc =>
+          values.map(_.take(loc))
+        }
+        .getOrElse(values)
     val rgt =
-      indexer.rTake.map { loc =>
-        other.values.take(loc)
-      } getOrElse other.values
+      indexer.rTake
+        .map { loc =>
+          other.values.take(loc)
+        }
+        .getOrElse(other.values)
     Panel(lft :+ rgt, indexer.index, IndexIntRange(colIx.length + 1))
   }
 
@@ -1145,13 +1161,17 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
               how: JoinType = LeftJoin): Frame[RX, Int, Any] = {
     val indexer = rowIx.join(other.rowIx, how)
     val lft =
-      indexer.lTake.map { loc =>
-        values.map(_.take(loc))
-      } getOrElse values
+      indexer.lTake
+        .map { loc =>
+          values.map(_.take(loc))
+        }
+        .getOrElse(values)
     val rgt =
-      indexer.rTake.map { loc =>
-        other.values.map(_.take(loc))
-      } getOrElse other.values
+      indexer.rTake
+        .map { loc =>
+          other.values.map(_.take(loc))
+        }
+        .getOrElse(other.values)
     Panel(lft ++ rgt,
           indexer.index,
           IndexIntRange(colIx.length + other.colIx.length))
@@ -1539,7 +1559,7 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     * in row-major order.
     */
   def toSeq: IndexedSeq[(RX, CX, T)] =
-    (Range(0, numRows) zip rowIx.toSeq).flatMap {
+    (Range(0, numRows).zip(rowIx.toSeq)).flatMap {
       case (i, rx) =>
         rowAt(i).toSeq.map {
           case (cx, t) =>
@@ -1582,7 +1602,7 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
       val rhalf = nrows / 2
 
       val maxf = (a: List[Int], b: List[String]) =>
-        (a zip b).map(v => math.max(v._1, v._2.length))
+        (a.zip(b)).map(v => math.max(v._1, v._2.length))
 
       // calc row index width
       val rsca = rowIx.scalarTag
@@ -1596,7 +1616,7 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
       val clens = MatCols.colLens(values, numCols, ncols)
 
       val csca = colIx.scalarTag
-      def clen(c: Int) = clens(c) max {
+      def clen(c: Int) = clens(c).max {
         val lst = csca.strList(colIx.raw(c)).map(_.length)
         if (lst.length > 0) lst.max else 0
       }
@@ -1648,7 +1668,7 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
 
       // for building row labels
       def enumZip[A, B](a: List[A], b: List[B]): List[(Int, A, B)] =
-        for (v <- (a.zipWithIndex zip b)) yield (v._1._2, v._1._1, v._2)
+        for (v <- (a.zipWithIndex.zip(b))) yield (v._1._2, v._1._1, v._2)
 
       val prevRowLabels =
         Array.fill(rowIx.scalarTag.strList(rowIx.raw(0)).size)("")
@@ -1674,8 +1694,8 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
       // for building frame entries
       def createVals(r: Int) = {
         val elem = (col: Int) =>
-          "%" + clen(col) +
-            "s " format values(col).scalarTag.show(values(r, col))
+          ("%" + clen(col) +
+            "s ").format(values(col).scalarTag.show(values(r, col)))
         util.buildStr(ncols, numCols, elem) + "\n"
       }
 
@@ -1876,7 +1896,7 @@ object Frame extends BinOpFrame {
       colIx: Index[CX]): Frame[RX, CX, T] =
     if (mat.length == 0) empty[RX, CX, T]
     else {
-      new Frame[RX, CX, T](mat.cols(), rowIx, colIx) withMat Some(mat)
+      new Frame[RX, CX, T](mat.cols(), rowIx, colIx).withMat(Some(mat))
     }
 }
 

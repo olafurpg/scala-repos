@@ -42,9 +42,9 @@ private[puzzle] final class Selector(puzzleColl: Coll,
           .one[Puzzle]
       case Some(user) if user.perfs.puzzle.nb > maxAttempts => fuccess(none)
       case Some(user) =>
-        val rating = user.perfs.puzzle.intRating min 2300 max 900
+        val rating = (user.perfs.puzzle.intRating min 2300).max(900)
         val step = toleranceStepFor(rating)
-        api.attempt.playedIds(user, maxAttempts) flatMap { ids =>
+        api.attempt.playedIds(user, maxAttempts).flatMap { ids =>
           tryRange(rating,
                    step,
                    step,
@@ -78,9 +78,10 @@ private[puzzle] final class Selector(puzzleColl: Coll,
           )
         ))
       .sort(BSONDocument(Puzzle.BSONFields.voteSum -> -1))
-      .one[Puzzle] flatMap {
-      case None if (tolerance + step) <= toleranceMax =>
-        tryRange(rating, tolerance + step, step, decay, ids, isMate)
-      case res => fuccess(res)
-    }
+      .one[Puzzle]
+      .flatMap {
+        case None if (tolerance + step) <= toleranceMax =>
+          tryRange(rating, tolerance + step, step, decay, ids, isMate)
+        case res => fuccess(res)
+      }
 }

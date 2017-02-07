@@ -48,7 +48,7 @@ class PowerMethod(maxIters: Int = 10, tolerance: Double = 1E-5)
 
   //in-place modification of eigen vector
   def nextEigen(eigenVector: BDV, ay: BDV) = {
-    val lambda = eigenVector dot ay
+    val lambda = eigenVector.dot(ay)
     eigenVector := ay
     val norm1 = norm(ay)
     eigenVector *= 1.0 / norm1

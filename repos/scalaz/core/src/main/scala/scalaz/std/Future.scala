@@ -23,8 +23,8 @@ private class FutureInstance(implicit ec: ExecutionContext)
     with MonadError[Future, Throwable]
     with Catchable[Future] {
   def point[A](a: => A): Future[A] = Future(a)
-  def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa flatMap f
-  override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f
+  def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa.flatMap(f)
+  override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
   def cobind[A, B](fa: Future[A])(f: Future[A] => B): Future[B] = Future(f(fa))
   override def cojoin[A](a: Future[A]): Future[Future[A]] = Future(a)
 
@@ -36,13 +36,13 @@ private class FutureInstance(implicit ec: ExecutionContext)
     def attemptComplete(t: Try[(A, Int)]): Unit = {
       val remaining = counter.decrementAndGet
       t match {
-        case TSuccess(_) => result tryComplete t
-        case _ if remaining == 0 => result tryComplete t
+        case TSuccess(_) => result.tryComplete(t)
+        case _ if remaining == 0 => result.tryComplete(t)
         case _ =>
       }
     }
 
-    fs foreach {
+    fs.foreach {
       case (fa, i) =>
         fa.onComplete { t =>
           attemptComplete(t.map(_ -> i))
@@ -57,17 +57,17 @@ private class FutureInstance(implicit ec: ExecutionContext)
 
   override def mapBoth[A, B, C](a: Future[A], b: Future[B])(
       f: (A, B) => C): Future[C] =
-    (a zip b).map(f.tupled)
+    (a.zip(b)).map(f.tupled)
 
   override def both[A, B](a: Future[A], b: Future[B]): Future[(A, B)] =
-    a zip b
+    a.zip(b)
 
   override def gather[A](fs: Seq[Future[A]]): Future[List[A]] =
     Future.sequence(fs.toList)
 
   // override for actual parallel execution
   override def ap[A, B](fa: => Future[A])(fab: => Future[A => B]) =
-    fab zip fa map { case (fa, a) => fa(a) }
+    fab.zip(fa).map { case (fa, a) => fa(a) }
 
   def attempt[A](f: Future[A]): Future[Throwable \/ A] =
     f.map(\/.right).recover { case e => -\/(e) }

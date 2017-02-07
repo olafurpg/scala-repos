@@ -15,7 +15,7 @@ case class PathPattern(regex: Regex, captureGroupNames: List[String] = Nil) {
     var multiParams = Map[String, Seq[String]]()
     if (m.matches) {
       var i = 0
-      captureGroupNames foreach { name =>
+      captureGroupNames.foreach { name =>
         i += 1
         val value = m.group(i)
         if (value != null) {

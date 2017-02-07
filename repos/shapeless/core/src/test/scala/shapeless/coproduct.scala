@@ -205,15 +205,15 @@ class CoproductTests {
     val foo2 = Coproduct[ISB]("foo")
     val foo3 = Coproduct[ISB](true)
 
-    val foo1b = foo1 map size
+    val foo1b = foo1.map(size)
     typed[III](foo1b)
     assertEquals(Inl(1), foo1b)
 
-    val foo2b = foo2 map size
+    val foo2b = foo2.map(size)
     typed[III](foo2b)
     assertEquals(Inr(Inl(3)), foo2b)
 
-    val foo3b = foo3 map size
+    val foo3b = foo3.map(size)
     typed[III](foo3b)
     assertEquals(Inr(Inr(Inl(1))), foo3b)
   }
@@ -224,9 +224,9 @@ class CoproductTests {
     val foo2 = Coproduct[ISB]("foo")
     val foo3 = Coproduct[ISB](true)
 
-    val foo1b = foo1 map size
-    val foo2b = foo2 map size
-    val foo3b = foo3 map size
+    val foo1b = foo1.map(size)
+    val foo2b = foo2.map(size)
+    val foo3b = foo3.map(size)
 
     val foo1c = foo1b.unify
     typed[Int](foo1c)
@@ -279,9 +279,9 @@ class CoproductTests {
     val foo2 = Coproduct[ISB]("foo")
     val foo3 = Coproduct[ISB](true)
 
-    val foo1b = foo1 fold size
-    val foo2b = foo2 fold size
-    val foo3b = foo3 fold size
+    val foo1b = foo1.fold(size)
+    val foo2b = foo2.fold(size)
+    val foo3b = foo3.fold(size)
 
     val foo1c = foo1.foldLeft(42)(addSize)
     val foo2c = foo2.foldLeft(42)(addSize)
@@ -309,13 +309,13 @@ class CoproductTests {
     val f2 = Coproduct[APB](Pear())
     val f3 = Coproduct[APB](Banana())
 
-    val f1b = f1 fold identity
+    val f1b = f1.fold(identity)
     typed[Fruit](f1b)
 
-    val f2b = f2 fold identity
+    val f2b = f2.fold(identity)
     typed[Fruit](f2b)
 
-    val f3b = f3 fold identity
+    val f3b = f3.fold(identity)
     typed[Fruit](f3b)
   }
 
@@ -402,10 +402,10 @@ class CoproductTests {
     def assertPOEquals(expected: Option[Int], l: ISB, r: ISB)(
         implicit po: PartialOrdering[ISB]) = {
       val actual =
-        po.tryCompare(l, r) map { i =>
+        po.tryCompare(l, r).map { i =>
           Some(if (i < 0) -1 else if (i > 0) 1 else 0)
         }
-      assertEquals(s"${l} ${r}", expected, actual getOrElse None)
+      assertEquals(s"${l} ${r}", expected, actual.getOrElse(None))
     }
 
     assertPOEquals(Some(0), one, one)

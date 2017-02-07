@@ -40,11 +40,13 @@ trait PredefinedFromStringUnmarshallers {
 
   implicit def CsvSeq[T](implicit unmarshaller: Unmarshaller[String, T])
     : Unmarshaller[String, immutable.Seq[T]] =
-    Unmarshaller.strict[String, immutable.Seq[String]] { string ⇒
-      string.split(",").toList
-    } flatMap { implicit ec ⇒ implicit mat ⇒ strings ⇒
-      FastFuture.sequence(strings.map(unmarshaller(_)))
-    }
+    Unmarshaller
+      .strict[String, immutable.Seq[String]] { string ⇒
+        string.split(",").toList
+      }
+      .flatMap { implicit ec ⇒ implicit mat ⇒ strings ⇒
+        FastFuture.sequence(strings.map(unmarshaller(_)))
+      }
 
   val HexByte: Unmarshaller[String, Byte] = numberUnmarshaller(
     java.lang.Byte.parseByte(_, 16),

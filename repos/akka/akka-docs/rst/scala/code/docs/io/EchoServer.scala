@@ -95,7 +95,7 @@ class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
   import EchoHandler._
 
   // sign death pact: this actor terminates when connection breaks
-  context watch connection
+  context.watch(connection)
 
   // start out in optimistic write-through mode
   def receive = writing
@@ -207,7 +207,7 @@ class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
     transferred += size
 
     storageOffset += 1
-    storage = storage drop 1
+    storage = storage.drop(1)
 
     if (suspended && stored < lowWatermark) {
       log.debug("resuming reading")
@@ -239,7 +239,7 @@ class SimpleEchoHandler(connection: ActorRef, remote: InetSocketAddress)
   import Tcp._
 
   // sign death pact: this actor terminates when connection breaks
-  context watch connection
+  context.watch(connection)
 
   case object Ack extends Event
 
@@ -294,7 +294,7 @@ class SimpleEchoHandler(connection: ActorRef, remote: InetSocketAddress)
     stored -= size
     transferred += size
 
-    storage = storage drop 1
+    storage = storage.drop(1)
 
     if (suspended && stored < lowWatermark) {
       log.debug("resuming reading")

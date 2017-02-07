@@ -238,12 +238,12 @@ sealed class SiteMapSingleton {
     } yield {
       val linkText = text match {
         case x if x.length > 0 => x
-        case _ => loc.linkText openOr Text(loc.name)
+        case _ => loc.linkText.openOr(Text(loc.name))
       }
       <a href={link}>{linkText}</a>
     }
 
-    options.headOption getOrElse NodeSeq.Empty
+    options.headOption.getOrElse(NodeSeq.Empty)
   }
 
   def buildLink(name: String): NodeSeq = buildLink(name, Nil)

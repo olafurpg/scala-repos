@@ -87,7 +87,7 @@ object CF1Array {
       pf: PartialFunction[(Column, Range), (CType, Array[Array[A]], BitSet)])
     : CMapper[M] = new ArrayMapperS[M] {
     def apply(columns0: Map[ColumnRef, Column], range: Range) = {
-      columns0 collect {
+      columns0.collect {
         case (ColumnRef(CPath.Identity, _), col)
             if pf isDefinedAt (col, range) => {
           val (tpe, cols, defined) = pf((col, range))
@@ -198,7 +198,7 @@ trait ArrayMapperS[M[+ _]] extends CMapperS[M] {
     val results = this(columns0, range)
 
     val columns =
-      results flatMap {
+      results.flatMap {
         case (tpe @ CString, (cols0, defined)) => {
           val max = maxIds(cols0, defined)
           val cols = cols0.asInstanceOf[Array[Array[String]]]
@@ -357,9 +357,9 @@ trait ArrayMapperS[M[+ _]] extends CMapperS[M] {
 
   private[this] def maxIds(arr: Array[Array[_]], mask: BitSet): Int = {
     var back = -1
-    0 until arr.length foreach { i =>
-      if (mask get i) {
-        back = back max arr(i).length
+    (0 until arr.length).foreach { i =>
+      if (mask.get(i)) {
+        back = back.max(arr(i).length)
       }
     }
     back

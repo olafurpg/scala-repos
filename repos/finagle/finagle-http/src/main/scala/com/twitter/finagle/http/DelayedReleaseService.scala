@@ -26,7 +26,7 @@ private[finagle] class DelayedReleaseService[-Req <: Request](
     Response(
       in.httpResponse,
       new Reader {
-        def read(n: Int) = in.reader.read(n) respond {
+        def read(n: Int) = in.reader.read(n).respond {
           case Return(None) => done()
           case Throw(_) => done()
           case _ =>
@@ -47,7 +47,7 @@ private[finagle] class DelayedReleaseService[-Req <: Request](
 
   override def apply(request: Req): Future[Response] = {
     counter.incr()
-    service(request) transform {
+    service(request).transform {
       case Return(r) if r.isChunked =>
         Future.value(proxy(r))
       case t =>

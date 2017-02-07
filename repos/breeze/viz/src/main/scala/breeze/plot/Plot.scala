@@ -48,20 +48,20 @@ class Plot() {
   }
 
   def ++=(pl: TraversableOnce[Series]) = {
-    pl foreach (this += _)
+    pl.foreach(this += _)
     refresh()
     this
   }
 
   def refresh() {
     var series = 0
-    for ((d, r) <- datasets zip renderers; s <- 0 until d.getSeriesCount) {
+    for ((d, r) <- datasets.zip(renderers); s <- 0 until d.getSeriesCount) {
       plot.setDataset(series, d)
       plot.setRenderer(series, r)
       series += 1
     }
 
-    listeners foreach { _._1.refresh(this) }
+    listeners.foreach { _._1.refresh(this) }
   }
 
   // Sigh, I hate the listener pattern
@@ -166,11 +166,10 @@ class Plot() {
   }
 
   // set integer tick units by default
-  Array(xaxis, yaxis) foreach
-    (axis => {
-       axis.setAutoRangeIncludesZero(false)
-       axis.setStandardTickUnits(Plot.integerTickUnits)
-     })
+  Array(xaxis, yaxis).foreach(axis => {
+    axis.setAutoRangeIncludesZero(false)
+    axis.setStandardTickUnits(Plot.integerTickUnits)
+  })
 
   /** The JFreeChart plot object. */
   lazy val plot = {
@@ -312,7 +311,7 @@ object Plot {
       datasetSeriesOffsets += seriesDelegates.length
     }
 
-    def getItemCount(series: Int): Int = delegate(series)(_ getItemCount _)
+    def getItemCount(series: Int): Int = delegate(series)(_.getItemCount(_))
 
     def getX(p1: Int, p2: Int): Number = { delegate(p1)(_.getX(_, p2)) }
     def getY(p1: Int, p2: Int): Number = delegate(p1)(_.getY(_, p2))
@@ -322,7 +321,7 @@ object Plot {
     def getSeriesCount: Int = seriesDelegates.length
 
     def getSeriesKey(series: Int): Comparable[_] = {
-      val name = delegate(series)(_ getSeriesKey _)
+      val name = delegate(series)(_.getSeriesKey(_))
       if (name == null) "Series " + series
       else name
     }

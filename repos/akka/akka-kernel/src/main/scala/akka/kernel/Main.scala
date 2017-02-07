@@ -84,7 +84,7 @@ object Main {
 
     val bootClasses: immutable.Seq[String] = args.to[immutable.Seq]
     val bootables: immutable.Seq[Bootable] =
-      bootClasses map { c ⇒
+      bootClasses.map { c ⇒
         classLoader.loadClass(c).newInstance.asInstanceOf[Bootable]
       }
 
@@ -118,18 +118,18 @@ object Main {
     val jars = deploy.listFiles.filter(_.getName.endsWith(".jar"))
 
     val nestedJars =
-      jars flatMap { jar ⇒
+      jars.flatMap { jar ⇒
         val jarFile = new JarFile(jar)
         val jarEntries =
           jarFile.entries.asScala.toArray.filter(_.getName.endsWith(".jar"))
-        jarEntries map { entry ⇒
-          new File("jar:file:%s!/%s" format (jarFile.getName, entry.getName))
+        jarEntries.map { entry ⇒
+          new File("jar:file:%s!/%s".format(jarFile.getName, entry.getName))
         }
       }
 
-    val urls = (jars ++ nestedJars) map { _.toURI.toURL }
+    val urls = ((jars ++ nestedJars)).map { _.toURI.toURL }
 
-    urls foreach { url ⇒
+    urls.foreach { url ⇒
       log("Deploying " + url)
     }
 

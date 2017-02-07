@@ -92,7 +92,9 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
         val (adjValue, adjGrad) = adjust(x, grad, value)
         val oneOffImprovement =
           (state.adjustedValue - adjValue) /
-            (state.adjustedValue.abs max adjValue.abs max 1E-6 * state.initialAdjVal.abs)
+            (state.adjustedValue.abs
+              .max(adjValue.abs)
+              .max(1E-6 * state.initialAdjVal.abs))
         logger.info(
           f"Val and Grad Norm: $adjValue%.6g (rel: $oneOffImprovement%.3g) ${norm(adjGrad)}%.6g")
         val history = updateHistory(x, grad, value, adjustedFun, state)
@@ -232,7 +234,7 @@ object FirstOrderMinimizer {
                         oldState: State[T, _, _],
                         oldInfo: Info): Info = {
       require(oldInfo.length == checks.length)
-      (checks zip oldInfo).map {
+      (checks.zip(oldInfo)).map {
         case (c, i) =>
           c.update(newX, newGrad, newVal, oldState, i.asInstanceOf[c.Info])
       }
@@ -241,7 +243,9 @@ object FirstOrderMinimizer {
     override def apply(state: State[T, _, _],
                        info: IndexedSeq[ConvergenceCheck[T]#Info])
       : Option[ConvergenceReason] = {
-      (checks zip info).iterator
+      (checks
+        .zip(info))
+        .iterator
         .flatMap {
           case (c, i) => c(state, i.asInstanceOf[c.Info])
         }

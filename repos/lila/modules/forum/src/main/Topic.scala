@@ -44,7 +44,7 @@ case class Topic(id: String,
 
 object Topic {
 
-  def nameToId(name: String) = (lila.common.String slugify name) |> { slug =>
+  def nameToId(name: String) = (lila.common.String.slugify(name)) |> { slug =>
     // if most chars are not latin, go for random slug
     (slug.size > (name.size / 2)).fold(slug, Random nextStringUppercase 8)
   }
@@ -83,13 +83,20 @@ object Topic {
   private def defaults = Json.obj("closed" -> false)
 
   private[forum] lazy val tube = JsTube(
-    (__.json update
-      (merge(defaults) andThen readDate('createdAt) andThen readDate(
-        'updatedAt) andThen readDate('updatedAtTroll))) andThen Json
-      .reads[Topic],
-    Json.writes[Topic] andThen
-      (__.json update
-        (writeDate('createdAt) andThen writeDate('updatedAt) andThen writeDate(
-          'updatedAtTroll)))
+    (__.json
+      .update(
+        merge(defaults)
+          .andThen(readDate('createdAt))
+          .andThen(readDate('updatedAt))
+          .andThen(readDate('updatedAtTroll))))
+      .andThen(Json
+        .reads[Topic]),
+    Json
+      .writes[Topic]
+      .andThen(
+        __.json.update(
+          writeDate('createdAt)
+            .andThen(writeDate('updatedAt))
+            .andThen(writeDate('updatedAtTroll))))
   )
 }

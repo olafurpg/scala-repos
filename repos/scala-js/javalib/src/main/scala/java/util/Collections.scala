@@ -460,7 +460,7 @@ object Collections {
           def hasNext(): Boolean = _hasNext
 
           def next(): T = {
-            if (! _hasNext) throw new NoSuchElementException
+            if (!_hasNext) throw new NoSuchElementException
             _hasNext = false
             o
           }

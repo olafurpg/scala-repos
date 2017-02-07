@@ -17,5 +17,5 @@ trait SimulHelper { self: I18nHelper =>
     s"""<a class="text" data-icon="|" href="$url">${simulIdToName(simulId)}</a>"""
   }
 
-  def simulIdToName(id: String) = simulEnv.cached name id getOrElse "Simul"
+  def simulIdToName(id: String) = simulEnv.cached.name(id).getOrElse("Simul")
 }

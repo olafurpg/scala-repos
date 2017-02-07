@@ -250,12 +250,13 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
 
         val session = mock[SSLSession]
         val engine = mock[SSLEngine]
-        when(engine.getSession) thenReturn session
-        when(session.getApplicationBufferSize) thenReturn 1024
-        when(engine.unwrap(any[java.nio.ByteBuffer], any[java.nio.ByteBuffer])) thenReturn result
-        when(engine.getUseClientMode) thenReturn true
-        when(engine.isInboundDone) thenReturn true
-        when(engine.getEnableSessionCreation) thenReturn true
+        when(engine.getSession).thenReturn(session)
+        when(session.getApplicationBufferSize).thenReturn(1024)
+        when(engine.unwrap(any[java.nio.ByteBuffer], any[java.nio.ByteBuffer]))
+          .thenReturn(result)
+        when(engine.getUseClientMode).thenReturn(true)
+        when(engine.isInboundDone).thenReturn(true)
+        when(engine.getEnableSessionCreation).thenReturn(true)
 
         val mockTlsConfig = Netty3TransporterTLSConfig(
           Function.const(new Engine(engine)),

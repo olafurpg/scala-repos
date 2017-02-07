@@ -108,7 +108,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       .sortBy(_.toString)
     topicSummary.zip(localTopicSummary).foreach {
       case (topics, topicsLocal) =>
-        assert(topics ~== topicsLocal absTol 0.01)
+        assert(topics ~== topicsLocal.absTol(0.01))
     }
 
     // Check: per-doc topic distributions
@@ -127,7 +127,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     topicDistributions.foreach {
       case (docId, topicDistribution) =>
         assert(topicDistribution.size === tinyK)
-        assert(topicDistribution.toArray.sum ~== 1.0 absTol 1e-5)
+        assert(topicDistribution.toArray.sum ~== 1.0.absTol(1e-5))
     }
 
     val top2TopicsPerDoc =
@@ -285,8 +285,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       Vectors.dense(1.1101, 1.2076, 1.3050, 0.8899, 0.7924, 0.6950)
     val expectedTopic2 =
       Vectors.dense(0.8899, 0.7924, 0.6950, 1.1101, 1.2076, 1.3050)
-    assert(topic1 ~== expectedTopic1 absTol 0.01)
-    assert(topic2 ~== expectedTopic2 absTol 0.01)
+    assert(topic1 ~== expectedTopic1.absTol(0.01))
+    assert(topic2 ~== expectedTopic2.absTol(0.01))
   }
 
   test("OnlineLDAOptimizer with toy data") {
@@ -352,8 +352,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
        > -31.4413908227
      */
 
-    assert(ldaModel.logLikelihood(docsSingleWord) ~== -25.971 relTol 1E-3D)
-    assert(ldaModel.logLikelihood(docsRepeatedWord) ~== -31.441 relTol 1E-3D)
+    assert(ldaModel.logLikelihood(docsSingleWord) ~== -25.971.relTol(1E-3D))
+    assert(ldaModel.logLikelihood(docsRepeatedWord) ~== -31.441.relTol(1E-3D))
   }
 
   test("LocalLDAModel logPerplexity") {
@@ -379,7 +379,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
      */
 
     // Gensim's definition of perplexity is negative our (and Stanford NLP's) definition
-    assert(ldaModel.logPerplexity(docs) ~== 3.690D relTol 1E-3D)
+    assert(ldaModel.logPerplexity(docs) ~== 3.690D.relTol(1E-3D))
   }
 
   test("LocalLDAModel predict") {
@@ -429,7 +429,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       case (expected, actual) =>
         assert(
           expected._1 === actual._1 &&
-            (expected._2 ~== actual._2 relTol 1E-3D))
+            (expected._2 ~== actual._2.relTol(1E-3D)))
     }
 
     docs
@@ -438,7 +438,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       .zip(actualPredictions.map(_._2).collect())
       .foreach {
         case (single, batch) =>
-          assert(single ~== batch relTol 1E-3D)
+          assert(single ~== batch.relTol(1E-3D))
       }
     actualPredictions.unpersist()
   }
@@ -485,7 +485,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
           '0.167*0 + 0.167*1 + 0.167*2 + 0.167*4 + 0.167*3 + 0.167*5']
      */
     topics.foreach { topic =>
-      assert(topic.forall { case (_, p) => p ~= 0.167 absTol 0.05 })
+      assert(topic.forall { case (_, p) => p ~= 0.167.absTol(0.05) })
     }
   }
 
@@ -528,7 +528,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
 
     assert(
       ldaModel.docConcentration ~==
-        Vectors.dense(0.42582646, 0.43511073) absTol 0.05)
+        Vectors.dense(0.42582646, 0.43511073).absTol(0.05))
   }
 
   test("model save/load") {

@@ -101,7 +101,7 @@ trait BlockSortSpec[M[+ _]]
     //  JArray(sortKeys.map(_.extract(v \ "value")).toList ::: List(v \ "globalId"))
     //}
 
-    val cSortKeys = sortKeys map { CPath(_) }
+    val cSortKeys = sortKeys.map { CPath(_) }
 
     val resultM = for {
       sorted <- module

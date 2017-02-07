@@ -289,7 +289,7 @@ private[akka] class ClusterRouterPoolActor(
     extends RouterPoolActor(supervisorStrategy)
     with ClusterRouterActor {
 
-  override def receive = clusterReceive orElse super.receive
+  override def receive = clusterReceive.orElse(super.receive)
 
   /**
     * Adds routees based on totalInstances and maxInstancesPerNode settings
@@ -350,7 +350,7 @@ private[akka] class ClusterRouterGroupActor(
           other.getClass)
   }
 
-  override def receive = clusterReceive orElse super.receive
+  override def receive = clusterReceive.orElse(super.receive)
 
   var usedRouteePaths: Map[Address, Set[String]] =
     if (settings.allowLocalRoutees)
@@ -387,7 +387,7 @@ private[akka] class ClusterRouterGroupActor(
       None
     } else {
       // find the node with least routees
-      val unusedNodes = currentNodes filterNot usedRouteePaths.contains
+      val unusedNodes = currentNodes.filterNot(usedRouteePaths.contains)
 
       if (unusedNodes.nonEmpty) {
         Some((unusedNodes.head, settings.routeesPaths.head))

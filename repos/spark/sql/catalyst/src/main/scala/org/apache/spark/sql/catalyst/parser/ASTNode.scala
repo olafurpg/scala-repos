@@ -90,7 +90,7 @@ case class ASTNode(token: Token,
       false
     } else {
       children.zip(other.children).forall {
-        case (l, r) => l treeEquals r
+        case (l, r) => l.treeEquals(r)
       }
     }
   }

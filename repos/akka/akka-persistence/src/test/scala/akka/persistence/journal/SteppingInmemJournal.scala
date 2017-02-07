@@ -73,7 +73,7 @@ final class SteppingInmemJournal extends InmemJournal {
   var queuedOps: Seq[() ⇒ Future[Unit]] = Seq.empty
   var queuedTokenRecipients = List.empty[ActorRef]
 
-  override def receivePluginInternal = super.receivePluginInternal orElse {
+  override def receivePluginInternal = super.receivePluginInternal.orElse {
     case Token if queuedOps.isEmpty ⇒
       queuedTokenRecipients = queuedTokenRecipients :+ sender()
     case Token ⇒

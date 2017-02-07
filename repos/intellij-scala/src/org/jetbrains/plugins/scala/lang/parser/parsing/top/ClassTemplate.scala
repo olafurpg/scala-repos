@@ -32,8 +32,8 @@ object ClassTemplate {
       case ScalaTokenTypes.tLBRACE =>
         empty = false
         //try to parse early definition if we can't => it's template body
-        if (EarlyDef parse builder) {
-          ClassParents parse builder
+        if (EarlyDef.parse(builder)) {
+          ClassParents.parse(builder)
           //parse template body
           builder.getTokenType match {
             case ScalaTokenTypes.tLBRACE => {
@@ -41,7 +41,7 @@ object ClassTemplate {
                 extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
                 return !nonEmpty || !empty
               }
-              TemplateBody parse builder
+              TemplateBody.parse(builder)
               extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
               !nonEmpty || !empty
             }
@@ -52,14 +52,14 @@ object ClassTemplate {
           }
         } else {
           //parse template body
-          TemplateBody parse builder
+          TemplateBody.parse(builder)
           extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
           !nonEmpty || !empty
         }
       //if we find nl => it could be TemplateBody only, but we can't find nl after extends keyword
       //In this case of course it's ClassParents
       case _ =>
-        if (ClassParents parse builder) empty = false
+        if (ClassParents.parse(builder)) empty = false
         else if (nonEmpty) {
           extendsMarker.drop()
           return false
@@ -71,7 +71,7 @@ object ClassTemplate {
               extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
               return !nonEmpty || !empty
             }
-            TemplateBody parse builder
+            TemplateBody.parse(builder)
             extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
             !nonEmpty || !empty
           }

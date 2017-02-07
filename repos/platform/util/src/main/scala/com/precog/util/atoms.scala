@@ -243,7 +243,7 @@ class Atom[A] extends Source[A] with Sink[A] {
     if (!targets.isEmpty) {
       lock.lock()
       try {
-        targets foreach { _() = value }
+        targets.foreach { _() = value }
         targets = Set()
       } finally {
         lock.unlock()

@@ -55,7 +55,7 @@ object ScalarTagTime extends ScalarTagAny[DateTime] {
     DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss.SSSZZ")
 
   override def show(v: DateTime) =
-    Option(v) map { fmtZ.print(_) } getOrElse ("NA")
+    Option(v).map { fmtZ.print(_) }.getOrElse("NA")
 
   // forward 2.10 compatibility
   override def runtimeClass = classOf[DateTime]

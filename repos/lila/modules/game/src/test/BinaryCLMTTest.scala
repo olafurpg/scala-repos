@@ -13,9 +13,9 @@ class BinaryCLMTTest extends Specification {
 
   val _0_ = "00000000"
   def write(all: CastleLastMoveTime): List[String] =
-    (BinaryFormat.castleLastMoveTime write all).showBytes.split(',').toList
+    (BinaryFormat.castleLastMoveTime.write(all)).showBytes.split(',').toList
   def read(bytes: List[String]): CastleLastMoveTime =
-    BinaryFormat.castleLastMoveTime read ByteArray.parseBytes(bytes)
+    BinaryFormat.castleLastMoveTime.read(ByteArray.parseBytes(bytes))
 
   "binary CastleLastMoveTime" should {
     "write" in {
@@ -23,7 +23,7 @@ class BinaryCLMTTest extends Specification {
       write(clmt) must_== {
         "11110000" :: _0_ :: List.fill(3)(_0_)
       }
-      write(clmt.copy(castles = clmt.castles without White)) must_== {
+      write(clmt.copy(castles = clmt.castles.without(White))) must_== {
         "00110000" :: _0_ :: List.fill(3)(_0_)
       }
       write(clmt.copy(castles = clmt.castles.without(Black, QueenSide))) must_== {
@@ -63,7 +63,7 @@ class BinaryCLMTTest extends Specification {
         clmt
       }
       read("00110000" :: _0_ :: List.fill(3)(_0_)) must_== {
-        clmt.copy(castles = clmt.castles without White)
+        clmt.copy(castles = clmt.castles.without(White))
       }
       read("11100000" :: _0_ :: List.fill(3)(_0_)) must_== {
         clmt.copy(castles = clmt.castles.without(Black, QueenSide))

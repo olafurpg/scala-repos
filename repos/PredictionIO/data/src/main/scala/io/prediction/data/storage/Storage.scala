@@ -159,7 +159,7 @@ object Storage extends Logging {
 
   private val requiredRepositories = Seq(MetaDataRepository)
 
-  requiredRepositories foreach { r =>
+  requiredRepositories.foreach { r =>
     if (!repositoryKeys.contains(r)) {
       error(s"Required repository (${r}) configuration is missing.")
       errors += 1
@@ -280,7 +280,7 @@ object Storage extends Logging {
       parallel: Boolean = false,
       test: Boolean = false)(implicit tag: TypeTag[T]): T = {
     val clientMeta =
-      sourcesToClientMeta(sourceName, parallel, test) getOrElse {
+      sourcesToClientMeta(sourceName, parallel, test).getOrElse {
         throw new StorageClientException(
           s"Data source $sourceName was not properly initialized.",
           null)

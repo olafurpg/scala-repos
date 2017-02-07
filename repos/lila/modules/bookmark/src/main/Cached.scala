@@ -11,7 +11,7 @@ private[bookmark] final class Cached {
     default = _ => Set.empty,
     logger = lila.log("bookmark"))
 
-  def gameIds(userId: String) = gameIdsCache get userId
+  def gameIds(userId: String) = gameIdsCache.get(userId)
 
   def bookmarked(gameId: String, userId: String): Boolean =
     gameIds(userId) contains gameId

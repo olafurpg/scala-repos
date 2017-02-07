@@ -21,21 +21,21 @@ class SslConnectHandlerTest extends FunSuite with MockitoSugar {
     val ctx = mock[ChannelHandlerContext]
     val sslHandler = mock[SslHandler]
     val session = mock[SSLSession]
-    when(session.getPeerCertificates) thenReturn Array.empty[Certificate]
+    when(session.getPeerCertificates).thenReturn(Array.empty[Certificate])
     val engine = mock[SSLEngine]
-    when(engine.getSession) thenReturn session
-    when(sslHandler.getEngine) thenReturn engine
+    when(engine.getSession).thenReturn(session)
+    when(sslHandler.getEngine).thenReturn(engine)
     val channel = mock[Channel]
-    when(ctx.getChannel) thenReturn channel
+    when(ctx.getChannel).thenReturn(channel)
     val pipeline = mock[ChannelPipeline]
-    when(channel.getPipeline) thenReturn pipeline
+    when(channel.getPipeline).thenReturn(pipeline)
     val closeFuture = Channels.future(channel)
-    when(channel.getCloseFuture) thenReturn closeFuture
+    when(channel.getCloseFuture).thenReturn(closeFuture)
     val remoteAddress = mock[SocketAddress]
-    when(channel.getRemoteAddress) thenReturn remoteAddress
+    when(channel.getRemoteAddress).thenReturn(remoteAddress)
 
     val handshakeFuture = Channels.future(channel)
-    when(sslHandler.handshake()) thenReturn handshakeFuture
+    when(sslHandler.handshake()).thenReturn(handshakeFuture)
   }
 
   class SslListenerConnectionHandlerHelper extends SslHandlerHelper {
@@ -74,7 +74,7 @@ class SslConnectHandlerTest extends FunSuite with MockitoSugar {
 
   class SslConnectHandlerHelper extends SslHandlerHelper {
     val verifier = mock[SSLSession => Option[Throwable]]
-    when(verifier(any[SSLSession])) thenReturn None
+    when(verifier(any[SSLSession])).thenReturn(None)
 
     val connectFuture = Channels.future(channel, true)
     val connectRequested = new DownstreamChannelStateEvent(
@@ -206,7 +206,7 @@ class SslConnectHandlerTest extends FunSuite with MockitoSugar {
     import h._
 
     val e = new Exception("session sucks")
-    when(verifier(any[SSLSession])) thenReturn Some(e)
+    when(verifier(any[SSLSession])).thenReturn(Some(e))
     handshakeFuture.setSuccess()
     assert(connectFuture.isDone)
     assert(connectFuture.getCause == e)

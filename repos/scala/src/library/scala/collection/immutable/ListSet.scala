@@ -51,7 +51,7 @@ object ListSet extends ImmutableSetFactory[ListSet] {
       this
     }
     def clear() = { elems.clear(); seen.clear() }
-    def result() = elems.foldLeft(empty[Elem])(_ unchecked_+ _)
+    def result() = elems.foldLeft(empty[Elem])(_.unchecked_+(_))
   }
 }
 

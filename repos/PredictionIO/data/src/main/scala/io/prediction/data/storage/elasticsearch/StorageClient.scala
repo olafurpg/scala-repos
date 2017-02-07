@@ -41,7 +41,7 @@ class StorageClient(val config: StorageClientConfig)
       .put("cluster.name",
            config.properties.getOrElse("CLUSTERNAME", "elasticsearch"))
     val transportClient = new TransportClient(settings)
-    (hosts zip ports) foreach { hp =>
+    (hosts.zip(ports)).foreach { hp =>
       transportClient.addTransportAddress(
         new InetSocketTransportAddress(hp._1, hp._2))
     }

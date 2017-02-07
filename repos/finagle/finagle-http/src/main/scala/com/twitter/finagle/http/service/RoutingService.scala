@@ -25,7 +25,7 @@ class RoutingService[REQUEST <: Request](
     Service[REQUEST, Response]] = {
     case _ => notFoundService
   }
-  protected[this] val requestToService = routes orElse notFoundPf
+  protected[this] val requestToService = routes.orElse(notFoundPf)
 
   def apply(request: REQUEST): Future[Response] = {
     val service = requestToService(request)

@@ -19,7 +19,8 @@ object TeamRepo {
 
   def teamIdsByCreator(userId: String): Fu[List[String]] =
     teamTube.coll
-      .distinct("_id", BSONDocument("createdBy" -> userId).some) map lila.db.BSON.asStrings
+      .distinct("_id", BSONDocument("createdBy" -> userId).some)
+      .map(lila.db.BSON.asStrings)
 
   def name(id: String): Fu[Option[String]] =
     $primitive.one($select(id), "name")(_.asOpt[String])
@@ -47,5 +48,5 @@ object TeamRepo {
 
   val enabledQuery = Json.obj("enabled" -> true)
 
-  val sortPopular = $sort desc "nbMembers"
+  val sortPopular = $sort.desc("nbMembers")
 }

@@ -179,7 +179,7 @@ object ClassHelpersSpec extends Specification {
     }
   }
 
-  "The invokeMethod function" can {
+  "The invokeMethod function".can {
     "call a method with its parameters" in {
       invokeMethod(classOf[String], "", "valueOf", Array("1")) must_==
         Full("1")

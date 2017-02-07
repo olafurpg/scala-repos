@@ -20,7 +20,7 @@ object DataForm {
       "lastName" -> nameField
     )(Profile.apply)(Profile.unapply))
 
-  def profileOf(user: User) = profile fill user.profileOrDefault
+  def profileOf(user: User) = profile.fill(user.profileOrDefault)
 
   private def nameField = optional(nonEmptyText(minLength = 2, maxLength = 20))
 

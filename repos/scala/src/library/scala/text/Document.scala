@@ -67,11 +67,11 @@ abstract class Document {
 
     def spaces(n: Int) {
       var rem = n
-      while (rem >= 16) { writer write "                "; rem -= 16 }
-      if (rem >= 8) { writer write "        "; rem -= 8 }
-      if (rem >= 4) { writer write "    "; rem -= 4 }
-      if (rem >= 2) { writer write "  "; rem -= 2 }
-      if (rem == 1) { writer write " " }
+      while (rem >= 16) { writer.write("                "); rem -= 16 }
+      if (rem >= 8) { writer.write("        "); rem -= 8 }
+      if (rem >= 4) { writer.write("    "); rem -= 4 }
+      if (rem >= 2) { writer.write("  "); rem -= 2 }
+      if (rem == 1) { writer.write(" ") }
     }
 
     def fmt(k: Int, state: List[FmtState]): Unit = state match {
@@ -81,16 +81,16 @@ abstract class Document {
       case (i, b, DocCons(h, t)) :: z =>
         fmt(k, (i, b, h) :: (i, b, t) :: z)
       case (i, _, DocText(t)) :: z =>
-        writer write t
+        writer.write(t)
         fmt(k + t.length(), z)
       case (i, b, DocNest(ii, d)) :: z =>
         fmt(k, (i + ii, b, d) :: z)
       case (i, true, DocBreak) :: z =>
-        writer write "\n"
+        writer.write("\n")
         spaces(i)
         fmt(i, z)
       case (i, false, DocBreak) :: z =>
-        writer write " "
+        writer.write(" ")
         fmt(k + 1, z)
       case (i, b, DocGroup(d)) :: z =>
         val fitsFlat = fits(width - k, (i, false, d) :: z)

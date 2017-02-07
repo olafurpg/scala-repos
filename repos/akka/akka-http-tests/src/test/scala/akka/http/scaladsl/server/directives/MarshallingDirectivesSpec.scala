@@ -22,10 +22,11 @@ class MarshallingDirectivesSpec extends RoutingSpec with Inside {
 
   private val iso88592 = HttpCharsets.getForKey("iso-8859-2").get
   implicit val IntUnmarshaller: FromEntityUnmarshaller[Int] =
-    nodeSeqUnmarshaller(ContentTypeRange(`text/xml`, iso88592), `text/html`) map {
-      case NodeSeq.Empty ⇒ throw Unmarshaller.NoContentException
-      case x ⇒ { val i = x.text.toInt; require(i >= 0); i }
-    }
+    nodeSeqUnmarshaller(ContentTypeRange(`text/xml`, iso88592), `text/html`)
+      .map {
+        case NodeSeq.Empty ⇒ throw Unmarshaller.NoContentException
+        case x ⇒ { val i = x.text.toInt; require(i >= 0); i }
+      }
 
   val `text/xxml` = MediaType.customWithFixedCharset("text", "xxml", `UTF-8`)
   implicit val IntMarshaller: ToEntityMarshaller[Int] =
@@ -49,7 +50,7 @@ class MarshallingDirectivesSpec extends RoutingSpec with Inside {
       } ~> check { rejection shouldEqual RequestEntityExpectedRejection }
     }
     "return an UnsupportedRequestContentTypeRejection if no matching unmarshaller is in scope" in {
-      Put("/", HttpEntity(`text/css` withCharset `UTF-8`, "<p>cool</p>")) ~> {
+      Put("/", HttpEntity(`text/css`.withCharset(`UTF-8`), "<p>cool</p>")) ~> {
         entity(as[NodeSeq]) { echoComplete }
       } ~> check {
         rejection shouldEqual UnsupportedRequestContentTypeRejection(
@@ -110,7 +111,7 @@ class MarshallingDirectivesSpec extends RoutingSpec with Inside {
       } ~> check { responseAs[String] shouldEqual "None" }
     }
     "return an UnsupportedRequestContentTypeRejection if no matching unmarshaller is in scope (for Option[T]s)" in {
-      Put("/", HttpEntity(`text/css` withCharset `UTF-8`, "<p>cool</p>")) ~> {
+      Put("/", HttpEntity(`text/css`.withCharset(`UTF-8`), "<p>cool</p>")) ~> {
         entity(as[Option[NodeSeq]]) { echoComplete }
       } ~> check {
         rejection shouldEqual UnsupportedRequestContentTypeRejection(

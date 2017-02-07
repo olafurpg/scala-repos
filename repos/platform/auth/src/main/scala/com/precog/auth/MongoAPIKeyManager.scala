@@ -92,10 +92,10 @@ object MongoAPIKeyManager extends Logging {
     val cached = config[Boolean]("cached", false)
 
     val dbStop =
-      Stoppable.fromFuture(database.disconnect.fallbackTo(Future(())) flatMap {
-        _ =>
+      Stoppable.fromFuture(
+        database.disconnect.fallbackTo(Future(())).flatMap { _ =>
           mongo.close
-      })
+        })
 
     (if (cached) new CachingAPIKeyManager(mongoAPIKeyManager)
      else mongoAPIKeyManager,
@@ -148,7 +148,7 @@ object MongoAPIKeyManager extends Logging {
   def findRootAPIKey(db: Database, keyCollection: String)(
       implicit context: ExecutionContext,
       timeout: Timeout): Future[APIKeyRecord] = {
-    db(selectOne().from(keyCollection).where("isRoot" === true)) flatMap {
+    db(selectOne().from(keyCollection).where("isRoot" === true)).flatMap {
       case Some(keyJv) =>
         logger.info("Retrieved existing root key")
         Promise.successful(keyJv.deserialize[APIKeyRecord])
@@ -199,7 +199,7 @@ class MongoAPIKeyManager(
                               false)
     database(
       insert(apiKey.serialize.asInstanceOf[JObject])
-        .into(settings.apiKeys)) map { _ =>
+        .into(settings.apiKeys)).map { _ =>
       apiKey
     }
   }
@@ -219,10 +219,10 @@ class MongoAPIKeyManager(
                    clock.instant(),
                    expiration)
     logger.debug("Adding grant: " + ng)
-    database(insert(ng.serialize.asInstanceOf[JObject]).into(settings.grants)) map {
-      _ =>
+    database(insert(ng.serialize.asInstanceOf[JObject]).into(settings.grants))
+      .map { _ =>
         logger.debug("Add complete for " + ng); ng
-    }
+      }
   }
 
   private def findOneMatching[A](keyName: String,
@@ -231,7 +231,7 @@ class MongoAPIKeyManager(
       implicit extractor: Extractor[A]): Future[Option[A]] = {
     database {
       selectOne().from(collection).where(keyName === keyValue)
-    } map {
+    }.map {
       _.map(_.deserialize[A])
     }
   }
@@ -242,7 +242,7 @@ class MongoAPIKeyManager(
       collection: String)(implicit extractor: Extractor[A]): Future[Set[A]] = {
     database {
       selectAll.from(collection).where(keyName === keyValue)
-    } map {
+    }.map {
       _.map(_.deserialize[A]).toSet
     }
   }
@@ -255,14 +255,14 @@ class MongoAPIKeyManager(
       selectAll
         .from(collection)
         .where(stringToMongoFilterBuilder(keyName) contains keyValue)
-    } map {
+    }.map {
       _.map(_.deserialize[A]).toSet
     }
   }
 
   private def findAll[A](collection: String)(
       implicit extract: Extractor[A]): Future[Seq[A]] =
-    database { selectAll.from(collection) } map {
+    database { selectAll.from(collection) }.map {
       _.map(_.deserialize[A]).toSeq
     }
 
@@ -358,20 +358,25 @@ class MongoAPIKeyManager(
   def deleteGrant(gid: GrantId): Future[Set[Grant]] = {
     for {
       children <- findGrantChildren(gid)
-      deletedChildren <- Future.sequence(children map { g =>
-        deleteGrant(g.grantId)
-      }) map { _.flatten }
+      deletedChildren <- Future
+        .sequence(children.map { g =>
+          deleteGrant(g.grantId)
+        })
+        .map { _.flatten }
       leafOpt <- findGrant(gid)
-      result <- leafOpt map { leafGrant =>
-        for {
-          _ <- database(
-            insert(leafGrant.serialize.asInstanceOf[JObject])
-              .into(settings.deletedGrants))
-          _ <- database(remove.from(settings.grants).where("grantId" === gid))
-        } yield { deletedChildren + leafGrant }
-      } getOrElse {
-        Promise successful deletedChildren
-      }
+      result <- leafOpt
+        .map { leafGrant =>
+          for {
+            _ <- database(
+              insert(leafGrant.serialize.asInstanceOf[JObject])
+                .into(settings.deletedGrants))
+            _ <- database(
+              remove.from(settings.grants).where("grantId" === gid))
+          } yield { deletedChildren + leafGrant }
+        }
+        .getOrElse {
+          Promise.successful(deletedChildren)
+        }
     } yield result
   }
 }

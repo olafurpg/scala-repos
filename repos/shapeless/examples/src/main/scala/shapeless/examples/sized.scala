@@ -45,7 +45,7 @@ object SizedExamples extends App {
 
     // hdrs and rows statically known to have the same number of columns
     val formatted = csv(hdrs, rows)
-    formatted foreach println // Compiles
+    formatted.foreach(println) // Compiles
 
     println
 
@@ -56,10 +56,10 @@ object SizedExamples extends App {
 
     // Extend the rows to match ...
     val extendedRows =
-      rows map (_ :+ "-") // List[Sized[IndexedSeq[String], _3]]
+      rows.map(_ :+ "-") // List[Sized[IndexedSeq[String], _3]]
 
     val extendedFormatted = csv(extendedHdrs, extendedRows) // Compiles
-    extendedFormatted foreach println
+    extendedFormatted.foreach(println)
   }
 
   def mixedDynamicStatic {
@@ -72,12 +72,12 @@ object SizedExamples extends App {
 
     for {
       shdrs <- hdrs.sized(2)
-      srows <- sequence(rows map (_.sized(2)))
+      srows <- sequence(rows.map(_.sized(2)))
     } {
       // If we get here then our lists are statically know to be
       // of the appropriate sizes
       val formatted = csv(shdrs, srows)
-      formatted foreach println
+      formatted.foreach(println)
     }
 
     println
@@ -87,23 +87,23 @@ object SizedExamples extends App {
 
     for {
       shdrs <- extendedHdrs.sized(2) // This will be empty ...
-      srows <- sequence(rows map (_.sized(2)))
+      srows <- sequence(rows.map(_.sized(2)))
     } {
       // ... hence, not reached
       val formatted = csv(shdrs, srows)
-      formatted foreach println
+      formatted.foreach(println)
     }
 
     // Extend the rows to match ...
-    val extendedRows = rows map (_ :+ "-")
+    val extendedRows = rows.map(_ :+ "-")
 
     for {
       shdrs <- extendedHdrs.sized(3)
-      srows <- sequence(extendedRows map (_.sized(3)))
+      srows <- sequence(extendedRows.map(_.sized(3)))
     } {
       // ... reached this time
       val formatted = csv(shdrs, srows)
-      formatted foreach println
+      formatted.foreach(println)
     }
   }
 

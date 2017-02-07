@@ -121,7 +121,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
           }
         }
         val members = t.members
-        members foreach {
+        members.foreach {
           case fun: ScFunctionDefinition =>
             res += fun.getStaticTraitFunctionWrapper(this)
           case definition: ScPatternDefinition =>

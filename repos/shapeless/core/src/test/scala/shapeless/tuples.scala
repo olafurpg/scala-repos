@@ -165,28 +165,28 @@ class TupleTests {
   @Test
   def testMap {
     val s1 = Tuple1(Set(1))
-    val o1 = s1 map choose
+    val o1 = s1.map(choose)
     typed[OI](o1)
     assertEquals(Tuple1(Option(1)), o1)
 
     val s2 = (Set(1), Set("foo"))
-    val o2 = s2 map choose
+    val o2 = s2.map(choose)
     typed[OIOS](o2)
     assertEquals((Option(1), Option("foo")), o2)
 
     val l1 = (1, "foo", 2, 3)
 
-    val l2 = l1 map singleton
+    val l2 = l1.map(singleton)
     typed[SISSSISI](l2)
     assertEquals((Set(1), Set("foo"), Set(2), Set(3)), l2)
 
-    val l3 = l1 map option
+    val l3 = l1.map(option)
     typed[OIOSOIOI](l3)
     assertEquals((Option(1), Option("foo"), Option(2), Option(3)), l3)
 
     val l4 = (Option(1), Option("foo"), Option(2), Option(3))
 
-    val l5 = l4 map get
+    val l5 = l4.map(get)
     typed[ISII](l5)
     assertEquals((1, "foo", 2, 3), l5)
 
@@ -195,24 +195,24 @@ class TupleTests {
     typed[Int](l5.tail.tail.head)
     typed[Int](l5.tail.tail.tail.head)
 
-    val l6 = l1 map identity
+    val l6 = l1.map(identity)
     typed[ISII](l6)
     assertEquals((1, "foo", 2, 3), l6)
 
-    val l7 = l4 map isDefined
+    val l7 = l4.map(isDefined)
     typed[BBBB](l7)
     assertEquals((true, true, true, true), l7)
 
     val l8 = (23, "foo", true)
-    val l9 = l8 map mkString
+    val l9 = l8.map(mkString)
     typed[(String, String, String)](l9)
     assertEquals(("23", "foo", "true"), l9)
 
-    val l10 = apbp map fruit
+    val l10 = apbp.map(fruit)
     typed[(Fruit, Fruit, Fruit, Fruit)](l10)
     assertEquals(apbp, l10)
 
-    val l11 = apbp map mkString
+    val l11 = apbp.map(mkString)
     typed[(String, String, String, String)](l11)
     assertEquals(("Apple()", "Pear()", "Banana()", "Pear()"), l11)
   }
@@ -225,23 +225,23 @@ class TupleTests {
   def testFlatMap {
     val l1 = (1, "foo", true)
 
-    val l2 = l1 flatMap dup
+    val l2 = l1.flatMap(dup)
     typed[(Int, Int, String, String, Boolean, Boolean)](l2)
     assertEquals((1, 1, "foo", "foo", true, true), l2)
 
     val l3 = ((1, "foo"), (), (2.0, true), Tuple1("bar"))
 
-    val l4 = l3 flatMap identity
+    val l4 = l3.flatMap(identity)
     typed[(Int, String, Double, Boolean, String)](l4)
     assertEquals((1, "foo", 2.0, true, "bar"), l4)
 
     val l5 = (23, "foo", 7, true, 0)
-    val l6 = l5 flatMap incInt
+    val l6 = l5.flatMap(incInt)
     typed[(Int, Int, Int)](l6)
     assertEquals((24, 8, 1), l6)
 
     val l7 = (Set(23), "foo", Set(true), 23)
-    val l8 = l7 flatMap extendedChoose
+    val l8 = l7.flatMap(extendedChoose)
     typed[(Option[Int], Option[Boolean])](l8)
     assertEquals((Option(23), Option(true)), l8)
   }
@@ -280,7 +280,7 @@ class TupleTests {
     typed[Banana](apbp2.tail.tail.head)
     typed[Pear](apbp2.tail.tail.tail.head)
 
-    val pabp = ap reverse_::: bp
+    val pabp = ap.reverse_:::(bp)
     typed[PABP](pabp)
     assertEquals((p, a, b, p), pabp)
   }
@@ -487,7 +487,7 @@ class TupleTests {
     assertEquals(List(1, "foo", 2, 3), stuff)
 
     val l4 = (Option(1), Option("foo"), Option(2), Option(3))
-    val l7 = l4 map isDefined
+    val l7 = l4.map(isDefined)
     typed[BBBB](l7)
     assertEquals((true, true, true, true), l7)
 
@@ -579,7 +579,7 @@ class TupleTests {
     assertEquals(List(1, "foo", 2, 3), stuff)
 
     val l4 = (Option(1), Option("foo"), Option(2), Option(3))
-    val l7 = l4 map isDefined
+    val l7 = l4.map(isDefined)
     typed[BBBB](l7)
     assertEquals((true, true, true, true), l7)
 
@@ -642,7 +642,7 @@ class TupleTests {
     assertArrayEquals2(Array(1, "foo", 2, 3), stuff)
 
     val l4 = (Option(1), Option("foo"), Option(2), Option(3))
-    val l7 = l4 map isDefined
+    val l7 = l4.map(isDefined)
     typed[BBBB](l7)
     assertEquals((true, true, true, true), l7)
 
@@ -716,7 +716,7 @@ class TupleTests {
     assertArrayEquals2(Array(1, "foo", 2, 3), stuff)
 
     val l4 = (Option(1), Option("foo"), Option(2), Option(3))
-    val l7 = l4 map isDefined
+    val l7 = l4.map(isDefined)
     typed[BBBB](l7)
     assertEquals((true, true, true, true), l7)
 
@@ -762,9 +762,9 @@ class TupleTests {
     val tl1 = (Option(1), Option("foo"), Option(2), Option(3))
     val tl2 = (Option(1), Option("foo"), (None: Option[Int]), Option(3))
 
-    val mlfl1 = (tl1 map isDefined).toList.foldLeft(true)(_ && _)
+    val mlfl1 = (tl1.map(isDefined)).toList.foldLeft(true)(_ && _)
     assertTrue(mlfl1)
-    val mlfl2 = (tl2 map isDefined).toList.foldLeft(true)(_ && _)
+    val mlfl2 = (tl2.map(isDefined)).toList.foldLeft(true)(_ && _)
     assertFalse(mlfl2)
 
     val fl1 = tl1.foldMap(true)(isDefined)(_ && _)
@@ -1239,12 +1239,12 @@ class TupleTests {
     val (rsp1, rsp2) = sl.reverse_splitLeft[String]
     typed[(Boolean, Int)](rsp1)
     typed[(String, Double)](rsp2)
-    assertEquals((rsp1 reverse_::: rsp2), sl)
+    assertEquals((rsp1.reverse_:::(rsp2)), sl)
 
     val (rsli1, rsli2) = sl2.reverse_splitLeft[String]
     typed[(Double, Int)](rsli1)
     typed[(String, Unit, String, Boolean, Long)](rsli2)
-    assertEquals((rsli1 reverse_::: rsli2), sl2)
+    assertEquals((rsli1.reverse_:::(rsli2)), sl2)
   }
 
   @Test
@@ -1265,12 +1265,12 @@ class TupleTests {
     val (rsrp1, rsrp2) = sl.reverse_splitRight[String]
     typed[(String, Boolean, Int)](rsrp1)
     typed[Tuple1[Double]](rsrp2)
-    assertEquals((rsrp1 reverse_::: rsrp2), sl)
+    assertEquals((rsrp1.reverse_:::(rsrp2)), sl)
 
     val (rsrli1, rsrli2) = sl2.reverse_splitRight[String]
     typed[(String, Unit, String, Double, Int)](rsrli1)
     typed[(Boolean, Long)](rsrli2)
-    assertEquals((rsrli1 reverse_::: rsrli2), sl2)
+    assertEquals((rsrli1.reverse_:::(rsrli2)), sl2)
   }
 
   @Test
@@ -1329,7 +1329,7 @@ class TupleTests {
     typed[((Int, Int), (String, String), (Double, Double))](z1)
     assertEquals(((1, 2), ("a", "b"), (1.0, 2.0)), z1)
 
-    val z2 = l1 zip l2
+    val z2 = l1.zip(l2)
     typed[((Int, Int), (String, String), (Double, Double))](z2)
     assertEquals(((1, 2), ("a", "b"), (1.0, 2.0)), z2)
 
@@ -1351,7 +1351,7 @@ class TupleTests {
 
     val l3 = (intInc, stringInc, doubleInc)
 
-    val z5 = l3 zipApply l1
+    val z5 = l3.zipApply(l1)
     typed[(Int, String, Int)](z5)
     assertEquals((2, "a*", 2), z5)
   }
@@ -1463,14 +1463,14 @@ class TupleTests {
   def testZipConst {
     val l1 = (1, true, "a")
     val c1 = 5
-    val zl1 = l1 zipConst c1
+    val zl1 = l1.zipConst(c1)
     typed[((Int, Int), (Boolean, Int), (String, Int))](zl1)
     assertEquals(((1, c1), (true, c1), ("a", c1)), zl1)
 
     val l2 = (Option("a"), 2, Set(true))
     val c2 = ("b", 5)
     type C2 = (String, Int)
-    val zl2 = l2 zipConst c2
+    val zl2 = l2.zipConst(c2)
     typed[((Option[String], C2), (Int, C2), (Set[Boolean], C2))](zl2)
     val expected = ((Option("a"), c2), (2, c2), (Set(true), c2))
     assertEquals(expected, zl2)
@@ -1847,43 +1847,43 @@ class TupleTests {
     // Note: Slightly different method signature in Tuple211Tests
 
     // group Unit
-    assertEquals((), () group (2, 1))
+    assertEquals((), ().group(2, 1))
 
     // partition a Tuple of 4 items into 2 (4/2) tuples of 2 items
     assertEquals(
       ((0, 1), (2, 3)),
-      range(0, 4) group (2, 2)
+      range(0, 4).group(2, 2)
     )
 
     // partition a Tuple of 5 items into 2 (5/2) tuples of 2 items
     // the last item does not make a complete partition and is dropped.
     assertEquals(
       ((0, 1), (2, 3)),
-      range(0, 5) group (2, 2)
+      range(0, 5).group(2, 2)
     )
 
     // uses the step to select the starting point for each partition
     assertEquals(
       ((0, 1), (4, 5)),
-      range(0, 6) group (2, 4)
+      range(0, 6).group(2, 4)
     )
 
     // if the step is smaller than the partition size, items will be reused
     assertEquals(
       ((0, 1), (1, 2), (2, 3)),
-      range(0, 4) group (2, 1)
+      range(0, 4).group(2, 1)
     )
 
     // when there are not enough items to fill the last partition, a pad can be supplied.
     assertEquals(
       ((0, 1), (2, 3), (4, 'a')),
-      range(0, 5) group (2, 2, Tuple1('a'))
+      range(0, 5).group(2, 2, Tuple1('a'))
     )
 
     // but only as many pad elements are used as necessary to fill the final partition.
     assertEquals(
       ((0, 1), (2, 3), (4, 'a')),
-      range(0, 5) group (2, 2, ('a', 'b', 'c'))
+      range(0, 5).group(2, 2, ('a', 'b', 'c'))
     )
   }
 

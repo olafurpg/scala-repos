@@ -187,7 +187,7 @@ class BoneConnectionPool @Inject()(environment: Environment)
       .foreach(datasource.setConnectionTestStatement)
 
     // Bind in JNDI
-    dbConfig.jndiName foreach { name =>
+    dbConfig.jndiName.foreach { name =>
       JNDI.initialContext.rebind(name, datasource)
       val visibleUrl = datasource.getJdbcUrl
       logger.info(s"""datasource [$visibleUrl] bound to JNDI as $name""")

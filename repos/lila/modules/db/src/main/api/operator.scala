@@ -17,11 +17,11 @@ trait $operator {
     BSONDocument("$set" -> BSONDocument(pairs))
   def $setBson(pairs: BSONDocument) = BSONDocument("$set" -> pairs)
   def $unset(fields: String*) =
-    Json.obj("$unset" -> Json.obj(wrap(fields map (_ -> true)): _*))
+    Json.obj("$unset" -> Json.obj(wrap(fields.map(_ -> true)): _*))
   def $inc[A: Writes](pairs: (String, A)*) =
     Json.obj("$inc" -> Json.obj(wrap(pairs): _*))
   def $incBson(pairs: (String, Int)*) =
-    BSONDocument("$inc" -> BSONDocument(pairs map {
+    BSONDocument("$inc" -> BSONDocument(pairs.map {
       case (k, v) => k -> BSONInteger(v)
     }))
   def $push[A: Writes](field: String, value: A) =
@@ -58,7 +58,7 @@ trait $operator {
   def $date(value: DateTime) = BSONFormats toJSON BSONDateTime(value.getMillis)
 
   private def wrap[K, V: Writes](
-      pairs: Seq[(K, V)]): Seq[(K, Json.JsValueWrapper)] = pairs map {
+      pairs: Seq[(K, V)]): Seq[(K, Json.JsValueWrapper)] = pairs.map {
     case (k, v) => k -> Json.toJsFieldJsValueWrapper(v)
   }
 }

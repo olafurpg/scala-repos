@@ -168,7 +168,7 @@ object build extends Build {
               .toString)
       },
       typeClasses := Seq(),
-      genToSyntax <<= typeClasses map { (tcs: Seq[TypeClass]) =>
+      genToSyntax <<= typeClasses.map { (tcs: Seq[TypeClass]) =>
         val objects = tcs
           .map(tc =>
             "object %s extends To%sSyntax".format(Util.initLower(tc.name),
@@ -179,11 +179,11 @@ object build extends Build {
             tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
         objects + "\n\n" + all
       },
-      typeClassTree <<= typeClasses map { tcs =>
+      typeClassTree <<= typeClasses.map { tcs =>
         tcs.map(_.doc).mkString("\n")
       },
       showDoc in Compile <<=
-        (doc in Compile, target in doc in Compile) map { (_, out) =>
+        (doc in Compile, target in doc in Compile).map { (_, out) =>
           val index = out / "index.html"
           if (index.exists()) Desktop.getDesktop.open(out / "index.html")
         },
@@ -246,7 +246,8 @@ object build extends Build {
       // kind-projector plugin
       resolvers += Resolver.sonatypeRepo("releases"),
       addCompilerPlugin(
-        "org.spire-math" % "kind-projector" % "0.7.1" cross CrossVersion.binary)
+        ("org.spire-math" % "kind-projector" % "0.7.1")
+          .cross(CrossVersion.binary))
     ) ++ osgiSettings ++ Seq[Sett](
       OsgiKeys.additionalHeaders :=
         Map("-removeheaders" -> "Include-Resource,Private-Package")
@@ -309,7 +310,7 @@ object build extends Build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-core",
-      sourceGenerators in Compile <+= (sourceManaged in Compile) map { dir =>
+      sourceGenerators in Compile <+= ((sourceManaged in Compile)).map { dir =>
         Seq(GenerateTupleW(dir), TupleNInstances(dir))
       },
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
@@ -397,7 +398,7 @@ object build extends Build {
                 "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
               osgiExport("scalaz.scalacheck"))
     .dependsOn(core, iteratee)
-    .jvmConfigure(_ dependsOn concurrent)
+    .jvmConfigure(_.dependsOn(concurrent))
     .jsSettings(scalajsProjectSettings: _*)
 
   lazy val scalacheckBindingJVM = scalacheckBinding.jvm
@@ -412,7 +413,7 @@ object build extends Build {
       libraryDependencies +=
         "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
     .dependsOn(core, effect, iteratee, scalacheckBinding)
-    .jvmConfigure(_ dependsOn concurrent)
+    .jvmConfigure(_.dependsOn(concurrent))
     .jsSettings(scalajsProjectSettings: _*)
     .jsSettings(
       jsEnv := NodeJSEnv().value,
@@ -426,13 +427,13 @@ object build extends Build {
     publishTo <<= (version).apply { v =>
       val nexus = "https://oss.sonatype.org/"
       if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+        Some("snapshots".at(nexus + "content/repositories/snapshots"))
+      else Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
     }
 
   lazy val credentialsSetting =
     credentials += {
-      Seq("build.publish.user", "build.publish.password") map sys.props.get match {
+      Seq("build.publish.user", "build.publish.password").map(sys.props.get) match {
         case Seq(Some(user), Some(pass)) =>
           Credentials("Sonatype Nexus Repository Manager",
                       "oss.sonatype.org",

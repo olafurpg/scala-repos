@@ -149,13 +149,13 @@ private[sbt] final class Execute[A[_] <: AnyRef](
     results(node) = result
     state(node) = Done
     progressState = progress.completed(progressState, node, result)
-    remove(reverse, node) foreach { dep =>
+    remove(reverse, node).foreach { dep =>
       notifyDone(node, dep)
     }
     callers.remove(node).toList.flatten.foreach { c =>
       retire(c, callerResult(c, result))
     }
-    triggeredBy(node) foreach { t =>
+    triggeredBy(node).foreach { t =>
       addChecked(t)
     }
 
@@ -165,7 +165,7 @@ private[sbt] final class Execute[A[_] <: AnyRef](
       readyInv(node)
       assert(!(reverse contains node))
       assert(!(callers contains node))
-      assert(triggeredBy(node) forall added)
+      assert(triggeredBy(node).forall(added))
     }
   }
   def callerResult[T](node: A[T], result: Result[T]): Result[T] =
@@ -206,7 +206,7 @@ private[sbt] final class Execute[A[_] <: AnyRef](
 
     val v = register(node)
     val deps = dependencies(v) ++ runBefore(node)
-    val active = IDSet[A[_]](deps filter notDone)
+    val active = IDSet[A[_]](deps.filter(notDone))
     progressState = progress.registered(
       progressState,
       node,
@@ -311,14 +311,14 @@ private[sbt] final class Execute[A[_] <: AnyRef](
 
   // Contracts
 
-  def addedInv(node: A[_]): Unit = topologicalSort(node) foreach addedCheck
+  def addedInv(node: A[_]): Unit = topologicalSort(node).foreach(addedCheck)
   def addedCheck(node: A[_]): Unit = {
     assert(added(node), "Not added: " + node)
     assert(viewCache contains node, "Not in view cache: " + node)
     dependencyCheck(node)
   }
   def dependencyCheck(node: A[_]): Unit = {
-    dependencies(node) foreach { dep =>
+    dependencies(node).foreach { dep =>
       def onOpt[T](o: Option[T])(f: T => Boolean) = o match {
         case None => false; case Some(x) => f(x)
       }
@@ -329,10 +329,10 @@ private[sbt] final class Execute[A[_] <: AnyRef](
   }
   def pendingInv(node: A[_]): Unit = {
     assert(atState(node, Pending))
-    assert((dependencies(node) ++ runBefore(node)) exists notDone)
+    assert(((dependencies(node) ++ runBefore(node))).exists(notDone))
   }
   def runningInv(node: A[_]): Unit = {
-    assert(dependencies(node) forall done)
+    assert(dependencies(node).forall(done))
     assert(!(forward contains node))
   }
   def newPre(node: A[_]): Unit = {
@@ -347,7 +347,7 @@ private[sbt] final class Execute[A[_] <: AnyRef](
   def topologicalSort(node: A[_]): Seq[A[_]] = {
     val seen = IDSet.create[A[_]]
     def visit(n: A[_]): List[A[_]] =
-      (seen process n)(List[A[_]]()) {
+      (seen.process(n))(List[A[_]]()) {
         node :: (List[A[_]]() /: dependencies(n)) { (ss, dep) =>
           visit(dep) ::: ss
         }
@@ -357,7 +357,7 @@ private[sbt] final class Execute[A[_] <: AnyRef](
   }
 
   def readyInv(node: A[_]): Unit = {
-    assert(dependencies(node) forall done)
+    assert(dependencies(node).forall(done))
     assert(!(forward contains node))
   }
 
@@ -370,7 +370,7 @@ private[sbt] final class Execute[A[_] <: AnyRef](
   def cycleCheck[T](node: A[T], target: A[T]): Unit = {
     if (node eq target) cyclic(node, target, "Cannot call self")
     val all = IDSet.create[A[T]]
-    def allCallers(n: A[T]): Unit = (all process n)(()) {
+    def allCallers(n: A[T]): Unit = (all.process(n))(()) {
       callers.get(n).toList.flatten.foreach(allCallers)
     }
     allCallers(node)

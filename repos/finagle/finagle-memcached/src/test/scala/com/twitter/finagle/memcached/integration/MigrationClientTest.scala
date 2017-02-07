@@ -67,7 +67,7 @@ class MigrationClientTest
     val oldPoolCluster = new ZookeeperServerSetCluster(
       ServerSets
         .create(zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, oldPoolPath))
-    (0 to 1) foreach { _ =>
+    ((0 to 1)).foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
           oldPoolCluster.join(server.address)
@@ -80,7 +80,7 @@ class MigrationClientTest
     val newPoolCluster = new ZookeeperServerSetCluster(
       ServerSets
         .create(zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, newPoolPath))
-    (0 to 1) foreach { _ =>
+    ((0 to 1)).foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
           newPoolCluster.join(server.address)
@@ -111,7 +111,7 @@ class MigrationClientTest
     connectionFactory.shutdown()
 
     // shutdown memcached server
-    testServers foreach { _.stop() }
+    testServers.foreach { _.stop() }
     testServers = List()
   }
 

@@ -19,9 +19,9 @@ class IncrementalLexerHighlightingTest
     val fileText = startText.replace(CARET_MARKER, "")
 
     myFixture.configureByText("dummy.scala", fileText)
-    myFixture.getEditor.getCaretModel moveToOffset caretIndex
+    myFixture.getEditor.getCaretModel.moveToOffset(caretIndex)
 
-    typed foreach {
+    typed.foreach {
       case '\r' =>
         CommandProcessor.getInstance
           .executeCommand(myFixture.getProject, new Runnable {
@@ -60,20 +60,20 @@ class IncrementalLexerHighlightingTest
     )
 
     for (i <- 0 until incSegments.getSegmentCount) {
-      val startI = incSegments getSegmentStart i
-      val start = segments getSegmentStart i
+      val startI = incSegments.getSegmentStart(i)
+      val start = segments.getSegmentStart(i)
       assert(
         start == startI,
         s"Different segment start in incremental ($startI) and full ($start) highlightings in segment #$i")
 
-      val endI = incSegments getSegmentEnd i
-      val end = segments getSegmentEnd i
+      val endI = incSegments.getSegmentEnd(i)
+      val end = segments.getSegmentEnd(i)
       assert(
         endI == end,
         s"Different segment end in incremental ($endI) and full ($end) highlightings in segment #$i")
 
-      val dataI = incSegments getSegmentData i
-      val data = incSegments getSegmentData i
+      val dataI = incSegments.getSegmentData(i)
+      val data = incSegments.getSegmentData(i)
       assert(
         dataI == data,
         s"Different segment data in incremental ($dataI) and full ($data) highlightings in segment #$i")

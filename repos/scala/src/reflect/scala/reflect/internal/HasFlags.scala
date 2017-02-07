@@ -138,9 +138,9 @@ trait HasFlags {
         if ((bits & flag) != 0L) {
           val s = resolveOverloadedFlag(flag)
           if (s.length > 0) {
-            if (sb eq null) sb = new StringBuilder append s
-            else if (sb.length == 0) sb append s
-            else sb append " " append s
+            if (sb eq null) sb = new StringBuilder.append(s)
+            else if (sb.length == 0) sb.append(s)
+            else sb.append(" ").append(s)
           }
         }
         i += 1

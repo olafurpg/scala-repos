@@ -42,6 +42,6 @@ object Test {
     assert(x3 != x2)
     assert(x2 != x3)
 
-    List(x1, x2, x3, x4, Dingus) map x4.f foreach println
+    List(x1, x2, x3, x4, Dingus).map(x4.f).foreach(println)
   }
 }

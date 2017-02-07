@@ -11,7 +11,7 @@ object Macros {
         override def transform(tree: Tree): Tree = tree match {
           case Template(_, _, ctor :: defs) =>
             val defs1 =
-              defs collect {
+              defs.collect {
                 case ddef @ DefDef(mods, name, tparams, vparamss, tpt, body) =>
                   val future = Select(Select(Ident(TermName("scala")),
                                              TermName("concurrent")),
@@ -30,7 +30,7 @@ object Macros {
           case _ =>
             super.transform(tree)
         }
-      } transform cdef
+      }.transform(cdef)
     c.Expr[Unit](Block(cdef1 :: Nil, Literal(Constant(()))))
   }
 

@@ -17,7 +17,7 @@ object MixedBag extends App {
     import syntax.monoid._
 
     1 |+| 2
-    1 mappend 2
+    1.mappend(2)
     some(1) |+| some(2)
     some(1) |+| mzero[Option[Int]]
 
@@ -54,11 +54,11 @@ object MixedBag extends App {
 
     val tree: Tree[Int] = 1.node(2.node(3.leaf), 4.leaf, 5.leaf)
     val r = tree.foldRight(".")((i, s) => i.toString |+| s)
-    r assert_=== "12345."
+    r.assert_===("12345.")
     val f = tree.flatten.foldMap(_.toString)
-    f assert_=== "12345"
+    f.assert_===("12345")
     val m = tree.foldMap(_.toString)
-    m assert_=== "12345"
+    m.assert_===("12345")
   }
 
   def kleisiArrow() {
@@ -67,10 +67,10 @@ object MixedBag extends App {
     import syntax.compose._
 
     val f = kleisli((i: Int) => some(i))
-    f map (i => i * 2) map (x => println(x)) run 3
+    f.map(i => i * 2).map(x => println(x)).run(3)
 
     val K = Arrow[λ[(α, β) => Kleisli[Option, α, β]]]
-    f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
+    (f >>> K.arr(i => i * 2) >>> K.arr(x => println(x))).run(3)
   }
 
   def dListExample() {

@@ -21,7 +21,7 @@ object CompoundType {
     val compoundMarker = builder.mark
     builder.getTokenType match {
       case ScalaTokenTypes.tLBRACE =>
-        if (Refinement parse builder) {
+        if (Refinement.parse(builder)) {
           compoundMarker.done(ScalaElementTypes.COMPOUND_TYPE)
           true
         } else {
@@ -38,10 +38,10 @@ object CompoundType {
             isCompound = true
             builder.advanceLexer() //Ate with
             if (!AnnotType.parse(builder, isPattern)) {
-              builder error ScalaBundle.message("wrong.type")
+              builder.error(ScalaBundle.message("wrong.type"))
             }
           }
-          val hasRefinement = Refinement parse builder
+          val hasRefinement = Refinement.parse(builder)
           if (isCompound || hasRefinement) {
             compoundMarker.done(ScalaElementTypes.COMPOUND_TYPE)
           } else compoundMarker.drop()

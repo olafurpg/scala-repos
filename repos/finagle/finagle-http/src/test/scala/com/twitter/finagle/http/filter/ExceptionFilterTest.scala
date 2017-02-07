@@ -25,7 +25,7 @@ class ExceptionFilterTest extends FunSuite {
 
   test("ignore success") {
     val request = Request()
-    val filter = (new ExceptionFilter) andThen service
+    val filter = (new ExceptionFilter).andThen(service)
 
     val response = Await.result(filter(request))
     assert(response.status == Status.Ok)
@@ -35,7 +35,7 @@ class ExceptionFilterTest extends FunSuite {
 
   test("handle exception") {
     val request = Request("exception" -> "true")
-    val filter = (new ExceptionFilter) andThen service
+    val filter = (new ExceptionFilter).andThen(service)
 
     val response = Await.result(filter(request))
     assert(response.status == Status.InternalServerError)
@@ -45,7 +45,7 @@ class ExceptionFilterTest extends FunSuite {
 
   test("handle throw") {
     val request = Request("throw" -> "true")
-    val filter = (new ExceptionFilter) andThen service
+    val filter = (new ExceptionFilter).andThen(service)
 
     val response = Await.result(filter(request))
     assert(response.status == Status.InternalServerError)
@@ -55,7 +55,7 @@ class ExceptionFilterTest extends FunSuite {
 
   test("handle cancel") {
     val request = Request("cancel" -> "true")
-    val filter = (new ExceptionFilter) andThen service
+    val filter = (new ExceptionFilter).andThen(service)
 
     val response = Await.result(filter(request))
     assert(response.statusCode == 499)

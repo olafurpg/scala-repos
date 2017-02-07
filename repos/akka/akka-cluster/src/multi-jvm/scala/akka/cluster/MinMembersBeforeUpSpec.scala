@@ -155,14 +155,14 @@ abstract class MinMembersBeforeUpBase(multiNodeConfig: MultiNodeConfig)
       cluster.join(first)
     }
     runOn(first, second) {
-      val expectedAddresses = Set(first, second) map address
+      val expectedAddresses = Set(first, second).map(address)
       awaitAssert {
         clusterView.refreshCurrentState()
         clusterView.members.map(_.address) should ===(expectedAddresses)
       }
       clusterView.members.map(_.status) should ===(Set(Joining))
       // and it should not change
-      1 to 5 foreach { _ ⇒
+      (1 to 5).foreach { _ ⇒
         Thread.sleep(1000)
         clusterView.members.map(_.address) should ===(expectedAddresses)
         clusterView.members.map(_.status) should ===(Set(Joining))

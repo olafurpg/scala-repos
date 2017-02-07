@@ -73,7 +73,7 @@ class BsonRecordField[OwnerType <: BsonRecord[OwnerType],
     case _ => genericSetFromAny(in)
   }
 
-  def asJValue: JValue = valueBox.map(_.asJValue) openOr (JNothing: JValue)
+  def asJValue: JValue = valueBox.map(_.asJValue).openOr(JNothing: JValue)
   def setFromJValue(jvalue: JValue): Box[SubRecordType] = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)
     case _ => setBox(valueMeta.fromJValue(jvalue))
@@ -114,7 +114,7 @@ class BsonRecordListField[OwnerType <: BsonRecord[OwnerType],
     case JNothing | JNull if optional_? => setBox(Empty)
     case JArray(arr) =>
       setBox(Full(arr.map(jv => {
-        valueMeta.fromJValue(jv) openOr valueMeta.createRecord
+        valueMeta.fromJValue(jv).openOr(valueMeta.createRecord)
       })))
     case other => setBox(FieldHelpers.expectedA("JArray", other))
   }

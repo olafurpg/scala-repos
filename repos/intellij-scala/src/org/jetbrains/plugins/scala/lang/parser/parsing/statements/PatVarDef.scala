@@ -31,7 +31,7 @@ object PatVarDef {
     builder.getTokenType match {
       case ScalaTokenTypes.kVAL =>
         builder.advanceLexer //Ate val
-        if (PatDef parse builder) {
+        if (PatDef.parse(builder)) {
           patVarMarker.done(ScalaElementTypes.PATTERN_DEFINITION)
           return true
         } else {
@@ -40,7 +40,7 @@ object PatVarDef {
         }
       case ScalaTokenTypes.kVAR =>
         builder.advanceLexer //Ate var
-        if (VarDef parse builder) {
+        if (VarDef.parse(builder)) {
           patVarMarker.done(ScalaElementTypes.VARIABLE_DEFINITION)
           return true
         } else {

@@ -32,7 +32,7 @@ class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
     with Growable[T] { outer =>
   assert(maxSize >= 0)
   protected val queue = new PriorityQueue[T]()(o.reverse)
-  xs foreach (cat(queue, _))
+  xs.foreach(cat(queue, _))
 
   override def size = queue.size
 
@@ -62,7 +62,7 @@ class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
 
   override def equals(other: Any): Boolean = other match {
     case b: Beam[T @unchecked] =>
-      (maxSize == b.maxSize) && (iterator sameElements b.iterator)
+      (maxSize == b.maxSize) && (iterator.sameElements(b.iterator))
   }
 }
 

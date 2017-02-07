@@ -93,7 +93,7 @@ class IndexScript(universe: doc.Universe) extends Page {
 
   /** Returns the json representation of the supplied members */
   def membersToJSON(entities: List[MemberEntity]): JSONType =
-    JSONArray(entities map memberToJSON)
+    JSONArray(entities.map(memberToJSON))
 
   private def memberToJSON(mbr: MemberEntity): JSONObject = {
 

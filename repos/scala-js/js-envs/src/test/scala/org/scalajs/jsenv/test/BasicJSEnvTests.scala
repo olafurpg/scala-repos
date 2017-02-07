@@ -28,6 +28,6 @@ trait BasicJSEnvTests extends JSEnvTest {
 
     """
     console.log("\u1234");
-    """ hasOutput "\u1234\n";
+    """.hasOutput("\u1234\n");
   }
 }

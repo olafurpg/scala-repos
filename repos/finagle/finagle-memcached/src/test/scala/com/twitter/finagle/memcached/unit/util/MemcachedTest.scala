@@ -45,7 +45,7 @@ class MemcachedTest
     assert(policy() == failureAccrualPolicy)
     assert(
       markDeadFor.take(10).force.toSeq ===
-        (0 until 10 map { _ =>
+        ((0 until 10).map { _ =>
           1.second
         }))
     assert(

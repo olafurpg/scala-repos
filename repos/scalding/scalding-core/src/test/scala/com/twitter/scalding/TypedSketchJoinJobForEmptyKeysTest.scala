@@ -24,7 +24,7 @@ class TypedSketchJoinJobForEmptyKeysTest extends WordSpec with Matchers {
     "Sketch leftJoin with a single left key should be correct" in {
       JobTest(new TypedSketchJoinJobForEmptyKeys(_))
         .sink[(Int, Int, Int)](TypedTsv[(Int, Int, Int)]("output")) { outBuf =>
-          outBuf should have size 1
+          (outBuf should have).size(1)
           val unordered = outBuf.toSet
           unordered should contain(1, 1111, -1)
         }

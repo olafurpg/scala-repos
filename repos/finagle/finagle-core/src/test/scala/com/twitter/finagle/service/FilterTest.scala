@@ -12,12 +12,12 @@ class FilterTest extends FunSuite {
   class FilterHelper {
     val stringToInt = new Filter[Int, Int, String, String] {
       def apply(request: Int, service: Service[String, String]) =
-        service(request.toString) map (_.toInt)
+        service(request.toString).map(_.toInt)
     }
 
     val intToString = new Filter[String, String, Int, Int] {
       def apply(request: String, service: Service[Int, Int]) =
-        service(request.toInt) map (_.toString)
+        service(request.toInt).map(_.toString)
     }
   }
 
@@ -25,13 +25,13 @@ class FilterTest extends FunSuite {
     val h = new FilterHelper
     import h._
 
-    val filter = stringToInt andThen intToString
+    val filter = stringToInt.andThen(intToString)
 
     val service = new Service[Int, Int] {
       def apply(request: Int) = Future(2 * request.intValue)
     }
 
-    val result = (filter andThen service)(123)
+    val result = (filter.andThen(service))(123)
 
     assert(Await.ready(result).poll.get.isReturn)
     assert(Await.result(result) == (123 * 2))

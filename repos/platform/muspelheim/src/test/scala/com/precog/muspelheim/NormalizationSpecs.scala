@@ -109,7 +109,7 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
   def makeObject(query: String): Map[String, SValue] = {
     val result =
-      evalE(query) collect { case (_, SObject(values)) => values("model1") }
+      evalE(query).collect { case (_, SObject(values)) => values("model1") }
     val SObject(obj) = result.head
     obj
   }
@@ -235,7 +235,7 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     def makeObject(query: String): Map[String, SValue] = {
       val result =
-        evalE(query) collect { case (_, SObject(values)) => values("model1") }
+        evalE(query).collect { case (_, SObject(values)) => values("model1") }
       val SObject(obj) = result.head
       obj
     }
@@ -312,9 +312,9 @@ trait NormalizationSpecs extends EvalStackSpecs {
     val expected0 = evalE(expectedInput)
 
     val result =
-      result0 collect { case (ids, value) if ids.size == 1 => value }
+      result0.collect { case (ids, value) if ids.size == 1 => value }
     val expected =
-      expected0 collect { case (ids, value) if ids.size == 1 => value }
+      expected0.collect { case (ids, value) if ids.size == 1 => value }
 
     result mustEqual expected
   }
@@ -341,12 +341,12 @@ trait NormalizationSpecs extends EvalStackSpecs {
     val expected = evalE(expectedInput)
 
     val resultValues =
-      result collect {
+      result.collect {
         case (ids, value) if ids.size == 1 => value
       }
 
     val expectedValues =
-      expected collect {
+      expected.collect {
         case (ids, value) if ids.size == 1 => value
       }
 
@@ -410,12 +410,12 @@ trait NormalizationSpecs extends EvalStackSpecs {
     expected.size mustEqual result.size
 
     val resultValues =
-      result collect {
+      result.collect {
         case (ids, value) if ids.size == 1 => value
       }
 
     val expectedValues =
-      expected collect {
+      expected.collect {
         case (ids, value) if ids.size == 1 => value
       }
 
@@ -445,12 +445,12 @@ trait NormalizationSpecs extends EvalStackSpecs {
     val expected = evalE(expectedInput)
 
     val resultValues =
-      result collect {
+      result.collect {
         case (ids, value) if ids.size == 1 => value
       }
 
     val expectedValues =
-      expected collect {
+      expected.collect {
         case (ids, value) if ids.size == 1 => value
       }
 
@@ -521,12 +521,12 @@ trait NormalizationSpecs extends EvalStackSpecs {
     val expected = evalE(expectedInput)
 
     val resultValues =
-      result collect {
+      result.collect {
         case (ids, value) if ids.size == 1 => value
       }
 
     val expectedValues =
-      expected collect {
+      expected.collect {
         case (ids, value) if ids.size == 1 => value
       }
 
@@ -581,7 +581,7 @@ trait NormalizationSpecs extends EvalStackSpecs {
     val result = evalE(input)
     result must not beEmpty
 
-    val clusterIds = (1 to 10) map { "cluster" + _.toString }
+    val clusterIds = ((1 to 10)).map { "cluster" + _.toString }
 
     def clusterSchema(obj: Map[String, SValue],
                       clusterId: String): Set[String] = obj(clusterId) match {

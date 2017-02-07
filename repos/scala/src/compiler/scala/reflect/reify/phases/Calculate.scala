@@ -16,10 +16,10 @@ trait Calculate { self: Reifier =>
   implicit class RichCalculateType(tpe: Type) {
     def isLocalToReifee =
       tpe != null &&
-        (tpe exists
-          (tp =>
-             (localSymbols contains tp.typeSymbol) ||
-               (localSymbols contains tp.termSymbol)))
+        (tpe.exists(
+          tp =>
+            (localSymbols contains tp.typeSymbol) ||
+              (localSymbols contains tp.termSymbol)))
   }
 
   private def localSymbols: Map[Symbol, Int] =
@@ -51,23 +51,27 @@ trait Calculate { self: Reifier =>
         if (reifyDebug)
           println(
             "boundSym: %s of type %s"
-              .format(tree.symbol, (tree.productIterator.toList collect {
-                case tt: TypeTree => tt
-              }).headOption.getOrElse(TypeTree(tree.tpe))))
+              .format(tree.symbol,
+                      (tree.productIterator.toList
+                        .collect {
+                          case tt: TypeTree => tt
+                        })
+                        .headOption
+                        .getOrElse(TypeTree(tree.tpe))))
         registerLocalSymbol(tree.symbol, currMetalevel)
 
         bindRelatedSymbol(tree.symbol.sourceModule, "sourceModule")
         bindRelatedSymbol(tree.symbol.moduleClass, "moduleClass")
         bindRelatedSymbol(tree.symbol.companionClass, "companionClass")
         bindRelatedSymbol(tree.symbol.companionModule, "companionModule")
-        Some(tree.symbol) collect {
+        Some(tree.symbol).collect {
           case termSymbol: TermSymbol =>
             bindRelatedSymbol(termSymbol.referenced, "referenced")
         }
-        Some(tree) collect {
+        Some(tree).collect {
           case labelDef: LabelDef =>
-            labelDef.params foreach
-              (param => bindRelatedSymbol(param.symbol, "labelParam"))
+            labelDef.params.foreach(param =>
+              bindRelatedSymbol(param.symbol, "labelParam"))
         }
         def bindRelatedSymbol(related: Symbol, name: String): Unit =
           if (related != null && related != NoSymbol) {

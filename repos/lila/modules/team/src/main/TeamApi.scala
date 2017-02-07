@@ -16,14 +16,14 @@ final class TeamApi(cached: Cached,
                     indexer: ActorSelection,
                     timeline: ActorSelection) {
 
-  val creationPeriod = Period weeks 1
+  val creationPeriod = Period.weeks(1)
 
   def team(id: String) = $find.byId[Team](id)
 
   def request(id: String) = $find.byId[Request](id)
 
   def create(setup: TeamSetup, me: User): Option[Fu[Team]] =
-    me.canTeam option {
+    me.canTeam.option {
       val s = setup.trim
       val team = Team.make(name = s.name,
                            location = s.location,
@@ -48,7 +48,7 @@ final class TeamApi(cached: Cached,
     }
   }
 
-  def mine(me: User): Fu[List[Team]] = $find.byIds[Team](cached teamIds me.id)
+  def mine(me: User): Fu[List[Team]] = $find.byIds[Team](cached.teamIds(me.id))
 
   def hasTeams(me: User): Boolean = cached.teamIds(me.id).nonEmpty
 
@@ -58,9 +58,9 @@ final class TeamApi(cached: Cached,
   def requestsWithUsers(team: Team): Fu[List[RequestWithUser]] =
     for {
       requests ← RequestRepo findByTeam team.id
-      users ← $find.byOrderedIds[User](requests map (_.user))
+      users ← $find.byOrderedIds[User](requests.map(_.user))
     } yield
-      requests zip users map {
+      requests.zip(users).map {
         case (request, user) => RequestWithUser(request, user)
       }
 
@@ -68,9 +68,9 @@ final class TeamApi(cached: Cached,
     for {
       teamIds ← TeamRepo teamIdsByCreator user.id
       requests ← RequestRepo findByTeams teamIds
-      users ← $find.byOrderedIds[User](requests map (_.user))
+      users ← $find.byOrderedIds[User](requests.map(_.user))
     } yield
-      requests zip users map {
+      requests.zip(users).map {
         case (request, user) => RequestWithUser(request, user)
       }
 
@@ -90,30 +90,33 @@ final class TeamApi(cached: Cached,
     for {
       teamOption ← $find.byId[Team](teamId)
       able ← teamOption.??(requestable(_, user))
-    } yield teamOption filter (_ => able)
+    } yield teamOption.filter(_ => able)
 
   def requestable(team: Team, user: User): Fu[Boolean] =
-    RequestRepo.exists(team.id, user.id).map {
-      _ -> belongsTo(team.id, user.id)
-    } map {
-      case (false, false) => true
-      case _ => false
-    }
+    RequestRepo
+      .exists(team.id, user.id)
+      .map {
+        _ -> belongsTo(team.id, user.id)
+      }
+      .map {
+        case (false, false) => true
+        case _ => false
+      }
 
   def createRequest(team: Team, setup: RequestSetup, user: User): Funit =
-    requestable(team, user) flatMap {
+    requestable(team, user).flatMap {
       _ ?? {
         val request =
           Request.make(team = team.id, user = user.id, message = setup.message)
         val rwu = RequestWithUser(request, user)
-        $insert(request) >> (cached.nbRequests remove team.createdBy)
+        $insert(request) >> (cached.nbRequests.remove(team.createdBy))
       }
     }
 
   def processRequest(team: Team, request: Request, accept: Boolean): Funit =
     for {
       _ ← $remove(request)
-      _ ← cached.nbRequests remove team.createdBy
+      _ ← cached.nbRequests.remove(team.createdBy)
       userOption ← $find.byId[User](request.user)
       _ ← userOption
         .filter(_ => accept)
@@ -122,12 +125,12 @@ final class TeamApi(cached: Cached,
     } yield ()
 
   def doJoin(team: Team, userId: String): Funit =
-    (!belongsTo(team.id, userId)) ?? {
+    ((!belongsTo(team.id, userId)) ?? {
       MemberRepo.add(team.id, userId) >> TeamRepo.incMembers(team.id, +1) >>- {
         cached.teamIdsCache invalidate userId
         timeline ! Propagate(TeamJoin(userId, team.id)).toFollowersOf(userId)
       }
-    } recover lila.db.recoverDuplicateKey(e => ())
+    }).recover(lila.db.recoverDuplicateKey(e => ()))
 
   def quit(teamId: String)(implicit ctx: UserContext): Fu[Option[Team]] =
     for {
@@ -163,17 +166,17 @@ final class TeamApi(cached: Cached,
     cached.teamIds(userId) contains teamId
 
   def owns(teamId: String, userId: String): Fu[Boolean] =
-    TeamRepo ownerOf teamId map (Some(userId) ==)
+    (TeamRepo ownerOf teamId).map(Some(userId) ==)
 
-  def teamIds(userId: String) = cached teamIds userId
+  def teamIds(userId: String) = cached.teamIds(userId)
 
-  def teamName(teamId: String) = cached name teamId
+  def teamName(teamId: String) = cached.name(teamId)
 
   def nbRequests(teamId: String) = cached nbRequests teamId
 
   def recomputeNbMembers =
     $enumerate.over[Team]($query.all[Team]) { team =>
-      MemberRepo.countByTeam(team.id) flatMap { nb =>
+      MemberRepo.countByTeam(team.id).flatMap { nb =>
         $update.field[String, Team, Int](team.id, "nbMembers", nb)
       }
     }

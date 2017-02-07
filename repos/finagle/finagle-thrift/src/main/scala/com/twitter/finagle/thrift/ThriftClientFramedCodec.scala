@@ -193,7 +193,7 @@ private[finagle] case class ThriftClientPreparer(
 
     buffer().writeMessageEnd()
 
-    service(new ThriftClientRequest(buffer.toArray, false)) map { bytes =>
+    service(new ThriftClientRequest(buffer.toArray, false)).map { bytes =>
       val memoryTransport = new TMemoryInputTransport(bytes)
       val iprot = protocolFactory.getProtocol(memoryTransport)
       val reply = iprot.readMessageBegin()

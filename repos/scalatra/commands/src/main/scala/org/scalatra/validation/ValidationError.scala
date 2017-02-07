@@ -52,17 +52,17 @@ object ValidationError {
     */
   def apply(msg: String, arguments: Any*): ValidationError = {
     val field =
-      arguments collectFirst {
+      arguments.collectFirst {
         case f: FieldName => f
         case Some(f: FieldName) => f
       }
     val code =
-      arguments collectFirst {
+      arguments.collectFirst {
         case f: ErrorCode => f
         case Some(f: ErrorCode) => f
       }
     val args =
-      arguments filter {
+      arguments.filter {
         case _: FieldName | _: ErrorCode | Some(_: FieldName) |
             Some(_: ErrorCode) =>
           false
@@ -79,7 +79,7 @@ object ValidationError {
   */
 class ErrorCodeSerializer(knownCodes: ErrorCode*)
     extends Serializer[ErrorCode] {
-  val ecs = Map(knownCodes map { c ⇒
+  val ecs = Map(knownCodes.map { c ⇒
     c.getClass.getSimpleName.replaceAll("\\$$", "").toUpperCase -> c
   }: _*)
   val Class = classOf[ErrorCode]
@@ -87,7 +87,7 @@ class ErrorCodeSerializer(knownCodes: ErrorCode*)
   def deserialize(implicit format: Formats)
     : PartialFunction[(TypeInfo, JValue), ErrorCode] = {
     case (TypeInfo(Class, _), JString(c)) if ecs contains c.toUpperCase =>
-      ecs get c.toUpperCase getOrElse UnknownError
+      ecs.get(c.toUpperCase).getOrElse(UnknownError)
     case (TypeInfo(Class, _), json) =>
       throw new MappingException("Can't convert " + json + " to " + Class)
   }
@@ -122,7 +122,7 @@ class ValidationErrorSerializer(includeCode: Boolean = true,
         case jo @ JObject(JField("message", _) :: _) ⇒
           implicit val fmts = formats
           new ValidationError((jo \ "message").extractOrElse(""),
-                              (jo \ "field").extractOpt[String] map FieldName,
+                              (jo \ "field").extractOpt[String].map(FieldName),
                               (jo \ "code").extractOpt[ErrorCode],
                               (jo \ "args").children)
       }, {
@@ -130,14 +130,16 @@ class ValidationErrorSerializer(includeCode: Boolean = true,
           implicit val fmts = formats
           val jv: JValue = ("message" -> message)
           val wf: JValue =
-            fieldName map (fn ⇒ ("field" -> fn.name): JValue) getOrElse JNothing
+            fieldName
+              .map(fn ⇒ ("field" -> fn.name): JValue)
+              .getOrElse(JNothing)
           val ec: JValue =
             if (includeCode && code.isDefined)
-              ("code" -> (code map (Extraction.decompose(_)(formats))))
+              ("code" -> (code.map(Extraction.decompose(_)(formats))))
             else JNothing
           val arg: JValue =
             if (includeArgs && args.nonEmpty)
               ("args" -> Extraction.decompose(args)(formats))
             else JNothing
-          jv merge wf merge ec merge arg
+          jv.merge(wf).merge(ec).merge(arg)
       }))

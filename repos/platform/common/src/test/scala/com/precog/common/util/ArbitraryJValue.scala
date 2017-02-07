@@ -27,8 +27,8 @@ import Arbitrary.arbitrary
 trait ArbitraryJValue {
   def genJValue: Gen[JValue] =
     frequency((10, genSimple),
-              (1, wrap(choose(0, 5) flatMap genArray)),
-              (1, wrap(choose(0, 5) flatMap genObject)))
+              (1, wrap(choose(0, 5).flatMap(genArray))),
+              (1, wrap(choose(0, 5).flatMap(genObject))))
   def genJNum: Gen[JNum] = arbitrary[BigDecimal].map(JNum(_))
   def genJBool: Gen[JBool] = arbitrary[Boolean].map(JBool(_))
   def genJString: Gen[JString] = alphaStr.map(JString(_))
@@ -64,7 +64,7 @@ trait ArbitraryJValue {
 
   implicit def arbJValue: Arbitrary[JValue] = Arbitrary(genJValue)
   implicit def arbJObject: Arbitrary[JObject] =
-    Arbitrary(choose(0, 5) flatMap genObject)
+    Arbitrary(choose(0, 5).flatMap(genObject))
   implicit def arbJValueClass: Arbitrary[Class[_ <: JValue]] =
     Arbitrary(genJValueClass)
   implicit def shrinkJValueClass[T]: Shrink[T] = Shrink(x => Stream.empty)

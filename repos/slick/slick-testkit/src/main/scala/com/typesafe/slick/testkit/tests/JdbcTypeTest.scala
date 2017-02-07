@@ -76,7 +76,7 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
     val p1 = db.stream(a1).mapResult {
       case (id, data) => (id, data.getBytes(1, data.length.toInt).mkString)
     }
-    materialize(p1).map(_.toSet shouldBe Set((1, "123"), (2, "45"))) flatMap {
+    materialize(p1).map(_.toSet shouldBe Set((1, "123"), (2, "45"))).flatMap {
       _ =>
         val f = materializeAsync[(Int, Blob), (Int, String)](
           db.stream(ts.result.transactionally, bufferNext = false), {

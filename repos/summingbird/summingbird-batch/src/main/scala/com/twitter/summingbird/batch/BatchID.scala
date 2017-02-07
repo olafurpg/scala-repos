@@ -71,7 +71,7 @@ object BatchID {
       .reduceOption { (left, right) =>
         val (lmin, lmax, lcnt) = left
         val (rmin, rmax, rcnt) = right
-        (lmin min rmin, lmax max rmax, lcnt + rcnt)
+        (lmin min rmin, lmax.max(rmax), lcnt + rcnt)
       }
       .flatMap {
         case (min, max, cnt) =>

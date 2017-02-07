@@ -92,7 +92,7 @@ class SingletonPool[Req, Rep](underlying: ServiceFactory[Req, Rep],
       case Idle | Closed | Awaiting(_) | Open(_) => false
     }
 
-    done.become(underlying(conn) transform {
+    done.become(underlying(conn).transform {
       case Throw(exc) =>
         failStat.incr()
         complete(Idle)

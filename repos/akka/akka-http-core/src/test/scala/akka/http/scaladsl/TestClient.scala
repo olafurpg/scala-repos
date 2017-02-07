@@ -37,7 +37,7 @@ object TestClient extends App {
     val connection = Http().outgoingConnectionHttps(host)
     val result =
       Source.single(HttpRequest()).via(connection).runWith(Sink.head)
-    result.map(_.header[headers.Server]) onComplete {
+    result.map(_.header[headers.Server]).onComplete {
       case Success(res) ⇒
         println(s"$host is running ${res mkString ", "}")
         println()
@@ -54,7 +54,7 @@ object TestClient extends App {
     println(
       s"Fetching HTTP server version of host `$host` via the high-level API ...")
     val result = Http().singleRequest(HttpRequest(uri = s"https://$host/"))
-    result.map(_.header[headers.Server]) onComplete {
+    result.map(_.header[headers.Server]).onComplete {
       case Success(res) ⇒
         println(s"$host is running ${res mkString ", "}")
         Http().shutdownAllConnectionPools().onComplete { _ ⇒

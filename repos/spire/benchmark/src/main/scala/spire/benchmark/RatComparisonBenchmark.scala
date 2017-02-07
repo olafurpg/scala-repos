@@ -77,18 +77,18 @@ class RatComparisonBenchmarks extends MyBenchmark {
       val j = jscis(i)
 
       // compare r and a
-      if (spireToAp(r) != a) sys.error("items %s and %s differ" format (r, a))
+      if (spireToAp(r) != a) sys.error("items %s and %s differ".format(r, a))
       if (spireToJsci(r) != j)
-        sys.error("items %s and %s differ" format (r, j))
+        sys.error("items %s and %s differ".format(r, j))
 
       // compare running totals
       val x = t1 + r
       val y = t2.add(a)
       val z = t3.plus(j)
       if (spireToAp(x) != y)
-        sys.error("totals %s and %s differ (from %s)" format (x, y, t2))
+        sys.error("totals %s and %s differ (from %s)".format(x, y, t2))
       if (spireToJsci(x) != z)
-        sys.error("totals %s and %s differ (from %s)" format (x, z, t3))
+        sys.error("totals %s and %s differ (from %s)".format(x, z, t3))
 
       i += 1
     }

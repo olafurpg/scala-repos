@@ -26,7 +26,7 @@ trait Serialized {
   protected def serialized[A](f: => A): Future[A] = {
     val result = new Promise[A]
 
-    serializedQueue add { Job(result, () => f) }
+    serializedQueue.add { Job(result, () => f) }
 
     if (nwaiters.getAndIncrement() == 0) {
       do {

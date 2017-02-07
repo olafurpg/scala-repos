@@ -64,13 +64,14 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       val xCs = x.callsite
       val yCs = y.callsite
       val cls =
-        xCs.callsiteClass.internalName compareTo yCs.callsiteClass.internalName
+        xCs.callsiteClass.internalName
+          .compareTo(yCs.callsiteClass.internalName)
       if (cls != 0) return cls
 
-      val name = xCs.callsiteMethod.name compareTo yCs.callsiteMethod.name
+      val name = xCs.callsiteMethod.name.compareTo(yCs.callsiteMethod.name)
       if (name != 0) return name
 
-      val desc = xCs.callsiteMethod.desc compareTo yCs.callsiteMethod.desc
+      val desc = xCs.callsiteMethod.desc.compareTo(yCs.callsiteMethod.desc)
       if (desc != 0) return desc
 
       def pos(c: Callsite) =
@@ -86,7 +87,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     val toRewrite = mutable.ArrayBuffer.empty[Callsite]
     for (css <- callsites.valuesIterator; cs <- css.valuesIterator
          if doRewriteTraitCallsite(cs)) toRewrite += cs
-    toRewrite foreach rewriteFinalTraitMethodInvocation
+    toRewrite.foreach(rewriteFinalTraitMethodInvocation)
   }
 
   /**
@@ -230,11 +231,11 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     */
   private def collectAndOrderInlineRequests: List[InlineRequest] = {
     val requestsByMethod =
-      selectCallsitesForInlining withDefaultValue Set.empty
+      selectCallsitesForInlining.withDefaultValue(Set.empty)
 
     val elided = mutable.Set.empty[InlineRequest]
     def nonElidedRequests(methodNode: MethodNode): Set[InlineRequest] =
-      requestsByMethod(methodNode) diff elided
+      requestsByMethod(methodNode).diff(elided)
 
     /**
       * Break cycles in the inline request graph by removing callsites.
@@ -369,7 +370,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
         inlineCallsite(request.callsite)
         val postRequests = request.post.flatMap(
           adaptPostRequestForMainCallsite(_, request.callsite))
-        postRequests flatMap inline
+        postRequests.flatMap(inline)
     }
 
   /**
@@ -418,7 +419,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
 
     // local vars in the callee are shifted by the number of locals at the callsite
     val localVarShift = callsiteMethod.maxLocals
-    clonedInstructions.iterator.asScala foreach {
+    clonedInstructions.iterator.asScala.foreach {
       case varInstruction: VarInsnNode => varInstruction.`var` += localVarShift
       case iinc: IincInsnNode => iinc.`var` += localVarShift
       case _ => ()
@@ -494,18 +495,18 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       val returnReplacement = new InsnList
 
       def drop(slot: Int) =
-        returnReplacement add getPop(frame.peekStack(slot).getSize)
+        returnReplacement.add(getPop(frame.peekStack(slot).getSize))
 
       // for non-void methods, store the stack top into the return local variable
       if (hasReturnValue) {
-        returnReplacement add returnValueStore(originalReturn)
+        returnReplacement.add(returnValueStore(originalReturn))
         stackHeight -= 1
       }
 
       // drop the rest of the stack
       for (i <- 0 until stackHeight) drop(i)
 
-      returnReplacement add new JumpInsnNode(GOTO, postCallLabel)
+      returnReplacement.add(new JumpInsnNode(GOTO, postCallLabel))
       clonedInstructions.insert(inlinedReturn, returnReplacement)
       clonedInstructions.remove(inlinedReturn)
     }
@@ -573,10 +574,10 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       }
 
     // Add all invocation instructions and closure instantiations that were inlined to the call graph
-    callGraph.callsites(callee).valuesIterator foreach { originalCallsite =>
+    callGraph.callsites(callee).valuesIterator.foreach { originalCallsite =>
       val newCallsiteIns = instructionMap(originalCallsite.callsiteInstruction)
         .asInstanceOf[MethodInsnNode]
-      val argInfos = originalCallsite.argInfos flatMap mapArgInfo
+      val argInfos = originalCallsite.argInfos.flatMap(mapArgInfo)
       val newCallsite = originalCallsite.copy(
         callsiteInstruction = newCallsiteIns,
         callsiteMethod = callsiteMethod,
@@ -589,13 +590,13 @@ class Inliner[BT <: BTypes](val btypes: BT) {
       callGraph.addCallsite(newCallsite)
     }
 
-    callGraph.closureInstantiations(callee).valuesIterator foreach {
+    callGraph.closureInstantiations(callee).valuesIterator.foreach {
       originalClosureInit =>
         val newIndy =
           instructionMap(originalClosureInit.lambdaMetaFactoryCall.indy)
             .asInstanceOf[InvokeDynamicInsnNode]
         val capturedArgInfos =
-          originalClosureInit.capturedArgInfos flatMap mapArgInfo
+          originalClosureInit.capturedArgInfos.flatMap(mapArgInfo)
         val newClosureInit = ClosureInstantiation(
           originalClosureInit.lambdaMetaFactoryCall.copy(indy = newIndy),
           callsiteMethod,
@@ -721,7 +722,7 @@ class Inliner[BT <: BTypes](val btypes: BT) {
     } else
       findIllegalAccess(callee.instructions,
                         calleeDeclarationClass,
-                        callsiteClass) map {
+                        callsiteClass).map {
         case (illegalAccessIns, None) =>
           IllegalAccessInstruction(calleeDeclarationClass.internalName,
                                    callee.name,

@@ -57,5 +57,5 @@ trait NumericTypedField[MyType] extends TypedField[MyType] {
 
   override def noValueErrorMessage = S.?("number.required")
 
-  def asJs = valueBox.map(v => JsRaw(String.valueOf(v))) openOr JsNull
+  def asJs = valueBox.map(v => JsRaw(String.valueOf(v))).openOr(JsNull)
 }

@@ -40,7 +40,7 @@ object Source {
   def fromIterable(iterable: Iterable[Char]): Source =
     new Source {
       val iter = iterable.iterator
-    } withReset (() => fromIterable(iterable))
+    }.withReset(() => fromIterable(iterable))
 
   /** Creates a Source instance from a single character.
     */
@@ -103,7 +103,7 @@ object Source {
       bufferSize,
       () => fromFile(file, bufferSize)(codec),
       () => inputStream.close()
-    )(codec) withDescription ("file:" + file.getAbsolutePath)
+    )(codec).withDescription("file:" + file.getAbsolutePath)
   }
 
   /** Create a `Source` from array of bytes, decoding
@@ -170,7 +170,9 @@ object Source {
         createBufferedSource(inputStream, bufferSize, reset, close)(codec)
       else reset
 
-    new BufferedSource(inputStream, bufferSize)(codec) withReset resetFn withClose close
+    new BufferedSource(inputStream, bufferSize)(codec)
+      .withReset(resetFn)
+      .withClose(close)
   }
 
   def fromInputStream(is: InputStream, enc: String): BufferedSource =
@@ -223,7 +225,7 @@ abstract class Source extends Iterator[Char] with Closeable {
   var nwarnings = 0
 
   private def lineNum(line: Int): String =
-    (getLines() drop (line - 1) take 1).mkString
+    (getLines().drop(line - 1).take(1)).mkString
 
   class LineIterator extends AbstractIterator[String] with Iterator[String] {
     private[this] val sb = new StringBuilder
@@ -238,7 +240,7 @@ abstract class Source extends Iterator[Char] with Closeable {
 
         false
       } else {
-        sb append ch
+        sb.append(ch)
         true
       }
     }
@@ -329,7 +331,7 @@ abstract class Source extends Iterator[Char] with Closeable {
     */
   def report(pos: Int, msg: String, out: PrintStream) {
     val line = Position line pos
-    val col = Position column pos
+    val col = Position.column(pos)
 
     out println "%s:%d:%d: %s%s%s^"
       .format(descr, line, col, msg, lineNum(line), spaces(col - 1))

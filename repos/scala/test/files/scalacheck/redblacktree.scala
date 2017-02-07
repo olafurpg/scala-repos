@@ -77,24 +77,23 @@ package scala.collection.immutable.redblacktree {
 
     def areAllLeavesBlack[A](t: Tree[String, A]): Boolean = t match {
       case null => isBlack(t)
-      case ne => List(ne.left, ne.right) forall areAllLeavesBlack
+      case ne => List(ne.left, ne.right).forall(areAllLeavesBlack)
     }
 
     def areRedNodeChildrenBlack[A](t: Tree[String, A]): Boolean = t match {
       case RedTree(_, _, left, right) =>
-        List(left, right) forall
-          (t => isBlack(t) && areRedNodeChildrenBlack(t))
+        List(left, right).forall(t => isBlack(t) && areRedNodeChildrenBlack(t))
       case BlackTree(_, _, left, right) =>
-        List(left, right) forall areRedNodeChildrenBlack
+        List(left, right).forall(areRedNodeChildrenBlack)
       case null => true
     }
 
     def blackNodesToLeaves[A](t: Tree[String, A]): List[Int] = t match {
       case null => List(1)
       case BlackTree(_, _, left, right) =>
-        List(left, right) flatMap blackNodesToLeaves map (_ + 1)
+        List(left, right).flatMap(blackNodesToLeaves).map(_ + 1)
       case RedTree(_, _, left, right) =>
-        List(left, right) flatMap blackNodesToLeaves
+        List(left, right).flatMap(blackNodesToLeaves)
     }
 
     def areBlackNodesToLeavesEqual[A](t: Tree[String, A]): Boolean = t match {
@@ -106,7 +105,9 @@ package scala.collection.immutable.redblacktree {
     }
 
     def orderIsPreserved[A](t: Tree[String, A]): Boolean =
-      iterator(t) zip iterator(t).drop(1) forall { case (x, y) => x._1 < y._1 }
+      iterator(t).zip(iterator(t).drop(1)).forall {
+        case (x, y) => x._1 < y._1
+      }
 
     def heightIsBounded(t: Tree[_, _]): Boolean =
       height(t) <= (2 * (32 - Integer.numberOfLeadingZeros(count(t) + 2)) - 2)
@@ -161,13 +162,15 @@ package scala.collection.immutable.redblacktree {
       choose(0, iterator(tree).size)
     override def modify(tree: Tree[String, Int],
                         parm: ModifyParm): Tree[String, Int] =
-      nodeAt(tree, parm) map {
-        case (key, _) => update(tree, key, newValue, true)
-      } getOrElse tree
+      nodeAt(tree, parm)
+        .map {
+          case (key, _) => update(tree, key, newValue, true)
+        }
+        .getOrElse(tree)
 
     property("update modifies values") = forAll(genInput) {
       case (tree, parm, newTree) =>
-        nodeAt(tree, parm) forall {
+        nodeAt(tree, parm).forall {
           case (key, _) =>
             iterator(newTree) contains (key, newValue)
         }
@@ -183,13 +186,15 @@ package scala.collection.immutable.redblacktree {
       choose(0, iterator(tree).size)
     override def modify(tree: Tree[String, Int],
                         parm: ModifyParm): Tree[String, Int] =
-      nodeAt(tree, parm) map {
-        case (key, _) => delete(tree, key)
-      } getOrElse tree
+      nodeAt(tree, parm)
+        .map {
+          case (key, _) => delete(tree, key)
+        }
+        .getOrElse(tree)
 
     property("delete removes elements") = forAll(genInput) {
       case (tree, parm, newTree) =>
-        nodeAt(tree, parm) forall {
+        nodeAt(tree, parm).forall {
           case (key, _) =>
             !treeContains(newTree, key)
         }
@@ -203,35 +208,35 @@ package scala.collection.immutable.redblacktree {
     override def genParm(tree: Tree[String, Int]): Gen[ModifyParm] =
       for {
         from <- choose(0, iterator(tree).size)
-        to <- choose(0, iterator(tree).size) suchThat (from <=)
+        to <- choose(0, iterator(tree).size).suchThat(from <=)
         optionalFrom <- oneOf(Some(from), None, Some(from)) // Double Some(n) to get around a bug
         optionalTo <- oneOf(Some(to), None, Some(to)) // Double Some(n) to get around a bug
       } yield (optionalFrom, optionalTo)
 
     override def modify(tree: Tree[String, Int],
                         parm: ModifyParm): Tree[String, Int] = {
-      val from = parm._1 flatMap (nodeAt(tree, _) map (_._1))
-      val to = parm._2 flatMap (nodeAt(tree, _) map (_._1))
+      val from = parm._1.flatMap(nodeAt(tree, _).map(_._1))
+      val to = parm._2.flatMap(nodeAt(tree, _).map(_._1))
       rangeImpl(tree, from, to)
     }
 
     property("range boundaries respected") = forAll(genInput) {
       case (tree, parm, newTree) =>
-        val from = parm._1 flatMap (nodeAt(tree, _) map (_._1))
-        val to = parm._2 flatMap (nodeAt(tree, _) map (_._1))
+        val from = parm._1.flatMap(nodeAt(tree, _).map(_._1))
+        val to = parm._2.flatMap(nodeAt(tree, _).map(_._1))
         ("lower boundary" |:
-          (from forall (key => keysIterator(newTree) forall (key <=)))) &&
+          (from.forall(key => keysIterator(newTree).forall(key <=)))) &&
         ("upper boundary" |:
-          (to forall (key => keysIterator(newTree) forall (key >))))
+          (to.forall(key => keysIterator(newTree).forall(key >))))
     }
 
     property("range returns all elements") = forAll(genInput) {
       case (tree, parm, newTree) =>
-        val from = parm._1 flatMap (nodeAt(tree, _) map (_._1))
-        val to = parm._2 flatMap (nodeAt(tree, _) map (_._1))
+        val from = parm._1.flatMap(nodeAt(tree, _).map(_._1))
+        val to = parm._2.flatMap(nodeAt(tree, _).map(_._1))
         val filteredTree = (keysIterator(tree)
-          .filter(key => from forall (key >=))
-          .filter(key => to forall (key <))
+          .filter(key => from.forall(key >=))
+          .filter(key => to.forall(key <))
           .toList)
         filteredTree == keysIterator(newTree).toList
     }

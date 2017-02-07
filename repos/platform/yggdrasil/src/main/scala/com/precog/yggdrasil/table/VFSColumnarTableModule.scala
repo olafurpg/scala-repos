@@ -56,7 +56,7 @@ trait VFSColumnarTableModule
              apiKey: APIKey,
              tpe: JType): EitherT[Future, ResourceError, Table] = {
       for {
-        _ <- EitherT.right(table.toJson map { json =>
+        _ <- EitherT.right(table.toJson.map { json =>
           logger.trace(
             "Starting load from " + json.toList.map(_.renderCompact))
         })
@@ -68,13 +68,14 @@ trait VFSColumnarTableModule
                     })#l,
                     ProjectionLike[Future, Slice]] { path =>
             logger.debug("Loading path: " + path)
-            vfs.readProjection(apiKey, path, Version.Current, AccessMode.Read) leftMap {
-              error =>
+            vfs
+              .readProjection(apiKey, path, Version.Current, AccessMode.Read)
+              .leftMap { error =>
                 logger.warn(
                   "An error was encountered in loading path %s: %s"
                     .format(path, error))
                 error
-            }
+              }
           }
       } yield {
         val length = projections.map(_.length).sum
@@ -86,7 +87,7 @@ trait VFSColumnarTableModule
             }
 
             logger.debug("Appending from projection: " + proj)
-            acc ++ StreamT.wrapEffect(constraints map { c =>
+            acc ++ StreamT.wrapEffect(constraints.map { c =>
               proj.getBlockStream(c)
             })
         }

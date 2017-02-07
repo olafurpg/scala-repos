@@ -20,10 +20,13 @@ final class ChallengeApi(repo: ChallengeRepo,
   import Challenge._
 
   def allFor(userId: User.ID): Fu[AllChallenges] =
-    createdByDestId(userId) zip createdByChallengerId(userId) map (AllChallenges.apply _).tupled
+    createdByDestId(userId)
+      .zip(createdByChallengerId(userId))
+      .map(AllChallenges.apply _)
+      .tupled
 
   def create(c: Challenge): Funit = {
-    repo like c flatMap { _ ?? repo.cancel }
+    repo.like(c).flatMap { _ ?? repo.cancel }
   } >> (repo insert c) >> uncacheAndNotify(c) >>- {
     lilaBus.publish(Event.Create(c), 'challenge)
   }
@@ -32,17 +35,17 @@ final class ChallengeApi(repo: ChallengeRepo,
 
   val countInFor = AsyncCache(repo.countCreatedByDestId, maxCapacity = 20000)
 
-  def createdByChallengerId = repo createdByChallengerId _
+  def createdByChallengerId = repo.createdByChallengerId(_)
 
-  def createdByDestId = repo createdByDestId _
+  def createdByDestId = repo.createdByDestId(_)
 
-  def cancel(c: Challenge) = (repo cancel c) >> uncacheAndNotify(c)
+  def cancel(c: Challenge) = (repo.cancel(c)) >> uncacheAndNotify(c)
 
   private def offline(c: Challenge) = (repo offline c) >> uncacheAndNotify(c)
 
   private[challenge] def ping(id: Challenge.ID): Funit =
-    repo statusById id flatMap {
-      case Some(Status.Created) => repo setSeen id
+    repo.statusById(id).flatMap {
+      case Some(Status.Created) => repo.setSeen(id)
       case Some(Status.Offline) =>
         (repo setSeenAgain id) >> byId(id).flatMap { _ ?? uncacheAndNotify }
       case _ => fuccess(socketReload(id))
@@ -54,7 +57,7 @@ final class ChallengeApi(repo: ChallengeRepo,
     joiner(c, user).flatMap {
       case None => fuccess(None)
       case Some(pov) =>
-        (repo accept c) >> uncacheAndNotify(c) >>- {
+        (repo.accept(c)) >> uncacheAndNotify(c) >>- {
           lilaBus.publish(Event.Accept(c, user.map(_.id)), 'challenge)
         } inject pov.some
     }
@@ -88,7 +91,7 @@ final class ChallengeApi(repo: ChallengeRepo,
       } yield success
     }
 
-  def removeByUserId = repo removeByUserId _
+  def removeByUserId = repo.removeByUserId(_)
 
   private[challenge] def sweep: Funit =
     repo.realTimeUnseenSince(DateTime.now minusSeconds 10, max = 50).flatMap {
@@ -111,7 +114,7 @@ final class ChallengeApi(repo: ChallengeRepo,
   }
 
   private def notify(userId: User.ID) {
-    allFor(userId) foreach { all =>
+    allFor(userId).foreach { all =>
       userRegister ! SendTo(
         userId,
         lila.socket.Socket.makeMessage("challenges", jsonView(all)))

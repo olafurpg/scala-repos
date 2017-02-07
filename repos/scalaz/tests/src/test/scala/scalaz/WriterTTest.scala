@@ -33,7 +33,7 @@ object WriterTTest extends SpecLite {
 
   "flatMapF consistent with flatMap" ! forAll {
     (fa: WriterTOptInt[Int], f: Int => Option[(Int, Int)]) =>
-      fa.flatMapF(f) must_=== fa.flatMap(f andThen WriterT.writerT)
+      fa.flatMapF(f) must_=== fa.flatMap(f.andThen(WriterT.writerT))
   }
 
   private def writerTUcompilationTest: Unit = {

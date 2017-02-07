@@ -20,7 +20,7 @@ class Cookie(private[http] val underlying: NettyCookie) {
   def maxAge: Duration = underlying.getMaxAge.seconds
   def name: String = underlying.getName
   def path: String = underlying.getPath
-  def ports: Set[Int] = underlying.getPorts.asScala.toSet map { i: Integer =>
+  def ports: Set[Int] = underlying.getPorts.asScala.toSet.map { i: Integer =>
     i.intValue
   }
   def value: String = underlying.getValue

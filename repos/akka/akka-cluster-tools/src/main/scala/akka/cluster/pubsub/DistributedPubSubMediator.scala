@@ -258,7 +258,7 @@ object DistributedPubSubMediator {
 
     @SerialVersionUID(1L)
     final case class ValueHolder(version: Long, ref: Option[ActorRef]) {
-      @transient lazy val routee: Option[Routee] = ref map ActorRefRoutee
+      @transient lazy val routee: Option[Routee] = ref.map(ActorRefRoutee)
     }
 
     @SerialVersionUID(1L)
@@ -342,12 +342,12 @@ object DistributedPubSubMediator {
 
       def defaultReceive: Receive = {
         case msg @ Subscribe(_, _, ref) ⇒
-          context watch ref
+          context.watch(ref)
           subscribers += ref
           pruneDeadline = None
           context.parent ! Subscribed(SubscribeAck(msg), sender())
         case msg @ Unsubscribe(_, _, ref) ⇒
-          context unwatch ref
+          context.unwatch(ref)
           remove(ref)
           context.parent ! Unsubscribed(UnsubscribeAck(msg), sender())
         case Terminated(ref) ⇒
@@ -362,7 +362,7 @@ object DistributedPubSubMediator {
             context stop self
           else context.parent ! NewSubscriberArrived
         case msg ⇒
-          subscribers foreach { _ forward msg }
+          subscribers.foreach { _.forward(msg) }
       }
 
       def business: Receive
@@ -385,8 +385,8 @@ object DistributedPubSubMediator {
           val encGroup = encName(group)
           bufferOr(mkKey(self.path / encGroup), msg, sender()) {
             context.child(encGroup) match {
-              case Some(g) ⇒ g forward msg
-              case None ⇒ newGroupActor(encGroup) forward msg
+              case Some(g) ⇒ g.forward(msg)
+              case None ⇒ newGroupActor(encGroup).forward(msg)
             }
           }
           pruneDeadline = None
@@ -394,14 +394,14 @@ object DistributedPubSubMediator {
           val encGroup = encName(group)
           bufferOr(mkKey(self.path / encGroup), msg, sender()) {
             context.child(encGroup) match {
-              case Some(g) ⇒ g forward msg
+              case Some(g) ⇒ g.forward(msg)
               case None ⇒ // no such group here
             }
           }
         case msg: Subscribed ⇒
-          context.parent forward msg
+          context.parent.forward(msg)
         case msg: Unsubscribed ⇒
-          context.parent forward msg
+          context.parent.forward(msg)
         case NoMoreSubscribers ⇒
           val key = mkKey(sender())
           initializeGrouping(key)
@@ -418,7 +418,7 @@ object DistributedPubSubMediator {
         val g = context.actorOf(
           Props(classOf[Group], emptyTimeToLive, routingLogic),
           name = encGroup)
-        context watch g
+        context.watch(g)
         context.parent ! RegisterTopic(g)
         g
       }
@@ -430,7 +430,7 @@ object DistributedPubSubMediator {
       def business = {
         case SendToOneSubscriber(msg) ⇒
           if (subscribers.nonEmpty)
-            Router(routingLogic, (subscribers map ActorRefRoutee).toVector)
+            Router(routingLogic, (subscribers.map(ActorRefRoutee)).toVector)
               .route(wrapIfNeeded(msg), sender())
       }
     }
@@ -633,8 +633,8 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
 
       bufferOr(mkKey(self.path / encTopic), msg, sender()) {
         context.child(encTopic) match {
-          case Some(t) ⇒ t forward msg
-          case None ⇒ newTopicActor(encTopic) forward msg
+          case Some(t) ⇒ t.forward(msg)
+          case None ⇒ newTopicActor(encTopic).forward(msg)
         }
       }
 
@@ -661,7 +661,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
       val encTopic = encName(topic)
       bufferOr(mkKey(self.path / encTopic), msg, sender()) {
         context.child(encTopic) match {
-          case Some(t) ⇒ t forward msg
+          case Some(t) ⇒ t.forward(msg)
           case None ⇒ // no such topic here
         }
       }
@@ -682,7 +682,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
       // only accept deltas/buckets from known nodes, otherwise there is a risk of
       // adding back entries when nodes are removed
       if (nodes(sender().path.address)) {
-        buckets foreach { b ⇒
+        buckets.foreach { b ⇒
           if (nodes(b.owner)) {
             val myBucket = registry(b.owner)
             if (b.version > myBucket.version) {
@@ -746,7 +746,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
         address == selfAddress) // if we should skip sender() node and current address == self address => skip
       valueHolder ← bucket.content.get(path)
       ref ← valueHolder.ref
-    } ref forward msg
+    } ref.forward(msg)
   }
 
   def publishToEachGroup(path: String, msg: Any): Unit = {
@@ -760,7 +760,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
     } yield (key, ref)).groupBy(_._1).values
 
     val wrappedMsg = SendToOneSubscriber(msg)
-    groups foreach { group ⇒
+    groups.foreach { group ⇒
       val routees = group.map(_._2).toVector
       if (routees.nonEmpty)
         Router(routingLogic, routees).route(wrappedMsg, sender())
@@ -834,7 +834,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
     * Gossip to peer nodes.
     */
   def gossip(): Unit =
-    selectRandomNode((nodes - selfAddress).toVector) foreach gossipTo
+    selectRandomNode((nodes - selfAddress).toVector).foreach(gossipTo)
 
   def gossipTo(address: Address): Unit = {
     context.actorSelection(self.path.toStringWithAddress(address)) ! Status(
@@ -847,7 +847,7 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
     else Some(addresses(ThreadLocalRandom.current nextInt addresses.size))
 
   def prune(): Unit = {
-    registry foreach {
+    registry.foreach {
       case (owner, bucket) ⇒
         val oldRemoved = bucket.content.collect {
           case (key, ValueHolder(version, None))

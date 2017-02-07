@@ -35,7 +35,7 @@ private[akka] object SubclassifiedIndex {
     }
 
     private def addValue(value: V): Changes = {
-      val kids = subkeys flatMap (_ addValue value)
+      val kids = subkeys.flatMap(_.addValue(value))
       if (!(values contains value)) {
         values += value
         kids :+ ((key, Set(value)))
@@ -50,7 +50,7 @@ private[akka] object SubclassifiedIndex {
     }
 
     override def removeValue(value: V): Changes = {
-      val kids = subkeys flatMap (_ removeValue value)
+      val kids = subkeys.flatMap(_.removeValue(value))
       if (values contains value) {
         values -= value
         kids :+ ((key, Set(value)))
@@ -106,7 +106,7 @@ private[akka] class SubclassifiedIndex[K, V] private (
   protected def innerAddKey(key: K): Changes = {
     var found = false
     val ch =
-      subkeys flatMap { n ⇒
+      subkeys.flatMap { n ⇒
         if (sc.isEqual(key, n.key)) {
           found = true
           Nil
@@ -132,7 +132,7 @@ private[akka] class SubclassifiedIndex[K, V] private (
   protected def innerAddValue(key: K, value: V): Changes = {
     var found = false
     val ch =
-      subkeys flatMap { n ⇒
+      subkeys.flatMap { n ⇒
         if (sc.isSubclass(key, n.key)) {
           found = true
           n.innerAddValue(key, value)
@@ -154,7 +154,7 @@ private[akka] class SubclassifiedIndex[K, V] private (
     // the reason for not using the values in the returned diff is that we need to
     // go through the whole tree to find all values for the "changed" keys in other
     // parts of the tree as well, since new nodes might have been created
-    mergeChangesByKey(innerRemoveValue(key, value)) map {
+    mergeChangesByKey(innerRemoveValue(key, value)).map {
       case (k, _) ⇒ (k, findValues(k))
     }
 
@@ -162,7 +162,7 @@ private[akka] class SubclassifiedIndex[K, V] private (
   protected def innerRemoveValue(key: K, value: V): Changes = {
     var found = false
     val ch =
-      subkeys flatMap { n ⇒
+      subkeys.flatMap { n ⇒
         if (sc.isSubclass(key, n.key)) {
           found = true
           n.innerRemoveValue(key, value)
@@ -180,7 +180,7 @@ private[akka] class SubclassifiedIndex[K, V] private (
     * @return the diff that should be removed from the cache
     */
   def removeValue(value: V): Changes =
-    mergeChangesByKey(subkeys flatMap (_ removeValue value))
+    mergeChangesByKey(subkeys.flatMap(_.removeValue(value)))
 
   /**
     * Find all values for a given key in the index.
@@ -219,7 +219,7 @@ private[akka] class SubclassifiedIndex[K, V] private (
     * Also needs to find subkeys in other parts of the tree to compensate for multiple inheritance.
     */
   private def integrate(n: Nonroot[K, V]): Changes = {
-    val (subsub, sub) = subkeys partition (k ⇒ sc.isSubclass(k.key, n.key))
+    val (subsub, sub) = subkeys.partition(k ⇒ sc.isSubclass(k.key, n.key))
     subkeys = sub :+ n
     n.subkeys = if (subsub.nonEmpty) subsub else n.subkeys
     n.subkeys ++=

@@ -25,7 +25,7 @@ trait MarshallingDirectives {
     extractRequestContext.flatMap[Tuple1[T]] { ctx ⇒
       import ctx.executionContext
       import ctx.materializer
-      onComplete(um(ctx.request)) flatMap {
+      onComplete(um(ctx.request)).flatMap {
         case Success(value) ⇒ provide(value)
         case Failure(Unmarshaller.NoContentException) ⇒
           reject(RequestEntityExpectedRejection)

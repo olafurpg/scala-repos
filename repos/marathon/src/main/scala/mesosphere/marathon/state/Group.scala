@@ -166,7 +166,7 @@ case class Group(id: PathId,
       dependentGroup = allGroups
         .find(_.id == dependencyId)
         .map(_.transitiveApps)
-      dependent <- dependentApp orElse dependentGroup getOrElse Set.empty
+      dependent <- dependentApp.orElse(dependentGroup).getOrElse(Set.empty)
     } result ::= app -> dependent
     result
   }
@@ -241,15 +241,16 @@ object Group {
 
   private def validNestedGroup(base: PathId): Validator[Group] =
     validator[Group] { group =>
-      group.id is validPathWithBase(base)
-      group.apps is every(AppDefinition.validNestedAppDefinition(base))
-      group is noAppsAndGroupsWithSameName
-      (group.id.isRoot is false) or
-        (group.dependencies is noCyclicDependencies(group))
-      group is validPorts
+      group.id.is(validPathWithBase(base))
+      group.apps.is(every(AppDefinition.validNestedAppDefinition(base)))
+      group.is(noAppsAndGroupsWithSameName)
+      (group.id.isRoot
+        .is(false))
+        .or(group.dependencies.is(noCyclicDependencies(group)))
+      group.is(validPorts)
 
-      group.dependencies is every(validPathWithBase(base))
-      group.groups is every(valid(validNestedGroup(base)))
+      group.dependencies.is(every(validPathWithBase(base)))
+      group.groups.is(every(valid(validNestedGroup(base))))
     }
 
   implicit val validRootGroup: Validator[Group] = new Validator[Group] {
@@ -262,16 +263,19 @@ object Group {
       implicit validator: Validator[Group]): Validator[Group] = {
     new Validator[Group] {
       override def apply(group: Group): Result = {
-        maxApps.filter(group.transitiveApps.size > _).map { num =>
-          Failure(
-            Set(
-              RuleViolation(
-                group,
-                s"""This Marathon instance may only handle up to $num Apps!
+        maxApps
+          .filter(group.transitiveApps.size > _)
+          .map { num =>
+            Failure(
+              Set(
+                RuleViolation(
+                  group,
+                  s"""This Marathon instance may only handle up to $num Apps!
                 |(Override with command line option --max_apps)""".stripMargin,
-                None)))
-        } getOrElse Success
-      } and validator(group)
+                  None)))
+          }
+          .getOrElse(Success)
+      }.and(validator(group))
     }
   }
 

@@ -203,7 +203,7 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
       def extractValue(res: Result): Option[RValue]
 
       def apply(table: Table, ctx: MorphContext) =
-        table.reduce(reducer(ctx))(monoid) map extract
+        table.reduce(reducer(ctx))(monoid).map(extract)
     }
 
     def coalesce(

@@ -48,7 +48,7 @@ class AccountsTask(settings: Settings)
       val body =
         """{ "email": "%s", "password": "%s" }""".format(user, pass + "xyz")
       val post = (accounts / "") << body
-      val result = Http(post OK as.String)
+      val result = Http(post.OK(as.String))
 
       val req = (accounts / accountId).as(user, pass + "xyz")
       Http(req > (_.getStatusCode))() must_== 401

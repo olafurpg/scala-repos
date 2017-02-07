@@ -19,7 +19,7 @@ abstract class Yoneda[F[_], A] { yo =>
   /** Simple function composition. Allows map fusion without traversing an `F`. */
   def map[B](f: A => B): Yoneda[F, B] =
     new Yoneda[F, B] {
-      def apply[C](g: B => C) = yo(f andThen g)
+      def apply[C](g: B => C) = yo(f.andThen(g))
     }
 
   import Id._
@@ -44,7 +44,7 @@ object Yoneda {
   /** `Yoneda[F,_]` is a functor for any `F` */
   implicit def yonedaFunctor[F[_]]: Functor[Yoneda[F, ?]] =
     new Functor[Yoneda[F, ?]] {
-      def map[A, B](ya: Yoneda[F, A])(f: A => B) = ya map f
+      def map[A, B](ya: Yoneda[F, A])(f: A => B) = ya.map(f)
     }
 
   /** `F[A]` converts to `Yoneda[F,A]` for any functor `F` */

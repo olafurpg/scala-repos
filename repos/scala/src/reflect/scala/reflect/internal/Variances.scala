@@ -96,7 +96,7 @@ trait Variances { self: SymbolTable =>
       }
       def isUncheckedVariance(tp: Type) = tp match {
         case AnnotatedType(annots, _) =>
-          annots exists (_ matches definitions.uncheckedVarianceClass)
+          annots.exists(_.matches(definitions.uncheckedVarianceClass))
         case _ => false
       }
 
@@ -113,10 +113,10 @@ trait Variances { self: SymbolTable =>
         }
       }
       override def mapOver(decls: Scope): Scope = {
-        decls foreach
-          (sym =>
-             withVariance(if (sym.isAliasType) Invariant else variance)(
-               this(sym.info)))
+        decls.foreach(
+          sym =>
+            withVariance(if (sym.isAliasType) Invariant else variance)(
+              this(sym.info)))
         decls
       }
       private def resultTypeOnly(tp: Type) = tp match {
@@ -138,9 +138,9 @@ trait Variances { self: SymbolTable =>
           case TypeRef(_, sym, _) if !sym.variance.isInvariant =>
             checkVarianceOfSymbol(sym); mapOver(tp)
           case RefinedType(_, _) => withinRefinement(mapOver(tp))
-          case ClassInfoType(parents, _, _) => parents foreach this
+          case ClassInfoType(parents, _, _) => parents.foreach(this)
           case mt @ MethodType(_, result) =>
-            flipped(mt.paramTypes foreach this); this(result)
+            flipped(mt.paramTypes.foreach(this)); this(result)
           case _ => mapOver(tp)
         }
         // We're using TypeMap here for type traversal only. To avoid wasteful symbol
@@ -200,14 +200,14 @@ trait Variances { self: SymbolTable =>
 
   /** Compute variance of type parameter `tparam` in all types `tps`. */
   def varianceInTypes(tps: List[Type])(tparam: Symbol): Variance =
-    fold(tps map (tp => varianceInType(tp)(tparam)))
+    fold(tps.map(tp => varianceInType(tp)(tparam)))
 
   /** Compute variance of type parameter `tparam` in type `tp`. */
   def varianceInType(tp: Type)(tparam: Symbol): Variance = {
     def inArgs(sym: Symbol, args: List[Type]): Variance =
       fold(map2(args, sym.typeParams)((a, p) => inType(a) * p.variance))
-    def inSyms(syms: List[Symbol]): Variance = fold(syms map inSym)
-    def inTypes(tps: List[Type]): Variance = fold(tps map inType)
+    def inSyms(syms: List[Symbol]): Variance = fold(syms.map(inSym))
+    def inTypes(tps: List[Type]): Variance = fold(tps.map(inType))
 
     def inSym(sym: Symbol): Variance =
       if (sym.isAliasType) inType(sym.info).cut else inType(sym.info)
@@ -227,7 +227,7 @@ trait Variances { self: SymbolTable =>
       case PolyType(tparams, restpe) => inSyms(tparams).flip & inType(restpe)
       case ExistentialType(tparams, restpe) => inSyms(tparams) & inType(restpe)
       case AnnotatedType(annots, tp) =>
-        inTypes(annots map (_.atp)) & inType(tp)
+        inTypes(annots.map(_.atp)) & inType(tp)
     }
 
     inType(tp)

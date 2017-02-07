@@ -80,7 +80,7 @@ class Slf4jLoggerSpec
       s should include("akkaSource=[akka://Slf4jLoggerSpec/user/logProducer]")
       s should include("level=[ERROR]")
       s should include("logger=[akka.event.slf4j.Slf4jLoggerSpec$LogProducer]")
-      s should include regex (sourceThreadRegex)
+      (s should include).regex(sourceThreadRegex)
       s should include("msg=[Simulated error]")
       s should include("java.lang.RuntimeException: Simulated error")
       s should include("at akka.event.slf4j.Slf4jLoggerSpec")
@@ -94,7 +94,7 @@ class Slf4jLoggerSpec
       s should include("akkaSource=[akka://Slf4jLoggerSpec/user/logProducer]")
       s should include("level=[INFO]")
       s should include("logger=[akka.event.slf4j.Slf4jLoggerSpec$LogProducer]")
-      s should include regex (sourceThreadRegex)
+      (s should include).regex(sourceThreadRegex)
       s should include("msg=[test x=3 y=17]")
     }
 
@@ -108,7 +108,7 @@ class Slf4jLoggerSpec
       s should include("akkaSource=[akka://Slf4jLoggerSpec/user/logProducer]")
       s should include("level=[INFO]")
       s should include("logger=[akka.event.slf4j.Slf4jLoggerSpec$LogProducer]")
-      s should include regex (sourceThreadRegex)
+      (s should include).regex(sourceThreadRegex)
       s should include("mdc=[ticket-#3671: Custom MDC Values]")
       s should include("msg=[Message with custom MDC values]")
     }
@@ -123,7 +123,7 @@ class Slf4jLoggerSpec
       s should include("akkaSource=[akka://Slf4jLoggerSpec/user/logProducer]")
       s should include("level=[INFO]")
       s should include("logger=[akka.event.slf4j.Slf4jLoggerSpec$LogProducer]")
-      s should include regex (sourceThreadRegex)
+      (s should include).regex(sourceThreadRegex)
       s should include("mdc=[ticket-#3671: null]")
       s should include("msg=[Message with null custom MDC values]")
     }

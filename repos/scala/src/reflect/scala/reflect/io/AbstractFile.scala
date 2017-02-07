@@ -50,7 +50,7 @@ object AbstractFile {
   def getDirectory(file: File): AbstractFile =
     if (file.isDirectory) new PlainFile(file)
     else if (file.isFile && Path.isExtensionJarOrZip(file.jfile))
-      ZipArchive fromFile file
+      ZipArchive.fromFile(file)
     else null
 
   /**
@@ -65,7 +65,7 @@ object AbstractFile {
       else getFile(f)
     } else null
 
-  def getResources(url: URL): AbstractFile = ZipArchive fromManifestURL url
+  def getResources(url: URL): AbstractFile = ZipArchive.fromManifestURL(url)
 }
 
 /**
@@ -223,7 +223,7 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     val separator = java.io.File.separatorChar
     // trim trailing '/'s
     val path: String =
-      if (path0.last == separator) path0 dropRight 1 else path0
+      if (path0.last == separator) path0.dropRight(1) else path0
     val length = path.length()
     assert(length > 0 && !(path.last == separator), path)
     var file = this

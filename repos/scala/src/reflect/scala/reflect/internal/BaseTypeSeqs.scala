@@ -131,13 +131,13 @@ trait BaseTypeSeqs { this: SymbolTable =>
 
     def lateMap(f: Type => Type): BaseTypeSeq = new MappedBaseTypeSeq(this, f)
 
-    def exists(p: Type => Boolean): Boolean = elems exists p
+    def exists(p: Type => Boolean): Boolean = elems.exists(p)
 
     lazy val maxDepth = maxDepthOfElems
 
     protected def maxDepthOfElems: Depth = {
       var d = Depth.Zero
-      1 until length foreach (i => d = d max typeDepth(elems(i)))
+      (1 until length).foreach(i => d = d.max(typeDepth(elems(i))))
       d
     }
 
@@ -195,7 +195,7 @@ trait BaseTypeSeqs { this: SymbolTable =>
         i = 1
         while (i < nparents) {
           val nextSym = nextTypeSymbol(i)
-          if (nextSym isLess minSym) minSym = nextSym
+          if (nextSym.isLess(minSym)) minSym = nextSym
           i += 1
         }
         var minTypes: List[Type] = List()
@@ -234,16 +234,16 @@ trait BaseTypeSeqs { this: SymbolTable =>
   }
 
   class MappedBaseTypeSeq(orig: BaseTypeSeq, f: Type => Type)
-      extends BaseTypeSeq(orig.parents map f, orig.elems) {
+      extends BaseTypeSeq(orig.parents.map(f), orig.elems) {
     override def apply(i: Int) = f(orig.apply(i))
     override def rawElem(i: Int) = f(orig.rawElem(i))
     override def typeSymbol(i: Int) = orig.typeSymbol(i)
-    override def toList = orig.toList map f
+    override def toList = orig.toList.map(f)
     override def copy(head: Type, offset: Int) =
-      (orig map f).copy(head, offset)
+      (orig.map(f)).copy(head, offset)
     override def map(g: Type => Type) = lateMap(g)
     override def lateMap(g: Type => Type) = orig.lateMap(x => g(f(x)))
-    override def exists(p: Type => Boolean) = elems exists (x => p(f(x)))
+    override def exists(p: Type => Boolean) = elems.exists(x => p(f(x)))
     override protected def maxDepthOfElems: Depth =
       elems.map(x => typeDepth(f(x))).max
     override def toString = elems.mkString("MBTS(", ",", ")")

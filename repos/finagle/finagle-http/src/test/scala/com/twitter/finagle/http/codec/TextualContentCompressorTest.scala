@@ -18,14 +18,15 @@ class TextualContentCompressorTest extends FunSuite {
     request
   }
 
-  (TextLike ++ Seq("text/plain",
-                   "text/html",
-                   "application/json;charset=utf-8")) foreach { contentType =>
-    test("enabled for " + contentType) {
-      val request = newRequest(contentType)
-      val encoder = compressor.newContentEncoder(request, "gzip")
-      assert(encoder != null)
-    }
+  ((TextLike ++ Seq("text/plain",
+                    "text/html",
+                    "application/json;charset=utf-8"))).foreach {
+    contentType =>
+      test("enabled for " + contentType) {
+        val request = newRequest(contentType)
+        val encoder = compressor.newContentEncoder(request, "gzip")
+        assert(encoder != null)
+      }
   }
 
   test("disabled for non-textual content-type") {

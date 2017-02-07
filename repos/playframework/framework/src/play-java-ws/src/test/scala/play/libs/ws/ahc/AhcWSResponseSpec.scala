@@ -36,7 +36,7 @@ object AhcWSResponseSpec extends Specification with Mockito {
         .add("foo", "b")
         .add("FOO", "b")
         .add("Bar", "baz")
-      srcResponse.getHeaders returns srcHeaders
+      srcResponse.getHeaders.returns(srcHeaders)
       val response = new AhcWSResponse(srcResponse)
       val headers = response.getAllHeaders
       headers.get("foo").asScala must_== Seq("a", "b", "b")
@@ -49,33 +49,33 @@ object AhcWSResponseSpec extends Specification with Mockito {
     "get the body as UTF-8 by default when no content type" in {
       val ahcResponse = mock[Response]
       val response = new AhcWSResponse(ahcResponse)
-      ahcResponse.getContentType returns null
-      ahcResponse.getResponseBody(any) returns "body"
+      ahcResponse.getContentType.returns(null)
+      ahcResponse.getResponseBody(any).returns("body")
 
       val body = response.getBody
-      there was one(ahcResponse).getResponseBody(StandardCharsets.UTF_8)
+      there.was(one(ahcResponse).getResponseBody(StandardCharsets.UTF_8))
       body must be_==("body")
     }
 
     "get the body as ISO_8859_1 by default when content type text/plain without charset" in {
       val ahcResponse = mock[Response]
       val response = new AhcWSResponse(ahcResponse)
-      ahcResponse.getContentType returns "text/plain"
-      ahcResponse.getResponseBody(any) returns "body"
+      ahcResponse.getContentType.returns("text/plain")
+      ahcResponse.getResponseBody(any).returns("body")
 
       val body = response.getBody
-      there was one(ahcResponse).getResponseBody(StandardCharsets.ISO_8859_1)
+      there.was(one(ahcResponse).getResponseBody(StandardCharsets.ISO_8859_1))
       body must be_==("body")
     }
 
     "get the body as given charset when content type has explicit charset" in {
       val ahcResponse = mock[Response]
       val response = new AhcWSResponse(ahcResponse)
-      ahcResponse.getContentType returns "text/plain; charset=UTF-16"
-      ahcResponse.getResponseBody(any) returns "body"
+      ahcResponse.getContentType.returns("text/plain; charset=UTF-16")
+      ahcResponse.getResponseBody(any).returns("body")
 
       val body = response.getBody
-      there was one(ahcResponse).getResponseBody(StandardCharsets.UTF_16)
+      there.was(one(ahcResponse).getResponseBody(StandardCharsets.UTF_16))
       body must be_==("body")
     }
   }

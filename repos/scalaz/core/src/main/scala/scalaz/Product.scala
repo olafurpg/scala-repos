@@ -205,7 +205,7 @@ private trait ProductTraverse1L[F[_], G[_]]
       implicit X0: Apply[X]): X[(F[B], G[B])] = {
     def resume = F.traverse1(a._1)(f)
     X0.applyApplicative
-      .traverse(a._2)(f andThen \/.left)(G)
+      .traverse(a._2)(f.andThen(\/.left))(G)
       .fold(X0.tuple2(resume, _), pr => X0.map(resume)((_, pr)))
   }
 
@@ -224,7 +224,7 @@ private trait ProductTraverse1R[F[_], G[_]]
       implicit X0: Apply[X]): X[(F[B], G[B])] = {
     def resume = G.traverse1(a._2)(f)
     X0.applyApplicative
-      .traverse(a._1)(f andThen \/.left)(F)
+      .traverse(a._1)(f.andThen(\/.left))(F)
       .fold(X0.tuple2(_, resume), pr => X0.map(resume)((pr, _)))
   }
 

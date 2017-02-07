@@ -54,15 +54,12 @@ class InMemoryAccountManager[M[+ _]](resetExpiration: Int = 1)(
       plan: AccountPlan,
       parentId: Option[AccountId],
       profile: Option[JValue])(f: AccountId => M[APIKey]): M[Account] = {
-    TestAccounts.createAccount(email,
-                               password,
-                               creationDate,
-                               plan,
-                               parentId,
-                               profile)(f) map { account =>
-      accounts.put(account.accountId, account)
-      account
-    }
+    TestAccounts
+      .createAccount(email, password, creationDate, plan, parentId, profile)(f)
+      .map { account =>
+        accounts.put(account.accountId, account)
+        account
+      }
   }
 
   def setAccount(accountId: AccountId,
@@ -73,7 +70,7 @@ class InMemoryAccountManager[M[+ _]](resetExpiration: Int = 1)(
                  parentId: Option[AccountId]) = {
     createAccount(email, password, creationDate, plan, parentId, None) { _ =>
       M.point(java.util.UUID.randomUUID().toString.toLowerCase)
-    } map { account =>
+    }.map { account =>
       {
         accounts -= account.accountId
         accounts += (accountId -> account.copy(accountId = accountId))

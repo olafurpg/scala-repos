@@ -701,7 +701,7 @@ trait Crudify {
     * of displaying records via the crud.all snippet
     */
   protected def doCrudAll: (NodeSeq) => NodeSeq = {
-    val first = S.param("first").map(toLong) openOr 0L
+    val first = S.param("first").map(toLong).openOr(0L)
     val list = findForList(first, rowsPerPage)
 
     ".header-item" #> doCrudAllHeaderItems & ".row" #> doCrudAllRows(list) & ".previous" #> crudAllPrev(
@@ -735,7 +735,7 @@ trait Crudify {
     */
   def obscurePrimaryKey(in: String): String = in
 
-  def referer: String = S.referer openOr listPathString
+  def referer: String = S.referer.openOr(listPathString)
 
   /**
     * As the field names are being displayed for editing, this method

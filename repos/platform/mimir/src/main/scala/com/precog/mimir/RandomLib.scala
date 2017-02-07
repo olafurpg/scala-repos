@@ -58,9 +58,9 @@ trait RandomLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
             schema.columns(JObjectFixedT(Map(paths.Value.name -> JNumberT)))
 
           val result: Set[Result] =
-            cols map {
+            cols.map {
               case (c: LongColumn) =>
-                range collectFirst { case i if c.isDefinedAt(i) => i } map {
+                range.collectFirst { case i if c.isDefinedAt(i) => i }.map {
                   c(_)
                 }
 
@@ -73,14 +73,16 @@ trait RandomLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       }
 
       def extract(res: Result): Table = {
-        res map { resultSeed =>
-          val distTable = Table.uniformDistribution(MmixPrng(resultSeed))
-          distTable.transform(buildConstantWrapSpec(TransSpec1.Id))
-        } getOrElse Table.empty
+        res
+          .map { resultSeed =>
+            val distTable = Table.uniformDistribution(MmixPrng(resultSeed))
+            distTable.transform(buildConstantWrapSpec(TransSpec1.Id))
+          }
+          .getOrElse(Table.empty)
       }
 
       def apply(table: Table, ctx: MorphContext): M[Table] =
-        table.reduce(reducer(ctx)) map extract
+        table.reduce(reducer(ctx)).map(extract)
     }
   }
 }

@@ -121,7 +121,7 @@ abstract class EventFilter(occurrences: Int) {
     * remove the filter when the block is finished or aborted.
     */
   def intercept[T](code: ⇒ T)(implicit system: ActorSystem): T = {
-    system.eventStream publish TestEvent.Mute(this)
+    system.eventStream.publish(TestEvent.Mute(this))
     val leeway = TestKitExtension(system).TestEventFilterLeeway.dilated
     try {
       val result = code
@@ -133,7 +133,7 @@ abstract class EventFilter(occurrences: Int) {
           throw new AssertionError(
             s"received ${-todo} excess messages on $this")
       result
-    } finally system.eventStream publish TestEvent.UnMute(this)
+    } finally system.eventStream.publish(TestEvent.UnMute(this))
   }
 
   /*
@@ -199,7 +199,7 @@ object EventFilter {
     ErrorFilter(implicitly[ClassTag[A]].runtimeClass,
                 Option(source),
                 if (message ne null) Left(message)
-                else Option(pattern) map (new Regex(_)) toRight start,
+                else Option(pattern).map(new Regex(_)) toRight start,
                 message ne null)(occurrences)
 
   /**
@@ -214,7 +214,7 @@ object EventFilter {
     ErrorFilter(Logging.Error.NoCause.getClass,
                 Option(source),
                 if (message ne null) Left(message)
-                else Option(pattern) map (new Regex(_)) toRight start,
+                else Option(pattern).map(new Regex(_)) toRight start,
                 message ne null)(occurrences)
 
   /**
@@ -238,7 +238,7 @@ object EventFilter {
               occurrences: Int = Int.MaxValue): EventFilter =
     WarningFilter(Option(source),
                   if (message ne null) Left(message)
-                  else Option(pattern) map (new Regex(_)) toRight start,
+                  else Option(pattern).map(new Regex(_)) toRight start,
                   message ne null)(occurrences)
 
   /**
@@ -262,7 +262,7 @@ object EventFilter {
            occurrences: Int = Int.MaxValue): EventFilter =
     InfoFilter(Option(source),
                if (message ne null) Left(message)
-               else Option(pattern) map (new Regex(_)) toRight start,
+               else Option(pattern).map(new Regex(_)) toRight start,
                message ne null)(occurrences)
 
   /**
@@ -286,7 +286,7 @@ object EventFilter {
             occurrences: Int = Int.MaxValue): EventFilter =
     DebugFilter(Option(source),
                 if (message ne null) Left(message)
-                else Option(pattern) map (new Regex(_)) toRight start,
+                else Option(pattern).map(new Regex(_)) toRight start,
                 message ne null)(occurrences)
 
   /**
@@ -327,7 +327,7 @@ final case class ErrorFilter(throwable: Class[_],
 
   def matches(event: LogEvent) = {
     event match {
-      case Error(cause, src, _, msg) if throwable isInstance cause ⇒
+      case Error(cause, src, _, msg) if throwable.isInstance(cause) ⇒
         (msg == null && cause.getMessage == null &&
           cause.getStackTrace.length == 0) || doMatch(src, msg) ||
           doMatch(src, cause.getMessage)
@@ -540,7 +540,7 @@ final case class DeadLettersFilter(val messageClass: Class[_])(
 
   def matches(event: LogEvent) = {
     event match {
-      case Warning(_, _, msg) ⇒ BoxedType(messageClass) isInstance msg
+      case Warning(_, _, msg) ⇒ BoxedType(messageClass).isInstance(msg)
       case _ ⇒ false
     }
   }
@@ -568,10 +568,10 @@ class TestEventListener extends Logging.DefaultLogger {
       Seq(classOf[Mute],
           classOf[UnMute],
           classOf[DeadLetter],
-          classOf[UnhandledMessage]) foreach (bus.subscribe(context.self, _))
+          classOf[UnhandledMessage]).foreach(bus.subscribe(context.self, _))
       sender() ! LoggerInitialized
-    case Mute(filters) ⇒ filters foreach addFilter
-    case UnMute(filters) ⇒ filters foreach removeFilter
+    case Mute(filters) ⇒ filters.foreach(addFilter)
+    case UnMute(filters) ⇒ filters.foreach(removeFilter)
     case event: LogEvent ⇒ if (!filter(event)) print(event)
     case DeadLetter(msg, snd, rcp) ⇒
       if (!msg.isInstanceOf[Terminate]) {
@@ -594,7 +594,7 @@ class TestEventListener extends Logging.DefaultLogger {
   }
 
   def filter(event: LogEvent): Boolean =
-    filters exists (f ⇒ try { f(event) } catch { case e: Exception ⇒ false })
+    filters.exists(f ⇒ try { f(event) } catch { case e: Exception ⇒ false })
 
   def addFilter(filter: EventFilter): Unit = filters ::= filter
 

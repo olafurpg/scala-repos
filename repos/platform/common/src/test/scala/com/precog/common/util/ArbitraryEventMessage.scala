@@ -42,12 +42,12 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
   def genContentJValue: Gen[JValue] =
     frequency(
       (1, genSimple),
-      (1, wrap(choose(0, 5) flatMap genArray)),
-      (1, wrap(choose(0, 5) flatMap genObject))
+      (1, wrap(choose(0, 5).flatMap(genArray))),
+      (1, wrap(choose(0, 5).flatMap(genObject)))
     )
 
   def genPath: Gen[Path] =
-    Gen.resize(10, Gen.containerOf[List, String](alphaStr)) map { elements =>
+    Gen.resize(10, Gen.containerOf[List, String](alphaStr)).map { elements =>
       Path(elements.filter(_.length > 0))
     }
 
@@ -100,7 +100,7 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
     } yield {
       //TODO: Replace with IngestMessage.fromIngest when it's usable
       val data =
-        (eventIds zip ingest.data) map { Function.tupled(IngestRecord.apply) }
+        (eventIds.zip(ingest.data)).map { Function.tupled(IngestRecord.apply) }
       IngestMessage(ingest.apiKey,
                     ingest.path,
                     ingest.writeAs.get,
@@ -175,7 +175,7 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
       paths <- containerOfN[Set, JPath](10, genStableJPath)
       values <- containerOfN[Set, JValue](10, genSimpleNotNull)
     } yield {
-      (paths zip values).foldLeft[JValue](JObject(Nil)) {
+      (paths.zip(values)).foldLeft[JValue](JObject(Nil)) {
         case (obj, (path, value)) => obj.set(path, value)
       }
     }
@@ -201,7 +201,7 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
       ingest <- genIngest
     } yield {
       val records =
-        ingest.data map { jv =>
+        ingest.data.map { jv =>
           IngestRecord(
             EventId(producerId, eventIds(producerId).getAndIncrement),
             jv)

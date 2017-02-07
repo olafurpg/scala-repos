@@ -238,7 +238,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
             "(^set|^add|Listener$|ElementListener$)".r.replaceAllIn(_, ""),
             ((s: String) => s.head.toLower + s.tail),
             "Changed$".r.replaceAllIn(_, "Change")
-          ).reduce(_ andThen _)
+          ).reduce(_.andThen(_))
 
           val specificName = transforms(setter)
           val generalName = "^on".r.replaceAllIn(am.name, "")
@@ -269,7 +269,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
     }
 
     def resolveListenerDuplication(listeners: List[AndroidListener]) =
-      listeners map { l =>
+      listeners.map { l =>
         if (listeners
               .filter(l2 =>
                 l.name == l2.name && l.setterArgTypes == l2.setterArgTypes)
@@ -398,7 +398,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
                  isDeprecated(cls))
   }
 
-  def extractTask = (moduleName, baseDirectory, streams) map {
+  def extractTask = (moduleName, baseDirectory, streams).map {
     (mName, baseDir, s) =>
       if (mName == "parent") Map[String, AndroidClass]()
       else {

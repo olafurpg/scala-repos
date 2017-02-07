@@ -193,7 +193,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
   /** Removes all bindings from the map. After this operation has completed,
     *  the map will be empty.
     */
-  def clear() { keysIterator foreach -= }
+  def clear() { keysIterator.foreach(-=) }
 
   /** If given key is already in this map, returns associated value.
     *
@@ -223,7 +223,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     * @return   the map itself.
     */
   def transform(f: (A, B) => B): this.type = {
-    this.iterator foreach {
+    this.iterator.foreach {
       case (key, value) => update(key, f(key, value))
     }
     this

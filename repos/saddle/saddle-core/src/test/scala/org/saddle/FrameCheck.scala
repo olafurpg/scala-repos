@@ -28,7 +28,7 @@ class FrameCheck extends Specification with ScalaCheck {
 
     "frame equality" in {
       forAll { (f: Frame[Int, Int, Double]) =>
-        (f must_== f.col(*)) and (f must_== f)
+        ((f must_== f.col(*))).and(f must_== f)
       }
     }
 
@@ -52,7 +52,7 @@ class FrameCheck extends Specification with ScalaCheck {
           val (l, r) = f.colSplitAt(i)
           l.numCols must_== i
           r.numCols must_== f.numCols - i
-          (l rconcat r) must_== f
+          (l.rconcat(r)) must_== f
         }
       }
     }
@@ -64,7 +64,7 @@ class FrameCheck extends Specification with ScalaCheck {
           val (l, r) = f.rowSplitAt(i)
           l.numRows must_== i
           r.numRows must_== f.numRows - i
-          (l concat r) must_== f
+          (l.concat(r)) must_== f
         }
       }
     }

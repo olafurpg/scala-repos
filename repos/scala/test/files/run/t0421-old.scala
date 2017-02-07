@@ -9,7 +9,7 @@ object Test extends App {
 
   def scalprod(xs: Array[Double], ys: Array[Double]) = {
     var acc = 0.0
-    for ((x, y) <- xs zip ys) acc = acc + x * y
+    for ((x, y) <- xs.zip(ys)) acc = acc + x * y
     acc
   }
 

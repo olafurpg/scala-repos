@@ -75,7 +75,7 @@ trait MethodDirectives {
     *  - Supporting older browsers that lack support for certain HTTP methods. E.g. IE8 does not support PATCH
     */
   def overrideMethodWithParameter(paramName: String): Directive0 =
-    parameter(paramName ?) flatMap {
+    parameter(paramName ?).flatMap {
       case Some(method) ⇒
         getForKey(method.toUpperCase) match {
           case Some(m) ⇒ mapRequest(_.copy(method = m))

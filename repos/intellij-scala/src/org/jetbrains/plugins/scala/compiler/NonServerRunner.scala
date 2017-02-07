@@ -35,7 +35,7 @@ class NonServerRunner(project: Project,
   def buildProcess(args: Seq[String],
                    listener: String => Unit): CompilationProcess = {
     val sdk =
-      Option(ProjectRootManager.getInstance(project).getProjectSdk) getOrElse {
+      Option(ProjectRootManager.getInstance(project).getProjectSdk).getOrElse {
         val all =
           ProjectJdkTable.getInstance.getSdksOfType(JavaSdk.getInstance())
 
@@ -91,7 +91,7 @@ class NonServerRunner(project: Project,
           }
 
           override def stop() {
-            myProcess foreach (_.destroy())
+            myProcess.foreach(_.destroy())
             myProcess = None
           }
         }

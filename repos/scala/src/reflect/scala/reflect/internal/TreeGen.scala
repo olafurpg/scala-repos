@@ -14,9 +14,9 @@ abstract class TreeGen {
 
   def rootId(name: Name) = Select(Ident(nme.ROOTPKG), name)
   def rootScalaDot(name: Name) =
-    Select(rootId(nme.scala_) setSymbol ScalaPackage, name)
+    Select(rootId(nme.scala_).setSymbol(ScalaPackage), name)
   def scalaDot(name: Name) =
-    Select(Ident(nme.scala_) setSymbol ScalaPackage, name)
+    Select(Ident(nme.scala_).setSymbol(ScalaPackage), name)
   def scalaAnnotationDot(name: Name) = Select(scalaDot(nme.annotation), name)
   def scalaAnyRefConstr = scalaDot(tpnme.AnyRef) // used in ide
 
@@ -98,13 +98,13 @@ abstract class TreeGen {
           mkAttributedThis(sym)
         } else if (sym.isType) {
           assert(termSym != NoSymbol, failMessage)
-          mkAttributedIdent(termSym) setType tpe
+          mkAttributedIdent(termSym).setType(tpe)
         } else {
           mkAttributedRef(pre, sym)
         }
 
       case ConstantType(value) =>
-        Literal(value) setType tpe
+        Literal(value).setType(tpe)
 
       case AnnotatedType(_, atp) =>
         mkAttributedQualifier(atp)
@@ -126,7 +126,7 @@ abstract class TreeGen {
     */
   def mkApplyIfNeeded(qual: Tree) = qual.tpe match {
     case MethodType(Nil, restpe) =>
-      atPos(qual.pos)(Apply(qual, Nil) setType restpe)
+      atPos(qual.pos)(Apply(qual, Nil).setType(restpe))
     case _ => qual
   }
 
@@ -187,7 +187,7 @@ abstract class TreeGen {
   /** Replaces tree type with a stable type if possible */
   def stabilize(tree: Tree): Tree = stableTypeFor(tree) match {
     case NoType => tree
-    case tp => tree setType tp
+    case tp => tree.setType(tp)
   }
 
   /** Computes stable type for a tree if possible */
@@ -209,10 +209,10 @@ abstract class TreeGen {
     stabilize(mkAttributedRef(sym))
 
   def mkAttributedThis(sym: Symbol): This =
-    This(sym.name.toTypeName) setSymbol sym setType sym.thisType
+    This(sym.name.toTypeName).setSymbol(sym).setType(sym.thisType)
 
   def mkAttributedIdent(sym: Symbol): RefTree =
-    Ident(sym.name) setSymbol sym setType sym.tpeHK
+    Ident(sym.name).setSymbol(sym).setType(sym.tpeHK)
 
   def mkAttributedSelect(qual: Tree, sym: Symbol): RefTree = {
     // Tests involving the repl fail without the .isEmptyPackage condition.
@@ -236,12 +236,14 @@ abstract class TreeGen {
       val pkgQualifier =
         if (needsPackageQualifier) {
           val packageObject = qualsym.packageObject
-          Select(qual, nme.PACKAGE) setSymbol packageObject setType packageObject.typeOfThis
+          Select(qual, nme.PACKAGE)
+            .setSymbol(packageObject)
+            .setType(packageObject.typeOfThis)
         } else qual
 
       val tree = Select(pkgQualifier, sym)
       if (pkgQualifier.tpe == null) tree
-      else tree setType (qual.tpe memberType sym)
+      else tree.setType(qual.tpe memberType sym)
     }
   }
 
@@ -253,7 +255,7 @@ abstract class TreeGen {
   def mkAttributedTypeApply(target: Tree,
                             method: Symbol,
                             targs: List[Type]): Tree =
-    mkTypeApply(mkAttributedSelect(target, method), targs map TypeTree)
+    mkTypeApply(mkAttributedSelect(target, method), targs.map(TypeTree))
 
   private def mkSingleTypeApply(value: Tree,
                                 tpe: Type,
@@ -304,7 +306,7 @@ abstract class TreeGen {
     *  I would be very surprised if there aren't more.
     */
   def mkClassOf(tp: Type): Tree =
-    Literal(Constant(tp)) setType ConstantType(Constant(tp))
+    Literal(Constant(tp)).setType(ConstantType(Constant(tp)))
 
   /** Builds a list with given head and tail. */
   def mkNil: Tree = mkAttributedRef(NilModule)
@@ -314,8 +316,8 @@ abstract class TreeGen {
     *  which is appropriate to the given Type.
     */
   def mkZero(tp: Type): Tree = tp.typeSymbol match {
-    case NothingClass => mkMethodCall(Predef_???, Nil) setType NothingTpe
-    case _ => Literal(mkConstantZero(tp)) setType tp
+    case NothingClass => mkMethodCall(Predef_???, Nil).setType(NothingTpe)
+    case _ => Literal(mkConstantZero(tp)).setType(tp)
   }
 
   def mkConstantZero(tp: Type): Constant = tp.typeSymbol match {
@@ -367,9 +369,9 @@ abstract class TreeGen {
 
   def mkRuntimeUniverseRef: Tree = {
     assert(ReflectRuntimeUniverse != NoSymbol)
-    mkAttributedRef(ReflectRuntimeUniverse) setType singleType(
-      ReflectRuntimeUniverse.owner.thisPrefix,
-      ReflectRuntimeUniverse)
+    mkAttributedRef(ReflectRuntimeUniverse).setType(
+      singleType(ReflectRuntimeUniverse.owner.thisPrefix,
+                 ReflectRuntimeUniverse))
   }
 
   def mkSeqApply(arg: Tree): Apply = {
@@ -411,7 +413,7 @@ abstract class TreeGen {
         val mods = Modifiers(
           vd.mods.flags &
             (IMPLICIT | DEFAULTPARAM | BYNAMEPARAM) | PARAM | PARAMACCESSOR)
-        ValDef(mods withAnnotations vd.mods.annotations,
+        ValDef(mods.withAnnotations(vd.mods.annotations),
                vd.name,
                vd.tpt.duplicate,
                duplicateAndKeepPositions(vd.rhs))
@@ -419,28 +421,28 @@ abstract class TreeGen {
       param
     }
 
-    val (edefs, rest) = body span treeInfo.isEarlyDef
-    val (evdefs, etdefs) = edefs partition treeInfo.isEarlyValDef
+    val (edefs, rest) = body.span(treeInfo.isEarlyDef)
+    val (evdefs, etdefs) = edefs.partition(treeInfo.isEarlyValDef)
     val gvdefs =
-      evdefs map {
+      evdefs.map {
         case vdef @ ValDef(_, _, tpt, _) =>
           copyValDef(vdef)(
             // atPos for the new tpt is necessary, since the original tpt might have no position
             // (when missing type annotation for ValDef for example), so even though setOriginal modifies the
             // position of TypeTree, it would still be NoPosition. That's what the author meant.
             tpt = atPos(vdef.pos.focus)(
-              TypeTree() setOriginal tpt setPos tpt.pos.focus),
+              (TypeTree() setOriginal tpt).setPos(tpt.pos.focus)),
             rhs = EmptyTree
           )
       }
     val lvdefs =
-      evdefs collect {
+      evdefs.collect {
         case vdef: ValDef => copyValDef(vdef)(mods = vdef.mods | PRESUPER)
       }
 
     val constr = {
       if (constrMods.isTrait) {
-        if (body forall treeInfo.isInterfaceMember) None
+        if (body.forall(treeInfo.isInterfaceMember)) None
         else
           Some(
             atPos(wrappingPos(superPos, lvdefs))(
@@ -472,21 +474,20 @@ abstract class TreeGen {
                  Block(lvdefs ::: List(superCall), Literal(Constant(()))))))
       }
     }
-    constr foreach (ensureNonOverlapping(_, parents ::: gvdefs, focus = false))
+    constr.foreach(ensureNonOverlapping(_, parents ::: gvdefs, focus = false))
     // Field definitions for the class - remove defaults.
 
     val fieldDefs =
-      vparamss.flatten map
-        (vd => {
-           val field =
-             copyValDef(vd)(mods = vd.mods &~ DEFAULTPARAM, rhs = EmptyTree)
-           // Prevent overlapping of `field` end's position with default argument's start position.
-           // This is needed for `Positions.Locator(pos).traverse` to return the correct tree when
-           // the `pos` is a point position with all its values equal to `vd.rhs.pos.start`.
-           if (field.pos.isRange && vd.rhs.pos.isRange)
-             field.pos = field.pos.withEnd(vd.rhs.pos.start - 1)
-           field
-         })
+      vparamss.flatten.map(vd => {
+        val field =
+          copyValDef(vd)(mods = vd.mods &~ DEFAULTPARAM, rhs = EmptyTree)
+        // Prevent overlapping of `field` end's position with default argument's start position.
+        // This is needed for `Positions.Locator(pos).traverse` to return the correct tree when
+        // the `pos` is a point position with all its values equal to `vd.rhs.pos.start`.
+        if (field.pos.isRange && vd.rhs.pos.isRange)
+          field.pos = field.pos.withEnd(vd.rhs.pos.start - 1)
+        field
+      })
 
     global.Template(parents,
                     self,
@@ -506,7 +507,7 @@ abstract class TreeGen {
                  tparams: List[TypeDef],
                  templ: Template): ClassDef = {
     val isInterface =
-      mods.isTrait && (templ.body forall treeInfo.isInterfaceMember)
+      mods.isTrait && (templ.body.forall(treeInfo.isInterfaceMember))
     val mods1 = if (isInterface) (mods | Flags.INTERFACE) else mods
     ClassDef(mods1, name, tparams, templ)
   }
@@ -529,10 +530,10 @@ abstract class TreeGen {
       // this change works great for things that are actually templates
       // but in this degenerate case we need to perform postprocessing
       val app = treeInfo.dissectApplied(parents.head)
-      atPos(npos union cpos) { New(app.callee, app.argss) }
+      atPos(npos.union(cpos)) { New(app.callee, app.argss) }
     } else {
       val x = tpnme.ANON_CLASS_NAME
-      atPos(npos union cpos) {
+      atPos(npos.union(cpos)) {
         Block(
           List(atPos(cpos) {
             ClassDef(
@@ -542,7 +543,7 @@ abstract class TreeGen {
               mkTemplate(parents, self, NoMods, ListOfNil, stats, cpos.focus))
           }),
           atPos(npos) {
-            New(Ident(x) setPos npos.focus, Nil)
+            New(Ident(x).setPos(npos.focus), Nil)
           }
         )
       }
@@ -732,7 +733,7 @@ abstract class TreeGen {
         case Some((name, tpt)) =>
           Function(List(atPos(pat.pos) {
             ValDef(Modifiers(PARAM), name.toTermName, tpt, EmptyTree)
-          }), body) setPos splitpos
+          }), body).setPos(splitpos)
         case None =>
           atPos(splitpos) {
             mkVisitor(List(CaseDef(pat, EmptyTree, body)),
@@ -750,18 +751,19 @@ abstract class TreeGen {
                         body: Tree): Tree =
       // ForAttachment on the method selection is used to differentiate
       // result of for desugaring from a regular method call
-      Apply(Select(qual, meth) setPos qual.pos updateAttachment ForAttachment,
-            List(makeClosure(pos, pat, body))) setPos pos
+      Apply(
+        Select(qual, meth).setPos(qual.pos).updateAttachment(ForAttachment),
+        List(makeClosure(pos, pat, body))).setPos(pos)
 
     /* If `pat` is not yet a `Bind` wrap it in one with a fresh name */
     def makeBind(pat: Tree): Tree = pat match {
       case Bind(_, _) => pat
-      case _ => Bind(freshTermName(), pat) setPos pat.pos
+      case _ => Bind(freshTermName(), pat).setPos(pat.pos)
     }
 
     /* A reference to the name bound in Bind `pat`. */
     def makeValue(pat: Tree): Tree = pat match {
-      case Bind(name, _) => Ident(name) setPos pat.pos.focus
+      case Bind(name, _) => Ident(name).setPos(pat.pos.focus)
     }
 
     /* The position of the closure that starts with generator at position `genpos`. */
@@ -786,7 +788,7 @@ abstract class TreeGen {
                         mkFor(rest, sugarBody))
       case (t @ ValFrom(pat, rhs)) :: Filter(test) :: rest =>
         mkFor(ValFrom(pat,
-                      makeCombination(rhs.pos union test.pos,
+                      makeCombination(rhs.pos.union(test.pos),
                                       nme.withFilter,
                                       rhs,
                                       pat.duplicate,
@@ -798,17 +800,17 @@ abstract class TreeGen {
         }
         assert(!valeqs.isEmpty)
         val rest1 = rest.drop(valeqs.length)
-        val pats = valeqs map { case ValEq(pat, _) => pat }
-        val rhss = valeqs map { case ValEq(_, rhs) => rhs }
+        val pats = valeqs.map { case ValEq(pat, _) => pat }
+        val rhss = valeqs.map { case ValEq(_, rhs) => rhs }
         val defpat1 = makeBind(pat)
-        val defpats = pats map makeBind
-        val pdefs = (defpats, rhss).zipped flatMap mkPatDef
-        val ids = (defpat1 :: defpats) map makeValue
+        val defpats = pats.map(makeBind)
+        val pdefs = (defpats, rhss).zipped.flatMap(mkPatDef)
+        val ids = ((defpat1 :: defpats)).map(makeValue)
         val rhs1 = mkFor(List(ValFrom(defpat1, rhs).setPos(t.pos)),
                          Yield(Block(pdefs, atPos(wrappingPos(ids)) {
                            mkTuple(ids)
-                         }) setPos wrappingPos(pdefs)))
-        val allpats = (pat :: pats) map (_.duplicate)
+                         }).setPos(wrappingPos(pdefs))))
+        val allpats = ((pat :: pats)).map(_.duplicate)
         val pos1 =
           if (t.pos == NoPosition) NoPosition
           else rangePos(t.pos.source, t.pos.start, t.pos.point, rhs1.pos.end)
@@ -830,7 +832,7 @@ abstract class TreeGen {
       implicit fresh: FreshNameCreator): List[ValDef] =
     matchVarPattern(pat) match {
       case Some((name, tpt)) =>
-        List(atPos(pat.pos union rhs.pos) {
+        List(atPos(pat.pos.union(rhs.pos)) {
           ValDef(mods, name.toTermName, tpt, rhs)
         })
 
@@ -857,25 +859,25 @@ abstract class TreeGen {
           case Typed(expr, tpt) if !expr.isInstanceOf[Ident] =>
             val rhsTypedUnchecked =
               if (tpt.isEmpty) rhsUnchecked
-              else Typed(rhsUnchecked, tpt) setPos (rhs.pos union tpt.pos)
+              else Typed(rhsUnchecked, tpt).setPos(rhs.pos.union(tpt.pos))
             (expr, rhsTypedUnchecked)
           case ok =>
             (ok, rhsUnchecked)
         }
         val vars = getVariables(pat1)
-        val matchExpr = atPos((pat1.pos union rhs.pos).makeTransparent) {
+        val matchExpr = atPos((pat1.pos.union(rhs.pos)).makeTransparent) {
           Match(rhs1,
                 List(
                   atPos(pat1.pos) {
                     CaseDef(pat1,
                             EmptyTree,
-                            mkTuple(vars map (_._1) map Ident.apply))
+                            mkTuple(vars.map(_._1).map(Ident.apply)))
                   }
                 ))
         }
         vars match {
           case List((vname, tpt, pos)) =>
-            List(atPos(pat.pos union pos union rhs.pos) {
+            List(atPos(pat.pos.union(pos).union(rhs.pos)) {
               ValDef(mods, vname.toTermName, tpt, matchExpr)
             })
           case _ =>
@@ -934,7 +936,7 @@ abstract class TreeGen {
     }
     tree match {
       case Ident(name) => Some((name, TypeTree()))
-      case Bind(name, body) => wildType(body) map (x => (name, x))
+      case Bind(name, body) => wildType(body).map(x => (name, x))
       case Typed(Ident(name), tpt) => Some((name, tpt))
       case _ => None
     }
@@ -968,7 +970,7 @@ abstract class TreeGen {
       }
 
     override def traverse(tree: Tree): Unit = {
-      def seenName(name: Name) = buf exists (_._1 == name)
+      def seenName(name: Name) = buf.exists(_._1 == name)
       def add(name: Name, t: Tree) =
         if (!seenName(name)) buf += ((name, t, namePos(tree, name)))
       val bl = buf.length
@@ -992,7 +994,7 @@ abstract class TreeGen {
         case _ =>
           super.traverse(tree)
       }
-      if (buf.length > bl) tree setPos tree.pos.makeTransparent
+      if (buf.length > bl) tree.setPos(tree.pos.makeTransparent)
     }
     def apply(tree: Tree) = {
       traverse(tree)
@@ -1004,7 +1006,7 @@ abstract class TreeGen {
     *  without duplicates
     */
   private def getVariables(tree: Tree): List[(Name, Tree, Position)] =
-    new GetVarTraverser apply tree
+    new GetVarTraverser.apply(tree)
 
   /** Convert all occurrences of (lower-case) variables in a pattern as follows:
     *    x                  becomes      x @ _

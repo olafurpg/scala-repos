@@ -134,7 +134,7 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
     : this.type = {
     doBeforeBindingActions()
 
-    bindings = bindings map {
+    bindings = bindings.map {
       case (name, b) =>
         val tcf = b.typeConverterFactory
         val cv = typeConverterBuilder(
@@ -149,7 +149,7 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
               data
                 .read(name)
                 .right
-                .map(_ map (_.asInstanceOf[fieldBinding.S])))
+                .map(_.map(_.asInstanceOf[fieldBinding.S])))
           case ValueSource.Header =>
             val tc: TypeConverter[String, _] = tcf.resolveStringParams
             val headersBinding =
@@ -169,14 +169,14 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
               params
                 .read(name)
                 .right
-                .map(_ map (_.asInstanceOf[paramsBinding.S])))
+                .map(_.map(_.asInstanceOf[paramsBinding.S])))
         }
 
         name -> result
     }
 
     // Defer validation until after all the fields have been bound.
-    bindings = bindings map { case (k, v) => k -> v.validate }
+    bindings = bindings.map { case (k, v) => k -> v.validate }
 
     doAfterBindingActions()
     this

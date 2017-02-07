@@ -45,7 +45,7 @@ package object util {
         buf.append(callback(i))
         i += 1
       }
-      buf append break
+      buf.append(break)
       i = total - count / 2
       while (i < total) {
         buf.append(callback(i))

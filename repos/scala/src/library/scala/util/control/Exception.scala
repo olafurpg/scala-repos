@@ -40,7 +40,7 @@ object Exception {
         Some(x.asInstanceOf[Ex])
       else None
 
-    def isDefinedAt(x: Throwable) = downcast(x) exists isDef
+    def isDefinedAt(x: Throwable) = downcast(x).exists(isDef)
     def apply(x: Throwable): T = f(downcast(x).get)
   }
 
@@ -95,7 +95,7 @@ object Exception {
 
     /** Create a new Catch with additional exception handling logic. */
     def or[U >: T](pf2: Catcher[U]): Catch[U] =
-      new Catch(pf orElse pf2, fin, rethrow)
+      new Catch(pf.orElse(pf2), fin, rethrow)
     def or[U >: T](other: Catch[U]): Catch[U] = or(other.pf)
 
     /** Apply this catch logic to the supplied body. */
@@ -104,12 +104,12 @@ object Exception {
       catch {
         case x if rethrow(x) => throw x
         case x if pf isDefinedAt x => pf(x)
-      } finally fin foreach (_.invoke())
+      } finally fin.foreach(_.invoke())
 
     /* Create an empty Try container with this Catch and the supplied `Finally`. */
     def andFinally(body: => Unit): Catch[T] = fin match {
       case None => new Catch(pf, Some(new Finally(body)), rethrow)
-      case Some(f) => new Catch(pf, Some(f and body), rethrow)
+      case Some(f) => new Catch(pf, Some(f.and(body)), rethrow)
     }
 
     /** Apply this catch logic to the supplied body, mapping the result
@@ -153,15 +153,15 @@ object Exception {
 
   /** The empty `Catch` object. */
   final val noCatch: Catch[Nothing] =
-    new Catch(nothingCatcher) withDesc "<nothing>"
+    new Catch(nothingCatcher).withDesc("<nothing>")
 
   /** A `Catch` object which catches everything. */
   final def allCatch[T]: Catch[T] =
-    new Catch(allCatcher[T]) withDesc "<everything>"
+    new Catch(allCatcher[T]).withDesc("<everything>")
 
   /** A `Catch` object which catches non-fatal exceptions. */
   final def nonFatalCatch[T]: Catch[T] =
-    new Catch(nonFatalCatcher[T]) withDesc "<non-fatal>"
+    new Catch(nonFatalCatcher[T]).withDesc("<non-fatal>")
 
   /** Creates a `Catch` object which will catch any of the supplied exceptions.
     *  Since the returned `Catch` object has no specific logic defined and will simply
@@ -173,8 +173,8 @@ object Exception {
     *  to catch exactly what you specify, use `catchingPromiscuously` instead.
     */
   def catching[T](exceptions: Class[_]*): Catch[T] =
-    new Catch(pfFromExceptions(exceptions: _*)) withDesc
-      (exceptions map (_.getName) mkString ", ")
+    new Catch(pfFromExceptions(exceptions: _*))
+      .withDesc(exceptions.map(_.getName) mkString ", ")
 
   def catching[T](c: Catcher[T]): Catch[T] = new Catch(c)
 
@@ -190,15 +190,15 @@ object Exception {
 
   /** Creates a `Catch` object which catches and ignores any of the supplied exceptions. */
   def ignoring(exceptions: Class[_]*): Catch[Unit] =
-    catching(exceptions: _*) withApply (_ => ())
+    catching(exceptions: _*).withApply(_ => ())
 
   /** Creates a `Catch` object which maps all the supplied exceptions to `None`. */
   def failing[T](exceptions: Class[_]*): Catch[Option[T]] =
-    catching(exceptions: _*) withApply (_ => None)
+    catching(exceptions: _*).withApply(_ => None)
 
   /** Creates a `Catch` object which maps all the supplied exceptions to the given value. */
   def failAsValue[T](exceptions: Class[_]*)(value: => T): Catch[T] =
-    catching(exceptions: _*) withApply (_ => value)
+    catching(exceptions: _*).withApply(_ => value)
 
   /** Returns a partially constructed `Catch` object, which you must give
     * an exception handler function as an argument to `by`.  Example:
@@ -210,7 +210,7 @@ object Exception {
     def by(x: T): R = f(x)
   }
   def handling[T](exceptions: Class[_]*) = {
-    def fun(f: Throwable => T) = catching(exceptions: _*) withApply f
+    def fun(f: Throwable => T) = catching(exceptions: _*).withApply(f)
     new By[Throwable => T, Catch[T]](fun _)
   }
 
@@ -223,13 +223,13 @@ object Exception {
       if (wouldMatch(x, exceptions) && x.getCause != null) unwrap(x.getCause)
       else x
 
-    catching(exceptions: _*) withApply (x => throw unwrap(x))
+    catching(exceptions: _*).withApply(x => throw unwrap(x))
   }
 
   /** Private **/
   private def wouldMatch(x: Throwable,
                          classes: scala.collection.Seq[Class[_]]): Boolean =
-    classes exists (_ isAssignableFrom x.getClass)
+    classes.exists(_.isAssignableFrom(x.getClass))
 
   private def pfFromExceptions(
       exceptions: Class[_]*): PartialFunction[Throwable, Nothing] = {

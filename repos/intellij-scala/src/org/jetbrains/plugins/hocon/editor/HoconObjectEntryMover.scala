@@ -162,7 +162,8 @@ class HoconObjectEntryMover extends LineMover {
                 .map(_.enclosingObjectField)
                 .contains(field)
             case field: HKeyedField => false
-          } getOrElse false
+          }
+          .getOrElse(false)
       }
 
     def adjacentEntry(entry: HObjectEntry) =
@@ -193,56 +194,62 @@ class HoconObjectEntryMover extends LineMover {
     def trySpecializedFieldMove(objField: HObjectField) = {
       val sourceRange = lineRange(objField)
 
-      fieldToAscendOutOf(objField).map {
-        case (enclosingField, prefixToAdd) =>
-          val targetRange =
-            if (down)
-              new LineRange(sourceRange.endLine, endLine(enclosingField) + 1)
-            else
-              new LineRange(startLine(enclosingField), sourceRange.startLine)
-          val mod = PrefixModification(objField.getTextOffset,
-                                       0,
-                                       prefixToAdd.mkString("", ".", "."))
-          (sourceRange, targetRange, Some(mod))
-      } orElse fieldToDescendInto(objField).map {
-        case (adjacentField, prefixToRemove) =>
-          val targetRange =
-            if (down)
-              new LineRange(sourceRange.endLine,
-                            firstNonCommentLine(adjacentField) + 1)
-            else new LineRange(endLine(adjacentField), sourceRange.startLine)
-          val prefixStr = prefixToRemove.mkString("", ".", ".")
-          val needsGuard = document.getCharsSequence
-            .charAt(objField.getTextOffset + prefixStr.length)
-            .isWhitespace
-          val mod = PrefixModification(objField.getTextOffset,
-                                       prefixStr.length,
-                                       if (needsGuard) "\"\"" else "")
-          (sourceRange, targetRange, Some(mod))
-      }
+      fieldToAscendOutOf(objField)
+        .map {
+          case (enclosingField, prefixToAdd) =>
+            val targetRange =
+              if (down)
+                new LineRange(sourceRange.endLine, endLine(enclosingField) + 1)
+              else
+                new LineRange(startLine(enclosingField), sourceRange.startLine)
+            val mod = PrefixModification(objField.getTextOffset,
+                                         0,
+                                         prefixToAdd.mkString("", ".", "."))
+            (sourceRange, targetRange, Some(mod))
+        }
+        .orElse(fieldToDescendInto(objField).map {
+          case (adjacentField, prefixToRemove) =>
+            val targetRange =
+              if (down)
+                new LineRange(sourceRange.endLine,
+                              firstNonCommentLine(adjacentField) + 1)
+              else new LineRange(endLine(adjacentField), sourceRange.startLine)
+            val prefixStr = prefixToRemove.mkString("", ".", ".")
+            val needsGuard = document.getCharsSequence
+              .charAt(objField.getTextOffset + prefixStr.length)
+              .isWhitespace
+            val mod = PrefixModification(objField.getTextOffset,
+                                         prefixStr.length,
+                                         if (needsGuard) "\"\"" else "")
+            (sourceRange, targetRange, Some(mod))
+        })
     }
 
     def tryEntryMove(entry: HObjectEntry) = {
       val sourceRange = lineRange(entry)
-      adjacentMovableEntry(entry).map { adjacentEntry =>
-        (sourceRange, lineRange(adjacentEntry), None)
-      } orElse {
-        val maxLinePos = editor.offsetToLogicalPosition(document.getTextLength)
-        val maxLine =
-          if (maxLinePos.column == 0) maxLinePos.line else maxLinePos.line + 1
-        val nearLine =
-          if (down) sourceRange.endLine else sourceRange.startLine - 1
+      adjacentMovableEntry(entry)
+        .map { adjacentEntry =>
+          (sourceRange, lineRange(adjacentEntry), None)
+        }
+        .orElse {
+          val maxLinePos =
+            editor.offsetToLogicalPosition(document.getTextLength)
+          val maxLine =
+            if (maxLinePos.column == 0) maxLinePos.line
+            else maxLinePos.line + 1
+          val nearLine =
+            if (down) sourceRange.endLine else sourceRange.startLine - 1
 
-        if (nearLine >= 0 && nearLine < maxLine)
-          Some((sourceRange, singleLineRange(nearLine), None))
-        else None
-      }
+          if (nearLine >= 0 && nearLine < maxLine)
+            Some((sourceRange, singleLineRange(nearLine), None))
+          else None
+        }
     }
 
     val rangesOpt: Option[(LineRange, LineRange, Option[PrefixModification])] =
       enclosingAnchoredEntry(element).flatMap {
         case objField: HObjectField =>
-          trySpecializedFieldMove(objField) orElse tryEntryMove(objField)
+          trySpecializedFieldMove(objField).orElse(tryEntryMove(objField))
         case include: HInclude =>
           tryEntryMove(include)
       }

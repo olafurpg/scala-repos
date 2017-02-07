@@ -96,7 +96,7 @@ trait Role {
     * Removes the child Role
     */
   def removeRoleByName(roleName: String): Box[Role] = {
-    getRoleByName(roleName).map(_.detach) openOr Empty
+    getRoleByName(roleName).map(_.detach).openOr(Empty)
   }
 
   /**
@@ -116,7 +116,7 @@ trait Role {
     */
   def isChildOf(roleName: String): Boolean = (this.name == roleName) match {
     case true => return true
-    case _ => this.parent.map(_ isChildOf (roleName)) openOr false
+    case _ => this.parent.map(_.isChildOf(roleName)).openOr(false)
   }
 
   /**

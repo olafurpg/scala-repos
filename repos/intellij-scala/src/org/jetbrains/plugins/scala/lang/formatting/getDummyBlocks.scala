@@ -997,10 +997,10 @@ object getDummyBlocks {
     val lines = node.getText.split("\n")
     var acc = 0
 
-    lines foreach { line =>
+    lines.foreach { line =>
       val trimmedLine = line.trim()
       val linePrefixLength =
-        if (settings useTabCharacter ScalaFileType.SCALA_FILE_TYPE) {
+        if (settings.useTabCharacter(ScalaFileType.SCALA_FILE_TYPE)) {
           val tabsCount = line.prefixLength(_ == '\t')
           tabsCount /* *settings.getTabSize(ScalaFileType.SCALA_FILE_TYPE)*/ +
             line.substring(tabsCount).prefixLength(_ == ' ')

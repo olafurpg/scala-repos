@@ -34,7 +34,7 @@ object BlockStat {
 
     tokenType match {
       case ScalaTokenTypes.kIMPORT =>
-        Import parse builder
+        Import.parse(builder)
         return true
       case ScalaTokenTypes.tSEMICOLON =>
         builder.advanceLexer()
@@ -43,11 +43,11 @@ object BlockStat {
           ScalaTokenTypes.kTYPE =>
         if (!Def.parse(builder, isMod = false, isImplicit = true)) {
           if (Dcl.parse(builder)) {
-            builder error ErrMsg("wrong.declaration.in.block")
+            builder.error(ErrMsg("wrong.declaration.in.block"))
             return true
           } else {
             EmptyDcl.parse(builder)
-            builder error ErrMsg("wrong.declaration.in.block")
+            builder.error(ErrMsg("wrong.declaration.in.block"))
             return true
           }
         }
@@ -60,11 +60,11 @@ object BlockStat {
           if (!Def.parse(builder, isMod = false, isImplicit = true)) {
             if (!TmplDef.parse(builder)) {
               if (Dcl.parse(builder)) {
-                builder error ErrMsg("wrong.declaration.in.block")
+                builder.error(ErrMsg("wrong.declaration.in.block"))
                 return true
               } else {
                 if (EmptyDcl.parse(builder)) {
-                  builder error ErrMsg("wrong.declaration.in.block")
+                  builder.error(ErrMsg("wrong.declaration.in.block"))
                   return true
                 } else return false
               }

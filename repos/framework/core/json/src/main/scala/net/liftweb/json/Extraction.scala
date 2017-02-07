@@ -45,7 +45,7 @@ object Extraction {
     */
   def extract[A](json: JValue)(implicit formats: Formats, mf: Manifest[A]): A = {
     def allTypes(mf: Manifest[_]): List[Class[_]] =
-      mf.runtimeClass :: (mf.typeArguments flatMap allTypes)
+      mf.runtimeClass :: (mf.typeArguments.flatMap(allTypes))
 
     try {
       val types = allTypes(mf)
@@ -96,10 +96,10 @@ object Extraction {
         case x if primitive_?(x.getClass) => primitive2jvalue(x)(formats)
         case x: Map[_, _] =>
           JObject(
-            (x map { case (k: String, v) => JField(k, decompose(v)) }).toList)
-        case x: Iterable[_] => JArray(x.toList map decompose)
+            (x.map { case (k: String, v) => JField(k, decompose(v)) }).toList)
+        case x: Iterable[_] => JArray(x.toList.map(decompose))
         case x if (x.getClass.isArray) =>
-          JArray(x.asInstanceOf[Array[_]].toList map decompose)
+          JArray(x.asInstanceOf[Array[_]].toList.map(decompose))
         case x: Option[_] =>
           x.flatMap[JValue] { y =>
               Some(decompose(y))
@@ -113,27 +113,31 @@ object Extraction {
           constructorArgs.collect {
             case (name, Some(f)) =>
               f.setAccessible(true)
-              JField(unmangleName(name), decompose(f get x))
+              JField(unmangleName(name), decompose(f.get(x)))
           } match {
             case args =>
               val fields =
-                formats.fieldSerializer(x.getClass).map { serializer =>
-                  Reflection.fields(x.getClass).map {
-                    case (mangledName, _) =>
-                      val n = Meta.unmangleName(mangledName)
-                      val fieldVal = Reflection.getField(x, mangledName)
-                      val s =
-                        serializer.serializer orElse Map(
-                          (n, fieldVal) -> Some(n, fieldVal))
-                      s((n, fieldVal))
-                        .map {
-                          case (name, value) => JField(name, decompose(value))
-                        }
-                        .getOrElse(JField(n, JNothing))
+                formats
+                  .fieldSerializer(x.getClass)
+                  .map { serializer =>
+                    Reflection.fields(x.getClass).map {
+                      case (mangledName, _) =>
+                        val n = Meta.unmangleName(mangledName)
+                        val fieldVal = Reflection.getField(x, mangledName)
+                        val s =
+                          serializer.serializer.orElse(
+                            Map((n, fieldVal) -> Some(n, fieldVal)))
+                        s((n, fieldVal))
+                          .map {
+                            case (name, value) =>
+                              JField(name, decompose(value))
+                          }
+                          .getOrElse(JField(n, JNothing))
+                    }
                   }
-                } getOrElse Nil
+                  .getOrElse(Nil)
               val uniqueFields =
-                fields filterNot (f => args.find(_.name == f.name).isDefined)
+                fields.filterNot(f => args.find(_.name == f.name).isDefined)
               mkObject(x.getClass, uniqueFields ++ args)
           }
       }
@@ -286,7 +290,7 @@ object Extraction {
                 .toSet
               val jsonFields = o.obj.map { f =>
                 val JField(n, v) =
-                  (serializer.deserializer orElse Map(f -> f))(f)
+                  (serializer.deserializer.orElse(Map(f -> f)))(f)
                 (n, (n, v))
               }.toMap
 
@@ -346,12 +350,14 @@ object Extraction {
                          fields: List[JField],
                          typeInfo: TypeInfo) = {
         val obj = JObject(
-          fields filterNot (_.name == formats.typeHintFieldName))
+          fields.filterNot(_.name == formats.typeHintFieldName))
         val deserializer = formats.typeHints.deserialize
         if (!deserializer.isDefinedAt(typeHint, obj)) {
           val concreteClass =
-            formats.typeHints.classFor(typeHint) getOrElse fail(
-              "Do not know how to deserialize '" + typeHint + "'")
+            formats.typeHints
+              .classFor(typeHint)
+              .getOrElse(
+                fail("Do not know how to deserialize '" + typeHint + "'"))
           val typeArgs = typeInfo.parameterizedType
             .map(_.getActualTypeArguments.toList.map(Meta.rawClassOf))
             .getOrElse(Nil)
@@ -376,7 +382,7 @@ object Extraction {
       def unapply(fs: List[JField]): Option[(String, List[JField])] =
         if (formats.typeHints == NoTypeHints) None
         else {
-          val grouped = fs groupBy (_.name == formats.typeHintFieldName)
+          val grouped = fs.groupBy(_.name == formats.typeHintFieldName)
           if (grouped.isDefinedAt(true))
             Some(
               (grouped(true).head.value.values.toString,

@@ -70,7 +70,7 @@ private class RedisTracingFilter extends SimpleFilter[Command, Reply] {
       Trace.recordServiceName("redis")
       Trace.recordRpc(command.command)
       Trace.record(Annotation.ClientSend())
-      service(command) map { response =>
+      service(command).map { response =>
         Trace.record(Annotation.ClientRecv())
         response
       }

@@ -112,7 +112,7 @@ final class OpenAddressHashArray[@specialized(Int, Float, Long, Double) V] priva
 
   def activeKeysIterator = keysIterator
   def activeValuesIterator = activeIterator.map(_._2)
-  def activeIterator = (index.iterator zip data.iterator).filter(_._1 >= 0)
+  def activeIterator = (index.iterator.zip(data.iterator)).filter(_._1 >= 0)
 
   private def locate(i: Int) = {
     if (i >= size)
@@ -186,7 +186,7 @@ final class OpenAddressHashArray[@specialized(Int, Float, Long, Double) V] priva
     case that: OpenAddressHashArray[V] =>
       (this eq that) || (this.size == that.size) && {
         try {
-          this.iterator forall {
+          this.iterator.forall {
             case (k, v) =>
               that(k) match {
                 case `v` =>

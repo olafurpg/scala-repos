@@ -12,5 +12,5 @@ object Test extends SessionTest {
     |res0: Int = 7
     |
     |scala> :quit"""
-  def pastie = testPath changeExtension "pastie"
+  def pastie = testPath.changeExtension("pastie")
 }

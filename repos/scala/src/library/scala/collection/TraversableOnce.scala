@@ -97,7 +97,7 @@ trait TraversableOnce[+A] extends Any with GenTraversableOnce[A] { self =>
   // for internal use
   protected[this] def reversed = {
     var elems: List[A] = Nil
-    self foreach (elems ::= _)
+    self.foreach(elems ::= _)
     elems
   }
 
@@ -154,7 +154,7 @@ trait TraversableOnce[+A] extends Any with GenTraversableOnce[A] { self =>
 
   def foldLeft[B](z: B)(op: (B, A) => B): B = {
     var result = z
-    this foreach (x => result = op(result, x))
+    this.foreach(x => result = op(result, x))
     result
   }
 
@@ -353,17 +353,17 @@ trait TraversableOnce[+A] extends Any with GenTraversableOnce[A] { self =>
                 end: String): StringBuilder = {
     var first = true
 
-    b append start
+    b.append(start)
     for (x <- self) {
       if (first) {
-        b append x
+        b.append(x)
         first = false
       } else {
-        b append sep
-        b append x
+        b.append(sep)
+        b.append(x)
       }
     }
-    b append end
+    b.append(end)
 
     b
   }
@@ -420,7 +420,7 @@ object TraversableOnce {
     new ForceImplicitAmbiguity
   implicit def flattenTraversableOnce[A, CC[_]](travs: TraversableOnce[CC[A]])(
       implicit ev: CC[A] => TraversableOnce[A]) =
-    new FlattenOps[A](travs map ev)
+    new FlattenOps[A](travs.map(ev))
 
   /* Functionality reused in Iterator.CanBuildFrom */
   private[collection] abstract class BufferedCanBuildFrom[
@@ -430,7 +430,7 @@ object TraversableOnce {
     def traversableToColl[B](t: GenTraversable[B]): CC[B]
 
     def newIterator: Builder[A, CC[A]] =
-      new ArrayBuffer[A] mapResult bufferToColl
+      new ArrayBuffer[A].mapResult(bufferToColl)
 
     /** Creates a new builder on request of a collection.
       *  @param from  the collection requesting the builder to be created.
@@ -438,7 +438,7 @@ object TraversableOnce {
       */
     def apply(from: CC[_]): Builder[A, CC[A]] = from match {
       case xs: generic.GenericTraversableTemplate[_, _] =>
-        xs.genericBuilder.asInstanceOf[Builder[A, Traversable[A]]] mapResult {
+        xs.genericBuilder.asInstanceOf[Builder[A, Traversable[A]]].mapResult {
           case res => traversableToColl(res.asInstanceOf[GenTraversable[A]])
         }
       case _ => newIterator
@@ -476,10 +476,10 @@ object TraversableOnce {
   class ForceImplicitAmbiguity
 
   implicit class MonadOps[+A](trav: TraversableOnce[A]) {
-    def map[B](f: A => B): TraversableOnce[B] = trav.toIterator map f
+    def map[B](f: A => B): TraversableOnce[B] = trav.toIterator.map(f)
     def flatMap[B](f: A => GenTraversableOnce[B]): TraversableOnce[B] =
-      trav.toIterator flatMap f
-    def withFilter(p: A => Boolean) = trav.toIterator filter p
+      trav.toIterator.flatMap(f)
+    def withFilter(p: A => Boolean) = trav.toIterator.filter(p)
     def filter(p: A => Boolean): TraversableOnce[A] = withFilter(p)
   }
 }

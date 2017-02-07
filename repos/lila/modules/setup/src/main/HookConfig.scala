@@ -64,7 +64,7 @@ case class HookConfig(variant: chess.variant.Variant,
             ratingRange = ratingRange
           ))
       case _ =>
-        Right(user map { u =>
+        Right(user.map { u =>
           Seek.make(variant = variant,
                     daysPerTurn = makeDaysPerTurn,
                     mode = mode,
@@ -80,7 +80,7 @@ case class HookConfig(variant: chess.variant.Variant,
   def updateFrom(game: lila.game.Game) =
     copy(
       variant = game.variant,
-      timeMode = TimeMode ofGame game,
+      timeMode = TimeMode.ofGame(game),
       time = game.clock.map(_.limitInMinutes) | time,
       increment = game.clock.map(_.increment) | increment,
       days = game.daysPerTurn | days,
@@ -102,8 +102,8 @@ object HookConfig extends BaseHumanConfig {
     val realMode = m.fold(Mode.default)(Mode.orDefault)
     val useRatingRange = realMode.rated || membersOnly
     new HookConfig(
-      variant = chess.variant.Variant(v) err "Invalid game variant " + v,
-      timeMode = TimeMode(tm) err s"Invalid time mode $tm",
+      variant = chess.variant.Variant(v).err("Invalid game variant " + v),
+      timeMode = TimeMode(tm).err(s"Invalid time mode $tm"),
       time = t,
       increment = i,
       days = d,
@@ -112,7 +112,7 @@ object HookConfig extends BaseHumanConfig {
       ratingRange = e
         .filter(_ => useRatingRange)
         .fold(RatingRange.default)(RatingRange.orDefault),
-      color = Color(c) err "Invalid color " + c
+      color = Color(c).err("Invalid color " + c)
     )
   }
 
@@ -135,15 +135,16 @@ object HookConfig extends BaseHumanConfig {
 
     def reads(r: BSON.Reader): HookConfig =
       HookConfig(
-        variant = chess.variant.Variant orDefault (r int "v"),
-        timeMode = TimeMode orDefault (r int "tm"),
-        time = r double "t",
+        variant = chess.variant.Variant.orDefault(r int "v"),
+        timeMode = TimeMode.orDefault(r int "tm"),
+        time = r.double("t"),
         increment = r int "i",
         days = r int "d",
-        mode = Mode orDefault (r int "m"),
-        allowAnon = r bool "a",
+        mode = Mode.orDefault(r int "m"),
+        allowAnon = r.bool("a"),
         color = Color.Random,
-        ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default
+        ratingRange =
+          r.strO("e").flatMap(RatingRange.apply).getOrElse(RatingRange.default)
       )
 
     def writes(w: BSON.Writer, o: HookConfig) =

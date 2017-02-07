@@ -565,7 +565,7 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
       multiParseTo(newParser, expected: _*)
     def multiParseTo(parser: HttpRequestParser,
                      expected: HttpRequest*): Matcher[Seq[String]] =
-      rawMultiParseTo(parser, expected: _*).compose(_ map prep)
+      rawMultiParseTo(parser, expected: _*).compose(_.map(prep))
 
     def rawMultiParseTo(expected: HttpRequest*): Matcher[Seq[String]] =
       rawMultiParseTo(newParser, expected: _*)
@@ -579,7 +579,7 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
 
     def generalMultiParseTo(
         expected: Either[RequestOutput, HttpRequest]*): Matcher[Seq[String]] =
-      generalRawMultiParseTo(expected: _*).compose(_ map prep)
+      generalRawMultiParseTo(expected: _*).compose(_.map(prep))
 
     def generalRawMultiParseTo(
         expected: Either[RequestOutput, HttpRequest]*): Matcher[Seq[String]] =
@@ -587,9 +587,9 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
     def generalRawMultiParseTo(
         parser: HttpRequestParser,
         expected: Either[RequestOutput, HttpRequest]*): Matcher[Seq[String]] =
-      equal(expected.map(strictEqualify)).matcher[Seq[
-        Either[RequestOutput, StrictEqualHttpRequest]]] compose multiParse(
-        parser)
+      equal(expected.map(strictEqualify))
+        .matcher[Seq[Either[RequestOutput, StrictEqualHttpRequest]]]
+        .compose(multiParse(parser))
 
     def multiParse(parser: HttpRequestParser)(input: Seq[String])
       : Seq[Either[RequestOutput, StrictEqualHttpRequest]] =

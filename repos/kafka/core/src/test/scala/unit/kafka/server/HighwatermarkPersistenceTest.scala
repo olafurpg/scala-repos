@@ -43,7 +43,7 @@ class HighwatermarkPersistenceTest {
     .map(KafkaConfig.fromProps)
   val topic = "foo"
   val logManagers =
-    configs map { config =>
+    configs.map { config =>
       TestUtils.createLogManager(logDirs =
                                    config.logDirs.map(new File(_)).toArray,
                                  cleanerConfig = CleanerConfig())

@@ -60,7 +60,7 @@ object ScalaFX_Controls_03 extends JFXApp {
 
   val theToggleGroup = new ToggleGroup {}
 
-  theToggleGroup.selectedToggle onChange { (_, _, _) =>
+  theToggleGroup.selectedToggle.onChange { (_, _, _) =>
     val selectedToggle = theToggleGroup.getSelectedToggle
     if (selectedToggle != null) {
       val userDataString = selectedToggle.getUserData.toString

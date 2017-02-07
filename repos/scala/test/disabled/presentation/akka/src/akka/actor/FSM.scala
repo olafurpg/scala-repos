@@ -327,7 +327,7 @@ trait FSM[S, D] extends ListenerManagement { this: Actor =>
     * Set handler which is called upon reception of unhandled messages.
     */
   protected final def whenUnhandled(stateFunction: StateFunction) = {
-    handleEvent = stateFunction orElse handleEventDefault
+    handleEvent = stateFunction.orElse(handleEventDefault)
   }
 
   /**
@@ -354,7 +354,7 @@ trait FSM[S, D] extends ListenerManagement { this: Actor =>
    * Timer handling
    */
   private val timers = mutable.Map[String, Timer]()
-  private val timerGen = Iterator from 0
+  private val timerGen = Iterator.from(0)
 
   /*
    * State definitions
@@ -364,8 +364,8 @@ trait FSM[S, D] extends ListenerManagement { this: Actor =>
 
   private def register(name: S, function: StateFunction, timeout: Timeout) {
     if (stateFunctions contains name) {
-      stateFunctions(name) = stateFunctions(name) orElse function
-      stateTimeouts(name) = timeout orElse stateTimeouts(name)
+      stateFunctions(name) = stateFunctions(name).orElse(function)
+      stateTimeouts(name) = timeout.orElse(stateTimeouts(name))
     } else {
       stateFunctions(name) = function
       stateTimeouts(name) = timeout

@@ -10,8 +10,8 @@ object Test extends JavapTest {
   override def yah(res: Seq[String]) = {
     // replstiltskin: what be my name?
     val keywords = List("public", "class", "line")
-    def isLineClass(s: String) = keywords forall (s contains _)
-    def filtered = res filter isLineClass
+    def isLineClass(s: String) = keywords.forall(s contains _)
+    def filtered = res.filter(isLineClass)
     1 == filtered.size
   }
 }

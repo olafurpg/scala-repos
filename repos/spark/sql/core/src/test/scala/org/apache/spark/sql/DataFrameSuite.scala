@@ -178,7 +178,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(
       df2
-        .select('_1 as 'letter, 'number)
+        .select('_1.as('letter), 'number)
         .groupBy('letter)
         .agg(countDistinct('number)),
       Row("a", 3) :: Row("b", 2) :: Row("c", 1) :: Nil
@@ -1476,7 +1476,7 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
 
   test("assertAnalyzed shouldn't replace original stack trace") {
     val e = intercept[AnalysisException] {
-      sqlContext.range(1).select('id as 'a, 'id as 'b).groupBy('a).agg('b)
+      sqlContext.range(1).select('id.as('a), 'id.as('b)).groupBy('a).agg('b)
     }
 
     assert(

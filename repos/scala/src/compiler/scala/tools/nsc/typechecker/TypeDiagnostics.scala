@@ -107,7 +107,7 @@ trait TypeDiagnostics { self: Analyzer =>
 
   private def methodTypeErrorString(tp: Type) = tp match {
     case mt @ MethodType(params, resultType) =>
-      def forString = params map (_.defString)
+      def forString = params.map(_.defString)
 
       forString.mkString("(", ",", ")") + resultType
     case x => x.toString
@@ -120,7 +120,7 @@ trait TypeDiagnostics { self: Analyzer =>
     */
   final def exampleTuplePattern(names: List[Name]): String = {
     val arity = names.length
-    val varPatterNames: Option[List[String]] = sequence(names map {
+    val varPatterNames: Option[List[String]] = sequence(names.map {
       case name if nme.isVariableName(name) => Some(name.decode)
       case _ => None
     })
@@ -132,11 +132,11 @@ trait TypeDiagnostics { self: Analyzer =>
   }
 
   def alternatives(tree: Tree): List[Type] = tree.tpe match {
-    case OverloadedType(pre, alternatives) => alternatives map pre.memberType
+    case OverloadedType(pre, alternatives) => alternatives.map(pre.memberType)
     case _ => Nil
   }
   def alternativesString(tree: Tree) =
-    alternatives(tree) map (x => "  " + methodTypeErrorString(x)) mkString
+    alternatives(tree).map(x => "  " + methodTypeErrorString(x)) mkString
       ("", " <and>\n", "\n")
 
   /** The symbol which the given accessor represents (possibly in part).
@@ -156,7 +156,8 @@ trait TypeDiagnostics { self: Analyzer =>
         else DEFERRED
 
       getter.owner
-        .newValue(getter.name.toTermName, getter.pos, flags) setInfo getter.tpe.resultType
+        .newValue(getter.name.toTermName, getter.pos, flags)
+        .setInfo(getter.tpe.resultType)
     }
 
   def treeSymTypeMsg(tree: Tree): String = {
@@ -185,14 +186,14 @@ trait TypeDiagnostics { self: Analyzer =>
   def disambiguate(ss: List[String]) = ss match {
     case Nil => Nil
     case s :: ss =>
-      s :: (ss map { case `s` => "(some other)" + s; case x => x })
+      s :: (ss.map { case `s` => "(some other)" + s; case x => x })
   }
 
   // todo: use also for other error messages
   def existentialContext(tp: Type) = tp.skolemsExceptMethodTypeParams match {
     case Nil => ""
     case xs =>
-      " where " + (disambiguate(xs map (_.existentialToString)) mkString ", ")
+      " where " + (disambiguate(xs.map(_.existentialToString)) mkString ", ")
   }
 
   def explainAlias(tp: Type) = {
@@ -217,15 +218,15 @@ trait TypeDiagnostics { self: Analyzer =>
     *  TODO: handle type aliases better.
     */
   def explainVariance(found: Type, req: Type): String = {
-    found.baseTypeSeq.toList foreach { tp =>
-      if (tp.typeSymbol isSubClass req.typeSymbol) {
+    found.baseTypeSeq.toList.foreach { tp =>
+      if (tp.typeSymbol.isSubClass(req.typeSymbol)) {
         val foundArgs = tp.typeArgs
         val reqArgs = req.typeArgs
         val params = req.typeConstructor.typeParams
 
         if (foundArgs.nonEmpty && foundArgs.length == reqArgs.length) {
           val relationships =
-            (foundArgs, reqArgs, params).zipped map {
+            (foundArgs, reqArgs, params).zipped.map {
               case (arg, reqArg, param) =>
                 def mkMsg(isSubtype: Boolean) = {
                   val op = if (isSubtype) "<:" else ">:"
@@ -283,7 +284,7 @@ trait TypeDiagnostics { self: Analyzer =>
           val messages = relationships.flatten
           // the condition verifies no type argument came back None
           if (messages.size == foundArgs.size)
-            return messages filterNot (_ == "") mkString ("\n", "\n", "")
+            return messages.filterNot(_ == "") mkString ("\n", "\n", "")
         }
       }
     }
@@ -313,15 +314,15 @@ trait TypeDiagnostics { self: Analyzer =>
   def typePatternAdvice(sym: Symbol, ptSym: Symbol) = {
     val clazz = if (sym.isModuleClass) sym.companionClass else sym
     val caseString =
-      if (clazz.isCaseClass && (clazz isSubClass ptSym))
-        (clazz.caseFieldAccessors map (_ => "_") // could use the actual param names here
+      if (clazz.isCaseClass && (clazz.isSubClass(ptSym)))
+        (clazz.caseFieldAccessors.map(_ => "_") // could use the actual param names here
           mkString (s"`case ${clazz.name}(", ",", ")`"))
       else
         "`case _: " +
           (clazz.typeParams match {
             case Nil => "" + clazz.name
             case xs =>
-              xs map (_ => "_") mkString (clazz.name + "[", ",", "]")
+              xs.map(_ => "_") mkString (clazz.name + "[", ",", "]")
           }) + "`"
 
     if (!clazz.exists) ""
@@ -336,7 +337,7 @@ trait TypeDiagnostics { self: Analyzer =>
     private var postQualifiedWith: List[Symbol] = Nil
     def restoreName() = sym.name = savedName
     def modifyName(f: String => String) =
-      sym setName newTypeName(f(sym.name.toString))
+      sym.setName(newTypeName(f(sym.name.toString)))
 
     /** Prepend java.lang, scala., or Predef. if this type originated
       *  in one of those.
@@ -366,7 +367,7 @@ trait TypeDiagnostics { self: Analyzer =>
 
     def compare(other: TypeDiag) =
       if (this == other) 0
-      else if (sym isLess other.sym) -1
+      else if (sym.isLess(other.sym)) -1
       else 1
 
     override def toString = {
@@ -398,8 +399,8 @@ trait TypeDiagnostics { self: Analyzer =>
     // If two different type diag instances are seen for a given
     // key (either the string representation of a type, or the simple
     // name of a symbol) then keep them for disambiguation.
-    val strings = mutable.Map[String, Set[TypeDiag]]() withDefaultValue Set()
-    val names = mutable.Map[Name, Set[TypeDiag]]() withDefaultValue Set()
+    val strings = mutable.Map[String, Set[TypeDiag]]().withDefaultValue(Set())
+    val names = mutable.Map[Name, Set[TypeDiag]]().withDefaultValue(Set())
 
     val localsSet = locals.toSet
 
@@ -418,7 +419,7 @@ trait TypeDiagnostics { self: Analyzer =>
       }
     }
 
-    val collisions = strings.values ++ names.values filter (_.size > 1)
+    val collisions = (strings.values ++ names.values).filter(_.size > 1)
     collisions.flatten.toList
   }
 
@@ -434,28 +435,28 @@ trait TypeDiagnostics { self: Analyzer =>
   def withDisambiguation[T](locals: List[Symbol], types: Type*)(op: => T): T = {
     val typeRefs = typeDiags(locals, types: _*)
     val toCheck =
-      pairs(typeRefs) filterNot { case (td1, td2) => td1 sym_== td2 }
+      pairs(typeRefs).filterNot { case (td1, td2) => td1.sym_==(td2) }
 
-    ultimately(typeRefs foreach (_.restoreName())) {
+    ultimately(typeRefs.foreach(_.restoreName())) {
       for ((td1, td2) <- toCheck) {
         val tds = List(td1, td2)
 
         // If the types print identically, qualify them:
         //   a) If the dealiased owner is a package, the full path
         //   b) Otherwise, append (in <owner>)
-        if (td1 string_== td2) tds foreach (_.nameQualify())
+        if (td1 string_== td2) tds.foreach(_.nameQualify())
 
         // If they have the same simple name, and either of them is in the
         // scala package or predef, qualify with scala so it is not confusing why
         // e.g. java.util.Iterator and Iterator are different types.
-        if (td1 name_== td2) tds foreach (_.qualifyDefaultNamespaces())
+        if (td1.name_==(td2)) tds.foreach(_.qualifyDefaultNamespaces())
 
         // If they still print identically:
         //   a) If they are type parameters with different owners, append (in <owner>)
         //   b) Failing that, the best we can do is append "(some other)" to the latter.
         if (td1 string_== td2) {
           if (td1 owner_== td2) td2.modifyName("(some other)" + _)
-          else tds foreach (_.typeQualify())
+          else tds.foreach(_.typeQualify())
         }
       }
       // performing the actual operation
@@ -482,8 +483,8 @@ trait TypeDiagnostics { self: Analyzer =>
         val setVars = mutable.Set[Symbol]()
         val treeTypes = mutable.Set[Type]()
 
-        def defnSymbols = defnTrees.toList map (_.symbol)
-        def localVars = defnSymbols filter (t => t.isLocalToBlock && t.isVar)
+        def defnSymbols = defnTrees.toList.map(_.symbol)
+        def localVars = defnSymbols.filter(t => t.isLocalToBlock && t.isVar)
 
         def qualifiesTerm(sym: Symbol) =
           ((sym.isModule ||
@@ -521,7 +522,7 @@ trait TypeDiagnostics { self: Analyzer =>
               }
             }
             // e.g. val a = new Foo ; new a.Bar ; don't let a be reported as unused.
-            t.tpe.prefix foreach {
+            t.tpe.prefix.foreach {
               case SingleType(_, sym) => targets += sym
               case _ =>
             }
@@ -532,7 +533,7 @@ trait TypeDiagnostics { self: Analyzer =>
           (m.isType &&
             !m.isTypeParameterOrSkolem // would be nice to improve this
             && (m.isPrivate || m.isLocalToBlock) && !(treeTypes.exists(tp =>
-            tp exists (t => t.typeSymbolDirect == m))))
+            tp.exists(t => t.typeSymbolDirect == m))))
         def isUnusedTerm(m: Symbol): Boolean =
           ((m.isTerm) &&
             (m.isPrivate || m.isLocalToBlock) && !targets(m) &&
@@ -543,17 +544,17 @@ trait TypeDiagnostics { self: Analyzer =>
             &&
               !treeTypes.exists(_ contains m) // e.g. val a = new Foo ; new a.Bar
           )
-        def unusedTypes = defnTrees.toList filter (t => isUnusedType(t.symbol))
-        def unusedTerms = defnTrees.toList filter (v => isUnusedTerm(v.symbol))
+        def unusedTypes = defnTrees.toList.filter(t => isUnusedType(t.symbol))
+        def unusedTerms = defnTrees.toList.filter(v => isUnusedTerm(v.symbol))
         // local vars which are never set, except those already returned in unused
-        def unsetVars = localVars filter (v => !setVars(v) && !isUnusedTerm(v))
+        def unsetVars = localVars.filter(v => !setVars(v) && !isUnusedTerm(v))
       }
 
       def apply(unit: CompilationUnit) = {
         val p = new UnusedPrivates
-        p traverse unit.body
+        p.traverse(unit.body)
         val unused = p.unusedTerms
-        unused foreach { defn: DefTree =>
+        unused.foreach { defn: DefTree =>
           val sym = defn.symbol
           val pos =
             (if (defn.pos.isDefined) defn.pos
@@ -576,12 +577,12 @@ trait TypeDiagnostics { self: Analyzer =>
              else "term")
           reporter.warning(pos, s"$why $what in ${sym.owner} is never used")
         }
-        p.unsetVars foreach { v =>
+        p.unsetVars.foreach { v =>
           reporter.warning(
             v.pos,
             s"local var ${v.name} in ${v.owner} is never set - it could be a val")
         }
-        p.unusedTypes foreach { t =>
+        p.unusedTypes.foreach { t =>
           val sym = t.symbol
           val why = if (sym.isPrivate) "private" else "local"
           reporter.warning(t.pos,
@@ -609,7 +610,7 @@ trait TypeDiagnostics { self: Analyzer =>
       @inline def updateExpr[A](fn: Tree)(f: => A) = {
         if (fn.symbol != null && fn.symbol.isMethod &&
             !fn.symbol.isConstructor) {
-          exprStack push fn.symbol
+          exprStack.push(fn.symbol)
           try f
           finally exprStack.pop()
         } else f
@@ -695,10 +696,10 @@ trait TypeDiagnostics { self: Analyzer =>
               case Import(expr, _) => expr.pos
               case _ => ex.pos
             }
-            context0.error(
-              pos,
-              cyclicReferenceMessage(sym, info.tree) getOrElse ex.getMessage(
-                ))
+            context0.error(pos,
+                           cyclicReferenceMessage(sym, info.tree).getOrElse(
+                             ex.getMessage(
+                               )))
 
             if (sym == ObjectClass)
               throw new FatalError("cannot redefine root " + sym)

@@ -86,12 +86,13 @@ trait SimpleInjector extends Injector {
     /**
       * Vend an instance
       */
-    implicit def vend: T = make openOr default.is.apply()
+    implicit def vend: T = make.openOr(default.is.apply())
 
     /**
       * Make a Box of the instance.
       */
-    override implicit def make: Box[T] = super.make or Full(default.is.apply())
+    override implicit def make: Box[T] =
+      super.make.or(Full(default.is.apply()))
   }
 }
 
@@ -192,7 +193,7 @@ class MakerStack[T](subMakers: PValueHolder[Maker[T]]*)
     extends StackableMaker[T] {
   private val _sub: List[PValueHolder[Maker[T]]] = subMakers.toList
 
-  override implicit def make: Box[T] = super.make or find(_sub)
+  override implicit def make: Box[T] = super.make.or(find(_sub))
 }
 
 /**

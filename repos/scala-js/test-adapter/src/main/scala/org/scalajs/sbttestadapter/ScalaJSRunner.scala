@@ -164,14 +164,16 @@ final class ScalaJSRunner private[testadapter] (
       yield
         Try {
           ComUtils.receiveLoop(slave, deadline)(
-            msgHandler(slave) orElse ComUtils.doneHandler)
+            msgHandler(slave).orElse(ComUtils.doneHandler))
           slave.close()
         }
 
     // Return the first failed of all these Try's
-    (stopMessagesSent ++ slavesClosed) collectFirst {
-      case failure: Failure[Unit] => failure
-    } getOrElse Success(())
+    ((stopMessagesSent ++ slavesClosed))
+      .collectFirst {
+        case failure: Failure[Unit] => failure
+      }
+      .getOrElse(Success(()))
   }
 
   private def createSlave(): ComJSRunner = {
@@ -184,7 +186,7 @@ final class ScalaJSRunner private[testadapter] (
 
     // Create a runner on the slave
     slave.send("newRunner")
-    ComUtils.receiveLoop(slave)(msgHandler(slave) orElse ComUtils.doneHandler)
+    ComUtils.receiveLoop(slave)(msgHandler(slave).orElse(ComUtils.doneHandler))
 
     slave
   }

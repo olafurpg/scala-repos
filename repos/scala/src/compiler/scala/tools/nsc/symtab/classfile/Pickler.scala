@@ -37,21 +37,21 @@ abstract class Pickler extends SubComponent {
         def add(sym: Symbol, pickle: Pickle) = {
           if (currentRun.compiles(sym) && !currentRun.symData.contains(sym)) {
             debuglog("pickling " + sym)
-            pickle putSymbol sym
+            pickle.putSymbol(sym)
             currentRun.symData(sym) = pickle
           }
         }
 
         tree match {
           case PackageDef(_, stats) =>
-            stats foreach pickle
+            stats.foreach(pickle)
           case ClassDef(_, _, _, _) | ModuleDef(_, _, _) =>
             val sym = tree.symbol
             val pickle = new Pickle(sym)
             add(sym, pickle)
             add(sym.companionSymbol, pickle)
             pickle.writeArray()
-            currentRun registerPickle sym
+            currentRun.registerPickle(sym)
           case _ =>
         }
       }
@@ -183,7 +183,7 @@ abstract class Pickler extends SubComponent {
           if (sym.hasSelfType) putType(sym.typeOfThis)
           putSymbol(sym.alias)
           if (!sym.children.isEmpty) {
-            val (locals, globals) = sym.children partition (_.isLocalClass)
+            val (locals, globals) = sym.children.partition(_.isLocalClass)
             val children =
               if (locals.isEmpty) globals
               else {
@@ -202,10 +202,11 @@ abstract class Pickler extends SubComponent {
                                                pos = sym.pos)
               }
 
-            putChildren(sym, children.toList sortBy (_.sealedSortName))
+            putChildren(sym, children.toList.sortBy(_.sealedSortName))
           }
-          for (annot <- (sym.annotations filter (ann =>
-                                                   ann.isStatic && !ann.isErroneous)).reverse)
+          for (annot <- (sym.annotations
+                 .filter(ann => ann.isStatic && !ann.isErroneous))
+                 .reverse)
             putAnnotation(sym, annot)
         } else if (sym != NoSymbol) {
           putEntry(if (sym.isModuleClass) sym.name.toTermName else sym.name)
@@ -215,7 +216,7 @@ abstract class Pickler extends SubComponent {
     }
 
     private def putSymbols(syms: List[Symbol]) =
-      syms foreach putSymbol
+      syms.foreach(putSymbol)
 
     /** Store type and everything it refers to in map index.
       */
@@ -257,12 +258,12 @@ abstract class Pickler extends SubComponent {
           putSymbols(tparams)
         case AnnotatedType(_, underlying) =>
           putType(underlying)
-          tp.staticAnnotations foreach putAnnotation
+          tp.staticAnnotations.foreach(putAnnotation)
         case _ =>
           throw new FatalError("bad type: " + tp + "(" + tp.getClass + ")")
       }
     }
-    private def putTypes(tps: List[Type]) { tps foreach putType }
+    private def putTypes(tps: List[Type]) { tps.foreach(putType) }
 
     private object putTreeTraverser extends Traverser {
       // Only used when pickling trees, i.e. in an argument of some Annotation
@@ -281,7 +282,7 @@ abstract class Pickler extends SubComponent {
       }
     }
     private def putTree(tree: Tree) {
-      if (putEntry(tree)) putTreeTraverser put tree
+      if (putEntry(tree)) putTreeTraverser.put(tree)
     }
 
     /** Store a constant in map index, along with anything it references.
@@ -296,7 +297,7 @@ abstract class Pickler extends SubComponent {
 
     private def putChildren(sym: Symbol, children: List[Symbol]) {
       putEntry(sym -> children)
-      children foreach putSymbol
+      children.foreach(putSymbol)
     }
 
     /** used in putSymbol only, i.e. annotations on definitions, not on types */
@@ -322,14 +323,14 @@ abstract class Pickler extends SubComponent {
         (carg: @unchecked) match {
           case LiteralAnnotArg(const) => putConstant(const)
           case ArrayAnnotArg(args) =>
-            if (putEntry(carg)) args foreach putClassfileAnnotArg
+            if (putEntry(carg)) args.foreach(putClassfileAnnotArg)
           case NestedAnnotArg(annInfo) => putAnnotation(annInfo)
         }
       }
       val AnnotationInfo(tpe, args, assocs) = annot
       putType(tpe)
-      args foreach putAnnotArg
-      assocs foreach { asc =>
+      args.foreach(putAnnotArg)
+      assocs.foreach { asc =>
         putEntry(asc._1)
         putClassfileAnnotArg(asc._2)
       }
@@ -342,7 +343,7 @@ abstract class Pickler extends SubComponent {
     private def writeRef(ref: AnyRef) {
       writeNat(index(deskolemizeTypeSymbols(ref)))
     }
-    private def writeRefs(refs: List[AnyRef]): Unit = refs foreach writeRef
+    private def writeRefs(refs: List[AnyRef]): Unit = refs.foreach(writeRef)
 
     private def writeRefsWithLength(refs: List[AnyRef]) {
       writeNat(refs.length)
@@ -378,8 +379,8 @@ abstract class Pickler extends SubComponent {
       }
 
       writeRef(annot.atp)
-      annot.args foreach writeAnnotArg
-      annot.assocs foreach { asc =>
+      annot.args.foreach(writeAnnotArg)
+      annot.assocs.foreach { asc =>
         writeRef(asc._1)
         writeClassfileAnnotArg(asc._2)
       }
@@ -475,7 +476,7 @@ abstract class Pickler extends SubComponent {
 
       def writeTreeBody(tree: Tree) {
         writeNat(picklerSubTag(tree))
-        if (!tree.isEmpty) writeTreeBodyTraverser traverse tree
+        if (!tree.isEmpty) writeTreeBodyTraverser.traverse(tree)
       }
 
       def writeConstant(c: Constant): Unit = c.tag match {
@@ -514,7 +515,7 @@ abstract class Pickler extends SubComponent {
         case mods: Modifiers => writeModifiers(mods)
         case annot: AnnotationInfo => writeAnnotation(annot)
         case (target: Symbol, other) => writeSymbolTuple(target, other)
-        case ArrayAnnotArg(args) => args foreach writeClassfileAnnotArg
+        case ArrayAnnotArg(args) => args.foreach(writeClassfileAnnotArg)
         case _ =>
           devWarning(
             s"Unexpected entry to pickler ${shortClassOfInstance(entry)} $entry")
@@ -542,7 +543,7 @@ abstract class Pickler extends SubComponent {
       writeNat(MinorVersion)
       writeNat(ep)
 
-      entries take ep foreach writeEntry
+      entries.take(ep).foreach(writeEntry)
     }
 
     override def toString = "" + rootName + " in " + rootOwner

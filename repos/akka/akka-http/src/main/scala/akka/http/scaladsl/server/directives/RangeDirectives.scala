@@ -73,7 +73,7 @@ trait RangeDirectives {
         iRanges.foldLeft(Seq.empty[IndexRange]) { (acc, iRange) ⇒
           val (mergeCandidates, otherCandidates) =
             acc.partition(_.distance(iRange) <= rangeCoalescingThreshold)
-          val merged = mergeCandidates.foldLeft(iRange)(_ mergeWith _)
+          val merged = mergeCandidates.foldLeft(iRange)(_.mergeWith(_))
           otherCandidates :+ merged
         }
 
@@ -99,7 +99,7 @@ trait RangeDirectives {
               HttpEntity(entity.contentType, range.length, bytes))
             Source.single(part)
           case n ⇒
-            Source fromGraph GraphDSL.create() { implicit b ⇒
+            Source.fromGraph(GraphDSL.create() { implicit b ⇒
               import GraphDSL.Implicits._
               val bcast = b.add(Broadcast[ByteString](n))
               val merge = b.add(Concat[Multipart.ByteRanges.BodyPart](n))
@@ -118,7 +118,7 @@ trait RangeDirectives {
               }
               entity.dataBytes ~> bcast
               SourceShape(merge.out)
-            }
+            })
         }
         Multipart.ByteRanges(source)
       }

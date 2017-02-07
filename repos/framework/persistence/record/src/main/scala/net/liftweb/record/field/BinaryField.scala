@@ -40,7 +40,7 @@ trait BinaryTypedField extends TypedField[Array[Byte]] {
 
   def toForm: Box[NodeSeq] = Empty
 
-  def asJs = valueBox.map(v => Str(hexEncode(v))) openOr JsNull
+  def asJs = valueBox.map(v => Str(hexEncode(v))).openOr(JsNull)
 
   def asJValue: JValue = asJString(base64Encode _)
   def setFromJValue(jvalue: JValue) =

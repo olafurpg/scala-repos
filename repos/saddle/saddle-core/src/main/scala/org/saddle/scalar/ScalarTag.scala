@@ -60,7 +60,7 @@ trait ScalarTag[@spec(Boolean, Int, Long, Float, Double) T]
     case _ => false
   }
 
-  override def toString = "ScalarTag[%s]" format runtimeClass
+  override def toString = "ScalarTag[%s]".format(runtimeClass)
 
   override def erasure = runtimeClass
 

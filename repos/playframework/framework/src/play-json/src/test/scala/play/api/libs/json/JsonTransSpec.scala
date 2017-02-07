@@ -81,13 +81,19 @@ object JsonTransSpec extends Specification {
     "pick a branch and update its content" in {
       js.transform(
           (__ \ 'field3).json.pickBranch(
-            (__ \ 'field32).json.update(
-              Reads.of[JsNumber].map { case JsNumber(nb) => JsNumber(nb + 12) }
-            ) andThen (__ \ 'field31).json.update(
-              Reads.of[JsString].map {
-                case JsString(s) => JsString(s + "toto")
-              }
-            )
+            (__ \ 'field32).json
+              .update(
+                Reads.of[JsNumber].map {
+                  case JsNumber(nb) => JsNumber(nb + 12)
+                }
+              )
+              .andThen(__ \ 'field31)
+              .json
+              .update(
+                Reads.of[JsString].map {
+                  case JsString(s) => JsString(s + "toto")
+                }
+              )
           )
         )
         .get must beEqualTo(
@@ -154,9 +160,13 @@ object JsonTransSpec extends Specification {
 
     "copy the full json and update a 2nd-level path and then prune a subbranch" in {
       js.validate(
-          (__ \ 'field3 \ 'field32).json.update(
-            Reads.of[JsNumber].map { case JsNumber(nb) => JsNumber(nb + 5) }
-          ) andThen (__ \ 'field4).json.prune
+          (__ \ 'field3 \ 'field32).json
+            .update(
+              Reads.of[JsNumber].map { case JsNumber(nb) => JsNumber(nb + 5) }
+            )
+            .andThen(__ \ 'field4)
+            .json
+            .prune
         )
         .get must beEqualTo(
         Json.obj(
@@ -173,9 +183,12 @@ object JsonTransSpec extends Specification {
     "deepMerge when reducing JsObjects" in {
       val json = Json.obj("somekey1" -> 11, "somekey2" -> 22)
       val jsonTransform =
-        ((__ \ "key1" \ "sk1").json.copyFrom((__ \ "somekey1").json.pick) and
-          (__ \ "key1" \ "sk2").json
-            .copyFrom((__ \ "somekey2").json.pick)).reduce
+        ((__ \ "key1" \ "sk1").json
+          .copyFrom((__ \ "somekey1").json.pick)
+          .and(__ \ "key1" \ "sk2")
+          .json
+          .copyFrom((__ \ "somekey2").json.pick))
+          .reduce
 
       json.validate(jsonTransform).get must beEqualTo(
         Json.obj("key1" -> Json.obj("sk1" -> 11, "sk2" -> 22))

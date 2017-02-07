@@ -112,7 +112,7 @@ object FutureCache {
     */
   def default[K, V](fn: K => Future[V],
                     cache: FutureCache[K, V]): K => Future[V] =
-    AsyncMemoize(fn, new EvictingCache(cache)) andThen { f: Future[V] =>
+    AsyncMemoize(fn, new EvictingCache(cache)).andThen { f: Future[V] =>
       f.interruptible()
     }
 

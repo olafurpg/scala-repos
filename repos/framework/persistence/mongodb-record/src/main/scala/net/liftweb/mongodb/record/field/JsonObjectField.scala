@@ -46,7 +46,7 @@ abstract class JsonObjectField[OwnerType <: BsonRecord[OwnerType],
   override def toForm: Box[NodeSeq] = Empty // FIXME
 
   /** Encode the field value into a JValue */
-  def asJValue: JValue = valueBox.map(_.asJObject) openOr (JNothing: JValue)
+  def asJValue: JValue = valueBox.map(_.asJObject).openOr(JNothing: JValue)
 
   /*
    * Decode the JValue and set the field to the decoded value.

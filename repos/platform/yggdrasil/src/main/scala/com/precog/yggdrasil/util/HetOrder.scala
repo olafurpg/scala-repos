@@ -82,11 +82,11 @@ object ExtraOrders {
 
   implicit object StringOrder extends Order[String] {
     def eqv(a: String, b: String) = a == b
-    def compare(a: String, b: String) = a compareTo b
+    def compare(a: String, b: String) = a.compareTo(b)
   }
 
   implicit object DateTimeOrder extends Order[DateTime] {
     def eqv(a: DateTime, b: DateTime) = compare(a, b) == 0
-    def compare(a: DateTime, b: DateTime) = a compareTo b
+    def compare(a: DateTime, b: DateTime) = a.compareTo(b)
   }
 }

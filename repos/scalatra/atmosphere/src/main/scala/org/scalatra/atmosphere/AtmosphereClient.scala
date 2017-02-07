@@ -13,13 +13,13 @@ import scala.concurrent.ExecutionContext
 
 object AtmosphereClient {
   def lookupAll(): Seq[ScalatraBroadcaster] = {
-    BroadcasterFactory.getDefault.lookupAll().asScala.toSeq collect {
+    BroadcasterFactory.getDefault.lookupAll().asScala.toSeq.collect {
       case b: ScalatraBroadcaster => b
     }
   }
 
   def lookup(path: String): Option[ScalatraBroadcaster] = {
-    val pth = path.blankOption getOrElse "/*"
+    val pth = path.blankOption.getOrElse("/*")
     val norm =
       if (!pth.endsWith("/*")) {
         if (!pth.endsWith("/")) pth + "/*" else "*"
@@ -36,14 +36,14 @@ object AtmosphereClient {
                 message: OutboundMessage,
                 filter: ClientFilter = new Everyone)(
       implicit executionContext: ExecutionContext) = {
-    lookup(path) foreach { _.broadcast(message, filter) }
+    lookup(path).foreach { _.broadcast(message, filter) }
   }
 
   def broadcastAll(message: OutboundMessage,
                    filter: ClientFilter = new Everyone)(
       implicit executionContext: ExecutionContext) = {
-    lookupAll() foreach {
-      _ broadcast (message, filter)
+    lookupAll().foreach {
+      _.broadcast(message, filter)
     }
   }
 }
@@ -65,7 +65,7 @@ trait AtmosphereClient extends AtmosphereClientFilters {
     resource.getBroadcaster.asInstanceOf[ScalatraBroadcaster]
 
   protected def requestUri = {
-    val u = resource.getRequest.getRequestURI.blankOption getOrElse "/"
+    val u = resource.getRequest.getRequestURI.blankOption.getOrElse("/")
     if (u.endsWith("/")) u + "*" else u + "/*"
   }
 

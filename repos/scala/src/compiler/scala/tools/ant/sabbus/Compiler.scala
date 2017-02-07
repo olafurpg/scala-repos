@@ -15,9 +15,9 @@ import scala.reflect.internal.util.ScalaClassLoader
 
 class Compiler(classpath: Array[URL], val settings: Settings) {
   val foreignCompilerName: String = "scala.tools.ant.sabbus.ForeignCompiler"
-  private lazy val classLoader = ScalaClassLoader fromURLs classpath
+  private lazy val classLoader = ScalaClassLoader.fromURLs(classpath)
   private lazy val foreignCompiler: AnyRef =
-    classLoader create foreignCompilerName
+    classLoader.create(foreignCompilerName)
 
   private def settingsArray: Array[String] = settings.toArgs.toArray
   foreignInvoke("args_$eq",

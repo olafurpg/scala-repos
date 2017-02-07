@@ -51,7 +51,7 @@ object Deadline
     * strictest deadline and the latest observation.
     */
   def combined(d1: Deadline, d2: Deadline): Deadline =
-    Deadline(d1.timestamp max d2.timestamp, d1.deadline min d2.deadline)
+    Deadline(d1.timestamp.max(d2.timestamp), d1.deadline min d2.deadline)
 
   def marshal(deadline: Deadline): Buf = {
     val bytes = new Array[Byte](16)

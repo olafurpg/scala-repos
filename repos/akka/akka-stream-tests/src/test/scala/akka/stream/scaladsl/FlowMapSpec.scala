@@ -20,11 +20,11 @@ class FlowMapSpec extends AkkaSpec with ScriptedTest {
 
     "map" in {
       def script =
-        Script(TestConfig.RandomTestRange map { _ ⇒
+        Script(TestConfig.RandomTestRange.map { _ ⇒
           val x = random.nextInt(); Seq(x) -> Seq(x.toString)
         }: _*)
-      TestConfig.RandomTestRange foreach
-        (_ ⇒ runScript(script, settings)(_.map(_.toString)))
+      TestConfig.RandomTestRange.foreach(_ ⇒
+        runScript(script, settings)(_.map(_.toString)))
     }
 
     "not blow up with high request counts" in {

@@ -273,7 +273,7 @@ object Console {
     *  @param args the arguments used to instantiating the pattern.
     *  @throws java.lang.IllegalArgumentException if there was a problem with the format string or arguments
     */
-  def printf(text: String, args: Any*) { out.print(text format (args: _*)) }
+  def printf(text: String, args: Any*) { out.print(text.format(args: _*)) }
 
   /** Read a full line from the default input.  Returns `null` if the end of the
     * input stream has been reached.
@@ -353,7 +353,7 @@ object Console {
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
-    else s charAt 0
+    else s.charAt(0)
   }
 
   /** Reads an int value from an entire line of the default input.

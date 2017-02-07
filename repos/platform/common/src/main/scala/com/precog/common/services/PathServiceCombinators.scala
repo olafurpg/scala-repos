@@ -54,7 +54,7 @@ trait PathServiceCombinators
 
           val path: Option[String] =
             request.parameters.get('prefixPath).filter(_ != null)
-          next.service(request) map { f => (b: B) =>
+          next.service(request).map { f => (b: B) =>
             f(b, Path(path.getOrElse("")))
           }
         }

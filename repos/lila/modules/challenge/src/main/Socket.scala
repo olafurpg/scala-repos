@@ -22,8 +22,8 @@ private final class Socket(challengeId: String,
   def receiveSpecific = {
 
     case Socket.Reload =>
-      getChallenge(challengeId) foreach {
-        _ foreach { challenge =>
+      getChallenge(challengeId).foreach {
+        _.foreach { challenge =>
           notifyVersion("reload", JsNull, ())
         }
       }
@@ -32,7 +32,7 @@ private final class Socket(challengeId: String,
       ping(uid)
       timeBomb.delay
       withMember(uid) { m =>
-        history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+        history.since(v).fold(resync(m))(_.foreach(sendMessage(m)))
       }
     }
 

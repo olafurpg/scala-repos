@@ -14,7 +14,7 @@ object Test extends CompilerTest {
     "class Hzz { }            "
   )
   def check(source: String, unit: CompilationUnit) {
-    unit.body foreach {
+    unit.body.foreach {
       case cdef: ClassDef =>
         println("%-15s class %s".format(cdef.pos.show, cdef.name))
       case _ =>

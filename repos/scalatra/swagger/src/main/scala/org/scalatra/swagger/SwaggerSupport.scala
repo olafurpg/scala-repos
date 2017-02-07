@@ -62,7 +62,7 @@ object SwaggerSupportSyntax {
 
       private def tokens: Parser[Builder => Builder] = rep(token) ^^ {
         tokens =>
-          tokens reduceLeft ((acc, fun) => builder => fun(acc(builder)))
+          tokens.reduceLeft((acc, fun) => builder => fun(acc(builder)))
       }
 
       private def token: Parser[Builder => Builder] =
@@ -76,22 +76,22 @@ object SwaggerSupportSyntax {
         ("." | "/") ~ "?:" ~ """\w+""".r ~ "?" ^^ {
           case p ~ "?:" ~ o ~ "?" =>
             builder =>
-              builder addPrefixedOptional (o, p)
+              builder.addPrefixedOptional(o, p)
         }
 
       private def optional: Parser[Builder => Builder] =
         "?:" ~> """\w+""".r <~ "?" ^^ { str => builder =>
-          builder addOptional str
+          builder.addOptional(str)
         }
 
       private def named: Parser[Builder => Builder] =
         ":" ~> """\w+""".r ^^ { str => builder =>
-          builder addNamed str
+          builder.addNamed(str)
         }
 
       private def literal: Parser[Builder => Builder] =
         ("""[\.\+\(\)\$]""".r | ".".r) ^^ { str => builder =>
-          builder addLiteral str
+          builder.addLiteral(str)
         }
     }
   }
@@ -122,7 +122,7 @@ object SwaggerSupportSyntax {
 
       private def tokens: Parser[Builder => Builder] = rep(token) ^^ {
         tokens =>
-          tokens reduceLeft ((acc, fun) => builder => fun(acc(builder)))
+          tokens.reduceLeft((acc, fun) => builder => fun(acc(builder)))
       }
 
       //private def token = param | glob | optional | static
@@ -131,22 +131,22 @@ object SwaggerSupportSyntax {
 
       private def param: Parser[Builder => Builder] =
         ":" ~> identifier ^^ { str => builder =>
-          builder addParam str
+          builder.addParam(str)
         }
 
       private def glob: Parser[Builder => Builder] =
         "*" ~> identifier ^^ { str => builder =>
-          builder addParam str
+          builder.addParam(str)
         }
 
       private def optional: Parser[Builder => Builder] =
         "(" ~> tokens <~ ")" ^^ { subBuilder => builder =>
-          builder optional subBuilder
+          builder.optional(subBuilder)
         }
 
       private def static: Parser[Builder => Builder] =
         (escaped | char) ^^ { str => builder =>
-          builder addStatic str
+          builder.addStatic(str)
         }
 
       private def identifier = """[a-zA-Z_]\w*""".r
@@ -428,19 +428,21 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
           val registrations =
             servletContext.getFilterRegistrations.asScala.values
           val registration =
-            registrations.find(_.getClassName == getClass.getName) getOrElse throwAFit
-          registration.getServletNameMappings.asScala foreach { name =>
-            Option(servletContext.getServletRegistration(name)) foreach {
+            registrations
+              .find(_.getClassName == getClass.getName)
+              .getOrElse(throwAFit)
+          registration.getServletNameMappings.asScala.foreach { name =>
+            Option(servletContext.getServletRegistration(name)).foreach {
               reg =>
-                reg.getMappings.asScala foreach registerInSwagger
+                reg.getMappings.asScala.foreach(registerInSwagger)
             }
           }
 
         case _: Servlet =>
           val registration =
-            ScalatraBase.getServletRegistration(this) getOrElse throwAFit
+            ScalatraBase.getServletRegistration(this).getOrElse(throwAFit)
           //          println("Registering for mappings: " + registration.getMappings().asScala.mkString("[", ", ", "]"))
-          registration.getMappings.asScala foreach registerInSwagger
+          registration.getMappings.asScala.foreach(registerInSwagger)
 
         case _ =>
           throw new RuntimeException(
@@ -476,7 +478,7 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
     * @tparam T the class of the model to register
     */
   protected def registerModel[T: Manifest: NotNothing]() {
-    Swagger.collectModels[T](_models.values.toSet) map registerModel
+    Swagger.collectModels[T](_models.values.toSet).map(registerModel)
   }
 
   @deprecated(
@@ -493,7 +495,7 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
   private[swagger] var _description: PartialFunction[String, String] =
     Map.empty
   protected def description(f: PartialFunction[String, String]) =
-    _description = f orElse _description
+    _description = f.orElse(_description)
 
   @deprecated(
     "Use the `apiOperation.summary` and `operation` methods to build swagger descriptions of endpoints",
@@ -556,7 +558,7 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
       sys.error(
         "An Option needs to have a type for swagger parameter [" +
           name + "].")
-    Swagger.collectModels(st, models.values.toSet) map registerModel
+    Swagger.collectModels(st, models.values.toSet).map(registerModel)
     val dt =
       if (liftCollection && (st.isCollection || st.isOption))
         DataType.fromScalaType(st.typeArgs.head)
@@ -566,7 +568,7 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
     if (st.isOption) b.optional
     if (st.isCollection) b.multiValued
 
-    Swagger.modelToSwagger[T] foreach { m =>
+    Swagger.modelToSwagger[T].foreach { m =>
       b.description(m.description)
     }
     b
@@ -620,13 +622,15 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
 
   protected def inferSwaggerEndpoint(route: Route): String = route match {
     case rev if rev.isReversible =>
-      rev.routeMatchers collectFirst {
-        case sin: SinatraRouteMatcher =>
-          new SinatraSwaggerGenerator(sin).toSwaggerPath
-        case rails: RailsRouteMatcher =>
-          new RailsSwaggerGenerator(rails).toSwaggerPath
-        case path: PathPatternRouteMatcher => path.toString
-      } getOrElse ""
+      rev.routeMatchers
+        .collectFirst {
+          case sin: SinatraRouteMatcher =>
+            new SinatraSwaggerGenerator(sin).toSwaggerPath
+          case rails: RailsRouteMatcher =>
+            new RailsSwaggerGenerator(rails).toSwaggerPath
+          case path: PathPatternRouteMatcher => path.toString
+        }
+        .getOrElse("")
     case _ => ""
   }
 
@@ -635,8 +639,10 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
     for {
       (method, routes) ← routes.methodRoutes
       route ← routes if (route.metadata.keySet & Symbols.AllSymbols).nonEmpty
-      endpoint = route.metadata.get(Symbols.Endpoint) map
-        (_.asInstanceOf[String]) getOrElse inferSwaggerEndpoint(route)
+      endpoint = route.metadata
+        .get(Symbols.Endpoint)
+        .map(_.asInstanceOf[String])
+        .getOrElse(inferSwaggerEndpoint(route))
       operation = extract(route, method)
     } yield Entry(endpoint, operation)
 }
@@ -656,25 +662,29 @@ trait SwaggerSupport
   protected def apiOperation[T: Manifest: NotNothing](
       nickname: String): OperationBuilder = {
     registerModel[T]()
-    (new OperationBuilder(DataType[T]) nickname nickname)
+    (new OperationBuilder(DataType[T]).nickname(nickname))
   }
   protected def apiOperation(nickname: String,
                              model: Model): OperationBuilder = {
     registerModel(model)
-    (new OperationBuilder(ValueDataType(model.id)) nickname nickname)
+    (new OperationBuilder(ValueDataType(model.id)).nickname(nickname))
   }
 
   /**
     * Builds the documentation for all the endpoints discovered in an API.
     */
   def endpoints(basePath: String): List[Endpoint] = {
-    (swaggerEndpointEntries(extractOperation) groupBy (_.key)).toList map {
-      case (name, entries) ⇒
-        val desc = _description lift name getOrElse ""
-        val pth = if (basePath endsWith "/") basePath else basePath + "/"
-        val nm = if (name startsWith "/") name.substring(1) else name
-        new Endpoint(pth + nm, desc.blankOption, entries.toList map (_.value))
-    } sortBy (_.path)
+    (swaggerEndpointEntries(extractOperation)
+      .groupBy(_.key))
+      .toList
+      .map {
+        case (name, entries) ⇒
+          val desc = _description.lift(name).getOrElse("")
+          val pth = if (basePath.endsWith("/")) basePath else basePath + "/"
+          val nm = if (name.startsWith("/")) name.substring(1) else name
+          new Endpoint(pth + nm, desc.blankOption, entries.toList.map(_.value))
+      }
+      .sortBy(_.path)
   }
 
   /**
@@ -683,27 +693,41 @@ trait SwaggerSupport
     */
   protected def extractOperation(route: Route, method: HttpMethod): Operation = {
     val op =
-      route.metadata.get(Symbols.Operation) map (_.asInstanceOf[Operation])
-    op map (_.copy(method = method)) getOrElse {
+      route.metadata.get(Symbols.Operation).map(_.asInstanceOf[Operation])
+    op.map(_.copy(method = method)).getOrElse {
       val theParams =
-        route.metadata.get(Symbols.Parameters) map
-          (_.asInstanceOf[List[Parameter]]) getOrElse Nil
+        route.metadata
+          .get(Symbols.Parameters)
+          .map(_.asInstanceOf[List[Parameter]])
+          .getOrElse(Nil)
       val errors =
-        route.metadata.get(Symbols.Errors) map
-          (_.asInstanceOf[List[ResponseMessage[_]]]) getOrElse Nil
+        route.metadata
+          .get(Symbols.Errors)
+          .map(_.asInstanceOf[List[ResponseMessage[_]]])
+          .getOrElse(Nil)
       val responseClass =
-        route.metadata.get(Symbols.ResponseClass) map
-          (_.asInstanceOf[DataType]) getOrElse DataType.Void
-      val summary = (route.metadata.get(Symbols.Summary) map
-        (_.asInstanceOf[String])).orNull
+        route.metadata
+          .get(Symbols.ResponseClass)
+          .map(_.asInstanceOf[DataType])
+          .getOrElse(DataType.Void)
+      val summary = (route.metadata
+        .get(Symbols.Summary)
+        .map(_.asInstanceOf[String]))
+        .orNull
       val notes =
-        route.metadata.get(Symbols.Notes) map (_.asInstanceOf[String])
+        route.metadata.get(Symbols.Notes).map(_.asInstanceOf[String])
       val nick =
-        route.metadata.get(Symbols.Nickname) map (_.asInstanceOf[String])
+        route.metadata.get(Symbols.Nickname).map(_.asInstanceOf[String])
       val produces =
-        route.metadata.get(Symbols.Produces) map (_.asInstanceOf[List[String]]) getOrElse Nil
+        route.metadata
+          .get(Symbols.Produces)
+          .map(_.asInstanceOf[List[String]])
+          .getOrElse(Nil)
       val consumes =
-        route.metadata.get(Symbols.Consumes) map (_.asInstanceOf[List[String]]) getOrElse Nil
+        route.metadata
+          .get(Symbols.Consumes)
+          .map(_.asInstanceOf[List[String]])
+          .getOrElse(Nil)
       Operation(
         method = method,
         responseClass = responseClass,

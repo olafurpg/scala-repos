@@ -16,8 +16,8 @@ private final class ApplePush(getDevice: String => Fu[Option[Device]],
     system.actorOf(Props(classOf[ApnsActor], certificate, password))
 
   def apply(userId: String)(data: => PushApi.Data): Funit =
-    getDevice(userId) map {
-      _ foreach { device =>
+    getDevice(userId).map {
+      _.foreach { device =>
         if (enabled)
           actor ! ApplePush.Notification(
             token = device.deviceId,
@@ -41,7 +41,7 @@ private final class ApnsActor(certificate: InputStream, password: String)
 
   var manager: PushManager[SimpleApnsPushNotification] = _
 
-  def getManager = Option(manager) getOrElse {
+  def getManager = Option(manager).getOrElse {
     val m = new PushManager[SimpleApnsPushNotification](
       ApnsEnvironment.getSandboxEnvironment(),
       SSLContextUtil.createDefaultSSLContext(certificate, password),

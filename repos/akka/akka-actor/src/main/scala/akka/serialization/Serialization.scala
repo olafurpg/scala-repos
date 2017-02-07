@@ -37,7 +37,7 @@ object Serialization {
 
     private final def configToMap(path: String): Map[String, String] = {
       import scala.collection.JavaConverters._
-      config.getConfig(path).root.unwrapped.asScala.toMap map {
+      config.getConfig(path).root.unwrapped.asScala.toMap.map {
         case (k, v) ⇒ (k -> v.toString)
       }
     }
@@ -186,13 +186,15 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
         def unique(
             possibilities: immutable.Seq[(Class[_], Serializer)]): Boolean =
           possibilities.size == 1 ||
-            (possibilities forall (_._1 isAssignableFrom possibilities(0)._1)) ||
-            (possibilities forall (_._2 == possibilities(0)._2))
+            (possibilities
+              .forall(_._1.isAssignableFrom(possibilities(0)._1))) ||
+            (possibilities.forall(_._2 == possibilities(0)._2))
 
-        val ser = bindings filter { _._1 isAssignableFrom clazz } match {
+        val ser = bindings.filter { _._1.isAssignableFrom(clazz) } match {
           case Seq() ⇒
             throw new NotSerializableException(
-              "No configured serialization-bindings for class [%s]" format clazz.getName)
+              "No configured serialization-bindings for class [%s]".format(
+                clazz.getName))
           case possibilities ⇒
             if (!unique(possibilities))
               log.warning(
@@ -224,12 +226,15 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
     * loading is performed by the system’s [[akka.actor.DynamicAccess]].
     */
   def serializerOf(serializerFQN: String): Try[Serializer] =
-    system.dynamicAccess.createInstanceFor[Serializer](
-      serializerFQN,
-      List(classOf[ExtendedActorSystem] -> system)) recoverWith {
-      case _: NoSuchMethodException ⇒
-        system.dynamicAccess.createInstanceFor[Serializer](serializerFQN, Nil)
-    }
+    system.dynamicAccess
+      .createInstanceFor[Serializer](
+        serializerFQN,
+        List(classOf[ExtendedActorSystem] -> system))
+      .recoverWith {
+        case _: NoSuchMethodException ⇒
+          system.dynamicAccess
+            .createInstanceFor[Serializer](serializerFQN, Nil)
+      }
 
   /**
     * A Map of serializer from alias to implementation (class implementing akka.serialization.Serializer)
@@ -265,8 +270,8 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
   private def sort(
       in: Iterable[ClassSerializer]): immutable.Seq[ClassSerializer] =
     ((new ArrayBuffer[ClassSerializer](in.size) /: in) { (buf, ca) ⇒
-      buf.indexWhere(_._1 isAssignableFrom ca._1) match {
-        case -1 ⇒ buf append ca
+      buf.indexWhere(_._1.isAssignableFrom(ca._1)) match {
+        case -1 ⇒ buf.append(ca)
         case x ⇒ buf insert (x, ca)
       }
       buf
@@ -285,7 +290,7 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
     * Maps from a Serializer Identity (Int) to a Serializer instance (optimization)
     */
   val serializerByIdentity: Map[Int, Serializer] =
-    Map(NullSerializer.identifier -> NullSerializer) ++ serializers map {
+    (Map(NullSerializer.identifier -> NullSerializer) ++ serializers).map {
       case (_, v) ⇒ (v.identifier, v)
     }
 

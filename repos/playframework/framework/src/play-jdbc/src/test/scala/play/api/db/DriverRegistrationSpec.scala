@@ -16,7 +16,7 @@ object DriverRegistrationSpec extends Specification {
   "JDBC driver" should {
 
     "be registered for H2 before databases start" in {
-      DriverManager.getDriver("jdbc:h2:mem:") aka "H2 driver" must not(beNull)
+      DriverManager.getDriver("jdbc:h2:mem:").aka("H2 driver") must not(beNull)
     }
 
     "not be registered for Acolyte until databases are connected" in {
@@ -25,14 +25,14 @@ object DriverRegistrationSpec extends Specification {
         DriverManager.deregisterDriver(DriverManager.getDriver(jdbcUrl))
       }
 
-      DriverManager.getDriver(jdbcUrl) aka "Acolyte driver" must
+      DriverManager.getDriver(jdbcUrl).aka("Acolyte driver") must
         (throwA[SQLException](message = "No suitable driver"))
     }
 
     "be registered for both Acolyte & H2 when databases are connected" in {
       dbApi.connect()
 
-      (DriverManager.getDriver(jdbcUrl) aka "Acolyte driver" must not(beNull))
+      (DriverManager.getDriver(jdbcUrl).aka("Acolyte driver") must not(beNull))
         .and(DriverManager.getDriver("jdbc:h2:mem:").aka("H2 driver") must not(
           beNull))
     }
@@ -40,9 +40,9 @@ object DriverRegistrationSpec extends Specification {
     "be deregistered for Acolyte but still there for H2 after databases stop" in {
       dbApi.shutdown()
 
-      (DriverManager.getDriver("jdbc:h2:mem:") aka "H2 driver" must not(
+      (DriverManager.getDriver("jdbc:h2:mem:").aka("H2 driver") must not(
         beNull))
-        .and(DriverManager.getDriver(jdbcUrl) aka "Acolyte driver" must {
+        .and(DriverManager.getDriver(jdbcUrl).aka("Acolyte driver") must {
           throwA[SQLException](message = "No suitable driver")
         })
     }

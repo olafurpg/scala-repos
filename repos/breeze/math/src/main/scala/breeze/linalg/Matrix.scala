@@ -39,7 +39,7 @@ trait MatrixLike[@spec(Double, Int, Float, Long) V, +Self <: Matrix[V]]
                                           V,
                                           V2,
                                           That]): That =
-    values map fn
+    values.map(fn)
 }
 
 trait Matrix[@spec(Double, Int, Float, Long) V]

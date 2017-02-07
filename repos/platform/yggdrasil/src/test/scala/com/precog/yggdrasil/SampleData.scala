@@ -74,7 +74,7 @@ object SampleData extends CValueGenerators {
       try {
 
         SampleData(
-          data.sorted.toStream flatMap {
+          data.sorted.toStream.flatMap {
             // Sometimes the assembly process will generate overlapping values which will
             // cause RuntimeExceptions in JValue.unsafeInsert. It's easier to filter these
             // out here than prevent it from happening in the first place.

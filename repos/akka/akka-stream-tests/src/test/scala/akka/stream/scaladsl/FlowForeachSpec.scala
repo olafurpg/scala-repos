@@ -19,7 +19,7 @@ class FlowForeachSpec extends AkkaSpec {
   "A Foreach" must {
 
     "call the procedure for each element" in assertAllStagesStopped {
-      Source(1 to 3).runForeach(testActor ! _) onSuccess {
+      Source(1 to 3).runForeach(testActor ! _).onSuccess {
         case _ ⇒ testActor ! "done"
       }
       expectMsg(1)
@@ -29,7 +29,7 @@ class FlowForeachSpec extends AkkaSpec {
     }
 
     "complete the future for an empty stream" in assertAllStagesStopped {
-      Source.empty[String].runForeach(testActor ! _) onSuccess {
+      Source.empty[String].runForeach(testActor ! _).onSuccess {
         case _ ⇒ testActor ! "done"
       }
       expectMsg("done")
@@ -37,7 +37,7 @@ class FlowForeachSpec extends AkkaSpec {
 
     "yield the first error" in assertAllStagesStopped {
       val p = TestPublisher.manualProbe[Int]()
-      Source.fromPublisher(p).runForeach(testActor ! _) onFailure {
+      Source.fromPublisher(p).runForeach(testActor ! _).onFailure {
         case ex ⇒ testActor ! ex
       }
       val proc = p.expectSubscription()

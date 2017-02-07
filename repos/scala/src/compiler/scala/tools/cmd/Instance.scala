@@ -15,7 +15,7 @@ trait Instance extends Spec {
 
   protected def help(str: => String): Unit = ()
 
-  def isSet(s: String) = parsed isSet toOpt(s)
+  def isSet(s: String) = parsed.isSet(toOpt(s))
   def originalArgs = parsed.originalArgs // the full original list
   def residualArgs =
     parsed.residualArgs // only args which were not options or args to options

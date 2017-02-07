@@ -12,11 +12,11 @@ class BinaryMoveTimeTest extends Specification {
   val _0_ = "00000000"
   type MT = Int
   def write(c: Vector[MT]): List[String] =
-    (BinaryFormat.moveTime write c).showBytes.split(',').toList
+    (BinaryFormat.moveTime.write(c)).showBytes.split(',').toList
   def read(bytes: List[String]): Vector[MT] =
-    BinaryFormat.moveTime read ByteArray.parseBytes(bytes)
+    BinaryFormat.moveTime.read(ByteArray.parseBytes(bytes))
   def isomorphism(c: Vector[MT]): Vector[MT] =
-    BinaryFormat.moveTime read (BinaryFormat.moveTime write c)
+    BinaryFormat.moveTime.read(BinaryFormat.moveTime.write(c))
 
   "binary move times" should {
     "write" in {

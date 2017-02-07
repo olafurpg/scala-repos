@@ -33,14 +33,14 @@ object AttrValue {
         builder.advanceLexer()
         var patched = false
         while (VALID_ATTRIBUTE_TOKENS.contains(builder.getTokenType) || {
-                 patched = patcher parse builder; patched
+                 patched = patcher.parse(builder); patched
                }) {
           if (!patched) builder.advanceLexer() else patched = false
         }
         builder.getTokenType match {
           case ScalaXmlTokenTypes.XML_ATTRIBUTE_VALUE_END_DELIMITER =>
             builder.advanceLexer()
-          case _ => builder error ErrMsg("xml.attribute.end.expected")
+          case _ => builder.error(ErrMsg("xml.attribute.end.expected"))
         }
       case _ =>
         if (!ScalaExpr.parse(builder) && !patcher.parse(builder)) {

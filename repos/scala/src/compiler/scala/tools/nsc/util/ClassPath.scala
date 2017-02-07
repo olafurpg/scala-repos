@@ -35,11 +35,13 @@ object ClassPath {
 
     /* Get all subdirectories, jars, zips out of a directory. */
     def lsDir(dir: Directory, filt: String => Boolean = _ => true) =
-      dir.list filter (x => filt(x.name) && (x.isDirectory || isJarOrZip(x))) map
-        (_.path) toList
+      dir.list
+        .filter(x => filt(x.name) && (x.isDirectory || isJarOrZip(x)))
+        .map(_.path) toList
 
     if (pattern == "*") lsDir(Directory("."))
-    else if (pattern endsWith wildSuffix) lsDir(Directory(pattern dropRight 2))
+    else if (pattern.endsWith(wildSuffix))
+      lsDir(Directory(pattern.dropRight(2)))
     else if (pattern contains '*') {
       try {
         val regexp =
@@ -51,18 +53,18 @@ object ClassPath {
 
   /** Split classpath using platform-dependent path separator */
   def split(path: String): List[String] =
-    (path split pathSeparator).toList filterNot (_ == "") distinct
+    (path.split(pathSeparator)).toList.filterNot(_ == "") distinct
 
   /** Join classpath using platform-dependent path separator */
   def join(paths: String*): String =
-    paths filterNot (_ == "") mkString pathSeparator
+    paths.filterNot(_ == "") mkString pathSeparator
 
   /** Split the classpath, apply a transformation function, and reassemble it. */
-  def map(cp: String, f: String => String): String = join(split(cp) map f: _*)
+  def map(cp: String, f: String => String): String = join(split(cp).map(f): _*)
 
   /** Expand path and possibly expanding stars */
   def expandPath(path: String, expandStar: Boolean = true): List[String] =
-    if (expandStar) split(path) flatMap expandS
+    if (expandStar) split(path).flatMap(expandS)
     else split(path)
 
   /** Expand dir out to contents, a la extdir */
@@ -70,8 +72,9 @@ object ClassPath {
     AbstractFile getDirectory extdir match {
       case null => Nil
       case dir =>
-        dir filter (_.isClassContainer) map
-          (x => new java.io.File(dir.file, x.name) getPath) toList
+        dir
+          .filter(_.isClassContainer)
+          .map(x => new java.io.File(dir.file, x.name) getPath) toList
     }
   }
 
@@ -83,8 +86,8 @@ object ClassPath {
     if (!file.isFile) return Nil
 
     val baseDir = file.parent
-    new Jar(file).classPathElements map
-      (elem => specToURL(elem) getOrElse (baseDir / elem).toURL)
+    new Jar(file).classPathElements.map(elem =>
+      specToURL(elem).getOrElse(baseDir / elem).toURL)
   }
 
   def specToURL(spec: String): Option[URL] =
@@ -216,8 +219,8 @@ abstract class ClassPath[T] extends ClassFileLookup[T] {
   override def findClass(name: String): Option[ClassRepresentation[T]] =
     splitWhere(name, _ == '.', doDropIndex = true) match {
       case Some((pkg, rest)) =>
-        val rep = packages find (_.name == pkg) flatMap (_ findClass rest)
-        rep map {
+        val rep = (packages find (_.name == pkg)).flatMap(_ findClass rest)
+        rep.map {
           case x: ClassRepresentation[T] => x
           case x =>
             throw new FatalError(
@@ -252,7 +255,7 @@ class SourcePath[T](dir: AbstractFile, val context: ClassPathContext[T])
   import FileUtils.AbstractFileOps
 
   def name = dir.name
-  override def origin = dir.underlyingSource map (_.path)
+  override def origin = dir.underlyingSource.map(_.path)
   def asURLs = dir.toURLs()
   def asClassPathString = dir.path
   val sourcepaths: IndexedSeq[AbstractFile] = IndexedSeq(dir)
@@ -260,7 +263,7 @@ class SourcePath[T](dir: AbstractFile, val context: ClassPathContext[T])
   private def traverse() = {
     val classBuf = immutable.Vector.newBuilder[ClassRep]
     val packageBuf = immutable.Vector.newBuilder[SourcePath[T]]
-    dir foreach { f =>
+    dir.foreach { f =>
       if (!f.isDirectory && validSourceFile(f.name))
         classBuf += ClassRep(None, Some(f))
       else if (f.isDirectory && validPackage(f.name))
@@ -282,7 +285,7 @@ class DirectoryClassPath(val dir: AbstractFile,
   import FileUtils.AbstractFileOps
 
   def name = dir.name
-  override def origin = dir.underlyingSource map (_.path)
+  override def origin = dir.underlyingSource.map(_.path)
   def asURLs = dir.toURLs(default = Seq(new URL(name)))
   def asClassPathString = dir.path
   val sourcepaths: IndexedSeq[AbstractFile] = IndexedSeq()
@@ -291,7 +294,7 @@ class DirectoryClassPath(val dir: AbstractFile,
   private def traverse() = {
     val classBuf = immutable.Vector.newBuilder[ClassRep]
     val packageBuf = immutable.Vector.newBuilder[DirectoryClassPath]
-    dir foreach { f =>
+    dir.foreach { f =>
       // Optimization: We assume the file was not changed since `dir` called
       // `Path.apply` and categorized existent files as `Directory`
       // or `File`.
@@ -320,7 +323,7 @@ class DirectoryClassPath(val dir: AbstractFile,
 class DeltaClassPath[T](original: MergedClassPath[T],
                         subst: Map[ClassPath[T], ClassPath[T]])
     extends MergedClassPath[T](
-      original.entries map (e => subst getOrElse (e, e)),
+      original.entries.map(e => subst.getOrElse(e, e)),
       original.context) {
   // not sure we should require that here. Commented out for now.
   // require(subst.keySet subsetOf original.entries.toSet)
@@ -339,16 +342,16 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
     this(entries.toIndexedSeq, context)
 
   def name = entries.head.name
-  def asURLs = (entries flatMap (_.asURLs)).toList
+  def asURLs = (entries.flatMap(_.asURLs)).toList
   lazy val sourcepaths: IndexedSeq[AbstractFile] =
-    entries flatMap (_.sourcepaths)
+    entries.flatMap(_.sourcepaths)
 
   override def origin =
     Some(
-      entries map (x => x.origin getOrElse x.name) mkString
+      entries.map(x => x.origin.getOrElse(x.name)) mkString
         ("Merged(", ", ", ")"))
   override def asClassPathString: String =
-    join(entries map (_.asClassPathString): _*)
+    join(entries.map(_.asClassPathString): _*)
 
   lazy val classes: IndexedSeq[ClassRepresentation[T]] = {
     var count = 0
@@ -405,7 +408,7 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
     println(
       "ClassPath %s has %d entries and results in:\n".format(name,
                                                              entries.size))
-    asClassPathString split ':' foreach (x => println("  " + x))
+    asClassPathString.split(':').foreach(x => println("  " + x))
   }
 
   override def toString() =

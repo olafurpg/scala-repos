@@ -50,7 +50,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Run the given function on this swapped value. Alias for `~` */
   def swapped[AA, BB](k: (B \/ A) => (BB \/ AA))(
       implicit F: Functor[F]): EitherT[F, AA, BB] =
-    EitherT(F.map(run)(_ swapped k))
+    EitherT(F.map(run)(_.swapped(k)))
 
   /** Run the given function on this swapped value. Alias for `swapped` */
   def ~[AA, BB](k: (B \/ A) => (BB \/ AA))(
@@ -88,7 +88,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     */
   def app[C](f: => EitherT[F, A, B => C])(
       implicit F: Apply[F]): EitherT[F, A, C] =
-    EitherT(F.apply2(f.run, run)((a, b) => b ap a))
+    EitherT(F.apply2(f.run, run)((a, b) => b.ap(a)))
 
   /** Bind through the right of this disjunction. */
   def flatMap[C](f: B => EitherT[F, A, C])(
@@ -116,11 +116,11 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
   def exists(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(run)(_ exists f)
+    F.map(run)(_.exists(f))
 
   /** Return `true` if this disjunction is a left value or the right value satisfies the given predicate. */
   def forall(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(run)(_ forall f)
+    F.map(run)(_.forall(f))
 
   /** Return an empty list or list with one element on the right of this disjunction. */
   def toList(implicit F: Functor[F]): F[List[B]] =
@@ -144,7 +144,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Return the right value of this disjunction or the given default if left. Alias for `|` */
   def getOrElse(default: => B)(implicit F: Functor[F]): F[B] =
-    F.map(run)(_ getOrElse default)
+    F.map(run)(_.getOrElse(default))
 
   /** Return the right value of this disjunction or the given default if left. Alias for `getOrElse` */
   def |(default: => B)(implicit F: Functor[F]): F[B] =
@@ -152,7 +152,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Return the right value of this disjunction or run the given function on the left. */
   def valueOr(x: A => B)(implicit F: Functor[F]): F[B] =
-    F.map(run)(_ valueOr x)
+    F.map(run)(_.valueOr(x))
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
   def orElse(x: => EitherT[F, A, B])(implicit F: Monad[F]): EitherT[F, A, B] = {
@@ -196,7 +196,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def compare(x: EitherT[F, A, B])(implicit EA: Order[A],
                                    EB: Order[B],
                                    F: Apply[F]): F[Ordering] =
-    F.apply2(run, x.run)(_ compare _)
+    F.apply2(run, x.run)(_.compare(_))
 
   /** Show for a disjunction value. */
   def show(implicit SA: Show[A], SB: Show[B], F: Functor[F]): F[Cord] =
@@ -291,7 +291,7 @@ object EitherT extends EitherTInstances {
   /** Construct a disjunction value from a standard `scala.Either`. */
   def fromEither[F[_], A, B](e: F[Either[A, B]])(
       implicit F: Functor[F]): EitherT[F, A, B] =
-    apply(F.map(e)(_ fold (\/.left, \/.right)))
+    apply(F.map(e)(_.fold(\/.left, \/.right)))
 
   def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(
       implicit F: Applicative[F],
@@ -407,7 +407,7 @@ private trait EitherTFunctor[F[_], E] extends Functor[EitherT[F, E, ?]] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: EitherT[F, E, A])(f: A => B): EitherT[F, E, B] =
-    fa map f
+    fa.map(f)
 }
 
 private trait EitherTBind[F[_], E]
@@ -416,7 +416,7 @@ private trait EitherTBind[F[_], E]
   implicit def F: Monad[F]
 
   final def bind[A, B](fa: EitherT[F, E, A])(
-      f: A => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
+      f: A => EitherT[F, E, B]): EitherT[F, E, B] = fa.flatMap(f)
 }
 
 private trait EitherTBindRec[F[_], E]
@@ -484,7 +484,7 @@ private trait EitherTTraverse[F[_], E]
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[F, E, A])(
-      f: A => G[B]): G[EitherT[F, E, B]] = fa traverse f
+      f: A => G[B]): G[EitherT[F, E, B]] = fa.traverse(f)
 }
 
 private trait EitherTBifunctor[F[_]] extends Bifunctor[EitherT[F, ?, ?]] {

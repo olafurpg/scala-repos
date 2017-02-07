@@ -41,7 +41,7 @@ object PlaySettings {
 
   /** Ask SBT to manage the classpath for the given configuration. */
   def manageClasspath(config: Configuration) =
-    managedClasspath in config <<= (classpathTypes in config, update) map {
+    managedClasspath in config <<= (classpathTypes in config, update).map {
       (ct, report) =>
         Classpaths.managedJars(config, ct, report)
     }
@@ -83,7 +83,7 @@ object PlaySettings {
                        "--ignore-runners=org.specs2.runner.JUnitRunner"),
       // Adds app directory's source files to continuous hot reloading
       watchSources <++=
-        (sourceDirectory in Compile, sourceDirectory in Assets) map {
+        (sourceDirectory in Compile, sourceDirectory in Assets).map {
           (sources, assets) =>
             (sources ** "*" --- assets ** "*").get
         },
@@ -217,7 +217,7 @@ object PlaySettings {
         val docDirectory = (doc in Compile).value
         val docDirectoryLen = docDirectory.getCanonicalPath.length
         val pathFinder = docDirectory ** "*"
-        pathFinder.get map { docFile: File =>
+        pathFinder.get.map { docFile: File =>
           docFile ->
             ("share/doc/api/" +
               docFile.getCanonicalPath.substring(docDirectoryLen))
@@ -225,7 +225,7 @@ object PlaySettings {
       },
       mappings in Universal ++= {
         val pathFinder = baseDirectory.value * "README*"
-        pathFinder.get map { readmeFile: File =>
+        pathFinder.get.map { readmeFile: File =>
           readmeFile -> readmeFile.getName
         }
       },
@@ -243,7 +243,7 @@ object PlaySettings {
                                  mappings in playJarSansExternalized) ++ Seq(
       playExternalizedResources := {
         val rdirs = unmanagedResourceDirectories.value
-        (unmanagedResources.value --- rdirs) pair (relativeTo(rdirs) | flat)
+        ((unmanagedResources.value --- rdirs)).pair(relativeTo(rdirs) | flat)
       },
       mappings in playJarSansExternalized := {
         // packageBin mappings have all the copied resources from the classes directory

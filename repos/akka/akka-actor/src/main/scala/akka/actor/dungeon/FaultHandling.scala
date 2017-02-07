@@ -38,9 +38,9 @@ private[akka] trait FaultHandling { this: ActorCell ⇒
    * of a restart, failures in constructor/preStart count as new failures.
    */
 
-  private def suspendNonRecursive(): Unit = dispatcher suspend this
+  private def suspendNonRecursive(): Unit = dispatcher.suspend(this)
 
-  private def resumeNonRecursive(): Unit = dispatcher resume this
+  private def resumeNonRecursive(): Unit = dispatcher.resume(this)
 
   /*
    * have we told our supervisor that we Failed() and have not yet heard back?
@@ -146,7 +146,7 @@ private[akka] trait FaultHandling { this: ActorCell ⇒
     cancelReceiveTimeout
 
     // stop all children, which will turn childrenRefs into TerminatingChildrenContainer (if there are children)
-    children foreach stop
+    children.foreach(stop)
 
     if (!setChildrenTerminationReason(ChildrenContainer.Creation()))
       finishCreate()
@@ -169,11 +169,11 @@ private[akka] trait FaultHandling { this: ActorCell ⇒
     unwatchWatchedActors(actor)
 
     // stop all children, which will turn childrenRefs into TerminatingChildrenContainer (if there are children)
-    children foreach stop
+    children.foreach(stop)
 
     if (systemImpl.aborting) {
       // separate iteration because this is a very rare case that should not penalize normal operation
-      children foreach {
+      children.foreach {
         case ref: ActorRefScope if !ref.isLocal ⇒
           self.sendSystemMessage(DeathWatchNotification(ref, true, false))
         case _ ⇒
@@ -229,7 +229,7 @@ private[akka] trait FaultHandling { this: ActorCell ⇒
                 clazz(actor),
                 "emergency stop: exception in failure handling for " +
                   t.getClass + Logging.stackTraceFor(t)))
-        try children foreach stop
+        try children.foreach(stop)
         finally finishTerminate()
       }
   }
@@ -281,16 +281,16 @@ private[akka] trait FaultHandling { this: ActorCell ⇒
         publish(Debug(self.path.toString, clazz(freshActor), "restarted"))
 
       // only after parent is up and running again do restart the children which were not stopped
-      survivors foreach
-        (child ⇒
-           try child.asInstanceOf[InternalActorRef].restart(cause)
-           catch handleNonFatalOrInterruptedException { e ⇒
-             publish(
-               Error(e,
-                     self.path.toString,
-                     clazz(freshActor),
-                     "restarting " + child))
-           })
+      survivors.foreach(
+        child ⇒
+          try child.asInstanceOf[InternalActorRef].restart(cause)
+          catch handleNonFatalOrInterruptedException { e ⇒
+            publish(
+              Error(e,
+                    self.path.toString,
+                    clazz(freshActor),
+                    "restarting " + child))
+        })
     } catch handleNonFatalOrInterruptedException { e ⇒
       clearActorFields(actor, recreate = false) // in order to prevent preRestart() from happening again
       handleInvokeFailure(survivors, new PostRestartException(self, e, cause))

@@ -99,11 +99,11 @@ object ScalaFX_Controls_02 extends JFXApp {
     }
   }
 
-  koButton1 addOnMouseEnteredHandler { (_: MouseEvent) =>
+  koButton1.addOnMouseEnteredHandler { (_: MouseEvent) =>
     koButton1.effect = new DropShadow()
   }
 
-  koButton1 addOnMouseExitedHandler { (_: MouseEvent) =>
+  koButton1.addOnMouseExitedHandler { (_: MouseEvent) =>
     koButton1.effect = null
   }
 

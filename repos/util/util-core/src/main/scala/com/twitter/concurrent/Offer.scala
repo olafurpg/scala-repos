@@ -48,8 +48,8 @@ trait Offer[+T] { self =>
     * of the synchronization.
     */
   def sync(): Future[T] =
-    prepare() flatMap { tx =>
-      tx.ack() flatMap {
+    prepare().flatMap { tx =>
+      tx.ack().flatMap {
         case Tx.Commit(v) => Future.value(v)
         case Tx.Abort => sync()
       }
@@ -69,10 +69,10 @@ trait Offer[+T] { self =>
     * successfully synchronized.
     */
   def map[U](f: T => U): Offer[U] = new Offer[U] {
-    def prepare() = self.prepare() map { tx =>
+    def prepare() = self.prepare().map { tx =>
       new Tx[U] {
         import Tx.{Commit, Abort}
-        def ack() = tx.ack() map {
+        def ack() = tx.ack().map {
           case Commit(t) => Commit(f(t))
           case Abort => Abort
         }
@@ -119,7 +119,7 @@ trait Offer[+T] { self =>
       val ourTx = self.prepare()
       if (ourTx.isDefined) ourTx
       else {
-        ourTx foreach { tx =>
+        ourTx.foreach { tx =>
           tx.nack()
         }
         ourTx.raise(LostSynchronization)
@@ -129,7 +129,7 @@ trait Offer[+T] { self =>
   }
 
   def or[U](other: Offer[U]): Offer[Either[T, U]] =
-    Offer.choose(this map { Left(_) }, other map { Right(_) })
+    Offer.choose(this.map { Left(_) }, other.map { Right(_) })
 
   /**
     * Synchronize on this offer indefinitely, invoking the given {{f}}
@@ -137,7 +137,7 @@ trait Offer[+T] { self =>
     * this to enumerate over all received values.
     */
   def foreach(f: T => Unit) {
-    sync() foreach { v =>
+    sync().foreach { v =>
       f(v)
       foreach(f)
     }
@@ -148,7 +148,7 @@ trait Offer[+T] { self =>
     * closure.  Convenient for loops.
     */
   def andThen(f: => Unit) {
-    sync() onSuccess { _ =>
+    sync().onSuccess { _ =>
       f
     }
   }
@@ -266,7 +266,7 @@ object Offer {
             while (j < prepd.length) {
               val loser = prepd(j)
               if (loser ne winner) {
-                loser onSuccess { tx =>
+                loser.onSuccess { tx =>
                   tx.nack()
                 }
                 loser.raise(LostSynchronization)
@@ -279,7 +279,7 @@ object Offer {
           if (foundPos >= 0) {
             updateLosers(foundPos, prepd)
           } else {
-            Future.selectIndex(prepd) flatMap { winPos =>
+            Future.selectIndex(prepd).flatMap { winPos =>
               updateLosers(winPos, prepd)
             }
           }

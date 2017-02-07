@@ -22,11 +22,10 @@ class TestTapFactoryTest extends WordSpec with Matchers {
           .createTap(Read)(testMode)
           .asInstanceOf[Tap[Any, Any, Any]]
 
-      the[IllegalArgumentException] thrownBy {
+      (the[IllegalArgumentException] thrownBy {
         createIllegalTap()
-      } should have message
-        ("requirement failed: " +
-          TestTapFactory.sourceNotFoundError.format(testSource))
+      } should have).message("requirement failed: " +
+        TestTapFactory.sourceNotFoundError.format(testSource))
     }
   }
 }

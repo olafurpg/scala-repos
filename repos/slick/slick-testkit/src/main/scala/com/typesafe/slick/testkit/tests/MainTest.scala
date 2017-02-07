@@ -11,10 +11,10 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
   class Users(tag: Tag)
       extends Table[(Int, String, Option[String])](tag, "users") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    def first = column[String]("first", O SqlType "varchar(64)")
+    def first = column[String]("first", O.SqlType("varchar(64)"))
     def last = column[Option[String]]("last")
     def * = (id, first, last)
-    def orders = mainTest.orders filter { _.userID === id }
+    def orders = mainTest.orders.filter { _.userID === id }
   }
   lazy val users = TableQuery[Users]
 
@@ -43,7 +43,12 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
         (u.id,
          u.first.?,
          u.last,
-         (Case If u.id < 3 Then "low" If u.id < 6 Then "medium" Else "high"))
+         (Case
+           .If(u.id < 3)
+           .Then("low")
+           .If(u.id < 6)
+           .Then("medium")
+           .Else("high")))
     q1b.result.statements.toSeq.length.should(_ >= 1)
 
     val q2 = for (u <- users if u.first === "Apu".bind) yield (u.last, u.id)
@@ -75,7 +80,7 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
       _ = total.map(_ shouldBe 7)
       r1 <- q1.result
       _ = r1 shouldBe expectedUserTuples
-    } yield ()) andThen q1.result).withPinnedSession)
+    } yield ()).andThen(q1.result)).withPinnedSession)
 
     materialize(p1.mapResult { case (id, f, l) => User(id, f, l.orNull) })
       .flatMap { allUsers =>
@@ -116,14 +121,14 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
         val q4 = for {
           u <- users
           o <- u.orders if (o.orderID === (for {
-            o2 <- orders filter (o.userID === _.userID)
+            o2 <- orders.filter(o.userID === _.userID)
           } yield o2.orderID).max)
         } yield (u.first, o.orderID)
         q4.result.statements.toSeq.length.should(_ >= 1)
 
         def maxOfPer[T <: Table[_], C[_]](
             c: Query[T, _, C])(m: (T => Rep[Int]), p: (T => Rep[Int])) =
-          c filter { o =>
+          c.filter { o =>
             m(o) === (for { o2 <- c if p(o) === p(o2) } yield m(o2)).max
           }
 
@@ -187,7 +192,7 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
         b9.result.statements.toSeq.length.should(_ >= 1)
         b10.result.statements.toSeq.length.should(_ >= 1)
 
-        val q5 = users filterNot { _.id in orders.map(_.userID) }
+        val q5 = users.filterNot { _.id in orders.map(_.userID) }
         q5.result.statements.toSeq.length.should(_ >= 1)
         q5.delete.statements.toSeq.length.should(_ >= 1)
         val q6 = Query(q5.length)

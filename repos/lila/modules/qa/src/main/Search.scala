@@ -31,7 +31,7 @@ final class Search(collection: Coll) {
         */
       def apply(document: BSONDocument): Either[CommandError, Result] =
         CommandError.checkOk(document, Some("search")) toLeft {
-          document.getAs[List[BSONDocument]]("results") getOrElse Nil
+          document.getAs[List[BSONDocument]]("results").getOrElse(Nil)
         }
     }
   }

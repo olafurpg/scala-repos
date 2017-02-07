@@ -123,8 +123,8 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
     }
 
     if (create.nonEmpty) {
-      create foreach { doc =>
-        writer addDocument doc
+      create.foreach { doc =>
+        writer.addDocument(doc)
       }
       if (commit) writer.commit()
     }

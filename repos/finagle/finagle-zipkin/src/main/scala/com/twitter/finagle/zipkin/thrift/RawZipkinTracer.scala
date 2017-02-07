@@ -42,7 +42,7 @@ object RawZipkinTracer {
       .daemon(true)
       .build()
 
-    new Scribe.FinagledClient(new TracelessFilter andThen transport,
+    new Scribe.FinagledClient(new TracelessFilter.andThen(transport),
                               Protocols.binaryFactory())
   }
 
@@ -79,7 +79,7 @@ object RawZipkinTracer {
       setName("RawZipkinTracer-ShutdownHook")
       override def run() {
         val tracers = RawZipkinTracer.synchronized(map.values.toSeq)
-        val joined = Future.join(tracers map (_.flush()))
+        val joined = Future.join(tracers.map(_.flush()))
         try {
           Await.result(joined, 100.milliseconds)
         } catch {
@@ -175,7 +175,7 @@ private[thrift] class RawZipkinTracer(
 
   private[this] val bufferPool =
     new ArrayBlockingQueue[ReusableTransport](poolSize)
-  (0 until poolSize) foreach { _ =>
+  ((0 until poolSize)).foreach { _ =>
     bufferPool.add(new ReusableTransport)
   }
 
@@ -185,7 +185,7 @@ private[thrift] class RawZipkinTracer(
   private[this] def createLogEntries(spans: Seq[Span]): Seq[LogEntry] = {
     val entries = new ArrayBuffer[LogEntry](spans.size)
 
-    spans foreach { span =>
+    spans.foreach { span =>
       val transport = bufferPool.take()
       try {
         span.toThrift.write(transport.protocol)

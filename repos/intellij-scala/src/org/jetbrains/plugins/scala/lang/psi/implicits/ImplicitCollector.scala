@@ -687,7 +687,7 @@ class ImplicitCollector(
                     substedFunType = subst.subst(funType)
                   }
 
-                  if (substedFunType conforms tp) {
+                  if (substedFunType.conforms(tp)) {
                     if (checkFast || noReturnType) Some(c, ScSubstitutor.empty)
                     else checkType(substedFunType)
                   } else if (noReturnType) Some(c, ScSubstitutor.empty)

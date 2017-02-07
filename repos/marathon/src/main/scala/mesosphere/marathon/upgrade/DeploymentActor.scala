@@ -64,7 +64,7 @@ private class DeploymentActor(parent: ActorRef,
                                   currentStep.getOrElse(DeploymentStep(Nil)),
                                   currentStepNr)
 
-      performStep(step) onComplete {
+      performStep(step).onComplete {
         case Success(_) => self ! NextStep
         case Failure(t) => self ! Fail(t)
       }
@@ -101,7 +101,7 @@ private class DeploymentActor(parent: ActorRef,
         }
       }
 
-      Future.sequence(futures).map(_ => ()) andThen {
+      Future.sequence(futures).map(_ => ()).andThen {
         case Success(_) => eventBus.publish(DeploymentStepSuccess(plan, step))
         case Failure(_) => eventBus.publish(DeploymentStepFailure(plan, step))
       }

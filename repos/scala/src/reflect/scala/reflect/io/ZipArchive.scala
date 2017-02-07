@@ -112,7 +112,7 @@ abstract class ZipArchive(override val file: JFile)
     //   parent.entries(baseName(path)) = dir
     //   dir
     // })
-    dirs get path match {
+    dirs.get(path) match {
       case Some(v) => v
       case None =>
         val parent = ensureDir(dirs, dirName(path), null)
@@ -151,7 +151,7 @@ final class FileZipArchive(file: JFile) extends ZipArchive(file) {
         class FileEntry() extends Entry(zipEntry.getName) {
           override def getArchive = zipFile
           override def lastModified = zipEntry.getTime()
-          override def input = getArchive getInputStream zipEntry
+          override def input = getArchive.getInputStream(zipEntry)
           override def sizeOption = Some(zipEntry.getSize().toInt)
         }
         val f = new FileEntry()

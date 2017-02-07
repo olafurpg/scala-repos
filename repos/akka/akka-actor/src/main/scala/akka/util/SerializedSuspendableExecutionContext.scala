@@ -71,7 +71,7 @@ private[akka] final class SerializedSuspendableExecutionContext(
           case null ⇒ ()
           case some ⇒
             try some.run()
-            catch { case NonFatal(t) ⇒ context reportFailure t }
+            catch { case NonFatal(t) ⇒ context.reportFailure(t) }
             run(done + 1)
         }
       }
@@ -80,12 +80,12 @@ private[akka] final class SerializedSuspendableExecutionContext(
   }
 
   final def attach(): Unit =
-    if (!isEmpty() && state.compareAndSet(Off, On)) context execute this
+    if (!isEmpty() && state.compareAndSet(Off, On)) context.execute(this)
   override final def execute(task: Runnable): Unit =
     try add(task)
     finally attach()
   override final def reportFailure(t: Throwable): Unit =
-    context reportFailure t
+    context.reportFailure(t)
 
   /**
     * O(N)

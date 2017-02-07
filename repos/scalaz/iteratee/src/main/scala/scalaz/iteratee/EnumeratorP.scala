@@ -147,7 +147,7 @@ trait EnumeratorPFunctions {
     def mergeOne(e: EnumeratorP[E, F],
                  es: List[EnumeratorP[E, F]]): EnumeratorP[E, F] =
       es match {
-        case x :: xs => mergeOne(e merge x, xs)
+        case x :: xs => mergeOne(e.merge(x), xs)
         case Nil => e
       }
 

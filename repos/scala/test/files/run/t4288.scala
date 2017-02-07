@@ -8,7 +8,7 @@ object Test {
   def f7 = (1 to 9).slice(-5, -1)
 
   def main(args: Array[String]): Unit = {
-    List[Traversable[Int]](f1, f2, f3, f4, f5, f6, f7) foreach
-      (x => assert(x.isEmpty, x))
+    List[Traversable[Int]](f1, f2, f3, f4, f5, f6, f7).foreach(x =>
+      assert(x.isEmpty, x))
   }
 }

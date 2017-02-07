@@ -85,13 +85,13 @@ object GroupUpdate {
 
   implicit val GroupUpdateValidator: Validator[GroupUpdate] =
     validator[GroupUpdate] { group =>
-      group is notNull
+      group.is(notNull)
 
-      group.version is theOnlyDefinedOptionIn(group)
-      group.scaleBy is theOnlyDefinedOptionIn(group)
+      group.version.is(theOnlyDefinedOptionIn(group))
+      group.scaleBy.is(theOnlyDefinedOptionIn(group))
 
-      group.id is valid
-      group.apps is valid
-      group.groups is valid
+      group.id.is(valid)
+      group.apps.is(valid)
+      group.groups.is(valid)
     }
 }

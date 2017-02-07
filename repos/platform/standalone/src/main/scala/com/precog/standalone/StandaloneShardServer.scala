@@ -78,24 +78,27 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
       new StaticAccountFinder[Future]("root", apiKey, Some("/"))
 
     val jobManager =
-      config.get[String]("jobs.jobdir").map { jobdir =>
-        val dir = new File(jobdir)
+      config
+        .get[String]("jobs.jobdir")
+        .map { jobdir =>
+          val dir = new File(jobdir)
 
-        if (!dir.isDirectory) {
-          throw new Exception(
-            "Configured job dir %s is not a directory".format(dir))
+          if (!dir.isDirectory) {
+            throw new Exception(
+              "Configured job dir %s is not a directory".format(dir))
+          }
+
+          if (!dir.canWrite) {
+            throw new Exception(
+              "Configured job dir %s is not writeable".format(dir))
+          }
+
+          FileJobManager(dir, M)
         }
-
-        if (!dir.canWrite) {
-          throw new Exception(
-            "Configured job dir %s is not writeable".format(dir))
+        .getOrElse {
+          new ExpiringJobManager(
+            Duration(config[Int]("jobs.ttl", 300), TimeUnit.SECONDS))
         }
-
-        FileJobManager(dir, M)
-      } getOrElse {
-        new ExpiringJobManager(
-          Duration(config[Int]("jobs.ttl", 300), TimeUnit.SECONDS))
-      }
 
     val (platform, stoppable) = platformFor(config, apiKeyFinder, jobManager)
 

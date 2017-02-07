@@ -80,7 +80,7 @@ abstract class ZipArchive(override val file: JFile)
 
   private def walkIterator(
       its: Iterator[AbstractFile]): Iterator[AbstractFile] = {
-    its flatMap { f =>
+    its.flatMap { f =>
       if (f.isDirectory) walkIterator(f.iterator)
       else Iterator(f)
     }
@@ -119,7 +119,7 @@ abstract class ZipArchive(override val file: JFile)
     //   parent.entries(baseName(path)) = dir
     //   dir
     // })
-    dirs get path match {
+    dirs.get(path) match {
       case Some(v) => v
       case None =>
         val parent = ensureDir(dirs, dirName(path), null)
@@ -163,7 +163,7 @@ final class FileZipArchive(file: JFile) extends ZipArchive(file) {
             override def lastModified = zipEntry.getTime()
             override def input = {
               val zipFile = getArchive
-              val delegate = zipFile getInputStream zipEntry
+              val delegate = zipFile.getInputStream(zipEntry)
               new FilterInputStream(delegate) {
                 override def close(): Unit = {
                   delegate.close()

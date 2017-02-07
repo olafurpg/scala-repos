@@ -58,7 +58,7 @@ object RunHook {
 
         val failures: LinkedHashMap[RunHook, Throwable] = LinkedHashMap.empty
 
-        hooks foreach { hook =>
+        hooks.foreach { hook =>
           try {
             f(hook)
           } catch {

@@ -34,7 +34,7 @@ sealed trait MapSubMap extends MapSub {
   protected final def ab_+[K: BuildKeyConstraint, V](m: XMap[K, V],
                                                      k: K,
                                                      v: V): XMap[K, V] =
-    m updated (k, v)
+    m.updated(k, v)
   protected final def ab_-[K: BuildKeyConstraint, V](m: XMap[K, V],
                                                      k: K): XMap[K, V] =
     m - k
@@ -154,7 +154,7 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
                              V: Show[V]): Show[XMap[K, V]] =
     Show.show(m =>
       "Map[" +: Cord.mkCord(", ", m.toSeq.view.map {
-        case (k, v) => Cord(K show k, "->", V show v)
+        case (k, v) => Cord(K.show(k), "->", V.show(v))
       }: _*) :+ "]")
 
   implicit def mapOrder[K: Order, V: Order]: Order[XMap[K, V]] =
@@ -179,13 +179,13 @@ trait MapSubFunctions extends MapSub {
   /** Vary the value of `m get k`. */
   final def alter[K: BuildKeyConstraint, A](m: XMap[K, A], k: K)(
       f: (Option[A] => Option[A])): XMap[K, A] =
-    f(m get k) map (ab_+(m, k, _)) getOrElse ab_-(m, k)
+    f(m.get(k)).map(ab_+(m, k, _)).getOrElse(ab_-(m, k))
 
   /** Like `intersectWith`, but tell `f` about the key. */
   final def intersectWithKey[K: BuildKeyConstraint, A, B, C](
       m1: XMap[K, A],
       m2: XMap[K, B])(f: (K, A, B) => C): XMap[K, C] =
-    m1 collect {
+    m1.collect {
       case (k, v) if m2 contains k => k -> f(k, v, m2(k))
     }
 
@@ -203,7 +203,7 @@ trait MapSubFunctions extends MapSub {
     */
   final def mapKeys[K, K2: BuildKeyConstraint, A](m: XMap[K, A])(
       f: K => K2): XMap[K2, A] =
-    m map { case (k, v) => f(k) -> v }
+    m.map { case (k, v) => f(k) -> v }
 
   /** Like `unionWith`, but telling `f` about the key. */
   final def unionWithKey[K: BuildKeyConstraint, A](
@@ -211,7 +211,7 @@ trait MapSubFunctions extends MapSub {
       m2: XMap[K, A])(f: (K, A, A) => A): XMap[K, A] = {
     val diff = m2 -- m1.keySet
     val aug =
-      m1 map {
+      m1.map {
         case (k, v) => if (m2 contains k) k -> f(k, v, m2(k)) else (k, v)
       }
     aug ++ diff
@@ -240,7 +240,7 @@ trait MapSubFunctions extends MapSub {
   final def getOrAdd[F[_], K, A](m: XMap[K, A], k: K)(fa: => F[A])(
       implicit F: Applicative[F],
       K: BuildKeyConstraint[K]): F[(XMap[K, A], A)] =
-    (m get k)
+    (m.get(k))
       .map(a => F.point(m, a))
       .getOrElse(F.map(fa)(a => (ab_+(m, k, a), a)))
 }

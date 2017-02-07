@@ -45,7 +45,7 @@ object ScalaRunTime {
   // A helper method to make my life in the pattern matcher a lot easier.
   def drop[Repr](coll: Repr, num: Int)(
       implicit traversable: IsTraversableLike[Repr]): Repr =
-    traversable conversion coll drop num
+    traversable.conversion(coll).drop(num)
 
   /** Return the class object representing an array with element class `clazz`.
     */
@@ -198,7 +198,7 @@ object ScalaRunTime {
 
   def _equals(x: Product, y: Any): Boolean = y match {
     case y: Product if x.productArity == y.productArity =>
-      x.productIterator sameElements y.productIterator
+      x.productIterator.sameElements(y.productIterator)
     case _ => false
   }
 
@@ -255,7 +255,7 @@ object ScalaRunTime {
     */
   def sameElements(xs1: scala.collection.Seq[Any],
                    xs2: scala.collection.Seq[Any]) =
-    xs1 sameElements xs2
+    xs1.sameElements(xs2)
 
   /** Given any Scala value, convert it to a String.
     *
@@ -275,9 +275,9 @@ object ScalaRunTime {
       case null => ""
       case p => p.getName
     }
-    def isScalaClass(x: AnyRef) = packageOf(x) startsWith "scala."
+    def isScalaClass(x: AnyRef) = packageOf(x).startsWith("scala.")
     def isScalaCompilerClass(x: AnyRef) =
-      packageOf(x) startsWith "scala.tools.nsc."
+      packageOf(x).startsWith("scala.tools.nsc.")
 
     // We use reflection because the scala.xml package might not be available
     def isSubClassOf(potentialSubClass: Class[_], ofClass: String) =
@@ -324,10 +324,10 @@ object ScalaRunTime {
     // Special casing Unit arrays, the value class which uses a reference array type.
     def arrayToString(x: AnyRef) = {
       if (x.getClass.getComponentType == classOf[BoxedUnit])
-        0 until (array_length(x) min maxElements) map (_ => "()") mkString
+        (0 until (array_length(x) min maxElements)).map(_ => "()") mkString
           ("Array(", ", ", ")")
       else
-        WrappedArray make x take maxElements map inner mkString
+        WrappedArray.make(x).take(maxElements).map(inner) mkString
           ("Array(", ", ", ")")
     }
 
@@ -343,17 +343,18 @@ object ScalaRunTime {
       case x if useOwnToString(x) => x.toString
       case x: AnyRef if isArray(x) => arrayToString(x)
       case x: scala.collection.Map[_, _] =>
-        x.iterator take maxElements map mapInner mkString
+        x.iterator.take(maxElements).map(mapInner) mkString
           (x.stringPrefix + "(", ", ", ")")
       case x: GenIterable[_] =>
-        x.iterator take maxElements map inner mkString
+        x.iterator.take(maxElements).map(inner) mkString
           (x.stringPrefix + "(", ", ", ")")
       case x: Traversable[_] =>
-        x take maxElements map inner mkString (x.stringPrefix + "(", ", ", ")")
+        x.take(maxElements)
+          .map(inner) mkString (x.stringPrefix + "(", ", ", ")")
       case x: Product1[_] if isTuple(x) =>
         "(" + inner(x._1) + ",)" // that special trailing comma
       case x: Product if isTuple(x) =>
-        x.productIterator map inner mkString ("(", ",", ")")
+        x.productIterator.map(inner) mkString ("(", ",", ")")
       case x => x.toString
     }
 

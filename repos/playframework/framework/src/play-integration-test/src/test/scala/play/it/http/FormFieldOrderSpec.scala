@@ -37,7 +37,7 @@ trait FormFieldOrderSpec
             request.contentType must beSome(contentType)
             // The following just ingests the request body and converts it to a sequnce of strings of the form name=value
             val pairs: Seq[String] = {
-              request.body.asFormUrlEncoded map {
+              request.body.asFormUrlEncoded.map {
                 params: Map[String, Seq[String]] =>
                   {
                     for ((key: String, value: Seq[String]) <- params)

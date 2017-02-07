@@ -32,24 +32,24 @@ object TypePattern {
             if (builder.getTokenType == ScalaTokenTypes.tFUNTYPE) {
               builder.advanceLexer() //Ate =>
               if (!Type.parse(builder, star = false, isPattern = true)) {
-                builder error ScalaBundle.message("wrong.type")
+                builder.error(ScalaBundle.message("wrong.type"))
               }
             }
             builder.getTokenType match {
               case ScalaTokenTypes.tRPARENTHESIS =>
                 builder.advanceLexer() //Ate )
               case _ =>
-                builder error ScalaBundle.message("rparenthesis.expected")
+                builder.error(ScalaBundle.message("rparenthesis.expected"))
             }
             builder.restoreNewlinesState
             builder.getTokenType match {
               case ScalaTokenTypes.tFUNTYPE =>
                 builder.advanceLexer() //Ate =>
               case _ =>
-                builder error ScalaBundle.message("fun.sign.expected")
+                builder.error(ScalaBundle.message("fun.sign.expected"))
             }
             if (!Type.parse(builder, star = false, isPattern = true)) {
-              builder error ScalaBundle.message("wrong.type")
+              builder.error(ScalaBundle.message("wrong.type"))
             }
             typeMarker.done(ScalaElementTypes.TYPE_PATTERN)
             parMarker.drop()
@@ -66,7 +66,7 @@ object TypePattern {
     }
     builder.getTokenType match {
       case ScalaTokenTypes.kFOR_SOME =>
-        ExistentialClause parse builder
+        ExistentialClause.parse(builder)
         typeMarker.done(ScalaElementTypes.TYPE_PATTERN)
         true
       case _ =>

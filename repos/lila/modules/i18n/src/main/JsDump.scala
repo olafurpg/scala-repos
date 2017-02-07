@@ -17,7 +17,7 @@ private[i18n] final class JsDump(path: String, pool: I18nPool, keys: I18nKeys) {
   def apply: Funit =
     Future {
       pathFile.mkdir
-      pool.langs foreach write(jsMessages)
+      pool.langs.foreach(write(jsMessages))
       writeRefs
       writeFullJson
     } void
@@ -96,7 +96,7 @@ private[i18n] final class JsDump(path: String, pool: I18nPool, keys: I18nKeys) {
   }
 
   private def writeFullJson {
-    pool.langs foreach { lang =>
+    pool.langs.foreach { lang =>
       val code = dumpFromKey(keys.keys, lang)
       val file = new File(
         "%s/%s.all.json".format(pathFile.getCanonicalPath, lang.language))

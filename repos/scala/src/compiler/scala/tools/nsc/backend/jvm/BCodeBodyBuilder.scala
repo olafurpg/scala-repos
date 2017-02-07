@@ -140,11 +140,11 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
                   if (scalaPrimitives.isShiftOp(code)) INT else resKind)
 
           (code: @switch) match {
-            case ADD => bc add resKind
-            case SUB => bc sub resKind
-            case MUL => bc mul resKind
-            case DIV => bc div resKind
-            case MOD => bc rem resKind
+            case ADD => bc.add(resKind)
+            case SUB => bc.sub(resKind)
+            case MUL => bc.mul(resKind)
+            case DIV => bc.div(resKind)
+            case MOD => bc.rem(resKind)
 
             case OR | XOR | AND => bc.genPrimitiveLogical(code, resKind)
 
@@ -217,7 +217,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       val resKind = if (hasUnitBranch) UNIT else tpeTK(tree)
 
       genLoad(thenp, resKind)
-      if (hasElse) { bc goTo postIf }
+      if (hasElse) { bc.goTo(postIf) }
       markProgramPoint(failure)
       if (hasElse) {
         genLoad(elsep, resKind)
@@ -248,11 +248,11 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
         genCond(tree, success, failure, targetIfNoJump = success)
         // success block
         markProgramPoint(success)
-        bc boolconst true
-        bc goTo after
+        bc.boolconst(true)
+        bc.goTo(after)
         // failure block
         markProgramPoint(failure)
-        bc boolconst false
+        bc.boolconst(false)
         // after
         markProgramPoint(after)
 
@@ -371,7 +371,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           val hostClass = findHostClass(qualifier.tpe, sym)
           debuglog(
             s"Host class of $sym with qual $qualifier (${qualifier.tpe}) is $hostClass")
-          val qualSafeToElide = treeInfo isQualifierSafeToElide qualifier
+          val qualSafeToElide = treeInfo.isQualifierSafeToElide(qualifier)
 
           def genLoadQualUnlessElidable() {
             if (!qualSafeToElide) { genLoadQualifier(tree) }
@@ -546,14 +546,14 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       cleanups match {
         case Nil =>
           // not an assertion: !shouldEmitCleanup (at least not yet, pendingCleanups() may still have to run, and reset `shouldEmitCleanup`.
-          bc emitRETURN returnType
+          bc.emitRETURN(returnType)
         case nextCleanup :: rest =>
           if (saveReturnValue) {
             if (insideCleanupBlock) {
               reporter.warning(
                 r.pos,
                 "Return statement found in finally-clause, discarding its return-value in favor of that of a more deeply nested return.")
-              bc drop returnType
+              bc.drop(returnType)
             } else {
               // regarding return value, the protocol is: in place of a `return-stmt`, a sequence of `adapt, store, jump` are inserted.
               if (earlyReturnVar == null) {
@@ -562,7 +562,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
               locals.store(earlyReturnVar)
             }
           }
-          bc goTo nextCleanup
+          bc.goTo(nextCleanup)
           shouldEmitCleanup = true
       }
     } // end of genReturn()
@@ -608,20 +608,20 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
             // TODO @lry make pattern match
             if (l.isPrimitive && r.isPrimitive) genConversion(l, r, cast)
             else if (l.isPrimitive) {
-              bc drop l
+              bc.drop(l)
               if (cast) {
                 mnode.visitTypeInsn(asm.Opcodes.NEW,
                                     jlClassCastExceptionRef.internalName)
-                bc dup ObjectRef
+                bc.dup(ObjectRef)
                 emit(asm.Opcodes.ATHROW)
               } else {
-                bc boolconst false
+                bc.boolconst(false)
               }
             } else if (r.isPrimitive && cast) {
               abort(
                 s"Erasure should have added an unboxing operation to prevent this cast. Tree: $app")
             } else if (r.isPrimitive) {
-              bc isInstance boxedClassOfPrimitive(r.asPrimitiveBType)
+              bc.isInstance(boxedClassOfPrimitive(r.asPrimitiveBType))
             } else {
               assert(r.isRef, r) // ensure that it's not a method
               genCast(r.asRefBType, cast)
@@ -694,7 +694,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
               assert(classBTypeFromSymbol(ctor.owner) == rt,
                      s"Symbol ${ctor.owner.fullName} is different from $rt")
               mnode.visitTypeInsn(asm.Opcodes.NEW, rt.internalName)
-              bc dup generatedType
+              bc.dup(generatedType)
               genLoadArguments(args, paramTKs(app))
               genCallMethod(ctor, InvokeStyle.Special, app.pos)
 
@@ -742,7 +742,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           if (sym.isLabel) {
             // jump to a label
             genLoadLabelArguments(args, labelDef(sym), app.pos)
-            bc goTo programPoint(sym)
+            bc.goTo(programPoint(sym))
           } else if (isPrimitive(sym)) {
             // primitive method call
             generatedType = genPrimitiveOp(app, expectedType)
@@ -834,14 +834,14 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       val generatedType = ArrayBType(elmKind)
 
       lineNumber(av)
-      bc iconst elems.length
+      bc.iconst(elems.length)
       bc newarray elmKind
 
       var i = 0
       var rest = elems
       while (!rest.isEmpty) {
-        bc dup generatedType
-        bc iconst i
+        bc.dup(generatedType)
+        bc.iconst(i)
         genLoad(rest.head, elmKind)
         bc astore elmKind
         rest = rest.tail
@@ -885,7 +885,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
                    s"multiple default targets in a Match node, at ${tree.pos}")
             default = switchBlockPoint
           case Alternative(alts) =>
-            alts foreach {
+            alts.foreach {
               case Literal(value) =>
                 flatKeys ::= value.intValue
                 targets ::= switchBlockPoint
@@ -908,7 +908,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
         val (caseLabel, caseBody) = sb
         markProgramPoint(caseLabel)
         genLoad(caseBody, generatedType)
-        bc goTo postMatch
+        bc.goTo(postMatch)
       }
 
       markProgramPoint(postMatch)
@@ -919,7 +919,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       val Block(stats, expr) = tree
       val savedScope = varsInScope
       varsInScope = Nil
-      stats foreach genStat
+      stats.foreach(genStat)
       genLoad(expr, expectedType)
       val end = currProgramPoint()
       if (emitVars) {
@@ -934,7 +934,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
     def adapt(from: BType, to: BType) {
       if (!from.conformsTo(to).get) {
         to match {
-          case UNIT => bc drop from
+          case UNIT => bc.drop(from)
           case _ => bc.emitT2T(from, to)
         }
       } else if (from.isNothingType) {
@@ -995,7 +995,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
          * inserted instead - after all, an expression of type scala.runtime.Null$ can only be null.
          */
         if (lastInsn.getOpcode != asm.Opcodes.ACONST_NULL) {
-          bc drop from
+          bc.drop(from)
           emit(asm.Opcodes.ACONST_NULL)
         }
       } else
@@ -1031,14 +1031,14 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           case _ => false
         }
 
-        (args zip params) filterNot isTrivial
+        (args.zip(params)).filterNot(isTrivial)
       }
 
       // first push *all* arguments. This makes sure muliple uses of the same labelDef-var will all denote the (previous) value.
-      aps foreach { case (arg, param) => genLoad(arg, locals(param).tk) } // `locals` is known to contain `param` because `genDefDef()` visited `labelDefsAtOrUnder`
+      aps.foreach { case (arg, param) => genLoad(arg, locals(param).tk) } // `locals` is known to contain `param` because `genDefDef()` visited `labelDefsAtOrUnder`
 
       // second assign one by one to the LabelDef's variables.
-      aps.reverse foreach {
+      aps.reverse.foreach {
         case (_, param) =>
           // TODO FIXME a "this" param results from tail-call xform. If so, the `else` branch seems perfectly fine. And the `then` branch must be wrong.
           if (param.name == nme.THIS) mnode.visitVarInsn(asm.Opcodes.ASTORE, 0)
@@ -1047,7 +1047,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
     }
 
     def genLoadArguments(args: List[Tree], btpes: List[BType]) {
-      (args zip btpes) foreach { case (arg, btpe) => genLoad(arg, btpe) }
+      (args.zip(btpes)).foreach { case (arg, btpe) => genLoad(arg, btpe) }
     }
 
     def genLoadModule(tree: Tree): BType = {
@@ -1084,13 +1084,13 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
 
     def genConversion(from: BType, to: BType, cast: Boolean) {
       if (cast) { bc.emitT2T(from, to) } else {
-        bc drop from
-        bc boolconst (from == to)
+        bc.drop(from)
+        bc.boolconst(from == to)
       }
     }
 
     def genCast(to: RefBType, cast: Boolean) {
-      if (cast) { bc checkCast to } else { bc isInstance to }
+      if (cast) { bc.checkCast(to) } else { bc.isInstance(to) }
     }
 
     /* Is the given symbol a primitive operation? */
@@ -1254,7 +1254,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           }
           bc.emitIF(op, success)
         }
-        if (targetIfNoJump != failure) bc goTo failure
+        if (targetIfNoJump != failure) bc.goTo(failure)
       }
     }
 
@@ -1274,8 +1274,8 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           // REFERENCE(_) | ARRAY(_)
           op match {
             // references are only compared with EQ and NE
-            case TestOp.EQ => bc emitIFNULL success
-            case TestOp.NE => bc emitIFNONNULL success
+            case TestOp.EQ => bc.emitIFNULL(success)
+            case TestOp.NE => bc.emitIFNONNULL(success)
           }
         } else {
           (tk: @unchecked) match {
@@ -1293,7 +1293,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           }
           bc.emitIF(op, success)
         }
-        if (targetIfNoJump != failure) bc goTo failure
+        if (targetIfNoJump != failure) bc.goTo(failure)
       }
     }
 
@@ -1473,7 +1473,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           genLoad(l, ObjectRef)
           genLoad(r, ObjectRef)
           locals.store(eqEqTempLocal)
-          bc dup ObjectRef
+          bc.dup(ObjectRef)
           genCZJUMP(lNull,
                     lNonNull,
                     TestOp.EQ,
@@ -1481,7 +1481,7 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
                     targetIfNoJump = lNull)
 
           markProgramPoint(lNull)
-          bc drop ObjectRef
+          bc.drop(ObjectRef)
           locals.load(eqEqTempLocal)
           genCZJUMP(success,
                     failure,

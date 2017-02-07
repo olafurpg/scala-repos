@@ -56,52 +56,60 @@ final class AssessApi(collAssessments: Coll,
     getPlayerAssessmentById(gameId + "/" + color.name)
 
   def getGameResultsById(gameId: String) =
-    getResultsByGameIdAndColor(gameId, Color.White) zip getResultsByGameIdAndColor(
-      gameId,
-      Color.Black) map { a =>
-      PlayerAssessments(a._1, a._2)
-    }
+    getResultsByGameIdAndColor(gameId, Color.White)
+      .zip(getResultsByGameIdAndColor(gameId, Color.Black))
+      .map { a =>
+        PlayerAssessments(a._1, a._2)
+      }
 
   def getPlayerAggregateAssessment(
       userId: String,
       nb: Int = 100): Fu[Option[PlayerAggregateAssessment]] = {
     val relatedUsers = userIdsSharingIp(userId)
-    UserRepo.byId(userId) zip getPlayerAssessmentsByUserId(userId, nb) zip relatedUsers zip
-      (relatedUsers flatMap UserRepo.filterByEngine) map {
-      case (((Some(user), assessedGamesHead :: assessedGamesTail), relatedUs),
+    UserRepo
+      .byId(userId)
+      .zip(getPlayerAssessmentsByUserId(userId, nb))
+      .zip(relatedUsers)
+      .zip(relatedUsers.flatMap(UserRepo.filterByEngine))
+      .map {
+        case (
+            ((Some(user), assessedGamesHead :: assessedGamesTail), relatedUs),
             relatedCheaters) =>
-        Some(
-          PlayerAggregateAssessment(user,
-                                    assessedGamesHead :: assessedGamesTail,
-                                    relatedUs,
-                                    relatedCheaters))
-      case _ => none
-    }
+          Some(
+            PlayerAggregateAssessment(user,
+                                      assessedGamesHead :: assessedGamesTail,
+                                      relatedUs,
+                                      relatedCheaters))
+        case _ => none
+      }
   }
 
   def withGames(pag: PlayerAggregateAssessment)
     : Fu[PlayerAggregateAssessment.WithGames] =
-    GameRepo games pag.playerAssessments.map(_.gameId) map {
+    GameRepo.games(pag.playerAssessments.map(_.gameId)).map {
       PlayerAggregateAssessment.WithGames(pag, _)
     }
 
   def getPlayerAggregateAssessmentWithGames(
       userId: String,
       nb: Int = 100): Fu[Option[PlayerAggregateAssessment.WithGames]] =
-    getPlayerAggregateAssessment(userId, nb) flatMap {
+    getPlayerAggregateAssessment(userId, nb).flatMap {
       case None => fuccess(none)
       case Some(pag) => withGames(pag).map(_.some)
     }
 
   def refreshAssessByUsername(username: String): Funit = withUser(username) {
     user =>
-      (GameRepo.gamesForAssessment(user.id, 100) flatMap { gs =>
-        (gs map { g =>
-          AnalysisRepo.byId(g.id) flatMap {
-            case Some(a) => onAnalysisReady(g, a, false)
-            case _ => funit
-          }
-        }).sequenceFu.void
+      (GameRepo.gamesForAssessment(user.id, 100).flatMap { gs =>
+        (gs
+          .map { g =>
+            AnalysisRepo.byId(g.id).flatMap {
+              case Some(a) => onAnalysisReady(g, a, false)
+              case _ => funit
+            }
+          })
+          .sequenceFu
+          .void
       }) >> assessUser(user.id)
   }
 
@@ -114,14 +122,14 @@ final class AssessApi(collAssessments: Coll,
       if (!game.source.exists(assessableSources.contains)) false
       else if (game.players.exists(_.hasSuspiciousHoldAlert)) true
       else if (game.isCorrespondence) false
-      else if (game.players exists consistentMoveTimes(game)) true
+      else if (game.players.exists(consistentMoveTimes(game))) true
       else if (game.playedTurns < 40) false
       else if (game.mode.casual) false
       else true
     shouldAssess.?? {
       val assessible = Assessible(Analysed(game, analysis))
-      createPlayerAssessment(assessible playerAssessment chess.White) >> createPlayerAssessment(
-        assessible playerAssessment chess.Black)
+      createPlayerAssessment(assessible.playerAssessment(chess.White)) >> createPlayerAssessment(
+        assessible.playerAssessment(chess.Black))
     } >>
       ((shouldAssess && thenAssessUser) ?? {
         game.whitePlayer.userId.??(assessUser) >> game.blackPlayer.userId
@@ -130,7 +138,7 @@ final class AssessApi(collAssessments: Coll,
   }
 
   def assessUser(userId: String): Funit =
-    getPlayerAggregateAssessment(userId) flatMap {
+    getPlayerAggregateAssessment(userId).flatMap {
       case Some(playerAggregateAssessment) =>
         playerAggregateAssessment.action match {
           case AccountAction.Engine | AccountAction.EngineAndBan =>
@@ -174,8 +182,8 @@ final class AssessApi(collAssessments: Coll,
       } yield user.perfs(perfType).nb
 
     def suspCoefVariation(c: Color) = {
-      val x = noFastCoefVariation(game player c)
-      x.filter(_ < 0.45) orElse x.filter(_ < 0.5).ifTrue(Random.nextBoolean)
+      val x = noFastCoefVariation(game.player(c))
+      x.filter(_ < 0.45).orElse(x.filter(_ < 0.5).ifTrue(Random.nextBoolean))
     }
     val whiteSuspCoefVariation = suspCoefVariation(chess.White)
     val blackSuspCoefVariation = suspCoefVariation(chess.Black)
@@ -202,9 +210,9 @@ final class AssessApi(collAssessments: Coll,
       // don't analyse other bullet games
       else if (game.speed == chess.Speed.Bullet) none
       // someone blurs a lot
-      else if (game.players exists manyBlurs) Blurs.some
+      else if (game.players.exists(manyBlurs)) Blurs.some
       // the winner shows a great rating progress
-      else if (game.players exists winnerGreatProgress)
+      else if (game.players.exists(winnerGreatProgress))
         WinnerRatingProgress.some
       // analyse some tourney games
       // else if (game.isTournament) Random.nextInt(5) == 0 option "Tourney random"
@@ -213,7 +221,7 @@ final class AssessApi(collAssessments: Coll,
         NewPlayerWin.some
       else none
 
-    shouldAnalyse foreach { reason =>
+    shouldAnalyse.foreach { reason =>
       lila.mon.cheat.autoAnalysis.reason(reason.toString)()
       fishnet ! lila.hub.actorApi.fishnet.AutoAnalyse(game.id)
     }
@@ -222,5 +230,8 @@ final class AssessApi(collAssessments: Coll,
   }
 
   private def withUser[A](username: String)(op: User => Fu[A]): Fu[A] =
-    UserRepo named username flatten "[mod] missing user " + username flatMap op
+    UserRepo
+      .named(username)
+      .flatten("[mod] missing user " + username)
+      .flatMap(op)
 }

@@ -69,11 +69,14 @@ class RouteRegistry {
 
   private def matchingMethodsExcept(requestPath: String)(
       p: HttpMethod => Boolean) = {
-    var methods = (_methodRoutes filter { kv =>
-      val method = kv._1
-      val routes = kv._2
-      !p(method) && (routes exists (_.apply(requestPath).isDefined))
-    }).keys.toSet
+    var methods = (_methodRoutes
+      .filter { kv =>
+        val method = kv._1
+        val routes = kv._2
+        !p(method) && (routes.exists(_.apply(requestPath).isDefined))
+      })
+      .keys
+      .toSet
     if (methods.contains(Get)) methods += Head
     methods
   }
@@ -95,7 +98,7 @@ class RouteRegistry {
     * Removes a route from the method's route seqeuence.
     */
   def removeRoute(method: HttpMethod, route: Route): Unit =
-    modifyRoutes(method, _ filterNot (_ == route))
+    modifyRoutes(method, _.filterNot(_ == route))
 
   /**
     * Returns the sequence of filters to run before the route.
@@ -121,7 +124,7 @@ class RouteRegistry {
                                     f: (Seq[Route] => Seq[Route])): Unit = {
     if (_methodRoutes.putIfAbsent(method, f(Vector.empty)).isDefined) {
       val oldRoutes = _methodRoutes(method)
-      if (! _methodRoutes.replace(method, oldRoutes, f(oldRoutes)))
+      if (!_methodRoutes.replace(method, oldRoutes, f(oldRoutes)))
         modifyRoutes(method, f)
     }
   }
@@ -133,7 +136,7 @@ class RouteRegistry {
     (for {
       (method, routes) <- _methodRoutes
       route <- routes
-    } yield method + " " + route).toSeq sortWith (_ < _)
+    } yield method + " " + route).toSeq.sortWith(_ < _)
 
   def methodRoutes: Map[HttpMethod, Seq[Route]] = _methodRoutes.clone().toMap
 

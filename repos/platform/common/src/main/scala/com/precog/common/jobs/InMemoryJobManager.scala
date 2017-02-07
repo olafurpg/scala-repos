@@ -86,17 +86,17 @@ trait BaseInMemoryJobManager[M[+ _]]
                 data: Option[JValue],
                 started: Option[DateTime]): M[Job] = {
     M.point {
-      val state = started map (Started(_, NotStarted)) getOrElse NotStarted
+      val state = started.map(Started(_, NotStarted)).getOrElse(NotStarted)
       val job = Job(newJobId, auth, name, jobType, data, state)
       jobs(job.id) = JobData(job, Map.empty, None)
       job
     }
   }
 
-  def findJob(id: JobId): M[Option[Job]] = M.point { jobs get id map (_.job) }
+  def findJob(id: JobId): M[Option[Job]] = M.point { jobs.get(id).map(_.job) }
 
   def listJobs(apiKey: APIKey): M[Seq[Job]] = M.point {
-    jobs.values.toList map (_.job) filter (_.apiKey == apiKey)
+    jobs.values.toList.map(_.job).filter(_.apiKey == apiKey)
   }
 
   def updateStatus(jobId: JobId,
@@ -110,44 +110,48 @@ trait BaseInMemoryJobManager[M[+ _]]
       JField("message", JString(msg)) :: JField("progress", JNum(progress)) :: JField(
         "unit",
         JString(unit)) ::
-        (extra map (JField("info", _) :: Nil) getOrElse Nil)
+        (extra.map(JField("info", _) :: Nil).getOrElse(Nil))
     )
 
     synchronized {
-      jobs get jobId map {
-        case JobData(_, _, Some(cur)) if cur.id == prev.getOrElse(cur.id) =>
-          for (m <- addMessage(jobId, JobManager.channels.Status, jval))
-            yield {
-              val Some(s) = Status.fromMessage(m)
-              jobs(jobId) = jobs(jobId).copy(status = Some(s))
-              Right(s)
-            }
+      jobs
+        .get(jobId)
+        .map {
+          case JobData(_, _, Some(cur)) if cur.id == prev.getOrElse(cur.id) =>
+            for (m <- addMessage(jobId, JobManager.channels.Status, jval))
+              yield {
+                val Some(s) = Status.fromMessage(m)
+                jobs(jobId) = jobs(jobId).copy(status = Some(s))
+                Right(s)
+              }
 
-        case JobData(_, _, Some(_)) =>
-          M.point(Left("Current status did not match expected status."))
+          case JobData(_, _, Some(_)) =>
+            M.point(Left("Current status did not match expected status."))
 
-        case JobData(_, _, None) if prev.isDefined =>
-          M.point(Left("Job has not yet started, yet a status was expected."))
+          case JobData(_, _, None) if prev.isDefined =>
+            M.point(
+              Left("Job has not yet started, yet a status was expected."))
 
-        case JobData(_, _, None) =>
-          for (m <- addMessage(jobId, JobManager.channels.Status, jval))
-            yield {
-              val Some(s) = Status.fromMessage(m)
-              jobs(jobId) = jobs(jobId).copy(status = Some(s))
-              Right(s)
-            }
-      } getOrElse {
-        M.point(Left("No job with ID " + jobId))
-      }
+          case JobData(_, _, None) =>
+            for (m <- addMessage(jobId, JobManager.channels.Status, jval))
+              yield {
+                val Some(s) = Status.fromMessage(m)
+                jobs(jobId) = jobs(jobId).copy(status = Some(s))
+                Right(s)
+              }
+        }
+        .getOrElse {
+          M.point(Left("No job with ID " + jobId))
+        }
     }
   }
 
   def getStatus(jobId: JobId): M[Option[Status]] = M.point {
-    jobs get jobId flatMap (_.status)
+    jobs.get(jobId).flatMap(_.status)
   }
 
   def listChannels(jobId: JobId): M[Seq[String]] = M.point {
-    jobs get jobId map (_.channels.keys.toList) getOrElse Nil
+    jobs.get(jobId).map(_.channels.keys.toList).getOrElse(Nil)
   }
 
   def addMessage(jobId: JobId, channel: String, value: JValue): M[Message] = {
@@ -168,9 +172,11 @@ trait BaseInMemoryJobManager[M[+ _]]
                    since: Option[MessageId]): M[Seq[Message]] = {
     M.point {
       val posts = jobs(jobId).channels.getOrElse(channel, Nil)
-      since map { mId =>
-        posts.takeWhile(_.id != mId).reverse
-      } getOrElse posts.reverse
+      since
+        .map { mId =>
+          posts.takeWhile(_.id != mId).reverse
+        }
+        .getOrElse(posts.reverse)
     }
   }
 
@@ -178,18 +184,21 @@ trait BaseInMemoryJobManager[M[+ _]]
       t: JobState => Either[String, JobState]): M[Either[String, Job]] = {
     M.point {
       synchronized {
-        jobs get id map {
-          case data @ JobData(job, _, _) =>
-            t(job.state) match {
-              case Right(newState) =>
-                val newJob = job.copy(state = newState)
-                jobs(id) = data.copy(job = newJob)
-                Right(newJob)
+        jobs
+          .get(id)
+          .map {
+            case data @ JobData(job, _, _) =>
+              t(job.state) match {
+                case Right(newState) =>
+                  val newJob = job.copy(state = newState)
+                  jobs(id) = data.copy(job = newJob)
+                  Right(newJob)
 
-              case Left(error) =>
-                Left(error)
-            }
-        } getOrElse Left("Cannot find job with ID '%s'." format id)
+                case Left(error) =>
+                  Left(error)
+              }
+          }
+          .getOrElse(Left("Cannot find job with ID '%s'.".format(id)))
       }
     }
   }

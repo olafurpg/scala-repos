@@ -96,7 +96,7 @@ trait RandomLibSpecs[M[+ _]]
       0.9204152760017362, 0.7976605648079012)
 
     val actual =
-      result collect {
+      result.collect {
         case (ids, SDecimal(d)) if ids.size == 1 => d
       }
 

@@ -156,7 +156,7 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
     val root = Files.createTempDir()
     root.deleteOnExit()
     val store = new VersionedStore(root.getAbsolutePath)
-    versions foreach { v =>
+    versions.foreach { v =>
       val p = store.createVersion(v)
       new File(p).mkdirs()
       store.succeedVersion(p)

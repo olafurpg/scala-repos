@@ -36,9 +36,10 @@ object Conneg {
     def content: Parser[String] = quotedString | token
     def content(value: String): String =
       if (value.exists(mustEscape))
-        "\"%s\"" format value
-          .replaceAllLiterally("\\", "\\\\")
-          .replaceAllLiterally("\"", "\\\"")
+        "\"%s\"".format(
+          value
+            .replaceAllLiterally("\\", "\\\\")
+            .replaceAllLiterally("\"", "\\\""))
       else value
 
     private def mustEscape(c: Char): Boolean = {

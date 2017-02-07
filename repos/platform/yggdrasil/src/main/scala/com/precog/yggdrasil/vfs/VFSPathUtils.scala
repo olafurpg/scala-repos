@@ -92,35 +92,37 @@ object VFSPathUtils extends Logging {
 
     logger.debug(
       "Checking for children of path %s in dir %s".format(path, pathRoot))
-    Option(pathRoot.listFiles(pathFileFilter)) map { files =>
-      logger.debug(
-        "Filtering children %s in path %s"
-          .format(files.mkString("[", ", ", "]"), path))
-      val childMetadata =
-        files.toList traverse { f =>
-          val childPath = unescapePath(path / Path(f.getName))
-          currentPathMetadata(baseDir, childPath).fold[Option[PathMetadata]](
-            {
-              case NotFound(message) =>
-                logger.trace(
-                  "No child data found for %s".format(childPath.path))
-                None
-              case error =>
-                logger.error(
-                  "Encountered corruption or error searching child paths: %s"
-                    .format(error.messages.list.mkString("; ")))
-                None
-            },
-            pathMetadata => Some(pathMetadata)
-          )
-        }
+    Option(pathRoot.listFiles(pathFileFilter))
+      .map { files =>
+        logger.debug(
+          "Filtering children %s in path %s"
+            .format(files.mkString("[", ", ", "]"), path))
+        val childMetadata =
+          files.toList.traverse { f =>
+            val childPath = unescapePath(path / Path(f.getName))
+            currentPathMetadata(baseDir, childPath).fold[Option[PathMetadata]](
+              {
+                case NotFound(message) =>
+                  logger.trace(
+                    "No child data found for %s".format(childPath.path))
+                  None
+                case error =>
+                  logger.error(
+                    "Encountered corruption or error searching child paths: %s"
+                      .format(error.messages.list.mkString("; ")))
+                  None
+              },
+              pathMetadata => Some(pathMetadata)
+            )
+          }
 
-      childMetadata.map(_.flatten.toSet): IO[Set[PathMetadata]]
-    } getOrElse {
-      logger.debug(
-        "Path dir %s for path %s is not a directory!".format(pathRoot, path))
-      IO(Set.empty)
-    }
+        childMetadata.map(_.flatten.toSet): IO[Set[PathMetadata]]
+      }
+      .getOrElse {
+        logger.debug(
+          "Path dir %s for path %s is not a directory!".format(pathRoot, path))
+        IO(Set.empty)
+      }
   }
 
   def currentPathMetadata(
@@ -129,7 +131,7 @@ object VFSPathUtils extends Logging {
     def containsNonemptyChild(dirs: List[File]): IO[Boolean] = dirs match {
       case f :: xs =>
         val childPath = unescapePath(path / Path(f.getName))
-        findChildren(baseDir, childPath) flatMap { children =>
+        findChildren(baseDir, childPath).flatMap { children =>
           if (children.nonEmpty) IO(true) else containsNonemptyChild(xs)
         }
 
@@ -138,16 +140,16 @@ object VFSPathUtils extends Logging {
 
     val pathDir0 = pathDir(baseDir, path)
     EitherT {
-      IO(pathDir0.isDirectory) flatMap {
+      IO(pathDir0.isDirectory).flatMap {
         case true =>
-          VersionLog.currentVersionEntry(pathDir0).run flatMap {
+          VersionLog.currentVersionEntry(pathDir0).run.flatMap {
             currentVersionV =>
               currentVersionV.fold[IO[ResourceError \/ PathMetadata]](
                 {
                   case NotFound(message) =>
                     // Recurse on children to find one that is nonempty
                     containsNonemptyChild(Option(
-                      pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
+                      pathDir0.listFiles(pathFileFilter)).toList.flatten).map {
                       case true =>
                         \/.right(PathMetadata(path, PathMetadata.PathOnly))
                       case false =>
@@ -161,7 +163,7 @@ object VFSPathUtils extends Logging {
                 }, {
                   case VersionEntry(uuid, dataType, timestamp) =>
                     containsNonemptyChild(Option(
-                      pathDir0.listFiles(pathFileFilter)).toList.flatten) map {
+                      pathDir0.listFiles(pathFileFilter)).toList.flatten).map {
                       case true =>
                         \/.right(
                           PathMetadata(

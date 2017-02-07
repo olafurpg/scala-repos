@@ -84,13 +84,13 @@ package object util {
     private val m: mutable.ConcurrentMap[A, C] =
       new java.util.concurrent.ConcurrentHashMap[A, C]().asScala
 
-    def iterator: Iterator[(A, C)] = source.keysIterator map { a =>
+    def iterator: Iterator[(A, C)] = source.keysIterator.map { a =>
       (a, apply(a))
     }
 
     def get(a: A): Option[C] = {
-      m get a orElse
-        (source get a map { b =>
+      m.get(a)
+        .orElse(source.get(a).map { b =>
           val c = f(b)
           m.putIfAbsent(a, c)
           c

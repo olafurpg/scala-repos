@@ -57,7 +57,7 @@ class InjectTests extends CatsSuite {
     }
   }
 
-  val coProductInterpreter: T ~> Id = Test1Interpreter or Test2Interpreter
+  val coProductInterpreter: T ~> Id = Test1Interpreter.or(Test2Interpreter)
 
   val x: Free[T, Int] = Free.inject[Test1Algebra, T](Test1(1, identity))
 
@@ -70,7 +70,7 @@ class InjectTests extends CatsSuite {
           b <- Free.inject[Test2Algebra, F](Test2(y, identity))
         } yield a + b
       }
-      (res[T] foldMap coProductInterpreter) == Id.pure(x + y) should ===(true)
+      (res[T].foldMap(coProductInterpreter)) == Id.pure(x + y) should ===(true)
     }
   }
 

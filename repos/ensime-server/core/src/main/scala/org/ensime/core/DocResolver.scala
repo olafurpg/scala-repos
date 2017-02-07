@@ -171,7 +171,7 @@ class DocResolver(
   }
 
   def resolve(sig: DocSigPair): Option[String] =
-    resolveLocalUri(sig) orElse resolveWellKnownUri(sig)
+    resolveLocalUri(sig).orElse(resolveWellKnownUri(sig))
 
   // for java stuff, really
   def resolve(sig: DocSig): Option[String] = resolve(DocSigPair(sig, sig))

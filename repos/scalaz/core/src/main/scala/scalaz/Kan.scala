@@ -5,7 +5,7 @@ trait Ran[G[_], H[_], A] { ran =>
   def apply[B](f: A => G[B]): H[B]
 
   def map[B](f: A => B): Ran[G, H, B] = new Ran[G, H, B] {
-    def apply[C](k: B => G[C]): H[C] = ran(f andThen k)
+    def apply[C](k: B => G[C]): H[C] = ran(f.andThen(k))
   }
 
   def toAdjoint[F[_]](implicit A: Adjunction[F, G]): H[F[A]] =
@@ -17,7 +17,7 @@ object Ran {
 
   implicit def ranFunctor[G[_], H[_]]: Functor[Ran[G, H, ?]] =
     new Functor[Ran[G, H, ?]] {
-      def map[A, B](r: Ran[G, H, A])(f: A => B) = r map f
+      def map[A, B](r: Ran[G, H, A])(f: A => B) = r.map(f)
     }
 
   /**
@@ -86,7 +86,7 @@ trait Lan[G[_], H[_], A] { lan =>
   def map[B](g: A => B): Lan[G, H, B] = new Lan[G, H, B] {
     type I = lan.I
     lazy val v = lan.v
-    def f(gi: G[I]) = g(lan f gi)
+    def f(gi: G[I]) = g(lan.f(gi))
   }
 }
 
@@ -153,7 +153,7 @@ sealed abstract class LanInstances extends LanInstances0 {
 }
 
 private trait LanFunctor[G[_], H[_]] extends Functor[Lan[G, H, ?]] {
-  override final def map[A, B](lan: Lan[G, H, A])(g: A => B) = lan map g
+  override final def map[A, B](lan: Lan[G, H, A])(g: A => B) = lan.map(g)
 }
 
 private trait LanApply[G[_], H[_]]

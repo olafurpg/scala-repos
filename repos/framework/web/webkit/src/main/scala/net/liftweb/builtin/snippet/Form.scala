@@ -94,7 +94,7 @@ object Form extends DispatchSnippet {
         name != "id" && name != "onsubmit" && name != "action" &&
           name != "form")
 
-    val pre = S.attr.~("onsubmit").map(_.text + ";") getOrElse ""
+    val pre = S.attr.~("onsubmit").map(_.text + ";").getOrElse("")
 
     val post = S.attr.~("postsubmit").map("function() { " + _.text + "; }")
 

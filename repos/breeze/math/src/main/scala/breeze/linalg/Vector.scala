@@ -43,9 +43,9 @@ trait VectorLike[@spec V, +Self <: Vector[V]]
                                           V,
                                           V2,
                                           That]): That =
-    values map fn
+    values.map(fn)
 
-  def foreach[U](fn: V => U): Unit = { values foreach fn }
+  def foreach[U](fn: V => U): Unit = { values.foreach(fn) }
 
   def copy: Self
 }
@@ -76,7 +76,8 @@ trait Vector[@spec(Int, Double, Float) V] extends VectorLike[V, Vector[V]] {
 
   override def equals(p1: Any) = p1 match {
     case x: Vector[_] =>
-      this.length == x.length && (valuesIterator sameElements x.valuesIterator)
+      this.length == x.length && (valuesIterator.sameElements(
+        x.valuesIterator))
     case _ => false
   }
 
@@ -285,22 +286,25 @@ object Vector extends VectorConstructors[Vector] with VectorOps {
         import v._
         if (n == 1) {
           var sum = 0.0
-          activeValuesIterator foreach (v => sum += canNormS(v))
+          activeValuesIterator.foreach(v => sum += canNormS(v))
           sum
         } else if (n == 2) {
           var sum = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = canNormS(v); sum += nn * nn })
+          activeValuesIterator.foreach(v => {
+            val nn = canNormS(v); sum += nn * nn
+          })
           math.sqrt(sum)
         } else if (n == Double.PositiveInfinity) {
           var max = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = canNormS(v); if (nn > max) max = nn })
+          activeValuesIterator.foreach(v => {
+            val nn = canNormS(v); if (nn > max) max = nn
+          })
           max
         } else {
           var sum = 0.0
-          activeValuesIterator foreach
-            (v => { val nn = canNormS(v); sum += math.pow(nn, n) })
+          activeValuesIterator.foreach(v => {
+            val nn = canNormS(v); sum += math.pow(nn, n)
+          })
           math.pow(sum, 1.0 / n)
         }
       }
@@ -413,7 +417,7 @@ trait VectorOps { this: Vector.type =>
                       @expand.args(OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : BinaryRegistry[Vector[T], Vector[T], Op.type, Vector[T]] =
     new BinaryRegistry[Vector[T], Vector[T], Op.type, Vector[T]] {
       override def bindingMissing(a: Vector[T], b: Vector[T]): Vector[T] = {
@@ -454,7 +458,7 @@ trait VectorOps { this: Vector.type =>
           _ / _
         }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T],
       @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : BinaryRegistry[Vector[T], T, Op.type, Vector[T]] =
     new BinaryRegistry[Vector[T], T, Op.type, Vector[T]] {
@@ -486,7 +490,7 @@ trait VectorOps { this: Vector.type =>
           _ / _
         }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T],
       @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : BinaryRegistry[T, Vector[T], Op.type, Vector[T]] =
     new BinaryRegistry[T, Vector[T], Op.type, Vector[T]] {
@@ -540,7 +544,7 @@ trait VectorOps { this: Vector.type =>
                                          OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ * _ }, { _ / _ }, { (a, b) =>
         b
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+      }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : BinaryUpdateRegistry[Vector[T], Vector[T], Op.type] =
     new BinaryUpdateRegistry[Vector[T], Vector[T], Op.type] {
       override def bindingMissing(a: Vector[T], b: Vector[T]): Unit = {
@@ -620,7 +624,7 @@ trait VectorOps { this: Vector.type =>
           _ / _
         }, { (a, b) =>
           b
-        }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+        }, { _ % _ }, { _.pow(_) }) op: Op.Impl2[T, T, T])
     : BinaryUpdateRegistry[Vector[T], T, Op.type] =
     new BinaryUpdateRegistry[Vector[T], T, Op.type] {
       override def bindingMissing(a: Vector[T], b: T): Unit = {

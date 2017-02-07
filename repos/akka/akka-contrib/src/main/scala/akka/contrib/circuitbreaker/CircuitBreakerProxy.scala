@@ -136,7 +136,7 @@ final class CircuitBreakerProxy(target: ActorRef,
 
   import CircuitBreakerInternalEvents._
 
-  context watch target
+  context.watch(target)
 
   startWith(Closed, CircuitBreakerStateData(failureCount = 0))
 
@@ -169,11 +169,13 @@ final class CircuitBreakerProxy(target: ActorRef,
   }
 
   def commonStateHandling: StateFunction = {
-    callSucceededHandling orElse passthroughHandling orElse targetTerminationHandling
+    callSucceededHandling
+      .orElse(passthroughHandling)
+      .orElse(targetTerminationHandling)
   }
 
   when(Closed) {
-    commonStateHandling orElse {
+    commonStateHandling.orElse {
       case Event(TellOnly(message), _) ⇒
         log.debug("Closed: Sending message {} without expecting any response",
                   message)
@@ -203,7 +205,7 @@ final class CircuitBreakerProxy(target: ActorRef,
   }
 
   when(Open, stateTimeout = resetTimeout.duration) {
-    commonStateHandling orElse {
+    commonStateHandling.orElse {
       case Event(StateTimeout, state) ⇒
         log.debug("Timeout expired for state OPEN, going to half open")
         goto(HalfOpen) using state.copy(firstHalfOpenMessageSent = false)
@@ -232,7 +234,7 @@ final class CircuitBreakerProxy(target: ActorRef,
   }
 
   when(HalfOpen) {
-    commonStateHandling orElse {
+    commonStateHandling.orElse {
       case Event(TellOnly(message), _) ⇒
         log.debug("HalfOpen: Dropping TellOnly request for message {}",
                   message)
@@ -321,14 +323,14 @@ final class CircuitBreakerProxy(target: ActorRef,
   onTransition {
     case from -> Closed ⇒
       log.debug("Moving from state {} to state CLOSED", from)
-      circuitEventListener foreach { _ ! CircuitClosed(self) }
+      circuitEventListener.foreach { _ ! CircuitClosed(self) }
 
     case from -> HalfOpen ⇒
       log.debug("Moving from state {} to state HALF OPEN", from)
-      circuitEventListener foreach { _ ! CircuitHalfOpen(self) }
+      circuitEventListener.foreach { _ ! CircuitHalfOpen(self) }
 
     case from -> Open ⇒
       log.debug("Moving from state {} to state OPEN", from)
-      circuitEventListener foreach { _ ! CircuitOpen(self) }
+      circuitEventListener.foreach { _ ! CircuitOpen(self) }
   }
 }

@@ -106,7 +106,7 @@ abstract class Page { thisPage =>
   }
 
   protected def inlineToStr(inl: comment.Inline): String = inl match {
-    case comment.Chain(items) => items flatMap (inlineToStr(_)) mkString ""
+    case comment.Chain(items) => items.flatMap(inlineToStr(_)) mkString ""
     case comment.Italic(in) => inlineToStr(in)
     case comment.Bold(in) => inlineToStr(in)
     case comment.Underline(in) => inlineToStr(in)

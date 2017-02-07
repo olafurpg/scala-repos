@@ -165,7 +165,7 @@ class WeightedPageRank(args: Args) extends Job(args) {
               if (WEIGHTED) {
                 // weighted distribution
                 val total: Double = args._2.sum
-                (args._1 zip args._2).map { idWeight: (Int, Float) =>
+                (args._1.zip(args._2)).map { idWeight: (Int, Float) =>
                   (idWeight._1, args._3 * idWeight._2 / total)
                 }
               } else {

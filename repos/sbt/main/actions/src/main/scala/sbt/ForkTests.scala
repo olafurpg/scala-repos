@@ -35,7 +35,7 @@ private[sbt] object ForkTests {
       else
         mainTestTask(runners, opts, classpath, fork, log, config.parallel)
           .tagw(config.tags: _*)
-    main.dependsOn(all(opts.setup): _*) flatMap { results =>
+    main.dependsOn(all(opts.setup): _*).flatMap { results =>
       all(opts.cleanup).join.map(_ => results)
     }
   }
@@ -49,7 +49,7 @@ private[sbt] object ForkTests {
     std.TaskExtra.task {
       val server = new ServerSocket(0)
       val testListeners =
-        opts.testListeners flatMap {
+        opts.testListeners.flatMap {
           case tl: TestsListener => Some(tl)
           case _ => None
         }
@@ -168,12 +168,12 @@ private final class React(is: ObjectInputStream,
     case t: Throwable =>
       log.trace(t); react()
     case Array(group: String, tEvents: Array[Event]) =>
-      listeners.foreach(_ startGroup group)
+      listeners.foreach(_.startGroup(group))
       val event = TestEvent(tEvents)
-      listeners.foreach(_ testEvent event)
+      listeners.foreach(_.testEvent(event))
       val suiteResult = SuiteResult(tEvents)
       results += group -> suiteResult
-      listeners.foreach(_ endGroup (group, suiteResult.result))
+      listeners.foreach(_.endGroup(group, suiteResult.result))
       react()
   }
 }

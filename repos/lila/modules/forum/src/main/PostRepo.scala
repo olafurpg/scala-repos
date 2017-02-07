@@ -32,20 +32,20 @@ sealed abstract class PostRepo(troll: Boolean) {
     $primitive.one(
       selectTopic(topicId),
       "_id",
-      _ sort $sort.createdAsc
-    )(_.asOpt[String]) map { _.??(postId ==) }
+      _.sort($sort.createdAsc)
+    )(_.asOpt[String]).map { _.??(postId ==) }
 
   def countByTopics(topics: List[String]): Fu[Int] =
     $count(selectTopics(topics))
 
   def lastByTopics(topics: List[String]): Fu[Option[Post]] =
-    $find.one($query(selectTopics(topics)) sort $sort.createdDesc)
+    $find.one($query(selectTopics(topics)).sort($sort.createdDesc))
 
   def recentInCategs(nb: Int)(categIds: List[String],
                               langs: List[String]): Fu[List[Post]] =
     $find($query(
             selectCategs(categIds) ++ selectLangs(langs) ++ selectNotHidden
-          ) sort $sort.createdDesc,
+          ).sort($sort.createdDesc),
           nb)
 
   def removeByTopic(topicId: String): Fu[Unit] =
@@ -84,9 +84,11 @@ sealed abstract class PostRepo(troll: Boolean) {
 
   def userIdsByTopicId(topicId: String): Fu[List[String]] =
     postTube.coll
-      .distinct("userId", BSONDocument("topicId" -> topicId).some) map lila.db.BSON.asStrings
+      .distinct("userId", BSONDocument("topicId" -> topicId).some)
+      .map(lila.db.BSON.asStrings)
 
   def idsByTopicId(topicId: String): Fu[List[String]] =
     postTube.coll
-      .distinct("_id", BSONDocument("topicId" -> topicId).some) map lila.db.BSON.asStrings
+      .distinct("_id", BSONDocument("topicId" -> topicId).some)
+      .map(lila.db.BSON.asStrings)
 }

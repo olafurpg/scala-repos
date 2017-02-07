@@ -33,7 +33,7 @@ private[lobby] case class Member(channel: JsChannel,
                                  mobile: Boolean)
     extends SocketMember {
 
-  val userId = user map (_.id)
+  val userId = user.map(_.id)
   val troll = user ?? (_.troll)
 }
 
@@ -45,7 +45,7 @@ private[lobby] object Member {
             uid: String,
             mobile: Boolean): Member =
     Member(channel = channel,
-           user = user map { LobbyUser.make(_, blocking) },
+           user = user.map { LobbyUser.make(_, blocking) },
            uid = uid,
            mobile = mobile)
 }

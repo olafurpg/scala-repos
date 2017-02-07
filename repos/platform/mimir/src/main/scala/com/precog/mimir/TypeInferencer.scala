@@ -78,23 +78,33 @@ trait TypeInferencer extends DAG {
 
           case ld @ AbsoluteLoad(parent, _) =>
             val typing0 = inner(Some(JTextT), typing, splits, parent)
-            jtpe map { jtpe0 =>
-              typing0 get ld map { jtpes =>
-                typing + (ld -> (jtpes + jtpe0))
-              } getOrElse {
-                typing + (ld -> Set(jtpe0))
+            jtpe
+              .map { jtpe0 =>
+                typing0
+                  .get(ld)
+                  .map { jtpes =>
+                    typing + (ld -> (jtpes + jtpe0))
+                  }
+                  .getOrElse {
+                    typing + (ld -> Set(jtpe0))
+                  }
               }
-            } getOrElse typing
+              .getOrElse(typing)
 
           case ld @ RelativeLoad(parent, _) =>
             val typing0 = inner(Some(JTextT), typing, splits, parent)
-            jtpe map { jtpe0 =>
-              typing0 get ld map { jtpes =>
-                typing + (ld -> (jtpes + jtpe0))
-              } getOrElse {
-                typing + (ld -> Set(jtpe0))
+            jtpe
+              .map { jtpe0 =>
+                typing0
+                  .get(ld)
+                  .map { jtpes =>
+                    typing + (ld -> (jtpes + jtpe0))
+                  }
+                  .getOrElse {
+                    typing + (ld -> Set(jtpe0))
+                  }
               }
-            } getOrElse typing
+              .getOrElse(typing)
 
           case Operate(op, parent) =>
             inner(Some(op.tpe.arg), typing, splits, parent)
@@ -116,20 +126,20 @@ trait TypeInferencer extends DAG {
                   right)
 
           case Join(DerefObject, Cross(_), left, right @ ConstString(str)) =>
-            inner(jtpe map { jtpe0 =>
+            inner(jtpe.map { jtpe0 =>
               JObjectFixedT(Map(str -> jtpe0))
             }, typing, splits, left)
 
           case Join(DerefArray, Cross(_), left, right @ ConstDecimal(d)) =>
-            inner(jtpe map { jtpe0 =>
+            inner(jtpe.map { jtpe0 =>
               JArrayFixedT(Map(d.toInt -> jtpe0))
             }, typing, splits, left)
 
           case Join(WrapObject, Cross(_), ConstString(str), right) => {
             val jtpe2 =
-              jtpe map {
+              jtpe.map {
                 case JObjectFixedT(map) =>
-                  map get str getOrElse universe
+                  map.get(str).getOrElse(universe)
 
                 case _ => universe
               }
@@ -139,7 +149,7 @@ trait TypeInferencer extends DAG {
 
           case Join(ArraySwap, Cross(_), left, right) => {
             val jtpe2 =
-              jtpe flatMap {
+              jtpe.flatMap {
                 case JArrayFixedT(_) => jtpe
                 case _ => Some(JArrayUnfixedT)
               }
@@ -193,7 +203,9 @@ trait TypeInferencer extends DAG {
           // not using extractors due to bug
           case s: SplitGroup => {
             val Split(spec, _, _) = splits(s.parentId)
-            findGroup(spec, s.id) map { inner(jtpe, typing, splits, _) } getOrElse typing
+            findGroup(spec, s.id)
+              .map { inner(jtpe, typing, splits, _) }
+              .getOrElse(typing)
           }
 
           // not using extractors due to bug
@@ -211,7 +223,7 @@ trait TypeInferencer extends DAG {
     }
 
     def applyTypes(typing: Map[DepGraph, JType], graph: DepGraph): DepGraph = {
-      graph mapDown { recurse =>
+      graph.mapDown { recurse =>
         {
           case ld @ AbsoluteLoad(parent, _) =>
             AbsoluteLoad(recurse(parent), typing(ld))(ld.loc)
@@ -224,9 +236,9 @@ trait TypeInferencer extends DAG {
 
     def findGroup(spec: BucketSpec, id: Int): Option[DepGraph] = spec match {
       case UnionBucketSpec(left, right) =>
-        findGroup(left, id) orElse findGroup(right, id)
+        findGroup(left, id).orElse(findGroup(right, id))
       case IntersectBucketSpec(left, right) =>
-        findGroup(left, id) orElse findGroup(right, id)
+        findGroup(left, id).orElse(findGroup(right, id))
 
       case Group(`id`, target, _) => Some(target)
       case Group(_, _, _) => None

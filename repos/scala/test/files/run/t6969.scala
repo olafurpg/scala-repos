@@ -22,14 +22,14 @@ object Test {
       choke()
     }
     override def run() {
-      1 to 50 foreach g
+      (1 to 50).foreach(g)
     }
   }
 
   def main(args: Array[String]): Unit = {
-    val threads = 1 to 3 map (id => new Choker(id))
-    threads foreach (_.start())
-    threads foreach (_.join())
+    val threads = (1 to 3).map(id => new Choker(id))
+    threads.foreach(_.start())
+    threads.foreach(_.join())
     println("All threads completed.")
   }
 }
